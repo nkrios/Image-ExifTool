@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -79,11 +79,13 @@ my %mieMap = (
    'MIE-Extender'   => 'MIE-Lens',
    'MIE-GPS'        => 'MIE-Geo',
    'MIE-UTM'        => 'MIE-Geo',
+   'MIE-Canon'      => 'MIE-MakerNotes',
     EXIF            => 'MIE-Meta',
     XMP             => 'MIE-Meta',
     IPTC            => 'MIE-Meta',
     ICC_Profile     => 'MIE-Meta',
     ID3             => 'MIE-Meta',
+    CanonVRD        => 'MIE-Canon',
     IFD0            => 'EXIF',
     IFD1            => 'IFD0',
     ExifIFD         => 'IFD0',
@@ -154,20 +156,23 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
    '0Type' => {
         Name => 'SubfileType',
         Notes => q{
-            Currently defined types are ACR, AI, AIFF, APE, ARW, ASF, AVI, BMP, CR2,
-            CRW, DCM, DNG, EPS, ERF, FLAC, FPX, GIF, ICC, JNG, JP2, JPEG, MIE, MIFF MNG,
-            MOS, MOV, MP3, MP4, MPC, MPEG, MRW, NEF, OGG, ORF, PBM, PDF, PEF, PGM, PICT,
-            PNG, PPM, PS, PSD, QTIF, RA, RAF, RAW, RIFF, RM, SR2, SRF, SWF, TIFF, VRD,
-            WAV, WDP, WMA, WMV, X3F and XMP.  Other types should use the common file
-            extension.
+            the capitalized common extension for this type of file.  If the extension
+            has a dot-3 abbreviation, then the longer version is used here. For
+            instance, JPEG and TIFF are used, not JPG and TIF
         },
     },
    '0Vers' => {
         Name => 'MIEVersion',
         Notes => 'version 1.1 is assumed if not specified',
     },
-   '1Directory' => { Name => 'SubfileDirectory' },
-   '1Name'      => { Name => 'SubfileName' },
+   '1Directory' => {
+        Name => 'SubfileDirectory',
+        Notes => 'original directory for the file',
+    },
+   '1Name'      => {
+        Name => 'SubfileName',
+        Notes => 'the file name, including extension if it exists',
+    },
    '2MIME'      => { Name => 'SubfileMIMEType' },
     Meta => {
         SubDirectory => {
@@ -686,10 +691,14 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     WRITE_GROUP => 'MIE-MakerNotes',
     NOTES => q{
         MIE maker notes are contained within separate groups for each manufacturer
-        to avoid name conflicts.  Currently no specific manufacturer information has
-        been defined.
+        to avoid name conflicts.
     },
-    Canon       => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Unknown' } },
+    Canon => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::MIE::Canon',
+            DirName => 'MIE-Canon',
+        },
+    },
     Casio       => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Unknown' } },
     FujiFilm    => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Unknown' } },
     Kodak       => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Unknown' } },
@@ -701,6 +710,17 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     Ricoh       => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Unknown' } },
     Sigma       => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Unknown' } },
     Sony        => { SubDirectory => { TagTable => 'Image::ExifTool::MIE::Unknown' } },
+);
+
+# MIE Canon-specific information
+%Image::ExifTool::MIE::Canon = (
+    %tableDefaults,
+    GROUPS => { 1 => 'MIE-Canon' },
+    WRITE_GROUP => 'MIE-Canon',
+    VRD => {
+        Name => 'CanonVRD',
+        SubDirectory => { TagTable => 'Image::ExifTool::CanonVRD::Main' },
+    },
 );
 
 %Image::ExifTool::MIE::Unknown = (
@@ -1119,6 +1139,8 @@ sub WriteMIEGroup($$$)
                     }
                     $subdirInfo{Parent} = $dirName;
                     my $writeProc = $newInfo->{SubDirectory}->{WriteProc};
+                    # reset processed lookup to avoid errors in case of multiple EXIF blocks
+                    $exifTool->{PROCESSED} = { };
                     $newVal = $exifTool->WriteDirectory(\%subdirInfo, $subTablePtr, $writeProc);
                     if (defined $newVal) {
                         if ($newVal eq '') {
@@ -1136,11 +1158,11 @@ sub WriteMIEGroup($$$)
 
                 # get the new tag information
                 $newInfo = $$newTags{$newTag};
-                my $newValueHash = $exifTool->GetNewValueHash($newInfo);
+                my $nvHash = $exifTool->GetNewValueHash($newInfo);
                 my @newVals;
 
                 # write information only to specified group
-                my $writeGroup = $$newValueHash{WriteGroup};
+                my $writeGroup = $$nvHash{WriteGroup};
                 last unless $isWriting{$writeGroup};
 
                 # if tag existed, must decide if we want to overwrite the value
@@ -1150,7 +1172,7 @@ sub WriteMIEGroup($$$)
                     if ($isList) {
                         $isOverwriting = -1;    # force processing list elements individually
                     } else {
-                        $isOverwriting = Image::ExifTool::IsOverwriting($newValueHash);
+                        $isOverwriting = Image::ExifTool::IsOverwriting($nvHash);
                         last unless $isOverwriting;
                     }
                     my ($val, $cmpVal);
@@ -1187,12 +1209,12 @@ sub WriteMIEGroup($$$)
                                 }
                                 # keep any list items that we aren't overwriting
                                 foreach $v (@vals) {
-                                    next if Image::ExifTool::IsOverwriting($newValueHash, $v);
+                                    next if Image::ExifTool::IsOverwriting($nvHash, $v);
                                     push @newVals, $v;
                                 }
                             } else {
                                 # test to see if we really want to overwrite the value
-                                $isOverwriting = Image::ExifTool::IsOverwriting($newValueHash, $val);
+                                $isOverwriting = Image::ExifTool::IsOverwriting($nvHash, $val);
                             }
                         }
                     }
@@ -1203,8 +1225,7 @@ sub WriteMIEGroup($$$)
                         }
                         if ($verbose > 1) {
                             $val .= "($units)" if defined $units;
-                            $val = $exifTool->Printable($val);
-                            print $out "    - $grp1:$$newInfo{Name} = '$val'\n";
+                            $exifTool->VerboseValue("- $grp1:$$newInfo{Name}", $val);
                         }
                         $deletedTag = $tag;     # remember that we deleted this tag
                         ++$exifTool->{CHANGED}; # we deleted the old value
@@ -1227,11 +1248,11 @@ sub WriteMIEGroup($$$)
                 } else {
                     # write new value if creating, or if List and list existed, or
                     # if tag was previously deleted
-                    next unless Image::ExifTool::IsCreating($newValueHash) or
+                    next unless Image::ExifTool::IsCreating($nvHash) or
                         ($newTag eq $lastTag and ($$newInfo{List} or $deletedTag eq $lastTag));
                 }
                 # get the new value to write (undef to delete)
-                push @newVals, Image::ExifTool::GetNewValues($newValueHash);
+                push @newVals, Image::ExifTool::GetNewValues($nvHash);
                 next unless @newVals;
                 $writable = $$newInfo{Writable} || $$tagTablePtr{WRITABLE};
                 if ($writable eq 'string') {
@@ -1333,11 +1354,11 @@ sub WriteMIEGroup($$$)
                 my $hdr = $toWrite . '~' . chr($newFormat) . chr(length $newTag);
                 Write($outfile, $hdr, chr($len), $newTag, $extLen, $$valPt) or $err = 1;
                 $toWrite = '';
-                if ($verbose > 1 and not $$editDirs{$newTag}) {
-                    $newVal = $exifTool->Printable($newVal);
-                    print $out "    + $grp1:$$newInfo{Name} = '$newVal'\n";
+                # we changed a tag unless just editing a subdirectory
+                unless ($$editDirs{$newTag}) {
+                    $exifTool->VerboseValue("+ $grp1:$$newInfo{Name}", $newVal);
+                    ++$exifTool->{CHANGED};
                 }
-                ++$exifTool->{CHANGED};
                 last;   # didn't want to loop anyway
             }
             next MieElement if defined $oldVal;
@@ -1456,6 +1477,7 @@ sub ProcessMIEGroup($$$)
         $exifTool->{INDENT} .= '| ';
         $exifTool->VerboseDir($grp1);
     }
+    my $wasCompressed = $$dirInfo{WasCompressed};
 
     # process all MIE elements
     for (;;) {
@@ -1538,6 +1560,7 @@ sub ProcessMIEGroup($$$)
                     next;
                 }
                 $valLen = length $value;
+                $wasCompressed = 1;
             }
         }
 
@@ -1560,6 +1583,7 @@ sub ProcessMIEGroup($$$)
                 DirName => $dirName || $tag,
                 RAF     => $raf,
                 Parent  => $$dirInfo{DirName},
+                WasCompressed => $wasCompressed,
             );
             # read from uncompressed data instead if necessary
             $subdirInfo{RAF} = new File::RandomAccess(\$value) if $format & 0x04;
@@ -1601,13 +1625,20 @@ sub ProcessMIEGroup($$$)
                     my %subdirInfo = (
                         DirName => $$tagInfo{Name},
                         DataPt  => \$value,
-                        DataPos => $raf->Tell() - $valLen,
                         DataLen => $valLen,
                         DirStart=> 0,
                         DirLen  => $valLen,
                         Parent  => $$dirInfo{DirName},
-                        Base    => $raf->Tell() - $valLen,
+                        WasCompressed => $wasCompressed,
                     );
+                    # set DataPos and Base for uncompressed information only
+                    unless ($wasCompressed) {
+                        $subdirInfo{DataPos} = $raf->Tell() - $valLen;
+                        $subdirInfo{Base}    = $raf->Tell() - $valLen;
+                    }
+                    # reset PROCESSED lookup for each MIE directory
+                    # (there is no possibility of double-processing a MIE directory)
+                    $exifTool->{PROCESSED} = { };
                     my $processProc = $tagInfo->{SubDirectory}->{ProcessProc};
                     delete $exifTool->{SET_GROUP1};
                     delete $exifTool->{NO_LIST};
@@ -1773,6 +1804,9 @@ sub ProcessMIE($$)
             # update %mieMap with user-defined MIE groups
             UpdateMieMap() unless $doneMieMap;
             # initialize write directories, with MIE tags taking priority
+            # (note that this may re-initialize directories when writing trailer
+            #  to another type of image, but this is OK because we are done writing
+            #  the other format by the time we start writing the trailer)
             $exifTool->InitWriteDirs(\%mieMap, 'MIE');
             $subdirInfo{ToWrite} = '~' . MIEGroupFormat(1) . "\x04\xfe0MIE\0\0\0\0";
             $msg = WriteMIEGroup($exifTool, \%subdirInfo, $tagTablePtr);
@@ -1781,7 +1815,6 @@ sub ProcessMIE($$)
                 $err = 1;
                 last;
             } elsif (defined $msg and $isCreating) {
-                $exifTool->Error('Nothing to write');
                 last;
             }
         } else {
@@ -2515,7 +2548,7 @@ tag name.  For example:
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.  The MIE format itself is also

@@ -21,7 +21,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.19';
+$VERSION = '1.21';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -69,6 +69,24 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             80 => 'Minolta AF 2x APO II',
             136 => 'Minolta AF 1.4x APO (D)',
             144 => 'Minolta AF 1.4x APO II',
+        },
+    },
+    0x0112 => { #JD
+        Name => 'WhiteBalanceFineTune',
+        Writable => 'int32s',
+    },
+    0x0115 => { #JD
+        Name => 'WhiteBalance',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Color Temperature/Color Filter',
+            16 => 'Daylight',
+            32 => 'Cloudy',
+            48 => 'Shade',
+            64 => 'Tungsten',
+            80 => 'Flash',
+            96 => 'Fluorescent',
+            112 => 'Custom',
         },
     },
     0x2001 => { #PH (A700)
@@ -400,14 +418,11 @@ sub ProcessSRF($$$)
         next unless $verbose > 2;
         # display decrypted data in verbose mode
         $exifTool->VerboseDir("Decrypted SRF$ifd", 0, $nextIFD + $len);
-        my %parms = (
+        $exifTool->VerboseDump($dataPt,
             Prefix => "$exifTool->{INDENT}  ",
             Start => $nextIFD,
             DataPos => $$dirInfo{DataPos},
-            Out => $exifTool->Options('TextOut'),
         );
-        $parms{MaxLen} = 96 unless $verbose > 3;
-        Image::ExifTool::HexDump($dataPt, $len, %parms);
     }
 }
 
@@ -462,13 +477,7 @@ sub ProcessSR2($$$)
             # display decrypted data in verbose mode
             if ($verbose > 2) {
                 $exifTool->VerboseDir("Decrypted SR2SubIFD", 0, $length);
-                my %parms = (
-                    Out => $exifTool->{OPTIONS}->{TextOut},
-                    Prefix => $exifTool->{INDENT},
-                    Addr => $offset + $base,
-                );
-                $parms{MaxLen} = 96 unless $verbose > 3;
-                Image::ExifTool::HexDump(\$buff, $length, %parms);
+                $exifTool->VerboseDump(\$buff, Addr => $offset + $base);
             }
             my $num = '';
             my $dPos = $offset;
@@ -523,7 +532,7 @@ documentation.  You can use "exiftool -v3" to dump these blocks in hex.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

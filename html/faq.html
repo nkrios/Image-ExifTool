@@ -6,36 +6,41 @@
 <link rel=stylesheet type='text/css' href='style.css' title='Style'>
 <style type="text/css">
 <!--
-pre { color: #800; margin-left: 2em }
+pre         { color: #800; margin-left: 2em }
+code        { white-space: nowrap }
+div.index   { float: right; clear: both;
+              border-left: 1px solid gray;
+              margin: .5em 0 .5em .5em; padding: 0 .5em }
+ol.index    { margin: 0; padding: 0 0 0 2em }
 -->
 </style>
 </head>
 <body>
+<div class='index'>
+<ol class='index'>
+<li><a href="#Q1">Discussion forum</a></li>
+<li><a href="#Q2">Determining tag names</a></li>
+<li><a href="#Q3">Problems with duplicate tags</a></li>
+<li><a href="#Q4">Aperture and shutter speed</a></li>
+<li><a href="#Q5">Date and time formats</a></li>
+<li><a href="#Q6">"Can't convert TAG" errors</a></li>
+<li><a href="#Q7">Deleting all EXIF from a TIFF</a></li>
+<li><a href="#Q8">Writing Make, Model &amp; MakerNotes</a></li>
+<li><a href="#Q9">Tag locations when copying</a></li>
+<li><a href="#Q10">Coded character sets</a></li>
+<li><a href="#Q11">User-defined tags</a></li>
+<li><a href="#Q12">Export to database</a></li>
+<li><a href="#Q13">Output file size</a></li>
+<li><a href="#Q14">GPS coordinate format</a></li>
+<li><a href="#Q15">MakerNote errors</a></li>
+<li><a href="#Q16">Some files not renamed</a></li>
+<li><a href="#Q17">List-type tags</a></li>
+<li><a href="#Q18">Feature requests</a></li>
+</ol>
+</div>
+
 <h1 class='up'>ExifTool FAQ</h1>
 
-<font size='+1'><b>Index</b></font>
-<table><tr><td><ol>
-<li><a href="#Q1">Discussion forum</a>
-<li><a href="#Q2">Determining tag names</a>
-<li><a href="#Q3">Problems with duplicate tags</a>
-<li><a href="#Q4">Aperture and shutter speed</a>
-<li><a href="#Q5">Date and time formats</a>
-<li><a href="#Q6">"Can't convert TAG" errors</a>
-<li><a href="#Q7">Deleting all EXIF from a TIFF</a>
-<li><a href="#Q8">Writing Make, Model and MakerNotes</a>
-<li><a href="#Q9">Tag locations when copying</a>
-</ol></td><td valign='top'><ol start=10>
-<li><a href="#Q10">Coded character sets</a>
-<li><a href="#Q11">User-defined tags</a>
-<li><a href="#Q12">Export to database</a>
-<li><a href="#Q13">Output file size</a>
-<li><a href="#Q14">GPS coordinate format</a>
-<li><a href="#Q15">MakerNote errors</a>
-<li><a href="#Q16">Some files not renamed</a>
-<li><a href="#Q17">List-type tags</a>
-</ol></td></tr></table>
-
-<hr>
 <a name="Q1"></a>
 <p>1. <b>"Is there a forum for discussing ExifTool issues?"</b></p>
 
@@ -50,13 +55,13 @@ ExifTool issues can be discussed on the CPAN forum at
 <blockquote>
 When you run exiftool, by default it prints descriptions, not tag names, for
 the information it extracts.  To print the tag names instead, use the
-<code>&#8209;s</code> option.  Also, see the <a href="TagNames/index.html">tag names
+<code>-s</code> option.  Also, see the <a href="TagNames/index.html">tag names
 documentation</a> for a complete list of available tag names.</blockquote>
 
 <blockquote>Tag names may be optionally prefixed by a family 0 or 1 group name
 to specify a particular information type or location.  Use the
-<code>&#8209;g0</code> and <code>&#8209;g1</code> (or
-<code>&#8209;G0</code> and <code>&#8209;G1</code>) options when extracting
+<code>-g0</code> and <code>-g1</code> (or
+<code>-G0</code> and <code>-G1</code>) options when extracting
 information to see the corresponding group names.
 </blockquote>
 
@@ -69,12 +74,12 @@ information to see the corresponding group names.
 Make sure you are looking at the right information.  Information may be
 duplicated in different locations within an image.  When in doubt, use
 "<code>exiftool -a -G1 FILENAME</code>" to show all information and the
-locations in the file.  In this command, <code>&#8209;a</code> allows
-duplicate tags to be displayed, <code>&#8209;G1</code> shows the family 1
+locations in the file.  In this command, <code>-a</code> allows
+duplicate tags to be displayed, <code>-G1</code> shows the family 1
 group name (ie. the location) of each tag, and "<code>FILENAME</code>" is
 the name of your image file.  Also, it may be helpful to add
-<code>&#8209;s</code> to show the actual tag names instead of the
-descriptions (and possibly <code>&#8209;D</code> or <code>&#8209;H</code> to
+<code>-s</code> to show the actual tag names instead of the
+descriptions (and possibly <code>-D</code> or <code>-H</code> to
 show the tag ID numbers if you are familiar with these).</blockquote>
 
 <blockquote>When duplicate tags exist, only one is extracted unless the
@@ -91,7 +96,7 @@ location.</blockquote>
 
 <blockquote>You can read or write information in a specific location by
 prefixing the tag name on the command line with the desired group name.  ie)
-"<code>&#8209;ExifIFD:DateTimeOriginal</code>"
+"<code>-ExifIFD:DateTimeOriginal</code>"
 </blockquote>
 
 <a name="Q4"></a>
@@ -100,13 +105,14 @@ they are slightly different"</b></p>
 
 <blockquote>
 There are a number of different ways that aperture and shutter speed information
-get saved in an image.  The standard EXIF values (EXIF:FNumber and
-EXIF:ExposureTime) should correspond to the values displayed by your camera, but
-these values may have been rounded off.  The APEX values (EXIF:ApertureValue and
-EXIF:ShutterSpeedValue) may be different due to their own round-off errors.  If
-available, the MakerNotes values are the typically the most accurate because
-they haven't been rounded off at all, but you may see odd values like 1/102
-instead of 1/100, etc.
+are stored in many images.  The standard EXIF values (EXIF:FNumber and
+EXIF:ExposureTime) should correspond to the values displayed by your camera,
+but these values may have been rounded off.  The corresponding EXIF APEX
+values (EXIF:ApertureValue and EXIF:ShutterSpeedValue) may be different due
+to their own round-off errors.  If available, the MakerNotes values may be
+the most accurate because they haven't been rounded off to nice even values
+for display, so with these you may see odd values like 1/102 instead of
+1/100, etc.
 </blockquote>
 
 <a name="Q5"></a>
@@ -118,7 +124,7 @@ time information to standard EXIF format, so this is also the way it is
 specified when writing. The standard EXIF date/time format is "<code>YYYY:MM:DD
 hh:mm:ss</code>", and some meta information formats such as XMP also allow
 sub-seconds and a timezone to be specified.  The timezone format is
-"<code>+hh:mm</code>", "<code>&#8209;hh:mm</code>" or "<code>Z</code>". For
+"<code>+hh:mm</code>", "<code>-hh:mm</code>" or "<code>Z</code>". For
 example:
 
 <pre>exiftool "-xmp:dateTimeOriginal=2005:10:23 20:06:34.33-05:00" a.jpg
@@ -133,24 +139,26 @@ format unless the <code>-n</code> option is used.
 '<code>Can't convert TAG (not in PrintConv)</code>'"</b></p>
 
 <blockquote>
-ExifTool applies a print conversion (PrintConv) to the printed values of all
-tags. These print conversions are documented for all tags in the <b>Values</b>
-column of the <a href="TagNames/index.html">Tag Name documentation</a>.  For
-example, the GPSAltitudeRef tag defines the following conversions:
+By default, ExifTool applies a print conversion (PrintConv) to extracted
+information to make the output more human-readable.  Some conversions involve
+lookup tables which are documented in the <b>Values</b> column of the
+<a href="TagNames/index.html">Tag Name documentation</a>.  For example, the
+GPSAltitudeRef tag defines the following conversions:
 <pre>0 = Above Sea Level
 1 = Below Sea Level
 </pre>
 For this tag, a value of '0' is printed as 'Above Sea Level', and '1' is printed
-as 'Below Sea Level'.  Reading and writing with ExifTool is symmetrical, so a
-value that is printed as 'Above Sea Level' must also be written in that form.
-(ie. The inverse print conversion is applied when writing values.) For example,
-to write GPSAltitudeRef you can type:
+as 'Below Sea Level'.  Reading and writing with ExifTool is symmetrical [<i>with
+the possible exception of List-type tags -- see <a href="#Q17">FAQ #17</a>
+below</i>], so a value that is printed as 'Above Sea Level' must also be written in
+that form. (ie. The inverse print conversion is applied when writing values.)
+For example, to write GPSAltitudeRef you can type:
 <pre>exiftool "-gpsaltituderef=Above Sea Level" image.jpg
 </pre>
 or any unambiguous short form may be used and ExifTool will know what you mean, ie)
 <pre>exiftool -gpsaltituderef=above image.jpg
 </pre>
-Alternatively, the print conversion can be disabled with the <code>&#8209;n</code>
+Alternatively, the print conversion can be disabled with the <code>-n</code>
 option. In this case the printed value of GPSAltitudeRef will be '0' or '1', and
 the value is written in the same way. So the following command has exactly the
 same effect as the commands above:
@@ -162,8 +170,8 @@ example, the following commands are all valid and accomplish the same thing:
 exiftool -flash=0x1 -n image.jpg
 exiftool -flash=fired image.jpg
 </pre>
-Programmers: If you are calling Image::ExifTool functions from your own script,
-the two techniques look like this:
+Programmers: The two techniques look like this when calling Image::ExifTool
+functions from a Perl script:
 <pre>$exifTool->SetNewValue(GPSAltitudeRef => 'Above Sea Level');
 $exifTool->SetNewValue(GPSAltitudeRef => 0, Type => 'ValueConv');
 </pre>
@@ -217,14 +225,13 @@ must be copied as a block with "<code>-makernotes</code>".)
 
 <a name="Q9"></a>
 <p>9a. <b>"The information is different when I copy all tags to a new file"</b>, or
-<br>9b. <b>"The tag locations change when I use <code>&#8209;tagsfromfile</code>
+<br>9b. <b>"The tag locations change when I use <code>-tagsfromfile</code>
 to copy information"</b></p>
 
 <blockquote>
-This feature is explained in the
-<a href="exiftool_pod.html#item__2dtagsfromfile_srcfile_or_fmt">exiftool
-application documentation</a>, but the question is common enough that it is
-discussed here in more detail.</blockquote>
+This feature is explained under the <code>-tagsFromFile</code> option in
+the <a href="exiftool_pod.html">exiftool application documentation</a>, but the
+question is common enough that it is discussed here in more detail.</blockquote>
 
 <blockquote>By default, ExifTool will store information in preferred locations
 when either writing new information or copying information between files. This
@@ -251,7 +258,7 @@ all information and preserve the original structure, use this syntax:
 <pre>exiftool -tagsfromfile src.jpg -all:all dst.jpg
 </pre>
 
-By specifying a group name with "<code>&#8209;all:all</code>", the location of the
+By specifying a group name with "<code>-all:all</code>", the location of the
 information is preserved.  (Specifically, since no destination tag was
 specified the source group "<code>all</code>" was assumed, thus preserving
 the original group.)</blockquote>
@@ -304,10 +311,10 @@ Certain meta information formats allow coded character sets other than plain
 ASCII.   When reading, 8-bit encodings are passed straight through ExifTool
 without translation (unless otherwise specified below), and multi-byte encodings
 are translated to UTF-8 by default, or Windows Latin1 with the
-<code>&#8209;L</code> option (or by setting the "<code>Charset</code>" option to
+<code>-L</code> option (or by setting the "<code>Charset</code>" option to
 "<code>Latin</code>" via the API).  When writing, the inverse translations are
 performed.  (Alternatively, special characters may be translated to HTML
-character entities by using the <code>&#8209;E</code> option, but this only
+character entities by using the <code>-E</code> option, but this only
 applies when reading.) More specific details are given below about how character
 coding is handled for EXIF, IPTC, XMP, ID3 and PDF information:</blockquote>
 
@@ -315,20 +322,20 @@ coding is handled for EXIF, IPTC, XMP, ID3 and PDF information:</blockquote>
 format, however some EXIF tags (UserComment, GPSProcessingMethod and
 GPSAreaInformation) may be also be encoded in Unicode or JIS.  When reading
 information, Unicode text is translated to UTF-8, or Windows Latin1 with the
-<code>&#8209;L</code> option.  Other encodings are not translated. When writing,
+<code>-L</code> option.  Other encodings are not translated. When writing,
 text is stored as ASCII unless the string contains special characters, in which
 case it is translated from UTF-8 or Latin1 (depending on the
-<code>&#8209;L</code> option) and stored as Unicode if allowed by the tag
+<code>-L</code> option) and stored as Unicode if allowed by the tag
 specification.  The EXIF "XP" tags (XPTitle, XPComment, etc) are always stored
 as Unicode, and are read and written as either UTF-8, or Windows Latin1 with the
-<code>&#8209;L</code> option.</blockquote>
+<code>-L</code> option.</blockquote>
 
 <blockquote><b>IPTC</b>: The value of the IPTC:CodedCharacterSet tag determines
 how the internal IPTC string values are interpreted.  If CodedCharacterSet
 exists and has a value of "<code>UTF8</code>" (or
 "<code>ESC&nbsp;%&nbsp;G</code>") then string values are assumed to be stored as
 UTF-8, otherwise Latin1 (cp1252) coding is assumed. When reading, these strings
-are translated to UTF-8 by default, or Latin1 with the <code>&#8209;L</code>
+are translated to UTF-8 by default, or Latin1 with the <code>-L</code>
 option.  When writing, the inverse translation is performed.  No translation is
 done if the internal (IPTC) and external (ExifTool) character sets are the same.
 Note that ISO 2022 character set shifting is not supported.  Instead, a warning
@@ -341,22 +348,22 @@ and converts them all to UTF-8 internally.  Also, all XML character entity
 references and numeric character references are converted.  When writing,
 ExifTool always encodes XMP as UTF-8, converting the following 5 characters to
 XML character references: <code>&amp; &lt; &gt; &#39; &quot;</code>. By default
-no further translation is performed, however the <code>&#8209;L</code> option
+no further translation is performed, however the <code>-L</code> option
 may be used used to translate text to Windows Latin1 when reading or from
 Windows Latin1 when writing.</blockquote>
 
 <blockquote><b>ID3</b>: The ID3v1 specification officially supports only ISO
 8859-1 encoding although some applications may incorrectly use other character
 sets.  ExifTool assumes proper ISO 8859-1 encoding and translates to UTF-8 by
-default, or disables translation with the <code>&#8209;L</code> option (since
+default, or disables translation with the <code>-L</code> option (since
 ISO 8859-1 is a subset of Windows Latin1).  ID3v2 text is may be stored with a
 number of different encodings, and ExifTool translates them all to UTF-8 by
-default or Windows Latin1 with the <code>&#8209;L</code> option.  ExifTool does
+default or Windows Latin1 with the <code>-L</code> option.  ExifTool does
 not currently write ID3 information.</blockquote>
 
 <blockquote><b>PDF</b>: PDF text strings are stored in either PDFDocEncoding
 (similar to Windows Latin1) or Unicode (UCS-2).  When reading, ExifTool
-translates to UTF-8 by default, or Windows Latin1 with the <code>&#8209;L</code>
+translates to UTF-8 by default, or Windows Latin1 with the <code>-L</code>
 option.  When writing, exiftool encodes UTF-8 or Latin1 text as Unicode only if
 the string contains special characters, otherwise PDFDocEncoding is
 used.</blockquote>
@@ -450,7 +457,7 @@ It should be possible to import a file like this directly into most database
 applications.  On the command line, any list of tag names may be used, and
 any number of file or directory names may be specified. (Hint: If your
 command line starts to get too long, you may want to look into using the
-<code>&#8209;@</code> option and/or the <a href="index.html#shortcut">ShortCut</a>
+<code>-@</code> option and/or the <a href="index.html#shortcut">ShortCut</a>
 feature).
 </blockquote>
 
@@ -577,7 +584,7 @@ may be used to list all writable file types.
 FileModifyDate.</blockquote>
 
 <a name="Q17"></a>
-<p>17. <b>"Please explain how list-type tags are handled"</b></p>
+<p>17. <b>"List-type tags do not behave as expected"</b></p>
 
 <blockquote>Tags indicated by a plus sign (<code>+</code>) in the
 <a href="TagNames/index.html">tag name documentation</a> are List-type tags.
@@ -589,37 +596,63 @@ extracted values are separated by a comma and a space, but the <code>-sep</code>
 option may be used to change this.)  When writing, separate
 values are always assigned individually, like this:
 
-<pre>exiftool -keywords=one -keywords=two -keywords=three image.jpg
+<pre>exiftool -keywords=one -keywords=two -keywords=three DIR
 </pre>
 
 NOT all together, because this would represent a single keyword:
 
-<pre>exiftool -keywords="one, two, three" image.jpg
+<pre>exiftool -keywords="one, two, three" test.jpg
 </pre>
 
-However, sometimes it is desirable to have single list item that contains a
-comma, and this is OK:
+With exiftool version 7.56 or later, the <code>-sep</code> option may be used to
+split values of list-type tags into separate items.  For example,
 
-<pre>exiftool -keywords="Harvey, Phil" -keywords="Marley, Bob" DIR
+<pre>exiftool -sep ", " -keywords="one, two, three" DIR
 </pre>
 
-Note that all of the above three examples overwrite any Keywords pre-existing in
-the original file.  Alternatively, "<code>+=</code>" or "<code>-=</code> may be
-used to add to or remove from the existing list:
+will store three separate keywords, the same as the first example above. This
+feature may be used to split a tag value into separate items if it was
+originally stored incorrectly as a single string:
+
+<pre>exiftool -sep ", " -tagsfromfile @ -keywords test.jpg
+</pre>
+
+However, sometimes it is desirable to have list items which contain a comma, and
+this is allowed:
+
+<pre>exiftool -contributor="Harvey, Phil" -contributor="Marley, Bob" a.jpg
+</pre>
+
+But to distinguish these entries when extracting information, a different list
+separator must be used.  For instance, the following command uses
+"<code>//</code>" to separate list items,
+
+<pre>exiftool -contributor -sep "//" a.jpg
+</pre>
+
+and produces an output like this:
+
+<pre class=blk>Contributor  : Harvey, Phil//Marley, Bob
+</pre>
+
+Note that the above examples overwrite any values which already existed in the
+original file for these tags.  Alternatively, "<code>+=</code>" or
+"<code>-=</code> may be used to add to or remove from an existing list:
 
 <pre>exiftool -keywords+="add this" -keywords-="remove this" DIR
 </pre>
 
 Using "<code>=</code>" is equivalent to "<code>+=</code>" in any command where
 the same tag is set with "<code>+=</code>" or "<code>-=</code>" in another
-assignment.  (ie. existing values are preserved unless specifically deleted
+assignment.  (ie. existing values will be preserved unless specifically deleted
 with "<code>-=</code>".)
 </blockquote>
 
-<blockquote>Now this is where it gets tricky...  The behaviour is different when
-copying to a list-type tag using the <code>-tagsFromFile</code> option.  Here,
-any assignment to a tag overrides earlier assignments to the same tag in the
-command.  For instance, this command
+<blockquote>When copying list tags using the <code>-tagsFromFile</code> option,
+values are copied individually to form proper lists.  However, it gets a bit
+tricky when copying multiple tags to a single list tag:  Here, any assignment to
+a tag overrides earlier assignments to the same tag in the command.  For
+instance, this command
 
 <pre>exiftool "-keywords&lt;filename" "-keywords&lt;comment" DIR
 </pre>
@@ -628,20 +661,58 @@ writes only the Comment tag.  (Note that <code>-tagsFromFile @</code> is implied
 by the "<code>&lt;</code>" operation in this command, causing tags to be copied
 from the original file.)  This may seem strange, but it prevents duplicate items
 from being added to a list when copying a group of tags from a file containing
-duplicate information.  To copy values from multiple tags, use the
-<code>-addTagsFromFile</code> option instead:
+duplicate information.  If you really want to add values from multiple tags, use
+the <code>-addTagsFromFile</code> option instead:
 
 <pre>exiftool -addTagsFromFile @ "-keywords&lt;filename" "-keywords&lt;comment" DIR
 </pre>
 
 Note that as with "<code>=</code>" in the first three examples above, the
 "<code>&lt;</code>" operation of the previous command overwrites any Keywords
-that existed in the original file.  To add to or remove from the existing
-keywords, "<code>+&lt;</code>" or "<code>-&lt;</code>" are used instead.
+that existed previously in the original file.  To add to or remove from the
+existing keywords, use "<code>+&lt;</code>" or "<code>-&lt;</code>".
+</blockquote>
+
+<a name="Q18"></a>
+<p>18. <b>"ExifTool doesn't have a feature that I require, could you please add it?"</b></p>
+
+<blockquote>I am very open to adding new features if they will be useful
+to other people, but most of the feature requests that I receive are for
+features that either <b>A)</b> already exist, <b>B)</b> are too specific to be
+useful for other people, or <b>C)</b> can be implemented easily via
+<a href="config.html">user-defined tags</a>.</blockquote>
+
+<blockquote>I must accept some of the blame for case <b>A</b> above.  I am aware
+that ExifTool has become too complex for the average user and it may be
+difficult to find the relevant section of the documentation.  But please try
+reading the docs -- you may discover some very useful features that you didn't
+know existed.  The more features I add, the more difficult it becomes to
+navigate the documentation -- this is one reason why I am reluctant to add new
+features unnecessarily.</blockquote>
+
+<blockquote>Cases <b>B</b> and <b>C</b> may both apply since very specific feature
+requests can usually be satisfied via a user-defined tag.  Please take a look a
+the <a href="config.html">config file documentation</a> for details about how to
+add user-defined tags, and search the
+<a href="http://www.cpanforum.com/dist/Image-ExifTool">ExifTool forum</a> for the
+word "UserDefined" to see examples of user-defined tags which other people have
+found useful. (Be sure to select "Posts by text in body" when you do the search.)
+</blockquote>
+
+<blockquote>If a user-defined tag doesn't solve the problem, often a bit of custom
+Perl script will do the job.  If you have any programming experience at all, you
+should be able to pick up Perl very quickly (the syntax is very similar to C),
+and the ExifTool API is very easy to use.</blockquote>
+
+<blockquote>But if you think the feature may be useful to other people, please
+let me know.  You can send me an e-mail or post in the
+<a href="http://www.cpanforum.com/dist/Image-ExifTool">ExifTool forum</a>.  I am
+more open to adding a new feature if it can be implemented without adding a new
+option to the already complex command-line interface.
 </blockquote>
 
 <hr>
-<i>Last revised Oct 18, 2008</i>
+<i>Last revised Dec 18, 2008</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

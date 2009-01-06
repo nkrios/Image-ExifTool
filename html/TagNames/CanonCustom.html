@@ -1302,7 +1302,7 @@ well as newer tags and values added by later models.</p>
 <td>ISOExpansion
   <br>ISOSpeedRange</td>
 <td class=c>int32s<br>int32s[3]</td>
-<td><span class=s><span class=n>(40D and 50D)</span>
+<td><span class=s><span class=n>(40D, 50D and 5DmkII)</span>
   <br>0 = Off
   <br>1 = On
   <br><span class=n>(1D Mark III)</span>
@@ -1319,7 +1319,7 @@ well as newer tags and values added by later models.</p>
 <td>0x0105</td>
 <td>AEBSequence</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 2 not used by 40D and 50D)</span>
+<td><span class=s><span class=n>(value of 2 not used by 40D, 50D and 5DmkII)</span>
   <br>0 = 0,-,+
   <br>1 = -,0,+
   <br>2 = +,0,-</span></td></tr>
@@ -1341,7 +1341,7 @@ well as newer tags and values added by later models.</p>
 <td>0x0108</td>
 <td>SafetyShift</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 2 not used by 40D and 50D)</span>
+<td><span class=s><span class=n>(value of 2 not used by 40D, 50D and 5DmkII)</span>
   <br>0 = Disable
   <br>1 = Enable (Tv/Av)
   <br>2 = Enable (ISO speed)</span></td></tr>
@@ -1403,6 +1403,10 @@ well as newer tags and values added by later models.</p>
   <br><span class=n>(450D and 1000D)</span>
   <br>0 = Auto
   <br>1 = 1/200 Fixed
+  <br><span class=n>(5D Mark II)</span>
+  <br>0 = Auto
+  <br>1 = 1/200-1/60 Auto
+  <br>2 = 1/200 Fixed
   <br><span class=n>(1D Mark III)</span>
   <br>0 = Auto
   <br>1 = 1/300 Fixed</span></td></tr>
@@ -1417,7 +1421,7 @@ well as newer tags and values added by later models.</p>
 <td>0x0202</td>
 <td>HighISONoiseReduction</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(50D)</span>
+<td><span class=s><span class=n>(50D and 5DmkII)</span>
   <br>0 = Standard
   <br>1 = Low
   <br>2 = Strong
@@ -1518,7 +1522,7 @@ well as newer tags and values added by later models.</p>
 <td>0x0506</td>
 <td>LensAFStopButton</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 6 not used by 40D or 50D)</span>
+<td><span class=s><span class=n>(value of 6 not used by 40D, 50D and 5DmkII)</span>
   <br>0 = AF stop
   <br>1 = AF start
   <br>2 = AE lock
@@ -1538,7 +1542,10 @@ well as newer tags and values added by later models.</p>
 <td>0x0508</td>
 <td>AFExpansionWithSelectedPoint</td>
 <td class=c>int32s</td>
-<td><span class=s>0 = Disable
+<td><span class=s><span class=n>(5D Mark II)</span>
+  <br>0 = Disable
+  <br>1 = Enable
+  <br>0 = Disable
   <br>1 = Enable (left/right assist points)
   <br>2 = Enable (surrounding assist points)</span></td></tr>
 <tr class=b>
@@ -1581,7 +1588,7 @@ well as newer tags and values added by later models.</p>
 <td>0x050e</td>
 <td>AFAssistBeam</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 2 not used by 1D Mark III)</span>
+<td><span class=s><span class=n>(value of 2 not used by 1DmkIII or 5DmkII)</span>
   <br>0 = Emits
   <br>1 = Does not emit
   <br>2 = Only ext. flash emits</span></td></tr>
@@ -1613,7 +1620,7 @@ well as newer tags and values added by later models.</p>
 <td>0x060f</td>
 <td>MirrorLockup</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 2 not used by 40D, 50D, 450D or 1000D)</span>
+<td><span class=s><span class=n>(value of 2 not used by 40D, 50D, 450D, 1000D or 5DmkII)</span>
   <br>0 = Disable
   <br>1 = Enable
   <br>2 = Enable: Down with Set</span></td></tr>
@@ -1666,13 +1673,14 @@ well as newer tags and values added by later models.</p>
 <td>0x0704</td>
 <td>SetButtonWhenShooting</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(40D and 50D, value of 5 is new for 50D)</span>
+<td><span class=s><span class=n>(40D, 50D and 5DmkII; value of 5 is new for 50D, and 6 is new for 5DmkII)</span>
   <br>0 = Normal (disabled)
   <br>1 = Image quality
   <br>2 = Picture style
   <br>3 = Menu display
   <br>4 = Image playback
   <br>5 = Quick control screen
+  <br>6 = Record movie (Live View)
   <br><span class=n>(450D)</span>
   <br>0 = Normal (disabled)
   <br>1 = Image quality
@@ -1747,6 +1755,10 @@ well as newer tags and values added by later models.</p>
   <br>0 = Ef-A
   <br>1 = Ef-D
   <br>2 = Ef-S
+  <br><span class=n>(5D Mark II)</span>
+  <br>0 = Eg-A
+  <br>1 = Eg-D
+  <br>2 = Eg-S
   <br><span class=n>(1D Mark III)</span>
   <br>0 = Ec-CIV
   <br>1 = Ec-A,B,C,CII,CIII,D,H,I,L
@@ -1798,7 +1810,7 @@ well as newer tags and values added by later models.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 6, 2008</i>
+<br><i>Last revised Dec 11, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -1,8 +1,8 @@
-  ExifToolVersion = 7.21
+  ExifToolVersion = 7.54
   FileName = Olympus_7_failed.jpg
   Directory = t
   FileSize = 7335
-  FileModifyDate = 1205171234
+  FileModifyDate = 1227201642
   FileType = JPEG
   MIMEType = image/jpeg
 JPEG APP1 (7080 bytes):
@@ -16,9 +16,9 @@ JPEG APP1 (7080 bytes):
   |     - Tag 0x0110 (17 bytes, string[17])
   | 3)  Orientation = 1
   |     - Tag 0x0112 (2 bytes, int16u[1])
-  | 4)  XResolution = 314
+  | 4)  XResolution = 314 (314/1)
   |     - Tag 0x011a (8 bytes, rational64u[1])
-  | 5)  YResolution = 314
+  | 5)  YResolution = 314 (314/1)
   |     - Tag 0x011b (8 bytes, rational64u[1])
   | 6)  ResolutionUnit = 2
   |     - Tag 0x0128 (2 bytes, int16u[1])
@@ -31,9 +31,9 @@ JPEG APP1 (7080 bytes):
   | 10) ExifOffset (SubDirectory) -->
   |     - Tag 0x8769 (4 bytes, int32u[1])
   | + [ExifIFD directory with 31 entries]
-  | | 0)  ExposureTime = 0.004
+  | | 0)  ExposureTime = 0.004 (1/250)
   | |     - Tag 0x829a (8 bytes, rational64u[1])
-  | | 1)  FNumber = 16
+  | | 1)  FNumber = 16 (160/10)
   | |     - Tag 0x829d (8 bytes, rational64u[1])
   | | 2)  ExposureProgram = 2
   | |     - Tag 0x8822 (2 bytes, int16u[1])
@@ -47,9 +47,9 @@ JPEG APP1 (7080 bytes):
   | |     - Tag 0x9004 (20 bytes, string[20])
   | | 7)  ComponentsConfiguration = ...
   | |     - Tag 0x9101 (4 bytes, undef[4])
-  | | 8)  ExposureCompensation = -0.7
+  | | 8)  ExposureCompensation = -0.7 (-7/10)
   | |     - Tag 0x9204 (8 bytes, rational64s[1])
-  | | 9)  MaxApertureValue = 3.53
+  | | 9)  MaxApertureValue = 3.53 (353/100)
   | |     - Tag 0x9205 (8 bytes, rational64u[1])
   | | 10) MeteringMode = 5
   | |     - Tag 0x9207 (2 bytes, int16u[1])
@@ -57,7 +57,7 @@ JPEG APP1 (7080 bytes):
   | |     - Tag 0x9208 (2 bytes, int16u[1])
   | | 12) Flash = 16
   | |     - Tag 0x9209 (2 bytes, int16u[1])
-  | | 13) FocalLength = 19.5
+  | | 13) FocalLength = 19.5 (1950/100)
   | |     - Tag 0x920a (8 bytes, rational64u[1])
   | | 14) MakerNoteOlympus2 (SubDirectory) -->
   | |     - Tag 0x927c (5502 bytes, undef[5502])
@@ -70,9 +70,9 @@ JPEG APP1 (7080 bytes):
   | | |     - Tag 0x0202 (2 bytes, int16u[1])
   | | | 3)  BWMode = 0
   | | |     - Tag 0x0203 (2 bytes, int16u[1])
-  | | | 4)  DigitalZoom = 1
+  | | | 4)  DigitalZoom = 1 (100/100)
   | | |     - Tag 0x0204 (8 bytes, rational64u[1])
-  | | | 5)  FocalPlaneDiagonal = 7.58
+  | | | 5)  FocalPlaneDiagonal = 7.58 (758/100)
   | | |     - Tag 0x0205 (8 bytes, rational64u[1])
   | | | 6)  LensDistortionParams = 0 0 0 0 0 0
   | | |     - Tag 0x0206 (12 bytes, int16s[6])
@@ -91,7 +91,7 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x0101 (32 bytes, string[32])
   | | | | 3)  InternalSerialNumber = 0171612001128001               
   | | | |     - Tag 0x0102 (32 bytes, string[32])
-  | | | | 4)  FocalPlaneDiagonal = 7.58
+  | | | | 4)  FocalPlaneDiagonal = 7.58 (758/100)
   | | | |     - Tag 0x0103 (8 bytes, rational64u[1])
   | | | | 5)  BodyFirmwareVersion = 4097
   | | | |     - Tag 0x0104 (4 bytes, int32u[1])
@@ -124,7 +124,7 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x0304 (256 bytes, int32u[64])
   | | | | 12) FlashMode = 0
   | | | |     - Tag 0x0400 (2 bytes, int16u[1])
-  | | | | 13) FlashExposureComp = 0
+  | | | | 13) FlashExposureComp = 0 (0/1)
   | | | |     - Tag 0x0401 (8 bytes, rational64s[1])
   | | | | 14) Olympus_CameraSettings_0x0402 = 0
   | | | |     - Tag 0x0402 (2 bytes, int16u[1])
@@ -152,7 +152,7 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x050b (2 bytes, int16u[1])
   | | | | 26) ShadingCompensation = 0
   | | | |     - Tag 0x050c (2 bytes, int16u[1])
-  | | | | 27) CompressionFactor = 4
+  | | | | 27) CompressionFactor = 4 (4/1)
   | | | |     - Tag 0x050d (8 bytes, rational64u[1])
   | | | | 28) Olympus_CameraSettings_0x050e = 0
   | | | |     - Tag 0x050e (2 bytes, int16u[1])
@@ -198,7 +198,7 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x0800 (36 bytes, float[9])
   | | | | 8)  Olympus_ImageProcessing_0x0801 = 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
   | | | |     - Tag 0x0801 (32 bytes, int16u[16])
-  | | | | 9)  Olympus_ImageProcessing_0x0802 = inf
+  | | | | 9)  Olympus_ImageProcessing_0x0802 = inf (0/0)
   | | | |     - Tag 0x0802 (8 bytes, rational64u[1])
   | | | | 10) Olympus_ImageProcessing_0x1000 = 0 0
   | | | |     - Tag 0x1000 (4 bytes, int16u[2])
@@ -325,11 +325,11 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x1201 (4 bytes, int16u[2])
   | | | | 46) Olympus_FocusInfo_0x1202 = 0
   | | | |     - Tag 0x1202 (2 bytes, int16u[1])
-  | | | | 47) Olympus_FocusInfo_0x1203 = 0
+  | | | | 47) Olympus_FocusInfo_0x1203 = 0 (0/1)
   | | | |     - Tag 0x1203 (8 bytes, rational64s[1])
   | | | | 48) ExternalFlashBounce = 0
   | | | |     - Tag 0x1204 (2 bytes, int16u[1])
-  | | | | 49) ExternalFlashZoom = 0
+  | | | | 49) ExternalFlashZoom = 0 (0/1)
   | | | |     - Tag 0x1205 (8 bytes, rational64u[1])
   | | | | 50) Olympus_FocusInfo_0x1206 = 0
   | | | |     - Tag 0x1206 (2 bytes, int16u[1])
@@ -364,7 +364,7 @@ JPEG APP1 (7080 bytes):
   | |     - Tag 0xa402 (2 bytes, int16u[1])
   | | 24) WhiteBalance = 0
   | |     - Tag 0xa403 (2 bytes, int16u[1])
-  | | 25) DigitalZoomRatio = 1
+  | | 25) DigitalZoomRatio = 1 (100/100)
   | |     - Tag 0xa404 (8 bytes, rational64u[1])
   | | 26) SceneCaptureType = 0
   | |     - Tag 0xa406 (2 bytes, int16u[1])
@@ -456,9 +456,9 @@ JPEG APP1 (7080 bytes):
   + [IFD1 directory with 6 entries]
   | 0)  Compression = 6
   |     - Tag 0x0103 (2 bytes, int16u[1])
-  | 1)  XResolution = 72
+  | 1)  XResolution = 72 (72/1)
   |     - Tag 0x011a (8 bytes, rational64u[1])
-  | 2)  YResolution = 72
+  | 2)  YResolution = 72 (72/1)
   |     - Tag 0x011b (8 bytes, rational64u[1])
   | 3)  ResolutionUnit = 2
   |     - Tag 0x0128 (2 bytes, int16u[1])

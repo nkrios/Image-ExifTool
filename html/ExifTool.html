@@ -212,13 +212,13 @@ argument specified the image data via a file reference (file ref) or data
 reference (SCALAR ref).  The remaining scalar arguments are names of tags
 for requested information.  If no tags are specified, all possible information
 is extracted.<br>&nbsp;<br> Tag names are case-insensitive and may be prefixed
-by an optional group name followed by a colon.  The group name may begin with a
+by a optional group names separated by colons.  A group name may begin with a
 family number (ie. '<code>1IPTC:Keywords</code>'), to restrict matches to a
 specific family.  A tag name of '<code>*</code>' may be used, thus allowing
 '<code>GROUP:*</code>' to represent all tags in a specific group, or a group
 name of '<code>*</code>' may be used, in which case all available instances of
-the specified tag are returned regardless of the <a
-href="#Duplicates">Duplicates</a> setting (ie. '<code>*:WhiteBalance</code>'). 
+the specified tag are returned regardless of the
+<a href="#Duplicates">Duplicates</a> setting (ie. '<code>*:WhiteBalance</code>'). 
 And finally, a leading '<code>-</code>' indicates tags to be excluded (ie.
 '<code>-IFD1:*</code>').
 <br>&nbsp;<br>
@@ -238,6 +238,13 @@ will not be returned.  (Also, the FileSize and FileModifyDate tags will not be
 returned unless it is a plain file.)  Image processing begins at the current
 file position, and on return the file position is unspecified. May be either a
 standard GLOB reference or a reference to a File::RandomAccess object.
+<br>&nbsp;<br>
+[Advanced:  To allow a non-rewindable stream (ie. a network socket) to be
+re-read after processing with ExifTool, first wrap the file reference in a
+File::RandomAccess object, then pass this object to
+<a href="#ImageInfo">ImageInfo</a>.  The File::RandomAccess object will buffer
+the file if necessary, and may be used to re-read the file after
+<a href="#ImageInfo">ImageInfo</a> returns.]
 
 </td></tr><tr><td valign='top'><b>SCALAR&nbsp;ref</b></td><td>
 A reference to image data in memory.
@@ -267,7 +274,7 @@ names may not be the same as requested.</p>
 <p>Values of the returned hash are usually simple scalars, but a scalar
 reference is used to indicate binary data and an array reference may be used
 to indicate a list.  Lists of values are joined by commas into a single
-string if and only if the PrintConv option is enabled and the List option is
+string only if the PrintConv option is enabled and the List option is
 disabled (which are the defaults).  Note that binary values are not
 necessarily extracted unless specifically requested or the Binary option is
 set.  If not extracted the value is a reference to a string of the form
@@ -410,10 +417,11 @@ to a specific function.</p>
     <td>Tag name or reference to a list of tag names to exclude.  Case is not significant.
     Tags may also be excluded by preceding their name with a '-' in the arguments to ImageInfo.</td>
     <td align='center'>undef</td></tr>
-<tr><td>ExtractEmbedded</td>
-    <td>Flag to extract information from embedded documents in PostScript files</td>
+<tr><td><a name="Embedded">ExtractEmbedded</a></td>
+    <td>Flag to extract information from embedded documents in PostScript files and
+    the AIPrivateData stream in PDF files</td>
     <td align='center'>0 or 1</td><td align=center>0</td></tr>
-<tr><td>FastScan</td>
+<tr><td><a name="FastScan">FastScan</a></td>
     <td>Flag to increase speed of extracting information from JPEG images.  With this
     option set, ExifTool will not scan to the end of a JPEG image to check for an AFCP,
     CanonVRD, FotoStation, PhotoMechanic, MIE or PreviewImage trailer.  Also, when
@@ -429,7 +437,8 @@ to a specific function.</p>
 <tr><td>Group#</td><td>Extract tags for specified groups</td>
     <td>Group name or reference to list of group names.
     Group name may begin with '-' to exclude a group.  Case IS significant.
-    See <a href="#GetAllGroups">GetAllGroups</a> for a list of available groups.</td>
+    See <a href="#GetGroup">GetGroup</a> for a description of group families,
+    and <a href="#GetAllGroups">GetAllGroups</a> for a list of available groups.</td>
     <td align='center'>undef</td></tr>
 <tr><td>HtmlDump</td><td>Dump information in hex to a dynamic HTML web page.
     Option value sets a limit on the maximum block size.  Output file is
@@ -457,6 +466,9 @@ to a specific function.</p>
     them into a string of values.</td><td align='center'>0 or 1</td><td align='center'>0</td></tr>
 <tr><td>ListSep</td><td>Separator string used to join lists of PrintConv values when
     List option is not set.</td><td align='center'>any string</td><td align='center'>', '</td></tr>
+<tr><td>ListSplit</td><td>Regular expression used to split values of list-type tags
+    into individual items when writing.  (ie. use ',\\s*' to split a comma-separated list)</td>
+    <td align='center'>a regular expression pattern</td><td align='center'>undef</td></tr>
 <tr><td>MakerNotes</td><td>Option to extract MakerNotes and other writable
     subdirectories (such as PrintIM) as a data block.  Normally when the MakerNotes
     are extracted they are rebuilt to include data outside the boundaries of the
@@ -483,8 +495,9 @@ to a specific function.</p>
     <tr><td valign='top' align=center><b>Alpha</b></td><td>Sort alphabetically</td></tr>
     <tr><td valign='top' align=center><b>File</b></td><td>Sort in order that tags were found in the file</td></tr>
     <tr valign=top><td valign='top' align=center><b>Group#</b></td><td>Sort by tag group,
-        where # is the group family number.  If # is not specified, Group0 is assumed.
-        See <a href="#GetAllGroups">GetAllGroups</a> for a group list.</td></tr>
+        where # is zero or more family numbers separated by colons. If # is not specified,
+        Group0 is assumed.  See <a href="#GetGroup">GetGroup</a> for a description of group
+        families.</td></tr>
     </table></td><td align=center>'Input'</td></tr>
 <tr><td>StrictDate</td><td>Flag to return undefined value for any date which can't be
     converted when the DateFormat option is used.</td>
@@ -512,27 +525,38 @@ to a specific function.</p>
 
 <p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
+<span class=com># exclude the 'OwnerName' tag from returned information</span>
 $exifTool-&gt;<b>Options</b>(Exclude =&gt; 'OwnerName');
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
+<span class=com># only get information in EXIF or MakerNotes groups</span>
 $exifTool-&gt;<b>Options</b>(Group0 =&gt; ['EXIF', 'MakerNotes']);
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
-$exifTool-&gt;<b>Options</b>(Group1 =&gt; '-IFD1');  <span class='com'># ignore IFD1 tags</span>
+<span class='com'># ignore information from IFD1</span>
+$exifTool-&gt;<b>Options</b>(Group1 =&gt; '-IFD1');
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
+<span class='com'># sort by groups in family 2, and extract unknown tags</span>
 $exifTool-&gt;<b>Options</b>(Sort =&gt; 'Group2', Unknown =&gt; 1);
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
-my $oldSetting = $exifTool-&gt;<b>Options</b>(Duplicates =&gt; 0);
+<span class='com'># reset DateFormat option</span>
+$exifTool-&gt;<b>Options</b>(DateFormat =&gt; undef);
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
-my $isVerbose = $exifTool-&gt;<b>Options</b>('Verbose');
+<span class='com'># do not extract duplicate tag names</span>
+$oldSetting = $exifTool-&gt;<b>Options</b>(Duplicates =&gt; 0);
+</pre></td></tr></table></blockquote>
+
+<blockquote><table class='box'><tr><td><pre>
+<span class='com'># get current Verbose setting</span>
+$isVerbose = $exifTool-&gt;<b>Options</b>('Verbose');
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="ClearOptions">ClearOptions</a></h2>
@@ -553,15 +577,15 @@ my $isVerbose = $exifTool-&gt;<b>Options</b>('Verbose');
 </td></tr>
 <tr><td><b>Returns</b></td><td>1 if this was a valid image, 0 otherwise</td></tr>
 </table></blockquote>
-<p>The following options are effective in the call to <a href="#ExtractInfo">ExtractInfo</a>:</p>
-<blockquote>
-Binary, Charset, Composite, FastScan, FixBase, HtmlDump, HtmlDumpBase,
-IgnoreMinorErrors, MakerNotes, ScanForXMP, TextOut, Unknown and Verbose.
-</blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
 $success = $exifTool-&gt;<b>ExtractInfo</b>('image.jpg', \%options);
 </pre></td></tr></table></blockquote>
+<p>The following options are effective in the call to <a href="#ExtractInfo">ExtractInfo</a>:</p>
+<blockquote>
+Binary, Charset, Composite, ExtractEmbedded, FastScan, FixBase, HtmlDump, HtmlDumpBase,
+IgnoreMinorErrors, MakerNotes, ScanForXMP, TextOut, Unknown and Verbose.
+</blockquote>
 
 <hr><h2><a name="GetInfo">GetInfo</a></h2>
 <p><a href="#GetInfo">GetInfo</a> is called to return meta information
@@ -592,8 +616,8 @@ $info = $exifTool-&gt;<b>GetInfo</b>({Group2 =&gt; ['Author', 'Location']});
 </pre></td></tr></table></blockquote>
 <p>The following options are effective in the call to <a href="#GetInfo">GetInfo</a>:</p>
 <blockquote>
-Charset, CoordFormat, DateFormat, Duplicates, Exclude, Group#, List,
-StrictDate, PrintConv (and Sort if a tag list reference is given).
+Charset, CoordFormat, DateFormat, Duplicates, Exclude, Group#, List, ListSep,
+StrictDate, PrintConv, Sort (if a tag list reference is given) and StrictDate.
 </blockquote>
 
 <hr><h2><a name="WriteInfo">WriteInfo</a></h2>
@@ -652,6 +676,11 @@ $warningMessage = $exifTool-&gt;<a href="#GetValue">GetValue</a>('Warning');
 <p>If an error code is returned, an Error tag is set and GetValue('Error') can
 be called to obtain the error description.  A Warning tag may be set even if
 this routine is successful.</p>
+<p>The following ExifTool options are effective in the call to
+<a href="#WriteInfo">WriteInfo</a>:</p>
+<blockquote>
+ByteOrder, Charset, Compact, Compress, FixBase, IgnoreMinorErrors and Verbose.
+</blockquote>
 
 <hr><h2><a name="CombineInfo">CombineInfo</a></h2>
 <p>Combine information from more than one information hash into a single hash.</p>
@@ -826,7 +855,7 @@ errors are printed to STDERR.
 <tr><td>DelValue</td><td>Delete an existing tag if it has the specified value</td>
     <td align=center>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Group</td><td>Specifies group name where tag should be written.
-    If not specified, tag is written to hightest priority group as specified
+    If not specified, tag is written to highest priority group as specified
     by <a href="#SetNewGroups">SetNewGroups</a>.  Case is not significant</td>
     <td>Any family 0 or 1 group name</td><td align=center>undef</td></tr>
 <tr><td>NoShortcut</td><td>Disables default behaviour of looking up tag in
@@ -887,12 +916,15 @@ $exifTool-&gt;<b>SetNewValue</b>('Keywords', $word, DelValue =&gt; 1);
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
-<span class='com'># write a list of keywords</span>
-$exifTool-&gt;<b>SetNewValue</b>('Keywords', ['word1','word2']);
+<span class='com'># set keywords (a List-type tag) with two new values</span>
+$exifTool-&gt;<b>SetNewValue</b>(Keywords =&gt; 'word1');
+$exifTool-&gt;<b>SetNewValue</b>(Keywords =&gt; 'word2');
+<span class='com'># equivalent, but set both in one call using an array reference</span>
+$exifTool-&gt;<b>SetNewValue</b>(Keywords =&gt; ['word1','word2']);
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
-<span class='com'># add a keyword without replacing existing keywords</span>
+<span class='com'># add a keyword without replacing existing keywords in the file</span>
 $exifTool-&gt;<b>SetNewValue</b>(Keywords =&gt; $word, AddValue =&gt; 1);
 </pre></td></tr></table></blockquote>
 
@@ -918,6 +950,11 @@ example above to exclude specific groups from a mass delete. However, this
 technique may not be used to exclude individual tags.  Instead, use
 <a href="#SetNewValuesFromFile">SetNewValuesFromFile</a> to recover the values
 of individual tags after deleting a group.</p>
+<p>The following ExifTool options are effective in the call to
+<a href="#SetNewValue">SetNewValue</a>:</p>
+<blockquote>
+Charset, IgnoreMinorErrors, ListSep, ListSplit, PrintConv and Verbose.
+</blockquote>
 
 <hr><h2><a name="SetNewValuesFromFile">SetNewValuesFromFile</a></h2>
 <p>A very powerful routine that sets new values for tags from information found
@@ -1210,23 +1247,73 @@ value.  In the case where the description doesn't exist, the tag name is returne
 </table></blockquote>
 
 <hr><h2><a name="GetGroup">GetGroup</a></h2>
-<p>Get group name for specified tag.</p>
+<p>Get group name(s) for a specified tag.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetGroup($$;$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
     <br><b>1)</b> Tag key
-    <br><b>2)</b> [<i>optional</i>] Group family number
+    <br><b>2)</b> [<i>optional</i>] Group family number, or string of numbers
+    separated by colons
 </td></tr>
-<tr><td valign='top'><b>Returns</b></td><td>Group name (or 'Other' if tag has no
+<tr><td valign='top'><b>Returns</b></td><td>Group name (or '' if tag has no
 group). If no group family is specified, returns the name of group in family 0
 when called in scalar context, or the names of groups for all families in list
-context.  See <a href="#GetAllGroups">GetAllGroups</a> for a list of group
-names.
+context. Returns a string of group names separated by colons if the input group
+family contains a colon.  The string is simplified to remove a leading 'Main:'
+and adjacent identical group names unless the family string begins with a colon.
 </td></tr>
 </table></blockquote>
-<p><b>Example:</b></p>
+<p>The following families of groups are available:</p>
+<blockquote><table class='norm'>
+<tr><th>Family</th><th>Description</th><th>Examples</th></tr>
+<tr><td align='center'>0</td><td>Information Type</td> <td>EXIF, XMP, IPTC</td></tr>
+<tr><td align='center'>1</td><td>Specific Location</td><td>IFD0, XMP-dc</td></tr>
+<tr><td align='center'>2</td><td>Category</td> <td>Author, Time</td></tr>
+<tr><td align='center'>3</td><td>Document Number</td> <td>Main, Doc1, Doc3-2</td></tr>
+</table></blockquote>
+
+<p>Families 0 and 1 are based on the file structure, and are similar except that
+family 1 is more specific -- it sub-divides the EXIF, MakerNotes, XMP and
+ICC_Profile groups to give more detail about the specific location where the
+information was found.  The EXIF group is split up based on the specific IFD
+(Image File Directory), the MakerNotes group is divided into groups for each
+manufacturer, and the XMP group is separated based on the XMP namespace prefix. 
+Note that only common XMP namespaces are listed below but additional namespaces
+may be present in some XMP data.  Also note that the '<code>XMP-xmp</code>...'
+group names may appear in the older form '<code>XMP-xap</code>...' since these
+names evolved as the XMP standard was developed.  The ICC_Profile group is
+broken down to give information about the specific ICC_Profile tag from which
+multiple values were extracted.  As well, information extracted from the
+ICC_Profile header is separated into the ICC-header group.</p>
+<p>Family 2 classifies information based on the logical category to which the
+information refers.</p>
+<p>Family 3 gives the document number when the
+<a href="#Embedded">ExtractEmbedded</a> option is used. Nested sub-documents (if
+they exist) are indicated by numbers separated with dashes in the group name, to
+an arbitrary depth. (ie. '<code>Doc2-3-1</code>' is the 1<sup>st</sup>
+sub-sub-document of the 3<sup>rd</sup> sub-document of the 2<sup>nd</sup>
+embedded document of the main file.)</p>
+<p>See <a href="#GetAllGroups">GetAllGroups</a> for lists of group names.</p>
+
+<p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
-my $group = $exifTool-&gt;<b>GetGroup</b>($tag, 0);
+<span class='com'># return family 0 group name (ie. 'EXIF')</span>
+$group = $exifTool-&gt;<b>GetGroup</b>($tag, 0);
+</pre></td></tr></table></blockquote>
+
+<blockquote><table class='box'><tr><td><pre>
+<span class='com'># return all groups (ie. qw{EXIF IFD0 Author Main})</span>
+@groups = $exifTool-&gt;<b>GetGroup</b>($tag);
+</pre></td></tr></table></blockquote>
+
+<blockquote><table class='box'><tr><td><pre>
+<span class='com'># return groups as a string (ie. 'Main:IFD0:Author')</span>
+$group = $exifTool-&gt;<b>GetGroup</b>($tag, ':3:1:2');
+</pre></td></tr></table></blockquote>
+
+<blockquote><table class='box'><tr><td><pre>
+<span class='com'># return groups as a simplified string (ie. 'IFD0:Author')</span>
+$group = $exifTool-&gt;<b>GetGroup</b>($tag, '3:1:2');
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="GetGroups">GetGroups</a></h2>
@@ -1241,7 +1328,7 @@ my $group = $exifTool-&gt;<b>GetGroup</b>($tag, 0);
 List of group names in alphabetical order.
 If information hash is not specified, the group names are returned for
 all extracted information.  See <a href="#GetAllGroups">GetAllGroups</a> for
-a complete list of group names.
+a list of groups in each family.
 </td></tr>
 </table></blockquote>
 <p><b>Examples:</b></p>
@@ -1331,12 +1418,13 @@ $tagName = Image::ExifTool::<b>GetTagName</b>($tag);
 <p>Get list of all available tag names.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetAllTags(;$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> [<i>optional</i>] Group name
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> [<i>optional</i>] Group name,
+or string of group names separated by colons
 </td></tr>
 <tr><td><b>Returns</b></td><td>A list of all available tags in alphabetical
-order, or all tags in specified group.  The group name is case insensitive,
-and any group in any family may be used except for EXIF family 1 groups (ie.
-the specific IFD).
+order, or all tags in a specified group or intersection of groups.  The
+group name is case insensitive, and any group in families 0-2 may be used
+except for EXIF family 1 groups (ie. the specific IFD).
 </td></tr>
 </table></blockquote>
 
@@ -1344,13 +1432,14 @@ the specific IFD).
 <p>Get list of all writable tag names.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetWritableTags(;$)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> [<i>optional</i>] Group name
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> [<i>optional</i>] Group name,
+or string of group names separated by colons
 </td></tr>
 <tr><td><b>Returns</b></td><td>A list of all writable tags in alphabetical
 order. These are the tags for which values may be set through
 <a href="#SetNewValue">SetNewValue</a>. If a group name is given, returns
-only writable tags in specified group. The group name is case insensitive,
-and any group in any family may be used except for EXIF family 1 groups (ie.
+only writable tags in specified group(s). The group name is case insensitive,
+and any group in families 0-2 may be used except for EXIF family 1 groups (ie.
 the specific IFD).
 </td></tr>
 </table></blockquote>
@@ -1359,29 +1448,11 @@ the specific IFD).
 <p>Get list of all group names in specified family.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetAllGroups($)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> Group family number (0-2)
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> Group family number (0-3)
 </td></tr>
 <tr><td><b>Returns</b></td>
 <td>A list of all groups in the specified family in alphabetical order</td></tr>
 </table></blockquote>
-<p>Three families of groups are currently defined: 0, 1 and 2. Families 0 and 1
-are based on the file structure, and family 2 classifies information based
-on the logical category to which the information refers.</p>
-
-<p>Families 0 and 1 are similar except that family 1 is more specific, and
-sub-divides the EXIF, MakerNotes, XMP and ICC_Profile groups to give more
-detail about the specific location where the information was found.  The
-EXIF group is split up based on the specific IFD (Image File Directory), the
-MakerNotes group is divided into groups for each manufacturer, and the XMP
-group is separated based on the XMP namespace prefix.  Note that only common
-XMP namespaces are listed below but additional namespaces may be present in
-some XMP data.  Also note that the '<code>XMP-xmp</code>...' group names may
-appear in the older form '<code>XMP-xap</code>...' since these names evolved as
-the XMP standard was developed.  The ICC_Profile group is broken down to give
-information about the specific ICC_Profile tag from which multiple values were
-extracted. As well, information extracted from the ICC_Profile header is
-separated into the ICC-header group.</p>
-
 <p>Here is a complete list of groups for each family:</p>
 <blockquote><table class='norm'>
 <tr><th>Family</th><th>Group Names</th></tr>
@@ -1396,31 +1467,34 @@ QuickTime, RAF, RIFF, Rawzor, Real, Ricoh, SVG, SigmaRaw, Vorbis, XMP, ZIP
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td>AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom, CanonRaw,
 CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky, EPPIM, EXE,
-ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, FotoStation, FujiFilm, GPS,
-GeoTiff, GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod,
-HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view,
-ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, ITC,
-InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
+EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, FotoStation, FujiFilm,
+GPS, GeoTiff, GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc,
+HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
+ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
+IPTC, ITC, InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
 KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, MAC,
-MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo,
-MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient,
-MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF,
-MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta, MinoltaRaw,
-Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF, PICT, PNG,
-Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo, PostScript,
-PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor, Real,
-Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
-Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo, Sigma, SigmaRaw,
-Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM, XMP-PixelLive, XMP-album,
-XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore,
-XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-photomech,
-XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-tiff,
-XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS,
-XMP-xmpRights, XMP-xmpTPg, ZIP
+MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS,
+MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+MIE-Orient, MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
+MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
+MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF,
+PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
+PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor,
+Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5,
+Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo,
+Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
+XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
+XMP-dex, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
+XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism,
+XMP-prl, XMP-pur, XMP-rdf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
+XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
 Time, Unknown, Video
+</td></tr>
+<tr><td><b>3&nbsp;(Document&nbsp;Number)</b></td>
+<td>Doc#, Main
 </td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
@@ -1497,8 +1571,8 @@ my $writable = Image::ExifTool::<b>CanWrite</b>($filename);
 <tr><td valign='top'><b>Inputs</b></td>
 <td><b>0)</b> File name, file extension, or file type</td></tr>
 <tr><td><b>Returns</b></td><td>True if the file type can be created
-from scratch.  Currently, this can only be done with XMP, MIE, ICC
-and VRD files.</td></tr>
+from scratch.  Currently, this can only be done with XMP, MIE, ICC,
+VRD and EXIF files.</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>

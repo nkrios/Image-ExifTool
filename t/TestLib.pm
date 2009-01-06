@@ -22,7 +22,7 @@ require Exporter;
 use Image::ExifTool qw(ImageInfo);
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.11';
+$VERSION = '1.12';
 @ISA = qw(Exporter);
 @EXPORT = qw(check writeCheck testCompare binaryCompare testVerbose);
 
@@ -215,11 +215,12 @@ sub closeEnough($$)
 # Inputs: 0) [optional] ExifTool object reference
 #         1) tag hash reference, 2) test name, 3) test number
 #         4) test number for comparison file (if different than this test)
+#         5) top group number to test (2 by default)
 # Returns: 1 if check passed
-sub check($$$;$$)
+sub check($$$;$$$)
 {
     my $exifTool = shift if ref $_[0] ne 'HASH';
-    my ($info, $testname, $testnum, $stdnum) = @_;
+    my ($info, $testname, $testnum, $stdnum, $topGroup) = @_;
     return 0 unless $info;
     $stdnum = $testnum unless defined $stdnum;
     my $testfile = "t/${testname}_$testnum.failed";
@@ -262,7 +263,8 @@ sub check($$$;$$)
         }
         # (no "\n" needed since we set the output line separator above)
         if ($exifTool) {
-            my $groups = join ', ', $exifTool->GetGroup($_);
+            my @groups = $exifTool->GetGroup($_);
+            my $groups = join ', ', @groups[0..($topGroup||2)];
             my $tagID = $exifTool->GetTagID($_);
             my $desc = $exifTool->GetDescription($_);
             print FILE "[$groups] $tagID - $desc: $val";

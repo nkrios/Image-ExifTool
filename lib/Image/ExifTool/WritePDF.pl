@@ -355,7 +355,7 @@ sub WritePDF($$)
     my $tagID;
     foreach $tagID (sort keys %$newTags) {
         my $tagInfo = $$newTags{$tagID};
-        my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+        my $nvHash = $exifTool->GetNewValueHash($tagInfo);
         my (@vals, $deleted);
         my $tag = $$tagInfo{Name};
         my $val = $$info{$tag};
@@ -372,9 +372,9 @@ sub WritePDF($$)
                 $val = shift @oldVals;
             }
             for (;;) {
-                if (Image::ExifTool::IsOverwriting($newValueHash, $val) > 0) {
+                if (Image::ExifTool::IsOverwriting($nvHash, $val) > 0) {
                     $deleted = 1;
-                    print $out "    - PDF:$tag = '",$exifTool->Printable($val),"'\n" if $out;
+                    $exifTool->VerboseValue("- PDF:$tag", $val);
                     ++$infoChanged;
                 } else {
                     push @vals, $val;
@@ -390,13 +390,13 @@ sub WritePDF($$)
         next unless $deleted or $$tagInfo{List} or not exists $$infoDict{$tagID};
 
         # add new values to existing ones
-        my @newVals = Image::ExifTool::GetNewValues($newValueHash);
+        my @newVals = Image::ExifTool::GetNewValues($nvHash);
         if (@newVals) {
             push @vals, @newVals;
             ++$infoChanged;
             if ($out) {
                 foreach $val (@newVals) {
-                    print $out "    + PDF:$tag = '",$exifTool->Printable($val),"'\n";
+                    $exifTool->VerboseValue("+ PDF:$tag", $val);
                 }
             }
         }
@@ -695,7 +695,7 @@ C<PDF-update> pseudo group).
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

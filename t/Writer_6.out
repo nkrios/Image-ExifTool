@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.53
 [File, File, Image]  - File Name: Writer_6_failed.jpg
 [File, File, Image]  - Directory: t
 [File, File, Image]  - File Size: 5.7 kB
-[File, File, Time]  - File Modification Date/Time: 2008:10:25 13:16:44-04:00
+[File, File, Time]  - File Modification Date/Time: 2008:11:10 12:46:19-05:00
 [File, File, Image]  - File Type: JPEG
 [File, File, Image]  - MIME Type: image/jpeg
 [File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
@@ -154,7 +154,7 @@
 [MakerNotes, Canon, Camera] 0 - Canon 0x0000: 0 0 0 0 0 0 3072000 892 2048000 595 65540 262146
 [IPTC, IPTC, Other] 15 - Category: IPTC test
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.53
 [XMP, XMP-dc, Image] description - Description: New description
 [XMP, XMP-exif, Camera] Contrast - Contrast: High
 [Composite, Composite, Image]  - Aperture: 14.0

@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.04';
+$VERSION = '1.06';
 
 sub ProcessMRW($$;$);
 
@@ -270,15 +270,15 @@ sub ProcessMRW($$;$)
             print $out "MRW ",$exifTool->Printable($tag)," segment ($len bytes):\n";
             if ($verbose > 2) {
                 $raf->Read($data,$len) == $len and $raf->Seek($pos,0) or $err = 1, last;
-                my %parms = (Addr => $pos, Out => $out);
-                $parms{MaxLen} = 96 unless $verbose > 3;
-                Image::ExifTool::HexDump(\$data,undef,%parms);
+                $exifTool->VerboseDump(\$data);
             }
         }
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         if ($tagInfo and $$tagInfo{SubDirectory}) {
             my $subTable = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
             my $buff;
+            # save shift for values stored with wrong base offset
+            $$exifTool{MRW_WrongBase} = -($raf->Tell());
             $raf->Read($buff, $len) == $len or $err = 1, last;
             my %subdirInfo = (
                 DataPt => \$buff,
@@ -348,7 +348,7 @@ write Konica-Minolta RAW (MRW) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

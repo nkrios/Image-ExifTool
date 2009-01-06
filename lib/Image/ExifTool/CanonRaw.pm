@@ -725,7 +725,7 @@ sub ProcessCanonRaw($$$)
             } else {
                 $value = "Binary data $size bytes";
                 if ($tagInfo) {
-                    if ($exifTool->Options('Binary')) {
+                    if ($exifTool->Options('Binary') or $verbose) {
                         # read the value anyway
                         unless ($raf->Seek($ptr, 0) and $raf->Read($value, $size) == $size) {
                             $exifTool->Warn(sprintf("Error reading %d bytes from 0x%x",$size,$ptr));
@@ -894,7 +894,7 @@ tags.)
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

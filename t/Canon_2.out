@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.43
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.57
 [File, File, Image]  - File Name: Canon1DmkIII.jpg
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 8.1 kB
@@ -84,6 +84,7 @@
 [MakerNotes, Canon, Camera] 37 - Zoom Target Width: 0
 [MakerNotes, Canon, Camera] 41 - Manual Flash Output: n/a
 [MakerNotes, Canon, Camera] 42 - Color Tone: Normal
+[MakerNotes, Canon, Camera] 46 - SRAW Quality: n/a
 [MakerNotes, Canon, Image] 1 - Focal Length: 35 mm
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
 [MakerNotes, Canon, Image] 2 - Base ISO: 3200
@@ -103,7 +104,6 @@
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/128
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS High-end
-[MakerNotes, Canon, Image] 27 - Auto Rotate: Rotated by Software
 [MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
 [MakerNotes, Canon, Image] 33 - Flash Output: 0
 [MakerNotes, Canon, Camera] 6 - Canon Image Type: Canon EOS-1D Mark III

@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -517,8 +517,8 @@ sub WriteKodakIFD($$$);
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
-        Kodak models such as the P712, P850, P880, Z612 and Z712 use standard TIFF
-        IFD format for the maker notes.  In keeping with Kodak's strategy of
+        Kodak models such as the P712, P850, P880, Z612, Z712 and Z8612 use standard
+        TIFF IFD format for the maker notes.  In keeping with Kodak's strategy of
         inconsitent makernotes, some models such as the Z1085 also use these tags,
         but for these models the makernotes begin with a TIFF header instead of an
         IFD entry count and use relative instead of absolute offsets.  There is a
@@ -596,6 +596,54 @@ sub WriteKodakIFD($$$);
             TagTable => 'Image::ExifTool::Kodak::CameraInfo',
             Start => '$val',
         },
+    },
+);
+
+# Kodak type 9 maker notes (ref PH)
+%Image::ExifTool::Kodak::Type9 = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    NOTES => 'These tags are used by the C1013.',
+    0x0c => {
+        Name => 'FNumber',
+        Format => 'int16u',
+        ValueConv => '$val / 100',
+        ValueConvInv => 'int($val * 100 + 0.5)',
+    },
+    0x10 => {
+        Name => 'ExposureTime',
+        Format => 'int32u',
+        ValueConv => '$val / 1e6',
+        ValueConvInv => '$val * 1e6',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
+    0x14 => {
+        Name => 'DateTimeOriginal',
+        Description => 'Date/Time Original',
+        Groups => { 2 => 'Time' },
+        Format => 'string[20]',
+        Shift => 'Time',
+        ValueConv => '$val=~s{/}{:}g; $val',
+        ValueConvInv => '$val=~s{^(\d{4}):(\d{2}):}{$1/$2/}; $val',
+        PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$self->InverseDateTime($val,0)', 
+    },
+    0x34 => {
+        Name => 'ISO',
+        Format => 'int16u',
+    },
+    0x57 => {
+        Name => 'FirmwareVersion',
+        Format => 'string[16]',
+    },
+    0xa8 => { # (not confirmed)
+        Name => 'SerialNumber',
+        Format => 'string[12]',
     },
 );
 
@@ -1336,7 +1384,7 @@ interpret Kodak maker notes EXIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

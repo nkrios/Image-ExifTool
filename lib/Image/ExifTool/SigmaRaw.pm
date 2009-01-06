@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
@@ -346,13 +346,8 @@ sub ProcessX3FDirectory($$$)
             $exifTool->VPrint(0, "$exifTool->{INDENT}$index) $tag Subsection ($len bytes):\n");
             if ($verbose > 2) {
                 $raf->Seek($offset, 0) or return 'Error seeking';
-                my $n = $verbose > 3 ? $len : 64;
-                $n = $len if $n > $len;
-                $raf->Read($buff, $n) == $n or return 'Truncated image';
-                Image::ExifTool::HexDump(\$buff, undef,
-                    Prefix => $exifTool->{INDENT},
-                    Out => $exifTool->Options('TextOut'),
-                );
+                $raf->Read($buff, $len) == $len or return 'Truncated image';
+                $exifTool->VerboseDump(\$buff);
             }
         }
         next unless $tagInfo;
@@ -455,7 +450,7 @@ Sigma and Foveon X3F images.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -139,10 +139,10 @@ sub AddChunks($$)
 
     foreach $tag (sort keys %$addTags) {
         my $tagInfo = $$addTags{$tag};
-        my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+        my $nvHash = $exifTool->GetNewValueHash($tagInfo);
         # (always create native PNG information, so don't check IsCreating())
-        next unless Image::ExifTool::IsOverwriting($newValueHash) > 0;
-        my $val = Image::ExifTool::GetNewValues($newValueHash);
+        next unless Image::ExifTool::IsOverwriting($nvHash) > 0;
+        my $val = Image::ExifTool::GetNewValues($nvHash);
         if (defined $val) {
             my $data;
             if ($$tagInfo{Table} eq \%Image::ExifTool::PNG::TextualData) {
@@ -176,7 +176,7 @@ sub AddChunks($$)
             my $hdr = pack('N', length($data) - 4);
             my $cbuf = pack('N', CalculateCRC(\$data, undef));
             Write($outfile, $hdr, $data, $cbuf) or $err = 1;
-            $exifTool->VPrint(1, "    + PNG:$$tagInfo{Name} = '",$exifTool->Printable($val),"'\n");
+            $exifTool->VerboseValue("+ PNG:$$tagInfo{Name}", $val);
             ++$exifTool->{CHANGED};
         }
     }
@@ -192,19 +192,9 @@ sub AddChunks($$)
             $exifTool->VPrint(0, "Creating EXIF profile:\n");
             $exifTool->{TIFF_TYPE} = 'APP1';
             $tagTablePtr = GetTagTable('Image::ExifTool::Exif::Main');
-            # use specified byte ordering or ordering from maker notes if set
-            my $byteOrder = $exifTool->Options('ByteOrder') ||
-                $exifTool->GetNewValues('ExifByteOrder') || $exifTool->{MAKER_NOTE_BYTE_ORDER} || 'MM';
-            unless (SetByteOrder($byteOrder)) {
-                warn "Invalid byte order '$byteOrder'\n";
-                $byteOrder = $exifTool->{MAKER_NOTE_BYTE_ORDER} || 'MM';
-                SetByteOrder($byteOrder);
-            }
-            $dirInfo{NewDataPos} = 8,   # new data will come after TIFF header
-            $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
+            $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr, \&Image::ExifTool::WriteTIFF);
             if (defined $buff and length $buff) {
-                my $tiffHdr = $byteOrder . Set16u(42) . Set32u(8);
-                $buff = $Image::ExifTool::exifAPP1hdr . $tiffHdr . $buff;
+                $buff = $Image::ExifTool::exifAPP1hdr . $buff;
                 WriteProfile($outfile, 'APP1', \$buff, 'generic') or $err = 1;
             }
         } elsif ($dir eq 'XMP') {
@@ -281,7 +271,7 @@ strings).
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

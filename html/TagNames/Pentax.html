@@ -177,6 +177,7 @@ These tags are used in Pentax/Asahi cameras.
   <br>5 = Pan Focus
   <br>16 = AF-S
   <br>17 = AF-C
+  <br>18 = AF-A
   <br><span class=n>(Asahi models)</span>
   <br>0 = Normal
   <br>1 = Macro (1)
@@ -478,6 +479,9 @@ step size)</span></span></td></tr>
   <br>&#39;0 16&#39; = Pet
   <br>&#39;0 17&#39; = Candlelight
   <br>&#39;0 18&#39; = Museum
+  <br>&#39;0 19&#39; = Food
+  <br>&#39;0 20&#39; = Stage Lighting
+  <br>&#39;0 21&#39; = Night Snap
   <br>&#39;1 4&#39; = Auto PICT (Standard)
   <br>&#39;1 5&#39; = Auto PICT (Portrait)
   <br>&#39;1 6&#39; = Auto PICT (Landscape)
@@ -856,23 +860,23 @@ step size)</span></span></td></tr>
 </tr><tr><td class=r>0x12b1a</td><td>= *ist DL</td>
 <td class='r b'>0x12cfa</td><td class=b>= K200D</td>
 </tr><tr><td class=r>0x12b24</td><td>= Optio S60</td>
-<td class='r b'>0x12d0e</td><td class=b>= Optio E50</td>
+<td class='r b'>0x12d04</td><td class=b>= Optio S12</td>
 </tr><tr><td class=r>0x12b2e</td><td>= Optio S45</td>
-<td class='r b'>0x12d18</td><td class=b>= Optio M50</td>
+<td class='r b'>0x12d0e</td><td class=b>= Optio E50</td>
 </tr><tr><td class=r>0x12b38</td><td>= Optio S6</td>
-<td class='r b'>0x12d2c</td><td class=b>= Optio V20</td>
+<td class='r b'>0x12d18</td><td class=b>= Optio M50</td>
 </tr><tr><td class=r>0x12b4c</td><td>= Optio WPi</td>
-<td class='r b'>0x12d40</td><td class=b>= Optio W60</td>
+<td class='r b'>0x12d2c</td><td class=b>= Optio V20</td>
 </tr><tr><td class=r>0x12b56</td><td>= BenQ DC X600</td>
-<td class='r b'>0x12d4a</td><td class=b>= Optio M60</td>
+<td class='r b'>0x12d40</td><td class=b>= Optio W60</td>
 </tr><tr><td class=r>0x12b60</td><td>= *ist DS2</td>
-<td class='r b'>0x12d68</td><td class=b>= Optio E60</td>
+<td class='r b'>0x12d4a</td><td class=b>= Optio M60</td>
 </tr><tr><td class=r>0x12b62</td><td>= Samsung GX-1S</td>
-<td class='r b'>0x12d72</td><td class=b>= K-m / K2000 (a)</td>
+<td class='r b'>0x12d68</td><td class=b>= Optio E60</td>
 </tr><tr><td class=r>0x12b6a</td><td>= Optio A10</td>
-<td class='r b'>0x12d73</td><td class=b>= K-m / K2000</td>
+<td class='r b'>0x12d72</td><td class=b>= K-m / K2000 (pre-production)</td>
 </tr><tr><td class=r>0x12b7e</td><td>= *ist DL2</td>
-<td class='r b'>&nbsp;</td><td class=b>&nbsp;</td>
+<td class='r b'>0x12d73</td><td class=b>= K-m / K2000</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='City'>Pentax City Values</a></h2>
@@ -1260,8 +1264,9 @@ released, including time for focusing)</span></span></td></tr>
 <td class=c>int8u</td>
 <td><span class=s>[Mask 0xf]
   <br>0x0 = Manual
-  <br>Bit 0 = AF-S
-  <br>Bit 1 = AF-C</span></td></tr>
+  <br>0x1 = AF-S
+  <br>0x2 = AF-C
+  <br>0x3 = AF-A</span></td></tr>
 <tr class=b>
 <td class=r>4</td>
 <td>AFPointSelected2</td>
@@ -2204,7 +2209,7 @@ ASCII text in a format very similar to some HP models.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 22, 2008</i>
+<br><i>Last revised Dec 9, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.53
 [File, File, Image]  - File Name: DjVu.djvu
 [File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 889 bytes
-[File, File, Time]  - File Modification Date/Time: 2008:09:25 12:24:48-04:00
+[File, File, Image]  - File Size: 955 bytes
+[File, File, Time]  - File Modification Date/Time: 2008:11:11 09:28:57-05:00
 [File, File, Image]  - File Type: DJVU (multi-page)
 [File, File, Image]  - MIME Type: image/vnd.djvu
 [DjVu, DjVu, Image] 0 - Subfile Type: Single-page image
@@ -18,15 +18,24 @@
 [DjVu, DjVu-Meta, Image] Title - Title: DjVu Metadata Sample
 [DjVu, DjVu-Meta, Image] Subject - Subject: ExifTool DjVu test image
 [DjVu, DjVu-Meta, Time] CreationDate - Create Date: 2008:09:23 12:31:34-04:00
-[DjVu, DjVu-Meta, Time] ModDate - Modify Date: 2008:09:24 14:27:57-04:00
+[DjVu, DjVu-Meta, Time] ModDate - Modify Date: 2008:11:11 09:17:10-05:00
 [DjVu, DjVu-Meta, Image] Keywords - Keywords: ExifTool, Test, DjVu, XMP
+[DjVu, DjVu-Meta, Image] Producer - Producer: djvused
+[DjVu, DjVu-Meta, Image] Trapped - Trapped: Unknown
+[DjVu, DjVu-Meta, Image] Creator - Creator: ExifTool
 [DjVu, DjVu-Meta, Image] url - URL: http://owl.phy.queensu.ca/~phil/exiftool/
-[DjVu, DjVu-Meta, Image] note - Note: (double quotes (") must be escaped)
+[DjVu, DjVu-Meta, Image] note - Note: Must escape double quotes (") and backslashes (\)
 [DjVu, DjVu-Meta, Image] annote - Annotation: Did you get this?
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.44
-[XMP, XMP-album, Image] Notes - Notes: (double quotes (") must be escaped)
-[XMP, XMP-dc, Time] date - Date: 2008:09:23 12:31:34-04:00
-[XMP, XMP-dc, Image] description - Description: Embedded XMP test
+[XMP, XMP-album, Image] Notes - Notes: Must escape double quotes (") and backslashes (\)
+[XMP, XMP-dc, Author] creator - Creator: Phil Harvey
+[XMP, XMP-dc, Image] description - Description: ExifTool DjVu test image
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2008 Phil Harvey
 [XMP, XMP-dc, Image] subject - Subject: ExifTool, Test, DjVu, XMP
+[XMP, XMP-dc, Image] title - Title: DjVu Metadata Sample
+[XMP, XMP-pdf, Image] Keywords - Keywords: ExifTool, Test, DjVu, XMP
+[XMP, XMP-pdf, Author] Producer - Producer: djvused
+[XMP, XMP-pdf, Image] Trapped - Trapped: Unknown
+[XMP, XMP-xmp, Time] CreateDate - Create Date: 2008:09:23 12:31:34-04:00
+[XMP, XMP-xmp, Image] CreatorTool - Creator Tool: ExifTool
+[XMP, XMP-xmp, Time] ModifyDate - Modify Date: 2008:11:11 09:17:10-05:00
 [Composite, Composite, Image]  - Image Size: 8x8

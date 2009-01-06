@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 # MIFF chunks
 %Image::ExifTool::MIFF::Main = (
@@ -231,10 +231,8 @@ sub ProcessMIFF($$)
             $exifTool->Warn("Unknown MIFF $type profile data");
             if ($verbose) {
                 $exifTool->VerboseDir($type, 0, $len);
-                Image::ExifTool::HexDump(\$buff, undef,
-                    Out => $exifTool->Options('TextOut')
-                ) if $verbose > 2;
-             }
+                $exifTool->VerboseDump(\$buff);
+            }
          }
     }
     return 1;
@@ -259,7 +257,7 @@ This module contains routines required by Image::ExifTool to read MIFF
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

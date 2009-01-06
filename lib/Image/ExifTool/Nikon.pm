@@ -48,8 +48,9 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.97';
+$VERSION = '2.01';
 
+sub LensIDConv($$$);
 sub FlashModelConv($$$);
 
 # nikon lens ID numbers (ref 8/11)
@@ -61,6 +62,7 @@ my %nikonLensIDs = (
         that order.  (source:
         L<http://www.rottmerhusen.com/objektives/lensid/thirdparty.html>)
     },
+    OTHER => \&LensIDConv,
     # (hex digits must be uppercase in keys below)
     '01 58 50 50 14 14 02 00' => 'AF Nikkor 50mm f/1.8',
     '01 00 00 00 00 00 02 00' => 'AF Teleconverter TC-16A 1.6x',
@@ -106,6 +108,7 @@ my %nikonLensIDs = (
     '27 48 8E 8E 24 24 F2 02' => 'AF-I Nikkor 300mm f/2.8D IF-ED + TC-20E',
     '28 3C A6 A6 30 30 1D 02' => 'AF-I Nikkor 600mm f/4D IF-ED',
     '2A 54 3C 3C 0C 0C 26 02' => 'AF Nikkor 28mm f/1.4D',
+    '2B 3C 44 60 30 3C 1F 02' => 'AF Zoom-Nikkor 35-80mm f/4-5.6D',
     '2C 48 6A 6A 18 18 27 02' => 'AF DC-Nikkor 105mm f/2D',
     '2D 48 80 80 30 30 21 02' => 'AF Micro-Nikkor 200mm f/4D IF-ED',
     '2E 48 5C 82 30 3C 28 02' => 'AF Nikkor 70-210mm f/4-5.6D',
@@ -122,7 +125,7 @@ my %nikonLensIDs = (
     '38 4C 62 62 14 14 37 02' => 'AF Nikkor 85mm f/1.8D',
     '3A 40 3C 5C 2C 34 39 02' => 'AF Zoom-Nikkor 28-70mm f/3.5-4.5D',
     '3B 48 44 5C 24 24 3A 02' => 'AF Zoom-Nikkor 35-70mm f/2.8D N',
-    '3C 48 60 80 24 24 3B 02' => 'AF Nikkor 80-200mm f/2.8 ED', #25
+    '3C 48 60 80 24 24 3B 02' => 'AF Zoom-Nikkor 80-200mm f/2.8 ED', #25
     '3D 3C 44 60 30 3C 3E 02' => 'AF Zoom-Nikkor 35-80mm f/4-5.6D',
     '3E 48 3C 3C 24 24 3D 02' => 'AF Nikkor 28mm f/2.8D',
     '3F 40 44 6A 2C 34 45 02' => 'AF Zoom-Nikkor 35-105mm f/3.5-4.5D',
@@ -130,7 +133,7 @@ my %nikonLensIDs = (
     '42 54 44 44 18 18 44 02' => 'AF Nikkor 35mm f/2D',
     '43 54 50 50 0C 0C 46 02' => 'AF Nikkor 50mm f/1.4D',
     '44 44 60 80 34 3C 47 02' => 'AF Nikkor 80-200mm f/4.5-5.6D',
-    '45 40 3C 60 2C 3C 48 02' => 'AF Zoom-Nikkor 28-80mm F/3.5-5.6D',
+    '45 40 3C 60 2C 3C 48 02' => 'AF Zoom-Nikkor 28-80mm f/3.5-5.6D',
     '46 3C 44 60 30 3C 49 02' => 'AF Zoom-Nikkor 35-80mm f/4-5.6D N',
     '47 42 37 50 2A 34 4A 02' => 'AF Zoom-Nikkor 24-50mm f/3.3-4.5D',
     '48 48 8E 8E 24 24 4B 02' => 'AF-S Nikkor 300mm f/2.8D IF-ED',
@@ -150,6 +153,7 @@ my %nikonLensIDs = (
     '56 48 5C 8E 30 3C 5A 02' => 'AF Zoom-Nikkor 70-300mm f/4-5.6D ED',
     '59 48 98 98 24 24 5D 02' => 'AF-S Nikkor 400mm f/2.8D IF-ED',
     '5A 3C 3E 56 30 3C 5E 06' => 'IX-Nikkor 30-60mm f/4-5.6',
+    '5B 44 56 7C 34 3C 5F 06' => 'IX-Nikkor 60-180mm f/4.5-5.6',
     '5D 48 3C 5C 24 24 63 02' => 'AF-S Zoom-Nikkor 28-70mm f/2.8D IF-ED',
     '5E 48 60 80 24 24 64 02' => 'AF-S Zoom-Nikkor 80-200mm f/2.8D IF-ED',
     '5F 40 3C 6A 2C 34 65 02' => 'AF Zoom-Nikkor 28-105mm f/3.5-4.5D IF',
@@ -201,11 +205,12 @@ my %nikonLensIDs = (
     '99 40 29 62 2C 3C 9B 0E' => 'AF-S DX VR Zoom-Nikkor 16-85mm f/3.5-5.6G ED',
     '9A 40 2D 53 2C 3C 9C 0E' => 'AF-S DX VR Zoom-Nikkor 18-55mm f/3.5-5.6G',
     '9B 54 4C 4C 24 24 9D 02' => 'PC-E Micro Nikkor 45mm f/2.8D ED',
-    '9B 00 4C 4C 24 24 9D 02' => 'PC-E Micro Nikkor 45mm f/2.8D ED',
+    '9B 00 4C 4C 24 24 9D 06' => 'PC-E Micro Nikkor 45mm f/2.8D ED',
     '9C 54 56 56 24 24 9E 06' => 'AF-S Micro Nikkor 60mm f/2.8G ED',
-    '9D 54 62 62 24 24 9F 06' => 'PC-E Micro Nikkor 85mm f/2.8D',
+    '9D 54 62 62 24 24 9F 02' => 'PC-E Micro Nikkor 85mm f/2.8D',
     '9D 00 62 62 24 24 9F 06' => 'PC-E Micro Nikkor 85mm f/2.8D',
     '9E 40 2D 6A 2C 3C A0 0E' => 'AF-S DX VR Zoom-Nikkor 18-105mm f/3.5-5.6G ED', #PH/10
+    'A0 54 50 50 0C 0C A2 06' => 'AF-S Nikkor 50mm f/1.4G',
 #
     'FE 47 00 00 24 24 4B 06' => 'Sigma 4.5mm F2.8 EX DC Circular Fisheye HSM', #JD
     '26 48 11 11 30 30 1C 02' => 'Sigma 8mm F4 EX Circular Fisheye',
@@ -216,6 +221,7 @@ my %nikonLensIDs = (
     '26 48 27 27 24 24 1C 02' => 'Sigma 15mm F2.8 EX Diagonal Fisheye',
     '26 58 31 31 14 14 1C 02' => 'Sigma 20mm F1.8 EX Aspherical DG DF RF',
     '26 58 37 37 14 14 1C 02' => 'Sigma 24mm F1.8 EX Aspherical DG DF Macro',
+    'E1 58 37 37 14 14 1C 02' => 'Sigma 24mm F1.8 EX Aspherical DG DF Macro', #24
     '02 46 37 37 25 25 02 00' => 'Sigma 24mm F2.8 Macro',
     '26 58 3C 3C 14 14 1C 02' => 'Sigma 28mm F1.8 EX DG DF',
     '48 54 3E 3E 0C 0C 4B 06' => 'Sigma 30mm F1.4 EX DC HSM',
@@ -235,7 +241,6 @@ my %nikonLensIDs = (
     '02 2F 98 98 3D 3D 02 00' => 'Sigma 400mm F5.6 APO',
     '02 37 A0 A0 34 34 02 00' => 'Sigma APO 500mm F4.5', #19
     '48 44 A0 A0 34 34 4B 02' => 'Sigma APO 500mm F4.5 EX HSM',
-    '48 3C B0 B0 3C 3C 4B 02' => 'Sigma APO 800mm F5.6 EX HSM',
     '48 3C 19 31 30 3C 4B 06' => 'Sigma 10-20mm F4-5.6 EX DC HSM',
     'F9 3C 19 31 30 3C 4B 06' => 'Sigma 10-20mm F4-5.6 EX DC HSM', #JD
     '48 38 1F 37 34 3C 4B 06' => 'Sigma 12-24mm F4.5-5.6 EX Aspherical DG HSM',
@@ -251,6 +256,7 @@ my %nikonLensIDs = (
     '26 40 2D 50 2C 3C 1C 06' => 'Sigma 18-50mm F3.5-5.6 DC',
     '7A 40 2D 50 2C 3C 4B 06' => 'Sigma 18-50mm F3.5-5.6 DC HSM',
     '26 40 2D 70 2B 3C 1C 06' => 'Sigma 18-125mm F3.5-5.6 DC',
+    'CD 3D 2D 70 2E 3C 4B 06' => 'Sigma 18-125mm F3.8-5.6 DC OS HSM',
     '26 40 2D 80 2C 40 1C 06' => 'Sigma 18-200mm F3.5-6.3 DC',
     'ED 40 2D 80 2C 40 4B 0E' => 'Sigma 18-200mm F3.5-6.3 DC OS HSM', #JD
     '26 48 31 49 24 24 1C 02' => 'Sigma 20-40mm F2.8',
@@ -275,6 +281,7 @@ my %nikonLensIDs = (
     '26 40 3C 8E 2C 40 1C 02' => 'Sigma 28-300mm F3.5-6.3 Macro',
     '02 40 44 73 2B 36 02 00' => 'Sigma 35-135mm F3.5-4.5 a',
     '7A 47 50 76 24 24 4B 06' => 'Sigma 50-150mm F2.8 EX APO DC HSM',
+    'FD 47 50 76 24 24 4B 06' => 'Sigma 50-150mm F2.8 EX APO DC HSM II',
     '48 3C 50 A0 30 40 4B 02' => 'Sigma 50-500mm F4-6.3 EX APO RF HSM',
     '26 3C 54 80 30 3C 1C 06' => 'Sigma 55-200mm F4-5.6 DC',
     '7A 3B 53 80 30 3C 4B 06' => 'Sigma 55-200mm F4-5.6 DC HSM',
@@ -295,6 +302,7 @@ my %nikonLensIDs = (
     'CE 34 76 A0 38 40 4B 0E' => 'Sigma 150-500mm F5-6.3 DG OS APO HSM', #JD
     '26 40 7B A0 34 40 1C 02' => 'Sigma APO 170-500mm F5-6.3 Aspherical RF',
     '48 3C 8E B0 3C 3C 4B 02' => 'Sigma APO 300-800 F5.6 EX DG HSM',
+    '48 3C B0 B0 3C 3C 4B 02' => 'Sigma APO 800mm F5.6 EX HSM',
 #
     '32 53 64 64 24 24 35 02' => 'Tamron SP AF 90mm f/2.8 Di Macro 1:1 (272E)',
     'F8 55 64 64 24 24 84 06' => 'Tamron SP AF 90mm f/2.8 Di Macro 1:1',
@@ -306,6 +314,7 @@ my %nikonLensIDs = (
     '00 54 2B 50 24 24 00 06' => 'Tamron SP AF 17-50mm f/2.8 XR Di II LD Aspherical [IF] (A16NII)',
     '00 3F 2D 80 2B 40 00 06' => 'Tamron AF 18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF)',
     '00 3F 2D 80 2C 40 00 06' => 'Tamron AF 18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF) Macro',
+    '00 40 2D 80 2C 40 00 06' => 'Tamron AF 18-200mm f/3.5-6.3 XR Di-II LD Aspherical (IF) Macro', #25
     '00 40 2D 88 2C 40 62 06' => 'Tamron AF 18-250mm f/3.5-6.3 Di II LD Aspherical (IF) Macro', # A18N?
     '00 40 2D 88 2C 40 00 06' => 'Tamron AF 18-250mm f/3.5-6.3 Di II LD Aspherical (IF) Macro (A18NII)', #JD
     'F5 40 2C 8A 2C 40 40 0E' => 'Tamron AF 18-270mm f/3.5-6.3 Di II VC LD Aspherical [IF] Macro',
@@ -323,7 +332,9 @@ my %nikonLensIDs = (
     '0B 3E 3D 7F 2F 3D 0E 00' => 'Tamron AF 28-200mm f/3.8-5.6',
     '4D 41 3C 8E 2B 40 62 02' => 'Tamron AF 28-300mm f/3.5-6.3 XR Di LD Aspherical (IF)',
     '4D 41 3C 8E 2C 40 62 02' => 'Tamron AF 28-300mm f/3.5-6.3 XR LD Aspherical (IF)',
+    'F9 40 3C 8E 2C 40 40 0E' => 'Tamron AF 28-300mm f/3.5-6.3 XR Di VC LD Aspherical [IF] MACRO',
     '00 47 53 80 30 3C 00 06' => 'Tamron AF 55-200mm f/4-5.6 Di II LD',
+    'F7 53 5C 80 24 24 84 06' => 'Tamron SP AF 70-200mm f/2.8 Di LD [IF] MACRO',
     '69 48 5C 8E 30 3C 6F 02' => 'Tamron AF 70-300mm f/4-5.6 LD Macro 1:2',
     '00 48 5C 8E 30 3C 00 06' => 'Tamron AF 70-300mm f/4-5.6 Di LD Macro 1:2', #JD
     '20 3C 80 98 3D 3D 1E 02' => 'Tamron AF 200-400mm f/5.6 LD IF',
@@ -371,7 +382,7 @@ my %flashModels = (
     '0 54 0 0' => 'Internal', # (D50, D70 or D70s)
     '2 46 0 0' => 'Internal', # (D80)
     '2 48 0 0' => 'Internal', # (D200 or D40)
-    '2 50 0 0' => 'Internal', # (D300)
+    '2 50 0 0' => 'Internal', # (D300 or D700)
     '0 0 0 0'  => '(none)',
     '0 72 0 0' => '(none)', # (D50)
     '0 78 0 0' => '(none)', # (D70 or D70s)
@@ -1405,7 +1416,7 @@ my %retouchValues = (
         PrintConv => { 0 => 'No', 1 => 'Yes' },
     },
     3 => {
-        Name => 'DateFormat',
+        Name => 'DateDisplayFormat',
         PrintConv => {
             0 => 'Y/M/D',
             1 => 'M/D/Y',
@@ -2183,6 +2194,28 @@ my %nikonFocalConversions = (
             7 => 'External',
         }},
     },
+    708 => {
+        Name => 'NikonImageSize',
+        Mask => 0xf0,
+        PrintConv => {
+            0x00 => 'Large (10.0 M)',
+            0x10 => 'Medium (5.6 M)',
+            0x20 => 'Small (2.5 M)',
+        },
+    },
+    708.1 => {
+        Name => 'ImageQuality',
+        Mask => 0x0f,
+        PrintConv => {
+            0 => 'NEF (RAW)',
+            1 => 'JPEG Fine',
+            2 => 'JPEG Normal',
+            3 => 'JPEG Basic',
+            4 => 'NEF (RAW) + JPEG Fine',
+            5 => 'NEF (RAW) + JPEG Normal',
+            6 => 'NEF (RAW) + JPEG Basic',
+        },
+    },
     # Custom Settings
     748.1 => { # CS1
         Name => 'Beep',
@@ -2436,7 +2469,7 @@ my %nikonFocalConversions = (
             0x80 => 'Off',
         },
     },
-    755.1 => { # CS24
+    755.2 => { # CS24
         Name => 'FlashShutterSpeed',
         Mask => 0x78,
         ValueConv => '2 ** (($val >> 3) - 6)',
@@ -2444,7 +2477,7 @@ my %nikonFocalConversions = (
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
     },
-    755.2 => { # CS25
+    755.3 => { # CS25
         Name => 'AutoFP',
         Mask => 0x04,
         PrintConv => {
@@ -2452,7 +2485,7 @@ my %nikonFocalConversions = (
             0x04 => 'On',
         },
     },
-    755.3 => { # CS26
+    755.4 => { # CS26
         Name => 'ModelingFlash',
         Mask => 0x02,
         PrintConv => {
@@ -3793,24 +3826,22 @@ my %nikonFocalConversions = (
             PrintConvInv => '$val',
         },
     ],
-    # the new byte is somewhere from 11 to 16, so the commented-out
-    # entries may move up by 1 byte - PH
-#     12 => {
-#         Name => 'FlashFocalLength',
-#         RawConv => '$val ? $val : undef',
-#         PrintConv => '"$val mm"',
-#         PrintConvInv => '$val=~/(\d+)/; $1 || 0',
-#     },
-#     13 => {
-#         Name => 'RepeatingFlashRate',
-#         RawConv => '$val ? $val : undef',
-#         PrintConv => '"$val Hz"',
-#         PrintConvInv => '$val=~/(\d+)/; $1 || 0',
-#     },
-#     14 => {
-#         Name => 'RepeatingFlashCount',
-#         RawConv => '$val ? $val : undef',
-#     },
+    12 => { #JD
+        Name => 'FlashFocalLength',
+        RawConv => '($val and $val != 255) ? $val : undef',
+        PrintConv => '"$val mm"',
+        PrintConvInv => '$val=~/(\d+)/; $1 || 0',
+    },
+    13 => { #JD
+        Name => 'RepeatingFlashRate',
+        RawConv => '($val and $val != 255) ? $val : undef',
+        PrintConv => '"$val Hz"',
+        PrintConvInv => '$val=~/(\d+)/; $1 || 0',
+    },
+    14 => { #JD
+        Name => 'RepeatingFlashCount',
+        RawConv => '($val and $val != 255) ? $val : undef',
+    },
     17.1 => {
         Name => 'FlashGroupAControlMode',
         Mask => 0x0f,
@@ -4118,6 +4149,20 @@ sub PrintPCInv($)
 }
 
 #------------------------------------------------------------------------------
+# Convert unknown LensID values
+# Inputs: 0) value, 1) flag for inverse conversion, 2) PrintConv hash ref
+sub LensIDConv($$$)
+{
+    my ($val, $inv, $conv) = @_;
+    return undef if $inv;
+    my $regex = $val;
+    $regex =~ s/^\w+/../;
+    my @ids = sort grep /^$regex$/, keys %$conv;
+    return "Unknown ($val) $$conv{$ids[0]} ?" if @ids;
+    return undef;
+}
+
+#------------------------------------------------------------------------------
 # Convert unknown flash model values
 # Inputs: 0) value, 1) flag for inverse conversion, 2) PrintConv hash ref
 sub FlashModelConv($$$)
@@ -4277,13 +4322,10 @@ sub ProcessNikonEncrypted($$$)
 
     if ($verbose > 2) {
         $exifTool->VerboseDir("Decrypted $$tagInfo{Name}");
-        my %parms = (
+        $exifTool->VerboseDump(\$data,
             Prefix  => $exifTool->{INDENT} . '  ',
-            Out     => $exifTool->Options('TextOut'),
             DataPos => $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base} || 0),
         );
-        $parms{MaxLen} = 96 unless $verbose > 3;
-        Image::ExifTool::HexDump(\$data, undef, %parms);
     }
     # process the decrypted information
     my %subdirInfo = (
@@ -4469,7 +4511,7 @@ Nikon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

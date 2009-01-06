@@ -103,10 +103,10 @@ sub WritePhotoshop($$$)
         if ($$newTags{$tagID} and $type eq '8BIM') {
             $tagInfo = $$newTags{$tagID};
             delete $$newTags{$tagID};
-            my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+            my $nvHash = $exifTool->GetNewValueHash($tagInfo);
             # check to see if we are overwriting this tag
             $value = substr($$dataPt, $pos, $size);
-            if (Image::ExifTool::IsOverwriting($newValueHash, $value)) {
+            if (Image::ExifTool::IsOverwriting($nvHash, $value)) {
                 $exifTool->VerboseValue("- Photoshop:$$tagInfo{Name}", $value);
                 # handle IPTCDigest specially because we want to write it last
                 # so the new IPTC digest will be known
@@ -114,7 +114,7 @@ sub WritePhotoshop($$$)
                     $$newTags{$tagID} = $tagInfo;   # add later
                     $value = undef;
                 } else {
-                    $value = Image::ExifTool::GetNewValues($newValueHash);
+                    $value = Image::ExifTool::GetNewValues($nvHash);
                 }
                 ++$exifTool->{CHANGED};
                 next unless defined $value;     # next if tag is being deleted
@@ -174,15 +174,15 @@ sub WritePhotoshop($$$)
         my $name = "\0\0";
         if ($$newTags{$tagID}) {
             $tagInfo = $$newTags{$tagID};
-            my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-            $value = Image::ExifTool::GetNewValues($newValueHash);
+            my $nvHash = $exifTool->GetNewValueHash($tagInfo);
+            $value = Image::ExifTool::GetNewValues($nvHash);
             # handle new IPTCDigest value specially
             if ($tagID == 0x0425 and defined $value and $value eq 'new') {
                 $value = $$exifTool{NewIPTCDigest};
             }
             next unless defined $value;     # next if tag is being deleted
             # don't add this tag unless specified
-            next unless Image::ExifTool::IsCreating($newValueHash);
+            next unless Image::ExifTool::IsCreating($nvHash);
             $exifTool->VerboseValue("+ Photoshop:$$tagInfo{Name}", $value);
             ++$exifTool->{CHANGED};
         } else {
@@ -237,7 +237,7 @@ default resource name, and applied if no appended name is provided.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -14,7 +14,10 @@ number of available PDF tags.</p>
 
 <p>When writing PDF files, ExifTool uses an increment update.  This has an
 advantage that the original PDF can be easily recovered by deleting the
-<code>PDF-update</code> pseudo-group (with <code>-PDF-update:all=</code> on the command line).
+<code>PDF-update</code> pseudo-group (with <code>-PDF-update:all=</code> on the command line). A
+disadvantage of the incremental update is that a linearized PDF file is no
+longer linearized after the update, so it must be subsequently re-linearized
+if this is required.
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -188,6 +191,11 @@ when reading)</span></span></td></tr>
 <td>AdobePhotoshop</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PDF.html#AdobePhotoshop'>PDF AdobePhotoshop Tags</a></td></tr>
+<tr class=b>
+<td>'Illustrator'</td>
+<td>Illustrator</td>
+<td class=c>-</td>
+<td>--&gt; <a href='PDF.html#Illustrator'>PDF Illustrator Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='AdobePhotoshop'>PDF AdobePhotoshop Tags</a></h2>
@@ -227,6 +235,67 @@ when reading)</span></span></td></tr>
 <td>_stream</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Illustrator'>PDF Illustrator Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'Private'</td>
+<td>Private</td>
+<td class=c>-</td>
+<td>--&gt; <a href='PDF.html#AIPrivate'>PDF AIPrivate Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AIPrivate'>PDF AIPrivate Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'AIMetaData'</td>
+<td>AIMetaData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='PDF.html#AIMetaData'>PDF AIMetaData Tags</a></td></tr>
+<tr class=b>
+<td>'AIPrivateData'</td>
+<td>AIPrivateData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='PostScript.html'>PostScript Tags</a>
+  <br><span class='n s'>(the ExtractEmbedded option enables information to be extracted from embedded
+PostScript documents in the AIPrivateData stream)</span></td></tr>
+<tr>
+<td>'ContainerVersion'</td>
+<td>ContainerVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'CreatorVersion'</td>
+<td>CreatorVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'RoundTripVersion'</td>
+<td>RoundTripVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AIMetaData'>PDF AIMetaData Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'_stream'</td>
+<td>_stream</td>
+<td class=c>-</td>
+<td>--&gt; <a href='PostScript.html'>PostScript Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Resources'>PDF Resources Tags</a></h2>
@@ -283,7 +352,7 @@ when reading)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 26, 2008</i>
+<br><i>Last revised Oct 29, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

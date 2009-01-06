@@ -42,10 +42,22 @@ allows them to be tested without having to check for an undefined value.</p>
 
 <tr><td>DIR_NAME</td><td>Name of directory currently being processed</td></tr>
 
+<tr><td>DOC_COUNT</td><td>Number of embedded documents processed while extracting</td></tr>
+
+<tr><td>DOC_NUM</td><td>Current document number while extracting (0, '' or undef for the
+    main document)</td></tr>
+
 <tr><td>DONE_ID3</td><td>Set to 1 if audio file was scanned for ID3,
     or 2 if there was an ID3v1 trailer found</td></tr>
 
 <tr><td>DROP_TAGS</td><td>Flag to exclude "Drop" tags when writing</td></tr>
+
+<tr><td>DUPL_TAG</td><td>Hash of last used tag key index numbers for each duplicate tag.</td></tr>
+
+<tr><td>DYGROUP</td><td>Hash of dynamic group name list for each tag.  List item 0
+    is the family 1 group name (ie. IFD name or XMP namespace), with a leading
+    '+' to add value to the existing group 1 name.  List item 1 is the number
+    for embedded documents (ie. 1, 2, etc)</td></tr>
 
 <tr><td>EDIT_DIRS</td><td>Hash of parent directories for each directory edited during
 	writing (Note: entry may exist but be undefined for top-level
@@ -69,9 +81,6 @@ allows them to be tested without having to check for an undefined value.</p>
 <tr><td>FIRST_EXIF_POS</td><td>Position of first EXIF in file</td></tr>
 
 <tr><td>FOUND_TAGS</td><td>Found tags with proper case and order</td></tr>
-
-<tr><td>GROUP1</td><td>Hash of family 1 group names (ie. IFD name or XMP namespace),
-    keyed by tag key</td></tr>
 
 <tr><td>INDENT</td><td>Indent string for verbose output</td></tr>
 

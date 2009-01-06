@@ -18,20 +18,20 @@ sub ShiftTime($$$;$);
 # Returns: error string or undef on success and updates value in new value hash
 sub ApplyShift($$$;$)
 {
-    my ($func, $shift, $val, $newValueHash) = @_;
+    my ($func, $shift, $val, $nvHash) = @_;
 
     # get shift direction from first character in shift string
     $shift =~ s/^(\+|-)// or return 'Bad shift string (no sign)';
     my $pre = $1;
     my $dir = ($pre eq '+') ? 1 : -1;
-    my $tagInfo = $$newValueHash{TagInfo};
+    my $tagInfo = $$nvHash{TagInfo};
     my $tag = $$tagInfo{Name};
-    my $self = $$newValueHash{Self};    # (used in eval)
+    my $self = $$nvHash{Self};    # (used in eval)
     my $shiftOffset;
-    if ($$newValueHash{ShiftOffset}) {
-        $shiftOffset = $$newValueHash{ShiftOffset};
+    if ($$nvHash{ShiftOffset}) {
+        $shiftOffset = $$nvHash{ShiftOffset};
     } else {
-        $shiftOffset = $$newValueHash{ShiftOffset} = { };
+        $shiftOffset = $$nvHash{ShiftOffset} = { };
     }
 
     # initialize handler for eval warnings
@@ -62,7 +62,7 @@ sub ApplyShift($$$;$)
         GetWarning() and return CleanWarning();
     }
     # update value in new value hash
-    $newValueHash->{Value} = [ $val ];
+    $nvHash->{Value} = [ $val ];
     return undef;   # success
 }
 
@@ -562,7 +562,7 @@ philosophy).
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

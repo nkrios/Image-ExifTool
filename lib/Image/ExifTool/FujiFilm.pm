@@ -21,10 +21,26 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 sub ProcessFujiDir($$$);
 
+# the following RAF version numbers have been tested for writing:
+my %testedRAF = (
+    '0100' => 'E550 V1.00, E900 V1.00, S5600 V1.00, S6000fd V1.00, S6500fd V2.00',
+    '0104' => 'S5Pro V1.04',
+    '0106' => 'S5Pro V1.06',
+    '0114' => 'S9600 V1.00',
+    '0159' => 'S2Pro V1.00',
+    '0212' => 'S3Pro V2.12',
+    '0218' => 'S3Pro V2.18',
+    '0264' => 'F700  V2.00',
+    '0266' => 'S9500 V1.01',
+    '0269' => 'S9500 V1.02',
+    '0712' => 'S5000 V3.00',
+);
+
+# FujiFilm MakerNotes tags
 %Image::ExifTool::FujiFilm::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
@@ -475,21 +491,12 @@ sub WriteRAF($$)
     # get the position and size of embedded JPEG
     my ($jpos, $jlen) = unpack('x84NN', $hdr);
     # check to be sure the JPEG starts in the expected location
-    if ($jpos > 0x94 or $jpos < 0x68) {
+    if ($jpos > 0x94 or $jpos < 0x68 or $jpos & 0x03) {
         $exifTool->Error("Unsupported or corrupted RAF image (version $ver)");
         return 1;
     }
-    # the following RAF version numbers have been tested:
-    # 0100 - E550 V1.00, E900 V1.00, S5600 V1.00, S6000fd V1.00, S6500fd V2.00
-    # 0104 - S5Pro V1.04
-    # 0106 - S5Pro V1.06
-    # 0114 - S9600 V1.00
-    # 0159 - S2Pro V1.00
-    # 0212 - S3Pro V2.12
-    # 0218 - S3Pro V2.18
-    # 0264 - F700  V2.00
-    # 0269 - S9500 V1.02
-    if ($ver !~ /^(0100|0104|0106|0114|0159|0212|0218|0264|0269)$/) {
+    # check to make sure this version of RAF has been tested
+    unless ($testedRAF{$ver}) {
         $exifTool->Error("RAF version $ver not yet tested", 1) and return 1;
     }
     # read the embedded JPEG
@@ -562,14 +569,14 @@ sub ProcessRAF($$)
     my ($buff, $jpeg, $warn, $offset);
 
     my $raf = $$dirInfo{RAF};
-    $raf->Read($buff,8) == 8          or return 0;
-    $buff eq 'FUJIFILM'               or return 0;
-    $raf->Seek(0x54, 0)               or return 0;
-    $raf->Read($buff, 8) == 8         or return 0;
-    my ($jpos, $jlen) = unpack('NN', $buff);
+    $raf->Read($buff,0x5c) == 0x5c    or return 0;
+    $buff =~ /^FUJIFILM/              or return 0;
+    my ($jpos, $jlen) = unpack('x84NN', $buff);
     $jpos & 0x8000                   and return 0;
     $raf->Seek($jpos, 0)              or return 0;
     $raf->Read($jpeg, $jlen) == $jlen or return 0;
+
+    $exifTool->FoundTag('RAFVersion', substr($buff, 0x3c, 4));
 
     # extract information from embedded JPEG
     my %dirInfo = (
@@ -628,7 +635,7 @@ FujiFilm maker notes in EXIF information, and to read/write FujiFilm RAW
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

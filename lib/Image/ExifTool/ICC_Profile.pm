@@ -596,9 +596,9 @@ sub WriteICC_Profile($$;$)
     my $dirName = $$dirInfo{DirName} || 'ICC_Profile';
     # (don't write AsShotICCProfile or CurrentICCProfile here)
     return undef unless $dirName eq 'ICC_Profile';
-    my $newValueHash = $exifTool->GetNewValueHash($Image::ExifTool::Extra{$dirName});
-    return undef unless Image::ExifTool::IsOverwriting($newValueHash);
-    my $val = Image::ExifTool::GetNewValues($newValueHash);
+    my $nvHash = $exifTool->GetNewValueHash($Image::ExifTool::Extra{$dirName});
+    return undef unless Image::ExifTool::IsOverwriting($nvHash);
+    my $val = Image::ExifTool::GetNewValues($nvHash);
     $val = '' unless defined $val;
     ++$exifTool->{CHANGED};
     return $val;
@@ -817,7 +817,7 @@ data created on one device into another device's native color space.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

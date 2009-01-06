@@ -204,14 +204,14 @@ sub IptcTime($)
         my $tz = $4;
         if ($tz =~ /([+-]\d{1,2}):?(\d{2})/) {
             $tz = sprintf("%+.2d%.2d",$1,$2);
-        } elsif ($tz !~ /Z/i and eval 'require Time::Local') {
+        } elsif ($tz !~ /Z/i) {
             # use local system timezone by default (note: it is difficult to use
             # the proper local timezone for this date/time because the date tag
             # is written separately so we don't know what the local timezone offset
             # really should be for this date/time)
-            my @tm = localtime(time());
-            my $diff = Time::Local::timegm(@tm) - Image::ExifTool::TimeLocal(@tm);
-            ($tz = Image::ExifTool::TimeZoneString($diff / 60)) =~ tr/://d;
+            my $now = time;
+            my @tm = localtime($now);
+            ($tz = Image::ExifTool::TimeZoneString(\@tm, $now)) =~ tr/://d;
         } else {
             $tz = '+0000';  # don't know the time zone
         }
@@ -438,7 +438,7 @@ sub DoWriteIPTC($$$)
                                 }
                                 $tagInfo = $subTablePtr->{$mandTag} or warn("WriteIPTC: Internal error 2\n"), next;
                                 my $value = $mandatory->{$mandTag};
-                                $verbose > 1 and print $out "    + IPTC:$$tagInfo{Name} = '$value' (mandatory)\n";
+                                $exifTool->VerboseValue("+ IPTC:$$tagInfo{Name}", $value, ' (mandatory)');
                                 # apply necessary format conversions
                                 FormatIPTC($exifTool, $tagInfo, \$value, \$xlat, $lastRec);
                                 $len = length $value;
@@ -460,7 +460,7 @@ sub DoWriteIPTC($$$)
                 # (write out our tags in numerical order even though
                 # this isn't required by the IPTC spec)
                 last if defined $rec and $rec <= $newRec;
-                my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+                my $nvHash = $exifTool->GetNewValueHash($tagInfo);
                 # only add new values if...
                 my ($doSet, @values);
                 my $found = $foundRec{$newRec}->{$newTag} || 0;
@@ -469,18 +469,18 @@ sub DoWriteIPTC($$$)
                     $doSet = 1;
                 } elsif ($$tagInfo{List}) {
                     # ...tag is List and it existed before or we are creating it
-                    $doSet = 1 if $found or Image::ExifTool::IsCreating($newValueHash);
+                    $doSet = 1 if $found or Image::ExifTool::IsCreating($nvHash);
                 } else {
                     # ...tag didn't exist before and we are creating it
-                    $doSet = 1 if not $found and Image::ExifTool::IsCreating($newValueHash);
+                    $doSet = 1 if not $found and Image::ExifTool::IsCreating($nvHash);
                 }
                 if ($doSet) {
-                    @values = Image::ExifTool::GetNewValues($newValueHash);
+                    @values = Image::ExifTool::GetNewValues($nvHash);
                     @values and $foundRec{$newRec}->{$newTag} = $found | 0x04;
                     # write tags for each value in list
                     my $value;
                     foreach $value (@values) {
-                        $verbose > 1 and print $out "    + IPTC:$$tagInfo{Name} = '$value'\n";
+                        $exifTool->VerboseValue("+ IPTC:$$tagInfo{Name}", $value);
                         # reset allMandatory flag if a non-mandatory tag is written
                         if ($allMandatory) {
                             my $mandatory = $mandatory{$newRec};
@@ -518,14 +518,14 @@ sub DoWriteIPTC($$$)
         # write out this record unless we are setting it with a new value
         $tagInfo = $set{$rec}->{$tag};
         if ($tagInfo) {
-            my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+            my $nvHash = $exifTool->GetNewValueHash($tagInfo);
             $len = $pos - $valuePtr;
             my $val = substr($$dataPt, $valuePtr, $len);
             my $oldXlat = $xlat;
             FormatIPTC($exifTool, $tagInfo, \$val, \$xlat, $rec, 1);
-            if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
+            if (Image::ExifTool::IsOverwriting($nvHash, $val)) {
                 $xlat = $oldXlat;   # don't change translation (not writing this value)
-                $verbose > 1 and print $out "    - IPTC:$$tagInfo{Name} = '$val'\n";
+                $exifTool->VerboseValue("- IPTC:$$tagInfo{Name}", $val);
                 ++$exifTool->{CHANGED};
                 # set deleted flag to indicate we found and deleted this tag
                 $foundRec{$rec}->{$tag} |= 0x02;
@@ -604,7 +604,7 @@ seldom-used routines.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

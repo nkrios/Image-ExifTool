@@ -17,7 +17,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::MakerNotes;
 use Image::ExifTool::CanonRaw;
 
-$VERSION = '1.08';
+$VERSION = '1.10';
 
 sub ProcessOriginalRaw($$$);
 sub ProcessAdobeData($$$);
@@ -26,6 +26,7 @@ sub ProcessAdobeCRW($$$);
 sub ProcessAdobeRAF($$$);
 sub ProcessAdobeMRW($$$);
 sub ProcessAdobeSR2($$$);
+sub ProcessAdobeIFD($$$);
 sub WriteAdobeStuff($$$);
 
 # data in OriginalRawFileData
@@ -95,6 +96,13 @@ sub WriteAdobeStuff($$$);
         SubDirectory => {
             TagTable => 'Image::ExifTool::FujiFilm::RAF',
             ProcessProc => \&ProcessAdobeRAF,
+        },
+    },
+    'Pano' => {
+        Name => 'AdobePano',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::Raw',
+            ProcessProc => \&ProcessAdobeIFD,
         },
     },
 );
@@ -389,9 +397,9 @@ sub ProcessAdobeCRW($$$)
                         }
                     }
                 } elsif ($$newTags{$tagID}) {
-                    my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-                    if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
-                        my $newVal = Image::ExifTool::GetNewValues($newValueHash);
+                    my $nvHash = $exifTool->GetNewValueHash($tagInfo);
+                    if (Image::ExifTool::IsOverwriting($nvHash, $val)) {
+                        my $newVal = Image::ExifTool::GetNewValues($nvHash);
                         my $verboseVal;
                         $verboseVal = $newVal if $verbose > 1;
                         # convert to specified format if necessary
@@ -399,13 +407,8 @@ sub ProcessAdobeCRW($$$)
                             $newVal = WriteValue($newVal, $format, $count);
                         }
                         if (defined $newVal) {
-                            if ($verbose > 1) {
-                                my $oldStr = $exifTool->Printable($value);
-                                my $newStr = $exifTool->Printable($verboseVal);
-                                my $out = $exifTool->Options('TextOut');
-                                print $out "    - CanonRaw:$$tagInfo{Name} = '$oldStr'\n";
-                                print $out "    + CanonRaw:$$tagInfo{Name} = '$newStr'\n";
-                            }
+                            $exifTool->VerboseValue("- CanonRaw:$$tagInfo{Name}", $value);
+                            $exifTool->VerboseValue("+ CanonRaw:$$tagInfo{Name}", $verboseVal);
                             $value = $newVal;
                             ++$exifTool->{CHANGED};
                         }
@@ -490,14 +493,11 @@ sub ProcessAdobeMRW($$$)
 sub ProcessAdobeRAF($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    return 0 if $$dirInfo{OutFile}; # (can't write this yet)
     my $dataPt = $$dirInfo{DataPt};
     my $pos = $$dirInfo{DirStart};
     my $dirEnd = $$dirInfo{DirLen} + $pos;
     my ($readIt, $warn);
-
-    # we don't yet write this information, but don't issue
-    # warning just because data isn't edited
-    return 0 if $$dirInfo{OutFile};
 
     # set byte order according to first 2 bytes of Adobe RAF data
     if ($pos + 2 <= $dirEnd and SetByteOrder(substr($$dataPt, $pos, 2))) {
@@ -541,10 +541,10 @@ sub ProcessAdobeRAF($$$)
 sub ProcessAdobeSR2($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    return 0 if $$dirInfo{OutFile}; # (can't write this yet)
     my $dataPt = $$dirInfo{DataPt};
     my $start = $$dirInfo{DirStart};
     my $len = $$dirInfo{DirLen};
-    return 0 if $$dirInfo{OutFile}; # (can't write this yet)
 
     return 0 if $len < 6;
     SetByteOrder('MM');
@@ -573,6 +573,67 @@ sub ProcessAdobeSR2($$$)
     }
     # parse the SR2 directory
     $exifTool->ProcessDirectory(\%subdirInfo, $tagTablePtr);
+    return 1;
+}
+
+#------------------------------------------------------------------------------
+# Process Adobe-mutilated IFD directory
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success, otherwise returns 0 and sets a Warning
+# Notes: data has 2 byte header (byte order of the data)
+sub ProcessAdobeIFD($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    return 0 if $$dirInfo{OutFile}; # (can't write this yet)
+    my $dataPt = $$dirInfo{DataPt};
+    my $pos = $$dirInfo{DirStart};
+    my $dataPos = $$dirInfo{DataPos};
+    my $base = $$dirInfo{Base};
+
+    return 0 if $$dirInfo{DirLen} < 4;
+    my $dataOrder = substr($$dataPt, $pos, 2);
+    return 0 unless SetByteOrder($dataOrder);   # validate byte order of data
+
+    # parse the mutilated IFD.  This is similar to a TIFF IFD, except:
+    # - data follows directly after Count entry in IFD
+    # - byte order of IFD entires is always big-endian, but byte order of data changes
+    SetByteOrder('MM');     # IFD structure is always big-endian
+    my $entries = Get16u($dataPt, $pos + 2);
+    $exifTool->VerboseDir($dirInfo, $entries);
+    $pos += 4;
+
+    my $end = $pos + $$dirInfo{DirLen};
+    my $index;
+    for ($index=0; $index<$entries; ++$index) {
+        last if $pos + 8 > $end;
+        SetByteOrder('MM'); # directory entries always big-endian (doh!)
+        my $tagID = Get16u($dataPt, $pos);
+        my $format = Get16u($dataPt, $pos+2);
+        my $count = Get32u($dataPt, $pos+4);
+        if ($format < 1 or $format > 13) {
+            # warn unless the IFD was just padded with zeros
+            $format and $exifTool->Warn(
+                sprintf("Unknown format ($format) for $$dirInfo{DirName} tag 0x%x",$tagID));
+            return 0; # must be corrupted
+        }
+        my $size = $Image::ExifTool::Exif::formatSize[$format] * $count;
+        last if $pos + 8 + $size > $end;
+        my $formatStr = $Image::ExifTool::Exif::formatName[$format];
+        SetByteOrder($dataOrder);   # data stored in native order
+        my $val = ReadValue($dataPt, $pos + 8, $formatStr, $count, $size);
+        $exifTool->HandleTag($tagTablePtr, $tagID, $val,
+            Index   => $index,
+            DataPt  => $dataPt,
+            DataPos => $dataPos,
+            Start   => $pos + 8,
+            Size    => $size
+        );
+        $pos += 8 + $size;
+    }
+    if ($index < $entries) {
+        $exifTool->Warn("Truncated $$dirInfo{DirName} directory");
+        return 0;
+    }
     return 1;
 }
 
@@ -728,7 +789,7 @@ information in DNG (Digital Negative) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

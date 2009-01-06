@@ -22,7 +22,7 @@ my $debug = 0;
 my $numPadLines = 24;       # number of blank padding lines
 
 # when writing extended XMP, resources bigger than this get placed in their own
-# rdf:Description so they can be moved to the extended segements if necessary
+# rdf:Description so they can be moved to the extended segments if necessary
 my $newDescThresh = 10000;  # 10 kB
 
 # individual resources and namespaces to place last inseparate rdf:Description's
@@ -422,7 +422,7 @@ sub XMPOpen($)
     my $tk;
     if (defined $nv) {
         $tk = Image::ExifTool::GetNewValues($nv);
-        $exifTool->VPrint(1, $tk ? "    + XMP-x:XMPToolkit = '$tk'\n" : "    - XMP-x:XMPToolkit\n");
+        $exifTool->VerboseValue(($tk ? '+' : '-') . ' XMP-x:XMPToolkit', $tk);
         ++$exifTool->{CHANGED};
     } else {
         $tk = "Image::ExifTool $Image::ExifTool::VERSION";
@@ -568,13 +568,13 @@ sub SetPropertyPath($$;$$)
         $propList[-1] =~ s/-$$tagInfo{LangCode}$// if $$tagInfo{LangCode};
         # handle lists of lang-alt lists (ie. XMP-plus:Custom tags)
         if ($$tagInfo{List} and $$tagInfo{List} ne '1') {
-            push @propList, "rdf:$$tagInfo{List}", 'rdf:li 000';
+            push @propList, "rdf:$$tagInfo{List}", 'rdf:li 10';
         }
     } else {
         $listType = $$tagInfo{List};
     }
     # add required properties if this is a list
-    push @propList, "rdf:$listType", 'rdf:li 000' if $listType and $listType ne '1';
+    push @propList, "rdf:$listType", 'rdf:li 10' if $listType and $listType ne '1';
     # set PropertyPath for all elements of this structure if necessary
     my $structName = $$tagInfo{Struct};
     if ($structName) {
@@ -600,7 +600,7 @@ sub SetPropertyPath($$;$$)
         } else {
             $listType = $$tagInfo{List};
         }
-        push @propList, "rdf:$listType", 'rdf:li 000' if $listType and $listType ne '1';
+        push @propList, "rdf:$listType", 'rdf:li 10' if $listType and $listType ne '1';
     }
     # set property path for tagInfo in main table
     $$tagInfo{PropertyPath} = join '/', @propList;
@@ -621,6 +621,11 @@ sub CaptureXMP($$$;$)
     {
         # no properties to save yet if this is just the description
         return unless @$propList > 3;
+        # ignore empty list properties
+        if ($$propList[-1] =~ /^rdf:(Bag|Seq|Alt)$/) {
+            $exifTool->Warn("Ignored empty $$propList[-1] list for $$propList[-2]", 1);
+            return;
+        }
         # save information about this property
         my $capture = $exifTool->{XMP_CAPTURE};
         my $path = join('/', @$propList[3..$#$propList]);
@@ -844,7 +849,7 @@ sub LimitXMPSize($$$$$$)
         $guid = uc unpack('H*', Digest::MD5::md5($extData));
         $newData =~ s/0{32}/$guid/;     # update GUID in main XMP segment
     }
-    $exifTool->VPrint(1, "    + XMP-xmpNote:HasExtendedXMP = '$guid'\n");
+    $exifTool->VerboseValue('+ XMP-xmpNote:HasExtendedXMP', $guid);
     $$dataPt = $newData;        # return main XMP block
     return (\$extData, $guid);  # return extended XMP and its GUID
 }
@@ -919,8 +924,8 @@ sub WriteXMP($$;$)
             $about = Image::ExifTool::GetNewValues($exifTool->{NEW_VALUE}->{$tagInfo}) || '';
             if ($verbose > 1) {
                 my $wasAbout = $exifTool->{XMP_ABOUT};
-                $exifTool->VPrint(1, "    - XMP-rdf:About = '", UnescapeXML($wasAbout), "'\n") if defined $wasAbout;
-                $exifTool->VPrint(1, "    + XMP-rdf:About = '$about'\n");
+                $exifTool->VerboseValue('- XMP-rdf:About', UnescapeXML($wasAbout)) if defined $wasAbout;
+                $exifTool->VerboseValue('+ XMP-rdf:About', $about);
             }
             $about = EscapeXML($about); # must escape for XML
             ++$changed;
@@ -944,8 +949,6 @@ sub WriteXMP($$;$)
                 $exifTool->VPrint(0, "  Writing XMP as a block\n");
                 ++$exifTool->{CHANGED};
                 Write($$dirInfo{OutFile}, $newVal) or $rtnVal = -1;
-            } else {
-                $exifTool->Error("Can't delete all XMP from an XMP file");
             }
             delete $exifTool->{XMP_CAPTURE};
             return $rtnVal;
@@ -982,10 +985,7 @@ sub WriteXMP($$;$)
                 my $ucg = uc $grp;
                 next unless $$del{$ucg} or ($$del{'XMP-*'} and not $$del{"-$ucg"});
             }
-            if ($verbose > 1) {
-                my $val = $capture{$path}->[0];
-                $exifTool->VPrint(1, "    - $grp:$tag = '$val'\n");
-            }
+            $exifTool->VerboseValue("- $grp:$tag", $capture{$path}->[0]);
             delete $capture{$path};
             ++$changed;
         }
@@ -993,10 +993,7 @@ sub WriteXMP($$;$)
     # delete HasExtendedXMP tag (we create it as needed)
     my $hasExtTag = 'xmpNote:HasExtendedXMP';
     if ($capture{$hasExtTag}) {
-        if ($verbose > 1) {
-            my $val = $capture{$hasExtTag}->[0];
-            $exifTool->VPrint(1, "    - XMP-$hasExtTag = '$val'\n");
-        }
+        $exifTool->VerboseValue("- XMP-$hasExtTag", $capture{$hasExtTag}->[0]);
         delete $capture{$hasExtTag};
     }
     # set $xmpOpen now to to handle xmptk tag first
@@ -1030,8 +1027,8 @@ sub WriteXMP($$;$)
             my ($path2) = grep /^\Q$path\E$/i, keys %capture;
             $path2 and $capList = $capture{$path = $path2};
         }
-        my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-        my $overwrite = Image::ExifTool::IsOverwriting($newValueHash);
+        my $nvHash = $exifTool->GetNewValueHash($tagInfo);
+        my $overwrite = Image::ExifTool::IsOverwriting($nvHash);
         my $writable = $$tagInfo{Writable} || '';
         my (%attrs, $deleted, $added);
         # delete existing entry if necessary
@@ -1043,7 +1040,7 @@ sub WriteXMP($$;$)
                 # check to see if this is an indexed list item
                 if ($path =~ / /) {
                     my $pathPattern;
-                    ($pathPattern = $path) =~ s/ 000/ \\d\{3\}/g;
+                    ($pathPattern = $path) =~ s/ \d+/ \\d\+/g;
                     @matchingPaths = sort grep(/^$pathPattern$/, keys %capture);
                 } else {
                     push @matchingPaths, $path;
@@ -1052,14 +1049,14 @@ sub WriteXMP($$;$)
                     my ($val, $attrs) = @{$capture{$path}};
                     if ($overwrite < 0) {
                         # only overwrite specific values
-                        next unless Image::ExifTool::IsOverwriting($newValueHash, UnescapeXML($val));
+                        next unless Image::ExifTool::IsOverwriting($nvHash, UnescapeXML($val));
                     }
                     if ($writable eq 'lang-alt') {
                         # get original language code (lc for comparisons)
                         $oldLang = lc($$attrs{'xml:lang'} || 'x-default');
                         # delete all if deleting "x-default" or writing with no LangCode
                         # (XMP spec requires x-default language exist and be first in list)
-                        if ($oldLang eq 'x-default' and not ($newValueHash->{Value} or
+                        if ($oldLang eq 'x-default' and not ($nvHash->{Value} or
                             ($$tagInfo{LangCode} and $$tagInfo{LangCode} ne 'x-default')))
                         {
                             $delLang = 1;   # delete all languages
@@ -1075,7 +1072,7 @@ sub WriteXMP($$;$)
                         my $tagName = $$tagInfo{Name};
                         $tagName =~ s/-$$tagInfo{LangCode}$// if $$tagInfo{LangCode};
                         $tagName .= '-' . $$attrs{'xml:lang'} if $$attrs{'xml:lang'};
-                        $exifTool->VPrint(1, "    - $grp:$tagName = '$val'\n");
+                        $exifTool->VerboseValue("- $grp:$tagName", $val);
                     }
                     # save attributes and path from first deleted property
                     # so we can replace it exactly
@@ -1102,26 +1099,31 @@ sub WriteXMP($$;$)
                     # unless this is a list or an lang-alt tag
                     next unless $$tagInfo{List} or $oldLang;
                     # (match last index to put in same lang-alt list for Bag of lang-alt items)
-                    $path =~ m/.* (\d{3})/g or warn "Internal error: no list index!\n", next;
+                    $path =~ m/.* (\d+)/g or warn "Internal error: no list index!\n", next;
                     $added = $1;
                 }
-            } elsif ($path =~ m/.* (\d{3})/g) {  # (match last index)
+            } elsif ($path =~ m/.* (\d+)/g) {  # (match last index)
                 $added = $1;
             }
             if (defined $added) {
                 # add to end of list
-                my $pos = pos($path) - 3;
+                my $len = length $added;
+                my $pos = pos($path) - $len;
+                my $nxt = substr($added, 1) + 1;
                 for (;;) {
-                    substr($path, $pos, 3) = ++$added;
+                    my $try = length($nxt) . $nxt;
+                    substr($path, $pos, $len) = $try;
                     last unless $capture{$path};
+                    $len = length $try;
+                    ++$nxt;
                 }
             }
         }
         # check to see if we want to create this tag
         # (create non-avoided tags in XMP data files by default)
-        my $isCreating = (Image::ExifTool::IsCreating($newValueHash) or
+        my $isCreating = (Image::ExifTool::IsCreating($nvHash) or
                           ($preferred and not $$tagInfo{Avoid} and
-                            not defined $$newValueHash{Shift}));
+                            not defined $$nvHash{Shift}));
 
         # don't add new values unless...
             # ...tag existed before and was deleted, or we added it to a list
@@ -1130,7 +1132,7 @@ sub WriteXMP($$;$)
             (not $capList and $isCreating);
 
         # get list of new values (all done if no new values specified)
-        my @newValues = Image::ExifTool::GetNewValues($newValueHash) or next;
+        my @newValues = Image::ExifTool::GetNewValues($nvHash) or next;
 
         # set language attribute for lang-alt lists
         if ($writable eq 'lang-alt') {
@@ -1143,9 +1145,9 @@ sub WriteXMP($$;$)
                     my $tagName = $$tagInfo{Name};
                     $tagName =~ s/-$$tagInfo{LangCode}$/-x-default/;
                     my $grp = $exifTool->GetGroup($tagInfo, 1);
-                    $exifTool->VPrint(1, "    + $grp:$tagName = '$newValue'\n");
+                    $exifTool->VerboseValue("+ $grp:$tagName", $newValue);
                 }
-                $path =~ s/(.*) 000/$1 001/ or warn "Internal error: no list index!\n", next;
+                $path =~ s/(.*) 10/$1 11/ or warn "Internal error: no list index!\n", next;
             }
         }
         
@@ -1159,7 +1161,7 @@ sub WriteXMP($$;$)
             }
             if ($verbose > 1) {
                 my $grp = $exifTool->GetGroup($tagInfo, 1);
-                $exifTool->VPrint(1, "    + $grp:$$tagInfo{Name} = '$newValue'\n");
+                $exifTool->VerboseValue("+ $grp:$$tagInfo{Name}", $newValue);
             }
             ++$changed;
             # add rdf:type if necessary
@@ -1168,14 +1170,17 @@ sub WriteXMP($$;$)
             }
             last unless @newValues;
             # (match first index to put in different lang-alt list for Bag of lang-alt items)
-            $path =~ m/ (\d{3})/g or warn("Internal error: no list index!\n"), next;
-            my $listIndex = $1;
-            my $pos = pos($path) - 3;
+            $path =~ m/ (\d+)/g or warn("Internal error: no list index!\n"), next;
+            my $len = length $1;
+            my $pos = pos($path) - $len;
+            my $nxt = substr($1, 1) + 1;
             for (;;) {
-                substr($path, $pos, 3) = ++$listIndex;
+                my $try = length($nxt) . $nxt;
+                substr($path, $pos, $len) = $try;
                 last unless $capture{$path};
+                $len = length $try;
+                ++$nxt;
             }
-            $capture{$path} and warn("Too many entries in XMP list!\n"), next;
         }
     }
     # remove the ExifTool members we created
@@ -1188,11 +1193,7 @@ sub WriteXMP($$;$)
         return undef unless $xmpFile;   # just rewrite original XMP
         # get DataPt again because it may have been set by ProcessXMP
         $dataPt = $$dirInfo{DataPt};
-        unless (defined $dataPt) {
-            $exifTool->Error("Nothing to write");
-            return 1;
-        }
-        Write($$dirInfo{OutFile}, $$dataPt) or return -1;
+        Write($$dirInfo{OutFile}, $$dataPt) or return -1 if defined $dataPt;
         return 1;
     }
 #
@@ -1213,7 +1214,6 @@ sub WriteXMP($$;$)
     my (@curPropList, @writeLast, @descStart, $extStart);
     my (%nsCur, $prop, $n, $lastDesc, $path);
     my @pathList = sort TypeFirst keys %capture;
-
     # order properties to write large values last if we have a MaxDataLen limit
     if ($maxDataLen and @pathList) {
         my @pathTmp;
@@ -1440,7 +1440,7 @@ This file contains routines to write XMP metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..22\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..23\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -169,7 +169,7 @@ my $testnum = 1;
     my $oldSep = $/;   
     $/ = "\x0a";        # set input line separator
     $exifTool->ExtractInfo('t/images/Canon.jpg');
-    my $family = 1;
+    my $family = '1:2';
     @groups = $exifTool->GetGroups($family);
     my $group;
     foreach $group (@groups) {
@@ -235,7 +235,7 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
     my @foundTags;
     $exifTool->ImageInfo('t/images/ExifTool.jpg', \@foundTags);
-    my $str = $exifTool->InsertTagValues(\@foundTags, '$ifd0:model - $1ciff:model');
+    my $str = $exifTool->InsertTagValues(\@foundTags, '$ifd0:model - $1ciff:3main:model');
     my $testfile = "t/ExifTool_$testnum";
     open(TESTFILE,">$testfile.failed");
     my $oldSep = $/;   
@@ -246,5 +246,15 @@ my $testnum = 1;
     print 'not ' unless testCompare("$testfile.out","$testfile.failed",$testnum);
     print "ok $testnum\n";
 }
+
+# test 23: Test the multi-group feature in a tag name
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $info = $exifTool->ImageInfo('t/images/ExifTool.jpg', 'main:Author:IPTC3:all');
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
+    print "ok $testnum\n";
+}
+
 
 # end

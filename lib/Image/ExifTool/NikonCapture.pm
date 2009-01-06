@@ -716,8 +716,8 @@ sub WriteNikonCapture($$$)
                 # get new value for this tag if we are writing it
                 my $format = $$tagInfo{Format} || $$tagInfo{Writable};
                 my $oldVal = ReadValue($dataPt,$pos+22,$format,1,$size);
-                my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-                if (Image::ExifTool::IsOverwriting($newValueHash, $oldVal)) {
+                my $nvHash = $exifTool->GetNewValueHash($tagInfo);
+                if (Image::ExifTool::IsOverwriting($nvHash, $oldVal)) {
                     my $val = $exifTool->GetNewValues($tagInfo);
                     $newVal = WriteValue($val, $$tagInfo{Writable}) if defined $val;
                     if (defined $newVal and length $newVal) {
@@ -813,7 +813,7 @@ the maker notes of NEF images.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

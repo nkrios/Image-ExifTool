@@ -38,7 +38,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.67';
+$VERSION = '2.71';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -683,6 +683,12 @@ my %longBin = (
     0x201 => [
         {
             Name => 'ThumbnailOffset',
+            Notes => q{
+                ThumbnailOffset in IFD1 of JPEG and some TIFF-based images, and IFD0 of MRW
+                images and AVI videos; PreviewImageStart in MakerNotes; JpgFromRawStart in
+                SubIFD of NEF images, IFD2 of PEF images, and IFD0 of SR2 and ARW images;
+                and OtherImageStart in everything else
+            },
             # thumbnail is found in IFD1 of JPEG and TIFF images, and
             # IFD0 of EXIF information in FujiFilm AVI (RIFF) videos
             Condition => q{
@@ -698,6 +704,20 @@ my %longBin = (
             Protected => 2,
         },
         {
+            Name => 'ThumbnailOffset',
+            # thumbnail in IFD0 of MRW images (Minolta A200)
+            Condition => '$$self{DIR_NAME} eq "IFD0" and $$self{TIFF_TYPE} eq "MRW"',
+            IsOffset => 1,
+            OffsetPair => 0x202,
+            # A200 uses the wrong base offset for this pointer!!
+            WrongBase => '$$self{Model} =~ /^DiMAGE A200/ ? $$self{MRW_WrongBase} : undef',
+            DataTag => 'ThumbnailImage',
+            Writable => 'int32u',
+            WriteGroup => 'IFD0',
+            WriteCondition => '$$self{FILE_TYPE} eq "MRW"',
+            Protected => 2,
+        },
+        {
             Name => 'PreviewImageStart',
             Condition => '$$self{DIR_NAME} eq "MakerNotes"',
             IsOffset => 1,
@@ -705,6 +725,7 @@ my %longBin = (
             DataTag => 'PreviewImage',
             Writable => 'int32u',
             WriteGroup => 'MakerNotes',
+            # (no WriteCondition necessary because MakerNotes won't be created)
             Protected => 2,
         },
         {
@@ -732,6 +753,19 @@ my %longBin = (
             Protected => 2,
         },
         {
+            Name => 'JpgFromRawStart',
+            # JpgFromRaw in IFD0 of SR2 and ARW files for all models
+            # (well, actually a thumbnail size for the A100)
+            Condition => '$$self{DIR_NAME} eq "IFD0" and $$self{TIFF_TYPE} =~ /^(SR2|ARW)$/',
+            IsOffset => 1,
+            OffsetPair => 0x202,
+            DataTag => 'JpgFromRaw',
+            Writable => 'int32u', #(but SR2/ARW aren't yet writable)
+            WriteGroup => 'IFD0',
+            WriteCondition => '$$self{TIFF_TYPE} =~ /^(SR2|ARW)$/',
+            Protected => 2,
+        },
+        {
             Name => 'OtherImageStart',
             IsOffset => 1,
             OffsetPair => 0x202,
@@ -740,6 +774,12 @@ my %longBin = (
     0x202 => [
         {
             Name => 'ThumbnailLength',
+            Notes => q{
+                ThumbnailLength in IFD1 of JPEG and some TIFF-based images, and IFD0 of MRW
+                images and AVI videos; PreviewImageLength in MakerNotes; JpgFromRawLength in
+                SubIFD of NEF images, IFD2 of PEF images, and IFD0 of SR2 and ARW images;
+                and OtherImageLength in everything else
+            },
             Condition => q{
                 $$self{DIR_NAME} eq 'IFD1' or
                 ($$self{FILE_TYPE} eq 'RIFF' and $$self{DIR_NAME} eq 'IFD0')
@@ -752,12 +792,24 @@ my %longBin = (
             Protected => 2,
         },
         {
+            Name => 'ThumbnailLength',
+            # thumbnail in IFD0 of MRW images (Minolta A200)
+            Condition => '$$self{DIR_NAME} eq "IFD0" and $$self{TIFF_TYPE} eq "MRW"',
+            OffsetPair => 0x201,
+            DataTag => 'ThumbnailImage',
+            Writable => 'int32u',
+            WriteGroup => 'IFD0',
+            WriteCondition => '$$self{FILE_TYPE} eq "MRW"',
+            Protected => 2,
+        },
+        {
             Name => 'PreviewImageLength',
             Condition => '$$self{DIR_NAME} eq "MakerNotes"',
             OffsetPair => 0x201,
             DataTag => 'PreviewImage',
             Writable => 'int32u',
             WriteGroup => 'MakerNotes',
+            # (no WriteCondition necessary because MakerNotes won't be created)
             Protected => 2,
         },
         {
@@ -778,6 +830,18 @@ my %longBin = (
             Writable => 'int32u',
             WriteGroup => 'IFD2',
             WriteCondition => '$$self{TIFF_TYPE} eq "PEF"',
+            Protected => 2,
+        },
+        {
+            Name => 'JpgFromRawLength',
+            # JpgFromRaw in IFD0 of SR2 and ARW files for all models
+            # (well, actually a thumbnail size for the A100)
+            Condition => '$$self{DIR_NAME} eq "IFD0" and $$self{TIFF_TYPE} =~ /^(SR2|ARW)$/',
+            OffsetPair => 0x201,
+            DataTag => 'JpgFromRaw',
+            Writable => 'int32u',
+            WriteGroup => 'IFD0',
+            WriteCondition => '$$self{TIFF_TYPE} =~ /^(SR2|ARW)$/',
             Protected => 2,
         },
         {
@@ -1447,6 +1511,7 @@ my %longBin = (
     0xa40b => {
         Name => 'DeviceSettingDescription',
         Groups => { 2 => 'Camera' },
+        Binary => 1,
     },
     0xa40c => {
         Name => 'SubjectDistanceRange',
@@ -1870,7 +1935,10 @@ my %longBin = (
     0xc71e => 'SubTileBlockSize',
     0xc71f => 'RowInterleaveFactor',
     0xc725 => 'ProfileLookTableDims',
-    0xc726 => 'ProfileLookTableData',
+    0xc726 => {
+        Name => 'ProfileLookTableData',
+        Binary => 1,
+    },
     0xea1c => { #13
         Name => 'Padding',
         Binary => 1,
@@ -2557,7 +2625,7 @@ sub PrintLensID(@)
         $shortFocal, $longFocal, $lensModel) = @_;
     # the rest of the logic relies on the LensType lookup:
     return undef unless defined $lensType;
-    my $printConv = $exifTool->{TAG_INFO}->{LensType}->{PrintConv};
+    my $printConv = $exifTool->{TAG_INFO}{LensType}{PrintConv};
     return undef unless ref $printConv eq 'HASH';
     # use MaxApertureValue if MaxAperture is not available
     $maxAperture = $maxApertureValue unless $maxAperture;
@@ -2829,7 +2897,7 @@ sub ProcessExif($$$)
             }
             # convert offset to pointer in $$dataPt
             if ($$dirInfo{EntryBased} or (ref $$tagTablePtr{$tagID} eq 'HASH' and
-                $tagTablePtr->{$tagID}->{EntryBased}))
+                $tagTablePtr->{$tagID}{EntryBased}))
             {
                 $valuePtr += $entry;
             } else {
@@ -2847,12 +2915,12 @@ sub ProcessExif($$$)
                             $$tagInfo{Binary} = 1 if $$tagInfo{Unknown};
                             last unless $$tagInfo{Binary};      # must read non-binary data
                             last if $$tagInfo{SubDirectory};    # must read SubDirectory data
-                            if ($exifTool->{OPTIONS}->{Binary}) {
+                            if ($exifTool->{OPTIONS}{Binary}) {
                                 # read binary data if specified unless tagsFromFile won't use it
                                 last unless $$exifTool{TAGS_FROM_FILE} and $$tagInfo{Protected};
                             }
                             # must read if tag is specified by name
-                            last if $exifTool->{REQ_TAG_LOOKUP}->{lc($$tagInfo{Name})};
+                            last if $exifTool->{REQ_TAG_LOOKUP}{lc($$tagInfo{Name})};
                         } else {
                             # must read value if needed for a condition
                             last if defined $tagInfo;
@@ -2955,6 +3023,13 @@ sub ProcessExif($$$)
         $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$count,$size);
 
         if ($verbose) {
+            my $tval = $val;
+            if ($formatStr =~ /^rational64([su])$/) {
+                # show numerator/denominator separately
+                my $f = ReadValue($valueDataPt,$valuePtr,"int32$1",$count*2,$size);
+                $f =~ s/(-?\d+) (-?\d+)/$1\/$2/g;
+                $tval .= " ($f)";
+            }
             if ($htmlDump) {
                 my ($tagName, $colName);
                 if ($tagID == 0x927c and $dirName eq 'ExifIFD') {
@@ -2968,32 +3043,30 @@ sub ProcessExif($$$)
                 # build our tool tip
                 $size < 0 and $size = $count * $formatSize[$format];
                 my $fstr = $origFormStr || "$formatName[$format]\[$count]";
-                my $tip = sprintf("Tag ID: 0x%.4x\\n", $tagID) .
-                          "Format: $fstr\\nSize: $size bytes\\n";
+                my $tip = sprintf("Tag ID: 0x%.4x\n", $tagID) .
+                          "Format: $fstr\nSize: $size bytes\n";
                 if ($size > 4) {
                     my $offPt = Get32u($dataPt,$entry+8);
-                    $tip .= sprintf("Value offset: 0x%.4x\\n", $offPt);
+                    $tip .= sprintf("Value offset: 0x%.4x\n", $offPt);
                     my $actPt = $valuePtr + $valueDataPos + $base - ($$exifTool{EXIF_POS} || 0);
                     # highlight tag name (red for bad size)
                     my $style = ($valueDataLen < 0) ? 'V' : 'H';
                     if ($actPt != $offPt) {
-                        $tip .= sprintf("Actual offset: 0x%.4x\\n", $actPt);
+                        $tip .= sprintf("Actual offset: 0x%.4x\n", $actPt);
                         $style = 'F' if $style eq 'H';  # purple for different offsets
                     }
                     $colName = "<span class=$style>$tagName</span>";
+                    $colName .= ' <span class=V>(odd)</span>' if $offPt & 0x01;
                 } else {
                     $colName = $tagName;
                 }
-                my $tval;
                 if ($valueDataLen < 0) {
                     $tval = '<bad offset>';
                 } else {
-                    $tval = (length $val < 32) ? $val : substr($val,0,28) . '[...]';
+                    $tval = substr($tval,0,28) . '[...]' if length($tval) > 32;
                     if ($formatStr =~ /^(string|undef|binary)/) {
-                        # translate all characters that could mess up JavaScript
-                        $tval =~ tr/\\\x00-\x1f\x7f-\xff/./;
-                        $tval =~ tr/"/'/;
-                        $tval = "$tval";
+                        # translate non-printable characters
+                        $tval =~ tr/\x00-\x1f\x7f-\xff/./;
                     } elsif ($tagInfo and Image::ExifTool::IsInt($tval)) {
                         if ($$tagInfo{IsOffset}) {
                             $tval = sprintf('0x%.4x', $tval);
@@ -3018,7 +3091,7 @@ sub ProcessExif($$$)
                 $exifTool->VerboseInfo($tagID, $tagInfo,
                     Table   => $tagTablePtr,
                     Index   => $index,
-                    Value   => $val,
+                    Value   => $tval,
                     DataPt  => $valueDataPt,
                     DataPos => $valueDataPos + $base,
                     Size    => $size,
@@ -3173,7 +3246,7 @@ sub ProcessExif($$$)
                 }
                 # set directory IFD name from group name of family 1 in tag information if it exists
                 if ($$tagInfo{Groups}) {
-                    $subdirInfo{DirName} = $tagInfo->{Groups}->{1};
+                    $subdirInfo{DirName} = $tagInfo->{Groups}{1};
                     # number multiple subdirectories
                     $dirNum and $subdirInfo{DirName} .= $dirNum;
                 }
@@ -3200,7 +3273,7 @@ sub ProcessExif($$$)
                 $val = shift @values;           # continue with next subdir
             }
             my $doMaker = $exifTool->Options('MakerNotes');
-            next unless $doMaker or $exifTool->{REQ_TAG_LOOKUP}->{lc($tagStr)};
+            next unless $doMaker or $exifTool->{REQ_TAG_LOOKUP}{lc($tagStr)};
             # extract as a block if specified
             if ($$tagInfo{MakerNotes}) {
                 # save maker note byte order (if it was significant and valid)
@@ -3248,6 +3321,11 @@ sub ProcessExif($$$)
         if ($$tagInfo{IsOffset} and eval $$tagInfo{IsOffset}) {
             my $offsetBase = $$tagInfo{IsOffset} eq '2' ? $firstBase : $base;
             $offsetBase += $$exifTool{BASE};
+            # handle offsets which use a wrong base (Minolta A200)
+            if ($$tagInfo{WrongBase}) {
+                my $self = $exifTool;
+                $offsetBase += eval $$tagInfo{WrongBase} || 0;
+            }
             my @vals = split(' ',$val);
             foreach $val (@vals) {
                 $val += $offsetBase;
@@ -3306,7 +3384,7 @@ EXIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

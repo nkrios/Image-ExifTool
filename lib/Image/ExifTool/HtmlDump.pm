@@ -11,8 +11,9 @@ package Image::ExifTool::HtmlDump;
 use strict;
 use vars qw($VERSION);
 use Image::ExifTool;    # only for FinishTiffDump()
+use Image::ExifTool::HTML qw(EscapeHTML);
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 
 sub DumpTable($$$;$$$$$);
 sub Open($$$;@);
@@ -43,6 +44,28 @@ my $htmlHeader2 = <<_END_PART_2_;
 .H { color: #0000ff } /* highlighted tag name */
 .F { color: #aa00dd } /* actual offset differs */
 .M { text-decoration: underline } /* maker notes data */
+.tt { /* tooltip text */
+    visibility: hidden;
+    position: absolute;
+    white-space: nowrap;
+    top: 0;
+    left: 0;
+    font-family: Verdana, sans-serif;
+    font-size: .7em;
+    padding: 2px 4px;
+    border: 1px solid gray;
+    z-index: 3;
+}
+.tb { /* tooltip background */
+    visibility: hidden;
+    position: absolute;
+    background: #ffffdd;
+    opacity: 0.8;
+    -moz-opacity: 0.8;
+    filter: alpha(opacity=80);
+    -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=80)';
+    z-index: 2;
+}
 /* table styles */
 table.dump {
   border-top: 1px solid gray;
@@ -60,8 +83,19 @@ body  { color: black; background: white }
 </style>
 <script language="JavaScript" type="text/JavaScript">
 <!-- Begin
-var t = new Array;
+// tooltip positioning constants
+var TMAR = 4;   // top/left margins
+var BMAR = 16;  // bottom/right margins (scrollbars may overhang inner dimensions)
+var XOFF = 10;  // x offset from cursor
+var YOFF = 40;  // y offset
+var YMIN = 10;  // minimum y offset
+var YTOP = 20;  // y offset when above cursor
+// common variables
+var safari1 = navigator.userAgent.indexOf("Safari/312.6") >= 0;
+var ie6 = navigator.userAgent.toLowerCase().indexOf('msie 6') >= 0;
 var mspan = new Array;
+var hlist, tt, tb;
+
 function GetElementsByClass(classname, tagname) {
   var found = new Array();
   var list = document.getElementsByTagName(tagname);
@@ -78,6 +112,53 @@ function GetElementsByClass(classname, tagname) {
   delete list;
   return found;
 }
+
+// move tooltip
+function move(e)
+{
+  if (!tt) return;
+  if (ie6 && (tt.style.top  == '' || tt.style.top  == 0) &&
+             (tt.style.left == '' || tt.style.left == 0))
+  {
+    tt.style.width  = tt.offsetWidth  + 'px';
+    tt.style.height = tt.offsetHeight + 'px';
+  }
+  var w, h;
+  // browser inconsistencies make getting window size more complex than it should be,
+  // and even then we don't know if it is smaller due to scrollbar width
+  if (typeof(window.innerWidth) == 'number') {
+    w = window.innerWidth;
+    h = window.innerHeight;
+  } else if (document.documentElement && document.documentElement.clientWidth) {
+    w = document.documentElement.clientWidth;
+    h = document.documentElement.clientHeight;
+  } else {
+    w = document.body.clientWidth;
+    h = document.body.clientHeight;
+  }
+  var x = e.clientX + XOFF;
+  var y = e.clientY + YOFF;
+  if (safari1) { // patch for people still using OS X 10.3.9
+    x -= document.body.scrollLeft + document.documentElement.scrollLeft;
+    y -= document.body.scrollTop  + document.documentElement.scrollTop;
+  }
+  var mx = w - BMAR - tt.offsetWidth;
+  var my = h - BMAR - tt.offsetHeight;
+  if (y > my + YOFF - YMIN) y = e.clientY - YTOP - tt.offsetHeight;
+  if (x > mx) x = mx;
+  if (y > my) y = my;
+  if (x < TMAR) x = TMAR;
+  if (y < TMAR) y = TMAR;
+  x += document.body.scrollLeft + document.documentElement.scrollLeft;
+  y += document.body.scrollTop  + document.documentElement.scrollTop;
+  tb.style.width  = tt.offsetWidth  + 'px';
+  tb.style.height = tt.offsetHeight + 'px';
+  tt.style.top  = tb.style.top  = y + 'px';
+  tt.style.left = tb.style.left = x + 'px';
+  tt.style.visibility = tb.style.visibility = 'visible';
+}
+
+// highlight/unhighlight text
 function high(e,on) {
   var targ;
   if (e.target) targ = e.target;
@@ -85,32 +166,43 @@ function high(e,on) {
   if (targ.nodeType == 3) targ = targ.parentNode; // defeat Safari bug
   if (!targ.name) targ = targ.parentNode; // go up another level if necessary
   if (targ.name && document.getElementsByName) {
-    var col;
-    var tip;
+    // un-highlight current objects
+    if (hlist) {
+      for (var i=0; i<hlist.length; ++i) {
+        hlist[i].style.background = 'transparent';
+      }
+      hlist = null;
+    }
+    if (tt) {
+      // hide old tooltip
+      tt.style.visibility = tb.style.visibility = 'hidden';
+      tt = null;
+    }
     if (on) {
-      col = "#ffcc99";
       if (targ.name.substring(0,1) == 't') {
-        var index = parseInt(targ.name.substring(1));
-        tip = t[index];
-        if (tip) delete t[index];
+        // show our tooltip (ID is different than name to avoid confusing IE)
+        tt = document.getElementById('p' + targ.name.substring(1));
+        if (tt) {
+          tb = document.getElementById('tb');
+          move(e);
+        }
       }
-    } else {
-      col = "transparent";
-    }
-    // highlight anchor elements with the same name and add tool tip
-    var list = document.getElementsByName(targ.name);
-    for (var i=0; i<list.length; ++i) {
-      list[i].style.background = col;
-      if (tip) list[i].title += tip;
-    }
-    // use class name to highlight span elements if necessary
-    for (var i=0; i<mspan.length; ++i) {
-      if (mspan[i] != targ.name) continue;
-      list = GetElementsByClass(targ.name, 'span');
-      for (var j=0; j<list.length; ++j) {
-        list[j].style.background = col;
+      // highlight anchor elements with the same name
+      hlist = document.getElementsByName(targ.name);
+      // use class name to highlight span elements if necessary
+      for (var i=0; i<mspan.length; ++i) {
+        if (mspan[i] != targ.name) continue;
+        var slist = GetElementsByClass(targ.name, 'span');
+        // add elements from hlist collection to our array
+        for (var j=0; j<hlist.length; ++j) {
+            slist[slist.length] = hlist[j];
+        }
+        hlist = slist;
+        break;
       }
-      break;
+      for (var j=0; j<hlist.length; ++j) {
+        hlist[j].style.background = '#ffcc99';
+      }
     }
   }
 }
@@ -121,10 +213,11 @@ my $htmlHeader3 = q[
 </script></head>
 <body><noscript><b class=V>--&gt;
 Enable JavaScript for active highlighting and information tool tips!
-</b></noscript><table class=dump cellspacing=0 cellpadding=2>
+</b></noscript>
+<table class=dump cellspacing=0 cellpadding=2>
 <tr><td valign='top'><pre>];
 
-my $preMouse = q(<pre onmouseover="high(event,1)" onmouseout="high(event,0)">);
+my $preMouse = q(<pre onmouseover="high(event,1)" onmouseout="high(event,0)" onmousemove="move(event)">);
 
 #------------------------------------------------------------------------------
 # New - create new HtmlDump object
@@ -152,18 +245,21 @@ sub Add($$$$;$$)
     my ($self, $start, $size, $msg, $tip, $flag, $sameTip) = @_;
     my $block = $$self{Block};
     $$block{$start} or $$block{$start} = [ ];
+    my $htip;
     if ($tip and $tip eq 'SAME') {
-        $tip = '';
+        $htip = '';
     } else {
-        $tip = defined $tip ? '\n' . $tip : '';
-        my $m = $msg;
-        $m =~ s/<.*?>//g;       # remove html format codes
-        $tip = "$m$tip";        # add msg as first line in tooltip
+        # use message as first line of tip, and make bold unless in brackets
+        $htip = ($msg =~ /^[[(]/) ? $msg : "<b>$msg</b>";
+        if (defined $tip) {
+            ($tip = EscapeHTML($tip)) =~ s/\n/<br>/g;   # HTML-ize tooltip text
+            $htip .= '<br>' . $tip;
+        }
         # add size if not already done
-        $tip .= "\\n($size bytes)" unless $tip =~ /\\nSize:/;
+        $htip .= "<br>($size bytes)" unless $htip =~ /<br>Size:/;
         ++$self->{TipNum};
     }
-    push @{$$block{$start}}, [ $size, $msg, $tip, $flag, $self->{TipNum} ];
+    push @{$$block{$start}}, [ $size, $msg, $htip, $flag, $self->{TipNum} ];
 }
 
 #------------------------------------------------------------------------------
@@ -273,7 +369,7 @@ sub Print($$;$$$$$)
                                 # reset $len to the actual length of available data
                                 $raf->Seek(0, 2);
                                 $len = $raf->Tell() - $start;
-                                $tip .= "\\nError: Only $len bytes available!" if $tip;
+                                $tip .= "\nError: Only $len bytes available!" if $tip;
                                 next;
                             }
                             $buff .= $buf2;
@@ -311,11 +407,6 @@ sub Print($$;$$$$$)
         for ($i=0; $i<@$mspan; ++$i) {
             Write($outfile, qq(mspan[$i] = "$$mspan[$i]";\n));
         }
-        my $tips = \@{$$self{TipList}};
-        for ($i=0; $i<@$tips; ++$i) {
-            Write($outfile, qq(t[$i] = "$$tips[$i]";\n)) if defined $$tips[$i];
-        }
-        delete $$self{TipList};
         Write($outfile, $htmlHeader3, $self->{Cols}->[0]);
         Write($outfile, '</pre></td><td valign="top">',
                         $preMouse, $self->{Cols}->[1]);
@@ -323,7 +414,13 @@ sub Print($$;$$$$$)
                         $preMouse, $self->{Cols}->[2]);
         Write($outfile, '</pre></td><td valign="top">',
                         $preMouse, $self->{Cols}->[3]);
-        Write($outfile, "</pre></td></tr></table>\n");
+        Write($outfile, "</pre></td></tr></table>\n<div id=tb class=tb> </div>\n");
+        my $tips = \@{$$self{TipList}};
+        for ($i=0; $i<@$tips; ++$i) {
+            my $tip = $$tips[$i];
+            Write($outfile, "<div id=p$i class=tt>$tip</div>\n") if defined $tip;
+        }
+        delete $$self{TipList};
         $rtnVal = 1;
     } else {
         Write($outfile, "$title</title></head><body>\n",
@@ -454,7 +551,7 @@ sub DumpTable($$$;$$$$$)
             }
             ++$id unless $dblRef;
         }
-        $name = qq{<a name=$name class=$id>};
+        $name = "<a name=$name class=$id>";
         $msg and $msg = "$name$msg</a>";
     } else {
         $name = '';
@@ -709,7 +806,7 @@ display linefeeds in the tool tips.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

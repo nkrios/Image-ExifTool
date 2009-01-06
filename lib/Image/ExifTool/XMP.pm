@@ -24,7 +24,7 @@
 #               9) http://www.w3.org/TR/SVG11/
 #               10) http://www.adobe.com/devnet/xmp/pdfs/XMPSpecificationPart2.pdf (Oct 2008)
 #
-# Notes:      - I am handling property qualifiers as if they were separate
+# Notes:      - Property qualifiers are handled as if they were separate
 #               properties (with no associated namespace).
 #
 #             - Currently, there is no special treatment of the following
@@ -45,7 +45,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '1.95';
+$VERSION = '2.00';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -122,6 +122,7 @@ my %stdXlatNS = (
     prism     => 'http://prismstandard.org/namespaces/basic/2.1/',
     prl       => 'http://prismstandard.org/namespaces/prl/2.1/',
     prismusagerights => 'http://prismstandard.org/namespaces/prismusagerights/2.1/',
+    acdsee    => 'http://ns.acdsee.com/iptc/1.0/',
 );
 
 # build reverse namespace lookup
@@ -226,6 +227,10 @@ my %recognizedAttrs = (
         Name => 'pdf',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::pdf' },
     },
+    pdfx => {
+        Name => 'pdfx',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::pdfx' },
+    },
     photoshop => {
         Name => 'photoshop',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::photoshop' },
@@ -317,6 +322,10 @@ my %recognizedAttrs = (
    'x' => {
         Name => 'x',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::x' },
+    },
+    acdsee => {
+        Name => 'acdsee',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::acdsee' },
     },
 );
 
@@ -410,10 +419,10 @@ my %recognizedAttrs = (
         Struct => 'Thumbnail',
         List => 'Alt',
     },
-    ThumbnailsHeight    => { Name => 'ThumbnailHeight', List => 1, Writable => 'integer' },
-    ThumbnailsWidth     => { Name => 'ThumbnailWidth',  List => 1, Writable => 'integer' },
-    ThumbnailsFormat    => { Name => 'ThumbnailFormat', List => 1 },
-    ThumbnailsImage     => {
+    ThumbnailsHeight => { Name => 'ThumbnailHeight', List => 1, Writable => 'integer' },
+    ThumbnailsWidth  => { Name => 'ThumbnailWidth',  List => 1, Writable => 'integer' },
+    ThumbnailsFormat => { Name => 'ThumbnailFormat', List => 1 },
+    ThumbnailsImage  => {
         # Eventually may want to handle this like a normal thumbnail image
         Name => 'ThumbnailImage',
         List => 1,
@@ -894,6 +903,18 @@ my %recognizedAttrs = (
     Producer    => { Groups => { 2 => 'Author' } },
 );
 
+# PDF extension schema properties (pdfx)
+%Image::ExifTool::XMP::pdfx = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-pdfx', 2 => 'Document' },
+    NAMESPACE => 'pdfx',
+    NOTES => q{
+        PDF extension tags.  This namespace is used to store application-defined PDF
+        information, so there are no pre-defined tags.  User-defined tags must be
+        created to enable writing of XMP-pdfx information.
+    },
+);
+
 # Photoshop schema properties (photoshop)
 %Image::ExifTool::XMP::photoshop = (
     %xmpTableDefaults,
@@ -942,6 +963,7 @@ my %recognizedAttrs = (
     ChromaticAberrationR=> { Writable => 'integer' },
     ColorNoiseReduction => { Writable => 'integer' },
     Contrast        => { Writable => 'integer', Avoid => 1 },
+    Converter       => { }, #PH guess (found in EXIF)
     CropTop         => { Writable => 'real' },
     CropLeft        => { Writable => 'real' },
     CropBottom      => { Writable => 'real' },
@@ -963,6 +985,7 @@ my %recognizedAttrs = (
     HasCrop         => { Writable => 'boolean' },
     HasSettings     => { Writable => 'boolean' },
     LuminanceSmoothing  => { Writable => 'integer' },
+    MoireFilter     => { PrintConv => { Off=>'Off', On=>'On' } },
     RawFileName     => { },
     RedHue          => { Writable => 'integer' },
     RedSaturation   => { Writable => 'integer' },
@@ -970,6 +993,7 @@ my %recognizedAttrs = (
     Shadows         => { Writable => 'integer' },
     ShadowTint      => { Writable => 'integer' },
     Sharpness       => { Writable => 'integer', Avoid => 1 },
+    Smoothness      => { Writable => 'integer' },
     Temperature     => { Writable => 'integer' },
     Tint            => { Writable => 'integer' },
     ToneCurve       => { List => 'Seq' },
@@ -1315,12 +1339,8 @@ my %recognizedAttrs = (
     NAMESPACE => 'tiff',
     PRIORITY => 0, # not as reliable as actual TIFF tags
     NOTES => 'EXIF schema for TIFF tags.',
-    ImageWidth  => { Writable => 'integer' },
-    ImageLength => {
-        Name => 'ImageHeight',
-        Notes => 'called ImageLength in the XMP specification',
-        Writable => 'integer',
-    },
+    ImageWidth    => { Writable => 'integer' },
+    ImageLength   => { Writable => 'integer', Name => 'ImageHeight' },
     BitsPerSample => { Writable => 'integer', List => 'Seq' },
     Compression => {
         Writable => 'integer',
@@ -1342,9 +1362,7 @@ my %recognizedAttrs = (
             2 => 'Planar',
         },
     },
-    YCbCrSubSampling => {
-        PrintConv => \%Image::ExifTool::JPEG::yCbCrSubSampling,
-    },
+    YCbCrSubSampling => { PrintConv => \%Image::ExifTool::JPEG::yCbCrSubSampling },
     YCbCrPositioning => {
         Writable => 'integer',
         PrintConv => {
@@ -1373,17 +1391,11 @@ my %recognizedAttrs = (
         %dateTimeInfo,
     },
     ImageDescription => { Writable => 'lang-alt' },
-    Make  => { Groups => { 2 => 'Camera' } },
-    Model => {
-        Description => 'Camera Model Name',
-        Groups => { 2 => 'Camera' },
-    },
+    Make      => { Groups => { 2 => 'Camera' } },
+    Model     => { Groups => { 2 => 'Camera' }, Description => 'Camera Model Name' },
     Software  => { },
     Artist    => { Groups => { 2 => 'Author' } },
-    Copyright => {
-        Groups => { 2 => 'Author' },
-        Writable => 'lang-alt',
-    },
+    Copyright => { Groups => { 2 => 'Author' }, Writable => 'lang-alt' },
     NativeDigest => { }, #PH
 );
 
@@ -1418,23 +1430,11 @@ my %recognizedAttrs = (
             6 => 'B',
         },
     },
-    CompressedBitsPerPixel => {
-        Writable => 'rational',
-    },
-    PixelXDimension => {
-        Name => 'ExifImageWidth',
-        Notes => 'called PixelXDimension by the XMP spec',
-        Writable => 'integer',
-    },
-    PixelYDimension => {
-        Name => 'ExifImageHeight',
-        Notes => 'called PixelYDimension by the XMP spec',
-        Writable => 'integer',
-    },
-    MakerNote => { },
-    UserComment => {
-        Writable => 'lang-alt',
-    },
+    CompressedBitsPerPixel => { Writable => 'rational' },
+    PixelXDimension  => { Name => 'ExifImageWidth',  Writable => 'integer' },
+    PixelYDimension  => { Name => 'ExifImageHeight', Writable => 'integer' },
+    MakerNote        => { },
+    UserComment      => { Writable => 'lang-alt' },
     RelatedSoundFile => { },
     DateTimeOriginal => {
         Description => 'Date/Time Original',
@@ -1470,9 +1470,7 @@ my %recognizedAttrs = (
             8 => 'Landscape',
         },
     },
-    SpectralSensitivity => {
-        Groups => { 2 => 'Camera' },
-    },
+    SpectralSensitivity => { Groups => { 2 => 'Camera' } },
     ISOSpeedRatings => {
         Name => 'ISO',
         Writable => 'integer',
@@ -1484,18 +1482,9 @@ my %recognizedAttrs = (
         SubDirectory => { },
         Struct => 'OECF',
     },
-    OECFColumns => {
-        Groups => { 2 => 'Camera' },
-        Writable => 'integer',
-    },
-    OECFRows => {
-        Groups => { 2 => 'Camera' },
-        Writable => 'integer',
-    },
-    OECFNames => {
-        Groups => { 2 => 'Camera' },
-        List => 'Seq',
-    },
+    OECFColumns => { Groups => { 2 => 'Camera' }, Writable => 'integer' },
+    OECFRows    => { Groups => { 2 => 'Camera' }, Writable => 'integer' },
+    OECFNames   => { Groups => { 2 => 'Camera' }, List => 'Seq' },
     OECFValues => {
         Groups => { 2 => 'Camera' },
         Writable => 'rational',
@@ -1516,9 +1505,7 @@ my %recognizedAttrs = (
         ValueConvInv => '$val>0 ? 2*log($val)/log(2) : 0',
         PrintConvInv => '$val',
     },
-    BrightnessValue => {
-        Writable => 'rational',
-    },
+    BrightnessValue   => { Writable => 'rational' },
     ExposureBiasValue => {
         Name => 'ExposureCompensation',
         Writable => 'rational',
@@ -1561,10 +1548,7 @@ my %recognizedAttrs = (
         SubDirectory => { },
         Struct => 'Flash',
     },
-    FlashFired => {
-        Groups => { 2 => 'Camera' },
-        Writable => 'boolean',
-    },
+    FlashFired  => { Groups => { 2 => 'Camera' }, Writable => 'boolean' },
     FlashReturn => {
         Groups => { 2 => 'Camera' },
         Writable => 'integer',
@@ -1584,58 +1568,31 @@ my %recognizedAttrs = (
             3 => 'Auto',
         },
     },
-    FlashFunction => {
-        Groups => { 2 => 'Camera' },
-        Writable => 'boolean',
-    },
-    FlashRedEyeMode => {
-        Groups => { 2 => 'Camera' },
-        Writable => 'boolean',
-    },
+    FlashFunction   => { Groups => { 2 => 'Camera' }, Writable => 'boolean' },
+    FlashRedEyeMode => { Groups => { 2 => 'Camera' }, Writable => 'boolean' },
     FocalLength=> {
         Groups => { 2 => 'Camera' },
         Writable => 'rational',
         PrintConv => 'sprintf("%.1f mm",$val)',
         PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
-    SubjectArea => {
-        Writable => 'integer',
-        List => 'Seq',
-    },
-    FlashEnergy => {
-        Groups => { 2 => 'Camera' },
-        Writable => 'rational',
-    },
+    SubjectArea => { Writable => 'integer', List => 'Seq' },
+    FlashEnergy => { Groups => { 2 => 'Camera' }, Writable => 'rational' },
     SpatialFrequencyResponse => {
         Groups => { 2 => 'Camera' },
         SubDirectory => { },
         Struct => 'OECF',
     },
-    SpatialFrequencyResponseColumns => {
-        Groups => { 2 => 'Camera' },
-        Writable => 'integer',
-    },
-    SpatialFrequencyResponseRows => {
-        Groups => { 2 => 'Camera' },
-        Writable => 'integer',
-    },
-    SpatialFrequencyResponseNames => {
-        Groups => { 2 => 'Camera' },
-        List => 'Seq',
-    },
+    SpatialFrequencyResponseColumns => { Groups => { 2 => 'Camera' }, Writable => 'integer' },
+    SpatialFrequencyResponseRows    => { Groups => { 2 => 'Camera' }, Writable => 'integer' },
+    SpatialFrequencyResponseNames   => { Groups => { 2 => 'Camera' }, List => 'Seq' },
     SpatialFrequencyResponseValues => {
         Groups => { 2 => 'Camera' },
         Writable => 'rational',
         List => 'Seq',
     },
-    FocalPlaneXResolution => {
-        Groups => { 2 => 'Camera' },
-        Writable => 'rational',
-    },
-    FocalPlaneYResolution => {
-        Groups => { 2 => 'Camera' },
-        Writable => 'rational',
-    },
+    FocalPlaneXResolution => { Groups => { 2 => 'Camera' }, Writable => 'rational' },
+    FocalPlaneYResolution => { Groups => { 2 => 'Camera' }, Writable => 'rational' },
     FocalPlaneResolutionUnit => {
         Groups => { 2 => 'Camera' },
         Writable => 'integer',
@@ -1647,13 +1604,8 @@ my %recognizedAttrs = (
             5 => 'um',   # (not standard EXIF)
         },
     },
-    SubjectLocation => {
-        Writable => 'integer',
-        List => 'Seq',
-    },
-    ExposureIndex => {
-        Writable => 'rational',
-    },
+    SubjectLocation => { Writable => 'integer', List => 'Seq' },
+    ExposureIndex   => { Writable => 'rational' },
     SensingMethod => {
         Groups => { 2 => 'Camera' },
         Writable => 'integer',
@@ -1682,7 +1634,7 @@ my %recognizedAttrs = (
     },
     CFAPatternColumns   => { Writable => 'integer' },
     CFAPatternRows      => { Writable => 'integer' },
-    CFAPatternValues    => { List => 'Seq', Writable => 'integer' },
+    CFAPatternValues    => { Writable => 'integer', List => 'Seq' },
     CustomRendered => {
         Writable => 'integer',
         PrintConv => {
@@ -1771,18 +1723,9 @@ my %recognizedAttrs = (
         SubDirectory => { },
         Struct => 'DeviceSettings',
     },
-    DeviceSettingDescriptionColumns => {
-        Groups => { 2 => 'Camera' },
-        Writable => 'integer',
-    },
-    DeviceSettingDescriptionRows => {
-        Groups => { 2 => 'Camera' },
-        Writable => 'integer',
-    },
-    DeviceSettingDescriptionSettings => {
-        Groups => { 2 => 'Camera' },
-        List => 'Seq',
-    },
+    DeviceSettingDescriptionColumns  => { Groups => { 2 => 'Camera' }, Writable => 'integer' },
+    DeviceSettingDescriptionRows     => { Groups => { 2 => 'Camera' }, Writable => 'integer' },
+    DeviceSettingDescriptionSettings => { Groups => { 2 => 'Camera' }, List => 'Seq' },
     SubjectDistanceRange => {
         Groups => { 2 => 'Camera' },
         Writable => 'integer',
@@ -1840,10 +1783,7 @@ my %recognizedAttrs = (
             3 => '3-Dimensional',
         },
     },
-    GPSDOP => {
-        Groups => { 2 => 'Location' },
-        Writable => 'rational',
-    },
+    GPSDOP => { Groups => { 2 => 'Location' }, Writable => 'rational' },
     GPSSpeedRef => {
         Groups => { 2 => 'Location' },
         PrintConv => {
@@ -1852,10 +1792,7 @@ my %recognizedAttrs = (
             N => 'knots',
         },
     },
-    GPSSpeed => {
-        Groups => { 2 => 'Location' },
-        Writable => 'rational',
-    },
+    GPSSpeed => { Groups => { 2 => 'Location' }, Writable => 'rational' },
     GPSTrackRef => {
         Groups => { 2 => 'Location' },
         PrintConv => {
@@ -1863,20 +1800,14 @@ my %recognizedAttrs = (
             T => 'True North',
         },
     },
-    GPSTrack => {
-        Groups => { 2 => 'Location' },
-        Writable => 'rational',
-    },
+    GPSTrack => { Groups => { 2 => 'Location' }, Writable => 'rational' },
     GPSImgDirectionRef => {
         PrintConv => {
             M => 'Magnetic North',
             T => 'True North',
         },
     },
-    GPSImgDirection => {
-        Groups => { 2 => 'Location' },
-        Writable => 'rational',
-    },
+    GPSImgDirection => { Groups => { 2 => 'Location' }, Writable => 'rational' },
     GPSMapDatum     => { Groups => { 2 => 'Location' } },
     GPSDestLatitude => { Groups => { 2 => 'Location' }, %latConv },
     GPSDestLongitude=> { Groups => { 2 => 'Location' }, %longConv },
@@ -1887,10 +1818,7 @@ my %recognizedAttrs = (
             T => 'True North',
         },
     },
-    GPSDestBearing => {
-        Groups => { 2 => 'Location' },
-        Writable => 'rational',
-    },
+    GPSDestBearing => { Groups => { 2 => 'Location' }, Writable => 'rational' },
     GPSDestDistanceRef => {
         Groups => { 2 => 'Location' },
         PrintConv => {
@@ -1946,7 +1874,8 @@ my %recognizedAttrs = (
     NOTES => q{
         IPTC Core schema tags.  The actual IPTC Core namespace prefix is
         "Iptc4xmpCore", which is the prefix recorded in the file, but ExifTool
-        shortens this for the "XMP-iptcCore" family 1 group name.
+        shortens this for the "XMP-iptcCore" family 1 group name. (see
+        L<http://www.iptc.org/IPTC4XMP/>)
     },
     CountryCode         => { Groups => { 2 => 'Location' } },
     CreatorContactInfo => {
@@ -1975,6 +1904,7 @@ my %recognizedAttrs = (
     NOTES => q{
         IPTC Extension schema tags.  The actual namespace prefix is "Iptc4xmpExt",
         but ExifTool shortens this for the "XMP-iptcExt" family 1 group name.
+        (see L<http://www.iptc.org/IPTC4XMP/>)
     },
     AdditionalModelInformation => { },
     ArtworkOrObject => {
@@ -1986,7 +1916,7 @@ my %recognizedAttrs = (
     ArtworkOrObjectAOCreator        => { List => 1, Name => 'ArtworkCreator' },
     ArtworkOrObjectAODateCreated    => {
         Name => 'ArtworkDateCreated',
-        Groups => { 2 => 'Time'},
+        Groups => { 2 => 'Time' },
         List => 1,
         %dateTimeInfo,
     },
@@ -2048,10 +1978,10 @@ my %recognizedAttrs = (
         uncommon and I haven't been able to locate a reference which gives the
         namespace URI.
     },
-    AUTHOR    => { Name => 'Author',   Avoid => 1, Groups => { 2 => 'Author'} },
+    AUTHOR    => { Name => 'Author',   Avoid => 1, Groups => { 2 => 'Author' } },
     COMMENTS  => { Name => 'Comments', Avoid => 1 },
-    COPYRIGHT => { Name => 'Copyright',Avoid => 1, Groups => { 2 => 'Author'} },
-    DATE      => { Name => 'Date',     Avoid => 1, Groups => { 2 => 'Time'} },
+    COPYRIGHT => { Name => 'Copyright',Avoid => 1, Groups => { 2 => 'Author' } },
+    DATE      => { Name => 'Date',     Avoid => 1, Groups => { 2 => 'Time' } },
     GENRE     => { Name => 'Genre',    Avoid => 1 },
     TITLE     => { Name => 'Title',    Avoid => 1 },
 );
@@ -2071,8 +2001,14 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-cc', 2 => 'Author' },
     NAMESPACE => 'cc',
-    NOTES => 'Creative Commons schema tags.',
+    NOTES => q{
+        Creative Commons schema tags.  (see
+        L<http://creativecommons.org/technology/xmp>)
+    },
     license => { },
+    morePermissions => { },
+    attributionName => { },
+    attributionURL  => { },
 );
 
 # Description Explorer schema properties (dex) (ref 6)
@@ -2083,7 +2019,7 @@ my %recognizedAttrs = (
     NOTES => q{
         Description Explorer schema tags.  These tags are not very common.  The
         Source and Rating tags are avoided when writing due to name conflicts with
-        other XMP tags.
+        other XMP tags.  (see L<http://www.optimasc.com/products/fileid/>)
     },
     crc32       => { Name => 'CRC32', Writable => 'integer' },
     source      => { Avoid => 1 },
@@ -2166,12 +2102,12 @@ my %recognizedAttrs = (
     hierarchicalSubject => { List => 'Bag' },
 );
 
-# Adobe Album Schema properties (album) - (PH)
+# Adobe Album schema properties (album) - (PH)
 %Image::ExifTool::XMP::Album = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-album', 2 => 'Image' },
     NAMESPACE => 'album',
-    NOTES => 'Adobe Album Schema tags.',
+    NOTES => 'Adobe Album schema tags.',
     Notes => { },
 );
 
@@ -2212,7 +2148,7 @@ my %recognizedAttrs = (
         SVG and Metadata tags are extracted from these images, but all graphics tags
         may be extracted by setting the Unknown option to 2 (-U on the command
         line).  The SVG tags are not part of XMP as such, but are included with the
-        XMP module for convenience.
+        XMP module for convenience.  (see L<http://www.w3.org/TR/SVG11/>)
     },
     version    => 'SVGVersion',
     id         => 'ID',
@@ -2569,7 +2505,7 @@ sub FoundXMP($$$$;$)
         # construct tag information for this unknown tag
         # make this a List type if necessary and not lang-alt
         $$tagInfo{List} = $1 if @$props > 2 and not $lang and
-            $$props[-1] =~ /^rdf:li \d+$/ and $$props[-2] =~ /^rdf:(Bag|Seq|Alt)/;
+            $$props[-1] =~ /^rdf:li \d+$/ and $$props[-2] =~ /^rdf:(Bag|Seq|Alt)$/;
         Image::ExifTool::AddTagToTable($tagTablePtr, $tagID, $tagInfo);
         $added = 1;
     }
@@ -2667,7 +2603,12 @@ sub ParseXMPElement($$$;$$$)
             # add index to list items so we can keep them in order
             # (this also enables us to keep structure elements grouped properly
             # for lists of structures, like JobRef)
-            $prop .= sprintf(' %.3d', $count);
+            # Note: the list index is prefixed by the number of digits so sorting
+            # alphabetically gives the correct order while still allowing a flexible
+            # number of digits -- this scheme allows up to 9 digits in the index,
+            # with index numbers ranging from 0 to 999999999.  The sequence is:
+            # 10,11,12-19,210,211-299,3100,3101-3999,41000//9999999999.
+            $prop .= ' ' . length($count) . $count;
         } elsif ($prop eq 'rdf:Description') {
             # trim comments and whitespace from rdf:Description properties only
             $val =~ s/<!--.*?-->//g;
@@ -2985,7 +2926,7 @@ sub ProcessXMP($$;$)
         $dirStart = 0;
     }
     # extract XMP as a block if specified
-    if ($exifTool->{REQ_TAG_LOOKUP}->{xmp} and not $isSVG) {
+    if (($exifTool->{REQ_TAG_LOOKUP}->{xmp} or $exifTool->{OPTIONS}->{Binary}) and not $isSVG) {
         $exifTool->FoundTag('XMP', substr($$dataPt, $dirStart, $dirLen));
     }
     if ($exifTool->Options('Verbose') and not $exifTool->{XMP_CAPTURE}) {
@@ -3084,7 +3025,7 @@ information.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

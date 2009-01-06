@@ -3,12 +3,12 @@
 #
 # Description:  Tag name translations for converting from XMP to IPTC
 #
-# Usage:        exiftool -tagsFromFile src.jpg -@ xmp2iptc.args dst.jpg
+# Usage:        exiftool -tagsFromFile SRCFILE -@ xmp2iptc.args DSTFILE
 #
 # Revisions:    2005/05/14 - P. Harvey Created
-#				2008/03/04 - PH Changed Location translation and added
-#							 IntellectualGenre and SubjectCode
-#				2008/09/30 - PH Added writing of Photoshop:IPTCDigest
+#               2008/03/04 - PH Changed Location translation and added
+#                            IntellectualGenre and SubjectCode
+#               2008/09/30 - PH Added writing of Photoshop:IPTCDigest
 #
 # References:   http://www.iptc.org/IPTC4XMP/
 #               http://www.iptc.org/IIM/
@@ -19,7 +19,7 @@
 #               Credit, DateCreated, Headline, Source, SupplementalCategories
 #               and Urgency.
 #
-#				Also updates Photoshop:IPTCDigest as per MWG recommendation.
+#               Also updates Photoshop:IPTCDigest as per MWG recommendation.
 #
 -XMP:* > IPTC:*
 -XMP-dc:Title > IPTC:ObjectName

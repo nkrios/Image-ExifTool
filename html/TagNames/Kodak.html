@@ -443,8 +443,8 @@ by 8 digits.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Type8'>Kodak Type8 Tags</a></h2>
-<p>Kodak models such as the P712, P850, P880, Z612 and Z712 use standard TIFF
-IFD format for the maker notes.  In keeping with Kodak&#39;s strategy of
+<p>Kodak models such as the P712, P850, P880, Z612, Z712 and Z8612 use standard
+TIFF IFD format for the maker notes.  In keeping with Kodak&#39;s strategy of
 inconsitent makernotes, some models such as the Z1085 also use these tags,
 but for these models the makernotes begin with a TIFF header instead of an
 IFD entry count and use relative instead of absolute offsets.  There is a
@@ -815,6 +815,45 @@ much duplication), but relatively few tags have so far been decoded.</p>
 <td>0xfd06</td>
 <td>ISO</td>
 <td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Type9'>Kodak Type9 Tags</a></h2>
+<p>These tags are used by the C1013.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r>12</td>
+<td>FNumber</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>16</td>
+<td>ExposureTime</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>20</td>
+<td>DateTimeOriginal</td>
+<td class=c>string[20]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>52</td>
+<td>ISO</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r>87</td>
+<td>FirmwareVersion</td>
+<td class=c>string[16]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r>168</td>
+<td>SerialNumber</td>
+<td class=c>string[12]</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1375,7 +1414,7 @@ Kodak JPEG APP3 &quot;Meta&quot; segment.
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 20, 2008</i>
+<br><i>Last revised Dec 1, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -20,7 +20,7 @@ use Image::ExifTool::PostScript;
 use Image::ExifTool::XMP qw(EscapeXML UnescapeXML);
 require Exporter;
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -266,7 +266,7 @@ my %entityName; # look up entity names by number (built as necessary)
 #------------------------------------------------------------------------------
 # Convert single UTF-8 character to HTML character reference
 # Inputs: 0) UTF-8 character sequence
-# Returns: HML character reference (ie. "&quot;");
+# Returns: HTML character reference (ie. "&quot;");
 # Note: Must be called via EscapeHTML to load name lookup
 sub EscapeChar($)
 {
@@ -353,6 +353,7 @@ sub ProcessHTML($$)
         $doc .= $buff;
         last if $buff =~ m{</head>}i;
     }
+    return 1 unless defined $doc;
 
     # process all elements in header
     my $tagTablePtr = GetTagTable('Image::ExifTool::HTML::Main');
@@ -440,7 +441,7 @@ meta information from HTML documents.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

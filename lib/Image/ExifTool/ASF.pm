@@ -17,7 +17,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -733,13 +733,8 @@ sub ProcessASF($$;$)
     my $verbose = $exifTool->Options('Verbose');
     my $rtnVal = 0;
     my $pos = 0;
-    my ($buff, $err, @parentTable, @childEnd, %dumpParms);
+    my ($buff, $err, @parentTable, @childEnd);
 
-    if ($verbose > 2) {
-        $dumpParms{MaxLen} = 96 unless $verbose > 3;
-        $dumpParms{Prefix} = $$exifTool{INDENT};
-        $dumpParms{Out} = $exifTool->Options('TextOut');
-    }
     for (;;) {
         last unless $raf->Read($buff, 24) == 24;
         $pos += 24;
@@ -768,7 +763,6 @@ sub ProcessASF($$;$)
             pop @childEnd;
             $tagTablePtr = pop @parentTable;
             $exifTool->{INDENT} = substr($exifTool->{INDENT},0,-2);
-            $dumpParms{Prefix} = $exifTool->{INDENT};
         }
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         $verbose and $exifTool->VerboseInfo($tag, $tagInfo);
@@ -781,7 +775,7 @@ sub ProcessASF($$;$)
                         my $s = $$subdir{Size};
                         if ($verbose > 2) {
                             $raf->Read($buff, $s) == $s or $err = 'Truncated file', last;
-                            Image::ExifTool::HexDump(\$buff, undef, %dumpParms);
+                            $exifTool->VerboseDump(\$buff);
                         } elsif (not $raf->Seek($s, 1)) {
                             $err = 'Seek error';
                             last;
@@ -793,7 +787,6 @@ sub ProcessASF($$;$)
                         $pos += $$subdir{Size};
                         if ($verbose) {
                             $exifTool->{INDENT} .= '| ';
-                            $dumpParms{Prefix} = $exifTool->{INDENT};
                             $exifTool->VerboseDir($$tagInfo{Name});
                         }
                         next;
@@ -805,9 +798,7 @@ sub ProcessASF($$;$)
                         DirLen => $size,
                         DirName => $$tagInfo{Name},
                     );
-                    if ($verbose > 2) {
-                        Image::ExifTool::HexDump(\$buff, undef, %dumpParms);
-                    }
+                    $exifTool->VerboseDump(\$buff) if $verbose > 2;
                     unless ($exifTool->ProcessDirectory(\%subdirInfo, $subTable)) {
                         $exifTool->Warn("Error processing $$tagInfo{Name} directory");
                     }
@@ -821,7 +812,7 @@ sub ProcessASF($$;$)
         }
         if ($verbose > 2) {
             $raf->Read($buff, $size) == $size or $err = 'Truncated file', last;
-            Image::ExifTool::HexDump(\$buff, undef, %dumpParms);
+            $exifTool->VerboseDump(\$buff);
         } elsif (not $raf->Seek($size, 1)) { # skip the block
             $err = 'Seek error';
             last;
@@ -852,7 +843,7 @@ Windows Media Audio (WMA) and Windows Media Video (WMV) files.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

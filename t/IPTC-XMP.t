@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..31\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..32\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # definitions for user-defined tag test (#28)
@@ -360,6 +360,20 @@ my $testnum = 1;
     ++$testnum;
     my @writeInfo = ( [ 'author' => 'Test' ] );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/ExtendedXMP.jpg');
+    print "ok $testnum\n";
+}
+
+# test 32: Test mass copy with deletion of specific XMP family 1 groups
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $testfile = "t/${testname}_${testnum}_failed.out";
+    unlink $testfile;
+    $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg');
+    $exifTool->SetNewValue('xmp-exif:all');
+    $exifTool->SetNewValue('XMP-TIFF:*');
+    $exifTool->WriteInfo(undef,$testfile,'XMP'); #(also test output file type option)
+    print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);
     print "ok $testnum\n";
 }
 

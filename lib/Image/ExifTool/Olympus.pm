@@ -29,7 +29,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.50';
+$VERSION = '1.52';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -2725,6 +2725,8 @@ sub PrintLensInfo($$)
             '0 49'  => 'Zuiko Digital ED 12-60mm F2.8-4.0 SWD', #7
             '0 50'  => 'Zuiko Digital ED 14-35mm F2.0 SWD', #PH
             '0 51'  => 'Zuiko Digital 25mm F2.8', #PH
+            '0 52'  => 'Zuiko Digital ED 9-18mm F4.0-5.6', #7
+            '0 53'  => 'Zuiko Digital 14-54mm F2.8-3.5 II', #PH
             # Sigma lenses
             '1 1'   => '18-50mm F3.5-5.6', #8
             '1 2'   => '55-200mm F4.0-5.6 DC',
@@ -2825,7 +2827,7 @@ Olympus or Epson maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

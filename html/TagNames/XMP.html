@@ -19,21 +19,24 @@ information.</p>
 to the <b>Tag Name</b>.</p>
 
 <p>All XMP information is stored as character strings.  The <b>Writable</b> column
-specifies the information format:  <code>integer</code> is a string of digits
-(possibly beginning with a &#39;+&#39; or &#39;-&#39;), <code>real</code> is a floating point number,
-<code>rational</code> is two <code>integer</code> strings separated by a &#39;/&#39; character, <code>date</code>
-is a date/time string in the format &quot;YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM]&quot;,
-<code>boolean</code> is either &quot;True&quot; or &quot;False&quot;, and <code>lang-alt</code> is a list of string
-alternatives in different languages.</p>
+specifies the information format:  <code>string</code> is an unformatted string,
+<code>integer</code> is a string of digits (possibly beginning with a &#39;+&#39; or &#39;-&#39;),
+<code>real</code> is a floating point number, <code>rational</code> is entered as a floating
+point number but stored as two <code>integer</code> strings separated by a &#39;/&#39;
+character, <code>date</code> is a date/time string entered in the format &quot;YYYY:MM:DD
+HH:MM:SS[.SS][+/-HH:MM]&quot;, <code>boolean</code> is either &quot;True&quot; or &quot;False&quot;, and
+<code>lang-alt</code> is a list of string alternatives in different languages.</p>
 
 <p>Individual languages for <code>lang-alt</code> tags are accessed by suffixing the tag
-name with a &#39;-&#39;, followed by an RFC 3066 language code (ie. &quot;XMP:Title-fr&quot;,
-or &quot;Rights-en-US&quot;).  A <code>lang-alt</code> tag with no language code accesses the
-&quot;x-default&quot; language, but causes other languages to be deleted when writing.
-The &quot;x-default&quot; language code may be specified when writing a new value to
-write only the default language, but note that all languages are still
-deleted if &quot;x-default&quot; tag is deleted.  When reading, &quot;x-default&quot; is not
-specified.</p>
+name with a &#39;-&#39;, followed by an
+<a href="http://www.ietf.org/rfc/rfc3066.txt">RFC 3066</a> language code (ie.
+&quot;XMP:Title-fr&quot;, or &quot;Rights-en-US&quot;).  A <code>lang-alt</code> tag with no language code
+accesses the &quot;x-default&quot; language, but causes other languages for this tag
+to be deleted when writing.  The &quot;x-default&quot; language code may be specified
+when writing to preserve other existing languages (ie.
+&quot;XMP-dc:Description-x-default&quot;), but note that other languages are still
+deleted if the &quot;x-default&quot; language is deleted.  When reading, &quot;x-default&quot;
+is not specified.</p>
 
 <p>The XMP tags are organized according to schema <b>Namespace</b> in the following
 tables.  Note that a few of the longer namespace prefixes given below have
@@ -46,7 +49,9 @@ for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.</p>
 <p>ExifTool will extract XMP information even if it is not listed in these
 tables.  For example, the <code>pdfx</code> namespace doesn&#39;t have a predefined set of
 tag names because it is used to store application-defined PDF information,
-but this information is extracted by ExifTool.
+but this information is extracted by ExifTool.</p>
+
+<p>See <a href="http://www.adobe.com/devnet/xmp/">http://www.adobe.com/devnet/xmp/</a> for the offical XMP specification.
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -54,61 +59,69 @@ but this information is extracted by ExifTool.
 <tr class=h><th>Namespace</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td>acdsee</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html#acdsee'>XMP acdsee Tags</a></td></tr>
+<tr class=b>
 <td>album</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#Album'>XMP Album Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>aux</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#aux'>XMP aux Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>cc</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#cc'>XMP cc Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>crs</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#crs'>XMP crs Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>dc</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#dc'>XMP dc Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>dex</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#dex'>XMP dex Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>DICOM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#DICOM'>XMP DICOM Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>exif</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#exif'>XMP exif Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>iptcCore</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#iptcCore'>XMP iptcCore Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>iptcExt</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#iptcExt'>XMP iptcExt Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>lr</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#Lightroom'>XMP Lightroom Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>mediapro</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#MediaPro'>XMP MediaPro Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>microsoft</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#Microsoft'>XMP Microsoft Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>pdf</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#pdf'>XMP pdf Tags</a></td></tr>
+<tr class=b>
+<td>pdfx</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html#pdfx'>XMP pdfx Tags</a></td></tr>
 <tr>
 <td>photomech</td>
 <td class=c>-</td>
@@ -183,8 +196,21 @@ but this information is extracted by ExifTool.
 <td>--&gt; <a href='XMP.html#xmpTPg'>XMP xmpTPg Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='acdsee'>XMP acdsee Tags</a></h2>
+<p>ACD Systems ACDSee schema tags.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>RPP</td>
+<td class=c>lang-alt</td>
+<td><span class=s><span class=n>(raw processing settings in XML format)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='Album'>XMP Album Tags</a></h2>
-<p>Adobe Album Schema tags.</p>
+<p>Adobe Album schema tags.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -238,14 +264,27 @@ but this information is extracted by ExifTool.
 </table></td></tr></table></blockquote>
 
 <h2><a name='cc'>XMP cc Tags</a></h2>
-<p>Creative Commons schema tags.</p>
+<p>Creative Commons schema tags.  (see
+<a href="http://creativecommons.org/technology/xmp">http://creativecommons.org/technology/xmp</a>)</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
 <tr class=h><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td>AttributionName</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>AttributionURL</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>License</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>MorePermissions</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -318,273 +357,282 @@ but this information is extracted by ExifTool.
 <td class=c>integer/</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>Converter</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>ConvertToGrayscale</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>CropAngle</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>CropBottom</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>CropHeight</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>CropLeft</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>CropRight</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>CropTop</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>CropUnit</td>
 <td class=c>integer</td>
 <td><span class=s>0 = pixels
   <br>1 = inches
   <br>2 = cm</span></td></tr>
-<tr class=b>
+<tr>
 <td>CropUnits</td>
 <td class=c>integer</td>
 <td><span class=s>0 = pixels
   <br>1 = inches
   <br>2 = cm</span></td></tr>
-<tr>
+<tr class=b>
 <td>CropWidth</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Defringe</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Exposure</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>FillLight</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GradientBasedCorrActive</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GradientBasedCorrAmount</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GradientBasedCorrMaskCenterWeight</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GradientBasedCorrMaskDabs</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GradientBasedCorrMaskFlow</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GradientBasedCorrMaskFullX</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GradientBasedCorrMaskFullY</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GradientBasedCorrMaskValue</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GradientBasedCorrMaskRadius</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GradientBasedCorrMaskWhat</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GradientBasedCorrMaskZeroX</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GradientBasedCorrMaskZeroY</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GradientBasedCorrBrightness</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GradientBasedCorrClarity</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GradientBasedCorrContrast</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GradientBasedCorrExposure</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GradientBasedCorrSaturation</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GradientBasedCorrSharpness</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GradientBasedCorrHue</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GradientBasedCorrSaturation</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GradientBasedCorrWhat</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GrayMixerAqua</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GrayMixerBlue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GrayMixerGreen</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GrayMixerMagenta</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GrayMixerOrange</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GrayMixerPurple</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GrayMixerRed</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GrayMixerYellow</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GreenHue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GreenSaturation</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HasCrop</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HasSettings</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HighlightRecovery</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HueAdjustmentAqua</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HueAdjustmentBlue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HueAdjustmentGreen</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HueAdjustmentMagenta</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HueAdjustmentOrange</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HueAdjustmentPurple</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HueAdjustmentRed</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HueAdjustmentYellow</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>IncrementalTemperature</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>IncrementalTint</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LuminanceAdjustmentAqua</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LuminanceAdjustmentBlue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LuminanceAdjustmentGreen</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LuminanceAdjustmentMagenta</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LuminanceAdjustmentOrange</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LuminanceAdjustmentPurple</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LuminanceAdjustmentRed</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LuminanceAdjustmentYellow</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LuminanceSmoothing</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>MoireFilter</td>
+<td class=c>string</td>
+<td><span class=s>&#39;Off&#39; = Off
+  <br>&#39;On&#39; = On</span></td></tr>
 <tr class=b>
 <td>PaintCorrectionActive</td>
 <td class=c>N</td>
@@ -794,61 +842,65 @@ but this information is extracted by ExifTool.
 <td class=c>integer/</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>Smoothness</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>SplitToningBalance</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SplitToningHighlightHue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SplitToningHighlightSaturation</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SplitToningShadowHue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SplitToningShadowSaturation</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Temperature</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Tint</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ToneCurve</td>
 <td class=c>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ToneCurveName</td>
 <td class=c>string</td>
 <td><span class=s>&#39;Custom&#39; = Custom
   <br>&#39;Linear&#39; = Linear
   <br>&#39;Medium Contrast&#39; = Medium Contrast
   <br>&#39;Strong Contrast&#39; = Strong Contrast</span></td></tr>
-<tr>
+<tr class=b>
 <td>Version</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Vibrance</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VignetteAmount</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VignetteMidpoint</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>WhiteBalance</td>
 <td class=c>string/</td>
 <td><span class=s>&#39;As Shot&#39; = As Shot
@@ -934,7 +986,7 @@ but this information is extracted by ExifTool.
 <h2><a name='dex'>XMP dex Tags</a></h2>
 <p>Description Explorer schema tags.  These tags are not very common.  The
 Source and Rating tags are avoided when writing due to name conflicts with
-other XMP tags.</p>
+other XMP tags.  (see <a href="http://www.optimasc.com/products/fileid/">http://www.optimasc.com/products/fileid/</a>)</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -999,7 +1051,7 @@ other XMP tags.</p>
 <tr>
 <td>PatientsBirthDate</td>
 <td class=c>date</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called PatientDOB by the spec.)</span></span></td></tr>
 <tr class=b>
 <td>PatientID</td>
 <td class=c>string</td>
@@ -1007,11 +1059,11 @@ other XMP tags.</p>
 <tr>
 <td>PatientsName</td>
 <td class=c>string</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called PatientName by the spec.)</span></span></td></tr>
 <tr class=b>
 <td>PatientsSex</td>
 <td class=c>string</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called PatientSex by the spec.)</span></span></td></tr>
 <tr>
 <td>SeriesDateTime</td>
 <td class=c>date</td>
@@ -1136,7 +1188,7 @@ other XMP tags.</p>
 <tr class=b>
 <td>ExposureCompensation</td>
 <td class=c>rational</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called ExposureBiasValue by the spec.)</span></span></td></tr>
 <tr>
 <td>ExposureIndex</td>
 <td class=c>rational</td>
@@ -1212,7 +1264,7 @@ other XMP tags.</p>
 <tr>
 <td>FocalLengthIn35mmFormat</td>
 <td class=c>integer</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called FocalLengthIn35mmFilm by the spec.)</span></span></td></tr>
 <tr class=b>
 <td>FocalPlaneResolutionUnit</td>
 <td class=c>integer</td>
@@ -1362,7 +1414,7 @@ Composite:GPSDateTime when copying from EXIF)</span></span></td></tr>
 <tr>
 <td>ISO</td>
 <td class=c>integer+</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called ISOSpeedRatings by the spec.)</span></span></td></tr>
 <tr class=b>
 <td>LightSource</td>
 <td class=c>string</td>
@@ -1428,11 +1480,11 @@ Composite:GPSDateTime when copying from EXIF)</span></span></td></tr>
 <tr>
 <td>ExifImageWidth</td>
 <td class=c>integer</td>
-<td><span class=s><span class=n>(called PixelXDimension by the XMP spec)</span></span></td></tr>
+<td><span class=s><span class=n>(called PixelXDimension by the spec.)</span></span></td></tr>
 <tr class=b>
 <td>ExifImageHeight</td>
 <td class=c>integer</td>
-<td><span class=s><span class=n>(called PixelYDimension by the XMP spec)</span></span></td></tr>
+<td><span class=s><span class=n>(called PixelYDimension by the spec.)</span></span></td></tr>
 <tr>
 <td>RelatedSoundFile</td>
 <td class=c>string</td>
@@ -1527,7 +1579,8 @@ Composite:GPSDateTime when copying from EXIF)</span></span></td></tr>
 <h2><a name='iptcCore'>XMP iptcCore Tags</a></h2>
 <p>IPTC Core schema tags.  The actual IPTC Core namespace prefix is
 &quot;Iptc4xmpCore&quot;, which is the prefix recorded in the file, but ExifTool
-shortens this for the &quot;XMP-iptcCore&quot; family 1 group name.</p>
+shortens this for the &quot;XMP-iptcCore&quot; family 1 group name. (see
+<a href="http://www.iptc.org/IPTC4XMP/">http://www.iptc.org/IPTC4XMP/</a>)</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -1589,7 +1642,8 @@ shortens this for the &quot;XMP-iptcCore&quot; family 1 group name.</p>
 
 <h2><a name='iptcExt'>XMP iptcExt Tags</a></h2>
 <p>IPTC Extension schema tags.  The actual namespace prefix is &quot;Iptc4xmpExt&quot;,
-but ExifTool shortens this for the &quot;XMP-iptcExt&quot; family 1 group name.</p>
+but ExifTool shortens this for the &quot;XMP-iptcExt&quot; family 1 group name.
+(see <a href="http://www.iptc.org/IPTC4XMP/">http://www.iptc.org/IPTC4XMP/</a>)</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -1626,11 +1680,11 @@ but ExifTool shortens this for the &quot;XMP-iptcExt&quot; family 1 group name.<
 <tr class=b>
 <td>ControlledVocabularyTerm</td>
 <td class=c>string+</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called CVterm by the spec.)</span></span></td></tr>
 <tr>
 <td>DigitalImageGUID</td>
 <td class=c>string</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called DigImageGUID by the spec.)</span></span></td></tr>
 <tr class=b>
 <td>DigitalSourceFileType</td>
 <td class=c>string</td>
@@ -1886,6 +1940,18 @@ name conflicts with other XMP namespaces.</p>
   <br>&#39;Unknown&#39; = Unknown</span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='pdfx'>XMP pdfx Tags</a></h2>
+<p>PDF extension tags.  This namespace is used to store application-defined PDF
+information, so there are no pre-defined tags.  User-defined tags must be
+created to enable writing of XMP-pdfx information.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr><td colspan=3 class=c>[no tags known]</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='photoshop'>XMP photoshop Tags</a></h2>
 <p>Adobe Photoshop schema tags.</p>
 <blockquote>
@@ -1936,7 +2002,7 @@ name conflicts with other XMP namespaces.</p>
 <tr>
 <td>ICCProfileName</td>
 <td class=c>string</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called ICCProfile by the spec.)</span></span></td></tr>
 <tr class=b>
 <td>Instructions</td>
 <td class=c>string</td>
@@ -2011,7 +2077,7 @@ namespace URI.</p>
 controlled-vocabulary tags in this table (ie. tags with a fixed set of
 values) have raw values which begin with &quot;http://ns.useplus.org/ldf/vocab/&quot;,
 but to reduce clutter this prefix has been removed from the values shown
-below.</p>
+below.  (see <a href="http://ns.useplus.org/">http://ns.useplus.org/</a>)</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -2395,11 +2461,12 @@ below.</p>
 <tr>
 <td>PLUSVersion</td>
 <td class=c>string</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called Version by the spec.)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='prism'>XMP prism Tags</a></h2>
-<p>Publishing Requirements for Industry Standard Metadata 2.1 schema tags.</p>
+<p>Publishing Requirements for Industry Standard Metadata 2.1 schema tags. (see
+<a href="http://www.prismstandard.org/">http://www.prismstandard.org/</a>)</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -2642,7 +2709,8 @@ below.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='prl'>XMP prl Tags</a></h2>
-<p>PRISM Rights Language 2.1 schema tags.</p>
+<p>PRISM Rights Language 2.1 schema tags.  (see
+<a href="http://www.prismstandard.org/">http://www.prismstandard.org/</a>)</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -2665,7 +2733,7 @@ below.</p>
 <h2><a name='pur'>XMP pur Tags</a></h2>
 <p>Prism Usage Rights 2.1 schema tags.  The actual namespace prefix is
 &quot;prismusagerights&quot;, but ExifTool shortens this for the &quot;XMP-pur&quot; family 1
-group name.</p>
+group name.  (see <a href="http://www.prismstandard.org/">http://www.prismstandard.org/</a>)</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -2817,7 +2885,7 @@ treated specially to allow it to be set to a specific value if required.</p>
 <tr>
 <td>ImageHeight</td>
 <td class=c>integer</td>
-<td><span class=s><span class=n>(called ImageLength in the XMP specification)</span></span></td></tr>
+<td><span class=s><span class=n>(called ImageLength by the spec.)</span></span></td></tr>
 <tr class=b>
 <td>ImageWidth</td>
 <td class=c>integer</td>
@@ -2938,7 +3006,7 @@ treated specially to allow it to be set to a specific value if required.</p>
 <tr>
 <td>XMPToolkit</td>
 <td class=c>string!</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called xmptk by the spec.)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='xmp'>XMP xmp Tags</a></h2>
@@ -4076,7 +4144,7 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 SVG and Metadata tags are extracted from these images, but all graphics tags
 may be extracted by setting the Unknown option to 2 (-U on the command
 line).  The SVG tags are not part of XMP as such, but are included with the
-XMP module for convenience.</p>
+XMP module for convenience.  (see <a href="http://www.w3.org/TR/SVG11/">http://www.w3.org/TR/SVG11/</a>)</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -4106,7 +4174,7 @@ XMP module for convenience.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 26, 2008</i>
+<br><i>Last revised Dec 23, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

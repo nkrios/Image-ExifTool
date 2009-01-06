@@ -116,7 +116,8 @@ each special key:
   data tables only.  Not used for EXIF tables.
 
   EXTRACT_UNKNOWN : Used in PDF tables to specify a directory where all unknown
-  tags should be extracted.
+  tags should be extracted.  Set to 0 to extract only unknown numbered tags for
+  which the unnumbered tag is known.
 
   NAMESPACE : Namespace prefix for tags in the XMP table.  If this isn't a
   standard (pre-defined) namespace, then the URI must be defined as well.  To do
@@ -329,6 +330,10 @@ numerical.
 
                   'Unknown' - this is an unknown tag (only extracted when the
                   Unknown option is set).
+
+                  'WrongBase' - ['IsOffset' tags only] An expression using $self
+                  that is evaluated to generate a base shift for 'IsOffset' tags
+                  which use a different base than the rest of the tags.
 
   RawConv       : Used to convert the Raw value at extraction time (while the
                   image file is still open, unlike ValueConv and PrintConv below

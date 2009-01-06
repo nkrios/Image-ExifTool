@@ -92,6 +92,7 @@ html/htmldump.html
 html/idiosyncracies.html
 html/index.html
 html/install.html
+html/metafiles.html
 html/models.html
 html/style.css
 html/verbose.html
@@ -246,6 +247,7 @@ t/ExifTool_2.out
 t/ExifTool_20.out
 t/ExifTool_21.out
 t/ExifTool_22.out
+t/ExifTool_23.out
 t/ExifTool_3.out
 t/ExifTool_4.out
 t/ExifTool_5.out
@@ -305,6 +307,7 @@ t/IPTC-XMP_28.out
 t/IPTC-XMP_29.out
 t/IPTC-XMP_30.out
 t/IPTC-XMP_31.out
+t/IPTC-XMP_32.out
 t/IPTC-XMP_4.out
 t/IPTC-XMP_6.out
 t/IPTC-XMP_7.out
@@ -444,6 +447,8 @@ t/Writer_33.out
 t/Writer_34.out
 t/Writer_35.out
 t/Writer_36.out
+t/Writer_37.out
+t/Writer_38.out
 t/Writer_4.out
 t/Writer_6.out
 t/Writer_7.out

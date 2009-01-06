@@ -16,12 +16,14 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 
 sub WritePS($$);
+sub ProcessPS($$;$);
 
 # PostScript tag table
 %Image::ExifTool::PostScript::Main = (
+    PROCESS_PROC => \&ProcessPS,
     WRITE_PROC => \&WritePS,
     PREFERRED => 1, # always add these tags when writing
     GROUPS => { 2 => 'Image' },
@@ -77,6 +79,20 @@ sub WritePS($$);
             EPS images
         },
     },
+    BeginDocument => {
+        Name => 'EmbeddedFile',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::PostScript::Main',
+        },
+        Notes => 'extracted with ExtractEmbedded option',
+    },
+    EmbeddedFileName => {
+        Groups => { 3 => 'Doc#' }, # (for GetAllGroups())
+        Notes => q{
+            not a real tag ID, but the file name from a BeginDocument statement.
+            Extracted with document metadata when ExtractEmbedded option is used
+        },
+    },
 );
 
 # composite tags
@@ -86,14 +102,14 @@ sub WritePS($$);
     # but use it anyway if ImageData is not available
     ImageWidth => {
         Desire => {
-            0 => 'PostScript:ImageData',
+            0 => 'Main:PostScript:ImageData',
             1 => 'PostScript:BoundingBox',
         },
         ValueConv => 'Image::ExifTool::PostScript::ImageSize(\@val, 0)',
     },
     ImageHeight => {
         Desire => {
-            0 => 'PostScript:ImageData',
+            0 => 'Main:PostScript:ImageData',
             1 => 'PostScript:BoundingBox',
         },
         ValueConv => 'Image::ExifTool::PostScript::ImageSize(\@val, 1)',
@@ -194,10 +210,10 @@ sub DecodeComment($$$;$)
                 push @$lines, $buff;
             }
         }
-        last unless $$lines[0] =~ s/^%%\+//;    # is the next line a continuation?
-        $$dataPt .= "%%+$$lines[0]" if $dataPt; # add to data if necessary
-        $$lines[0] =~ s/\x0d*\x0a*$//;          # remove trailing CR, LF or CR/LF
-        $val .= shift @$lines;
+        last unless $$lines[0] =~ /^%%\+/;  # is the next line a continuation?
+        $$dataPt .= $$lines[0] if $dataPt;  # add to data if necessary
+        $$lines[0] =~ s/\x0d*\x0a*$//;      # remove trailing CR, LF or CR/LF
+        $val .= substr(shift(@$lines), 3);  # add to value (without leading "%%+")
     }
     my @vals;
     # handle bracketed string values
@@ -253,13 +269,17 @@ sub DecodeComment($$$;$)
 
 #------------------------------------------------------------------------------
 # Extract information from EPS, PS or AI file
-# Inputs: 0) ExifTool object reference, 1) dirInfo reference
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference, 2) optional tag table ref
 # Returns: 1 if this was a valid PostScript file
-sub ProcessPS($$)
+sub ProcessPS($$;$)
 {
-    my ($exifTool, $dirInfo) = @_;
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $raf = $$dirInfo{RAF};
-    my ($data, $dos);
+    my $embedded = $exifTool->Options('ExtractEmbedded');
+    my ($data, $dos, $endDoc);
+
+    # allow read from data
+    $raf = new File::RandomAccess($$dirInfo{DataPt}) unless $raf;
 #
 # determine if this is a postscript file
 #
@@ -288,11 +308,11 @@ sub ProcessPS($$)
 
     # set file type (PostScript or EPS)
     $raf->ReadLine($data) or return 0;
-    $exifTool->SetFileType($data =~ /EPSF/ ? 'EPS' : 'PS');
+    $exifTool->SetFileType($data =~ /EPSF/ ? 'EPS' : 'PS') unless $exifTool->{VALUE}->{FileType};
 #
 # extract TIFF information from DOS header
 #
-    my $tagTablePtr = GetTagTable('Image::ExifTool::PostScript::Main');
+    $tagTablePtr or $tagTablePtr = GetTagTable('Image::ExifTool::PostScript::Main');
     if ($dos) {
         my $base = Get32u(\$dos, 16);
         if ($base) {
@@ -320,7 +340,7 @@ sub ProcessPS($$)
 #
 # parse the postscript
 #
-    my ($buff, $mode, $endToken);
+    my ($buff, $mode, $beginToken, $endToken, $docNum, $subDocNum);
     my (@lines, $altnl);
     if ($/ eq "\x0d") {
         $altnl = "\x0a";
@@ -353,34 +373,73 @@ sub ProcessPS($$)
                 if ($mode eq 'XMP') {
                     $buff .= $data;
                 } elsif ($mode eq 'Document') {
-                    # ignore embedded documents 
+                    # ignore embedded documents, but keep track of nesting level
+                    $docNum .= '-1' if $data =~ /^$beginToken/;
                 } else {
                     # data is ASCII-hex encoded
                     $data =~ tr/0-9A-Fa-f//dc;  # remove all but hex characters
                     $buff .= pack('H*', $data); # translate from hex
                 }
                 next;
-            }
-        } elsif ($data =~ /^(%{1,2})(Begin)(_xml_packet|Photoshop|ICCProfile|Binary|Document)/i) {
-            my $type = lc $3;
-            if ($type eq 'document') {
-                $mode = 'Document' unless $exifTool->Options('ExtractEmbedded');
+            } elsif ($mode eq 'Document') {
+                $docNum =~ s/-?\d+$//;  # decrement document nesting level
+                # done with Document mode if we are back at the top level
+                undef $mode unless $docNum;
                 next;
             }
+        } elsif ($endDoc and $data =~ /^$endDoc/i) {
+            $docNum =~ s/-?(\d+)$//;        # decrement nesting level
+            $subDocNum = $1;                # remember our last sub-document number
+            $$exifTool{DOC_NUM} = $docNum;
+            undef $endDoc unless $docNum;   # done with document if top level
+            next;
+        } elsif ($data =~ /^(%{1,2})(Begin)(_xml_packet|Photoshop|ICCProfile|Document|Binary)/i) {
             # the beginning of a data block
             my %modeLookup = (
                 _xml_packet => 'XMP',
-                iccprofile  => 'ICC_Profile',
                 photoshop   => 'Photoshop',
+                iccprofile  => 'ICC_Profile',
+                document    => 'Document',
+                binary      => undef, # (we will try to skip this)
             );
-            $mode = $modeLookup{$type};
-            unless ($mode or @lines) {
-                # skip binary data
-                $raf->Seek($1, 1) or last if $data =~ /^%{1,2}BeginBinary:\s*(\d+)/i;
+            $mode = $modeLookup{lc $3};
+            unless ($mode) {
+                if (not @lines and $data =~ /^%{1,2}BeginBinary:\s*(\d+)/i) {
+                    $raf->Seek($1, 1) or last;  # skip binary data
+                }
                 next;
             }
             $buff = '';
+            $beginToken = $1 . $2 . $3;
             $endToken = $1 . ($2 eq 'begin' ? 'end' : 'End') . $3;
+            if ($mode eq 'Document') {
+                # this is either the 1st sub-document or Nth document
+                if ($docNum) {
+                    # increase nesting level
+                    $docNum .= '-' . (++$subDocNum);
+                } else {
+                    # this is the Nth document
+                    $$exifTool{DOC_COUNT} = ($$exifTool{DOC_COUNT} || 0) + 1;
+                    $docNum = $$exifTool{DOC_COUNT};
+                }
+                $subDocNum = 0; # new level, so reset subDocNum
+                next unless $embedded;  # skip over this document
+                # set document number for family 4-7 group names
+                $$exifTool{DOC_NUM} = $docNum;
+                $$exifTool{LIST_TAGS} = { };  # don't build lists across different documents
+                $exifTool->{PROCESSED} = { }; # re-initialize processed directory lookup too
+                $endDoc = $endToken;          # parse to EndDocument token
+                # reset mode to allow parsing into sub-directories
+                undef $endToken;
+                undef $mode;
+                # save document name if available
+                if ($data =~ /^$beginToken:\s+([^\n\r]+)/i) {
+                    my $docName = $1;
+                    # remove brackets if necessary
+                    $docName = $1 if $docName =~ /^\((.*)\)$/;
+                    $exifTool->HandleTag($tagTablePtr, 'EmbeddedFileName', $docName);
+                }
+            }
             next;
         } elsif ($data =~ /^<\?xpacket begin=.{7,13}W5M0MpCehiHzreSzNTczkc9d/) {
             # pick up any stray XMP data
@@ -397,28 +456,75 @@ sub ProcessPS($$)
             $val = DecodeComment($val, $raf, \@lines);
             $exifTool->HandleTag($tagTablePtr, $tag, $val);
             next;
+        } elsif ($embedded and $data =~ /^%AI12_CompressedData/) {
+            # the rest of the file is compressed
+            unless (eval 'require Compress::Zlib') {
+                $exifTool->Warn('Install Compress::Zlib to extract compressed embedded data');
+                last;
+            }
+            # seek back to find the start of the compressed data in the file
+            my $tlen = length($data) + @lines;
+            $tlen += length $_ foreach @lines;
+            my $backTo = $raf->Tell() - $tlen - 64;
+            $backTo = 0 if $backTo < 0;
+            last unless $raf->Seek($backTo, 0) and $raf->Read($data, 2048);
+            last unless $data =~ s/.*?%AI12_CompressedData//;
+            my $inflate = Compress::Zlib::inflateInit();
+            $inflate or $exifTool->Warn('Error initializing inflate'), last;
+            # generate a PS-like file in memory from the compressed data
+            my $verbose = $exifTool->Options('Verbose');
+            my $out = $exifTool->Options('TextOut');
+            if ($verbose > 1) {
+                $exifTool->VerboseDir('AI12_CompressedData (first 4kB)');
+                $exifTool->VerboseDump(\$data);
+            }
+            # remove header if it exists (Windows AI files only)
+            $data =~ s/^.{0,256}EndData[\x0d\x0a]+//s;
+            my $val;
+            for (;;) {
+                my ($v2, $stat) = $inflate->inflate($data);
+                $stat == Compress::Zlib::Z_STREAM_END() and $val .= $v2, last;
+                $stat != Compress::Zlib::Z_OK() and undef($val), last;
+                if (defined $val) {
+                    $val .= $v2;
+                } elsif ($v2 =~ /^%!PS/) {
+                    $val = $v2;
+                } else {
+                    # add postscript header (for file recognition) if it doesn't exist
+                    $val = "%!PS-Adobe-3.0$/" . $v2;
+                }
+                $raf->Read($data, 65536) or last;
+            }
+            defined $val or $exifTool->Warn('Error inflating AI compressed data'), last;
+            if ($verbose > 1) {
+                $exifTool->VerboseDir('Uncompressed AI12 Data');
+                $exifTool->VerboseDump(\$val);
+            }
+            # extract information from embedded images in the uncompressed data
+            $val =  # add PS header in case it needs one
+            ProcessPS($exifTool, { DataPt => \$val });
+            last;
         } else {
             next;
         }
         # extract information from buffered data
-        if ($mode ne 'Document') {
-            my %dirInfo = (
-                DataPt => \$buff,
-                DataLen => length $buff,
-                DirStart => 0,
-                DirLen => length $buff,
-                Parent => 'PostScript',
-            );
-            my $subTablePtr = GetTagTable("Image::ExifTool::${mode}::Main");
-            unless ($exifTool->ProcessDirectory(\%dirInfo, $subTablePtr)) {
-                $exifTool->Warn("Error processing $mode information in PostScript file");
-            }
-            undef $buff;
+        my %dirInfo = (
+            DataPt => \$buff,
+            DataLen => length $buff,
+            DirStart => 0,
+            DirLen => length $buff,
+            Parent => 'PostScript',
+        );
+        my $subTablePtr = GetTagTable("Image::ExifTool::${mode}::Main");
+        unless ($exifTool->ProcessDirectory(\%dirInfo, $subTablePtr)) {
+            $exifTool->Warn("Error processing $mode information in PostScript file");
         }
+        undef $buff;
         undef $mode;
     }
     $/ = $oldsep;   # restore original separator
-    $mode and $mode ne 'Document' and PSErr($exifTool, "unterminated $mode data");
+    $mode = 'Document' if $endDoc and not $mode;
+    $mode and PSErr($exifTool, "unterminated $mode data");
     return 1;
 }
 
@@ -449,13 +555,9 @@ This module is loaded automatically by Image::ExifTool when required.
 This code reads meta information from EPS (Encapsulated PostScript), PS
 (PostScript) and AI (Adobe Illustrator) files.
 
-=head1 NOTES
-
-Currently doesn't handle continued lines ("%+" syntax).
-
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

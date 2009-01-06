@@ -5,7 +5,7 @@
 #
 # URL:          http://owl.phy.queensu.ca/~phil/exiftool/
 #
-# Legal:        Copyright (c) 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+# Legal:        Copyright (c) 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 #               This library is free software; you can redistribute it and/or
 #               modify it under the same terms as Perl itself.
 #------------------------------------------------------------------------------
@@ -65,35 +65,36 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  3FR   r       HTML  r       PPM   r/w    |  EXIF           r/w/c
-  ACR   r       ICC   r/w/c   PPT   r      |  GPS            r/w/c
-  AI    r       ITC   r       PS    r/w    |  IPTC           r/w/c
-  AIFF  r       JNG   r/w     PSD   r/w    |  XMP            r/w/c
-  APE   r       JP2   r/w     QTIF  r      |  MakerNotes     r/w/c
-  ARW   r       JPEG  r/w     RA    r      |  Photoshop IRB  r/w/c
-  ASF   r       K25   r       RAF   r/w    |  ICC Profile    r/w/c
-  AVI   r       KDC   r       RAM   r      |  MIE            r/w/c
-  BMP   r       M4A   r       RAW   r/w    |  JFIF           r/w/c
-  BTF   r       MEF   r/w     RIFF  r      |  Ducky APP12    r/w/c
-  CR2   r/w     MIE   r/w/c   RWZ   r      |  PDF            r/w/c
-  CRW   r/w     MIFF  r       RM    r      |  CIFF           r/w
-  CS1   r/w     MNG   r/w     SO    r      |  AFCP           r/w
-  DCM   r       MOS   r/w     SR2   r      |  JPEG 2000      r
-  DCR   r       MOV   r       SRF   r      |  DICOM          r
-  DIVX  r       MP3   r       SVG   r      |  Flash          r
-  DJVU  r       MP4   r       SWF   r      |  FlashPix       r
-  DLL   r       MPC   r       THM   r/w    |  QuickTime      r
-  DNG   r/w     MPG   r       TIFF  r/w    |  GeoTIFF        r
-  DOC   r       MRW   r/w     VRD   r/w/c  |  PrintIM        r
-  DYLIB r       NEF   r/w     WAV   r      |  ID3            r
-  EPS   r/w     OGG   r       WDP   r/w    |  Kodak Meta     r
-  EXE   r       ORF   r/w     WMA   r      |  Ricoh RMETA    r
-  ERF   r/w     PBM   r/w     WMV   r      |  Picture Info   r
-  FLAC  r       PDF   r/w     X3F   r      |  Adobe APP14    r
-  FLV   r       PEF   r/w     XLS   r      |  APE            r
-  FPX   r       PGM   r/w     XMP   r/w/c  |  Vorbis         r
-  GIF   r/w     PICT  r       ZIP   r      |  SPIFF          r
-  HDP   r/w     PNG   r/w                  |  (and more)
+  3FR   r       HDP   r/w     PPM   r/w    |  EXIF           r/w/c
+  ACR   r       HTML  r       PPT   r      |  GPS            r/w/c
+  AI    r       ICC   r/w/c   PS    r/w    |  IPTC           r/w/c
+  AIFF  r       ITC   r       PSD   r/w    |  XMP            r/w/c
+  APE   r       JNG   r/w     QTIF  r      |  MakerNotes     r/w/c
+  ARW   r       JP2   r/w     RA    r      |  Photoshop IRB  r/w/c
+  ASF   r       JPEG  r/w     RAF   r/w    |  ICC Profile    r/w/c
+  AVI   r       K25   r       RAM   r      |  MIE            r/w/c
+  BMP   r       KDC   r       RAW   r/w    |  JFIF           r/w/c
+  BTF   r       M4A   r       RIFF  r      |  Ducky APP12    r/w/c
+  CR2   r/w     MEF   r/w     RW2   r      |  PDF            r/w/c
+  CRW   r/w     MIE   r/w/c   RWZ   r      |  CIFF           r/w
+  CS1   r/w     MIFF  r       RM    r      |  AFCP           r/w
+  DCM   r       MNG   r/w     SO    r      |  JPEG 2000      r
+  DCP   r/w     MOS   r/w     SR2   r      |  DICOM          r
+  DCR   r       MOV   r       SRF   r      |  Flash          r
+  DIVX  r       MP3   r       SVG   r      |  FlashPix       r
+  DJVU  r       MP4   r       SWF   r      |  QuickTime      r
+  DLL   r       MPC   r       THM   r/w    |  GeoTIFF        r
+  DNG   r/w     MPG   r       TIFF  r/w    |  PrintIM        r
+  DOC   r       MRW   r/w     VRD   r/w/c  |  ID3            r
+  DYLIB r       NEF   r/w     WAV   r      |  Kodak Meta     r
+  EPS   r/w     OGG   r       WDP   r/w    |  Ricoh RMETA    r
+  ERF   r/w     ORF   r/w     WMA   r      |  Picture Info   r
+  EXE   r       PBM   r/w     WMV   r      |  Adobe APP14    r
+  EXIF  r/w/c   PDF   r/w     X3F   r      |  APE            r
+  FLAC  r       PEF   r/w     XLS   r      |  Vorbis         r
+  FLV   r       PGM   r/w     XMP   r/w/c  |  SPIFF          r
+  FPX   r       PICT  r       ZIP   r      |  (and more)
+  GIF   r/w     PNG   r/w
 
 =head1 CONFIGURATION
 
@@ -135,18 +136,18 @@ obtaining meta information from an image.  Internally, L</ImageInfo> calls
 L</ExtractInfo> to extract the information, L</GetInfo> to generate the
 information hash, and L</GetTagList> for the returned tag list.
 
-    # Return meta information for 2 tags only (procedural)
+    # return meta information for 2 tags only (procedural)
     $info = ImageInfo($filename, $tag1, $tag2);
 
-    # Return information about an open image file (object-oriented)
+    # return information about an open image file (object-oriented)
     $info = $exifTool->ImageInfo(\*FILE);
 
-    # Return information from image data in memory for specified tags
+    # return information from image data in memory for specified tags
     %options = (PrintConv => 0);
     @tagList = qw(filename imagesize xmp:creator exif:* -ifd1:*);
     $info = ImageInfo(\$imageData, \@tagList, \%options);
 
-    # Extract information from an embedded thumbnail image
+    # extract information from an embedded thumbnail image
     $info = ImageInfo('image.jpg', 'thumbnailimage');
     $thumbInfo = ImageInfo($$info{ThumbnailImage});
 
@@ -183,14 +184,14 @@ reference (SCALAR ref).  The remaining scalar arguments are names of tags
 for requested information.  If no tags are specified, all possible
 information is extracted.
 
-Tag names are case-insensitive and may be prefixed by an optional group name
-followed by a colon.  The group name may begin with a family number
-(ie. '1IPTC:Keywords'), to restrict matches to a specific family.  A tag
-name of '*' may be used, thus allowing 'GROUP:*' to represent all tags in a
-specific group, or a group name of '*' may be used, in which case all
-available instances of the specified tag are returned regardless of the
-L</Duplicates> setting (ie. '*:WhiteBalance').  And finally, a leading '-'
-indicates tags to be excluded (ie. '-IFD1:*').
+Tag names are case-insensitive and may be prefixed by a optional group names
+separated by colons.  A group name may begin with a family number (ie.
+'1IPTC:Keywords'), to restrict matches to a specific family.  A tag name of
+'*' may be used, thus allowing 'GROUP:*' to represent all tags in a specific
+group, or a group name of '*' may be used, in which case all available
+instances of the specified tag are returned regardless of the L</Duplicates>
+setting (ie. '*:WhiteBalance').  And finally, a leading '-' indicates tags
+to be excluded (ie. '-IFD1:*').
 
 Note that keys in the returned information hash and elements of the returned
 tag list are not necessarily the same as these tag names -- group names are
@@ -209,7 +210,15 @@ tags will not be returned.  (Also, the FileSize and FileModifyDate tags will
 not be returned unless it is a plain file.)  Image processing begins at the
 current file position, and on return the file position is unspecified.  May
 be either a standard GLOB reference, or a reference to a
-L<File::RandomAccess|File::RandomAccess> object;
+L<File::RandomAccess|File::RandomAccess> object.  Note that the file remains
+open and must be closed by the caller after L<ImageInfo> returns.
+
+[Advanced:  To allow a non-rewindable stream (ie. a network socket) to be
+re-read after processing with ExifTool, first wrap the file reference in a
+L<File::RandomAccess|File::RandomAccess> object, then pass this object to
+L<ImageInfo>.  The L<File::RandomAccess|File::RandomAccess> object will
+buffer the file if necessary, and may be used to re-read the file after
+L<ImageInfo> returns.]
 
 =item SCALAR ref
 
@@ -248,7 +257,7 @@ L</ImageInfo>:
 Values of the returned hash are usually simple scalars, but a scalar
 reference is used to indicate binary data and an array reference may be used
 to indicate a list.  Lists of values are joined by commas into a single
-string if and only if the PrintConv option is enabled and the List option is
+string only if the PrintConv option is enabled and the List option is
 disabled (which are the defaults).  Note that binary values are not
 necessarily extracted unless specifically requested or the Binary option is
 set.  If not extracted the value is a reference to a string of the form
@@ -299,22 +308,25 @@ options for an ExifTool object.  Options set this way are in effect for
 all function calls but may be overridden by options passed as arguments
 to a specific function.
 
-    # Exclude the 'OwnerName' tag from returned information
+    # exclude the 'OwnerName' tag from returned information
     $exifTool->Options(Exclude => 'OwnerName');
 
-    # Only get information in EXIF or MakerNotes groups
+    # only get information in EXIF or MakerNotes groups
     $exifTool->Options(Group0 => ['EXIF', 'MakerNotes']);
 
-    # Ignore information from IFD1
+    # ignore information from IFD1
     $exifTool->Options(Group1 => '-IFD1');
 
-    # Sort by groups in family 2, and extract unknown tags
+    # sort by groups in family 2, and extract unknown tags
     $exifTool->Options(Sort => 'Group2', Unknown => 1);
 
-    # Do not extract duplicate tag names
+    # reset DateFormat option
+    $exifTool->Options(DateFormat => undef);
+
+    # do not extract duplicate tag names
     $oldSetting = $exifTool->Options(Duplicates => 0);
 
-    # Get current setting
+    # get current Verbose setting
     $isVerbose = $exifTool->Options('Verbose');
 
 =over 4
@@ -412,8 +424,8 @@ name with a '-' in the arguments to L</ImageInfo>.
 
 =item ExtractEmbedded
 
-Flag to extract information from embedded documents in PostScript files.
-Default is 0.
+Flag to extract information from embedded documents in PostScript files and
+the AIPrivateData stream in PDF files.  Default is 0.
 
 =item FastScan
 
@@ -437,9 +449,10 @@ or undef (the default) for no base adjustment.
 
 Extract tags only for specified groups in family # (Group0 assumed if #
 not given).  The option value may be a single group name or a reference
-to a list of groups.  Case is significant in group names.  Specify a
-group to be excluded by preceding group name with a '-'.  See
-L</GetAllGroups [static]> for a list of available groups.
+to a list of groups.  Case is significant in group names.  Specify a group
+to be excluded by preceding group name with a '-'.  See L</GetGroup> for a
+description of group families, and L</GetAllGroups [static]> for lists of
+group names.
 
 =item HtmlDump
 
@@ -471,6 +484,12 @@ separator used when combining values.  Default is 0.
 
 Separator string used to join lists of PrintConv values when L</List> option
 is not set.  Default is ', '.
+
+=item ListSplit
+
+Regular expression used to split values of list-type tags into individual items
+when writing.  (ie. use ',\\s*' to split a comma-separated list.)  Default is
+undef.
 
 =item MakerNotes
 
@@ -507,9 +526,10 @@ Specifies order to sort tags in returned list:
 
   Alpha  - Sort alphabetically
   File   - Sort in order that tags were found in the file
-  Group# - Sort by tag group, where # is the group family
-           number.  If # is not specified, Group0 is assumed.
-           See GetGroup for a list of groups.
+  Group# - Sort by tag group, where # is zero or more family
+           numbers separated by colons. If # is not specified,
+           Group0 is assumed.  See GetGroup for a description
+           of group families.
   Input  - Sort in same order as input tag arguments (default)
 
 =item StrictDate
@@ -579,8 +599,9 @@ difference is that a list of tag keys is not returned if an ARRAY reference
 is given.  The following options are effective in the call to
 L</ExtractInfo>:
 
-Binary, Charset, Composite, FastScan, FixBase, HtmlDump, HtmlDumpBase,
-IgnoreMinorErrors, MakerNotes, ScanForXMP, TextOut, Unknown and Verbose.
+Binary, Charset, Composite, ExtractEmbedded, FastScan, FixBase, HtmlDump,
+HtmlDumpBase, IgnoreMinorErrors, MakerNotes, ScanForXMP, TextOut, Unknown
+and Verbose.
 
 =item Return Value:
 
@@ -595,13 +616,13 @@ from the image by a previous call to L</ExtractInfo> or L</ImageInfo>. This
 function may be called repeatedly after a single call to L</ExtractInfo> or
 L</ImageInfo>.
 
-    # Get image width and hieght only
+    # get image width and hieght only
     $info = $exifTool->GetInfo('ImageWidth', 'ImageHeight');
 
-    # Get information for all tags in list (list updated with tags found)
+    # get information for all tags in list (list updated with tags found)
     $info = $exifTool->GetInfo(\@ioTagList);
 
-    # Get all information in Author or Location groups
+    # get all information in Author or Location groups
     $info = $exifTool->GetInfo({Group2 => ['Author', 'Location']});
 
 =over 4
@@ -612,7 +633,8 @@ Inputs are the same as L</ExtractInfo> and L</ImageInfo> except that an
 image can not be specified.  Options in effect are:
 
 Charset, CoordFormat, DateFormat, Duplicates, Exclude, Group#, List,
-StrictDate, PrintConv (and Sort if a tag list reference is given).
+ListSep, StrictDate, PrintConv, Sort (if a tag list reference is given) and
+StrictDate.
 
 =item Return Value:
 
@@ -680,6 +702,11 @@ and renamed to replace the source file if no errors occurred while writing.
 The destination file type is only used if the source file is undefined.
 
 =back
+
+The following ExifTool options are effective in the call to L</WriteInfo>:
+
+ByteOrder, Charset, Compact, Compress, FixBase, IgnoreMinorErrors and
+Verbose.
 
 =head2 CombineInfo
 
@@ -868,10 +895,13 @@ name for each value, or call with a reference to the list of values.
     # delete a specific keyword
     $exifTool->SetNewValue('Keywords', $word, DelValue => 1);
 
-    # write a list of keywords
-    $exifTool->SetNewValue('Keywords', ['word1','word2']);
+    # set keywords (a List-type tag) with two new values
+    $exifTool->SetNewValue(Keywords => 'word1');
+    $exifTool->SetNewValue(Keywords => 'word2');
+    # equivalent, but set both in one call using an array reference
+    $exifTool->SetNewValue(Keywords => ['word1','word2']);
 
-    # add a keyword without replacing existing keywords
+    # add a keyword without replacing existing keywords in the file
     $exifTool->SetNewValue(Keywords => $word, AddValue => 1);
 
     # set a tag in a specific group
@@ -976,6 +1006,10 @@ deleting a group.
 
 =back
 
+The following ExifTool options are effective in the call to L</SetNewValue>:
+
+Charset, IgnoreMinorErrors, ListSep, ListSplit, PrintConv and Verbose.
+
 =head2 SetNewValuesFromFile
 
 A very powerful routine that sets new values for tags from information found
@@ -1017,7 +1051,7 @@ in a specified file.
 2-N) [optional] List of tag names to set or options hash references.  All
 writable tags are set if none are specified.  The tag names are not case
 sensitive, and may be prefixed by an optional family 0 or 1 group name,
-separated by a colon (ie. 'exif:iso'). A leading '-' indicates tags to be
+separated by a colon (ie. 'exif:iso').  A leading '-' indicates tags to be
 excluded (ie. '-comment').  An asterisk ('*') may be used for the tag name,
 and is useful when a group is specified to set all tags from a group (ie.
 'XMP:*').  A special feature allows tag names of the form 'SRCTAG>DSTTAG'
@@ -1311,9 +1345,19 @@ A description for the specified tag.
 
 =head2 GetGroup
 
-Get group name for specified tag.
+Get group name(s) for a specified tag.
 
+    # return family 0 group name (ie. 'EXIF');
     $group = $exifTool->GetGroup($tag, 0);
+
+    # return all groups (ie. qw{EXIF IFD0 Author Main})
+    @groups = $exifTool->GetGroup($tag);
+
+    # return groups as a string (ie. 'Main:IFD0:Author')
+    $group = $exifTool->GetGroup($tag, ':3:1:2');
+
+    # return groups as a simplified string (ie. 'IFD0:Author')
+    $group = $exifTool->GetGroup($tag, '3:1:2');
 
 =over 4
 
@@ -1323,22 +1367,59 @@ Get group name for specified tag.
 
 1) Tag key
 
-2) [optional] Group family number
+2) [optional] Group family number, or string of numbers separated by colons
 
 =item Return Values:
 
-Group name (or 'Other' if tag has no group).  If no group family is
-specified, L</GetGroup> returns the name of the group in family 0 when
-called in scalar context, or the names of groups for all families in list
-context. See L</GetAllGroups [static]> for a list of groups in each famly.
+Group name (or '' if tag has no group).  If no group family is specified,
+L</GetGroup> returns the name of the group in family 0 when called in scalar
+context, or the names of groups for all families in list context.  Returns a
+string of group names separated by colons if the input group family contains
+a colon.  The string is simplified to remove a leading 'Main:' and adjacent
+identical group names unless the family string begins with a colon.
+
+=item Notes:
+
+The group family numbers are currently available:
+
+    0) Information Type             (ie. EXIF, XMP, IPTC)
+    1) Specific Location            (ie. IFD0, XMP-dc)
+    2) Category                     (ie. Author, Time)
+    3) Document Number              (ie. Main, Doc1, Doc3-2)
+
+Families 0 and 1 are based on the file structure, and are similar except
+that family 1 is more specific -- it sub-divides the EXIF, MakerNotes, XMP
+and ICC_Profile groups to give more detail about the specific location where
+the information was found.  The EXIF group is split up based on the specific
+IFD (Image File Directory), the MakerNotes group is divided into groups for
+each manufacturer, and the XMP group is separated based on the XMP namespace
+prefix.  Note that only common XMP namespaces are listed below but
+additional namespaces may be present in some XMP data.  Also note that the
+'XMP-xmp...' group names may appear in the older form 'XMP-xap...' since
+these names evolved as the XMP standard was developed.  The ICC_Profile
+group is broken down to give information about the specific ICC_Profile tag
+from which multiple values were extracted.  As well, information extracted
+from the ICC_Profile header is separated into the ICC-header group.
+
+Family 2 classifies information based on the logical category to which the
+information refers.
+
+Family 3 gives the document number when the L</ExtractEmbedded> option is
+used.  Nested sub-documents (if they exist) are indicated by numbers
+separated with dashes in the group name, to an arbitrary depth. (ie.
+'Doc2-3-1' is the 1st sub-sub-document of the 3rd sub-document of the 2nd
+embedded document of the main file.)
+
+See L</GetAllGroups [static]> for complete lists of group names.
 
 =back
 
 =head2 GetGroups
 
-Get list of group names for specified information.
+Get list of group names that exist in the specified information.
 
     @groups = $exifTool->GetGroups($info, 2);
+    @groups = $exifTool->GetGroups('3:1');
 
 =over 4
 
@@ -1348,12 +1429,13 @@ Get list of group names for specified information.
 
 1) [optional] Info hash ref (default is all extracted info)
 
-2) [optional] Group family number (default 0)
+2) [optional] Group family number, or string of numbers (default 0)
 
 =item Return Values:
 
 List of group names in alphabetical order. If information hash is not
-specified, the group names are returned for all extracted information.
+specified, the group names are returned for all extracted information. See
+L</GetGroup> for an description of family numbers and family number strings.
 
 =back
 
@@ -1439,13 +1521,14 @@ Get list of all available tag names.
 
 =item Inputs:
 
-0) [optional] Group name
+0) [optional] Group name, or string of group names separated by colons
 
 =item Return Values:
 
-A list of all available tags in alphabetical order, or all tags in specified
-group.  The group name is case insensitive, and any group in any family may
-be used except for EXIF family 1 groups (ie. the specific IFD).
+A list of all available tags in alphabetical order, or all tags in a
+specified group or intersection of groups.  The group name is case
+insensitive, and any group in families 0-2 may be used except for EXIF
+family 1 groups (ie. the specific IFD).
 
 =back
 
@@ -1459,15 +1542,15 @@ Get list of all writable tag names.
 
 =item Inputs:
 
-0) [optional] Group name
+0) [optional] Group name, or string of group names separated by colons
 
 =item Return Values:
 
 A list of all writable tags in alphabetical order.  These are the tags for
 which values may be set through L</SetNewValue>.  If a group name is given,
-returns only writable tags in specified group.  The group name is case
-insensitive, and any group in any family may be used except for EXIF family
-1 groups (ie. the specific IFD).
+returns only writable tags in specified group(s).  The group name is case
+insensitive, and any group in families 0-2 may be used except for EXIF
+family 1 groups (ie. the specific IFD).
 
 =back
 
@@ -1481,7 +1564,7 @@ Get list of all group names in specified family.
 
 =item Inputs:
 
-0) Group family number (0-2)
+0) Group family number (0-3)
 
 =item Return Values:
 
@@ -1489,25 +1572,7 @@ A list of all groups in the specified family in alphabetical order.
 
 =back
 
-Three families of groups are currently defined: 0, 1 and 2. Families 0 and 1
-are based on the file structure, and family 2 classifies information based
-on the logical category to which the information refers.
-
-Families 0 and 1 are similar except that family 1 is more specific, and
-sub-divides the EXIF, MakerNotes, XMP and ICC_Profile groups to give more
-detail about the specific location where the information was found.  The
-EXIF group is split up based on the specific IFD (Image File Directory), the
-MakerNotes group is divided into groups for each manufacturer, and the XMP
-group is separated based on the XMP namespace prefix.  Note that only common
-XMP namespaces are listed below but additional namespaces may be present in
-some XMP data.  Also note that the 'XMP-xmp...' group names may appear in
-the older form 'XMP-xap...' since these names evolved as the XMP standard
-was developed.  The ICC_Profile group is broken down to give information
-about the specific ICC_Profile tag from which multiple values were
-extracted.  As well, information extracted from the ICC_Profile header is
-separated into the ICC-header group.
-
-Here is a complete list of groups for each family:
+Here is a complete list of groups for each of these families:
 
 =over 4
 
@@ -1524,32 +1589,36 @@ QuickTime, RAF, RIFF, Rawzor, Real, Ricoh, SVG, SigmaRaw, Vorbis, XMP, ZIP
 
 AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom, CanonRaw,
 CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky, EPPIM, EXE,
-ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, FotoStation, FujiFilm, GPS,
-GeoTiff, GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod,
-HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view,
-ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, ITC,
-InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
+EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, FotoStation, FujiFilm,
+GPS, GeoTiff, GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc,
+HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
+ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
+IPTC, ITC, InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
 KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, MAC,
-MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo,
-MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient,
-MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF,
-MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta, MinoltaRaw,
-Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF, PICT, PNG,
-Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo, PostScript,
-PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor, Real,
-Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
-Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo, Sigma, SigmaRaw,
-Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM, XMP-PixelLive, XMP-album,
-XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore,
-XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-photomech,
-XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-tiff,
-XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS,
-XMP-xmpRights, XMP-xmpTPg, ZIP
+MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS,
+MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+MIE-Orient, MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
+MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
+MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF,
+PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
+PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor,
+Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5,
+Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo,
+Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
+XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
+XMP-dex, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
+XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism,
+XMP-prl, XMP-pur, XMP-rdf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
+XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
 
 =item Family 2 (Category):
 
 Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
 Time, Unknown, Video
+
+=item Family 3 (Document Number):
+
+Doc#, Main
 
 =back
 
@@ -1641,13 +1710,13 @@ Can the specified file or file type be created?
 =item Return Value:
 
 True if the specified file type can be created from scratch.  Currently,
-this can only be done with XMP, MIE, ICC and VRD files.
+this can only be done with XMP, MIE, ICC, VRD and EXIF files.
 
 =back
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey
+Copyright 2003-2009, Phil Harvey
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

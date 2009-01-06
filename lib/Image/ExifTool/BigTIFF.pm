@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 my $maxOffset = 0x7fffffff; # currently supported maximum data offset/size
 
@@ -111,6 +111,13 @@ sub ProcessBigIFD($$$)
             }
             my $val = ReadValue(\$valBuff, 0, $formatStr, $count, $size);
             if ($htmlDump) {
+                my $tval = $val;
+                if ($formatStr =~ /^rational64([su])$/) {
+                    # show numerator/denominator separately
+                    my $f = ReadValue(\$valBuff, 0, "int32$1", $count*2, $size);
+                    $f =~ s/(-?\d+) (-?\d+)/$1\/$2/g;
+                    $tval .= " ($f)";
+                }
                 my ($tagName, $colName);
                 if ($tagID == 0x927c and $dirName eq 'ExifIFD') {
                     $tagName = 'MakerNotes';
@@ -121,20 +128,18 @@ sub ProcessBigIFD($$$)
                 }
                 my $dname = sprintf("$dirName-%.2d", $index);
                 # build our tool tip
-                my $tip = sprintf("Tag ID: 0x%.4x\\n", $tagID) .
-                          "Format: $formatStr\[$count]\\nSize: $size bytes\\n";
+                my $tip = sprintf("Tag ID: 0x%.4x\n", $tagID) .
+                          "Format: $formatStr\[$count]\nSize: $size bytes\n";
                 if ($size > 8) {
-                    $tip .= sprintf("Value offset: 0x%.8x\\n", $valuePtr);
+                    $tip .= sprintf("Value offset: 0x%.8x\n", $valuePtr);
                     $colName = "<span class=H>$tagName</span>";
                 } else {
                     $colName = $tagName;
                 }
-                my $tval = (length $val < 32) ? $val : substr($val,0,28) . '[...]';
+                $tval = substr($tval,0,28) . '[...]' if length($tval) > 32;
                 if ($formatStr =~ /^(string|undef|binary)/) {
-                    # translate all characters that could mess up JavaScript
-                    $tval =~ tr/\\\x00-\x1f\x7f-\xff/./;
-                    $tval =~ tr/"/'/;
-                    $tval = "$tval";
+                    # translate non-printable characters
+                    $tval =~ tr/\x00-\x1f\x7f-\xff/./;
                 } elsif ($tagInfo and Image::ExifTool::IsInt($tval)) {
                     if ($$tagInfo{IsOffset}) {
                         $tval = sprintf('0x%.4x', $tval);
@@ -255,7 +260,7 @@ information in BigTIFF images.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

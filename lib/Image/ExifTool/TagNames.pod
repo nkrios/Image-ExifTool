@@ -48,7 +48,7 @@ tag this is writable only when the print conversion is disabled (by setting
 PrintConv to 0, or using the -n option).  An exclamation point (C<!>)
 indicates a tag that is considered unsafe to write under normal
 circumstances.  These "unsafe" tags are not set when calling
-SetNewValuesFromFile() or when using the exiftool -TagsFromFile option
+SetNewValuesFromFile() or when using the exiftool -tagsFromFile option
 unless specified explicitly, and care should be taken when editing them
 manually since they may affect the way an image is rendered.  An asterisk
 (C<*>) indicates a "protected" tag which is not writable directly, but is
@@ -186,6 +186,9 @@ Also listed in the table below are TIFF, DNG, HDP and other tags which are
 not part of the EXIF specification, but may co-exist with EXIF tags in some
 images.
 
+See L<http://www.exif.org/specifications.html> for the official EXIF
+specification.
+
   Tag ID   Tag Name                  Group      Writable
   ------   --------                  -----      --------
   0x0001   InteropIndex              InteropIFD string!
@@ -279,14 +282,18 @@ images.
   0x01b2   DefaultImageColor         -          N
   0x0200   JPEGProc                  -          N
   0x0201   ThumbnailOffset           IFD1       int32u*
+           ThumbnailOffset           IFD0       int32u*
            PreviewImageStart         MakerNotes int32u*
            JpgFromRawStart           SubIFD     int32u*
            JpgFromRawStart           IFD2       int32u*
+           JpgFromRawStart           IFD0       int32u*
            OtherImageStart           -          N
   0x0202   ThumbnailLength           IFD1       int32u*
+           ThumbnailLength           IFD0       int32u*
            PreviewImageLength        MakerNotes int32u*
            JpgFromRawLength          SubIFD     int32u*
            JpgFromRawLength          IFD2       int32u*
+           JpgFromRawLength          IFD0       int32u*
            OtherImageLength          -          N
   0x0203   JPEGRestartInterval       -          N
   0x0205   JPEGLosslessPredictors    -          N
@@ -425,6 +432,7 @@ images.
            MakerNoteKodak7           ExifIFD    Kodak Type7
            MakerNoteKodak8a          ExifIFD    Kodak Type8
            MakerNoteKodak8b          ExifIFD    Kodak Type8
+           MakerNoteKodak9           ExifIFD    Kodak Type9
            MakerNoteKodakUnknown     ExifIFD    Kodak Unknown
            MakerNoteKyocera          ExifIFD    Unknown
            MakerNoteMinolta          ExifIFD    Minolta
@@ -639,6 +647,8 @@ are not null terminated.
 IPTC information is separated into different records, each of which has its
 own set of tags.
 
+See L<http://www.iptc.org/IIM/> for the official IPTC specification.
+
   Record   Tag Name                             Writable
   ------   --------                             --------
       1    IPTCEnvelope                         IPTC EnvelopeRecord
@@ -806,21 +816,24 @@ The XMP B<Tag ID>'s aren't listed because in most cases they are identical
 to the B<Tag Name>.
 
 All XMP information is stored as character strings.  The B<Writable> column
-specifies the information format:  C<integer> is a string of digits
-(possibly beginning with a '+' or '-'), C<real> is a floating point number,
-C<rational> is two C<integer> strings separated by a '/' character, C<date>
-is a date/time string in the format "YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM]",
-C<boolean> is either "True" or "False", and C<lang-alt> is a list of string
-alternatives in different languages.
+specifies the information format:  C<string> is an unformatted string,
+C<integer> is a string of digits (possibly beginning with a '+' or '-'),
+C<real> is a floating point number, C<rational> is entered as a floating
+point number but stored as two C<integer> strings separated by a '/'
+character, C<date> is a date/time string entered in the format "YYYY:MM:DD
+HH:MM:SS[.SS][+/-HH:MM]", C<boolean> is either "True" or "False", and
+C<lang-alt> is a list of string alternatives in different languages.
 
 Individual languages for C<lang-alt> tags are accessed by suffixing the tag
-name with a '-', followed by an RFC 3066 language code (ie. "XMP:Title-fr",
-or "Rights-en-US").  A C<lang-alt> tag with no language code accesses the
-"x-default" language, but causes other languages to be deleted when writing.
-The "x-default" language code may be specified when writing a new value to
-write only the default language, but note that all languages are still
-deleted if "x-default" tag is deleted.  When reading, "x-default" is not
-specified.
+name with a '-', followed by an
+L<RFC 3066|http://www.ietf.org/rfc/rfc3066.txt> language code (ie.
+"XMP:Title-fr", or "Rights-en-US").  A C<lang-alt> tag with no language code
+accesses the "x-default" language, but causes other languages for this tag
+to be deleted when writing.  The "x-default" language code may be specified
+when writing to preserve other existing languages (ie.
+"XMP-dc:Description-x-default"), but note that other languages are still
+deleted if the "x-default" language is deleted.  When reading, "x-default"
+is not specified.
 
 The XMP tags are organized according to schema B<Namespace> in the following
 tables.  Note that a few of the longer namespace prefixes given below have
@@ -835,8 +848,11 @@ tables.  For example, the C<pdfx> namespace doesn't have a predefined set of
 tag names because it is used to store application-defined PDF information,
 but this information is extracted by ExifTool.
 
+See L<http://www.adobe.com/devnet/xmp/> for the offical XMP specification.
+
   Namespace                                     Writable
   ---------                                     --------
+  acdsee                                        XMP acdsee
   album                                         XMP Album
   aux                                           XMP aux
   cc                                            XMP cc
@@ -851,6 +867,7 @@ but this information is extracted by ExifTool.
   mediapro                                      XMP MediaPro
   microsoft                                     XMP Microsoft
   pdf                                           XMP pdf
+  pdfx                                          XMP pdfx
   photomech                                     PhotoMechanic XMP
   photoshop                                     XMP photoshop
   PixelLive                                     XMP PixelLive
@@ -870,9 +887,17 @@ but this information is extracted by ExifTool.
   xmpRights                                     XMP xmpRights
   xmpTPg                                        XMP xmpTPg
 
+=head3 XMP acdsee Tags
+
+ACD Systems ACDSee schema tags.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  RPP                                           lang-alt
+
 =head3 XMP Album Tags
 
-Adobe Album Schema tags.
+Adobe Album schema tags.
 
   Tag Name                                      Writable
   --------                                      --------
@@ -895,11 +920,15 @@ Photoshop Auxiliary schema tags.
 
 =head3 XMP cc Tags
 
-Creative Commons schema tags.
+Creative Commons schema tags.  (see
+L<http://creativecommons.org/technology/xmp>)
 
   Tag Name                                      Writable
   --------                                      --------
+  AttributionName                               string
+  AttributionURL                                string
   License                                       string
+  MorePermissions                               string
 
 =head3 XMP crs Tags
 
@@ -922,6 +951,7 @@ Photoshop Camera Raw Schema tags.
   Clarity                                       integer
   ColorNoiseReduction                           integer
   Contrast                                      integer/
+  Converter                                     string
   ConvertToGrayscale                            boolean
   CropAngle                                     real
   CropBottom                                    real
@@ -988,6 +1018,7 @@ Photoshop Camera Raw Schema tags.
   LuminanceAdjustmentRed                        integer
   LuminanceAdjustmentYellow                     integer
   LuminanceSmoothing                            integer
+  MoireFilter                                   string
   PaintCorrectionActive                         N
   PaintCorrectionAmount                         N
   PaintCorrectionMaskCenterWeight               N
@@ -1040,6 +1071,7 @@ Photoshop Camera Raw Schema tags.
   SharpenEdgeMasking                            integer
   SharpenRadius                                 real
   Sharpness                                     integer/
+  Smoothness                                    integer
   SplitToningBalance                            integer
   SplitToningHighlightHue                       integer
   SplitToningHighlightSaturation                integer
@@ -1081,7 +1113,7 @@ Dublin Core schema tags.
 
 Description Explorer schema tags.  These tags are not very common.  The
 Source and Rating tags are avoided when writing due to name conflicts with
-other XMP tags.
+other XMP tags.  (see L<http://www.optimasc.com/products/fileid/>)
 
   Tag Name                                      Writable
   --------                                      --------
@@ -1220,7 +1252,8 @@ EXIF schema for EXIF tags.
 
 IPTC Core schema tags.  The actual IPTC Core namespace prefix is
 "Iptc4xmpCore", which is the prefix recorded in the file, but ExifTool
-shortens this for the "XMP-iptcCore" family 1 group name.
+shortens this for the "XMP-iptcCore" family 1 group name. (see
+L<http://www.iptc.org/IPTC4XMP/>)
 
   Tag Name                                      Writable
   --------                                      --------
@@ -1242,6 +1275,7 @@ shortens this for the "XMP-iptcCore" family 1 group name.
 
 IPTC Extension schema tags.  The actual namespace prefix is "Iptc4xmpExt",
 but ExifTool shortens this for the "XMP-iptcExt" family 1 group name.
+(see L<http://www.iptc.org/IPTC4XMP/>)
 
   Tag Name                                      Writable
   --------                                      --------
@@ -1341,6 +1375,16 @@ name conflicts with other XMP namespaces.
   Title                                         string/
   Trapped                                       string
 
+=head3 XMP pdfx Tags
+
+PDF extension tags.  This namespace is used to store application-defined PDF
+information, so there are no pre-defined tags.  User-defined tags must be
+created to enable writing of XMP-pdfx information.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  [no tags known]
+
 =head3 XMP photoshop Tags
 
 Adobe Photoshop schema tags.
@@ -1388,7 +1432,7 @@ PLUS License Data Format 1.2.0 schema tags.  Note that all
 controlled-vocabulary tags in this table (ie. tags with a fixed set of
 values) have raw values which begin with "http://ns.useplus.org/ldf/vocab/",
 but to reduce clutter this prefix has been removed from the values shown
-below.
+below.  (see L<http://ns.useplus.org/>)
 
   Tag Name                                      Writable
   --------                                      --------
@@ -1474,7 +1518,8 @@ below.
 
 =head3 XMP prism Tags
 
-Publishing Requirements for Industry Standard Metadata 2.1 schema tags.
+Publishing Requirements for Industry Standard Metadata 2.1 schema tags. (see
+L<http://www.prismstandard.org/>)
 
   Tag Name                                      Writable
   --------                                      --------
@@ -1538,7 +1583,8 @@ Publishing Requirements for Industry Standard Metadata 2.1 schema tags.
 
 =head3 XMP prl Tags
 
-PRISM Rights Language 2.1 schema tags.
+PRISM Rights Language 2.1 schema tags.  (see
+L<http://www.prismstandard.org/>)
 
   Tag Name                                      Writable
   --------                                      --------
@@ -1550,7 +1596,7 @@ PRISM Rights Language 2.1 schema tags.
 
 Prism Usage Rights 2.1 schema tags.  The actual namespace prefix is
 "prismusagerights", but ExifTool shortens this for the "XMP-pur" family 1
-group name.
+group name.  (see L<http://www.prismstandard.org/>)
 
   Tag Name                                      Writable
   --------                                      --------
@@ -1947,7 +1993,7 @@ SVG (Scalable Vector Graphics) image tags.  By default, only the top-level
 SVG and Metadata tags are extracted from these images, but all graphics tags
 may be extracted by setting the Unknown option to 2 (-U on the command
 line).  The SVG tags are not part of XMP as such, but are included with the
-XMP module for convenience.
+XMP module for convenience.  (see L<http://www.w3.org/TR/SVG11/>)
 
   Tag Name                                      Writable
   --------                                      --------
@@ -2331,6 +2377,7 @@ This information is found in the PSD file header.
            CanonCameraInfo1DmkIIN               Canon CameraInfo1DmkIIN
            CanonCameraInfo1DmkIII               Canon CameraInfo1DmkIII
            CanonCameraInfo5D                    Canon CameraInfo5D
+           CanonCameraInfo5DmkII                Canon CameraInfo5DmkII
            CanonCameraInfo40D                   Canon CameraInfo40D
            CanonCameraInfo50D                   Canon CameraInfo50D
            CanonCameraInfo450D                  Canon CameraInfo450D
@@ -2393,6 +2440,7 @@ This information is found in the PSD file header.
            ColorBalance2                        Canon ColorBalance2
            ColorBalance3                        Canon ColorBalance3
            ColorBalance4                        Canon ColorBalance4
+           ColorBalance4b                       Canon ColorBalance4
            ColorBalanceUnknown                  N
   0x4002   UnknownBlock1?                       N
   0x4003   ColorInfo                            Canon ColorInfo
@@ -2439,6 +2487,7 @@ This information is found in the PSD file header.
      40    PhotoEffect                          int16s
      41    ManualFlashOutput                    int16s
      42    ColorTone                            int16s
+     46    SRAWQuality                          int16s
 
 =head3 Canon FocalLength Tags
 
@@ -2599,6 +2648,7 @@ CameraInfo tags for the EOS 5D.
       4    ExposureTime                         int8u
       6    ISO                                  int8u
      13    LensType                             int8u
+     39    CameraOrientation                    int8s
      40    FocalLength                          int16u
      56    AFPointsInFocus5D                    int16u
      84    WhiteBalance                         int16u
@@ -2651,6 +2701,14 @@ CameraInfo tags for the EOS 5D.
     272    UserDef3PictureStyle                 int16u
     284    TimeStamp                            int32u
 
+=head3 Canon CameraInfo5DmkII Tags
+
+CameraInfo tags for the EOS 5D Mark II.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+     49    CameraOrientation                    int8s
+
 =head3 Canon CameraInfo40D Tags
 
 CameraInfo tags for the EOS 40D.
@@ -2658,6 +2716,7 @@ CameraInfo tags for the EOS 40D.
    Index   Tag Name                             Writable
    -----   --------                             --------
      29    FocalLength                          int16u
+     48    CameraOrientation                    int8u
      67    FocusDistanceUpper                   int16u
      69    FocusDistanceLower                   int16u
     111    WhiteBalance                         int16u
@@ -2676,6 +2735,7 @@ CameraInfo tags for the EOS 50D.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
+     49    CameraOrientation                    int8u
      80    FocusDistanceUpper                   int16u
      82    FocusDistanceLower                   int16u
     115    ColorTemperature                     int16u
@@ -2690,6 +2750,7 @@ CameraInfo tags for the EOS 450D.
    Index   Tag Name                             Writable
    -----   --------                             --------
      29    FocalLength                          int16u
+     48    CameraOrientation                    int8u
      67    FocusDistanceUpper                   int16u
      69    FocusDistanceLower                   int16u
     111    WhiteBalance                         int16u
@@ -2707,6 +2768,7 @@ CameraInfo tags for the EOS 1000D.
    Index   Tag Name                             Writable
    -----   --------                             --------
      29    FocalLength                          int16u
+     48    CameraOrientation                    int8u
      67    FocusDistanceUpper                   int16u
      69    FocusDistanceLower                   int16u
     111    WhiteBalance                         int16u
@@ -2967,12 +3029,12 @@ These tags are used by the 1DmkII and 1DSmkII.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-     24    WB_RGGBLevelsAsShot                  int16u[4]
-     28    ColorTempAsShot                      int16u
+     24    WB_RGGBLevelsAuto                    int16u[4]
+     28    ColorTempAuto                        int16u
      29    WB_RGGBLevelsUnknown?                int16u[4]
      33    ColorTempUnknown?                    int16u
-     34    WB_RGGBLevelsAuto                    int16u[4]
-     38    ColorTempAuto                        int16u
+     34    WB_RGGBLevelsAsShot                  int16u[4]
+     38    ColorTempAsShot                      int16u
      39    WB_RGGBLevelsDaylight                int16u[4]
      43    ColorTempDaylight                    int16u
      44    WB_RGGBLevelsShade                   int16u[4]
@@ -3061,7 +3123,9 @@ These tags are used by the 1DmkIIN, 5D, 30D and 400D.
 
 =head3 Canon ColorBalance4 Tags
 
-These tags are used by the 40D, 1DmkIII, 1DSmkIII, 450D and 1000D.
+These tags are used by the 1DmkIII, 1DSmkIII, 40D, 50D, 5DmkII, 450D and
+1000D, and also by the PowerShot G10 but with a base offset applied to all
+indices.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -3071,6 +3135,8 @@ These tags are used by the 40D, 1DmkIII, 1DSmkIII, 450D and 1000D.
      72    ColorTempAuto                        int16u
      73    WB_RGGBLevelsMeasured                int16u[4]
      77    ColorTempMeasured                    int16u
+     78    WB_RGGBLevelsUnknown?                int16u[4]
+     82    ColorTempUnknown?                    int16u
      83    WB_RGGBLevelsDaylight                int16u[4]
      87    ColorTempDaylight                    int16u
      88    WB_RGGBLevelsShade                   int16u[4]
@@ -3766,8 +3832,8 @@ by 8 digits.
 
 =head3 Kodak Type8 Tags
 
-Kodak models such as the P712, P850, P880, Z612 and Z712 use standard TIFF
-IFD format for the maker notes.  In keeping with Kodak's strategy of
+Kodak models such as the P712, P850, P880, Z612, Z712 and Z8612 use standard
+TIFF IFD format for the maker notes.  In keeping with Kodak's strategy of
 inconsitent makernotes, some models such as the Z1085 also use these tags,
 but for these models the makernotes begin with a TIFF header instead of an
 IFD entry count and use relative instead of absolute offsets.  There is a
@@ -3864,6 +3930,19 @@ These tags are used by the  P712, P850 and P880.
   0xfd04   FNumber                              int16u
   0xfd05   ExposureTime                         int32u
   0xfd06   ISO                                  int16u
+
+=head3 Kodak Type9 Tags
+
+These tags are used by the C1013.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+     12    FNumber                              int16u
+     16    ExposureTime                         int32u
+     20    DateTimeOriginal                     string[20]
+     52    ISO                                  int16u
+     87    FirmwareVersion                      string[16]
+    168    SerialNumber                         string[12]
 
 =head3 Kodak Unknown Tags
 
@@ -4647,7 +4726,7 @@ DiMAGE X and Xt.
    -----   --------                             --------
       0    Timezone                             int16s
       2    DaylightSavings                      int8u
-      3    DateFormat                           int8u
+      3    DateDisplayFormat                    int8u
 
 =head3 Nikon ISOInfo Tags
 
@@ -4677,6 +4756,8 @@ These tags are extracted from encrypted data in D80 images.
   590.1    Rotation                             int8u
   590.2    VibrationReduction                   int8u
   590.3    FlashFired                           int8u
+    708    NikonImageSize                       int8u
+  708.1    ImageQuality                         int8u
   748.1    Beep                                 int8u
   748.2    AFAssist                             int8u
   748.3    NoMemoryCard                         int8u
@@ -4702,9 +4783,10 @@ These tags are extracted from encrypted data in D80 images.
   754.3    CenterWeightedAreaSize               int8u
   754.4    ExposureDelayMode                    int8u
   754.5    MB-D80Batteries                      int8u
-  755.1    FlashShutterSpeed                    int8u
-  755.2    AutoFP                               int8u
-  755.3    ModelingFlash                        int8u
+  755.1    FlashWarning                         int8u
+  755.2    FlashShutterSpeed                    int8u
+  755.3    AutoFP                               int8u
+  755.4    ModelingFlash                        int8u
   756.1    InternalFlash                        int8u
   756.2    ManualFlashOutput                    int8u
   757.1    RepeatingFlashOutput                 int8u
@@ -4992,6 +5074,9 @@ These tags are used by the D90 and D700.
     9.2    FlashControlMode                     int8u
      10    FlashOutput                          int8u
            FlashExposureComp                    int8s
+     12    FlashFocalLength                     int8u
+     13    RepeatingFlashRate                   int8u
+     14    RepeatingFlashCount                  int8u
    17.1    FlashGroupAControlMode               int8u
    18.1    FlashGroupBControlMode               int8u
    18.2    FlashGroupCControlMode               int8u
@@ -5826,7 +5911,7 @@ iPalm.
 
 =head3 Panasonic Raw Tags
 
-These tags are found in IFD0 of Panasonic RAW images.
+These tags are found in IFD0 of Panasonic RAW and RW2 images.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -5850,6 +5935,7 @@ These tags are found in IFD0 of Panasonic RAW images.
   0x0112   Orientation                          int16u
   0x0116   RowsPerStrip                         N
   0x0117   StripByteCounts                      N
+  0x0118   RawDataOffset                        N
   0x8769   ExifOffset                           EXIF
   0x8825   GPSInfo                              GPS
 
@@ -6373,6 +6459,8 @@ tags.
   0x0102   Quality                              int32u
   0x0104   FlashExposureComp                    rational64s
   0x0105   Teleconverter                        int32u
+  0x0112   WhiteBalanceFineTune                 int32s
+  0x0115   WhiteBalance                         N
   0x0e00   PrintIM                              PrintIM
   0x2001   PreviewImage                         undef
   0xb020   ColorReproduction                    string
@@ -6488,6 +6576,7 @@ who wants to use this information).
            MakerNoteKodak7                      Kodak Type7
            MakerNoteKodak8a                     Kodak Type8
            MakerNoteKodak8b                     Kodak Type8
+           MakerNoteKodak9                      Kodak Type9
            MakerNoteKodakUnknown                Kodak Unknown
            MakerNoteKyocera                     Unknown
            MakerNoteMinolta                     Minolta
@@ -6520,6 +6609,7 @@ who wants to use this information).
            MakerNoteSony4                       Sony
            MakerNoteSonySRF                     Sony SRF
            MakerNoteUnknown                     Unknown
+  'Pano'   AdobePano                            Panasonic Raw
   'RAF '   AdobeRAF                             FujiFilm RAF
   'SR2 '   AdobeSR2                             Sony SR2Private
 
@@ -7204,7 +7294,7 @@ an auxiliary technique to store IPTC information in images, but is
 incompatible with some file formats.
 
 ExifTool will read and write (but not create) AFCP IPTC information in JPEG
-images, but not other image formats.
+and TIFF images.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -7264,6 +7354,7 @@ explicitly.
     584    CropTop                              int16u
     586    CropWidth                            int16u
     588    CropHeight                           int16u
+    602    SharpnessAdj                         int16u
     608    CropAspectRatio                      int16u
     610    ConstrainedCropWidth                 float
     614    ConstrainedCropHeight                float
@@ -7283,23 +7374,35 @@ Tags added in DPP version 2.0 and later.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-      4    PictureStyle                         int16u
-     26    RawColorToneAdj                      int16s
-     28    RawSaturationAdj                     int16s
-     30    RawContrastAdj                       int16s
-     32    RawLinear                            int16u
-     34    RawSharpnessAdj                      int16s
-     36    RawHighlightPoint                    int16s
-     38    RawShadowPoint                       int16s
-    116    MonochromeFilterEffect               int16s
-    118    MonochromeToningEffect               int16s
-    120    MonochromeContrast                   int16s
-    122    MonochromeLinear                     int16u
-    124    MonochromeSharpness                  int16s
-    188    ChrominanceNoiseReduction            int16u
-    190    LuminanceNoiseReduction              int16u
-    192    ChrominanceNR_TIFF_JPEG              int16u
-    218    LuminanceNR_TIFF_JPEG                int16u
+      2    PictureStyle                         int16s
+     13    RawColorToneAdj                      int16s
+     14    RawSaturationAdj                     int16s
+     15    RawContrastAdj                       int16s
+     16    RawLinear                            int16s
+     17    RawSharpnessAdj                      int16s
+     18    RawHighlightPoint                    int16s
+     19    RawShadowPoint                       int16s
+     58    MonochromeFilterEffect               int16s
+     59    MonochromeToningEffect               int16s
+     60    MonochromeContrast                   int16s
+     61    MonochromeLinear                     int16s
+     62    MonochromeSharpness                  int16s
+     94    ChrominanceNoiseReduction            int16s
+     95    LuminanceNoiseReduction              int16s
+     96    ChrominanceNR_TIFF_JPEG              int16s
+     98    ChromaticAberrationOn                int16s
+     99    DistortionCorrectionOn               int16s
+    100    PeripheralIlluminationOn             int16s
+    101    ColorBlur                            int16s
+    102    ChromaticAberration                  int16s
+    103    DistortionCorrection                 int16s
+    104    PeripheralIllumination               int16s
+    105    AberrationCorrectionDistance         int16s
+    106    ChromaticAberrationRed               int16s
+    107    ChromaticAberrationBlue              int16s
+    109    LuminanceNR_TIFF_JPEG                int16s
+    110    AutoLightingOptimizerOn              int16s
+    111    AutoLightingOptimizer                int16s
 
 =head2 FotoStation Tags
 
@@ -7613,12 +7716,11 @@ Information related to geographic location.
 =head3 MIE MakerNotes Tags
 
 MIE maker notes are contained within separate groups for each manufacturer
-to avoid name conflicts.  Currently no specific manufacturer information has
-been defined.
+to avoid name conflicts.
 
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
-  'Canon'              Canon                    MIE Unknown
+  'Canon'              Canon                    MIE Canon
   'Casio'              Casio                    MIE Unknown
   'FujiFilm'           FujiFilm                 MIE Unknown
   'Kodak'              Kodak                    MIE Unknown
@@ -7630,6 +7732,12 @@ been defined.
   'Ricoh'              Ricoh                    MIE Unknown
   'Sigma'              Sigma                    MIE Unknown
   'Sony'               Sony                     MIE Unknown
+
+=head3 MIE Canon Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'VRD'    CanonVRD                             CanonVRD
 
 =head3 MIE Unknown Tags
 
@@ -8304,7 +8412,10 @@ number of available PDF tags.
 
 When writing PDF files, ExifTool uses an increment update.  This has an
 advantage that the original PDF can be easily recovered by deleting the
-C<PDF-update> pseudo-group (with C<-PDF-update:all=> on the command line).
+C<PDF-update> pseudo-group (with C<-PDF-update:all=> on the command line). A
+disadvantage of the incremental update is that a linearized PDF file is no
+longer linearized after the update, so it must be subsequently re-linearized
+if this is required.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -8370,6 +8481,7 @@ This is the PDF document catalog.
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
   'AdobePhotoshop'     AdobePhotoshop           PDF AdobePhotoshop
+  'Illustrator'        Illustrator              PDF Illustrator
 
 =head3 PDF AdobePhotoshop Tags
 
@@ -8388,6 +8500,28 @@ This is the PDF document catalog.
   Tag ID       Tag Name                         Writable
   ------       --------                         --------
   '_stream'    _stream                          Photoshop
+
+=head3 PDF Illustrator Tags
+
+  Tag ID       Tag Name                         Writable
+  ------       --------                         --------
+  'Private'    Private                          PDF AIPrivate
+
+=head3 PDF AIPrivate Tags
+
+  Tag ID               Tag Name                 Writable
+  ------               --------                 --------
+  'AIMetaData'         AIMetaData               PDF AIMetaData
+  'AIPrivateData'      AIPrivateData            PostScript
+  'ContainerVersion'   ContainerVersion         N
+  'CreatorVersion'     CreatorVersion           N
+  'RoundTripVersion'   RoundTripVersion         N
+
+=head3 PDF AIMetaData Tags
+
+  Tag ID       Tag Name                         Writable
+  ------       --------                         --------
+  '_stream'    _stream                          PostScript
 
 =head3 PDF Resources Tags
 
@@ -8418,12 +8552,14 @@ This is the PDF document catalog.
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
   'Author'             Author                   string
+  'BeginDocument'      EmbeddedFile             PostScript
   'BeginICCProfile'    ICC_Profile              ICC_Profile
   'BeginPhotoshop'     PhotoshopData            Photoshop
   'BoundingBox'        BoundingBox              N
   'Copyright'          Copyright                string
   'CreationDate'       CreateDate               string
   'Creator'            Creator                  string
+  'EmbeddedFileName'   EmbeddedFileName         N
   'For'                For                      string
   'ImageData'          ImageData                N
   'Keywords'           Keywords                 string
@@ -9198,6 +9334,7 @@ if they don't exist in this table.
   Tag ID       Tag Name                         Writable
   ------       --------                         --------
   'AllF'       PlayAllFrames                    N
+  'CNCV'       CompressorVersion                N
   'DcMD'       DcMD                             QuickTime DcMD
   'LOOP'       LoopStyle                        N
   'MMA0'       MinoltaMMA0                      Minolta MMA
@@ -12490,7 +12627,7 @@ contained within the file data.
   Comment                                       Y
   CurrentIPTCDigest                             N
   Directory                                     Y!
-  EXIF                                          N
+  EXIF                                          Y!
   Encryption                                    N
   Error                                         N
   ExifByteOrder                                 Y
@@ -12508,8 +12645,9 @@ contained within the file data.
   MIMEType                                      N
   MaxVal                                        N
   Now                                           N
+  RAFVersion                                    N
   Warning                                       N
-  XMP                                           Y
+  XMP                                           Y!
   XResolution                                   N
   YResolution                                   N
 
@@ -12594,11 +12732,11 @@ information is extracted.
   ISO                  Canon:CameraISO          N
                        Canon:BaseISO
                        Canon:AutoISO
-  ImageHeight          PostScript:ImageData     N
+  ImageHeight          Main:PostScript:ImageData N
                        PostScript:BoundingBox
   ImageSize            ImageWidth               N
                        ImageHeight
-  ImageWidth           PostScript:ImageData     N
+  ImageWidth           Main:PostScript:ImageData N
                        PostScript:BoundingBox
   JpgFromRaw           JpgFromRawStart          Y
                        JpgFromRawLength
@@ -12808,6 +12946,7 @@ for more details.
                        MakerNoteKodak7
                        MakerNoteKodak8a
                        MakerNoteKodak8b
+                       MakerNoteKodak9
                        MakerNoteKodakUnknown
                        MakerNoteKyocera
                        MakerNoteMinolta
@@ -12875,7 +13014,7 @@ L<Image::ExifTool::BuildTagLookup|Image::ExifTool::BuildTagLookup>.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

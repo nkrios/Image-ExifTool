@@ -20,7 +20,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.25';
+$VERSION = '1.28';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -1228,8 +1228,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0103 => [
         {
             Name => 'ISOExpansion',
-            Condition => '$$self{Model} =~ /\b(40D|50D)\b/',
-            Notes => '40D and 50D',
+            Condition => '$$self{Model} =~ /\b(40D|50D|5D Mark II)\b/',
+            Notes => '40D, 50D and 5DmkII',
             PrintConv => {
                 0 => 'Off',
                 1 => 'On',
@@ -1268,7 +1268,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     0x0105 => {
         Name => 'AEBSequence',
-        Notes => 'value of 2 not used by 40D and 50D',
+        Notes => 'value of 2 not used by 40D, 50D and 5DmkII',
         PrintConv => {
             0 => '0,-,+',
             1 => '-,0,+',
@@ -1293,7 +1293,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     0x0108 => {
         Name => 'SafetyShift',
-        Notes => 'value of 2 not used by 40D and 50D',
+        Notes => 'value of 2 not used by 40D, 50D and 5DmkII',
         PrintConv => {
             0 => 'Disable',
             1 => 'Enable (Tv/Av)',
@@ -1420,6 +1420,16 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         },
         {
             Name => 'FlashSyncSpeedAv',
+            Condition => '$$self{Model} =~ /\b5D Mark II\b/',
+            Notes => '5D Mark II',
+            PrintConv => {
+                0 => 'Auto',
+                1 => '1/200-1/60 Auto',
+                2 => '1/200 Fixed',
+            },
+        },
+        {
+            Name => 'FlashSyncSpeedAv',
             Notes => '1D Mark III',
             PrintConv => {
                 0 => 'Auto',
@@ -1439,8 +1449,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0202 => [
         {
             Name => 'HighISONoiseReduction',
-            Condition => '$$self{Model} =~ /\b50D\b/',
-            Notes => '50D',
+            Condition => '$$self{Model} =~ /\b(50D|5D Mark II)\b/',
+            Notes => '50D and 5DmkII',
             PrintConv => {
                 0 => 'Standard',
                 1 => 'Low',
@@ -1558,7 +1568,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     0x0506 => {
         Name => 'LensAFStopButton',
-        Notes => 'value of 6 not used by 40D or 50D',
+        Notes => 'value of 6 not used by 40D, 50D and 5DmkII',
         PrintConv => {
             0 => 'AF stop',
             1 => 'AF start',
@@ -1581,14 +1591,25 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             # DECODE OTHER VALUES
         ],
     },
-    0x0508 => {
-        Name => 'AFExpansionWithSelectedPoint',
-        PrintConv => {
-            0 => 'Disable',
-            1 => 'Enable (left/right assist points)',
-            2 => 'Enable (surrounding assist points)',
+    0x0508 => [
+        {
+            Name => 'AFExpansionWithSelectedPoint',
+            Condition => '$$self{Model} =~ /\b5D Mark II\b/',
+            Notes => '5D Mark II',
+            PrintConv => {
+                0 => 'Disable',
+                1 => 'Enable',
+            },
         },
-    },
+        {
+            Name => 'AFExpansionWithSelectedPoint',
+            PrintConv => {
+                0 => 'Disable',
+                1 => 'Enable (left/right assist points)',
+                2 => 'Enable (surrounding assist points)',
+            },
+        },
+    ],
     0x0509 => {
         Name => 'SelectableAFPoint',
         PrintConv => {
@@ -1629,7 +1650,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     0x050e => {
         Name => 'AFAssistBeam',
-        Notes => 'value of 2 not used by 1D Mark III',
+        Notes => 'value of 2 not used by 1DmkIII or 5DmkII',
         PrintConv => {
             0 => 'Emits',
             1 => 'Does not emit',
@@ -1668,7 +1689,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     #### 3b) Drive
     0x060f => {
         Name => 'MirrorLockup',
-        Notes => 'value of 2 not used by 40D, 50D, 450D or 1000D',
+        Notes => 'value of 2 not used by 40D, 50D, 450D, 1000D or 5DmkII',
         PrintConv => {
             0 => 'Disable',
             1 => 'Enable',
@@ -1743,8 +1764,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0704 => [
         {
             Name => 'SetButtonWhenShooting',
-            Condition => '$$self{Model} =~ /\b(40D|50D)\b/',
-            Notes => '40D and 50D, value of 5 is new for 50D',
+            Condition => '$$self{Model} =~ /\b(40D|50D|5D Mark II)\b/',
+            Notes => '40D, 50D and 5DmkII; value of 5 is new for 50D, and 6 is new for 5DmkII',
             PrintConv => {
                 0 => 'Normal (disabled)',
                 1 => 'Image quality',
@@ -1752,6 +1773,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
                 3 => 'Menu display',
                 4 => 'Image playback',
                 5 => 'Quick control screen', #50D
+                6 => 'Record movie (Live View)', #5DmkII
             },
         },
         {
@@ -1833,7 +1855,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             1 => 'Disable main, Control, Multi-control',
         },
     },
-    0x070b => { # 50D
+    0x070b => { # 50D (also, 5DmkII writes this but it isn't in user guide)
         Name => 'AssignFuncButton',
         PrintConv => {
             0 => 'LCD brightness',
@@ -1853,6 +1875,16 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
                 0 => 'Ef-A',
                 1 => 'Ef-D',
                 2 => 'Ef-S',
+            },
+        },
+        {
+            Name => 'FocusingScreen',
+            Condition => '$$self{Model} =~ /\b5D Mark II\b/',
+            Notes => '5D Mark II',
+            PrintConv => {
+                0 => 'Eg-A',
+                1 => 'Eg-D',
+                2 => 'Eg-S',
             },
         },
         {
@@ -1989,15 +2021,13 @@ sub ProcessCanonCustom2($$$)
                 # write new value
                 my $tagInfo = $$newTags{$tag};
                 next unless $tagInfo;
-                my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-                next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
-                my $newVal = Image::ExifTool::GetNewValues($newValueHash);
+                my $nvHash = $exifTool->GetNewValueHash($tagInfo);
+                next unless Image::ExifTool::IsOverwriting($nvHash, $val);
+                my $newVal = Image::ExifTool::GetNewValues($nvHash);
                 next unless defined $newVal;    # can't delete from a custom table
                 WriteValue($newVal, 'int32s', $num, $dataPt, $recPos);
-                if ($verbose > 1) {
-                    $exifTool->VPrint(0, "    - CanonCustom:$$tagInfo{Name} = '$val'\n",
-                                         "    + CanonCustom:$$tagInfo{Name} = '$newVal'\n");
-                }
+                $exifTool->VerboseValue("- CanonCustom:$$tagInfo{Name}", $val);
+                $exifTool->VerboseValue("+ CanonCustom:$$tagInfo{Name}", $newVal);
                 ++$exifTool->{CHANGED};
             } else {
                 # extract the value
@@ -2120,16 +2150,14 @@ sub WriteCanonCustom($$$)
         my $tag = ($val >> 8);
         my $tagInfo = $$newTags{$tag};
         next unless $tagInfo;
-        my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
+        my $nvHash = $exifTool->GetNewValueHash($tagInfo);
         $val = ($val & 0xff);
-        next unless Image::ExifTool::IsOverwriting($newValueHash, $val);
-        my $newVal = Image::ExifTool::GetNewValues($newValueHash);
+        next unless Image::ExifTool::IsOverwriting($nvHash, $val);
+        my $newVal = Image::ExifTool::GetNewValues($nvHash);
         next unless defined $newVal;    # can't delete from a custom table
         Set16u(($newVal & 0xff) + ($tag << 8), $dataPt, $pos);
-        if ($verbose > 1) {
-            $exifTool->VPrint(0, "    - $dirName:$$tagInfo{Name} = '$val'\n",
-                                 "    + $dirName:$$tagInfo{Name} = '$newVal'\n");
-        }
+        $exifTool->VerboseValue("- $dirName:$$tagInfo{Name}", $val);
+        $exifTool->VerboseValue("+ $dirName:$$tagInfo{Name}", $newVal);
         ++$exifTool->{CHANGED};
     }
     return $newData;
@@ -2157,7 +2185,7 @@ Image::ExifTool to read this information.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

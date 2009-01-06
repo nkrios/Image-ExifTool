@@ -133,8 +133,21 @@ Samsung and Yakumo models built by Skanhex.</p>
 start of the individual IFD entry.  (very similar to Konica KD-300Z)</p>
 
 <hr>
+<h2>RAW file Idiosyncracies</h2>
+
+<p><b>Minolta MRW:</b> The A200 stores the thumbnail image offset in IFD0
+relative to the start of file, while all other offsets are relative to the start
+of the TIFF header, which is 48 bytes into the file.  Also, the A200 stores the
+StripOffsets and the StripByteCounts values in the wrong byte order.</p>
+
+<p><b>Sony ARW:</b> The A100 with firmware 1.00 sets the high word of the
+thumbnail image offset to zero, but it should be 0x0001.  This problem is fixed
+for firmware 1.04, but may or may not exist in versions between 1.00 and
+1.04.</p>
+
+<hr>
 <i>Created Mar. 25, 2005</i>
-<br><i>Last revised Dec. 19, 2007</i>
+<br><i>Last revised Dec. 10, 2008</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

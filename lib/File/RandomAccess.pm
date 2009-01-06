@@ -13,6 +13,8 @@
 #                            generate "substr outside string" warning
 #               06/10/2006 - P. Harvey Decreased $CHUNK_SIZE from 64k to 8k
 #               11/23/2006 - P. Harvey Limit reads to < 0x80000000 bytes
+#               11/26/2008 - P. Harvey Fixed bug in ReadLine when reading from a
+#                            scalar with a multi-character newline
 #
 # Notes:        Calls the normal file i/o routines unless SeekTest() fails, in
 #               which case the file is buffered in memory to allow random access.
@@ -21,7 +23,7 @@
 #
 #               May also be used for string i/o (just pass a scalar reference)
 #
-# Legal:        Copyright (c) 2003-2008 Phil Harvey (phil at owl.phy.queensu.ca)
+# Legal:        Copyright (c) 2003-2009 Phil Harvey (phil at owl.phy.queensu.ca)
 #               This library is free software; you can redistribute it and/or
 #               modify it under the same terms as Perl itself.
 #------------------------------------------------------------------------------
@@ -33,7 +35,7 @@ require 5.002;
 require Exporter;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '1.07';
+$VERSION = '1.09';
 @ISA = qw(Exporter);
 
 # constants
@@ -63,7 +65,7 @@ sub new($$;$)
     } else {
         # file i/o
         my $buff = '';
-        $self = { 
+        $self = {
             FILE_PT => $filePt, # file pointer
             BUFF_PT => \$buff,  # reference to file data
             POS => 0,           # current position in file
@@ -203,7 +205,7 @@ sub Read($$$)
         unless ($self->{DEBUG}->{$pos} and $self->{DEBUG}->{$pos} > $rtnVal) {
             $self->{DEBUG}->{$pos} = $rtnVal;
         }
-    } 
+    }
     return $rtnVal;
 }
 
@@ -216,7 +218,7 @@ sub ReadLine($$)
     my $self = shift;
     my $rtnVal;
     my $fp = $self->{FILE_PT};
-    
+
     if ($self->{TESTED} < 0) {
         my ($num, $buff);
         my $pos = $self->{POS};
@@ -230,8 +232,11 @@ sub ReadLine($$)
             }
             # scan and read until we find the EOL (or hit EOF)
             for (;;) {
-                $pos = index(${$self->{BUFF_PT}}, $/, $pos) + length($/);
-                last if $pos > 0;
+                $pos = index(${$self->{BUFF_PT}}, $/, $pos);
+                if ($pos >= 0) {
+                    $pos += length($/);
+                    last;
+                }
                 $pos = $self->{LEN};    # have scanned to end of buffer
                 $num = read($fp, $buff, $CHUNK_SIZE) or last;
                 ${$self->{BUFF_PT}} .= $buff;
@@ -239,8 +244,13 @@ sub ReadLine($$)
             }
         } else {
             # string i/o
-            $pos = index(${$self->{BUFF_PT}}, $/, $pos) + length($/);
-            $pos <= 0 and $pos = $self->{LEN};
+            $pos = index(${$self->{BUFF_PT}}, $/, $pos);
+            if ($pos < 0) {
+                $pos = $self->{LEN};
+                $self->{POS} = $pos if $self->{POS} > $pos;
+            } else {
+                $pos += length($/);
+            }
         }
         # read the line from our buffer
         $rtnVal = $pos - $self->{POS};
@@ -259,8 +269,8 @@ sub ReadLine($$)
         unless ($self->{DEBUG}->{$pos} and $self->{DEBUG}->{$pos} > $rtnVal) {
             $self->{DEBUG}->{$pos} = $rtnVal;
         }
-    } 
-    return $rtnVal;  
+    }
+    return $rtnVal;
 }
 
 #------------------------------------------------------------------------------
@@ -294,7 +304,7 @@ sub BinMode($)
 sub Close($)
 {
     my $self = shift;
-    
+
     if ($self->{DEBUG}) {
         local $_;
         if ($self->Seek(0,2)) {

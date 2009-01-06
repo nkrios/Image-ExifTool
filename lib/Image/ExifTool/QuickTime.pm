@@ -25,7 +25,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -485,18 +485,19 @@ my %vendorID = (
             ByteOrder => 'BigEndian',
         },
     },
-    MMA0 => { #PH
-        Name => 'MinoltaMMA0', # (DiMage 7Hi)
+    MMA0 => { #PH (DiMage 7Hi)
+        Name => 'MinoltaMMA0',
         SubDirectory => { TagTable => 'Image::ExifTool::Minolta::MMA' },
     },
-    MMA1 => { #PH
-        Name => 'MinoltaMMA1', # (Dimage A2)
+    MMA1 => { #PH (Dimage A2)
+        Name => 'MinoltaMMA1',
         SubDirectory => { TagTable => 'Image::ExifTool::Minolta::MMA' },
     },
     XMP_ => { #PH (Adobe CS3 Bridge)
         Name => 'XMP',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
     },
+    CNCV => 'CompressorVersion', #PH (Canon 5D Mark II)
 );
 
 # meta atoms
@@ -895,7 +896,7 @@ my %vendorID = (
     2 => {
         Name => 'GraphicsMode',
         PrintHex => 1,
-        PrintConv => {  
+        PrintConv => {
             # (ref http://homepage.mac.com/vanhoek/MovieGuts%20docs/64.html)
             0x00 => 'srcCopy',
             0x01 => 'srcOr',
@@ -1353,13 +1354,14 @@ sub ProcessMOV($$;$)
                     if ($$subdir{ByteOrder} and $$subdir{ByteOrder} =~ /^Little/) {
                         SetByteOrder('II');
                     }
+                    my $oldGroup1 = $exifTool->{SET_GROUP1};
                     if ($$tagInfo{Name} eq 'Track') {
                         $track or $track = 0;
                         $exifTool->{SET_GROUP1} = 'Track' . (++$track);
                     }
                     my $subTable = GetTagTable($$subdir{TagTable});
                     $exifTool->ProcessDirectory(\%dirInfo, $subTable) if $size > $start;
-                    delete $exifTool->{SET_GROUP1};
+                    $exifTool->{SET_GROUP1} = $oldGroup1;
                     SetByteOrder('MM');
                 } elsif ($hasData) {
                     # handle atoms containing 'data' tags
@@ -1456,7 +1458,7 @@ information from QuickTime and MP4 video, and M4A audio files.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

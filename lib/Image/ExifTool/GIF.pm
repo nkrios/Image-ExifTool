@@ -59,9 +59,9 @@ sub ProcessGIF($$)
                 $newComment = $exifTool->GetNewValues('Comment');
             }
         } else {
-            my $newValueHash;
-            $newComment = $exifTool->GetNewValues('Comment', \$newValueHash);
-            $setComment = 1 if $newValueHash;
+            my $nvHash;
+            $newComment = $exifTool->GetNewValues('Comment', \$nvHash);
+            $setComment = 1 if $nvHash;
         }
         # change to GIF 89a if adding comment or XMP
         $buff = 'GIF89a' if $$addDirs{XMP} or defined $newComment;
@@ -293,7 +293,7 @@ only the Comment tag is currently supported in GIF89a images.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -35,7 +35,7 @@ use vars qw($VERSION %minoltaLensTypes %minoltaColorMode %sonyColorMode %minolta
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.47';
+$VERSION = '1.48';
 
 # lens ID numbers (ref 3)
 %minoltaLensTypes = (
@@ -171,6 +171,7 @@ $VERSION = '1.47';
     25781 => 'Minolta AF 16mm F2.8 Fisheye or Sigma Lens',
     25781.1 => 'Sigma 8mm F4 Fisheye',
     25781.2 => 'Sigma 14mm F3.5',
+    25781.3 => 'Sigma 15mm F2.8 Fisheye', #JD (writes 16mm to EXIF)
     25791 => 'Minolta AF 20mm F2.8',
     25811 => 'Minolta/Sony AF 100mm F2.8 Macro New or Sigma or Tamron Lens',
     25811.1 => 'Sigma AF 90mm F2.8 Macro', #JD
@@ -1578,7 +1579,7 @@ and write Minolta RAW (MRW) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

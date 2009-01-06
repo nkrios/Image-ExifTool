@@ -15,7 +15,7 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.42';
+$VERSION = '1.43';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -277,6 +277,19 @@ my $debug;          # set to 1 to enabled debugging code
             ByteOrder => 'Unknown',
             Start => '$valuePtr + 8',
             Base => '$start - 8',
+        },
+    },
+    {
+        Name => 'MakerNoteKodak9',
+        # test header and Kodak:DateTimeOriginal
+        Condition => q{
+            $$self{Make}=~/Kodak/i and
+            $$valPt =~ /^IIII.{16}\d{4}\/\d{2}\/\d{2} /s
+        },
+        NotIFD => 1,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Type9',
+            ByteOrder => 'LittleEndian',
         },
     },
     {
@@ -1132,7 +1145,7 @@ maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

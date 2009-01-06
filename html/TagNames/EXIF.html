@@ -20,7 +20,10 @@ ExifTool family 1 group names.  When writing EXIF information, the default
 
 <p>Also listed in the table below are TIFF, DNG, HDP and other tags which are
 not part of the EXIF specification, but may co-exist with EXIF tags in some
-images.
+images.</p>
+
+<p>See <a href="http://www.exif.org/specifications.html">http://www.exif.org/specifications.html</a> for the official EXIF
+specification.
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -658,23 +661,33 @@ JpgFromRawLength in SubIFD2 of DNG images)</span></span></td></tr>
 <tr class=b>
 <td>0x0201</td>
 <td>ThumbnailOffset
+  <br>ThumbnailOffset
   <br>PreviewImageStart
   <br>JpgFromRawStart
   <br>JpgFromRawStart
+  <br>JpgFromRawStart
   <br>OtherImageStart</td>
-<td class=c>int32u*<br>int32u*<br>int32u*<br>int32u*<br>N</td>
-<td class=c>IFD1<br>MakerNotes<br>SubIFD<br>IFD2<br>-</td>
-<td>&nbsp;</td></tr>
+<td class=c>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>N</td>
+<td class=c>IFD1<br>IFD0<br>MakerNotes<br>SubIFD<br>IFD2<br>IFD0<br>-</td>
+<td><span class=s><span class=n>(ThumbnailOffset in IFD1 of JPEG and some TIFF-based images, and IFD0 of MRW
+images and AVI videos; PreviewImageStart in MakerNotes; JpgFromRawStart in
+SubIFD of NEF images, IFD2 of PEF images, and IFD0 of SR2 and ARW images;
+and OtherImageStart in everything else)</span></span></td></tr>
 <tr>
 <td>0x0202</td>
 <td>ThumbnailLength
+  <br>ThumbnailLength
   <br>PreviewImageLength
   <br>JpgFromRawLength
   <br>JpgFromRawLength
+  <br>JpgFromRawLength
   <br>OtherImageLength</td>
-<td class=c>int32u*<br>int32u*<br>int32u*<br>int32u*<br>N</td>
-<td class=c>IFD1<br>MakerNotes<br>SubIFD<br>IFD2<br>-</td>
-<td>&nbsp;</td></tr>
+<td class=c>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>N</td>
+<td class=c>IFD1<br>IFD0<br>MakerNotes<br>SubIFD<br>IFD2<br>IFD0<br>-</td>
+<td><span class=s><span class=n>(ThumbnailLength in IFD1 of JPEG and some TIFF-based images, and IFD0 of MRW
+images and AVI videos; PreviewImageLength in MakerNotes; JpgFromRawLength in
+SubIFD of NEF images, IFD2 of PEF images, and IFD0 of SR2 and ARW images;
+and OtherImageLength in everything else)</span></span></td></tr>
 <tr class=b>
 <td>0x0203</td>
 <td>JPEGRestartInterval</td>
@@ -1476,6 +1489,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNoteKodak7
   <br>MakerNoteKodak8a
   <br>MakerNoteKodak8b
+  <br>MakerNoteKodak9
   <br>MakerNoteKodakUnknown
   <br>MakerNoteKyocera
   <br>MakerNoteMinolta
@@ -1508,8 +1522,8 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNoteSony4
   <br>MakerNoteSonySRF
   <br>MakerNoteUnknown</td>
-<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
-<td class=c>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
+<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td class=c>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
 <td>--&gt; <a href='Canon.html'>Canon Tags</a>
   <br>--&gt; <a href='Casio.html'>Casio Tags</a>
   <br>--&gt; <a href='Casio.html#Type2'>Casio Type2 Tags</a>
@@ -1532,6 +1546,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>--&gt; <a href='Kodak.html#Type7'>Kodak Type7 Tags</a>
   <br>--&gt; <a href='Kodak.html#Type8'>Kodak Type8 Tags</a>
   <br>--&gt; <a href='Kodak.html#Type8'>Kodak Type8 Tags</a>
+  <br>--&gt; <a href='Kodak.html#Type9'>Kodak Type9 Tags</a>
   <br>--&gt; <a href='Kodak.html#Unknown'>Kodak Unknown Tags</a>
   <br>--&gt; <a href='Unknown.html'>Unknown Tags</a>
   <br>--&gt; <a href='Minolta.html'>Minolta Tags</a>
@@ -2713,7 +2728,7 @@ writing these unless they already exist in the file)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 30, 2008</i>
+<br><i>Last revised Dec 10, 2008</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

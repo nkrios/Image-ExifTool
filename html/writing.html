@@ -172,13 +172,12 @@ information.</p>
 <h3>IFD0/ExifIFD Ambiguity</h3>
 
 <p>ExifTool has a preferred location (IFD) where it writes all EXIF tags. 
-However, a number of tags have are written to different locations by various
-digital cameras or image editors.  Specifically, the following tags have been
-observed in both IFD0 and ExifIFD: Make, Model, Software, Artist,
-DateTimeOriginal, SensingMethod, CustomRendered, ExposureMode, WhiteBalance,
-DigitalZoomRatio and SceneCaptureType.  To handle this ambiguity, ExifTool will
-delete the tag if it exists in IFD0 when it is written to ExifIFD, and vice
-versa.</p>
+However, a number of tags are written to different locations by various digital
+cameras or image editors.  Specifically, the following tags have been observed
+in both IFD0 and ExifIFD: Make, Model, Software, Artist, DateTimeOriginal,
+SensingMethod, CustomRendered, ExposureMode, WhiteBalance, DigitalZoomRatio and
+SceneCaptureType.  To handle this ambiguity, ExifTool will delete the tag if it
+exists in IFD0 when it is written to ExifIFD, and vice versa.</p>
 
 <hr>
 <i>Created Dec. 30, 2004</i><br>

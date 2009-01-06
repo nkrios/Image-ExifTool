@@ -24,7 +24,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.30';
+$VERSION = '1.31';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -663,7 +663,7 @@ my %shootingMode = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITE_GROUP => 'IFD0',   # default write group
-    NOTES => 'These tags are found in IFD0 of Panasonic RAW images.',
+    NOTES => 'These tags are found in IFD0 of Panasonic RAW and RW2 images.',
     0x01 => {
         Name => 'PanasonicRawVersion',
         Writable => 'undef',
@@ -718,6 +718,17 @@ my %shootingMode = (
         Name => 'PreviewImage',
         Writable => 'undef',
         Binary => 1,
+        # extract information from embedded image since it is metadata-rich,
+        # unless HtmlDump option set (note that the offsets will be relative,
+        # not absolute like they should be in verbose mode)
+        RawConv => q{
+            unless ($self->Options('HtmlDump')) {
+                $$self{DOC_NUM} = 1;
+                $self->ExtractInfo(\$val, {ReEntry => 1});
+                delete $$self{DOC_NUM};
+            }
+            return $val;
+        },
     },
     0x10f => {
         Name => 'Make',
@@ -756,6 +767,10 @@ my %shootingMode = (
         Name => 'StripByteCounts',
         OffsetPair => 0x111,   # point to associated offset
         ValueConv => 'length($val) > 32 ? \$val : $val',
+    },
+    0x118 => {
+        Name => 'RawDataOffset', #PH (RW2)
+        IsOffset => 1,
     },
     0x8769 => {
         Name => 'ExifOffset',
@@ -813,7 +828,7 @@ Panasonic and Leica maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

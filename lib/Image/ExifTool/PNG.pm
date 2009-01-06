@@ -28,7 +28,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.17';
+$VERSION = '1.20';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -444,9 +444,7 @@ sub FoundPNG($$$$;$$)
                     my $name = $tagName;
                     $wasCompressed and $name = "Decompressed $name";
                     $exifTool->VerboseDir($name, 0, $len);
-                    my %parms = ( Prefix => $exifTool->{INDENT}, Out => $out );
-                    $parms{MaxLen} = 96 unless $verbose > 3;
-                    Image::ExifTool::HexDump(\$val, undef, %parms);
+                    $exifTool->VerboseDump(\$val);
                 }
                 # don't indent next directory (since it is really the same data)
                 $exifTool->{INDENT} =~ s/..$//;
@@ -495,10 +493,10 @@ sub FoundPNG($$$$;$$)
                     delete $exifTool->{ADD_PNG}->{$tag};
                     # (also handle case of tEXt tags written with lowercase first letter)
                     delete $exifTool->{ADD_PNG}->{ucfirst($tag)};
-                    my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-                    $isOverwriting = Image::ExifTool::IsOverwriting($newValueHash);
+                    my $nvHash = $exifTool->GetNewValueHash($tagInfo);
+                    $isOverwriting = Image::ExifTool::IsOverwriting($nvHash);
                     if (defined $deflateErr) {
-                        $newVal = Image::ExifTool::GetNewValues($newValueHash);
+                        $newVal = Image::ExifTool::GetNewValues($nvHash);
                         # can only write tag now if unconditionally deleting it
                         if ($isOverwriting > 0 and not defined $newVal) {
                             $val = '<deflate error>';
@@ -508,19 +506,17 @@ sub FoundPNG($$$$;$$)
                         }
                     } else {
                         if ($isOverwriting < 0) {
-                            $isOverwriting = Image::ExifTool::IsOverwriting($newValueHash, $val);
+                            $isOverwriting = Image::ExifTool::IsOverwriting($nvHash, $val);
                         }
                         # (must get new value after IsOverwriting() in case it was shifted)
-                        $newVal = Image::ExifTool::GetNewValues($newValueHash);
+                        $newVal = Image::ExifTool::GetNewValues($nvHash);
                     }
                 }
                 if ($isOverwriting) {
                     $$outBuff =  (defined $newVal) ? $newVal : '';
                     ++$exifTool->{CHANGED};
-                    if ($verbose > 1) {
-                        print $out "    - PNG:$tagName = '",$exifTool->Printable($val),"'\n";
-                        print $out "    + PNG:$tagName = '",$exifTool->Printable($newVal),"'\n" if defined $newVal;
-                    }
+                    $exifTool->VerboseValue("- PNG:$tagName", $val);
+                    $exifTool->VerboseValue("+ PNG:$tagName", $newVal) if defined $newVal;
                 }
             }
             if ($$outBuff) {
@@ -605,12 +601,7 @@ sub ProcessProfile($$$)
     if ($verbose) {
         if ($verbose > 2) {
             $exifTool->VerboseDir("Decoded $tagName", 0, $len);
-            my %parms = (
-                Prefix => $exifTool->{INDENT},
-                Out => $exifTool->Options('TextOut'),
-            );
-            $parms{MaxLen} = 96 unless $verbose > 3;
-            Image::ExifTool::HexDump(\$buff, undef, %parms);
+            $exifTool->VerboseDump(\$buff);
         }
         # don't indent next directory (since it is really the same data)
         $exifTool->{INDENT} =~ s/..$//;
@@ -647,14 +638,13 @@ sub ProcessProfile($$$)
         my $hdrLen = length($Image::ExifTool::exifAPP1hdr);
         $dirInfo{DirStart} += $hdrLen;
         $dirInfo{DirLen} -= $hdrLen;
-        $processed = $exifTool->ProcessTIFF(\%dirInfo);
         if ($outBuff) {
-            if ($$outBuff) {
-                $$outBuff = $Image::ExifTool::exifAPP1hdr . $$outBuff if $$outBuff;
-            } else {
-                $$outBuff = '' if $processed;
-            }
+            $$outBuff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr,
+                                                  \&Image::ExifTool::WriteTIFF);
+            $$outBuff = $Image::ExifTool::exifAPP1hdr . $$outBuff if $$outBuff;
             delete $$addDirs{IFD0};
+        } else {
+            $processed = $exifTool->ProcessTIFF(\%dirInfo);
         }
     } elsif ($buff =~ /^$Image::ExifTool::xmpAPP1hdr/) {
         # APP1 XMP information
@@ -673,14 +663,13 @@ sub ProcessProfile($$$)
     } elsif ($buff =~ /^(MM\0\x2a|II\x2a\0)/) {
         # TIFF information (haven't seen this, but what the heck...)
         return 1 if $outBuff and not $$editDirs{IFD0};
-        $processed = $exifTool->ProcessTIFF(\%dirInfo);
         if ($outBuff) {
-            if ($$outBuff) {
-                $$outBuff = $Image::ExifTool::exifAPP1hdr . $$outBuff if $$outBuff;
-            } else {
-                $$outBuff = '' if $processed;
-            }
+            $$outBuff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr,
+                                                  \&Image::ExifTool::WriteTIFF);
+            $$outBuff = $Image::ExifTool::exifAPP1hdr . $$outBuff if $$outBuff;
             delete $$addDirs{IFD0};
+        } else {
+            $processed = $exifTool->ProcessTIFF(\%dirInfo);
         }
     } else {
         my $profName = $profileType;
@@ -864,11 +853,7 @@ sub ProcessPNG($$)
                 next;
             }
             print $out "$fileType $chunk ($len bytes):\n";
-            if ($verbose > 2) {
-                my %dumpParms = ( Out => $out, Addr => $raf->Tell() - $len - 4 );
-                $dumpParms{MaxLen} = 96 if $verbose <= 4;
-                Image::ExifTool::HexDump(\$dbuf, undef, %dumpParms);
-            }
+            $exifTool->VerboseDump(\$dbuf, Addr => $raf->Tell() - $len - 4) if $verbose > 2;
         }
         # only extract information from chunks in our tables
         my ($theBuff, $outBuff);
@@ -915,7 +900,7 @@ and JNG (JPEG Network Graphics) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

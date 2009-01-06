@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..36\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..38\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -208,14 +208,18 @@ my $testfile;
 }
 
 # tests 11/12: Try creating something from nothing and removing it again
+#              (also test ListSplit and ListSep options)
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
+    $exifTool->Options(ListSplit => ';\\s*');
+    $exifTool->Options(ListSep => ' <<separator>> ');
     $exifTool->SetNewValue(DateTimeOriginal => '2005:01:19 13:37:22', Group => 'EXIF');
     $exifTool->SetNewValue(FileVersion => 12, Group => 'IPTC');
     $exifTool->SetNewValue(Contributor => 'Guess who', Group => 'XMP');
     $exifTool->SetNewValue(GPSLatitude => q{44 deg 14' 12.25"}, Group => 'GPS');
     $exifTool->SetNewValue('Ducky:Quality' => 50);
+    $exifTool->SetNewValue(Keywords => 'this; that');
     my $testfile1 = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile1;
     $exifTool->WriteInfo('t/images/Writer.jpg', $testfile1);
@@ -230,6 +234,7 @@ my $testfile;
     $exifTool->SetNewValue('Contributor');
     $exifTool->SetNewValue('GPSLatitude');
     $exifTool->SetNewValue('Ducky:Quality');
+    $exifTool->SetNewValue('Keywords');
     my $testfile2 = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile2;
     $exifTool->WriteInfo($testfile1, $testfile2);
@@ -651,6 +656,34 @@ my $testOK;
         print 'not ';
     }
     print "ok $testnum\n";
+}
+
+# tests 37-38: Create EXIF file from EXIF block and individual tags
+{
+    my $i;
+    for ($i=0; $i<2; ++$i) {
+        ++$testnum;
+        my $exifTool = new Image::ExifTool;
+        my @tags;
+        if ($i == 0) {
+            $exifTool->SetNewValuesFromFile('t/images/Sony.jpg', 'EXIF');
+            $exifTool->Options(PrintConv => 0);
+            @tags = qw(FileSize Compression);
+        } else {
+            $exifTool->SetNewValuesFromFile('t/images/Sony.jpg');
+            $exifTool->Options(PrintConv => 1, Unknown => 1);
+        }
+        $testfile = "t/${testname}_${testnum}_failed.exif";
+        unlink $testfile;
+        $exifTool->WriteInfo(undef, $testfile);
+        my $info = $exifTool->ImageInfo($testfile, @tags);
+        if (check($exifTool, $info, $testname, $testnum)) {
+            unlink $testfile;
+        } else {
+            print 'not ';
+        }
+        print "ok $testnum\n";
+    }
 }
 
 # end

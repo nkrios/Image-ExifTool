@@ -23,7 +23,13 @@
 	<li><a href="#options">OPTIONS</a></li>
 	<ul>
 
-		<li><a href="#advanced_options">Advanced Options</a></li>
+		<li><a href="#option_summary">Option Summary</a></li>
+		<li><a href="#option_details">Option Details</a></li>
+		<ul>
+
+			<li><a href="#advanced_options">Advanced Options</a></li>
+		</ul>
+
 	</ul>
 
 	<li><a href="#reading_examples">READING EXAMPLES</a></li>
@@ -48,9 +54,9 @@
 <h1><a name="synopsis">SYNOPSIS</a></h1>
 <p><strong>exiftool</strong> [<em>OPTIONS</em>] [-<em>TAG</em>...] [--<em>TAG</em>...] <em>FILE</em>...</p>
 <p><strong>exiftool</strong> [<em>OPTIONS</em>] -<em>TAG</em>[+-&lt;]=[<em>VALUE</em>]... <em>FILE</em>...</p>
-<p><strong>exiftool</strong> [<em>OPTIONS</em>] <strong>-TagsFromFile</strong> <em>SRCFILE</em>
+<p><strong>exiftool</strong> [<em>OPTIONS</em>] <strong>-tagsFromFile</strong> <em>SRCFILE</em>
 [-<em>SRCTAG</em>[&gt;<em>DSTTAG</em>]...] <em>FILE</em>...</p>
-<p><strong>exiftool</strong> [ <strong>-ver</strong> | <strong>-list</strong>[<strong>w</strong>|<strong>f</strong>|<strong>g</strong>[<em>NUM</em>]|<strong>d</strong>] ]</p>
+<p><strong>exiftool</strong> [ <strong>-ver</strong> | <strong>-list</strong>[<strong>w</strong>|<strong>f</strong>|<strong>wf</strong>|<strong>g</strong>[<em>NUM</em>]|<strong>d</strong>] ]</p>
 <p>For specific examples, see the <a href="#reading_examples">EXAMPLES</a> sections below.</p>
 <p>
 </p>
@@ -62,7 +68,7 @@ reading and writing meta information in image, audio and video files.
 input.  Information is read from the source file and output in readable form
 to the console (or written to an output text file with the <strong>-w</strong> option).</p>
 <p>To write or copy information, new values are specified with the
--<em>TAG</em>=[<em>VALUE</em>] syntax or the <strong>-TagsFromFile</strong> option.  This causes
+-<em>TAG</em>=[<em>VALUE</em>] syntax or the <strong>-tagsFromFile</strong> option.  This causes
 <em>FILE</em> to be rewritten, and by default the original file is preserved with
 <code>_original</code> appended to the file name.  (Be sure to verify that the new
 file is OK before erasing the original.)  Once in write mode, exiftool will
@@ -72,35 +78,36 @@ supported by ExifTool (r = read, w = write, c = create):</p>
 <pre>
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  3FR   r       HTML  r       PPM   r/w    |  EXIF           r/w/c
-  ACR   r       ICC   r/w/c   PPT   r      |  GPS            r/w/c
-  AI    r       ITC   r       PS    r/w    |  IPTC           r/w/c
-  AIFF  r       JNG   r/w     PSD   r/w    |  XMP            r/w/c
-  APE   r       JP2   r/w     QTIF  r      |  MakerNotes     r/w/c
-  ARW   r       JPEG  r/w     RA    r      |  Photoshop IRB  r/w/c
-  ASF   r       K25   r       RAF   r/w    |  ICC Profile    r/w/c
-  AVI   r       KDC   r       RAM   r      |  MIE            r/w/c
-  BMP   r       M4A   r       RAW   r/w    |  JFIF           r/w/c
-  BTF   r       MEF   r/w     RIFF  r      |  Ducky APP12    r/w/c
-  CR2   r/w     MIE   r/w/c   RWZ   r      |  PDF            r/w/c
-  CRW   r/w     MIFF  r       RM    r      |  CIFF           r/w
-  CS1   r/w     MNG   r/w     SO    r      |  AFCP           r/w
-  DCM   r       MOS   r/w     SR2   r      |  JPEG 2000      r
-  DCR   r       MOV   r       SRF   r      |  DICOM          r
-  DIVX  r       MP3   r       SVG   r      |  Flash          r
-  DJVU  r       MP4   r       SWF   r      |  FlashPix       r
-  DLL   r       MPC   r       THM   r/w    |  QuickTime      r
-  DNG   r/w     MPG   r       TIFF  r/w    |  GeoTIFF        r
-  DOC   r       MRW   r/w     VRD   r/w/c  |  PrintIM        r
-  DYLIB r       NEF   r/w     WAV   r      |  ID3            r
-  EPS   r/w     OGG   r       WDP   r/w    |  Kodak Meta     r
-  EXE   r       ORF   r/w     WMA   r      |  Ricoh RMETA    r
-  ERF   r/w     PBM   r/w     WMV   r      |  Picture Info   r
-  FLAC  r       PDF   r/w     X3F   r      |  Adobe APP14    r
-  FLV   r       PEF   r/w     XLS   r      |  APE            r
-  FPX   r       PGM   r/w     XMP   r/w/c  |  Vorbis         r
-  GIF   r/w     PICT  r       ZIP   r      |  SPIFF          r
-  HDP   r/w     PNG   r/w                  |  (and more)</pre>
+  3FR   r       HDP   r/w     PPM   r/w    |  EXIF           r/w/c
+  ACR   r       HTML  r       PPT   r      |  GPS            r/w/c
+  AI    r       ICC   r/w/c   PS    r/w    |  IPTC           r/w/c
+  AIFF  r       ITC   r       PSD   r/w    |  XMP            r/w/c
+  APE   r       JNG   r/w     QTIF  r      |  MakerNotes     r/w/c
+  ARW   r       JP2   r/w     RA    r      |  Photoshop IRB  r/w/c
+  ASF   r       JPEG  r/w     RAF   r/w    |  ICC Profile    r/w/c
+  AVI   r       K25   r       RAM   r      |  MIE            r/w/c
+  BMP   r       KDC   r       RAW   r/w    |  JFIF           r/w/c
+  BTF   r       M4A   r       RIFF  r      |  Ducky APP12    r/w/c
+  CR2   r/w     MEF   r/w     RW2   r      |  PDF            r/w/c
+  CRW   r/w     MIE   r/w/c   RWZ   r      |  CIFF           r/w
+  CS1   r/w     MIFF  r       RM    r      |  AFCP           r/w
+  DCM   r       MNG   r/w     SO    r      |  JPEG 2000      r
+  DCP   r/w     MOS   r/w     SR2   r      |  DICOM          r
+  DCR   r       MOV   r       SRF   r      |  Flash          r
+  DIVX  r       MP3   r       SVG   r      |  FlashPix       r
+  DJVU  r       MP4   r       SWF   r      |  QuickTime      r
+  DLL   r       MPC   r       THM   r/w    |  GeoTIFF        r
+  DNG   r/w     MPG   r       TIFF  r/w    |  PrintIM        r
+  DOC   r       MRW   r/w     VRD   r/w/c  |  ID3            r
+  DYLIB r       NEF   r/w     WAV   r      |  Kodak Meta     r
+  EPS   r/w     OGG   r       WDP   r/w    |  Ricoh RMETA    r
+  ERF   r/w     ORF   r/w     WMA   r      |  Picture Info   r
+  EXE   r       PBM   r/w     WMV   r      |  Adobe APP14    r
+  EXIF  r/w/c   PDF   r/w     X3F   r      |  APE            r
+  FLAC  r       PEF   r/w     XLS   r      |  Vorbis         r
+  FLV   r       PGM   r/w     XMP   r/w/c  |  SPIFF          r
+  FPX   r       PICT  r       ZIP   r      |  (and more)
+  GIF   r/w     PNG   r/w</pre>
 <p>Note:  If <em>FILE</em> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are processed
 when any tag is written.  However, the <strong>-ext</strong> option may be used to force
@@ -110,20 +117,92 @@ processing of files with any extension.</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <p>Case is not significant for any command-line option (including tag and group
-names), except for single-character options if the corresponding upper case
-option is defined.  Multiple options may NOT be combined into a single
-argument, because that would be interpreted as a tag name.</p>
+names), except for single-character options when the corresponding
+upper-case option is defined.  Many single-character options have equivalent
+long-name versions (shown in brackets), and some options have inverses which
+are invoked with a leading double-dash.  Note that multiple single-character
+options may NOT be combined into one argument because this would be
+interpreted as a tag name.</p>
+<p>
+</p>
+<h2><a name="option_summary">Option Summary</a></h2>
+<pre>
+  -TAG or --TAG                     Extract or exclude specified tag
+  -TAG[+-]=[VALUE]                  Write new value for tag
+  -TAG[+-]&lt;=DATFILE                 Write tag value from contents of file
+  -TAG[+-]&lt;SRCTAG                   Copy tag value (see -tagsFromFile)</pre>
+<pre>
+  -@ ARGFILE                        Read command-line arguments from file
+  -a          (-duplicates)         Allow duplicate tag names in output
+  -b          (-binary)             Output data in binary format
+  -c FMT      (-coordFormat)        Set format for GPS coordinates
+  -d FMT      (-dateFormat)         Set format for date/time values
+  -D          (-decimal)            Show tag ID numbers in decimal
+  -e          (--composite)         Do not calculate composite tags
+  -E          (-escapeHTML)         Escape special characters for HTML
+  -ee         (-extractEmbedded)    Extract information from embedded files
+  -ext EXT    (-extension)          Process files with specified extension
+  -f          (-forcePrint)         Force printing of all specified tags
+  -F[OFFSET]  (-fixBase)            Fix the base for maker notes offsets
+  -fast                             Increase speed for slow devices
+  -g[NUM...]  (-groupHeadings)      Organize output by tag group
+  -G[NUM...]  (-groupNames)         Print group name for each tag
+  -h          (-htmlFormat)         Use HMTL formatting for output
+  -H          (-hex)                Show tag ID number in hexadecimal
+  -htmlDump[OFFSET]                 Generate HTML-format binary dump
+  -i DIR      (-ignore)             Ignore specified directory name
+  -if EXPR                          Conditionally process files
+  -k          (-pause)              Pause before terminating
+  -l          (-long)               Use long 2-line output format
+  -L          (-latin)              Use Windows Latin1 encoding
+  -list                             List all tag names
+  -listw                            List writable tag names
+  -listf                            List recognized file extensions
+  -listwf                           List writable file extensions
+  -listg[NUM]                       List groups in specified family
+  -listd                            List deletable groups
+  -m          (-ignoreMinorErrors)  Ignore minor errors
+  -n          (--printConv)         Disable print conversion
+  -o OUTFILE  (-out)                Set output file or directory name
+  -overwrite_original               Overwrite original by renaming tmp file
+  -overwrite_original_in_place      Overwrite original by copying tmp file
+  -p FMTFILE  (-printFormat)        Print output in specified format
+  -P          (-preserve)           Preserve date/time of original file
+  -q          (-quiet)              Quiet processing
+  -r          (-recurse)            Recursively process subdirectories
+  -s          (-short)              Short output format
+  -S          (-veryShort)          Very short output format
+  -scanForXMP                       Brute force XMP scan
+  -sep STR    (-separator)          Set separator string for list items
+  -t          (-tab)                Output in tab-delimited list format
+  -T          (-table)              Output in tabular format
+  -tagsFromFile SRCFILE             Copy tag values from file
+  -u          (-unknown)            Extract unknown tags
+  -U          (-unknown2)           Extract unknown binary tags too
+  -v[NUM]     (-verbose)            Print verbose messages
+  -ver                              Print version number and exit
+  -w EXT      (-textOut)            Write console output to file
+  -x TAG      (-exclude)            Exclude specified tag
+  -X          (-xmlFormat)          Use RDF/XML output format
+  -z          (-zip)                Read/write compressed information</pre>
+<pre>
+  -common_args                      Define common arguments
+  -execute                          Execute multiple commands on one line
+  -srcfile FMT                      Set different source file name</pre>
+<p>
+</p>
+<h2><a name="option_details">Option Details</a></h2>
 <dl>
 <dt><strong><a name="item__2dtag"><strong>-</strong><em>TAG</em></a></strong><br />
 </dt>
 <dd>
 Extract information for specified tag (ie. <code>-CreateDate</code>).  See
 <a href="TagNames/index.html">Image::ExifTool::TagNames</a> for documentation on
-available tag names.  A tag name may include a leading group name separated
-by a colon (ie. <code>-XMP:Creator</code>).  Any family 0 or 1 group name may be used,
-and the group name may be prefixed by a digit to specify family number (ie.
-<code>-1IPTC:Keywords</code>).  Use the <strong>-listg</strong> or <strong>-listg1</strong> option to list valid
-family 0 or 1 group names.
+available tag names.  A tag name may include leading group names separated
+by colons (ie. <code>-EXIF:CreateDate</code>, or <code>-Doc1:XMP:Creator</code>), and each group
+name may be prefixed by a digit to specify family number (ie.
+<code>-1IPTC:City</code>).  Use the <strong>-listg</strong> option to list available group names by
+family.
 </dd>
 <dd>
 <p>A special tag name of <code>All</code> may be used to indicate all meta information.
@@ -143,13 +222,13 @@ information.  Use the <strong>-s</strong> option to see the tag names instead.</
 </dt>
 <dd>
 Exclude specified tag from extracted information.  Same as the <strong>-x</strong> option.
-May also be used following a <strong>-TagsFromFile</strong> option to exclude tags from
+May also be used following a <strong>-tagsFromFile</strong> option to exclude tags from
 being copied, or to exclude groups from being deleted when deleting all
 information (ie. <code>-all= --exif:all</code> deletes all but EXIF information).
 </dd>
 <dd>
 <p>Note that this will not exclude individual tags from a group delete.
-Instead, the tags must be recovered using the <strong>-TagsFromFile</strong> option.</p>
+Instead, the tags must be recovered using the <strong>-tagsFromFile</strong> option.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2dtag_5b_2b_2d_5d_3d_5bvalue_5d"><strong>-</strong><em>TAG</em>[+-]<strong>=</strong>[<em>VALUE</em>]</a></strong><br />
@@ -163,17 +242,18 @@ and <code>-=</code> may be used to conditionally remove or replace a tag (see
 <a href="#writing_examples">WRITING EXAMPLES</a> for examples).
 </dd>
 <dd>
-<p>If a group name is not specified for <em>TAG</em>, then the information is written
-to the preferred group, which is the first group in the following list where
-<em>TAG</em> is valid:  1) EXIF, 2) IPTC, 3) XMP, 4) MakerNotes.</p>
+<p><em>TAG</em> may contain a leading family 0 or 1 group name separated by a colon.
+If no group name is specified, the information is written to the preferred
+group, which is the first group in the following list where <em>TAG</em> is valid:
+1) EXIF, 2) IPTC, 3) XMP, 4) MakerNotes.</p>
 </dd>
 <dd>
 <p>The special <code>All</code> tag may be used in this syntax only if a <em>VALUE</em> is NOT
 given.  This causes all meta information to be deleted (or all information
 in a group if <code>-GROUP:All=</code> is used).  Note that not all groups are
-deletable.  Also, within an image some groups may be contained within
-others, and these groups are removed if the super group is deleted.  Below
-are lists of these group dependencies:</p>
+deletable.  Use the <strong>-listd</strong> option for a complete list of deletable
+groups.  Also, within an image some groups may be contained within others,
+and these groups are removed if the containing group is deleted:</p>
 </dd>
 <dd>
 <pre>
@@ -208,7 +288,7 @@ entries, or to shift date/time values.
 Read command-line arguments from the specified file.  The file contains one
 argument per line (NOT one option per line -- some options require
 additional arguments which must be placed on separate lines).  Blank lines
-and lines beginning with <code>#</code> and are ignored.   Normal shell processing of
+and lines beginning with <code>#</code> and are ignored.  Normal shell processing of
 arguments is not performed, which among other things means that arguments
 should not be quoted.  <em>ARGFILE</em> may exist relative to either the current
 directory or the exiftool directory unless an absolute pathname is given.
@@ -224,27 +304,28 @@ directory or the exiftool directory unless an absolute pathname is given.
     -copyright&lt;Copyright $createdate, Phil Harvey</pre>
 </dd>
 <p></p>
-<dt><strong><a name="item__2da_2c__2d_2da"><strong>-a</strong>, <strong>--a</strong></a></strong><br />
+<dt><strong><a name="item_a"><strong>-a</strong>, <strong>--a</strong> (<strong>-duplicates</strong>, <strong>--duplicates</strong>)</a></strong><br />
 </dt>
 <dd>
-<strong>A</strong>llow (<strong>-a</strong>) or supress (<strong>--a</strong>) duplicate tag names in the output.  By
-default, duplicate tags are suppressed unless the <strong>-X</strong> option is used.
+Allow (<strong>-a</strong>) or supress (<strong>--a</strong>) duplicate tag names in the output.  By
+default, duplicate tags are suppressed unless the <strong>-X</strong> or <strong>-ee</strong> options
+are used.
 </dd>
 <p></p>
-<dt><strong><a name="item__2db"><strong>-b</strong></a></strong><br />
+<dt><strong><a name="item_b"><strong>-b</strong> (<strong>-binary</strong>)</a></strong><br />
 </dt>
 <dd>
-Output requested data in <strong>b</strong>inary format without tag names or descriptions.
+Output requested data in binary format without tag names or descriptions.
 This option is mainly used for extracting embedded images or other binary
 data, but it may also be useful for some text strings since control
 characters (such as newlines) are not replaced by '.' as they are in the
 default output.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dc_fmt"><strong>-c</strong> <em>FMT</em></a></strong><br />
+<dt><strong><a name="item_fmt"><strong>-c</strong> <em>FMT</em> (<strong>-coordFormat</strong>)</a></strong><br />
 </dt>
 <dd>
-Set the print format for GPS <strong>c</strong>oordinates.  <em>FMT</em> uses the same syntax as
+Set the print format for GPS coordinates.  <em>FMT</em> uses the same syntax as
 the <code>printf</code> format string.  The specifiers correspond to degrees, minutes
 and seconds in that order, but minutes and seconds are optional.  For
 example, the following table gives the output for the same coordinate using
@@ -259,41 +340,50 @@ various formats:
     &quot;%.6f degrees&quot;         54.989667 degrees</pre>
 </dd>
 <p></p>
-<dt><strong><a name="item__2dd_fmt"><strong>-d</strong> <em>FMT</em></a></strong><br />
+<dt><strong><strong>-d</strong> <em>FMT</em> (<strong>-dateFormat</strong>)</strong><br />
 </dt>
 <dd>
-Set the format for <strong>d</strong>ate/time tag values.  Consult <code>strftime</code> man page
-for <em>FMT</em> syntax. The default format is equivalent to ``%Y:%m:%d %H:%M:%S''.
-This option has no effect on date-only or time-only tags and ignores
-timezone information if present.  The inverse operation (ie. un-formatting a
+Set the format for date/time tag values.  Consult <code>strftime</code> man page for
+<em>FMT</em> syntax. The default format is equivalent to ``%Y:%m:%d %H:%M:%S''. This
+option has no effect on date-only or time-only tags and ignores timezone
+information if present.  The inverse operation (ie. un-formatting a
 date/time value) is currently not applied when writing a date/time tag.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dd"><strong>-D</strong></a></strong><br />
+<dt><strong><a name="item_d"><strong>-D</strong> (<strong>-decimal</strong>)</a></strong><br />
 </dt>
 <dd>
-Show tag ID number in <strong>D</strong>ecimal.
+Show tag ID number in decimal.
 </dd>
 <p></p>
-<dt><strong><a name="item__2de"><strong>-e</strong></a></strong><br />
+<dt><strong><a name="item_e"><strong>-e</strong> (<strong>--composite</strong>)</a></strong><br />
 </dt>
 <dd>
-Print <strong>e</strong>xisting tags only -- don't calculate composite tags.
+Print existing tags only -- don't calculate composite tags.
 </dd>
 <p></p>
-<dt><strong><a name="item__2de"><strong>-E</strong></a></strong><br />
+<dt><strong><a name="item_e"><strong>-E</strong> (<strong>-escapeHTML</strong>)</a></strong><br />
 </dt>
 <dd>
-<strong>E</strong>scape characters in output values for HTML.  Implied with the <strong>-h</strong>
-option.
+Escape characters in output values for HTML.  Implied with the <strong>-h</strong> option.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dext_ext_2c__2d_2dext_ext"><strong>-ext</strong> <em>EXT</em>, <strong>--ext</strong> <em>EXT</em></a></strong><br />
+<dt><strong><a name="item_ee"><strong>-ee</strong> (<strong>-extractEmbedded</strong>)</a></strong><br />
+</dt>
+<dd>
+Extract information from embedded documents in EPS and PDF files.  Implies
+the <strong>-a</strong> option.  Use <strong>-g3</strong> or <strong>-G3</strong> to identify the originating document
+for extracted information.  Embedded documents containing sub-documents are
+indicated with dashes in the family 3 group name.  (ie. <code>Doc2-3</code> is the 3rd
+sub-document of the 2nd embedded document.)
+</dd>
+<p></p>
+<dt><strong><a name="item_ext"><strong>-ext</strong> <em>EXT</em>, <strong>--ext</strong> <em>EXT</em> (<strong>-extension</strong>)</a></strong><br />
 </dt>
 <dd>
 Process only files with (<strong>-ext</strong>) or without (<strong>--ext</strong>) a specified
-extension.  There may be multiple <strong>-ext</strong> and <strong>--ext</strong> options.  Extensions may
-begin with a leading '.', and case is not significant.  For example:
+extension.  There may be multiple <strong>-ext</strong> and <strong>--ext</strong> options.  Extensions
+may begin with a leading '.', and case is not significant.  For example:
 </dd>
 <dd>
 <pre>
@@ -302,13 +392,14 @@ begin with a leading '.', and case is not significant.  For example:
     exiftool --ext . DIR              # ignore if no extension</pre>
 </dd>
 <p></p>
-<dt><strong><a name="item__2df"><strong>-f</strong></a></strong><br />
+<dt><strong><a name="item_f"><strong>-f</strong> (<strong>-forcePrint</strong>)</a></strong><br />
 </dt>
 <dd>
-<strong>F</strong>orce printing of tags even if their values are not found.
+Force printing of tags even if their values are not found.  This option only
+applies when tag names are specified.
 </dd>
 <p></p>
-<dt><strong><a name="item__2df_5boffset_5d"><strong>-F</strong>[<em>OFFSET</em>]</a></strong><br />
+<dt><strong><a name="item__2df_5boffset_5d__28_2dfixbase_29"><strong>-F</strong>[<em>OFFSET</em>] (<strong>-fixBase</strong>)</a></strong><br />
 </dt>
 <dd>
 Fix the base for maker notes offsets.  A common problem with some image
@@ -332,33 +423,37 @@ images directly from disk, but can be substantial if piping images through a
 network connection.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dg_5bnum_5d"><strong>-g</strong>[<em>NUM</em>]</a></strong><br />
+<dt><strong><a name="item__2dg_5bnum_5d_5b_3anum_2e_2e_2e_5d__28_2dgrouphead"><strong>-g</strong>[<em>NUM</em>][:<em>NUM</em>...] (<strong>-groupHeadings</strong>)</a></strong><br />
 </dt>
 <dd>
-Organize output by tag <strong>g</strong>roup.  <em>NUM</em> specifies the group family number,
-and may be 0 (general location), 1 (specific location) or 2 (category).  If
-not specified, <strong>-g0</strong> is assumed.  Use the <strong>-listg</strong> option to list all
-group names for a specified family.
+Organize output by tag group.  <em>NUM</em> specifies a group family number, and
+may be 0 (general location), 1 (specific location), 2 (category) or 3
+(document number).  Multiple families may be specified by separating them
+with colons.  By default the resulting group name is simplified by removing
+any leading <code>Main:</code> and collapsing adjacent identical group names, but this
+can avoided by placing a colon before the first family number (ie.
+<strong>-g:3:1</strong>).  If <em>NUM</em> is not specified, <strong>-g0</strong> is assumed.  Use the
+<strong>-listg</strong> option to list group names for a specified family.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dg_5bnum_5d"><strong>-G</strong>[<em>NUM</em>]</a></strong><br />
+<dt><strong><a name="item__2dg_5bnum_5d_5b_3anum_2e_2e_2e_5d__28_2dgroupname"><strong>-G</strong>[<em>NUM</em>][:<em>NUM</em>...] (<strong>-groupNames</strong>)</a></strong><br />
 </dt>
 <dd>
-Same as <strong>-g</strong> but print <strong>G</strong>roup name for each tag.
+Same as <strong>-g</strong> but print group name for each tag.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dh"><strong>-h</strong></a></strong><br />
+<dt><strong><a name="item_h"><strong>-h</strong> (<strong>-htmlFormat</strong>)</a></strong><br />
 </dt>
 <dd>
-Use <strong>H</strong>TML formatting for output.  Implies <strong>-E</strong> option.  The formatting
+Use HTML formatting for output.  Implies <strong>-E</strong> option.  The formatting
 options <strong>-D</strong>, <strong>-H</strong>, <strong>-g</strong>, <strong>-G</strong>, <strong>-l</strong> and <strong>-s</strong> may be used in
 combination with <strong>-h</strong> to influence the HTML format.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dh"><strong>-H</strong></a></strong><br />
+<dt><strong><a name="item_h"><strong>-H</strong> (<strong>-hex</strong>)</a></strong><br />
 </dt>
 <dd>
-Show tag ID number in <strong>H</strong>exadecimal.
+Show tag ID number in hexadecimal.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dhtmldump_5boffset_5d"><strong>-htmlDump</strong>[<em>OFFSET</em>]</a></strong><br />
@@ -375,10 +470,10 @@ information is dumped, but the -u option can be used to give a raw hex dump
 of other file formats.
 </dd>
 <p></p>
-<dt><strong><a name="item__2di_dir"><strong>-i</strong> <em>DIR</em></a></strong><br />
+<dt><strong><a name="item_dir"><strong>-i</strong> <em>DIR</em> (<strong>-ignore</strong>)</a></strong><br />
 </dt>
 <dd>
-<strong>I</strong>gnore specified directory name.  May be multiple <strong>-i</strong> options.
+Ignore specified directory name.  May be multiple <strong>-i</strong> options.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dif_expr"><strong>-if</strong> <em>EXPR</em></a></strong><br />
@@ -408,7 +503,7 @@ conditions must be satisfied to process the file.  Below are a few examples:
     exiftool '-exif:iso&lt;iso' -if 'not $exif:iso' dir</pre>
 </dd>
 <p></p>
-<dt><strong><a name="item__2dk"><strong>-k</strong></a></strong><br />
+<dt><strong><a name="item_k"><strong>-k</strong> (<strong>-pause</strong>)</a></strong><br />
 </dt>
 <dd>
 Pause with the message <code>-- press any key --</code> before terminating.  This
@@ -416,58 +511,60 @@ option is used to prevent the command window from closing when run as a
 Windows drag and drop application.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dl"><strong>-l</strong></a></strong><br />
+<dt><strong><a name="item_l"><strong>-l</strong> (<strong>-long</strong>)</a></strong><br />
 </dt>
 <dd>
-Use <strong>l</strong>ong 2-line Canon-style output format.  Adds a description to the XML
+Use long 2-line Canon-style output format.  Adds a description to the XML
 output when <strong>-X</strong> is used.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dl"><strong>-L</strong></a></strong><br />
+<dt><strong><a name="item_l"><strong>-L</strong> (<strong>-latin</strong>)</a></strong><br />
 </dt>
 <dd>
-Convert 16-bit Unicode characters in output to Windows <strong>L</strong>atin1 (cp1252)
-instead of the default UTF-8.  When writing, -L is used to specify that
-input text values are Latin1 instead of UTF-8.
+Convert Unicode characters in output to Windows Latin1 (cp1252) instead of
+the default UTF-8.  When writing, <strong>-L</strong> is used to specify that input text
+values are Latin1 instead of UTF-8.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dlist_2c__2dlistw_2c__2dlistf_2c__2dlistwf_2c__2"><strong>-list</strong>, <strong>-listw</strong>, <strong>-listf</strong>, <strong>-listwf</strong>, <strong>-listg</strong>[<em>NUM</em>],
 <strong>-listd</strong></a></strong><br />
 </dt>
 <dd>
-Print a <strong>list</strong> of all valid tag names (<strong>-list</strong>), all <strong>w</strong>ritable tag names
-(<strong>-listw</strong>), all recognized <strong>f</strong>ile extensions (<strong>-listf</strong>), all <strong>w</strong>ritable
-<strong>f</strong>ile extensions (<strong>-listwf</strong>), all tag <strong>g</strong>roups [in a specified family]
-(<strong>-listg</strong>[<em>NUM</em>]), or all <strong>d</strong>eletable tag groups (<strong>-listd</strong>).  The
-<strong>-list</strong> and <strong>-listw</strong> options may be followed by an additional argument of
-the form <code>-GROUP:All</code> to list all tags in a specific group.  With
-<strong>-listg</strong>, <em>NUM</em> may be given to specify the group family, otherwise family
-0 is assumed. For example:
+Print a list of all valid tag names (<strong>-list</strong>), all writable tag names
+(<strong>-listw</strong>), all recognized file extensions (<strong>-listf</strong>), all writable file
+extensions (<strong>-listwf</strong>), all tag groups [in a specified family]
+(<strong>-listg</strong>[<em>NUM</em>]), or all deletable tag groups (<strong>-listd</strong>).  The <strong>-list</strong>
+and <strong>-listw</strong> options may be followed by an additional argument of the form
+<code>-GROUP:All</code> to list all tags in a specific group, where <code>GROUP</code> is one or
+more family 0-2 group names (excepting EXIF IFD groups) separated by colons.
+With <strong>-listg</strong>, <em>NUM</em> may be given to specify the group family, otherwise
+family 0 is assumed.  For example:
 </dd>
 <dd>
 <pre>
-    -list               # list all tag names
-    -list -EXIF:All     # list all EXIF tags
-    -listw -XMP-dc:All  # list all writable XMP-dc tags
-    -listf              # list all recognized file extensions
-    -listwf             # list all writable file extensions
-    -listg1             # list all groups in family 1
-    -listd              # list all deletable groups</pre>
+    -list                # list all tag names
+    -list -EXIF:All      # list all EXIF tags
+    -list -xmp:time:all  # list all XMP tags relating to time
+    -listw -XMP-dc:All   # list all writable XMP-dc tags
+    -listf               # list all recognized file extensions
+    -listwf              # list all writable file extensions
+    -listg1              # list all groups in family 1
+    -listd               # list all deletable groups</pre>
 </dd>
 <p></p>
-<dt><strong><a name="item__2dm"><strong>-m</strong></a></strong><br />
+<dt><strong><a name="item_m"><strong>-m</strong> (<strong>-ignoreMinorErrors</strong>)</a></strong><br />
 </dt>
 <dd>
-Ignore <strong>m</strong>inor errors.  Allows writing if some minor errors occur, or
+Ignore minor errors.  Allows writing if some minor errors occur, or
 extraction of embedded images that aren't in standard JPG format.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dn"><strong>-n</strong></a></strong><br />
+<dt><strong><a name="item_n"><strong>-n</strong> (<strong>--printConv</strong>)</a></strong><br />
 </dt>
 <dd>
-Read and write values as <strong>n</strong>umbers instead of words.  This option disables
-the print conversion that is applied when extracting values to make them
-more readable, and the inverse print conversion when writing.  For example:
+Read and write values as numbers instead of words.  This option disables the
+print conversion that is applied when extracting values to make them more
+readable.  For example:
 </dd>
 <dd>
 <pre>
@@ -477,7 +574,8 @@ more readable, and the inverse print conversion when writing.  For example:
     Orientation: 6</pre>
 </dd>
 <dd>
-<p>and the following two writing commands have the same effect</p>
+<p>This option also disables the inverse print conversion when writing, so the
+following two commands have the same effect:</p>
 </dd>
 <dd>
 <pre>
@@ -485,10 +583,10 @@ more readable, and the inverse print conversion when writing.  For example:
     &gt; exiftool -Orientation=6 -n a.jpg</pre>
 </dd>
 <p></p>
-<dt><strong><a name="item__2do_outfile_or_fmt"><strong>-o</strong> <em>OUTFILE</em> or <em>FMT</em></a></strong><br />
+<dt><strong><strong>-o</strong> <em>OUTFILE</em> or <em>FMT</em> (<strong>-out</strong>)</strong><br />
 </dt>
 <dd>
-Set the <strong>o</strong>utput file or directory name when writing information.  (Without
+Set the output file or directory name when writing information.  (Without
 this option, the original file is renamed to <code>FILE_original</code> and output is
 sent to <em>FILE</em>.)  The output file name may also be specified using a <em>FMT</em>
 string in which %d, %f and %e represent the directory, file name and
@@ -525,21 +623,21 @@ temporary file.
 <dt><strong><a name="item__2doverwrite_original_in_place"><strong>-overwrite_original_in_place</strong></a></strong><br />
 </dt>
 <dd>
-Similar to the <strong>-overwrite_original</strong> option except that an extra step is
-added to allow the original file attributes to be preserved.  On a Macintosh
-for example, this preserves the original file type, creator and icon.  This
+Similar to <strong>-overwrite_original</strong> except that an extra step is added to
+allow the original file attributes to be preserved.  For example, on a Mac
+this causes the original file type, creator and icon to be preserved.  This
 is implemented by copying the contents of a temporary file over the
 original, then deleting the temporary file.  The extra step results in
 slower performance, so the <strong>-overwrite_original</strong> option should be used
 instead unless necessary.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dp_fmtfile_or_str"><strong>-p</strong> <em>FMTFILE</em> or <em>STR</em></a></strong><br />
+<dt><strong><a name="item_str"><strong>-p</strong> <em>FMTFILE</em> or <em>STR</em> (<strong>-printFormat</strong>)</a></strong><br />
 </dt>
 <dd>
-<strong>P</strong>rint output in the format specified by the given file or string (and
-ignore other format options).  Tag names in the format file or string begin
-with a <code>$</code> symbol and may contain an optional group name.  Case is not
+Print output in the format specified by the given file or string (and ignore
+other format options).  Tag names in the format file or string begin with a
+<code>$</code> symbol and may contain an optional group name.  Case is not
 significant.  Braces <code>{}</code> may be used around the tag name to separate it
 from subsequent text.  Use <code>$$</code> to represent a <code>$</code> symbol.  <code>$/</code> may be
 used for a newline.  In the file, lines beginning with <code>#</code> are ignored. For
@@ -566,33 +664,33 @@ tag is not printed.  However, if the <strong>-m</strong> option is used, minor w
 are ignored and the line is printed with an empty tag value.</p>
 </dd>
 <p></p>
-<dt><strong><a name="item__2dp"><strong>-P</strong></a></strong><br />
+<dt><strong><a name="item_p"><strong>-P</strong> (<strong>-preserve</strong>)</a></strong><br />
 </dt>
 <dd>
-<strong>P</strong>reserve date/time of original file (<code>FileModifyDate</code>) when writing.
+Preserve date/time of original file (<code>FileModifyDate</code>) when writing.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dq"><strong>-q</strong></a></strong><br />
+<dt><strong><a name="item_q"><strong>-q</strong> (<strong>-quiet</strong>)</a></strong><br />
 </dt>
 <dd>
-<strong>Q</strong>uiet processing.  One <strong>-q</strong> suppresses normal informational messages,
-and a second <strong>-q</strong> suppresses warnings as well.  Error messages can not be
+Quiet processing.  One <strong>-q</strong> suppresses normal informational messages, and a
+second <strong>-q</strong> suppresses warnings as well.  Error messages can not be
 suppressed, although minor errors may be downgraded to warnings with the
 <strong>-m</strong> option.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dr"><strong>-r</strong></a></strong><br />
+<dt><strong><a name="item_r"><strong>-r</strong> (<strong>-recurse</strong>)</a></strong><br />
 </dt>
 <dd>
-<strong>R</strong>ecursively scan subdirectories.  Only meaningful if <em>FILE</em> is a
-directory name.
+Recursively process files in subdirectories.  Only meaningful if <em>FILE</em> is
+a directory name.
 </dd>
 <p></p>
-<dt><strong><a name="item__2ds"><strong>-s</strong></a></strong><br />
+<dt><strong><a name="item_s"><strong>-s</strong> (<strong>-short</strong>)</a></strong><br />
 </dt>
 <dd>
-Print tag names instead of descriptions.  This is the <strong>s</strong>hort output
-format.  Add up to 3 <strong>-s</strong> options for even shorter formats:
+Short output format.  Prints tag names instead of descriptions.  Add up to 3
+<strong>-s</strong> options for even shorter formats:
 </dd>
 <dd>
 <pre>
@@ -604,14 +702,14 @@ format.  Add up to 3 <strong>-s</strong> options for even shorter formats:
 <p>Also effective when combined with <strong>-t</strong>, <strong>-h</strong> or <strong>-X</strong> options.</p>
 </dd>
 <p></p>
-<dt><strong><a name="item__2ds"><strong>-S</strong></a></strong><br />
+<dt><strong><a name="item_s"><strong>-S</strong> (<strong>-veryShort</strong>)</a></strong><br />
 </dt>
 <dd>
-Very <strong>s</strong>hort format.  The same as two <strong>-s</strong> options.  Extra spaces used
-to column-align values are not printed.
+Very short format.  The same as two <strong>-s</strong> options.  Extra spaces used to
+column-align values are not printed.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dscanforxmp"><strong>-ScanForXMP</strong></a></strong><br />
+<dt><strong><a name="item__2dscanforxmp"><strong>-scanForXMP</strong></a></strong><br />
 </dt>
 <dd>
 Scan all files (even unrecognized formats) for XMP information unless found
@@ -619,34 +717,38 @@ already.  When combined with the <strong>-fast</strong> option, only unrecognize
 types are scanned.  Warning: It can be time consuming to scan large files.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dsep_str"><strong>-sep</strong> <em>STR</em></a></strong><br />
+<dt><strong><strong>-sep</strong> <em>STR</em> (<strong>-separator</strong>)</strong><br />
 </dt>
 <dd>
-Specify separator for values in List-type tags.  Default is ``, ''.
+Specify separator string for items in List-type tags.  When reading, the
+default is ``, ''.  When writing, this option causes values assigned to
+list-type tags to be split into individual items at each substring matching
+specified separator.  Space characters in the separator string match zero or
+more whitespace characters.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dt"><strong>-t</strong></a></strong><br />
+<dt><strong><a name="item_t"><strong>-t</strong> (<strong>-tab</strong>)</a></strong><br />
 </dt>
 <dd>
-Output a <strong>t</strong>ab-delimited list of description/values (useful for database
+Output a tab-delimited list of description/values (useful for database
 import).  May be combined with <strong>-s</strong> to print tag names instead of
 descriptions, or <strong>-S</strong> to print tag values only, tab-delimited on a single
 line.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dt"><strong>-T</strong></a></strong><br />
+<dt><strong><a name="item_t"><strong>-T</strong> (<strong>-table</strong>)</a></strong><br />
 </dt>
 <dd>
-Output tag values in <strong>T</strong>able form.  (Equivalent to <strong>-t -S -q -f</strong>.)
+Output tag values in table form.  (Equivalent to <strong>-t -S -q -f</strong>.)
 </dd>
 <p></p>
-<dt><strong><a name="item__2dtagsfromfile_srcfile_or_fmt"><strong>-TagsFromFile</strong> <em>SRCFILE</em> or <em>FMT</em></a></strong><br />
+<dt><strong><a name="item__2dtagsfromfile_srcfile_or_fmt"><strong>-tagsFromFile</strong> <em>SRCFILE</em> or <em>FMT</em></a></strong><br />
 </dt>
 <dd>
 Copy tag values from <em>SRCFILE</em> to <em>FILE</em>.  Tag names on the command line
 after this option specify the tags to be copied, or excluded from the copy.
 If no tags are specified, then all tags from the source file are copied.
-More than one <strong>-TagsFromFile</strong> option may be used to copy tags from multiple
+More than one <strong>-tagsFromFile</strong> option may be used to copy tags from multiple
 files.
 </dd>
 <dd>
@@ -662,7 +764,7 @@ group in the destination file.</p>
 <dd>
 <p><em>SRCFILE</em> may be the same as <em>FILE</em> to move information around within a
 file.  In this case, <code>@</code> may be used to represent the source file (ie.
-<code>-TagsFromFile @</code>), permitting this feature to be used for batch processing
+<code>-tagsFromFile @</code>), permitting this feature to be used for batch processing
 multiple files (see note 3 below).  Specified tags are then copied from each
 file in turn as it is rewritten.  For advanced batch use, the source file
 name may also be specified using a <em>FMT</em> string in which %d, %f and %e
@@ -674,14 +776,14 @@ option for <em>FMT</em> string examples.</p>
 each extracted tag.  With this feature, information may be written to a tag
 with a different name or group.  This is done using
 &quot;'-<em>SRCTAG</em>&gt;<em>DSTTAG</em>'&quot; on the command line after
-<strong>-TagsFromFile</strong> (&quot;'-<em>DSTTAG</em>&lt;<em>SRCTAG</em>'&quot; also works).
+<strong>-tagsFromFile</strong> (&quot;'-<em>DSTTAG</em>&lt;<em>SRCTAG</em>'&quot; also works).
 Note that this argument must be quoted to prevent shell redirection, and
 there is no <code>=</code> sign as when assigning new values.  Both source and
 destination tags may be prefixed by a group name, and <code>All</code> or <code>*</code> may be
 used as a tag or group name.  If no destination group is specified, the
 information is written to the preferred group.  As a convenience,
-<code>-TagsFromFile @</code> is assumed for any redirected tags which are specified
-without a prior <strong>-TagsFromFile</strong> option.  Copied tags may also be added or
+<code>-tagsFromFile @</code> is assumed for any redirected tags which are specified
+without a prior <strong>-tagsFromFile</strong> option.  Copied tags may also be added or
 deleted from a list with arguments of the form
 &quot;'-<em>SRCTAG</em>+&gt;<em>DSTTAG</em>'&quot; or
 &quot;'-<em>SRCTAG</em>-&gt;<em>DSTTAG</em>'&quot;.</p>
@@ -698,7 +800,7 @@ single space at the start of the string is removed if it exists, but all
 other whitespace is preserved.</p>
 </dd>
 <dd>
-<p>See <a href="#copying_examples">COPYING EXAMPLES</a> for examples using <strong>-TagsFromFile</strong>.</p>
+<p>See <a href="#copying_examples">COPYING EXAMPLES</a> for examples using <strong>-tagsFromFile</strong>.</p>
 </dd>
 <dd>
 <p>Notes:</p>
@@ -744,24 +846,24 @@ is provided to allow multiple items to be copied to the same list.  Other
 than this difference, <strong>-addTagsFromFile</strong> is equivalent to <strong>-tagsFromFile</strong>.</p>
 </dd>
 <p></p>
-<dt><strong><a name="item__2du"><strong>-u</strong></a></strong><br />
+<dt><strong><a name="item_u"><strong>-u</strong> (<strong>-unknown</strong>)</a></strong><br />
 </dt>
 <dd>
-Extract values of <strong>u</strong>nknown tags.  Add another <strong>-u</strong> to also extract
-unknown information from binary data blocks.
+Extract values of unknown tags.  Add another <strong>-u</strong> to also extract unknown
+information from binary data blocks.
 </dd>
 <p></p>
-<dt><strong><a name="item__2du"><strong>-U</strong></a></strong><br />
+<dt><strong><a name="item_u"><strong>-U</strong> (<strong>-unknown2</strong>)</a></strong><br />
 </dt>
 <dd>
-Extract values of <strong>u</strong>nknown tags as well as unknown information from binary
+Extract values of unknown tags as well as unknown information from binary
 data blocks.  This is the same as two <strong>-u</strong> options.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dv_5bnum_5d"><strong>-v</strong>[<em>NUM</em>]</a></strong><br />
+<dt><strong><a name="item__2dv_5bnum_5d__28_2dverbose_29"><strong>-v</strong>[<em>NUM</em>] (<strong>-verbose</strong>)</a></strong><br />
 </dt>
 <dd>
-Print <strong>v</strong>erbose messages.  <em>NUM</em> specifies the level of verbosity in the
+Print verbose messages.  <em>NUM</em> specifies the level of verbosity in the
 range 0-5, with higher numbers being more verbose.  If <em>NUM</em> is not given,
 then each <strong>-v</strong> option increases the level of verbosity by 1.  This option
 suppresses normal console output unless specific tags are being extracted.
@@ -775,10 +877,10 @@ suppresses normal console output unless specific tags are being extracted.
 Print version number and exit.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dw_ext_or_fmt"><strong>-w</strong> <em>EXT</em> or <em>FMT</em></a></strong><br />
+<dt><strong><strong>-w</strong> <em>EXT</em> or <em>FMT</em> (<strong>-textOut</strong>)</strong><br />
 </dt>
 <dd>
-<strong>W</strong>rite console output to a file with name ending in <em>EXT</em> for each source
+Write console output to a file with name ending in <em>EXT</em> for each source
 file.  The output file name is obtained by replacing the source file
 extension (including the '.') with the specified extension (and a '.' is
 added to the start of <em>EXT</em> if it didn't contain one).  Alternatively, a
@@ -847,22 +949,22 @@ modify the copy number (%c), the numbers are changed to an alphabetical base
 natural numbers starting from 1, instead of 0 (see example F).</p>
 </dd>
 <dd>
-<p>This same <em>FMT</em> syntax is used with the <strong>-o</strong> and <strong>-TagsFromFile</strong> options,
+<p>This same <em>FMT</em> syntax is used with the <strong>-o</strong> and <strong>-tagsFromFile</strong> options,
 although %c is only valid for output file names.</p>
 </dd>
 <p></p>
-<dt><strong><a name="item__2dx_tag"><strong>-x</strong> <em>TAG</em></a></strong><br />
+<dt><strong><a name="item_tag"><strong>-x</strong> <em>TAG</em> (<strong>-exclude</strong>)</a></strong><br />
 </dt>
 <dd>
-E<strong>x</strong>clude the specified tag.  There may be multiple <strong>-x</strong> options.  This
-has the same effect as --<em>TAG</em> on the command line.  May also be used
-following a <strong>-TagsFromFile</strong> option to exclude tags from being copied.
+Exclude the specified tag.  There may be multiple <strong>-x</strong> options.  This has
+the same effect as --<em>TAG</em> on the command line.  May also be used following
+a <strong>-tagsFromFile</strong> option to exclude tags from being copied.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dx"><strong>-X</strong></a></strong><br />
+<dt><strong><a name="item_x"><strong>-X</strong> (<strong>-xmlFormat</strong>)</a></strong><br />
 </dt>
 <dd>
-Use RDF/<strong>X</strong>ML formatting for console output.  Implies the <strong>-a</strong> option so
+Use RDF/XML formatting for console output.  Implies the <strong>-a</strong> option so
 duplicate tags are extracted.  The formatting options <strong>-D</strong>, <strong>-H</strong>, <strong>-l</strong>
 and <strong>-s</strong> may be used in combination with <strong>-X</strong> to affect the output, but
 note that tag ID's (<strong>-D</strong> and <strong>-H</strong> options) may not be added to the short
@@ -873,10 +975,10 @@ a single string when <strong>-sep</strong> or <strong>-s</strong> is used.  Usin
 encoding from ``UTF-8'' to ``windows-1252''.
 </dd>
 <p></p>
-<dt><strong><a name="item__2dz"><strong>-z</strong></a></strong><br />
+<dt><strong><a name="item_z"><strong>-z</strong> (<strong>-zip</strong>)</a></strong><br />
 </dt>
 <dd>
-When reading, causes information to be extracted from .g<strong>z</strong> and .b<strong>z</strong>2
+When reading, causes information to be extracted from .gz and .bz2
 compressed images.  (Only one image per archive.)  When writing, causes
 compressed information to be written if supported by the image format.  (ie.
 The PNG format supports compressed text.)
@@ -884,7 +986,7 @@ The PNG format supports compressed text.)
 <p></p></dl>
 <p>
 </p>
-<h2><a name="advanced_options">Advanced Options</a></h2>
+<h3><a name="advanced_options">Advanced Options</a></h3>
 <p>The following options allow complex processing to be performed with a single
 command without the need for additional scripting.  This may be particularly
 useful for implementations such as Windows drag-and-drop applications.
@@ -995,10 +1097,16 @@ directory, adding <code>_JFR.JPG</code> for the name of the output JPG files.
 Print formatted date/time for all JPG files in a directory.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2difd1_3axresolution__2difd1_3ayresoluti">exiftool -IFD1:XResolution -IFD1:YResolution</a></strong><br />
+<dt><strong><a name="item_exiftool__2difd1_3axresolution__2difd1_3ayresoluti">exiftool -IFD1:XResolution -IFD1:YResolution image.jpg</a></strong><br />
 </dt>
 <dd>
 Extract image resolution from EXIF IFD1 information (thumbnail image IFD).
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dxmp_3aauthor_3aall__2da_image_2ejpg">exiftool -xmp:author:all -a image.jpg</a></strong><br />
+</dt>
+<dd>
+Extract all author-related XMP information from an image.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dxmp__2db_a_2ejpg__3e_out_2exmp">exiftool -xmp -b a.jpg &gt; out.xmp</a></strong><br />
@@ -1184,7 +1292,7 @@ Write ICC_Profile to an image from a <code>.icc</code> file of the same name.
 <h1><a name="copying_examples">COPYING EXAMPLES</a></h1>
 <p>These examples demonstrate the ability to copy tag values between files.</p>
 <dl>
-<dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ecrw_dst_2ejpg">exiftool -TagsFromFile src.crw dst.jpg</a></strong><br />
+<dt><strong><a name="item_exiftool__2dtagsfromfile_src_2ecrw_dst_2ejpg">exiftool -tagsFromFile src.crw dst.jpg</a></strong><br />
 </dt>
 <dd>
 Copy the values of all writable tags from <code>src.crw</code> to <code>dst.jpg</code>, writing
@@ -1205,7 +1313,7 @@ Erase all meta information from <code>dst.jpg</code> image, then copy EXIF tags 
 <code>src.jpg</code>.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg_out_2exmp">exiftool -tagsfromfile a.jpg out.xmp</a></strong><br />
+<dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg_out_2exmp">exiftool -Tagsfromfile a.jpg out.xmp</a></strong><br />
 </dt>
 <dd>
 Copy meta information <code>a.jpg</code> to an XMP data file.  If the XMP data file
@@ -1452,7 +1560,7 @@ Macintosh filesystems.</p>
 </p>
 <hr />
 <h1><a name="author">AUTHOR</a></h1>
-<p>Copyright 2003-2008, Phil Harvey</p>
+<p>Copyright 2003-2009, Phil Harvey</p>
 <p>This is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.</p>
 <p>

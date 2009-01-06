@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ParseAnt($);
 sub ProcessAnt($$$);
@@ -321,10 +321,7 @@ sub ProcessBZZ($$$)
     if ($verbose >= 3) {
         # dump the decoded data in very verbose mode
         $exifTool->VerboseDir("Decoded $$dirInfo{DirName}", 0, length $buff);
-        Image::ExifTool::HexDump(\$buff, undef,
-            MaxLen => $verbose < 4 ? 96 : undef,
-            Prefix => $exifTool->{INDENT},
-        );
+        $exifTool->VerboseDump(\$buff);
     }
     $$dirInfo{DataPt} = \$buff;
     $$dirInfo{DataLen} = $$dirInfo{DirLen} = length $buff;
@@ -353,7 +350,7 @@ Image::ExifTool::AIFF.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

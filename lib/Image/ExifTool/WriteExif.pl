@@ -1010,9 +1010,9 @@ sub GetCFAPattern($)
 sub CheckExif($$$)
 {
     my ($exifTool, $tagInfo, $valPtr) = @_;
-    my $format = $$tagInfo{Format} || $$tagInfo{Writable} || $tagInfo->{Table}->{WRITABLE};
+    my $format = $$tagInfo{Format} || $$tagInfo{Writable} || $tagInfo->{Table}{WRITABLE};
     if (not $format or $format eq '1') {
-        if ($tagInfo->{Groups}->{0} eq 'MakerNotes') {
+        if ($tagInfo->{Groups}{0} eq 'MakerNotes') {
             return undef;   # OK to have no format for makernotes
         } else {
             return 'No writable format';
@@ -1122,7 +1122,7 @@ sub RebuildMakerNotes($$$)
             # add the dummy/empty preview image if necessary
             if ($newTool->{PREVIEW_INFO}) {
                 $makerFixup->SetMarkerPointers(\$rtnValue, 'PreviewImage', length($rtnValue));
-                $rtnValue .= $newTool->{PREVIEW_INFO}->{Data};
+                $rtnValue .= $newTool->{PREVIEW_INFO}{Data};
                 delete $newTool->{PREVIEW_INFO};
             }
             # add makernote header
@@ -1230,8 +1230,8 @@ sub ExifErr($$$)
 {
     my ($exifTool, $errStr, $tagTablePtr) = @_;
     # MakerNote errors are minor by default
-    my $minor = ($tagTablePtr->{GROUPS}->{0} eq 'MakerNotes');
-    if ($tagTablePtr->{VARS} and $tagTablePtr->{VARS}->{MINOR_ERRORS}) {
+    my $minor = ($tagTablePtr->{GROUPS}{0} eq 'MakerNotes');
+    if ($tagTablePtr->{VARS} and $tagTablePtr->{VARS}{MINOR_ERRORS}) {
         $exifTool->Warn("$errStr. IFD dropped.") and return '' if $minor;
         $minor = 1;
     }
@@ -1252,7 +1252,7 @@ sub ProcessTiffIFD($$$)
     my $raf = $$dirInfo{RAF};
     my $base = $$dirInfo{Base} || 0;
     my $dirName = $$dirInfo{DirName};
-    my $magic = $dirInfo->{Subdir}->{Magic} || 0x002a;
+    my $magic = $dirInfo->{Subdir}{Magic} || 0x002a;
     my $buff;
 
     # structured with a TIFF-like header and relative offsets
@@ -1290,7 +1290,7 @@ sub ProcessTiffIFD($$$)
         return GetByteOrder() . Set16u($magic) . Set32u(8) . $newDir;
     }
     if ($exifTool->{HTML_DUMP}) {
-        my $tip = sprintf('Byte order: %s endian\\nIdentifier: 0x%.4x\\n%s offset: 0x%.4x',
+        my $tip = sprintf("Byte order: %s endian\nIdentifier: 0x%.4x\n%s offset: 0x%.4x",
                           (GetByteOrder() eq 'II') ? 'Little' : 'Big', $magic, $dirName, $offset);
         $exifTool->HtmlDump($base, 8, "$dirName header", $tip, 0);
     }
@@ -1338,7 +1338,7 @@ sub WriteExif($$$)
 
     # allow multiple IFD's in IFD0-IFD1-IFD2... chain
     $$dirInfo{Multi} = 1 if $dirName =~ /^(IFD0|SubIFD)$/ and not defined $$dirInfo{Multi};
-    $inMakerNotes = 1 if $tagTablePtr->{GROUPS}->{0} eq 'MakerNotes';
+    $inMakerNotes = 1 if $tagTablePtr->{GROUPS}{0} eq 'MakerNotes';
     my $ifd;
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # loop through each IFD
@@ -1347,7 +1347,7 @@ sub WriteExif($$$)
 
         # loop through new values and accumulate all information for this IFD
         my (%set, $tagInfo);
-        my $tableGroup = $tagTablePtr->{GROUPS}->{0};
+        my $tableGroup = $tagTablePtr->{GROUPS}{0};
         my $wrongDir = $crossDelete{$dirName};
         foreach $tagInfo ($exifTool->GetNewTagInfoList($tagTablePtr)) {
             my $tagID = $$tagInfo{TagID};
@@ -1377,16 +1377,16 @@ sub WriteExif($$$)
                     next;
                 }
             }
-            my $newValueHash = $exifTool->GetNewValueHash($tagInfo, $dirName);
-            unless ($newValueHash) {
+            my $nvHash = $exifTool->GetNewValueHash($tagInfo, $dirName);
+            unless ($nvHash) {
                 next unless $wrongDir;
                 # delete stuff from the wrong directory if setting somewhere else
-                $newValueHash = $exifTool->GetNewValueHash($tagInfo, $wrongDir);
-                next unless Image::ExifTool::IsOverwriting($newValueHash);
+                $nvHash = $exifTool->GetNewValueHash($tagInfo, $wrongDir);
+                next unless Image::ExifTool::IsOverwriting($nvHash);
                 # don't cross delete if specifically deleting from the other directory
-                my $val = Image::ExifTool::GetNewValues($newValueHash);
-                next if not defined $val and $newValueHash->{WantGroup} and
-                        lc($newValueHash->{WantGroup}) eq lc($wrongDir);
+                my $val = Image::ExifTool::GetNewValues($nvHash);
+                next if not defined $val and $nvHash->{WantGroup} and
+                        lc($nvHash->{WantGroup}) eq lc($wrongDir);
                 # remove this tag if found in this IFD
                 $xDelete{$tagID} = 1;
             }
@@ -1605,7 +1605,7 @@ Entry:  for (;;) {
                         }
                         # convert offset to pointer in $$dataPt
                         if ($$dirInfo{EntryBased} or (ref $$tagTablePtr{$oldID} eq 'HASH' and
-                            $tagTablePtr->{$oldID}->{EntryBased}))
+                            $tagTablePtr->{$oldID}{EntryBased}))
                         {
                             $valuePtr += $entry;
                         } else {
@@ -1631,7 +1631,7 @@ Entry:  for (;;) {
                                 }
                             }
                             # copy huge data blocks later instead of loading into memory
-                            if ($oldSize > BINARY_DATA_LIMIT and $_[1]->{ImageData} and
+                            if ($oldSize > BINARY_DATA_LIMIT and $_[1]{ImageData} and
                                 (not $oldInfo or not $$oldInfo{SubDirectory}))
                             {
                                 $oldValue = ''; # dummy empty value
@@ -1642,7 +1642,7 @@ Entry:  for (;;) {
                                     # offset to write proper offset/size later)
                                     push @imageData, [$base+$valuePtr+$dataPos, $oldSize, $pad,
                                                       $newStart + length($dirBuff) + 2];
-                                    $_[1]->{ImageData} = \@imageData;
+                                    $_[1]{ImageData} = \@imageData;
                                 }
                             } elsif ($raf) {
                                 my $success = ($raf->Seek($base+$valuePtr+$dataPos, 0) and
@@ -1758,12 +1758,12 @@ DropTag:                    ++$index;
                     $newInfo = $set{$newID};
                     $newCount = $$newInfo{Count};
                     my ($val, $newVal, $n);
-                    my $newValueHash = $exifTool->GetNewValueHash($newInfo, $dirName);
+                    my $nvHash = $exifTool->GetNewValueHash($newInfo, $dirName);
                     if ($isNew > 0) {
                         # don't create new entry unless requested
-                        if ($newValueHash) {
-                            next unless Image::ExifTool::IsCreating($newValueHash);
-                            $isOverwriting = Image::ExifTool::IsOverwriting($newValueHash);
+                        if ($nvHash) {
+                            next unless Image::ExifTool::IsCreating($nvHash);
+                            $isOverwriting = Image::ExifTool::IsOverwriting($nvHash);
                         } else {
                             next if $xDelete{$newID};       # don't create if cross deleting
                             $newVal = $$mandatory{$newID};  # get value for mandatory tag
@@ -1782,9 +1782,9 @@ DropTag:                    ++$index;
                             }
                         }
                         $newFormat = $formatNumber{$newFormName};
-                    } elsif ($newValueHash or $xDelete{$newID}) {
-                        unless ($newValueHash) {
-                            $newValueHash = $exifTool->GetNewValueHash($newInfo, $wrongDir);
+                    } elsif ($nvHash or $xDelete{$newID}) {
+                        unless ($nvHash) {
+                            $nvHash = $exifTool->GetNewValueHash($newInfo, $wrongDir);
                         }
                         # read value
                         $val = ReadValue(\$oldValue, 0, $readFormName, $readCount, $oldSize);
@@ -1799,35 +1799,34 @@ DropTag:                    ++$index;
                             # keep same size in maker notes unless string or binary
                             $newCount = $oldCount * $formatSize[$oldFormat] / $formatSize[$newFormat];
                         }
-                        $isOverwriting = Image::ExifTool::IsOverwriting($newValueHash, $val);
+                        $isOverwriting = Image::ExifTool::IsOverwriting($nvHash, $val);
                     }
                     if ($isOverwriting) {
-                        $newVal = Image::ExifTool::GetNewValues($newValueHash) unless defined $newVal;
+                        $newVal = Image::ExifTool::GetNewValues($nvHash) unless defined $newVal;
                         # value undefined if deleting this tag
                         # (also delete tag if cross-deleting and this isn't a date/time shift)
-                        if (not defined $newVal or ($xDelete{$newID} and not defined $$newValueHash{Shift})) {
-                            if ($$newInfo{RawConvInv} and defined $$newValueHash{Value}) {
+                        if (not defined $newVal or ($xDelete{$newID} and not defined $$nvHash{Shift})) {
+                            if ($$newInfo{RawConvInv} and defined $$nvHash{Value}) {
                                 goto NoOverwrite;   # error in RawConvInv, so rewrite existing tag
                             }
                             unless ($isNew) {
                                 ++$exifTool->{CHANGED};
-                                $val = $exifTool->Printable($val);
-                                $verbose > 1 and print $out "    - $dirName:$$newInfo{Name} = '$val'\n";
+                                $exifTool->VerboseValue("- $dirName:$$newInfo{Name}", $val);
                             }
                             next;
                         }
-                        if (length $newVal) {
-                            if ($newCount and $newCount < 0) {
-                                # set count to number of values if variable
-                                my @vals = split ' ',$newVal;
-                                $newCount = @vals;
-                            }
-                            # convert to binary format
-                            $newValue = WriteValue($newVal, $newFormName, $newCount);
-                            unless (defined $newValue) {
-                                $exifTool->Warn("Error writing $dirName:$$newInfo{Name}");
-                                goto NoOverwrite;
-                            }
+                        if ($newCount and $newCount < 0) {
+                            # set count to number of values if variable
+                            my @vals = split ' ',$newVal;
+                            $newCount = @vals;
+                        }
+                        # convert to binary format
+                        $newValue = WriteValue($newVal, $newFormName, $newCount);
+                        unless (defined $newValue) {
+                            $exifTool->Warn("Error writing $dirName:$$newInfo{Name}");
+                            goto NoOverwrite;
+                        }
+                        if (length $newValue) {
                             # limit maximum value length in JPEG images
                             # (max segment size is 65533 bytes and the min EXIF size is 96 incl an additional IFD entry)
                             if ($$exifTool{FILE_TYPE} eq 'JPEG' and length($newValue) > 65436) {
@@ -1836,23 +1835,21 @@ DropTag:                    ++$index;
                                 goto NoOverwrite;
                             }
                         } else {
-                            $exifTool->Warn("Can't write zero length $$newInfo{Name} in $tagTablePtr->{GROUPS}->{1}");
+                            $exifTool->Warn("Can't write zero length $$newInfo{Name} in $tagTablePtr->{GROUPS}{1}");
                             goto NoOverwrite;
                         }
                         if ($isNew >= 0) {
                             $newCount = length($newValue) / $formatSize[$newFormat];
                             ++$exifTool->{CHANGED};
                             # not all mandatory if we are writing any tag specifically
-                            if ($newValueHash and defined $allMandatory) {
+                            if ($nvHash and defined $allMandatory) {
                                 undef $allMandatory;
                                 undef $deleteAll;
                             }
                             if ($verbose > 1) {
-                                $val = $exifTool->Printable($val);
-                                $newVal = $exifTool->Printable($newVal);
-                                print $out "    - $dirName:$$newInfo{Name} = '$val'\n" unless $isNew;
-                                my $str = $newValueHash ? '' : ' (mandatory)';
-                                print $out "    + $dirName:$$newInfo{Name} = '$newVal'$str\n";
+                                $exifTool->VerboseValue("- $dirName:$$newInfo{Name}", $val) unless $isNew;
+                                my $str = $nvHash ? '' : ' (mandatory)';
+                                $exifTool->VerboseValue("+ $dirName:$$newInfo{Name}", $newVal, $str);
                             }
                         }
                     } else {
@@ -1874,8 +1871,8 @@ NoOverwrite:            next if $isNew > 0;
                     # or a SubIFD
                     next if $$newInfo{MakerNotes} or $$newInfo{Name} eq 'SubIFD';
                     my $subTable;
-                    if ($newInfo->{SubDirectory}->{TagTable}) {
-                        $subTable = GetTagTable($newInfo->{SubDirectory}->{TagTable});
+                    if ($newInfo->{SubDirectory}{TagTable}) {
+                        $subTable = GetTagTable($newInfo->{SubDirectory}{TagTable});
                     } else {
                         $subTable = $tagTablePtr;
                     }
@@ -1884,7 +1881,7 @@ NoOverwrite:            next if $isNew > 0;
                         Parent => $dirName,
                         Fixup => new Image::ExifTool::Fixup,
                     );
-                    $sourceDir{DirName} = $newInfo->{Groups}->{1} if $$newInfo{SubIFD};
+                    $sourceDir{DirName} = $newInfo->{Groups}{1} if $$newInfo{SubIFD};
                     $newValue = $exifTool->WriteDirectory(\%sourceDir, $subTable);
                     # only add new directory if it isn't empty
                     next unless defined $newValue and length($newValue);
@@ -1904,7 +1901,7 @@ NoOverwrite:            next if $isNew > 0;
                         $newFormat = $formatNumber{$newFormName};
                     } else {
                         # subdirectory goes directly into value buffer
-                        $sourceDir{Fixup}->{Start} += length($valBuff);
+                        $sourceDir{Fixup}{Start} += length($valBuff);
                         # use Writable to set format, otherwise 'undef'
                         $newFormName = $$newInfo{Writable};
                         unless ($newFormName and $formatNumber{$newFormName}) {
@@ -1960,8 +1957,8 @@ NoOverwrite:            next if $isNew > 0;
 #
                 if ($$newInfo{MakerNotes}) {
                     # don't write new makernotes if we are deleting this group
-                    if ($exifTool->{DEL_GROUP}->{MakerNotes} and
-                        ($exifTool->{DEL_GROUP}->{MakerNotes} != 2 or $isNew <= 0))
+                    if ($exifTool->{DEL_GROUP}{MakerNotes} and
+                        ($exifTool->{DEL_GROUP}{MakerNotes} != 2 or $isNew <= 0))
                     {
                         if ($isNew <= 0) {
                             ++$exifTool->{CHANGED};
@@ -1973,10 +1970,10 @@ NoOverwrite:            next if $isNew > 0;
                     if ($isNew >= 0 and $set{$newID}) {
                         # we are writing a whole new maker note block
                         # --> add fixup information if necessary
-                        my $newValueHash = $exifTool->GetNewValueHash($newInfo, $dirName);
-                        if ($newValueHash and $newValueHash->{MAKER_NOTE_FIXUP}) {
+                        my $nvHash = $exifTool->GetNewValueHash($newInfo, $dirName);
+                        if ($nvHash and $nvHash->{MAKER_NOTE_FIXUP}) {
                             # must clone fixup because we will be shifting it
-                            my $makerFixup = $newValueHash->{MAKER_NOTE_FIXUP}->Clone();
+                            my $makerFixup = $nvHash->{MAKER_NOTE_FIXUP}->Clone();
                             my $valLen = length($valBuff);
                             $makerFixup->{Start} += $valLen;
                             push @valFixups, $makerFixup;
@@ -2006,7 +2003,7 @@ NoOverwrite:            next if $isNew > 0;
                         # get the proper tag table for these maker notes
                         my $subTable;
                         if ($oldInfo and $oldInfo->{SubDirectory}) {
-                            $subTable = $oldInfo->{SubDirectory}->{TagTable};
+                            $subTable = $oldInfo->{SubDirectory}{TagTable};
                             $subTable and $subTable = Image::ExifTool::GetTagTable($subTable);
                         } else {
                             $exifTool->Warn('Internal problem getting maker notes tag table');
@@ -2058,7 +2055,7 @@ NoOverwrite:            next if $isNew > 0;
                                 if ($previewInfo) {
                                     # remove all but PreviewImage fixup (since others shouldn't change)
                                     foreach (keys %{$makerFixup->{Pointers}}) {
-                                        /_PreviewImage$/ or delete $makerFixup->{Pointers}->{$_};
+                                        /_PreviewImage$/ or delete $makerFixup->{Pointers}{$_};
                                     }
                                     # zero pointer so we can see how it gets shifted later
                                     $makerFixup->SetMarkerPointers(\$newValue, 'PreviewImage', 0);
@@ -2115,9 +2112,9 @@ NoOverwrite:            next if $isNew > 0;
                             $subTable = GetTagTable($$subdir{TagTable});
                         }
                         # determine directory name for this IFD
-                        my $subdirName = $newInfo->{Groups}->{1} || $$newInfo{Name};
+                        my $subdirName = $newInfo->{Groups}{1} || $$newInfo{Name};
                         # all makernotes directory names must be 'MakerNotes'
-                        $subdirName = 'MakerNotes' if $subTable->{GROUPS}->{0} eq 'MakerNotes';
+                        $subdirName = 'MakerNotes' if $subTable->{GROUPS}{0} eq 'MakerNotes';
                         # must handle sub-IFD's specially since the values
                         # are actually offsets to subdirectories
                         unless ($readCount) {   # can't have zero count
@@ -2160,7 +2157,7 @@ NoOverwrite:            next if $isNew > 0;
                                     $subdirInfo{DataLen} = 0;
                                 } else {
                                     my @err = ("Can't read $subdirName data", $inMakerNotes);
-                                    if ($$subTable{VARS} and $subTable->{VARS}->{MINOR_ERRORS}) {
+                                    if ($$subTable{VARS} and $subTable->{VARS}{MINOR_ERRORS}) {
                                         $exifTool->Warn($err[0] . '. Ignored.');
                                     } elsif ($exifTool->Error(@err)) {
                                         return undef;
@@ -2199,8 +2196,8 @@ NoOverwrite:            next if $isNew > 0;
                         # must change location of subdir offset if we deleted
                         # a directory and only one remains
                         if ($writeCount < $readCount and $writeCount == 1) {
-                            $subdirs[-1]->{Where} = 'dirBuff';
-                            $subdirs[-1]->{Offset} = length($dirBuff) + 8;
+                            $subdirs[-1]{Where} = 'dirBuff';
+                            $subdirs[-1]{Offset} = length($dirBuff) + 8;
                         }
                         # set new format to int32u for IFD
                         $newFormName = $$newInfo{FixFormat} || 'int32u';
@@ -2277,11 +2274,11 @@ NoOverwrite:            next if $isNew > 0;
                     if ($dataTag eq 'CanonVRD') {
                         # must decide now if we will write CanonVRD information
                         my $hasVRD;
-                        if ($exifTool->{NEW_VALUE}->{$Image::ExifTool::Extra{CanonVRD}}) {
+                        if ($exifTool->{NEW_VALUE}{$Image::ExifTool::Extra{CanonVRD}}) {
                             # adding or deleting as a block
                             $hasVRD = $exifTool->GetNewValues('CanonVRD') ? 1 : 0;
-                        } elsif ($exifTool->{DEL_GROUP}->{CanonVRD} or
-                                 $exifTool->{DEL_GROUP}->{Trailer})
+                        } elsif ($exifTool->{DEL_GROUP}{CanonVRD} or
+                                 $exifTool->{DEL_GROUP}{Trailer})
                         {
                             $hasVRD = 0;    # deleting as a group
                         } else {
@@ -2301,7 +2298,7 @@ NoOverwrite:            next if $isNew > 0;
                         #   invalidated anyway by our edits
                         my $odd;
                         my $oddInfo = $Image::ExifTool::Composite{OriginalDecisionData};
-                        if ($oddInfo and $exifTool->{NEW_VALUE}->{$oddInfo}) {
+                        if ($oddInfo and $exifTool->{NEW_VALUE}{$oddInfo}) {
                             $odd = $exifTool->GetNewValues($dataTag);
                             if ($verbose > 1) {
                                 print $out "    - $dirName:$dataTag\n" if $$newValuePt ne "\0\0\0\0";
@@ -2360,9 +2357,12 @@ NoOverwrite:            next if $isNew > 0;
 
                 } elsif ($$newInfo{DataMember}) {
 
-                    # save any necessary data members (Make, Model)
-                    # (note that this will not trim null from string values, etc)
-                    $exifTool->{$$newInfo{DataMember}} = $$newValuePt;
+                    my ($m, $w) = @$newInfo{'DataMember','Writable'};
+                    # save any necessary data members (Make, Model, etc)
+                    # Note that this will not trim null from string values, etc...
+                    $$exifTool{$m} = $$newValuePt;
+                    # ...so explicitly terminate string values at null
+                    $$exifTool{$m} =~ s/\0.*//s if $w and $w eq 'string';
                 }
             }
 #
@@ -2392,12 +2392,12 @@ NoOverwrite:            next if $isNew > 0;
                     if ($dataTag eq 'PreviewImage' and $exifTool->{FILE_TYPE} eq 'JPEG') {
                         # hold onto the PreviewImage until we can determine if it fits
                         $exifTool->{PREVIEW_INFO} or $exifTool->{PREVIEW_INFO} = { };
-                        $exifTool->{PREVIEW_INFO}->{Data} = $$newValuePt;
+                        $exifTool->{PREVIEW_INFO}{Data} = $$newValuePt;
                         if ($$newInfo{Name} eq 'PreviewImage') {
-                            $exifTool->{PREVIEW_INFO}->{IsValue} = 1;
+                            $exifTool->{PREVIEW_INFO}{IsValue} = 1;
                         }
                         if ($$newInfo{IsOffset} and $$newInfo{IsOffset} eq '2') {
-                            $exifTool->{PREVIEW_INFO}->{NoBaseShift} = 1;
+                            $exifTool->{PREVIEW_INFO}{NoBaseShift} = 1;
                         }
                         $$newValuePt = '';
                     }
@@ -2448,7 +2448,7 @@ NoOverwrite:            next if $isNew > 0;
         }
         my $isNextIFD = ($$dirInfo{Multi} and ($nextIfdOffset or
                         # account for the case where we will create the next IFD
-                        ($dirName eq 'IFD0' and $exifTool->{ADD_DIRS}->{'IFD1'})));
+                        ($dirName eq 'IFD0' and $exifTool->{ADD_DIRS}{'IFD1'})));
         # calculate number of entries in new directory
         my $newEntries = length($dirBuff) / 12;
         # delete entire directory if we deleted a tag and only mandatory tags remain or we
@@ -2548,11 +2548,11 @@ NoOverwrite:            next if $isNew > 0;
 
         # guard against writing the same directory twice
         my $addr = $nextIfdOffset + $base;
-        if ($exifTool->{PROCESSED}->{$addr}) {
-            $exifTool->Error("$dirName pointer references previous $exifTool->{PROCESSED}->{$addr} directory", 1);
+        if ($exifTool->{PROCESSED}{$addr}) {
+            $exifTool->Error("$dirName pointer references previous $exifTool->{PROCESSED}{$addr} directory", 1);
             last;
         }
-        $exifTool->{PROCESSED}->{$addr} = $dirName;
+        $exifTool->{PROCESSED}{$addr} = $dirName;
 
         if ($dirName eq 'SubIFD1' and not ValidateIFD($dirInfo, $dirStart)) {
             if ($exifTool->{TIFF_TYPE} eq 'TIFF') {
@@ -2562,13 +2562,13 @@ NoOverwrite:            next if $isNew > 0;
             }
             last;   # don't write bad IFD
         }
-        if ($exifTool->{DEL_GROUP}->{$dirName}) {
+        if ($exifTool->{DEL_GROUP}{$dirName}) {
             $verbose and print $out "  Deleting $dirName\n";
             $raf and $exifTool->Error("Deleting $dirName also deletes subsequent" .
                                       " IFD's and possibly image data", 1);
             ++$exifTool->{CHANGED};
-            if ($exifTool->{DEL_GROUP}->{$dirName} == 2 and
-                $exifTool->{ADD_DIRS}->{$dirName})
+            if ($exifTool->{DEL_GROUP}{$dirName} == 2 and
+                $exifTool->{ADD_DIRS}{$dirName})
             {
                 my $emptyIFD = "\0" x 2;    # start with empty IFD
                 $dataPt = \$emptyIFD;
@@ -2619,13 +2619,13 @@ NoOverwrite:            next if $isNew > 0;
                 # loop through all tags in reverse order so we save thumbnail
                 # data before main image data if both exist in the same IFD
                 foreach $tagID (reverse sort keys %$offsetInfo) {
-                    my $tagInfo = $offsetInfo->{$tagID}->[0];
+                    my $tagInfo = $offsetInfo->{$tagID}[0];
                     next unless $$tagInfo{IsOffset}; # handle byte counts with offsets
                     my $sizeInfo = $offsetInfo->{$$tagInfo{OffsetPair}};
                     $sizeInfo or $exifTool->Error("No size tag for $dirName:$$tagInfo{Name}"), next;
                     my $dataTag = $$tagInfo{DataTag};
                     # write TIFF image data (strips or tiles) later if requested
-                    if ($raf and defined $_[1]->{ImageData} and
+                    if ($raf and defined $_[1]{ImageData} and
                         ($tagID == 0x111 or $tagID == 0x144) and
                         (not defined $dataTag or not defined $offsetData{$dataTag}))
                     {
@@ -2657,13 +2657,22 @@ NoOverwrite:            next if $isNew > 0;
                     return undef;
                 }
                 # get offset base and data pos (abnormal for some preview images)
-                my ($dbase, $dpos);
+                my ($dbase, $dpos, $wrongBase);
                 if ($$tagInfo{IsOffset} eq '2') {
                     $dbase = $firstBase;
                     $dpos = $dataPos + $base - $firstBase;
                 } else {
                     $dbase = $base;
                     $dpos = $dataPos;
+                }
+                # use different base if necessary for some offsets (Minolta A200)
+                if ($$tagInfo{WrongBase}) {
+                    my $self = $exifTool;
+                    $wrongBase = eval $$tagInfo{WrongBase} || 0;
+                    $dbase += $wrongBase;
+                    $dpos -= $wrongBase;
+                } else {
+                    $wrongBase = 0;
                 }
                 my $oldOrder = GetByteOrder();
                 # use different byte order for values of this offset pair if required (Minolta A200)
@@ -2681,7 +2690,7 @@ NoOverwrite:            next if $isNew > 0;
                     my $byteCountPos = $byteCounts + $n * $formatSize[$format];
                     my $size = ReadValue(\$newData, $byteCountPos, $formatStr, 1, 4);
                     my $offset = Get32u(\$newData, $offsetPos) - $dpos;
-                    my $newOffset = length($newData) + $blockSize;
+                    my $newOffset = length($newData) + $blockSize - $wrongBase;
                     my $buff;
                     # look for 'feed' code to use our new data
                     if ($size == 0xfeedfeed) {
@@ -2712,7 +2721,7 @@ NoOverwrite:            next if $isNew > 0;
                         ++$pad if $size & 0x01 and ($n+1 >= $count or not $oldEnd or
                                   $oldEnd != $$oldOffset[$n+1]);
                         # preserve original image padding if specified
-                        if ($_[1]->{PreserveImagePadding} and $n+1 < $count and
+                        if ($_[1]{PreserveImagePadding} and $n+1 < $count and
                             $oldEnd and $$oldOffset[$n+1] > $oldEnd)
                         {
                             $pad = $$oldOffset[$n+1] - $oldEnd;
@@ -2721,7 +2730,7 @@ NoOverwrite:            next if $isNew > 0;
                         push @imageData, [$offset+$dbase+$dpos, $size, $pad];
                         $size += $pad; # account for pad byte if necessary
                         # return ImageData list
-                        $_[1]->{ImageData} = \@imageData;
+                        $_[1]{ImageData} = \@imageData;
                     } elsif ($offset >= 0 and $offset+$size <= $dataLen) {
                         # take data from old dir data buffer
                         $buff = substr($$dataPt, $offset, $size);
@@ -2769,9 +2778,9 @@ NoOverwrite:            next if $isNew > 0;
                     if ($$tagInfo{Name} eq 'PreviewImageStart' and $exifTool->{FILE_TYPE} eq 'JPEG') {
                         # hold onto the PreviewImage until we can determine if it fits
                         $exifTool->{PREVIEW_INFO} or $exifTool->{PREVIEW_INFO} = { };
-                        $exifTool->{PREVIEW_INFO}->{Data} = $buff;
+                        $exifTool->{PREVIEW_INFO}{Data} = $buff;
                         if ($$tagInfo{IsOffset} and $$tagInfo{IsOffset} eq '2') {
-                            $exifTool->{PREVIEW_INFO}->{NoBaseShift} = 1;
+                            $exifTool->{PREVIEW_INFO}{NoBaseShift} = 1;
                         }
                         $buff = '';
                     }
@@ -2844,7 +2853,7 @@ NoOverwrite:            next if $isNew > 0;
         # save location of last IFD for use in Canon RAW header
         if ($newDataPos == 16) {
             my @ifdPos = $fixup->GetMarkerPointers(\$newData,'NextIFD');
-            $_[1]->{LastIFD} = pop @ifdPos;
+            $_[1]{LastIFD} = pop @ifdPos;
         }
     }
     # return empty string if no entries in directory
@@ -2872,7 +2881,7 @@ This file contains routines to write EXIF metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -30,7 +30,7 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 3: Write EPS information
+# test 3: Write EPS information (and test ExtractEmbedded option)
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
@@ -41,8 +41,8 @@ my $testnum = 1;
     $testfile = "t/${testname}_${testnum}_failed.eps";
     unlink $testfile;
     $exifTool->WriteInfo('t/images/PostScript.eps', $testfile);
-    my $info = $exifTool->ImageInfo($testfile);
-    if (check($exifTool, $info, $testname, $testnum)) {
+    my $info = $exifTool->ImageInfo($testfile, {ExtractEmbedded => 1});
+    if (check($exifTool, $info, $testname, $testnum, $testnum, 3)) {
         unlink $testfile;
     } else {
         print 'not ';

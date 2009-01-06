@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.42
+[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.56
 [File, File, Image]  - File Name: QuickTime.m4a
 [File, File, Image]  - Directory: t/images
 [File, File, Image]  - File Size: 5.1 kB
-[File, File, Time]  - File Modification Date/Time: 2006:09:23 16:45:18
+[File, File, Time]  - File Modification Date/Time: 2006:09:23 16:45:18-04:00
 [File, File, Image]  - File Type: M4A
 [File, File, Image]  - MIME Type: audio/mp4
 [QuickTime, QuickTime, Video] 0 - Version: 0
@@ -26,18 +26,18 @@
 [QuickTime, Track1, Video] 5 - Track Duration: 29.05 s
 [QuickTime, Track1, Video] 8 - Track Layer: 0
 [QuickTime, Track1, Video] 9 - Track Volume: 100.00%
-[QuickTime, QuickTime, Video] 0 - Media Header Version: 0
-[QuickTime, QuickTime, Time] 1 - Media Create Date: 2005:06:29 19:02:19
-[QuickTime, QuickTime, Time] 2 - Media Modify Date: 2006:09:22 11:06:45
-[QuickTime, QuickTime, Video] 3 - Media Time Scale: 32000
-[QuickTime, QuickTime, Video] 4 - Media Duration: 29.06 s
-[QuickTime, QuickTime, Video] 5 - Media Language Code: und
-[QuickTime, QuickTime, Video] 8 - Handler Type: Audio Track
-[QuickTime, QuickTime, Audio] 2 - Balance: 0
-[QuickTime, QuickTime, Audio] 2 - Audio Format: mp4a
-[QuickTime, QuickTime, Audio] 12 - Audio Channels: 2
-[QuickTime, QuickTime, Audio] 13 - Audio Bits Per Sample: 16
-[QuickTime, QuickTime, Audio] 16 - Audio Sample Rate: 44100
+[QuickTime, Track1, Video] 0 - Media Header Version: 0
+[QuickTime, Track1, Time] 1 - Media Create Date: 2005:06:29 19:02:19
+[QuickTime, Track1, Time] 2 - Media Modify Date: 2006:09:22 11:06:45
+[QuickTime, Track1, Video] 3 - Media Time Scale: 32000
+[QuickTime, Track1, Video] 4 - Media Duration: 29.06 s
+[QuickTime, Track1, Video] 5 - Media Language Code: und
+[QuickTime, Track1, Video] 8 - Handler Type: Audio Track
+[QuickTime, Track1, Audio] 2 - Balance: 0
+[QuickTime, Track1, Audio] 2 - Audio Format: mp4a
+[QuickTime, Track1, Audio] 12 - Audio Channels: 2
+[QuickTime, Track1, Audio] 13 - Audio Bits Per Sample: 16
+[QuickTime, Track1, Audio] 16 - Audio Sample Rate: 44100
 [QuickTime, QuickTime, Video] 8 - Handler Type: Metadata
 [QuickTime, QuickTime, Video] 12 - Handler Vendor ID: Apple
 [QuickTime, QuickTime, Audio] ©nam - Title: Sample

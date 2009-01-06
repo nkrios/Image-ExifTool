@@ -31,7 +31,7 @@ my %plusVocab = (
         controlled-vocabulary tags in this table (ie. tags with a fixed set of
         values) have raw values which begin with "http://ns.useplus.org/ldf/vocab/",
         but to reduce clutter this prefix has been removed from the values shown
-        below.
+        below.  (see L<http://ns.useplus.org/>)
     },
     Version  => { Name => 'PLUSVersion' },
     Licensee => {
@@ -311,7 +311,10 @@ my %plusVocab = (
     %xmpTableDefaults,
     GROUPS => { 0 => 'XMP', 1 => 'XMP-prism', 2 => 'Document' },
     NAMESPACE => 'prism',
-    NOTES => 'Publishing Requirements for Industry Standard Metadata 2.1 schema tags.',
+    NOTES => q{
+        Publishing Requirements for Industry Standard Metadata 2.1 schema tags. (see
+        L<http://www.prismstandard.org/>)
+    },
     aggregationType => { List => 'Bag' },
     alternateTitle  => { List => 'Bag' },
     byteCount       => { Writable => 'integer' },
@@ -415,7 +418,10 @@ my %plusVocab = (
     %xmpTableDefaults,
     GROUPS => { 0 => 'XMP', 1 => 'XMP-prl', 2 => 'Document' },
     NAMESPACE => 'prl',
-    NOTES => 'PRISM Rights Language 2.1 schema tags.',
+    NOTES => q{
+        PRISM Rights Language 2.1 schema tags.  (see
+        L<http://www.prismstandard.org/>)
+    },
     geography       => { List => 'Bag' },
     industry        => { List => 'Bag' },
     usage           => { List => 'Bag' },
@@ -426,11 +432,10 @@ my %plusVocab = (
     %xmpTableDefaults,
     GROUPS => { 0 => 'XMP', 1 => 'XMP-pur', 2 => 'Document' },
     NAMESPACE => 'prismusagerights',
-    NOTES => 'PRISM Rights Language 2.1 schema tags.',
     NOTES => q{
         Prism Usage Rights 2.1 schema tags.  The actual namespace prefix is
         "prismusagerights", but ExifTool shortens this for the "XMP-pur" family 1
-        group name.
+        group name.  (see L<http://www.prismstandard.org/>)
     },
     adultContentWarning => { List => 'Bag' },
     agreement           => { List => 'Bag' },
@@ -457,6 +462,20 @@ foreach $table (\%prism, \%prl, \%pur) {
     }
 }
 
+# ACDSee schema (acdsee) (ref PH)
+%Image::ExifTool::XMP::acdsee = (
+    %xmpTableDefaults,
+    GROUPS => { 0 => 'XMP', 1 => 'XMP-acdsee', 2 => 'Image' },
+    NAMESPACE => 'acdsee',
+    NOTES => 'ACD Systems ACDSee schema tags.',
+    rpp => {
+        Name => 'RPP',
+        Writable => 'lang-alt',
+        Notes => 'raw processing settings in XML format',
+        Binary => 1,
+    },
+);
+
 
 1;  #end
 
@@ -480,7 +499,7 @@ This file contains definitions for the following XMP schemas:
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

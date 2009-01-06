@@ -250,205 +250,228 @@ $mainTool->Options(Duplicates => 0);    # don't extract duplicates by default
 
 # parse command-line options
 while ($_ = shift) {
-    if (s/^-//) {
-        if (/^list(w|f|wf|d|g(\d*))?$/i) {
-            $helped = 1;
-            if (not $1 or $1 eq 'w') {
-                my $wr = $1;
-                my $group;
-                if ($ARGV[0] and $ARGV[0] =~ /^-(.+):(all|\*)$/i) {
-                    $group = $1;
-                    shift;
-                    $group =~ /IFD/i and warn("Can't list tags for specific IFD\n"), next;
-                }
-                my $msg = ($wr ? 'Writable' : 'Available') . ($group ? " $group" : '') . ' tags';
-                PrintTagList($msg, $wr ? GetWritableTags($group) : GetAllTags($group));
-                # also print shortcuts if listing all tags
-                next if $group or $wr;
-                my @tagList = GetShortcuts();
-                PrintTagList('Command-line shortcuts', @tagList) if @tagList;
-            } elsif ($1 eq 'wf') {
-                my @wf;
-                CanWrite($_) and push @wf, $_ foreach GetFileType();
-                PrintTagList('Writable file extensions', @wf);
-            } elsif ($1 eq 'f') {
-                PrintTagList('Recognized file extensions', GetFileType());
-            } elsif ($1 eq 'd') {
-                PrintTagList('Deletable groups', GetDeleteGroups());
-            } else { # 'g(\d*)'
-                # list all groups in specified family
-                my $family = $2 || 0;
-                PrintTagList("Groups in family $family", GetAllGroups($family));
+  if (s/^-//) {
+    my $a = lc $_;
+    if (/^list(w|f|wf|d|g(\d*))?$/i) {
+        $helped = 1;
+        if (not $1 or $1 eq 'w') {
+            my $wr = $1;
+            my $group;
+            if ($ARGV[0] and $ARGV[0] =~ /^-(.+):(all|\*)$/i) {
+                $group = $1;
+                shift;
+                $group =~ /IFD/i and warn("Can't list tags for specific IFD\n"), next;
             }
-            next;
+            my $msg = ($wr ? 'Writable' : 'Available') . ($group ? " $group" : '') . ' tags';
+            PrintTagList($msg, $wr ? GetWritableTags($group) : GetAllTags($group));
+            # also print shortcuts if listing all tags
+            next if $group or $wr;
+            my @tagList = GetShortcuts();
+            PrintTagList('Command-line shortcuts', @tagList) if @tagList;
+        } elsif ($1 eq 'wf') {
+            my @wf;
+            CanWrite($_) and push @wf, $_ foreach GetFileType();
+            PrintTagList('Writable file extensions', @wf);
+        } elsif ($1 eq 'f') {
+            PrintTagList('Recognized file extensions', GetFileType());
+        } elsif ($1 eq 'd') {
+            PrintTagList('Deletable groups', GetDeleteGroups());
+        } else { # 'g(\d*)'
+            # list all groups in specified family
+            my $family = $2 || 0;
+            PrintTagList("Groups in family $family", GetAllGroups($family));
         }
-        if (/^ver$/i) {
-            print("$Image::ExifTool::VERSION$Image::ExifTool::RELEASE\n");
-            $helped = 1;
-            next;
-        }
-        if (/^(all|add)?tagsfromfile(=.*)?$/i) {
-            $setTagsFile = $2 ? substr($2,1) : (@ARGV ? shift : '');
-            $setTagsFile eq '' and Die "File must be specified for -TagsFromFile option\n";
-            push(@newValues, "TagsFromFile=$setTagsFile");
-            $setTags{$setTagsFile} or $setTags{$setTagsFile} = [];
-            push @{$setTags{$setTagsFile}}, { Replace => ($1 and lc($1) eq 'add') ? 0 : 1 };
-            next;
-        }
-        if (/^\@$/) {
-            my $argFile = shift or Die "Expecting filename for -\@ option\n";
-            unless (open(ARGFILE, "<$argFile")) {
-                unless ($argFile !~ /^\// and open(ARGFILE, "<$exeDir/$argFile")) {
-                    Die "Error opening arg file $argFile\n";
-                }
-            }
-            my @newArgs;
-            foreach (<ARGFILE>) {
-                s/^\s+//; s/\s+$//s; # remove leading/trailing white space
-                # remove white space before, and single space after '=', '+=', '-=' or '<='
-                s/^([-\w]+)\s*([-+<]?=) ?/$1$2/;
-                push @newArgs, $_ unless $_ eq '' or /^#/;
-            }
-            close(ARGFILE);
-            unshift @ARGV, @newArgs;
-            next;
-        }
-        /^(-?)a$/i and $mainTool->Options(Duplicates => ($1 ? 0 : 1)), next;
-        /^b$/i and $mainTool->Options(Binary => 1), $binaryOutput = 1,  next;
-        /^c$/  and $mainTool->Options('CoordFormat', shift || Die "Expecting coordinate format for -c option\n"), next;
-        /^d$/  and $mainTool->Options('DateFormat', shift || Die "Expecting date format for -d option\n"), next;
-        /^D$/  and $showTagID = 'D', next;
-        /^e$/  and $mainTool->Options(Composite => 0), next;
-        /^E$/  and $escapeHTML = 1, next;
-        # undocumented debugging option "-echo"
-        /^echo$/i and print(shift,"\n"), $helped=1, next;
-        if (/^execute$/i) {
-            $helped = 1;
-            last if $doneCommonArgs or not @commonArgs;
-            # execute common arguments for each command
-            unshift @ARGV, @commonArgs, '-execute';
-            $doneCommonArgs = 1;
-            next;
-        }
-        if (/^-?ext$/i) {
-            my $ext = shift;
-            defined $ext or Die "Expecting extension for -ext option\n";
-            $ext =~ s/^\.//;    # remove leading '.' if it exists
-            my $flag = /^-/ ? 0 : 1;
-            $filterFlag |= (0x01 << $flag);
-            $filterExt{uc($ext)} = $flag;
-            next;
-        }
-        if (/^f$/) {
-            $forcePrint = 1;
-            $mainTool->Options(MissingTagValue => '-');
-            next;
-        }
-        /^F([-+]?\d*)$/ and $mainTool->Options(FixBase => $1), next;
-        /^fast$/i and $mainTool->Options(FastScan => 1), next;
-        /^g(\d*)$/ and $showGroup = $1 || 0, next;
-        /^G(\d*)$/ and $showGroup = $1 || 0, $allGroup=1, next;
-        /^h$/  and $htmlOutput = 1, $escapeHTML = 1, $xmlOutput = 0, next;
-        /^H$/  and $showTagID = 'H', next;
-        if (/^htmldump([-+]?\d+)?$/i) {
-            $verbose = ($verbose || 0) + 1;
-            $htmlOutput = 2;
-            $mainTool->Options(HtmlDumpBase => $1) if defined $1;
-            next;
-        }
-        /^i$/i and push(@ignore,shift || Die "Expecting directory name for -i option\n"), next;
-        if (/^if$/i) {
-            my $cond = shift;
-            defined $cond or Die("Expecting expression for -if option\n");
-            if (defined $condition) {
-                $condition .= " and $cond";
-            } else {
-                $condition = $cond;
-            }
-            next;
-        }
-        /^k$/i and $pause = 1, next;
-        /^l$/  and --$outFormat, next;
-        /^L$/  and $mainTool->Options(Charset => 'Latin'), next;
-        /^m$/i and $mainTool->Options(IgnoreMinorErrors => 1), next;
-        /^n$/i and $mainTool->Options(PrintConv => 0), next;
-        if (/^o$/i) {
-            $outOpt = shift || Die("Expected output file or directory name for -o option\n");
-            CleanFilename($outOpt);
-            next;
-        }
-        /^overwrite_original$/i and $overwriteOrig = 1, next;
-        /^overwrite_original_in_place$/i and $overwriteOrig = 2, next;
-        /^p$/  and LoadPrintFormat(shift), next;
-        /^P$/  and $preserveTime = 1, next;
-        /^q$/i and ++$quiet, next;
-        /^r$/i and $recurse = 1, next;
-        /^s$/  and ++$outFormat, next;
-        /^S$/  and $outFormat+=2, next;
-        /^scanforxmp$/i and $mainTool->Options(ScanForXMP => 1), next;
-        if (/^sep$/i) {
-            $listSep = shift;
-            defined $listSep or Die("Expecting list item separator for -sep option\n");
-            $mainTool->Options(ListSep => $listSep);
-            $setListSep = 1;
-            next;
-        }
-        /^srcfile$/i and $srcFmt = shift || Die("Expecting FMT for -srcfile option\n"), next;
-        /^t$/  and $tabFormat = 1, next;
-        if (/^T$/) {
-            $tabFormat = 1; $outFormat+=2; ++$quiet; $forcePrint = 1;
-            $mainTool->Options(MissingTagValue => '-');
-            next;
-        }
-        /^u$/  and $mainTool->Options(Unknown => $mainTool->Options('Unknown')+1), next;
-        /^U$/  and $mainTool->Options(Unknown => 2), next;
-        if (/^v(\d*)$/i) {
-            $verbose = ($1 eq '') ? ($verbose || 0) + 1 : $1;
-            next;
-        }
-        /^w$/i and $outputExt = shift || Die("Expecting output extension for -w option\n"), next;
-        if (/^x$/) {
-            my $tag = shift;
-            defined $tag or Die "Expecting tag name for -x option\n";
-            $tag =~ s/\ball\b/\*/ig;    # replace 'all' with '*' in tag names
-            if ($setTagsFile) {
-                push @{$setTags{$setTagsFile}}, "-$tag";
-            } else {
-                push @exclude, $tag;
-            }
-            next;
-        }
-        /^X$/  and $xmlOutput = 1, $htmlOutput = 0, $mainTool->Options(Duplicates => 1), next;
-        /^y$/i and $mainTool->Options(ExtractEmbedded => 1), next; #(undocumented option)
-        /^z$/i and $doUnzip = 1, $mainTool->Options(Compress => 1), next;
-        $_ eq '' and push(@files, '-'), next;   # read STDIN
-        length $_ eq 1 and Die "Unknown option -$_\n";
-        if (/^[^<]+(<?)=(.*)/s) {
-            push @newValues, $_;
-            $doSetFileName = 1 if /^(filename|directory)\b/i;
-        } else {
-            if (not $setTagsFile and /(<|>)/) {
-                # assume '-tagsFromFile @' if tags are being redirected
-                # and -tagsFromFile hasn't already been specified
-                $setTagsFile = '@';
-                push(@newValues, "TagsFromFile=@");
-                $setTags{$setTagsFile} or $setTags{$setTagsFile} = [];
-            }
-            if ($setTagsFile) {
-                push @{$setTags{$setTagsFile}}, $_;
-                $doSetFileName = 1 if /(^|>)(filename|directory)\b/i;
-            } elsif (/^-(.*)/) {
-                push @exclude, $1;
-            } else {
-                push @tags, $_;
-            }
-        }
-    } else {
-        # glob each filespec if necessary - MK/20061010
-        $_ = File::Glob::bsd_glob($_) if $doGlob and /[*?]/;
-        CleanFilename($_);  # change to forward slashes if necessary
-        push @files, $_;
+        next;
     }
+    if ($a eq 'ver') {
+        print("$Image::ExifTool::VERSION$Image::ExifTool::RELEASE\n");
+        $helped = 1;
+        next;
+    }
+    if (/^(all|add)?tagsfromfile(=.*)?$/i) {
+        $setTagsFile = $2 ? substr($2,1) : (@ARGV ? shift : '');
+        $setTagsFile eq '' and Die "File must be specified for -tagsFromFile option\n";
+        push(@newValues, "TagsFromFile=$setTagsFile");
+        $setTags{$setTagsFile} or $setTags{$setTagsFile} = [];
+        push @{$setTags{$setTagsFile}}, { Replace => ($1 and lc($1) eq 'add') ? 0 : 1 };
+        next;
+    }
+    if ($a eq '@') {
+        my $argFile = shift or Die "Expecting filename for -\@ option\n";
+        unless (open(ARGFILE, "<$argFile")) {
+            unless ($argFile !~ /^\// and open(ARGFILE, "<$exeDir/$argFile")) {
+                Die "Error opening arg file $argFile\n";
+            }
+        }
+        my @newArgs;
+        foreach (<ARGFILE>) {
+            s/^\s+//; s/\s+$//s; # remove leading/trailing white space
+            # remove white space before, and single space after '=', '+=', '-=' or '<='
+            s/^([-\w]+)\s*([-+<]?=) ?/$1$2/;
+            push @newArgs, $_ unless $_ eq '' or /^#/;
+        }
+        close(ARGFILE);
+        unshift @ARGV, @newArgs;
+        next;
+    }
+    /^(-?)(a|duplicates)$/i and $mainTool->Options(Duplicates => ($1 ? 0 : 1)), next;
+    /^b(inary)?$/i and $mainTool->Options(Binary => 1), $binaryOutput = 1,  next;
+    /^c(oordFormat)?$/i and $mainTool->Options('CoordFormat', shift || Die "Expecting coordinate format for -c option\n"), next;
+    (/^d$/ or $a eq 'dateformat') and $mainTool->Options('DateFormat', shift || Die "Expecting date format for -d option\n"), next;
+    (/^D$/ or $a eq 'decimal') and $showTagID = 'D', next;
+    (/^e$/ or $a eq '-composite') and $mainTool->Options(Composite => 0), next;
+    (/^-e$/ or $a eq 'composite') and $mainTool->Options(Composite => 1), next;
+    (/^E$/ or $a eq 'escapehtml') and $escapeHTML = 1, next;
+    # undocumented debugging option "-echo"
+    /^echo$/i and print(shift,"\n"), $helped=1, next;
+    if (/^(ee|extractembedded)$/i) {
+        $mainTool->Options(ExtractEmbedded => 1);
+        $mainTool->Options(Duplicates => 1);
+        next;
+    }
+    if (/^execute$/i) {
+        $helped = 1;
+        last if $doneCommonArgs or not @commonArgs;
+        # execute common arguments for each command
+        unshift @ARGV, @commonArgs, '-execute';
+        $doneCommonArgs = 1;
+        next;
+    }
+    if (/^-?ext(ension)?$/i) {
+        my $ext = shift;
+        defined $ext or Die "Expecting extension for -ext option\n";
+        $ext =~ s/^\.//;    # remove leading '.' if it exists
+        my $flag = /^-/ ? 0 : 1;
+        $filterFlag |= (0x01 << $flag);
+        $filterExt{uc($ext)} = $flag;
+        next;
+    }
+    if (/^f$/ or $a eq 'forceprint') {
+        $forcePrint = 1;
+        $mainTool->Options(MissingTagValue => '-');
+        next;
+    }
+    if (/^F([-+]?\d*)$/ or /^fixbase([-+]?\d*)$/i) {
+        $mainTool->Options(FixBase => $1);
+        next;
+    }
+    /^fast$/i and $mainTool->Options(FastScan => 1), next;
+    if (/^(g)(roupHeadings|roupNames)?([\d:]*)$/i) {
+        $showGroup = $3 || 0;
+        $allGroup = ($2 ? lc($2) eq 'roupnames' : $1 eq 'G');
+        next;
+    }
+    (/^h$/ or $a eq 'htmlformat') and $htmlOutput = 1, $escapeHTML = 1, $xmlOutput = 0, next;
+    (/^H$/ or $a eq 'hex') and $showTagID = 'H', next;
+    if (/^htmldump([-+]?\d+)?$/i) {
+        $verbose = ($verbose || 0) + 1;
+        $htmlOutput = 2;
+        $mainTool->Options(HtmlDumpBase => $1) if defined $1;
+        next;
+    }
+    /^i(gnore)?$/i and push(@ignore,shift || Die "Expecting directory name for -i option\n"), next;
+    if (/^if$/i) {
+        my $cond = shift;
+        defined $cond or Die("Expecting expression for -if option\n");
+        if (defined $condition) {
+            $condition .= " and $cond";
+        } else {
+            $condition = $cond;
+        }
+        next;
+    }
+    /^(k|pause)$/i and $pause = 1, next;
+    (/^l$/ or $a eq 'long') and --$outFormat, next;
+    (/^L$/ or $a eq 'latin') and $mainTool->Options(Charset => 'Latin'), next;
+    /^(m|ignoreminorerrors)$/i and $mainTool->Options(IgnoreMinorErrors => 1), next;
+    /^(n|-printconv)$/i and $mainTool->Options(PrintConv => 0), next;
+    /^(-n|printconv)$/i and $mainTool->Options(PrintConv => 1), next;
+    if (/^o(ut)?$/i) {
+        $outOpt = shift || Die("Expected output file or directory name for -o option\n");
+        CleanFilename($outOpt);
+        next;
+    }
+    /^overwrite_original$/i and $overwriteOrig = 1, next;
+    /^overwrite_original_in_place$/i and $overwriteOrig = 2, next;
+    (/^p$/ or $a eq 'printformat') and LoadPrintFormat(shift), next;
+    (/^P$/ or $a eq 'preserve') and $preserveTime = 1, next;
+    /^q(uiet)?$/i and ++$quiet, next;
+    /^r(ecurse)?$/i and $recurse = 1, next;
+    (/^s$/ or $a eq 'short') and ++$outFormat, next;
+    (/^S$/ or $a eq 'veryshort') and $outFormat+=2, next;
+    /^scanforxmp$/i and $mainTool->Options(ScanForXMP => 1), next;
+    if (/^sep(arator)?$/i) {
+        $listSep = shift;
+        defined $listSep or Die("Expecting list item separator for -sep option\n");
+        $mainTool->Options(ListSep => $listSep);
+        $setListSep = 1;
+        # also split when writing values
+        my $listSplit = quotemeta $listSep;
+        # a space in the string matches zero or more whitespace characters
+        $listSplit =~ s/(\\ )+/\\s\*/g;
+        # but a single space alone matches one or more whitespace characters
+        $listSplit = '\\s+' if $listSplit eq '\\s*';
+        $mainTool->Options(ListSplit => $listSplit);
+        next;
+    }
+    /^srcfile$/i and $srcFmt = shift || Die("Expecting FMT for -srcfile option\n"), next;
+    /^t(ab)?$/  and $tabFormat = 1, next;
+    if (/^T$/ or $a eq 'table') {
+        $tabFormat = 1; $outFormat+=2; ++$quiet; $forcePrint = 1;
+        $mainTool->Options(MissingTagValue => '-');
+        next;
+    }
+    if (/^(u)(nknown(2)?)?$/i) {
+        my $inc = ($3 or (not $2 and $1 eq 'U')) ? 2 : 1;
+        $mainTool->Options(Unknown => $mainTool->Options('Unknown') + $inc);
+        next;
+    }
+    if (/^v(erbose)?(\d*)$/i) {
+        $verbose = ($2 eq '') ? ($verbose || 0) + 1 : $2;
+        next;
+    }
+    /^(w|textout)$/i and $outputExt = shift || Die("Expecting output extension for -w option\n"), next;
+    if (/^x$/ or $a eq 'exclude') {
+        my $tag = shift;
+        defined $tag or Die "Expecting tag name for -x option\n";
+        $tag =~ s/\ball\b/\*/ig;    # replace 'all' with '*' in tag names
+        if ($setTagsFile) {
+            push @{$setTags{$setTagsFile}}, "-$tag";
+        } else {
+            push @exclude, $tag;
+        }
+        next;
+    }
+    (/^X$/ or $a eq 'xmlformat') and $xmlOutput = 1, $htmlOutput = 0, $mainTool->Options(Duplicates => 1), next;
+    /^z(ip)?$/i and $doUnzip = 1, $mainTool->Options(Compress => 1), next;
+    $_ eq '' and push(@files, '-'), next;   # read STDIN
+    length $_ eq 1 and Die "Unknown option -$_\n";
+    if (/^[^<]+(<?)=(.*)/s) {
+        push @newValues, $_;
+        $doSetFileName = 1 if /^(filename|directory)\b/i;
+    } else {
+        if (not $setTagsFile and /(<|>)/) {
+            # assume '-tagsFromFile @' if tags are being redirected
+            # and -tagsFromFile hasn't already been specified
+            $setTagsFile = '@';
+            push(@newValues, "TagsFromFile=@");
+            $setTags{$setTagsFile} or $setTags{$setTagsFile} = [];
+        }
+        if ($setTagsFile) {
+            push @{$setTags{$setTagsFile}}, $_;
+            $doSetFileName = 1 if /(^|>)(filename|directory)\b/i;
+        } elsif (/^-(.*)/) {
+            push @exclude, $1;
+        } else {
+            push @tags, $_;
+        }
+    }
+  } elsif ($doGlob and /[*?]/) {
+    # glob each filespec if necessary - MK/20061010
+    push @files, File::Glob::bsd_glob($_);
+  } else {
+    push @files, $_;
+  }
 }
 
 # print help
@@ -497,6 +520,11 @@ if ($xmlOutput) {
     $showGroup = $allGroup = 1;
 }
 
+# change to forward slashes if necessary in all filenames (like CleanFilename)
+if ($hasBackslash{$^O}) {
+    tr/\\/\// foreach @files;
+}
+
 # can't do anything if no file specified
 unless (@files) {
     unless ($outOpt) {
@@ -532,14 +560,14 @@ if (@newValues) {
         $tag =~ s/\ball\b/\*/ig;    # replace 'all' with '*' in tag names
         $newVal eq '' and undef $newVal;    # undefined to delete tag
         if ($tag =~ /^(All)?TagsFromFile$/i) {
-            Die "Need file name for -TagsFromFile\n" unless defined $newVal;
+            Die "Need file name for -tagsFromFile\n" unless defined $newVal;
             ++$isWriting;
             if ($newVal eq '@' or not defined FilenameSPrintf($newVal)) {
                 push @dynamicFiles, $newVal unless grep /^$newVal$/, @dynamicFiles;
                 next;   # set tags from dynamic file later
             }
             unless (-e $newVal) {
-                Warn "File '$newVal' does not exist for -TagsFromFile option\n";
+                Warn "File '$newVal' does not exist for -tagsFromFile option\n";
                 $rtnVal = 1;
                 next Command;
             }
@@ -923,7 +951,7 @@ sub GetImageInfo($$)
                 $val = '-';     # forced to print all tag values
             }
             if (defined $showGroup) {
-                $group = $exifTool->GetGroup($tag, $showGroup);
+                $group = $exifTool->GetGroup($tag, $showGroup, 1);
                 unless ($allGroup) {
                     if ($lastGroup ne $group) {
                         if ($htmlOutput) {
@@ -1493,9 +1521,9 @@ sub AddPrintFormat($)
     my $expr = shift;
     push @printFmt, $expr;
     # add to list of requested tags
-    push @tags, $expr =~ /\$((?:[a-zA-Z0-9]+:)?[-a-zA-Z_0-9]+)/g;
+    push @tags, $expr =~ /\$((?:[-\w]+:)*[-\w]+)/g;
     # tags contained in braces too...
-    push @tags, $expr =~ /\$\{((?:[a-zA-Z0-9]+:)?[-a-zA-Z_0-9]+)\}/g;
+    push @tags, $expr =~ /\$\{((?:[-\w]+:)*[-\w]+)\}/g;
 }
 
 #------------------------------------------------------------------------------
@@ -1679,11 +1707,22 @@ sub SlurpFile($$)
     my ($file, $buffPt) = @_;
     open(INFILE, "<$file") or Warn("Error opening file $file\n"), return 0;
     binmode(INFILE);
-    my $maxSize = 16000000;
-    my $num = read(INFILE, $$buffPt, $maxSize);
+    my $bsize = 1024 * 1024;
+    my $num = read(INFILE, $$buffPt, $bsize);
+    unless ($num) {
+        close(INFILE);
+        Warn("Error reading $file\n");
+        return 0;
+    }
+    my $bmax = 64 * $bsize;
+    while ($num == $bsize) {
+        $bsize *= 2 if $bsize < $bmax;
+        my $buff;
+        $num = read(INFILE, $buff, $bsize);
+        last unless $num;
+        $$buffPt .= $buff;
+    }
     close(INFILE);
-    $num or Warn("Error reading $file\n"), return 0;
-    $num < $maxSize or Warn("File exceeds size limit: $file\n"), return 0;
     return 1;
 }
 
@@ -1748,10 +1787,10 @@ B<exiftool> [I<OPTIONS>] [-I<TAG>...] [--I<TAG>...] I<FILE>...
 
 B<exiftool> [I<OPTIONS>] -I<TAG>[+-E<lt>]=[I<VALUE>]... I<FILE>...
 
-B<exiftool> [I<OPTIONS>] B<-TagsFromFile> I<SRCFILE>
+B<exiftool> [I<OPTIONS>] B<-tagsFromFile> I<SRCFILE>
 [-I<SRCTAG>[E<gt>I<DSTTAG>]...] I<FILE>...
 
-B<exiftool> [ B<-ver> | B<-list>[B<w>|B<f>|B<g>[I<NUM>]|B<d>] ]
+B<exiftool> [ B<-ver> | B<-list>[B<w>|B<f>|B<wf>|B<g>[I<NUM>]|B<d>] ]
 
 For specific examples, see the L<EXAMPLES|/READING EXAMPLES> sections below.
 
@@ -1764,7 +1803,7 @@ input.  Information is read from the source file and output in readable form
 to the console (or written to an output text file with the B<-w> option).
 
 To write or copy information, new values are specified with the
--I<TAG>=[I<VALUE>] syntax or the B<-TagsFromFile> option.  This causes
+-I<TAG>=[I<VALUE>] syntax or the B<-tagsFromFile> option.  This causes
 I<FILE> to be rewritten, and by default the original file is preserved with
 C<_original> appended to the file name.  (Be sure to verify that the new
 file is OK before erasing the original.)  Once in write mode, exiftool will
@@ -1775,35 +1814,36 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  3FR   r       HTML  r       PPM   r/w    |  EXIF           r/w/c
-  ACR   r       ICC   r/w/c   PPT   r      |  GPS            r/w/c
-  AI    r       ITC   r       PS    r/w    |  IPTC           r/w/c
-  AIFF  r       JNG   r/w     PSD   r/w    |  XMP            r/w/c
-  APE   r       JP2   r/w     QTIF  r      |  MakerNotes     r/w/c
-  ARW   r       JPEG  r/w     RA    r      |  Photoshop IRB  r/w/c
-  ASF   r       K25   r       RAF   r/w    |  ICC Profile    r/w/c
-  AVI   r       KDC   r       RAM   r      |  MIE            r/w/c
-  BMP   r       M4A   r       RAW   r/w    |  JFIF           r/w/c
-  BTF   r       MEF   r/w     RIFF  r      |  Ducky APP12    r/w/c
-  CR2   r/w     MIE   r/w/c   RWZ   r      |  PDF            r/w/c
-  CRW   r/w     MIFF  r       RM    r      |  CIFF           r/w
-  CS1   r/w     MNG   r/w     SO    r      |  AFCP           r/w
-  DCM   r       MOS   r/w     SR2   r      |  JPEG 2000      r
-  DCR   r       MOV   r       SRF   r      |  DICOM          r
-  DIVX  r       MP3   r       SVG   r      |  Flash          r
-  DJVU  r       MP4   r       SWF   r      |  FlashPix       r
-  DLL   r       MPC   r       THM   r/w    |  QuickTime      r
-  DNG   r/w     MPG   r       TIFF  r/w    |  GeoTIFF        r
-  DOC   r       MRW   r/w     VRD   r/w/c  |  PrintIM        r
-  DYLIB r       NEF   r/w     WAV   r      |  ID3            r
-  EPS   r/w     OGG   r       WDP   r/w    |  Kodak Meta     r
-  EXE   r       ORF   r/w     WMA   r      |  Ricoh RMETA    r
-  ERF   r/w     PBM   r/w     WMV   r      |  Picture Info   r
-  FLAC  r       PDF   r/w     X3F   r      |  Adobe APP14    r
-  FLV   r       PEF   r/w     XLS   r      |  APE            r
-  FPX   r       PGM   r/w     XMP   r/w/c  |  Vorbis         r
-  GIF   r/w     PICT  r       ZIP   r      |  SPIFF          r
-  HDP   r/w     PNG   r/w                  |  (and more)
+  3FR   r       HDP   r/w     PPM   r/w    |  EXIF           r/w/c
+  ACR   r       HTML  r       PPT   r      |  GPS            r/w/c
+  AI    r       ICC   r/w/c   PS    r/w    |  IPTC           r/w/c
+  AIFF  r       ITC   r       PSD   r/w    |  XMP            r/w/c
+  APE   r       JNG   r/w     QTIF  r      |  MakerNotes     r/w/c
+  ARW   r       JP2   r/w     RA    r      |  Photoshop IRB  r/w/c
+  ASF   r       JPEG  r/w     RAF   r/w    |  ICC Profile    r/w/c
+  AVI   r       K25   r       RAM   r      |  MIE            r/w/c
+  BMP   r       KDC   r       RAW   r/w    |  JFIF           r/w/c
+  BTF   r       M4A   r       RIFF  r      |  Ducky APP12    r/w/c
+  CR2   r/w     MEF   r/w     RW2   r      |  PDF            r/w/c
+  CRW   r/w     MIE   r/w/c   RWZ   r      |  CIFF           r/w
+  CS1   r/w     MIFF  r       RM    r      |  AFCP           r/w
+  DCM   r       MNG   r/w     SO    r      |  JPEG 2000      r
+  DCP   r/w     MOS   r/w     SR2   r      |  DICOM          r
+  DCR   r       MOV   r       SRF   r      |  Flash          r
+  DIVX  r       MP3   r       SVG   r      |  FlashPix       r
+  DJVU  r       MP4   r       SWF   r      |  QuickTime      r
+  DLL   r       MPC   r       THM   r/w    |  GeoTIFF        r
+  DNG   r/w     MPG   r       TIFF  r/w    |  PrintIM        r
+  DOC   r       MRW   r/w     VRD   r/w/c  |  ID3            r
+  DYLIB r       NEF   r/w     WAV   r      |  Kodak Meta     r
+  EPS   r/w     OGG   r       WDP   r/w    |  Ricoh RMETA    r
+  ERF   r/w     ORF   r/w     WMA   r      |  Picture Info   r
+  EXE   r       PBM   r/w     WMV   r      |  Adobe APP14    r
+  EXIF  r/w/c   PDF   r/w     X3F   r      |  APE            r
+  FLAC  r       PEF   r/w     XLS   r      |  Vorbis         r
+  FLV   r       PGM   r/w     XMP   r/w/c  |  SPIFF          r
+  FPX   r       PICT  r       ZIP   r      |  (and more)
+  GIF   r/w     PNG   r/w
 
 Note:  If I<FILE> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are processed
@@ -1813,9 +1853,79 @@ processing of files with any extension.
 =head1 OPTIONS
 
 Case is not significant for any command-line option (including tag and group
-names), except for single-character options if the corresponding upper case
-option is defined.  Multiple options may NOT be combined into a single
-argument, because that would be interpreted as a tag name.
+names), except for single-character options when the corresponding
+upper-case option is defined.  Many single-character options have equivalent
+long-name versions (shown in brackets), and some options have inverses which
+are invoked with a leading double-dash.  Note that multiple single-character
+options may NOT be combined into one argument because this would be
+interpreted as a tag name.
+
+=head2 Option Summary
+
+  -TAG or --TAG                     Extract or exclude specified tag
+  -TAG[+-]=[VALUE]                  Write new value for tag
+  -TAG[+-]<=DATFILE                 Write tag value from contents of file
+  -TAG[+-]<SRCTAG                   Copy tag value (see -tagsFromFile)
+
+  -@ ARGFILE                        Read command-line arguments from file
+  -a          (-duplicates)         Allow duplicate tag names in output
+  -b          (-binary)             Output data in binary format
+  -c FMT      (-coordFormat)        Set format for GPS coordinates
+  -d FMT      (-dateFormat)         Set format for date/time values
+  -D          (-decimal)            Show tag ID numbers in decimal
+  -e          (--composite)         Do not calculate composite tags
+  -E          (-escapeHTML)         Escape special characters for HTML
+  -ee         (-extractEmbedded)    Extract information from embedded files
+  -ext EXT    (-extension)          Process files with specified extension
+  -f          (-forcePrint)         Force printing of all specified tags
+  -F[OFFSET]  (-fixBase)            Fix the base for maker notes offsets
+  -fast                             Increase speed for slow devices
+  -g[NUM...]  (-groupHeadings)      Organize output by tag group
+  -G[NUM...]  (-groupNames)         Print group name for each tag
+  -h          (-htmlFormat)         Use HMTL formatting for output
+  -H          (-hex)                Show tag ID number in hexadecimal
+  -htmlDump[OFFSET]                 Generate HTML-format binary dump
+  -i DIR      (-ignore)             Ignore specified directory name
+  -if EXPR                          Conditionally process files
+  -k          (-pause)              Pause before terminating
+  -l          (-long)               Use long 2-line output format
+  -L          (-latin)              Use Windows Latin1 encoding
+  -list                             List all tag names
+  -listw                            List writable tag names
+  -listf                            List recognized file extensions
+  -listwf                           List writable file extensions
+  -listg[NUM]                       List groups in specified family
+  -listd                            List deletable groups
+  -m          (-ignoreMinorErrors)  Ignore minor errors
+  -n          (--printConv)         Disable print conversion
+  -o OUTFILE  (-out)                Set output file or directory name
+  -overwrite_original               Overwrite original by renaming tmp file
+  -overwrite_original_in_place      Overwrite original by copying tmp file
+  -p FMTFILE  (-printFormat)        Print output in specified format
+  -P          (-preserve)           Preserve date/time of original file
+  -q          (-quiet)              Quiet processing
+  -r          (-recurse)            Recursively process subdirectories
+  -s          (-short)              Short output format
+  -S          (-veryShort)          Very short output format
+  -scanForXMP                       Brute force XMP scan
+  -sep STR    (-separator)          Set separator string for list items
+  -t          (-tab)                Output in tab-delimited list format
+  -T          (-table)              Output in tabular format
+  -tagsFromFile SRCFILE             Copy tag values from file
+  -u          (-unknown)            Extract unknown tags
+  -U          (-unknown2)           Extract unknown binary tags too
+  -v[NUM]     (-verbose)            Print verbose messages
+  -ver                              Print version number and exit
+  -w EXT      (-textOut)            Write console output to file
+  -x TAG      (-exclude)            Exclude specified tag
+  -X          (-xmlFormat)          Use RDF/XML output format
+  -z          (-zip)                Read/write compressed information
+
+  -common_args                      Define common arguments
+  -execute                          Execute multiple commands on one line
+  -srcfile FMT                      Set different source file name
+
+=head2 Option Details
 
 =over 5
 
@@ -1823,11 +1933,11 @@ argument, because that would be interpreted as a tag name.
 
 Extract information for specified tag (ie. C<-CreateDate>).  See
 L<Image::ExifTool::TagNames|Image::ExifTool::TagNames> for documentation on
-available tag names.  A tag name may include a leading group name separated
-by a colon (ie. C<-XMP:Creator>).  Any family 0 or 1 group name may be used,
-and the group name may be prefixed by a digit to specify family number (ie.
-C<-1IPTC:Keywords>).  Use the B<-listg> or B<-listg1> option to list valid
-family 0 or 1 group names.
+available tag names.  A tag name may include leading group names separated
+by colons (ie. C<-EXIF:CreateDate>, or C<-Doc1:XMP:Creator>), and each group
+name may be prefixed by a digit to specify family number (ie.
+C<-1IPTC:City>).  Use the B<-listg> option to list available group names by
+family.
 
 A special tag name of C<All> may be used to indicate all meta information.
 This is particularly useful when a group name is specified to extract all
@@ -1842,12 +1952,12 @@ information.  Use the B<-s> option to see the tag names instead.
 =item B<-->I<TAG>
 
 Exclude specified tag from extracted information.  Same as the B<-x> option.
-May also be used following a B<-TagsFromFile> option to exclude tags from
+May also be used following a B<-tagsFromFile> option to exclude tags from
 being copied, or to exclude groups from being deleted when deleting all
 information (ie. C<-all= --exif:all> deletes all but EXIF information).
 
 Note that this will not exclude individual tags from a group delete.
-Instead, the tags must be recovered using the B<-TagsFromFile> option.
+Instead, the tags must be recovered using the B<-tagsFromFile> option.
 
 =item B<->I<TAG>[+-]B<=>[I<VALUE>]
 
@@ -1858,16 +1968,17 @@ add or remove existing entries from a list, or to shift date/time values
 and C<-=> may be used to conditionally remove or replace a tag (see
 L</WRITING EXAMPLES> for examples).
 
-If a group name is not specified for I<TAG>, then the information is written
-to the preferred group, which is the first group in the following list where
-I<TAG> is valid:  1) EXIF, 2) IPTC, 3) XMP, 4) MakerNotes.
+I<TAG> may contain a leading family 0 or 1 group name separated by a colon.
+If no group name is specified, the information is written to the preferred
+group, which is the first group in the following list where I<TAG> is valid:
+1) EXIF, 2) IPTC, 3) XMP, 4) MakerNotes.
 
 The special C<All> tag may be used in this syntax only if a I<VALUE> is NOT
 given.  This causes all meta information to be deleted (or all information
 in a group if C<-GROUP:All=> is used).  Note that not all groups are
-deletable.  Also, within an image some groups may be contained within
-others, and these groups are removed if the super group is deleted.  Below
-are lists of these group dependencies:
+deletable.  Use the B<-listd> option for a complete list of deletable
+groups.  Also, within an image some groups may be contained within others,
+and these groups are removed if the containing group is deleted:
 
   JPEG Image:
   - Deleting EXIF or IFD0 also deletes ExifIFD, GlobParamIFD,
@@ -1894,7 +2005,7 @@ entries, or to shift date/time values.
 Read command-line arguments from the specified file.  The file contains one
 argument per line (NOT one option per line -- some options require
 additional arguments which must be placed on separate lines).  Blank lines
-and lines beginning with C<#> and are ignored.   Normal shell processing of
+and lines beginning with C<#> and are ignored.  Normal shell processing of
 arguments is not performed, which among other things means that arguments
 should not be quoted.  I<ARGFILE> may exist relative to either the current
 directory or the exiftool directory unless an absolute pathname is given.
@@ -1906,22 +2017,23 @@ For example, the following I<ARGFILE> will set the value of Copyright to
     %Y
     -copyright<Copyright $createdate, Phil Harvey
 
-=item B<-a>, B<--a>
+=item B<-a>, B<--a> (B<-duplicates>, B<--duplicates>)
 
-B<A>llow (B<-a>) or supress (B<--a>) duplicate tag names in the output.  By
-default, duplicate tags are suppressed unless the B<-X> option is used.
+Allow (B<-a>) or supress (B<--a>) duplicate tag names in the output.  By
+default, duplicate tags are suppressed unless the B<-X> or B<-ee> options
+are used.
 
-=item B<-b>
+=item B<-b> (B<-binary>)
 
-Output requested data in B<b>inary format without tag names or descriptions.
+Output requested data in binary format without tag names or descriptions.
 This option is mainly used for extracting embedded images or other binary
 data, but it may also be useful for some text strings since control
 characters (such as newlines) are not replaced by '.' as they are in the
 default output.
 
-=item B<-c> I<FMT>
+=item B<-c> I<FMT> (B<-coordFormat>)
 
-Set the print format for GPS B<c>oordinates.  I<FMT> uses the same syntax as
+Set the print format for GPS coordinates.  I<FMT> uses the same syntax as
 the C<printf> format string.  The specifiers correspond to degrees, minutes
 and seconds in that order, but minutes and seconds are optional.  For
 example, the following table gives the output for the same coordinate using
@@ -1933,42 +2045,50 @@ various formats:
     "%d deg %.4f min"      54 deg 59.3800 min
     "%.6f degrees"         54.989667 degrees
 
-=item B<-d> I<FMT>
+=item B<-d> I<FMT> (B<-dateFormat>)
 
-Set the format for B<d>ate/time tag values.  Consult C<strftime> man page
-for I<FMT> syntax. The default format is equivalent to "%Y:%m:%d %H:%M:%S".
-This option has no effect on date-only or time-only tags and ignores
-timezone information if present.  The inverse operation (ie. un-formatting a
+Set the format for date/time tag values.  Consult C<strftime> man page for
+I<FMT> syntax. The default format is equivalent to "%Y:%m:%d %H:%M:%S". This
+option has no effect on date-only or time-only tags and ignores timezone
+information if present.  The inverse operation (ie. un-formatting a
 date/time value) is currently not applied when writing a date/time tag.
 
-=item B<-D>
+=item B<-D> (B<-decimal>)
 
-Show tag ID number in B<D>ecimal.
+Show tag ID number in decimal.
 
-=item B<-e>
+=item B<-e> (B<--composite>)
 
-Print B<e>xisting tags only -- don't calculate composite tags.
+Print existing tags only -- don't calculate composite tags.
 
-=item B<-E>
+=item B<-E> (B<-escapeHTML>)
 
-B<E>scape characters in output values for HTML.  Implied with the B<-h>
-option.
+Escape characters in output values for HTML.  Implied with the B<-h> option.
 
-=item B<-ext> I<EXT>, B<--ext> I<EXT>
+=item B<-ee> (B<-extractEmbedded>)
+
+Extract information from embedded documents in EPS and PDF files.  Implies
+the B<-a> option.  Use B<-g3> or B<-G3> to identify the originating document
+for extracted information.  Embedded documents containing sub-documents are
+indicated with dashes in the family 3 group name.  (ie. C<Doc2-3> is the 3rd
+sub-document of the 2nd embedded document.)
+
+=item B<-ext> I<EXT>, B<--ext> I<EXT> (B<-extension>)
 
 Process only files with (B<-ext>) or without (B<--ext>) a specified
-extension.  There may be multiple B<-ext> and B<--ext> options.  Extensions may
-begin with a leading '.', and case is not significant.  For example:
+extension.  There may be multiple B<-ext> and B<--ext> options.  Extensions
+may begin with a leading '.', and case is not significant.  For example:
 
     exiftool -ext .JPG DIR            # process only JPG files
     exiftool --ext crw --ext dng DIR  # process all but CRW and DNG
     exiftool --ext . DIR              # ignore if no extension
 
-=item B<-f>
+=item B<-f> (B<-forcePrint>)
 
-B<F>orce printing of tags even if their values are not found.
+Force printing of tags even if their values are not found.  This option only
+applies when tag names are specified.
 
-=item B<-F>[I<OFFSET>]
+=item B<-F>[I<OFFSET>] (B<-fixBase>)
 
 Fix the base for maker notes offsets.  A common problem with some image
 editors is that offsets in the maker notes are not adjusted properly when
@@ -1988,26 +2108,30 @@ AFCP or PreviewImage trailer.  The speed benefits are small when reading
 images directly from disk, but can be substantial if piping images through a
 network connection.
 
-=item B<-g>[I<NUM>]
+=item B<-g>[I<NUM>][:I<NUM>...] (B<-groupHeadings>)
 
-Organize output by tag B<g>roup.  I<NUM> specifies the group family number,
-and may be 0 (general location), 1 (specific location) or 2 (category).  If
-not specified, B<-g0> is assumed.  Use the B<-listg> option to list all
-group names for a specified family.
+Organize output by tag group.  I<NUM> specifies a group family number, and
+may be 0 (general location), 1 (specific location), 2 (category) or 3
+(document number).  Multiple families may be specified by separating them
+with colons.  By default the resulting group name is simplified by removing
+any leading C<Main:> and collapsing adjacent identical group names, but this
+can avoided by placing a colon before the first family number (ie.
+B<-g:3:1>).  If I<NUM> is not specified, B<-g0> is assumed.  Use the
+B<-listg> option to list group names for a specified family.
 
-=item B<-G>[I<NUM>]
+=item B<-G>[I<NUM>][:I<NUM>...] (B<-groupNames>)
 
-Same as B<-g> but print B<G>roup name for each tag.
+Same as B<-g> but print group name for each tag.
 
-=item B<-h>
+=item B<-h> (B<-htmlFormat>)
 
-Use B<H>TML formatting for output.  Implies B<-E> option.  The formatting
+Use HTML formatting for output.  Implies B<-E> option.  The formatting
 options B<-D>, B<-H>, B<-g>, B<-G>, B<-l> and B<-s> may be used in
 combination with B<-h> to influence the HTML format.
 
-=item B<-H>
+=item B<-H> (B<-hex>)
 
-Show tag ID number in B<H>exadecimal.
+Show tag ID number in hexadecimal.
 
 =item B<-htmlDump>[I<OFFSET>]
 
@@ -2021,9 +2145,9 @@ B<-htmlDump0> for absolute offsets.  Currently only EXIF and TIFF
 information is dumped, but the -u option can be used to give a raw hex dump
 of other file formats.
 
-=item B<-i> I<DIR>
+=item B<-i> I<DIR> (B<-ignore>)
 
-B<I>gnore specified directory name.  May be multiple B<-i> options.
+Ignore specified directory name.  May be multiple B<-i> options.
 
 =item B<-if> I<EXPR>
 
@@ -2044,67 +2168,70 @@ conditions must be satisfied to process the file.  Below are a few examples:
     # set EXIF ISO value if possible, unless it is set already
     exiftool '-exif:iso<iso' -if 'not $exif:iso' dir
 
-=item B<-k>
+=item B<-k> (B<-pause>)
 
 Pause with the message C<-- press any key --> before terminating.  This
 option is used to prevent the command window from closing when run as a
 Windows drag and drop application.
 
-=item B<-l>
+=item B<-l> (B<-long>)
 
-Use B<l>ong 2-line Canon-style output format.  Adds a description to the XML
+Use long 2-line Canon-style output format.  Adds a description to the XML
 output when B<-X> is used.
 
-=item B<-L>
+=item B<-L> (B<-latin>)
 
-Convert 16-bit Unicode characters in output to Windows B<L>atin1 (cp1252)
-instead of the default UTF-8.  When writing, -L is used to specify that
-input text values are Latin1 instead of UTF-8.
+Convert Unicode characters in output to Windows Latin1 (cp1252) instead of
+the default UTF-8.  When writing, B<-L> is used to specify that input text
+values are Latin1 instead of UTF-8.
 
 =item B<-list>, B<-listw>, B<-listf>, B<-listwf>, B<-listg>[I<NUM>],
 B<-listd>
 
-Print a B<list> of all valid tag names (B<-list>), all B<w>ritable tag names
-(B<-listw>), all recognized B<f>ile extensions (B<-listf>), all B<w>ritable
-B<f>ile extensions (B<-listwf>), all tag B<g>roups [in a specified family]
-(B<-listg>[I<NUM>]), or all B<d>eletable tag groups (B<-listd>).  The
-B<-list> and B<-listw> options may be followed by an additional argument of
-the form C<-GROUP:All> to list all tags in a specific group.  With
-B<-listg>, I<NUM> may be given to specify the group family, otherwise family
-0 is assumed. For example:
+Print a list of all valid tag names (B<-list>), all writable tag names
+(B<-listw>), all recognized file extensions (B<-listf>), all writable file
+extensions (B<-listwf>), all tag groups [in a specified family]
+(B<-listg>[I<NUM>]), or all deletable tag groups (B<-listd>).  The B<-list>
+and B<-listw> options may be followed by an additional argument of the form
+C<-GROUP:All> to list all tags in a specific group, where C<GROUP> is one or
+more family 0-2 group names (excepting EXIF IFD groups) separated by colons.
+With B<-listg>, I<NUM> may be given to specify the group family, otherwise
+family 0 is assumed.  For example:
 
-    -list               # list all tag names
-    -list -EXIF:All     # list all EXIF tags
-    -listw -XMP-dc:All  # list all writable XMP-dc tags
-    -listf              # list all recognized file extensions
-    -listwf             # list all writable file extensions
-    -listg1             # list all groups in family 1
-    -listd              # list all deletable groups
+    -list                # list all tag names
+    -list -EXIF:All      # list all EXIF tags
+    -list -xmp:time:all  # list all XMP tags relating to time
+    -listw -XMP-dc:All   # list all writable XMP-dc tags
+    -listf               # list all recognized file extensions
+    -listwf              # list all writable file extensions
+    -listg1              # list all groups in family 1
+    -listd               # list all deletable groups
 
-=item B<-m>
+=item B<-m> (B<-ignoreMinorErrors>)
 
-Ignore B<m>inor errors.  Allows writing if some minor errors occur, or
+Ignore minor errors.  Allows writing if some minor errors occur, or
 extraction of embedded images that aren't in standard JPG format.
 
-=item B<-n>
+=item B<-n> (B<--printConv>)
 
-Read and write values as B<n>umbers instead of words.  This option disables
-the print conversion that is applied when extracting values to make them
-more readable, and the inverse print conversion when writing.  For example:
+Read and write values as numbers instead of words.  This option disables the
+print conversion that is applied when extracting values to make them more
+readable.  For example:
 
     > exiftool -Orientation -S a.jpg
     Orientation: Rotate 90 CW
     > exiftool -Orientation -S -n a.jpg
     Orientation: 6
 
-and the following two writing commands have the same effect
+This option also disables the inverse print conversion when writing, so the
+following two commands have the same effect:
 
     > exiftool -Orientation='Rotate 90 CW' a.jpg
     > exiftool -Orientation=6 -n a.jpg
 
-=item B<-o> I<OUTFILE> or I<FMT>
+=item B<-o> I<OUTFILE> or I<FMT> (B<-out>)
 
-Set the B<o>utput file or directory name when writing information.  (Without
+Set the output file or directory name when writing information.  (Without
 this option, the original file is renamed to C<FILE_original> and output is
 sent to I<FILE>.)  The output file name may also be specified using a I<FMT>
 string in which %d, %f and %e represent the directory, file name and
@@ -2135,19 +2262,19 @@ temporary file.
 
 =item B<-overwrite_original_in_place>
 
-Similar to the B<-overwrite_original> option except that an extra step is
-added to allow the original file attributes to be preserved.  On a Macintosh
-for example, this preserves the original file type, creator and icon.  This
+Similar to B<-overwrite_original> except that an extra step is added to
+allow the original file attributes to be preserved.  For example, on a Mac
+this causes the original file type, creator and icon to be preserved.  This
 is implemented by copying the contents of a temporary file over the
 original, then deleting the temporary file.  The extra step results in
 slower performance, so the B<-overwrite_original> option should be used
 instead unless necessary.
 
-=item B<-p> I<FMTFILE> or I<STR>
+=item B<-p> I<FMTFILE> or I<STR> (B<-printFormat>)
 
-B<P>rint output in the format specified by the given file or string (and
-ignore other format options).  Tag names in the format file or string begin
-with a C<$> symbol and may contain an optional group name.  Case is not
+Print output in the format specified by the given file or string (and ignore
+other format options).  Tag names in the format file or string begin with a
+C<$> symbol and may contain an optional group name.  Case is not
 significant.  Braces C<{}> may be used around the tag name to separate it
 from subsequent text.  Use C<$$> to represent a C<$> symbol.  C<$/> may be
 used for a newline.  In the file, lines beginning with C<#> are ignored. For
@@ -2167,26 +2294,26 @@ is used.  Otherwise a minor warning is issued and the line with the missing
 tag is not printed.  However, if the B<-m> option is used, minor warnings
 are ignored and the line is printed with an empty tag value.
 
-=item B<-P>
+=item B<-P> (B<-preserve>)
 
-B<P>reserve date/time of original file (C<FileModifyDate>) when writing.
+Preserve date/time of original file (C<FileModifyDate>) when writing.
 
-=item B<-q>
+=item B<-q> (B<-quiet>)
 
-B<Q>uiet processing.  One B<-q> suppresses normal informational messages,
-and a second B<-q> suppresses warnings as well.  Error messages can not be
+Quiet processing.  One B<-q> suppresses normal informational messages, and a
+second B<-q> suppresses warnings as well.  Error messages can not be
 suppressed, although minor errors may be downgraded to warnings with the
 B<-m> option.
 
-=item B<-r>
+=item B<-r> (B<-recurse>)
 
-B<R>ecursively scan subdirectories.  Only meaningful if I<FILE> is a
-directory name.
+Recursively process files in subdirectories.  Only meaningful if I<FILE> is
+a directory name.
 
-=item B<-s>
+=item B<-s> (B<-short>)
 
-Print tag names instead of descriptions.  This is the B<s>hort output
-format.  Add up to 3 B<-s> options for even shorter formats:
+Short output format.  Prints tag names instead of descriptions.  Add up to 3
+B<-s> options for even shorter formats:
 
     -s        - print tag names instead of descriptions
     -s -s     - no extra spaces to column-align values
@@ -2194,38 +2321,42 @@ format.  Add up to 3 B<-s> options for even shorter formats:
 
 Also effective when combined with B<-t>, B<-h> or B<-X> options.
 
-=item B<-S>
+=item B<-S> (B<-veryShort>)
 
-Very B<s>hort format.  The same as two B<-s> options.  Extra spaces used
-to column-align values are not printed.
+Very short format.  The same as two B<-s> options.  Extra spaces used to
+column-align values are not printed.
 
-=item B<-ScanForXMP>
+=item B<-scanForXMP>
 
 Scan all files (even unrecognized formats) for XMP information unless found
 already.  When combined with the B<-fast> option, only unrecognized file
 types are scanned.  Warning: It can be time consuming to scan large files.
 
-=item B<-sep> I<STR>
+=item B<-sep> I<STR> (B<-separator>)
 
-Specify separator for values in List-type tags.  Default is ", ".
+Specify separator string for items in List-type tags.  When reading, the
+default is ", ".  When writing, this option causes values assigned to
+list-type tags to be split into individual items at each substring matching
+specified separator.  Space characters in the separator string match zero or
+more whitespace characters.
 
-=item B<-t>
+=item B<-t> (B<-tab>)
 
-Output a B<t>ab-delimited list of description/values (useful for database
+Output a tab-delimited list of description/values (useful for database
 import).  May be combined with B<-s> to print tag names instead of
 descriptions, or B<-S> to print tag values only, tab-delimited on a single
 line.
 
-=item B<-T>
+=item B<-T> (B<-table>)
 
-Output tag values in B<T>able form.  (Equivalent to B<-t -S -q -f>.)
+Output tag values in table form.  (Equivalent to B<-t -S -q -f>.)
 
-=item B<-TagsFromFile> I<SRCFILE> or I<FMT>
+=item B<-tagsFromFile> I<SRCFILE> or I<FMT>
 
 Copy tag values from I<SRCFILE> to I<FILE>.  Tag names on the command line
 after this option specify the tags to be copied, or excluded from the copy.
 If no tags are specified, then all tags from the source file are copied.
-More than one B<-TagsFromFile> option may be used to copy tags from multiple
+More than one B<-tagsFromFile> option may be used to copy tags from multiple
 files.
 
 By default, this option will commute information between same-named tags in
@@ -2239,7 +2370,7 @@ group in the destination file.
 
 I<SRCFILE> may be the same as I<FILE> to move information around within a
 file.  In this case, C<@> may be used to represent the source file (ie.
-C<-TagsFromFile @>), permitting this feature to be used for batch processing
+C<-tagsFromFile @>), permitting this feature to be used for batch processing
 multiple files (see note 3 below).  Specified tags are then copied from each
 file in turn as it is rewritten.  For advanced batch use, the source file
 name may also be specified using a I<FMT> string in which %d, %f and %e
@@ -2250,14 +2381,14 @@ A powerful redirection feature allows a destination tag to be specified for
 each extracted tag.  With this feature, information may be written to a tag
 with a different name or group.  This is done using
 E<quot>'-I<SRCTAG>E<gt>I<DSTTAG>'E<quot> on the command line after
-B<-TagsFromFile> (E<quot>'-I<DSTTAG>E<lt>I<SRCTAG>'E<quot> also works).
+B<-tagsFromFile> (E<quot>'-I<DSTTAG>E<lt>I<SRCTAG>'E<quot> also works).
 Note that this argument must be quoted to prevent shell redirection, and
 there is no C<=> sign as when assigning new values.  Both source and
 destination tags may be prefixed by a group name, and C<All> or C<*> may be
 used as a tag or group name.  If no destination group is specified, the
 information is written to the preferred group.  As a convenience,
-C<-TagsFromFile @> is assumed for any redirected tags which are specified
-without a prior B<-TagsFromFile> option.  Copied tags may also be added or
+C<-tagsFromFile @> is assumed for any redirected tags which are specified
+without a prior B<-tagsFromFile> option.  Copied tags may also be added or
 deleted from a list with arguments of the form
 E<quot>'-I<SRCTAG>+E<gt>I<DSTTAG>'E<quot> or
 E<quot>'-I<SRCTAG>-E<gt>I<DSTTAG>'E<quot>.
@@ -2272,7 +2403,7 @@ otherwise attempt to set the tag value from the contents of a file.  A
 single space at the start of the string is removed if it exists, but all
 other whitespace is preserved.
 
-See L</COPYING EXAMPLES> for examples using B<-TagsFromFile>.
+See L</COPYING EXAMPLES> for examples using B<-tagsFromFile>.
 
 Notes:
 
@@ -2308,19 +2439,19 @@ list when this is the intent.  To change this, a B<-addTagsFromFile> option
 is provided to allow multiple items to be copied to the same list.  Other
 than this difference, B<-addTagsFromFile> is equivalent to B<-tagsFromFile>.
 
-=item B<-u>
+=item B<-u> (B<-unknown>)
 
-Extract values of B<u>nknown tags.  Add another B<-u> to also extract
-unknown information from binary data blocks.
+Extract values of unknown tags.  Add another B<-u> to also extract unknown
+information from binary data blocks.
 
-=item B<-U>
+=item B<-U> (B<-unknown2>)
 
-Extract values of B<u>nknown tags as well as unknown information from binary
+Extract values of unknown tags as well as unknown information from binary
 data blocks.  This is the same as two B<-u> options.
 
-=item B<-v>[I<NUM>]
+=item B<-v>[I<NUM>] (B<-verbose>)
 
-Print B<v>erbose messages.  I<NUM> specifies the level of verbosity in the
+Print verbose messages.  I<NUM> specifies the level of verbosity in the
 range 0-5, with higher numbers being more verbose.  If I<NUM> is not given,
 then each B<-v> option increases the level of verbosity by 1.  This option
 suppresses normal console output unless specific tags are being extracted.
@@ -2331,9 +2462,9 @@ B<-v0> is used when writing to print only the processed file names, and the
 
 Print version number and exit.
 
-=item B<-w> I<EXT> or I<FMT>
+=item B<-w> I<EXT> or I<FMT> (B<-textOut>)
 
-B<W>rite console output to a file with name ending in I<EXT> for each source
+Write console output to a file with name ending in I<EXT> for each source
 file.  The output file name is obtained by replacing the source file
 extension (including the '.') with the specified extension (and a '.' is
 added to the start of I<EXT> if it didn't contain one).  Alternatively, a
@@ -2390,18 +2521,18 @@ modify the copy number (%c), the numbers are changed to an alphabetical base
 (see example H above).  Also, %c may be modified by 'n' to count using
 natural numbers starting from 1, instead of 0 (see example F).
 
-This same I<FMT> syntax is used with the B<-o> and B<-TagsFromFile> options,
+This same I<FMT> syntax is used with the B<-o> and B<-tagsFromFile> options,
 although %c is only valid for output file names.
 
-=item B<-x> I<TAG>
+=item B<-x> I<TAG> (B<-exclude>)
 
-EB<x>clude the specified tag.  There may be multiple B<-x> options.  This
-has the same effect as --I<TAG> on the command line.  May also be used
-following a B<-TagsFromFile> option to exclude tags from being copied.
+Exclude the specified tag.  There may be multiple B<-x> options.  This has
+the same effect as --I<TAG> on the command line.  May also be used following
+a B<-tagsFromFile> option to exclude tags from being copied.
 
-=item B<-X>
+=item B<-X> (B<-xmlFormat>)
 
-Use RDF/B<X>ML formatting for console output.  Implies the B<-a> option so
+Use RDF/XML formatting for console output.  Implies the B<-a> option so
 duplicate tags are extracted.  The formatting options B<-D>, B<-H>, B<-l>
 and B<-s> may be used in combination with B<-X> to affect the output, but
 note that tag ID's (B<-D> and B<-H> options) may not be added to the short
@@ -2411,16 +2542,16 @@ with multiple values are formatted as an RDF Bag, but they are combined into
 a single string when B<-sep> or B<-s> is used.  Using B<-L> changes the XML
 encoding from "UTF-8" to "windows-1252".
 
-=item B<-z>
+=item B<-z> (B<-zip>)
 
-When reading, causes information to be extracted from .gB<z> and .bB<z>2
+When reading, causes information to be extracted from .gz and .bz2
 compressed images.  (Only one image per archive.)  When writing, causes
 compressed information to be written if supported by the image format.  (ie.
 The PNG format supports compressed text.)
 
 =back
 
-=head2 Advanced Options
+=head3 Advanced Options
 
 The following options allow complex processing to be performed with a single
 command without the need for additional scripting.  This may be particularly
@@ -2507,9 +2638,13 @@ directory, adding C<_JFR.JPG> for the name of the output JPG files.
 
 Print formatted date/time for all JPG files in a directory.
 
-=item exiftool -IFD1:XResolution -IFD1:YResolution
+=item exiftool -IFD1:XResolution -IFD1:YResolution image.jpg
 
 Extract image resolution from EXIF IFD1 information (thumbnail image IFD).
+
+=item exiftool -xmp:author:all -a image.jpg
+
+Extract all author-related XMP information from an image.
 
 =item exiftool -xmp -b a.jpg > out.xmp
 
@@ -2650,7 +2785,7 @@ These examples demonstrate the ability to copy tag values between files.
 
 =over 5
 
-=item exiftool -TagsFromFile src.crw dst.jpg
+=item exiftool -tagsFromFile src.crw dst.jpg
 
 Copy the values of all writable tags from C<src.crw> to C<dst.jpg>, writing
 the information to the preferred groups.
@@ -2665,7 +2800,7 @@ preserving the original tag groups.
 Erase all meta information from C<dst.jpg> image, then copy EXIF tags from
 C<src.jpg>.
 
-=item exiftool -tagsfromfile a.jpg out.xmp
+=item exiftool -Tagsfromfile a.jpg out.xmp
 
 Copy meta information C<a.jpg> to an XMP data file.  If the XMP data file
 C<out.xmp> already exists, it will be updated with the new information.
@@ -2860,7 +2995,7 @@ Macintosh filesystems.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey
+Copyright 2003-2009, Phil Harvey
 
 This is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.

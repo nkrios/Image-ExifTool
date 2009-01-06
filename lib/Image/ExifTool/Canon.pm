@@ -10,6 +10,8 @@
 #               01/30/2005 - P. Harvey Added a few more tags (ref 4)
 #               02/10/2006 - P. Harvey Decode a lot of new tags (ref 12)
 #
+# Notes:        Must check FocalPlaneX/YResolution values for each new model!
+#
 # References:   1) http://park2.wakwak.com/~tsuruzoh/Computer/Digicams/exif-e.html
 #               2) Michael Rommel private communication (Digital Ixus)
 #               3) Daniel Pittman private communication (PowerShot S70)
@@ -45,6 +47,7 @@
 #              32) Rich Taylor private communication (5D)
 #              33) D.J. Cristi private communication
 #              34) Andreas Huggel and Pascal de Bruijn private communication
+#              35) Jan Boelsma private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -57,7 +60,7 @@ use Image::ExifTool::Exif;
 sub WriteCanon($$$);
 sub ProcessSerialData($$$);
 
-$VERSION = '2.08';
+$VERSION = '2.11';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -265,6 +268,7 @@ my %canonLensTypes = ( #4
     245 => 'Canon EF 70-200mm f/4L IS + 2.8x', #32
     246 => 'Canon EF 16-35mm f/2.8L II', #PH
     247 => 'Canon EF 14mm f/2.8L II USM', #32
+    249 => 'Canon EF 800mm f/5.6L IS', #35
 );
 
 # Canon model ID numbers (PH)
@@ -381,7 +385,8 @@ my %canonLensTypes = ( #4
     0x4007d778 => 'iVIS HV20',
     0x4007d779 => 'DC211', #29
     0x4007d77b => 'iVIS HR10', #29
-    0x4007d880 => 'iVIS HF10', #29
+    0x4007d87f => 'FS100',
+    0x4007d880 => 'iVIS HF10', #29 (VIXIA HF10)
     0x80000001 => 'EOS-1D',
     0x80000167 => 'EOS-1DS',
     0x80000168 => 'EOS 10D',
@@ -623,6 +628,13 @@ my %printParameter = (
             },
         },
         {
+            Name => 'CanonCameraInfo5DmkII',
+            Condition => '$$self{Model} =~ /EOS 5D Mark II$/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Canon::CameraInfo5DmkII',
+            },
+        },
+        {
             Name => 'CanonCameraInfo40D',
             Condition => '$$self{Model} =~ /EOS 40D$/',
             SubDirectory => {
@@ -645,7 +657,7 @@ my %printParameter = (
         },
         {
             Name => 'CanonCameraInfo1000D',
-            Condition => '$$self{Model} =~ /\b1000D\b/',
+            Condition => '$$self{Model} =~ /\b(1000D|REBEL XS|Kiss F)\b/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Canon::CameraInfo1000D',
             },
@@ -970,6 +982,7 @@ my %printParameter = (
         },
     },
     # 0x9a - 5 numbers, the 2nd and 3rd are imagewidth/height (EOS 1DmkIII and 40D)
+    #        (for the 5DmkII, this is true for raw and sraw2 images, but not sraw1)
     0xa0 => {
         Name => 'ProccessingInfo',
         SubDirectory => {
@@ -1068,13 +1081,23 @@ my %printParameter = (
         },
         {   # (int16u[692|674|702|1227])
             # 40D (692), 1DmkIII (674), 1DSmkIII (702), 450D/1000D (1227)
+            # 50D/5DmkII (1250)
             Condition => q{
                 $count == 692 or $count == 674 or
-                $count == 702 or $count == 1227
+                $count == 702 or $count == 1227 or
+                $count == 1250
             },
             Name => 'ColorBalance4',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Canon::ColorBalance4',
+            },
+        },
+        {   # (int16u[5120]) - G10
+            Condition => '$count == 5120',
+            Name => 'ColorBalance4b',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Canon::ColorBalance4',
+                Start => '$valuePtr + 16',
             },
         },
         {
@@ -1466,6 +1489,15 @@ my %printParameter = (
         RawConv => '$val == 0x7fff ? undef : $val',
         %printParameter,
     },
+    46 => { #PH
+        Name => 'SRAWQuality',
+        RawConv => '$val==-1 ? undef : $val',
+        PrintConv => {
+            0 => 'n/a',
+            1 => 'sRAW1',
+            2 => 'sRAW2',
+        },
+    },
 );
 
 # focal length information (MakerNotes tag 0x02)
@@ -1507,9 +1539,12 @@ my %printParameter = (
     2 => [ #4
         {
             Name => 'FocalPlaneXSize',
-            Notes => 'reported focal plane sizes are affected by digital zoom if applied',
-            # this conversion is not valid for the 1DmkIII, 1DSmkIII, 40D or 450D
-            Condition => '$$self{Model} !~ /\b(III|40D|450D|REBEL XSi|Kiss X2)\b/',
+            Notes => q{
+                these focal plane sizes are only valid for some models, and are affected by
+                digital zoom if applied
+            },
+            # this conversion is not valid for the 1DmkIII, 1DSmkIII, 5DmkII, 40D, 50D, 450D, 1000D
+            Condition => '$$self{Model} !~ /\b(III|5D Mark II|40D|50D|450D|1000D|REBEL XSi?|Kiss (X2|F))\b/',
             # focal plane image dimensions in 1/1000 inch -- convert to mm
             RawConv => '$val < 40 ? undef : $val',  # must be reasonable
             ValueConv => '$val * 25.4 / 1000',
@@ -1524,7 +1559,7 @@ my %printParameter = (
     3 => [ #4
         {
             Name => 'FocalPlaneYSize',
-            Condition => '$$self{Model} !~ /\b(III|40D|450D|REBEL XSi|Kiss X2)\b/',
+            Condition => '$$self{Model} !~ /\b(III|5D Mark II|40D|50D|450D|1000D|REBEL XSi?|Kiss (X2|F))\b/',
             RawConv => '$val < 40 ? undef : $val',  # must be reasonable
             ValueConv => '$val * 25.4 / 1000',
             ValueConvInv => 'int($val * 1000 / 25.4 + 0.5)',
@@ -1630,7 +1665,7 @@ my %printParameter = (
     # 11 - (8 for all EOS samples, [0,8] for other models - PH)
     13 => { #PH
         Name => 'FlashGuideNumber',
-        RawConv => '$val == -1 ? undef : $val',
+        RawConv => '$val==-1 ? undef : $val',
         ValueConv => '$val / 32',
         ValueConvInv => '$val * 32',
     },
@@ -1758,8 +1793,9 @@ my %printParameter = (
     },
     27 => {
         Name => 'AutoRotate',
+        RawConv => '$val >= 0 ? $val : undef',
         PrintConv => {
-           -1 => 'Rotated by Software',
+           -1 => 'Unknown', # (set to -1 when rotated by Canon software)
             0 => 'None',
             1 => 'Rotate 90 CW',
             2 => 'Rotate 180',
@@ -2302,7 +2338,7 @@ my %printParameter = (
     },
 );
 
-# Camera information for 5D  (MakerNotes tag 0x0d)
+# Camera information for 5D (MakerNotes tag 0x0d)
 # (ref 12 unless otherwise noted)
 %Image::ExifTool::Canon::CameraInfo5D = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -2351,6 +2387,14 @@ my %printParameter = (
         SeparateTable => 1,
         RawConv => '$val ? $val : undef', # don't use if value is zero
         PrintConv => \%canonLensTypes,
+    },
+    0x27 => { #PH
+        Name => 'CameraOrientation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+        },
     },
     0x28 => { #15
         Name => 'FocalLength',
@@ -2527,6 +2571,26 @@ my %printParameter = (
     },
 );
 
+# Camera information for 5D Mark II (MakerNotes tag 0x0d)
+%Image::ExifTool::Canon::CameraInfo5DmkII = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int8s',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'CameraInfo tags for the EOS 5D Mark II.',
+    0x31 => { #PH
+        Name => 'CameraOrientation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+        },
+    },
+);
+
 # Canon camera information for 40D (MakerNotes tag 0x0d)
 %Image::ExifTool::Canon::CameraInfo40D = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -2549,6 +2613,14 @@ my %printParameter = (
         ValueConvInv => 'unpack("v",pack("n",$val))',
         PrintConv => '"$val mm"',
         PrintConvInv => '$val=~s/\s*mm//;$val',
+    },
+    0x30 => { #20
+        Name => 'CameraOrientation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+        },
     },
     0x43 => { #21/24
         Name => 'FocusDistanceUpper',
@@ -2632,6 +2704,14 @@ my %printParameter = (
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'CameraInfo tags for the EOS 50D.',
+    0x31 => { #PH
+        Name => 'CameraOrientation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+        },
+    },
     0x50 => { #33
         Name => 'FocusDistanceUpper',
         Format => 'int16u',
@@ -2664,10 +2744,16 @@ my %printParameter = (
     0x15e => { #33
         Name => 'FirmwareVersion',
         Format => 'string[6]',
-        Notes => 'at this location for firmware 3.1.1',
+        Notes => 'at this location for firmware 1.0.3, 2.9.1 and 3.1.1',
         Writable => 0,
         RawConv => '$val=~/^\d+\.\d+\.\d+\s*$/ ? $val : undef',
     },
+    # This is definitely sharpness for firmware 1.0.3, but it doesn't always agree
+    # with the other Sharpness tag for firmware 2.6.1 and 2.9.1
+    # 0x036b => { #PH
+    #     Name => 'Sharpness',
+    #     Format => 'int16u',
+    # },
 );
 
 # Canon camera information for 450D (MakerNotes tag 0x0d)
@@ -2692,6 +2778,14 @@ my %printParameter = (
         ValueConvInv => 'unpack("v",pack("n",$val))',
         PrintConv => '"$val mm"',
         PrintConvInv => '$val=~s/\s*mm//;$val',
+    },
+    0x30 => { #20
+        Name => 'CameraOrientation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+        },
     },
     0x43 => { #20
         Name => 'FocusDistanceUpper',
@@ -2719,25 +2813,21 @@ my %printParameter = (
     },
     0xdf => { #33
         Name => 'LensType',
-        Condition => '$$self{Model} !~ /\b1000D\b/',
         SeparateTable => 1,
         Priority => 0,
         PrintConv => \%canonLensTypes,
     },
     0x107 => { #PH
         Name => 'FirmwareVersion',
-        Condition => '$$self{Model} !~ /\b1000D\b/',
         Format => 'string[6]',
     },
     0x133 => { #20
         Name => 'DirectoryIndex',
-        Condition => '$$self{Model} !~ /\b1000D\b/',
         Groups => { 2 => 'Image' },
         Format => 'int32u',
     },
     0x13f => { #20
         Name => 'FileIndex',
-        Condition => '$$self{Model} !~ /\b1000D\b/',
         Groups => { 2 => 'Image' },
         Format => 'int32u',
         ValueConv => '$val + 1',
@@ -2745,7 +2835,6 @@ my %printParameter = (
     },
     0x933 => { #33
         Name => 'LensModel',
-        Condition => '$$self{Model} !~ /\b1000D\b/',
         Format => 'string[64]',
     },
 );
@@ -2773,6 +2862,14 @@ my %printParameter = (
         PrintConv => '"$val mm"',
         PrintConvInv => '$val=~s/\s*mm//;$val',
     },
+    0x30 => { #20
+        Name => 'CameraOrientation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+        },
+    },
     0x43 => { #20
         Name => 'FocusDistanceUpper',
         Format => 'int16u',
@@ -2799,25 +2896,21 @@ my %printParameter = (
     },
     0xe3 => { #PH
         Name => 'LensType',
-        Condition => '$$self{Model} =~ /\b1000D\b/',
         SeparateTable => 1,
         Priority => 0,
         PrintConv => \%canonLensTypes,
     },
     0x10b => { #PH
         Name => 'FirmwareVersion',
-        Condition => '$$self{Model} =~ /\b1000D\b/',
         Format => 'string[6]',
     },
     0x137 => { #PH (NC)
         Name => 'DirectoryIndex',
-        Condition => '$$self{Model} =~ /\b1000D\b/',
         Groups => { 2 => 'Image' },
         Format => 'int32u',
     },
     0x143 => { #PH
         Name => 'FileIndex',
-        Condition => '$$self{Model} =~ /\b1000D\b/',
         Groups => { 2 => 'Image' },
         Format => 'int32u',
         ValueConv => '$val + 1',
@@ -2825,7 +2918,6 @@ my %printParameter = (
     },
     0x937 => { #PH
         Name => 'LensModel',
-        Condition => '$$self{Model} =~ /\b1000D\b/',
         Format => 'string[64]',
     },
 );
@@ -3446,8 +3538,9 @@ my %printParameter = (
     },
     2 => { #12
         Name => 'Sharpness',
-        Notes => '1D, 5D and 450D only',
-        Condition => '$$self{Model} =~ /\b(1D|5D|450D|XSi|Kiss X2)/',
+        Notes => 'all models except the 20D and 350D',
+        Condition => '$$self{Model} !~ /\b(20D|350D|REBEL XT|Kiss Digital N)\b/',
+        Priority => 0,  # (maybe not as reliable as other sharpness values)
     },
     3 => { #PH
         Name => 'SharpnessFrequency',
@@ -3567,13 +3660,13 @@ my %printParameter = (
     FIRST_ENTRY => 0,
     WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    24 => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16u[4]' },
-    28 => 'ColorTempAsShot',
+    24 => { Name => 'WB_RGGBLevelsAuto',        Format => 'int16u[4]' },
+    28 => 'ColorTempAuto',
     29 => { Name => 'WB_RGGBLevelsUnknown',     Format => 'int16u[4]', Unknown => 1 },
     33 => { Name => 'ColorTempUnknown', Unknown => 1 },
-    # (dcraw 8.81 uses index 34 for WB -- could this really be AsShot?)
-    34 => { Name => 'WB_RGGBLevelsAuto',        Format => 'int16u[4]' },
-    38 => 'ColorTempAuto',
+    # (dcraw 8.81 uses index 34 for WB)
+    34 => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16u[4]' },
+    38 => 'ColorTempAsShot',
     39 => { Name => 'WB_RGGBLevelsDaylight',    Format => 'int16u[4]' },
     43 => 'ColorTempDaylight',
     44 => { Name => 'WB_RGGBLevelsShade',       Format => 'int16u[4]' },
@@ -3668,16 +3761,22 @@ my %printParameter = (
     132 => 'ColorTempCustom',
 );
 
-# Color balance (MakerNotes tag 0x4001, count=674|692|702|1227) (ref PH)
+# Color balance (MakerNotes tag 0x4001, count=674|692|702|1227|1250) (ref PH)
+# (a similar record with count=5120 is found offset by 16 bytes for the G10)
 %Image::ExifTool::Canon::ColorBalance4 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    NOTES => 'These tags are used by the 40D, 1DmkIII, 1DSmkIII, 450D and 1000D.',
+    NOTES => q{
+        These tags are used by the 1DmkIII, 1DSmkIII, 40D, 50D, 5DmkII, 450D and
+        1000D, and also by the PowerShot G10 but with a base offset applied to all
+        indices.
+    },
     FORMAT => 'int16u',
     FIRST_ENTRY => 0,
     WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # 1,5,9,13,17,21 => unknown RGGB coefficients (int16u[4]) (50D)
     # (dcraw 8.81 uses index 63 for WB)
     63 => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16u[4]' },
     67 => 'ColorTempAsShot',
@@ -3685,8 +3784,11 @@ my %printParameter = (
     72 => 'ColorTempAuto',
     73 => { Name => 'WB_RGGBLevelsMeasured',    Format => 'int16u[4]' },
     77 => 'ColorTempMeasured',
-#    78 => { Name => 'WB_RGGBLevelsUnused',      Format => 'int16u[4]', Unknown => 1 },
-#    82 => { Name => 'ColorTempUnused',   Unknown => 1 },
+    # the following Unknown values are set for the 50D and 5DmkII, and the
+    # SRAW images of the 40D, and affect thumbnail display for the 50D/5DmkII
+    # and conversion for all modes of the 40D
+    78 => { Name => 'WB_RGGBLevelsUnknown',     Format => 'int16u[4]', Unknown => 1 },
+    82 => { Name => 'ColorTempUnknown', Unknown => 1 },
     83 => { Name => 'WB_RGGBLevelsDaylight',    Format => 'int16u[4]' },
     87 => 'ColorTempDaylight',
     88 => { Name => 'WB_RGGBLevelsShade',       Format => 'int16u[4]' },
@@ -3697,6 +3799,7 @@ my %printParameter = (
     102 => 'ColorTempTungsten',
     103 => { Name => 'WB_RGGBLevelsFluorescent',Format => 'int16u[4]' },
     107 => 'ColorTempFluorescent',
+    # (changing the Kelvin values has no effect on image in DPP... why not?)
     108 => { Name => 'WB_RGGBLevelsKelvin',     Format => 'int16u[4]' },
     112 => 'ColorTempKelvin',
     113 => { Name => 'WB_RGGBLevelsFlash',      Format => 'int16u[4]' },
@@ -4450,7 +4553,7 @@ Canon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -4477,9 +4580,9 @@ Thanks Michael Rommel and Daniel Pittman for information they provided about
 the Digital Ixus and PowerShot S70 cameras, Juha Eskelinen and Emil Sit for
 figuring out the 20D and 30D FileNumber, Denny Priebe for figuring out a
 couple of 1D tags, and Michael Tiemann, Rainer Honle, Dave Nicholson, Chris
-Huebsch, Ger Vermeulen, Darryl Zurn and D.J. Cristi for decoding a number of
-new tags.  Also thanks to everyone who made contributions to the LensType
-lookup list or the meanings of other tag values.
+Huebsch, Ger Vermeulen, Darryl Zurn, D.J. Cristi and Bogdan for decoding a
+number of new tags.  Also thanks to everyone who made contributions to the
+LensType lookup list or the meanings of other tag values.
 
 =head1 SEE ALSO
 

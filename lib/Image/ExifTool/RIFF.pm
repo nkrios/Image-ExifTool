@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 # type of current stream
 $Image::ExifTool::RIFF::streamType = '';
@@ -540,7 +540,10 @@ $Image::ExifTool::RIFF::streamType = '';
   # 7 => 'Start',
   # 8 => 'Length',
   # 9 => 'SuggestedBufferSize',
-    10 => 'Quality',
+    10 => {
+        Name => 'Quality',
+        PrintConv => '$val eq 0xffffffff ? "Default" : $val',
+    },
     11 => {
         Name => 'SampleSize',
         PrintConv => '$val ? "$val byte" . ($val==1 ? "" : "s") : "Variable"',
@@ -800,7 +803,7 @@ including Windows WAV audio and AVI video files.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

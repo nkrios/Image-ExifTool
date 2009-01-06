@@ -67,7 +67,7 @@ my $testnum = 1;
     $info = ImageInfo(\$gifImage, 'Comment', 'XMP');
     $exifTool->SetNewValue();       # clear previous new values
     $exifTool->SetNewValue(Comment => $$info{Comment});
-    $exifTool->SetNewValue(XMP => $$info{XMP});
+    $exifTool->SetNewValue(XMP => $$info{XMP}, Protected => 1);
     my $image3;
     $exifTool->WriteInfo(\$image2, \$image3);
     my $testfile = "t/${testname}_${testnum}_failed.gif";

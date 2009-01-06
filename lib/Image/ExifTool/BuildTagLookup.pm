@@ -29,7 +29,7 @@ use Image::ExifTool::IPTC;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '1.77';
+$VERSION = '1.82';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -102,7 +102,7 @@ tag this is writable only when the print conversion is disabled (by setting
 PrintConv to 0, or using the -n option).  An exclamation point (C<!>)
 indicates a tag that is considered unsafe to write under normal
 circumstances.  These "unsafe" tags are not set when calling
-SetNewValuesFromFile() or when using the exiftool -TagsFromFile option
+SetNewValuesFromFile() or when using the exiftool -tagsFromFile option
 unless specified explicitly, and care should be taken when editing them
 manually since they may affect the way an image is rendered.  An asterisk
 (C<*>) indicates a "protected" tag which is not writable directly, but is
@@ -133,6 +133,9 @@ B<Group> listed below is used unless another group is specified.
 Also listed in the table below are TIFF, DNG, HDP and other tags which are
 not part of the EXIF specification, but may co-exist with EXIF tags in some
 images.
+
+See L<http://www.exif.org/specifications.html> for the official EXIF
+specification.
 },
     GPS => q{
 These GPS tags are part of the EXIF standard, and are stored in a separate
@@ -163,21 +166,24 @@ The XMP B<Tag ID>'s aren't listed because in most cases they are identical
 to the B<Tag Name>.
 
 All XMP information is stored as character strings.  The B<Writable> column
-specifies the information format:  C<integer> is a string of digits
-(possibly beginning with a '+' or '-'), C<real> is a floating point number,
-C<rational> is two C<integer> strings separated by a '/' character, C<date>
-is a date/time string in the format "YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM]",
-C<boolean> is either "True" or "False", and C<lang-alt> is a list of string
-alternatives in different languages.
+specifies the information format:  C<string> is an unformatted string,
+C<integer> is a string of digits (possibly beginning with a '+' or '-'),
+C<real> is a floating point number, C<rational> is entered as a floating
+point number but stored as two C<integer> strings separated by a '/'
+character, C<date> is a date/time string entered in the format "YYYY:MM:DD
+HH:MM:SS[.SS][+/-HH:MM]", C<boolean> is either "True" or "False", and
+C<lang-alt> is a list of string alternatives in different languages.
 
 Individual languages for C<lang-alt> tags are accessed by suffixing the tag
-name with a '-', followed by an RFC 3066 language code (ie. "XMP:Title-fr",
-or "Rights-en-US").  A C<lang-alt> tag with no language code accesses the
-"x-default" language, but causes other languages to be deleted when writing.
-The "x-default" language code may be specified when writing a new value to
-write only the default language, but note that all languages are still
-deleted if "x-default" tag is deleted.  When reading, "x-default" is not
-specified.
+name with a '-', followed by an
+L<RFC 3066|http://www.ietf.org/rfc/rfc3066.txt> language code (ie.
+"XMP:Title-fr", or "Rights-en-US").  A C<lang-alt> tag with no language code
+accesses the "x-default" language, but causes other languages for this tag
+to be deleted when writing.  The "x-default" language code may be specified
+when writing to preserve other existing languages (ie.
+"XMP-dc:Description-x-default"), but note that other languages are still
+deleted if the "x-default" language is deleted.  When reading, "x-default"
+is not specified.
 
 The XMP tags are organized according to schema B<Namespace> in the following
 tables.  Note that a few of the longer namespace prefixes given below have
@@ -191,6 +197,8 @@ ExifTool will extract XMP information even if it is not listed in these
 tables.  For example, the C<pdfx> namespace doesn't have a predefined set of
 tag names because it is used to store application-defined PDF information,
 but this information is extracted by ExifTool.
+
+See L<http://www.adobe.com/devnet/xmp/> for the offical XMP specification.
 },
     IPTC => q{
 IPTC stands for "International Press Telecommunications Council".  This is
@@ -206,6 +214,8 @@ are not null terminated.
 
 IPTC information is separated into different records, each of which has its
 own set of tags.
+
+See L<http://www.iptc.org/IIM/> for the official IPTC specification.
 },
     Photoshop => q{
 Photoshop tags are found in PSD files, as well as inside embedded Photoshop
@@ -276,7 +286,10 @@ number of available PDF tags.
 
 When writing PDF files, ExifTool uses an increment update.  This has an
 advantage that the original PDF can be easily recovered by deleting the
-C<PDF-update> pseudo-group (with C<-PDF-update:all=> on the command line).
+C<PDF-update> pseudo-group (with C<-PDF-update:all=> on the command line). A
+disadvantage of the incremental update is that a linearized PDF file is no
+longer linearized after the update, so it must be subsequently re-linearized
+if this is required.
 },
     DNG => q{
 The main DNG tags are found in the EXIF table.  The tables below define only
@@ -322,7 +335,7 @@ L<Image::ExifTool::BuildTagLookup|Image::ExifTool::BuildTagLookup>.
 
 ~head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -410,8 +423,9 @@ sub new
         $longID{$tableName} = 0;
         $longName{$tableName} = 0;
         # save all tag names
-        my ($tagID, $binaryTable, $noID, $isIPTC);
+        my ($tagID, $binaryTable, $noID, $isIPTC, $isXMP);
         $isIPTC = 1 if $$table{WRITE_PROC} and $$table{WRITE_PROC} eq \&Image::ExifTool::IPTC::WriteIPTC;
+        $isXMP = 1 if $short =~ /^XMP\b/;
         $noID = 1 if $short =~ /^(Composite|XMP|Extra|Shortcuts|ASF.*)$/ or $$vars{NO_ID};
         if ($$vars{ID_LABEL} or ($table->{PROCESS_PROC} and
             $table->{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData))
@@ -445,6 +459,12 @@ TagID:  foreach $tagID (@keys) {
             }
             $format = $defFormat;
             foreach $tagInfo (@infoArray) {
+                my $writable;
+                if (defined $$tagInfo{Writable}) {
+                    $writable = $$tagInfo{Writable};
+                } elsif (not $$tagInfo{SubDirectory}) {
+                    $writable = $$table{WRITABLE};
+                }
                 if ($$tagInfo{Notes}) {
                     my $note = $$tagInfo{Notes};
                     # remove leading/trailing blank lines
@@ -452,12 +472,9 @@ TagID:  foreach $tagID (@keys) {
                     # remove leading/trailing spaces on each line
                     $note =~ s/(^[ \t]+|[ \t]+$)//mg;
                     push @values, "($note)";
-                }
-                my $writable;
-                if (defined $$tagInfo{Writable}) {
-                    $writable = $$tagInfo{Writable};
-                } elsif (not $$tagInfo{SubDirectory}) {
-                    $writable = $$table{WRITABLE};
+                } elsif ($isXMP and lc $tagID ne lc $$tagInfo{Name}) {
+                    # add note about different XMP Tag ID unless this is a structure tag
+                    push @values,"(called $tagID by the spec.)" if $writable and not $$tagInfo{PropertyPath};
                 }
                 my $writeGroup;
                 $writeGroup = $$tagInfo{WriteGroup};
@@ -901,6 +918,7 @@ sub Doc2Html($)
     $doc =~ s/\n\n/<\/p>\n\n<p>/g;
     $doc =~ s/B&lt;(.*?)&gt;/<b>$1<\/b>/sg;
     $doc =~ s/C&lt;(.*?)&gt;/<code>$1<\/code>/sg;
+    $doc =~ s/L&lt;([^&]+?)\|(.+?)&gt;/<a href="$2">$1<\/a>/sg;
     $doc =~ s/L&lt;(.*?)&gt;/<a href="$1">$1<\/a>/sg;
     return $doc;
 }
@@ -1234,7 +1252,7 @@ sub WriteTagNames($$)
                 my $wid = 0;
                 my @keys;
                 foreach (sort NumbersFirst keys %$printConv) {
-                    next if /^(Notes|PrintHex|PrintString)$/;
+                    next if /^(Notes|PrintHex|PrintString|OTHER)$/;
                     $align = '' if $align and /[^\d]/;
                     my $w = length($_) + length($$printConv{$_});
                     $wid = $w if $wid < $w;
@@ -1592,7 +1610,7 @@ WriteTagNames().
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -25,13 +25,12 @@ Existing files will not be overwritten.</p>
 may be used to represent the directory, name and extension of the original file
 when specifying <b>FileName</b> and <b>Directory</b> tags via the command-line
 interface. (In a similar way to the <code>-o</code>, <code>-w</code> and
-<code>-TagsFromFile</code> options.) Also, <code>%c</code> may be used to add a
+<code>-tagsFromFile</code> options.) Also, <code>%c</code> may be used to add a
 copy number to the output file name to avoid collisions with existing file
 names. Note that these codes must be escaped with an extra <code>%</code> if
 used within a date format string.  Modifiers may also be used to change the
-default behaviour of these format codes.  See the
-<a href="exiftool_pod.html#item__2dw_ext_or_fmt">-w option</a> documentation for
-details.</p>
+default behaviour of these format codes.  See the <code>-w</code> option in the
+<a href="exiftool_pod.html">application documentation</a> for details.</p>
 
 <p>When organizing files by date/time, use of the <code>-d</code> (date format)
 option is essential to specify a format for the filename (and/or directory
@@ -226,10 +225,9 @@ parser:</p>
 <tr><th>%%e</th><td>- original file extension</td></tr>
 <tr><th>%%c</th><td>- copy number (output files only)</td></tr>
 </table></blockquote>
-<p>See the
-<a href="exiftool_pod.html#item__2dw_ext_or_fmt">-w option</a> in the exiftool
-application documentation for details about special features available with
-these name format codes.</p>
+<p>See the <code>-w</code> option in the <a href="exiftool_pod.html">exiftool
+application documentation</a> for details about special features available
+with these name format codes.</p>
 <hr>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>

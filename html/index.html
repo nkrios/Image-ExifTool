@@ -24,6 +24,7 @@ a.top       { text-decoration: none; font-size: smaller;
               border: 1px solid blue; padding: 0 .2em }
 pre         { color: #800; padding: 0; margin: 0 }
 blockquote  { margin-top: 1em; margin-bottom: 1em }
+code        { white-space: nowrap }
 div.wide        { margin: 0 -.5em }
 table.tight td  { padding: 0px 4px }
 table.links     { border-collapse: collapse; width: 100%; margin: 0 }
@@ -45,7 +46,7 @@ div.index       { float: right; clear: both;
 <div class='wide'><table class='links'><tr>
 <th><a href="install.html" class='wt'>&nbsp;Installing&nbsp;</a></th>
 <th><a href="TagNames/index.html" class='wt'>&nbsp;Tag&nbsp;Names&nbsp;</a></th>
-<th><a href="#links" class='wt'>&nbsp;Links&nbsp;</a></th>
+<th><a href="#links" class='wt'>&nbsp;Resources&nbsp;</a></th>
 <th><a href="history.html" class='wt'>&nbsp;History&nbsp;</a></th>
 <th><a href="http://www.cpanforum.com/dist/Image-ExifTool" class='wt'>&nbsp;Forum&nbsp;</a></th>
 <th class='rt'><a href="faq.html" class='wt'>&nbsp;FAQ&nbsp;</a></th>
@@ -75,9 +76,9 @@ div.index       { float: right; clear: both;
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-7.51.tar.gz">
-Download        Version 7.51</a> (1.7 MB) -
-<a href="history.html">Oct. 27, 2008</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-7.60.tar.gz">
+Download        Version 7.60</a> (1.7 MB) -
+<a href="history.html">Jan. 6, 2009</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -119,19 +120,19 @@ distribution above.</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-7.50.zip">
-         exiftool-7.50.zip</a> (2.1 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-7.59.zip">
+         exiftool-7.59.zip</a> (2.1 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
-"<code>exiftool(&#8209;k).exe</code>" to read the application documentation,
+"<code>exiftool(-k).exe</code>" to read the application documentation,
 drag-and-drop files and folders to view meta information, or rename to
 "<code>exiftool.exe</code>" for command-line use.</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 Mac OS X Package:
-<a href="ExifTool-7.50.dmg">
-         ExifTool-7.50.dmg</a> (964 kB)</b></td></tr></table></blockquote>
+<a href="ExifTool-7.60.dmg">
+         ExifTool-7.60.dmg</a> (982 kB)</b></td></tr></table></blockquote>
 
 <p><b>The OS X package</b> installs the ExifTool command-line application and
 libraries in /usr/bin. After installing, type "<code>exiftool</code>" in a
@@ -233,15 +234,17 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td><a href="TagNames/CanonRaw.html">CRW, CIFF</a></td><td>R/W</td><td>Canon RAW Camera Image File Format (<a href="canon_raw.html">CRW specification</a>)</td></tr>
 <tr><td>CS1</td><td>R/W</td><td>Sinar CaptureShop 1-shot RAW (<a href="TagNames/Photoshop.html">PSD</a>-based)</td></tr>
 <tr><td><a href="TagNames/DICOM.html">DCM, DC3, DIC, DICM</a></td><td>R</td><td>DICOM - Digital Imaging and Communications in Medicine</td></tr>
+<tr><td>DCP</td><td>R/W</td><td>DNG Camera Profile (<a href="TagNames/DNG.html">DNG</a>-like)</td></tr>
 <tr><td>DCR</td><td>R</td><td>Kodak Digital Camera RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td>DIVX</td><td>R</td><td>DivX media format (<a href="TagNames/ASF.html">ASF</a>-based)</td></tr>
-<tr><td><a href="TagNames/DjVu.html">DJVU, DJV</a></td><td>R</td><td>DjVu image file (<a href="TagNames/AIFF.html">AIFF</a>-like)</td></tr>
+<tr><td><a href="TagNames/DjVu.html">DJVU, DJV</a></td><td>R</td><td>DjVu image file</td></tr>
 <tr><td><a href="TagNames/DNG.html">DNG</a></td><td>R/W</td><td>Digital Negative (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td>DOC</td><td>R</td><td>Microsoft Word Document (<a href="TagNames/FlashPix.html">FPX</a>-like)</td></tr>
 <tr><td><a href="TagNames/EXE.html#MachO">DYLIB</a></td><td>R</td><td>Mac OS X Mach-O executable and library files</td></tr>
 <tr><td><a href="TagNames/PostScript.html">EPS, EPSF, PS</a></td><td>R/W</td><td>[Encapsulated] PostScript Format</td></tr>
 <tr><td>ERF</td><td>R/W</td><td>Epson RAW Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/EXE.html">EXE, DLL</a></td><td>R</td><td>DOS/Windows executable and library files</td></tr>
+<tr><td><a href="TagNames/EXIF.html">EXIF</a></td><td>R/W/C</td><td>Exchangable Image File Format metadata (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/FLAC.html">FLAC</a></td><td>R</td><td>Free Lossless Audio Codec</td></tr>
 <tr><td><a href="TagNames/Flash.html#FLV">FLV</a></td><td>R</td><td>Flash Video</td></tr>
 <tr><td><a href="TagNames/FlashPix.html">FPX</a></td><td>R</td><td>FlashPix image</td></tr>
@@ -283,6 +286,7 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td><a href="TagNames/Panasonic.html#Raw">RAW</a></td><td>R/W</td><td>Panasonic RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/RIFF.html">RIFF, RIF</a></td><td>R</td><td>Resource Interchange File Format</td></tr>
 <tr><td><a href="TagNames/Real.html">RM, RV, RMVB</a></td><td>R</td><td>Real Media/Video [Variable Bitrate]</td></tr>
+<tr><td><a href="TagNames/Panasonic.html#Raw">RW2</a></td><td>R</td><td>Panasonic RAW 2 (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/Rawzor.html">RWZ</a></td><td>R</td><td>Rawzor compressed image</td></tr>
 <tr><td><a href="TagNames/EXE.html#ELF">SO</a></td><td>R</td><td>Unix ELF executable and Shared Object files</td></tr>
 <tr><td>SR2</td><td>R</td><td>Sony RAW 2 (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
@@ -375,7 +379,7 @@ exiftool</code>". Alternately, you may be able to rename it to
 requires that the proper Windows associations have been made for the the
 "<code>.pl</code>" extension.</p>
 
-<p>The stand-alone version ("<code>exiftool(&#8209;k).exe</code>") should be
+<p>The stand-alone version ("<code>exiftool(-k).exe</code>") should be
 renamed to "<code>exiftool.exe</code>" to allow it to be run by typing
 "<code>exiftool</code>" at the command line.</p>
 
@@ -390,7 +394,7 @@ quotes instead of single quotes as shown in some examples.</p>
 
 <p><b>ii) Stand-alone version in the Windows GUI:</b></p>
 
-<p>Double-click on "<code>exiftool(&#8209;k).exe</code>" to read the application
+<p>Double-click on "<code>exiftool(-k).exe</code>" to read the application
 documentation, or drag-and-drop files and folders to run exiftool on the
 selected files.</p>
 
@@ -460,8 +464,8 @@ more information:  Right-click on the window's title bar then select
 
 <h3>Verbose and HtmlDump Output</h3>
 
-<p>The <a href="verbose.html">Verbose</a> (<code>&#8209;v</code>) and <a
-href="htmldump.html">HtmlDump</a> (<code>&#8209;htmlDump</code>) options print additional
+<p>The <a href="verbose.html">Verbose</a> (<code>-v</code>) and <a
+href="htmldump.html">HtmlDump</a> (<code>-htmlDump</code>) options print additional
 information that can be very useful for debugging or when decoding new tags.</p>
 
 <h2><a name="tagnames">Tag Names Explained</a>
@@ -481,23 +485,23 @@ exiftool -filename -imagesize -exif:fnumber -xmp:all image.jpg
 
 <p>A complete list of <a href="TagNames/index.html">ExifTool Tag Names</a>
 accompanies this documentation.  As well, current lists of available tag names
-and writable tag names may be obtained using the exiftool <code>&#8209;list</code> and
-<code>&#8209;listw</code> options. But perhaps the easiest way to determine a tag name
-is to use the <code>&#8209;s</code> option to print the tag names instead of
+and writable tag names may be obtained using the exiftool <code>-list</code> and
+<code>-listw</code> options. But perhaps the easiest way to determine a tag name
+is to use the <code>-s</code> option to print the tag names instead of
 descriptions for all information in a file.  It may also be helpful to use the
-<code>&#8209;G</code> option to display the group names, and the <code>&#8209;H</code> or
-<code>&#8209;D</code> option to print the numerical tag ID's for reference.</p>
+<code>-G</code> option to display the group names, and the <code>-H</code> or
+<code>-D</code> option to print the numerical tag ID's for reference.</p>
 
 <p><b>Notes:</b></p>
 
 <ol><li>Tag names sometimes differ from their descriptions.  Use the
-<code>&#8209;s</code> command-line option to see the actual tag names instead of the
+<code>-s</code> command-line option to see the actual tag names instead of the
 descriptions shown when extracting information.</li>
 <li>When extracting information, tags will not appear in the output unless they
 exist in the file, even if they are specified on the command line.  The
-<code>&#8209;f</code> option may be used to force all specified tags to be displayed.</li>
+<code>-f</code> option may be used to force all specified tags to be displayed.</li>
 <li>Information for a given tag name may occur in multiple locations within a
-single file.  By default these duplicate tags are suppressed, but the <code>&#8209;a</code>
+single file.  By default these duplicate tags are suppressed, but the <code>-a</code>
 option may be used to extract all tags.</li>
 </ol>
 
@@ -521,7 +525,7 @@ directory.  Here is a simple example that defines two shortcuts:</p>
 <p>In this example, MyShortcut is a shortcut for the CreateDate, ExposureTime
 and Aperture tags, and MyAlias is a shortcut for FocalLengthIn35mmFormat.</p>
 
-<p>The current shortcuts may be listed with the <code>&#8209;list</code> option.</p>
+<p>The current shortcuts may be listed with the <code>-list</code> option.</p>
 
 <p>The <code>~/.ExifTool_config</code> file may also be used to define new tags.
 For more information about the configuration file, see the
@@ -535,7 +539,7 @@ with a '<code>.</code>' in the Windows GUI, but it can be done with the
 <h2><a name="groups">Tag Groups</a>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
 
-<p>ExifTool classifies tags into groups in three different families.
+<p>ExifTool classifies tags into groups in four different families.
 These groups are:</p>
 
 <blockquote><table class='norm'>
@@ -551,36 +555,39 @@ QuickTime, RAF, RIFF, Rawzor, Real, Ricoh, SVG, SigmaRaw, Vorbis, XMP, ZIP
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td>AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom, CanonRaw,
 CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky, EPPIM, EXE,
-ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, FotoStation, FujiFilm, GPS,
-GeoTiff, GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc, HTML-prod,
-HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view,
-ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, ITC,
-InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
+EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, FotoStation, FujiFilm,
+GPS, GeoTiff, GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc,
+HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
+ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
+IPTC, ITC, InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
 KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, MAC,
-MIE-Audio, MIE-Camera, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo,
-MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient,
-MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF,
-MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta, MinoltaRaw,
-Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF, PICT, PNG,
-Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo, PostScript,
-PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor, Real,
-Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
-Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo, Sigma, SigmaRaw,
-Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM, XMP-PixelLive, XMP-album,
-XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore,
-XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-photomech,
-XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-tiff,
-XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS,
-XMP-xmpRights, XMP-xmpTPg, ZIP
+MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS,
+MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+MIE-Orient, MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
+MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
+MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF,
+PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
+PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor,
+Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5,
+Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo,
+Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
+XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
+XMP-dex, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
+XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism,
+XMP-prl, XMP-pur, XMP-rdf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM,
+XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
 Time, Unknown, Video
 </td></tr>
+<tr><td><b>3&nbsp;(Document&nbsp;Number)</b></td>
+<td>Doc#, Main
+</td></tr>
 </table></blockquote>
 
 <p>The exiftool output can be organized based on these groups using the
-<code>&#8209;g</code> or <code>&#8209;G</code> option.</p>
+<code>-g</code> or <code>-G</code> option.</p>
 
 <h2><a name="writing">Writing Meta Information</a>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
@@ -648,11 +655,11 @@ deleted from Canon CRW files.  This has been tested and doesn't cause problems
 with the Canon software or Photoshop, however it does confuse Capture One
 somewhat if this image is missing, so beware.</p>
 
-<h3>The "-TagsFromFile" Option</h3>
+<h3>The "-tagsFromFile" Option</h3>
 
 <p>A special ExifTool option allows copying tags from one file to another. The
 command-line syntax for doing this is
-"<code>&#8209;TagsFromFile&nbsp;SRCFILE</code>".  Any tags specified after this
+"<code>-tagsFromFile&nbsp;SRCFILE</code>".  Any tags specified after this
 option on the command line are extracted from source file and written to the
 destination file.  If no tags are specified, then all writable tags are copied.
 This option is very simple, yet very powerful.  Depending on the formats of the
@@ -661,7 +668,7 @@ destination file, in which case they aren't written.</p>
 
 <p>This option may also be used to transfer information between different tags
 within a single image or between different images.  See the
-<a href="exiftool_pod.html#item__2dtagsfromfile_srcfile_or_fmt">&#8209;TagsFromFile
+<a href="exiftool_pod.html#item__2dtagsfromfile_srcfile_or_fmt">-tagsFromFile
 option</a> in the application documentation for more details.</p>
 
 <h2><font color='#cc0000'><a name="limitations">Writer Limitations</a></font>
@@ -683,7 +690,8 @@ writing.</li>
 <ul>
 <li>There is a bug in the Apple RAW file support (OS X 10.4.11) which prevents
 some edited PEF images from being displayed properly.  Other software such as
-the Pentax Silkypix software and dcraw have no problems with these images.</li>
+the Pentax Silkypix software and dcraw have no problems with these images.
+[This bug is fixed in OS X 10.5.4]</li>
 <li>Some Macintosh applications may store information in the resource fork of a
 file.  ExifTool does not process the resource fork, so this information is lost
 if the file is rewritten.  (The resource fork is also typically dropped if the
@@ -728,7 +736,7 @@ for details about the syntax of the time shift string.</p>
 
 <p>By writing a new value to the <b>FileName</b> and/or <b>Directory</b> tags,
 files can be renamed and/or moved to different directories.  This can be a very
-powerful tool in combination with the <code>&#8209;d</code> (date format) option for
+powerful tool in combination with the <code>-d</code> (date format) option for
 organizing images by date/time. For example, the following command renames all
 images in directory "DIR" according to the individual file's creation date in
 the form "<code>yyyymmdd_HHMMSS.ext</code>".</p>
@@ -752,17 +760,20 @@ feature.</p>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
 
 <p>The processing speed of ExifTool can be improved when extracting information
-by reducing the amount of work that it must do.  Disabling the composite tags
-(<code>&#8209;e</code> option) and the print conversions (<code>&#8209;n</code>
-option) will speed things up somewhat if these features aren't required, but the
-biggest performance benefits come from reducing the number of extracted tags.
-By specifying only the tags you need to extract, you can speed things up
-significantly.</p>
+by reducing the amount of work that it must do.  Decrease the number of
+extracted tags and disable the composite tags (<code>-e</code> option) and the
+print conversions (<code>-n</code> option) if these features aren't
+required.</p>
 
-<p>There is also a <code>&#8209;fast</code> option which can significantly increase speed
-when extracting information from JPEG images which are piped across a slow
-network connection.  However, with this option any information in a JPEG trailer
-will not be extracted.</p>
+<p>There is overhead in loading ExifTool, so performance may be improved by
+taking advantage of ExifTool's batch processing capabilities to reduce the
+number of executed commands when performing complex operations or processing
+multiple files.</p>
+
+<p>The <code>-fast</code> option can significantly increase speed when
+extracting information from JPEG images which are piped across a slow network
+connection.  However, with this option any information in a JPEG trailer is not
+extracted.</p>
 
 <h2><a name="library">The Image::ExifTool Perl Library Module</a>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
@@ -777,7 +788,7 @@ Image::ExifTool to print out all recognized meta information in a file:</p>
 <span class='com'>#!/usr/bin/perl -w</span>
 use Image::ExifTool ':Public';
 my $file = shift or die "Please specify filename";
-my $info = ImageInfo($file);
+my $info = <a href="ExifTool.html#ImageInfo">ImageInfo</a>($file);
 foreach (keys %$info) {
     print "$_ : $info-&gt;{$_}\n";
 }
@@ -798,6 +809,7 @@ binary data.  The simple script above does not handle this case.</p>
 <li><a href="TagNames/index.html">ExifTool Tag Names</a></li>
 <li><a href="ExifTool.html">Image::ExifTool Module Documentation</a></li>
 <li><a href="config.html">Sample ExifTool Configuration File (user-defined tags)</a></li>
+<li><a href="metafiles.html">Working with metadata sidecar files</a></li>
 <li><a href="writing.html">Comments on the Subject of Writing Meta Information</a></li>
 <li><a href="canon_raw.html">Canon RAW (CRW) File Format Specification</a></li>
 <li><a href="MIE1.1-20070121.pdf">MIE 1.1 File Format Specification (pdf)</a></li>
@@ -813,33 +825,52 @@ binary data.  The simple script above does not handle this case.</p>
 
 <p>Below are some utilities which take advantage of the ExifTool engine:</p>
 
+<p><b>Windows</b></p>
+<ul>
+<li><a href="http://www.thezeal.com/blog/?p=145">Exif Stats Utility</a>: Analyzes images to tabulate apertures, exposure times, etc</li>
+<li><a href="http://owl.phy.queensu.ca/~phil/exiftool/modEXIFTOOL.zip">Download</a> Visual Basic 6.0 example script for reading tags with exiftool (thanks Michael Wandel)</li> 
+<li><a href="http://aeropic.free.fr/H&amp;B/AUTO_ISO_patcher/">Auto ISO Tool</a>: GUI front-end for ExifTool to patch Canon ISO information</li>
+<li><a href="http://home.wi.rr.com/dick/ExifAuto.htm">ExifAuto</a>: GUI front-end for ExifTool to perform simple operations</li>
+<li><a href="http://freeweb.siol.net/hrastni3/foto/exif/exiftoolgui.htm">ExifTool GUI for Windows</a>: A nice GUI for viewing meta information with some editing features</li>
+<li><a href="http://www.geosetter.de/en/">GeoSetter</a>: Utility for showing and changing geo data of image files</li>
+<li><a href="http://www.moonsoftware.com/exifmixer.asp">ExifMixer</a>: GUI extension for the exiftool command-line interface</li>
+</ul>
+
+<p><b>Mac OS X</b></p>
 <ul>
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/Extract%20Preview.sit">Download</a>
-a stand-alone Mac OS X droplet to extract preview images from RAW files (thanks to Brett Gross)</li>
+a stand-alone droplet to extract preview images from RAW files (thanks to Brett Gross)</li>
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/List_Exif_Metadata.sit">Download</a>
-three Mac OS X droplets to extract information [exiftool must be installed] (thanks to Rob Lewis)</li>
-<li><a href="http://owl.phy.queensu.ca/~phil/exiftool/modEXIFTOOL.zip">Download</a> Visual Basic 6.0 example script for reading tags with exiftool (thanks Michael Wandel)</li> 
-<li><a href="http://fidel.vido.info/show/applescript/Tierprogramm/">Tierprogramm</a>: Mac OS X droplet to perform some basic operations</li>
+three droplets to extract information [exiftool must be installed] (thanks to Rob Lewis)</li>
+<li><a href="http://fidel.vido.info/show/applescript/Tierprogramm/">Tierprogramm</a>: Droplet to perform some basic operations</li>
+<li><a href="http://xray.bmc.uu.se/markh/photos/macmetamod.html">MacMetaMod</a>: Droplet for adding Keywords to images</li>
+<li><a href="http://www.scriptamac.at/geotaggingactions.html">Geotagging Automator Action</a>: Application to geotag images from GPX tracks</li>
+<li><a href="http://www.mmisoftware.co.uk/pages/photogpseditor.php">PhotoGPSEditor</a> and <a href="http://www.mmisoftware.co.uk/pages/photoinfoeditor.php">PhotoInfoEditor</a>: Geocoding utilities</li>
+<li><a href="http://6v8.gamboni.org/Move-Rename-files-according-to.html">MetaDataMover</a>: A GUI-based automator utility for moving/renaming images</li>
+<li><a href="http://www.lintburger.com/software.php">CS1ToCR2</a>: Utility that uses Sony GPS-CS1 log files to add GPS information to CR2 images</li>
+<li><a href="http://82.94.219.20/~marcvos/software/realbasic/sed.html">SetEXIFData</a>: Utility to set EXIF data</li>
+<li><a href="http://craig.stanton.net.nz/software/Geotagger.html">Geotagger</a>: Droplet for inserting GPS coordinates in your photos</li>
+</ul>
+
+<p><b>Multi-Platform</b></p>
+<ul>
+<li><a href="http://basepath.com/ImageIngester/">ImageIngester</a>: Windows and Mac OS X image workflow automator</li>
+<li><a href="http://www.carto.net/projects/photoTools/gpsPhoto/">gpsPhoto</a>: Geotag your images from a GPS (GPX) track log</li>
 <li><a href="https://puszcza.gnu.org.ua/projects/renrot/">renrot</a>: Perl utility to perform various processing tasks on images</li>
 <li><a href="http://www.proxel.se/exif.html">Proxel EXIF Tool</a>: Photoshop plugin based on ExifTool</li>
-<li><a href="http://kde-apps.org/content/show.php?content=30971">rawimage:</a> A kfile plugin and thumbnail image handler for RAW formats</li>
-<li><a href="http://www.thezeal.com/blog/?p=145">Exif Stats Utility</a>: Analyzes images to tabulate apertures, exposure times, etc (Windows)</li>
-<li><a href="http://www.carto.net/projects/photoTools/gpsPhoto/">gpsPhoto</a>: Geotag your images from a GPS (GPX) track log</li>
-<li><a href="http://www.scriptamac.at/geotaggingactions.html">Geotagging Automator Action</a>: Mac OS X application to geotag images from GPX tracks</li>
-<li><a href="http://xray.bmc.uu.se/markh/photos/macmetamod.html">MacMetaMod</a>: Mac OS X droplet for adding Keywords to images</li>
-<li><a href="http://www.mmisoftware.co.uk/pages/photogpseditor.php">PhotoGPSEditor</a> and <a href="http://www.mmisoftware.co.uk/pages/photoinfoeditor.php">PhotoInfoEditor</a>: Mac OS X geocoding utilities</li>
-<li><a href="http://aeropic.free.fr/H&amp;B/AUTO_ISO_patcher/">Auto ISO Tool</a>: Windows GUI front-end for ExifTool to patch Canon ISO information</li>
-<li><a href="http://home.wi.rr.com/dick/ExifAuto.htm">ExifAuto</a>: Windows GUI front-end for ExifTool to perform simple operations</li>
-<li><a href="http://freeweb.siol.net/hrastni3/foto/exif/exiftoolgui.htm">ExifTool GUI for Windows</a>: A nice Windows GUI for viewing meta information with some editing features</li>
-<li><a href="http://6v8.gamboni.org/Move-Rename-files-according-to.html">MetaDataMover</a>: A GUI-based Mac OS X automator utility for moving/renaming images</li>
-<li><a href="http://www.lintburger.com/software.php">CS1ToCR2</a>: Mac OS X utility that uses Sony GPS-CS1 log files to add GPS information to CR2 images</li>
-<li><a href="http://82.94.219.20/~marcvos/software/realbasic/sed.html">SetEXIFData</a>: Mac OS X utility to set EXIF data</li>
-<li><a href="http://basepath.com/ImageIngester/">ImageIngester</a>: Windows and Mac OS X image workflow automator</li>
-<li><a href="http://www.geosetter.de/en/">GeoSetter</a>: Windows utility for showing and changing geo data of image files</li>
 <li><a href="http://code.google.com/p/gpicsync/">GPicSync</a>: Windows/Linux utility to geocode photos from a GPX track log and create KML files</li>
-<li><a href="http://sagittarius.berlios.de/">Sagittarius</a>: Linux XMP metadata editor</li>
 <li><a href="http://regex.info/exif.cgi">Jeffrey's Exif Viewer</a>: Web utility to view meta information in online images</li>
+<li><a href="http://regex.info/blog/lightroom-goodies/gps/">Jeffrey's Geoencoding Plugin for Lightroom</a>: Geoencode your photos from within Lightroom</li>
+<li><a href="http://code.google.com/p/geotag-lightroom-plugin/">geotag-lightroom-plugin</a>: Another Lightroom plugin for geotagging photos</li>
+<li><a href="http://flickfleck.googlecode.com/">FlickFleck</a>: Tool to transfer images from memory card, rotate, rename, and organize by date</li>
 </ul>
+
+<p><b>Linux</b></p>
+<ul>
+<li><a href="http://kde-apps.org/content/show.php?content=30971">rawimage:</a> A kfile plugin and thumbnail image handler for RAW formats</li>
+<li><a href="http://sagittarius.berlios.de/">Sagittarius</a>: Linux XMP metadata editor</li>
+</ul>
+
 <p>Also notable, but not directly based on ExifTool:</p>
 
 <ul><li><a href="http://www.photome.de/">PhotoME</a>: Windows utility to read/write meta information</li>
@@ -879,7 +910,7 @@ information:</p>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
 
 <p>There is still much unknown information in the maker notes for many camera
-models.  (To see this information, run exiftool with the <code>&#8209;U</code>
+models.  (To see this information, run exiftool with the <code>-U</code>
 option.)  In this area, ExifTool is very much a collaborative effort, and
 development relies heavily on the input from camera owners to help decode new
 meta information.  If you manage to figure out what any of it means, send me an
@@ -921,6 +952,7 @@ to the code:</p>
 <li>Nilesh Patel for his help with the web page layout</li>
 <li>Jens Duttke for his suggestions, bug reports and help decoding new tags</li>
 <li>Dave Nicholson for decoding new tags in Pentax and Canon maker notes</li>
+<li>Bogdan for his feedback, decoding efforts, and user support</li>
 </ul>
 
 <p>And special thanks to my family for putting up with me and this
@@ -966,7 +998,7 @@ the README file in the full distribution.  Thanks. &nbsp; - <i>Phil Harvey</i></
 <div class='wide'><table class='links'><tr>
 <th><a href="install.html" class='wt'>&nbsp;Installing&nbsp;</a></th>
 <th><a href="TagNames/index.html" class='wt'>&nbsp;Tag&nbsp;Names&nbsp;</a></th>
-<th><a href="#links" class='wt'>&nbsp;Links&nbsp;</a></th>
+<th><a href="#links" class='wt'>&nbsp;Resources&nbsp;</a></th>
 <th><a href="history.html" class='wt'>&nbsp;History&nbsp;</a></th>
 <th><a href="http://www.cpanforum.com/dist/Image-ExifTool" class='wt'>&nbsp;Forum&nbsp;</a></th>
 <th class='rt'><a href="faq.html" class='wt'>&nbsp;FAQ&nbsp;</a></th>

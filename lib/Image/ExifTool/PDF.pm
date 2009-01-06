@@ -17,7 +17,7 @@ use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
@@ -194,6 +194,11 @@ my $pdfVer;         # version of PDF file being processed
             TagTable => 'Image::ExifTool::PDF::AdobePhotoshop',
         },
     },
+    Illustrator => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::PDF::Illustrator',
+        },
+    },
 );
 
 # tags in PDF AdobePhotoshop directory
@@ -205,11 +210,51 @@ my $pdfVer;         # version of PDF file being processed
     },
 );
 
+# tags in PDF Illustrator directory
+%Image::ExifTool::PDF::Illustrator = (
+    Private => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::PDF::AIPrivate',
+        },
+    },
+);
+
 # tags in PDF Private directory
 %Image::ExifTool::PDF::Private = (
     ImageResources => {
         SubDirectory => {
             TagTable => 'Image::ExifTool::PDF::ImageResources',
+        },
+    },
+);
+
+# tags in PDF AI Private directory
+%Image::ExifTool::PDF::AIPrivate = (
+    EXTRACT_UNKNOWN => 0,   # extract known but numbered tags
+    AIMetaData => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::PDF::AIMetaData',
+        },
+    },
+    AIPrivateData => {
+        Notes => q{
+            the ExtractEmbedded option enables information to be extracted from embedded
+            PostScript documents in the AIPrivateData stream
+        },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::PostScript::Main',
+        },
+    },
+    RoundTripVersion => { },
+    ContainerVersion => { },
+    CreatorVersion => { },
+);
+
+# tags in PDF AIMetaData directory
+%Image::ExifTool::PDF::AIMetaData = (
+    _stream => {
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::PostScript::Main',
         },
     },
 );
@@ -1005,9 +1050,11 @@ sub ProcessDict($$$$;$$)
 {
     my ($exifTool, $tagTablePtr, $dict, $xref, $nesting, $type) = @_;
     my $verbose = $exifTool->Options('Verbose');
+    my $unknown = $$tagTablePtr{EXTRACT_UNKNOWN};
+    my $embedded = (defined $unknown and not $unknown and $exifTool->Options('ExtractEmbedded'));
     my @tags = @{$$dict{_tags}};
+    my ($next, %join);
     my $index = 0;
-    my $next;
 
     $nesting = ($nesting || 0) + 1;
     if ($nesting > 50) {
@@ -1040,10 +1087,20 @@ sub ProcessDict($$$$;$$)
         } else {
             last;
         }
+        my $val = $$dict{$tag};
         if ($$tagTablePtr{$tag}) {
             $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        } elsif ($embedded and $tag =~ /^(.*?)(\d+)$/ and
+            $$tagTablePtr{$1} and ref $val eq 'SCALAR' and not $fetched{$$val})
+        {
+            my ($name, $num) = ($1, $2);
+            $join{$name} = [] unless $join{$name};
+            $fetched{$$val} = 1;
+            my $obj = FetchObject($exifTool, $$val, $xref, $tag);
+            next unless ref $obj eq 'HASH' and $$obj{_stream};
+            # save all the stream data to join later
+            $join{$name}->[$num] = $$obj{_stream};
         }
-        my $val = $$dict{$tag};
         if ($verbose) {
             my ($val2, $extra);
             if (ref $val eq 'SCALAR') {
@@ -1105,7 +1162,7 @@ sub ProcessDict($$$$;$$)
         }
         unless ($tagInfo) {
             # add any tag found in Info directory to table
-            next unless $$tagTablePtr{EXTRACT_UNKNOWN};
+            next unless $unknown;
             my $name = $tag;
             $name =~ s/[^-\w]/_/g;  # translate invalid characters in tag name
             $tagInfo = { Name => $name };
@@ -1178,7 +1235,8 @@ sub ProcessDict($$$$;$$)
             }
             my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
             if (not $verbose) {
-                ProcessDict($exifTool, $subTablePtr, $subDict, $xref, $nesting);
+                my $proc = $$subTablePtr{PROCESS_PROC} || \&ProcessDict;
+                &$proc($exifTool, $subTablePtr, $subDict, $xref, $nesting);
             } elsif ($next) {
                 # handle 'Next' links at this level to avoid deep recursion
                 undef $next;
@@ -1197,6 +1255,23 @@ sub ProcessDict($$$$;$$)
                 $exifTool->{INDENT} = $oldIndent;
                 $exifTool->{DIR_NAME} = $oldDir;
             }
+        }
+    }
+#
+# extract information from joined streams if necessary
+#
+    
+    if (%join) {
+        my ($tag, $i);
+        foreach $tag (sort keys %join) {
+            my $list = $join{$tag};
+            last unless defined $$list[1] and $$list[1] =~ /^%.*?([\x0d\x0a]*)/;
+            my $buff = "%!PS-Adobe-3.0$1";  # add PS header with same line break
+            for ($i=1; defined $$list[$i]; ++$i) {
+                $buff .= $$list[$i];
+                undef $$list[$i];   # free memory
+            }
+            $exifTool->HandleTag($tagTablePtr, $tag, $buff);
         }
     }
 #
@@ -1460,7 +1535,7 @@ information but only with a limited number of algorithms.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

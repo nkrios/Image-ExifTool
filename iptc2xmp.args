@@ -6,9 +6,9 @@
 # Usage:        exiftool -tagsFromFile src.jpg -@ iptc2xmp.args dst.jpg
 #
 # Revisions:    2005/05/14 - P. Harvey Created
-#				2008/03/04 - PH Changed Location translation and added
-#							 IntellectualGenre and SubjectCode
-#				2008/09/30 - PH Added writing of Photoshop:IPTCDigest
+#               2008/03/04 - PH Changed Location translation and added
+#                            IntellectualGenre and SubjectCode
+#               2008/09/30 - PH Added writing of Photoshop:IPTCDigest
 #
 # References:   http://www.iptc.org/IPTC4XMP/
 #               http://www.iptc.org/IIM/
@@ -25,7 +25,7 @@
 #               exclude these tags from the mass copy and handle them
 #               separately.
 #
-#				Also updates Photoshop:IPTCDigest as per MWG recommendation.
+#               Also updates Photoshop:IPTCDigest as per MWG recommendation.
 #
 -IPTC:* > XMP:*
 --IPTC:Source

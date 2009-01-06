@@ -47,7 +47,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '1.92';
+$VERSION = '1.94';
 
 sub CryptShutterCount($$);
 
@@ -295,13 +295,14 @@ my %pentaxModelID = (
     0x12ce6 => 'Optio A40',
     0x12cf0 => 'Optio V10',
     0x12cfa => 'K200D',
+    0x12d04 => 'Optio S12',
     0x12d0e => 'Optio E50',
     0x12d18 => 'Optio M50',
     0x12d2c => 'Optio V20',
     0x12d40 => 'Optio W60',
     0x12d4a => 'Optio M60',
     0x12d68 => 'Optio E60',
-    0x12d72 => 'K-m / K2000 (a)',
+    0x12d72 => 'K-m / K2000 (pre-production)',
     0x12d73 => 'K-m / K2000',
 );
 
@@ -635,6 +636,7 @@ my %lensCode = (
                 5 => 'Pan Focus',
                 16 => 'AF-S', #17
                 17 => 'AF-C', #17
+                18 => 'AF-A', #PH (educated guess)
             },
         },
         {
@@ -1041,7 +1043,7 @@ my %lensCode = (
             '16 0 0 0' => 'Frame Synthesis?',
         },
     },
-    0x0033 => { #PH (K110D/K100D)
+    0x0033 => { #PH (K110D/K100D/K-m)
         Name => 'PictureMode',
         Writable => 'int8u',
         Count => 3,
@@ -1068,6 +1070,9 @@ my %lensCode = (
             '0 16' => 'Pet',
             '0 17' => 'Candlelight',
             '0 18' => 'Museum',
+            '0 19' => 'Food', #(n/c)
+            '0 20' => 'Stage Lighting',
+            '0 21' => 'Night Snap',
             # AUTO PICT modes (auto-selected)
             '1 4'  => 'Auto PICT (Standard)', #13
             '1 5'  => 'Auto PICT (Portrait)', #7 (K100D)
@@ -1689,10 +1694,9 @@ my %lensCode = (
         Mask => 0x0f,
         PrintConv => {
             0 => 'Manual',
-            BITMASK => {
-                0 => 'AF-S',
-                1 => 'AF-C',
-            },
+            1 => 'AF-S',
+            2 => 'AF-C',
+            3 => 'AF-A', #PH
         },
     },
     4 => {
@@ -3032,7 +3036,7 @@ contributing print conversion values for some tags.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

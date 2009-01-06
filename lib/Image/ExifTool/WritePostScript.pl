@@ -287,13 +287,10 @@ sub WriteNewTags($$$)
 
     foreach $tag (sort keys %$newTags) {
         my $tagInfo = $$newTags{$tag};
-        my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-        next unless Image::ExifTool::IsCreating($newValueHash);
-        my $val = Image::ExifTool::GetNewValues($newValueHash);
-        if ($exifTool->Options('Verbose') > 1) {
-            my $out = $exifTool->Options('TextOut');
-            print $out "    + PostScript:$$tagInfo{Name} = '$val'\n";
-        }
+        my $nvHash = $exifTool->GetNewValueHash($tagInfo);
+        next unless Image::ExifTool::IsCreating($nvHash);
+        my $val = Image::ExifTool::GetNewValues($nvHash);
+        $exifTool->VerboseValue("+ PostScript:$$tagInfo{Name}", $val);
         Write($outfile, EncodeTag($tag, $val)) or $success = 0;
         ++$exifTool->{CHANGED};
     }
@@ -546,13 +543,13 @@ sub WritePS($$)
                 # decode comment string (reading continuation lines if necessary)
                 $val = DecodeComment($val, $raf, \@lines, \$data);
                 $val = join $exifTool->Options('ListSep'), @$val if ref $val eq 'ARRAY';
-                my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-                if (Image::ExifTool::IsOverwriting($newValueHash, $val)) {
-                    $verbose > 1 and print $out "    - PostScript:$$tagInfo{Name} = '$val'\n";
-                    $val = Image::ExifTool::GetNewValues($newValueHash);
+                my $nvHash = $exifTool->GetNewValueHash($tagInfo);
+                if (Image::ExifTool::IsOverwriting($nvHash, $val)) {
+                    $exifTool->VerboseValue("- PostScript:$$tagInfo{Name}", $val);
+                    $val = Image::ExifTool::GetNewValues($nvHash);
                     ++$exifTool->{CHANGED};
                     next unless defined $val;   # next if tag is being deleted
-                    $verbose > 1 and print $out "    + PostScript:$$tagInfo{Name} = '$val'\n";
+                    $exifTool->VerboseValue("+ PostScript:$$tagInfo{Name}", $val);
                     $data = EncodeTag($tag, $val);
                 }
             }
@@ -724,7 +721,7 @@ Thanks to Tim Kordick for his help testing the EPS writer.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

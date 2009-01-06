@@ -5,13 +5,128 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 7.51. (Other versions are
+Note: The most recent production release is Version 7.60. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+Jan. 6, 2009 - Version 7.60 (production release)
+
+  - Decode a few more Nikon D700 FlashInfo tags (thanks Jens Duttke)
+  - Defined (empty) XMP-pdfx tag table, mainly for documentation purposes
+  - Fixed problem where the behaviour of -tagsFromFile changed to that of
+    -addTagsFromFile if the first specified tag was an exclusion
+  - Fixed XMP writer to allow a namespace to be deleted after a mass copy
+  - Fixed bug introduced in 7.58 which could cause hang when using -tagsFromFile
+
+Dec. 23, 2008 - Version 7.59
+
+  - Removed file size limit when setting tag value from contents of a file
+
+Dec. 22, 2008 - Version 7.58
+
+  - Added new Canon, Nikon and Olympus lenses (thanks Jan Boelsma and Geert De
+    Soete)
+  - Added write support for FujiFilm S5000 Ver3.00 and S9500 Ver1.01 RAF images
+  - Extract RAFVersion tag from FujiFilm RAF images
+  - Decode ColorBalance information for PowerShot G10
+  - Decode Sharpness for Canon EOS 50D
+  - More improvements to Canon 50D and 5DmkII makernote decoding 
+  - Attempt to identify unknown Nikon lenses which exist in LensID list with a
+    different LensIDNumber (to patch Sigma lens renumbering debacle)
+  - Removed limit of 1000 items in an XMP list-type tag when writing
+  - Increased maximum size of file from 16MB to 100MB when setting tag value
+    from the contents of a file
+  - Improved performance when extracting a large number of same-named tags
+  - Fixed bug which resulted in "segment too large" error message when rewriting
+    multi-segment XMP if XMP was edited but nothing was actually changed
+
+Dec. 11, 2008 - Version 7.57
+
+  - Added read support for Panasonic RW2 raw images (and extract meta
+    information from embedded PreviewImage as Doc1)
+  - Added new Pentax K-m PictureModes and new PentaxModelID for the Optio S12
+  - Decode ColorBalance information for Canon 50D and 5DmkII
+  - Decode Panasonic RAW/RW2 information from DNG images
+  - Decode Canon SRAWQuality tag
+  - Recognize DCP (DNG Camera Profile) files
+  - Updated Canon CustomFunctions for the EOS 5D Mark II
+  - Changed name of "OtherImage" tags to "JpgFromRaw" in IFD0 of SR2 and ARW
+    images, and to "ThumbnailImage" in IFD0 of MRW images
+  - Changed EXIF DeviceSettingDescription and ProfileLookTableData to binary
+    data tags
+  - Fixed problem reading/writing ThumbnailImage in Minolta A200 MRW images
+  - Fixed ColorBalance2 tags for AsShot and Auto modes of Canon 1DmkII/1DSmkII
+
+Dec. 2, 2008 - Version 7.56
+
+  - Decode CompressorVersion from Canon 5D Mark II videos
+  - Fixed family 1 group classifications for tags in QuickTime video tracks
+  - Fixed problem with new -sep feature when separator contained spaces
+
+Dec. 2, 2008 - Version 7.55
+
+  - Added a number of new CanonVRD tags for DPP 3.4/3.5 (thanks Bogdan)
+  - Added a new FocusMode for the Pentax K-m
+  - Added a new Nikon LensID (thanks Niels Kristian)
+  - Decode some tags from Kodak C1013 maker notes (type 9)
+  - Enhanced -sep option to allow list-type tag values to be split when writing
+  - API Changes:
+      - Added ListSplit option
+
+Nov. 26, 2008 - Version 7.54
+
+  - Added a few old XMP-crs tags that were missed
+  - Show numerator and denominator for rational EXIF values in verbose mode
+  - Changed htmldump tooltip font
+  - Fixed bugs in HTML reader that could cause runtime error or hang
+
+Nov. 19, 2008 - Version 7.53
+
+  - Added read/write support for EXIF files
+  - Added ability to write EXIF as a block (finally!)
+  - Added ability to write CanonVRD information to MIE files
+  - Added timezone to "Now" tag value
+  - Added a new CanonModelID (FS100)
+  - Added write support for ACDSee XMP tags (XMP-acdsee:RPP)
+  - Added a few new XMP-cc tags
+  - Decode CameraOrientation for a number of Canon EOS models (thanks Bogdan)
+  - Allow XMP to be copied as a block with -tagsFromFile option
+  - Highlight odd value offsets in -htmldump output
+  - Improved htmldump tooltip display
+  - Minor improvements to MIE reader
+  - API Changes:
+      - The full XMP block is now extracted with the Binary option, so the XMP
+        block is marked as "unsafe" and the Protected flag must be set (as with
+        other writable blocks) when calling SetNewValue()
+
+Nov. 4, 2008 - Version 7.52
+
+  - Added ability to extract AI private data from PDF files
+  - Added extract embedded option (-ee, -extractEmbedded)
+  - Added new group family 3 and ability to specify multiple group names for a
+    single tag when extracting information
+  - Added a new Sony lens and decode two new Sony tags (thanks Jens Duttke)
+  - Added a few new Nikon LensID's (thanks Robert Rottmerhusen)
+  - Added a new Olympus LensType (thanks Michael Meissner)
+  - Decode a few new Nikon tags (thanks Jens Duttke)
+  - Enhanced command line parsing to allow long names for most options
+  - Improved verbose output when writing makernotes
+  - Allow writing of empty string values in EXIF information
+  - Fixed problem rewriting XMP lists that contained no entries
+  - Fixed bug writing JpgFromRaw and ThumbnailImage to CRW files that could make
+    the image unreadable by Canon utilities (affected images may be repaired by
+    rewriting the same tag with this version of exiftool)
+  - Fixed bug where some Canon MakerNote values could not be written
+  - Fixed bug introduced in version 7.49 that broke the use of wildcards in
+    filenames for the Windows version
+  - API Changes:
+      - Enhanced a number of functions to accept multiple group names separated
+        by colons
 
 Oct. 27, 2008 - Version 7.51 (production release)
 
   - Fixed problems which caused failed test or warning with Perl 5.6 or older
     (does do not affect Mac or Windows versions)
+  - Fixed Windows application so help is displayed when run with no options
 
 Oct. 26, 2008 - Version 7.50 (production release) "XMP 2008"
 
@@ -3640,5 +3755,6 @@ Nov. 20, 2003 - Version 1.10
 
 Nov. 19, 2003 - Version 1.00
 
-  - Initial release
+  - Initial release (extracts information from JPEG and GIF images, with Canon,
+    FujiFilm and Pentax makernote support)
 

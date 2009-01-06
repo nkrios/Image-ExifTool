@@ -304,6 +304,11 @@ sub WriteCanonRaw($$$)
             $tagInfo = $$newTags{$addTag};
             my $newVal = $exifTool->GetNewValues($tagInfo);
             if (defined $newVal) {
+                # pad value to an even length (Canon ImageBrowser and ZoomBrowser
+                # version 6.1.1 have problems with odd-sized embedded JPEG images
+                # even if the value is padded to maintain alignment, so do this
+                # before calculating the size for the directory entry)
+                $newVal .= "\0" if length($newVal) & 0x01;
                 # add new directory entry
                 $newDir .= Set16u($addTag) . Set32u(length($newVal)) .
                            Set32u($outPos - $outBase);
@@ -317,7 +322,7 @@ sub WriteCanonRaw($$$)
             $delTag{$addTag} = 1;
         }
         last unless defined $tag;           # all done if no more directory entries
-        return 0 if $tag & 0x8000;      # top bit should not be set
+        return 0 if $tag & 0x8000;          # top bit should not be set
         my $tagID = $tag & 0x3fff;          # get tag ID
         my $tagType = ($tag >> 8) & 0x38;   # get tag type
         my $valueInDir = ($tag & 0x4000);   # flag for value in directory
@@ -420,9 +425,9 @@ sub WriteCanonRaw($$$)
                 } else {
                     $oldVal = $value;
                 }
-                my $newValueHash = $exifTool->GetNewValueHash($tagInfo);
-                if (Image::ExifTool::IsOverwriting($newValueHash, $oldVal)) {
-                    my $newVal = Image::ExifTool::GetNewValues($newValueHash);
+                my $nvHash = $exifTool->GetNewValueHash($tagInfo);
+                if (Image::ExifTool::IsOverwriting($nvHash, $oldVal)) {
+                    my $newVal = Image::ExifTool::GetNewValues($nvHash);
                     my $verboseVal;
                     $verboseVal = $newVal if $verbose > 1;
                     # convert to specified format if necessary
@@ -432,12 +437,8 @@ sub WriteCanonRaw($$$)
                     if (defined $newVal) {
                         $value = $newVal;
                         ++$exifTool->{CHANGED};
-                        if ($verbose > 1) {
-                            my $oldStr = $exifTool->Printable($oldVal);
-                            my $newStr = $exifTool->Printable($verboseVal);
-                            print $out "    - CanonRaw:$$tagInfo{Name} = '$oldStr'\n";
-                            print $out "    + CanonRaw:$$tagInfo{Name} = '$newStr'\n";
-                        }
+                        $exifTool->VerboseValue("- CanonRaw:$$tagInfo{Name}", $oldVal);
+                        $exifTool->VerboseValue("+ CanonRaw:$$tagInfo{Name}", $verboseVal);
                     }
                 }
             }
@@ -603,7 +604,7 @@ files, and would lead to far fewer problems with corrupted metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2008, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
