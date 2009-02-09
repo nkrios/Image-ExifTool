@@ -163,7 +163,7 @@ sub ProcessPhotoMechanic($$)
         last unless $raf->Seek(-12-$offset, 2) and $raf->Read($footer, 12) == 12;
         last unless $footer =~ /cbipcbbl$/;
         my $size = unpack('N', $footer);
-    
+
         if ($size & 0x80000000 or not $raf->Seek(-$size-12, 1)) {
             $exifTool->Warn('Bad PhotoMechanic trailer');
             last;
@@ -177,7 +177,7 @@ sub ProcessPhotoMechanic($$)
         # set variables returned in dirInfo hash
         $$dirInfo{DataPos} = $raf->Tell() - $size;
         $$dirInfo{DirLen} = $size + 12;
-    
+
         my %dirInfo = (
             DataPt => \$buff,
             DataPos => $$dirInfo{DataPos},

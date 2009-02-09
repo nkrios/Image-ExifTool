@@ -307,7 +307,7 @@ sub ProcessX3FProperties($$$)
             # add tag information to table
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
-        
+
         $exifTool->HandleTag($tagTablePtr, $tag, $val,
             Index => $index,
             DataPt => $dataPt,

@@ -106,7 +106,7 @@ sub ProcessZIP($$)
         }
         my $len = Get16u(\$buff, 26) + Get16u(\$buff, 28);
         $raf->Read($buf2, $len) == $len or last;
-        
+
         $rtnVal = 1;
         $buff .= $buf2;
         my %dirInfo = (

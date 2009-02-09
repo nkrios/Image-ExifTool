@@ -453,7 +453,7 @@ sub WritePDF($$)
         DataPt => $$info{XMP},
         Parent => 'PDF',
     );
-    my $xmpTable = GetTagTable('Image::ExifTool::XMP::Main');
+    my $xmpTable = Image::ExifTool::GetTagTable('Image::ExifTool::XMP::Main');
     my $oldChanged = $$exifTool{CHANGED};
     my $newXMP = $exifTool->WriteDirectory(\%xmpInfo, $xmpTable);
     $newXMP = $$info{XMP} ? ${$$info{XMP}} : '' unless defined $newXMP;
@@ -644,8 +644,8 @@ sub WritePDF($$)
                 # write this (contiguous-numbered object) section of the xref table
                 Write($outfile, $startID, ' ', $id - $startID + 1, $/, $buff) or $rtn = -1;
             }
-     
-            # write main (trailer) dictionary        
+
+            # write main (trailer) dictionary
             Write($outfile, 'trailer') or $rtn = -1;
             WriteObject($outfile, $mainDict) or $rtn = -1;
         }

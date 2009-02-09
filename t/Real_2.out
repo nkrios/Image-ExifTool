@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.25
-[File, File, Image]  - File Name: Real.rm
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 1915 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:05:24 08:37:37
-[File, File, Image]  - File Type: RM
-[File, File, Image]  - MIME Type: audio/x-pn-realaudio
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: Real.rm
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 1915 bytes
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:05:24 08:37:37-04:00
+[File, File, Image] FileType - File Type: RM
+[File, File, Image] MIMEType - MIME Type: audio/x-pn-realaudio
 [Real, Real-PROP, Video] 0 - Max Bit Rate: 32041
 [Real, Real-PROP, Video] 1 - Avg Bit Rate: 32041
 [Real, Real-PROP, Video] 2 - Max Packet Size: 465

@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.58
-[File, File, Image]  - File Name: FLAC.ogg
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 151 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:11:13 16:02:06
-[File, File, Image]  - File Type: OGG
-[File, File, Image]  - MIME Type: audio/x-ogg
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: FLAC.ogg
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 151 bytes
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:11:13 16:10:54-05:00
+[File, File, Image] FileType - File Type: OGG
+[File, File, Image] MIMEType - MIME Type: audio/x-ogg
 [FLAC, FLAC, Audio] Bit000-015 - Block Size Min: 4608
 [FLAC, FLAC, Audio] Bit016-031 - Block Size Max: 4608
 [FLAC, FLAC, Audio] Bit032-055 - Frame Size Min: 0

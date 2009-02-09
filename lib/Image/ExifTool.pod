@@ -474,6 +474,12 @@ and preview images to be extracted even if they don't have a recognizable
 header.  Minor errors/warnings are denoted by '[minor]' at the start of the
 message.
 
+=item Lang
+
+Localized language for exiftool tag descriptions, etc.  If the specified
+language isn't available, the option is not changed.  May be set to undef to
+select the built-in default language.  Default is 'en'.
+
 =item List
 
 Flag to extract lists of PrintConv values into arrays instead of joining
@@ -600,8 +606,8 @@ is given.  The following options are effective in the call to
 L</ExtractInfo>:
 
 Binary, Charset, Composite, ExtractEmbedded, FastScan, FixBase, HtmlDump,
-HtmlDumpBase, IgnoreMinorErrors, MakerNotes, ScanForXMP, TextOut, Unknown
-and Verbose.
+HtmlDumpBase, IgnoreMinorErrors, Lang, MakerNotes, ScanForXMP, TextOut,
+Unknown and Verbose.
 
 =item Return Value:
 
@@ -632,7 +638,7 @@ L</ImageInfo>.
 Inputs are the same as L</ExtractInfo> and L</ImageInfo> except that an
 image can not be specified.  Options in effect are:
 
-Charset, CoordFormat, DateFormat, Duplicates, Exclude, Group#, List,
+Charset, CoordFormat, DateFormat, Duplicates, Exclude, Group#, Lang, List,
 ListSep, StrictDate, PrintConv, Sort (if a tag list reference is given) and
 StrictDate.
 
@@ -1008,7 +1014,7 @@ deleting a group.
 
 The following ExifTool options are effective in the call to L</SetNewValue>:
 
-Charset, IgnoreMinorErrors, ListSep, ListSplit, PrintConv and Verbose.
+Charset, IgnoreMinorErrors, Lang, ListSep, ListSplit, PrintConv and Verbose.
 
 =head2 SetNewValuesFromFile
 
@@ -1204,6 +1210,8 @@ None.
 
 Set the file modification time from the new value of the FileModifyDate tag.
 
+    $exifTool->SetNewValue(FileModifyDate => '2000:01:02 03:04:05-05:00',
+                           Protected => 1);
     $result = $exifTool->SetFileModifyDate($file);
 
 =over 4
@@ -1220,6 +1228,14 @@ Set the file modification time from the new value of the FileModifyDate tag.
 
 1 if the time was changed, 0 if nothing was done, or -1 if there was an
 error setting the time.
+
+=item Notes:
+
+Equivalent to, but more efficient than calling L<WriteInfo> when only the
+FileModifyDate tag has been set.  If a timezone is not specified in the
+FileModifyDate value, local time is assumed.  When shifting FileModifyDate,
+the time of the original file is used unless an optional base time is
+specified.
 
 =back
 
@@ -1592,19 +1608,19 @@ CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky, EPPIM, EXE,
 EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, FotoStation, FujiFilm,
 GPS, GeoTiff, GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc,
 HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
-IPTC, ITC, InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
-KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, MAC,
-MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS,
-MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
-MIE-Orient, MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
-MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
-MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF,
-PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
-PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor,
-Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5,
-Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo,
-Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
+ICC-view, ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4,
+IFD0, IFD1, IPTC, IPTC#, ITC, InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak,
+KodakBordersIFD, KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD,
+Leica, MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender,
+MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
+MIE-Meta, MIE-Orient, MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM,
+MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown,
+MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan,
+Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop,
+PictureInfo, PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF,
+RMETA, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4,
+Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG,
+Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
 XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
 XMP-dex, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
 XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism,

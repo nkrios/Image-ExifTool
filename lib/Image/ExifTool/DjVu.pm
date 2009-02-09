@@ -62,7 +62,6 @@ sub ProcessBZZ($$$);
     2 => {
         Name => 'ImageHeight',
         Format => 'int16u',
-        
     },
     4 => {
         Name => 'DjVuVersion',

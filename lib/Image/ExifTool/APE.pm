@@ -95,7 +95,7 @@ sub ProcessAPE($$)
     my ($exifTool, $dirInfo) = @_;
 
     # must first check for leading/trailing ID3 information
-    unless ($exifTool->{DONE_ID3}) {
+    unless ($exifTool->{DoneID3}) {
         require Image::ExifTool::ID3;
         Image::ExifTool::ID3::ProcessID3($exifTool, $dirInfo) and return 1;
     }
@@ -138,7 +138,7 @@ sub ProcessAPE($$)
         # look for the APE trailer footer...
         my $footPos = -32;
         # (...but before the ID3v1 trailer if it exists)
-        $footPos -= 128 if $exifTool->{DONE_ID3} == 2;
+        $footPos -= 128 if $exifTool->{DoneID3} == 2;
         $raf->Seek($footPos, 2)     or return 1;
         $raf->Read($buff, 32) == 32 or return 1;
         $buff =~ /^APETAGEX/        or return 1;

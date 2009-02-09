@@ -1376,7 +1376,7 @@
   <br>0x2 = 10 s
   <br>0x3 = 20 s</span></td></tr>
 <tr>
-<td class=r>733.1</td>
+<td class=r>732.4</td>
 <td>RemoteOnDuration</td>
 <td class=c>int8u</td>
 <td><span class=s>[Mask 0xc0]
@@ -1385,7 +1385,7 @@
   <br>0x80 = 10 min
   <br>0xc0 = 15 min</span></td></tr>
 <tr class=b>
-<td class=r>733.2</td>
+<td class=r>733.1</td>
 <td>AELockButton</td>
 <td class=c>int8u</td>
 <td><span class=s>[Mask 0xe]
@@ -1395,7 +1395,7 @@
   <br>0x6 = AE Lock Hold
   <br>0x8 = AF-ON</span></td></tr>
 <tr>
-<td class=r>733.3</td>
+<td class=r>733.2</td>
 <td>AELock</td>
 <td class=c>int8u</td>
 <td><span class=s>[Mask 0x1]
@@ -2823,20 +2823,41 @@ complications which make writing more difficult.</p>
 <td class=c>rational64s[3]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>0x0060</td>
+<td>ScanImageEnhancer</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
 <td>0x0100</td>
 <td>DigitalICE</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0110</td>
 <td>ROCInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#ROC'>Nikon ROC Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x0120</td>
 <td>GEMInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#GEM'>Nikon GEM Tags</a></td></tr>
+<tr class=b>
+<td>0x0200</td>
+<td>DigitalDEEShadowAdj</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0x0201</td>
+<td>DigitalDEEThreshold</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x0202</td>
+<td>DigitalDEEHighlightAdj</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ROC'>Nikon ROC Tags</a></h2>
@@ -3310,7 +3331,7 @@ that order.  (source:
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 6, 2009</i>
+<br><i>Last revised Feb 3, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

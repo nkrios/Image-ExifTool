@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
-[File, File, Image]  - File Name: XMP3.xmp
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 1225 bytes
-[File, File, Time]  - File Modification Date/Time: 2007:12:04 10:41:44-05:00
-[File, File, Image]  - File Type: XMP
-[File, File, Image]  - MIME Type: application/rdf+xml
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: XMP3.xmp
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 1225 bytes
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2007:12:04 10:41:44-05:00
+[File, File, Image] FileType - File Type: XMP
+[File, File, Image] MIMEType - MIME Type: application/rdf+xml
 [XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 6.32
 [XMP, XMP-rdf, Document] about - About: http://www.w3.org/TR/rdf-syntax-grammar
 [XMP, XMP-dc, Image] title - Title: ExifTool common node and nonstandard namespace prefix test

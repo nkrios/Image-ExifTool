@@ -76,9 +76,9 @@ div.index       { float: right; clear: both;
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-7.60.tar.gz">
-Download        Version 7.60</a> (1.7 MB) -
-<a href="history.html">Jan. 6, 2009</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-7.67.tar.gz">
+Download        Version 7.67</a> (1.8 MB) -
+<a href="history.html">Feb. 9, 2009</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -120,8 +120,8 @@ distribution above.</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-7.59.zip">
-         exiftool-7.59.zip</a> (2.1 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-7.67.zip">
+         exiftool-7.67.zip</a> (2.3 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -131,8 +131,8 @@ drag-and-drop files and folders to view meta information, or rename to
 
 <blockquote><table class='dl lg'><tr><td><b>
 Mac OS X Package:
-<a href="ExifTool-7.60.dmg">
-         ExifTool-7.60.dmg</a> (982 kB)</b></td></tr></table></blockquote>
+<a href="ExifTool-7.67.dmg">
+         ExifTool-7.67.dmg</a> (1.1 MB)</b></td></tr></table></blockquote>
 
 <p><b>The OS X package</b> installs the ExifTool command-line application and
 libraries in /usr/bin. After installing, type "<code>exiftool</code>" in a
@@ -167,7 +167,8 @@ installing ExifTool on Windows, Mac OS X and Unix systems.</p>
     <a href="TagNames/AFCP.html">AFCP</a> and more...</li>
 <li>Reads and writes maker notes of many digital cameras</li>
 <li>Decodes a riddle wrapped in a mystery inside an enigma</li>
-<li>Numerous output formatting options (including tab-delimited, HTML and XML)</li>
+<li>Numerous output formatting options (including tab-delimited, HTML, XML and JSON)</li>
+<li>Many available localized languages (ch_s, cz, de, en, en_ca, en_gb, es, fr, it, jp, nl and pl)</li>
 <li><a href="#shift">Shifts date/time values</a> to fix timestamps in images</li>
 <li><a href="#filename">Renames files and organizes in directories</a> (by date
     or by any other meta information)</li>
@@ -175,7 +176,7 @@ installing ExifTool on Windows, Mac OS X and Unix systems.</p>
 <li>Copies meta information between files (even different-format files)</li>
 <li>Deletes meta information individually, in groups, or altogether</li>
 <li>Sets the file modification date from EXIF information</li>
-<li>Supports alternate languages in <a href="TagNames/XMP.html">XMP</a> and <a href="TagNames/MIE.html">MIE</a> information</li>
+<li>Supports alternate language tags in <a href="TagNames/XMP.html">XMP</a> and <a href="TagNames/MIE.html">MIE</a> information</li>
 <li>Processes entire directory trees</li>
 <li>Creates text output file for each image file</li>
 <li>Creates binary-format metadata-only (MIE) files for metadata backup</li>
@@ -208,6 +209,9 @@ detailed exif data of /any/ tool I've found.</i>"
 <blockquote>"<i>ExifTool makes every other EXIF reader (and writer) than I've
 seen, including the camera manufacturers' readers, look lame.</i>"
 - <a href="http://photo.net/bboard/q-and-a-fetch-msg?msg_id=00IfoF">photo.net Nikon forum</a>
+</blockquote>
+<blockquote>"<i>Insanely great tool with a long learning curve ...</i>" -
+<a href="http://www.adobeforums.com/webx?14@@.59b6fbf2/18">Adobe Forums</a>
 </blockquote>
 <blockquote>"<i>... it is the mother of all EXIF utilities; the BFG of meta-data
 extraction; the Pan Galactic Gargle Blaster of EXIF tools ... This thing will
@@ -429,12 +433,13 @@ more information:  Right-click on the window's title bar then select
 <h2><a name="output">Example Output</a>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
 
-<p>&gt; <code>exiftool -h -canon pics/103_0315.JPG</code></p>
-
 <blockquote>
-<!-- ======== /Users/phil/Desktop/103_0315.JPG -->
+<table width='100%'><tr valign='top'><td>
+&gt; <code>exiftool -h -canon pics/IMG_0315.JPG</code><br>&nbsp;
+
+<!-- pics/IMG_0315.JPG -->
 <table class='box sm tight'>
-<tr><td>File Name</td><td>103_0315.JPG</td></tr>
+<tr><td>File Name</td><td>IMG_0315.JPG</td></tr>
 <tr><td>Camera Model Name</td><td>Canon EOS DIGITAL REBEL</td></tr>
 <tr><td>Date/Time Original</td><td>2003:09:30 13:37:51</td></tr>
 <tr><td>Shooting Mode</td><td>Sports</td></tr>
@@ -443,8 +448,8 @@ more information:  Right-click on the window's title bar then select
 <tr><td>Metering Mode</td><td>Evaluative</td></tr>
 <tr><td>Exposure Compensation</td><td>0</td></tr>
 <tr><td>ISO</td><td>400</td></tr>
-<tr><td>Lens</td><td>75.0 - 300.0mm</td></tr>
-<tr><td>Focal Length</td><td>300.0mm</td></tr>
+<tr><td>Lens</td><td>75.0 - 300.0 mm</td></tr>
+<tr><td>Focal Length</td><td>300.0 mm</td></tr>
 <tr><td>Image Size</td><td>3072x2048</td></tr>
 <tr><td>Quality</td><td>Normal</td></tr>
 <tr><td>Flash</td><td>Off</td></tr>
@@ -460,6 +465,38 @@ more information:  Right-click on the window's title bar then select
 <tr><td>Owner Name</td><td>Phil Harvey</td></tr>
 <tr><td>Camera Body No.</td><td>0560012345</td></tr>
 </table>
+</td><td>
+&gt; <code>exiftool -lang jp -h -canon pics/IMG_0315.JPG</code><br>&nbsp;
+
+<!-- pics/IMG_0315.JPG -->
+<table class='box sm tight'>
+<tr><td>&#x30d5;&#x30a1;&#x30a4;&#x30eb;&#x540d;</td><td>IMG_0315.JPG</td></tr>
+<tr><td>&#x753b;&#x50cf;&#x5165;&#x529b;&#x6a5f;&#x5668;&#x30e2;&#x30c7;&#x30eb;</td><td>Canon EOS DIGITAL REBEL</td></tr>
+<tr><td>&#x30aa;&#x30ea;&#x30b8;&#x30ca;&#x30eb;&#x30c7;&#x30fc;&#x30bf;&#x4f5c;&#x6210;&#x65e5;&#x6642;</td><td>2003:09:30 13:37:51</td></tr>
+<tr><td>&#x64ae;&#x5f71;&#x30e2;&#x30fc;&#x30c9;</td><td>&#x30b9;&#x30dd;&#x30fc;&#x30c4;</td></tr>
+<tr><td>&#x9732;&#x51fa;&#x6642;&#x9593;</td><td>1/2000</td></tr>
+<tr><td>F&#x5024;</td><td>7.1</td></tr>
+<tr><td>&#x6e2c;&#x5149;&#x30e2;&#x30fc;&#x30c9;</td><td>&#x8a55;&#x4fa1;</td></tr>
+<tr><td>&#x9732;&#x51fa;&#x88dc;&#x6b63;&#x5024;</td><td>0</td></tr>
+<tr><td>ISO&#x30b9;&#x30d4;&#x30fc;&#x30c9;&#x30ec;&#x30fc;&#x30c8;</td><td>400</td></tr>
+<tr><td>&#x30ec;&#x30f3;&#x30ba;</td><td>75.0 - 300.0 mm</td></tr>
+<tr><td>&#x30ec;&#x30f3;&#x30ba;&#x7126;&#x70b9;&#x8ddd;&#x96e2;</td><td>300.0 mm</td></tr>
+<tr><td>&#x30a4;&#x30e1;&#x30fc;&#x30b8;&#x30b5;&#x30a4;&#x30ba;</td><td>3072x2048</td></tr>
+<tr><td>&#x54c1;&#x8cea;</td><td>&#x6a19;&#x6e96;</td></tr>
+<tr><td>&#x30b9;&#x30c8;&#x30ed;&#x30dc;</td><td>&#x30aa;&#x30d5;</td></tr>
+<tr><td>&#x30db;&#x30ef;&#x30a4;&#x30c8;&#x30d0;&#x30e9;&#x30f3;&#x30b9;</td><td>&#x30aa;&#x30fc;&#x30c8;</td></tr>
+<tr><td>&#x30d5;&#x30a9;&#x30fc;&#x30ab;&#x30b9;&#x30e2;&#x30fc;&#x30c9;</td><td>AI&#x30b5;&#x30fc;&#x30dc;AF</td></tr>
+<tr><td>&#x30b3;&#x30f3;&#x30c8;&#x30e9;&#x30b9;&#x30c8;</td><td>+1</td></tr>
+<tr><td>&#x30b7;&#x30e3;&#x30fc;&#x30d7;&#x30cd;&#x30b9;</td><td>+1</td></tr>
+<tr><td>&#x5f69;&#x5ea6;</td><td>+1</td></tr>
+<tr><td>&#x30ab;&#x30e9;&#x30fc;&#x30c8;&#x30fc;&#x30f3;</td><td>Normal</td></tr>
+<tr><td>&#x30d5;&#x30a1;&#x30a4;&#x30eb;&#x306e;&#x30b5;&#x30a4;&#x30ba;</td><td>1606 kB</td></tr>
+<tr><td>&#x30d5;&#x30a1;&#x30a4;&#x30eb;&#x756a;&#x53f7;</td><td>103-0315</td></tr>
+<tr><td>&#x30c9;&#x30e9;&#x30a4;&#x30d6;&#x30e2;&#x30fc;&#x30c9;</td><td>&#x9023;&#x7d9a;&#x64ae;&#x5f71;</td></tr>
+<tr><td>&#x30aa;&#x30fc;&#x30ca;&#x30fc;&#x540d;</td><td>Phil Harvey</td></tr>
+<tr><td>&#x30ab;&#x30e1;&#x30e9;&#x672c;&#x4f53;&#x756a;&#x53f7;</td><td>0560012345</td></tr>
+</table>
+</td></tr></table>
 </blockquote>
 
 <h3>Verbose and HtmlDump Output</h3>
@@ -558,19 +595,19 @@ CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky, EPPIM, EXE,
 EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, FotoStation, FujiFilm,
 GPS, GeoTiff, GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc,
 HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
-IPTC, ITC, InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
-KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, MAC,
-MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS,
-MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
-MIE-Orient, MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
-MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
-MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF,
-PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
-PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor,
-Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5,
-Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo,
-Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
+ICC-view, ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4,
+IFD0, IFD1, IPTC, IPTC#, ITC, InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak,
+KodakBordersIFD, KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD,
+Leica, MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender,
+MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
+MIE-Meta, MIE-Orient, MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM,
+MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown,
+MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan,
+Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop,
+PictureInfo, PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF,
+RMETA, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4,
+Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG,
+Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
 XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
 XMP-dex, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
 XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism,
@@ -828,7 +865,7 @@ binary data.  The simple script above does not handle this case.</p>
 <p><b>Windows</b></p>
 <ul>
 <li><a href="http://www.thezeal.com/blog/?p=145">Exif Stats Utility</a>: Analyzes images to tabulate apertures, exposure times, etc</li>
-<li><a href="http://owl.phy.queensu.ca/~phil/exiftool/modEXIFTOOL.zip">Download</a> Visual Basic 6.0 example script for reading tags with exiftool (thanks Michael Wandel)</li> 
+<li><a href="http://owl.phy.queensu.ca/~phil/exiftool/modEXIFTOOL.zip">Download</a> Visual Basic 6.0 example script for reading tags with exiftool (thanks Michael Wandel)</li>
 <li><a href="http://aeropic.free.fr/H&amp;B/AUTO_ISO_patcher/">Auto ISO Tool</a>: GUI front-end for ExifTool to patch Canon ISO information</li>
 <li><a href="http://home.wi.rr.com/dick/ExifAuto.htm">ExifAuto</a>: GUI front-end for ExifTool to perform simple operations</li>
 <li><a href="http://freeweb.siol.net/hrastni3/foto/exif/exiftoolgui.htm">ExifTool GUI for Windows</a>: A nice GUI for viewing meta information with some editing features</li>
@@ -850,6 +887,8 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="http://www.lintburger.com/software.php">CS1ToCR2</a>: Utility that uses Sony GPS-CS1 log files to add GPS information to CR2 images</li>
 <li><a href="http://82.94.219.20/~marcvos/software/realbasic/sed.html">SetEXIFData</a>: Utility to set EXIF data</li>
 <li><a href="http://craig.stanton.net.nz/software/Geotagger.html">Geotagger</a>: Droplet for inserting GPS coordinates in your photos</li>
+<li><a href="http://www.raw-photo-processor.com/RPP/Overview.html">Raw Photo Processor</a>: A Raw converter for Mac OS X</li>
+<li><a href="http://www.lemkesoft.com/content/188/graphicconverter.html">GraphicConverter</a>: Full-featured image editor</li>
 </ul>
 
 <p><b>Multi-Platform</b></p>
@@ -863,6 +902,7 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="http://regex.info/blog/lightroom-goodies/gps/">Jeffrey's Geoencoding Plugin for Lightroom</a>: Geoencode your photos from within Lightroom</li>
 <li><a href="http://code.google.com/p/geotag-lightroom-plugin/">geotag-lightroom-plugin</a>: Another Lightroom plugin for geotagging photos</li>
 <li><a href="http://flickfleck.googlecode.com/">FlickFleck</a>: Tool to transfer images from memory card, rotate, rename, and organize by date</li>
+<li><a href="http://muellerware.org/hg/gpx2exif/">gpx2exif</a>: Python script to geocode photos and produce KML files from a GPS track log</li>
 </ul>
 
 <p><b>Linux</b></p>

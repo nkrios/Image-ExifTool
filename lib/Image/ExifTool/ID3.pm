@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.12';
+$VERSION = '1.14';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -185,6 +185,29 @@ my %genre = (
     123 => 'Acapella',
     124 => 'Euro-House',
     125 => 'Dance Hall',
+    # ref http://yar.hole.ru/MP3Tech/lamedoc/id3.html
+    126 => 'Goa',
+    127 => 'Drum & Bass',
+    128 => 'Club-House',
+    129 => 'Hardcore',
+    130 => 'Terror',
+    131 => 'Indie',
+    132 => 'BritPop',
+    133 => 'Negerpunk',
+    134 => 'Polsk Punk',
+    135 => 'Beat',
+    136 => 'Christian Gangsta',
+    137 => 'Heavy Metal',
+    138 => 'Black Metal',
+    139 => 'Crossover',
+    140 => 'Contemporary C',
+    141 => 'Christian Rock',
+    142 => 'Merengue',
+    143 => 'Salsa',
+    144 => 'Thrash Metal',
+    145 => 'Anime',
+    146 => 'JPop',
+    147 => 'SynthPop',
     255 => 'None',
     # ID3v2 adds some text short forms...
     CR  => 'Cover',
@@ -330,6 +353,7 @@ my %id3v2_common = (
   # SYTC => 'SynchronizedTempoCodes',
     TALB => 'Album',
     TBPM => 'BeatsPerMinute',
+    TCMP => { Name => 'Compilation', PrintConv => { 0 => 'No', 1 => 'Yes' } }, #PH (iTunes)
     TCOM => 'Composer',
     TCON =>{
         Name => 'Genre',
@@ -506,6 +530,7 @@ sub PrintGenre($)
     }
     $val =~ s/\((\d+)\)/\($genre{$1}\)/g;
     $val =~ s/(^|\/)(\d+)/$1$genre{$2}/g;
+    $val =~ s/^\(([^)]+)\)\1?$/$1/; # clean up by removing brackets and duplicates
     return $val;
 }
 
@@ -694,7 +719,7 @@ sub ProcessID3v2($$$)
             unless (defined $val and defined $url) {
                 $exifTool->Warn("Invalid $id frame value");
                 next;
-            }               
+            }
             $val = DecodeString($exifTool, $val);
             $url =~ s/\0.*//;
             $val = length($val) ? "($val) $url" : $url;
@@ -744,13 +769,13 @@ sub ProcessID3v2($$$)
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
 # Returns: 1 on success, 0 if this file didn't contain ID3 information
 # - also processes audio data if any ID3 information was found
-# - sets ExifTool DONE_ID3 to 1 when called, or to 2 if an ID3v1 trailer exists
+# - sets ExifTool DoneID3 to 1 when called, or to 2 if an ID3v1 trailer exists
 sub ProcessID3($$)
 {
     my ($exifTool, $dirInfo) = @_;
-    
-    return 0 if $exifTool->{DONE_ID3};  # avoid infinite recursion
-    $exifTool->{DONE_ID3} = 1;
+
+    return 0 if $exifTool->{DoneID3};  # avoid infinite recursion
+    $exifTool->{DoneID3} = 1;
 
     # allow this to be called with either RAF or DataPt
     my $raf = $$dirInfo{RAF} || new File::RandomAccess($$dirInfo{DataPt});
@@ -826,7 +851,7 @@ sub ProcessID3($$)
 # read ID3v1 trailer if it exists
 #
     if ($raf->Seek(-128, 2) and $raf->Read($tBuff, 128) == 128 and $tBuff =~ /^TAG/) {
-        $exifTool->{DONE_ID3} = 2;  # set to 2 as flag that trailer exists
+        $exifTool->{DoneID3} = 2;  # set to 2 as flag that trailer exists
         %id3Trailer = (
             DataPt   => \$tBuff,
             DataPos  => $raf->Tell() - 128,
@@ -893,7 +918,7 @@ sub ProcessMP3($$)
     my ($exifTool, $dirInfo) = @_;
 
     # must first check for leading/trailing ID3 information
-    unless ($exifTool->{DONE_ID3}) {
+    unless ($exifTool->{DoneID3}) {
         ProcessID3($exifTool, $dirInfo) and return 1;
     }
     my $raf = $$dirInfo{RAF};
@@ -901,17 +926,19 @@ sub ProcessMP3($$)
     my $buff;
 #
 # extract information from first audio/video frame headers
-# (if found in the first 256 bytes)
+# (if found in the first $scanLen bytes)
 #
-    if ($raf->Read($buff, 256)) {
+    # scan further into a file that should be an MP3
+    my $scanLen = ($$exifTool{FILE_EXT} and $$exifTool{FILE_EXT} eq 'MP3') ? 8192 : 256;
+    if ($raf->Read($buff, $scanLen)) {
         require Image::ExifTool::MPEG;
         if ($buff =~ /\0\0\x01(\xb3|\xc0)/) {
             # look for A/V headers in first 64kB
             my $buf2;
-            $raf->Read($buf2, 65280) and $buff .= $buf2;
+            $raf->Read($buf2, 0x10000 - $scanLen) and $buff .= $buf2;
             $rtnVal = 1 if Image::ExifTool::MPEG::ProcessMPEGAudioVideo($exifTool, \$buff);
         } else {
-            # look for audio frame sync in first 256 bytes
+            # look for audio frame sync in first $scanLen bytes
             $rtnVal = 1 if Image::ExifTool::MPEG::ProcessMPEGAudio($exifTool, \$buff);
         }
     }

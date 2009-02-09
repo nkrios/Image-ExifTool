@@ -114,7 +114,7 @@ sub Add_iCCP($$)
     my ($exifTool, $outfile) = @_;
     if ($exifTool->{ADD_DIRS}->{ICC_Profile}) {
         # write new ICC data
-        my $tagTablePtr = GetTagTable('Image::ExifTool::ICC_Profile::Main');
+        my $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::ICC_Profile::Main');
         my %dirInfo = ( Parent => 'PNG', DirName => 'ICC_Profile' );
         my $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
         if (defined $buff and length $buff and WriteProfile($outfile, 'icm', \$buff)) {
@@ -169,7 +169,7 @@ sub AddChunks($$)
                         $warn = 'deflate error';
                     }
                 } else {
-                    $warn = 'Compress::Zlib not available'; 
+                    $warn = 'Compress::Zlib not available';
                 }
                 $warn and $exifTool->Warn("PNG:$$tagInfo{Name} not compressed ($warn)", 1);
             }
@@ -191,7 +191,7 @@ sub AddChunks($$)
         if ($dir eq 'IFD0') {
             $exifTool->VPrint(0, "Creating EXIF profile:\n");
             $exifTool->{TIFF_TYPE} = 'APP1';
-            $tagTablePtr = GetTagTable('Image::ExifTool::Exif::Main');
+            $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::Exif::Main');
             $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr, \&Image::ExifTool::WriteTIFF);
             if (defined $buff and length $buff) {
                 $buff = $Image::ExifTool::exifAPP1hdr . $buff;
@@ -199,7 +199,7 @@ sub AddChunks($$)
             }
         } elsif ($dir eq 'XMP') {
             $exifTool->VPrint(0, "Creating XMP iTXt chunk:\n");
-            $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
+            $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::XMP::Main');
             $dirInfo{ReadOnly} = 1;
             $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
             if (defined $buff and length $buff and
@@ -218,7 +218,7 @@ sub AddChunks($$)
         } elsif ($dir eq 'IPTC') {
             $exifTool->VPrint(0, "Creating IPTC profile:\n");
             # write new IPTC data
-            $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Main');
+            $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::Photoshop::Main');
             $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
             if (defined $buff and length $buff) {
                 WriteProfile($outfile, 'iptc', \$buff, 'IPTC') or $err = 1;
@@ -226,7 +226,7 @@ sub AddChunks($$)
         } elsif ($dir eq 'ICC_Profile') {
             $exifTool->VPrint(0, "Creating ICC profile:\n");
             # write new ICC data (only done if we couldn't create iCCP chunk)
-            $tagTablePtr = GetTagTable('Image::ExifTool::ICC_Profile::Main');
+            $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::ICC_Profile::Main');
             $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
             if (defined $buff and length $buff) {
                 WriteProfile($outfile, 'icm', \$buff, 'ICC') or $err = 1;

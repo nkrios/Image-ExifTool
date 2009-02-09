@@ -15,7 +15,7 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.43';
+$VERSION = '1.44';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -644,8 +644,7 @@ foreach $tagInfo (@Image::ExifTool::MakerNotes::Main) {
     $$tagInfo{Groups} = { 1 => 'MakerNotes' };
     next unless $$tagInfo{SubDirectory};
     # set up this tag so we can write it
-    $$tagInfo{ValueConv} = '\$val';
-    $$tagInfo{ValueConvInv} = '$val';
+    $$tagInfo{Binary} = 1,
     $$tagInfo{MakerNotes} = 1;
 }
 

@@ -14,13 +14,17 @@ the binary data block (floating point IDs allow multiple tags for the same
 offset, with the integer part being used for the offset).  The corresponding
 hash value provides information about the tag (explained later).
 
-Twenty-two special keys (PROCESS_PROC, WRITE_PROC, CHECK_PROC, GROUPS, FORMAT,
-FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, DID_TAG_ID, WRITABLE, NOTES, IS_OFFSET,
-EXTRACT_UNKNOWN, NAMESPACE, PREFERRED, PARENT, PRIORITY, WRITE_GROUP, LANG_INFO,
-VARS, DATAMEMBER and SET_GROUP1) are used to provide additional information
-about a table. The special keys have names that are all capitalized to avoid
-possible conflicts with tag keys.  Below is an explanation of the meaning of
-each special key:
+Twenty-five special keys (TABLE_NAME, SHORT_NAME, PROCESS_PROC, WRITE_PROC,
+CHECK_PROC, GROUPS, FORMAT, FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, WRITABLE,
+DESCRIPTION, NOTES, IS_OFFSET, EXTRACT_UNKNOWN, NAMESPACE, PREFERRED, PARENT,
+PRIORITY, WRITE_GROUP, LANG_INFO, CUR_LANG, VARS, DATAMEMBER and SET_GROUP1) are
+used to provide additional information about a table. The special keys have
+names that are all capitalized to avoid possible conflicts with tag keys.  Below
+is an explanation of the meaning of each special key:
+
+  TABLE_NAME : Name of this table (set by GetTagTable()).
+
+  SHORT_NAME : Table name with leading "Image::ExifTool::" removed.
 
   PROCESS_PROC : Reference to a function used to process the directory for this
   table.  If PROCESS_PROC is not given, \&Image::ExifTool::Exif::ProcessExif is
@@ -101,13 +105,11 @@ each special key:
 
   PRINT_CONV : Default print conversion tags where PrintConv isn't specified.
 
-  DID_TAG_ID : Used by GetTagID() as a flag to indicate that TagID's have been
-  defined for all tags in this table.  This may be set in the table definition
-  to prevent GetTagID() from assigning TagID's.
-
   WRITABLE : Indicates that all tags in this table are writable.  This is the
   same as setting the Writable flag for each individual tag in the table, except
   for SubDirectory tags which are not made Writable.
+
+  DESCRIPTION : Short description for this table.  Plain text only.
 
   NOTES : Notes to introduce the table in the TagNames documentation.  Pod
   formatting codes B<> and C<> may be used in this text.
@@ -142,6 +144,9 @@ each special key:
   language-specific tag information hash.  The routine takes two arguments: a
   reference to the non-specific tagInfo hash, and the language code. Used only
   in tables which support tag name language extensions (ie. MIE and XMP).
+
+  CUR_LANG : Reference to current localized language information hash, or undef
+  for the default language.
 
   VARS : Hash used to store additional parameters.  Individual modules may use
   this to store any parameters they want.  The following additional parameters
@@ -258,6 +263,9 @@ numerical.
                   on the IFD entry position.  This allows individual values to
                   be entry-based even though some others aren't (as with the
                   Casio PrintIM information).
+
+                  'GotGroups' - [reserved] flag used internally to indicate that
+                  the Groups hash has been initialized for this tag.
 
                   'IsOffset' - flag set if the tag represents an offset to some
                   data, and causes value will be adjusted to an absolute file
@@ -533,8 +541,9 @@ numerical.
                   condition is evaluated before the information is written in
                   each file.
 
-  WriteGroup    : [Required for writable EXIF tags] Specifies the IFD where the
-                  information gets written by default.
+  WriteGroup    : [Writable EXIF tags only] Specifies the IFD where the
+                  information gets written by default.  Must be defined for
+                  writable EXIF tags if WRITE_GROUP is not specified in table.
 
   OffsetPair    : Used in EXIF table to specify the tagID for the corresponding
                   offset or length tag.
@@ -552,8 +561,10 @@ numerical.
   Units         : [MIE tags only] Reference to a list of valid units strings.
                   The default units are the first item in the list.
 
-  TagID         : [reserved] This entry is used internally by GetTagID() to
-                  cache tag ID numbers for speed.
+  TagID         : [reserved] Used internally to save the table key for this tag.
+
+  Index         : [reserved] Used internally to save the index of tagInfo records
+                  which are in a conditional list.
 
   Table         : [reserved] Reference to parent tag table.
 

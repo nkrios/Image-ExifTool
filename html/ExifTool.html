@@ -462,13 +462,18 @@ to a specific function.</p>
     occur, but also allows thumbnail and preview images to be extracted even if
     they don't have a recognizable header.</td>
     <td align='center'>0 or 1</td><td align='center'>0</td></tr>
+<tr><td>Lang</td><td>Localized language for exiftool tag descriptions, etc.  If the
+    specified language isn't available, the option is not changed.  May be set to
+    undef to select the built-in default language.</td>
+    <td align='center'>String corresponding to the name of a module in Image/ExifTool/Lang.</td>
+    <td align='center'>'en'</td></tr>
 <tr><td>List</td><td>Flag to extract lists of PrintConv values into arrays instead of combining
     them into a string of values.</td><td align='center'>0 or 1</td><td align='center'>0</td></tr>
 <tr><td>ListSep</td><td>Separator string used to join lists of PrintConv values when
     List option is not set.</td><td align='center'>any string</td><td align='center'>', '</td></tr>
 <tr><td>ListSplit</td><td>Regular expression used to split values of list-type tags
     into individual items when writing.  (ie. use ',\\s*' to split a comma-separated list)</td>
-    <td align='center'>a regular expression pattern</td><td align='center'>undef</td></tr>
+    <td align='center'>A regular expression pattern</td><td align='center'>undef</td></tr>
 <tr><td>MakerNotes</td><td>Option to extract MakerNotes and other writable
     subdirectories (such as PrintIM) as a data block.  Normally when the MakerNotes
     are extracted they are rebuilt to include data outside the boundaries of the
@@ -482,7 +487,7 @@ to a specific function.</p>
     expressions evaluated by <a href="#SetNewValuesFromFile">SetNewValuesFromFile</a>.
     If not set, a minor error is issued for missing values, or the value
     is set to '' if IgnoreMinorErrors is set.</td>
-    <td align='center'>any string, or undef</td><td align='center'>undef</td></tr>
+    <td align='center'>Any string, or undef</td><td align='center'>undef</td></tr>
 <tr><td>PrintConv</td><td><a name="PrintConv"></a>Flag to enable print conversion.  Also enables inverse print
     conversion for writing.</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
 <tr><td>ScanForXMP</td><td><a name="ScanForXMP"></a>Flag for scan all files (even unrecognized
@@ -584,7 +589,7 @@ $success = $exifTool-&gt;<b>ExtractInfo</b>('image.jpg', \%options);
 <p>The following options are effective in the call to <a href="#ExtractInfo">ExtractInfo</a>:</p>
 <blockquote>
 Binary, Charset, Composite, ExtractEmbedded, FastScan, FixBase, HtmlDump, HtmlDumpBase,
-IgnoreMinorErrors, MakerNotes, ScanForXMP, TextOut, Unknown and Verbose.
+IgnoreMinorErrors, Lang, MakerNotes, ScanForXMP, TextOut, Unknown and Verbose.
 </blockquote>
 
 <hr><h2><a name="GetInfo">GetInfo</a></h2>
@@ -616,7 +621,7 @@ $info = $exifTool-&gt;<b>GetInfo</b>({Group2 =&gt; ['Author', 'Location']});
 </pre></td></tr></table></blockquote>
 <p>The following options are effective in the call to <a href="#GetInfo">GetInfo</a>:</p>
 <blockquote>
-Charset, CoordFormat, DateFormat, Duplicates, Exclude, Group#, List, ListSep,
+Charset, CoordFormat, DateFormat, Duplicates, Exclude, Group#, Lang, List, ListSep,
 StrictDate, PrintConv, Sort (if a tag list reference is given) and StrictDate.
 </blockquote>
 
@@ -953,7 +958,7 @@ of individual tags after deleting a group.</p>
 <p>The following ExifTool options are effective in the call to
 <a href="#SetNewValue">SetNewValue</a>:</p>
 <blockquote>
-Charset, IgnoreMinorErrors, ListSep, ListSplit, PrintConv and Verbose.
+Charset, IgnoreMinorErrors, Lang, ListSep, ListSplit, PrintConv and Verbose.
 </blockquote>
 
 <hr><h2><a name="SetNewValuesFromFile">SetNewValuesFromFile</a></h2>
@@ -1151,8 +1156,15 @@ done, or -1 if there was an error setting the time.
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
+$exifTool-&gt;<a href="#SetNewValue">SetNewValue</a>(FileModifyDate =&gt; '2000:01:02 03:04:05', Protected => 1);
 my $result = $exifTool-&gt;<b>SetFileModifyDate</b>($file);
 </pre></td></tr></table></blockquote>
+<p><b>Notes:</b></p>
+<p>Equivalent to, but more efficient than calling <a href="#WriteInfo">WriteInfo</a>
+when only the FileModifyDate tag has been set.  If a timezone is not specified
+in the FileModifyDate value, local time is assumed.  When shifting
+FileModifyDate, the time of the original file is used unless an optional base
+time is specified.</p>
 
 <hr><h2><a name="SetFileName">SetFileName</a></h2>
 <p>Set the file name and directory.  If not specified, the new file name is
@@ -1470,19 +1482,19 @@ CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky, EPPIM, EXE,
 EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, FotoStation, FujiFilm,
 GPS, GeoTiff, GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc,
 HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
-IPTC, ITC, InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
-KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, MAC,
-MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS,
-MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
-MIE-Orient, MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM, MIE-Unknown,
-MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown, MetaIFD, Minolta,
-MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus, PDF,
-PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
-PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor,
-Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5,
-Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo,
-Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
+ICC-view, ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v2_2, ID3v2_3, ID3v2_4,
+IFD0, IFD1, IPTC, IPTC#, ITC, InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak,
+KodakBordersIFD, KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD,
+Leica, MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender,
+MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes,
+MIE-Meta, MIE-Orient, MIE-Preview, MIE-Test, MIE-Thumbnail, MIE-UTM,
+MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MakerNotes, MakerUnknown,
+MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan,
+Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop,
+PictureInfo, PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF,
+RMETA, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4,
+Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG,
+Sanyo, Sigma, SigmaRaw, Sony, SubIFD, Track#, Vorbis, XMP, XMP-DICOM,
 XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
 XMP-dex, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
 XMP-microsoft, XMP-pdf, XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism,

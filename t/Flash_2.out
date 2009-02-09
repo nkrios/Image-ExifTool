@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
-[File, File, Image]  - File Name: Flash.swf
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 384 bytes
-[File, File, Time]  - File Modification Date/Time: 2008:10:23 16:26:04-04:00
-[File, File, Image]  - File Type: SWF
-[File, File, Image]  - MIME Type: application/x-shockwave-flash
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: Flash.swf
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 384 bytes
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:10:23 16:26:04-04:00
+[File, File, Image] FileType - File Type: SWF
+[File, File, Image] MIMEType - MIME Type: application/x-shockwave-flash
 [Flash, Flash, Video] FlashVersion - Flash Version: 6
 [Flash, Flash, Video] Compressed - Compressed: False
 [Flash, Flash, Video] ImageWidth - Image Width: 50
@@ -14,4 +14,4 @@
 [Flash, Flash, Video] Duration - Duration: 0.08 s
 [XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
 [XMP, XMP-pdf, Author] Author - Author: Phil
-[Composite, Composite, Image]  - Image Size: 50x50
+[Composite, Composite, Image] ImageSize - Image Size: 50x50

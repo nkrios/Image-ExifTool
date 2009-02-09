@@ -1338,10 +1338,10 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>0x5 = Fired, Return not detected
   <br>0x7 = Fired, Return detected
   <br>0x8 = On, Did not fire
-  <br>0x9 = On
+  <br>0x9 = On, Fired
   <br>0xd = On, Return not detected
   <br>0xf = On, Return detected
-  <br>0x10 = Off
+  <br>0x10 = Off, Did not fire
   <br>0x14 = Off, Did not fire, Return not detected
   <br>0x18 = Auto, Did not fire
   <br>0x19 = Auto, Fired
@@ -1908,6 +1908,42 @@ indicated by &quot;Uncalibrated&quot; with an InteropIndex of &quot;R03&quot;)</
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>0xafc0</td>
+<td>ExpandSoftware</td>
+<td class=c>N</td>
+<td class=c>-</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xafc1</td>
+<td>ExpandLens</td>
+<td class=c>N</td>
+<td class=c>-</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xafc2</td>
+<td>ExpandFilm</td>
+<td class=c>N</td>
+<td class=c>-</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xafc3</td>
+<td>ExpandFilterLens</td>
+<td class=c>N</td>
+<td class=c>-</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>0xafc4</td>
+<td>ExpandScanner</td>
+<td class=c>N</td>
+<td class=c>-</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>0xafc5</td>
+<td>ExpandFlashLamp</td>
+<td class=c>N</td>
+<td class=c>-</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>0xbc01</td>
 <td>PixelFormat</td>
 <td class=c>N</td>
@@ -2312,7 +2348,7 @@ unnecessary clutter)</span>
 <td>0xc634</td>
 <td>SR2Private
   <br>DNGAdobeData
-  <br>DNGPentaxData
+  <br>MakerNotePentax
   <br>DNGPrivateData</td>
 <td class=c>-<br>-<br>-<br>N</td>
 <td class=c>-<br>-<br>-<br>-</td>
@@ -2459,10 +2495,10 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <td>&nbsp;</td></tr>
 <tr>
 <td>0xc6d2</td>
-<td>Title</td>
-<td class=c>string/</td>
+<td>PanasonicTitle</td>
+<td class=c>undef/</td>
 <td class=c>IFD0</td>
-<td><span class=s><span class=n>(proprietary Panasonic tag)</span></span></td></tr>
+<td><span class=s><span class=n>(proprietary Panasonic tag used for baby name, etc)</span></span></td></tr>
 <tr class=b>
 <td>0xc6f3</td>
 <td>CameraCalibrationSig</td>
@@ -2728,7 +2764,7 @@ writing these unless they already exist in the file)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 10, 2008</i>
+<br><i>Last revised Feb 7, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

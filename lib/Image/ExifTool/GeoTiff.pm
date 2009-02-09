@@ -14,7 +14,7 @@ package Image::ExifTool::GeoTiff;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool qw(:DataAccess :Utils);
 
 $VERSION = '1.06';
 
@@ -2085,16 +2085,16 @@ sub ProcessGeoTiff($)
         my $revision   = Get16u($dirData,2);
         my $minorRev   = Get16u($dirData,4);
         my $numEntries = Get16u($dirData,6);
-    
+
         if ($verbose) {
             $exifTool->{INDENT} .= '| ';
             $exifTool->VerboseDir('GeoTiff',$numEntries);
         }
         # generate version number tag (not a real GeoTiff tag)
-        my $tagTable = Image::ExifTool::GetTagTable("Image::ExifTool::GeoTiff::Main");
+        my $tagTable = GetTagTable("Image::ExifTool::GeoTiff::Main");
         my $tagInfo = $exifTool->GetTagInfo($tagTable, 1);
         $tagInfo and $exifTool->FoundTag($tagInfo,"$version.$revision.$minorRev");
-    
+
         my $i;
         for ($i=0; $i<$numEntries; ++$i) {
             my $pt = 8 * ($i + 1);

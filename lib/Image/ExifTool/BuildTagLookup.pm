@@ -29,7 +29,7 @@ use Image::ExifTool::IPTC;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '1.82';
+$VERSION = '1.84';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -418,17 +418,17 @@ sub new
             $table = GetTagTable($tableName);
         }
         my $tableNum = $tableNum{$tableName};
-        my $writeProc = $table->{WRITE_PROC};
-        my $vars = $table->{VARS} || { };
+        my $writeProc = $$table{WRITE_PROC};
+        my $vars = $$table{VARS} || { };
         $longID{$tableName} = 0;
         $longName{$tableName} = 0;
         # save all tag names
         my ($tagID, $binaryTable, $noID, $isIPTC, $isXMP);
-        $isIPTC = 1 if $$table{WRITE_PROC} and $$table{WRITE_PROC} eq \&Image::ExifTool::IPTC::WriteIPTC;
+        $isIPTC = 1 if $writeProc and $writeProc eq \&Image::ExifTool::IPTC::WriteIPTC;
         $isXMP = 1 if $short =~ /^XMP\b/;
-        $noID = 1 if $short =~ /^(Composite|XMP|Extra|Shortcuts|ASF.*)$/ or $$vars{NO_ID};
-        if ($$vars{ID_LABEL} or ($table->{PROCESS_PROC} and
-            $table->{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData))
+        $noID = 1 if $short =~ /^(XMP|Shortcuts|ASF.*)$/ or $$vars{NO_ID};
+        if ($$vars{ID_LABEL} or ($$table{PROCESS_PROC} and
+            $$table{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData))
         {
             $binaryTable = 1;
             $id{$tableName} = $$vars{ID_LABEL} || 'Index';
@@ -716,7 +716,7 @@ TagID:  foreach $tagID (@keys) {
                 if ($1 or $binaryTable or $isIPTC or ($short =~ /^CanonCustom/ and $tagID < 256)) {
                     $tagIDstr = $tagID;
                 } else {
-                    $tagIDstr = sprintf("0x%.4x",$tagID);
+                    $tagIDstr = sprintf('0x%.4x',$tagID);
                 }
             } elsif ($short eq 'DICOM') {
                 ($tagIDstr = $tagID) =~ s/_/,/;
@@ -812,7 +812,7 @@ sub WriteTagLookup($$)
                 my @tagIDs = sort keys %$tagID;
                 foreach (@tagIDs) {
                     if (/^\d+$/) {
-                        $_ = sprintf("0x%x",$_);
+                        $_ = sprintf('0x%x',$_);
                     } else {
                         my $quot = "'";
                         # escape non-printable characters in tag ID if necessary
@@ -822,7 +822,7 @@ sub WriteTagLookup($$)
                 }
                 $entry = '[' . join(',', @tagIDs) . ']';
             } elsif ($tagID =~ /^\d+$/) {
-                $entry = sprintf("0x%x",$tagID);
+                $entry = sprintf('0x%x',$tagID);
             } else {
                 $entry = "'$tagID'";
             }

@@ -127,7 +127,7 @@ sub-seconds and a timezone to be specified.  The timezone format is
 "<code>+hh:mm</code>", "<code>-hh:mm</code>" or "<code>Z</code>". For
 example:
 
-<pre>exiftool "-xmp:dateTimeOriginal=2005:10:23 20:06:34.33-05:00" a.jpg
+<pre>exiftool -xmp:dateTimeOriginal="2005:10:23 20:06:34.33-05:00" a.jpg
 </pre>
 
 ExifTool will attempt to reformat input date/time values into the standard
@@ -153,7 +153,7 @@ the possible exception of List-type tags -- see <a href="#Q17">FAQ #17</a>
 below</i>], so a value that is printed as 'Above Sea Level' must also be written in
 that form. (ie. The inverse print conversion is applied when writing values.)
 For example, to write GPSAltitudeRef you can type:
-<pre>exiftool "-gpsaltituderef=Above Sea Level" image.jpg
+<pre>exiftool -gpsaltituderef="Above Sea Level" image.jpg
 </pre>
 or any unambiguous short form may be used and ExifTool will know what you mean, ie)
 <pre>exiftool -gpsaltituderef=above image.jpg
@@ -368,6 +368,14 @@ option.  When writing, exiftool encodes UTF-8 or Latin1 text as Unicode only if
 the string contains special characters, otherwise PDFDocEncoding is
 used.</blockquote>
 
+<blockquote><b>MIE</b>: MIE strings are stored as either UTF-8 or ISO 8859-1. 
+When reading, UTF-8 strings are translated to Latin only if the <code>-L</code>
+option is used, and ISO 8859-1 strings are never translated.  When writing,
+input strings are translated from Latin1 to UTF-8 only if the <code>-L</code>
+option is used, otherwise no translation is performed.  The resulting strings
+are stored as UTF-8 if they contain multi-byte UTF-8 character sequences,
+otherwise they are assumed to be ISO 8859-1.</blockquote>
+
 <a name="Q11"></a>
 <p>11. <b>"My user-defined tags don't work"</b></p>
 
@@ -462,8 +470,9 @@ feature).
 </blockquote>
 
 <blockquote>Another approach is to export information in RDF/XML format using
-the <code>-X</code> option.  This method allows transfer of more complex data
-sets, but it requires that the importing software supports RDF/XML.
+the <code>-X</code> option, or JSON (JavaScript Object Notation) using the
+<code>-j</code> option.  These methods allow transfer of more complex data
+sets, but require that the importing software supports these formats.
 </blockquote>
 
 <a name="Q13"></a>
@@ -515,11 +524,11 @@ string with "<code>W</code>" or "<code>S</code>". </blockquote>
 <blockquote>Here are some examples of equivalent ways to specify a GPS
 latitude in both EXIF and XMP:
 
-<pre>exiftool "-exif:gpslatitude=42 30 0.00" -exif:gpslatituderef=S a.jpg
-exiftool "-exif:gpslatitude=42 deg 30.00 min" -exif:gpslatituderef=S a.jpg
+<pre>exiftool -exif:gpslatitude="42 30 0.00" -exif:gpslatituderef=S a.jpg
+exiftool -exif:gpslatitude="42 deg 30.00 min" -exif:gpslatituderef=S a.jpg
 exiftool -exif:gpslatitude=42.5 -exif:gpslatituderef=S a.jpg
 
-exiftool "-xmp:gpslatitude=42 30 0.00 S" a.jpg
+exiftool -xmp:gpslatitude="42 30 0.00 S" a.jpg
 exiftool -xmp:gpslatitude=42.50S a.jpg
 exiftool -xmp:gpslatitude=-42.5 a.jpg
 </pre>
@@ -567,7 +576,7 @@ types</u><span class='sm'><sup>&dagger;</sup></span> when <u>any
 tag</u><span class='sm'><sup>&Dagger;</sup></span> is being written and a
 directory name is specified on the command line.  To force exiftool to process
 other files, they must either be listed on the command line by name, or be
-specified using the <code>-ext</code> option -- something like this:
+specified using the <code>-ext</code> option, something like this:
 
 <pre>exiftool -ext AVI -ext JPG -d pics/%Y/%m "-directory&lt;dateTimeOriginal" DIR
 </pre>
@@ -691,7 +700,7 @@ navigate the documentation -- this is one reason why I am reluctant to add new
 features unnecessarily.</blockquote>
 
 <blockquote>Cases <b>B</b> and <b>C</b> may both apply since very specific feature
-requests can usually be satisfied via a user-defined tag.  Please take a look a
+requests can often be satisfied via a user-defined tag.  Please take a look a
 the <a href="config.html">config file documentation</a> for details about how to
 add user-defined tags, and search the
 <a href="http://www.cpanforum.com/dist/Image-ExifTool">ExifTool forum</a> for the
@@ -699,10 +708,10 @@ word "UserDefined" to see examples of user-defined tags which other people have
 found useful. (Be sure to select "Posts by text in body" when you do the search.)
 </blockquote>
 
-<blockquote>If a user-defined tag doesn't solve the problem, often a bit of custom
-Perl script will do the job.  If you have any programming experience at all, you
-should be able to pick up Perl very quickly (the syntax is very similar to C),
-and the ExifTool API is very easy to use.</blockquote>
+<blockquote>If a user-defined tag doesn't solve the problem, usually a bit of
+custom Perl script will do the job.  If you have any programming experience at
+all, you should be able to pick up Perl very quickly (the syntax is very similar
+to C), and the ExifTool API is very easy to use.</blockquote>
 
 <blockquote>But if you think the feature may be useful to other people, please
 let me know.  You can send me an e-mail or post in the
@@ -712,7 +721,7 @@ option to the already complex command-line interface.
 </blockquote>
 
 <hr>
-<i>Last revised Dec 18, 2008</i>
+<i>Last revised Feb 5, 2009</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

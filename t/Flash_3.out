@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.15
-[File, File, Image]  - File Name: Flash.flv
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 1358 bytes
-[File, File, Time]  - File Modification Date/Time: 2007:06:12 12:12:29
-[File, File, Image]  - File Type: FLV
-[File, File, Image]  - MIME Type: video/x-flv
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: Flash.flv
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 1358 bytes
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2007:06:12 12:15:04-04:00
+[File, File, Image] FileType - File Type: FLV
+[File, File, Image] MIMEType - MIME Type: video/x-flv
 [Flash, Flash, Video] hasKeyframes - Has Key Frames: Yes
 [Flash, Flash, Video] CuePoint0Name - Cue Point 0 Name: Cue1
 [Flash, Flash, Video] CuePoint0Time - Cue Point 0 Time: 0
@@ -39,7 +39,7 @@
 [Flash, Flash, Video] keyframesFilepositions - Key Frame Positions: 1463, 32674, 143320, 181650
 [Flash, Flash, Audio] audiocodecid - Audio Codec ID: 2
 [Flash, Flash, Video] videodatarate - Video Bitrate: 418659
-[Flash, Flash, Video] duration - Duration: 3.089 s
+[Flash, Flash, Video] duration - Duration: 3.09 s
 [Flash, Flash, Video] hasCuePoints - Has Cue Points: Yes
 [Flash, Flash, Video] width - Image Width: 320
 [Flash, Flash, Audio] Bit0-3 - Audio Encoding: MP3
@@ -47,4 +47,4 @@
 [Flash, Flash, Audio] Bit6 - Audio Sample Bits: 16
 [Flash, Flash, Audio] Bit7 - Audio Channels: 1 (mono)
 [Flash, Flash, Video] Bit4-7 - Video Encoding: On2 VP6
-[Composite, Composite, Image]  - Image Size: 320x240
+[Composite, Composite, Image] ImageSize - Image Size: 320x240

@@ -29,7 +29,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.52';
+$VERSION = '1.53';
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -951,6 +951,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x000 => { #PH
         Name => 'EquipmentVersion',
         Writable => 'undef',
+        RawConv => '$val=~s/\0+$//; $val',  # (may be null terminated)
         Count => 4,
     },
     0x100 => { #6
@@ -1116,6 +1117,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x000 => { #PH
         Name => 'CameraSettingsVersion',
         Writable => 'undef',
+        RawConv => '$val=~s/\0+$//; $val',  # (may be null terminated)
         Count => 4,
     },
     0x100 => { #6
@@ -1573,6 +1575,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x000 => { #PH
         Name => 'RawDevVersion',
         Writable => 'undef',
+        RawConv => '$val=~s/\0+$//; $val',  # (may be null terminated)
         Count => 4,
     },
     0x100 => {
@@ -1678,6 +1681,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x000 => {
         Name => 'RawDevVersion',
         Writable => 'undef',
+        RawConv => '$val=~s/\0+$//; $val',  # (may be null terminated)
         Count => 4,
     },
     0x100 => {
@@ -1830,6 +1834,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x000 => { #PH
         Name => 'ImageProcessingVersion',
         Writable => 'undef',
+        RawConv => '$val=~s/\0+$//; $val',  # (may be null terminated)
         Count => 4,
     },
     0x100 => { #6
@@ -2093,6 +2098,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x000 => { #PH
         Name => 'FocusInfoVersion',
         Writable => 'undef',
+        RawConv => '$val=~s/\0+$//; $val',  # (may be null terminated)
         Count => 4,
     },
     0x209 => { #PH/4
@@ -2294,6 +2300,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x000 => {
         Name => 'RawInfoVersion',
         Writable => 'undef',
+        RawConv => '$val=~s/\0+$//; $val',  # (may be null terminated)
         Count => 4,
     },
     0x100 => {

@@ -47,7 +47,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '1.94';
+$VERSION = '1.96';
 
 sub CryptShutterCount($$);
 
@@ -208,6 +208,8 @@ my %pentaxLensTypes = (
     '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
     '7 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #23
     '7 222' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #PH (tag 0x003f -- was '7 229' in LensInfo)
+    '7 223' => 'Samsung D-XENON 18-55mm F3.5-5.6 II', #PH
+    '7 225' => 'Samsung D-XENON 18-250mm F3.5-6.3', #8/PH
     '7 229' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #JD
     '7 230' => 'Tamron AF 17-50mm F2.8 XR Di-II LD (Model A16)', #JD
     '7 231' => 'smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]', #JD
@@ -291,6 +293,7 @@ my %pentaxModelID = (
     0x12cbe => 'Optio M40',
     0x12cc8 => 'Optio Z10',
     0x12cd2 => 'K20D',
+    0x12cd4 => 'Samsung GX20', #8
     0x12cdc => 'Optio S10',
     0x12ce6 => 'Optio A40',
     0x12cf0 => 'Optio V10',
@@ -302,8 +305,8 @@ my %pentaxModelID = (
     0x12d40 => 'Optio W60',
     0x12d4a => 'Optio M60',
     0x12d68 => 'Optio E60',
-    0x12d72 => 'K-m / K2000 (pre-production)',
-    0x12d73 => 'K-m / K2000',
+    0x12d72 => 'K2000',
+    0x12d73 => 'K-m',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -595,11 +598,11 @@ my %lensCode = (
         PrintHex => 1,
         PrintConv => [{
             0x000 => 'Auto, Did not fire',
-            0x001 => 'Off',
+            0x001 => 'Off, Did not fire',
             0x002 => 'On, Did not fire', #19
             0x003 => 'Auto, Did not fire, Red-eye reduction',
             0x100 => 'Auto, Fired',
-            0x102 => 'On',
+            0x102 => 'On, Fired',
             0x103 => 'Auto, Fired, Red-eye reduction',
             0x104 => 'On, Red-eye reduction',
             0x105 => 'On, Wireless (Master)', #19
@@ -1551,6 +1554,7 @@ my %lensCode = (
             0 => 'Off',
             1 => 'On',
             4 => 'Off (4)', #(NC) (K20D, K200D)
+            5 => 'On (5)', #(guess) (K20D)
             7 => 'On (7)', #(NC) (K20D, K200D)
         },
     },
@@ -2852,14 +2856,14 @@ my %lensCode = (
     },
 );
 
-# ASCII-based maker notes of Optio E20 - PH
+# ASCII-based maker notes of Optio E20 and E25 - PH
 %Image::ExifTool::Pentax::Type4 = (
     PROCESS_PROC => \&Image::ExifTool::HP::ProcessHP,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
         The following few tags are extracted from the wealth of information
-        available in maker notes of the Optio E20.  These maker notes are stored as
-        ASCII text in a format very similar to some HP models.
+        available in maker notes of the Optio E20 and E25.  These maker notes are
+        stored as ASCII text in a format very similar to some HP models.
     },
    'F/W Version' => 'FirmwareVersion',
 );
@@ -2950,7 +2954,7 @@ sub PentaxEvInv($)
     my $sign = $num < 0 ? -1 : 1;
     my $inum = $num * $sign - int($num * $sign);
     if ($inum > 0.29 and $inum < 0.4) {
-        $val += $sign / 3; 
+        $val += $sign / 3;
     } elsif ($inum > 0.6 and $inum < .71) {
         $val -= $sign / 3;
     }

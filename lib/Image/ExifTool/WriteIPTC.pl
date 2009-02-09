@@ -199,9 +199,9 @@ sub IptcDate($)
 sub IptcTime($)
 {
     my $val = shift;
-    if ($val =~ /\s*\b(\d{1,2}):?(\d{2}):?(\d{2})(\S*)\s*$/) {
-        $val = sprintf("%.2d%.2d%.2d",$1,$2,$3);
-        my $tz = $4;
+    if ($val =~ /\s*\b(\d{1,2})(:?)(\d{2})(:?)(\d{2})(\S*)\s*$/ and ($2 or not $4)) {
+        $val = sprintf("%.2d%.2d%.2d",$1,$3,$5);
+        my $tz = $6;
         if ($tz =~ /([+-]\d{1,2}):?(\d{2})/) {
             $tz = sprintf("%+.2d%.2d",$1,$2);
         } elsif ($tz !~ /Z/i) {
@@ -323,7 +323,6 @@ sub DoWriteIPTC($$$)
         my $table = $tagInfo->{SubDirectory}->{TagTable} or next;
         my $subTablePtr = Image::ExifTool::GetTagTable($table);
         $recordNum{$subTablePtr} = $tag;
-        Image::ExifTool::GenerateTagIDs($subTablePtr);
     }
 
     # loop through new values and accumulate all IPTC information
@@ -583,7 +582,7 @@ sub WriteIPTC($$$)
     $$exifTool{NewIPTCDigest} = Digest::MD5::md5($$dataPt) if length $$dataPt;
     return $newData;
 }
-        
+
 
 1; # end
 

@@ -667,6 +667,19 @@ Conv:   while (defined $val and not $shift) {
                                 $$conv{BITMASK} = $lookupBits;
                             }
                         } else {
+                            # insert alternate language print conversions if available
+                            while ($$self{CUR_LANG} and $type eq 'PrintConv') {
+                                my $lc = $self->{CUR_LANG}{$tag} or last;
+                                ref $lc eq 'HASH' and ($lc = $$lc{PrintConv}) or last;
+                                my %newConv;
+                                foreach (keys %$conv) {
+                                    my $val = $$conv{$_};
+                                    defined $$lc{$val} or $newConv{$_} = $val, next;
+                                    $newConv{$_} = $self->UTF82Charset($$lc{$val});
+                                }
+                                $conv = \%newConv;
+                                last;
+                            }
                             ($val, $multi) = ReverseLookup($val, $conv);
                         }
                         unless (defined $val) {
@@ -917,6 +930,7 @@ sub SetNewValuesFromFile($$;@)
         PrintConv   => $$options{PrintConv},
         Composite   => $$options{Composite},
         Charset     => $$options{Charset},
+        Lang        => $$options{Lang},
         MissingTagValue   => $$options{MissingTagValue},
         IgnoreMinorErrors => $$options{IgnoreMinorErrors},
     );
@@ -1469,7 +1483,7 @@ sub WriteInfo($$;$$)
                 # can't delete original
             } elsif (IsOverwriting($nvHash, $infile)) {
                 $outfile = GetNewFileName($infile, $newFileName);
-                $eraseIn = 1; # delete original                
+                $eraseIn = 1; # delete original
             }
         }
     }
@@ -1575,7 +1589,7 @@ sub WriteInfo($$;$$)
         until ($seekErr) {
             $type = shift @fileTypeList;
             # do quick test to see if this is the right file type
-            if ($magicNumber{$type} and $hdr !~ /^$magicNumber{$type}/s) {
+            if ($magicNumber{$type} and length($hdr) and $hdr !~ /^$magicNumber{$type}/s) {
                 next if @fileTypeList;
                 last;
             }
@@ -1747,12 +1761,12 @@ sub GetAllTags(;$)
 {
     local $_;
     my $group = shift;
-    my (%allTags, $exifTool, @groups);
+    my (%allTags, @groups);
     @groups = split ':', $group if $group;
 
-    $group and $exifTool = new Image::ExifTool;
+    my $exifTool = new Image::ExifTool;
     LoadAllTables();    # first load all our tables
-    my @tableNames = ( keys %allTables );
+    my @tableNames = keys %allTables;
 
     # loop through all tables and save tag names to %allTags hash
     while (@tableNames) {
@@ -1786,10 +1800,10 @@ sub GetWritableTags(;$)
 {
     local $_;
     my $group = shift;
-    my (%writableTags, $exifTool, @groups);
+    my (%writableTags, @groups);
     @groups = split ':', $group if $group;
 
-    $group and $exifTool = new Image::ExifTool;
+    my $exifTool = new Image::ExifTool;
     LoadAllTables();
     my @tableNames = keys %allTables;
 
@@ -1837,25 +1851,19 @@ sub GetAllGroups($)
 
     LoadAllTables();    # first load all our tables
 
-    my @tableNames = ( keys %allTables );
+    my @tableNames = keys %allTables;
 
     # loop through all tag tables and get all group names
     my %allGroups;
     while (@tableNames) {
         my $table = GetTagTable(pop @tableNames);
-        my $defaultGroup;
-        $defaultGroup = $table->{GROUPS}{$family} if $table->{GROUPS};
-        $allGroups{$defaultGroup} = 1 if defined $defaultGroup;
-        foreach (TagTableKeys($table)) {
-            my @infoArray = GetTagInfoList($table,$_);
-            my ($tagInfo, $groups, $group);
-            if ($groups = $$table{GROUPS} and $group = $$groups{$family}) {
-                $allGroups{$group} = 1;
-            }
+        my ($grps, $grp, $tag, $tagInfo);
+        $allGroups{$grp} = 1 if ($grps = $$table{GROUPS}) and ($grp = $$grps{$family});
+        foreach $tag (TagTableKeys($table)) {
+            my @infoArray = GetTagInfoList($table, $tag);
             foreach $tagInfo (@infoArray) {
-                if ($groups = $$tagInfo{Groups} and $group = $$groups{$family}) {
-                    $allGroups{$group} = 1;
-                }
+                next unless ($grps = $$tagInfo{Groups}) and ($grp = $$grps{$family});
+                $allGroups{$grp} = 1;
             }
         }
     }
@@ -2252,7 +2260,7 @@ sub LoadAllTables()
         GetTagTable('Image::ExifTool::Extra');
         GetTagTable('Image::ExifTool::Composite');
         # recursively load all tables referenced by the current tables
-        my @tableNames = ( keys %allTables );
+        my @tableNames = keys %allTables;
         my %pushedTables;
         while (@tableNames) {
             $table = GetTagTable(shift @tableNames);
@@ -2332,7 +2340,7 @@ sub RemoveNewValuesForGroup($$)
             my $tagInfo = $nvHash->{TagInfo};
             my ($grp0,$grp1) = $self->GetGroup($tagInfo);
             my $wgrp = $nvHash->{WriteGroup};
-            # use group1 if write group is not specific 
+            # use group1 if write group is not specific
             $wgrp = $grp1 if $wgrp eq $grp0;
             if (grep /^($grp0|$wgrp)$/i, @groups) {
                 $out and print $out "Removed new value for $wgrp:$$tagInfo{Name}\n";
@@ -2375,7 +2383,6 @@ sub GetNewTagInfoHash($@)
     my $nv = $self->{NEW_VALUE};
     while ($nv) {
         my $tagTablePtr = shift || last;
-        GenerateTagIDs($tagTablePtr);  # make sure IDs are generated
         foreach $hashKey (keys %$nv) {
             my $tagInfo = $nv->{$hashKey}{TagInfo};
             next if $tagTablePtr and $tagTablePtr ne $tagInfo->{Table};
@@ -2435,7 +2442,6 @@ sub GetLangInfo($$)
     my ($tagInfo, $langCode) = @_;
     # make a new tagInfo hash for this locale
     my $table = $$tagInfo{Table};
-    GenerateTagIDs($table);
     my $tagID = $$tagInfo{TagID} . '-' . $langCode;
     my $langInfo = $$table{$tagID};
     unless ($langInfo) {
@@ -2534,7 +2540,7 @@ sub InitWriteDirs($$;$)
         $$editDirs{JFIF} = 'IFD1';
         $$editDirs{APP0} = undef;
     }
-  
+
     if ($self->{OPTIONS}{Verbose}) {
         my $out = $self->{OPTIONS}{TextOut};
         print $out "  Editing tags in: ";
@@ -2652,8 +2658,6 @@ sub WriteDirectory($$$;$)
         }
         $self->{PROCESSED}{$addr} = $dirName;
     }
-    # be sure the tag ID's are generated, because the write proc will need them
-    GenerateTagIDs($tagTablePtr);
     my $oldDir = $self->{DIR_NAME};
     my $isRewriting = ($$dirInfo{DirLen} or (defined $dataPt and length $$dataPt));
     if ($out) {
@@ -3231,6 +3235,20 @@ sub Charset2Unicode($$;$)
 }
 
 #------------------------------------------------------------------------------
+# Convert string to UTF-8
+# Inputs: 0) ExifTool ref, 1) Latin or UTF-8 string (depending on Charset option)
+# Return: UTF8 string
+sub Charset2UTF8($$)
+{
+    my ($self, $val) = @_;
+    if ($self->{OPTIONS}{Charset} eq 'Latin' and $val =~ /[\x80-\xff]/) {
+        $val = Latin2Unicode($val,'n');
+        $val = Unicode2UTF8($val,'n');
+    }
+    return $val;
+}
+
+#------------------------------------------------------------------------------
 # Inverse date/time print conversion (reformat to YYYY:MM:DD HH:MM:SS[.ss][+-hh:mm|Z])
 # Inputs: 0) ExifTool object ref, 1) Date/Time string, 2) timezone flag:
 #               0     - remove timezone and sub-seconds if they exist
@@ -3267,7 +3285,7 @@ sub InverseDateTime($$;$$)
                         if (eval 'require Time::Local') {
                             # determine timezone offset for this time
                             my @args = ($a[4],$a[3],$a[2],$a[1],$a[0]-1,$yr-1900);
-                            my $diff = Time::Local::timegm(@args) - Image::ExifTool::TimeLocal(@args);
+                            my $diff = Time::Local::timegm(@args) - TimeLocal(@args);
                             $tz = TimeZoneString($diff / 60);
                         } else {
                             $tz = 'Z';  # don't know time zone
@@ -4833,7 +4851,7 @@ sub WriteBinaryData($$$)
         next unless defined $newVal;    # can't delete from a binary table
         # only write masked bits if specified
         my $mask = $$tagInfo{Mask};
-        $newVal = ($newVal & $mask) | ($val & ~$mask) if defined $mask; 
+        $newVal = ($newVal & $mask) | ($val & ~$mask) if defined $mask;
         # set the size
         if ($$tagInfo{DataTag} and not $$tagInfo{IsOffset}) {
             warn 'Internal error' unless $newVal == 0xfeedfeed;

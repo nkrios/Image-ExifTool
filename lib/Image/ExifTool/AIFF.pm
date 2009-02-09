@@ -18,7 +18,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::ID3;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 # information for time/date-based tags (time zero is Jan 1, 1904)
 my %timeInfo = (
@@ -180,6 +180,9 @@ sub ProcessAIFF($$)
                 $exifTool->VPrint(0, $exifTool->{INDENT} . "Page $page:\n");
             }
             $raf->Read($buff, $len2) >= $len or $err=1, last;
+            unless ($$tagInfo{SubDirectory} or $$tagInfo{Binary}) {
+                $buff =~ s/\0+$//;  # remove trailing nulls
+            }
             $exifTool->HandleTag($tagTablePtr, $tag, $buff,
                 DataPt => \$buff,
                 DataPos => $pos,

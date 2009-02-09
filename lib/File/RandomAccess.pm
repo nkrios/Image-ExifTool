@@ -15,6 +15,7 @@
 #               11/23/2006 - P. Harvey Limit reads to < 0x80000000 bytes
 #               11/26/2008 - P. Harvey Fixed bug in ReadLine when reading from a
 #                            scalar with a multi-character newline
+#               01/24/2009 - PH Protect against reading too much at once
 #
 # Notes:        Calls the normal file i/o routines unless SeekTest() fails, in
 #               which case the file is buffered in memory to allow random access.
@@ -35,8 +36,10 @@ require 5.002;
 require Exporter;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
-$VERSION = '1.09';
+$VERSION = '1.10';
 @ISA = qw(Exporter);
+
+sub Read($$$);
 
 # constants
 my $CHUNK_SIZE = 8192;  # size of chunks to read from file (must be power of 2)
@@ -157,8 +160,7 @@ sub Seek($$;$)
 
 #------------------------------------------------------------------------------
 # Read from the file
-# Inputs: 0) reference to RandomAccess object
-#         1) buffer, 2) bytes to read
+# Inputs: 0) reference to RandomAccess object, 1) buffer, 2) bytes to read
 # Returns: Number of bytes read
 sub Read($$$)
 {
@@ -166,9 +168,29 @@ sub Read($$$)
     my $len = $_[1];
     my $rtnVal;
 
-    # avoid dying with "Negative length" error
-    return 0 if $len & 0x80000000;
-
+    # protect against reading too much at once
+    # (also from dying with a "Negative length" error)
+    if ($len & 0xf8000000) {
+        return 0 if $len < 0;
+        # read in smaller blocks because Windows attempts to pre-allocate
+        # memory for the full size, which can lead to an out-of-memory error
+        my $maxLen = 0x4000000; # (MUST be less than bitmask in "if" above)
+        my $num = Read($self, $_[0], $maxLen);
+        return $num if $num < $maxLen;
+        for (;;) {
+            $len -= $maxLen;
+            last if $len <= 0;
+            my $l = $len < $maxLen ? $len : $maxLen;
+            my $buff;
+            my $n = Read($self, $buff, $l);
+            last unless $n;
+            $_[0] .= $buff;
+            $num += $n;
+            last if $n < $l;
+        }
+        return $num;
+    }
+    # read through our buffer if necessary
     if ($self->{TESTED} < 0) {
         my $buff;
         my $newPos = $self->{POS} + $len;
@@ -197,6 +219,7 @@ sub Read($$$)
         $_[0] = substr(${$self->{BUFF_PT}}, $self->{POS}, $rtnVal);
         $self->{POS} += $rtnVal;
     } else {
+        # read directly from file
         $_[0] = '' unless defined $_[0];
         $rtnVal = read($self->{FILE_PT}, $_[0], $len) || 0;
     }

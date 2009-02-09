@@ -22,7 +22,7 @@ sub ProcessHP($$$);
     NOTES => q{
         These tables list tags found in the maker notes of some Hewlett-Packard
         camera models.
-        
+
         The first table lists tags found in the EXIF-format maker notes of the
         PhotoSmart 720 (also used by the Vivitar ViviCam 3705, 3705B and 3715).
     },

@@ -1,13 +1,13 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
-[File, File, Image]  - File Name: Photoshop_3_failed.psd
-[File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 16 kB
-[File, File, Time]  - File Modification Date/Time: 2008:10:25 13:16:40-04:00
-[File, File, Image]  - File Type: PSD
-[File, File, Image]  - MIME Type: application/photoshop
-[File, File, Image]  - Current IPTC Digest: 7eea28616594f46e45fbc9db62cd784e
-[File, File, Image]  - Exif Byte Order: Big-endian (Motorola, MM)
-[File, File, Image]  - Current IPTC Digest: 055bdc3d875fdcf414e0848e76acc470
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: Photoshop_3_failed.psd
+[File, File, Image] Directory - Directory: t
+[File, File, Image] FileSize - File Size: 16 kB
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:01 07:56:29-05:00
+[File, File, Image] FileType - File Type: PSD
+[File, File, Image] MIMEType - MIME Type: application/photoshop
+[File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 7eea28616594f46e45fbc9db62cd784e
+[File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
+[File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 055bdc3d875fdcf414e0848e76acc470
 [Photoshop, Photoshop, Image] 6 - Num Channels: 3
 [Photoshop, Photoshop, Image] 7 - Image Height: 8
 [Photoshop, Photoshop, Image] 9 - Image Width: 8
@@ -41,7 +41,7 @@
 [IPTC, IPTC, Other] 5 - Object Name: Test Picture
 [IPTC, IPTC, Author] 116 - Copyright Notice: Free for all
 [IPTC, IPTC, Author] 80 - By-line: Phil Again
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.64
 [XMP, XMP-rdf, Document] about - About: uuid:c197d41e-f8f7-11d9-b03e-c023c3939af5
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: This is a teeny weeny white square
@@ -103,4 +103,4 @@
 [PhotoMechanic, PhotoMechanic, Image] 219 - Crop Right: 890
 [PhotoMechanic, PhotoMechanic, Image] 220 - Crop Bottom: 1072
 [PhotoMechanic, PhotoMechanic, Image] 221 - Tagged: No
-[Composite, Composite, Image]  - Image Size: 8x8
+[Composite, Composite, Image] ImageSize - Image Size: 8x8

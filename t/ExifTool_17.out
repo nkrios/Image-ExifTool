@@ -1,4 +1,4 @@
-  ExifToolVersion = 7.54
+  ExifToolVersion = 7.62
   FileName = Canon.jpg
   Directory = t/images
   FileSize = 2697
@@ -341,9 +341,6 @@ JPEG APP1 (2442 bytes):
   | | | | RawJpgSize = -1
   | | | | - Tag 0x0007 (2 bytes, int16s[1]):
   | | | |     04a4: ff ff                                           [..]
-  | | | | NoiseReduction = -1
-  | | | | - Tag 0x0008 (2 bytes, int16s[1]):
-  | | | |     04a6: ff ff                                           [..]
   | | | 5)  CanonImageType = CRW:EOS DIGITAL REBEL CMOS RAW
   | | |     - Tag 0x0006 (32 bytes, string[32]):
   | | |         04a8: 43 52 57 3a 45 4f 53 20 44 49 47 49 54 41 4c 20 [CRW:EOS DIGITAL ]

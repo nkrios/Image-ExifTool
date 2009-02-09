@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
@@ -278,7 +278,7 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     GROUPS => { 2 => 'Document' },
     NOTES => q{
         The DocumentSummaryInformation property set includes a UserDefined property
-        set for which only the Hyperlinks and HyperlinkBase tags are pre-defined. 
+        set for which only the Hyperlinks and HyperlinkBase tags are pre-defined.
         However, ExifTool will also extract any other information found in the
         UserDefined properties.
     },
@@ -308,7 +308,10 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
         # (not sure what the lower 16 bits mean, so print them in hex inside brackets)
         ValueConv => 'sprintf("%d (%.4x)",$val >> 16, $val & 0xffff)',
     },
-   '_PID_LINKBASE' => 'HyperlinkBase',
+   '_PID_LINKBASE' => {
+        Name => 'HyperlinkBase',
+        ValueConv => '$self->Unicode2Charset($val,"II")',
+    },
    '_PID_HLINKS' => {
         Name => 'Hyperlinks',
         RawConv => \&ProcessHyperlinks,

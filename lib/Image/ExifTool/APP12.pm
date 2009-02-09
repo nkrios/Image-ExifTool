@@ -276,7 +276,7 @@ sub ProcessAPP12($$$)
         $verbose and $exifTool->VerboseInfo($tag, $tagInfo, Value => $val);
         unless ($tagInfo) {
             # add new tag to table
-            $tagInfo = { Name => $tag };
+            $tagInfo = { Name => ucfirst $tag };
             # put in Camera group if information in "Camera" section
             $$tagInfo{Groups} = { 2 => 'Camera' } if $section =~ /camera/i;
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);

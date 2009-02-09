@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 # type of current stream
 $Image::ExifTool::RIFF::streamType = '';
@@ -335,7 +335,7 @@ $Image::ExifTool::RIFF::streamType = '';
         {
             Name => 'UnknownJunk',
             # try to interpret unknown junk as a string
-            RawConv => '$_=$val; s/\0.*//s; /^[^\0-\x1f\x7f-\xff]+$/ ? $_ : undef',
+            RawConv => '$_=$val; /^[^\0-\x1f\x7f-\xff]+$/ ? $_ : undef',
         }
     ],
     _PMX => { #PH (Adobe CS3 Bridge)
@@ -392,7 +392,7 @@ $Image::ExifTool::RIFF::streamType = '';
     ICRD => {
         Name => 'DateCreated',
         Groups => { 2 => 'Time' },
-        ValueConv => '$_=$val; s/-/:/g; s/\0.*//s; $_',
+        ValueConv => '$_=$val; s/-/:/g; $_',
     },
     ICRP => 'Cropped',
     IDIM => 'Dimensions',
@@ -408,7 +408,9 @@ $Image::ExifTool::RIFF::streamType = '';
     ISBJ => 'Subject',
     ISFT => {
         Name => 'Software',
-        ValueConv => '$val=~s/\0.*//s; $val', # truncate at null
+        # remove trailing nulls/spaces and split at first null
+        # (Casio writes "CASIO" in unicode after the first null)
+        ValueConv => '$_=$val; s/(\s*\0)+$//; s/(\s*\0)/, /; s/\0+//g; $_',
     },
     ISHP => 'Sharpness',
     ISRC => 'Source',
@@ -571,7 +573,7 @@ $Image::ExifTool::RIFF::streamType = '';
     unknown => {
         Name => 'UnknownData',
         # try to interpret unknown stream data as a string
-        RawConv => '$_=$val; s/\0.*//s; /^[^\0-\x1f\x7f-\xff]+$/ ? $_ : undef',
+        RawConv => '$_=$val; /^[^\0-\x1f\x7f-\xff]+$/ ? $_ : undef',
     },
 );
 
@@ -700,12 +702,18 @@ sub ProcessChunks($$$)
         }
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         my $baseShift = 0;
-        if ($tagInfo and $$tagInfo{SubDirectory}) {
-            # adjust base if necessary (needed for Ricoh maker notes)
-            my $newBase = $tagInfo->{SubDirectory}->{Base};
-            $baseShift = $newBase - $$dirInfo{Base} if defined $newBase;
+        my $val;
+        if ($tagInfo) {
+            if ($$tagInfo{SubDirectory}) {
+                # adjust base if necessary (needed for Ricoh maker notes)
+                my $newBase = $tagInfo->{SubDirectory}->{Base};
+                $baseShift = $newBase - $$dirInfo{Base} if defined $newBase;
+            } elsif (not $$tagInfo{Binary}) {
+                $val = substr($$dataPt, $start, $len);
+                $val =~ s/\0+$//;   # remove trailing nulls from strings
+            }
         }
-        $exifTool->HandleTag($tagTablePtr, $tag, undef,
+        $exifTool->HandleTag($tagTablePtr, $tag, $val,
             DataPt  => $dataPt,
             DataPos => $$dirInfo{DataPos} - $baseShift,
             Start   => $start,

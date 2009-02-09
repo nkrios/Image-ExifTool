@@ -17,7 +17,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -647,8 +647,8 @@ sub ProcessPreview($$$)
     my $str = substr($$dataPt, $dirStart+5, $n);
     if ($str =~ /^((?:..)*?)\0\0((?:..)*?)\0\0/) {
         my ($mime, $desc) = ($1, $2);
-        $exifTool->HandleTag($tagTablePtr, 1, $mime);
-        $exifTool->HandleTag($tagTablePtr, 2, $desc) if length $desc;
+        $exifTool->HandleTag($tagTablePtr, 1, $exifTool->Unicode2Charset($mime,'II'));
+        $exifTool->HandleTag($tagTablePtr, 2, $exifTool->Unicode2Charset($desc,'II')) if length $desc;
     }
     $exifTool->HandleTag($tagTablePtr, 3, substr($$dataPt, $dirStart+5+$n, $picLen));
     return 1;

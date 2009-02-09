@@ -7,12 +7,233 @@
 #
 # References:   1) PLUS - http://ns.useplus.org/
 #               2) PRISM - http://www.prismstandard.org/
+#               3) http://www.portfoliofaq.com/pfaq/v7mappings.htm
+#               5) http://creativecommons.org/technology/xmp
+#                  --> changed to http://wiki.creativecommons.org/Companion_File_metadata_specification (2007/12/21)
+#               6) http://www.optimasc.com/products/fileid/xmp-extensions.pdf
+#               9) http://www.w3.org/TR/SVG11/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::XMP;
 
 use Image::ExifTool qw(:Utils);
 use Image::ExifTool::XMP;
+
+# XMP Dynamic Media schema properties (xmpDM)
+%Image::ExifTool::XMP::xmpDM = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-xmpDM', 2 => 'Image' },
+    NAMESPACE => 'xmpDM',
+    NOTES => 'XMP Dynamic Media schema tags.',
+    absPeakAudioFilePath=> { },
+    album               => { },
+    altTapeName         => { },
+    altTimecode => {
+        SubDirectory => { },
+        Struct => 'Timecode',
+    },
+    altTimecodeTimeFormat   => { },
+    altTimecodeTimeValue    => { },
+    altTimecodeValue        => { Writable => 'integer' },
+    artist              => { Avoid => 1, Groups => { 2 => 'Author' } },
+    audioModDate        => { Groups => { 2 => 'Time' }, %dateTimeInfo },
+    audioSampleRate     => { Writable => 'integer' },
+    audioSampleType     => { },
+    audioChannelType    => { },
+    audioCompressor     => { },
+    beatSpliceParams => {
+        SubDirectory => { },
+        Struct => 'BeatSpliceStretch',
+    },
+    beatSpliceParamsUseFileBeatsMarker => { Writable => 'boolean' },
+    beatSpliceParamsRiseInDecibel      => { Writable => 'real' },
+    beatSpliceParamsRiseInTimeDuration => {
+        SubDirectory => { },
+        Struct => 'Time',
+    },
+    beatSpliceParamsRiseInTimeDurationScale => { Writable => 'rational' },
+    beatSpliceParamsRiseInTimeDurationValue => { Writable => 'integer' },
+    composer        => { Groups => { 2 => 'Author' } },
+    contributedMedia => {
+        SubDirectory => { },
+        Struct => 'Media',
+        List => 'Bag',
+    },
+    contributedMediaDuration => {
+        SubDirectory => { },
+        Struct => 'Time',
+    },
+    contributedMediaDurationScale => { List => 1, Writable => 'rational' },
+    contributedMediaDurationValue => { List => 1, Writable => 'integer' },
+    contributedMediaPath         => { List => 1 },
+    contributedMediaTrack        => { List => 1 },
+    contributedMediaStartTime => {
+        SubDirectory => { },
+        Struct => 'Time',
+    },
+    contributedMediaStartTimeScale => { List => 1, Writable => 'rational' },
+    contributedMediaStartTimeValue => { List => 1, Writable => 'integer' },
+    contributedMediaManaged      => { List => 1, Writable => 'boolean' },
+    contributedMediaWebStatement => { List => 1 },
+    copyright       => { Avoid => 1, Groups => { 2 => 'Author' } },
+    duration        => {
+        SubDirectory => { },
+        Struct => 'Time',
+    },
+    durationScale   => { Writable => 'rational' },
+    durationValue   => { Writable => 'integer' },
+    engineer        => { },
+    fileDataRate    => { Writable => 'rational' },
+    genre           => { },
+    instrument      => { },
+    introTime => {
+        SubDirectory => { },
+        Struct => 'Time',
+    },
+    introTimeScale  => { Writable => 'rational' },
+    introTimeValue  => { Writable => 'integer' },
+    key             => { },
+    logComment      => { },
+    loop            => { Writable => 'boolean' },
+    numberOfBeats   => { Writable => 'real' },
+    markers => {
+        SubDirectory => { },
+        Struct => 'Marker',
+        List => 'Seq',
+    },
+    markersComment      => { List => 1 },
+    markersCuePointParams => {
+        SubDirectory => { },
+        Struct => 'CuePointParam',
+        List => 'Seq',
+    },
+    markersCuePointParamsValue => { List => 1 },
+    markersCuePointParamsKey   => { List => 1 },
+    markersCuePointType => { List => 1 },
+    markersDuration     => { List => 1 },
+    markersLocation     => { List => 1 },
+    markersName         => { List => 1 },
+    markersProbability  => { List => 1, Writable => 'real' },
+    markersSpeaker      => { List => 1 },
+    markersStartTime    => { List => 1 },
+    markersTarget       => { List => 1 },
+    markersType         => { List => 1 },
+    metadataModDate => { Groups => { 2 => 'Time' }, %dateTimeInfo },
+    outCue => {
+        SubDirectory => { },
+        Struct => 'Time',
+    },
+    outCueScale         => { Writable => 'rational' },
+    outCueValue         => { Writable => 'integer' },
+    projectRef => {
+        SubDirectory => { },
+        Struct => 'ProjectLink',
+    },
+    projectRefType      => { },
+    projectRefPath      => { },
+    pullDown            => { },
+    relativePeakAudioFilePath => { },
+    relativeTimestamp => {
+        SubDirectory => { },
+        Struct => 'Time',
+    },
+    relativeTimestampScale  => { Writable => 'rational' },
+    relativeTimestampValue  => { Writable => 'integer' },
+    releaseDate         => { Groups => { 2 => 'Time' }, %dateTimeInfo },
+    resampleParams => {
+        SubDirectory => { },
+        Struct => 'ResampleStretch',
+    },
+    resampleParamsQuality   => { PrintConv => { Low => 'Low', Medium => 'Medium', High => 'High' } },
+    scaleType           => { },
+    scene               => { Avoid => 1 },
+    shotDate            => { Groups => { 2 => 'Time' }, %dateTimeInfo },
+    shotLocation        => { },
+    shotName            => { },
+    speakerPlacement    => { },
+    startTimecode => {
+        SubDirectory => { },
+        Struct => 'Timecode',
+    },
+    startTimecodeTimeFormat => { },
+    startTimecodeTimeValue  => { },
+    startTimecodeValue      => { Writable => 'integer' },
+    stretchMode     => { },
+    tapeName        => { },
+    tempo           => { Writable => 'real' },
+    timeScaleParams => {
+        SubDirectory => { },
+        Struct => 'TimeScaleStretch',
+    },
+    timeScaleParamsFrameOverlappingPercentage => { Writable => 'real' },
+    timeScaleParamsFrameSize => { Writable => 'real' },
+    timeScaleParamsQuality   => { PrintConv => { Low => 'Low', Medium => 'Medium', High => 'High' } },
+    timeSignature   => { },
+    trackNumber     => { Writable => 'integer' },
+    Tracks => {
+        SubDirectory => { },
+        Struct => 'Track',
+        List => 'Bag',
+    },
+    TracksFrameRate => { List => 1 },
+    TracksMarkers => {
+        SubDirectory => { },
+        Struct => 'Marker',
+        List => 'Seq',
+    },
+    TracksMarkersComment => { List => 1 },
+    TracksMarkersCuePointParams => {
+        SubDirectory => { },
+        Struct => 'CuePointParam',
+        List => 1,
+    },
+    TracksMarkersCuePointParamsKey      => { List => 1 },
+    TracksMarkersCuePointParamsValue    => { List => 1 },
+    TracksMarkersCuePointType           => { List => 1 },
+    TracksMarkersDuration           => { List => 1 },
+    TracksMarkersLocation           => { List => 1 },
+    TracksMarkersName               => { List => 1 },
+    TracksMarkersProbability        => { List => 1, Writable => 'real' },
+    TracksMarkersSpeaker            => { List => 1 },
+    TracksMarkersStartTime          => { List => 1 },
+    TracksMarkersTarget             => { List => 1 },
+    TracksMarkersType               => { List => 1 },
+    TracksTrackName     => { List => 1 },
+    TracksTrackType     => { List => 1 },
+    videoAlphaMode      => { },
+    videoAlphaPremultipleColor => {
+        SubDirectory => { },
+        Struct => 'Colorant',
+    },
+    videoAlphaPremultipleColorSwatchName => { },
+    videoAlphaPremultipleColorMode       => { },
+    videoAlphaPremultipleColorType       => { },
+    videoAlphaPremultipleColorCyan       => { Writable => 'real' },
+    videoAlphaPremultipleColorMagenta    => { Writable => 'real' },
+    videoAlphaPremultipleColorYellow     => { Writable => 'real' },
+    videoAlphaPremultipleColorBlack      => { Writable => 'real' },
+    videoAlphaPremultipleColorRed        => { Writable => 'integer' },
+    videoAlphaPremultipleColorGreen      => { Writable => 'integer' },
+    videoAlphaPremultipleColorBlue       => { Writable => 'integer' },
+    videoAlphaPremultipleColorL          => { Writable => 'real' },
+    videoAlphaPremultipleColorA          => { Writable => 'integer' },
+    videoAlphaPremultipleColorB          => { Writable => 'integer' },
+    videoAlphaUnityIsTransparent => { Writable => 'boolean' },
+    videoColorSpace     => { },
+    videoCompressor     => { },
+    videoFieldOrder     => { },
+    videoFrameRate      => { },
+    videoFrameSize => {
+        SubDirectory => { },
+        Struct => 'Dimensions',
+    },
+    videoFrameSizeW     => { Writable => 'real' },
+    videoFrameSizeH     => { Writable => 'real' },
+    videoFrameSizeUnit  => { },
+    videoModDate        => { Groups => { 2 => 'Time' }, %dateTimeInfo },
+    videoPixelAspectRatio => { Writable => 'rational' },
+    videoPixelDepth     => { },
+);
 
 #------------------------------------------------------------------------------
 # PLUS vocabulary conversions
@@ -454,13 +675,50 @@ my %plusVocab = (
     usageFee            => { List => 'Bag' },
 );
 
-# set "Avoid" flag for all PRISM tags
-my ($table, $key);
-foreach $table (\%prism, \%prl, \%pur) {
-    foreach $key (TagTableKeys($table)) {
-        $table->{$key}->{Avoid} = 1;
-    }
-}
+# DICOM schema properties (DICOM) (ref PH, written by CS3)
+%Image::ExifTool::XMP::DICOM = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-DICOM', 2 => 'Image' },
+    NAMESPACE => 'DICOM',
+    NOTES => 'DICOM schema tags.',
+    # change some tag names to correspond with DICOM tags
+    PatientName             => { Name => 'PatientsName' },
+    PatientID               => { },
+    PatientSex              => { Name => 'PatientsSex' },
+    PatientDOB              => {
+        Name => 'PatientsBirthDate',
+        Groups => { 2 => 'Time' },
+        %dateTimeInfo,
+    },
+    StudyID                 => { },
+    StudyPhysician          => { },
+    StudyDateTime           => { Groups => { 2 => 'Time' }, %dateTimeInfo },
+    StudyDescription        => { },
+    SeriesNumber            => { },
+    SeriesModality          => { },
+    SeriesDateTime          => { Groups => { 2 => 'Time' }, %dateTimeInfo },
+    SeriesDescription       => { },
+    EquipmentInstitution    => { },
+    EquipmentManufacturer   => { },
+);
+
+# PixelLive schema properties (PixelLive) (ref 3)
+%Image::ExifTool::XMP::PixelLive = (
+    GROUPS => { 1 => 'XMP-PixelLive', 2 => 'Image' },
+    NAMESPACE => 'PixelLive',
+    WRITE_PROC => \&WriteXMP,
+    NOTES => q{
+        PixelLive schema tags.  These tags are not writable becase they are very
+        uncommon and I haven't been able to locate a reference which gives the
+        namespace URI.
+    },
+    AUTHOR    => { Name => 'Author',   Avoid => 1, Groups => { 2 => 'Author' } },
+    COMMENTS  => { Name => 'Comments', Avoid => 1 },
+    COPYRIGHT => { Name => 'Copyright',Avoid => 1, Groups => { 2 => 'Author' } },
+    DATE      => { Name => 'Date',     Avoid => 1, Groups => { 2 => 'Time' } },
+    GENRE     => { Name => 'Genre',    Avoid => 1 },
+    TITLE     => { Name => 'Title',    Avoid => 1 },
+);
 
 # ACDSee schema (acdsee) (ref PH)
 %Image::ExifTool::XMP::acdsee = (
@@ -475,6 +733,117 @@ foreach $table (\%prism, \%prl, \%pur) {
         Binary => 1,
     },
 );
+
+# Picture Licensing Universal System schema properties (xmpPLUS)
+%Image::ExifTool::XMP::xmpPLUS = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-xmpPLUS', 2 => 'Author' },
+    NAMESPACE => 'xmpPLUS',
+    NOTES => 'XMP Picture Licensing Universal System (PLUS) schema tags.',
+    CreditLineReq   => { Writable => 'boolean' },
+    ReuseAllowed    => { Writable => 'boolean' },
+);
+
+# Creative Commons schema properties (cc) (ref 5)
+%Image::ExifTool::XMP::cc = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-cc', 2 => 'Author' },
+    NAMESPACE => 'cc',
+    NOTES => q{
+        Creative Commons schema tags.  (see
+        L<http://creativecommons.org/technology/xmp>)
+    },
+    license => { },
+    morePermissions => { },
+    attributionName => { },
+    attributionURL  => { },
+);
+
+# Description Explorer schema properties (dex) (ref 6)
+%Image::ExifTool::XMP::dex = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-dex', 2 => 'Image' },
+    NAMESPACE => 'dex',
+    NOTES => q{
+        Description Explorer schema tags.  These tags are not very common.  The
+        Source and Rating tags are avoided when writing due to name conflicts with
+        other XMP tags.  (see L<http://www.optimasc.com/products/fileid/>)
+    },
+    crc32       => { Name => 'CRC32', Writable => 'integer' },
+    source      => { Avoid => 1 },
+    shortdescription => {
+        Name => 'ShortDescription',
+        Writable => 'lang-alt',
+    },
+    licensetype => {
+        Name => 'LicenseType',
+        PrintConv => {
+            unknown        => 'Unknown',
+            shareware      => 'Shareware',
+            freeware       => 'Freeware',
+            adware         => 'Adware',
+            demo           => 'Demo',
+            commercial     => 'Commercial',
+           'public domain' => 'Public Domain',
+           'open source'   => 'Open Source',
+        },
+    },
+    revision    => { },
+    rating      => { Avoid => 1 },
+    os          => { Name => 'OS', Writable => 'integer' },
+    ffid        => { Name => 'FFID' },
+);
+
+# IView MediaPro schema properties (mediapro) (ref PH)
+%Image::ExifTool::XMP::MediaPro = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-mediapro', 2 => 'Image' },
+    NAMESPACE => 'mediapro',
+    NOTES => 'IView MediaPro schema tags.',
+    Event       => { },
+    Location    => {
+        Avoid => 1,
+        Groups => { 2 => 'Location' },
+        Notes => 'avoided due to conflict with XMP-iptcCore:Location',
+    },
+    Status      => { },
+    People      => { List => 'Bag' },
+    UserFields  => { List => 'Bag' },
+    CatalogSets => { List => 'Bag' },
+);
+
+# SVG schema properties (ref 9)
+%Image::ExifTool::XMP::SVG = (
+    GROUPS => { 0 => 'SVG', 1 => 'SVG', 2 => 'Image' },
+    NAMESPACE => 'svg',
+    LANG_INFO => \&GetLangInfo,
+    NOTES => q{
+        SVG (Scalable Vector Graphics) image tags.  By default, only the top-level
+        SVG and Metadata tags are extracted from these images, but all graphics tags
+        may be extracted by setting the Unknown option to 2 (-U on the command
+        line).  The SVG tags are not part of XMP as such, but are included with the
+        XMP module for convenience.  (see L<http://www.w3.org/TR/SVG11/>)
+    },
+    version    => 'SVGVersion',
+    id         => 'ID',
+    metadataId => 'MetadataID',
+    width      => 'ImageWidth',
+    height     => 'ImageHeight',
+);
+
+# table to add tags in other namespaces
+%Image::ExifTool::XMP::otherSVG = (
+    GROUPS => { 0 => 'SVG', 2 => 'Unknown' },
+    LANG_INFO => \&GetLangInfo,
+);
+
+# set "Avoid" flag for all PRISM tags
+my ($table, $key);
+foreach $table (\%prism, \%prl, \%pur) {
+    foreach $key (TagTableKeys($table)) {
+        $table->{$key}->{Avoid} = 1;
+    }
+}
 
 
 1;  #end
@@ -511,6 +880,14 @@ under the same terms as Perl itself.
 =item L<http://ns.useplus.org/>
 
 =item L<http://www.prismstandard.org/>
+
+=item L<http://www.portfoliofaq.com/pfaq/v7mappings.htm>
+
+=item L<http://creativecommons.org/technology/xmp>
+
+=item L<http://www.optimasc.com/products/fileid/xmp-extensions.pdf>
+
+=item L<http://www.w3.org/TR/SVG11/>
 
 =back
 

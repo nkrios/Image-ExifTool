@@ -12,7 +12,7 @@ package Image::ExifTool::KyoceraRaw;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool qw(:DataAccess :Utils);
 
 $VERSION = '1.00';
 
@@ -126,7 +126,7 @@ sub ProcessRAW($$)
         DirStart => 0,
         DirLen => $size,
     );
-    my $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::KyoceraRaw::Main');
+    my $tagTablePtr = GetTagTable('Image::ExifTool::KyoceraRaw::Main');
     $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
     return 1;
 }

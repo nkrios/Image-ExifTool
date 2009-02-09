@@ -141,7 +141,7 @@ sub WritePSDirectory($$$$$)
         $dirInfo{DataLen} = $dirInfo{DirLen} = length $xmp;
         $dirInfo{DataPt} = \$xmp;
     }
-    my $tagTablePtr = GetTagTable("Image::ExifTool::${dirName}::Main");
+    my $tagTablePtr = Image::ExifTool::GetTagTable("Image::ExifTool::${dirName}::Main");
     my $val = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
     if (defined $val) {
         $dataPt = \$val;    # use modified directory

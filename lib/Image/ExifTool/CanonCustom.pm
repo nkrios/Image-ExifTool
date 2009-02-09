@@ -20,7 +20,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.28';
+$VERSION = '1.30';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -1221,8 +1221,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0102 => {
         Name => 'ISOSpeedIncrements',
         PrintConv => {
-            0 => '1/3-stop',
-            1 => '1-stop',
+            0 => '1/3 Stop',
+            1 => '1 Stop',
         },
     },
     0x0103 => [
@@ -1242,13 +1242,15 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             # (this decoding may not be valid for CR2 images?)
             ValueConv => [
                 undef,
-                '$val < 1000 ? exp(($val/8-9)*log(2))*100 : 0', # (educated guess)
-                '$val < 1000 ? exp(($val/8-9)*log(2))*100 : 0', # (educated guess)
+                # this may also be set to "H" (Hi6400) -- is this the -1 value I see? - PH
+                '$val < 2 ? $val : ($val < 1000 ? exp(($val/8-9)*log(2))*100 : 0)', # (educated guess)
+                # this may also be set to "L" (Lo50) -- is this the 1 value I see? - PH
+                '$val < 2 ? $val : ($val < 1000 ? exp(($val/8-9)*log(2))*100 : 0)', # (educated guess)
             ],
             ValueConvInv => [
                 undef,
-                '$val ? int(8*(log($val/100)/log(2)+9) + 0.5) : 0xffffffff',
-                '$val ? int(8*(log($val/100)/log(2)+9) + 0.5) : 0xffffffff',
+                '$val < 2 ? $val : int(8*(log($val/100)/log(2)+9) + 0.5)',
+                '$val < 2 ? $val : int(8*(log($val/100)/log(2)+9) + 0.5)',
             ],
             PrintConv => [
                 \%disableEnable,
@@ -1257,8 +1259,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             ],
             PrintConvInv => [
                 undef,
-                '$val=~/([\d.]+)/ ? $1 : 0',
-                '$val=~/([\d.]+)/ ? $1 : 0',
+                '$val=~/(-?[\d.]+)/ ? $1 : 0',
+                '$val=~/(-?[\d.]+)/ ? $1 : 0',
             ],
         },
     ],

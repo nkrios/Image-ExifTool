@@ -1,4 +1,4 @@
-  ExifToolVersion = 7.15
+  ExifToolVersion = 7.62
   FileName = CanonRaw.crw
   Directory = t/images
   FileSize = 6255
@@ -97,7 +97,6 @@
   | | | | BracketShotNumber = 0
   | | | | RawJpgQuality = -1
   | | | | RawJpgSize = -1
-  | | | | NoiseReduction = -1
   | | | 4)  CanonCameraSettings (SubDirectory) -->
   | | | + [BinaryData directory, 92 bytes]
   | | | | MacroMode = 0

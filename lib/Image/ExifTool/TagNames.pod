@@ -513,6 +513,12 @@ specification.
   0xa480   GDALMetadata              -          N
   0xa481   GDALNoData                -          N
   0xa500   Gamma                     ExifIFD    rational64u
+  0xafc0   ExpandSoftware            -          N
+  0xafc1   ExpandLens                -          N
+  0xafc2   ExpandFilm                -          N
+  0xafc3   ExpandFilterLens          -          N
+  0xafc4   ExpandScanner             -          N
+  0xafc5   ExpandFlashLamp           -          N
   0xbc01   PixelFormat               -          N
   0xbc02   Transformation            -          N
   0xbc03   Uncompressed              -          N
@@ -569,7 +575,7 @@ specification.
   0xc633   ShadowScale               IFD0       rational64u!
   0xc634   SR2Private                -          Sony SR2Private
            DNGAdobeData              -          DNG AdobeData
-           DNGPentaxData             -          Pentax
+           MakerNotePentax           -          Pentax
            DNGPrivateData            -          N
   0xc635   MakerNoteSafety           IFD0       int16u
   0xc640   RawImageSegmentation      -          N
@@ -587,7 +593,7 @@ specification.
   0xc691   CurrentICCProfile         IFD0       ICC_Profile
   0xc692   CurrentPreProfileMatrix   IFD0       rational64s[n]!
   0xc6bf   ColorimetricReference     IFD0       int16u!
-  0xc6d2   Title                     IFD0       string/
+  0xc6d2   PanasonicTitle            IFD0       undef/
   0xc6f3   CameraCalibrationSig      IFD0       string!
   0xc6f4   ProfileCalibrationSig     IFD0       string!
   0xc6f5   ProfileIFD                -          EXIF
@@ -866,6 +872,7 @@ See L<http://www.adobe.com/devnet/xmp/> for the offical XMP specification.
   lr                                            XMP Lightroom
   mediapro                                      XMP MediaPro
   microsoft                                     XMP Microsoft
+  MP                                            XMP MP
   pdf                                           XMP pdf
   pdfx                                          XMP pdfx
   photomech                                     PhotoMechanic XMP
@@ -932,7 +939,7 @@ L<http://creativecommons.org/technology/xmp>)
 
 =head3 XMP crs Tags
 
-Photoshop Camera Raw Schema tags.
+XMP Photoshop Camera Raw
 
   Tag Name                                      Writable
   --------                                      --------
@@ -1352,6 +1359,15 @@ namespace prefix is "MicrosoftPhoto", but ExifTool shortens this to
   LensManufacturer                              string
   LensModel                                     string
   RatingPercent                                 string
+
+=head3 XMP MP Tags
+
+Microsoft Photo 1.2 schema tags.  Again, not a complete list.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  RegionPersonDisplayName                       string+
+  RegionRectangle                               string+
 
 =head3 XMP pdf Tags
 
@@ -2325,7 +2341,7 @@ Unknown (-u) option is used.
   0x0429   LayerComps?                          N
   0x042a   AlternateDuotoneColors?              N
   0x042b   AlternateSpotColors?                 N
-  0x0bb7   ClippingPathName?                    N
+  0x0bb7   ClippingPathName                     N
   0x2710   PrintFlagsInfo?                      N
 
 =head3 Photoshop Resolution Tags
@@ -2421,7 +2437,7 @@ This information is found in the PSD file header.
            InternalSerialNumber                 string
   0x0097   DustRemovalData                      N
   0x0099   CustomFunctions2                     CanonCustom Functions2
-  0x00a0   ProccessingInfo                      Canon Processing
+  0x00a0   ProcessingInfo                       Canon Processing
   0x00a1   ToneCurveTable                       N
   0x00a2   SharpnessTable                       N
   0x00a3   SharpnessFreqTable                   N
@@ -2446,6 +2462,7 @@ This information is found in the PSD file header.
   0x4003   ColorInfo                            Canon ColorInfo
   0x4005   UnknownBlock2?                       N
   0x4008   BlackLevel?                          N
+  0x4013   AFMicroAdj                           Canon AFMicroAdj
 
 =head3 Canon CameraSettings Tags
 
@@ -2622,6 +2639,7 @@ CameraInfo tags for the 1DmkIII and 1DSmkIII.
       3    FNumber                              int8u
       4    ExposureTime                         int8u
       6    ISO                                  int8u
+     24    CameraTemperature                    int8u
      29    FocalLength                          int16u
      67    FocusDistanceUpper                   int16u
      69    FocusDistanceLower                   int16u
@@ -2707,7 +2725,29 @@ CameraInfo tags for the EOS 5D Mark II.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
-     49    CameraOrientation                    int8s
+      3    FNumber                              int8u
+      4    ExposureTime                         int8u
+      6    ISO                                  int8u
+      7    HighlightTonePriority                int8u
+     25    CameraTemperature                    int8u
+     30    FocalLength                          int16u
+     49    CameraOrientation                    int8u
+     80    FocusDistanceUpper                   int16u
+     82    FocusDistanceLower                   int16u
+    111    WhiteBalance                         int16u
+    115    ColorTemperature                     int16u
+    167    PictureStyle                         int8u
+    189    HighISONoiseReduction                int8u
+    191    AutoLightingOptimizer                int8u
+    231    LensType                             int8u
+    232    ShortFocal                           int16u
+    234    LongFocal                            int16u
+    346    FirmwareVersion                      N
+    382    FirmwareVersion                      N
+    407    FileIndex                            int32u
+    419    DirectoryIndex                       int32u
+    443    FileIndex                            int32u
+    455    DirectoryIndex                       int32u
 
 =head3 Canon CameraInfo40D Tags
 
@@ -2715,6 +2755,10 @@ CameraInfo tags for the EOS 40D.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
+      3    FNumber                              int8u
+      4    ExposureTime                         int8u
+      6    ISO                                  int8u
+     24    CameraTemperature                    int8u
      29    FocalLength                          int16u
      48    CameraOrientation                    int8u
      67    FocusDistanceUpper                   int16u
@@ -2735,13 +2779,29 @@ CameraInfo tags for the EOS 50D.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
+      3    FNumber                              int8u
+      4    ExposureTime                         int8u
+      6    ISO                                  int8u
+      7    HighlightTonePriority                int8u
+     25    CameraTemperature                    int8u
+     30    FocalLength                          int16u
      49    CameraOrientation                    int8u
      80    FocusDistanceUpper                   int16u
      82    FocusDistanceLower                   int16u
+    111    WhiteBalance                         int16u
     115    ColorTemperature                     int16u
+    167    PictureStyle                         int8u
+    189    HighISONoiseReduction                int8u
+    191    AutoLightingOptimizer                int8u
     235    LensType                             int8u
+    236    ShortFocal                           int16u
+    238    LongFocal                            int16u
     346    FirmwareVersion                      N
     350    FirmwareVersion                      N
+    407    FileIndex                            int32u
+    411    FileIndex                            int32u
+    419    DirectoryIndex                       int32u
+    423    DirectoryIndex                       int32u
 
 =head3 Canon CameraInfo450D Tags
 
@@ -2749,6 +2809,10 @@ CameraInfo tags for the EOS 450D.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
+      3    FNumber                              int8u
+      4    ExposureTime                         int8u
+      6    ISO                                  int8u
+     24    CameraTemperature                    int8u
      29    FocalLength                          int16u
      48    CameraOrientation                    int8u
      67    FocusDistanceUpper                   int16u
@@ -2767,6 +2831,10 @@ CameraInfo tags for the EOS 1000D.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
+      3    FNumber                              int8u
+      4    ExposureTime                         int8u
+      6    ISO                                  int8u
+     24    CameraTemperature                    int8u
      29    FocalLength                          int16u
      48    CameraOrientation                    int8u
      67    FocusDistanceUpper                   int16u
@@ -2908,6 +2976,8 @@ Newer version of the AFInfo record containing much of the same information
      13    WBBracketValueGM                     int16s
      14    FilterEffect                         int16s
      15    ToningEffect                         int16s
+     19    LiveViewShooting                     int16s
+     25    FlashExposureLock                    int16s
 
 =head3 Canon SerialInfo Tags
 
@@ -3179,6 +3249,13 @@ indices.
       1    Saturation                           int16s
       2    ColorTone                            int16s
       3    ColorSpace                           int16s
+
+=head3 Canon AFMicroAdj Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      1    AFMicroAdjActive                     int32s
+      2    AFMicroAdjValue                      rational64s
 
 =head2 CanonCustom Tags
 
@@ -3966,7 +4043,7 @@ from some older Kodak models such as the DC50, DC120, DCS760C, DCS Pro 14N,
   0x03ed   SensorImageWidth                     N
   0x03ee   SensorImageHeight                    N
   0x03f1   TextualInfo                          Kodak TextualInfo
-  0x0401   SubSecTime                           string
+  0x0401   Time                                 string
   0x0414   NCDFileInfo                          string
   0x0846   ColorTemperature                     int16u
   0x0ce5   FirmwareVersion                      string
@@ -4008,7 +4085,7 @@ data, however ExifTool will extract information from any tags found here.
   'Shooting Mode'       ShootingMode            N
   'Shutter'             ShutterSpeed            N
   'Temperature'         Temperature             N
-  'Time'                SubSecTime              N
+  'Time'                Time                    N
   'White balance'       Whitebalance            N
   'Width'               KodakImageWidth         N
   '_other_info'         OtherInfo               N
@@ -4827,9 +4904,9 @@ These tags are extracted from encrypted data in D40 and D40X images.
   732.1    MonitorOffTime                       int8u
   732.2    MeteringTime                         int8u
   732.3    SelfTimerTime                        int8u
-  733.1    RemoteOnDuration                     int8u
-  733.2    AELockButton                         int8u
-  733.3    AELock                               int8u
+  732.4    RemoteOnDuration                     int8u
+  733.1    AELockButton                         int8u
+  733.2    AELock                               int8u
   734.1    ShootingModeSetting                  int8u
   734.2    TimerFunctionButton                  int8u
     735    Metering                             int8u
@@ -5138,9 +5215,13 @@ This information is written by the Nikon Scan software.
   0x0041   BitDepth                             int16u
   0x0050   MasterGain                           rational64s
   0x0051   ColorGain                            rational64s[3]
+  0x0060   ScanImageEnhancer                    int32u
   0x0100   DigitalICE                           string
   0x0110   ROCInfo                              Nikon ROC
   0x0120   GEMInfo                              Nikon GEM
+  0x0200   DigitalDEEShadowAdj                  int32u
+  0x0201   DigitalDEEThreshold                  int32u
+  0x0202   DigitalDEEHighlightAdj               int32u
 
 =head3 Nikon ROC Tags
 
@@ -5847,6 +5928,7 @@ These tags are used in Panasonic/Leica cameras.
   0x0036   TravelDay                            int16u
   0x0039   Contrast                             int16u
   0x003a   WorldTimeLocation                    int16u
+  0x003b   TextStamp                            in16u
   0x003c   ProgramISO                           int16u
   0x0040   Saturation                           int16u
   0x0041   Sharpness                            int16u
@@ -5862,6 +5944,7 @@ These tags are used in Panasonic/Leica cameras.
   0x8004   WBRedLevel                           int16u
   0x8005   WBGreenLevel                         int16u
   0x8006   WBBlueLevel                          int16u
+  0x8007   FlashFired                           int16u
   0x8010   BabyAge                              string
 
 =head3 Panasonic Leica2 Tags
@@ -6242,8 +6325,8 @@ tags used by Casio.
 =head3 Pentax Type4 Tags
 
 The following few tags are extracted from the wealth of information
-available in maker notes of the Optio E20.  These maker notes are stored as
-ASCII text in a format very similar to some HP models.
+available in maker notes of the Optio E20 and E25.  These maker notes are
+stored as ASCII text in a format very similar to some HP models.
 
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
@@ -6509,9 +6592,16 @@ Tags in the encrypted SR2SubIFD
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   0x7303   WB_GRBGLevels                        N
+  0x7313   WB_RGGBLevels                        N
   0x74a0   MaxApertureAtMaxFocal                N
   0x74a1   MaxApertureAtMinFocal                N
   0x74c0   SR2DataIFD                           Sony SR2DataIFD
+  0x7820   WB_RGBLevelsDaylight                 N
+  0x7821   WB_RGBLevelsCloudy                   N
+  0x7822   WB_RGBLevelsTungsten                 N
+  0x7825   WB_RGBLevelsShade                    N
+  0x7826   WB_RGBLevelsFluorescent              N
+  0x7828   WB_RGBLevelsFlash                    N
 
 =head3 Sony SR2DataIFD Tags
 
@@ -6841,7 +6931,8 @@ These tags are used in Minolta RAW format (MRW) images.
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    WBScale                              int8u[4]
-      4    WBLevels                             int16u[4]
+      4    WB_GBRGLevels                        int16u[4]
+           WB_RGGBLevels                        int16u[4]
 
 =head2 SigmaRaw Tags
 
@@ -8669,6 +8760,7 @@ ID3 version 2.3 tags
   'PRIV'   Private                              ID3 Private
   'TALB'   Album                                N
   'TBPM'   BeatsPerMinute                       N
+  'TCMP'   Compilation                          N
   'TCOM'   Composer                             N
   'TCON'   Genre                                N
   'TCOP'   Copyright                            N
@@ -8741,6 +8833,7 @@ ID3 version 2.4 tags
   'PRIV'   Private                              ID3 Private
   'TALB'   Album                                N
   'TBPM'   BeatsPerMinute                       N
+  'TCMP'   Compilation                          N
   'TCOM'   Composer                             N
   'TCON'   Genre                                N
   'TCOP'   Copyright                            N
@@ -8861,7 +8954,6 @@ any tag found, even if not listed here.
   'COVERART'              CoverArt              N
   'COVERARTMIME'          CoverArtMIMEType      N
   'DATE'                  Date                  N
-  'DESCRIPTION'           Description           N
   'ENCODED_BY'            EncodedBy             N
   'ENCODED_USING'         EncodedUsing          N
   'GENRE'                 Genre                 N
@@ -12666,6 +12758,7 @@ information is extracted.
                        WB_RBGGLevels
                        WB_GRBGLevels
                        WB_GRGBLevels
+                       WB_GBRGLevels
                        WB_RGBLevels
                        WB_RBLevels
                        WBBlueLevel
@@ -12681,9 +12774,11 @@ information is extracted.
                        CircleOfConfusion
   DateCreated          Kodak:YearCreated        N
                        Kodak:MonthDayCreated
-  DateTimeCreated      DateCreated              N
-                       TimeCreated
+  DateTimeCreated      IPTC:DateCreated         N
+                       IPTC:TimeCreated
   DateTimeOriginal     DateTimeCreated          N
+                       DateCreated
+                       TimeCreated
   DigitalZoom          Canon:ZoomSourceWidth    N
                        Canon:ZoomTargetWidth
                        Canon:DigitalZoom
@@ -12782,6 +12877,7 @@ information is extracted.
                        WB_RBGGLevels
                        WB_GRBGLevels
                        WB_GRGBLevels
+                       WB_GBRGLevels
                        WB_RGBLevels
                        WB_RBLevels
                        WBRedLevel
@@ -12810,8 +12906,12 @@ information is extracted.
   ShutterSpeed         ExposureTime             N
                        ShutterSpeedValue
                        BulbDuration
-  SubSecDateTimeOriginal DateTimeOriginal       N
+  SubSecCreateDate     EXIF:CreateDate          N
+                       SubSecTimeDigitized
+  SubSecDateTimeOriginal EXIF:DateTimeOriginal  N
                        SubSecTimeOriginal
+  SubSecModifyDate     EXIF:ModifyDate          N
+                       SubSecTime
   ThumbnailImage       ThumbnailOffset          Y
                        ThumbnailLength
   WB_RGGBLevels        Canon:WhiteBalance       N

@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -631,7 +631,7 @@ sub WriteKodakIFD($$$);
         ValueConv => '$val=~s{/}{:}g; $val',
         ValueConvInv => '$val=~s{^(\d{4}):(\d{2}):}{$1/$2/}; $val',
         PrintConv => '$self->ConvertDateTime($val)',
-        PrintConvInv => '$self->InverseDateTime($val,0)', 
+        PrintConvInv => '$self->InverseDateTime($val,0)',
     },
     0x34 => {
         Name => 'ISO',
@@ -1031,7 +1031,7 @@ my %sceneModeUsed = (
     # 0x03fc: some sort of white balance index (ref 3)
     # 0x03fd: manual white balance information (ref 3)
     0x0401 => {
-        Name => 'SubSecTime',
+        Name => 'Time',
         Groups => { 2 => 'Time' },
         Writable => 'string',
     },
@@ -1108,7 +1108,7 @@ my %sceneModeUsed = (
     'Shutter'       => 'ShutterSpeed',
     'Temperature'   => 'Temperature', # with a value of 15653, what could this be? - PH
     'Time'          => {
-        Name => 'SubSecTime',
+        Name => 'Time',
         Groups => { 2 => 'Time' },
     },
     'White balance' => 'Whitebalance',

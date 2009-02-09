@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.42
-[File, File, Image]  - File Name: EXE.macho
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 9.3 kB
-[File, File, Time]  - File Modification Date/Time: 2008:08:30 11:33:33
-[File, File, Image]  - File Type: Mach-O executable
-[File, File, Image]  - MIME Type: application/octet-stream
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: EXE.macho
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 9.3 kB
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:08:30 13:31:01-04:00
+[File, File, Image] FileType - File Type: Mach-O executable
+[File, File, Image] MIMEType - MIME Type: application/octet-stream
 [EXE, EXE, Other] 0 - CPU Architecture: 32 bit
 [EXE, EXE, Other] 1 - CPU Byte Order: Big endian
 [EXE, EXE, Other] 3 - CPU Type: PowerPC

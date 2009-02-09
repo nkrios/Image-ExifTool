@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.49
-[File, File, Image]  - File Name: IPTC-XMP_30_failed.xml
-[File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 2.9 kB
-[File, File, Time]  - File Modification Date/Time: 2008:10:14 10:33:45-04:00
-[File, File, Image]  - File Type: XMP
-[File, File, Image]  - MIME Type: application/rdf+xml
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: IPTC-XMP_30_failed.xml
+[File, File, Image] Directory - Directory: t
+[File, File, Image] FileSize - File Size: 3.0 kB
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:01 07:56:24-05:00
+[File, File, Image] FileType - File Type: XMP
+[File, File, Image] MIMEType - MIME Type: application/rdf+xml
 [XMP, XMP-rdf, Document] about - About: t/images/Nikon.jpg
 [XMP, XMP-pdf, Author] Author - Author: Phil
 [XML, XML-File, Unknown] File:BitsPerSample - Bits Per Sample: 8
@@ -31,9 +31,11 @@
 [EXIF, IFD0, Unknown] IFD0:YCbCrPositioning - Y Cb Cr Positioning: Co-sited
 [EXIF, IFD0, Unknown] IFD0:YResolution - Y Resolution: 300
 [EXIF, IFD1, Unknown] IFD1:Compression - Compression: JPEG (old-style)
+[EXIF, IFD1, Unknown] IFD1:ResolutionUnit - Resolution Unit: inches
 [EXIF, IFD1, Unknown] IFD1:ThumbnailLength - Thumbnail Length: 28
 [EXIF, IFD1, Unknown] IFD1:ThumbnailOffset - Thumbnail Offset: 1426
+[EXIF, IFD1, Unknown] IFD1:XResolution - X Resolution: 300
+[EXIF, IFD1, Unknown] IFD1:YResolution - Y Resolution: 300
 [EXIF, InteropIFD, Unknown] InteropIFD:InteropIndex - Interop Index: R98 - DCF basic file (sRGB)
 [EXIF, InteropIFD, Unknown] InteropIFD:InteropVersion - Interop Version: 0100
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Image]  - Image Size: 8x8
+[Composite, Composite, Image] ImageSize - Image Size: 8x8

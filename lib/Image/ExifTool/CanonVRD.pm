@@ -3,7 +3,10 @@
 #
 # Description:  Read/write Canon VRD information
 #
-# Revisions:    10/30/2006 - P. Harvey Created
+# Revisions:    2006/10/30 - P. Harvey Created
+#               2007/10/23 - PH Added new VRD 3.0 tags
+#               2008/08/29 - PH Added new VRD 3.4 tags
+#               2008/12/02 - PH Added new VRD 3.5 tags
 #
 # References:   1) Bogdan private communication (Canon DPP v3.4.1.1)
 #------------------------------------------------------------------------------
@@ -386,7 +389,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
     # (VRD 2.0 edit data ends here: 178 bytes, index 0x59)
     0x5e => [{
         Name => 'ChrominanceNoiseReduction',
-        Condition => '$$self{VRDVersion} < 330', 
+        Condition => '$$self{VRDVersion} < 330',
         Notes => 'VRDVersion prior to 3.30',
         PrintConv => {
             0   => 'Off',
@@ -423,7 +426,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
     }],
     0x5f => [{
         Name => 'LuminanceNoiseReduction',
-        Condition => '$$self{VRDVersion} < 330', 
+        Condition => '$$self{VRDVersion} < 330',
         Notes => 'VRDVersion prior to 3.30',
         PrintConv => {
             0   => 'Off',
@@ -460,7 +463,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
     }],
     0x60 => [{
         Name => 'ChrominanceNR_TIFF_JPEG',
-        Condition => '$$self{VRDVersion} < 330', 
+        Condition => '$$self{VRDVersion} < 330',
         Notes => 'VRDVersion prior to 3.30',
         PrintConv => {
             0   => 'Off',

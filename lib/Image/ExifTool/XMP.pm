@@ -45,7 +45,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.00';
+$VERSION = '2.04';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -113,6 +113,9 @@ my %stdXlatNS = (
     Iptc4xmpCore => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
     Iptc4xmpExt => 'http://iptc.org/std/Iptc4xmpExt/2008-02-29/',
     MicrosoftPhoto => 'http://ns.microsoft.com/photo/1.0',
+    MP        => 'http://ns.microsoft.com/photo/1.2/',
+    MPRI      => 'http://ns.microsoft.com/photo/1.2/t/RegionInfo#',
+    MPReg     => 'http://ns.microsoft.com/photo/1.2/t/Region#',
     lr        => 'http://ns.adobe.com/lightroom/1.0/',
     DICOM     => 'http://ns.adobe.com/DICOM/',
     svg       => 'http://www.w3.org/2000/svg',
@@ -291,6 +294,10 @@ my %recognizedAttrs = (
         Name => 'microsoft',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Microsoft' },
     },
+    MP => {
+        Name => 'MP',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::MP' },
+    },
     lr => {
         Name => 'lr',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Lightroom' },
@@ -375,6 +382,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-dc', 2 => 'Other' },
     NAMESPACE => 'dc',
+    DESCRIPTION => 'XMP Dublin Core',
     NOTES => 'Dublin Core schema tags.',
     contributor => { Groups => { 2 => 'Author' }, List => 'Bag' },
     coverage    => { },
@@ -460,6 +468,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-xmpMM', 2 => 'Other' },
     NAMESPACE => 'xmpMM',
+    DESCRIPTION => 'XMP Media Management',
     NOTES => 'XMP Media Management schema tags.',
     DerivedFrom     => {
         SubDirectory => { },
@@ -594,6 +603,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-xmpBJ', 2 => 'Other' },
     NAMESPACE => 'xmpBJ',
+    DESCRIPTION => 'XMP Basic Job Ticket',
     NOTES => 'XMP Basic Job Ticket schema tags.',
     # Note: JobRef is a List of structures.  To accomplish this, we set the XMP
     # List=>'Bag', but since SubDirectory is defined, this tag isn't writable
@@ -614,6 +624,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-xmpTPg', 2 => 'Image' },
     NAMESPACE => 'xmpTPg',
+    DESCRIPTION => 'XMP Paged-Text',
     NOTES => 'XMP Paged-Text schema tags.',
     MaxPageSize => {
         SubDirectory => { },
@@ -657,227 +668,12 @@ my %recognizedAttrs = (
     PlateNames  => { List => 'Seq' },
 );
 
-# XMP Dynamic Media schema properties (xmpDM)
-%Image::ExifTool::XMP::xmpDM = (
-    %xmpTableDefaults,
-    GROUPS => { 1 => 'XMP-xmpDM', 2 => 'Image' },
-    NAMESPACE => 'xmpDM',
-    NOTES => 'XMP Dynamic Media schema tags.',
-    absPeakAudioFilePath=> { },
-    album               => { },
-    altTapeName         => { },
-    altTimecode => {
-        SubDirectory => { },
-        Struct => 'Timecode',
-    },
-    altTimecodeTimeFormat   => { },
-    altTimecodeTimeValue    => { },
-    altTimecodeValue        => { Writable => 'integer' },
-    artist              => { Avoid => 1, Groups => { 2 => 'Author' } },
-    audioModDate        => { Groups => { 2 => 'Time' }, %dateTimeInfo },
-    audioSampleRate     => { Writable => 'integer' },
-    audioSampleType     => { },
-    audioChannelType    => { },
-    audioCompressor     => { },
-    beatSpliceParams => {
-        SubDirectory => { },
-        Struct => 'BeatSpliceStretch',
-    },
-    beatSpliceParamsUseFileBeatsMarker => { Writable => 'boolean' },
-    beatSpliceParamsRiseInDecibel      => { Writable => 'real' },
-    beatSpliceParamsRiseInTimeDuration => {
-        SubDirectory => { },
-        Struct => 'Time',
-    },
-    beatSpliceParamsRiseInTimeDurationScale => { Writable => 'rational' },
-    beatSpliceParamsRiseInTimeDurationValue => { Writable => 'integer' },
-    composer        => { Groups => { 2 => 'Author' } },
-    contributedMedia => {
-        SubDirectory => { },
-        Struct => 'Media',
-        List => 'Bag',
-    },
-    contributedMediaDuration => {
-        SubDirectory => { },
-        Struct => 'Time',
-    },
-    contributedMediaDurationScale => { List => 1, Writable => 'rational' },
-    contributedMediaDurationValue => { List => 1, Writable => 'integer' },
-    contributedMediaPath         => { List => 1 },
-    contributedMediaTrack        => { List => 1 },
-    contributedMediaStartTime => {
-        SubDirectory => { },
-        Struct => 'Time',
-    },
-    contributedMediaStartTimeScale => { List => 1, Writable => 'rational' },
-    contributedMediaStartTimeValue => { List => 1, Writable => 'integer' },
-    contributedMediaManaged      => { List => 1, Writable => 'boolean' },
-    contributedMediaWebStatement => { List => 1 },
-    copyright       => { Avoid => 1, Groups => { 2 => 'Author' } },
-    duration        => {
-        SubDirectory => { },
-        Struct => 'Time',
-    },
-    durationScale   => { Writable => 'rational' },
-    durationValue   => { Writable => 'integer' },
-    engineer        => { },
-    fileDataRate    => { Writable => 'rational' },
-    genre           => { },
-    instrument      => { },
-    introTime => {
-        SubDirectory => { },
-        Struct => 'Time',
-    },
-    introTimeScale  => { Writable => 'rational' },
-    introTimeValue  => { Writable => 'integer' },
-    key             => { },
-    logComment      => { },
-    loop            => { Writable => 'boolean' },
-    numberOfBeats   => { Writable => 'real' },
-    markers => {
-        SubDirectory => { },
-        Struct => 'Marker',
-        List => 'Seq',
-    },
-    markersComment      => { List => 1 },
-    markersCuePointParams => {
-        SubDirectory => { },
-        Struct => 'CuePointParam',
-        List => 'Seq',
-    },
-    markersCuePointParamsValue => { List => 1 },
-    markersCuePointParamsKey   => { List => 1 },
-    markersCuePointType => { List => 1 },
-    markersDuration     => { List => 1 },
-    markersLocation     => { List => 1 },
-    markersName         => { List => 1 },
-    markersProbability  => { List => 1, Writable => 'real' },
-    markersSpeaker      => { List => 1 },
-    markersStartTime    => { List => 1 },
-    markersTarget       => { List => 1 },
-    markersType         => { List => 1 },
-    metadataModDate => { Groups => { 2 => 'Time' }, %dateTimeInfo },
-    outCue => {
-        SubDirectory => { },
-        Struct => 'Time',
-    },
-    outCueScale         => { Writable => 'rational' },
-    outCueValue         => { Writable => 'integer' },
-    projectRef => {
-        SubDirectory => { },
-        Struct => 'ProjectLink',
-    },
-    projectRefType      => { },
-    projectRefPath      => { },
-    pullDown            => { },
-    relativePeakAudioFilePath => { },
-    relativeTimestamp => {
-        SubDirectory => { },
-        Struct => 'Time',
-    },
-    relativeTimestampScale  => { Writable => 'rational' },
-    relativeTimestampValue  => { Writable => 'integer' },
-    releaseDate         => { Groups => { 2 => 'Time' }, %dateTimeInfo },
-    resampleParams => {
-        SubDirectory => { },
-        Struct => 'ResampleStretch',
-    },
-    resampleParamsQuality   => { PrintConv => { Low => 'Low', Medium => 'Medium', High => 'High' } },
-    scaleType           => { },
-    scene               => { Avoid => 1 },
-    shotDate            => { Groups => { 2 => 'Time' }, %dateTimeInfo },
-    shotLocation        => { },
-    shotName            => { },
-    speakerPlacement    => { },
-    startTimecode => {
-        SubDirectory => { },
-        Struct => 'Timecode',
-    },
-    startTimecodeTimeFormat => { },
-    startTimecodeTimeValue  => { },
-    startTimecodeValue      => { Writable => 'integer' },
-    stretchMode     => { },
-    tapeName        => { },
-    tempo           => { Writable => 'real' },
-    timeScaleParams => {
-        SubDirectory => { },
-        Struct => 'TimeScaleStretch',
-    },
-    timeScaleParamsFrameOverlappingPercentage => { Writable => 'real' },
-    timeScaleParamsFrameSize => { Writable => 'real' },
-    timeScaleParamsQuality   => { PrintConv => { Low => 'Low', Medium => 'Medium', High => 'High' } },
-    timeSignature   => { },
-    trackNumber     => { Writable => 'integer' },
-    Tracks => {
-        SubDirectory => { },
-        Struct => 'Track',
-        List => 'Bag',
-    },
-    TracksFrameRate => { List => 1 },
-    TracksMarkers => {
-        SubDirectory => { },
-        Struct => 'Marker',
-        List => 'Seq',
-    },
-    TracksMarkersComment => { List => 1 },
-    TracksMarkersCuePointParams => {
-        SubDirectory => { },
-        Struct => 'CuePointParam',
-        List => 1,
-    },
-    TracksMarkersCuePointParamsKey      => { List => 1 },
-    TracksMarkersCuePointParamsValue    => { List => 1 },
-    TracksMarkersCuePointType           => { List => 1 },
-    TracksMarkersDuration           => { List => 1 },
-    TracksMarkersLocation           => { List => 1 },
-    TracksMarkersName               => { List => 1 },
-    TracksMarkersProbability        => { List => 1, Writable => 'real' },
-    TracksMarkersSpeaker            => { List => 1 },
-    TracksMarkersStartTime          => { List => 1 },
-    TracksMarkersTarget             => { List => 1 },
-    TracksMarkersType               => { List => 1 },
-    TracksTrackName     => { List => 1 },
-    TracksTrackType     => { List => 1 },
-    videoAlphaMode      => { },
-    videoAlphaPremultipleColor => {
-        SubDirectory => { },
-        Struct => 'Colorant',
-    },
-    videoAlphaPremultipleColorSwatchName => { },
-    videoAlphaPremultipleColorMode       => { },
-    videoAlphaPremultipleColorType       => { },
-    videoAlphaPremultipleColorCyan       => { Writable => 'real' },
-    videoAlphaPremultipleColorMagenta    => { Writable => 'real' },
-    videoAlphaPremultipleColorYellow     => { Writable => 'real' },
-    videoAlphaPremultipleColorBlack      => { Writable => 'real' },
-    videoAlphaPremultipleColorRed        => { Writable => 'integer' },
-    videoAlphaPremultipleColorGreen      => { Writable => 'integer' },
-    videoAlphaPremultipleColorBlue       => { Writable => 'integer' },
-    videoAlphaPremultipleColorL          => { Writable => 'real' },
-    videoAlphaPremultipleColorA          => { Writable => 'integer' },
-    videoAlphaPremultipleColorB          => { Writable => 'integer' },
-    videoAlphaUnityIsTransparent => { Writable => 'boolean' },
-    videoColorSpace     => { },
-    videoCompressor     => { },
-    videoFieldOrder     => { },
-    videoFrameRate      => { },
-    videoFrameSize => {
-        SubDirectory => { },
-        Struct => 'Dimensions',
-    },
-    videoFrameSizeW     => { Writable => 'real' },
-    videoFrameSizeH     => { Writable => 'real' },
-    videoFrameSizeUnit  => { },
-    videoModDate        => { Groups => { 2 => 'Time' }, %dateTimeInfo },
-    videoPixelAspectRatio => { Writable => 'rational' },
-    videoPixelDepth     => { },
-);
-
 # PDF schema properties (pdf)
 %Image::ExifTool::XMP::pdf = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-pdf', 2 => 'Image' },
     NAMESPACE => 'pdf',
+    DESCRIPTION => 'XMP PDF',
     NOTES => q{
         Adobe PDF schema tags.  The official XMP specification defines only
         Keywords, PDFVersion and Producer.  The other tags are included because they
@@ -920,6 +716,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-photoshop', 2 => 'Image' },
     NAMESPACE => 'photoshop',
+    DESCRIPTION => 'XMP Photoshop',
     NOTES => 'Adobe Photoshop schema tags.',
     AuthorsPosition => { Groups => { 2 => 'Author' } },
     CaptionWriter   => { Groups => { 2 => 'Author' } },
@@ -949,7 +746,8 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-crs', 2 => 'Image' },
     NAMESPACE => 'crs',
-    NOTES => 'Photoshop Camera Raw Schema tags.',
+    DESCRIPTION => 'Photoshop Camera Raw Schema tags.',
+    NOTES => 'XMP Photoshop Camera Raw',
     AlreadyApplied  => { Writable => 'boolean' }, #PH (written by LightRoom beta 4.1)
     AutoBrightness  => { Writable => 'boolean' },
     AutoContrast    => { Writable => 'boolean' },
@@ -1160,7 +958,7 @@ my %recognizedAttrs = (
         Writable => 0, # real
         #List => 1,
     },
-    GradientBasedCorrectionsCorrectionMasks => { 
+    GradientBasedCorrectionsCorrectionMasks => {
         SubDirectory => { },
         Struct => 'CorrectionMask',
         List => 'Seq',
@@ -1275,7 +1073,7 @@ my %recognizedAttrs = (
         Writable => 0, # real
         #List => 1,
     },
-    PaintBasedCorrectionsCorrectionMasks => { 
+    PaintBasedCorrectionsCorrectionMasks => {
         SubDirectory => { },
         Struct => 'CorrectionMask',
         List => 'Seq',
@@ -1338,6 +1136,7 @@ my %recognizedAttrs = (
     GROUPS => { 1 => 'XMP-tiff', 2 => 'Image' },
     NAMESPACE => 'tiff',
     PRIORITY => 0, # not as reliable as actual TIFF tags
+    DESCRIPTION => 'XMP TIFF',
     NOTES => 'EXIF schema for TIFF tags.',
     ImageWidth    => { Writable => 'integer' },
     ImageLength   => { Writable => 'integer', Name => 'ImageHeight' },
@@ -1866,11 +1665,12 @@ my %recognizedAttrs = (
     },
 );
 
-# IPTC Core schema properties (Iptc4xmpCore)
+# IPTC Core schema properties (Iptc4xmpCore) (ref 4)
 %Image::ExifTool::XMP::iptcCore = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-iptcCore', 2 => 'Author' },
     NAMESPACE => 'Iptc4xmpCore',
+    DESCRIPTION => 'XMP IPTC Core',
     NOTES => q{
         IPTC Core schema tags.  The actual IPTC Core namespace prefix is
         "Iptc4xmpCore", which is the prefix recorded in the file, but ExifTool
@@ -1896,11 +1696,12 @@ my %recognizedAttrs = (
     SubjectCode         => { Groups => { 2 => 'Other' }, List => 'Bag' },
 );
 
-# IPTC Extension schema properties (Iptc4xmpExt)
+# IPTC Extension schema properties (Iptc4xmpExt) (ref 4)
 %Image::ExifTool::XMP::iptcExt = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-iptcExt', 2 => 'Author' },
     NAMESPACE => 'Iptc4xmpExt',
+    DESCRIPTION => 'XMP IPTC Extension',
     NOTES => q{
         IPTC Extension schema tags.  The actual namespace prefix is "Iptc4xmpExt",
         but ExifTool shortens this for the "XMP-iptcExt" family 1 group name.
@@ -1968,107 +1769,12 @@ my %recognizedAttrs = (
     MaxAvailWidth   => { Writable => 'integer' },
 );
 
-# PixelLive schema properties (PixelLive) (ref 3)
-%Image::ExifTool::XMP::PixelLive = (
-    GROUPS => { 1 => 'XMP-PixelLive', 2 => 'Image' },
-    NAMESPACE => 'PixelLive',
-    WRITE_PROC => \&WriteXMP,
-    NOTES => q{
-        PixelLive schema tags.  These tags are not writable becase they are very
-        uncommon and I haven't been able to locate a reference which gives the
-        namespace URI.
-    },
-    AUTHOR    => { Name => 'Author',   Avoid => 1, Groups => { 2 => 'Author' } },
-    COMMENTS  => { Name => 'Comments', Avoid => 1 },
-    COPYRIGHT => { Name => 'Copyright',Avoid => 1, Groups => { 2 => 'Author' } },
-    DATE      => { Name => 'Date',     Avoid => 1, Groups => { 2 => 'Time' } },
-    GENRE     => { Name => 'Genre',    Avoid => 1 },
-    TITLE     => { Name => 'Title',    Avoid => 1 },
-);
-
-# Picture Licensing Universal System schema properties (xmpPLUS)
-%Image::ExifTool::XMP::xmpPLUS = (
-    %xmpTableDefaults,
-    GROUPS => { 1 => 'XMP-xmpPLUS', 2 => 'Author' },
-    NAMESPACE => 'xmpPLUS',
-    NOTES => 'XMP Picture Licensing Universal System (PLUS) schema tags.',
-    CreditLineReq   => { Writable => 'boolean' },
-    ReuseAllowed    => { Writable => 'boolean' },
-);
-
-# Creative Commons schema properties (cc) (ref 5)
-%Image::ExifTool::XMP::cc = (
-    %xmpTableDefaults,
-    GROUPS => { 1 => 'XMP-cc', 2 => 'Author' },
-    NAMESPACE => 'cc',
-    NOTES => q{
-        Creative Commons schema tags.  (see
-        L<http://creativecommons.org/technology/xmp>)
-    },
-    license => { },
-    morePermissions => { },
-    attributionName => { },
-    attributionURL  => { },
-);
-
-# Description Explorer schema properties (dex) (ref 6)
-%Image::ExifTool::XMP::dex = (
-    %xmpTableDefaults,
-    GROUPS => { 1 => 'XMP-dex', 2 => 'Image' },
-    NAMESPACE => 'dex',
-    NOTES => q{
-        Description Explorer schema tags.  These tags are not very common.  The
-        Source and Rating tags are avoided when writing due to name conflicts with
-        other XMP tags.  (see L<http://www.optimasc.com/products/fileid/>)
-    },
-    crc32       => { Name => 'CRC32', Writable => 'integer' },
-    source      => { Avoid => 1 },
-    shortdescription => {
-        Name => 'ShortDescription',
-        Writable => 'lang-alt',
-    },
-    licensetype => {
-        Name => 'LicenseType',
-        PrintConv => {
-            unknown        => 'Unknown',
-            shareware      => 'Shareware',
-            freeware       => 'Freeware',
-            adware         => 'Adware',
-            demo           => 'Demo',
-            commercial     => 'Commercial',
-           'public domain' => 'Public Domain',
-           'open source'   => 'Open Source',
-        },
-    },
-    revision    => { },
-    rating      => { Avoid => 1 },
-    os          => { Name => 'OS', Writable => 'integer' },
-    ffid        => { Name => 'FFID' },
-);
-
-# IView MediaPro schema properties (mediapro) (ref PH)
-%Image::ExifTool::XMP::MediaPro = (
-    %xmpTableDefaults,
-    GROUPS => { 1 => 'XMP-mediapro', 2 => 'Image' },
-    NAMESPACE => 'mediapro',
-    NOTES => 'IView MediaPro schema tags.',
-    Event       => { },
-    Location    => {
-        Avoid => 1,
-        Groups => { 2 => 'Location' },
-        Notes => 'avoided due to conflict with XMP-iptcCore:Location',
-    },
-    Status      => { },
-    People      => { List => 'Bag' },
-    UserFields  => { List => 'Bag' },
-    CatalogSets => { List => 'Bag' },
-);
-
 # Microsoft Photo schema properties (MicrosoftPhoto) (ref PH)
 %Image::ExifTool::XMP::Microsoft = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-microsoft', 2 => 'Image' },
     NAMESPACE => 'MicrosoftPhoto',
+    DESCRIPTION => 'XMP Microsoft',
     NOTES => q{
         Microsoft Photo schema tags.  This is likely not a complete list, but
         represents tags which have been observed in sample images.  The actual
@@ -2092,75 +1798,52 @@ my %recognizedAttrs = (
     },
 );
 
+# Microsoft Photo 1.2 schema properties (MP) (ref PH)
+%Image::ExifTool::XMP::MP = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-MP', 2 => 'Image' },
+    NAMESPACE => 'MP',
+    DESCRIPTION => 'XMP Microsoft Photo',
+    NOTES => q{
+        Microsoft Photo 1.2 schema tags.  Again, not a complete list.
+    },
+    RegionInfo => {
+        SubDirectory => { },
+        Struct => 'RegionInfo',
+    },
+    RegionInfoRegions => {
+        SubDirectory => { },
+        Struct => 'Regions',
+    },
+    RegionInfoRegionsRectangle => {
+        Name => 'RegionRectangle',
+        List => 1,
+    },
+    RegionInfoRegionsPersonDisplayName => {
+        Name => 'RegionPersonDisplayName',
+        List => 1,
+    },
+);
+
 # Adobe Lightroom schema properties (lr) (ref PH)
 %Image::ExifTool::XMP::Lightroom = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-lr', 2 => 'Image' },
     NAMESPACE => 'lr',
     NOTES => 'Adobe Lightroom "lr" schema tags.',
+    DESCRIPTION => 'XMP Adobe Lightroom',
     privateRTKInfo => { },
     hierarchicalSubject => { List => 'Bag' },
 );
 
-# Adobe Album schema properties (album) - (PH)
+# Adobe Album schema properties (album) (ref PH)
 %Image::ExifTool::XMP::Album = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-album', 2 => 'Image' },
     NAMESPACE => 'album',
+    DESCRIPTION => 'XMP Adobe Album',
     NOTES => 'Adobe Album schema tags.',
     Notes => { },
-);
-
-# DICOM schema properties (DICOM) (ref PH, written by CS3)
-%Image::ExifTool::XMP::DICOM = (
-    %xmpTableDefaults,
-    GROUPS => { 1 => 'XMP-DICOM', 2 => 'Image' },
-    NAMESPACE => 'DICOM',
-    NOTES => 'DICOM schema tags.',
-    # change some tag names to correspond with DICOM tags
-    PatientName             => { Name => 'PatientsName' },
-    PatientID               => { },
-    PatientSex              => { Name => 'PatientsSex' },
-    PatientDOB              => {
-        Name => 'PatientsBirthDate',
-        Groups => { 2 => 'Time' },
-        %dateTimeInfo,
-    },
-    StudyID                 => { },
-    StudyPhysician          => { },
-    StudyDateTime           => { Groups => { 2 => 'Time' }, %dateTimeInfo },
-    StudyDescription        => { },
-    SeriesNumber            => { },
-    SeriesModality          => { },
-    SeriesDateTime          => { Groups => { 2 => 'Time' }, %dateTimeInfo },
-    SeriesDescription       => { },
-    EquipmentInstitution    => { },
-    EquipmentManufacturer   => { },
-);
-
-# SVG schema properties (ref 9)
-%Image::ExifTool::XMP::SVG = (
-    GROUPS => { 0 => 'SVG', 1 => 'SVG', 2 => 'Image' },
-    NAMESPACE => 'svg',
-    LANG_INFO => \&GetLangInfo,
-    NOTES => q{
-        SVG (Scalable Vector Graphics) image tags.  By default, only the top-level
-        SVG and Metadata tags are extracted from these images, but all graphics tags
-        may be extracted by setting the Unknown option to 2 (-U on the command
-        line).  The SVG tags are not part of XMP as such, but are included with the
-        XMP module for convenience.  (see L<http://www.w3.org/TR/SVG11/>)
-    },
-    version    => 'SVGVersion',
-    id         => 'ID',
-    metadataId => 'MetadataID',
-    width      => 'ImageWidth',
-    height     => 'ImageHeight',
-);
-
-# table to add tags in other namespaces
-%Image::ExifTool::XMP::otherSVG = (
-    GROUPS => { 0 => 'SVG', 2 => 'Unknown' },
-    LANG_INFO => \&GetLangInfo,
 );
 
 # table to add tags in other namespaces
@@ -2237,6 +1920,36 @@ sub UnescapeXML($;$)
 }
 
 #------------------------------------------------------------------------------
+# Escape string for XML, ensuring valid XML and UTF-8
+# Inputs: 0) string
+# Returns: escaped string
+sub FullEscapeXML($)
+{
+    my $str = shift;
+    $str =~ s/([&><'"])/&$charName{$1};/sg; # escape necessary XML characters
+    $str =~ s/\\/&#92;/sg;                  # escape backslashes too
+    # then use C-escape sequences for invalid characters
+    if ($str =~ /[\0-\x1f]/ or IsUTF8(\$str) < 0) {
+        $str =~ s/([\0-\x1f\x80-\xff])/sprintf("\\x%.2x",ord $1)/sge;
+    }
+    return $str;
+}
+
+#------------------------------------------------------------------------------
+# Unescape XML/C escaped string
+# Inputs: 0) string
+# Returns: unescaped string
+sub FullUnescapeXML($)
+{
+    my $str = shift;
+    # unescape C escape sequences first
+    $str =~ s/\\x([\da-f]{2})/chr(hex($1))/sge;
+    my $conv = \%charNum;
+    $str =~ s/&(#?\w+);/UnescapeChar($1,$conv)/sge;
+    return $str;
+}
+
+#------------------------------------------------------------------------------
 # Convert XML character reference to UTF-8
 # Inputs: 0) XML character reference stripped of the '&' and ';' (ie. 'quot', '#34', '#x22')
 #         1) hash reference for looking up character numbers by name
@@ -2260,9 +1973,70 @@ sub UnescapeChar($$)
 }
 
 #------------------------------------------------------------------------------
+# Does a string contain valid UTF-8 characters?
+# Inputs: 0) string reference
+# Returns: 0=regular ASCII, -1=invalid UTF-8, 1=valid UTF-8 with maximum 16-bit
+#          wide characters, 2=valid UTF-8 requiring 32-bit wide characters
+# Notes: Changes current string position
+sub IsUTF8($)
+{
+    my $strPt = shift;
+    pos($$strPt) = 0; # start at beginning of string
+    return 0 unless $$strPt =~ /([\x80-\xff])/g;
+    my $rtnVal = 1;
+    for (;;) {
+        my $ch = ord($1);
+        # minimum lead byte for 2-byte sequence is 0xc2 (overlong sequences
+        # not allowed), 0xf8-0xfd are restricted by RFC 3629 (no 5 or 6 byte
+        # sequences), and 0xfe and 0xff are not valid in UTF-8 strings
+        return -1 if $ch < 0xc2 or $ch >= 0xf8;
+        # determine number of bytes remaining in sequence
+        my $n;
+        if ($ch < 0xe0) {
+            $n = 1;
+        } elsif ($ch < 0xf0) {
+            $n = 2;
+        } else {
+            $n = 3;
+            # character code is greater than 0xffff if more than 2 extra bytes
+            # were required in the UTF-8 character
+            $rtnVal = 2;
+        }
+        return -1 unless $$strPt =~ /\G[\x80-\xbf]{$n}/g;
+        last unless $$strPt =~ /([\x80-\xff])/g;
+    }
+    return $rtnVal;
+}
+
+#------------------------------------------------------------------------------
+# Fix malformed UTF8 (by replacing bad bytes with '?')
+# Inputs: 0) string reference
+# Returns: true if string was fixed, and updates string
+sub FixUTF8($)
+{
+    my $strPt = shift;
+    my $fixed;
+    pos($$strPt) = 0; # start at beginning of string
+    for (;;) {
+        last unless $$strPt =~ /([\x80-\xff])/g;
+        my $ch = ord($1);
+        my $pos = pos($$strPt);
+        # (see comments in IsUTF8() above)
+        if ($ch >= 0xc2 and $ch < 0xf8) {
+            my $n = $ch < 0xe0 ? 1 : ($ch < 0xf0 ? 2 : 3);
+            next if $$strPt =~ /\G[\x80-\xbf]{$n}/g;
+        }
+        # replace bad character with '?'
+        substr($$strPt, $pos-1, 1) = '?';
+        pos($$strPt) = $fixed = $pos;
+    }
+    return $fixed;
+}
+
+#------------------------------------------------------------------------------
 # Utility routine to decode a base64 string
 # Inputs: 0) base64 string
-# Returns:   reference to decoded data
+# Returns: reference to decoded data
 sub DecodeBase64($)
 {
     local($^W) = 0; # unpack('u',...) gives bogus warning in 5.00[123]
@@ -2445,13 +2219,13 @@ sub ConvertXMPDate($;$)
 # We found an XMP property name/value
 # Inputs: 0) ExifTool object ref, 1) Pointer to tag table
 #         2) reference to array of XMP property names (last is current property)
-#         3) property value, 4) xml:lang attribute (or undef)
+#         3) property value, 4) attribute hash ref (for 'xml:lang' or 'et:encoding')
 # Returns: 1 if valid tag was found
 sub FoundXMP($$$$;$)
 {
     local $_;
-    my ($exifTool, $tagTablePtr, $props, $val, $lang) = @_;
-
+    my ($exifTool, $tagTablePtr, $props, $val, $attrs) = @_;
+    my $lang;
     my ($tag, $ns) = GetXMPTagID($props);
     return 0 unless $tag;   # ignore things that aren't valid tags
 
@@ -2486,9 +2260,15 @@ sub FoundXMP($$$$;$)
     # look up this tag in the appropriate table
     my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
 
+    $lang = $$attrs{'xml:lang'} if $attrs;
     unless ($tagInfo) {
         $tagInfo = { Name => ucfirst($tag), WasAdded => 1 };
         if ($curNS{$ns} and $curNS{$ns} =~ m{^http://ns.exiftool.ca/(.*?)/(.*?)/}) {
+            # decode value if necessary
+            if ($attrs and $$attrs{'et:encoding'} and $$attrs{'et:encoding'} eq 'base64') {
+                $val = DecodeBase64($val); # (now a value ref)
+                $val = $$val unless length $$val > 100 or $$val =~ /[\0-\x08\x0b\0x0c\x0e-\x1f]/;
+            }
             # apply a little magic to recover original group names
             # from this exiftool-written RDF/XML file
             my %grps = ( 0 => $1, 1 => $2 );
@@ -2515,7 +2295,7 @@ sub FoundXMP($$$$;$)
         $tagInfo = $langInfo if $langInfo;
     }
     if ($exifTool->{OPTIONS}->{Charset} ne 'UTF8' and $val =~ /[\x80-\xff]/) {
-        # convert from UTF-8 to specified characterset
+        # convert from UTF-8 to specified character set
         $val = $exifTool->UTF82Charset($val);
     }
     # convert rational and date values to a more sensible format
@@ -2529,15 +2309,14 @@ sub FoundXMP($$$$;$)
         }
     }
     # store the value for this tag
-    $tag = $exifTool->FoundTag($tagInfo, UnescapeXML($val));
-
+    my $key = $exifTool->FoundTag($tagInfo, UnescapeXML($val));
     if ($ns and not $$tagInfo{StaticGroup1}) {
         # set group1 dynamically according to the namespace
-        $exifTool->SetGroup1($tag, "$tagTablePtr->{GROUPS}->{0}-$ns");
+        $exifTool->SetGroup1($key, "$tagTablePtr->{GROUPS}->{0}-$ns");
     }
     if ($exifTool->{OPTIONS}->{Verbose}) {
         if ($added) {
-            my $g1 = $exifTool->GetGroup($tag, 1);
+            my $g1 = $exifTool->GetGroup($key, 1);
             $exifTool->VPrint(0, $exifTool->{INDENT}, "[adding $g1:$tag]\n");
         }
         my $tagID = join('/',@$props);
@@ -2599,6 +2378,7 @@ sub ParseXMPElement($$$;$$$)
                 $val .= "</$prop>";
             }
         }
+        my $parseResource;
         if ($prop eq 'rdf:li') {
             # add index to list items so we can keep them in order
             # (this also enables us to keep structure elements grouped properly
@@ -2607,12 +2387,15 @@ sub ParseXMPElement($$$;$$$)
             # alphabetically gives the correct order while still allowing a flexible
             # number of digits -- this scheme allows up to 9 digits in the index,
             # with index numbers ranging from 0 to 999999999.  The sequence is:
-            # 10,11,12-19,210,211-299,3100,3101-3999,41000//9999999999.
+            # 10,11,12-19,210,211-299,3100,3101-3999,41000...9999999999.
             $prop .= ' ' . length($count) . $count;
         } elsif ($prop eq 'rdf:Description') {
             # trim comments and whitespace from rdf:Description properties only
             $val =~ s/<!--.*?-->//g;
             $val =~ s/^\s*(.*)\s*$/$1/;
+            # remove unnecessary rdf:Description elements since parseType='Resource'
+            # is more efficient (also necessary to make property path consistent)
+            $parseResource = 1 if grep /^rdf:Description$/, @$propListPt;
         } elsif ($prop eq 'xmp:xmpmeta') {
             # patch MicrosoftPhoto unconformity
             $prop = 'x:xmpmeta';
@@ -2625,15 +2408,31 @@ sub ParseXMPElement($$$;$$$)
             $attrs{$1} = $3;
         }
 
+#TESTcode to extract tags from .cos files
+#if ($val eq '' and defined $attrs{K} and defined $attrs{V}) {
+#    $prop = $attrs{K};
+#    $val = $attrs{V};
+#    my @a = @attrs;
+#    undef @attrs;
+#    my $a;
+#    foreach $a (@a) {
+#        if ($a eq 'K' or $a eq 'V') {
+#            delete $attrs{$a};
+#        } else {
+#            push @attrs, $a;
+#        }
+#    }
+#}
         # add nodeID to property path (with leading ' #') if it exists
         if (defined $attrs{'rdf:nodeID'}) {
             $nodeID = $$blankInfo{NodeID} = $attrs{'rdf:nodeID'};
             delete $attrs{'rdf:nodeID'};
             $prop .= ' #' . $nodeID;
+            undef $parseResource;   # can't ignore if this is a node
         }
 
         # push this property name onto our hierarchy list
-        push @$propListPt, $prop;
+        push @$propListPt, $prop unless $parseResource;
 
         if ($isSVG) {
             # ignore everything but top level SVG tags and metadata unless Unknown set
@@ -2689,6 +2488,7 @@ sub ParseXMPElement($$$;$$$)
                         my $nsUsed = $exifTool->{XMP_NS};
                         $$nsUsed{$name} = $attrs{$shortName} unless defined $$nsUsed{$name};
                     }
+                    delete $attrs{$shortName};  # (handled my namespace logic)
                     next;
                 } elsif ($recognizedAttrs{$propName}) {
                     # save UUID to use same ID when writing
@@ -2762,12 +2562,12 @@ sub ParseXMPElement($$$;$$$)
                     } elsif ($$propListPt[-1] eq 'rdf:type' and $wasEmpty) {
                         # do not extract empty structure types (for now)
                     } else {
-                        FoundXMP($exifTool, $tagTablePtr, $propListPt, $val, $attrs{'xml:lang'});
+                        FoundXMP($exifTool, $tagTablePtr, $propListPt, $val, \%attrs);
                     }
                 }
             }
         }
-        pop @$propListPt;
+        pop @$propListPt unless $parseResource;
         ++$count;
     }
 #
@@ -3038,15 +2838,7 @@ under the same terms as Perl itself.
 
 =item L<http://www.w3.org/TR/rdf-syntax-grammar/>
 
-=item L<http://www.portfoliofaq.com/pfaq/v7mappings.htm>
-
 =item L<http://www.iptc.org/IPTC4XMP/>
-
-=item L<http://creativecommons.org/technology/xmp>
-
-=item L<http://www.optimasc.com/products/fileid/xmp-extensions.pdf>
-
-=item L<http://www.w3.org/TR/SVG11/>
 
 =back
 

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
 [XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 4.73
 [XMP, XMP-rdf, Document] about - About: uuid:80056b68-1045-fa97-3401-6f4ed84cd53d
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
@@ -24,4 +24,4 @@
 [XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
 [XMP, XMP-xmpRights, Author] Marked - Marked: False
 [XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
-[Composite, Composite, Image]  - Image Size: 100x80
+[Composite, Composite, Image] ImageSize - Image Size: 100x80

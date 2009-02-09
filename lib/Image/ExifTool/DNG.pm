@@ -17,7 +17,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::MakerNotes;
 use Image::ExifTool::CanonRaw;
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 sub ProcessOriginalRaw($$$);
 sub ProcessAdobeData($$$);
@@ -118,6 +118,7 @@ sub WriteAdobeStuff($$$);
         }
         my %copy = %$tagInfo;
         delete $copy{Groups};
+        delete $copy{GotGroups};
         delete $copy{Table};
         push @$list, \%copy;
     }
@@ -368,7 +369,7 @@ sub ProcessAdobeCRW($$$)
                 my $subdir = $$tagInfo{SubDirectory};
                 if ($subdir and $$subdir{TagTable}) {
                     my $name = $$tagInfo{Name};
-                    my $newTagTable = Image::ExifTool::GetTagTable($$subdir{TagTable});
+                    my $newTagTable = GetTagTable($$subdir{TagTable});
                     return 0 unless $newTagTable;
                     my $subdirStart = 0;
                     #### eval Start ()

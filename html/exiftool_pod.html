@@ -56,7 +56,7 @@
 <p><strong>exiftool</strong> [<em>OPTIONS</em>] -<em>TAG</em>[+-&lt;]=[<em>VALUE</em>]... <em>FILE</em>...</p>
 <p><strong>exiftool</strong> [<em>OPTIONS</em>] <strong>-tagsFromFile</strong> <em>SRCFILE</em>
 [-<em>SRCTAG</em>[&gt;<em>DSTTAG</em>]...] <em>FILE</em>...</p>
-<p><strong>exiftool</strong> [ <strong>-ver</strong> | <strong>-list</strong>[<strong>w</strong>|<strong>f</strong>|<strong>wf</strong>|<strong>g</strong>[<em>NUM</em>]|<strong>d</strong>] ]</p>
+<p><strong>exiftool</strong> [ <strong>-ver</strong> | <strong>-list</strong>[<strong>w</strong>|<strong>f</strong>|<strong>wf</strong>|<strong>g</strong>[<em>NUM</em>]|<strong>d</strong>|<strong>x</strong>] ]</p>
 <p>For specific examples, see the <a href="#reading_examples">EXAMPLES</a> sections below.</p>
 <p>
 </p>
@@ -110,8 +110,8 @@ supported by ExifTool (r = read, w = write, c = create):</p>
   GIF   r/w     PNG   r/w</pre>
 <p>Note:  If <em>FILE</em> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are processed
-when any tag is written.  However, the <strong>-ext</strong> option may be used to force
-processing of files with any extension.</p>
+when any tag is written.  However, a filename may be specified or the
+<strong>-ext</strong> option may be used to force processing of files with any extension.</p>
 <p>
 </p>
 <hr />
@@ -152,15 +152,18 @@ interpreted as a tag name.</p>
   -htmlDump[OFFSET]                 Generate HTML-format binary dump
   -i DIR      (-ignore)             Ignore specified directory name
   -if EXPR                          Conditionally process files
+  -j          (-json)               Use JSON output format
   -k          (-pause)              Pause before terminating
   -l          (-long)               Use long 2-line output format
   -L          (-latin)              Use Windows Latin1 encoding
-  -list                             List all tag names
-  -listw                            List writable tag names
+  -lang [LANG]                      Set current language
+  -list [-GROUP:all]                List all tag names
+  -listw [-GROUP:all]               List writable tag names
   -listf                            List recognized file extensions
   -listwf                           List writable file extensions
   -listg[NUM]                       List groups in specified family
   -listd                            List deletable groups
+  -listx [-GROUP:all]               List tag database in XML format
   -m          (-ignoreMinorErrors)  Ignore minor errors
   -n          (--printConv)         Disable print conversion
   -o OUTFILE  (-out)                Set output file or directory name
@@ -243,9 +246,10 @@ and <code>-=</code> may be used to conditionally remove or replace a tag (see
 </dd>
 <dd>
 <p><em>TAG</em> may contain a leading family 0 or 1 group name separated by a colon.
-If no group name is specified, the information is written to the preferred
-group, which is the first group in the following list where <em>TAG</em> is valid:
-1) EXIF, 2) IPTC, 3) XMP, 4) MakerNotes.</p>
+If no group name is specified, the tag is created in the preferred group,
+and updated in any other location where the tag already exists.  The
+preferred group is the first group in the following list where <em>TAG</em> is
+valid: 1) EXIF, 2) IPTC, 3) XMP.</p>
 </dd>
 <dd>
 <p>The special <code>All</code> tag may be used in this syntax only if a <em>VALUE</em> is NOT
@@ -319,7 +323,7 @@ Output requested data in binary format without tag names or descriptions.
 This option is mainly used for extracting embedded images or other binary
 data, but it may also be useful for some text strings since control
 characters (such as newlines) are not replaced by '.' as they are in the
-default output.
+default output.  Also valid in combination with the <code>-X</code> option.
 </dd>
 <p></p>
 <dt><strong><a name="item_fmt"><strong>-c</strong> <em>FMT</em> (<strong>-coordFormat</strong>)</a></strong><br />
@@ -410,7 +414,11 @@ integer <em>OFFSET</em> to be specified for adjusting the maker notes base offse
 If no <em>OFFSET</em> is given, ExifTool takes its best guess at the correct base.
 Note that exiftool will automatically fix the offsets for images which store
 original offset information (ie. newer Canon models).  Offsets are fixed
-permanently if used when writing an image.
+permanently if <strong>-F</strong> is used when writing EXIF to an image. ie)
+</dd>
+<dd>
+<pre>
+    exiftool -F -exif:resolutionunit=inches image.jpg</pre>
 </dd>
 <p></p>
 <dt><strong><a name="item__2dfast"><strong>-fast</strong></a></strong><br />
@@ -503,6 +511,17 @@ conditions must be satisfied to process the file.  Below are a few examples:
     exiftool '-exif:iso&lt;iso' -if 'not $exif:iso' dir</pre>
 </dd>
 <p></p>
+<dt><strong><a name="item_j"><strong>-j</strong> (<strong>-json</strong>)</a></strong><br />
+</dt>
+<dd>
+Use JSON (JavaScript Object Notation) formatting for console output.  This
+option may be combined with <strong>-g</strong> to organize the output into objects by
+group, or <strong>-G</strong> to add group names to each tag.  List-type tags with
+multiple items are output as JSON arrays unless <strong>-sep</strong> is used.  The <strong>-a</strong>
+option is implied if the <strong>-g</strong> or <strong>-G</strong> options are used, otherwise
+it is ignored and duplicate tags are suppressed.
+</dd>
+<p></p>
 <dt><strong><a name="item_k"><strong>-k</strong> (<strong>-pause</strong>)</a></strong><br />
 </dt>
 <dd>
@@ -526,36 +545,66 @@ the default UTF-8.  When writing, <strong>-L</strong> is used to specify that in
 values are Latin1 instead of UTF-8.
 </dd>
 <p></p>
+<dt><strong><a name="item__2dlang__5blang_5d"><strong>-lang</strong> [<em>LANG</em>]</a></strong><br />
+</dt>
+<dd>
+Set current language for tag descriptions and converted values.  <em>LANG</em> is
+<code>de</code>, <code>fr</code>, <code>jp</code>, etc.  Use <strong>-lang</strong> with no other arguments to get a
+list of available languages.  The default language is <code>en</code> if <strong>-lang</strong> is
+not specified.  Note that tag/group names are always English, independent of
+the <strong>-lang</strong> setting, and translation of warning/error messages has not yet
+been implemented.
+</dd>
+<dd>
+<p>By default, ExifTool uses UTF-8 encoding for special characters.  The <strong>-L</strong>
+option should be used to switch to the Windows Latin1 character set on
+consoles using this encoding.</p>
+</dd>
+<dd>
+<p>Currently, the language support is not complete, but I welcome any
+translations submitted by users.  To submit a set of translations, first use
+the <strong>-listx</strong> option and redirect the output to a file to generate an XML
+tag database, then add entries for other languages, zip this file, and email
+it to phil at owl.phy.queensu.ca for inclusion in the next ExifTool release.</p>
+</dd>
+<p></p>
 <dt><strong><a name="item__2dlist_2c__2dlistw_2c__2dlistf_2c__2dlistwf_2c__2"><strong>-list</strong>, <strong>-listw</strong>, <strong>-listf</strong>, <strong>-listwf</strong>, <strong>-listg</strong>[<em>NUM</em>],
-<strong>-listd</strong></a></strong><br />
+<strong>-listd</strong>, <strong>-listx</strong></a></strong><br />
 </dt>
 <dd>
 Print a list of all valid tag names (<strong>-list</strong>), all writable tag names
 (<strong>-listw</strong>), all recognized file extensions (<strong>-listf</strong>), all writable file
 extensions (<strong>-listwf</strong>), all tag groups [in a specified family]
-(<strong>-listg</strong>[<em>NUM</em>]), or all deletable tag groups (<strong>-listd</strong>).  The <strong>-list</strong>
-and <strong>-listw</strong> options may be followed by an additional argument of the form
-<code>-GROUP:All</code> to list all tags in a specific group, where <code>GROUP</code> is one or
-more family 0-2 group names (excepting EXIF IFD groups) separated by colons.
-With <strong>-listg</strong>, <em>NUM</em> may be given to specify the group family, otherwise
-family 0 is assumed.  For example:
+(<strong>-listg</strong>[<em>NUM</em>]), all deletable tag groups (<strong>-listd</strong>), or an XML
+database of tag details (<strong>-listx</strong>).  The <strong>-list</strong>, <strong>-listw</strong> and <strong>-listx</strong>
+options may be followed by an additional argument of the form <code>-GROUP:All</code>
+to list all tags in a specific group, where <code>GROUP</code> is one or more family
+0-2 group names (excepting EXIF IFD groups) separated by colons.  With
+<strong>-listg</strong>, <em>NUM</em> may be given to specify the group family, otherwise family
+0 is assumed.  The <strong>-s</strong> option may be used before <strong>-listx</strong> to shorten the
+output by omitting the descriptions and values.  Here are some examples:
 </dd>
 <dd>
 <pre>
-    -list                # list all tag names
-    -list -EXIF:All      # list all EXIF tags
-    -list -xmp:time:all  # list all XMP tags relating to time
-    -listw -XMP-dc:All   # list all writable XMP-dc tags
-    -listf               # list all recognized file extensions
-    -listwf              # list all writable file extensions
-    -listg1              # list all groups in family 1
-    -listd               # list all deletable groups</pre>
+    -list               # list all tag names
+    -list -EXIF:All     # list all EXIF tags
+    -list -xmp:time:all # list all XMP tags relating to time
+    -listw -XMP-dc:All  # list all writable XMP-dc tags
+    -listf              # list all recognized file extensions
+    -listwf             # list all writable file extensions
+    -listg1             # list all groups in family 1
+    -listd              # list all deletable groups
+    -listx -EXIF:All    # list database of EXIF tags in XML format
+    -s -listx           # list short XML database of all tags</pre>
+</dd>
+<dd>
+<p>Note that none of the <strong>-list</strong> options require an input <em>FILE</em>.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item_m"><strong>-m</strong> (<strong>-ignoreMinorErrors</strong>)</a></strong><br />
 </dt>
 <dd>
-Ignore minor errors.  Allows writing if some minor errors occur, or
+Ignore minor errors.  This enables writing to a file with minor errors, or
 extraction of embedded images that aren't in standard JPG format.
 </dd>
 <p></p>
@@ -733,7 +782,8 @@ more whitespace characters.
 Output a tab-delimited list of description/values (useful for database
 import).  May be combined with <strong>-s</strong> to print tag names instead of
 descriptions, or <strong>-S</strong> to print tag values only, tab-delimited on a single
-line.
+line.  The <strong>-t</strong> option may also be used to add tag table information to the
+<strong>-X</strong> option output.
 </dd>
 <p></p>
 <dt><strong><a name="item_t"><strong>-T</strong> (<strong>-table</strong>)</a></strong><br />
@@ -836,14 +886,21 @@ command line.)  For example, the following two commands are not equivalent:</p>
     exiftool -tagsfromfile @ -xmp:title -xmp:title=NEW a.jpg</pre>
 </dd>
 <dd>
-<p>4) The normal behaviour of copied tags differs subtly from assigned tags for
-List-type tags.  When copying to a list, each copied tag overrides any
-previous operations on the list.  While this avoids duplicate list items
+<p>4) The normal behaviour of copied tags differs subtly from that of assigned
+tags for List-type tags.  When copying to a list, each copied tag overrides
+any previous operations on the list.  While this avoids duplicate list items
 when copying groups of tags from a file containing redundant information, it
-also prevents values from different tags from being copied into the same
-list when this is the intent.  To change this, a <strong>-addTagsFromFile</strong> option
-is provided to allow multiple items to be copied to the same list.  Other
-than this difference, <strong>-addTagsFromFile</strong> is equivalent to <strong>-tagsFromFile</strong>.</p>
+also prevents values of different tags from being copied into the same list
+when this is the intent.  So a <strong>-addTagsFromFile</strong> option is provided which
+allows copying of multiple tags into the same list.  ie)</p>
+</dd>
+<dd>
+<pre>
+    exiftool -addtagsfromfile @ '-subject&lt;make' '-subject&lt;model' ...</pre>
+</dd>
+<dd>
+<p>Other than this difference, the <strong>-tagsFromFile</strong> and <strong>-addTagsFromFile</strong>
+options are equivalent.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item_u"><strong>-u</strong> (<strong>-unknown</strong>)</a></strong><br />
@@ -965,14 +1022,19 @@ a <strong>-tagsFromFile</strong> option to exclude tags from being copied.
 </dt>
 <dd>
 Use RDF/XML formatting for console output.  Implies the <strong>-a</strong> option so
-duplicate tags are extracted.  The formatting options <strong>-D</strong>, <strong>-H</strong>, <strong>-l</strong>
-and <strong>-s</strong> may be used in combination with <strong>-X</strong> to affect the output, but
-note that tag ID's (<strong>-D</strong> and <strong>-H</strong> options) may not be added to the short
-(<strong>-s</strong>) output.  Another restriction of <strong>-s</strong> is that only one tag with a
-given group and name may appear in the output.  By default, list-type tags
-with multiple values are formatted as an RDF Bag, but they are combined into
-a single string when <strong>-sep</strong> or <strong>-s</strong> is used.  Using <strong>-L</strong> changes the XML
-encoding from ``UTF-8'' to ``windows-1252''.
+duplicate tags are extracted.  The formatting options <strong>-b</strong>, <strong>-D</strong>, <strong>-H</strong>,
+<strong>-l</strong>, <strong>-s</strong>, <strong>-sep</strong> and <strong>-t</strong> may be used in combination with <strong>-X</strong> to
+affect the output, but note that the tag ID (<strong>-D</strong>, <strong>-H</strong> and <strong>-t</strong>) and
+binary data (<strong>-b</strong>) options are not effective for the short output (<strong>-s</strong>).
+Another restriction of <strong>-s</strong> is that only one tag with a given group and
+name may appear in the output.  By default, list-type tags with multiple
+values are formatted as an RDF Bag, but they are combined into a single
+string when <strong>-sep</strong> or <strong>-s</strong> is used.  Using <strong>-L</strong> changes the XML encoding
+from ``UTF-8'' to ``windows-1252''. The <strong>-b</strong> option causes binary data values
+to be written, encoded in base64 if necessary.  The <strong>-t</strong> option has a
+different meaning when used with <strong>-X</strong> -- it causes tag table information
+(table <code>name</code>, decimal tag <code>id</code>, and <code>index</code> for cases where multiple
+conditional tags exist with the same ID) to be included in the output.
 </dd>
 <p></p>
 <dt><strong><a name="item_z"><strong>-z</strong> (<strong>-zip</strong>)</a></strong><br />

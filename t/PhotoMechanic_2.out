@@ -1,18 +1,18 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
-[File, File, Image]  - File Name: PhotoMechanic.jpg
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 3.3 kB
-[File, File, Time]  - File Modification Date/Time: 2006:10:31 12:53:49-05:00
-[File, File, Image]  - File Type: JPEG
-[File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Current IPTC Digest: 2c19015ea7e2d138576e147a3f093c1a
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: PhotoMechanic.jpg
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 3.3 kB
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:10:31 12:53:49-05:00
+[File, File, Image] FileType - File Type: JPEG
+[File, File, Image] MIMEType - MIME Type: image/jpeg
+[File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 2c19015ea7e2d138576e147a3f093c1a
 [File, File, Image] ImageWidth - Image Width: 8
 [File, File, Image] ImageHeight - Image Height: 8
 [File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
 [File, File, Image] BitsPerSample - Bits Per Sample: 8
 [File, File, Image] ColorComponents - Color Components: 3
 [File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
-[File, File, Image]  - Current IPTC Digest: 3966859223dfd48164eafc7ad95e2a38
+[File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 3966859223dfd48164eafc7ad95e2a38
 [IPTC, IPTC, Other] 0 - Application Record Version: 3
 [IPTC, IPTC, Time] 55 - Date Created: 2006:10:29
 [IPTC, IPTC, Time] 60 - Time Created: 06:27:51-05:00
@@ -33,7 +33,7 @@
 [IPTC, IPTC, Other] 120 - Caption-Abstract: Caption
 [IPTC, IPTC, Other] 105 - Headline: Headline
 [IPTC, IPTC, Other] 40 - Special Instructions: Special ins
-[IPTC, IPTC, Other] 10 - Urgency: 8
+[IPTC, IPTC, Other] 10 - Urgency: 8 (least urgent)
 [IPTC, IPTC, Author] 116 - Copyright Notice: Copyright
 [IPTC, IPTC, Image] 221 - Prefs: Tagged:0, ColorClass:0, Rating:0, FrameNum:-00001
 [Photoshop, Photoshop, Image] 0 - X Resolution: 200
@@ -74,6 +74,6 @@
 [PhotoMechanic, PhotoMechanic, Image] 218 - Crop Top: 618
 [PhotoMechanic, PhotoMechanic, Image] 219 - Crop Right: 890
 [PhotoMechanic, PhotoMechanic, Image] 220 - Crop Bottom: 1072
-[Composite, Composite, Time]  - Date/Time Created: 2006:10:29 06:27:51-05:00
-[Composite, Composite, Time]  - Date/Time Original: 2006:10:29 06:27:51-05:00
-[Composite, Composite, Image]  - Image Size: 8x8
+[Composite, Composite, Time] DateTimeCreated - Date/Time Created: 2006:10:29 06:27:51-05:00
+[Composite, Composite, Time] DateTimeOriginal - Date/Time Original: 2006:10:29 06:27:51-05:00
+[Composite, Composite, Image] ImageSize - Image Size: 8x8

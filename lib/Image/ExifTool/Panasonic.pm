@@ -24,7 +24,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.31';
+$VERSION = '1.32';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -46,7 +46,7 @@ my %shootingMode = (
     13 => 'Panning',
     14 => 'Simple', #PH (LZ6)
     15 => 'Color Effects', #7
-    # 16 => 'His XX RI?', #7
+    16 => 'Self Portrait', #PH (TZ5)
     # 17 => 'Eco Mode?', #7
     18 => 'Fireworks',
     19 => 'Party',
@@ -68,6 +68,7 @@ my %shootingMode = (
     # 35 => 'NOTE?', #7
     36 => 'High Speed Continuous Shooting', #7
     37 => 'Intelligent Auto', #7
+    39 => 'Multi-aspect', #PH (TZ5)
 );
 
 %Image::ExifTool::Panasonic::Main = (
@@ -264,10 +265,12 @@ my %shootingMode = (
     0x2a => { #4
         Name => 'BurstMode',
         Writable => 'int16u',
+        Notes => 'decoding may be different for some models',
         PrintConv => {
             0 => 'Off',
-            1 => 'Low/High Quality',
+            1 => 'On', #PH (TZ5) [was "Low/High Quality" from ref 4]
             2 => 'Infinite',
+            4 => 'Unlimited', #PH (TZ5)
         },
     },
     0x2b => { #4
@@ -288,7 +291,7 @@ my %shootingMode = (
             0 => 'Normal',
             1 => 'Low',
             2 => 'High',
-            # 3 - observed with LZ6 - PH
+            # 3 - observed with LZ6 and TZ5 in Fireworks mode - PH
             # 5 - observed with FX01 - PH
             6 => 'Medium Low', #PH (FZ18)
             7 => 'Medium High', #PH (FZ18)
@@ -314,8 +317,8 @@ my %shootingMode = (
         Writable => 'int16u',
         PrintConv => {
             1 => 'Off',
-            2 => '10s',
-            3 => '2s',
+            2 => '10 s',
+            3 => '2 s',
         },
     },
     # 0x2f - values: 1 (LZ6,FX10K)
@@ -329,6 +332,7 @@ my %shootingMode = (
         },
     },
     # 0x31 - values: 1-5 some sort of mode? (changes with FOC-L) (PH/10)
+    #        - changed from 2 to 4 when AFAssist was turned off - PH (TZ5)
     0x32 => { #7
         Name => 'ColorMode',
         Writable => 'int16u',
@@ -369,8 +373,8 @@ my %shootingMode = (
         PrintConv => '$val == 65535 ? "n/a" : $val',
         PrintConvInv => '$val =~ /(\d+)/ ? $1 : $val',
     },
-    # 0x37 - values: 0,1,2 (LZ6, 0 for movie preview) and 257 (FX10K)
-    # 0x38 - values: 0,1,2 (LZ6, same as 0x37) and 1,2 (FX10K)
+    # 0x37 - values: 0,1,2 (LZ6, 0 for movie preview); 257 (FX10K); 0,256 (TZ5, 0 for movie preview)
+    # 0x38 - values: 0,1,2 (LZ6, same as 0x37); 1,2 (FX10K); 0,256 (TZ5, 0 for movie preview)
     0x39 => { #7 (L1/L10)
         Name => 'Contrast',
         Format => 'int16s',
@@ -386,13 +390,24 @@ my %shootingMode = (
             2 => 'Destination',
         },
     },
-    # 0x3b - values: 1 (LZ6, FX10K)
+    0x3b => { #PH (TZ5)
+        # (same as tags 0x3e, 0x8008 and 0x8009 in all my samples - PH)
+        Name => 'TextStamp',
+        Writable => 'in16u',
+        PrintConv => { 1 => 'Off', 2 => 'On' },
+    },
     0x3c => { #PH
         Name => 'ProgramISO',
         Writable => 'int16u',
         PrintConv => '$val == 65535 ? "n/a" : $val',
         PrintConvInv => '$val eq "n/a" ? 65535 : $val',
     },
+    # 0x3d - values: 5=full auto, 1=program, auto ISO (PH,TZ5)
+    # 0x3e => { #PH (TZ5)
+    #     Name => 'TextStamp2',
+    #     Writable => 'in16u',
+    #     PrintConv => { 1 => 'Off', 2 => 'On' },
+    # },
     0x40 => { #7 (L1/L10)
         Name => 'Saturation',
         Format => 'int16s',
@@ -480,7 +495,21 @@ my %shootingMode = (
         Name => 'WBBlueLevel',
         Writable => 'int16u',
     },
-    # 0x8007 - values: 1,2
+    0x8007 => { #PH
+        Name => 'FlashFired',
+        Writable => 'int16u',
+        PrintConv => { 1 => 'No', 2 => 'Yes' },
+    },
+    # 0x8008 => { #PH (TZ5)
+    #     Name => 'TextStamp3',
+    #     Writable => 'in16u',
+    #     PrintConv => { 1 => 'Off', 2 => 'On' },
+    # },
+    # 0x8009 => { #PH (TZ5)
+    #     Name => 'TextStamp4',
+    #     Writable => 'in16u',
+    #     PrintConv => { 1 => 'Off', 2 => 'On' },
+    # },
     0x8010 => { #PH
         Name => 'BabyAge',
         Writable => 'string',

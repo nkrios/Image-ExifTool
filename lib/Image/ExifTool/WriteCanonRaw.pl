@@ -165,7 +165,6 @@ sub SaveMakerNotes($)
 sub CheckCanonRaw($$$)
 {
     my ($exifTool, $tagInfo, $valPtr) = @_;
-    Image::ExifTool::GenerateTagIDs($$tagInfo{Table});
     my $tagName = $$tagInfo{Name};
     if ($tagName eq 'JpgFromRaw' or $tagName eq 'ThumbnailImage') {
         unless ($$valPtr =~ /^\xff\xd8/ or $exifTool->Options('IgnoreMinorErrors')) {

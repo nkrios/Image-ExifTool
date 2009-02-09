@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.14';
+$VERSION = '1.16';
 
 sub ProcessICC($$);
 sub ProcessICC_Profile($$$);
@@ -83,6 +83,7 @@ my %profileClass = (
     chad => 'ChromaticAdaptation',
     chrm => {
         Name => 'Chromaticity',
+        Groups => { 1 => 'ICC_Profile#' }, #(just for the group list)
         SubDirectory => {
             TagTable => 'Image::ExifTool::ICC_Profile::Chromaticity',
             Validate => '$type eq "chrm"',
@@ -96,7 +97,10 @@ my %profileClass = (
             Validate => '$type eq "clrt"',
         },
     },
-    cprt => 'ProfileCopyright',
+    cprt => {
+        Name => 'ProfileCopyright',
+        ValueConv => '$val=~s/\0.*//; $val', # may be null terminated
+    },
     crdi => 'CRDInfo', #2
     dmnd => {
         Name => 'DeviceMfgDesc',
@@ -195,7 +199,7 @@ my %profileClass = (
     mmod => 'MakeAndModel',
     dscm => 'ProfileDescriptionML',
     ndin => 'NativeDisplayInfo',
-    
+
     # Microsoft custom tags (ref http://msdn2.microsoft.com/en-us/library/ms536870.aspx)
     MS00 => 'WCSProfiles',
 

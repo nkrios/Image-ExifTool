@@ -31,6 +31,7 @@ information is extracted.
   <br>WB_RBGGLevels
   <br>WB_GRBGLevels
   <br>WB_GRGBLevels
+  <br>WB_GBRGLevels
   <br>WB_RGBLevels
   <br>WB_RBLevels
   <br>WBBlueLevel
@@ -71,13 +72,15 @@ D/1440, where D is the focal plane diagonal in mm)</span></span></td></tr>
 <tr class=b>
 <td>DateTimeCreated</td>
 <td class=c>N</td>
-<td>DateCreated
-  <br>TimeCreated</td>
+<td>IPTC:DateCreated
+  <br>IPTC:TimeCreated</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>DateTimeOriginal</td>
 <td class=c>N</td>
-<td>DateTimeCreated</td>
+<td>DateTimeCreated
+  <br>DateCreated
+  <br>TimeCreated</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>DigitalZoom</td>
@@ -334,6 +337,7 @@ by adding user-defined lenses)</span></span></td></tr>
   <br>WB_RBGGLevels
   <br>WB_GRBGLevels
   <br>WB_GRGBLevels
+  <br>WB_GBRGLevels
   <br>WB_RGBLevels
   <br>WB_RBLevels
   <br>WBRedLevel
@@ -386,10 +390,22 @@ by adding user-defined lenses)</span></span></td></tr>
   <br>BulbDuration</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>SubSecCreateDate</td>
+<td class=c>N</td>
+<td>EXIF:CreateDate
+  <br>SubSecTimeDigitized</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>SubSecDateTimeOriginal</td>
 <td class=c>N</td>
-<td>DateTimeOriginal
+<td>EXIF:DateTimeOriginal
   <br>SubSecTimeOriginal</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>SubSecModifyDate</td>
+<td class=c>N</td>
+<td>EXIF:ModifyDate
+  <br>SubSecTime</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>ThumbnailImage</td>
@@ -416,7 +432,7 @@ by adding user-defined lenses)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 31, 2008</i>
+<br><i>Last revised Jan 20, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

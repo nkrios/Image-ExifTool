@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.52
-[File, File, Image]  - File Name: PostScript.eps
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 11 kB
-[File, File, Time]  - File Modification Date/Time: 2008:11:03 09:32:08-05:00
-[File, File, Image]  - File Type: EPS
-[File, File, Image]  - MIME Type: application/postscript
-[File, File, Image]  - Current IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: PostScript.eps
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 11 kB
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:11:03 19:04:15-05:00
+[File, File, Image] FileType - File Type: EPS
+[File, File, Image] MIMEType - MIME Type: application/postscript
+[File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
 [PostScript, PostScript, Image] Creator - Creator: Adobe Photoshop Version 7.0.1
 [PostScript, PostScript, Image] Title - Title: c.eps
 [PostScript, PostScript, Time] CreationDate - Create Date: 7/18/05 2:33 PM
@@ -28,7 +28,7 @@
 [IPTC, IPTC, Other] 103 - Original Transmission Reference: What is a transmission reference
 [IPTC, IPTC, Other] 15 - Category: 1
 [IPTC, IPTC, Other] 20 - Supplemental Categories: amazing, image, utilities
-[IPTC, IPTC, Other] 10 - Urgency: 8
+[IPTC, IPTC, Other] 10 - Urgency: 8 (least urgent)
 [IPTC, IPTC, Other] 25 - Keywords: ExifTool, Test, XMP
 [IPTC, IPTC, Author] 116 - Copyright Notice: Copyright 2004 Phil Harvey
 [Photoshop, Photoshop, Image] 1061 - IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
@@ -56,6 +56,6 @@
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey
 [XMP, XMP-dc, Image] title - Title: Test IPTC picture
 [XMP, XMP-dc, Image] subject - Subject: ExifTool, Test, XMP
-[Composite, Composite, Image]  - Image Height: 8
-[Composite, Composite, Image]  - Image Width: 8
-[Composite, Composite, Image]  - Image Size: 8x8
+[Composite, Composite, Image] ImageHeight - Image Height: 8
+[Composite, Composite, Image] ImageWidth - Image Width: 8
+[Composite, Composite, Image] ImageSize - Image Size: 8x8

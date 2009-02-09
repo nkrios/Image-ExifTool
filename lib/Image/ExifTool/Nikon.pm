@@ -29,6 +29,7 @@
 #              15) http://tomtia.plala.jp/DigitalCamera/MakerNote/index.asp
 #              16) Jeffrey Friedl private communication (D200 with firmware update)
 #              17) http://www.wohlberg.net/public/software/photo/nstiffexif/
+#                  and Brendt Wohlberg private communication
 #              18) Anonymous user private communication (D70, D200, D2x)
 #              19) Bruce Stevens private communication
 #              20) Vladimir Sauta private communication (D80)
@@ -48,7 +49,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.01';
+$VERSION = '2.02';
 
 sub LensIDConv($$$);
 sub FlashModelConv($$$);
@@ -615,7 +616,7 @@ my %retouchValues = (
             TagTable => 'Image::ExifTool::Nikon::WorldTime',
             # (CaptureNX does flip the byte order of this record)
         },
-    },        
+    },
     0x0025 => { #PH
         Name => 'ISOInfo',
         SubDirectory => {
@@ -1179,6 +1180,11 @@ my %retouchValues = (
         PrintConv => 'sprintf("%.2f %.2f %.2f",split(" ",$val))',
         PrintConvInv => '$val',
     },
+    0x60 => {
+        Name => 'ScanImageEnhancer',
+        Writable => 'int32u',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
     0x100 => { Name => 'DigitalICE', Writable => 'string' },
     0x110 => {
         Name => 'ROCInfo',
@@ -1188,6 +1194,9 @@ my %retouchValues = (
         Name => 'GEMInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::GEM' },
     },
+    0x200 => { Name => 'DigitalDEEShadowAdj',   Writable => 'int32u' },
+    0x201 => { Name => 'DigitalDEEThreshold',   Writable => 'int32u' },
+    0x202 => { Name => 'DigitalDEEHighlightAdj',Writable => 'int32u' },
 );
 
 # ref 17
@@ -2799,7 +2808,7 @@ my %nikonFocalConversions = (
             0x03 => '20 s',
         },
     },
-    733.1 => { # CS17
+    732.4 => { # CS17
         Name => 'RemoteOnDuration',
         Mask => 0xc0,
         PrintConv => {
@@ -2809,7 +2818,7 @@ my %nikonFocalConversions = (
             0xc0 => '15 min',
         },
     },
-    733.2 => { # CS12
+    733.1 => { # CS12
         Name => 'AELockButton',
         Mask => 0x0e,
         PrintConv => {
@@ -2820,7 +2829,7 @@ my %nikonFocalConversions = (
             0x08 => 'AF-ON',
         },
     },
-    733.3 => { # CS13
+    733.2 => { # CS13
         Name => 'AELock',
         Mask => 0x01,
         PrintConv => {
@@ -4374,7 +4383,7 @@ sub PrescanExif($$$)
     if ($dirStart >= 0 and $dirStart <= $dataLen-2) {
         $numEntries = Get16u($dataPt, $dirStart);
         # reset $numEntries to read from file if necessary
-        undef $numEntries if $dirStart + 2 + 12 * $numEntries > $dataLen; 
+        undef $numEntries if $dirStart + 2 + 12 * $numEntries > $dataLen;
     }
     # read IFD from file if necessary
     unless ($numEntries) {
@@ -4538,9 +4547,9 @@ under the same terms as Perl itself.
 
 Thanks to Joseph Heled, Thomas Walter, Brian Ristuccia, Danek Duvall, Tom
 Christiansen, Robert Rottmerhusen, Werner Kober, Roger Larsson, Jens Duttke,
-Gregor Dorlars, Neil Nappe and Alexandre Naaman for their help figuring out
-some Nikon tags, and Bruce Stevens, Vladimir Sauta and Tanel Kuusk for their
-additions to the LensID list.
+Gregor Dorlars, Neil Nappe, Alexandre Naaman and Brendt Wohlberg for their
+help figuring out some Nikon tags, and Bruce Stevens, Vladimir Sauta and
+Tanel Kuusk for their additions to the LensID list.
 
 =head1 SEE ALSO
 

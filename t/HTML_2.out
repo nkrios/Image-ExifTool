@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.42
-[File, File, Image]  - File Name: HTML.html
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 2.1 kB
-[File, File, Time]  - File Modification Date/Time: 2007:02:18 10:47:47
-[File, File, Image]  - File Type: HTML
-[File, File, Image]  - MIME Type: text/html
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: HTML.html
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 2.1 kB
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2007:02:17 19:44:20-05:00
+[File, File, Image] FileType - File Type: HTML
+[File, File, Image] MIMEType - MIME Type: text/html
 [HTML, HTML, Document] title - Title: ExifTool HTML Test
 [HTML, HTTP-equiv, Document] content-type - Content Type: text/html; charset="iso-8859-1"
 [HTML, HTML-dc, Document] title - Title: ExifTool HTML Test

@@ -14,12 +14,12 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.27';
+$VERSION = '1.29';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
    # don't translate these (at least until we handle ISO 2022 shift codes)
-   # because the sets are only designated and not invoked 
+   # because the sets are only designated and not invoked
    # "\x1b,A"  => 'Latin',  # G0 = ISO 8859-1 (similar to Latin1, but codes 0x80-0x9f are missing)
    # "\x1b-A"  => 'Latin',  # G1     "
    # "\x1b.A"  => 'Latin',  # G2
@@ -104,6 +104,7 @@ my %fileFormat = (
     },
     9 => {
         Name => 'IPTCPostObjectData',
+        Groups => { 1 => 'IPTC#' }, #(just so this shows up in group list)
         SubDirectory => {
             TagTable => 'Image::ExifTool::IPTC::PostObjectData',
         },
@@ -153,6 +154,18 @@ my %fileFormat = (
     60 => {
         Name => 'EnvelopePriority',
         Format => 'digits[1]',
+        PrintConv => {
+            0 => '0 (reserved)',
+            1 => '1 (most urgent)',
+            2 => 2,
+            3 => 3,
+            4 => 4,
+            5 => '5 (normal urgency)',
+            6 => 6,
+            7 => 7,
+            8 => '8 (least urgent)',
+            9 => '9 (user-defined priority)',
+        },
     },
     70 => {
         Name => 'DateSent',
@@ -228,10 +241,25 @@ my %fileFormat = (
     8 => {
         Name => 'EditorialUpdate',
         Format => 'digits[2]',
+        PrintConv => {
+            '01' => 'Additional language',
+        },
     },
     10 => {
         Name => 'Urgency',
         Format => 'digits[1]',
+        PrintConv => {
+            0 => '0 (reserved)',
+            1 => '1 (most urgent)',
+            2 => 2,
+            3 => 3,
+            4 => 4,
+            5 => '5 (normal urgency)',
+            6 => 6,
+            7 => 7,
+            8 => '8 (least urgent)',
+            9 => '9 (user-defined priority)',
+        },
     },
     12 => {
         Name => 'SubjectReference',
@@ -862,7 +890,7 @@ sub PrintCodedCharset($)
     $val =~ s/^,? //;
     return $val;
 }
-        
+
 #------------------------------------------------------------------------------
 # Handle CodedCharacterSet
 # Inputs: 0) ExifTool ref, 1) CodedCharacterSet value
@@ -932,7 +960,7 @@ sub ProcessIPTC($$$)
     # begin by assuming IPTC is Latin (so no translation if Charset is Latin)
     my $xlat = $exifTool->Options('Charset');
     undef $xlat if $xlat eq 'Latin';
-    
+
     $verbose and $dirInfo and $exifTool->VerboseDir('IPTC', 0, $$dirInfo{DirLen});
     if ($tagTablePtr eq \%Image::ExifTool::IPTC::Main) {
         my $dirCount = ($exifTool->{DIR_COUNT}->{IPTC} || 0) + 1;
@@ -1034,6 +1062,7 @@ sub ProcessIPTC($$$)
                     }
                 }
             } elsif ($format =~ /^string/) {
+                $val =~ s/\0+$//;   # some braindead softwares add null terminators
                 if ($rec == 1) {
                     # handle CodedCharacterSet tag
                     $xlat = HandleCodedCharset($exifTool, $val) if $tag == 90;
@@ -1042,7 +1071,9 @@ sub ProcessIPTC($$$)
                     # translate to specified character set
                     TranslateCodedString($exifTool, \$val, \$xlat, 1);
                 }
-            } elsif ($format !~ /^digits/) {
+            } elsif ($format =~ /^digits/) {
+                $val =~ s/\0+$//;
+            } else {
                 warn("Invalid IPTC format: $format");
             }
         }

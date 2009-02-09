@@ -10,6 +10,7 @@
 #               3) Thomas Bodenmann private communication
 #               4) Philippe Devaux private communication (A700)
 #               5) Marcus Holland-Moritz private communication (A700)
+#               6) Andrey Tverdokhleb private communication
 #               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -21,7 +22,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -294,13 +295,21 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             MaxSubdirs => 20, # an A700 ARW has 14 of these! - PH
         },
     },
+    0x7313 => 'WB_RGGBLevels', #6
     0x74a0 => 'MaxApertureAtMaxFocal', #PH
     0x74a1 => 'MaxApertureAtMinFocal', #PH
+    0x7820 => 'WB_RGBLevelsDaylight', #6
+    0x7821 => 'WB_RGBLevelsCloudy', #6
+    0x7822 => 'WB_RGBLevelsTungsten', #6
+    0x7825 => 'WB_RGBLevelsShade', #6
+    0x7826 => 'WB_RGBLevelsFluorescent', #6
+    0x7828 => 'WB_RGBLevelsFlash', #6
 );
 
 %Image::ExifTool::Sony::SR2DataIFD = (
     GROUPS => { 0 => 'MakerNotes', 1 => 'SR2DataIFD', 2 => 'Camera' },
     SET_GROUP1 => 1, # set group1 name to directory name for all tags in table
+    # 0x7313 => 'WB_RGGBLevels', (duplicated in all SR2DataIFD's)
     0x7770 => { #PH
         Name => 'ColorMode',
         Priority => 0,
@@ -470,7 +479,7 @@ sub ProcessSR2($$$)
         if (($raf and $raf->Seek($offset+$base, 0) and
                 $raf->Read($buff, $length) == $length) or
             # or read from data (when processing Adobe DNGPrivateData)
-            ($offset - $dataPos >= 0 and $offset - $dataPos + $length < $dataLen and 
+            ($offset - $dataPos >= 0 and $offset - $dataPos + $length < $dataLen and
                 ($buff = substr($$dataPt, $offset - $dataPos, $length))))
         {
             Decrypt(\$buff, 0, $length, $key);
@@ -490,7 +499,7 @@ sub ProcessSR2($$$)
                     DirName => "SR2SubIFD$num",
                     DataPos => $dPos,
                 );
-                my $subTable = Image::ExifTool::GetTagTable('Image::ExifTool::Sony::SR2SubIFD');
+                my $subTable = GetTagTable('Image::ExifTool::Sony::SR2SubIFD');
                 $result = $exifTool->ProcessDirectory(\%dirInfo, $subTable);
                 last unless @offsets;
                 $offset = shift @offsets;
@@ -549,8 +558,8 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Thomas Bodenmann, Philippe Devaux, JensDuttke and Marcus
-Holland-Moritz for help decoding some tags.
+Thanks to Thomas Bodenmann, Philippe Devaux, Jens Duttke, Marcus
+Holland-Moritz and Andrey Tverdokhleb for help decoding some tags.
 
 =head1 SEE ALSO
 

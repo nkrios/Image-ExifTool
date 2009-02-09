@@ -77,7 +77,7 @@ my $pdfVer;         # version of PDF file being processed
         Groups => { 2 => 'Time' },
         Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
-        PrintConvInv => '$self->InverseDateTime($val)', 
+        PrintConvInv => '$self->InverseDateTime($val)',
     },
     ModDate => {
         Name => 'ModifyDate',
@@ -85,7 +85,7 @@ my $pdfVer;         # version of PDF file being processed
         Groups => { 2 => 'Time' },
         Shift => 'Time',
         PrintConv => '$self->ConvertDateTime($val)',
-        PrintConvInv => '$self->InverseDateTime($val)', 
+        PrintConvInv => '$self->InverseDateTime($val)',
     },
     Trapped => {
         Protected => 1,
@@ -1260,7 +1260,7 @@ sub ProcessDict($$$$;$$)
 #
 # extract information from joined streams if necessary
 #
-    
+
     if (%join) {
         my ($tag, $i);
         foreach $tag (sort keys %join) {

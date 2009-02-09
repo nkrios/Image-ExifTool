@@ -1,12 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.53
-[File, File, Image]  - File Name: CanonRaw_6_failed.cr2
-[File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 11 kB
-[File, File, Time]  - File Modification Date/Time: 2008:11:10 12:45:51-05:00
-[File, File, Image]  - File Type: CR2
-[File, File, Image]  - MIME Type: image/x-raw
-[File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
-[File, File, Image]  - Current IPTC Digest: 74386a2844191f61317ffa999148834a
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.66
+[File, File, Image] FileName - File Name: CanonRaw_6_failed.cr2
+[File, File, Image] Directory - Directory: t
+[File, File, Image] FileSize - File Size: 11 kB
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:07 15:06:21-05:00
+[File, File, Image] FileType - File Type: CR2
+[File, File, Image] MIMEType - MIME Type: image/x-raw
+[File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
+[File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 74386a2844191f61317ffa999148834a
 [EXIF, IFD0, Image] 256 - Image Width: 1536
 [EXIF, IFD0, Image] 257 - Image Height: 1024
 [EXIF, IFD0, Image] 258 - Bits Per Sample: 8 8 8
@@ -32,7 +32,7 @@
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 8.0
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Average
-[EXIF, ExifIFD, Camera] 37385 - Flash: Off
+[EXIF, ExifIFD, Camera] 37385 - Flash: Off, Did not fire
 [EXIF, ExifIFD, Camera] 37386 - Focal Length: 55.0 mm
 [EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
@@ -64,7 +64,7 @@
 [EXIF, IFD3, Image] 273 - Strip Offsets: 11474
 [EXIF, IFD3, Image] 279 - Strip Byte Counts: 16
 [EXIF, IFD3, Image] 50752 - Raw Image Segmentation: 1 1758 1758
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.53
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.66
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [IPTC, IPTC, Other] 25 - Keywords: CR2 test
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
@@ -206,24 +206,24 @@
 [MakerNotes, Canon, Camera] 70 - WB RGGB Levels Custom 2: 2312 1022 1024 1501
 [MakerNotes, Canon, Camera] 74 - Color Temp Custom 2: 5200
 [MakerNotes, Canon, Camera] 2 - Color Tone: Normal
-[Composite, Composite, Image]  - Aperture: 8.0
-[Composite, Composite, Camera]  - Drive Mode: Single-frame shooting
-[Composite, Composite, Camera]  - Flash: Off
-[Composite, Composite, Camera]  - ISO: 400
-[Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm
-[Composite, Composite, Camera]  - Lens ID: Unknown 18-55mm
-[Composite, Composite, Image]  - Preview Image: (Binary data 26 bytes)
-[Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 1.6
-[Composite, Composite, Camera]  - Shooting Mode: Aperture-priority AE
-[Composite, Composite, Image]  - Shutter Speed: 1/15
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera]  - WB RGGB Levels: 2002 1185 1187 2364
-[Composite, Composite, Camera]  - Blue Balance: 1.993255
-[Composite, Composite, Camera]  - Circle Of Confusion: 0.019 mm
-[Composite, Composite, Image]  - Field Of View: 22.8 deg
-[Composite, Composite, Camera]  - Focal Length: 55.0 mm (35 mm equivalent: 89.2 mm)
-[Composite, Composite, Camera]  - Hyperfocal Distance: 20.42 m
-[Composite, Composite, Image]  - Image Size: 1536x1024
-[Composite, Composite, Camera]  - Lens: 18.0 - 55.0 mm (35 mm equivalent: 29.2 - 89.2 mm)
-[Composite, Composite, Image]  - Light Value: 7.9
-[Composite, Composite, Camera]  - Red Balance: 1.688027
+[Composite, Composite, Image] Aperture - Aperture: 8.0
+[Composite, Composite, Camera] DriveMode - Drive Mode: Single-frame shooting
+[Composite, Composite, Camera] FlashOn - Flash: Off
+[Composite, Composite, Camera] ISO - ISO: 400
+[Composite, Composite, Camera] Lens - Lens: 18.0 - 55.0 mm
+[Composite, Composite, Camera] LensID - Lens ID: Unknown 18-55mm
+[Composite, Composite, Image] PreviewImage - Preview Image: (Binary data 26 bytes)
+[Composite, Composite, Camera] ScaleFactor35efl - Scale Factor To 35 mm Equivalent: 1.6
+[Composite, Composite, Camera] ShootingMode - Shooting Mode: Aperture-priority AE
+[Composite, Composite, Image] ShutterSpeed - Shutter Speed: 1/15
+[Composite, Composite, Image] ThumbnailImage - Thumbnail Image: (Binary data 28 bytes)
+[Composite, Composite, Camera] WB_RGGBLevels - WB RGGB Levels: 2002 1185 1187 2364
+[Composite, Composite, Camera] BlueBalance - Blue Balance: 1.993255
+[Composite, Composite, Camera] CircleOfConfusion - Circle Of Confusion: 0.019 mm
+[Composite, Composite, Image] FOV - Field Of View: 22.8 deg
+[Composite, Composite, Camera] FocalLength35efl - Focal Length: 55.0 mm (35 mm equivalent: 89.2 mm)
+[Composite, Composite, Camera] HyperfocalDistance - Hyperfocal Distance: 20.42 m
+[Composite, Composite, Image] ImageSize - Image Size: 1536x1024
+[Composite, Composite, Camera] Lens35efl - Lens: 18.0 - 55.0 mm (35 mm equivalent: 29.2 - 89.2 mm)
+[Composite, Composite, Image] LightValue - Light Value: 7.9
+[Composite, Composite, Camera] RedBalance - Red Balance: 1.688027

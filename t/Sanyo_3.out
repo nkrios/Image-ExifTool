@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.42
-[File, File, Image]  - File Name: Sanyo_3_failed.jpg
-[File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 2.1 kB
-[File, File, Time]  - File Modification Date/Time: 2008:09:09 13:27:41
-[File, File, Image]  - File Type: JPEG
-[File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: Sanyo_3_failed.jpg
+[File, File, Image] Directory - Directory: t
+[File, File, Image] FileSize - File Size: 2.1 kB
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:01 07:56:31-05:00
+[File, File, Image] FileType - File Type: JPEG
+[File, File, Image] MIMEType - MIME Type: image/jpeg
+[File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
 [File, File, Image] ImageWidth - Image Width: 8
 [File, File, Image] ImageHeight - Image Height: 8
 [File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
@@ -95,13 +95,13 @@
 [MakerNotes, Sanyo, Camera] 549 - Flash Mode: Force
 [MakerNotes, Sanyo, Camera] 3840 - Data Dump: (Binary data 260 bytes)
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x00000001
-[Composite, Composite, Image]  - Aperture: 6.9
-[Composite, Composite, Image]  - Image Size: 8x8
-[Composite, Composite, Camera]  - Scale Factor To 35 mm Equivalent: 481.1
-[Composite, Composite, Image]  - Shutter Speed: 1/185
-[Composite, Composite, Image]  - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera]  - Circle Of Confusion: 0.000 mm
-[Composite, Composite, Image]  - Field Of View: 0.2 deg
-[Composite, Composite, Camera]  - Focal Length: 23.1 mm (35 mm equivalent: 11113.0 mm)
-[Composite, Composite, Camera]  - Hyperfocal Distance: 1238.24 m
-[Composite, Composite, Image]  - Light Value: 11.1
+[Composite, Composite, Image] Aperture - Aperture: 6.9
+[Composite, Composite, Image] ImageSize - Image Size: 8x8
+[Composite, Composite, Camera] ScaleFactor35efl - Scale Factor To 35 mm Equivalent: 481.1
+[Composite, Composite, Image] ShutterSpeed - Shutter Speed: 1/185
+[Composite, Composite, Image] ThumbnailImage - Thumbnail Image: (Binary data 28 bytes)
+[Composite, Composite, Camera] CircleOfConfusion - Circle Of Confusion: 0.000 mm
+[Composite, Composite, Image] FOV - Field Of View: 0.2 deg
+[Composite, Composite, Camera] FocalLength35efl - Focal Length: 23.1 mm (35 mm equivalent: 11113.0 mm)
+[Composite, Composite, Camera] HyperfocalDistance - Hyperfocal Distance: 1238.24 m
+[Composite, Composite, Image] LightValue - Light Value: 11.1

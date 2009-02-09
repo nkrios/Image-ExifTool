@@ -24,9 +24,9 @@ package Image::ExifTool::Photoshop;
 
 use strict;
 use vars qw($VERSION $AUTOLOAD);
-use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.36';
+$VERSION = '1.37';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -204,7 +204,16 @@ my %psdMap = (
     0x042a => { Unknown => 1, Name => 'AlternateDuotoneColors' }, #5
     0x042b => { Unknown => 1, Name => 'AlternateSpotColors' }, #5
     # 0x07d0-0x0bb6 Path information
-    0x0bb7 => { Unknown => 1, Name => 'ClippingPathName' },
+    0x0bb7 => {
+        Name => 'ClippingPathName',
+        # convert from a Pascal string
+        ValueConv => q{
+            my $len = ord($val);
+            $val = substr($val, 1, $len) if $len < length($val);
+            return $val;
+        },
+        # there are 6 bytes of unknown information that follow the name
+    },
     0x2710 => { Unknown => 1, Name => 'PrintFlagsInfo' },
 );
 
@@ -369,7 +378,7 @@ sub ProcessPhotoshop($$$)
         if ($type eq '8BIM') {
             $ttPtr = $tagTablePtr;
         } elsif ($type =~ /^(PHUT|DCSR|AgHg)$/) {
-            $ttPtr = Image::ExifTool::GetTagTable('Image::ExifTool::Photoshop::Unknown');
+            $ttPtr = GetTagTable('Image::ExifTool::Photoshop::Unknown');
         } else {
             $type =~ s/([^\w])/sprintf("\\x%.2x",ord($1))/ge;
             $exifTool->Warn(qq{Bad Photoshop IRB resource "$type"});
@@ -450,7 +459,7 @@ sub ProcessPSD($$)
         $exifTool->InitWriteDirs(\%psdMap);
     } else {
         # process the header
-        $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::Photoshop::Header');
+        $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Header');
         $dirInfo{DirLen} = 30;
         $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
         $raf->Seek($len, 1) or $err = 1;    # skip over color mode data
@@ -458,7 +467,7 @@ sub ProcessPSD($$)
     $raf->Read($data, 4) == 4 or $err = 1;
     $len = Get32u(\$data, 0);
     $raf->Read($data, $len) == $len or $err = 1;
-    $tagTablePtr = Image::ExifTool::GetTagTable('Image::ExifTool::Photoshop::Main');
+    $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Main');
     $dirInfo{DirLen} = $len;
     my $rtnVal = 1;
     if ($outfile) {

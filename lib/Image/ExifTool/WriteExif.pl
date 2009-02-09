@@ -217,7 +217,7 @@ my %writeTable = (
         Writable => 'string',
         Shift => 'Time',
         WriteGroup => 'IFD0',
-        PrintConvInv => '$self->InverseDateTime($val,0)', 
+        PrintConvInv => '$self->InverseDateTime($val,0)',
     },
     0x013b => {             # Artist
         Writable => 'string',
@@ -359,12 +359,12 @@ my %writeTable = (
     0x9003 => {             # DateTimeOriginal
         Writable => 'string',
         Shift => 'Time',
-        PrintConvInv => '$self->InverseDateTime($val,0)', 
+        PrintConvInv => '$self->InverseDateTime($val,0)',
     },
     0x9004 => {             # CreateDate
         Writable => 'string',
         Shift => 'Time',
-        PrintConvInv => '$self->InverseDateTime($val,0)', 
+        PrintConvInv => '$self->InverseDateTime($val,0)',
     },
     0x9101 => {             # ComponentsConfiguration
         Protected => 1,
@@ -426,9 +426,19 @@ my %writeTable = (
         Writable => 'undef',
         RawConvInv => 'Image::ExifTool::Exif::EncodeExifText($self,$val)',
     },
-    0x9290 => 'string',     # SubSecTime
-    0x9291 => 'string',     # SubSecTimeOriginal
-    0x9292 => 'string',     # SubSecTimeDigitized
+    0x9290 => {             # SubSecTime
+        Writable => 'string',
+        # extract fractional seconds from a full date/time value
+        ValueConvInv => '$val=~/^(\d+)\s*$/ ? $1 : ($val=~/\.(\d+)/ ? $1 : undef)',
+    },
+    0x9291 => {             # SubSecTimeOriginal
+        Writable => 'string',
+        ValueConvInv => '$val=~/^(\d+)\s*$/ ? $1 : ($val=~/\.(\d+)/ ? $1 : undef)',
+    },
+    0x9292 => {             # SubSecTimeDigitized
+        Writable => 'string',
+        ValueConvInv => '$val=~/^(\d+)\s*$/ ? $1 : ($val=~/\.(\d+)/ ? $1 : undef)',
+    },
     0x935c => {             # ImageSourceData
         Writable => 'undef',
         WriteGroup => 'IFD0',
@@ -718,10 +728,11 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         Protected => 1,
     },
-    0xc6d2 => {             # Title (Panasonic DMC-TZ5, not a DNG tag)
-        Writable => 'string',
+    0xc6d2 => {             # PanasonicTitle (Panasonic DMC-TZ5, not a DNG tag)
+        Writable => 'undef',
         Avoid => 1,
         WriteGroup => 'IFD0',
+        ValueConvInv => '$self->Charset2UTF8($val)',
     },
     0xc6f3 => {             # CameraCalibrationSig
         Writable => 'string',
@@ -972,7 +983,7 @@ my %writeTable = (
 );
 
 # insert our writable properties into main EXIF tag table
-InsertWritableProperties('Image::ExifTool::Exif::Main', \%writeTable, \&CheckExif);
+InsertWritableProperties(\%Image::ExifTool::Exif::Main, \%writeTable, \&CheckExif);
 
 #------------------------------------------------------------------------------
 # Get binary CFA Pattern from a text string
@@ -1040,13 +1051,12 @@ sub EncodeExifText($$)
 
 #------------------------------------------------------------------------------
 # insert writable properties into main tag table
-# Inputs: 0) tag table name, 1) reference to writable properties
+# Inputs: 0) tag table ref, 1) reference to writable properties
 #         2) [optional] CHECK_PROC reference
 sub InsertWritableProperties($$;$)
 {
-    my ($tableName, $writeTablePtr, $checkProc) = @_;
+    my ($tagTablePtr, $writeTablePtr, $checkProc) = @_;
     my $tag;
-    my $tagTablePtr = GetTagTable($tableName);
     $checkProc and $tagTablePtr->{CHECK_PROC} = $checkProc;
     foreach $tag (keys %$writeTablePtr) {
         my $writeInfo = $$writeTablePtr{$tag};
@@ -1072,8 +1082,7 @@ sub InsertWritableProperties($$;$)
 #------------------------------------------------------------------------------
 # rebuild maker notes to properly contain all value data
 # (some manufacturers put value data outside maker notes!!)
-# Inputs: 0) ExifTool object reference, 1) tag table reference,
-#         2) dirInfo reference
+# Inputs: 0) ExifTool object ref, 1) tag table ref, 2) dirInfo ref
 # Returns: new maker note data (and creates MAKER_NOTE_FIXUP), or undef on error
 sub RebuildMakerNotes($$$)
 {
@@ -1126,9 +1135,18 @@ sub RebuildMakerNotes($$$)
                 delete $newTool->{PREVIEW_INFO};
             }
             # add makernote header
-            $loc and $rtnValue = substr($$dataPt, $dirStart, $loc) . $rtnValue;
-            # adjust fixup for shift in start position
-            $makerFixup->{Start} += $loc;
+            if ($loc) {
+                my $hdr = substr($$dataPt, $dirStart, $loc);
+                # special case: convert Pentax/Samsung DNG maker notes to JPEG style
+                # (in JPEG, Pentax makernotes are absolute and start with "AOC\0")
+                if ($hdr =~ s/^(PENTAX |SAMSUNG)\0/AOC\0/) {
+                    # save fixup so we will adjust to absolute offsets when writing
+                    $exifTool->{MAKER_NOTE_FIXUP} = $makerFixup;
+                }
+                $rtnValue = $hdr . $rtnValue;
+                # adjust fixup for shift in start position
+                $makerFixup->{Start} += length $hdr;
+            }
             # shift offsets according to original position of maker notes,
             # and relative to the makernotes Base
             $makerFixup->{Shift} += $dataPos + $dirStart +
@@ -1528,7 +1546,7 @@ sub WriteExif($$$)
         my $entryBasedFixup;
         my $index = 0;
         my $lastTagID = -1;
-        my ($oldInfo, $oldFormat, $oldFormName, $oldCount, $oldSize, $oldValue);
+        my ($oldInfo, $oldFormat, $oldFormName, $oldCount, $oldSize, $oldValue, $oldImageData);
         my ($readFormat, $readFormName, $readCount); # format for reading old value(s)
         my ($entry, $valueDataPt, $valueDataPos, $valueDataLen, $valuePtr, $valEnd);
         my $oldID = -1;
@@ -1548,6 +1566,7 @@ Entry:  for (;;) {
                     $oldID = Get16u($dataPt, $entry);
                     $readFormat = $oldFormat = Get16u($dataPt, $entry+2);
                     $readCount = $oldCount = Get32u($dataPt, $entry+4);
+                    undef $oldImageData;
                     if ($oldFormat < 1 or $oldFormat > 13) {
                         # patch to preserve invalid directory entries in SubIFD3 of
                         # various Kodak Z-series cameras (Z812, Z1085IS, Z1275)
@@ -1636,13 +1655,10 @@ Entry:  for (;;) {
                             {
                                 $oldValue = ''; # dummy empty value
                                 # copy this value later unless writing a new value
-                                unless ($set{$oldID}) {                                
+                                unless ($set{$oldID}) {
                                     my $pad = $oldSize & 0x01 ? 1 : 0;
-                                    # save block information to copy later (plus directory
-                                    # offset to write proper offset/size later)
-                                    push @imageData, [$base+$valuePtr+$dataPos, $oldSize, $pad,
-                                                      $newStart + length($dirBuff) + 2];
-                                    $_[1]{ImageData} = \@imageData;
+                                    # save block information to copy later (set directory offset later)
+                                    $oldImageData = [$base+$valuePtr+$dataPos, $oldSize, $pad];
                                 }
                             } elsif ($raf) {
                                 my $success = ($raf->Seek($base+$valuePtr+$dataPos, 0) and
@@ -1872,7 +1888,7 @@ NoOverwrite:            next if $isNew > 0;
                     next if $$newInfo{MakerNotes} or $$newInfo{Name} eq 'SubIFD';
                     my $subTable;
                     if ($newInfo->{SubDirectory}{TagTable}) {
-                        $subTable = GetTagTable($newInfo->{SubDirectory}{TagTable});
+                        $subTable = Image::ExifTool::GetTagTable($newInfo->{SubDirectory}{TagTable});
                     } else {
                         $subTable = $tagTablePtr;
                     }
@@ -1922,6 +1938,13 @@ NoOverwrite:            next if $isNew > 0;
                 $newValue = $oldValue;
                 $newFormat = $oldFormat; # (just in case it changed)
                 $newFormName = $oldFormName;
+                # set offset of this entry in the directory so we can update the pointer
+                # and save block information to copy this large block later
+                if ($oldImageData) {
+                    $$oldImageData[3] = $newStart + length($dirBuff) + 2;
+                    push @imageData, $oldImageData;
+                    $_[1]{ImageData} = \@imageData;
+                }
             }
             if ($newInfo) {
 #
@@ -2109,7 +2132,7 @@ NoOverwrite:            next if $isNew > 0;
 #
                         my $subTable = $tagTablePtr;
                         if ($$subdir{TagTable}) {
-                            $subTable = GetTagTable($$subdir{TagTable});
+                            $subTable = Image::ExifTool::GetTagTable($$subdir{TagTable});
                         }
                         # determine directory name for this IFD
                         my $subdirName = $newInfo->{Groups}{1} || $$newInfo{Name};
@@ -2239,7 +2262,7 @@ NoOverwrite:            next if $isNew > 0;
                             RAF      => $raf,
                             TagInfo  => $newInfo,
                         );
-                        my $subTable = GetTagTable($$subdir{TagTable});
+                        my $subTable = Image::ExifTool::GetTagTable($$subdir{TagTable});
                         my $oldOrder = GetByteOrder();
                         SetByteOrder($$subdir{ByteOrder}) if $$subdir{ByteOrder};
                         $newValue = $exifTool->WriteDirectory(\%subdirInfo, $subTable, $$subdir{WriteProc});
@@ -2357,12 +2380,9 @@ NoOverwrite:            next if $isNew > 0;
 
                 } elsif ($$newInfo{DataMember}) {
 
-                    my ($m, $w) = @$newInfo{'DataMember','Writable'};
                     # save any necessary data members (Make, Model, etc)
-                    # Note that this will not trim null from string values, etc...
-                    $$exifTool{$m} = $$newValuePt;
-                    # ...so explicitly terminate string values at null
-                    $$exifTool{$m} =~ s/\0.*//s if $w and $w eq 'string';
+                    my $v = ReadValue($newValuePt,0,$newFormName,$newCount,length($$newValuePt));
+                    $$exifTool{$$newInfo{DataMember}} = $v;
                 }
             }
 #

@@ -13,7 +13,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ProcessLeaf($$$);
 
@@ -471,7 +471,8 @@ sub ProcessLeaf($$$)
                 my $subTable = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
                 $exifTool->ProcessDirectory(\%subdirInfo, $subTable);
             } else {
-                $val =~ tr/\n/ /;   # remove newlines from value
+                $val =~ tr/\n/ /;   # translate newlines to spaces
+                $val =~ s/\0+$//;   # remove null terminators
                 $exifTool->FoundTag($tagInfo, $val);
             }
         }

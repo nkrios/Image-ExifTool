@@ -1,13 +1,13 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.55
-[File, File, Image]  - File Name: Writer_35_failed.jpg
-[File, File, Image]  - Directory: t
-[File, File, Image]  - File Size: 9.5 kB
-[File, File, Time]  - File Modification Date/Time: 2008:11:26 21:25:48-05:00
-[File, File, Image]  - File Type: JPEG
-[File, File, Image]  - MIME Type: image/jpeg
-[File, File, Image]  - Exif Byte Order: Little-endian (Intel, II)
-[File, File, Image]  - Current IPTC Digest: d624fa41e4169333a86729e3c275f95a
-[File, File, Image]  - Comment: © PhotoStudio Unicode comment;;
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: Writer_35_failed.jpg
+[File, File, Image] Directory - Directory: t
+[File, File, Image] FileSize - File Size: 9.5 kB
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:01 07:56:34-05:00
+[File, File, Image] FileType - File Type: JPEG
+[File, File, Image] MIMEType - MIME Type: image/jpeg
+[File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
+[File, File, Image] CurrentIPTCDigest - Current IPTC Digest: d624fa41e4169333a86729e3c275f95a
+[File, File, Image] Comment - Comment: © PhotoStudio Unicode comment;;
 [File, File, Image] ImageWidth - Image Width: 8
 [File, File, Image] ImageHeight - Image Height: 8
 [File, File, Image] EncodingProcess - Encoding Process: Baseline DCT, Huffman coding
@@ -61,7 +61,7 @@
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [IPTC, IPTC, Other] 0 - Application Record Version: 2
 [IPTC, IPTC, Other] 5 - Object Name: Test IPTC picture
-[IPTC, IPTC, Other] 10 - Urgency: 8
+[IPTC, IPTC, Other] 10 - Urgency: 8 (least urgent)
 [IPTC, IPTC, Other] 15 - Category: 1
 [IPTC, IPTC, Other] 20 - Supplemental Categories: amazing, image, utilities
 [IPTC, IPTC, Other] 25 - Keywords: jambalaya
@@ -83,7 +83,7 @@
 [Photoshop, Photoshop, Author] 1035 - URL: http://owl.phy.queensu.ca/~phil/exiftool/
 [Photoshop, Photoshop, Image] 1037 - Global Angle: 30
 [Photoshop, Photoshop, Image] 1049 - Global Altitude: 30
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.55
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.64
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey

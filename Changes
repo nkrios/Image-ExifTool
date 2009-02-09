@@ -5,8 +5,106 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 7.60. (Other versions are
+Note: The most recent production release is Version 7.67. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+Feb. 9, 2009 - Version 7.67 (production release)
+
+  - IMPORTANT: Fixed bug introduced in version 7.01 which could cause corruption
+    of TIFF-format images in very rare situations when adding tags to an image
+    containing very large (> 10 MB) binary data blocks
+
+Feb. 7, 2009 - Version 7.66
+
+  - Improved language support
+  - Changed conversion for a couple of the EXIF Flash values
+  - Removed trailing white space from Make and Model values
+  - Removed null terminators that may be left on some string values
+  - Fixed problem with family 1 group names for QuickTime Date tags
+  - Fixed problem with invalid names being generated for some unknown tags
+  - Fixed decoding of ASF PreviewMimeType and PreviewDescription
+  - Fixed formatting problems with -j output when combined with some options
+
+Feb. 5, 2009 - Version 7.65
+
+  - Added -j option for JSON (JavaScript Object Notation) output format
+  - Improved French language translation for File group (thanks Jean Piquemal)
+  - Enhanced -listx option to give short output when used after -s
+  - Renamed "tagid" attribute to "id" in -X output to match -listx output
+  - Fixed bug introduced in 7.64 which resulted in runtime warning when
+    extracting non-existent tags with the -f option
+  - Fixed problem which could cause runtime error with -listx option on some
+    systems
+  - Fixed problem with family 1 group names for QuickTime date tags
+
+Feb. 3, 2009 - Version 7.64 - "Babel fish"
+
+  - Added -listx and -lang options
+  - Added preliminary support for the following languages (thanks Jens!):
+      - en    [default]
+      - ch_s  (thanks Haibing Zhong)
+      - cz    (thanks Petr Michalek)
+      - de    (thanks Jens Duttke)
+      - en_ca (for those of us who like to see "colour" to be spelled properly)
+      - en_gb (correct "colour" plus a few other quirks)
+      - es    (thanks Santiago del Brio Gonzalez)
+      - fr    (thanks Bernard Guillotin)
+      - it    (thanks Emilio Dati)
+      - jp    (thanks Kazunari Nishina)
+      - nl    (thanks Peter Moonen and Herman Beld)
+      - pl    (thanks Przemyslaw Sulek)
+  - Added support for new XMP Windows Live Photo Gallery tags
+  - Decode two new Panasonic tags and improved decoding of some others
+  - Decode a few new 3rd party EXIF and IPTC tags
+  - Enhanced -X output by adding -t feature for tag table information
+  - Improved decoding of Photoshop ClippingPathName and remove Unknown flag
+  - Renamed Panasonic EXIF "Title" tag to "PanasonicTitle" and improved decoding
+  - Fixed problem which could cause crash if reading corrupted images on Windows
+  - Fixed inconsistencies rewriting XMP which uses extra rdf:Description
+    elements instead of rdf:parseType='Resource' attribute
+  - Fixed decoding of Nikon D40 RemoteOnDuration
+  - API Changes:
+      - Added Lang option
+
+Jan. 23, 2009 - Version 7.63
+
+  - Added new Composite tags: SubSecCreateDate and SubSecModifyDate
+  - Decode Sony DSLR WB_RGBLevels tags (thanks Andrey Tverdokhleb)
+  - Decode a few more NikonScan tags (thanks Brendt Wohlberg)
+  - Included new argument files in distribution: xmp2exif.args and exif2xmp.args
+  - Improved decoding of PentaxModelID for K-m and K2000
+  - Minor change to decoding of Canon 1DmkIII ISOSpeedRange
+  - Downgrade "MRW format error" to a warning when reading ARW images containing
+    MRW information that has been corrupted by the Sony IDC utility
+  - Renamed Kodak SubSecTime tag to Time
+  - Changed Composite DateTimeCreated tag to use only IPTC tags
+  - Changed name of Sony/Minolta MRW WBLevels tag to reflect ordering of color
+    components
+  - Fixed problems recognizing some MP3 files
+
+Jan. 16, 2009 - Version 7.62
+
+  - Decode a number of new tags for recent Canon EOS models
+  - Decode ID3v2.3 Compilation tag (written by iTunes)
+  - Added a number of new ID3 genre's and improved ID3v2 genre conversion
+  - Avoid converting MIE ISO 8859-1 string values
+  - Enhanced XML output (-X) to work with binary data (-b) option and encode
+    values in base64 if necessary
+  - Fixed problem with invalid UTF-8 when writing XMP or using -X (XML) option
+
+Jan. 10, 2009 - Version 7.61
+
+  - Added a new Pentax LensType and a new PentaxModelID (thanks Denis Bourez)
+  - Added ability to copy makernotes from Pentax or Samsung native DNG image
+  - Decode makernotes in Samsung GX model DNG images
+  - Decode CameraTemperature for Canon EOS cameras with Live View (thanks
+    Karl-Heinz Klotz)
+  - Decode a number of Canon 5DmkII CameraInfo tags
+  - Included 2 new argument files in distribution: xmp2gps.args and gps2xmp.args
+  - Prevent writing of TIFF images containing the obsolete (and unsupported)
+    TIFF 6.0 JPEG extensions
+  - Fixed bug which could result in runtime warning when writing makernotes as a
+    block
 
 Jan. 6, 2009 - Version 7.60 (production release)
 
@@ -29,7 +127,7 @@ Dec. 22, 2008 - Version 7.58
   - Extract RAFVersion tag from FujiFilm RAF images
   - Decode ColorBalance information for PowerShot G10
   - Decode Sharpness for Canon EOS 50D
-  - More improvements to Canon 50D and 5DmkII makernote decoding 
+  - More improvements to Canon 50D and 5DmkII makernote decoding
   - Attempt to identify unknown Nikon lenses which exist in LensID list with a
     different LensIDNumber (to patch Sigma lens renumbering debacle)
   - Removed limit of 1000 items in an XMP list-type tag when writing

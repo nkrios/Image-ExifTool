@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.43
-[File, File, Image]  - File Name: DICOM.dcm
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 1860 bytes
-[File, File, Time]  - File Modification Date/Time: 2005:11:11 14:10:21
-[File, File, Image]  - File Type: DICOM
-[File, File, Image]  - MIME Type: application/dicom
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: DICOM.dcm
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 1860 bytes
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2005:11:14 14:47:21-05:00
+[File, File, Image] FileType - File Type: DICOM
+[File, File, Image] MIMEType - MIME Type: application/dicom
 [DICOM, DICOM, Image] 0002,0000 - File Meta Info Group Length: 180
 [DICOM, DICOM, Image] 0002,0001 - File Meta Info Version: 0 1
 [DICOM, DICOM, Image] 0002,0002 - Media Storage SOP Class UID: MR Image Storage

@@ -1,12 +1,12 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 6.43
-[File, File, Image]  - File Name: PICT.pict
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 150 bytes
-[File, File, Time]  - File Modification Date/Time: 2005:10:11 14:41:06
-[File, File, Image]  - File Type: PICT
-[File, File, Image]  - MIME Type: image/pict
-[File, File, Image]  - Image Width: 8
-[File, File, Image]  - Image Height: 8
-[File, File, Image]  - X Resolution: 72
-[File, File, Image]  - Y Resolution: 72
-[Composite, Composite, Image]  - Image Size: 8x8
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: PICT.pict
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 150 bytes
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2005:11:14 14:47:21-05:00
+[File, File, Image] FileType - File Type: PICT
+[File, File, Image] MIMEType - MIME Type: image/pict
+[File, File, Image] ImageWidth - Image Width: 8
+[File, File, Image] ImageHeight - Image Height: 8
+[File, File, Image] XResolution - X Resolution: 72
+[File, File, Image] YResolution - Y Resolution: 72
+[Composite, Composite, Image] ImageSize - Image Size: 8x8

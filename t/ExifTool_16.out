@@ -43,7 +43,7 @@ Saturation : +1
 SelfTimer : Off
 SerialNumber : 0560018150
 SerialNumberFormat : Format 1
-Sharpness : 1
+Sharpness : +1
 ShortFocal : 18 mm
 ThumbnailImageValidArea : 0 159 7 112
 ValidAFPoints : 7

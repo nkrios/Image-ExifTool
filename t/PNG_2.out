@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
-[File, File, Image]  - File Name: PNG.png
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 572 bytes
-[File, File, Time]  - File Modification Date/Time: 2006:10:27 11:44:00-04:00
-[File, File, Image]  - File Type: PNG
-[File, File, Image]  - MIME Type: image/png
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: PNG.png
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 572 bytes
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:10:27 11:44:00-04:00
+[File, File, Image] FileType - File Type: PNG
+[File, File, Image] MIMEType - MIME Type: image/png
 [PNG, PNG, Image] 0 - Image Width: 16
 [PNG, PNG, Image] 4 - Image Height: 16
 [PNG, PNG, Image] 8 - Bit Depth: 1
@@ -16,4 +16,4 @@
 [PNG, PNG, Image] Comment - Comment: test comment
 [XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 6.51
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
-[Composite, Composite, Image]  - Image Size: 16x16
+[Composite, Composite, Image] ImageSize - Image Size: 16x16

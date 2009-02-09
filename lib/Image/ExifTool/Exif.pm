@@ -38,7 +38,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.71';
+$VERSION = '2.79';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -65,23 +65,23 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
 # hash to look up EXIF format numbers by name
 # (format types are all lower case)
 %formatNumber = (
-    'int8u'         => 1,   # BYTE
-    'string'        => 2,   # ASCII
-    'int16u'        => 3,   # SHORT
-    'int32u'        => 4,   # LONG
-    'rational64u'   => 5,   # RATIONAL
-    'int8s'         => 6,   # SBYTE
-    'undef'         => 7,   # UNDEFINED
-    'binary'        => 7,   # (treat binary data as undef)
-    'int16s'        => 8,   # SSHORT
-    'int32s'        => 9,   # SLONG
-    'rational64s'   => 10,  # SRATIONAL
-    'float'         => 11,  # FLOAT
-    'double'        => 12,  # DOUBLE
-    'ifd'           => 13,  # IFD (with int32u format)
-    'int64u'        => 16,  # LONG8 [BigTIFF]
-    'int64s'        => 17,  # SLONG8 [BigTIFF]
-    'ifd8'          => 18,  # IFD8 (with int64u format) [BigTIFF]
+    'int8u'       => 1,  # BYTE
+    'string'      => 2,  # ASCII
+    'int16u'      => 3,  # SHORT
+    'int32u'      => 4,  # LONG
+    'rational64u' => 5,  # RATIONAL
+    'int8s'       => 6,  # SBYTE
+    'undef'       => 7,  # UNDEFINED
+    'binary'      => 7,  # (treat binary data as undef)
+    'int16s'      => 8,  # SSHORT
+    'int32s'      => 9,  # SLONG
+    'rational64s' => 10, # SRATIONAL
+    'float'       => 11, # FLOAT
+    'double'      => 12, # DOUBLE
+    'ifd'         => 13, # IFD (with int32u format)
+    'int64u'      => 16, # LONG8 [BigTIFF]
+    'int64s'      => 17, # SLONG8 [BigTIFF]
+    'ifd8'        => 18, # IFD8 (with int64u format) [BigTIFF]
 );
 
 # EXIF LightSource PrintConv values
@@ -201,6 +201,7 @@ my %longBin = (
     0x2 => { #5
         Name => 'InteropVersion',
         Description => 'Interoperability Version',
+        RawConv => '$val=~s/\0+$//; $val',  # (some idiots add null terminators)
     },
     0x0b => { #PH
         Name => 'ProcessingSoftware',
@@ -219,6 +220,8 @@ my %longBin = (
             5 => 'Transparency mask of reduced-resolution image',
             6 => 'Transparency mask of multi-page image',
             7 => 'Transparency mask of reduced-resolution multi-page image',
+            # 0x08 => TIFF/IT Final Page ? (PhotoME)
+            # 0x10 => TIFF-FX Mixed Raster Content ? (PhotoME)
         },
     },
     0xff => {
@@ -285,16 +288,16 @@ my %longBin = (
         Name => 'Make',
         Groups => { 2 => 'Camera' },
         DataMember => 'Make',
-        # save this value as an ExifTool member variable
-        RawConv => '$$self{Make} = $val',
+        # remove trailing whitespace and save as an ExifTool member variable
+        RawConv => '$val =~ s/\s+$//; $$self{Make} = $val',
     },
     0x110 => {
         Name => 'Model',
         Description => 'Camera Model Name',
         Groups => { 2 => 'Camera' },
         DataMember => 'Model',
-        # save this value as an ExifTool member variable
-        RawConv => '$$self{Model} = $val',
+        # remove trailing whitespace and save as an ExifTool member variable
+        RawConv => '$val =~ s/\s+$//; $$self{Model} = $val',
     },
     0x111 => [
         {
@@ -852,9 +855,24 @@ my %longBin = (
     0x203 => 'JPEGRestartInterval',
     0x205 => 'JPEGLosslessPredictors',
     0x206 => 'JPEGPointTransforms',
-    0x207 => 'JPEGQTables',
-    0x208 => 'JPEGDCTables',
-    0x209 => 'JPEGACTables',
+    0x207 => {
+        Name => 'JPEGQTables',
+        IsOffset => 1,
+        # this tag is not supported for writing, so define an
+        # invalid offset pair to cause a "No size tag" error to be
+        # generated if we try to write a file containing this tag
+        OffsetPair => -1,
+    },
+    0x208 => {
+        Name => 'JPEGDCTables',
+        IsOffset => 1,
+        OffsetPair => -1, # (see comment for JPEGQTables)
+    },
+    0x209 => {
+        Name => 'JPEGACTables',
+        IsOffset => 1,
+        OffsetPair => -1, # (see comment for JPEGQTables)
+    },
     0x211 => {
         Name => 'YCbCrCoefficients',
         Priority => 0,
@@ -1117,7 +1135,10 @@ my %longBin = (
             Start => '$val',
         },
     },
-    0x9000 => 'ExifVersion',
+    0x9000 => {
+        Name => 'ExifVersion',
+        RawConv => '$val=~s/\0+$//; $val',  # (some idiots add null terminators)
+    },
     0x9003 => {
         Name => 'DateTimeOriginal',
         Description => 'Date/Time Original',
@@ -1190,10 +1211,10 @@ my %longBin = (
             0x05 => 'Fired, Return not detected',
             0x07 => 'Fired, Return detected',
             0x08 => 'On, Did not fire', # not charged up?
-            0x09 => 'On',
+            0x09 => 'On, Fired',
             0x0d => 'On, Return not detected',
             0x0f => 'On, Return detected',
-            0x10 => 'Off',
+            0x10 => 'Off, Did not fire',
             0x14 => 'Off, Did not fire, Return not detected',
             0x18 => 'Auto, Did not fire',
             0x19 => 'Auto, Fired',
@@ -1283,14 +1304,17 @@ my %longBin = (
     0x9290 => {
         Name => 'SubSecTime',
         Groups => { 2 => 'Time' },
+        ValueConv => '$val=~s/\s+$//; $val', # trim trailing blanks
     },
     0x9291 => {
         Name => 'SubSecTimeOriginal',
         Groups => { 2 => 'Time' },
+        ValueConv => '$val=~s/\s+$//; $val', # trim trailing blanks
     },
     0x9292 => {
         Name => 'SubSecTimeDigitized',
         Groups => { 2 => 'Time' },
+        ValueConv => '$val=~s/\s+$//; $val', # trim trailing blanks
     },
     0x935c => { #3
         Name => 'ImageSourceData',
@@ -1322,7 +1346,10 @@ my %longBin = (
         Format => 'undef',
         ValueConv => '$self->Unicode2Charset($val,"II")',
     },
-    0xa000 => 'FlashpixVersion',
+    0xa000 => {
+        Name => 'FlashpixVersion',
+        RawConv => '$val=~s/\0+$//; $val',  # (some idiots add null terminators)
+    },
     0xa001 => {
         Name => 'ColorSpace',
         Notes => q{
@@ -1527,6 +1554,12 @@ my %longBin = (
     0xa480 => 'GDALMetadata', #3
     0xa481 => 'GDALNoData', #3
     0xa500 => 'Gamma',
+    0xafc0 => 'ExpandSoftware', #JD (Opanda)
+    0xafc1 => 'ExpandLens', #JD (Opanda)
+    0xafc2 => 'ExpandFilm', #JD (Opanda)
+    0xafc3 => 'ExpandFilterLens', #JD (Opanda)
+    0xafc4 => 'ExpandScanner', #JD (Opanda)
+    0xafc5 => 'ExpandFlashLamp', #JD (Opanda)
 #
 # Windows Media Photo / HD Photo (WDP/HDP) tags
 #
@@ -1777,10 +1810,15 @@ my %longBin = (
             Format => 'undef',  # written incorrectly as int8u (change to undef for speed)
         },
         {
-            Condition => '$$valPt =~ /^PENTAX \0/',
-            Name => 'DNGPentaxData',
+            Condition => '$$valPt =~ /^(PENTAX |SAMSUNG)\0/',
+            Name => 'MakerNotePentax',
             DNGMakerNotes => 1,
             MakerNotes => 1,    # (causes "MakerNotes header" to be identified in HtmlDump output)
+            Binary => 1,
+            # Note: Don't make this block-writable for a few reasons:
+            # 1) It would be dangerous (possibly confusing Pentax software)
+            # 2) It is a different format from the JPEG version of MakerNotePentax
+            # 3) It is converted to JPEG format by RebuildMakerNotes() when copying
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Pentax::Main',
                 Start => '$valuePtr + 10',
@@ -1864,8 +1902,14 @@ my %longBin = (
     },
     0xc692 => 'CurrentPreProfileMatrix',
     0xc6d2 => { #JD (Panasonic DMC-TZ5)
-        Name => 'Title',
-        Notes => 'proprietary Panasonic tag',
+        # this text is UTF-8 encoded (hooray!) - PH (TZ5)
+        Name => 'PanasonicTitle',
+        Format => 'string', # written incorrectly as 'undef'
+        Notes => 'proprietary Panasonic tag used for baby name, etc',
+        # panasonic always records this tag (full of zero bytes),
+        # so ignore it unless it contains valid information
+        RawConv => 'length($val) ? $val : undef',
+        ValueConv => '$self->UTF82Charset($val)',
     },
     0xc6bf => 'ColorimetricReference',
     0xc6f3 => 'CameraCalibrationSig',
@@ -1952,26 +1996,26 @@ my %longBin = (
         Name => 'OffsetSchema',
         Notes => "Microsoft's ill-conceived maker note offset difference",
         # From the Microsoft documentation:
-        # 
+        #
         #     Any time the "Maker Note" is relocated by Windows, the Exif MakerNote
         #     tag (37500) is updated automatically to reference the new location. In
         #     addition, Windows records the offset (or difference) between the old and
         #     new locations in the Exif OffsetSchema tag (59933). If the "Maker Note"
         #     contains relative references, the developer can add the value in
         #     OffsetSchema to the original references to find the correct information.
-        # 
+        #
         # My recommendation is for other developers to ignore this tag because the
         # information it contains is unreliable. It will be wrong if the image has
         # been subsequently edited by another application that doesn't recognize the
         # new Microsoft tag.
-        # 
+        #
         # The new tag unfortunately only gives the difference between the new maker
         # note offset and the original offset. Instead, it should have been designed
         # to store the original offset. The new offset may change if the image is
         # edited, which will invalidate the tag as currently written. If instead the
         # original offset had been stored, the new difference could be easily
         # calculated because the new maker note offset is known.
-        # 
+        #
         # I exchanged emails with a Microsoft technical representative, pointing out
         # this problem shortly after they released the update (Feb 2007), but so far
         # they have taken no steps to address this (over a year later).
@@ -2150,25 +2194,32 @@ my %longBin = (
             return $str;
         },
     },
-    DateTimeCreated => { # used by IPTC, XMP, WAV, etc
+    DateTimeCreated => {
         Description => 'Date/Time Created',
         Groups => { 2 => 'Time' },
         Require => {
-            0 => 'DateCreated',
-            1 => 'TimeCreated',
+            0 => 'IPTC:DateCreated',
+            1 => 'IPTC:TimeCreated',
         },
-        # (XMP:DateCreated may contain time too, so use this if it does)
-        ValueConv => '$val[0]=~/ / ? $val[0] : "$val[0] $val[1]"',
+        ValueConv => '"$val[0] $val[1]"',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    # create DateTimeOriginal from DateTimeCreated if not set already
+    # generate DateTimeOriginal from Date and Time Created if not set already
     DateTimeOriginal => {
         Condition => 'not defined($oldVal)',
         Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
-        Require => 'DateTimeCreated',
-        ValueConv => '$val[0]',
-        PrintConv => '$prt[0]',
+        Desire => {
+            0 => 'DateTimeCreated',
+            1 => 'DateCreated',
+            2 => 'TimeCreated',
+        },
+        ValueConv => q{
+            return $val[0] if $val[0] and $val[0]=~/ /;
+            return undef unless $val[1] and $val[2];
+            return "$val[1] $val[2]";
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
     },
     ThumbnailImage => {
         Writable => 1,
@@ -2246,12 +2297,42 @@ my %longBin = (
     },
     SubSecDateTimeOriginal => {
         Description => 'Date/Time Original',
+        Groups => { 2 => 'Time' },
         Require => {
-            0 => 'DateTimeOriginal',
+            0 => 'EXIF:DateTimeOriginal',
             1 => 'SubSecTimeOriginal',
         },
-        # be careful here in case there is a timezone following the seconds
-        ValueConv => '$_=$val[0];s/(.*:\d{2})/$1\.$val[1]/;$_',
+        # be careful here just in case there is a timezone following the seconds
+        ValueConv => q{
+            return undef if $val[1] eq '';
+            $_ = $val[0]; s/( \d{2}:\d{2}:\d{2})/$1\.$val[1]/; $_;
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    SubSecCreateDate => {
+        Description => 'Create Date',
+        Groups => { 2 => 'Time' },
+        Require => {
+            0 => 'EXIF:CreateDate',
+            1 => 'SubSecTimeDigitized',
+        },
+        ValueConv => q{
+            return undef if $val[1] eq '';
+            $_ = $val[0]; s/( \d{2}:\d{2}:\d{2})/$1\.$val[1]/; $_;
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    SubSecModifyDate => {
+        Description => 'Modify Date',
+        Groups => { 2 => 'Time' },
+        Require => {
+            0 => 'EXIF:ModifyDate',
+            1 => 'SubSecTime',
+        },
+        ValueConv => q{
+            return undef if $val[1] eq '';
+            $_ = $val[0]; s/( \d{2}:\d{2}:\d{2})/$1\.$val[1]/; $_;
+        },
         PrintConv => '$self->ConvertDateTime($val)',
     },
     CFAPattern => {
@@ -2276,10 +2357,11 @@ my %longBin = (
             2 => 'WB_RBGGLevels',
             3 => 'WB_GRBGLevels',
             4 => 'WB_GRGBLevels',
-            5 => 'WB_RGBLevels',
-            6 => 'WB_RBLevels',
-            7 => 'WBRedLevel', # red
-            8 => 'WBGreenLevel',
+            5 => 'WB_GBRGLevels',
+            6 => 'WB_RGBLevels',
+            7 => 'WB_RBLevels',
+            8 => 'WBRedLevel', # red
+            9 => 'WBGreenLevel',
         },
         ValueConv => 'Image::ExifTool::Exif::RedBlueBalance(0,@val)',
         PrintConv => 'int($val * 1e6 + 0.5) * 1e-6',
@@ -2292,10 +2374,11 @@ my %longBin = (
             2 => 'WB_RBGGLevels',
             3 => 'WB_GRBGLevels',
             4 => 'WB_GRGBLevels',
-            5 => 'WB_RGBLevels',
-            6 => 'WB_RBLevels',
-            7 => 'WBBlueLevel', # blue
-            8 => 'WBGreenLevel',
+            5 => 'WB_GBRGLevels',
+            6 => 'WB_RGBLevels',
+            7 => 'WB_RBLevels',
+            8 => 'WBBlueLevel', # blue
+            9 => 'WBGreenLevel',
         },
         ValueConv => 'Image::ExifTool::Exif::RedBlueBalance(1,@val)',
         PrintConv => 'int($val * 1e6 + 0.5) * 1e-6',
@@ -2545,13 +2628,14 @@ sub ConvertParameter($)
 #         8) red or blue level, 9) green level
 my @rggbLookup = (
     # indices for R, G, G and B components in input value
-    [ 0, 1, 2, 3 ], # RGGB
-    [ 0, 1, 3, 2 ], # RGBG
-    [ 0, 2, 3, 1 ], # RBGG
-    [ 1, 0, 3, 2 ], # GRBG
-    [ 1, 0, 2, 3 ], # GRGB
-    [ 0, 1, 1, 2 ], # RGB
-    [ 0, 256, 256, 1 ], # RB (green level is 256)
+    [ 0, 1, 2, 3 ], # 0 RGGB
+    [ 0, 1, 3, 2 ], # 1 RGBG
+    [ 0, 2, 3, 1 ], # 2 RBGG
+    [ 1, 0, 3, 2 ], # 3 GRBG
+    [ 1, 0, 2, 3 ], # 4 GRGB
+    [ 2, 3, 0, 1 ], # 5 GBRG
+    [ 0, 1, 1, 2 ], # 6 RGB
+    [ 0, 256, 256, 1 ], # 7 RB (green level is 256)
 );
 sub RedBlueBalance($@)
 {
@@ -2739,7 +2823,8 @@ sub ExtractImage($$$$)
     my $dataPos = $exifTool->{EXIF_POS};
     my $image;
 
-    return undef unless $len;   # no image if length is zero
+    # no image if length is zero, and don't try to extract binary from XMP file
+    return undef if not $len or $$exifTool{FILE_TYPE} eq 'XMP';
 
     # take data from EXIF block if possible
     if (defined $dataPos and $offset>=$dataPos and $offset+$len<=$dataPos+length($$dataPt)) {
@@ -3190,7 +3275,7 @@ sub ProcessExif($$$)
                     if ($pos + 4 > $subdirDataLen) {
                         $exifTool->Warn("Bad $tagStr OffsetPt");
                         last;
-                    }                    
+                    }
                     SetByteOrder($newByteOrder);
                     $subdirStart += Get32u($subdirDataPt, $pos);
                     SetByteOrder($oldByteOrder);
@@ -3278,8 +3363,8 @@ sub ProcessExif($$$)
             if ($$tagInfo{MakerNotes}) {
                 # save maker note byte order (if it was significant and valid)
                 if ($$subdir{ByteOrder} and not $invalid) {
-                    $exifTool->{MAKER_NOTE_BYTE_ORDER} = 
-                        defined ($exifTool->{UnknownByteOrder}) ? 
+                    $exifTool->{MAKER_NOTE_BYTE_ORDER} =
+                        defined ($exifTool->{UnknownByteOrder}) ?
                                  $exifTool->{UnknownByteOrder} : $newByteOrder;
                 }
                 if ($doMaker and $doMaker eq '2') {

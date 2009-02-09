@@ -460,7 +460,7 @@ my %resourceType = (
         PrintConv => {
             # in theory, subtype can by -1 for multiple CPU types,
             # but in practice I'm not sure anyone uses this - PH
-            '1 0' => 'VAX (all)', 
+            '1 0' => 'VAX (all)',
             '1 1' => 'VAX780',
             '1 2' => 'VAX785',
             '1 3' => 'VAX750',
@@ -512,7 +512,7 @@ my %resourceType = (
             '8 3' => 'MIPS R2800',
             '8 4' => 'MIPS R2000a',
             '6 1' => 'MC680x0 (all)',
-            '6 2' => 'MC68040', 
+            '6 2' => 'MC68040',
             '6 3' => 'MC68030',
             '11 0' => 'HPPA (all)',
             '11 1' => 'HPPA 7100LC',

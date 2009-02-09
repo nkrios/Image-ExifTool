@@ -18,7 +18,7 @@ package Image::ExifTool::CanonRaw;
 
 use strict;
 use vars qw($VERSION $AUTOLOAD %crwTagFormat);
-use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
@@ -771,7 +771,7 @@ sub ProcessCanonRaw($$$)
             my $name = $$tagInfo{Name};
             my $newTagTable;
             if ($$subdir{TagTable}) {
-                $newTagTable = Image::ExifTool::GetTagTable($$subdir{TagTable});
+                $newTagTable = GetTagTable($$subdir{TagTable});
                 unless ($newTagTable) {
                     warn "Unknown tag table $$subdir{TagTable}\n";
                     next;
@@ -850,7 +850,7 @@ sub ProcessCRW($$)
     );
 
     # process the raw directory
-    my $rawTagTable = Image::ExifTool::GetTagTable('Image::ExifTool::CanonRaw::Main');
+    my $rawTagTable = GetTagTable('Image::ExifTool::CanonRaw::Main');
     unless ($exifTool->ProcessDirectory(\%dirInfo, $rawTagTable)) {
         $exifTool->Warn('CRW file format error');
     }

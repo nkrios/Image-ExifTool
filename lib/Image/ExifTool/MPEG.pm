@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 %Image::ExifTool::MPEG::Audio = (
     GROUPS => { 2 => 'Audio' },
@@ -381,6 +381,7 @@ sub ProcessMPEGAudio($$)
 {
     my ($exifTool, $buffPt) = @_;
     my ($word, $pos);
+    my $ext = $$exifTool{FILE_EXT} || '';
 
     for (;;) {
         # find frame sync
@@ -393,11 +394,15 @@ sub ProcessMPEGAudio($$)
         # validate header as much as possible
         if (($word & 0x180000) == 0x080000 or   # 01 is a reserved version ID
             ($word & 0x060000) == 0x000000 or   # 00 is a reserved layer description
+            ($word & 0x00f000) == 0x000000 or   # 0000 is the "free" bitrate index
             ($word & 0x00f000) == 0x00f000 or   # 1111 is a bad bitrate index
-            ($word & 0x000600) == 0x000600 or   # 11 is a reserved sampling frequency
+            ($word & 0x000c00) == 0x000c00 or   # 11 is a reserved sampling frequency
             ($word & 0x000003) == 0x000002)     # 10 is a reserved emphasis
         {
-            return 0;   # invalid frame header
+            # give up easily unless this really should be an MP3 file
+            return 0 unless $ext eq 'MP3';
+            pos($$buffPt) = pos($$buffPt) - 1;
+            next;
         }
         $pos = pos($$buffPt);
         last;
@@ -478,7 +483,7 @@ sub ProcessMPEGVideo($$)
 sub ProcessMPEGAudioVideo($$)
 {
     my ($exifTool, $buffPt) = @_;
-    my %found;
+    my (%found, $didHdr);
     my $rtnVal = 0;
     my %proc = ( audio => \&ProcessMPEGAudio, video => \&ProcessMPEGVideo );
 
@@ -487,6 +492,14 @@ sub ProcessMPEGAudioVideo($$)
 
     while ($$buffPt =~ /\0\0\x01(\xb3|\xc0)/g) {
         my $type = $1 eq "\xb3" ? 'video' : 'audio';
+        unless ($didHdr) {
+            # make sure we didn't miss an audio frame sync before this (ie. MP3 file)
+            # (the last byte of the 4-byte MP3 audio frame header word may be zero,
+            # but the 2nd last must be non-zero, so we need only check to pos-3)
+            my $buff = substr($$buffPt, 0, pos($$buffPt) - 3);
+            $found{audio} = 1 if ProcessMPEGAudio($exifTool, \$buff);
+            $didHdr = 1;
+        }
         next if $found{$type};
         my $len = length($$buffPt) - pos($$buffPt);
         last if $len < 4;

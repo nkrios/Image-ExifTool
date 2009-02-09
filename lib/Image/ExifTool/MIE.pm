@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.25';
+$VERSION = '1.27';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -103,7 +103,6 @@ my %binaryConv = (
     Binary => 1,
 );
 my %dateInfo = (
-    Groups => { 2 => 'Time' },
     Shift => 'Time',
     PrintConv => '$self->ConvertDateTime($val)',
     PrintConvInv => '$self->InverseDateTime($val)',
@@ -295,11 +294,11 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     Comment     => { },
     Contributors=> { Groups => { 2 => 'Author' }, List => 1 },
     Copyright   => { Groups => { 2 => 'Author' } },
-    CreateDate  => { %dateInfo },
+    CreateDate  => { Groups => { 2 => 'Time' }, %dateInfo },
     EMail       => { Groups => { 2 => 'Author' } },
     Keywords    => { List => 1 },
-    ModifyDate  => { %dateInfo },
-    OriginalDate=> { Name => 'DateTimeOriginal', %dateInfo },
+    ModifyDate  => { Groups => { 2 => 'Time' }, %dateInfo },
+    OriginalDate=> { Name => 'DateTimeOriginal', Groups => { 2 => 'Time' }, %dateInfo },
     Phone       => { Name => 'PhoneNumber', Groups => { 2 => 'Author' } },
     References  => { List => 1 },
     Software    => { },
@@ -410,7 +409,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Units => [ qw(km/h mi/h m/s kn) ],
         Notes => q{'km/h' unless 'mi/h', 'm/s' or 'kn' specified},
     },
-    DateTime => { Name => 'GPSDateTime', %dateInfo },
+    DateTime => { Name => 'GPSDateTime', Groups => { 2 => 'Time' }, %dateInfo },
 );
 
 # MIE UTM information
@@ -819,34 +818,6 @@ sub MIEGroupFormat(;$)
 }
 
 #------------------------------------------------------------------------------
-# Does a string contain valid UTF-8 characters?
-# Inputs: 0) string
-# Returns: 0=regular ASCII, -1=invalid UTF-8, 1=valid UTF-8 with maximum 16-bit
-#          wide characters, 2=valid UTF-8 requiring 32-bit wide characters
-# Notes: Changes current string position
-sub IsUTF8($)
-{
-    my $rtnVal = 0;
-    pos($_[0]) = 0; # start at beginning of string
-    for (;;) {
-        last unless $_[0] =~ /([\x80-\xff])/g;
-        my $ch = ord($1);
-        # minimum lead byte for 2-byte sequence is 0xc2 (overlong sequences
-        # not allowed), 0xf8-0xfd are restricted by RFC 3629 (no 5 or 6 byte
-        # sequences), and 0xfe and 0xff are not valid in UTF-8 strings
-        return -1 if $ch < 0xc2 or $ch >= 0xf8;
-        # determine number of bytes remaining in sequence
-        my $n = 1;
-        $n += ($ch >= 0xf0) ? 2 : 1 if $ch >= 0xe0;
-        return -1 unless $_[0] =~ /\G[\x80-\xbf]{$n}/g;
-        # character code is greater than 0xffff if more than 2 extra bytes were
-        # required in the UTF-8 character
-        $rtnVal |= ($n > 2) ? 2 : 1;
-    }
-    return $rtnVal;
-}
-
-#------------------------------------------------------------------------------
 # ReadValue() with added support for UTF formats (utf8, utf16 and utf32)
 # Inputs: 0) data reference, 1) value offset, 2) format string,
 #         3) number of values (or undef to use all data)
@@ -862,11 +833,12 @@ sub ReadMIEValue($$$$$)
         if ($1 eq 'utf8' or $1 eq 'string') {
             # read the 8-bit string
             $val = substr($$dataPt, $offset, $size);
-            # convert ISO 8859-1 string to UTF-8 if necessary
-            if ($1 eq 'string' and $val =~ /[\x80-\xff]/) {
-                $val = Image::ExifTool::Latin2Unicode($val,'n');
-                $val = Image::ExifTool::Unicode2UTF8($val,'n');
-            }
+            # (as of ExifTool 7.62, leave string values unconverted)
+            ## convert ISO 8859-1 string to UTF-8 if necessary
+            #if ($1 eq 'string' and $val =~ /[\x80-\xff]/) {
+            #    $val = Image::ExifTool::Latin2Unicode($val,'n');
+            #    $val = Image::ExifTool::Unicode2UTF8($val,'n');
+            #}
         } else {
             # convert to UTF8
             my $fmt;
@@ -1259,7 +1231,8 @@ sub WriteMIEGroup($$$)
                     # join multiple values into a single string
                     $newVal = join "\0", @newVals;
                     # write string as UTF-8,16 or 32 if value contains valid UTF-8 codes
-                    my $isUTF8 = IsUTF8($newVal);
+                    require Image::ExifTool::XMP;
+                    my $isUTF8 = Image::ExifTool::XMP::IsUTF8(\$newVal);
                     if ($isUTF8 > 0) {
                         $writable = 'utf8';
                         # write UTF-16 or UTF-32 if it is more compact

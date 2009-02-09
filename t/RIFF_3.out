@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.50
-[File, File, Image]  - File Name: RIFF.avi
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 1262 bytes
-[File, File, Time]  - File Modification Date/Time: 2008:09:12 16:31:11-04:00
-[File, File, Image]  - File Type: AVI
-[File, File, Image]  - MIME Type: video/avi
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: RIFF.avi
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 1262 bytes
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:09:12 16:31:11-04:00
+[File, File, Image] FileType - File Type: AVI
+[File, File, Image] MIMEType - MIME Type: video/avi
 [RIFF, RIFF, Video] 0 - Frame Rate: 15
 [RIFF, RIFF, Video] 1 - Max Data Rate: 201.2 kB/s
 [RIFF, RIFF, Video] 4 - Frame Count: 233
@@ -41,5 +41,5 @@
 [XMP, XMP-xmpDM, Image] album - Album: No Album
 [XMP, XMP-xmp, Time] MetadataDate - Metadata Date: 2008:09:12 11:17:39-04:00
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
-[Composite, Composite, Other]  - Duration: 15.53 s
-[Composite, Composite, Image]  - Image Size: 320x240
+[Composite, Composite, Other] Duration - Duration: 15.53 s
+[Composite, Composite, Image] ImageSize - Image Size: 320x240

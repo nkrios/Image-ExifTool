@@ -33,6 +33,11 @@ allows them to be tested without having to check for an undefined value.</p>
 
 <tr><td>CHANGED</td><td>Number of tags changed during writing</td></tr>
 
+<tr><td>CUR_LANG</td><td>Current language-Charset code for localized descriptions,
+    but note that the default language 'en' does not have a Charset designation
+    appended because there are no special characters in these descriptions so
+    it doesn't have to be reloaded when Charset changes.</td></tr>
+
 <tr><td>DEL_GROUP</td><td>Hash of groups to delete.  Value is 1 to delete group
     completely, or 2 if tags were added back after deleting the group.</td></tr>
 
@@ -47,7 +52,7 @@ allows them to be tested without having to check for an undefined value.</p>
 <tr><td>DOC_NUM</td><td>Current document number while extracting (0, '' or undef for the
     main document)</td></tr>
 
-<tr><td>DONE_ID3</td><td>Set to 1 if audio file was scanned for ID3,
+<tr><td>DoneID3</td><td>Set to 1 if audio file was scanned for ID3,
     or 2 if there was an ID3v1 trailer found</td></tr>
 
 <tr><td>DROP_TAGS</td><td>Flag to exclude "Drop" tags when writing</td></tr>
@@ -74,7 +79,8 @@ allows them to be tested without having to check for an undefined value.</p>
 <tr><td>FILE_ORDER</td><td>Hash of numbers to give the sequence the tags were
     extracted from file, keyed by tag key</td></tr>
 
-<tr><td>FILE_EXT</td><td>File extension (JPG, PEF, AVI, etc...)</td></tr>
+<tr><td>FILE_EXT</td><td>File extension (JPG, PEF, AVI, etc...) May be undefined if
+    file has no extension.</td></tr>
 
 <tr><td>FILE_TYPE</td><td>Root file format type (JPEG, TIFF, RIFF, etc...)</td></tr>
 

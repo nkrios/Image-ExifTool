@@ -33,7 +33,8 @@ div.index   { float: right; clear: both;
 file. These are the only files that exiftool can create from scratch.  A common
 example of this is the XMP "sidecar" file (which is discussed in the next
 section in some detail).  Other supported metadata file types are EXIF, MIE,
-ICC and VRD.</p>
+ICC and VRD.  As well, ExifTool supports XML-format output, which can also be
+used to generate metadata sidecar files.</p>
 
 <hr>
 <a name="xmp"></a>
@@ -136,8 +137,9 @@ exiftool-specific namespaces to give an exact mapping for all exiftool tag
 names.  This type of file is better suited to general information
 storage/recovery since it facilitates copying of more original metadata than an
 XMP file, but it doesn't have the portability of an XMP file or the ability to
-store binary data like a MIE file. Below are example commands demonstrating the
-use of exiftool XML files.</p>
+store native-format data like a MIE file, and ExifTool can not be used to edit
+XML files as it can with other metadata files.  Below are example commands
+demonstrating the use of exiftool XML files.</p>
 
 <p>Create an exiftool XML sidecar file:</p>
 <pre>exiftool a.jpg -X > a.xml</pre>
@@ -214,7 +216,7 @@ which may be useful if disk space is at a premium.</p>
 
 <hr>
 <i>Created Nov 12, 2008</i><br>
-<i>Last revised Nov 26, 2008</i>
+<i>Last revised Jan 17, 2009</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

@@ -98,6 +98,7 @@ reference number and not the actual firmware version)</span></span></td></tr>
   <br>13 = Panning
   <br>14 = Simple
   <br>15 = Color Effects
+  <br>16 = Self Portrait
   <br>18 = Fireworks
   <br>19 = Party
   <br>20 = Snow
@@ -116,7 +117,8 @@ reference number and not the actual firmware version)</span></span></td></tr>
   <br>33 = Pet
   <br>34 = Intelligent ISO
   <br>36 = High Speed Continuous Shooting
-  <br>37 = Intelligent Auto</span></td></tr>
+  <br>37 = Intelligent Auto
+  <br>39 = Multi-aspect</span></td></tr>
 <tr>
 <td>0x0020</td>
 <td>Audio</td>
@@ -168,9 +170,11 @@ written to memory card)</span></span></td></tr>
 <td>0x002a</td>
 <td>BurstMode</td>
 <td class=c>int16u</td>
-<td><span class=s>0 = Off
-  <br>1 = Low/High Quality
-  <br>2 = Infinite</span></td></tr>
+<td><span class=s><span class=n>(decoding may be different for some models)</span>
+  <br>0 = Off
+  <br>1 = On
+  <br>2 = Infinite
+  <br>4 = Unlimited</span></td></tr>
 <tr class=b>
 <td>0x002b</td>
 <td>SequenceNumber</td>
@@ -205,8 +209,8 @@ and LC80)</span>
 <td>SelfTimer</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Off
-  <br>2 = 10s
-  <br>3 = 2s</span></td></tr>
+  <br>2 = 10 s
+  <br>3 = 2 s</span></td></tr>
 <tr class=b>
 <td>0x0030</td>
 <td>Rotation</td>
@@ -257,21 +261,27 @@ and LC80)</span>
 <td><span class=s>1 = Home
   <br>2 = Destination</span></td></tr>
 <tr class=b>
+<td>0x003b</td>
+<td>TextStamp</td>
+<td class=c>in16u</td>
+<td><span class=s>1 = Off
+  <br>2 = On</span></td></tr>
+<tr>
 <td>0x003c</td>
 <td>ProgramISO</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0040</td>
 <td>Saturation</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0041</td>
 <td>Sharpness</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0042</td>
 <td>FilmMode</td>
 <td class=c>int16u</td>
@@ -282,42 +292,42 @@ and LC80)</span>
   <br>5 = Standard (B&amp;W)
   <br>6 = Dynamic (B&amp;W)
   <br>7 = Smooth (B&amp;W)</span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0046</td>
 <td>WBAdjustAB</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(positive is a shift toward blue)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>0x0047</td>
 <td>WBAdjustGM</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(positive is a shift toward green)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>0x0051</td>
 <td>LensType</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0052</td>
 <td>LensSerialNumber</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x0053</td>
 <td>AccessoryType</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>0x8000</td>
 <td>MakerNoteVersion</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x8001</td>
 <td>SceneMode</td>
 <td class=c>int16u</td>
@@ -337,6 +347,7 @@ and LC80)</span>
   <br>13 = Panning
   <br>14 = Simple
   <br>15 = Color Effects
+  <br>16 = Self Portrait
   <br>18 = Fireworks
   <br>19 = Party
   <br>20 = Snow
@@ -355,22 +366,29 @@ and LC80)</span>
   <br>33 = Pet
   <br>34 = Intelligent ISO
   <br>36 = High Speed Continuous Shooting
-  <br>37 = Intelligent Auto</span></td></tr>
-<tr class=b>
+  <br>37 = Intelligent Auto
+  <br>39 = Multi-aspect</span></td></tr>
+<tr>
 <td>0x8004</td>
 <td>WBRedLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>0x8005</td>
 <td>WBGreenLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>0x8006</td>
 <td>WBBlueLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>0x8007</td>
+<td>FlashFired</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = No
+  <br>2 = Yes</span></td></tr>
 <tr>
 <td>0x8010</td>
 <td>BabyAge</td>
@@ -698,7 +716,7 @@ iPalm.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 9, 2008</i>
+<br><i>Last revised Feb 7, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

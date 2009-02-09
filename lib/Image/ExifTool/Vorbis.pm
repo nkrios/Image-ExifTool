@@ -196,7 +196,7 @@ sub ProcessOGG($$)
     my ($exifTool, $dirInfo) = @_;
 
     # must first check for leading/trailing ID3 information
-    unless ($exifTool->{DONE_ID3}) {
+    unless ($exifTool->{DoneID3}) {
         require Image::ExifTool::ID3;
         Image::ExifTool::ID3::ProcessID3($exifTool, $dirInfo) and return 1;
     }

@@ -337,6 +337,19 @@ my %xmpStruct = (
         Sublocation  => { },
         WorldRegion  => { },
     },
+    # Microsoft Photo 1.2 structures
+    RegionInfo => {
+        NAMESPACE => 'MPRI',
+        Regions => {
+            Struct => 'Regions',
+            List => 'Bag',
+        },
+    },
+    Regions => {
+        NAMESPACE => 'MPReg',
+        Rectangle => { },
+        PersonDisplayName => { },
+    },
 );
 
 my $rdfDesc = 'rdf:Description';
@@ -379,7 +392,6 @@ my $pktCloseR =  "<?xpacket end='r'?>";
     }
     # update XMP tag tables
     my $mainTable = GetTagTable('Image::ExifTool::XMP::Main');
-    GenerateTagIDs($mainTable);
     foreach $mainTag (keys %$mainTable) {
         my $mainInfo = $mainTable->{$mainTag};
         next unless ref $mainInfo eq 'HASH' and $mainInfo->{SubDirectory};
@@ -398,7 +410,6 @@ my $pktCloseR =  "<?xpacket end='r'?>";
             $$table{NAMESPACE} = $ns;
         }
         $$table{WRITE_PROC} = \&WriteXMP;   # set WRITE_PROC for all tables
-        GenerateTagIDs($table);
         $table->{CHECK_PROC} = \&CheckXMP;  # add our write check routine
         foreach $tag (TagTableKeys($table)) {
             my $tagInfo = $$table{$tag};
@@ -487,15 +498,27 @@ sub FormatXMPDate($)
 sub CheckXMP($$$)
 {
     my ($exifTool, $tagInfo, $valPtr) = @_;
-    # convert value from Latin if necessary
-    if ($exifTool->{OPTIONS}->{Charset} eq 'Latin' and $$valPtr =~ /[\x80-\xff]/) {
-        # convert from Latin to UTF-8
-        my $val = Image::ExifTool::Latin2Unicode($$valPtr,'n');
-        $$valPtr = Image::ExifTool::Unicode2UTF8($val,'n');
-    }
     my $format = $tagInfo->{Writable};
-    # if no format specified, value is a simple string
-    return undef unless $format and $format ne 'string';
+    # (if no format specified, value is a simple string)
+    if (not $format or $format eq 'string' or $format eq 'lang-alt') {
+        # convert value from Latin if necessary
+        if ($exifTool->{OPTIONS}->{Charset} eq 'Latin') {
+            if ($$valPtr =~ /[\x80-\xff]/) {
+                # convert from Latin to UTF-8
+                my $val = Image::ExifTool::Latin2Unicode($$valPtr,'n');
+                $$valPtr = Image::ExifTool::Unicode2UTF8($val,'n');
+            }
+        } else {
+            # translate invalid XML characters to "."
+            $$valPtr =~ tr/\0-\x08\x0b\x0c\x0e-\x1f/./;
+            # fix any malformed UTF-8 characters
+            if (FixUTF8($valPtr) and not $$exifTool{WarnBadUTF8}) {
+                $exifTool->Warn('Malformed UTF-8 character(s)');
+                $$exifTool{WarnBadUTF8} = 1;
+            }
+        }
+        return undef;   # success
+    }
     if ($format eq 'rational' or $format eq 'real') {
         # make sure the value is a valid floating point number
         Image::ExifTool::IsFloat($$valPtr) or return 'Not a floating point number';
@@ -515,8 +538,6 @@ sub CheckXMP($$$)
         my $newDate = FormatXMPDate($$valPtr);
         return "Invalid date/time (use YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM|Z])" unless $newDate;
         $$valPtr = $newDate;
-    } elsif ($format eq 'lang-alt') {
-        # nothing to do
     } elsif ($format eq 'boolean') {
         if (not $$valPtr or $$valPtr =~ /false/i or $$valPtr =~ /^no$/i) {
             $$valPtr = 'False';
@@ -578,7 +599,7 @@ sub SetPropertyPath($$;$$)
     # set PropertyPath for all elements of this structure if necessary
     my $structName = $$tagInfo{Struct};
     if ($structName) {
-        my $struct = $xmpStruct{$structName} || 
+        my $struct = $xmpStruct{$structName} ||
                      $Image::ExifTool::UserDefined::xmpStruct{$structName};
         $struct or warn("No XMP $$tagInfo{Struct} structure!\n"), return;
         my $tag;
@@ -640,7 +661,7 @@ sub CaptureXMP($$$;$)
         # set flag so we don't write x:xmpmeta element
         $exifTool->{XMP_NO_XMPMETA} = 1;
         # add missing x:xmpmeta element and try again
-        unshift @$propList, 'x:xmpmeta';    
+        unshift @$propList, 'x:xmpmeta';
         CaptureXMP($exifTool, $propList, $val, $attrs);
     } else {
         $exifTool->{XMP_ERROR} = 'Improperly enclosed XMP property: ' . join('/',@$propList);
@@ -1150,12 +1171,12 @@ sub WriteXMP($$;$)
                 $path =~ s/(.*) 10/$1 11/ or warn "Internal error: no list index!\n", next;
             }
         }
-        
+
         # add new value(s) to %capture hash
         for (;;) {
             my $newValue = EscapeXML(shift @newValues);
             if ($$tagInfo{Resource}) {
-                $capture{$path} = [ '', { %attrs, 'rdf:resource' => $newValue } ]; 
+                $capture{$path} = [ '', { %attrs, 'rdf:resource' => $newValue } ];
             } else {
                 $capture{$path} = [ $newValue, \%attrs ];
             }

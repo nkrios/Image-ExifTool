@@ -19,13 +19,13 @@ use strict;
 require 5.004;  # require 5.004 for UNIVERSAL::isa (otherwise 5.002 would do)
 require Exporter;
 use File::RandomAccess;
-    
+
 use vars qw($VERSION $RELEASE @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $xmpExtAPP1hdr $psAPP13hdr
             $psAPP13old @loadAllTables %UserDefined $evalWarning %noWriteFile
-            %magicNumber);
+            %magicNumber @langs $defaultLang);
 
-$VERSION = '7.60';
+$VERSION = '7.67';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -41,7 +41,7 @@ $RELEASE = '';
         WriteValue Tell Set8u Set8s Set16u Set32u
     )],
     Utils => [qw(
-        GetTagTable TagTableKeys GetTagInfoList GenerateTagIDs
+        GetTagTable TagTableKeys GetTagInfoList
     )],
     Vars => [qw(
         %allTables @tableOrder @fileTypes
@@ -103,6 +103,7 @@ sub WriteBinaryData($$$);
 sub CheckBinaryData($$$);
 sub WriteTIFF($$$);
 sub Charset2Unicode($$;$);
+sub Charset2UTF8($$);
 sub Latin2Unicode($$);
 sub UTF82Unicode($$;$);
 sub Unicode2Charset($$;$);
@@ -124,6 +125,11 @@ sub SetPreferredByteOrder($);
     Real::Metafile RIFF AIFF ASF DICOM DjVu MIE HTML XMP::SVG EXE EXE::PEVersion
     EXE::PEString EXE::MachO EXE::PEF EXE::ELF Rawzor ZIP
 );
+
+# alphabetical list of current Lang modules
+@langs = qw(ch_s cz de en en_ca en_gb es fr it jp nl pl);
+
+$defaultLang = 'en';        # default language
 
 # recognized file types, in the order we test unknown files
 # Notes: 1) There is no need to test for like types separately here
@@ -385,7 +391,7 @@ my %moduleName = (
 # - regular expression evaluated on first 1024 bytes of file
 # - must match beginning at first byte in file
 # - this test must not be more stringent than module logic
-my %magicNumber = (
+%magicNumber = (
     AIFF => '(FORM....AIF[FC]|AT&TFORM)',
     APE  => '(MAC |APETAGEX|ID3)',
     ASF  => '\x30\x26\xb2\x75\x8e\x66\xcf\x11\xa6\xd9\x00\xaa\x00\x62\xce\x6c',
@@ -444,11 +450,11 @@ my %allGroupsExifTool = ( 0 => 'ExifTool', 1 => 'ExifTool', 2 => 'ExifTool' );
 
 # special tag names (not used for tag info)
 my %specialTags = (
-    PROCESS_PROC=>1, WRITE_PROC=>1, CHECK_PROC=>1, GROUPS=>1, FORMAT=>1,
-    FIRST_ENTRY=>1, TAG_PREFIX=>1, PRINT_CONV=>1, DID_TAG_ID=>1, WRITABLE=>1,
-    NOTES=>1, IS_OFFSET=>1, EXTRACT_UNKNOWN=>1, NAMESPACE=>1, PREFERRED=>1,
-    PARENT=>1, PRIORITY=>1, WRITE_GROUP=>1, LANG_INFO=>1, VARS=>1,
-    DATAMEMBER=>1, SET_GROUP1=>1,
+    TABLE_NAME=>1, SHORT_NAME=>1, PROCESS_PROC=>1, WRITE_PROC=>1, CHECK_PROC=>1,
+    GROUPS=>1, FORMAT=>1, FIRST_ENTRY=>1, TAG_PREFIX=>1, PRINT_CONV=>1,
+    WRITABLE=>1, DESCRIPTION=>1, NOTES=>1, IS_OFFSET=>1, EXTRACT_UNKNOWN=>1,
+    NAMESPACE=>1, PREFERRED=>1, PARENT=>1, PRIORITY=>1, WRITE_GROUP=>1,
+    LANG_INFO=>1, CUR_LANG=>1, VARS=>1, DATAMEMBER=>1, SET_GROUP1=>1,
 );
 
 # headers for various segment types
@@ -483,7 +489,7 @@ sub DummyWriteProc { return 1; }
 #       used to write the entire corresponding directory as a block.
 %Image::ExifTool::Extra = (
     GROUPS => { 0 => 'File', 1 => 'File', 2 => 'Image' },
-    DID_TAG_ID => 1,   # tag ID's aren't meaningful for these tags
+    VARS => { NO_ID => 2 }, # tag ID's aren't meaningful for these tags
     WRITE_PROC => \&DummyWriteProc,
     Comment => {
         Notes => 'comment embedded in JPEG, GIF89a or PPM/PGM/PBM image',
@@ -525,7 +531,7 @@ sub DummyWriteProc { return 1; }
         ValueConv => 'ConvertUnixTime($val,"local")',
         ValueConvInv => 'GetUnixTime($val,"local")',
         PrintConv => '$self->ConvertDateTime($val)',
-        PrintConvInv => '$self->InverseDateTime($val)', 
+        PrintConvInv => '$self->InverseDateTime($val)',
     },
     MIMEType    => { },
     ImageWidth  => { },
@@ -554,7 +560,7 @@ sub DummyWriteProc { return 1; }
     XMP => {
         Notes => 'the full XMP data block',
         Groups => { 0 => 'XMP', 1 => 'XMP' },
-        Flags => [ 'Writable', 'Protected', 'Binary' ],
+        Flags => ['Writable', 'Protected', 'Binary'],
         Priority => 0,  # so main xmp (which usually comes first) takes priority
         WriteCheck => q{
             require Image::ExifTool::XMP;
@@ -641,7 +647,7 @@ sub DummyWriteProc { return 1; }
 %Image::ExifTool::JPEG::SOF = (
     GROUPS => { 0 => 'File', 1 => 'File', 2 => 'Image' },
     NOTES => 'This information is extracted from the JPEG Start Of Frame segment.',
-    VARS => { NO_ID => 1 },
+    VARS => { NO_ID => 2 }, # tag ID's aren't meaningful for these tags
     EncodingProcess => {
         PrintHex => 1,
         PrintConv => {
@@ -675,12 +681,12 @@ sub DummyWriteProc { return 1; }
 %allTables = ( );   # list of all tables loaded (except composite tags)
 @tableOrder = ( );  # order the tables were loaded
 
-my $didTagID;       # flag indicating we are accessing tag ID's
-
 # composite tags (accumulation of all Composite tag tables)
 %Image::ExifTool::Composite = (
     GROUPS => { 0 => 'Composite', 1 => 'Composite' },
-    DID_TAG_ID => 1,    # want empty tagID's for composite tags
+    TABLE_NAME => 'Image::ExifTool::Composite',
+    SHORT_NAME => 'Composite',
+    VARS => { NO_ID => 2 }, # want empty tagID's for composite tags
     WRITE_PROC => \&DummyWriteProc,
 );
 
@@ -837,20 +843,36 @@ sub Options($$;@)
 
     while (@_) {
         my $param = shift;
-        $oldVal = $options->{$param};
+        $oldVal = $$options{$param};
         last unless @_;
-        $options->{$param} = shift;
-        # clone Exclude list and expand shortcuts
-        if ($param eq 'Exclude' and defined $options->{$param}) {
+        my $newVal = shift;
+        if ($param eq 'Lang') {
+            # allow this to be set to undef to select the default language
+            $newVal = $defaultLang unless defined $newVal;
+            if ($newVal eq $defaultLang) {
+                $$options{$param} = $newVal;
+                delete $$self{CUR_LANG};
+            # make sure the language is available
+            } elsif (eval "require Image::ExifTool::Lang::$newVal") {
+                my $xlat = "Image::ExifTool::Lang::${newVal}::Translate";
+                no strict 'refs';
+                if (%$xlat) {
+                    $$self{CUR_LANG} = \%$xlat;
+                    $$options{$param} = $newVal;
+                }
+            } # else don't change Lang
+        } elsif ($param eq 'Exclude' and defined $$options{$param}) {
+            # clone Exclude list and expand shortcuts
             my @exclude;
-            my $val = $options->{$param};
-            if (ref $val eq 'ARRAY') {
-                @exclude = @$val;
+            if (ref $newVal eq 'ARRAY') {
+                @exclude = @$newVal;
             } else {
-                @exclude = ($val);
+                @exclude = ($newVal);
             }
             ExpandShortcuts(\@exclude);
-            $options->{$param} = \@exclude;
+            $$options{$param} = \@exclude;
+        } else {
+            $$options{$param} = $newVal;
         }
     }
     return $oldVal;
@@ -884,6 +906,7 @@ sub ClearOptions($)
         HtmlDump    => 0,       # HTML dump (0-3, higher # = bigger limit)
     #   HtmlDumpBase => undef,  # base address for HTML dump
     #   IgnoreMinorErrors => undef, # ignore minor errors when reading/writing
+        Lang        => $defaultLang, # localized language for descriptions etc
     #   List        => undef,   # extract lists of PrintConv values into arrays
         ListSep     => ', ',    # list item separator
     #   ListSplit   => undef,   # regex for splitting list-type tag values when writing
@@ -897,6 +920,8 @@ sub ClearOptions($)
         Unknown     => 0,       # flag to get values of unknown tags (0-2)
         Verbose     => 0,       # print verbose messages (0-4, higher # = more verbose)
     };
+    # must keep CUR_LANG in sync with options
+    delete $$self{CUR_LANG};
 }
 
 #------------------------------------------------------------------------------
@@ -919,7 +944,7 @@ sub ExtractInfo($;@)
         $reEntry = 1;
     } elsif (defined $_[0] or $options->{HtmlDump}) {
         %saveOptions = %$options;       # save original options
-        
+
         # require duplicates for html dump
         $self->Options(Duplicates => 1) if $options->{HtmlDump};
 
@@ -927,18 +952,17 @@ sub ExtractInfo($;@)
             # only initialize filename if called with arguments
             $self->{FILENAME} = undef;  # name of file (or '' if we didn't open it)
             $self->{RAF} = undef;       # RandomAccess object reference
-    
+
             $self->ParseArguments(@_);  # initialize from our arguments
         }
     }
     unless ($reEntry) {
         # initialize ExifTool object members
         $self->Init();
-    
+
         delete $self->{MAKER_NOTE_FIXUP};   # fixup information for extracted maker notes
         delete $self->{MAKER_NOTE_BYTE_ORDER};
-        delete $self->{DONE_ID3};
-    
+
         # return our version number
         $self->FoundTag('ExifToolVersion', "$VERSION$RELEASE");
         $self->FoundTag('Now', time()) if $self->{REQ_TAG_LOOKUP}{now} or $self->{TAGS_FROM_FILE};
@@ -1373,7 +1397,16 @@ sub GetValue($$;$)
                 }
                 if (ref $conv eq 'HASH') {
                     # look up converted value in hash
-                    unless (defined($value = $$conv{$val})) {
+                    if (defined($value = $$conv{$val})) {
+                        # override with our localized language PrintConv if available
+                        while ($$self{CUR_LANG} and $convType eq 'PrintConv') {
+                            my $lc = $self->{CUR_LANG}{$$tagInfo{Name}} or last;
+                            ref $lc eq 'HASH' and ($lc = $$lc{PrintConv}) or last;
+                            $lc = $$lc{$value} or last;
+                            $value = $self->UTF82Charset($lc);
+                            last;
+                        }
+                    } else {
                         if ($$conv{BITMASK}) {
                             $value = DecodeBits($val, $$conv{BITMASK});
                         } elsif (not $$conv{OTHER} or
@@ -1445,16 +1478,33 @@ sub GetValue($$;$)
 # Returns: Tag ID if available, otherwise ''
 sub GetTagID($$)
 {
-    local $_;
     my ($self, $tag) = @_;
     my $tagInfo = $self->{TAG_INFO}{$tag};
-
-    if ($tagInfo) {
-        GenerateAllTagIDs();    # make sure tag ID's are generated
-        defined $$tagInfo{TagID} and return $$tagInfo{TagID};
-    }
+    defined $$tagInfo{TagID} and return $$tagInfo{TagID} if $tagInfo;
     # no ID for this tag (shouldn't happen)
     return '';
+}
+
+#------------------------------------------------------------------------------
+# Get tag table name
+# Inputs: 0) ExifTool object reference, 1) tag key
+# Returns: Table name if available, otherwise ''
+sub GetTableName($$)
+{
+    my ($self, $tag) = @_;
+    my $tagInfo = $self->{TAG_INFO}{$tag} or return '';
+    return $tagInfo->{Table}{SHORT_NAME};
+}
+
+#------------------------------------------------------------------------------
+# Get tag index number
+# Inputs: 0) ExifTool object reference, 1) tag key
+# Returns: Table index number, or undefined if this tag isn't indexed
+sub GetTagIndex($$)
+{
+    my ($self, $tag) = @_;
+    my $tagInfo = $self->{TAG_INFO}{$tag} or return undef;
+    return $$tagInfo{Index};
 }
 
 #------------------------------------------------------------------------------
@@ -1466,11 +1516,18 @@ sub GetDescription($$)
 {
     local $_;
     my ($self, $tag) = @_;
-    my $tagInfo = $self->{TAG_INFO}{$tag};
-    # ($tagInfo should be defined for any extracted tag,
-    # but we might as well handle the case where it isn't)
     my $desc;
-    $desc = $$tagInfo{Description} if $tagInfo;
+    my $tagInfo = $self->{TAG_INFO}{$tag};
+    # ($tagInfo won't be defined for missing tags extracted with -f)
+    if ($tagInfo) {
+        # use alternate language description if available
+        while ($$self{CUR_LANG}) {
+            $desc = $self->{CUR_LANG}{$$tagInfo{Name}} or last;
+            $desc = $$desc{Description} or last if ref $desc;
+            return $self->UTF82Charset($desc);
+        }
+        $desc = $$tagInfo{Description};
+    }
     # just make the tag more readable if description doesn't exist
     unless ($desc) {
         $desc = MakeDescription(GetTagName($tag));
@@ -1489,7 +1546,7 @@ sub GetDescription($$)
 #          Array context: Group name if family specified, otherwise list of
 #          group names for each family.  Returns '' for undefined tag.
 # Notes: Mutiple families may be specified with ':' in family argument (ie. '1:2')
-sub GetGroup($$;$$)
+sub GetGroup($$;$)
 {
     local $_;
     my ($self, $tag, $family) = @_;
@@ -1628,7 +1685,7 @@ sub BuildCompositeTags($)
     my $self = shift;
 
     # first, add user-defined composite tags if necessary
-    if (defined %UserDefined and $UserDefined{'Image::ExifTool::Composite'}) {
+    if (%UserDefined and $UserDefined{'Image::ExifTool::Composite'}) {
         AddCompositeTags($UserDefined{'Image::ExifTool::Composite'},1);
         delete $UserDefined{'Image::ExifTool::Composite'};
     }
@@ -1969,7 +2026,7 @@ sub GroupMatches($$$)
             }
             push @matches, $tag if $g == @grps;
         }
-    } else {  
+    } else {
         my $family = ($group =~ s/^(\d+)//) ? $1 : -1;
         foreach $tag (@$tagList) {
             my @groups = $self->GetGroup($tag, $family);
@@ -2431,13 +2488,13 @@ sub ExpandFlags($)
 sub SetupTagTable($)
 {
     my $tagTablePtr = shift;
-    my $tagID;
+    my ($tagID, $tagInfo);
     foreach $tagID (TagTableKeys($tagTablePtr)) {
         my @infoArray = GetTagInfoList($tagTablePtr,$tagID);
         # process conditional tagInfo arrays
-        my $tagInfo;
         foreach $tagInfo (@infoArray) {
             $$tagInfo{Table} = $tagTablePtr;
+            $$tagInfo{TagID} = $tagID;
             my $tag = $$tagInfo{Name};
             unless (defined $tag) {
                 # generate name equal to tag ID if 'Name' doesn't exist
@@ -2445,6 +2502,12 @@ sub SetupTagTable($)
                 $$tagInfo{Name} = ucfirst($tag); # make first char uppercase
             }
             $$tagInfo{Flags} and ExpandFlags($tagInfo);
+        }
+        next unless @infoArray > 1;
+        # add an "Index" member to each tagInfo in a list
+        my $index = 0;
+        foreach $tagInfo (@infoArray) {
+            $$tagInfo{Index} = $index++;
         }
     }
 }
@@ -2794,8 +2857,8 @@ sub UTF82Charset($$)
 {
     my ($self, $val) = @_;
     if ($self->{OPTIONS}{Charset} eq 'Latin' and $val =~ /[\x80-\xff]/) {
-        $val = Image::ExifTool::UTF82Unicode($val,'n',$self);
-        $val = Image::ExifTool::Unicode2Latin($val,'n',$self);
+        $val = UTF82Unicode($val,'n',$self);
+        $val = Unicode2Latin($val,'n',$self);
     }
     return $val;
 }
@@ -2808,8 +2871,8 @@ sub Latin2Charset($$)
 {
     my ($self, $val) = @_;
     if ($self->{OPTIONS}{Charset} eq 'UTF8' and $val =~ /[\x80-\xff]/) {
-        $val = Image::ExifTool::Latin2Unicode($val,'n');
-        $val = Image::ExifTool::Unicode2UTF8($val,'n');
+        $val = Latin2Unicode($val,'n');
+        $val = Unicode2UTF8($val,'n');
     }
     return $val;
 }
@@ -2927,6 +2990,7 @@ sub ConvertDateTime($$)
 #------------------------------------------------------------------------------
 # Patched timelocal() that fixes ActivePerl timezone bug
 # Inputs/Returns: same as timelocal()
+# Notes: must 'require Time::Local' before calling this routine
 sub TimeLocal(@)
 {
     my $tm = Time::Local::timelocal(@_);
@@ -3019,7 +3083,7 @@ sub ConvertDuration($;$)
     my $time = shift;
     return $time unless IsFloat($time);
     return '0 s' if $time == 0;
-    return sprintf('%.2f s', $time) if $time < 60;
+    return sprintf('%.2f s', $time) if $time < 30;
     my $str = '';
     if ($time >= 3600) {
         my $h = int($time / 3600);
@@ -3629,6 +3693,7 @@ sub ProcessJPEG($$)
             }
         } elsif ($marker == 0xfe) {         # COM (JPEG comment)
             $dumpType = 'Comment';
+            $$segDataPt =~ s/\0+$//;    # some dumb softwares add null terminators
             $self->FoundTag('Comment', $$segDataPt);
         } elsif (($marker & 0xf0) != 0xe0) {
             undef $dumpType;    # only dump unknown APP segments
@@ -3930,9 +3995,13 @@ sub ProcessTIFF($$;$)
         Write($outfile, $$trailPt) or $err = 1 if $trailPt;
     }
     # check DNG version
-    if ($$self{DNGVersion} and $$self{DNGVersion} ge "\x01\x03\0\0") {
-        my $ver = join('.', unpack('C*', $$self{DNGVersion}));;
-        $self->Error("DNG Version $ver not yet supported", 1);
+    if ($$self{DNGVersion}) {
+        my $ver = $$self{DNGVersion};
+        # currently support up to DNG version 1.2
+        unless ($ver =~ /^(\d+) (\d+)/ and "$1.$2" <= 1.2) {
+            $ver =~ tr/ /./;
+            $self->Error("DNG Version $ver not yet supported", 1);
+        }
     }
     delete $self->{TIFF_END};
     return $err ? -1 : 1;
@@ -3968,25 +4037,24 @@ sub TagTableKeys($)
 sub GetTagTable($)
 {
     my $tableName = shift or return undef;
-
     my $table = $allTables{$tableName};
 
     unless ($table) {
         no strict 'refs';
-        unless (defined %$tableName) {
+        unless (%$tableName) {
             # try to load module for this table
             if ($tableName =~ /(.*)::/) {
                 my $module = $1;
                 if (eval "require $module") {
                     # load additional XMP modules if required
-                    if (not defined %$tableName and $module eq 'Image::ExifTool::XMP') {
+                    if (not %$tableName and $module eq 'Image::ExifTool::XMP') {
                         require Image::ExifTool::XMP2;
                     }
                 } else {
                     $@ and warn $@;
                 }
             }
-            unless (defined %$tableName) {
+            unless (%$tableName) {
                 warn "Can't find table $tableName\n";
                 return undef;
             }
@@ -3994,6 +4062,8 @@ sub GetTagTable($)
         no strict 'refs';
         $table = \%$tableName;
         use strict 'refs';
+        $$table{TABLE_NAME} = $tableName;   # set table name
+        ($$table{SHORT_NAME} = $tableName) =~ s/^Image::ExifTool:://;
         # set default group 0 and 1 from module name unless already specified
         my $defaultGroups = $$table{GROUPS};
         $defaultGroups or $defaultGroups = $$table{GROUPS} = { };
@@ -4020,7 +4090,7 @@ sub GetTagTable($)
         # set up the new table
         SetupTagTable($table);
         # add any user-defined tags
-        if (defined %UserDefined and $UserDefined{$tableName}) {
+        if (%UserDefined and $UserDefined{$tableName}) {
             my $tagID;
             foreach $tagID (TagTableKeys($UserDefined{$tableName})) {
                 my $tagInfo = $UserDefined{$tableName}{$tagID};
@@ -4038,8 +4108,6 @@ sub GetTagTable($)
                 AddTagToTable($table, $tagID, $tagInfo);
             }
         }
-        # generate tag ID's if necessary
-        GenerateTagIDs($table) if $didTagID;
         # remember order we loaded the tables in
         push @tableOrder, $tableName;
         # insert newly loaded table into list
@@ -4089,7 +4157,7 @@ sub ProcessDirectory($$$;$)
 #------------------------------------------------------------------------------
 # Get standardized file extension
 # Inputs: 0) file name
-# Returns: standardized extension (all uppercase)
+# Returns: standardized extension (all uppercase), or undefined if no extension
 sub GetFileExtension($)
 {
     my $filename = shift;
@@ -4196,12 +4264,13 @@ sub GetTagInfo($$$;$$$)
 #------------------------------------------------------------------------------
 # Add new tag to table (must use this routine to add new tags to a table)
 # Inputs: 0) reference to tag table, 1) tag ID
-#         2) reference to tag information hash
+#         2) [optional] reference to tag information hash
 # Notes: - will not overwrite existing entry in table
 # - info need contain no entries when this routine is called
-sub AddTagToTable($$$)
+sub AddTagToTable($$;$)
 {
     my ($tagTablePtr, $tagID, $tagInfo) = @_;
+    $tagInfo or $tagInfo = { };
 
     # define necessary entries in information hash
     if ($$tagInfo{Groups}) {
@@ -4218,12 +4287,24 @@ sub AddTagToTable($$$)
     $$tagInfo{Table} = $tagTablePtr;
     $$tagInfo{TagID} = $tagID;
 
-    unless ($$tagInfo{Name}) {
+    my $name = $$tagInfo{Name};
+    if ($name) {
+        $name =~ tr/-_a-zA-Z0-9//dc;    # remove illegal characters
+    } else {
+        # construct a name from the tag ID
+        $name = $tagID;
+        $name =~ tr/-_a-zA-Z0-9//dc;    # remove illegal characters
+        $name = ucfirst $name;          # start with uppercase
+        # make sure name is a reasonable length
         my $prefix = $$tagTablePtr{TAG_PREFIX};
-        $$tagInfo{Name} = "${prefix}_$tagID";
-        # make description to prevent tagID from getting mangled by MakeDescription()
-        $$tagInfo{Description} = MakeDescription($prefix, $tagID);
+        if ($prefix) {
+            # make description to prevent tagID from getting mangled by MakeDescription()
+            $$tagInfo{Description} = MakeDescription($prefix, $name);
+            $name = "${prefix}_$name";
+        }
     }
+    # don't allow single-character tag names
+    $$tagInfo{Name} = length($name) > 1 ? $name : "Tag$name";
     # add tag to table, but never overwrite existing entries (could potentially happen
     # if someone thinks there isn't any tagInfo because a condition wasn't satisfied)
     $$tagTablePtr{$tagID} = $tagInfo unless defined $$tagTablePtr{$tagID};
@@ -4423,44 +4504,6 @@ sub SetGroup1($$$)
 {
     my ($self, $tagKey, $extra) = @_;
     $self->{DYGROUP}{$tagKey}[0] = $extra;
-}
-
-#------------------------------------------------------------------------------
-# Set ID's for all tags in specified table
-# Inputs: 0) tag table reference
-sub GenerateTagIDs($)
-{
-    my $table = shift;
-
-    unless ($$table{DID_TAG_ID}) {
-        $$table{DID_TAG_ID} = 1;    # set flag so we won't do this table again
-        my ($tagID, $tagInfo);
-        foreach $tagID (keys %$table) {
-            next if $specialTags{$tagID};
-            # define tag ID in each element of conditional array
-            my @infoArray = GetTagInfoList($table,$tagID);
-            foreach $tagInfo (@infoArray) {
-                # define tag ID's in info hash
-                $$tagInfo{TagID} = $tagID;
-            }
-        }
-    }
-}
-
-#------------------------------------------------------------------------------
-# Generate TagID's for all loaded tables
-# Inputs: None
-# Notes: Causes subsequently loaded tables to automatically generate TagID's too
-sub GenerateAllTagIDs()
-{
-    unless ($didTagID) {
-        my $tableName;
-        foreach $tableName (keys %allTables) {
-            # generate tag ID's for all tags in this table
-            GenerateTagIDs($allTables{$tableName});
-        }
-        $didTagID = 1;
-    }
 }
 
 #------------------------------------------------------------------------------

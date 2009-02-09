@@ -115,82 +115,86 @@ but this information is extracted by ExifTool.</p>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#Microsoft'>XMP Microsoft Tags</a></td></tr>
 <tr>
+<td>MP</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html#MP'>XMP MP Tags</a></td></tr>
+<tr class=b>
 <td>pdf</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#pdf'>XMP pdf Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>pdfx</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#pdfx'>XMP pdfx Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>photomech</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PhotoMechanic.html#XMP'>PhotoMechanic XMP Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>photoshop</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#photoshop'>XMP photoshop Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>PixelLive</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#PixelLive'>XMP PixelLive Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>plus</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#plus'>XMP plus Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>prism</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#prism'>XMP prism Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>prl</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#prl'>XMP prl Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>pur</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#pur'>XMP pur Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>rdf</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#rdf'>XMP rdf Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>tiff</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#tiff'>XMP tiff Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>x</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#x'>XMP x Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>xmp</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmp'>XMP xmp Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>xmpBJ</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpBJ'>XMP xmpBJ Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>xmpDM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpDM'>XMP xmpDM Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>xmpMM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpMM'>XMP xmpMM Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>xmpNote</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpNote'>XMP xmpNote Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>xmpPLUS</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpPLUS'>XMP xmpPLUS Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>xmpRights</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpRights'>XMP xmpRights Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>xmpTPg</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpTPg'>XMP xmpTPg Tags</a></td></tr>
@@ -290,7 +294,7 @@ but this information is extracted by ExifTool.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='crs'>XMP crs Tags</a></h2>
-<p>Photoshop Camera Raw Schema tags.</p>
+<p>XMP Photoshop Camera Raw</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -1876,6 +1880,23 @@ namespace prefix is &quot;MicrosoftPhoto&quot;, but ExifTool shortens this to
 <td class=c>string</td>
 <td><span class=s><span class=n>(normal Rating values of 1,2,3,4 and 5 stars correspond to RatingPercent
 values of 1,25,50,75 and 99 respectively)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='MP'>XMP MP Tags</a></h2>
+<p>Microsoft Photo 1.2 schema tags.  Again, not a complete list.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>RegionPersonDisplayName</td>
+<td class=c>string+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>RegionRectangle</td>
+<td class=c>string+</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='pdf'>XMP pdf Tags</a></h2>
@@ -4174,7 +4195,7 @@ XMP module for convenience.  (see <a href="http://www.w3.org/TR/SVG11/">http://w
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 23, 2008</i>
+<br><i>Last revised Feb 9, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

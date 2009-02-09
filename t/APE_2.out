@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool]  - ExifTool Version Number: 7.42
-[File, File, Image]  - File Name: APE.ape
-[File, File, Image]  - Directory: t/images
-[File, File, Image]  - File Size: 2.1 kB
-[File, File, Time]  - File Modification Date/Time: 2006:11:14 07:32:27
-[File, File, Image]  - File Type: APE
-[File, File, Image]  - MIME Type: audio/x-monkeys-audio
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[File, File, Image] FileName - File Name: APE.ape
+[File, File, Image] Directory - Directory: t/images
+[File, File, Image] FileSize - File Size: 2.1 kB
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:11:14 11:04:22-05:00
+[File, File, Image] FileType - File Type: APE
+[File, File, Image] MIMEType - MIME Type: audio/x-monkeys-audio
 [APE, MAC, Audio] 0 - Compression Level: 3000
 [APE, MAC, Audio] 2 - Blocks Per Frame: 73728
 [APE, MAC, Audio] 4 - Final Frame Blocks: 42662

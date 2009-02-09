@@ -35,7 +35,7 @@ use vars qw($VERSION %minoltaLensTypes %minoltaColorMode %sonyColorMode %minolta
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.48';
+$VERSION = '1.50';
 
 # lens ID numbers (ref 3)
 %minoltaLensTypes = (
@@ -501,6 +501,7 @@ $VERSION = '1.48';
     0x0f00 => {
         Name => 'MinoltaCameraSettings2',
         Writable => 0,
+        Binary => 1,
     },
 );
 
@@ -936,11 +937,11 @@ $VERSION = '1.48';
     0x0e => {
         Name => 'FocusMode',
         PrintConv => {
-            0 => 'Single-shot AF',
-            1 => 'Continuous AF',
+            0 => 'AF-S',
+            1 => 'AF-C',
             # Note: these two are reversed in ref 8
             3 => 'Manual', #JD
-            4 => 'Automatic AF', #JD
+            4 => 'AF-A', #JD
         },
     },
     0x10 => {

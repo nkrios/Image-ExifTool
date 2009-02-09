@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 sub ProcessMRW($$;$);
 
@@ -114,10 +114,19 @@ sub ProcessMRW($$;$);
         Name => 'WBScale',
         Format => 'int8u[4]',
     },
-    4 => {
-        Name => 'WBLevels',
-        Format => 'int16u[4]',
-    },
+    4 => [
+        {
+            Condition => '$$self{Model} =~ /DiMAGE A200\b/',
+            Name => 'WB_GBRGLevels',
+            Format => 'int16u[4]',
+            Notes => 'DiMAGE A200',
+        },
+        {
+            Name => 'WB_RGGBLevels',
+            Format => 'int16u[4]',
+            Notes => 'other models',
+        },
+    ],
 );
 
 # Minolta MRW RIF information (ref 2)
@@ -165,6 +174,7 @@ sub ProcessMRW($$;$);
     7 => {
         Name => 'ColorMode',
         PrintHex => 1,
+        Priority => 0, # (so Sony ColorMode takes priority in ARW images)
         PrintConv => {
             0 => 'Normal',
             1 => 'Black & White',
@@ -173,7 +183,12 @@ sub ProcessMRW($$;$);
             4 => 'Adobe RGB',
             13 => 'Natural sRGB',
             14 => 'Natural+ sRGB',
-            0x84 => 'Adobe RGB', # what does the high bit mean?
+            0x84 => 'Embed Adobe RGB',
+            # have seen these values in Sony ARW images: - PH
+            # 0x00 = Standard
+            # 0x30 = Vivid
+            # 0x38 = AdobeRGB (??)
+            # 0x40 = Standard, AdobeRGB (??)
         },
     },
     56 => {
@@ -324,8 +339,10 @@ sub ProcessMRW($$;$)
         while ($raf->Read($outBuff, 65536)) {
             Write($outfile, $outBuff) or $rtnVal = -1;
         }
+        $err and $exifTool->Error("MRW format error");
+    } else {
+        $err and $exifTool->Warn("MRW format error");
     }
-    $err and $exifTool->Error("MRW format error");
     return $rtnVal;
 }
 
