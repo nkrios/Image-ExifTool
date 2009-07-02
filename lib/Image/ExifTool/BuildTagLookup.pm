@@ -29,7 +29,7 @@ use Image::ExifTool::IPTC;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '1.84';
+$VERSION = '1.90';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -107,7 +107,8 @@ unless specified explicitly, and care should be taken when editing them
 manually since they may affect the way an image is rendered.  An asterisk
 (C<*>) indicates a "protected" tag which is not writable directly, but is
 written automatically by exiftool (often when a corresponding Composite or
-Extra tag is written).
+Extra tag is written).  A colon (C<:>) indicates a mandatory tag which may
+be added automatically when writing certain types of information.
 
 The HTML version of these tables also list possible B<Values> for
 discrete-valued tags, as well as B<Notes> for some tags.
@@ -130,12 +131,12 @@ The EXIF meta information is organized into different Image File Directories
 ExifTool family 1 group names.  When writing EXIF information, the default
 B<Group> listed below is used unless another group is specified.
 
-Also listed in the table below are TIFF, DNG, HDP and other tags which are
-not part of the EXIF specification, but may co-exist with EXIF tags in some
-images.
-
-See L<http://www.exif.org/specifications.html> for the official EXIF
-specification.
+The table below lists all EXIF tags.  Also listed are TIFF, DNG, HDP and
+other tags which are not part of the EXIF specification, but may co-exist
+with EXIF tags in some images.  Tags which are part of the EXIF 2.2
+specification have an underlined B<Tag Name> in the HTML version of this
+documentation.  See L<http://www.exif.org/specifications.html> for the
+official EXIF specification.
 },
     GPS => q{
 These GPS tags are part of the EXIF standard, and are stored in a separate
@@ -158,8 +159,8 @@ API).
 XMP stands for "Extensible Metadata Platform", an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
 embedded in many different image file types including JPG, JP2, TIFF, GIF,
-EPS, PDF, PSD, DNG, PNG, DJVU, SVG and MIFF, as well as MOV, AVI, ASF, WMV,
-FLV, SWF and MP4 videos, and WMA and audio formats supporting ID3v2
+EPS, PDF, PSD, DNG, IND, PNG, DJVU, SVG and MIFF, as well as MOV, AVI, ASF,
+WMV, FLV, SWF and MP4 videos, and WMA and audio formats supporting ID3v2
 information.
 
 The XMP B<Tag ID>'s aren't listed because in most cases they are identical
@@ -284,12 +285,12 @@ The tags listed in the PDF tables below are those which are used by ExifTool
 to extract meta information, but they are only a small fraction of the total
 number of available PDF tags.
 
-When writing PDF files, ExifTool uses an increment update.  This has an
-advantage that the original PDF can be easily recovered by deleting the
-C<PDF-update> pseudo-group (with C<-PDF-update:all=> on the command line). A
-disadvantage of the incremental update is that a linearized PDF file is no
-longer linearized after the update, so it must be subsequently re-linearized
-if this is required.
+When writing PDF files, ExifTool uses an increment update.  This has the
+advantages of being fast and reversible.  The original PDF can be easily
+recovered by deleting the C<PDF-update> pseudo-group (with
+C<-PDF-update:all=> on the command line).  A disadvantage of the incremental
+update is that a linearized PDF file is no longer linearized after the
+update, so it must be subsequently re-linearized if this is required.
 },
     DNG => q{
 The main DNG tags are found in the EXIF table.  The tables below define only
@@ -323,7 +324,7 @@ names.  They are used like regular tags to read and write the information
 for a specified set of tags.
 
 The shortcut tags below have been pre-defined, but user-defined shortcuts
-may be added via the %Image::ExifTool::Shortcuts::UserDefined lookup in the
+may be added via the %Image::ExifTool::UserDefined::Shortcuts lookup in the
 ~/.ExifTool_config file.  See the Image::ExifTool::Shortcuts documentation
 for more details.
 },
@@ -348,6 +349,33 @@ L<Image::ExifTool(3pm)|Image::ExifTool>
 },
 );
 
+# EXIF table tag ID's which are part of the EXIF 2.2 specification
+# (used only to add underlines in HTML version of EXIF Tag Table)
+my %exifSpec = (
+    0x100 => 1,  0x201 => 1,   0x9204 => 1,  0xa210 => 1,
+    0x101 => 1,  0x202 => 1,   0x9205 => 1,  0xa214 => 1,
+    0x102 => 1,  0x211 => 1,   0x9206 => 1,  0xa215 => 1,
+    0x103 => 1,  0x212 => 1,   0x9207 => 1,  0xa217 => 1,
+    0x106 => 1,  0x213 => 1,   0x9208 => 1,  0xa300 => 1,
+    0x10e => 1,  0x214 => 1,   0x9209 => 1,  0xa301 => 1,
+    0x10f => 1,  0x8298 => 1,  0x920a => 1,  0xa302 => 1,
+    0x110 => 1,  0x829a => 1,  0x9214 => 1,  0xa401 => 1,
+    0x111 => 1,  0x829d => 1,  0x927c => 1,  0xa402 => 1,
+    0x112 => 1,  0x8769 => 1,  0x9286 => 1,  0xa403 => 1,
+    0x115 => 1,  0x8822 => 1,  0x9290 => 1,  0xa404 => 1,
+    0x116 => 1,  0x8824 => 1,  0x9291 => 1,  0xa405 => 1,
+    0x117 => 1,  0x8825 => 1,  0x9292 => 1,  0xa406 => 1,
+    0x11a => 1,  0x8827 => 1,  0xa000 => 1,  0xa407 => 1,
+    0x11b => 1,  0x8828 => 1,  0xa001 => 1,  0xa408 => 1,
+    0x11c => 1,  0x9000 => 1,  0xa002 => 1,  0xa409 => 1,
+    0x128 => 1,  0x9003 => 1,  0xa003 => 1,  0xa40a => 1,
+    0x12d => 1,  0x9004 => 1,  0xa004 => 1,  0xa40b => 1,
+    0x131 => 1,  0x9101 => 1,  0xa005 => 1,  0xa40c => 1,
+    0x132 => 1,  0x9102 => 1,  0xa20b => 1,  0xa420 => 1,
+    0x13b => 1,  0x9201 => 1,  0xa20c => 1,
+    0x13e => 1,  0x9202 => 1,  0xa20e => 1,
+    0x13f => 1,  0x9203 => 1,  0xa20f => 1,
+);
 
 #------------------------------------------------------------------------------
 # New - create new BuildTagLookup object
@@ -514,6 +542,16 @@ TagID:  foreach $tagID (@keys) {
                             next unless %{$$printConv[$index]};
                             push @printConvList, $$printConv[$index];
                             push @indexList, $index;
+                            # collapse values with identical PrintConv's
+                            if (@printConvList >= 2 and $printConvList[-1] eq $printConvList[-2]) {
+                                if (ref $indexList[-2]) {
+                                    push @{$indexList[-2]}, $indexList[-1];
+                                } else {
+                                    $indexList[-2] = [ $indexList[-2], $indexList[-1] ];
+                                }
+                                pop @printConvList;
+                                pop @indexList;
+                            }
                         }
                         $printConv = shift @printConvList;
                         $index = shift @indexList;
@@ -525,7 +563,16 @@ TagID:  foreach $tagID (@keys) {
                             my $idx = $$tagInfo{Relist} ? $tagInfo->{Relist}->[$index] : $index;
                             if (ref $idx) {
                                 $s = 's' if @$idx > 1;
-                                ($idx = join ', ', @$idx) =~ s/(.*),/$1 and/;
+                                # collapse consecutive number ranges
+                                my ($i, @i, $rngStart);
+                                for ($i=0; $i<@$idx; ++$i) {
+                                    if ($i < @$idx - 1 and $$idx[$i+1] == $$idx[$i] + 1) {
+                                        $rngStart = $i unless defined $rngStart;
+                                        next;
+                                    }
+                                    push @i, defined($rngStart) ? "$rngStart-$i" : $i;
+                                }
+                                ($idx = join ', ', @i) =~ s/(.*),/$1 and/;
                             } elsif (not $$tagInfo{Relist}) {
                                 while (@printConvList and $printConv eq $printConvList[0]) {
                                     shift @printConvList;
@@ -552,7 +599,8 @@ TagID:  foreach $tagID (@keys) {
                         } else {
                             $caseInsensitive = 0;
                             my @pk = sort NumbersFirst keys %$printConv;
-                            my $bits;
+                            my $n = scalar @values;
+                            my ($bits, $cols, $i);
                             foreach (@pk) {
                                 next if $_ eq '';
                                 $_ eq 'BITMASK' and $bits = $$printConv{$_}, next;
@@ -578,6 +626,21 @@ TagID:  foreach $tagID (@keys) {
                                 foreach (@pk) {
                                     push @values, "Bit $_ = " . $$bits{$_};
                                 }
+                            }
+                            # organize values into columns if specified
+                            if (defined($cols = $$tagInfo{PrintConvColumns})) {
+                                my @new = splice @values, $n;
+                                my $v = '[!HTML]<table class=cols><tr>';
+                                my $rows = int((scalar(@new) + $cols - 1) / $cols);
+                                for ($n=0; $n<@new; $n+=$rows) {
+                                    $v .= "\n  <td>";
+                                    for ($i=0; $i<$rows and $n+$i<@new; ++$i) {
+                                        $v .= "\n  <br>" if $i;
+                                        $v .= EscapeHTML($new[$n+$i]);
+                                    }
+                                    $v .= '</td><td>&nbsp;&nbsp;</td>';
+                                }
+                                push @values, $v . "</tr></table>\n";
                             }
                         }
                         last unless @printConvList;
@@ -638,7 +701,7 @@ TagID:  foreach $tagID (@keys) {
                             $writable .= "[$count]";
                         }
                         $writable .= '~' if $noPrintConvInv;
-                        # add a '*' if this tag is protected or a '~' for unsafe tags
+                        # add a '*' if this tag is protected or a '!' for unsafe tags
                         if ($$tagInfo{Protected}) {
                             $writable .= '*' if $$tagInfo{Protected} & 0x02;
                             $writable .= '!' if $$tagInfo{Protected} & 0x01;
@@ -646,7 +709,8 @@ TagID:  foreach $tagID (@keys) {
                         $writable .= '/' if $$tagInfo{Avoid};
                     }
                     $writable .= '+' if $$tagInfo{List};
-                    # Œseparate tables link like subdirectories (flagged with leading '-')
+                    $writable .= ':' if $$tagInfo{Mandatory};
+                    # separate tables link like subdirectories (flagged with leading '-')
                     $writable = "-$writable" if $subdir;
                 }
                 # don't duplicate a tag name unless an entry is different
@@ -1008,6 +1072,8 @@ sub GetTableOrder()
         PrintIM => 'ICC_Profile',
         ID3     => 'PostScript',
         MinoltaRaw => 'KyoceraRaw',
+        KyoceraRaw => 'CanonRaw',
+        SigmaRaw => 'PanasonicRaw',
         Olympus => 'NikonCapture',
         Pentax  => 'Panasonic',
         Ricoh   => 'Pentax',
@@ -1304,6 +1370,7 @@ sub WriteTagNames($$)
         }
         last unless @tableNames;
         $tableName = shift @tableNames;
+        my $isExif = $tableName eq 'Image::ExifTool::Exif::Main' ? 1 : undef;
         $short = $$shortName{$tableName};
         unless ($short) {
             # this is just an index heading
@@ -1407,7 +1474,7 @@ sub WriteTagNames($$)
         foreach $infoList (@$info) {
             ++$infoCount;
             my ($tagIDstr, $tagNames, $writable, $values, $require, $writeGroup) = @$infoList;
-            my ($align, $idStr, $w);
+            my ($align, $idStr, $w, $tip);
             if (not $id) {
                 $idStr = '  ';
             } elsif ($tagIDstr =~ /^\d+(\.\d+)?$/) {
@@ -1494,6 +1561,11 @@ sub WriteTagNames($$)
             foreach (@$tagNames) {
                 push @htmlTags, EscapeHTML($_);
             }
+            if ($isExif and $exifSpec{hex $tagIDstr}) {
+                # underline "unknown" makernote tags only
+                my $n = $tagIDstr eq '0x927c' ? -1 : 0;
+                $htmlTags[$n] = '<u>' . $htmlTags[$n] . '</u>';
+            }
             $rowClass = $rowClass ? '' : " class=b";
             my $isSubdir;
             if ($$writable[0] =~ /^-/) {
@@ -1502,18 +1574,23 @@ sub WriteTagNames($$)
                     s/^-(.+)/$1/;
                 }
             }
+            if ($tagIDstr =~ /^0x[0-9a-f]+$/i) {
+                $tip = sprintf(" title='$tagIDstr = %d'",hex $tagIDstr);
+            } elsif ($tagIDstr =~ /^(\d+)(\.\d*)?$/) {
+                $tip = sprintf(" title='%d = 0x%x'", $1, $1);
+            } else {
+                $tip = '';
+            }
             print HTMLFILE "<tr$rowClass>\n";
-            print HTMLFILE "<td$align>$tagIDstr</td>\n" if $id;
+            print HTMLFILE "<td$align$tip>$tagIDstr</td>\n" if $id;
             print HTMLFILE "<td>", join("\n  <br>",@htmlTags), "</td>\n";
             print HTMLFILE "<td class=c>",join('<br>',@$writable),"</td>\n";
             print HTMLFILE '<td>',join("\n  <br>",@$require),"</td>\n" if $composite;
             print HTMLFILE "<td class=c>",join('<br>',@$writeGroup),"</td>\n" if $showGrp;
             print HTMLFILE "<td>";
-            my $close = '';
-            my @values;
             if (@$values) {
                 if ($isSubdir) {
-                    my $smallNote;
+                    my ($smallNote, @values);
                     foreach (@$values) {
                         if (/^[[(]/) {
                             $smallNote = 1 if $numTags < 2;
@@ -1533,19 +1610,28 @@ sub WriteTagNames($$)
                     }
                     # put small note last
                     $smallNote and push @values, shift @values;
+                    print HTMLFILE join("\n  <br>",@values);
                 } else {
+                    my ($close, $br) = ('', '');
                     foreach (@$values) {
-                        $_ = EscapeHTML($_);
-                        /^\(/ and $_ = "$noteFont$_</span>";
-                        push @values, $_;
+                        if (s/^\[!HTML\]//) {
+                            print HTMLFILE $close if $close;
+                            print HTMLFILE $_;
+                            $close = $br = '';
+                        } else {
+                            $_ = EscapeHTML($_);
+                            /^\(/ and $_ = "$noteFont$_</span>";
+                            $close or $_ = "<span class=s>$_", $close = '</span>';
+                            print HTMLFILE $br, $_;
+                            $br = "\n  <br>";
+                        }
                     }
-                    print HTMLFILE "<span class=s>";
-                    $close = '</span>';
+                    print HTMLFILE $close if $close;
                 }
             } else {
-                push @values, '&nbsp;';
+                print HTMLFILE '&nbsp;';
             }
-            print HTMLFILE join("\n  <br>",@values),"$close</td></tr>\n";
+            print HTMLFILE "</td></tr>\n";
         }
         unless ($infoCount) {
             printf PODFILE "  [no tags known]\n";

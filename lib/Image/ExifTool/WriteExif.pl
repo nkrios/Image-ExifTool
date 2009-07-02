@@ -29,7 +29,7 @@ my %mandatory = (
     IFD0 => {
         0x011a => 72,       # XResolution
         0x011b => 72,       # YResolution
-        0x0128 => 2,        # Resolution unit (inches)
+        0x0128 => 2,        # ResolutionUnit (inches)
         0x0213 => 1,        # YCbCrPositioning (centered)
       # 0x8769 => ????,     # ExifOffset
     },
@@ -37,11 +37,11 @@ my %mandatory = (
         0x0103 => 6,        # Compression (JPEG)
         0x011a => 72,       # XResolution
         0x011b => 72,       # YResolution
-        0x0128 => 2,        # Resolution unit (inches)
+        0x0128 => 2,        # ResolutionUnit (inches)
     },
     ExifIFD => {
         0x9000 => '0220',   # ExifVersion
-        0x9101 => "\1\2\3\0", # ComponentsConfiguration
+        0x9101 => "1 2 3 0",# ComponentsConfiguration
         0xa000 => '0100',   # FlashpixVersion
         0xa001 => 0xffff,   # ColorSpace (uncalibrated)
       # 0xa002 => ????,     # ExifImageWidth
@@ -71,6 +71,7 @@ my %writeTable = (
     0x0002 => {             # InteropVersion
         Protected => 1,
         Writable => 'undef',
+        Mandatory => 1,
         WriteGroup => 'InteropIFD',
     },
     0x000b => {             # ProcessingSoftware
@@ -92,7 +93,7 @@ my %writeTable = (
         Writable => 'int32u',
         WriteGroup => 'IFD0',
     },
-    0x0101 => {             # ImageHeigth
+    0x0101 => {             # ImageHeight
         Protected => 1,
         Writable => 'int32u',
         WriteGroup => 'IFD0',
@@ -107,6 +108,7 @@ my %writeTable = (
         Protected => 1,
         Writable => 'int16u',
         WriteGroup => 'IFD0',
+        Mandatory => 1,
     },
     0x0106 => {             # PhotometricInterpretation
         Protected => 1,
@@ -174,10 +176,12 @@ my %writeTable = (
     0x011a => {             # XResolution
         Writable => 'rational64u',
         WriteGroup => 'IFD0',
+        Mandatory => 1,
     },
     0x011b => {             # YResolution
         Writable => 'rational64u',
         WriteGroup => 'IFD0',
+        Mandatory => 1,
     },
     0x011c => {             # PlanarConfiguration
         Protected => 1,
@@ -203,11 +207,18 @@ my %writeTable = (
     0x0128 => {             # ResolutionUnit
         Writable => 'int16u',
         WriteGroup => 'IFD0',
+        Mandatory => 1,
     },
     0x0129 => {             # PageNumber
         Writable => 'int16u',
         WriteGroup => 'IFD0',
         Count => 2,
+    },
+    0x012d => {             # TransferFunction
+        Protected => 1,
+        Writable => 'int16u',
+        WriteGroup => 'IFD0',
+        Count => 768,
     },
     0x0131 => {             # Software
         Writable => 'string',
@@ -285,6 +296,7 @@ my %writeTable = (
         Protected => 1,
         Writable => 'int16u',
         WriteGroup => 'IFD0',
+        Mandatory => 1,
     },
     0x0214 => {             # ReferenceBlackWhite
         Writable => 'rational64u',
@@ -345,7 +357,11 @@ my %writeTable = (
     },
     0x8822 => 'int16u',     # ExposureProgram
     0x8824 => 'string',     # SpectralSensitivity
-    0x8827 => 'int16u',     # ISO
+    0x8827 => {             # ISO
+        Writable => 'int16u',
+        Count => -1,
+        PrintConvInv => '$val=~tr/,//d; $val',
+    },
     0x882a => {             # TimeZoneOffset
         Writable => 'int16s',
         Count => -1, # can be 1 or 2
@@ -355,7 +371,10 @@ my %writeTable = (
         },
     },
     0x882b => 'int16u',     # SelfTimerMode
-    0x9000 => 'undef',      # ExifVersion
+    0x9000 => {             # ExifVersion
+        Writable => 'undef',
+        Mandatory => 1,
+    },
     0x9003 => {             # DateTimeOriginal
         Writable => 'string',
         Shift => 'Time',
@@ -369,13 +388,9 @@ my %writeTable = (
     0x9101 => {             # ComponentsConfiguration
         Protected => 1,
         Writable => 'undef',
-        PrintConv => '$_=$val;s/\0.*//s;tr/\x01-\x06/YXWRGB/;s/X/Cb/g;s/W/Cr/g;$_',
-        PrintConvInv => q{
-            $_=uc($val); s/CR/W/g; s/CB/X/g;
-            return undef if /[^YXWRGB]/;
-            tr/YXWRGB/\x01-\x06/;
-            return $_ . "\0";
-        },
+        Count => 4,
+        Mandatory => 1,
+        ValueConvInv => '$val=~tr/,//d; $val',  # (so we can copy from XMP with -n)
     },
     0x9102 => {             # CompressedBitsPerPixel
         Protected => 1,
@@ -417,9 +432,9 @@ my %writeTable = (
     0x9211 => 'int32u',     # ImageNumber
     0x9212 => 'string',     # SecurityClassification
     0x9213 => 'string',     # ImageHistory
-    0x9214 => {             # SubjectLocation
+    0x9214 => {             # SubjectArea
         Writable => 'int16u',
-        Count => 4,  # write this SubjectLocation with 4 and the other with 2 values
+        Count => -1, # 2, 3 or 4 values
     },
 #    0x927c => 'undef',      # MakerNotes
     0x9286 => {             # UserComment (starts with "ASCII\0\0\0" or "UNICODE\0")
@@ -477,10 +492,22 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         ValueConvInv => '$self->Charset2Unicode($val,"II") . "\0\0"',
     },
-    0xa000 => 'undef',      # FlashpixVersion
-    0xa001 => 'int16u',     # ColorSpace
-    0xa002 => 'int16u',     # ExifImageWidth (could also be int32u)
-    0xa003 => 'int16u',     # ExifImageHeight (could also be int32u)
+    0xa000 => {             # FlashpixVersion
+        Writable => 'undef',
+        Mandatory => 1,
+    },
+    0xa001 => {             # ColorSpace
+        Writable => 'int16u',
+        Mandatory => 1,
+    },
+    0xa002 => {             # ExifImageWidth (could also be int32u)
+        Writable => 'int16u',
+        Mandatory => 1,
+    },
+    0xa003 => {             # ExifImageHeight (could also be int32u)
+        Writable => 'int16u',
+        Mandatory => 1,
+    },
     0xa004 => 'string',     # RelatedSoundFile
     0xa20b => {             # FlashEnergy
         Writable => 'rational64u',
@@ -730,7 +757,11 @@ my %writeTable = (
     },
     0xc6d2 => {             # PanasonicTitle (Panasonic DMC-TZ5, not a DNG tag)
         Writable => 'undef',
-        Avoid => 1,
+        WriteGroup => 'IFD0',
+        ValueConvInv => '$self->Charset2UTF8($val)',
+    },
+    0xc6d3 => {             # PanasonicTitle2 (Panasonic DMC-FS7, not a DNG tag)
+        Writable => 'undef',
         WriteGroup => 'IFD0',
         ValueConvInv => '$self->Charset2UTF8($val)',
     },
@@ -1331,7 +1362,8 @@ sub ProcessTiffIFD($$$)
 sub WriteExif($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    $exifTool or return 1;    # allow dummy access to autoload this package
+    $exifTool or return 1;      # allow dummy access to autoload this package
+    my $origDirInfo = $dirInfo; # save original dirInfo
     my $dataPt = $$dirInfo{DataPt};
     unless ($dataPt) {
         my $emptyData = '';
@@ -1346,13 +1378,14 @@ sub WriteExif($$$)
     my $raf = $$dirInfo{RAF};
     my $dirName = $$dirInfo{DirName} || 'unknown';
     my $fixup = $$dirInfo{Fixup} || new Image::ExifTool::Fixup;
+    my $imageDataFlag = $$dirInfo{ImageData} || '';
     my $verbose = $exifTool->Options('Verbose');
     my $out = $exifTool->Options('TextOut');
     my (@offsetInfo, %xDelete);
     my $newData = '';   # initialize buffer to receive new directory data
     my ($nextIfdPos, %offsetData, $inMakerNotes);
     my $deleteAll = 0;
-    my @imageData;      # image data blocks if requested
+    my @imageData;      # image data blocks to copy later if requested
 
     # allow multiple IFD's in IFD0-IFD1-IFD2... chain
     $$dirInfo{Multi} = 1 if $dirName =~ /^(IFD0|SubIFD)$/ and not defined $$dirInfo{Multi};
@@ -1650,8 +1683,8 @@ Entry:  for (;;) {
                                 }
                             }
                             # copy huge data blocks later instead of loading into memory
-                            if ($oldSize > BINARY_DATA_LIMIT and $_[1]{ImageData} and
-                                (not $oldInfo or not $$oldInfo{SubDirectory}))
+                            if ($oldSize > BINARY_DATA_LIMIT and $$origDirInfo{ImageData} and
+                                (not defined $oldInfo or ($oldInfo and not $$oldInfo{SubDirectory})))
                             {
                                 $oldValue = ''; # dummy empty value
                                 # copy this value later unless writing a new value
@@ -1668,9 +1701,8 @@ Entry:  for (;;) {
                                     undef $raf;
                                     # (sony A700 has 32-byte header on PreviewImage)
                                     unless ($success and $oldValue =~ /^(\xff\xd8\xff|(.|.{33})\xd8\xff\xdb)/s) {
-                                        $exifTool->Error("Bad PreviewImage pointer in $dirName", 1);
                                         $invalidPreview = 1;
-                                        $success = 1;   # continue writing directory
+                                        $success = 1;   # continue writing directory anyway
                                     }
                                 }
                                 unless ($success) {
@@ -1682,8 +1714,16 @@ Entry:  for (;;) {
                                 goto DropTag;
                             }
                             if ($invalidPreview) {
-                                $oldValue = 'none';     # flag for missing preview
-                                $oldSize = length $oldValue;
+                                # set value for invalid preview
+                                if ($exifTool->{FILE_TYPE} eq 'JPEG') {
+                                    # set flag for invalid preview
+                                    # (value must be larger than 4 bytes to generate PREVIEW_INFO,
+                                    # and an even number of bytes so it won't be padded)
+                                    $oldValue = 'LOAD_PREVIEW';
+                                } else {
+                                    $oldValue = 'none';
+                                    $oldSize = length $oldValue;
+                                }
                                 $valuePtr = 0;
                             } else {
                                 UpdateTiffEnd($exifTool, $base+$valuePtr+$dataPos+$oldSize);
@@ -1804,12 +1844,24 @@ DropTag:                    ++$index;
                         }
                         # read value
                         $val = ReadValue(\$oldValue, 0, $readFormName, $readCount, $oldSize);
-                        if ($$newInfo{Format}) {
-                            $newFormName = $$newInfo{Format};
-                            # override existing format if necessary
-                            $ifdFormName = $$newInfo{Writable};
-                            $ifdFormName = $oldFormName unless $ifdFormName and $ifdFormName ne '1';
+                        # determine write format (by default, use 'Writable' format)
+                        my $writable = $$newInfo{Writable};
+                        # (or use existing format if 'Writable' not specified)
+                        $writable = $oldFormName unless $writable and $writable ne '1';
+                        # (and override write format with 'Format' if specified)
+                        my $writeForm = $$newInfo{Format} || $writable;
+                        if ($writeForm ne $newFormName) {
+                            # write in specified format
+                            $newFormName = $writeForm;
                             $newFormat = $formatNumber{$newFormName};
+                            # use different IFD format code if necessary
+                            if ($inMakerNotes) {
+                                # always preserve IFD format in maker notes
+                                $ifdFormName = $oldFormName;
+                            } elsif ($writable ne $newFormName) {
+                                # use specified IFD format
+                                $ifdFormName = $writable;
+                            }
                         }
                         if ($inMakerNotes and $readFormName ne 'string' and $readFormName ne 'undef') {
                             # keep same size in maker notes unless string or binary
@@ -1845,7 +1897,9 @@ DropTag:                    ++$index;
                         if (length $newValue) {
                             # limit maximum value length in JPEG images
                             # (max segment size is 65533 bytes and the min EXIF size is 96 incl an additional IFD entry)
-                            if ($$exifTool{FILE_TYPE} eq 'JPEG' and length($newValue) > 65436) {
+                            if ($$exifTool{FILE_TYPE} eq 'JPEG' and length($newValue) > 65436 and
+                                $$newInfo{Name} ne 'PreviewImage')
+                            {
                                 my $name = $$newInfo{MakerNotes} ? 'MakerNotes' : $$newInfo{Name};
                                 $exifTool->Warn("$name too large to write in JPEG segment");
                                 goto NoOverwrite;
@@ -1882,7 +1936,9 @@ NoOverwrite:            next if $isNew > 0;
 #
 # create new subdirectory
 #
-                    $newInfo = $$addDirs{$newID} or warn('internal error'), next;
+                    # newInfo may not be defined if we try to add a mandatory tag
+                    # to a directory that doesn't support it (ie. IFD1 in RW2 images)
+                    $newInfo = $$addDirs{$newID} or next;
                     # make sure we don't try to generate a new MakerNotes directory
                     # or a SubIFD
                     next if $$newInfo{MakerNotes} or $$newInfo{Name} eq 'SubIFD';
@@ -1943,7 +1999,7 @@ NoOverwrite:            next if $isNew > 0;
                 if ($oldImageData) {
                     $$oldImageData[3] = $newStart + length($dirBuff) + 2;
                     push @imageData, $oldImageData;
-                    $_[1]{ImageData} = \@imageData;
+                    $$origDirInfo{ImageData} = \@imageData;
                 }
             }
             if ($newInfo) {
@@ -2089,13 +2145,16 @@ NoOverwrite:            next if $isNew > 0;
                                     $previewInfo->{BaseShift} = $baseShift;
                                     $previewInfo->{Relative} = 1;
                                 }
+                            # don't shift anything if relative flag set to zero (Pentax patch)
                             } elsif (not defined $subdirInfo{Relative}) {
-                                # ^^ don't shift anything if relative flag set to zero (Pentax patch)
                                 # shift offset base if shifted in the original image or if FixBase
-                                # was used, but be careful with negative shifts since they may lead
-                                # to negative (invalid) offsets
+                                # was used, but be careful of automatic FixBase with negative shifts
+                                # since they may lead to negative (invalid) offsets (casio_edit_problem.jpg)
                                 my $baseShift = $base - $subdirInfo{Base};
-                                if ($baseShift < 0) {
+                                if ($subdirInfo{FixBase} and $baseShift < 0 and
+                                    # allow negative base shift if offsets are bigger (PentaxOptioWP.jpg)
+                                    (not $subdirInfo{MinOffset} or $subdirInfo{MinOffset} + $baseShift < 0))
+                                {
                                     my $fixBase = $exifTool->Options('FixBase');
                                     if (not defined $fixBase) {
                                         my $str = $exifTool->Options('IgnoreMinorErrors') ? 'ignored' : 'fix or ignore?';
@@ -2170,6 +2229,8 @@ NoOverwrite:            next if $isNew > 0;
                                 Fixup    => new Image::ExifTool::Fixup,
                                 RAF      => $raf,
                                 Subdir   => $subdir,
+                                # set ImageData only for 1st level SubIFD's
+                                ImageData=> $imageDataFlag eq 'Main' ? 'SubIFD' : undef,
                             );
                             # is the subdirectory outside our current data?
                             if ($subdirStart < 0 or $subdirStart + 2 > $dataLen) {
@@ -2194,6 +2255,11 @@ NoOverwrite:            next if $isNew > 0;
                                 return undef;
                             }
                             next unless length($subdirData);
+                            # handle data blocks that we will transfer later
+                            if (ref $subdirInfo{ImageData}) {
+                                push @imageData, @{$subdirInfo{ImageData}};
+                                $$origDirInfo{ImageData} = \@imageData;
+                            }
                             # temporarily set value to subdirectory index
                             # (will set to actual offset later when we know what it is)
                             $newValue .= Set32u(0xfeedf00d);
@@ -2207,11 +2273,12 @@ NoOverwrite:            next if $isNew > 0;
                             }
                             # add to list of subdirectories we will append later
                             push @subdirs, {
-                                DataPt => \$subdirData,
-                                Table => $subTable,
-                                Fixup => $subdirInfo{Fixup},
-                                Offset => $offset,
-                                Where => $where,
+                                DataPt    => \$subdirData,
+                                Table     => $subTable,
+                                Fixup     => $subdirInfo{Fixup},
+                                Offset    => $offset,
+                                Where     => $where,
+                                ImageData => $subdirInfo{ImageData},
                             };
                             ++$writeCount;  # count number of subdirs written
                         }
@@ -2413,12 +2480,11 @@ NoOverwrite:            next if $isNew > 0;
                         # hold onto the PreviewImage until we can determine if it fits
                         $exifTool->{PREVIEW_INFO} or $exifTool->{PREVIEW_INFO} = { };
                         $exifTool->{PREVIEW_INFO}{Data} = $$newValuePt;
-                        if ($$newInfo{Name} eq 'PreviewImage') {
-                            $exifTool->{PREVIEW_INFO}{IsValue} = 1;
-                        }
                         if ($$newInfo{IsOffset} and $$newInfo{IsOffset} eq '2') {
                             $exifTool->{PREVIEW_INFO}{NoBaseShift} = 1;
                         }
+                        # use original preview size if we will attempt to load it later
+                        $newCount = $oldCount if $$newValuePt eq 'LOAD_PREVIEW';
                         $$newValuePt = '';
                     }
                 }
@@ -2442,7 +2508,8 @@ NoOverwrite:            next if $isNew > 0;
             while (defined $allMandatory) {
                 if (defined $$mandatory{$newID}) {
                     # values must correspond to mandatory values
-                    my $mandVal = WriteValue($$mandatory{$newID}, $newFormName, $newCount);
+                    my $form = $$newInfo{Format} || $newFormName;
+                    my $mandVal = WriteValue($$mandatory{$newID}, $form, $newCount);
                     if (defined $mandVal and $mandVal eq $$newValuePt) {
                         ++$allMandatory;        # count mandatory tags
                         last;
@@ -2512,17 +2579,32 @@ NoOverwrite:            next if $isNew > 0;
         if (@subdirs) {
             my $subdir;
             foreach $subdir (@subdirs) {
-                my $pos = length($newData);    # position of subdirectory in data
-                my $subdirFixup = $subdir->{Fixup};
-                $subdirFixup->{Start} += $pos;
+                my $len = length($newData);         # position of subdirectory in data
+                my $subdirFixup = $$subdir{Fixup};
+                $$subdirFixup{Start} += $len;
                 $fixup->AddFixup($subdirFixup);
-                $newData .= ${$subdir->{DataPt}};   # add subdirectory to our data
-                undef ${$subdir->{DataPt}};         # free memory now
+                my $imageData = $$subdir{ImageData};
+                my $blockSize = 0;
+                # must also update start position for ImageData fixups
+                if (ref $imageData) {
+                    my $blockInfo;
+                    foreach $blockInfo (@$imageData) {
+                        my ($pos, $size, $pad, $entry, $subFix) = @$blockInfo;
+                        if ($subFix) {
+                            $$subFix{Start} += $len;
+                            # save expected image data offset for calculating shift later
+                            $$subFix{BlockLen} = length(${$$subdir{DataPt}}) + $blockSize;
+                        }
+                        $blockSize += $size + $pad;
+                    }
+                }
+                $newData .= ${$$subdir{DataPt}};    # add subdirectory to our data
+                undef ${$$subdir{DataPt}};          # free memory now
                 # set the pointer
-                my $offset = $subdir->{Offset};
+                my $offset = $$subdir{Offset};
                 # if offset is in valBuff, it was added to the end of dirBuff
                 # (plus 4 bytes for nextIFD pointer)
-                $offset += length($dirBuff) + 4 if $subdir->{Where} eq 'valBuff';
+                $offset += length($dirBuff) + 4 if $$subdir{Where} eq 'valBuff';
                 $offset += $newStart + 2;           # get offset in newData
                 # check to be sure we got the right offset
                 unless (Get32u(\$newData, $offset) == 0xfeedf00d) {
@@ -2530,7 +2612,7 @@ NoOverwrite:            next if $isNew > 0;
                     return undef;
                 }
                 # set the offset to the subdirectory data
-                Set32u($pos, \$newData, $offset);
+                Set32u($len, \$newData, $offset);
                 $fixup->AddFixup($offset);  # add fixup for this offset in newData
             }
         }
@@ -2606,23 +2688,42 @@ NoOverwrite:            next if $isNew > 0;
     # do our fixups now so we can more easily calculate offsets below
     $fixup->ApplyFixup(\$newData);
 #
-# copy over tag values which were too large for memory
+# set offsets and generate fixups for tag values which were too large for memory
 #
     my $blockSize = 0;  # total size of blocks to copy later
     my $blockInfo;
     foreach $blockInfo (@imageData) {
-        my ($pos, $size, $pad, $entry) = @$blockInfo;
-        next unless defined $entry; # (just to be safe)
-        my $format = Get16u(\$newData, $entry + 2);
-        if ($format < 1 or $format > 13) {
-            $exifTool->Error('Internal error copying huge value');
-        } else {
-            # set count and offset in directory entry
-            Set32u($size / $formatSize[$format], \$newData, $entry + 4);
-            Set32u(length($newData)+$blockSize, \$newData, $entry + 8);
-            $fixup->AddFixup($entry + 8);
-            $blockSize += $size + $pad;
+        my ($pos, $size, $pad, $entry, $subFix) = @$blockInfo;
+        if (defined $entry) {
+            my $format = Get16u(\$newData, $entry + 2);
+            if ($format < 1 or $format > 13) {
+                $exifTool->Error('Internal error copying huge value');
+                last;
+            } else {
+                # set count and offset in directory entry
+                Set32u($size / $formatSize[$format], \$newData, $entry + 4);
+                Set32u(length($newData)+$blockSize, \$newData, $entry + 8);
+                $fixup->AddFixup($entry + 8);
+                # create special fixup for SubIFD data
+                if ($imageDataFlag eq 'SubIFD') {
+                    my $subIfdDataFixup = new Image::ExifTool::Fixup;
+                    $subIfdDataFixup->AddFixup($entry + 8);
+                    # save fixup in imageData list
+                    $$blockInfo[4] = $subIfdDataFixup; 
+                }
+                # must reset entry pointer so we don't use it again in a parent IFD!
+                $$blockInfo[3] = undef;
+            }
         }
+        # apply additional shift required for SubIFD image data offsets
+        if ($subFix and $$subFix{BlockLen}) {
+            # our offset expects the data at the end of the SubIFD block (BlockLen + Start),
+            # but it will actually be at length($newData) + $blockSize.  So adjust accordingly
+            # (and subtract an extra Start because this shift is applied later)
+            $subFix->{Shift} += length($newData) - $$subFix{BlockLen} - 2 * $$subFix{Start} + $blockSize;
+            $subFix->ApplyFixup(\$newData);
+        }
+        $blockSize += $size + $pad;
     }
 #
 # copy over image data for IFD's, starting with the last IFD first
@@ -2635,6 +2736,13 @@ NoOverwrite:            next if $isNew > 0;
             my @offsetList;
             if ($ifd >= 0) {
                 my $offsetInfo = $offsetInfo[$ifd] or next;
+                # do Panasonic RAW/RW2 hack if necessary
+                my $stripOffsets = $$offsetInfo{0x111};
+                if ($stripOffsets and $$stripOffsets[0]{PanasonicHack}) {
+                    require Image::ExifTool::PanasonicRaw;
+                    my $err = Image::ExifTool::PanasonicRaw::PatchRawDataOffset($offsetInfo, $raf, $ifd);
+                    $err and $exifTool->Error($err);
+                }
                 my $tagID;
                 # loop through all tags in reverse order so we save thumbnail
                 # data before main image data if both exist in the same IFD
@@ -2645,8 +2753,13 @@ NoOverwrite:            next if $isNew > 0;
                     $sizeInfo or $exifTool->Error("No size tag for $dirName:$$tagInfo{Name}"), next;
                     my $dataTag = $$tagInfo{DataTag};
                     # write TIFF image data (strips or tiles) later if requested
-                    if ($raf and defined $_[1]{ImageData} and
-                        ($tagID == 0x111 or $tagID == 0x144) and
+                    if ($raf and defined $$origDirInfo{ImageData} and
+                        ($tagID == 0x111 or $tagID == 0x144 or
+                          # also defer writing of other big data such as JpgFromRaw in NEF
+                          ($$sizeInfo[3][0] and
+                           # (calculate approximate combined size of all blocks)
+                           $$sizeInfo[3][0] * scalar(@{$$sizeInfo[3]}) > 1000000)) and
+                        # but don't defer writing if replacing with new value
                         (not defined $dataTag or not defined $offsetData{$dataTag}))
                     {
                         push @writeLater, [ $offsetInfo->{$tagID}, $sizeInfo ];
@@ -2664,7 +2777,7 @@ NoOverwrite:            next if $isNew > 0;
                 my ($cntInfo, $byteCounts, $count2, $oldSize, $format) = @{$$offsetPair[1]};
                 # must be the same number of offset and byte count values
                 unless ($count == $count2) {
-                    $exifTool->Error("Offset/byteCounts disagree on count for $$tagInfo{Name}");
+                    $exifTool->Error("Offsets/ByteCounts disagree on count for $$tagInfo{Name}");
                     return undef;
                 }
                 my $formatStr = $formatName[$format];
@@ -2677,7 +2790,7 @@ NoOverwrite:            next if $isNew > 0;
                     return undef;
                 }
                 # get offset base and data pos (abnormal for some preview images)
-                my ($dbase, $dpos, $wrongBase);
+                my ($dbase, $dpos, $wrongBase, $subIfdDataFixup);
                 if ($$tagInfo{IsOffset} eq '2') {
                     $dbase = $firstBase;
                     $dpos = $dataPos + $base - $firstBase;
@@ -2695,11 +2808,12 @@ NoOverwrite:            next if $isNew > 0;
                     $wrongBase = 0;
                 }
                 my $oldOrder = GetByteOrder();
+                my $dataTag = $$tagInfo{DataTag};
                 # use different byte order for values of this offset pair if required (Minolta A200)
                 SetByteOrder($$tagInfo{ByteOrder}) if $$tagInfo{ByteOrder};
                 # transfer the data referenced by all offsets of this tag
                 for ($n=0; $n<$count; ++$n) {
-                    my $oldEnd;
+                    my ($oldEnd, $size);
                     if (@$oldOffset and @$oldSize) {
                         # calculate end offset of this block
                         $oldEnd = $$oldOffset[$n] + $$oldSize[$n];
@@ -2708,13 +2822,18 @@ NoOverwrite:            next if $isNew > 0;
                     }
                     my $offsetPos = $offsets + $n * 4;
                     my $byteCountPos = $byteCounts + $n * $formatSize[$format];
-                    my $size = ReadValue(\$newData, $byteCountPos, $formatStr, 1, 4);
+                    if ($$tagInfo{PanasonicHack}) {
+                        # use actual raw data length (may be different than StripByteCounts!)
+                        $size = $$oldSize[$n];
+                    } else {
+                        # use size of new data
+                        $size = ReadValue(\$newData, $byteCountPos, $formatStr, 1, 4);
+                    }
                     my $offset = Get32u(\$newData, $offsetPos) - $dpos;
                     my $newOffset = length($newData) + $blockSize - $wrongBase;
                     my $buff;
                     # look for 'feed' code to use our new data
                     if ($size == 0xfeedfeed) {
-                        my $dataTag = $$tagInfo{DataTag};
                         unless (defined $dataTag) {
                             $exifTool->Error("No DataTag defined for $$tagInfo{Name}");
                             return undef;
@@ -2741,16 +2860,21 @@ NoOverwrite:            next if $isNew > 0;
                         ++$pad if $size & 0x01 and ($n+1 >= $count or not $oldEnd or
                                   $oldEnd != $$oldOffset[$n+1]);
                         # preserve original image padding if specified
-                        if ($_[1]{PreserveImagePadding} and $n+1 < $count and
+                        if ($$origDirInfo{PreserveImagePadding} and $n+1 < $count and
                             $oldEnd and $$oldOffset[$n+1] > $oldEnd)
                         {
                             $pad = $$oldOffset[$n+1] - $oldEnd;
                         }
                         # copy data later
                         push @imageData, [$offset+$dbase+$dpos, $size, $pad];
+                        # create fixup for SubIFD ImageData
+                        if ($imageDataFlag eq 'SubIFD' and not $subIfdDataFixup) {
+                            $subIfdDataFixup = new Image::ExifTool::Fixup;
+                            $imageData[-1][4] = $subIfdDataFixup;
+                        }
                         $size += $pad; # account for pad byte if necessary
                         # return ImageData list
-                        $_[1]{ImageData} = \@imageData;
+                        $$origDirInfo{ImageData} = \@imageData;
                     } elsif ($offset >= 0 and $offset+$size <= $dataLen) {
                         # take data from old dir data buffer
                         $buff = substr($$dataPt, $offset, $size);
@@ -2789,9 +2913,10 @@ NoOverwrite:            next if $isNew > 0;
                                                $buff =~ /^.\xd8\xff[\xc4\xdb\xe0-\xef]/;
                             $r->Seek($tell, 0) or $exifTool->Error('Seek error'), return undef;
                         }
-                        $buff = 'LOAD' unless defined $buff;    # flag indicating we must load PreviewImage
+                        # set flag if we must load PreviewImage
+                        $buff = 'LOAD_PREVIEW' unless defined $buff;
                     } else {
-                        my $dataName = $$tagInfo{DataTag} || $$tagInfo{Name};
+                        my $dataName = $dataTag || $$tagInfo{Name};
                         return undef if $exifTool->Error("Error reading $dataName data in $dirName", $inMakerNotes);
                         $buff = '';
                     }
@@ -2807,7 +2932,15 @@ NoOverwrite:            next if $isNew > 0;
                     # update offset accordingly and add to end of new data
                     Set32u($newOffset, \$newData, $offsetPos);
                     # add a pointer to fix up this offset value (marked with DataTag name)
-                    $fixup->AddFixup($offsetPos, $$tagInfo{DataTag});
+                    $fixup->AddFixup($offsetPos, $dataTag);
+                    # also add to subIfdDataFixup if necessary
+                    $subIfdDataFixup->AddFixup($offsetPos, $dataTag) if $subIfdDataFixup;
+                    # must also (sometimes) update StripOffsets in Panasonic RW2 images
+                    my $otherPos = $$offsetPair[0][5];
+                    if ($otherPos and $$tagInfo{PanasonicHack}) {
+                        Set32u($newOffset, \$newData, $otherPos);
+                        $fixup->AddFixup($otherPos, $dataTag);
+                    }
                     if ($ifd >= 0) {
                         # buff length must be even (Note: may have changed since $size was set)
                         $buff .= "\0" if length($buff) & 0x01;
@@ -2842,10 +2975,10 @@ NoOverwrite:            next if $isNew > 0;
         # save fixup for PreviewImage in JPEG file if necessary
         my $previewInfo = $exifTool->{PREVIEW_INFO};
         if ($previewInfo) {
-            my $pt = \$previewInfo->{Data}; # image data or 'LOAD' flag
+            my $pt = \$previewInfo->{Data}; # image data or 'LOAD_PREVIEW' flag
             # now that we know the size of the EXIF data, first test to see if our new image fits
             # inside the EXIF segment (remember about the TIFF and EXIF headers: 8+6 bytes)
-            if (($$pt ne 'LOAD' and length($$pt) + length($newData) + 14 <= 0xfffd) or
+            if (($$pt ne 'LOAD_PREVIEW' and length($$pt) + length($newData) + 14 <= 0xfffd) or
                 $previewInfo->{IsShort}) # must fit in this segment if using short pointers
             {
                 # It fits! (or must exist in EXIF segment), so fixup the
@@ -2873,7 +3006,7 @@ NoOverwrite:            next if $isNew > 0;
         # save location of last IFD for use in Canon RAW header
         if ($newDataPos == 16) {
             my @ifdPos = $fixup->GetMarkerPointers(\$newData,'NextIFD');
-            $_[1]{LastIFD} = pop @ifdPos;
+            $$origDirInfo{LastIFD} = pop @ifdPos;
         }
     }
     # return empty string if no entries in directory

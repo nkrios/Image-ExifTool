@@ -17,6 +17,6 @@
 -GPS:all < XMP-exif:all
 -GPS:GPSLatitudeRef < Composite:GPSLatitudeRef
 -GPS:GPSLongitudeRef < Composite:GPSLongitudeRef
--GPS:GPSDatestamp < XMP-exif:GPSDateTime
--GPS:GPSTimestamp < XMP-exif:GPSDateTime
+-GPS:GPSDateStamp < XMP-exif:GPSDateTime
+-GPS:GPSTimeStamp < XMP-exif:GPSDateTime
 # end

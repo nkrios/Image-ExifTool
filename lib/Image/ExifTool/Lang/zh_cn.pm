@@ -1,14 +1,18 @@
 #------------------------------------------------------------------------------
-# File:         ch_s.pm
+# File:         zh_cn.pm
 #
-# Description:  ExifTool language-specific tag information
+# Description:  ExifTool Simplified Chinese language translations
 #
 # Notes:        This file generated automatically by Image::ExifTool::TagInfoXML
 #------------------------------------------------------------------------------
 
-package Image::ExifTool::Lang::ch_s;
+package Image::ExifTool::Lang::zh_cn;
 
-%Image::ExifTool::Lang::ch_s::Translate = (
+use vars qw($VERSION);
+
+$VERSION = '1.02';
+
+%Image::ExifTool::Lang::zh_cn::Translate = (
    'AEProgramMode' => {
       PrintConv => {
         'Landscape' => '风景',
@@ -64,6 +68,7 @@ package Image::ExifTool::Lang::ch_s;
    'Aperture' => '光圈数',
    'ApertureValue' => '光圈',
    'Artist' => '图像作者',
+   'Author' => '作者',
    'AutoLightingOptimizer' => {
       PrintConv => {
         'n/a' => '未设置',
@@ -106,6 +111,7 @@ package Image::ExifTool::Lang::ch_s;
       },
     },
    'CameraOrientation' => {
+      Description => '图像取向',
       PrintConv => {
         'Horizontal (normal)' => '0° (上/左)',
         'Rotate 270 CW' => '90° CW (左/底)',
@@ -299,7 +305,6 @@ package Image::ExifTool::Lang::ch_s;
         'Unknown' => '未知',
       },
     },
-   'FlashOn' => '闪光',
    'FlashOptions' => {
       PrintConv => {
         'Auto' => '自动',
@@ -459,6 +464,7 @@ package Image::ExifTool::Lang::ch_s;
       },
     },
    'JFIFVersion' => 'JFIF 版本',
+   'Keyword' => '关键词',
    'LensType' => '未设置',
    'LicenseType' => {
       PrintConv => {
@@ -488,6 +494,7 @@ package Image::ExifTool::Lang::ch_s;
       },
     },
    'Make' => '厂商',
+   'MakerNote' => '厂商注释',
    'ManualFlashOutput' => {
       PrintConv => {
         'n/a' => '未设置',
@@ -676,6 +683,7 @@ package Image::ExifTool::Lang::ch_s;
       PrintConv => {
         'High' => '高饱和度',
         'Low' => '低饱和度',
+        'None' => '未设置',
       },
     },
    'SceneCaptureType' => {
@@ -747,6 +755,7 @@ package Image::ExifTool::Lang::ch_s;
    'SubSecTime' => '时间的次秒',
    'SubSecTimeDigitized' => '数字化时间的次秒',
    'SubSecTimeOriginal' => '原始时间的次秒',
+   'Subject' => '主题',
    'SubjectDistance' => '目标距离',
    'SubjectDistanceRange' => {
       PrintConv => {
@@ -771,6 +780,7 @@ package Image::ExifTool::Lang::ch_s;
    'T4Options' => '未压缩',
    'T6Options' => 'T6 选项',
    'ThumbnailImage' => '缩略图',
+   'Title' => '标题',
    'ToneCurve' => {
       PrintConv => {
         'Manual' => '手动',
@@ -845,7 +855,6 @@ package Image::ExifTool::Lang::ch_s;
         'Fluorescent' => '荧光',
         'Manual' => '手动',
         'Shade' => '阴影',
-        'Shadow' => '阴影',
         'Unknown' => '未知',
       },
     },
@@ -879,6 +888,7 @@ package Image::ExifTool::Lang::ch_s;
         'Shade' => '阴影',
       },
     },
+   'XMP' => 'XMP 元数据',
    'XPAuthor' => '作者',
    'XPComment' => '注释',
    'XPKeywords' => '关键词',
@@ -898,7 +908,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Lang::ch_s.pm - ExifTool language-specific tag information
+Image::ExifTool::Lang::zh_cn.pm - ExifTool Simplified Chinese language translations
 
 =head1 DESCRIPTION
 

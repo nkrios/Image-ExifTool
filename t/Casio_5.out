@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.66
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.79
 [File, File, Image] FileName - File Name: Casio_5_failed.jpg
 [File, File, Image] Directory - Directory: t
 [File, File, Image] FileSize - File Size: 1699 bytes
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:07 15:06:23-05:00
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:06:18 19:02:25-04:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
@@ -27,7 +27,7 @@
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2003:06:18 16:54:37
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2003:06:18 16:54:37
-[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: Y, Cb, Cr, -
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 0.533203125
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.6
@@ -45,7 +45,7 @@
 [EXIF, ExifIFD, Image] 41985 - Custom Rendered: Normal
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Manual
-[EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: inf
+[EXIF, ExifIFD, Camera] 41988 - Digital Zoom Ratio: undef
 [EXIF, ExifIFD, Camera] 41989 - Focal Length In 35mm Format: 74 mm
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [EXIF, ExifIFD, Camera] 41991 - Gain Control: None
@@ -68,7 +68,7 @@
 [MakerNotes, Casio, Camera] 8209 - White Balance Bias: 87 93
 [MakerNotes, Casio, Camera] 8210 - White Balance: Unknown (13)
 [MakerNotes, Casio, Camera] 8211 - Casio Type 2 0x2013: 2
-[MakerNotes, Casio, Camera] 8225 - AF Point Position: 50% 50%
+[MakerNotes, Casio, Camera] 8225 - AF Point Position: 0.5 0.5
 [MakerNotes, Casio, Camera] 8226 - Object Distance: 3.5 m
 [MakerNotes, Casio, Camera] 8227 - Casio Type 2 0x2023: 1
 [MakerNotes, Casio, Camera] 8241 - Casio Type 2 0x2031: 
@@ -98,7 +98,6 @@
 [PrintIM, PrintIM, Printing] 256 - Print IM 0x0100: 0x05000000
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x01000000
 [Composite, Composite, Image] Aperture - Aperture: 3.9
-[Composite, Composite, Camera] FlashOn - Flash: Off
 [Composite, Composite, Image] ImageSize - Image Size: 8x8
 [Composite, Composite, Image] PreviewImage - Preview Image: (Binary data 26 bytes)
 [Composite, Composite, Camera] ScaleFactor35efl - Scale Factor To 35 mm Equivalent: 6.1

@@ -5,8 +5,236 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 7.67. (Other versions are
+Note: The most recent production release is Version 7.82. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+July 2, 2009 - Version 7.82 (production release)
+
+  - Added a new Canon LensType (thanks Norbert Wasser)
+  - Decode another Nikon AVI tag
+  - Support multi-language ID3 tags in the same way as with XMP and MIE
+  - A number of improvements, bug fixes and additions to ID3 decoding
+  - Fixed problem extracting some ID3v2 Lyrics and Comment values
+
+June 28, 2009 - Version 7.81
+
+  - Added a few missing print conversions to Nikon, Kyocera and FlashPix
+    date/time tags
+
+June 26, 2009 - Version 7.80
+
+  - IMPORTANT: Fixed bug introduced in 7.77 which had the potential to corrupt
+    TIFF-format images when writing to an image containing a SubIFD tag larger
+    than 10 MB (not that I've ever seen one of these in the wild)
+  - Added support for DNG version 1.3
+  - Decode makernotes in Nikon AVI videos
+  - Decode QuickTime MatrixStructure tag and added Composite Rotation tag to
+    calculate the rotation of the QuickTime video track
+  - Updated CanonCustom tags for the EOS 500D
+  - The -fast option now stops parsing of WAV and AVI files at audio/video data
+  - API Changes:
+      - Improved handling of $/ by localizing internally
+
+June 20, 2009 - Version 7.79
+
+  - Added read/write support for Adobe InDesign files (.IND, .INDD, .INDT)
+  - Added ability to geotag with KML files (Note: each Placemark must contain a
+    TimeStamp for this to work)
+  - Added undocumented XMP-xmp PagInfo tags written by Adobe InDesign
+  - Added conversion for MPF:PanOrientation
+  - Many improvements and additions to Olympus and Panasonic makernote decoding
+  - Improved logic of -scanForXMP option
+  - Recognize MPO file extension (Extended Multi-Picture format)
+  - Distinguish between infinite (inf) and undefined (undef) rational values
+  - Changed namespace prefixes for xapG and xapGImg to match current XMP spec
+  - Changed print conversion for Casio AFPointPosition
+  - Made "Error reading value" warning minor when reading makernotes values
+  - Allow all tags to be deleted from an XMP file
+  - Fixed group names for a few Panasonic and Sony makernote tags
+
+June 13, 2009 - Version 7.78
+
+  - Added read support for the new CIPA standards: Multi Picture Format (MPF)
+    and Stereo Still Image format (Stim)
+  - Added support for Kodak type 10 makernotes (Z980)
+  - Added a new Pentax LensType and a new Nikon LensID (thanks Jens Duttke)
+  - Added %C format code for output file names
+  - Decode a number of camera settings from Sony DSLR images
+
+June 7, 2009 - Version 7.77
+
+  - Added -struct option for JSON (-j) and XML (-X) outputs
+  - Added 2 new Pentax LensType's and a PentaxModelID (thanks Jens Duttke)
+  - Decode large preview in APP2 of images from newer Samsung models
+  - Extract FujiFilm PreviewImage from improperly written FPXR segment
+  - Improved decoding of Nikon WB levels for some models
+  - Reduced memory useage when writing DNG and some other RAW image files
+  - Changed format of Canon D30 SerialNumber to remove the hyphen and add
+    leading 0's if less than 9 characters (now same format as printed on camera)
+  - Changed writing of GPSTimeStamp and GPSDateStamp to adjust date/time to UTC
+    if it contains a timezone, and added timezone ("Z") to Composite:GPSDateTime
+  - Suppress "Unlisted FPXR segment (index 255)" warning from some Kodak images
+  - Suppress "Unrecognized MakerNotes" warning for Samsung STMN-type maker notes
+  - Made "Unrecognized MakerNotes" a minor warning
+  - Fixed problems reading/writing large PreviewImage in some Sony JPEG images
+  - Fixed problem decoding some base64 values in XML files
+  - API Changes:
+      - Added Struct option (considered experimental)
+
+May 20, 2009 - Version 7.76
+
+  - Added support for Leica RWL raw images (just RW2 with a different name --
+    Panasonic is pulling the same dumb stunt as Nikon with NRW)
+  - Added ability to specify geotagging parameters via config file
+  - Added two new Canon LensType's (thanks Jose Oliver-Didier)
+  - Added a couple more Panasonic FilmMode values
+  - Added bitmapped value lookups to -listx output
+  - Decode Panasonic face recognition information (DMC-TZ7)
+  - Decode some new FujiFilm face detection tags
+  - Implemented language translations for bitmapped values
+  - Enhanced -geotag option to allow wildcards in track file name
+  - Minor changes to Nikon AF point decoding
+  - Allow empty string when writing unknown values (ie. "Unknown ()")
+  - Pad numerical IPTC values with zeros if necessary when writing
+  - Fixed problem with -geotag feature interpolating in some NMEA logs
+  - API Changes:
+      - Added GeoMaxHDOP, GeoMaxPDOP, GeoMaxIntSecs and GeoMaxExtSecs options
+
+May 9, 2009 - Version 7.75
+
+  - Added a few new translations (thanks Jens Duttke et al)
+  - Added warning when stream mode data is encountered in a ZIP file (this
+    is currently not supported)
+  - Added a couple of new Nikon ActiveD-Lighting values (thanks Werner Kober)
+  - Added and changed some Nikon LensID's (thanks Robert Rottmerhusen)
+  - Added ability to specify user-defined option defaults in config file
+  - Added write support for FujiFilm S5Pro firmware 1.11 RAF images
+  - Decode AF point information for more Nikon models (thanks Werner Kober)
+  - Improvements to new geotagging feature
+  - Changed language code for simplified Chinese from "zh_s" to "zh_cn"
+  - Changed user-defined shortcuts to Image::ExifTool::UserDefined::Shortcuts
+  - Limit PrintConv precision of Composite GPSAltitude to 1 decimal place
+  - API Changes:
+      - Changed WriteInfo() to use a temporary file instead of a memory buffer
+        when a source file name is given with no destination file
+      - Attempt (yet again) to fix problems when UTF-8 encoded strings are
+        passed to exiftool functions
+
+Apr. 10, 2009 - Version 7.74
+
+  - Added geotagging feature and new -geotag option (guess who finally bought a
+    hand-held GPS!)
+  - Added a few new Casio RecordMode values
+  - Decode FujiFilm EXRAuto and EXRMode tags (FinePix F200EXR)
+  - Decode Olympus ArtFilter tag
+  - Allow EXIF ISO to have multiple values as per EXIF spec
+  - Improved XMP-exif and XMP-tiff List-type tags to allow copying from EXIF
+  - Changed handling of ComponentsConfiguration to facilitate copying between
+    EXIF and XMP
+  - Changed name of EXIF tag 0x9214 from SubjectLocation to SubjectArea to match
+    EXIF specification
+  - Changed behaviour when writing pre-existing EXIF tags to use the standard
+    EXIF field type instead of preserving the existing type (fixes problem
+    rewriting some incorrectly typed EXIF tags)
+  - Fixed error if a shift value is not given when shifting a date/time tag
+  - Fixed makernote offsets error message when writing Pentax Optio WP images
+  - API Changes:
+      - Added EditOnly option to SetNewValue()
+
+Mar. 31, 2009 - Version 7.73
+
+  - Added write support for Panasonic RW2 images (including IPTC and XMP)
+  - Added ability to write IPTC and XMP to Panasonic/Leica RAW images and fixed
+    bug introduced in version 7.64 which disabled write support for these images
+  - Added a new Canon EasyMode value (thanks Irwin Poche)
+  - Added a number of new Nikon LensID's (thanks Robert Rottmerhusen)
+  - Added CanonModelID for the new 500D (thanks Laurent Clevy)
+  - Decode many CameraInfo and ColorData tags for the Canon EOS 500D
+  - Decode track-level 'meta' atom in MOV videos
+  - Enhanced Canon Composite:ShootingMode logic to distinguish Bulb mode
+  - Improved decoding of Canon TargetExposureTime
+  - Changed name of Panasonic RW2 PreviewImage to JpgFromRaw
+  - Fixed bug where JPEGDigest wasn't generated for some images
+  - Fixed problem where -F didn't permanently fix makernote offsets for some
+    images when writing
+  - Fixed bug decoding Canon RawMeasuredRGGB and MeasuredRGGBData which resulted
+    in a failed test on 64-bit systems
+
+Mar. 20, 2009 - Version 7.72
+
+  - Added a new Minolta/Sony LensType (thanks Jens Duttke)
+  - Added support for localized language descriptions of "lang-alt" tags
+  - Added support for Nikon NRW files (please just kill me now)
+  - Added two new PentaxModelID's and a new PentaxImageSize
+  - Decode Pentax PEF HuffmanTable as Unknown Binary tag (thanks Laurent Clevy)
+  - Decode Leaf and Kodak records in DNGAdobeData information
+  - Made "Empty PrintIM data" a minor warning
+  - Minor improvement to Canon lens recognition logic
+  - Changed Composite:LensID to also return a value for Olympus lenses
+  - Changed copying behaviour to preserve the specific location (family 1 group)
+    when source group is specified and destination group is "all" or "*"
+    (ie. "-exif:all>all:all" now preserves the IFD of each tag)
+  - Fixed a number of incorrect Minolta/Sony lens names (thanks Olaf Ulrich)
+  - Fixed bug rewriting MIE trailers on TIFF images
+
+Mar. 12, 2009 - Version 7.71
+
+  - Added a new Pentax LensType (thanks Akos Szalkai)
+  - Added a new Canon LensType (thanks Kurt Garloff)
+  - Added new PentaxModelID for the Optio P70
+  - Added XMP List-type flag (Alt, Bag or Seq) to "-f -listx" output
+  - Decode a number of new Canon tags (thanks Vesa Kivisto)
+  - Removed unreliable Canon Composite FlashOn tag (use Flash instead)
+  - Removed Nikon FlashModel tag and replaced it with ExternalFlashFirmware
+  - Changed tags in Canon "ColorBalance" tables to signed integer and renamed
+    the tables to "ColorData"
+  - Changed formatting for Canon FocalUnits
+  - Changes to -X output:
+      - Now uses 'rdf:datatype' instead of 'et:encoding' (thanks Alexander Vonk)
+      - Improved long (-l) output to produce valid RDF/XML, and added 'et:val'
+  - Improved handling of unknown XMP lang-alt tags
+  - Fixed family 2 group names for a few tags
+
+Feb. 26, 2009 - Version 7.70
+
+  - Added a few new Nikon LensID's (thanks Robert Rottmerhusen)
+  - Added a number of new CanonModelID's (thanks Laurent Clevy)
+  - Added ability to use -f before -listx to output 'flags' attribute
+  - Added xml:lang attribute to -X output (when used with -t, -H or -D) to
+    identify alternate language entries for XMP lang-alt tags
+  - Decode Canon ImageUniqueID and added a new EasyMode value
+  - Created "Unsafe" shortcut used when rebuilding JPEG EXIF metadata from
+    scratch
+  - Changed Olympus lens "pre-release" designation to "release 1"
+  - Changed exiftool to continue after encountering "Error opening directory"
+  - Enhanced makernote-offset-fix logic to account for problems like those
+    caused by bugs in Picasa and ACDSee
+  - API Changes:
+      - Enhanced GetTagID() to also return language code in list context
+
+Feb. 17, 2009 - Version 7.69
+
+  - Added a new Nikon LensID (thanks Jens Kriese)
+  - Added a new Pentax LensType (thanks Jens Duttke)
+  - Added Extra JPEGDigest tag
+  - Recognize new Panasonic APP2 MPF information written by FX40
+  - Improved -@ option to allow a UTF-8 BOM at the start of the input file
+  - Augmented -listx output to include indexed value conversions
+  - Changed Japanese and Chinese language codes to 'ja' and 'zh' (ISO 639-1)
+  - Fixed a few problems with some CanonCustom tags
+
+Feb. 13, 2009 - Version 7.68
+
+  - Added French translations for XMP and Composite tags (thanks Jean Piquemal)
+  - Decode Panasonic AdvancedSceneMode, added a few more SceneMode values, and
+    fixed incorrect format for TextStamp
+  - Decode a missing Canon 1DmkII custom function
+  - Changed Czech language code to 'cs' (as per ISO 639-1)
+  - Relaxed XMP date/time validation to allow writing year-only and year-month
+    values (YYYY and YYYY:MM) without requiring the -n option
+  - More work on language translations (this will be ongoing)
+  - Fixed problem shifting XMP date/time values with missing seconds
+  - Fixed some family 1 group names in -listx output
 
 Feb. 9, 2009 - Version 7.67 (production release)
 
@@ -35,22 +263,21 @@ Feb. 5, 2009 - Version 7.65
     extracting non-existent tags with the -f option
   - Fixed problem which could cause runtime error with -listx option on some
     systems
-  - Fixed problem with family 1 group names for QuickTime date tags
 
 Feb. 3, 2009 - Version 7.64 - "Babel fish"
 
   - Added -listx and -lang options
   - Added preliminary support for the following languages (thanks Jens!):
       - en    [default]
-      - ch_s  (thanks Haibing Zhong)
-      - cz    (thanks Petr Michalek)
+      - ch_s  (thanks Haibing Zhong) [renamed 'zh_cn' in 7.75]
+      - cz    (thanks Petr Michalek) [renamed 'cs' in 7.68]
       - de    (thanks Jens Duttke)
       - en_ca (for those of us who like to see "colour" to be spelled properly)
       - en_gb (correct "colour" plus a few other quirks)
       - es    (thanks Santiago del Brio Gonzalez)
       - fr    (thanks Bernard Guillotin)
       - it    (thanks Emilio Dati)
-      - jp    (thanks Kazunari Nishina)
+      - jp    (thanks Kazunari Nishina) [renamed 'ja' in 7.69]
       - nl    (thanks Peter Moonen and Herman Beld)
       - pl    (thanks Przemyslaw Sulek)
   - Added support for new XMP Windows Live Photo Gallery tags
@@ -1139,7 +1366,7 @@ Apr. 26, 2007 - Version 6.87
   - Minor changes to a few warning messages
   - Avoid converting XMP values as rational or date if tag is known and not
     specified with these formats
-  - Identify CR2 header and Canon MakerNote trailer in -htmlDump output
+  - Identify CR2 header and Canon MakerNote footer in -htmlDump output
   - Reverted change from version 6.85 to once again allow JPEG thumbnails to be
     written to TIFF-type images (perfectly valid for many TIFF-based RAW formats
     even though it isn't technically correct in a proper TIFF)
@@ -1178,7 +1405,7 @@ Mar. 30, 2007 - Version 6.84
 
   - Added a number of new XMP-crs tags, plus new XMP-lr (Adobe Lightroom) group
   - No longer automatically fix Canon makernote offsets (but still use makernote
-    trailer if present to calculate recommended fix)
+    footer if present to calculate recommended fix)
   - Fixed problem where some errors were not properly counted in the summary
     statistics with the -overwrite_original_in_place option
   - Fixed problem parsing XMP shorthand format for values containing '=' symbol
@@ -1186,7 +1413,7 @@ Mar. 30, 2007 - Version 6.84
 Mar. 24, 2007 - Version 6.83
 
   - Automatically fix corrupted makernote offsets when reading images from Canon
-    models which include a makernote offset trailer
+    models which include a makernote offset footer
   - Added CanonModelID and CameraType values for 2 new Canon DV cameras
   - Renamed SPIFF ResolutionUnits tag to ResolutionUnit
   - Fixed formatting of GPSTimeStamp value
@@ -1979,7 +2206,7 @@ Feb. 26, 2006 - Version 6.02
   - Added a number of new XMP tags and bring XMP support up to new
     specification, plus a few undocumented XMP-aux tags (thanks Lou Salkind)
   - Added support for large DNG preview image (with JpgFromRaw tag)
-  - Added ability to decode DNGMakerNotes
+  - Added ability to decode DNG Adobe MakerNotes
   - Added SEMInfo tag (thanks Robert Mucke)
   - Decode (but don't rewrite) old PS APP13 "Adobe_Photoshop2.5:" segment
 
@@ -2017,7 +2244,7 @@ Feb. 1, 2006 - Version 5.99
 
   - Major additions to Canon maker note decoding, including EOS-1D personal
     functions (thanks Rainer Honle for decoding many 5D tags)
-  - Added Canon maker note trailer when rewriting Canon maker notes
+  - Added Canon maker note footer when rewriting Canon maker notes
   - Attempt to fix problem where ScaleFactor35efl was calculated incorrectly for
     some Canon images
   - Reduce memory useage and speed up writing of large TIFF images

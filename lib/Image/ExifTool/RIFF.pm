@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 # type of current stream
 $Image::ExifTool::RIFF::streamType = '';
@@ -306,13 +306,15 @@ $Image::ExifTool::RIFF::streamType = '';
         Name => 'Tdat',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Tdat' },
     },
+    LIST_ncdt => { #PH (Nikon metadata)
+        Name => 'NikonData',
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Nikon' },
+    },
     JUNK => [
         {
             Name => 'OlympusJunk',
             Condition => '$$valPt =~ /^OLYMDigital Camera/',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Olympus::AVI',
-            },
+            SubDirectory => { TagTable => 'Image::ExifTool::Olympus::AVI' },
         },
         {
             Name => 'CasioJunk',
@@ -353,6 +355,25 @@ $Image::ExifTool::RIFF::streamType = '';
 %Image::ExifTool::RIFF::Junk = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Audio' },
+);
+
+# Nikon metadata in AVI videos (PH)
+%Image::ExifTool::RIFF::Nikon = (
+    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunks,
+    NOTES => 'Proprietry RIFF tags found in Nikon AVI videos.',
+    GROUPS => { 2 => 'Video' },
+    ncvr => {
+        Name => 'NikonVers',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::AVIVers' },
+    },
+    nctg => {
+        Name => 'NikonTags',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::AVITags' },
+    },
+    ncth => {
+        Name => 'ThumbnailImage',
+        Binary => 1,
+    },
 );
 
 # Format and Audio Stream Format chunk data
@@ -767,13 +788,16 @@ sub ProcessRIFF($$)
         $exifTool->VPrint(0, "RIFF '$tag' chunk ($len bytes of data):\n");
         # stop when we hit the audio data or AVI index or AVI movie data
         # --> no more because Adobe Bridge stores XMP after this!!
-        #if ($tag eq 'data' or $tag eq 'idx1' or $tag eq 'LIST_movi') {
-        #    $exifTool->VPrint(0, "(end of parsing)\n");
-        #    last;
-        #}
+        # (so now we only do this on the FastScan option)
+        if (($tag eq 'data' or $tag eq 'idx1' or $tag eq 'LIST_movi') and
+            $exifTool->Options('FastScan'))
+        {
+            $exifTool->VPrint(0, "(end of parsing)\n");
+            last;
+        }
         # RIFF chunks are padded to an even number of bytes
         my $len2 = $len + ($len & 0x01);
-        if ($$tagTablePtr{$tag}) {
+        if ($$tagTablePtr{$tag} or ($verbose and $tag !~ /^(data|idx1|LIST_movi)$/)) {
             $raf->Read($buff, $len2) == $len2 or $err=1, last;
             $exifTool->HandleTag($tagTablePtr, $tag, $buff,
                 DataPt  => \$buff,

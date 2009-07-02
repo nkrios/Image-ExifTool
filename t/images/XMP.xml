@@ -75,7 +75,7 @@
  <Nikon:AFPoint et:tagid='1'>Center</Nikon:AFPoint>
  <Nikon:AFPointsInFocus et:tagid='2'>(none)</Nikon:AFPointsInFocus>
  <Nikon:SceneMode et:tagid='143'></Nikon:SceneMode>
- <Nikon:DataDump et:tagid='16' et:encoding='base64'>
+ <Nikon:DataDump et:tagid='16' rdf:datatype='http://www.w3.org/2001/XMLSchema#base64Binary'>
 ATkAgAFEAAAAAP8BAAAAAAJqGAAAAAAAAjEAAA8wAAAR4wAADwsAAA8LAQAf
 AArcAE4AAAAABpkFwwSSA3YT/QPrAAAAAA4YHAoAAAAAAAAAAAAAAAALDwAA
 KAANJAABYjEANhAAFxwYIRwk/1MRURBYMgABHQAE/wA=

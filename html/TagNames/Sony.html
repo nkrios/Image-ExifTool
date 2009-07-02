@@ -19,7 +19,7 @@ tags.
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>0x0102</td>
+<td title='0x0102 = 258'>0x0102</td>
 <td>Quality</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = RAW
@@ -32,12 +32,12 @@ tags.
   <br>7 = Compressed RAW
   <br>8 = Compressed RAW + JPEG</span></td></tr>
 <tr class=b>
-<td>0x0104</td>
+<td title='0x0104 = 260'>0x0104</td>
 <td>FlashExposureComp</td>
 <td class=c>rational64s</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0105</td>
+<td title='0x0105 = 261'>0x0105</td>
 <td>Teleconverter</td>
 <td class=c>int32u</td>
 <td><span class=s>0x0 = None
@@ -46,12 +46,17 @@ tags.
   <br>0x88 = Minolta AF 1.4x APO (D)
   <br>0x90 = Minolta AF 1.4x APO II</span></td></tr>
 <tr class=b>
-<td>0x0112</td>
+<td title='0x0112 = 274'>0x0112</td>
 <td>WhiteBalanceFineTune</td>
 <td class=c>int32s</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0115</td>
+<td title='0x0114 = 276'>0x0114</td>
+<td>CameraSettings</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Sony.html#CameraSettings'>Sony CameraSettings Tags</a></td></tr>
+<tr class=b>
+<td title='0x0115 = 277'>0x0115</td>
 <td>WhiteBalance</td>
 <td class=c>N</td>
 <td><span class=s>0 = Auto
@@ -63,28 +68,33 @@ tags.
   <br>80 = Flash
   <br>96 = Fluorescent
   <br>112 = Custom</span></td></tr>
-<tr class=b>
-<td>0x0e00</td>
+<tr>
+<td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr>
-<td>0x2001</td>
+<tr class=b>
+<td title='0x2001 = 8193'>0x2001</td>
 <td>PreviewImage</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td title='0x3000 = 12288'>0x3000</td>
+<td>ShotInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Sony.html#ShotInfo'>Sony ShotInfo Tags</a></td></tr>
 <tr class=b>
-<td>0xb020</td>
+<td title='0xb020 = 45088'>0xb020</td>
 <td>ColorReproduction</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0xb021</td>
+<td title='0xb021 = 45089'>0xb021</td>
 <td>ColorTemperature</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0xb023</td>
+<td title='0xb023 = 45091'>0xb023</td>
 <td>SceneMode</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = Standard
@@ -100,14 +110,14 @@ tags.
   <br>16 = Auto
   <br>17 = Night View/Portrait</span></td></tr>
 <tr>
-<td>0xb024</td>
+<td title='0xb024 = 45092'>0xb024</td>
 <td>ZoneMatching</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = ISO Setting Used
   <br>1 = High Key
   <br>2 = Low Key</span></td></tr>
 <tr class=b>
-<td>0xb025</td>
+<td title='0xb025 = 45093'>0xb025</td>
 <td>DynamicRangeOptimizer</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = Off
@@ -119,54 +129,55 @@ tags.
   <br>11 = Advanced Lv4
   <br>12 = Advanced Lv5</span></td></tr>
 <tr>
-<td>0xb026</td>
+<td title='0xb026 = 45094'>0xb026</td>
 <td>ImageStabilization</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr class=b>
-<td>0xb027</td>
+<td title='0xb027 = 45095'>0xb027</td>
 <td>LensType</td>
 <td class=c>int32u</td>
 <td><span class=s><span class=n>(decimal values differentiate lenses which would otherwise have the same
 LensType, and are used by the Composite LensID tag when attempting to
-identify the specific lens model)</span>
-  <br>0 = Minolta AF 28-85mm F3.5-4.5
+identify the specific lens model.  &quot;New&quot; or &quot;II&quot; appear in brackets if the
+original version of the lens has the same LensType)</span>
+  <br>0 = Minolta AF 28-85mm F3.5-4.5 New
   <br>1 = Minolta AF 80-200mm F2.8 HS-APO G
   <br>2 = Minolta AF 28-70mm F2.8 G
   <br>3 = Minolta AF 28-80mm F4-5.6
-  <br>5 = Minolta AF 35-70mm F3.5-4.5
+  <br>5 = Minolta AF 35-70mm F3.5-4.5 [II]
   <br>6 = Minolta AF 24-85mm F3.5-4.5 [New]
   <br>7 = Minolta AF 100-300mm F4.5-5.6 APO [New] or 100-400mm or Sigma Lens
   <br>7.1 = Minolta AF 100-400mm F4.5-6.7 APO
   <br>7.2 = Sigma AF 100-300mm F4 EX DG IF
-  <br>8 = Minolta AF 70-210mm F4.5-5.6
+  <br>8 = Minolta AF 70-210mm F4.5-5.6 [II]
   <br>9 = Minolta AF 50mm F3.5 Macro
   <br>10 = Minolta AF 28-105mm F3.5-4.5 [New]
   <br>11 = Minolta AF 300mm F4 HS-APO G
   <br>12 = Minolta AF 100mm F2.8 Soft Focus
-  <br>13 = Minolta AF 75-300mm F4.5-5.6
+  <br>13 = Minolta AF 75-300mm F4.5-5.6 (New or II)
   <br>14 = Minolta AF 100-400mm F4.5-6.7 APO
   <br>15 = Minolta AF 400mm F4.5 HS-APO G
   <br>16 = Minolta AF 17-35mm F3.5 G
   <br>17 = Minolta AF 20-35mm F3.5-4.5
   <br>18 = Minolta AF 28-80mm F3.5-5.6 II
-  <br>19 = Minolta AF 35mm F1.4
-  <br>20 = Minolta/Sony STF 135mm F2.8 [T4.5]
-  <br>22 = Minolta AF 35-80mm F4-5.6
-  <br>23 = Minolta AF 200mm F4 G APO Macro
-  <br>24 = Minolta/Sony AF 24-105mm F3.5-4.5 (D) or Sigma Lens
+  <br>19 = Minolta AF 35mm F1.4 G
+  <br>20 = Minolta/Sony 135mm F2.8 [T4.5] STF
+  <br>22 = Minolta AF 35-80mm F4-5.6 II
+  <br>23 = Minolta AF 200mm F4 Macro APO G
+  <br>24 = Minolta/Sony AF 24-105mm F3.5-4.5 (D) or Sigma or Tamron Lens
   <br>24.1 = Sigma 18-50mm F2.8
   <br>24.2 = Sigma 17-70mm F2.8-4.5 (D)
   <br>24.3 = Sigma 20-40mm F2.8 EX DG Aspherical IF
   <br>24.4 = Tamron SP AF 28-75mm F2.8 XR Di (IF) Macro
-  <br>25 = Minolta AF 100-300mm F4.5-5.6 (APO D) or Sigma Lens
+  <br>25 = Minolta AF 100-300mm F4.5-5.6 APO (D) or Sigma Lens
   <br>25.1 = Sigma 100-300mm F4 EX (APO (D) or D IF)
   <br>25.2 = Sigma 70mm F2.8 EX DG Macro
-  <br>27 = Minolta AF 85mm F1.4 G
-  <br>28 = Minolta AF 100mm F2.8 Macro (D) or Tamron Lens
+  <br>27 = Minolta AF 85mm F1.4 G (D)
+  <br>28 = Minolta/Sony AF 100mm F2.8 Macro (D) or Tamron Lens
   <br>28.1 = Tamron SP AF 90mm F2.8 Di Macro
-  <br>29 = Minolta AF 75-300mm F4.5-5.6 (D)
+  <br>29 = Minolta/Sony AF 75-300mm F4.5-5.6 (D)
   <br>30 = Minolta AF 28-80mm F3.5-5.6 (D) or Sigma Lens
   <br>30.1 = Sigma AF 10-20mm F4-5.6 EX DC
   <br>30.2 = Sigma AF 12-24mm F4.5-5.6 EX DG
@@ -174,9 +185,8 @@ identify the specific lens model)</span>
   <br>30.4 = Sigma 55-200mm F4-5.6 DC
   <br>31 = Minolta/Sony AF 50mm F2.8 Macro (D) or F3.5
   <br>31.1 = Minolta/Sony AF 50mm F3.5 Macro
-  <br>32 = Minolta AF 300mm F2.8 G or 100-400mm F4.5-6.7 x1.5
-  <br>32.1 = Minolta AF 100-400mm F4.5-6.7 (D) x1.5
-  <br>33 = Minolta/Sony AF 70-200mm F2.8 G (D) SSM
+  <br>32 = Minolta/Sony AF 300mm F2.8 G or 1.5x Teleconverter
+  <br>33 = Minolta/Sony AF 70-200mm F2.8 G
   <br>35 = Minolta AF 85mm F1.4 G (D) Limited
   <br>36 = Minolta AF 28-100mm F3.5-5.6 (D)
   <br>38 = Minolta AF 17-35mm F2.8-4 (D)
@@ -184,9 +194,9 @@ identify the specific lens model)</span>
   <br>40 = Minolta/Sony AF DT 18-70mm F3.5-5.6 (D)
   <br>41 = Minolta/Sony AF DT 11-18mm F4.5-5.6 (D) or Tamron Lens
   <br>41.1 = Tamron SP AF 11-18mm F4.5-5.6 Di II LD Aspherical IF
-  <br>42 = Minolta AF DT 18-200mm F3.5-6.3 (D)
-  <br>43 = Minolta AF 35mm F1.4 G
-  <br>44 = Minolta AF 50mm F1.4
+  <br>42 = Minolta/Sony AF DT 18-200mm F3.5-6.3 (D)
+  <br>43 = Sony 35mm F1.4 G (SAL-35F14G)
+  <br>44 = Sony 50mm F1.4 (SAL-50F14)
   <br>45 = Carl Zeiss Planar T* 85mm F1.4 ZA
   <br>46 = Carl Zeiss Vario-Sonnar T* DT 16-80mm F3.5-4.5 ZA
   <br>47 = Carl Zeiss Sonnar T* 135mm F1.8 ZA
@@ -198,12 +208,13 @@ identify the specific lens model)</span>
   <br>52 = Sony 70-300mm F4.5-5.6 G SSM
   <br>53 = Sony AF 70-400mm F4.5-5.6 G SSM (SAL-70400G)
   <br>54 = Carl Zeiss Vario-Sonnar T* 16-35mm F2.8 ZA SSM (SAL-1635Z)
-  <br>128 = Tamron Lens (128)
+  <br>128 = Tamron or Sigma Lens (128)
   <br>128.1 = Tamron 18-200mm F3.5-6.3
   <br>128.2 = Tamron 28-300mm F3.5-6.3
   <br>128.3 = Tamron 80-300mm F3.5-6.3
   <br>128.4 = Tamron AF 28-200mm F3.8-5.6 XR Di Aspherical [IF] MACRO
   <br>128.5 = Tamron SP AF 17-35mm F2.8-4 Di LD Aspherical IF
+  <br>128.6 = Sigma AF 50-150mm f/2.8 EX DC APO HSM II
   <br>129 = Tamron Lens (129)
   <br>129.1 = Tamron 200-400mm F5.6
   <br>129.2 = Tamron 70-300mm F4-5.6 LD
@@ -225,7 +236,7 @@ identify the specific lens model)</span>
   <br>2551.2 = Sigma AF 28-70mm F2.8
   <br>2551.3 = Sigma M-AF 70-200mm F2.8 EX Aspherical
   <br>2551.4 = Quantaray M-AF 35-80mm F4-5.6
-  <br>2552 = Minolta AF 28-85mm F3.5-4.5 [New] or Other Lens
+  <br>2552 = Minolta AF 28-85mm F3.5-4.5 or Other Lens
   <br>2552.1 = Tokina 19-35mm F3.5-4.5
   <br>2552.2 = Tokina 28-70mm F2.8 AT-X
   <br>2552.3 = Tokina 80-400mm F4.5-5.6 AT-X AF II 840
@@ -240,7 +251,7 @@ identify the specific lens model)</span>
   <br>2555.1 = Sigma 70-210mm F4-5.6 APO
   <br>2555.2 = Sigma M-AF 70-200mm F2.8 EX APO
   <br>2556 = Minolta AF 135mm F2.8
-  <br>2557 = Minolta AF 28mm F2.8
+  <br>2557 = Minolta/Sony AF 28mm F2.8
   <br>2558 = Minolta AF 24-50mm F4
   <br>2560 = Minolta AF 100-200mm F4.5
   <br>2561 = Minolta AF 75-300mm F4.5-5.6 or Sigma Lens
@@ -250,8 +261,8 @@ identify the specific lens model)</span>
   <br>2561.4 = Sigma AF 170-500mm F5-6.3 APO Aspherical
   <br>2561.5 = Tokina AT-X AF 300mm F4
   <br>2561.6 = Tokina AF 730 II 75-300mm F4.5-5.6
-  <br>2562 = Minolta/Sony AF 50mm F1.4 [New]
-  <br>2563 = Minolta AF 300mm F2.8 G or Sigma Lens
+  <br>2562 = Minolta AF 50mm F1.4 [New]
+  <br>2563 = Minolta AF 300mm F2.8 APO or Sigma Lens
   <br>2563.1 = Sigma AF 50-500mm F4-6.3 EX DG APO
   <br>2563.2 = Sigma AF 170-500mm F5-6.3 APO Aspherical
   <br>2563.3 = Sigma AF 500mm F4.5 EX DG APO
@@ -259,12 +270,12 @@ identify the specific lens model)</span>
   <br>2565 = Minolta AF 600mm F4
   <br>2566 = Minolta AF 24mm F2.8
   <br>2572 = Minolta/Sony AF 500mm F8 Reflex
-  <br>2578 = Minolta AF 16mm F2.8 Fisheye or Sigma Lens
+  <br>2578 = Minolta/Sony AF 16mm F2.8 Fisheye or Sigma Lens
   <br>2578.1 = Sigma 8mm F4 Fisheye
   <br>2578.2 = Sigma 14mm F3.5
   <br>2578.3 = Sigma 15mm F2.8 Fisheye
   <br>2579 = Minolta AF 20mm F2.8
-  <br>2581 = Minolta/Sony AF 100mm F2.8 Macro New or Sigma or Tamron Lens
+  <br>2581 = Minolta AF 100mm F2.8 Macro [New] or Sigma or Tamron Lens
   <br>2581.1 = Sigma AF 90mm F2.8 Macro
   <br>2581.2 = Sigma AF 105mm F2.8 EX DG Macro
   <br>2581.3 = Sigma 180mm F5.6 Macro
@@ -280,22 +291,22 @@ identify the specific lens model)</span>
   <br>2593 = Minolta AF 200mm F2.8 G APO
   <br>2594 = Minolta AF 3x-1x F1.7-2.8 Macro
   <br>2596 = Minolta AF 28mm F2
-  <br>2597 = Minolta AF 35mm F2
+  <br>2597 = Minolta AF 35mm F2 [New]
   <br>2598 = Minolta AF 100mm F2
   <br>2604 = Minolta AF 80-200mm F4.5-5.6
   <br>2605 = Minolta AF 35-80mm F4-5.6
-  <br>2606 = Minolta AF 100-300mm F4.5-5.6 (D)
+  <br>2606 = Minolta AF 100-300mm F4.5-5.6
   <br>2607 = Minolta AF 35-80mm F4-5.6
-  <br>2608 = Minolta AF 300mm F2.8 G
+  <br>2608 = Minolta AF 300mm F2.8 HS-APO G
   <br>2609 = Minolta AF 600mm F4 HS-APO G
-  <br>2612 = Minolta AF 200mm F2.8 G HS-APO
+  <br>2612 = Minolta AF 200mm F2.8 HS-APO G
   <br>2613 = Minolta AF 50mm F1.7 New
-  <br>2615 = Minolta AF 28-105mm F3.5-4.5 Power Zoom
-  <br>2616 = Minolta AF 35-200mm F4.5-5.6 Power Zoom
-  <br>2618 = Minolta AF 28-80mm F4-5.6 Power Zoom
-  <br>2619 = Minolta AF 80-200mm F4.5-5.6 Power Zoom
+  <br>2615 = Minolta AF 28-105mm F3.5-4.5 xi
+  <br>2616 = Minolta AF 35-200mm F4.5-5.6 xi
+  <br>2618 = Minolta AF 28-80mm F4-5.6 xi
+  <br>2619 = Minolta AF 80-200mm F4.5-5.6 xi
   <br>2620 = Minolta AF 28-70mm F2.8 G
-  <br>2621 = Minolta AF 100-300mm F4.5-5.6 Power Zoom
+  <br>2621 = Minolta AF 100-300mm F4.5-5.6 xi
   <br>2624 = Minolta AF 35-80mm F4-5.6 Power Zoom
   <br>2628 = Minolta AF 80-200mm F2.8 G
   <br>2629 = Minolta AF 85mm F1.4 New
@@ -303,17 +314,18 @@ identify the specific lens model)</span>
   <br>2632 = Minolta AF 24-50mm F4 New
   <br>2638 = Minolta AF 50mm F2.8 Macro New
   <br>2639 = Minolta AF 100mm F2.8 Macro
-  <br>2641 = Minolta AF 20mm F2.8 New
+  <br>2641 = Minolta/Sony AF 20mm F2.8 New
   <br>2642 = Minolta AF 24mm F2.8 New
   <br>2644 = Minolta AF 100-400mm F4.5-6.7 APO
   <br>2662 = Minolta AF 50mm F1.4 New
   <br>2667 = Minolta AF 35mm F2 New
   <br>2668 = Minolta AF 28mm F2 New
   <br>2672 = Minolta AF 24-105mm F3.5-4.5 (D)
-  <br>4574 = Minolta AF 200mm F2.8 G x2 or Tamron or Tokina Lens
+  <br>4574 = 2x Teleconverter or Tamron or Tokina Lens
   <br>4574.1 = Tamron SP AF 90mm F2.5
   <br>4574.2 = Tokina RF 500mm F8.0 x2
   <br>4574.3 = Tokina 300mm F2.8 x2
+  <br>4575 = 1.4x Teleconverter
   <br>4585 = Tamron SP AF 300mm F2.8 LD IF
   <br>6553 = T-Mount or Other Lens or no lens
   <br>6553.1 = Arax MC 35mm F2.8 Tilt+Shift
@@ -325,7 +337,7 @@ identify the specific lens model)</span>
   <br>25511.2 = Sigma AF 28-70mm F2.8
   <br>25511.3 = Sigma M-AF 70-200mm F2.8 EX Aspherical
   <br>25511.4 = Quantaray M-AF 35-80mm F4-5.6
-  <br>25521 = Minolta AF 28-85mm F3.5-4.5 [New] or Other Lens
+  <br>25521 = Minolta AF 28-85mm F3.5-4.5 or Other Lens
   <br>25521.1 = Tokina 19-35mm F3.5-4.5
   <br>25521.2 = Tokina 28-70mm F2.8 AT-X
   <br>25521.3 = Tokina 80-400mm F4.5-5.6 AT-X AF II 840
@@ -340,7 +352,7 @@ identify the specific lens model)</span>
   <br>25551.1 = Sigma 70-210mm F4-5.6 APO
   <br>25551.2 = Sigma M-AF 70-200mm F2.8 EX APO
   <br>25561 = Minolta AF 135mm F2.8
-  <br>25571 = Minolta AF 28mm F2.8
+  <br>25571 = Minolta/Sony AF 28mm F2.8
   <br>25581 = Minolta AF 24-50mm F4
   <br>25601 = Minolta AF 100-200mm F4.5
   <br>25611 = Minolta AF 75-300mm F4.5-5.6 or Sigma Lens
@@ -350,8 +362,8 @@ identify the specific lens model)</span>
   <br>25611.4 = Sigma AF 170-500mm F5-6.3 APO Aspherical
   <br>25611.5 = Tokina AT-X AF 300mm F4
   <br>25611.6 = Tokina AF 730 II 75-300mm F4.5-5.6
-  <br>25621 = Minolta/Sony AF 50mm F1.4 [New]
-  <br>25631 = Minolta AF 300mm F2.8 G or Sigma Lens
+  <br>25621 = Minolta AF 50mm F1.4 [New]
+  <br>25631 = Minolta AF 300mm F2.8 APO or Sigma Lens
   <br>25631.1 = Sigma AF 50-500mm F4-6.3 EX DG APO
   <br>25631.2 = Sigma AF 170-500mm F5-6.3 APO Aspherical
   <br>25631.3 = Sigma AF 500mm F4.5 EX DG APO
@@ -359,12 +371,12 @@ identify the specific lens model)</span>
   <br>25651 = Minolta AF 600mm F4
   <br>25661 = Minolta AF 24mm F2.8
   <br>25721 = Minolta/Sony AF 500mm F8 Reflex
-  <br>25781 = Minolta AF 16mm F2.8 Fisheye or Sigma Lens
+  <br>25781 = Minolta/Sony AF 16mm F2.8 Fisheye or Sigma Lens
   <br>25781.1 = Sigma 8mm F4 Fisheye
   <br>25781.2 = Sigma 14mm F3.5
   <br>25781.3 = Sigma 15mm F2.8 Fisheye
   <br>25791 = Minolta AF 20mm F2.8
-  <br>25811 = Minolta/Sony AF 100mm F2.8 Macro New or Sigma or Tamron Lens
+  <br>25811 = Minolta AF 100mm F2.8 Macro [New] or Sigma or Tamron Lens
   <br>25811.1 = Sigma AF 90mm F2.8 Macro
   <br>25811.2 = Sigma AF 105mm F2.8 EX DG Macro
   <br>25811.3 = Sigma 180mm F5.6 Macro
@@ -380,22 +392,22 @@ identify the specific lens model)</span>
   <br>25931 = Minolta AF 200mm F2.8 G APO
   <br>25941 = Minolta AF 3x-1x F1.7-2.8 Macro
   <br>25961 = Minolta AF 28mm F2
-  <br>25971 = Minolta AF 35mm F2
+  <br>25971 = Minolta AF 35mm F2 [New]
   <br>25981 = Minolta AF 100mm F2
   <br>26041 = Minolta AF 80-200mm F4.5-5.6
   <br>26051 = Minolta AF 35-80mm F4-5.6
-  <br>26061 = Minolta AF 100-300mm F4.5-5.6 (D)
+  <br>26061 = Minolta AF 100-300mm F4.5-5.6
   <br>26071 = Minolta AF 35-80mm F4-5.6
-  <br>26081 = Minolta AF 300mm F2.8 G
+  <br>26081 = Minolta AF 300mm F2.8 HS-APO G
   <br>26091 = Minolta AF 600mm F4 HS-APO G
-  <br>26121 = Minolta AF 200mm F2.8 G HS-APO
+  <br>26121 = Minolta AF 200mm F2.8 HS-APO G
   <br>26131 = Minolta AF 50mm F1.7 New
-  <br>26151 = Minolta AF 28-105mm F3.5-4.5 Power Zoom
-  <br>26161 = Minolta AF 35-200mm F4.5-5.6 Power Zoom
-  <br>26181 = Minolta AF 28-80mm F4-5.6 Power Zoom
-  <br>26191 = Minolta AF 80-200mm F4.5-5.6 Power Zoom
+  <br>26151 = Minolta AF 28-105mm F3.5-4.5 xi
+  <br>26161 = Minolta AF 35-200mm F4.5-5.6 xi
+  <br>26181 = Minolta AF 28-80mm F4-5.6 xi
+  <br>26191 = Minolta AF 80-200mm F4.5-5.6 xi
   <br>26201 = Minolta AF 28-70mm F2.8 G
-  <br>26211 = Minolta AF 100-300mm F4.5-5.6 Power Zoom
+  <br>26211 = Minolta AF 100-300mm F4.5-5.6 xi
   <br>26241 = Minolta AF 35-80mm F4-5.6 Power Zoom
   <br>26281 = Minolta AF 80-200mm F2.8 G
   <br>26291 = Minolta AF 85mm F1.4 New
@@ -403,29 +415,30 @@ identify the specific lens model)</span>
   <br>26321 = Minolta AF 24-50mm F4 New
   <br>26381 = Minolta AF 50mm F2.8 Macro New
   <br>26391 = Minolta AF 100mm F2.8 Macro
-  <br>26411 = Minolta AF 20mm F2.8 New
+  <br>26411 = Minolta/Sony AF 20mm F2.8 New
   <br>26421 = Minolta AF 24mm F2.8 New
   <br>26441 = Minolta AF 100-400mm F4.5-6.7 APO
   <br>26621 = Minolta AF 50mm F1.4 New
   <br>26671 = Minolta AF 35mm F2 New
   <br>26681 = Minolta AF 28mm F2 New
   <br>26721 = Minolta AF 24-105mm F3.5-4.5 (D)
-  <br>45741 = Minolta AF 200mm F2.8 G x2 or Tamron or Tokina Lens
+  <br>45741 = 2x Teleconverter or Tamron or Tokina Lens
   <br>45741.1 = Tamron SP AF 90mm F2.5
   <br>45741.2 = Tokina RF 500mm F8.0 x2
   <br>45741.3 = Tokina 300mm F2.8 x2
+  <br>45751 = 1.4x Teleconverter
   <br>45851 = Tamron SP AF 300mm F2.8 LD IF
   <br>65535 = T-Mount or Other Lens or no lens
   <br>65535.1 = Arax MC 35mm F2.8 Tilt+Shift
   <br>65535.2 = Arax MC 80mm F2.8 Tilt+Shift
   <br>65535.3 = Zenitar MF 16mm F2.8 Fisheye M42</span></td></tr>
 <tr>
-<td>0xb028</td>
+<td title='0xb028 = 45096'>0xb028</td>
 <td>MinoltaMakerNote</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Minolta.html'>Minolta Tags</a></td></tr>
 <tr class=b>
-<td>0xb029</td>
+<td title='0xb029 = 45097'>0xb029</td>
 <td>ColorMode</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = Standard
@@ -433,7 +446,7 @@ identify the specific lens model)</span>
   <br>2 = Portrait
   <br>3 = Landscape
   <br>4 = Sunset
-  <br>5 = Night Portrait
+  <br>5 = Night View/Portrait
   <br>6 = B&amp;W
   <br>7 = Adobe RGB
   <br>12 = Neutral
@@ -444,13 +457,13 @@ identify the specific lens model)</span>
   <br>104 = Night View
   <br>105 = Autumn Leaves</span></td></tr>
 <tr>
-<td>0xb040</td>
+<td title='0xb040 = 45120'>0xb040</td>
 <td>Macro</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr class=b>
-<td>0xb041</td>
+<td title='0xb041 = 45121'>0xb041</td>
 <td>ExposureMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Auto
@@ -461,13 +474,13 @@ identify the specific lens model)</span>
   <br>9 = Night Scene
   <br>15 = Manual</span></td></tr>
 <tr>
-<td>0xb047</td>
+<td title='0xb047 = 45127'>0xb047</td>
 <td>Quality</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Normal
   <br>1 = Fine</span></td></tr>
 <tr class=b>
-<td>0xb04b</td>
+<td title='0xb04b = 45131'>0xb04b</td>
 <td>Anti-Blur</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
@@ -475,11 +488,102 @@ identify the specific lens model)</span>
   <br>2 = On (Shooting)
   <br>65535 = n/a</span></td></tr>
 <tr>
-<td>0xb04e</td>
+<td title='0xb04e = 45134'>0xb04e</td>
 <td>LongExposureNoiseReduction</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraSettings'>Sony CameraSettings Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='17 = 0x11'>17</td>
+<td>AFArea</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Wide
+  <br>1 = Local
+  <br>2 = Spot</span></td></tr>
+<tr class=b>
+<td class=r title='22 = 0x16'>22</td>
+<td>ISOSetting</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='26 = 0x1a'>26</td>
+<td>CreativeStyle</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Standard
+  <br>2 = Vivid
+  <br>3 = Portrait
+  <br>4 = Landscape
+  <br>5 = Sunset
+  <br>6 = Night View/Portrait
+  <br>8 = B&amp;W
+  <br>9 = Adobe RGB
+  <br>11 = Neutral</span></td></tr>
+<tr class=b>
+<td class=r title='28 = 0x1c'>28</td>
+<td>Sharpness</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='29 = 0x1d'>29</td>
+<td>Contrast</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='30 = 0x1e'>30</td>
+<td>Saturation</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='35 = 0x23'>35</td>
+<td>FlashMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = ADI
+  <br>1 = TTL</span></td></tr>
+<tr class=b>
+<td class=r title='60 = 0x3c'>60</td>
+<td>ExposureProgram</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Auto
+  <br>1 = Manual
+  <br>2 = Program AE
+  <br>3 = Aperture-priority AE
+  <br>4 = Shutter speed priority AE
+  <br>16 = Portrait</span></td></tr>
+<tr>
+<td class=r title='63 = 0x3f'>63</td>
+<td>Rotation</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Horizontal (normal)
+  <br>1 = Rotate 90 CW
+  <br>2 = Rotate 270 CW</span></td></tr>
+<tr class=b>
+<td class=r title='84 = 0x54'>84</td>
+<td>SonyImageSize</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Large
+  <br>2 = Medium
+  <br>3 = Small</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ShotInfo'>Sony ShotInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='6 = 0x6'>6</td>
+<td>SonyDateTime</td>
+<td class=c>string[20]</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SRF'>Sony SRF Tags</a></h2>
@@ -493,12 +597,12 @@ encrypted, but thanks to Dave Coffin the decryption algorithm is known.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>0x0000</td>
+<td title='0x0000 = 0'>0x0000</td>
 <td>SRF2_Key</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(key to decrypt maker notes from the start of SRF2)</span></span></td></tr>
 <tr class=b>
-<td>0x0001</td>
+<td title='0x0001 = 1'>0x0001</td>
 <td>DataKey</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(key to decrypt the rest of the file from the end of the maker notes)</span></span></td></tr>
@@ -513,22 +617,22 @@ containing these tags.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>0x7200</td>
+<td title='0x7200 = 29184'>0x7200</td>
 <td>SR2SubIFDOffset</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x7201</td>
+<td title='0x7201 = 29185'>0x7201</td>
 <td>SR2SubIFDLength</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x7221</td>
+<td title='0x7221 = 29217'>0x7221</td>
 <td>SR2SubIFDKey</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(key to decrypt SR2SubIFD)</span></span></td></tr>
 <tr class=b>
-<td>0x7250</td>
+<td title='0x7250 = 29264'>0x7250</td>
 <td>MRWInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='MinoltaRaw.html'>MinoltaRaw Tags</a></td></tr>
@@ -542,57 +646,57 @@ containing these tags.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>0x7303</td>
+<td title='0x7303 = 29443'>0x7303</td>
 <td>WB_GRBGLevels</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x7313</td>
+<td title='0x7313 = 29459'>0x7313</td>
 <td>WB_RGGBLevels</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x74a0</td>
+<td title='0x74a0 = 29856'>0x74a0</td>
 <td>MaxApertureAtMaxFocal</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x74a1</td>
+<td title='0x74a1 = 29857'>0x74a1</td>
 <td>MaxApertureAtMinFocal</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x74c0</td>
+<td title='0x74c0 = 29888'>0x74c0</td>
 <td>SR2DataIFD</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Sony.html#SR2DataIFD'>Sony SR2DataIFD Tags</a></td></tr>
 <tr class=b>
-<td>0x7820</td>
+<td title='0x7820 = 30752'>0x7820</td>
 <td>WB_RGBLevelsDaylight</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x7821</td>
+<td title='0x7821 = 30753'>0x7821</td>
 <td>WB_RGBLevelsCloudy</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x7822</td>
+<td title='0x7822 = 30754'>0x7822</td>
 <td>WB_RGBLevelsTungsten</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x7825</td>
+<td title='0x7825 = 30757'>0x7825</td>
 <td>WB_RGBLevelsShade</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x7826</td>
+<td title='0x7826 = 30758'>0x7826</td>
 <td>WB_RGBLevelsFluorescent</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x7828</td>
+<td title='0x7828 = 30760'>0x7828</td>
 <td>WB_RGBLevelsFlash</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -605,7 +709,7 @@ containing these tags.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>0x7770</td>
+<td title='0x7770 = 30576'>0x7770</td>
 <td>ColorMode</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -613,7 +717,7 @@ containing these tags.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 23, 2009</i>
+<br><i>Last revised Jun 11, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

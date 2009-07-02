@@ -7,6 +7,7 @@
 #
 # References:   1) http://www.id3.org/
 #               2) http://www.mp3-tech.org/
+#               3) http://www.fortunecity.com/underworld/sonic/3/id3tag.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::ID3;
@@ -15,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.14';
+$VERSION = '1.17';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -36,11 +37,19 @@ my %warnedOnce;     # hash of warnings we issued
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData, # (not really)
     NOTES => q{
         ExifTool extracts ID3 information from MP3, MPEG, AIFF, OGG, FLAC, APE and
-        RealAudio files.
+        RealAudio files.  Tags which support multiple languages (ie. Comment and
+        Lyrics) are extracted by specifying the tag name, followed by a dash ('-'),
+        then a 3-character
+        L<ISO 639-2|http://www.loc.gov/standards/iso639-2/php/code_list.php>
+        language code (ie. "Comment-spa").
     },
     ID3v1 => {
         Name => 'ID3v1',
         SubDirectory => { TagTable => 'Image::ExifTool::ID3::v1' },
+    },
+    ID3v1Enh => {
+        Name => 'ID3v1_Enh',
+        SubDirectory => { TagTable => 'Image::ExifTool::ID3::v1_Enh' },
     },
     ID3v22 => {
         Name => 'ID3v2_2',
@@ -245,6 +254,12 @@ my %genre = (
         Format => 'string[30]',
         ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
     },
+    125 => { # ID3v1.1 (ref http://en.wikipedia.org/wiki/ID3#Layout)
+        Name => 'Track',
+        Format => 'int8u[2]',
+        Notes => 'v1.1 addition -- last 2 bytes of v1.0 Comment field',
+        RawConv => '($val =~ s/^0 // and $val) ? $val : undef',
+    },
     127 => {
         Name => 'Genre',
         Notes => 'CR and RX are ID3v2 only',
@@ -253,16 +268,63 @@ my %genre = (
     },
 );
 
+# ID3v1 "Enhanced TAG" information (ref 3)
+%Image::ExifTool::ID3::v1_Enh = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 1 => 'ID3v1_Enh', 2 => 'Audio' },
+    NOTES => 'ID3 version 1 "Enhanced TAG" information (not part of the official spec).',
+    PRIORITY => 0,  # let ID3v2 tags replace these if they come later
+    4 => {
+        Name => 'Title2',
+        Format => 'string[60]',
+        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
+    },
+    64 => {
+        Name => 'Artist2',
+        Groups => { 2 => 'Author' },
+        Format => 'string[60]',
+        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
+    },
+    124 => {
+        Name => 'Album2',
+        Format => 'string[60]',
+        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
+    },
+    184 => {
+        Name => 'Speed',
+        Format => 'int8u',
+        PrintConv => {
+            1 => 'Slow',
+            2 => 'Medium',
+            3 => 'Fast',
+            4 => 'Hardcore',
+        },
+    },
+    185 => {
+        Name => 'Genre',
+        Format => 'string[30]',
+        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
+    },
+    215 => {
+        Name => 'StartTime',
+        Format => 'string[6]',
+    },
+    221 => {
+        Name => 'EndTime',
+        Format => 'string[6]',
+    },
+);
+
 # Tags for ID2v2.2
 %Image::ExifTool::ID3::v2_2 = (
     PROCESS_PROC => \&Image::ExifTool::ID3::ProcessID3v2,
     GROUPS => { 1 => 'ID3v2_2', 2 => 'Audio' },
     NOTES => q{
-ExifTool extracts mainly text-based tags from ID3v2 information.  The tags
-in the tables below are those extracted by ExifTool, and don't represent a
-complete list of available ID3v2 tags.
-
-ID3 version 2.2 tags.  (These are the tags written by iTunes 5.0.)
+        ExifTool extracts mainly text-based tags from ID3v2 information.  The tags
+        in the tables below are those extracted by ExifTool, and don't represent a
+        complete list of available ID3v2 tags.
+        
+        ID3 version 2.2 tags.  (These are the tags written by iTunes 5.0.)
     },
     CNT => 'PlayCounter',
     COM => 'Comment',
@@ -272,6 +334,10 @@ ID3 version 2.2 tags.  (These are the tags written by iTunes 5.0.)
         Binary => 1,
     },
   # POP => 'Popularimeter',
+    SLT => {
+        Name => 'SynchronizedLyricText',
+        Binary => 1,
+    },
     TAL => 'Album',
     TBP => 'BeatsPerMinute',
     TCM => 'Composer',
@@ -349,7 +415,10 @@ my %id3v2_common = (
     },
   # RBUF => 'RecommendedBufferSize',
   # RVRB => 'Reverb',
-  # SYLT => 'SynchronizedLyricText',
+    SYLT => {
+        Name => 'SynchronizedLyricText',
+        Binary => 1,
+    },
   # SYTC => 'SynchronizedTempoCodes',
     TALB => 'Album',
     TBPM => 'BeatsPerMinute',
@@ -475,6 +544,9 @@ my %id3v2_common = (
     foreach $tag (keys %id3v2_common) {
         next unless ref $id3v2_common{$tag} eq 'HASH';
         my %tagInfo = %{$id3v2_common{$tag}};
+        # must also copy Groups hash if it exists
+        my $groups = $tagInfo{Groups};
+        $tagInfo{Groups} = { %$groups } if $groups;
         $Image::ExifTool::ID3::v2_4{$tag} = \%tagInfo;
     }
 }
@@ -545,14 +617,13 @@ sub DecodeString($$)
     my $enc = unpack('C', $val);
     $val = substr($val, 1); # remove encoding byte
     my @vals;
-    if ($enc == 0) {        # ISO 8859-1
+    if ($enc == 0 or $enc == 3) { # ISO 8859-1 or UTF-8
         $val =~ s/\0+$//;   # remove any null padding
-        $val = $exifTool->Latin2Charset($val);
+        # (must split before converting because conversion routines truncate at null)
         @vals = split "\0", $val;
-    } elsif ($enc == 3) {   # UTF-8
-        $val =~ s/\0+$//;
-        $val = $exifTool->UTF82Charset($val);
-        @vals = split "\0", $val;
+        foreach $val (@vals) {
+            $val = $enc ? $exifTool->UTF82Charset($val) : $exifTool->Latin2Charset($val);
+        }
     } elsif ($enc == 1 or $enc == 2) {  # UTF-16 with BOM, or UTF-16BE
         my $bom = "\xfe\xff";
         my %order = ( "\xfe\xff" => 'MM', "\xff\xfe", => 'II' );
@@ -620,6 +691,25 @@ sub ProcessID3v2($$$)
             ($id, $len, $flags) = unpack("x${offset}a4Nn",$$dataPt);
             last if $id eq "\0\0\0\0";
             $offset += 10;
+            # length is a "sync-safe" integer by the ID3v2.4 specification, but
+            # reportedly some versions of iTunes write this as a normal integer
+            # (ref http://www.id3.org/iTunes)
+            while ($vers >= 0x0400 and $len > 0x7f and not $len & 0x80808080) {
+                my $oldLen = $len;
+                $len =  ($len & 0x0000007f) |
+                       (($len & 0x00007f00) >> 1) |
+                       (($len & 0x007f0000) >> 2) |
+                       (($len & 0x7f000000) >> 3);
+                last if $offset + $len + 10 > $size;
+                # check next ID to see if it makes sense
+                my $nextID = substr($$dataPt, $offset + $len, 4);
+                last if $$tagTablePtr{$nextID};
+                # try again with the incorrect length word (patch for iTunes bug)
+                last if $offset + $oldLen + 10 > $size;
+                $nextID = substr($$dataPt, $offset + $len, 4);
+                $len = $oldLen if $$tagTablePtr{$nextID};
+                last; # yes, "while" was really a "goto" in disguise
+            }
         }
         last if $offset + $len > $size;
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $id);
@@ -699,6 +789,7 @@ sub ProcessID3v2($$$)
 #
 # decode data in this frame
 #
+        my $lang;
         my $valLen = length($val);  # actual value length (after decompression, etc)
         if ($id =~ /^(TXX|TXXX)$/) {
             # two encoded strings separated by a null
@@ -727,12 +818,14 @@ sub ProcessID3v2($$$)
             $val =~ s/\0.*//;   # truncate at null
         } elsif ($id =~ /^(COM|COMM|ULT|USLT)$/) {
             $valLen > 4 or $exifTool->Warn("Short $id frame"), next;
+            $lang = substr($val,1,3);
             substr($val, 1, 3) = '';    # remove language code
             my @vals = DecodeString($exifTool, $val);
             foreach (0..1) { $vals[$_] = '' unless defined $vals[$_]; }
             $val = length($vals[0]) ? "($vals[0]) $vals[1]" : $vals[1];
         } elsif ($id eq 'USER') {
             $valLen > 4 or $exifTool->Warn('Short USER frame'), next;
+            $lang = substr($val,1,3);
             substr($val, 1, 3) = '';    # remove language code
             $val = DecodeString($exifTool, $val);
         } elsif ($id =~ /^(CNT|PCNT)$/) {
@@ -759,6 +852,9 @@ sub ProcessID3v2($$$)
             $exifTool->Warn("Don't know how to handle $id frame");
             next;
         }
+        if ($lang and $lang =~ /^[a-z]{3}$/i) {
+            $tagInfo = Image::ExifTool::GetLangInfo($tagInfo, lc $lang);
+        }
         $exifTool->FoundTag($tagInfo, $val);
     }
     undef %warnedOnce;
@@ -779,7 +875,7 @@ sub ProcessID3($$)
 
     # allow this to be called with either RAF or DataPt
     my $raf = $$dirInfo{RAF} || new File::RandomAccess($$dirInfo{DataPt});
-    my ($buff, %id3Header, %id3Trailer, $hBuff, $tBuff, $tBuffPos, $tagTablePtr);
+    my ($buff, %id3Header, %id3Trailer, $hBuff, $tBuff, $eBuff, $tagTablePtr);
     my $rtnVal = 0;
     my $hdrEnd = 0;
     my $id3Len = 0;
@@ -860,6 +956,10 @@ sub ProcessID3($$)
         );
         $id3Len += length($tBuff);
         $rtnVal = 1;
+        # load 'Enhanced TAG' information if available
+        if ($raf->Seek(-355, 2) and $raf->Read($eBuff, 227) == 227 and $eBuff =~ /^TAG+/) {
+            $id3Trailer{EnhancedTAG} = \$eBuff;
+        }
     }
 #
 # process the the information
@@ -867,11 +967,11 @@ sub ProcessID3($$)
     if ($rtnVal) {
         # first process audio data if it exists
         if ($$dirInfo{RAF}) {
-            my $type = $exifTool->{FILE_TYPE};  # save file type
+            my $oldType = $exifTool->{FILE_TYPE};   # save file type
             # check current file type first
-            my @types = grep /^$type$/, @audioFormats;
-            push @types, grep(!/^$type$/, @audioFormats);
-            my $oldType = $exifTool->{FILE_TYPE};
+            my @types = grep /^$oldType$/, @audioFormats;
+            push @types, grep(!/^$oldType$/, @audioFormats);
+            my $type;
             foreach $type (@types) {
                 # seek to end of ID3 header
                 $raf->Seek($hdrEnd, 0);
@@ -885,7 +985,7 @@ sub ProcessID3($$)
                 &$func($exifTool, $dirInfo) and last;
                 use strict 'refs';
             }
-            $exifTool->{FILE_TYPE} = $type;     # restore original file type
+            $exifTool->{FILE_TYPE} = $oldType;      # restore original file type
         }
         # set file type to MP3 if we didn't find audio data
         $exifTool->SetFileType('MP3') unless $exifTool->{VALUE}->{FileType};
@@ -902,6 +1002,15 @@ sub ProcessID3($$)
             SetByteOrder('MM');
             $tagTablePtr = GetTagTable('Image::ExifTool::ID3::v1');
             $exifTool->ProcessDirectory(\%id3Trailer, $tagTablePtr);
+            # process "Enhanced TAG" information if available
+            if ($id3Trailer{EnhancedTAG}) {
+                $exifTool->VPrint(0, "ID3v1 Enhanced TAG:\n");
+                $tagTablePtr = GetTagTable('Image::ExifTool::ID3::v1_Enh');
+                $id3Trailer{DataPt} = $id3Trailer{EnhancedTAG};
+                $id3Trailer{DataPos} -= 227; # (227 = length of Enhanced TAG block)
+                $id3Trailer{DirLen} = 227;
+                $exifTool->ProcessDirectory(\%id3Trailer, $tagTablePtr);
+            }
         }
     }
     # return file pointer to start of file to read audio data if necessary
@@ -977,6 +1086,8 @@ under the same terms as Perl itself.
 =item L<http://www.id3.org/>
 
 =item L<http://www.mp3-tech.org/>
+
+=item L<http://www.fortunecity.com/underworld/sonic/3/id3tag.html>
 
 =back
 

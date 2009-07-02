@@ -20,7 +20,7 @@ use Image::ExifTool::PostScript;
 use Image::ExifTool::XMP qw(EscapeXML UnescapeXML);
 require Exporter;
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -302,7 +302,7 @@ sub EscapeHTML($)
             }
             delete $entityName{39};  # 'apos' is not valid HTML
         }
-        # supress warnings
+        # suppress warnings
         local $SIG{'__WARN__'} = sub { 1 };
         # escape any non-ascii characters for HTML
         $str =~ s/([\xc2-\xf7][\x80-\xbf]+)/EscapeChar($1)/sge;
@@ -338,8 +338,8 @@ sub ProcessHTML($$)
 
     $raf->Seek(0,0) or $exifTool->Warn('Seek error'), return 1;
 
-    my $oldsep = Image::ExifTool::PostScript::SetInputRecordSeparator($raf);
-    $oldsep or $exifTool->Warn('Invalid HTML data'), return 1;
+    local $/ = Image::ExifTool::PostScript::GetInputRecordSeparator($raf);
+    $/ or $exifTool->Warn('Invalid HTML data'), return 1;
 
     # extract header information
     my $doc;
@@ -418,7 +418,6 @@ sub ProcessHTML($$)
         $val = UnescapeHTML($val);  # unescape HTML character references
         $exifTool->HandleTag($table, $tag, $val);
     }
-    $/ = $oldsep;   # restore original separator
     return 1;
 }
 

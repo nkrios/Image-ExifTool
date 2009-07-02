@@ -38,7 +38,7 @@ my $testnum = 1;
     $exifTool->SetNewValue(Title => 'new title');
     $exifTool->SetNewValue(Copyright => 'my copyright');
     $exifTool->SetNewValue(Creator => 'phil made it', Replace => 1);
-    $testfile = "t/${testname}_${testnum}_failed.eps";
+    my $testfile = "t/${testname}_${testnum}_failed.eps";
     unlink $testfile;
     $exifTool->WriteInfo('t/images/PostScript.eps', $testfile);
     my $info = $exifTool->ImageInfo($testfile, {ExtractEmbedded => 1});

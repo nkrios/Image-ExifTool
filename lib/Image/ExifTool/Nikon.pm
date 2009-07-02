@@ -21,7 +21,7 @@
 #               7) Tom Christiansen private communication (tests with D70)
 #               8) Robert Rottmerhusen private communication
 #               9) http://members.aol.com/khancock/pilot/nbuddy/
-#              10) Werner Kober private communication (D2H, D2X, D100, D70, D200)
+#              10) Werner Kober private communication (D2H, D2X, D100, D70, D200, D90)
 #              11) http://www.rottmerhusen.com/objektives/lensid/thirdparty.html
 #              12) http://libexif.sourceforge.net/internals/mnote-olympus-tag_8h-source.html
 #              13) Roger Larsson private communication (tests with D200)
@@ -39,6 +39,7 @@
 #              24) Geert De Soete private communication
 #              25) Niels Kristian private communication
 #              26) Bozi (http://www.cpanforum.com/posts/8983)
+#              27) Jens Kriese private communication
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -49,10 +50,10 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.02';
+$VERSION = '2.12';
 
 sub LensIDConv($$$);
-sub FlashModelConv($$$);
+sub ProcessNikonAVI($$$);
 
 # nikon lens ID numbers (ref 8/11)
 my %nikonLensIDs = (
@@ -66,8 +67,6 @@ my %nikonLensIDs = (
     OTHER => \&LensIDConv,
     # (hex digits must be uppercase in keys below)
     '01 58 50 50 14 14 02 00' => 'AF Nikkor 50mm f/1.8',
-    '01 00 00 00 00 00 02 00' => 'AF Teleconverter TC-16A 1.6x',
-    '01 00 00 00 00 00 08 00' => 'AF Teleconverter TC-16A 1.6x',
     '02 42 44 5C 2A 34 02 00' => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5',
     '02 42 44 5C 2A 34 08 00' => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5',
     '03 48 5C 81 30 30 02 00' => 'AF Zoom-Nikkor 70-210mm f/4',
@@ -88,6 +87,7 @@ my %nikonLensIDs = (
     '13 42 37 50 2A 34 0B 00' => 'AF Zoom-Nikkor 24-50mm f/3.3-4.5',
     '14 48 60 80 24 24 0B 00' => 'AF Zoom-Nikkor 80-200mm f/2.8 ED',
     '15 4C 62 62 14 14 0C 00' => 'AF Nikkor 85mm f/1.8',
+    '17 3C A0 A0 30 30 0F 00' => 'Nikkor 500mm f/4 P ED IF',
     '17 3C A0 A0 30 30 11 00' => 'Nikkor 500mm f/4 P ED IF',
     '18 40 44 72 2C 34 0E 00' => 'AF Zoom-Nikkor 35-135mm f/3.5-4.5 N',
     '1A 54 44 44 18 18 11 00' => 'AF Nikkor 35mm f/2',
@@ -96,11 +96,11 @@ my %nikonLensIDs = (
     '1D 42 44 5C 2A 34 12 00' => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5 N',
     '1E 54 56 56 24 24 13 00' => 'AF Micro-Nikkor 60mm f/2.8',
     '1F 54 6A 6A 24 24 14 00' => 'AF Micro-Nikkor 105mm f/2.8',
-    '20 48 60 80 24 24 15 00' => 'AF Zoom-Nikkor ED 80-200mm f/2.8',
+    '20 48 60 80 24 24 15 00' => 'AF Zoom-Nikkor 80-200mm f/2.8 ED',
     '21 40 3C 5C 2C 34 16 00' => 'AF Zoom-Nikkor 28-70mm f/3.5-4.5',
     '22 48 72 72 18 18 16 00' => 'AF DC-Nikkor 135mm f/2',
     '23 30 BE CA 3C 48 17 00' => 'Zoom-Nikkor 1200-1700mm f/5.6-8 P ED IF',
-    '24 48 60 80 24 24 1A 02' => 'AF Zoom-Nikkor ED 80-200mm f/2.8D',
+    '24 48 60 80 24 24 1A 02' => 'AF Zoom-Nikkor 80-200mm f/2.8D ED',
     '25 48 44 5C 24 24 1B 02' => 'AF Zoom-Nikkor 35-70mm f/2.8D',
     '25 48 44 5C 24 24 52 02' => 'AF Zoom-Nikkor 35-70mm f/2.8D',
     '27 48 8E 8E 24 24 1D 02' => 'AF-I Nikkor 300mm f/2.8D IF-ED',
@@ -108,6 +108,9 @@ my %nikonLensIDs = (
     '27 48 8E 8E 24 24 E1 02' => 'AF-I Nikkor 300mm f/2.8D IF-ED + TC-17E',
     '27 48 8E 8E 24 24 F2 02' => 'AF-I Nikkor 300mm f/2.8D IF-ED + TC-20E',
     '28 3C A6 A6 30 30 1D 02' => 'AF-I Nikkor 600mm f/4D IF-ED',
+    '28 3C A6 A6 30 30 F1 02' => 'AF-I Nikkor 600mm f/4D IF-ED + TC-14E',
+    '28 3C A6 A6 30 30 E1 02' => 'AF-I Nikkor 600mm f/4D IF-ED + TC-17E',
+    '28 3C A6 A6 30 30 F2 02' => 'AF-I Nikkor 600mm f/4D IF-ED + TC-20E',
     '2A 54 3C 3C 0C 0C 26 02' => 'AF Nikkor 28mm f/1.4D',
     '2B 3C 44 60 30 3C 1F 02' => 'AF Zoom-Nikkor 35-80mm f/4-5.6D',
     '2C 48 6A 6A 18 18 27 02' => 'AF DC-Nikkor 105mm f/2D',
@@ -115,44 +118,60 @@ my %nikonLensIDs = (
     '2E 48 5C 82 30 3C 28 02' => 'AF Nikkor 70-210mm f/4-5.6D',
     '2F 48 30 44 24 24 29 02' => 'AF Zoom-Nikkor 20-35mm f/2.8D IF',
     '30 48 98 98 24 24 24 02' => 'AF-I Nikkor 400mm f/2.8D IF-ED',
+    '30 48 98 98 24 24 F1 02' => 'AF-I Nikkor 400mm f/2.8D IF-ED + TC-14E',
+    '30 48 98 98 24 24 E1 02' => 'AF-I Nikkor 400mm f/2.8D IF-ED + TC-17E',
+    '30 48 98 98 24 24 F2 02' => 'AF-I Nikkor 400mm f/2.8D IF-ED + TC-20E',
     '31 54 56 56 24 24 25 02' => 'AF Micro-Nikkor 60mm f/2.8D',
     '32 54 6A 6A 24 24 35 02' => 'AF Micro-Nikkor 105mm f/2.8D' .
                                  ' or Sigma 105mm f/2.8 EX DG MACRO', #JD
     '33 48 2D 2D 24 24 31 02' => 'AF Nikkor 18mm f/2.8D',
     '34 48 29 29 24 24 32 02' => 'AF Fisheye Nikkor 16mm f/2.8D',
     '35 3C A0 A0 30 30 33 02' => 'AF-I Nikkor 500mm f/4D IF-ED',
+    '35 3C A0 A0 30 30 F1 02' => 'AF-I Nikkor 500mm f/4D IF-ED + TC-14E',
+    '35 3C A0 A0 30 30 E1 02' => 'AF-I Nikkor 500mm f/4D IF-ED + TC-17E',
+    '35 3C A0 A0 30 30 F2 02' => 'AF-I Nikkor 500mm f/4D IF-ED + TC-20E',
     '36 48 37 37 24 24 34 02' => 'AF Nikkor 24mm f/2.8D',
     '37 48 30 30 24 24 36 02' => 'AF Nikkor 20mm f/2.8D',
     '38 4C 62 62 14 14 37 02' => 'AF Nikkor 85mm f/1.8D',
     '3A 40 3C 5C 2C 34 39 02' => 'AF Zoom-Nikkor 28-70mm f/3.5-4.5D',
     '3B 48 44 5C 24 24 3A 02' => 'AF Zoom-Nikkor 35-70mm f/2.8D N',
-    '3C 48 60 80 24 24 3B 02' => 'AF Zoom-Nikkor 80-200mm f/2.8 ED', #25
+    '3C 48 60 80 24 24 3B 02' => 'AF Zoom-Nikkor 80-200mm f/2.8D ED', #25
     '3D 3C 44 60 30 3C 3E 02' => 'AF Zoom-Nikkor 35-80mm f/4-5.6D',
     '3E 48 3C 3C 24 24 3D 02' => 'AF Nikkor 28mm f/2.8D',
     '3F 40 44 6A 2C 34 45 02' => 'AF Zoom-Nikkor 35-105mm f/3.5-4.5D',
     '41 48 7C 7C 24 24 43 02' => 'AF Nikkor 180mm f/2.8D IF-ED',
     '42 54 44 44 18 18 44 02' => 'AF Nikkor 35mm f/2D',
     '43 54 50 50 0C 0C 46 02' => 'AF Nikkor 50mm f/1.4D',
-    '44 44 60 80 34 3C 47 02' => 'AF Nikkor 80-200mm f/4.5-5.6D',
+    '44 44 60 80 34 3C 47 02' => 'AF Zoom-Nikkor 80-200mm f/4.5-5.6D',
     '45 40 3C 60 2C 3C 48 02' => 'AF Zoom-Nikkor 28-80mm f/3.5-5.6D',
     '46 3C 44 60 30 3C 49 02' => 'AF Zoom-Nikkor 35-80mm f/4-5.6D N',
     '47 42 37 50 2A 34 4A 02' => 'AF Zoom-Nikkor 24-50mm f/3.3-4.5D',
     '48 48 8E 8E 24 24 4B 02' => 'AF-S Nikkor 300mm f/2.8D IF-ED',
+    '48 48 8E 8E 24 24 F1 02' => 'AF-S Nikkor 300mm f/2.8D IF-ED + TC-14E',
+    '48 48 8E 8E 24 24 E1 02' => 'AF-S Nikkor 300mm f/2.8D IF-ED + TC-17E',
+    '48 48 8E 8E 24 24 F2 02' => 'AF-S Nikkor 300mm f/2.8D IF-ED + TC-20E',
     '49 3C A6 A6 30 30 4C 02' => 'AF-S Nikkor 600mm f/4D IF-ED',
     '49 3C A6 A6 30 30 F1 02' => 'AF-S Nikkor 600mm f/4D IF-ED + TC-14E',
+    '49 3C A6 A6 30 30 E1 02' => 'AF-S Nikkor 600mm f/4D IF-ED + TC-17E',
     '49 3C A6 A6 30 30 F2 02' => 'AF-S Nikkor 600mm f/4D IF-ED + TC-20E',
     '4A 54 62 62 0C 0C 4D 02' => 'AF Nikkor 85mm f/1.4D IF',
     '4B 3C A0 A0 30 30 4E 02' => 'AF-S Nikkor 500mm f/4D IF-ED',
     '4B 3C A0 A0 30 30 F1 02' => 'AF-S Nikkor 500mm f/4D IF-ED + TC-14E',
+    '4B 3C A0 A0 30 30 E1 02' => 'AF-S Nikkor 500mm f/4D IF-ED + TC-17E',
     '4B 3C A0 A0 30 30 F2 02' => 'AF-S Nikkor 500mm f/4D IF-ED + TC-20E',
     '4C 40 37 6E 2C 3C 4F 02' => 'AF Zoom-Nikkor 24-120mm f/3.5-5.6D IF',
     '4D 40 3C 80 2C 3C 62 02' => 'AF Zoom-Nikkor 28-200mm f/3.5-5.6D IF',
     '4E 48 72 72 18 18 51 02' => 'AF DC-Nikkor 135mm f/2D',
     '4F 40 37 5C 2C 3C 53 06' => 'IX-Nikkor 24-70mm f/3.5-5.6',
+    '50 48 56 7C 30 3C 54 06' => 'IX-Nikkor 60-180mm f/4-5.6',
+    '53 48 60 80 24 24 57 02' => 'AF Zoom-Nikkor 80-200mm f/2.8D ED',
     '53 48 60 80 24 24 60 02' => 'AF Zoom-Nikkor 80-200mm f/2.8D ED',
     '54 44 5C 7C 34 3C 58 02' => 'AF Zoom-Micro Nikkor 70-180mm f/4.5-5.6D ED',
     '56 48 5C 8E 30 3C 5A 02' => 'AF Zoom-Nikkor 70-300mm f/4-5.6D ED',
     '59 48 98 98 24 24 5D 02' => 'AF-S Nikkor 400mm f/2.8D IF-ED',
+    '59 48 98 98 24 24 F1 02' => 'AF-S Nikkor 400mm f/2.8D IF-ED + TC-14E',
+    '59 48 98 98 24 24 E1 02' => 'AF-S Nikkor 400mm f/2.8D IF-ED + TC-17E',
+    '59 48 98 98 24 24 F2 02' => 'AF-S Nikkor 400mm f/2.8D IF-ED + TC-20E',
     '5A 3C 3E 56 30 3C 5E 06' => 'IX-Nikkor 30-60mm f/4-5.6',
     '5B 44 56 7C 34 3C 5F 06' => 'IX-Nikkor 60-180mm f/4.5-5.6',
     '5D 48 3C 5C 24 24 63 02' => 'AF-S Zoom-Nikkor 28-70mm f/2.8D IF-ED',
@@ -211,26 +230,35 @@ my %nikonLensIDs = (
     '9D 54 62 62 24 24 9F 02' => 'PC-E Micro Nikkor 85mm f/2.8D',
     '9D 00 62 62 24 24 9F 06' => 'PC-E Micro Nikkor 85mm f/2.8D',
     '9E 40 2D 6A 2C 3C A0 0E' => 'AF-S DX VR Zoom-Nikkor 18-105mm f/3.5-5.6G ED', #PH/10
+    '9F 58 44 44 14 14 A1 06' => 'AF-S DX Nikkor 35mm f/1.8G', #27
     'A0 54 50 50 0C 0C A2 06' => 'AF-S Nikkor 50mm f/1.4G',
-#
-    'FE 47 00 00 24 24 4B 06' => 'Sigma 4.5mm F2.8 EX DC Circular Fisheye HSM', #JD
+    'A1 40 18 37 2C 34 A3 06' => 'AF-S DX Nikkor 10-24mm f/3.5-4.5G ED',
+    '01 00 00 00 00 00 02 00' => 'TC-16A',
+    '01 00 00 00 00 00 08 00' => 'TC-16A',
+    '00 00 00 00 00 00 F1 0C' => 'TC-14E',
+    '00 00 00 00 00 00 F2 18' => 'TC-20E',
+    '00 00 00 00 00 00 F1 0C' => 'TC-14E II',
+    '00 00 00 00 00 00 F2 18' => 'TC-20E II',
+    '00 00 00 00 00 00 E1 12' => 'TC-17E II',
+    'FE 47 00 00 24 24 4B 06' => 'Sigma 4.5mm F2.8 EX DC HSM Circular Fisheye', #JD
     '26 48 11 11 30 30 1C 02' => 'Sigma 8mm F4 EX Circular Fisheye',
     '79 40 11 11 2C 2C 1C 06' => 'Sigma 8mm F3.5 EX Circular Fisheye', #JD
     'DC 48 19 19 24 24 4B 06' => 'Sigma 10mm F2.8 EX DC HSM Fisheye',
     '02 3F 24 24 2C 2C 02 00' => 'Sigma 14mm F3.5',
     '48 48 24 24 24 24 4B 02' => 'Sigma 14mm F2.8 EX Aspherical HSM',
     '26 48 27 27 24 24 1C 02' => 'Sigma 15mm F2.8 EX Diagonal Fisheye',
-    '26 58 31 31 14 14 1C 02' => 'Sigma 20mm F1.8 EX Aspherical DG DF RF',
-    '26 58 37 37 14 14 1C 02' => 'Sigma 24mm F1.8 EX Aspherical DG DF Macro',
-    'E1 58 37 37 14 14 1C 02' => 'Sigma 24mm F1.8 EX Aspherical DG DF Macro', #24
-    '02 46 37 37 25 25 02 00' => 'Sigma 24mm F2.8 Macro',
-    '26 58 3C 3C 14 14 1C 02' => 'Sigma 28mm F1.8 EX DG DF',
+    '26 58 31 31 14 14 1C 02' => 'Sigma 20mm F1.8 EX DG Aspherical RF',
+    '26 58 37 37 14 14 1C 02' => 'Sigma 24mm F1.8 EX DG Aspherical Macro',
+    'E1 58 37 37 14 14 1C 02' => 'Sigma 24mm F1.8 EX DG Aspherical Macro',
+    '02 46 37 37 25 25 02 00' => 'Sigma 24mm F2.8 Super Wide II Macro',
+    '26 58 3C 3C 14 14 1C 02' => 'Sigma 28mm F1.8 EX DG Aspherical Macro',
     '48 54 3E 3E 0C 0C 4B 06' => 'Sigma 30mm F1.4 EX DC HSM',
     'F8 54 3E 3E 0C 0C 4B 06' => 'Sigma 30mm F1.4 EX DC HSM', #JD
     'DE 54 50 50 0C 0C 4B 06' => 'Sigma 50mm F1.4 EX DG HSM',
-    '32 54 50 50 24 24 35 02' => 'Sigma 50mm F2.8 EX DG Macro',
-    '79 48 5C 5C 24 24 1C 06' => 'Sigma 70mm F2.8 EX DG Macro', #JD
+    '32 54 50 50 24 24 35 02' => 'Sigma Macro 50mm F2.8 EX DG',
+    '79 48 5C 5C 24 24 1C 06' => 'Sigma Macro 70mm F2.8 EX DG', #JD
     '02 48 65 65 24 24 02 00' => 'Sigma 90mm F2.8 Macro',
+    '32 54 6A 6A 24 24 35 02' => 'Sigma Macro 105mm F2.8 EX DG',
     'E5 54 6A 6A 24 24 35 02' => 'Sigma Macro 105mm F2.8 EX DG',
     '48 48 76 76 24 24 4B 06' => 'Sigma 150mm F2.8 EX DG APO Macro HSM',
     'F5 48 76 76 24 24 4B 06' => 'Sigma 150mm F2.8 EX DG APO Macro HSM', #24
@@ -242,27 +270,31 @@ my %nikonLensIDs = (
     '02 2F 98 98 3D 3D 02 00' => 'Sigma 400mm F5.6 APO',
     '02 37 A0 A0 34 34 02 00' => 'Sigma APO 500mm F4.5', #19
     '48 44 A0 A0 34 34 4B 02' => 'Sigma APO 500mm F4.5 EX HSM',
+    '48 3C B0 B0 3C 3C 4B 02' => 'Sigma APO 800mm f/5.6 EX HSM',
     '48 3C 19 31 30 3C 4B 06' => 'Sigma 10-20mm F4-5.6 EX DC HSM',
     'F9 3C 19 31 30 3C 4B 06' => 'Sigma 10-20mm F4-5.6 EX DC HSM', #JD
-    '48 38 1F 37 34 3C 4B 06' => 'Sigma 12-24mm F4.5-5.6 EX Aspherical DG HSM',
-    '26 40 27 3F 2C 34 1C 02' => 'Sigma 15-30mm F3.5-4.5 EX Aspherical DG DF',
+    '48 38 1F 37 34 3C 4B 06' => 'Sigma 12-24mm F4.5-5.6 EX DG Aspherical HSM',
+    'F0 38 1F 37 34 3C 4B 06' => 'Sigma 12-24mm F4.5-5.6 EX DG Aspherical HSM',
+    '26 40 27 3F 2C 34 1C 02' => 'Sigma 15-30mm F3.5-4.5 EX DG Aspherical DF',
     '48 48 2B 44 24 30 4B 06' => 'Sigma 17-35mm F2.8-4 EX DG  Aspherical HSM',
     '26 54 2B 44 24 30 1C 02' => 'Sigma 17-35mm F2.8-4 EX Aspherical',
     '7A 47 2B 5C 24 34 4B 06' => 'Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF HSM',
+    '7A 48 2B 5C 24 34 4B 06' => 'Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF HSM',
     '7F 48 2B 5C 24 34 1C 06' => 'Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF',
     '26 40 2D 44 2B 34 1C 02' => 'Sigma 18-35 F3.5-4.5 Aspherical',
     '26 48 2D 50 24 24 1C 06' => 'Sigma 18-50mm F2.8 EX DC',
     '7F 48 2D 50 24 24 1C 06' => 'Sigma 18-50mm F2.8 EX DC Macro', #25
-    '7A 48 2D 50 24 24 4B 06' => 'Sigma 18-50mm F2.8 EX DC HSM',
+    '7A 48 2D 50 24 24 4B 06' => 'Sigma 18-50mm F2.8 EX DC Macro',
     '26 40 2D 50 2C 3C 1C 06' => 'Sigma 18-50mm F3.5-5.6 DC',
     '7A 40 2D 50 2C 3C 4B 06' => 'Sigma 18-50mm F3.5-5.6 DC HSM',
     '26 40 2D 70 2B 3C 1C 06' => 'Sigma 18-125mm F3.5-5.6 DC',
-    'CD 3D 2D 70 2E 3C 4B 06' => 'Sigma 18-125mm F3.8-5.6 DC OS HSM',
+    'CD 3D 2D 70 2E 3C 4B 0E' => 'Sigma 18-125mm F3.8-5.6 DC OS HSM',
     '26 40 2D 80 2C 40 1C 06' => 'Sigma 18-200mm F3.5-6.3 DC',
     'ED 40 2D 80 2C 40 4B 0E' => 'Sigma 18-200mm F3.5-6.3 DC OS HSM', #JD
     '26 48 31 49 24 24 1C 02' => 'Sigma 20-40mm F2.8',
     '26 48 37 56 24 24 1C 02' => 'Sigma 24-60mm F2.8 EX DG',
     'B6 48 37 56 24 24 1C 02' => 'Sigma 24-60mm F2.8 EX DG',
+    'A6 48 37 5C 24 24 4B 06' => 'Sigma 24-70mm F2.8 IF EX DG HSM', #JD
     '26 54 37 5C 24 24 1C 02' => 'Sigma 24-70mm F2.8 EX DG Macro',
     '67 54 37 5C 24 24 1C 02' => 'Sigma 24-70mm F2.8 EX DG Macro',
     '26 40 37 5C 2C 3C 1C 02' => 'Sigma 24-70mm F3.5-5.6 Aspherical HF',
@@ -270,7 +302,7 @@ my %nikonLensIDs = (
     '02 46 3C 5C 25 25 02 00' => 'Sigma 28-70mm F2.8',
     '26 54 3C 5C 24 24 1C 02' => 'Sigma 28-70mm F2.8 EX',
     '26 48 3C 5C 24 24 1C 06' => 'Sigma 28-70mm F2.8 EX DG',
-    '26 48 3C 5C 24 30 1C 02' => 'Sigma 28-70mm F2.8-4 High Speed Zoom',
+    '26 48 3C 5C 24 30 1C 02' => 'Sigma 28-70mm F2.8-4 DG',
     '02 3F 3C 5C 2D 35 02 00' => 'Sigma 28-70mm F3.5-4.5 UC',
     '26 40 3C 60 2C 3C 1C 02' => 'Sigma 28-80mm F3.5-5.6 Mini Zoom Macro II Aspherical',
     '26 40 3C 65 2C 3C 1C 02' => 'Sigma 28-90mm F3.5-5.6 Macro',
@@ -278,8 +310,10 @@ my %nikonLensIDs = (
     '26 3E 3C 6A 2E 3C 1C 02' => 'Sigma 28-105mm F3.8-5.6 UC-III Aspherical IF',
     '26 40 3C 80 2C 3C 1C 02' => 'Sigma 28-200mm F3.5-5.6 Compact Aspherical Hyperzoom Macro',
     '26 40 3C 80 2B 3C 1C 02' => 'Sigma 28-200mm F3.5-5.6 Compact Aspherical Hyperzoom Macro',
+    '26 3D 3C 80 2F 3D 1C 02' => 'Sigma 28-300mm F3.8-5.6 Aspherical',
     '26 41 3C 8E 2C 40 1C 02' => 'Sigma 28-300mm F3.5-6.3 DG Macro',
     '26 40 3C 8E 2C 40 1C 02' => 'Sigma 28-300mm F3.5-6.3 Macro',
+    '02 3B 44 61 30 3D 02 00' => 'Sigma 35-80mm F4-5.6',
     '02 40 44 73 2B 36 02 00' => 'Sigma 35-135mm F3.5-4.5 a',
     '7A 47 50 76 24 24 4B 06' => 'Sigma 50-150mm F2.8 EX APO DC HSM',
     'FD 47 50 76 24 24 4B 06' => 'Sigma 50-150mm F2.8 EX APO DC HSM II',
@@ -298,20 +332,24 @@ my %nikonLensIDs = (
     '77 44 61 98 34 3C 7B 0E' => 'Sigma 80-400mm F4.5-5.6 EX OS',
     '48 48 68 8E 30 30 4B 02' => 'Sigma 100-300mm F4 EX IF HSM',
     '48 54 6F 8E 24 24 4B 02' => 'Sigma APO 120-300mm F2.8 EX DG HSM',
+    '7A 54 6E 8E 24 24 4B 02' => 'Sigma APO 120-300mm F2.8 EX DG HSM',
     'CF 38 6E 98 34 3C 4B 0E' => 'Sigma APO 120-400mm F4.5-5.6 DG OS HSM',
     '26 44 73 98 34 3C 1C 02' => 'Sigma 135-400mm F4.5-5.6 APO Aspherical',
     'CE 34 76 A0 38 40 4B 0E' => 'Sigma 150-500mm F5-6.3 DG OS APO HSM', #JD
     '26 40 7B A0 34 40 1C 02' => 'Sigma APO 170-500mm F5-6.3 Aspherical RF',
     '48 3C 8E B0 3C 3C 4B 02' => 'Sigma APO 300-800 F5.6 EX DG HSM',
     '48 3C B0 B0 3C 3C 4B 02' => 'Sigma APO 800mm F5.6 EX HSM',
+    '00 00 00 00 00 00 F1 0C' => 'Sigma APO Tele Converter 1.4x EX DG',
+    '00 00 00 00 00 00 F2 18' => 'Sigma APO Tele Converter 2x EX DG',
 #
+    '1E 5D 64 64 20 20 13 00' => 'Tamron SP AF 90mm f/2.5',
     '32 53 64 64 24 24 35 02' => 'Tamron SP AF 90mm f/2.8 Di Macro 1:1 (272E)',
     'F8 55 64 64 24 24 84 06' => 'Tamron SP AF 90mm f/2.8 Di Macro 1:1',
     '00 4C 7C 7C 2C 2C 00 02' => 'Tamron SP AF 180mm f/3.5 Di Model B01',
     'F6 3F 18 37 2C 34 84 06' => 'Tamron SP AF 10-24mm f/3.5-4.5 Di II LD Aspherical (IF)',
     '00 36 1C 2D 34 3C 00 06' => 'Tamron SP AF 11-18mm f/4.5-5.6 Di II LD Aspherical (IF)',
     '07 46 2B 44 24 30 03 02' => 'Tamron SP AF 17-35mm f/2.8-4 Di LD Aspherical (IF)',
-    '00 53 2B 50 24 24 00 06' => 'Tamron SP AF 17-50mm f/2.8 (A16)', #PH
+    '00 53 2B 50 24 24 00 06' => 'Tamron SP AF 17-50mm f/2.8 XR Di II LD Aspherical (IF) (A16)', #PH
     '00 54 2B 50 24 24 00 06' => 'Tamron SP AF 17-50mm f/2.8 XR Di II LD Aspherical [IF] (A16NII)',
     '00 3F 2D 80 2B 40 00 06' => 'Tamron AF 18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF)',
     '00 3F 2D 80 2C 40 00 06' => 'Tamron AF 18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF) Macro',
@@ -328,9 +366,10 @@ my %nikonLensIDs = (
     'FA 54 3C 5E 24 24 84 06' => 'Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical (IF) Macro', #JD
     '10 3D 3C 60 2C 3C D2 02' => 'Tamron AF 28-80mm f/3.5-5.6 Aspherical',
     '45 3D 3C 60 2C 3C 48 02' => 'Tamron AF 28-80mm f/3.5-5.6 Aspherical',
-    '00 48 3C 6A 24 24 00 02' => 'Tamron SP AF 28-105mm f/2.8',
-    '0B 3E 3D 7F 2F 3D 0E 02' => 'Tamron AF 28-200mm f/3.8-5.6D',
+    '00 48 3C 6A 24 24 00 02' => 'Tamron SP AF 28-105mm f/2.8 LD Aspherical IF',
     '0B 3E 3D 7F 2F 3D 0E 00' => 'Tamron AF 28-200mm f/3.8-5.6',
+    '0B 3E 3D 7F 2F 3D 0E 02' => 'Tamron AF 28-200mm f/3.8-5.6D',
+    '12 3D 3C 80 2E 3C DF 02' => 'Tamron AF 28-200mm f/3.8-5.6 AF Aspherical LD (IF)',
     '4D 41 3C 8E 2B 40 62 02' => 'Tamron AF 28-300mm f/3.5-6.3 XR Di LD Aspherical (IF)',
     '4D 41 3C 8E 2C 40 62 02' => 'Tamron AF 28-300mm f/3.5-6.3 XR LD Aspherical (IF)',
     'F9 40 3C 8E 2C 40 40 0E' => 'Tamron AF 28-300mm f/3.5-6.3 XR Di VC LD Aspherical [IF] MACRO',
@@ -349,56 +388,71 @@ my %nikonLensIDs = (
     '00 40 18 2B 2C 34 00 06' => 'Tokina AT-X 107 DX Fisheye -AF 10-17mm f/3.5-4.5',
     '00 48 1C 29 24 24 00 06' => 'Tokina AT-X 116 PRO DX AF 11-16mm f/2.8',
     '00 3C 1F 37 30 30 00 06' => 'Tokina AT-X 124 AF PRO DX - AF 12-24mm f/4',
-    '00 48 29 50 24 24 00 06' => 'Tokina AT-X 165 PRO DX - AF 16-50mm f/2.8',
+    '7A 3C 1F 37 30 30 7E 06' => 'Tokina AT-X 124 AF PRO DX II (AF 12-24mm f/4)',
+    '00 48 29 50 24 24 00 06' => 'Tokina AT-X 165 PRO DX (AF 16-50mm f/2.8)',
+    '00 40 2A 72 2C 3C 00 06' => 'Tokina AT-X 16.5-135 DX (AF 16.5-135mm F3.5-5.6)',
+    '2F 48 30 44 24 24 29 02' => 'Tokina AT-X 235 AF PRO (AF 20-35mm f/2.8)',
+    '2F 40 30 44 2C 34 29 02' => 'Tokina AF 235 II (AF 20-35mm f/3.5-4.5)',
     '25 48 3C 5C 24 24 1B 02' => 'Tokina AT-X 287 AF PRO SV 28-70mm f/2.8',
     '07 48 3C 5C 24 24 03 00' => 'Tokina AT-X AF 28-70mm f/2.8', #JD
-    '00 48 3C 60 24 24 00 02' => 'Tokina AT-X 280 AF PRO 28-80mm f/2.8 Aspherical',
-    '00 48 50 72 24 24 00 06' => 'Tokina AT-X 535 PRO DX - AF 50-135mm f/2.8',
-    '14 54 60 80 24 24 0B 00' => 'Tokina AT-X 828 AF 80-200mm f/2.8',
-    '24 44 60 98 34 3C 1A 02' => 'Tokina AT-X 840 AF II 80-400mm f/4.5-5.6',
-    '00 44 60 98 34 3C 00 02' => 'Tokina AT-X 840 D 80-400mm f/4.5-5.6', #PH
-    '14 48 68 8E 30 30 0B 00' => 'Tokina AT-X 340 AF II 100-300mm f/4',
+    '07 47 3C 5C 25 35 03 00' => 'Tokina AF 287 SD (AF 28-70mm f/2.8-4.5)',
+    '00 48 3C 60 24 24 00 02' => 'Tokina AT-X 280 AF PRO (AF 28-80mm f/2.8)',
+    '00 48 50 72 24 24 00 06' => 'Tokina AT-X 535 PRO DX (AF 50-135mm f/2.8)',
+    '14 54 60 80 24 24 0B 00' => 'Tokina AT-X 828 AF PRO (AF 80-200mm f/2.8)',
+    '24 44 60 98 34 3C 1A 02' => 'Tokina AT-X 840 AF-II (AF 80-400mm f/4.5-5.6)',
+    '00 44 60 98 34 3C 00 02' => 'Tokina AT-X 840 AF D (AF 80-400mm f/4.5-5.6)',
+    '14 48 68 8E 30 30 0B 00' => 'Tokina AT-X 340 AF (AF 100-300mm f/4)',
 #
     '00 54 56 56 30 30 00 00' => 'Coastal Optical Systems 60mm 1:4 UV-VIS-IR Macro Apo',
 #
-    '00 54 48 48 18 18 00 00' => 'Voigtlander Ultron SL2 40mm f/2 SL II Aspherical',
-    '00 54 55 55 0C 0C 00 00' => 'Voigtlander Nokton SL2 58mm f/1.4 SL II',
+    '06 3F 68 68 2C 2C 06 00' => 'Cosina AF 100mm F3.5 Macro',
+    '07 36 3D 5F 2C 3C 03 00' => 'Cosina AF Zoom 28-80mm F3.5-5.6 MC Macro',
+    '07 46 3D 6A 25 2F 03 00' => 'Cosina AF Zoom 28-105mm F2.8-3.8 MC',
+    '12 36 5C 81 35 3D 09 00' => 'Cosina AF Zoom 70-210mm F4.5-5.6 MC Macro',
+    '12 39 5C 8E 34 3D 08 02' => 'Cosina AF Zoom 70-300mm F4.5-5.6 MC Macro',
+    '12 3B 68 8D 3D 43 09 02' => 'Cosina AF Zoom 100-300mm F5.6-6.7 MC Macro',
 #
-    '07 3E 30 43 2D 35 03 00' => 'Soligor AF Zoom 19-35mm 1:3.5-4.5',
+    '02 40 44 5C 2C 34 02 00' => 'Exakta AF 35-70mm 1:3.5-4.5 MC',
+#
+    '07 3E 30 43 2D 35 03 00' => 'Soligor AF Zoom 19-35mm 1:3.5-4.5 MC',
     '03 43 5C 81 35 35 02 00' => 'Soligor AF C/D Zoom UMCS 70-210mm 1:4.5',
+    '12 4A 5C 81 31 3D 09 00' => 'Soligor AF C/D Auto Zoom+Macro 70-210mm 1:4-5.6 UMCS',
+    '00 40 31 31 2C 2C 00 00' => 'Voigtlander Color Skopar 20mm F3.5 SLII Aspherical',
+    '00 54 48 48 18 18 00 00' => 'Voigtlander Ultron 40mm F2 SLII Aspherical',
+    '00 54 55 55 0C 0C 00 00' => 'Voigtlander Nokton 58mm F1.4 SLII',
 #
-    '07 36 3D 5F 2C 3C 03 00' => 'Cosina AF Zoom 28-80mm f/3.5-5.6 MC Macro',
-    '12 36 5C 81 35 3D 09 00' => 'Cosina AF Zoom 70-210mm f/4.5-5.6 MC Macro',
-    '06 3F 68 68 2C 2C 06 00' => 'Cosina 100mm f/3.5 Macro',
+    '00 00 00 00 00 00 F1 0C' => 'Kenko Teleplus PRO 300 DG 1.4x',
+    '00 00 00 00 00 00 F2 18' => 'Kenko Teleplus PRO 300 DG 2.0x',
 #
-    '2F 40 30 44 2C 34 29 02' => 'Unknown 20-35mm f/3.5-4.5D',
-    '1E 5D 64 64 20 20 13 00' => 'Unknown 90mm f/2.5',
-    '12 3B 68 8D 3D 43 09 02' => 'Unknown 100-290mm f/5.6-6.7',
     '00 00 00 00 00 00 00 01' => 'Manual Lens No CPU',
+#
+    '00 54 44 44 0C 0C 00 00' => 'Nikkor 35mm f/1.4 AiS',
+    '00 48 50 50 18 18 00 00' => 'Nikkor H 50mm f/2',
+    '00 48 68 68 24 24 00 00' => 'Series E 100mm f/2.8',
+    '00 4C 6A 6A 20 20 00 00' => 'Nikkor 105mm f/2.5 AiS',
+    '00 48 80 80 30 30 00 00' => 'Nikkor 200mm f/4 AiS',
 );
 
-# flash model decoding (ref JD)
-my %flashModels = (
-    # If byte 2 and 3 are both 0 either a internal flash was used, or no flash
-    '0 54 0 0' => 'Internal', # (D50, D70 or D70s)
-    '2 46 0 0' => 'Internal', # (D80)
-    '2 48 0 0' => 'Internal', # (D200 or D40)
-    '2 50 0 0' => 'Internal', # (D300 or D700)
-    '0 0 0 0'  => '(none)',
-    '0 72 0 0' => '(none)', # (D50)
-    '0 78 0 0' => '(none)', # (D70 or D70s)
-    # If byte 2 and 3 are not 0, they need to be interpreted instead of byte 0 and 1:
-    'x x 1 1' => 'SB-800 (or Metz 58 AF-1)',
-    'x x 1 3' => 'SB-800',
-    'x x 2 1' => 'SB-800',
-    'x x 2 4' => 'SB-600',
-    'x x 2 5' => 'SB-600',
-    'x x 3 1' => 'SU-800 Remote Commander',
-    'x x 4 1' => 'SB-400',
-    'x x 4 2' => 'SB-400',
-    'x x 4 4' => 'SB-400',
-    'x x 5 1' => 'SB-900',
-    OTHER => \&FlashModelConv,
+# flash firmware decoding (ref JD)
+my %flashFirmware = (
+    '0 0' => 'n/a',
+    '1 1' => '1.01 (SB-800 or Metz 58 AF-1)',
+    '1 3' => '1.03 (SB-800)',
+    '2 1' => '2.01 (SB-800)',
+    '2 4' => '2.04 (SB-600)',
+    '2 5' => '2.05 (SB-600)',
+    '3 1' => '3.01 (SU-800 Remote Commander)',
+    '4 1' => '4.01 (SB-400)',
+    '4 2' => '4.02 (SB-400)',
+    '4 4' => '4.04 (SB-400)',
+    '5 1' => '5.01 (SB-900)',
+    '5 2' => '5.02 (SB-900)',
+    OTHER => sub {
+        my ($val, $inv) = @_;
+        return sprintf('%d.%.2d (Unknown model)', split(' ', $val)) unless $inv;
+        return "$1 $2" if $val =~ /(\d+)\.(\d+)/;
+        return '0 0';
+    },
 );
 
 my %retouchValues = (
@@ -466,10 +520,10 @@ my %retouchValues = (
     # 0x000a - rational values: 5.6 to 9.283 - found in coolpix models - PH
     #          (not correlated with any LV or scale factor)
     0x000b => { Name => 'WhiteBalanceFineTune', Writable => 'int16s' }, #2
-    0x000c => {
-        Name => 'ColorBalance1',
+    0x000c => { # (D1X)
+        Name => 'WB_RBLevels',
         Writable => 'rational64u',
-        Count => 4,
+        Count => 4, # (not sure what the last 2 values are for)
     },
     0x000d => { #15
         Name => 'ProgramShift',
@@ -532,6 +586,15 @@ my %retouchValues = (
         PrintConv => '$_=$val;s/^0 //;$_',
         PrintConvInv => '"0 $val"',
     },
+    0x0014 => { #4
+        Name => 'ColorBalanceA',
+        Condition => '$format eq "undef" and $count == 2560',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::ColorBalanceA',
+            ByteOrder => 'BigEndian',
+        },
+    },
+    # 0x0014 - Found in NRW images, starts with "NRW 0100"
     # D70 Image boundary?? top x,y bot-right x,y
     0x0016 => { #2
         Name => 'ImageBoundary',
@@ -604,6 +667,8 @@ my %retouchValues = (
             1 => 'Low',
             3 => 'Normal',
             5 => 'High',
+            7 => 'Extra High', #10
+            0xffff => 'Auto', #10
         },
     },
     0x0023 => { #PH
@@ -1089,6 +1154,7 @@ my %retouchValues = (
         Name => 'Nikon_0x00b9',
         Description => 'Nikon 0x00b9',
         Unknown => 1,
+        Writable => 0,
         PrintConv => '"0x" . unpack("H*", $val)',
     },
     0x0e00 => {
@@ -1458,6 +1524,7 @@ my %retouchValues = (
         Name => 'ISOExpansion',
         Format => 'int16u',
         PrintHex => 1,
+        PrintConvColumns => 2,
         PrintConv => {
             0x000 => 'Off',
             0x101 => 'Hi 0.3',
@@ -1490,6 +1557,7 @@ my %retouchValues = (
         Name => 'ISOExpansion2',
         Format => 'int16u',
         PrintHex => 1,
+        PrintConvColumns => 2,
         PrintConv => {
             0x000 => 'Off',
             0x101 => 'Hi 0.3',
@@ -1531,12 +1599,13 @@ my %retouchValues = (
     1 => {
         Name => 'AFPoint',
         Notes => 'in some focus modes this value is not meaningful',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 'Center',
             1 => 'Top',
             2 => 'Bottom',
-            3 => 'Left',
-            4 => 'Right',
+            3 => 'Mid-left',
+            4 => 'Mid-right',
             5 => 'Upper-left',
             6 => 'Upper-right',
             7 => 'Lower-left',
@@ -1548,13 +1617,15 @@ my %retouchValues = (
     2 => {
         Name => 'AFPointsInFocus',
         Format => 'int16u',
+        PrintConvColumns => 2,
         PrintConv => {
+            0x7ff => 'All 11 Points',
             BITMASK => {
                 0 => 'Center',
                 1 => 'Top',
                 2 => 'Bottom',
-                3 => 'Left',
-                4 => 'Right',
+                3 => 'Mid-left',
+                4 => 'Mid-right',
                 5 => 'Upper-left',
                 6 => 'Upper-right',
                 7 => 'Lower-left',
@@ -1596,13 +1667,137 @@ my %retouchValues = (
             1 => 'On',
         },
     },
-    # byte 7 is primary AF point: 0=none, 1=C6, 3=A5, 5=E5, 19=D8, 22=B9, 31=C11 - JD/PH
-    8 => {
-        Name => 'AFPointsUsed',
-        Format => 'undef[7]',
-        Notes => 'D3/D300 AF points -- 5 rows: A1-9, B1-11, C1-11, D1-11, E1-9, center point is C6',
-        PrintConv => 'Image::ExifTool::Nikon::PrintAFPointsD3($val)',
-    },
+    7 => [
+        { #PH/JD
+            Name => 'PrimaryAFPoint',
+            Condition => '$$self{Model} =~ /D(3X?|300|700)\b/',
+            Notes => 'D3, D3X, D300 and D700',
+            PrintConvColumns => 5,
+            PrintConv => {
+                0 => 'none',
+                1 => 'C6 (Center)',
+                2 => 'B6',
+                3 => 'A5',
+                4 => 'D6',
+                5 => 'E5',
+                6 => 'C7',
+                7 => 'B7',
+                8 => 'A6',
+                9 => 'D7',
+                10 => 'E6',
+                11 => 'C5',
+                12 => 'B5',
+                13 => 'A4',
+                14 => 'D5',
+                15 => 'E4',
+                16 => 'C8',
+                17 => 'B8',
+                18 => 'A7',
+                19 => 'D8',
+                20 => 'E7',
+                21 => 'C9',
+                22 => 'B9',
+                23 => 'A8',
+                24 => 'D9',
+                25 => 'E8',
+                26 => 'C10',
+                27 => 'B10',
+                28 => 'A9',
+                29 => 'D10',
+                30 => 'E9',
+                31 => 'C11',
+                32 => 'B11',
+                33 => 'D11',
+                34 => 'C4',
+                35 => 'B4',
+                36 => 'A3',
+                37 => 'D4',
+                38 => 'E3',
+                39 => 'C3',
+                40 => 'B3',
+                41 => 'A2',
+                42 => 'D3',
+                43 => 'E2',
+                44 => 'C2',
+                45 => 'B2',
+                46 => 'A1',
+                47 => 'D2',
+                48 => 'E1',
+                49 => 'C1',
+                50 => 'B1',
+                51 => 'D1',
+            },
+        },
+        { #10
+            Name => 'PrimaryAFPoint',
+            Notes => 'D90 and D5000',
+            Condition => '$$self{Model} =~ /D(90|5000)\b/',
+            PrintConvColumns => 2,
+            PrintConv => {
+                0 => 'none',
+                1 => 'Center',
+                2 => 'Top',
+                3 => 'Bottom',
+                4 => 'Mid-left',
+                5 => 'Upper-left',
+                6 => 'Lower-left',
+                7 => 'Far Left',
+                8 => 'Mid-right',
+                9 => 'Upper-right',
+                10 => 'Lower-right',
+                11 => 'Far Right',
+            },
+        },
+        {
+            Name => 'PrimaryAFPoint',
+            Notes => 'other models',
+            PrintConv => {
+                0 => 'none',
+                1 => 'Center',
+            },
+        },
+    ],
+    8 => [
+        { #JD/PH
+            Name => 'AFPointsUsed',
+            Condition => '$$self{Model} =~ /D(3X?|300|700)\b/',
+            Notes => 'D3, D3X, D300 and D700',
+            Format => 'undef[7]',
+            Notes => 'D3/D300 AF points -- 5 rows: A1-9, B1-11, C1-11, D1-11, E1-9, center point is C6',
+            PrintConv => 'Image::ExifTool::Nikon::PrintAFPointsD3($val)',
+        },
+        { #10
+            Name => 'AFPointsUsed',
+            Condition => '$$self{Model} =~ /D(90|5000)\b/',
+            Notes => 'D90 and D5000',
+            # read as int16u in little-endian byte order
+            Format => 'undef[2]',
+            ValueConv => 'unpack("v",$val)',
+            ValueConvInv => 'pack("v",$val)',
+            PrintConvColumns => 2,
+            PrintConv => {
+                0x7ff => 'All 11 Points',
+                BITMASK => {
+                    0 => 'Center',
+                    1 => 'Top',
+                    2 => 'Bottom',
+                    3 => 'Mid-left',
+                    4 => 'Upper-left',
+                    5 => 'Lower-left',
+                    6 => 'Far Left',
+                    7 => 'Mid-right',
+                    8 => 'Upper-right',
+                    9 => 'Lower-right',
+                    10 => 'Far Right',
+                },
+            },
+        },
+        {
+            Name => 'AFPointsUsed',
+            Format => 'undef[7]',
+            PrintConv => '$_=unpack("H*",$val); "Unknown (".join(" ", /(..)/g).")"',
+        },
+    ],
 );
 
 # Nikon File information - D60, D3 and D300 (ref PH)
@@ -1655,6 +1850,27 @@ my %retouchValues = (
     3 => 'OutputImageHeight',
     4 => 'OutputResolution',
     # 5 = 1
+);
+
+# ref 4
+%Image::ExifTool::Nikon::ColorBalanceA = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    624 => {
+        Name => 'RedBalance',
+        ValueConv => '$val / 256',
+        Protected => 1,
+    },
+    625 => {
+        Name => 'BlueBalance',
+        ValueConv => '$val / 256',
+        Protected => 1,
+    },
 );
 
 # ref 4
@@ -2948,6 +3164,7 @@ my %nikonFocalConversions = (
         # thanks to Neil Nappe for the samples to decode this!...
         # (have seen various unknown values here when flash is enabled, but
         # these are yet to be decoded: 0x2e,0x619,0xd0d,0x103a,0x2029 - PH)
+        PrintConvColumns => 3,
         PrintConv => {
             0x403e => '+20',
             0x303e => '+19',
@@ -3348,6 +3565,7 @@ my %nikonFocalConversions = (
     810.2 => { # CSe2
         Name => 'FlashShutterSpeed',
         Mask => 0x0f,
+        PrintConvColumns => 2,
         PrintConv => {
             0x00 => '1/60 s',
             0x01 => '1/30 s',
@@ -3407,6 +3625,7 @@ my %nikonFocalConversions = (
     812.2 => { # CSc2
         Name => 'MeteringTime',
         Mask => 0x0f,
+        PrintConvColumns => 2,
         PrintConv => {
             0x00 => '4 s',
             0x01 => '2 s',
@@ -3448,10 +3667,10 @@ my %nikonFocalConversions = (
         Format => 'string[4]',
         Writable => 0,
     },
-    4 => {
-        Name => 'FlashModel',
-        Format => 'int8u[4]',
-        PrintConv => \%flashModels,
+    6 => {
+        Format => 'int8u[2]',
+        Name => 'ExternalFlashFirmware',
+        PrintConv => \%flashFirmware,
     },
     8 => {
         Name => 'ExternalFlashFlags',
@@ -3599,10 +3818,10 @@ my %nikonFocalConversions = (
         Format => 'string[4]',
         Writable => 0,
     },
-    4 => {
-        Name => 'FlashModel',
-        Format => 'int8u[4]',
-        PrintConv => \%flashModels,
+    6 => {
+        Format => 'int8u[2]',
+        Name => 'ExternalFlashFirmware',
+        PrintConv => \%flashFirmware,
     },
     8 => {
         Name => 'ExternalFlashFlags',
@@ -3782,10 +4001,10 @@ my %nikonFocalConversions = (
         Format => 'string[4]',
         Writable => 0,
     },
-    4 => {
-        Name => 'FlashModel',
-        Format => 'int8u[4]',
-        PrintConv => \%flashModels,
+    6 => {
+        Format => 'int8u[2]',
+        Name => 'ExternalFlashFirmware',
+        PrintConv => \%flashFirmware,
     },
     8 => {
         Name => 'ExternalFlashFlags',
@@ -4057,6 +4276,168 @@ my %nikonFocalConversions = (
     },
 );
 
+# version information in AVI videos (PH)
+%Image::ExifTool::Nikon::AVIVers = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Video' },
+    PROCESS_PROC => \&ProcessNikonAVI,
+    FORMAT => 'string',
+    0x01 => 'MakerNoteType',
+    0x02 => {
+        Name => 'MakerNoteVersion',
+        Format => 'int8u',
+        ValueConv => 'my @a = reverse split " ", $val; join ".", @a;',
+    },
+);
+
+# tags in AVI videos (PH)
+%Image::ExifTool::Nikon::AVITags = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&ProcessNikonAVI,
+    FORMAT => 'string',
+    NOTES => 'This information is found in Nikon AVI videos.',
+    0x03 => 'Make',
+    0x04 => 'Model',
+    0x05 => {
+        Name => 'Software',
+        Format => 'undef',
+        ValueConv => '$val =~ tr/\0//d; $val',
+    },
+    0x06 => 'Equipment', # "NIKON DIGITAL CAMERA"
+    0x07 => { # (guess)
+        Name => 'Orientation',
+        Format => 'int16u',
+        Groups => { 2 => 'Image' },
+        PrintConv => \%Image::ExifTool::Exif::orientation,
+    },
+    0x08 => {
+        Name => 'ExposureTime',
+        Format => 'rational64u',
+        Groups => { 2 => 'Image' },
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x09 => {
+        Name => 'FNumber',
+        Format => 'rational64u',
+        Groups => { 2 => 'Image' },
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x0a => {
+        Name => 'ExposureCompensation',
+        Format => 'rational64s',
+        Groups => { 2 => 'Image' },
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    0x0b => {
+        Name => 'MaxApertureValue',
+        Format => 'rational64u',
+        ValueConv => '2 ** ($val / 2)',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x0c => {
+        Name => 'MeteringMode', # (guess)
+        Format => 'int16u',
+        PrintConv => {
+            0 => 'Unknown',
+            1 => 'Average',
+            2 => 'Center-weighted average',
+            3 => 'Spot',
+            4 => 'Multi-spot',
+            5 => 'Multi-segment',
+            6 => 'Partial',
+            255 => 'Other',
+        },
+    },
+    0x0d => { # val: 0
+        Name => 'Nikon_AVITags_0x000d',
+        Format => 'int16u',
+        Unknown => 1,
+    },
+    0x0e => { # val: 0
+        Name => 'Nikon_AVITags_0x000e',
+        Format => 'int16u',
+        Unknown => 1,
+    },
+    0x0f => {
+        Name => 'FocalLength',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f mm",$val)',
+    },
+    0x10 => {
+        Name => 'XResolution',
+        Format => 'rational64u',
+        Groups => { 2 => 'Image' },
+    },
+    0x11 => {
+        Name => 'YResolution',
+        Format => 'rational64u',
+        Groups => { 2 => 'Image' },
+    },
+    0x12 => {
+        Name => 'ResolutionUnit',
+        Format => 'int16u',
+        Groups => { 2 => 'Image' },
+        PrintConv => {
+            1 => 'None',
+            2 => 'inches',
+            3 => 'cm',
+        },
+    },
+    0x13 => {
+        Name => 'DateTimeOriginal', # (guess)
+        Groups => { 2 => 'Time' },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    0x14 => {
+        Name => 'CreateDate', # (guess)
+        Groups => { 2 => 'Time' },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    0x15 => {
+        Name => 'Nikon_AVITags_0x0015',
+        Format => 'int16u',
+        Unknown => 1,
+    },
+    0x16 => {
+        Name => 'Duration',
+        Format => 'rational64u',
+        PrintConv => '"$val s"',
+    },
+    0x17 => { # val: 1
+        Name => 'Nikon_AVITags_0x0017',
+        Format => 'int16u',
+        Unknown => 1,
+    },
+    0x18 => 'FocusMode',
+    0x19 => { # vals: -5, -2, 3, 5, 6, 8, 11, 12, 14, 20, 22
+        Name => 'Nikon_AVITags_0x0019',
+        Format => 'int32s',
+        Unknown => 1,
+    },
+    0x1b => { # vals: 1 (640x480), 1.25 (320x240)
+        Name => 'DigitalZoom',
+        Format => 'rational64u',
+    },
+    0x1c => { # (same as Nikon_0x000a)
+        Name => 'Nikon_AVITags_0x001c',
+        Format => 'rational64u',
+        Unknown => 1,
+    },
+    0x1d => 'ColorMode',
+    0x1e => { # string[8] - val: "AUTO"
+        Name => 'Sharpness', # (guess, could also be ISOSelection)
+    },
+    0x1f => { # string[16] - val: "AUTO"
+        Name => 'WhiteBalance', # (guess, could also be ImageAdjustment)
+    },
+    0x20 => { # string[4] - val: "OFF"
+        Name => 'NoiseReduction', # (guess)
+    },
+    0x801a => { # val: 0 (why is the 0x8000 bit set in the ID?)
+        Name => 'Nikon_AVITags_0x801a',
+        Format => 'int32s',
+        Unknown => 1,
+    }
+);
 
 # Nikon composite tags
 %Image::ExifTool::Nikon::Composite = (
@@ -4092,12 +4473,38 @@ my %nikonFocalConversions = (
 Image::ExifTool::AddCompositeTags('Image::ExifTool::Nikon');
 
 #------------------------------------------------------------------------------
+# Process Nikon AVI tags (D5000 videos)
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessNikonAVI($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $pos = $$dirInfo{DirStart} || 0;
+    my $dirEnd = $pos + $$dirInfo{DirLen};
+    $exifTool->VerboseDir($dirInfo, undef, $$dirInfo{DirLen});
+    SetByteOrder('II');
+    while ($pos + 4 <= $dirEnd) {
+        my $tag = Get16u($dataPt, $pos);
+        my $size = Get16u($dataPt, $pos + 2);
+        $pos += 4;
+        last if $pos + $size > $dirEnd;
+        $exifTool->HandleTag($tagTablePtr, $tag, undef,
+            DataPt => $dataPt,
+            Start  => $pos,
+            Size   => $size,
+        );
+        $pos += $size;
+    }
+    return 1;
+}
+#------------------------------------------------------------------------------
 # Print D3/D300 AF points (similar to Canon::PrintAFPoints1D)
 # Inputs: 0) value to convert (undef[7])
 # Focus point pattern:
 #        A1  A2  A3  A4  A5  A6  A7  A8  A9
 #    B1  B2  B3  B4  B5  B6  B7  B8  B9  B10  B11
-#    C1  C2  C3  C4  C5  C6  C7  C9  C9  C10  C11
+#    C1  C2  C3  C4  C5  C6  C7  C8  C9  C10  C11
 #    D1  D2  D3  D4  D5  D6  D7  D8  D9  D10  D11
 #        E1  E2  E3  E4  E5  E6  E7  E8  E9
 sub PrintAFPointsD3($)
@@ -4169,21 +4576,6 @@ sub LensIDConv($$$)
     my @ids = sort grep /^$regex$/, keys %$conv;
     return "Unknown ($val) $$conv{$ids[0]} ?" if @ids;
     return undef;
-}
-
-#------------------------------------------------------------------------------
-# Convert unknown flash model values
-# Inputs: 0) value, 1) flag for inverse conversion, 2) PrintConv hash ref
-sub FlashModelConv($$$)
-{
-    my ($val, $inv, $conv) = @_;
-    return undef if $inv;
-    my @n = split ' ', $val;
-    if (@n == 4 and ($n[2] or $n[3])) {
-        my $val2 = "x x $n[2] $n[3]";
-        return $$conv{$val2} if $val2;
-    }
-    return "Unknown ($val)";
 }
 
 #------------------------------------------------------------------------------

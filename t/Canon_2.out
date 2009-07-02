@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.66
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
 [File, File, Image] FileName - File Name: Canon1DmkIII.jpg
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 8.1 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:01:18 14:10:05-05:00
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:01:18 12:41:29-05:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -27,7 +27,7 @@
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2007:02:22 17:02:42
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2007:02:22 17:02:42
-[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: Y, Cb, Cr, -
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 1/128
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 5.7
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
@@ -75,7 +75,7 @@
 [MakerNotes, Canon, Camera] 20 - Canon Exposure Mode: Program AE
 [MakerNotes, Canon, Camera] 23 - Long Focal: 35 mm
 [MakerNotes, Canon, Camera] 24 - Short Focal: 16 mm
-[MakerNotes, Canon, Camera] 25 - Focal Units: 1
+[MakerNotes, Canon, Camera] 25 - Focal Units: 1/mm
 [MakerNotes, Canon, Camera] 26 - Max Aperture: 2.8
 [MakerNotes, Canon, Camera] 27 - Min Aperture: 23
 [MakerNotes, Canon, Camera] 28 - Flash Activity: 145
@@ -102,11 +102,11 @@
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
 [MakerNotes, Canon, Image] 21 - F Number: 5.7
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/128
+[MakerNotes, Canon, Image] 23 - Measured EV 2: -1.25
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS High-end
 [MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
-[MakerNotes, Canon, Image] 33 - Flash Output: 0
-[MakerNotes, Canon, Camera] 6 - Canon Image Type: Canon EOS-1D Mark III
+[MakerNotes, Canon, Image] 6 - Canon Image Type: Canon EOS-1D Mark III
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 5.3.1
 [MakerNotes, Canon, Camera] 9 - Owner Name: 
 [MakerNotes, Canon, Camera] 12 - Camera Body No.: 500292
@@ -188,7 +188,7 @@
 [MakerNotes, CanonCustom, Camera] 1285 - Lens Drive No AF: Focus search on
 [MakerNotes, CanonCustom, Camera] 1286 - Lens AF Stop Button: AF stop
 [MakerNotes, CanonCustom, Camera] 1287 - AF Microadjustment: Disable; 0; 0; 0; 0
-[MakerNotes, CanonCustom, Camera] 1288 - AF Expansion With Selected Point: Disable
+[MakerNotes, CanonCustom, Camera] 1288 - AF Point Area Expansion: Disable
 [MakerNotes, CanonCustom, Camera] 1289 - Selectable AF Point: 19 points
 [MakerNotes, CanonCustom, Camera] 1290 - Switch To Registered AF Point: Disable
 [MakerNotes, CanonCustom, Camera] 1291 - AF Point Auto Selection: Control-direct:disable/Main:enable
@@ -226,6 +226,7 @@
 [MakerNotes, Canon, Image] 11 - Digital Gain: 0
 [MakerNotes, Canon, Image] 12 - WB Shift AB: 0
 [MakerNotes, Canon, Image] 13 - WB Shift GM: 0
+[MakerNotes, Canon, Camera] 1 - Measured RGGB: 663 1024 1024 611
 [MakerNotes, Canon, Camera] 180 - Color Space: sRGB
 [MakerNotes, Canon, Camera] 208 - VRD Offset: 0
 [MakerNotes, Canon, Image] 1 - Sensor Width: 3984
@@ -238,6 +239,7 @@
 [MakerNotes, Canon, Image] 10 - Black Mask Top Border: 0
 [MakerNotes, Canon, Image] 11 - Black Mask Right Border: 0
 [MakerNotes, Canon, Image] 12 - Black Mask Bottom Border: 0
+[MakerNotes, Canon, Camera] 0 - Color Data Version: 2 (1DmkIII)
 [MakerNotes, Canon, Camera] 63 - WB RGGB Levels As Shot: 2275 1024 1024 1357
 [MakerNotes, Canon, Camera] 67 - Color Temp As Shot: 6142
 [MakerNotes, Canon, Camera] 68 - WB RGGB Levels Auto: 2275 1024 1024 1357
@@ -258,12 +260,12 @@
 [MakerNotes, Canon, Camera] 112 - Color Temp Kelvin: 5210
 [MakerNotes, Canon, Camera] 113 - WB RGGB Levels Flash: 2422 1024 1024 1295
 [MakerNotes, Canon, Camera] 117 - Color Temp Flash: 6777
+[MakerNotes, Canon, Camera] 640 - Raw Measured RGGB: 294111 455756 464315 279659
 [MakerNotes, Canon, Camera] 1 - AF Micro Adj Active: No
 [MakerNotes, Canon, Camera] 2 - AF Micro Adj Value: 0
 [Composite, Composite, Image] Aperture - Aperture: 5.6
 [Composite, Composite, Camera] DriveMode - Drive Mode: Continuous shooting
 [Composite, Composite, Image] FileNumber - File Number: 108-0232
-[Composite, Composite, Camera] FlashOn - Flash: Off
 [Composite, Composite, Camera] ISO - ISO: 3200
 [Composite, Composite, Image] ImageSize - Image Size: 8x8
 [Composite, Composite, Camera] Lens - Lens: 16.0 - 35.0 mm

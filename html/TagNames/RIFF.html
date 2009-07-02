@@ -54,11 +54,16 @@ extracted.</p>
 <td class=c>-</td>
 <td>--&gt; <a href='RIFF.html#Hdrl'>RIFF Hdrl Tags</a></td></tr>
 <tr>
+<td>'LIST_ncdt'</td>
+<td>NikonData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='RIFF.html#Nikon'>RIFF Nikon Tags</a></td></tr>
+<tr class=b>
 <td>'_PMX'</td>
 <td>XMP</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'fmt '</td>
 <td>AudioFormat</td>
 <td class=c>-</td>
@@ -329,27 +334,27 @@ extracted.</p>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>Encoding</td>
 <td class=c>N</td>
 <td>--&gt; <a href='RIFF.html#AudioEncoding'>RIFF AudioEncoding Values</a></td></tr>
 <tr class=b>
-<td class=r>1</td>
+<td class=r title='1 = 0x1'>1</td>
 <td>NumChannels</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>SampleRate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>4</td>
+<td class=r title='4 = 0x4'>4</td>
 <td>AvgBytesPerSec</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>7</td>
+<td class=r title='7 = 0x7'>7</td>
 <td>BitsPerSample</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -613,7 +618,7 @@ These &quot;TwoCC&quot; audio encoding codes are used in RIFF and ASF files.
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>StreamType</td>
 <td class=c>N</td>
 <td><span class=s>&#39;auds&#39; = Audio
@@ -621,17 +626,17 @@ These &quot;TwoCC&quot; audio encoding codes are used in RIFF and ASF files.
   <br>&#39;txts&#39; = Text
   <br>&#39;vids&#39; = Video</span></td></tr>
 <tr class=b>
-<td class=r>1</td>
+<td class=r title='1 = 0x1'>1</td>
 <td>Codec</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>10</td>
+<td class=r title='10 = 0xa'>10</td>
 <td>Quality</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>11</td>
+<td class=r title='11 = 0xb'>11</td>
 <td>SampleSize</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -644,40 +649,64 @@ These &quot;TwoCC&quot; audio encoding codes are used in RIFF and ASF files.
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>FrameRate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>1</td>
+<td class=r title='1 = 0x1'>1</td>
 <td>MaxDataRate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>4</td>
+<td class=r title='4 = 0x4'>4</td>
 <td>FrameCount</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>6</td>
+<td class=r title='6 = 0x6'>6</td>
 <td>StreamCount</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>8</td>
+<td class=r title='8 = 0x8'>8</td>
 <td>ImageWidth</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>9</td>
+<td class=r title='9 = 0x9'>9</td>
 <td>ImageHeight</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Nikon'>RIFF Nikon Tags</a></h2>
+<p>Proprietry RIFF tags found in Nikon AVI videos.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'nctg'</td>
+<td>NikonTags</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Nikon.html#AVI'>Nikon AVI Tags</a></td></tr>
+<tr class=b>
+<td>'ncth'</td>
+<td>ThumbnailImage</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'ncvr'</td>
+<td>NikonVers</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Nikon.html#AVIVers'>Nikon AVIVers Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 12, 2008</i>
+<br><i>Last revised Jun 22, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

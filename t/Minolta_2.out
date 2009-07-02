@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.66
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
 [File, File, Image] FileName - File Name: Minolta.jpg
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 13 kB
@@ -29,7 +29,7 @@
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2002:06:01 12:37:27
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2002:06:01 12:37:27
-[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: Y, Cb, Cr, -
 [EXIF, ExifIFD, Image] 37379 - Brightness Value: 7.5
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 3.4
@@ -37,7 +37,7 @@
 [EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: Off, Did not fire
 [EXIF, ExifIFD, Camera] 37386 - Focal Length: 42.3 mm
-[EXIF, ExifIFD, Camera] 37396 - Subject Location: 960 960 320 192
+[EXIF, ExifIFD, Camera] 37396 - Subject Area: 960 960 320 192
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 2560

@@ -39,7 +39,7 @@ my %manufacturer = (
     12 => 'Visualize, Spain',
 );
 
-my %iptcCharsetInv = ( 'UTF8' => "\x1b%G" );
+my %iptcCharsetInv = ( 'UTF8' => "\x1b%G", 'UTF-8' => "\x1b%G" );
 
 # ISO 2022 Character Coding Notes
 # -------------------------------
@@ -121,9 +121,12 @@ sub CheckIPTC($$$)
         my ($fmt, $minlen, $maxlen) = ($1, $2, $3);
         my $len = length $$valPtr;
         if ($fmt eq 'digits') {
-            return 'Non-numeric characters in value' unless $$valPtr =~ /^\d+$/;
-            # left pad with zeros if necessary
-            $$valPtr = ('0' x ($len - $minlen)) . $$valPtr if $len < $minlen;
+            return 'Non-numeric characters in value' unless $$valPtr =~ /^\d*$/;
+            if ($len < $minlen and $len) {
+                # left pad with zeros if necessary
+                $$valPtr = ('0' x ($minlen - $len)) . $$valPtr;
+                $len = $minlen;
+            }
         }
         if ($minlen) {
             $maxlen or $maxlen = $minlen;

@@ -62,10 +62,9 @@ sub WriteAdobeStuff($$$);
         to the DNG image.   While this isn't a big problem for most camera makes, it
         is serious for some makes like Olympus.
 
-        The CRW data is from DNG-converted CRW images, but it has been restructured
-        to a proprietary Adobe format (which results in a loss of the original
-        hierarchical information structure, and creates extra work for everyone else
-        who wants to use this information).
+        Other entries in this table represent proprietary information that is
+        extracted from the original RAW image and restructured to a different (but
+        still proprietary) Adobe format.
     },
     MakN  => [ ],   # (filled in later)
    'CRW ' => {
@@ -101,7 +100,21 @@ sub WriteAdobeStuff($$$);
     'Pano' => {
         Name => 'AdobePano',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Panasonic::Raw',
+            TagTable => 'Image::ExifTool::PanasonicRaw::Main',
+            ProcessProc => \&ProcessAdobeIFD,
+        },
+    },
+    'Koda' => {
+        Name => 'AdobeKoda',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::IFD',
+            ProcessProc => \&ProcessAdobeIFD,
+        },
+    },
+    'Leaf' => {
+        Name => 'AdobeLeaf',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Leaf::SubIFD',
             ProcessProc => \&ProcessAdobeIFD,
         },
     },
@@ -236,13 +249,16 @@ sub ProcessAdobeData($$$)
                 $exifTool->HtmlDump($dataPos + $pos, $size, "$name data");
             }
         }
-        $verbose and not $outfile and $exifTool->VerboseInfo($tag,
-            ref $tagInfo eq 'HASH' ? $tagInfo : undef,
-            DataPt => $dataPt,
-            DataPos => $dataPos,
-            Start => $pos,
-            Size => $size,
-        );
+        if ($verbose and not $outfile) {
+            $tagInfo or $exifTool->VPrint(0, "$$exifTool{INDENT}Unsupported DNGAdobeData record: ($tag)\n");
+            $exifTool->VerboseInfo($tag,
+                ref $tagInfo eq 'HASH' ? $tagInfo : undef,
+                DataPt => $dataPt,
+                DataPos => $dataPos,
+                Start => $pos,
+                Size => $size,
+            );
+        }
         my $value;
         while ($tagInfo) {
             my ($subTable, $subName, $processProc);

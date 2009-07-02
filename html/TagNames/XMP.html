@@ -11,8 +11,8 @@
 XMP stands for &quot;Extensible Metadata Platform&quot;, an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
 embedded in many different image file types including JPG, JP2, TIFF, GIF,
-EPS, PDF, PSD, DNG, PNG, DJVU, SVG and MIFF, as well as MOV, AVI, ASF, WMV,
-FLV, SWF and MP4 videos, and WMA and audio formats supporting ID3v2
+EPS, PDF, PSD, DNG, IND, PNG, DJVU, SVG and MIFF, as well as MOV, AVI, ASF,
+WMV, FLV, SWF and MP4 videos, and WMA and audio formats supporting ID3v2
 information.</p>
 
 <p>The XMP <b>Tag ID</b>&#39;s aren&#39;t listed because in most cases they are identical
@@ -1139,7 +1139,7 @@ other XMP tags.  (see <a href="http://www.optimasc.com/products/fileid/">http://
 <tr>
 <td>ComponentsConfiguration</td>
 <td class=c>integer+</td>
-<td><span class=s>0 = .
+<td><span class=s>0 = -
   <br>1 = Y
   <br>2 = Cb
   <br>3 = Cr
@@ -3076,22 +3076,42 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>Rating</td>
-<td class=c>real</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>ThumbnailFormat</td>
+<td>PageImageFormat</td>
 <td class=c>string+</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>PageImageHeight</td>
+<td class=c>integer+</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
-<td>ThumbnailHeight</td>
+<td>PageImage</td>
+<td class=c>string+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>PageImagePageNumber</td>
+<td class=c>integer+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>PageImageWidth</td>
 <td class=c>integer+</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>Rating</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>ThumbnailFormat</td>
+<td class=c>string+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>ThumbnailHeight</td>
+<td class=c>integer+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>ThumbnailImage</td>
 <td class=c>string/+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ThumbnailWidth</td>
 <td class=c>integer+</td>
 <td>&nbsp;</td></tr>
@@ -4195,7 +4215,7 @@ XMP module for convenience.  (see <a href="http://www.w3.org/TR/SVG11/">http://w
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 9, 2009</i>
+<br><i>Last revised Jun 19, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

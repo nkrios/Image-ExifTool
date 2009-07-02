@@ -45,7 +45,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.04';
+$VERSION = '2.08';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -58,6 +58,7 @@ sub ProcessBlankInfo($$$;$);
 sub ValidateXMP($;$);
 sub UnescapeChar($$);
 sub FormatXMPDate($);
+sub RestoreStructure($);
 
 my %curNS;  # namespaces currently in effect while parsing the file
 
@@ -97,8 +98,8 @@ my %stdXlatNS = (
     stVer     => 'http://ns.adobe.com/xap/1.0/sType/Version#',
     tiff      => 'http://ns.adobe.com/tiff/1.0/',
    'x'        => 'adobe:ns:meta/',
-    xapG      => 'http://ns.adobe.com/xap/1.0/g/',
-    xapGImg   => 'http://ns.adobe.com/xap/1.0/g/img/',
+    xmpG      => 'http://ns.adobe.com/xap/1.0/g/',
+    xmpGImg   => 'http://ns.adobe.com/xap/1.0/g/img/',
     xmp       => 'http://ns.adobe.com/xap/1.0/',
     xmpBJ     => 'http://ns.adobe.com/xap/1.0/bj/',
     xmpDM     => 'http://ns.adobe.com/xmp/1.0/DynamicMedia/',
@@ -382,7 +383,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-dc', 2 => 'Other' },
     NAMESPACE => 'dc',
-    DESCRIPTION => 'XMP Dublin Core',
+    TABLE_DESC => 'XMP Dublin Core',
     NOTES => 'Dublin Core schema tags.',
     contributor => { Groups => { 2 => 'Author' }, List => 'Bag' },
     coverage    => { },
@@ -439,6 +440,22 @@ my %recognizedAttrs = (
         ValueConv => 'Image::ExifTool::XMP::DecodeBase64($val)',
         ValueConvInv => 'Image::ExifTool::XMP::EncodeBase64($val)',
     },
+    # the following written by Adobe InDesign, ot part of XMP spec:
+    PageInfo  => {
+        SubDirectory => { },
+        Struct => 'PageInfo',
+        List => 'Seq',
+    },
+    PageInfoPageNumber => { Name => 'PageImagePageNumber',  List => 1, Writable => 'integer' },
+    PageInfoHeight => { Name => 'PageImageHeight', List => 1, Writable => 'integer' },
+    PageInfoWidth  => { Name => 'PageImageWidth',  List => 1, Writable => 'integer' },
+    PageInfoFormat => { Name => 'PageImageFormat', List => 1 },
+    PageInfoImage  => {
+        Name => 'PageImage',
+        List => 1,
+        ValueConv => 'Image::ExifTool::XMP::DecodeBase64($val)',
+        ValueConvInv => 'Image::ExifTool::XMP::EncodeBase64($val)',
+    },
 );
 
 # XMP Rights Management schema properties (xmpRights, xapRights)
@@ -468,7 +485,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-xmpMM', 2 => 'Other' },
     NAMESPACE => 'xmpMM',
-    DESCRIPTION => 'XMP Media Management',
+    TABLE_DESC => 'XMP Media Management',
     NOTES => 'XMP Media Management schema tags.',
     DerivedFrom     => {
         SubDirectory => { },
@@ -490,6 +507,7 @@ my %recognizedAttrs = (
     DerivedFromMaskMarkers      => { PrintConv => { All => 'All', None => 'None' } },
     DerivedFromPartMapping      => { },
     DerivedFromToPart           => { },
+    #  DerivedFromOriginalDocumentID (undocumented property written by Adobe InDesign)
     DocumentID      => { },
     History         => {
         SubDirectory => { },
@@ -603,7 +621,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-xmpBJ', 2 => 'Other' },
     NAMESPACE => 'xmpBJ',
-    DESCRIPTION => 'XMP Basic Job Ticket',
+    TABLE_DESC => 'XMP Basic Job Ticket',
     NOTES => 'XMP Basic Job Ticket schema tags.',
     # Note: JobRef is a List of structures.  To accomplish this, we set the XMP
     # List=>'Bag', but since SubDirectory is defined, this tag isn't writable
@@ -624,7 +642,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-xmpTPg', 2 => 'Image' },
     NAMESPACE => 'xmpTPg',
-    DESCRIPTION => 'XMP Paged-Text',
+    TABLE_DESC => 'XMP Paged-Text',
     NOTES => 'XMP Paged-Text schema tags.',
     MaxPageSize => {
         SubDirectory => { },
@@ -673,7 +691,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-pdf', 2 => 'Image' },
     NAMESPACE => 'pdf',
-    DESCRIPTION => 'XMP PDF',
+    TABLE_DESC => 'XMP PDF',
     NOTES => q{
         Adobe PDF schema tags.  The official XMP specification defines only
         Keywords, PDFVersion and Producer.  The other tags are included because they
@@ -716,9 +734,9 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-photoshop', 2 => 'Image' },
     NAMESPACE => 'photoshop',
-    DESCRIPTION => 'XMP Photoshop',
+    TABLE_DESC => 'XMP Photoshop',
     NOTES => 'Adobe Photoshop schema tags.',
-    AuthorsPosition => { Groups => { 2 => 'Author' } },
+    AuthorsPosition => { Groups => { 2 => 'Author' }, Description => "Author's Position" },
     CaptionWriter   => { Groups => { 2 => 'Author' } },
     Category        => { },
     City            => { Groups => { 2 => 'Location' } },
@@ -746,7 +764,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-crs', 2 => 'Image' },
     NAMESPACE => 'crs',
-    DESCRIPTION => 'Photoshop Camera Raw Schema tags.',
+    TABLE_DESC => 'Photoshop Camera Raw Schema tags.',
     NOTES => 'XMP Photoshop Camera Raw',
     AlreadyApplied  => { Writable => 'boolean' }, #PH (written by LightRoom beta 4.1)
     AutoBrightness  => { Writable => 'boolean' },
@@ -1136,11 +1154,11 @@ my %recognizedAttrs = (
     GROUPS => { 1 => 'XMP-tiff', 2 => 'Image' },
     NAMESPACE => 'tiff',
     PRIORITY => 0, # not as reliable as actual TIFF tags
-    DESCRIPTION => 'XMP TIFF',
+    TABLE_DESC => 'XMP TIFF',
     NOTES => 'EXIF schema for TIFF tags.',
     ImageWidth    => { Writable => 'integer' },
     ImageLength   => { Writable => 'integer', Name => 'ImageHeight' },
-    BitsPerSample => { Writable => 'integer', List => 'Seq' },
+    BitsPerSample => { Writable => 'integer', List => 'Seq', AutoSplit => 1 },
     Compression => {
         Writable => 'integer',
         PrintConv => \%Image::ExifTool::Exif::compression,
@@ -1180,10 +1198,10 @@ my %recognizedAttrs = (
         },
     },
     TransferFunction      => { Writable => 'integer',  List => 'Seq' },
-    WhitePoint            => { Writable => 'rational', List => 'Seq' },
-    PrimaryChromaticities => { Writable => 'rational', List => 'Seq' },
-    YCbCrCoefficients     => { Writable => 'rational', List => 'Seq' },
-    ReferenceBlackWhite   => { Writable => 'rational', List => 'Seq' },
+    WhitePoint            => { Writable => 'rational', List => 'Seq', AutoSplit => 1 },
+    PrimaryChromaticities => { Writable => 'rational', List => 'Seq', AutoSplit => 1 },
+    YCbCrCoefficients     => { Writable => 'rational', List => 'Seq', AutoSplit => 1 },
+    ReferenceBlackWhite   => { Writable => 'rational', List => 'Seq', AutoSplit => 1 },
     DateTime => { # (EXIF tag named ModifyDate, but this exists in XMP-xmp)
         Description => 'Date/Time Modified',
         Groups => { 2 => 'Time' },
@@ -1219,8 +1237,9 @@ my %recognizedAttrs = (
     ComponentsConfiguration => {
         List => 'Seq',
         Writable => 'integer',
+        AutoSplit => 1,
         PrintConv => {
-            0 => '.',
+            0 => '-',
             1 => 'Y',
             2 => 'Cb',
             3 => 'Cr',
@@ -1274,6 +1293,7 @@ my %recognizedAttrs = (
         Name => 'ISO',
         Writable => 'integer',
         List => 'Seq',
+        AutoSplit => 1,
     },
     OECF => {
         Name => 'Opto-ElectricConvFactor',
@@ -1322,7 +1342,7 @@ my %recognizedAttrs = (
     SubjectDistance => {
         Groups => { 2 => 'Camera' },
         Writable => 'rational',
-        PrintConv => '$val eq "inf" ? $val : "$val m"',
+        PrintConv => '$val =~ /^(inf|undef)$/ ? $val : "$val m"',
         PrintConvInv => '$val=~s/\s*m$//;$val',
     },
     MeteringMode => {
@@ -1375,7 +1395,7 @@ my %recognizedAttrs = (
         PrintConv => 'sprintf("%.1f mm",$val)',
         PrintConvInv => '$val=~s/\s*mm$//;$val',
     },
-    SubjectArea => { Writable => 'integer', List => 'Seq' },
+    SubjectArea => { Writable => 'integer', List => 'Seq', AutoSplit => 1 },
     FlashEnergy => { Groups => { 2 => 'Camera' }, Writable => 'rational' },
     SpatialFrequencyResponse => {
         Groups => { 2 => 'Camera' },
@@ -1403,7 +1423,7 @@ my %recognizedAttrs = (
             5 => 'um',   # (not standard EXIF)
         },
     },
-    SubjectLocation => { Writable => 'integer', List => 'Seq' },
+    SubjectLocation => { Writable => 'integer', List => 'Seq', AutoSplit => 1 },
     ExposureIndex   => { Writable => 'rational' },
     SensingMethod => {
         Groups => { 2 => 'Camera' },
@@ -1552,11 +1572,12 @@ my %recognizedAttrs = (
         Writable => 'rational',
         # extricate unsigned decimal number from string
         ValueConvInv => '$val=~/((?=\d|\.\d)\d*(?:\.\d*)?)/ ? $1 : undef',
-        PrintConv => '$val eq "inf" ? $val : "$val m"',
+        PrintConv => '$val =~ /^(inf|undef)$/ ? $val : "$val m"',
         PrintConvInv => '$val=~s/\s*m$//;$val',
     },
     GPSTimeStamp => {
         Name => 'GPSDateTime',
+        Description => 'GPS Date/Time',
         Groups => { 2 => 'Time' },
         Notes => q{
             a date/time tag called GPSTimeStamp by the XMP specification.  This tag is
@@ -1670,7 +1691,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-iptcCore', 2 => 'Author' },
     NAMESPACE => 'Iptc4xmpCore',
-    DESCRIPTION => 'XMP IPTC Core',
+    TABLE_DESC => 'XMP IPTC Core',
     NOTES => q{
         IPTC Core schema tags.  The actual IPTC Core namespace prefix is
         "Iptc4xmpCore", which is the prefix recorded in the file, but ExifTool
@@ -1701,7 +1722,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-iptcExt', 2 => 'Author' },
     NAMESPACE => 'Iptc4xmpExt',
-    DESCRIPTION => 'XMP IPTC Extension',
+    TABLE_DESC => 'XMP IPTC Extension',
     NOTES => q{
         IPTC Extension schema tags.  The actual namespace prefix is "Iptc4xmpExt",
         but ExifTool shortens this for the "XMP-iptcExt" family 1 group name.
@@ -1774,7 +1795,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-microsoft', 2 => 'Image' },
     NAMESPACE => 'MicrosoftPhoto',
-    DESCRIPTION => 'XMP Microsoft',
+    TABLE_DESC => 'XMP Microsoft',
     NOTES => q{
         Microsoft Photo schema tags.  This is likely not a complete list, but
         represents tags which have been observed in sample images.  The actual
@@ -1803,7 +1824,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-MP', 2 => 'Image' },
     NAMESPACE => 'MP',
-    DESCRIPTION => 'XMP Microsoft Photo',
+    TABLE_DESC => 'XMP Microsoft Photo',
     NOTES => q{
         Microsoft Photo 1.2 schema tags.  Again, not a complete list.
     },
@@ -1831,7 +1852,7 @@ my %recognizedAttrs = (
     GROUPS => { 1 => 'XMP-lr', 2 => 'Image' },
     NAMESPACE => 'lr',
     NOTES => 'Adobe Lightroom "lr" schema tags.',
-    DESCRIPTION => 'XMP Adobe Lightroom',
+    TABLE_DESC => 'XMP Adobe Lightroom',
     privateRTKInfo => { },
     hierarchicalSubject => { List => 'Bag' },
 );
@@ -1841,7 +1862,7 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-album', 2 => 'Image' },
     NAMESPACE => 'album',
-    DESCRIPTION => 'XMP Adobe Album',
+    TABLE_DESC => 'XMP Adobe Album',
     NOTES => 'Adobe Album schema tags.',
     Notes => { },
 );
@@ -2071,22 +2092,28 @@ sub DecodeBase64($)
 
 #------------------------------------------------------------------------------
 # Generate a name for this XMP tag
-# Inputs: 0) reference to tag property name list
+# Inputs: 0) tag property name list ref, 1) array ref for receiving structure property list
 # Returns: tagID and outtermost interesting namespace (or '' if no namespace)
-sub GetXMPTagID($)
+sub GetXMPTagID($;$)
 {
-    my $props = shift;
+    my ($props, $structProps) = @_;
     my ($tag, $prop, $namespace);
     foreach $prop (@$props) {
         # split name into namespace and property name
         # (Note: namespace can be '' for property qualifiers)
         my ($ns, $nm) = ($prop =~ /(.*?):(.*)/) ? ($1, $2) : ('', $prop);
-        $nm =~ s/ .*//;     # remove nodeID if it exists
         if ($ignoreNamespace{$ns}) {
             # special case: don't ignore rdf numbered items
-            next unless $prop =~ /^rdf:(_\d+)$/;
+            unless ($prop =~ /^rdf:(_\d+)$/) {
+                # save list index if necessary for structures
+                if ($structProps and @$structProps and $prop =~ /^rdf:li (\d+)$/) {
+                    $$structProps[-1][1] = $1;
+                }
+                next;
+            }
             $tag .= $1;
         } else {
+            $nm =~ s/ .*//; # remove nodeID if it exists
             # all uppercase is ugly, so convert it
             if ($nm !~ /[a-z]/) {
                 my $xlatNS = $$xlatNamespace{$ns} || $ns;
@@ -2105,6 +2132,8 @@ sub GetXMPTagID($)
             } else {
                 $tag = $nm;
             }
+            # save structure information if necessary
+            push @$structProps, [ $nm ] if $structProps;
         }
         # save namespace of first property to contribute to tag name
         $namespace = $ns unless $namespace;
@@ -2166,21 +2195,15 @@ sub ScanForXMP($$)
             $xmp = $1;
             $buff = substr($lastBuff, pos($lastBuff));
         }
-        $xmp .= $buff;
-        my $pos = length($xmp) - length($buff) - 18; # 18 is length("<xpacket end...")-1
-        pos($xmp) = $pos if $pos > 0;
+        my $pos = length($xmp) - 18;    # (18 = length("<?xpacket end...") - 1)
+        $xmp .= $buff;                  # add new data to our XMP
+        pos($xmp) = $pos if $pos > 0;   # set start for "xpacket end" scan
         if ($xmp =~ /<\?xpacket end=['"][wr]['"]\?>/g) {
-            $xmp = substr($xmp, 0, pos($xmp));
-            # XMP is not valid if it contains null bytes
-            pos($xmp) = 0;
-            last unless $xmp =~ /\0/g;
-            my $null = pos $xmp;
-            while ($xmp =~ /\0/g) {
-                $null = pos($xmp);
-            }
-            # re-parse beginning after last null byte
-            $buff = substr($xmp, $null);
-            $lastBuff = '';
+            $buff = substr($xmp, pos($xmp));    # save data after end of XMP
+            $xmp = substr($xmp, 0, pos($xmp));  # isolate XMP
+            # check XMP for validity (not valid if it contains null bytes)
+            $pos = rindex($xmp, "\0") + 1 or last;
+            $lastBuff = substr($xmp, $pos);     # re-parse beginning after last null byte
             undef $xmp;
         } else {
             undef $buff;
@@ -2219,14 +2242,14 @@ sub ConvertXMPDate($;$)
 # We found an XMP property name/value
 # Inputs: 0) ExifTool object ref, 1) Pointer to tag table
 #         2) reference to array of XMP property names (last is current property)
-#         3) property value, 4) attribute hash ref (for 'xml:lang' or 'et:encoding')
+#         3) property value, 4) attribute hash ref (for 'xml:lang' or 'rdf:datatype')
 # Returns: 1 if valid tag was found
 sub FoundXMP($$$$;$)
 {
     local $_;
     my ($exifTool, $tagTablePtr, $props, $val, $attrs) = @_;
-    my $lang;
-    my ($tag, $ns) = GetXMPTagID($props);
+    my ($lang, @structProps);
+    my ($tag, $ns) = GetXMPTagID($props, $exifTool->{OPTIONS}{Struct} ? \@structProps : undef);
     return 0 unless $tag;   # ignore things that aren't valid tags
 
     # translate namespace if necessary
@@ -2264,14 +2287,9 @@ sub FoundXMP($$$$;$)
     unless ($tagInfo) {
         $tagInfo = { Name => ucfirst($tag), WasAdded => 1 };
         if ($curNS{$ns} and $curNS{$ns} =~ m{^http://ns.exiftool.ca/(.*?)/(.*?)/}) {
-            # decode value if necessary
-            if ($attrs and $$attrs{'et:encoding'} and $$attrs{'et:encoding'} eq 'base64') {
-                $val = DecodeBase64($val); # (now a value ref)
-                $val = $$val unless length $$val > 100 or $$val =~ /[\0-\x08\x0b\0x0c\x0e-\x1f]/;
-            }
+            my %grps = ( 0 => $1, 1 => $2 );
             # apply a little magic to recover original group names
             # from this exiftool-written RDF/XML file
-            my %grps = ( 0 => $1, 1 => $2 );
             if ($grps{1} =~ /^\d/) {
                 # URI's with only family 0 are internal tags from the source file,
                 # so change the group name to avoid confusion with tags from this file
@@ -2283,11 +2301,26 @@ sub FoundXMP($$$$;$)
             $$tagInfo{StaticGroup1} = 1;
         }
         # construct tag information for this unknown tag
-        # make this a List type if necessary and not lang-alt
-        $$tagInfo{List} = $1 if @$props > 2 and not $lang and
-            $$props[-1] =~ /^rdf:li \d+$/ and $$props[-2] =~ /^rdf:(Bag|Seq|Alt)$/;
+        # -> make this a List or lang-alt tag if necessary
+        if (@$props > 2 and $$props[-1] =~ /^rdf:li \d+$/ and
+            $$props[-2] =~ /^rdf:(Bag|Seq|Alt)$/)
+        {
+            if ($lang and $1 eq 'Alt') {
+                $$tagInfo{Writable} = 'lang-alt';
+            } else {
+                $$tagInfo{List} = $1;
+            }
+        }
         Image::ExifTool::AddTagToTable($tagTablePtr, $tagID, $tagInfo);
         $added = 1;
+    }
+    # decode value if necessary (et:encoding was used before exiftool 7.71)
+    if ($attrs) {
+        my $enc = $$attrs{'rdf:datatype'} || $$attrs{'et:encoding'};
+        if ($enc and $enc =~ /base64/) {
+            $val = DecodeBase64($val); # (now a value ref)
+            $val = $$val unless length $$val > 100 or $$val =~ /[\0-\x08\x0b\0x0c\x0e-\x1f]/;
+        }
     }
     if (defined $lang and lc($lang) ne 'x-default') {
         $lang = StandardLangCase($lang);
@@ -2303,13 +2336,26 @@ sub FoundXMP($$$$;$)
     my $new = $$tagInfo{WasAdded};
     if ($fmt or $new) {
         if (($new or $fmt eq 'rational') and $val =~ m{^(-?\d+)/(-?\d+)$}) {
-            $val = $1 / $2 if $2;       # calculate quotient
+            if ($2) {
+                $val = $1 / $2; # calculate quotient
+            } elsif ($1) {
+                $val = 'inf';
+            } else {
+                $val = 'undef';
+            }
         } elsif ($new or $fmt eq 'date') {
             $val = ConvertXMPDate($val, $new);
         }
     }
     # store the value for this tag
     my $key = $exifTool->FoundTag($tagInfo, UnescapeXML($val));
+    # save structure/list information if necessary
+    if (@structProps and (@structProps > 1 or defined $structProps[0][1])) {
+        $exifTool->{TAG_EXTRA}{$key}{Struct} = \@structProps;
+        $exifTool->{IsStruct} = 1;
+        # don't accumulate lists in structures
+        delete $exifTool->{LIST_TAGS}{$tagInfo} if @structProps > 1;
+    }
     if ($ns and not $$tagInfo{StaticGroup1}) {
         # set group1 dynamically according to the namespace
         $exifTool->SetGroup1($key, "$tagTablePtr->{GROUPS}->{0}-$ns");
@@ -2557,10 +2603,14 @@ sub ParseXMPElement($$$;$$$)
                 # there are no contained elements, so this must be a simple property value
                 # (unless we already extracted shorthand values from this element)
                 if (length $val or not $shorthand) {
+                    my $lastProp = $$propListPt[-1];
                     if (defined $nodeID) {
                         SaveBlankInfo($blankInfo, $propListPt, $val);
-                    } elsif ($$propListPt[-1] eq 'rdf:type' and $wasEmpty) {
+                    } elsif ($lastProp eq 'rdf:type' and $wasEmpty) {
                         # do not extract empty structure types (for now)
+                    } elsif ($lastProp =~ /^et:(desc|prt|val)$/ and ($count or $1 eq 'desc')) {
+                        # ignore et:desc, and et:val if preceeded by et:prt
+                        --$count;
                     } else {
                         FoundXMP($exifTool, $tagTablePtr, $propListPt, $val, \%attrs);
                     }
@@ -2799,6 +2849,11 @@ sub ProcessXMP($$;$)
     # return DataPt if successful in case we want it for writing
     $$dirInfo{DataPt} = $dataPt if $rtnVal and $$dirInfo{RAF};
 
+    # restore structures if necessary
+    if ($$exifTool{IsStruct}) {
+        RestoreStructure($exifTool);
+        delete $$exifTool{IsStruct};
+    }
     undef %curNS;
     return $rtnVal;
 }

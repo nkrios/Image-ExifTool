@@ -25,7 +25,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.22';
+$VERSION = '1.24';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -57,6 +57,9 @@ my %vendorID = (
     pana => 'Panasonic',
     pent => 'Pentax',
     sany => 'Sanyo',
+    # have also seen:
+    # VendorID - 'SMI ', fe20 (Olympus FE200), pr01, 
+    # HandlerVendorID - ZORA, pr01, 'GIC '
 );
 
 # QuickTime atoms
@@ -236,6 +239,16 @@ my %vendorID = (
         ValueConv => '$val / 256',
         PrintConv => 'sprintf("%.2f%%", $val * 100)',
     },
+    9 => {
+        Name => 'MatrixStructure',
+        Format => 'fixed32s[9]',
+        # (the right column is fixed 2.30 instead of 16.16)
+        ValueConv => q{
+            my @a = split ' ',$val;
+            $_ /= 0x4000 foreach @a[2,5,8];
+            return "@a";
+        },
+    },
     18 => { Name => 'PreviewTime',      %durationInfo },
     19 => { Name => 'PreviewDuration',  %durationInfo },
     20 => { Name => 'PosterTime',       %durationInfo },
@@ -261,6 +274,18 @@ my %vendorID = (
         Name => 'Media',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Media' },
     },
+    meta => { #PH (MOV)
+        Name => 'Meta',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Meta' },
+    },
+    # edts - edits --> contains elst (edit list)
+    # tapt - TrackApertureModeDimensionsAID --> contains clef (TrackCleanApertureDimensionsAID),
+    #        prof (TrackProductionApertureDimensionsAID), enof (TrackEncodedPixelsDimensionsAID)
+    # clip - clipping --> contains crgn (clip region)
+    # matt - track matt --> contains kmat (compressed matt)
+    # tref - track reference --> contains tmcd, chap, sync, scpt, ssrc, hint
+    # load - track loading settings
+    # imap - track input map --> contains '  in' --> contains '  ty', obid
 );
 
 # track header data block
@@ -305,6 +330,16 @@ my %vendorID = (
         Priority => 0,
         ValueConv => '$val / 256',
         PrintConv => 'sprintf("%.2f%%", $val * 100)',
+    },
+    10 => {
+        Name => 'MatrixStructure',
+        Format => 'fixed32s[9]',
+        # (the right column is fixed 2.30 instead of 16.16)
+        ValueConv => q{
+            my @a = split ' ',$val;
+            $_ /= 0x4000 foreach @a[2,5,8];
+            return "@a";
+        },
     },
     19 => {
         Name => 'ImageWidth',
@@ -1155,6 +1190,57 @@ my %vendorID = (
         },
     },
 );
+
+# QuickTime composite tags
+%Image::ExifTool::QuickTime::Composite = (
+    GROUPS => { 2 => 'Video' },
+    Rotation => {
+        Require => {
+            0 => 'QuickTime:MatrixStructure',
+            1 => 'QuickTime:HandlerType',
+        },
+        ValueConv => 'Image::ExifTool::QuickTime::CalcRotation($self)',
+    },
+);
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags('Image::ExifTool::QuickTime');
+
+
+#------------------------------------------------------------------------------
+# Calculate rotation of video track
+# Inputs: 0) ExifTool object ref
+# Returns: rotation angle or undef
+sub CalcRotation($)
+{
+    my $exifTool = shift;
+    my $value = $$exifTool{VALUE};
+    my ($i, $track);
+    # get the video track family 1 group (ie. "Track1");
+    for ($i=0; ; ++$i) {
+        my $ind = $i ? " ($i)" : '';
+        my $tag = "HandlerType$ind";
+        last unless $$value{$tag};
+        next unless $$value{$tag} eq 'vide';
+        $track = $exifTool->GetGroup($tag, 1);
+        last;
+    }
+    return undef unless $track;
+    # get the video track matrix
+    for ($i=0; ; ++$i) {
+        my $ind = $i ? " ($i)" : '';
+        my $tag = "MatrixStructure$ind";
+        last unless $$value{$tag};
+        next unless $exifTool->GetGroup($tag, 1) eq $track;
+        my @a = split ' ', $$value{$tag};
+        return undef unless $a[0] or $a[1];
+        # calculate the rotation angle (assume uniform rotation)
+        my $angle = atan2($a[1], $a[0]) * 180 / 3.14159;
+        $angle += 360 if $angle < 0;
+        return int($angle * 1000 + 0.5) / 1000;
+    }
+    return undef;
+}
 
 #------------------------------------------------------------------------------
 # Determine the average sample rate from a time-to-sample table

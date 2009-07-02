@@ -12,7 +12,6 @@ CanonExposureMode : Manual
 CanonFirmwareVersion : Firmware Version 1.1.1
 CanonFlashMode : Off
 CanonImageSize : Large
-CanonImageType : CRW:EOS DIGITAL REBEL CMOS RAW
 CanonModelID : EOS Digital Rebel / 300D / Kiss Digital
 ColorSpace (1) : sRGB
 ColorTemperature : 5200
@@ -21,10 +20,9 @@ ContinuousDrive : Continuous
 Contrast : +1
 DigitalZoom : Unknown (-1)
 EasyMode : Manual
-FileNumber : 118-1861
 FlashActivity : 0
 FlashBits : (none)
-FocalUnits : 1
+FocalUnits : 1/mm
 FocusMode : Manual Focus (3)
 FocusRange : Not Known
 LensType : Unknown (-1)
@@ -32,6 +30,7 @@ LongFocal : 55 mm
 MacroMode : Unknown (0)
 ManualFlashOutput : n/a
 MaxAperture : 4
+MeasuredRGGB : 998 1022 1026 808
 MeteringMode : Center-weighted average
 MinAperture : 27
 NumAFPoints : 7
@@ -70,11 +69,13 @@ BracketValue : 0
 BulbDuration : 4
 CanonFileLength : 4480822
 CanonImageHeight : 2048
+CanonImageType : CRW:EOS DIGITAL REBEL CMOS RAW
 CanonImageWidth : 3072
 ControlMode : Camera Local Control
 ExposureCompensation : 0
 ExposureTime (1) : 128
 FNumber (1) : 14
+FileNumber : 118-1861
 FlashExposureComp : 0
 FlashGuideNumber : 0
 FocalLength (1) : 34 mm
@@ -83,6 +84,7 @@ FocalPlaneYSize : 15.49 mm
 FocusDistanceLower : 5.46
 FocusDistanceUpper : -0.01
 MeasuredEV : -6.25
+MeasuredEV2 : -6.25
 NDFilter : Unknown (-1)
 SelfTimer2 : 0
 SequenceNumber : 0
@@ -93,7 +95,6 @@ WhiteBalance : Auto
 BlueBalance : 1.190619
 CircleOfConfusion : 0.019 mm
 DriveMode : Continuous shooting
-FlashOn : Off
 FocalLength35efl : 34.0 mm (35 mm equivalent: 52.7 mm)
 HyperfocalDistance : 4.26 m
 ISO (1) : 100
@@ -102,7 +103,7 @@ Lens35efl : 18.0 - 55.0 mm (35 mm equivalent: 27.9 - 85.3 mm)
 LensID : Unknown 18-55mm
 RedBalance : 2.067348
 ScaleFactor35efl : 1.6
-ShootingMode : Manual
+ShootingMode : Bulb
 WB_RGGBLevels : 1719 832 831 990
 ---- Composite:Image ----
 Aperture : 14.0
@@ -125,7 +126,7 @@ WhiteBalance (1) : Auto
 ---- ExifIFD:Image ----
 ApertureValue : 14.0
 ColorSpace : sRGB
-ComponentsConfiguration : YCbCr
+ComponentsConfiguration : Y, Cb, Cr, -
 CompressedBitsPerPixel : 9
 CustomRendered : Normal
 ExifImageHeight : 120

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.68
 [File, File, Image] FileName - File Name: Photoshop.psd
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 17 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2007:04:14 21:00:40-04:00
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2007:04:16 07:18:42-04:00
 [File, File, Image] FileType - File Type: PSD
 [File, File, Image] MIMEType - MIME Type: application/photoshop
 [File, File, Image] CurrentIPTCDigest - Current IPTC Digest: b765e54396f2885e9a76ff4ad665b190
@@ -32,7 +32,7 @@
 [XMP, XMP-x, Document] xmptk - XMP Toolkit: XMP toolkit 2.8.2-33, framework 1.5
 [XMP, XMP-rdf, Document] about - About: uuid:c197d41e-f8f7-11d9-b03e-c023c3939af5
 [XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: Me too
-[XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: Supreme leader
+[XMP, XMP-photoshop, Author] AuthorsPosition - Author's Position: Supreme leader
 [XMP, XMP-xmpBJ, Other] JobRefName - Job Ref Name: This isn't a job
 [XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:c197d41a-f8f7-11d9-b03e-c023c3939af5
 [XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/

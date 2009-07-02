@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.66
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.71
 [File, File, Image] FileName - File Name: CanonRaw.crw
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 6.1 kB
@@ -56,6 +56,7 @@
 [MakerNotes, Canon, Image] 20 - Focus Distance Lower: 1.19
 [MakerNotes, Canon, Image] 21 - F Number: 3.6
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/64
+[MakerNotes, Canon, Image] 23 - Measured EV 2: -5.125
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
@@ -85,7 +86,7 @@
 [MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
 [MakerNotes, Canon, Camera] 23 - Long Focal: 55 mm
 [MakerNotes, Canon, Camera] 24 - Short Focal: 18 mm
-[MakerNotes, Canon, Camera] 25 - Focal Units: 1
+[MakerNotes, Canon, Camera] 25 - Focal Units: 1/mm
 [MakerNotes, Canon, Camera] 26 - Max Aperture: 3.6
 [MakerNotes, Canon, Camera] 27 - Min Aperture: 22
 [MakerNotes, Canon, Camera] 28 - Flash Activity: 0
@@ -138,7 +139,6 @@
 [Composite, Composite, Image] Aperture - Aperture: 3.6
 [Composite, Composite, Camera] ConditionalFEC - Flash Exposure Compensation: +2/3
 [Composite, Composite, Camera] DriveMode - Drive Mode: Continuous shooting
-[Composite, Composite, Camera] FlashOn - Flash: On
 [Composite, Composite, Camera] FlashType - Flash Type: Built-In Flash
 [Composite, Composite, Camera] ISO - ISO: 100
 [Composite, Composite, Image] ImageSize - Image Size: 3072x2048

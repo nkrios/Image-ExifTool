@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
 [File, File, Image] FileName - File Name: IPTC-XMP_7_failed.xmp
 [File, File, Image] Directory - Directory: t
-[File, File, Image] FileSize - File Size: 5.3 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:01 07:56:24-05:00
+[File, File, Image] FileSize - File Size: 5.5 kB
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:04:07 08:24:30-04:00
 [File, File, Image] FileType - File Type: XMP
 [File, File, Image] MIMEType - MIME Type: application/rdf+xml
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.64
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.74
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey
@@ -14,6 +14,7 @@
 [XMP, XMP-exif, Image] ApertureValue - Aperture Value: 3.5
 [XMP, XMP-exif, Image] BrightnessValue - Brightness Value: 2
 [XMP, XMP-exif, Image] ColorSpace - Color Space: sRGB
+[XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -
 [XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 1.6
 [XMP, XMP-exif, Time] DateTimeOriginal - Date/Time Original: 2001:05:19 18:36:41
 [XMP, XMP-exif, Image] ExifVersion - Exif Version: 0210
@@ -35,7 +36,7 @@
 [XMP, XMP-exif, Camera] SensingMethod - Sensing Method: One-chip color area
 [XMP, XMP-exif, Image] ShutterSpeedValue - Shutter Speed Value: 1/64
 [XMP, XMP-pdf, Image] Keywords - Keywords: ExifTool, Test, XMP
-[XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: My Position
+[XMP, XMP-photoshop, Author] AuthorsPosition - Author's Position: My Position
 [XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: I wrote it
 [XMP, XMP-photoshop, Image] Category - Category: 1
 [XMP, XMP-photoshop, Location] City - City: Kingston

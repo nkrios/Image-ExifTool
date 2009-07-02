@@ -22,11 +22,12 @@ require Exporter;
 use Image::ExifTool qw(ImageInfo);
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.12';
+$VERSION = '1.13';
 @ISA = qw(Exporter);
 @EXPORT = qw(check writeCheck testCompare binaryCompare testVerbose);
 
 sub closeEnough($$);
+sub formatValue($);
 
 #------------------------------------------------------------------------------
 # compare 2 binary files
@@ -211,6 +212,44 @@ sub closeEnough($$)
 }
 
 #------------------------------------------------------------------------------
+# Format value for printing
+# Inputs: 0) value
+# Returns: string for printing
+sub formatValue($)
+{
+    local $_;
+    my $val = shift;
+    my ($str, @a);
+    if (ref $val eq 'SCALAR') {
+        if ($$val =~ /^Binary data/) {
+            $str = "($$val)";
+        } else {
+            $str = '(Binary data ' . length($$val) . ' bytes)';
+        }
+    } elsif (ref $val eq 'ARRAY') {
+        foreach (@$val) {
+            push @a, formatValue($_);
+        }
+        $str = join(', ', @a);
+    } elsif (ref $val eq 'HASH') {
+        my $key;
+        foreach $key (sort keys %$val) {
+            push @a, $key . '=' . formatValue($$val{$key});
+        }
+        $str = '{ ' . join('; ',@a) . ' }';
+    } else {
+        # make sure there are no linefeeds in output
+        ($str = $val) =~ tr/\x0a\x0d/;/;
+        # translate unknown characters
+       # $str =~ tr/\x01-\x1f\x80-\xff/\./;
+        $str =~ tr/\x01-\x1f\x7f/./;
+        # remove NULL chars
+        $str =~ s/\x00//g;
+    }
+    return $str;
+}
+
+#------------------------------------------------------------------------------
 # Compare extracted information against a standard output file
 # Inputs: 0) [optional] ExifTool object reference
 #         1) tag hash reference, 2) test name, 3) test number
@@ -243,24 +282,7 @@ sub check($$$;$$$)
 # Write information to file (with filename "TESTNAME_#.failed")
 #
     foreach (@tags) {
-        my $val = $$info{$_};
-        if (ref $val eq 'SCALAR') {
-            if ($$val =~ /^Binary data/) {
-                $val = "($$val)";
-            } else {
-                $val = '(Binary data ' . length($$val) . ' bytes)';
-            }
-        } elsif (ref $val eq 'ARRAY') {
-            $val = join(', ', @$val);
-        } else {
-            # make sure there are no linefeeds in output
-            $val =~ tr/\x0a\x0d/;/;
-            # translate unknown characters
-           # $val =~ tr/\x01-\x1f\x80-\xff/\./;
-            $val =~ tr/\x01-\x1f\x7f/./;
-            # remove NULL chars
-            $val =~ s/\x00//g;
-        }
+        my $val = formatValue($$info{$_});
         # (no "\n" needed since we set the output line separator above)
         if ($exifTool) {
             my @groups = $exifTool->GetGroup($_);

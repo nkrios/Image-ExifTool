@@ -206,10 +206,10 @@ remain constant for all camera models.</p>
 <tr align='center'><td>0x0032</td><td>-</td><td>0x300b</td><td>CanonColorInfo1</td><td>768 or 2048</td>
     <td align='left'>Block of color information (format unknown)</td></tr>
 <tr align='center'><td>0x0036</td><td>-</td><td>0x300b</td><td>?</td><td><i>varies</i></td><td align='left'>-</td></tr>
-<tr><th class='lt' colspan=6>ASCII Strings</th></tr>
 <tr align='center'><td>0x003f</td><td>-</td><td>0x300b</td><td>?</td><td>5120</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x0040</td><td>-</td><td>0x300b</td><td>?</td><td>256</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x0041</td><td>-</td><td>0x300b</td><td>?</td><td>256</td><td align='left'>-</td></tr>
+<tr><th class='lt' colspan=6>ASCII Strings</th></tr>
 <tr align='center'><td>0x0805</td><td>-</td><td>0x2804</td><td>CanonFileDescription</td><td>32</td>
     <td align='left'>Description of the file format.
     ie) "EOS DIGITAL REBEL CMOS RAW"</td></tr>
@@ -287,7 +287,6 @@ remain constant for all camera models.</p>
 <tr align='center'><td>0x10c1</td><td>0xc1</td><td>0x300b</td><td>?</td><td>26</td><td align='left'>-</td></tr>
 <tr align='center'><td>0x10c2</td><td>-</td><td>0x300b</td><td>?</td><td>884</td><td align='left'>-</td></tr>
 <tr><th class='lt' colspan=6>4-Byte Alignment</th></tr>
-<tr align='center'><td>0x107f</td><td>-</td><td>0x300b</td><td>?</td><td><i>varies</i></td><td align='left'>-</td></tr>
 <tr align='center'><td>0x1803</td><td>-</td><td>0x300a</td><td>ImageFormat</td><td>8</td>
     <td align='left'>32-bit integer specifying image format (0x20001 for CRW), followed
     by 32-bit float giving target compression ratio</td></tr>
@@ -346,6 +345,8 @@ remain constant for all camera models.</p>
 </table></blockquote>
 
 <h3>Revisions</h3>
+<p>Feb. 12, 2009 - Moved a couple of entries in the TagID table that were in
+the wrong section</p>
 <p>Feb. 4, 2008 - Added a number of unknown TagID's, decode some tags in the
 WhiteSample and DecoderTable data blocks, and fix incorrect SubDir for
 SerialNumber tag</p>
@@ -357,7 +358,7 @@ directory block</p>
 Please e-mail me if you find any errors or omissions in this document.  My
 address is phil at owl.phy.queensu.ca - Thanks!
 <p class='lf'><i>Created Jan. 28, 2005</i>
-<br><i>Last revised Nov. 17, 2008</i></p>
+<br><i>Last revised Feb. 12, 2009</i></p>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

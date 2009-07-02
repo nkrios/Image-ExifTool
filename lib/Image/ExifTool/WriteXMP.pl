@@ -87,7 +87,15 @@ my %xmpStruct = (
         version     => { },
     },
     Thumbnail => {
-        NAMESPACE => 'xapGImg',
+        NAMESPACE => 'xmpGImg',
+        height      => { },
+        width       => { },
+       'format'     => { },
+        image       => { },
+    },
+    PageInfo => {
+        NAMESPACE => 'xmpGImg',
+        PageNumber  => { Namespace => 'xmpTPg' }, # override default namespace for this element
         height      => { },
         width       => { },
        'format'     => { },
@@ -104,7 +112,7 @@ my %xmpStruct = (
         unit        => { },
     },
     Colorant => {
-        NAMESPACE => 'xapG',
+        NAMESPACE => 'xmpG',
         swatchName  => { },
         mode        => { },
         type        => { },
@@ -492,8 +500,7 @@ sub FormatXMPDate($)
 
 #------------------------------------------------------------------------------
 # Check XMP values for validity and format accordingly
-# Inputs: 0) ExifTool object reference, 1) tagInfo hash reference,
-#         2) raw value reference
+# Inputs: 0) ExifTool object ref, 1) tagInfo hash ref, 2) raw value ref
 # Returns: error string or undef (and may change value) on success
 sub CheckXMP($$$)
 {
@@ -521,7 +528,12 @@ sub CheckXMP($$$)
     }
     if ($format eq 'rational' or $format eq 'real') {
         # make sure the value is a valid floating point number
-        Image::ExifTool::IsFloat($$valPtr) or return 'Not a floating point number';
+        unless (Image::ExifTool::IsFloat($$valPtr) or
+            # allow 'inf' and 'undef' rational values
+            ($format eq 'rational' and ($$valPtr eq 'inf' or $$valPtr eq 'undef')))
+        {
+            return 'Not a floating point number' 
+        }
         if ($format eq 'rational') {
             $$valPtr = join('/', Image::ExifTool::Rationalize($$valPtr));
         }
@@ -575,7 +587,7 @@ sub SetPropertyPath($$;$$)
     my ($tagTablePtr, $tagID, $structPtr, $propList) = @_;
     my $table = $structPtr || $tagTablePtr;
     my $tagInfo = $$table{$tagID};
-    my $ns = $$table{NAMESPACE};
+    my $ns = $$tagInfo{Namespace} || $$table{NAMESPACE};
     # don't override existing main table entry if already set by a Struct
     return if not $structPtr and $$tagInfo{PropertyPath};
     $ns or warn("No namespace for $tagID\n"), return;
@@ -876,6 +888,109 @@ sub LimitXMPSize($$$$$$)
 }
 
 #------------------------------------------------------------------------------
+# Restore XMP structures in extracted information
+# Inputs: 0) ExifTool object ref
+sub RestoreStructure($)
+{
+    my $exifTool = shift;
+    my ($key, $nm, %structs, %var, $si);
+    my $ex = $$exifTool{TAG_EXTRA};
+    foreach $key (keys %{$$exifTool{TAG_INFO}}) {
+        $$ex{$key} or next;
+        my $structProps = $$ex{$key}{Struct} or next;
+        # preserve List-ness of List tags containing only a single value
+        if (@$structProps < 2) {
+            my $val = $$exifTool{VALUE}{$key};
+            $$exifTool{VALUE}{$key} = [ $val ] unless ref $val eq 'ARRAY';
+            next;
+        }
+        my $tagInfo = $$exifTool{TAG_INFO}{$key};
+        my $table = $$tagInfo{Table};
+        my $prop = shift @$structProps;
+        my $tag = $$prop[0];
+        # namespace is added to tag ID's in unknown table to avoid conflicts
+        if ($table eq \%Image::ExifTool::XMP::other) {
+            my $g1 = $$ex{$key}{G1} || $$tagInfo{Groups}{1};
+            my $ns = ($g1 and $g1=~/^XMP-(.*)/) ? $1 : 'unknown';
+            $tag = "$ns:$tag";
+        }
+        my $structInfo = $$table{$tag};
+        if ($structInfo) {
+            ref $structInfo eq 'HASH' or next;
+            unless ($$structInfo{SubDirectory}) {
+                $exifTool->Warn("[internal] $$tagInfo{Name} is not a SubDirectory!", 1);
+                next;
+            }
+        } else {
+            # create new entry in tag table for this structure
+            $structInfo = {
+                Name => ucfirst $$prop[0],
+                Groups => { 1 => $$ex{$key}{G1} || $$tagInfo{Groups}{1} },
+                SubDirectory => { },
+            };
+            Image::ExifTool::AddTagToTable($table, $tag, $structInfo);
+        }
+        # use structInfo ref for base key to avoid collisions
+        $tag = $structInfo;
+        # save structInfo ref and file order
+        $var{$structInfo} = [ $structInfo, $$exifTool{FILE_ORDER}{$key} ];
+        my $struct = \%structs;
+        my $oldStruct = $structs{$structInfo};
+        my $err;
+        for (;;) {
+            my $nextStruct = $$struct{$tag};
+            my $index = $$prop[1];
+            if (defined $index) {
+                $index = substr $index, 1;  # remove digit count
+                if ($nextStruct) {
+                    ref $nextStruct eq 'ARRAY' or $err = 1, last;
+                    $struct = $nextStruct;
+                } else {
+                    $struct = $$struct{$tag} = [ ];
+                }
+                $nextStruct = $$struct[$index];
+                if ($nextStruct) {
+                    ref $nextStruct eq 'HASH' or $err = 1, last;
+                    $struct = $nextStruct;
+                } elsif (@$structProps) {
+                    $struct = $$struct[$index] = { };
+                } else {
+                    $$struct[$index] = $exifTool->GetValue($key);
+                    last;
+                }
+            } else {
+                if ($nextStruct) {
+                    ref $nextStruct eq 'HASH' or $err = 1, last;
+                    $struct = $nextStruct;
+                } elsif (@$structProps) {
+                    $struct = $$struct{$tag} = { };
+                } else {
+                    $$struct{$tag} = $exifTool->GetValue($key);
+                    last;
+                }
+            }
+            $prop = shift @$structProps or last;
+            $tag = ucfirst $$prop[0];
+        }
+        if ($err) {
+            $exifTool->Warn("[internal] Error placing $$tagInfo{Name} in structure", 1);
+            unless ($oldStruct) {
+                delete $var{$structInfo};
+                delete $structs{$structInfo};
+            }
+        } else {
+            $exifTool->DeleteTag($key);
+        }
+    }
+    # save new structure tags
+    foreach $si (keys %structs) {
+        $key = $exifTool->FoundTag($var{$si}[0], '');
+        $$exifTool{VALUE}{$key} = $structs{$si};
+        $$exifTool{FILE_ORDER}{$key} = $var{$si}[1];
+    }
+}
+
+#------------------------------------------------------------------------------
 # Write XMP information
 # Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
 #         2) [optional] tag table reference
@@ -894,8 +1009,8 @@ sub WriteXMP($$;$)
     my (%capture, %nsUsed, $xmpErr, $tagInfo, $about);
     my $changed = 0;
     my $xmpFile = (not $tagTablePtr);   # this is an XMP data file if no $tagTablePtr
-    # write XMP as preferred if this is an XMP file or a GIF file
-    my $preferred = $xmpFile || ($$exifTool{FILE_TYPE} and $$exifTool{FILE_TYPE} eq 'GIF');
+    # write XMP as preferred if this is an XMP, GIF or IND file
+    my $preferred = $xmpFile || ($$exifTool{FILE_TYPE} and $$exifTool{FILE_TYPE} =~ /^(GIF|IND)$/);
     my $verbose = $exifTool->Options('Verbose');
 #
 # extract existing XMP information into %capture hash
@@ -1424,9 +1539,10 @@ sub WriteXMP($$;$)
         }
         $newData .= ($$dirInfo{ReadOnly} ? $pktCloseR : $pktCloseW);
     }
-    # return empty data if no properties exist
-    $newData = '' unless %capture or $$dirInfo{InPlace};
-
+    # return empty data if no properties exist and this is allowed
+    unless (%capture or $xmpFile or $$dirInfo{InPlace} or $$dirInfo{NoDelete}) {
+        $newData = '';
+    }
     if ($xmpErr) {
         if ($xmpFile) {
             $exifTool->Error($xmpErr);

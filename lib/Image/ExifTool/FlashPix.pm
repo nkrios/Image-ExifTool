@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.07';
+$VERSION = '1.09';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
@@ -228,7 +228,7 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
         # strip off stream header
         ValueConv => 'length($val) > 0x1c and $val = substr($val, 0x1c); \$val',
     },
-    "Current User" => { #PH
+    'Current User' => { #PH
         Name => 'CurrentUser',
         # not sure what the rest of this data is, but extract ASCII name from it - PH
         ValueConv => q{
@@ -261,8 +261,16 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     0x09 => 'RevisionNumber',
     0x0a => { Name => 'TotalEditTime', PrintConv => \&ConvertTimeSpan },
     0x0b => 'LastPrinted',
-    0x0c => { Name => 'CreateDate', Groups => { 2 => 'Time' } },
-    0x0d => { Name => 'ModifyDate', Groups => { 2 => 'Time' } },
+    0x0c => {
+        Name => 'CreateDate',
+        Groups => { 2 => 'Time' },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    0x0d => {
+        Name => 'ModifyDate',
+        Groups => { 2 => 'Time' },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
     0x0e => 'PageCount',
     0x0f => 'WordCount',
     0x10 => 'CharCount',
@@ -366,7 +374,11 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     0x23000003 => 'CaptionText',
     0x23000004 => 'People',
     0x23000007 => 'Things',
-    0x2300000A => { Name => 'DateTimeOriginal', Groups => { 2 => 'Time' } },
+    0x2300000A => {
+        Name => 'DateTimeOriginal',
+        Groups => { 2 => 'Time' },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
     0x2300000B => 'Events',
     0x2300000C => 'Places',
     0x2300000F => 'ContentDescriptionNotes',
@@ -377,7 +389,11 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
         Groups => { 2 => 'Camera' },
     },
     0x24000002 => { Name => 'SerialNumber',     Groups => { 2 => 'Camera' } },
-    0x25000000 => { Name => 'CreateDate',       Groups => { 2 => 'Time' } },
+    0x25000000 => {
+        Name => 'CreateDate',
+        Groups => { 2 => 'Time' },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
     0x25000001 => {
         Name => 'ExposureTime',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
@@ -522,8 +538,16 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     0x28000004 => { Name => 'ScanSoftwareRevisionDate', Groups => { 2 => 'Time' } },
     0x28000005 => 'ServiceOrganizationName',
     0x28000006 => 'ScanOperatorID',
-    0x28000008 => { Name => 'ScanDate',   Groups => { 2 => 'Time' } },
-    0x28000009 => { Name => 'ModifyDate', Groups => { 2 => 'Time' } },
+    0x28000008 => {
+        Name => 'ScanDate',
+        Groups => { 2 => 'Time' },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    0x28000009 => {
+        Name => 'ModifyDate',
+        Groups => { 2 => 'Time' },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
     0x2800000A => 'ScannerPixelSize',
 );
 
@@ -1184,7 +1208,7 @@ sub ProcessFPXR($$$)
                             $$obj{Stream} .= ($$obj{Default} x $pad);
                         }
                     }
-                    # concatinate data with this stream
+                    # concatenate data with this stream
                     $$obj{Stream} .= substr($$dataPt, $dirStart+13);
                 } else {
                     $exifTool->Warn("Duplicate FPXR stream data at offset $offset");
@@ -1216,8 +1240,19 @@ sub ProcessFPXR($$$)
                 );
                 delete $$obj{Stream}; # done with this stream
             }
+        # hack for improperly stored FujiFilm PreviewImage (stored with no contents list)
+        } elsif ($index == 512 and $dirLen > 60 and ($$exifTool{FujiPreview} or
+            ($dirLen > 64 and substr($$dataPt, $dirStart+60, 4) eq "\xff\xd8\xff\xdb")))
+        {
+            # recombine PreviewImage, skipping unknown 60 byte header
+            if ($$exifTool{FujiPreview}) {
+                $$exifTool{FujiPreview} .= substr($$dataPt, $dirStart+60);
+            } else {
+                $$exifTool{FujiPreview} = substr($$dataPt, $dirStart+60);
+            }
         } else {
-            $exifTool->Warn("Unlisted FPXR segment (index $index)");
+            # (Kodak uses index 255 for a free segment in images from some cameras)
+            $exifTool->Warn("Unlisted FPXR segment (index $index)") if $index != 255;
         }
 
     } elsif ($type ne 3) {  # not a "Reserved" segment
@@ -1227,14 +1262,20 @@ sub ProcessFPXR($$$)
     }
 
     # clean up if this was the last FPXR segment
-    if ($$dirInfo{LastFPXR} and $$exifTool{FPXR}) {
-        my $obj;
-        my $i = 0;
-        foreach $obj (@{$$exifTool{FPXR}}) {
-            $exifTool->Warn("Missing stream for FPXR object $i") if defined $$obj{Stream};
-            ++$i;
+    if ($$dirInfo{LastFPXR}) {
+        if ($$exifTool{FPXR}) {
+            my $obj;
+            my $i = 0;
+            foreach $obj (@{$$exifTool{FPXR}}) {
+                $exifTool->Warn("Missing stream for FPXR object $i") if defined $$obj{Stream};
+                ++$i;
+            }
+            delete $$exifTool{FPXR};    # delete our temporary variables
         }
-        delete $$exifTool{FPXR};    # delete our temporary variables
+        if ($$exifTool{FujiPreview}) {
+            $exifTool->FoundTag('PreviewImage', $$exifTool{FujiPreview});
+            delete $$exifTool{FujiPreview};
+        }
     }
     return 1;
 }

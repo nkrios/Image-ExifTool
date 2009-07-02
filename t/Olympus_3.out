@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
 [File, File, Image] FileName - File Name: Olympus_3_failed.jpg
 [File, File, Image] Directory - Directory: t
 [File, File, Image] FileSize - File Size: 4.3 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:01 07:56:27-05:00
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:04:07 11:44:05-04:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -29,7 +29,7 @@
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0210
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 1999:12:06 16:38:40
 [EXIF, ExifIFD, Time] 36868 - Create Date: 1999:12:06 16:38:40
-[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: Y, Cb, Cr, -
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 1
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 2.8
@@ -64,7 +64,7 @@
 [MakerNotes, Olympus, Camera] Type - Camera Type: SR951
 [MakerNotes, Olympus, Camera] 521 - Camera ID: OLYMPUS DIGITAL CAMERA
 [MakerNotes, Olympus, Camera] 3840 - Data Dump: (Binary data 186 bytes)
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.64
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.74
 [XMP, XMP-tiff, Image] Software - Software: ExifTool
 [Composite, Composite, Image] Aperture - Aperture: 2.0
 [Composite, Composite, Image] ImageSize - Image Size: 8x8

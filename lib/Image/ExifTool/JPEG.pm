@@ -10,7 +10,7 @@ package Image::ExifTool::JPEG;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 # (this main JPEG table is for documentation purposes only)
 %Image::ExifTool::JPEG::Main = (
@@ -49,12 +49,24 @@ $VERSION = '1.07';
         Name => 'FPXR',
         Condition => '$$valPt =~ /^FPXR\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::FlashPix::Main' },
+      }, {
+        Name => 'MPF',
+        Condition => '$$valPt =~ /^MPF\0/',
+        SubDirectory => { TagTable => 'Image::ExifTool::MPF::Main' },
+      }, {
+        Name => 'PreviewImage',
+        Condition => '$$valPt =~ /^\xff\xd8\xff\xdb/',
+        Notes => 'Samsung large preview',
     }],
-    APP3 => {
+    APP3 => [{
         Name => 'Meta',
         Condition => '$$valPt =~ /^(Meta|META|Exif)\0\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::Kodak::Meta' },
-    },
+      }, {
+        Name => 'Stim',
+        Condition => '$$valPt =~ /^Stim\0/',
+        SubDirectory => { TagTable => 'Image::ExifTool::Stim::Main' },
+    }],
     APP5 => {
         Name => 'RMETA',
         Condition => '$$valPt =~ /^RMETA\0/',
@@ -112,6 +124,10 @@ $VERSION = '1.07';
     SOF => {
         Name => 'StartOfFrame',
         SubDirectory => { TagTable => 'Image::ExifTool::JPEG::SOF' },
+    },
+    DQT => {
+        Name => 'DefineQuantizationTable',
+        Notes => 'used to calculate the Extra:JPEGDigest tag value',
     },
     Trailer => [{
         Name => 'AFCP',

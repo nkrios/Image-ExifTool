@@ -3,7 +3,7 @@
 [EXIF, IFD0, Image] 274 - Orientamento dell'immagine: 0° (alto/sinistra)
 [EXIF, IFD0, Image] 282 - Risoluzione orizzontale immagine: 72
 [EXIF, IFD0, Image] 283 - Risoluzione verticale immagine: 72
-[EXIF, IFD0, Image] 296 - Unità di risoluzione in X e Y: pollici
+[EXIF, IFD0, Image] 296 - Unità di risoluzione in X e Y: Pollici
 [EXIF, IFD0, Image] 305 - Software: Digital Camera FinePix2400Zoom Ver1.70
 [EXIF, IFD0, Time] 306 - Data e ora di modifica del file: 2001:05:19 18:36:41
 [EXIF, IFD0, Image] 531 - Posizionamento Y e C: Affiancato
@@ -14,7 +14,7 @@
 [EXIF, ExifIFD, Image] 36864 - Versione Exif: 0210
 [EXIF, ExifIFD, Time] 36867 - Data e ora di creazione dei dati originali: 2001:05:19 18:36:41
 [EXIF, ExifIFD, Time] 36868 - Data e ora di creazione dei dati digitali: 2001:05:19 18:36:41
-[EXIF, ExifIFD, Image] 37121 - Significato di ogni componente: YCbCr
+[EXIF, ExifIFD, Image] 37121 - Significato di ogni componente: Y, Cb, Cr, -
 [EXIF, ExifIFD, Image] 37122 - Modo compressione immagine: 1.6
 [EXIF, ExifIFD, Image] 37377 - Velocità otturatore: 1/64
 [EXIF, ExifIFD, Image] 37378 - Diaframma: 3.5
@@ -40,7 +40,7 @@
 [EXIF, IFD1, Image] 274 - Orientamento dell'immagine: 0° (alto/sinistra)
 [EXIF, IFD1, Image] 282 - Risoluzione orizzontale immagine: 72
 [EXIF, IFD1, Image] 283 - Risoluzione verticale immagine: 72
-[EXIF, IFD1, Image] 296 - Unità di risoluzione in X e Y: pollici
+[EXIF, IFD1, Image] 296 - Unità di risoluzione in X e Y: Pollici
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 1096
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD1, Image] 531 - Posizionamento Y e C: Affiancato

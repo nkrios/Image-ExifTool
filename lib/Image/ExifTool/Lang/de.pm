@@ -1,25 +1,42 @@
 #------------------------------------------------------------------------------
 # File:         de.pm
 #
-# Description:  ExifTool language-specific tag information
+# Description:  ExifTool German language translations
 #
 # Notes:        This file generated automatically by Image::ExifTool::TagInfoXML
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Lang::de;
 
+use vars qw($VERSION);
+
+$VERSION = '1.07';
+
 %Image::ExifTool::Lang::de::Translate = (
    'AEAperture' => 'AE-Blende',
    'AEBAutoCancel' => {
+      Description => 'Automatisches Bracketingende',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
       },
     },
    'AEBBracketValue' => 'AEB-Korrekturwert',
+   'AEBSequence' => 'Bracketing-Sequenz',
+   'AEBSequenceAutoCancel' => {
+      Description => 'WB-Sequenz/autom. Abschaltung',
+      PrintConv => {
+        '-,0,+/Disabled' => '-,0,+/Aus',
+        '-,0,+/Enabled' => '-,0,+/Ein',
+        '0,-,+/Disabled' => '0,-,+/Aus',
+        '0,-,+/Enabled' => '0,-,+/Ein',
+      },
+    },
+   'AEBShotCount' => 'Anzahl Belichtungsreihenaufnahmen',
    'AEBXv' => 'AEB-Belichtungskorrektur',
    'AEExposureTime' => 'AE-Belichtungszeit',
    'AEExtra' => 'AE-Extra?',
+   'AEInfo' => 'Automatikbelichtungs-Informationen',
    'AELock' => {
       Description => 'Belichtungsspeicher',
       PrintConv => {
@@ -46,7 +63,7 @@ package Image::ExifTool::Lang::de;
    'AEMaxAperture' => 'Größte AE-Blende',
    'AEMaxAperture2' => 'Größte AE-Blende (2)',
    'AEMeteringMode' => {
-      Description => 'Spotmessung',
+      Description => 'AE Belichtungs-Messmethode',
       PrintConv => {
         'Multi-segment' => 'Multi-Segment',
       },
@@ -79,7 +96,12 @@ package Image::ExifTool::Lang::de;
         'Sv or Green Mode' => 'Sv oder "Grünes" AE-Programm',
       },
     },
-   'AESetting' => 'AE-Einstellung',
+   'AESetting' => {
+      Description => 'AE-Einstellung',
+      PrintConv => {
+        'Exposure Compensation' => 'Belichtungsausgleich',
+      },
+    },
    'AEXv' => 'AE-Belichtungskorrektur',
    'AE_ISO' => 'AE-ISO-Empfindlichkeit',
    'AF-CPrioritySelection' => {
@@ -117,6 +139,8 @@ package Image::ExifTool::Lang::de;
       },
     },
    'AFAdjustment' => 'AF-Verstellung',
+   'AFAperture' => 'AF-Blende',
+   'AFArea' => 'AF-Feld',
    'AFAreaHeight' => 'AF-Bereichshöhe',
    'AFAreaHeights' => 'AF-Bereichshöhe',
    'AFAreaIllumination' => {
@@ -132,7 +156,11 @@ package Image::ExifTool::Lang::de;
       PrintConv => {
         'Auto-area AF' => 'Autom. Messfeldgr.',
         'Dynamic Area' => 'Dynamisch',
+        'Dynamic Area (wide)' => 'Dynamische Messfeldsteuerung (groß)',
+        'Dynamic Area, Closest Subject' => 'Dynamic Messfeldgruppensteuerung, Priorität der kürzesten Aufnahmedistanz',
+        'Group Dynamic' => 'Dynamische Messfeldgruppensteuerung',
         'Single Area' => 'Einzelfeld',
+        'Single Area (wide)' => 'Einzelfeldmessung (groß)',
       },
     },
    'AFAreaModeSetting' => {
@@ -145,11 +173,24 @@ package Image::ExifTool::Lang::de;
     },
    'AFAreaWidth' => 'AF-Bereichsbreite',
    'AFAreaWidths' => 'AF-Bereichsbreite',
+   'AFAreas' => 'AF-Bereiche',
    'AFAssist' => {
       Description => 'AF-Hilfslicht',
       PrintConv => {
+        'Does not emit/Fires' => 'Kein Messlicht/Zündung',
+        'Emits/Does not fire' => 'Messlicht/keine Zündung',
+        'Emits/Fires' => 'Messlicht/Zündung',
         'Off' => 'Aus',
         'On' => 'Ein',
+        'Only ext. flash emits/Fires' => 'Nur ext. Messl./Zündung',
+      },
+    },
+   'AFAssistBeam' => {
+      Description => 'AF-Hilfslicht Aussendung',
+      PrintConv => {
+        'Does not emit' => 'Deaktiv',
+        'Emits' => 'Aktiv',
+        'Only ext. flash emits' => 'Nur bei ext. Blitz aktiv',
       },
     },
    'AFAssistIlluminator' => {
@@ -160,9 +201,21 @@ package Image::ExifTool::Lang::de;
       },
     },
    'AFDefocus' => 'AF-Defocus',
+   'AFDuringLiveView' => {
+      Description => 'AF bei Live View-Aufnahmen',
+      PrintConv => {
+        'Disable' => 'Inaktiv',
+        'Enable' => 'Aktiv',
+        'Live mode' => 'LiveModus',
+        'Quick mode' => 'QuickModus',
+      },
+    },
    'AFFineTuneAdj' => 'AF-Feinabstimmung',
    'AFImageHeight' => 'AF-Bildhöhe',
    'AFImageWidth' => 'AF-Bildbreite',
+   'AFInfo' => 'AF-Modus',
+   'AFInfo2' => 'AF-Informationen',
+   'AFInfo2Version' => 'AF-Info-Version',
    'AFIntegrationTime' => 'AF-Messzeit',
    'AFMicroAdjActive' => {
       PrintConv => {
@@ -170,7 +223,27 @@ package Image::ExifTool::Lang::de;
         'Yes' => 'Ja',
       },
     },
-   'AFMode' => 'AF-Modus',
+   'AFMicroadjustment' => {
+      Description => 'AFFeinabstimmung',
+      PrintConv => {
+        'Adjust all by same amount' => 'Alle auf gleichen Wert',
+        'Adjust by lens' => 'Abstimmung pro Objektiv',
+        'Disable' => 'Deaktivieren',
+      },
+    },
+   'AFMode' => {
+      Description => 'AF-Modus',
+      PrintConv => {
+        'Face Detect AF' => 'Gesichtserk',
+      },
+    },
+   'AFOnAELockButtonSwitch' => {
+      Description => 'AF-ON/AELocktaste- Schalter',
+      PrintConv => {
+        'Disable' => 'Deaktiviert',
+        'Enable' => 'Aktiviert',
+      },
+    },
    'AFPoint' => {
       Description => 'Gewählter AF-Punkt',
       PrintConv => {
@@ -181,6 +254,8 @@ package Image::ExifTool::Lang::de;
         'Left' => 'Links',
         'Lower-left' => 'Unten-Links',
         'Lower-right' => 'Unten-Rechts',
+        'Mid-left' => 'Links-Mitte',
+        'Mid-right' => 'Rechts-Mitte',
         'None' => 'Keine',
         'Right' => 'Rechts',
         'Top' => 'Oben',
@@ -188,10 +263,36 @@ package Image::ExifTool::Lang::de;
         'Upper-right' => 'Oben-Rechts',
       },
     },
+   'AFPointActivationArea' => 'AF-Messfeld-Aktivierungsbereich',
+   'AFPointAreaExpansion' => {
+      Description => 'AF-Messbereich Ausweitung',
+      PrintConv => {
+        'Disable' => 'Aus',
+        'Enable' => 'An',
+        'Enable (left/right assist points)' => 'Möglich (linkes/rechtes zusätzliches AF-Messfeld)',
+        'Enable (surrounding assist points)' => 'Möglich (entsprechendes zusätzliches AF-Messfeld)',
+      },
+    },
+   'AFPointAutoSelection' => {
+      Description => 'Automatische AF-Feldwahl',
+      PrintConv => {
+        'Control-direct:disable/Main:disable' => 'Schnelleinstellrad-Direkt:nicht möglich/Haupt-Wahlrad:nein',
+        'Control-direct:disable/Main:enable' => 'Schnelleinstellrad-Direkt:nicht möglich/Haupt-Wahlrad:möglich',
+        'Control-direct:enable/Main:enable' => 'Schnelleinstellrad-Direkt:möglich/Haupt-Wahlrad:möglich',
+      },
+    },
+   'AFPointBrightness' => {
+      Description => 'AF-Feld Helligkeit',
+      PrintConv => {
+        'Brighter' => 'Heller',
+      },
+    },
    'AFPointDisplayDuringFocus' => {
+      Description => 'AF-Feld Anzeige während Fokus',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
+        'On (when focus achieved)' => 'Ein (nach Scharfeinstellung)',
       },
     },
    'AFPointIllumination' => {
@@ -209,6 +310,7 @@ package Image::ExifTool::Lang::de;
       },
     },
    'AFPointRegistration' => {
+      Description => 'AF-Feld Speicherung',
       PrintConv => {
         'Automatic' => 'Automatisch',
         'Bottom' => 'Unten',
@@ -253,6 +355,14 @@ package Image::ExifTool::Lang::de;
         '51 Points' => '51 Messfelder (3D-Tracking)',
       },
     },
+   'AFPointSelectionMethod' => {
+      Description => 'Wahlmethode für AF-Messfeld',
+      PrintConv => {
+        'Multi-controller direct' => 'Multicontroller',
+        'Quick Control Dial direct' => 'Schnelleinstellrad',
+      },
+    },
+   'AFPointSpotMetering' => 'Anzahl AF-Messff./Spotmsg.',
    'AFPoints' => 'AF-Punkte',
    'AFPointsInFocus' => {
       Description => 'AF-Punkte im Fokus',
@@ -265,10 +375,14 @@ package Image::ExifTool::Lang::de;
         'Center' => 'Mitte',
         'Center (horizontal)' => 'Mitte (horizontal)',
         'Center (vertical)' => 'Mitte (vertikal)',
+        'Far Left' => 'Ganz links',
+        'Far Right' => 'Ganz rechts',
         'Fixed Center or Multiple' => 'Auf Mitte fixiert oder mehrere',
         'Left' => 'Links',
+        'Lower-left' => 'Unten-Links',
         'Lower-left, Bottom' => 'Unten-links + Unten',
         'Lower-left, Mid-left' => 'Unten-links + Links-Mitte',
+        'Lower-right' => 'Unten-Rechts',
         'Lower-right, Bottom' => 'Unten-rechts + Unten',
         'Lower-right, Mid-right' => 'Unten-rechts + Rechts-Mitte',
         'Mid-left' => 'Links-Mitte',
@@ -282,25 +396,76 @@ package Image::ExifTool::Lang::de;
         'Top-center' => 'Oben-Mitte',
         'Top-left' => 'Oben-links',
         'Top-right' => 'Oben-rechts',
+        'Upper-left' => 'Oben-Links',
         'Upper-left, Mid-left' => 'Oben-links + Links-mitte',
         'Upper-left, Top' => 'Oben-links + Oben',
+        'Upper-right' => 'Oben-Rechts',
         'Upper-right, Mid-right' => 'Oben-rechts + Rechts-Mitte',
         'Upper-right, Top' => 'Oben-rechts + Oben',
       },
     },
+   'AFPointsInFocus1D' => 'AF-Punkte im Fokus 1D',
+   'AFPointsInFocus5D' => 'AF-Punkte im Fokus',
    'AFPointsSelected' => 'Gewählte AF-Punkte',
+   'AFPointsUnknown1' => {
+      PrintConv => {
+        'All' => 'Alle',
+        'Central 9 points' => 'Alle mittleren 9 Punkte',
+      },
+    },
    'AFPointsUnknown2' => {
+      Description => 'AF-Punkte Unbekannt 2?',
       PrintConv => {
         'Auto' => 'Automatisch',
       },
     },
+   'AFPointsUsed' => {
+      Description => 'Verwendete AF-Punkte',
+      PrintConv => {
+        'Bottom' => 'Unten',
+        'Center' => 'Mitte',
+        'Far Left' => 'Ganz links',
+        'Far Right' => 'Ganz rechts',
+        'Lower-left' => 'Unten-Links',
+        'Lower-right' => 'Unten-Rechts',
+        'Mid-left' => 'Links-Mitte',
+        'Mid-right' => 'Rechts-Mitte',
+        'Top' => 'Oben',
+        'Upper-left' => 'Oben-Links',
+        'Upper-right' => 'Oben-Rechts',
+      },
+    },
    'AFPredictor' => 'AF-Prädiktor',
    'AFResponse' => 'Verwendeter AF',
+   'AIServoContinuousShooting' => 'Auslösepriorität',
+   'AIServoImagePriority' => {
+      Description => 'AI Servo Priorität 1./2. Bild',
+      PrintConv => {
+        '1: AF, 2: Drive speed' => 'AF-Priorität/Transportgeschwindigkeit',
+        '1: AF, 2: Tracking' => 'AF-Priorität/Nachführpriorität',
+        '1: Release, 2: Drive speed' => 'Auslösung/Transportgeschwindigkeit',
+      },
+    },
+   'AIServoTrackingMethod' => {
+      Description => 'AI Servo AF Nachführung',
+      PrintConv => {
+        'Continuous AF track priority' => 'AF Nachführ-Priorität',
+        'Main focus point priority' => 'Hauptfokussierungsfeld',
+      },
+    },
+   'AIServoTrackingSensitivity' => {
+      Description => 'AI Servo Empfindlichkeit',
+      PrintConv => {
+        'Fast' => 'Rapide',
+        'Slow' => 'Langsam',
+      },
+    },
    'APEVersion' => 'APE-Version',
    'ARMVersion' => 'ARM-Version',
    'ActionAdvised' => 'Aktion empfohlen',
    'ActiveArea' => 'Aktiver Bereich',
    'ActiveD-Lighting' => {
+      Description => 'Aktives D-Lighting',
       PrintConv => {
         'High' => 'Hoch',
         'Low' => 'Leicht',
@@ -316,11 +481,13 @@ package Image::ExifTool::Lang::de;
       },
     },
    'AddAspectRatioInfo' => {
+      Description => 'Seitenverhältnisinfo zufügen',
       PrintConv => {
         'Off' => 'Aus',
       },
     },
    'AddOriginalDecisionData' => {
+      Description => 'Originaldaten zufügen',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
@@ -338,6 +505,7 @@ package Image::ExifTool::Lang::de;
       },
     },
    'AlphaByteCount' => 'Anzahl Bytes der Alpha-Kanal-Daten',
+   'AlphaChannelsNames' => 'Alpha-Kanal-Namen',
    'AlphaDataDiscard' => {
       Description => 'Verworfene Alpha-Kanal-Daten',
       PrintConv => {
@@ -350,22 +518,64 @@ package Image::ExifTool::Lang::de;
    'AlphaOffset' => 'Alpha-Kanal-Datenposition',
    'AnalogBalance' => 'Analog-Balance',
    'Anti-Blur' => {
+      Description => 'Verwacklungsschutz-Modus',
       PrintConv => {
         'Off' => 'Aus',
+        'On (Continuous)' => 'Ein (Kontinuierlich)',
+        'On (Shooting)' => 'Ein (Aufnahme)',
         'n/a' => 'Nicht gesetzt',
       },
     },
-   'Aperture' => 'F-Wert',
+   'Aperture' => 'Blende',
+   'ApertureRange' => {
+      Description => 'Einstellung Verschlusszeitenbereich',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
+      },
+    },
    'ApertureRingUse' => {
       Description => 'Blendenring-Verwendung',
       PrintConv => {
         'Permitted' => 'Erlaubt',
-        'Prohibited' => 'nicht erlaubt',
+        'Prohibited' => 'Nicht erlaubt',
       },
     },
    'ApertureValue' => 'Blende',
    'ApplicationRecordVersion' => 'IPTC-Modell-2-Version',
+   'ApplyShootingMeteringMode' => {
+      Description => 'Angewandter Belichtungs-/Messmodus',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
+      },
+    },
    'Artist' => 'Ersteller des Bildes',
+   'AssignFuncButton' => {
+      Description => 'FUNC.-Taste zuordnen',
+      PrintConv => {
+        'Exposure comp./AEB setting' => 'Belichtungskorrektur/AEB-Einstellung',
+        'Image jump with main dial' => 'Bildsprung mit Haupt-Wahlrad',
+        'Image quality' => 'Qualität ändern',
+        'LCD brightness' => 'LCD-Helligkeit',
+        'Live view function settings' => 'Livebild Funktionseinstellung',
+      },
+    },
+   'AssistButtonFunction' => {
+      Description => 'Funktion Assist-Taste',
+      PrintConv => {
+        'Av+/- (AF point by QCD)' => 'Av+/- (AF-Feld mit Daumenrad)',
+        'FE lock' => 'FE Blitzmesswertspeicherung',
+        'Select HP (while pressing)' => 'Ausw.G.pos.(Ass-Taste gedr.)',
+        'Select Home Position' => 'Auswahl Grundposition',
+      },
+    },
+   'Audio' => {
+      PrintConv => {
+        'No' => 'Nein',
+        'Yes' => 'Ja',
+      },
+    },
    'AudioDuration' => 'Audiodauer',
    'AudioOutcue' => 'Audio-Outcue',
    'AudioSamplingRate' => 'Audio-Samplingrate',
@@ -445,9 +655,13 @@ package Image::ExifTool::Lang::de;
    'AutoISOMax' => 'ISO-Automatik Max',
    'AutoISOMinShutterSpeed' => 'ISO-Automatik Längste Belichtungszeit',
    'AutoLightingOptimizer' => {
+      Description => 'Autom. Belichtungsoptimierung',
       PrintConv => {
-        'Low' => 'Leicht',
+        'Disable' => 'Inaktiv',
+        'Enable' => 'Aktiv',
+        'Low' => 'Gering',
         'Off' => 'Aus',
+        'Strong' => 'Stark',
         'n/a' => 'Nicht gesetzt',
       },
     },
@@ -475,6 +689,13 @@ package Image::ExifTool::Lang::de;
     },
    'AuxiliaryLens' => 'Vorsatzlinse',
    'AvApertureSetting' => 'Av Blenden-Einstellung',
+   'AvSettingWithoutLens' => {
+      Description => 'Blendeneinstellung ohne Objektiv',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
+      },
+    },
    'BWFilter' => 'S/W-Filter',
    'BWMode' => {
       PrintConv => {
@@ -499,6 +720,7 @@ package Image::ExifTool::Lang::de;
    'BatteryADBodyNoLoad' => 'Kamerabatterie A/D im Leerlauf',
    'BatteryADGripLoad' => 'Griffbatterie A/D unter Last',
    'BatteryADGripNoLoad' => 'Griffbatterie A/D im Leerlauf',
+   'BatteryInfo' => 'Stromquelle',
    'BatteryLevel' => 'Batteriestatus',
    'BatteryOrder' => {
       Description => 'Akkureihenfolge',
@@ -507,7 +729,19 @@ package Image::ExifTool::Lang::de;
         'MB-D10 First' => 'Zuerst Akkus im MB-D10',
       },
     },
-   'BatteryStates' => 'Batterie-Status',
+   'BatteryStates' => {
+      Description => 'Batterie-Status',
+      PrintConv => {
+        'Body Battery Almost Empty' => 'Kamerabatterie ist fast leer',
+        'Body Battery Empty or Missing' => 'Kamerabatterie ist leer oder nicht vorhanden',
+        'Body Battery Full' => 'Kamerabatterie ist voll geladen',
+        'Body Battery Running Low' => 'Kamerabatterie ist schwach',
+        'Grip Battery Almost Empty' => 'Griffbatterie ist fast leer',
+        'Grip Battery Empty or Missing' => 'Griffbatterie ist leer oder nicht vorhanden',
+        'Grip Battery Full' => 'Griffbatterie ist voll geladen',
+        'Grip Battery Running Low' => 'Griffbatterie ist schwach',
+      },
+    },
    'Beep' => {
       Description => 'Tonsignal',
       PrintConv => {
@@ -567,6 +801,13 @@ package Image::ExifTool::Lang::de;
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
+      },
+    },
+   'ButtonFunctionControlOff' => {
+      Description => 'Tastenfunktion wenn Schnelleinstellrad OFF',
+      PrintConv => {
+        'Disable main, Control, Multi-control' => 'Deaktiv Haupt-Wahlrad, Schnelleinstellrad, Multicontroller',
+        'Normal (enable)' => 'Normal (eingeschaltet)',
       },
     },
    'By-line' => 'Ersteller',
@@ -629,7 +870,9 @@ package Image::ExifTool::Lang::de;
    'CameraCalibration1' => 'Kamerakalibrierung 1',
    'CameraCalibration2' => 'Kamerakalibrierung 2',
    'CameraISO' => 'Kamera-ISO',
+   'CameraInfo' => 'Pentax-Modell',
    'CameraOrientation' => {
+      Description => 'Ausrichtung des Bildes',
       PrintConv => {
         'Horizontal (normal)' => '0° (oben/links)',
         'Rotate 270 CW' => '90° im Uhrzeigersinn (links/unten)',
@@ -637,19 +880,24 @@ package Image::ExifTool::Lang::de;
       },
     },
    'CameraSerialNumber' => 'Kamera-Seriennummer',
+   'CameraSettings' => 'Kameraeinstellungen',
    'CameraSettingsVersion' => 'Kameraeinstellungen-Version',
    'CameraTemperature' => 'Kamera-Temperatur',
    'CameraType' => 'Kameratyp',
    'CameraType2' => 'Kameratyp 2',
+   'CanonAFInfo' => 'AF-Info',
+   'CanonAFInfo2' => 'AF-Info (2)',
    'CanonExposureMode' => {
       Description => 'Belichtungsmodus',
       PrintConv => {
         'Aperture-priority AE' => 'Blendenpriorität',
         'Bulb' => 'Bulb-Modus',
         'Manual' => 'Manuell',
+        'Program AE' => 'Programmautomatik',
         'Shutter speed priority AE' => 'Verschlusspriorität',
       },
     },
+   'CanonFileInfo' => 'Dateiinformationen',
    'CanonFileLength' => 'Dateilänge',
    'CanonFirmwareVersion' => 'Firmware-Version',
    'CanonFlashMode' => {
@@ -661,9 +909,10 @@ package Image::ExifTool::Lang::de;
         'Red-eye reduction' => 'Rote-Augen-Reduzierung',
       },
     },
-   'CanonImageHeight' => 'Bildhöhe',
+   'CanonFocalLength' => 'Objektivart',
+   'CanonImageHeight' => 'Canon-Bildhöhe',
    'CanonImageSize' => {
-      Description => 'Bildgröße',
+      Description => 'Canon-Bildgröße',
       PrintConv => {
         'Large' => 'Groß',
         'Medium' => 'Mittelgroß',
@@ -677,9 +926,9 @@ package Image::ExifTool::Lang::de;
         'Widescreen' => 'Breitbild',
       },
     },
-   'CanonImageType' => 'Bildtyp',
-   'CanonImageWidth' => 'Bildbreite',
-   'CanonModelID' => 'Modell-ID',
+   'CanonImageType' => 'Canon-Bildtyp',
+   'CanonImageWidth' => 'Canon-Bildbreite',
+   'CanonModelID' => 'Canon-Modell',
    'Caption-Abstract' => 'Beschreibung/Zusammenfassung',
    'CaptureXResolutionUnit' => {
       PrintConv => {
@@ -691,6 +940,7 @@ package Image::ExifTool::Lang::de;
         'um' => 'µm (Mikrometer)',
       },
     },
+   'Categories' => 'Kategorien',
    'Category' => 'Kategorie',
    'CenterAFArea' => {
       Description => 'AF-Messfeldgröße',
@@ -705,6 +955,8 @@ package Image::ExifTool::Lang::de;
         'Average' => 'Durchschnitt',
       },
     },
+   'CharacterSet' => 'Zeichensatz',
+   'Chromaticity' => 'Chromatizität',
    'ChrominanceNR_TIFF_JPEG' => {
       PrintConv => {
         'High' => 'Hoch',
@@ -733,6 +985,7 @@ package Image::ExifTool::Lang::de;
         'On' => 'Ein',
       },
     },
+   'ColorBalance' => 'Farbabgleich',
    'ColorBalance1' => 'Farbabgleich 1',
    'ColorBalanceAdj' => {
       PrintConv => {
@@ -769,27 +1022,34 @@ package Image::ExifTool::Lang::de;
       },
     },
    'ColorHue' => 'Farbwiedergabe',
+   'ColorInfo' => 'Farb-Informationen',
+   'ColorMatrix' => 'Farb-Matrix',
    'ColorMatrix1' => 'Farbmatrix 1',
    'ColorMatrix2' => 'Farbmatrix 2',
    'ColorMode' => {
       Description => 'Farbmodus',
       PrintConv => {
+        'Autumn Leaves' => 'Herbstlaub',
         'B & W' => 'S/W',
         'B&W' => 'Schwarz-Weiß',
         'Black & White' => 'Schwarz/Weiß',
         'Black&white' => 'Schwarz/Weiß',
-        'Evening' => 'abends',
+        'Clear' => 'Klar',
+        'Deep' => 'Tief',
+        'Evening' => 'Abends',
         'Landscape' => 'Landschaft',
+        'Light' => 'Hell',
         'Natural' => 'Natürlich',
         'Natural color' => 'Natürliche Farben',
         'Natural sRGB' => 'Neutral sRGB',
         'Natural+ sRGB' => 'Neutral+ sRGB',
         'Night Portrait' => 'Nachtporträt',
         'Night Scene' => 'Nachtszene',
+        'Night View' => 'Abendszene',
         'Off' => 'Aus',
         'Portrait' => 'Porträt',
         'Solarization' => 'Solarisation',
-        'Sunset' => 'Sonnenuntergang',
+        'Vivid' => 'Lebhafte Farbe',
         'Vivid color' => 'Lebhafte Farbe',
       },
     },
@@ -825,7 +1085,12 @@ package Image::ExifTool::Lang::de;
     },
    'ColorSpaceData' => 'Daten-Farbraum',
    'ColorTemperature' => 'Farbtemperatur',
-   'ColorTone' => 'Farbton',
+   'ColorTone' => {
+      Description => 'Farbton',
+      PrintConv => {
+        'Normal' => 'Standard',
+      },
+    },
    'ColorimetricReference' => 'Farbmetrische Referenz',
    'CommandDials' => {
       Description => 'Einstellräder',
@@ -862,10 +1127,11 @@ package Image::ExifTool::Lang::de;
         'Yes' => 'Umgekehrt',
       },
     },
-   'CommanderChannel' => 'Master-Steuerung > Kanal',
+   'CommanderChannel' => 'Master-Steuerung Kanal',
    'CommanderGroupAMode' => {
       Description => 'Master-Steuerung Gruppe A Modus',
       PrintConv => {
+        'Auto Aperture' => 'Blendenautomatik (AA)',
         'Manual' => 'Manuell',
         'Off' => 'Aus',
       },
@@ -875,6 +1141,7 @@ package Image::ExifTool::Lang::de;
    'CommanderGroupBMode' => {
       Description => 'Master-Steuerung Gruppe B Modus',
       PrintConv => {
+        'Auto Aperture' => 'Blendenautomatik (AA)',
         'Manual' => 'Manuell',
         'Off' => 'Aus',
       },
@@ -900,6 +1167,7 @@ package Image::ExifTool::Lang::de;
     },
    'ComponentsConfiguration' => 'Bedeutung jeder Komponente',
    'CompressedBitsPerPixel' => 'Bildkomprimierungsmodus',
+   'CompressedImageSize' => 'Komprimierte Bildgröße',
    'Compression' => {
       Description => 'Komprimierungsschema',
       PrintConv => {
@@ -915,7 +1183,7 @@ package Image::ExifTool::Lang::de;
         'SGILog24' => 'SGI 24-Bit Log Luminance Kodierung',
         'Sony ARW Compressed' => 'Sony ARW-komprimiert',
         'Thunderscan' => 'ThunderScan 4-Bit Kodierung',
-        'Uncompressed' => 'nicht komprimiert',
+        'Uncompressed' => 'Nicht komprimiert',
       },
     },
    'CompressionType' => {
@@ -932,6 +1200,21 @@ package Image::ExifTool::Lang::de;
       Description => 'Aufnahme-Modus',
       PrintConv => {
         'Continuous' => 'Serienaufnahme',
+        'Movie' => 'Filmen',
+      },
+    },
+   'ContinuousShootingSpeed' => {
+      Description => 'Geschwindigkeit Reihenaufnahmen',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
+      },
+    },
+   'ContinuousShotLimit' => {
+      Description => 'Limit Anzahl Reihenaufnahmen',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
       },
     },
    'Contrast' => {
@@ -940,9 +1223,13 @@ package Image::ExifTool::Lang::de;
         'Film Simulation' => 'Film-Simulation',
         'High' => 'Stark',
         'Low' => 'Leicht',
+        'Med High' => 'Leicht erhöht',
+        'Med Low' => 'Leicht verringert',
         'Medium High' => 'Mittel-Hoch',
         'Medium Low' => 'Mittel-Gering',
         'Normal' => 'Standard',
+        'Very High' => 'Sehr hoch',
+        'Very Low' => 'Sehr gering',
       },
     },
    'ContrastCurve' => 'Kontrast-Kurve',
@@ -958,6 +1245,7 @@ package Image::ExifTool::Lang::de;
         'Off' => 'Aus',
       },
     },
+   'Converter' => 'Konverter',
    'Copyright' => 'Urheberrechtsinhaber',
    'CopyrightNotice' => 'Urheberrechtsvermerk',
    'CopyrightStatus' => {
@@ -968,7 +1256,16 @@ package Image::ExifTool::Lang::de;
    'Country-PrimaryLocationCode' => 'ISO-Landescode',
    'Country-PrimaryLocationName' => 'Land',
    'CreateDate' => 'Datum der Digitaldatengenerierung',
+   'CreationDate' => 'Aufnahmedatum',
    'Creator' => 'Ersteller',
+   'CreatorAddress' => 'Ersteller - Adresse',
+   'CreatorCity' => 'Ersteller - Ort',
+   'CreatorCountry' => 'Ersteller - Land',
+   'CreatorPostalCode' => 'Ersteller - PLZ',
+   'CreatorRegion' => 'Ersteller - Staat/Provinz',
+   'CreatorWorkEmail' => 'Ersteller - E-Mail',
+   'CreatorWorkTelephone' => 'Ersteller - Telefon',
+   'CreatorWorkURL' => 'Ersteller - Webseite(n)',
    'Credit' => 'Anbieter',
    'CropActive' => {
       PrintConv => {
@@ -983,6 +1280,8 @@ package Image::ExifTool::Lang::de;
         'On' => 'Ein',
       },
     },
+   'Custom1' => 'Benutzerdefiniert 1',
+   'Custom2' => 'Benutzerdefiniert 2',
    'CustomRendered' => {
       Description => 'Benutzerdefinierte Bildverarbeitung',
       PrintConv => {
@@ -1043,6 +1342,7 @@ package Image::ExifTool::Lang::de;
    'DateStampMode' => {
       Description => 'Zeitstempel-Modus',
       PrintConv => {
+        'Date' => 'Datum',
         'Off' => 'Aus',
       },
     },
@@ -1074,9 +1374,14 @@ package Image::ExifTool::Lang::de;
    'DeviceModel' => 'Geräte-Modell',
    'DeviceModelDesc' => 'Geräte-Modell-Bezeichnung',
    'DeviceSettingDescription' => 'Geräteeinstellung',
+   'DialDirectionTvAv' => {
+      Description => 'Sens rotation molette Tv/Av',
+      PrintConv => {
+        'Reversed' => 'Umgekehrt',
+      },
+    },
    'DigitalCreationDate' => 'Digitalisierungsdatum',
    'DigitalCreationTime' => 'Digitalisierungszeit',
-   'DigitalGEM' => 'Bildeffekt-Methode',
    'DigitalZoom' => {
       Description => 'Digital-Zoom',
       PrintConv => {
@@ -1093,6 +1398,8 @@ package Image::ExifTool::Lang::de;
       },
     },
    'DigitalZoomRatio' => 'Digital-Zoom-Fakor',
+   'DirectoryIndex' => 'Verzeichnis-Index',
+   'DirectoryNumber' => 'Ordner-Nummer',
    'DisplayAperture' => 'Angezeigte Blende',
    'DisplayXResolutionUnit' => {
       PrintConv => {
@@ -1104,6 +1411,8 @@ package Image::ExifTool::Lang::de;
         'um' => 'µm (Mikrometer)',
       },
     },
+   'DisplayedUnitsX' => 'Einheit der horiz. Auflösung',
+   'DisplayedUnitsY' => 'Einheit der vert. Auflösung',
    'DistortionCorrection' => {
       PrintConv => {
         'Off' => 'Aus',
@@ -1124,16 +1433,26 @@ package Image::ExifTool::Lang::de;
       PrintConv => {
         'Bracketing' => 'Belichtungsreihe',
         'Continuous' => 'Serienaufnahme',
+        'Continuous (Hi)' => 'Serienaufnahme (Hi)',
         'Continuous Bracketing' => 'Serienbild-Belichtungsreihe',
         'Continuous shooting' => 'Serienaufnahme',
         'HS continuous' => 'High-Speed Serienbild',
+        'Multiple Exposure' => 'Mehrfachbelichtung',
+        'No Timer' => 'Ohne Selbstauslöser',
         'Off' => 'Aus',
+        'Remote Control' => 'Fernauslöser',
+        'Remote Control (3 s delay)' => 'Fernauslöser (3 Sek. Verzögerung)',
         'Self-timer' => 'Selbstauslöser',
+        'Self-timer (12 s)' => 'Selbstauslöser (12 Sek.)',
+        'Self-timer (2 s)' => 'Selbstauslöser (2 Sek.)',
         'Self-timer Operation' => 'Selbstauslöser',
+        'Shutter Button' => 'Kamera-Auslöser',
         'Single' => 'Einzelbild',
+        'Single Exposure' => 'Einzelbelichtung',
         'Single Frame' => 'Einzelbild',
         'Single Shot' => 'Einzelbild',
         'Single-Frame Bracketing' => 'Einzelbild-Belichtungsreihe',
+        'Single-frame' => 'Einzelbild',
         'Single-frame shooting' => 'Einzelbild',
         'UHS continuous' => 'Ultra High-Speed Serienbild',
         'White Balance Bracketing' => 'Weißabgleichs-Belichtungsreihe',
@@ -1195,8 +1514,10 @@ package Image::ExifTool::Lang::de;
    'ETTLII' => {
       PrintConv => {
         'Average' => 'Durchschnitt',
+        'Evaluative' => 'Mehrfeldmessung',
       },
     },
+   'EVStepInfo' => 'EV-Schritte Information',
    'EVStepSize' => {
       Description => 'Belichtungswerte',
       PrintConv => {
@@ -1226,11 +1547,17 @@ package Image::ExifTool::Lang::de;
       PrintConv => {
         'Beach' => 'Strand',
         'Black & White' => 'Schwarz/Weiß',
+        'Color Accent' => 'Farbton',
+        'Color Swap' => 'Farbwechsel',
         'Fireworks' => 'Feuerwerk',
+        'Foliage' => 'Laub',
+        'Indoor' => 'Innenaufnahme',
+        'Kids & Pets' => 'Kinder & Tiere',
         'Landscape' => 'Landschaft',
         'Macro' => 'Makro',
         'Manual' => 'Manuell',
         'Night' => 'Nachtszene',
+        'Night Snapshot' => 'Nacht Schnappschuss',
         'Portrait' => 'Porträt',
         'Snow' => 'Schnee',
         'Sports' => 'Sport',
@@ -1247,6 +1574,7 @@ package Image::ExifTool::Lang::de;
    'EditStatus' => 'Bearbeitungsstatus',
    'EditorialUpdate' => 'Redaktionelle Überarbeitung',
    'EffectiveLV' => 'Effektiver LW',
+   'EffectiveMaxAperture' => 'Effektiv größte Blende',
    'Emphasis' => {
       PrintConv => {
         'None' => 'Keine',
@@ -1281,10 +1609,11 @@ package Image::ExifTool::Lang::de;
    'EquipmentVersion' => 'Equipment-Version',
    'Error' => 'Fehler',
    'ExifCameraInfo' => 'Exif Kamerainformationen',
-   'ExifImageHeight' => 'Bildhöhe',
-   'ExifImageWidth' => 'Bildbreite',
+   'ExifImageHeight' => 'Exif-Bildhöhe',
+   'ExifImageWidth' => 'Exif-Bildbreite',
    'ExifToolVersion' => 'ExifTool-Version',
    'ExifVersion' => 'Exif-Version',
+   'ExitPupilPosition' => 'Austrittspupillenposition',
    'ExpandFilm' => 'Erweitert Film',
    'ExpandFilterLens' => 'Erweitert Filterlinse',
    'ExpandFlashLamp' => 'Erweitert Blitzlicht',
@@ -1293,6 +1622,7 @@ package Image::ExifTool::Lang::de;
    'ExpandSoftware' => 'Erweitert Software',
    'ExpirationDate' => 'Ablaufdatum',
    'ExpirationTime' => 'Ablaufzeit',
+   'Exposure' => 'Belichtung',
    'ExposureBracketStepSize' => 'Belichtungsreihen-Stufenabstand',
    'ExposureBracketValue' => 'Belichtungsreihenwert',
    'ExposureCompensation' => 'Belichtungskorrektur',
@@ -1316,8 +1646,11 @@ package Image::ExifTool::Lang::de;
    'ExposureLevelIncrements' => {
       Description => 'Belichtungswert',
       PrintConv => {
+        '1-stop set, 1/3-stop comp.' => '1-Blende, 1/3-Blendenkompensation',
         '1/2 Stop' => '1/2 LW',
+        '1/2-stop set, 1/2-stop comp.' => '1/2-Blende, 1/2-Blendenkompensation',
         '1/3 Stop' => '1/3 LW',
+        '1/3-stop set, 1/3-stop comp.' => '1/3-Blende, 1/3-Blendenkompensation',
       },
     },
    'ExposureMode' => {
@@ -1342,9 +1675,12 @@ package Image::ExifTool::Lang::de;
       },
     },
    'ExposureModeInManual' => {
+      Description => 'Belichtungsmodus bei manueller Belichtung',
       PrintConv => {
         'Center-weighted average' => 'Mittenbetont',
+        'Evaluative metering' => 'Mehrfeldmessung',
         'Partial metering' => 'Teilbild',
+        'Specified metering mode' => 'Spezifizierte Messmethode',
         'Spot metering' => 'Spotmessung',
       },
     },
@@ -1395,6 +1731,8 @@ package Image::ExifTool::Lang::de;
       PrintConv => {
         'Bounce' => 'Mit Bounce',
         'Direct' => 'Direkt',
+        'No' => 'Nein',
+        'Yes' => 'Ja',
         'n/a' => 'Nicht gesetzt',
       },
     },
@@ -1414,6 +1752,8 @@ package Image::ExifTool::Lang::de;
         'n/a (Manual Mode)' => 'Nicht gesetzt (Manueller Modus)',
       },
     },
+   'ExternalFlashFlags' => 'Externer Blitz Flags',
+   'ExternalFlashGuideNumber' => 'Leitzahl des externen Blitzgeräts',
    'ExternalFlashMode' => {
       Description => 'Slave-Blitz-Messfeld 3',
       PrintConv => {
@@ -1426,7 +1766,7 @@ package Image::ExifTool::Lang::de;
         'On, P-TTL Auto' => 'Ein, P-TTL-Blitzautomatik',
         'On, Wireless' => 'Ein, Drahtlos',
         'On, Wireless, High-speed Sync' => 'Ein, Drahtlos, High-Speed-Synchronisation',
-        'n/a - Off-Auto-Aperture' => 'k/A - Blendenring nicht auf A',
+        'n/a - Off-Auto-Aperture' => 'K/A - Blendenring nicht auf A',
       },
     },
    'ExtraSamples' => 'Zusätzliche Komponenten',
@@ -1440,6 +1780,8 @@ package Image::ExifTool::Lang::de;
    'Face6Position' => 'Position, 6. Gesicht',
    'Face7Position' => 'Position, 7. Gesicht',
    'Face8Position' => 'Position, 8. Gesicht',
+   'FaceDetect1' => 'Gesichter erkannt',
+   'FaceDetect2' => 'Gesichter erkannt',
    'FaceDetectFrameHeight' => 'Bereichshöhe',
    'FaceDetectFrameWidth' => 'Bereichsbreite',
    'FacesDetected' => 'Gesichter erkannt',
@@ -1458,6 +1800,9 @@ package Image::ExifTool::Lang::de;
    'FaxRecvTime' => 'Fax-Empfangszeit',
    'FaxSubAddress' => 'Fax-Sub-Adresse',
    'FileFormat' => 'Dateiformat',
+   'FileIndex' => 'Datei-Index',
+   'FileInfo' => 'Datei-Informationen',
+   'FileInfoVersion' => 'Datei-Informationen-Version',
    'FileModifyDate' => 'Datei Änderung Datum / Uhrzeit',
    'FileName' => 'Dateiname',
    'FileNumber' => 'Dateinummer',
@@ -1485,6 +1830,14 @@ package Image::ExifTool::Lang::de;
       },
     },
    'FileType' => 'Dateityp',
+   'FileVersion' => 'Dateiformatversion',
+   'FillFlashAutoReduction' => {
+      Description => 'E-TTL II-Automatikblitz-System',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
+      },
+    },
    'FilmMode' => {
       Description => 'Film-Modus',
       PrintConv => {
@@ -1521,14 +1874,15 @@ package Image::ExifTool::Lang::de;
       },
     },
    'FinderDisplayDuringExposure' => {
+      Description => 'Sucheranzeige bei Belichtung',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
       },
     },
-   'FineTuneOptCenterWeighted' => 'Feinabst. der Bel.Messung > Mittenbetonte Messung',
-   'FineTuneOptMatrixMetering' => 'Feinabst. der Bel.Messung > Matrixmessung',
-   'FineTuneOptSpotMetering' => 'Feinabst. der Bel.Messung > Spotmessung',
+   'FineTuneOptCenterWeighted' => 'Feinabst. der Bel.Messung Mittenbetonte Messung',
+   'FineTuneOptMatrixMetering' => 'Feinabst. der Bel.Messung Matrixmessung',
+   'FineTuneOptSpotMetering' => 'Feinabst. der Bel.Messung Spotmessung',
    'FineTuneStepSize' => {
       Description => 'Belichtungskorrekturwert',
       PrintConv => {
@@ -1538,6 +1892,7 @@ package Image::ExifTool::Lang::de;
       },
     },
    'FirmwareRevision' => 'Firmware-Revision',
+   'FirmwareVersion' => 'Firmware-Version',
    'FixtureIdentifier' => 'Kennzeichnung',
    'Flash' => {
       Description => 'Blitz',
@@ -1577,14 +1932,17 @@ package Image::ExifTool::Lang::de;
    'FlashActivity' => 'Blitz-Leistung',
    'FlashBits' => 'Blitz-Details',
    'FlashCommanderMode' => {
+      Description => 'Master-Steuerung',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
       },
     },
+   'FlashCompensation' => 'Blitzbelichtungs-Korrektur',
    'FlashControlMode' => {
       Description => 'Blitzlichtsteuerungsmodus',
       PrintConv => {
+        'Auto Aperture' => 'Blendenautomatik (AA)',
         'Manual' => 'Manuell',
         'Off' => 'Aus',
         'Repeating Flash' => 'Stroboskopblitz',
@@ -1615,35 +1973,55 @@ package Image::ExifTool::Lang::de;
         'Yes' => 'Ja',
       },
     },
+   'FlashFiring' => {
+      Description => 'Blitzzündung',
+      PrintConv => {
+        'Does not fire' => 'Unterdrückt',
+        'Fires' => 'Aktiv',
+      },
+    },
    'FlashFirmwareVersion' => 'Blitz-Firmware-Version',
+   'FlashFocalLength' => 'Blitz-Brennweite',
    'FlashGroupAControlMode' => {
       Description => 'Gruppe A, Blitzlichtsteuerungsmodus',
       PrintConv => {
+        'Auto Aperture' => 'Blendenautomatik (AA)',
         'Manual' => 'Manuell',
         'Off' => 'Aus',
         'Repeating Flash' => 'Stroboskopblitz',
       },
     },
+   'FlashGroupAExposureComp' => 'Gruppe A, Blitzbelichtungs-Korrektur',
+   'FlashGroupAOutput' => 'Gruppe A, Blitz-Leistung',
    'FlashGroupBControlMode' => {
       Description => 'Gruppe B, Blitzlichtsteuerungsmodus',
       PrintConv => {
+        'Auto Aperture' => 'Blendenautomatik (AA)',
         'Manual' => 'Manuell',
         'Off' => 'Aus',
         'Repeating Flash' => 'Stroboskopblitz',
       },
     },
+   'FlashGroupBExposureComp' => 'Gruppe B, Blitzbelichtungs-Korrektur',
+   'FlashGroupBOutput' => 'Gruppe B, Blitz-Leistung',
    'FlashGroupCControlMode' => {
       Description => 'Gruppe C, Blitzlichtsteuerungsmodus',
       PrintConv => {
+        'Auto Aperture' => 'Blendenautomatik (AA)',
         'Manual' => 'Manuell',
         'Off' => 'Aus',
         'Repeating Flash' => 'Stroboskopblitz',
       },
     },
+   'FlashGroupCExposureComp' => 'Gruppe C, Blitzbelichtungs-Korrektur',
+   'FlashGroupCOutput' => 'Gruppe C, Blitz-Leistung',
    'FlashGuideNumber' => 'Blitzleitzahl',
+   'FlashInfo' => 'Blitz-Informationen',
+   'FlashInfoVersion' => 'Blitz-Informationen-Version',
    'FlashIntensity' => {
       PrintConv => {
         'High' => 'Hoch',
+        'Strong' => 'Stark',
       },
     },
    'FlashLevel' => 'Blitzbelichtungskorr.',
@@ -1659,33 +2037,50 @@ package Image::ExifTool::Lang::de;
       Description => 'Blitz-Modus',
       PrintConv => {
         'Auto' => 'Automatisch',
+        'Auto, Did not fire' => 'Auto, nicht ausgelöst',
+        'Auto, Did not fire, Red-eye reduction' => 'Auto, nicht ausgelöst, Rote-Augen-Reduzierung',
+        'Auto, Fired' => 'Auto, ausgelöst',
+        'Auto, Fired, Red-eye reduction' => 'Auto, ausgelöst, Rote-Augen-Reduzierung',
         'Did Not Fire' => 'Nicht ausgelöst',
+        'External, Auto' => 'Extern, Auto',
+        'External, Contrast-control Sync' => 'Extern, Kontrast-Steuerungs-Synchronisation',
+        'External, Flash Problem' => 'Extern, Blitzproblem?',
+        'External, High-speed Sync' => 'Extern, High-Speed-Synchronisation',
+        'External, Manual' => 'Extern, Manuell',
+        'External, P-TTL Auto' => 'Extern, P-TTL-Blitzautomatik',
+        'External, Wireless' => 'Extern, Drahtlos',
+        'External, Wireless, High-speed Sync' => 'Extern, Drahtlos, High-Speed-Synchronisation',
         'Fill flash' => 'Aufhellblitz',
         'Fired, Commander Mode' => 'Ausgelöst, Befehlsmodus',
         'Fired, External' => 'Ausgelöst, Extern',
         'Fired, Manual' => 'Ausgelöst, Manuell',
         'Fired, TTL Mode' => 'Ausgelöst, TTL-Modus',
+        'Internal' => 'Intern',
         'Off' => 'Aus',
+        'Off, Did not fire' => 'Aus',
         'Off?' => 'Aus?',
         'On' => 'Ein',
+        'On, Did not fire' => 'Ein, nicht ausgelöst',
+        'On, Fired' => 'Ein',
+        'On, Red-eye reduction' => 'Ein, Rote-Augen-Reduzierung',
+        'On, Slow-sync' => 'Ein, Langzeit-Synchronisation',
+        'On, Slow-sync, Red-eye reduction' => 'Ein, Langzeit-Synchronisation, Rote-Augen-Reduzierung',
+        'On, Soft' => 'Ein, Softblitz',
+        'On, Trailing-curtain Sync' => 'Ein, 2. Verschlussvorhang',
+        'On, Wireless (Control)' => 'Ein, Drahtlos (Steuerblitz)',
+        'On, Wireless (Master)' => 'Ein, Drahtlos (Hauptblitz)',
         'Rear flash sync' => 'Synchronisation auf den zweiten Verschlussvorhang',
         'Red-eye Reduction' => 'Rote-Augen-Reduzierung',
         'Red-eye reduction' => 'Rote-Augen-Reduzierung',
         'Unknown' => 'Unbekannt',
         'Wireless' => 'Drahtlos',
+        'n/a - Off-Auto-Aperture' => 'K/A - Blendenring nicht auf A',
       },
     },
    'FlashModel' => {
       Description => 'Blitz-Modell',
       PrintConv => {
         'None' => 'Keines',
-      },
-    },
-   'FlashOn' => {
-      Description => 'Blitz',
-      PrintConv => {
-        'Off' => 'Aus',
-        'On' => 'Ein',
       },
     },
    'FlashOptions' => {
@@ -1730,7 +2125,13 @@ package Image::ExifTool::Lang::de;
     },
    'FlashSyncSpeed' => 'Blitzsynchronzeit',
    'FlashSyncSpeedAv' => {
+      Description => 'Blitzsynchronzeit bei Av',
       PrintConv => {
+        '1/200 Fixed' => '1/200 Fest',
+        '1/200-1/60 Auto' => '1/200-1/60 automatisch',
+        '1/250 Fixed' => '1/250 Fest',
+        '1/250-1/60 Auto' => '1/200-1/60 automatisch',
+        '1/300 Fixed' => '1/300 Fest',
         'Auto' => 'Automatisch',
       },
     },
@@ -1786,6 +2187,7 @@ package Image::ExifTool::Lang::de;
     },
    'FocalUnits' => '"focal units" pro mm',
    'Focus' => {
+      Description => 'Schärfepriorität',
       PrintConv => {
         'Manual' => 'Manuell',
       },
@@ -1807,6 +2209,7 @@ package Image::ExifTool::Lang::de;
    'FocusContinuous' => {
       Description => 'Fortlaufende Fokussierung',
       PrintConv => {
+        'Continuous' => 'Serienaufnahme',
         'Manual' => 'Manuell',
       },
     },
@@ -1819,6 +2222,7 @@ package Image::ExifTool::Lang::de;
         'AF-C' => 'AF-C (Kontinuierlicher Autofokus)',
         'AF-S' => 'AF-S (Einzelautofokus)',
         'Auto' => 'Automatisch',
+        'Continuous' => 'Serienaufnahme',
         'Custom' => 'Benutzerdefiniert',
         'Infinity' => 'Unendlich',
         'Macro' => 'Makro',
@@ -1840,6 +2244,7 @@ package Image::ExifTool::Lang::de;
    'FocusModeSetting' => {
       Description => 'Autofokus',
       PrintConv => {
+        'AF-A' => 'AF-Automatik',
         'AF-C' => 'AF-C (Kontinuierlicher Autofokus)',
         'AF-S' => 'AF-S (Einzelautofokus)',
         'Manual' => 'Manuell',
@@ -1885,6 +2290,7 @@ package Image::ExifTool::Lang::de;
         'Out of focus' => 'Ausserhalb des Fokus',
       },
     },
+   'FocusingScreen' => 'Mattscheibe',
    'FolderName' => 'Ordner-Name',
    'FrameNumber' => 'Bildnummer',
    'FreeByteCounts' => 'Anzahl Bytes des leeren Datenbereiches',
@@ -1977,7 +2383,7 @@ package Image::ExifTool::Lang::de;
     },
    'GPSLatitude' => 'Geografische Breite',
    'GPSLatitudeRef' => {
-      Description => 'nördl. oder südl. Breite',
+      Description => 'Nördl. oder südl. Breite',
       PrintConv => {
         'North' => 'Nördliche Breite',
         'South' => 'Südliche Breite',
@@ -2067,9 +2473,11 @@ package Image::ExifTool::Lang::de;
       },
     },
    'Headline' => 'Überschrift',
+   'HeightResolution' => 'Vertikale Bildauflösung',
    'HighISONoiseReduction' => {
       Description => 'Rauschunterdrückung bei hoher Empfindlichkeit',
       PrintConv => {
+        'Disable' => 'Ausgeschaltet',
         'High' => 'Stärker',
         'Low' => 'Schwächer',
         'Off' => 'Aus',
@@ -2080,7 +2488,10 @@ package Image::ExifTool::Lang::de;
       },
     },
    'HighlightTonePriority' => {
+      Description => 'Tonwert Priorität',
       PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
         'Off' => 'Aus',
         'On' => 'Ein',
       },
@@ -2099,17 +2510,20 @@ package Image::ExifTool::Lang::de;
    'ISO' => 'ISO-Empfindlichkeit',
    'ISO2' => 'ISO-Empfindlichkeit (2)',
    'ISOExpansion' => {
+      Description => 'ISO-Erweiterung',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
       },
     },
    'ISOExpansion2' => {
+      Description => 'ISO-Erweiterung (2)',
       PrintConv => {
         'Off' => 'Aus',
       },
     },
    'ISOFloor' => 'ISO-Untergrenze',
+   'ISOInfo' => 'ISO-Informationen',
    'ISOSelection' => 'ISO-Auswahl',
    'ISOSetting' => {
       Description => 'ISO-Einstellung',
@@ -2131,6 +2545,13 @@ package Image::ExifTool::Lang::de;
       PrintConv => {
         '1 Stop' => '1 LW',
         '1/3 Stop' => '1/3 LW',
+      },
+    },
+   'ISOSpeedRange' => {
+      Description => 'Einstellung ISO-Bereich',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
       },
     },
    'ISOStepSize' => {
@@ -2208,6 +2629,7 @@ package Image::ExifTool::Lang::de;
         'High' => 'Hoch',
       },
     },
+   'ImageQuality2' => 'Bildqualität 2',
    'ImageReview' => {
       Description => 'Bildkontrolle',
       PrintConv => {
@@ -2243,6 +2665,13 @@ package Image::ExifTool::Lang::de;
    'ImageType' => 'Bildtyp',
    'ImageUniqueID' => 'Eindeutige Bild-ID',
    'ImageWidth' => 'Bildbreite',
+   'InfoButtonWhenShooting' => {
+      Description => 'INFO-Taste bei Aufnahme',
+      PrintConv => {
+        'Displays camera settings' => 'Anzeige Kameradaten',
+        'Displays shooting functions' => 'Anzeige Aufnahmedaten',
+      },
+    },
    'InitialZoomSetting' => {
       Description => 'Erste Vergrößerungsstufe',
       PrintConv => {
@@ -2251,6 +2680,7 @@ package Image::ExifTool::Lang::de;
         'Medium Magnification' => 'Mittlere Vergrößerung',
       },
     },
+   'IntellectualGenre' => 'Genre',
    'IntensityStereo' => {
       PrintConv => {
         'Off' => 'Aus',
@@ -2291,7 +2721,7 @@ package Image::ExifTool::Lang::de;
         'On, Trailing-curtain Sync' => 'Ein, 2. Verschlussvorhang',
         'On, Wireless (Control)' => 'Ein, Drahtlos (Steuerblitz)',
         'On, Wireless (Master)' => 'Ein, Drahtlos (Hauptblitz)',
-        'n/a - Off-Auto-Aperture' => 'k/A - Blendenring nicht auf A',
+        'n/a - Off-Auto-Aperture' => 'K/A - Blendenring nicht auf A',
       },
     },
    'InternalFlashStrength' => 'Slave-Blitz-Messfeld 4',
@@ -2301,7 +2731,7 @@ package Image::ExifTool::Lang::de;
       PrintConv => {
         'R03 - DCF option file (Adobe RGB)' => 'R03: DCF Option-Format (Adobe RGB)',
         'R98 - DCF basic file (sRGB)' => 'R98: DCF Basic-Format (sRGB)',
-        'THM - DCF thumbnail file' => 'THM: DCF Thumbnail-Format',
+        'THM - DCF thumbnail file' => 'THM: DCF Miniaturbild-Format',
       },
     },
    'InteropVersion' => 'Interoperabilitäts-Version',
@@ -2315,21 +2745,36 @@ package Image::ExifTool::Lang::de;
     },
    'IntervalNumber' => 'Intervalnummer',
    'JFIFVersion' => 'JFIF-Version',
+   'JPEGQuality' => 'JPEG-Qualität',
    'JobID' => 'Job-ID',
    'JpgRecordedPixels' => 'JPEG-Auflösung',
+   'Keyword' => 'Stichwörter',
    'Keywords' => 'Schlüsselwort',
    'LC1' => 'Objektiv-Wert',
-   'LC10' => 'mv\' nv\'-Daten',
+   'LC10' => 'Mv\' nv\'-Daten',
    'LC11' => 'AVC 1/EXP-Wert',
-   'LC12' => 'mv1 Avminsif-Wert',
+   'LC12' => 'Mv1 Avminsif-Wert',
    'LC14' => 'UNT_12 UNT_6-Wert',
    'LC15' => 'Incorporated Flash Suited END-Wert',
    'LC2' => 'Entfernungscode',
-   'LC3' => 'K-Wert',
+   'LC3' => 'K-Wert (LC3)',
    'LC4' => 'Wert für Aberrationskorrektur im Nahbereich',
    'LC5' => 'Wert für Aberrationskorrektur heller Farben',
    'LC6' => 'Wert für Aberrationskorrektur bei offener Blende',
    'LC7' => 'AF Minimum Actuation Condition-Wert',
+   'LCDDisplayAtPowerOn' => {
+      Description => 'LCD-Display bei Kamera Ein',
+      PrintConv => {
+        'Retain power off status' => 'Aus-Status beibehalten',
+      },
+    },
+   'LCDDisplayReturnToShoot' => {
+      Description => 'LC-Display->Zurück zur Aufn.',
+      PrintConv => {
+        'Also with * etc.' => 'Auch mit * etc.',
+        'With Shutter Button only' => 'Nur mit Auslöser',
+      },
+    },
    'LCDIllumination' => {
       Description => 'Displaybeleuchtung',
       PrintConv => {
@@ -2338,11 +2783,13 @@ package Image::ExifTool::Lang::de;
       },
     },
    'LCDIlluminationDuringBulb' => {
+      Description => 'LCD-Beleuchtung bei Langzeitaufnahme',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
       },
     },
+   'LCDPanels' => 'LCD oben/LCD Rückwand',
    'LCHEditor' => {
       PrintConv => {
         'Off' => 'Aus',
@@ -2351,10 +2798,36 @@ package Image::ExifTool::Lang::de;
     },
    'LanguageIdentifier' => 'Sprachkennung',
    'LastFileNumber' => 'Letzte Dateinummer',
+   'LeafData' => 'Leaf Daten',
    'Lens' => 'Objektiv',
    'Lens35efl' => 'Objektiv',
+   'LensAFStopButton' => {
+      Description => 'Funktion Objektiv-AF-Stopptaste',
+      PrintConv => {
+        'AE lock' => 'AE-Speicherung',
+        'AE lock while metering' => 'AE-Sperre b. aktiv. Messung',
+        'AF Stop' => 'AF-Stopp',
+        'AF point: M->Auto/Auto->ctr' => 'AF-Messf: M->Aut./Aut.->Ctr',
+        'AF start' => 'AF-Start',
+        'AF stop' => 'AF-Stopp',
+        'IS start' => 'Start Bildstabilisierung',
+        'Switch to registered AF point' => 'Auf gesp. AF-Messf. schalten',
+      },
+    },
+   'LensData' => 'K-Wert',
+   'LensDataVersion' => 'Objektivdaten-Version',
+   'LensDriveNoAF' => {
+      Description => 'Schärfensuche wenn AF unmöglich',
+      PrintConv => {
+        'Focus search off' => 'Schärfensuche aus',
+        'Focus search on' => 'Schärfensuche ein',
+      },
+    },
    'LensFStops' => 'Objektiv-Blendenstufen',
    'LensFirmwareVersion' => 'Objektiv-Firmware-Version',
+   'LensID' => 'Objektiv-ID',
+   'LensIDNumber' => 'Objektivkennnummer',
+   'LensInfo' => 'Objektiv-Informationen',
    'LensKind' => 'Objektivtyp / Version (LC0)',
    'LensModel' => 'Objektiv-Typ',
    'LensProperties' => 'Objektivfunktionen?',
@@ -2396,6 +2869,19 @@ package Image::ExifTool::Lang::de;
       },
     },
    'LinearizationTable' => 'Linearisierungstabelle',
+   'Lit' => {
+      PrintConv => {
+        'No' => 'Nein',
+        'Yes' => 'Ja',
+      },
+    },
+   'LiveViewExposureSimulation' => {
+      Description => 'Livebild-Belichtungssimulator',
+      PrintConv => {
+        'Disable (LCD auto adjust)' => 'Inaktiv (automatische LCD-Anzeige)',
+        'Enable (simulates exposure)' => 'Aktiv (simuliert Belichtung)',
+      },
+    },
    'LiveViewShooting' => {
       PrintConv => {
         'Off' => 'Aus',
@@ -2403,6 +2889,14 @@ package Image::ExifTool::Lang::de;
       },
     },
    'LocalizedCameraModel' => 'Lokalisiertes Kameramodell',
+   'Location' => 'Aufnahmeort',
+   'LockMicrophoneButton' => {
+      Description => 'Mikrofone-Tastenfunktion',
+      PrintConv => {
+        'Protect (holding:sound rec.)' => 'Geschützt (drücken:Tonaufnahme)',
+        'Sound rec. (protect:disable)' => 'Tonaufnahme (ungeschützt)',
+      },
+    },
    'LongExposureNoiseReduction' => {
       Description => 'Langzeit-Rauschminderung',
       PrintConv => {
@@ -2430,7 +2924,7 @@ package Image::ExifTool::Lang::de;
       },
     },
    'MB-D80Batteries' => {
-      Description => '[32] Akku-/Batterietyp',
+      Description => 'Akku-/Batterietyp',
       PrintConv => {
         'FR6 (AA Lithium)' => 'FR6 (Mignon-Lithium)',
         'HR6 (AA Ni-MH)' => 'HR6 (Mignon-Ni-MH)',
@@ -2438,6 +2932,7 @@ package Image::ExifTool::Lang::de;
         'ZR6 (AA Ni-Mg)' => 'ZR6 (Mignon-Ni-Mg)',
       },
     },
+   'MCUVersion' => 'MCU-Version',
    'MIEVersion' => 'MIE-Version',
    'MIMEType' => 'MIME-Typ',
    'MSStereo' => {
@@ -2465,6 +2960,13 @@ package Image::ExifTool::Lang::de;
         'Super Macro' => 'Super-Makro',
       },
     },
+   'MagnifiedView' => {
+      Description => 'Lupenfunktion',
+      PrintConv => {
+        'Image playback only' => 'Nur bei Bildwiedergabe',
+        'Image review and playback' => 'Sofortbild u. Wiedergabe',
+      },
+    },
    'MainDialExposureComp' => {
       Description => 'Main Dial Belichtungskorrektur',
       PrintConv => {
@@ -2474,6 +2976,7 @@ package Image::ExifTool::Lang::de;
     },
    'Make' => 'Gerätehersteller',
    'MakeAndModel' => 'Hersteller und Modell',
+   'MakerNote' => 'Hersteller-eigene Daten',
    'MakerNoteSafety' => {
       Description => 'Sicherheit der Hersteller-Informationsdaten',
       PrintConv => {
@@ -2494,6 +2997,13 @@ package Image::ExifTool::Lang::de;
       },
     },
    'ManualFocusDistance' => 'Manuelle Fokusdistanz',
+   'ManualTv' => {
+      Description => 'Man. Tv/Av-Einst. für M. Bel.',
+      PrintConv => {
+        'Tv=Control/Av=Main' => 'Tv=Schnelleinstellrad/Av=Haupt-Wahlrad',
+        'Tv=Main/Av=Control' => 'Tv=Haupt-Wahlrad/Av=Schnelleinstellrad',
+      },
+    },
    'ManufactureDate' => 'Herstellungsdatum?',
    'MasterDocumentID' => 'ID des Originaldokuments',
    'MaxAperture' => 'Größte Blende',
@@ -2512,13 +3022,18 @@ package Image::ExifTool::Lang::de;
     },
    'MediaBlackPoint' => 'Medium-Schwarzpunkt',
    'MediaWhitePoint' => 'Medium-Weißpunkt',
+   'Medium' => 'Mittelgroß',
    'MenuButtonDisplayPosition' => {
+      Description => 'Positionsanzeige Menuetaste',
       PrintConv => {
-        'Top' => 'Oben',
+        'Previous' => 'Vorherige Anzeige',
+        'Previous (top if power off)' => 'Vorherige (Anfang nach AUS)',
+        'Top' => 'Anfang',
       },
     },
    'MenuButtonReturn' => {
       PrintConv => {
+        'Previous' => 'Vorherige Anzeige',
         'Top' => 'Oben',
       },
     },
@@ -2535,6 +3050,7 @@ package Image::ExifTool::Lang::de;
       PrintConv => {
         'Average' => 'Durchschnitt',
         'Center-weighted average' => 'Mittenbetont',
+        'Evaluative' => 'Mehrfeldmessung',
         'Multi-segment' => 'Multi-Segment',
         'Other' => 'Andere',
         'Partial' => 'Teilbild',
@@ -2554,13 +3070,20 @@ package Image::ExifTool::Lang::de;
         'Multi-segment' => 'Multi-Segment',
       },
     },
-   'MeteringTime' => 'Ausschaltzeit Belichtungsmesser',
+   'MeteringTime' => {
+      Description => 'Ausschaltzeit Belichtungsmesser',
+      PrintConv => {
+        'No Limit' => 'Unbegrenzt',
+      },
+    },
    'MinAperture' => 'Kleinste Blende',
    'MinFocalLength' => 'Geringste Brennweite',
    'MinoltaCameraSettings2' => 'Kameraeinstellungen 2',
-   'MinoltaDate' => 'Datum',
+   'MinoltaCameraSettings5D' => 'Kameraeinstellungen (A100)',
+   'MinoltaCameraSettings7D' => 'Kameraeinstellungen (7D)',
+   'MinoltaDate' => 'Minolta-Datum',
    'MinoltaImageSize' => {
-      Description => 'Bildgröße',
+      Description => 'Minolta-Bildgröße',
       PrintConv => {
         'Full' => 'Volle Größe',
         'Large' => 'Groß',
@@ -2568,9 +3091,10 @@ package Image::ExifTool::Lang::de;
         'Small' => 'Klein',
       },
     },
-   'MinoltaModelID' => 'Modell-ID',
+   'MinoltaMakerNote' => 'Minolta-Herstellerinformationen',
+   'MinoltaModelID' => 'Minolta-Modell',
    'MinoltaQuality' => {
-      Description => 'Bildqualität',
+      Description => 'Minolta-Bildqualität',
       PrintConv => {
         'Extra Fine' => 'Extra-Fein',
         'Fine' => 'Fein',
@@ -2578,7 +3102,15 @@ package Image::ExifTool::Lang::de;
         'Superfine' => 'Superfein',
       },
     },
-   'MinoltaTime' => 'Zeit',
+   'MinoltaTime' => 'Minolta-Zeit',
+   'MirrorLockup' => {
+      Description => 'Spiegelverriegelung',
+      PrintConv => {
+        'Disable' => 'Ausgeschaltet',
+        'Enable' => 'Eingeschaltet',
+        'Enable: Down with Set' => 'Eingeschaltet: Abwärts mit SET (Taste)',
+      },
+    },
    'Model' => 'Kameramodell',
    'Model2' => 'Kameramodell (2)',
    'ModelingFlash' => {
@@ -2604,6 +3136,7 @@ package Image::ExifTool::Lang::de;
    'ModifiedSharpnessFreq' => {
       PrintConv => {
         'High' => 'Hoch',
+        'Highest' => 'Höchste',
         'Low' => 'Leicht',
         'n/a' => 'Nicht gesetzt',
       },
@@ -2664,26 +3197,33 @@ package Image::ExifTool::Lang::de;
         'Purple' => 'Lila',
       },
     },
+   'MultiExposure' => 'Mehrfachbelichtungsdaten',
    'MultiExposureAutoGain' => {
+      Description => 'Mehrfachbel.: Autom. Belichtung',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
       },
     },
    'MultiExposureMode' => {
+      Description => 'Mehrfachbelichtungsmodus',
       PrintConv => {
+        'Image Overlay' => 'Bildüberlagerung',
+        'Multiple Exposure' => 'Mehrfachbelichtung',
         'Off' => 'Aus',
       },
     },
+   'MultiExposureShots' => 'Mehrfachbel.: Anzahl der Aufnahmen',
+   'MultiExposureVersion' => 'Mehrfachbelichtungsdaten-Version',
    'MultiSelector' => {
-      Description => '[f2] Multifunktionswähler',
+      Description => 'Multifunktionswähler',
       PrintConv => {
         'Do Nothing' => 'Ohne Funktion',
         'Reset Meter-off Delay' => 'Ruhezustand verzögern',
       },
     },
    'MultiSelectorPlaybackMode' => {
-      Description => 'Mitteltaste > Bei Wiedergabe',
+      Description => 'Mitteltaste Bei Wiedergabe',
       PrintConv => {
         'Choose Folder' => 'Ordner auswählen',
         'Thumbnail On/Off' => 'Bildindex ein/aus',
@@ -2692,7 +3232,7 @@ package Image::ExifTool::Lang::de;
       },
     },
    'MultiSelectorShootMode' => {
-      Description => 'Mitteltaste > Bei Aufnahme',
+      Description => 'Mitteltaste Bei Aufnahme',
       PrintConv => {
         'Highlight Active Focus Point' => 'AF-Messfeld hervorheben',
         'Not Used' => 'Ohne Funktion',
@@ -2719,6 +3259,7 @@ package Image::ExifTool::Lang::de;
         'Off' => 'Aus',
       },
     },
+   'MyColors' => 'My Color-Modus',
    'NDFilter' => {
       Description => 'ND-Filter',
       PrintConv => {
@@ -2727,13 +3268,28 @@ package Image::ExifTool::Lang::de;
       },
     },
    'NEFCompression' => {
+      Description => 'RAW-Komprimierung',
       PrintConv => {
-        'Uncompressed' => 'nicht komprimiert',
+        'Lossless' => 'Verlustfrei',
+        'Lossy (type 1)' => 'Verlustbehaftet (Type 1)',
+        'Lossy (type 2)' => 'Verlustbehaftet (Type 2)',
+        'Uncompressed' => 'Nicht komprimiert',
       },
     },
    'NewsPhotoVersion' => 'IPTC-Modell-3-Version',
+   'NikonCaptureData' => 'Nikon Capture-Daten',
+   'NikonCaptureOutput' => 'Nikon Capture-Ausgabe',
    'NikonCaptureVersion' => 'Nikon Capture-Version',
    'NikonICCProfile' => 'Nikon ICC-Profil-Zeiger',
+   'NikonImageSize' => {
+      Description => 'Bildgröße',
+      PrintConv => {
+        'Large (10.0 M)' => 'Groß (10.0M)',
+        'Medium (5.6 M)' => 'Mittel (5.6M)',
+        'Small (2.5 M)' => 'Klein (2.5M)',
+      },
+    },
+   'NikonPreview' => 'Preview-IFD-Zeiger',
    'NoMemoryCard' => {
       Description => 'Auslösesperre',
       PrintConv => {
@@ -2767,9 +3323,9 @@ package Image::ExifTool::Lang::de;
    'ObjectCycle' => {
       Description => 'Objektzyklus',
       PrintConv => {
-        'Both Morning and Evening' => 'beides',
-        'Evening' => 'abends',
-        'Morning' => 'morgens',
+        'Both Morning and Evening' => 'Beides',
+        'Evening' => 'Abends',
+        'Morning' => 'Morgens',
       },
     },
    'ObjectFileType' => {
@@ -2825,8 +3381,8 @@ package Image::ExifTool::Lang::de;
    'PageName' => 'Seitenname',
    'PageNumber' => 'Seitenummer',
    'PanasonicTitle' => 'Titel',
-   'PanoramaDirection' => 'F-Wert',
-   'PanoramaFrame' => 'Panorama-Bild',
+   'PanoramaDirection' => 'Panorama-Richtung',
+   'PanoramaFrameNumber' => 'Panorama-Bild',
    'PentaxImageSize' => {
       Description => 'Pentax-Bildgröße',
       PrintConv => {
@@ -2853,6 +3409,7 @@ package Image::ExifTool::Lang::de;
         'On' => 'Ein',
       },
     },
+   'PhotoEffectsData' => 'Bildeffekt-Daten',
    'PhotoEffectsType' => {
       Description => 'Bildeffekt-Methode',
       PrintConv => {
@@ -2879,7 +3436,11 @@ package Image::ExifTool::Lang::de;
         'WhiteIsZero' => 'Weiß ist Null',
       },
     },
+   'PhotoshopBGRThumbnail' => 'Photoshop BGR-Vorschaubild',
+   'PhotoshopFormat' => 'Photoshop-Format',
+   'PhotoshopQuality' => 'Photoshop-Qualität',
    'PictureControl' => {
+      Description => 'Bildoptimierung',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
@@ -2899,7 +3460,10 @@ package Image::ExifTool::Lang::de;
         'Quick Adjust' => 'Schnelleinstellung',
       },
     },
+   'PictureControlBase' => 'Bildoptimierung-Basis',
+   'PictureControlName' => 'Bildoptimierung-Name',
    'PictureControlQuickAdjust' => 'Bildoptimierung-Schnelleinstellung',
+   'PictureControlVersion' => 'Bildoptimierung-Version',
    'PictureFinish' => {
       PrintConv => {
         'Evening Scene' => 'Abendszene',
@@ -2914,25 +3478,72 @@ package Image::ExifTool::Lang::de;
    'PictureMode' => {
       Description => 'Motivprogramm',
       PrintConv => {
+        '1/2 EV steps' => '1/2 LW Schritte',
+        '1/3 EV steps' => '1/3 LW Schitte',
         'Anti-blur' => 'Motivschärfe-Modus',
+        'Aperture Priority' => 'Zeitautomatik',
+        'Aperture Priority, Off-Auto-Aperture' => 'Zeitautomatik (Blendenring nicht auf A)',
         'Aperture-priority AE' => 'Blendenpriorität',
         'Auto' => 'Automatisch',
+        'Auto PICT (Landscape)' => 'Auto PICT (Landschaft)',
+        'Auto PICT (Macro)' => 'Auto PICT (Makro)',
+        'Auto PICT (Portrait)' => 'Auto PICT (Porträt)',
+        'Auto PICT (Sport)' => 'Auto PICT (Motiv in Bewegung)',
+        'Auto PICT (Standard)' => 'Auto PICT (Normal)',
+        'Autumn' => 'Herbst',
         'Beach' => 'Strand',
         'Beach & Snow' => 'Strand & Schnee',
+        'Blur Reduction' => 'Digital SR (Unschärfereduktion)',
+        'Bulb' => 'Bulb-Modus',
+        'Bulb, Off-Auto-Aperture' => 'Bulb (Blendenring nicht auf A)',
+        'Candlelight' => 'Kerzenlicht',
+        'DOF Program' => 'Schärfentiefe-Priorität',
+        'DOF Program (HyP)' => 'Schärfentiefe-Priorität (Hyper-Programm)',
+        'Dark Pet' => 'Haustier (Dunkel)',
+        'Digital Filter' => 'Digitalfilter',
         'Fireworks' => 'Feuerwerk',
+        'Flash X-Sync Speed AE' => 'Blitz X-synch. Zeit',
         'Flower' => 'Blumen',
+        'Food' => 'Lebensmittel',
+        'Frame Composite' => 'Rahmen',
+        'Green Mode' => 'Grüner Modus',
+        'Half-length Portrait' => 'Brustbild',
+        'Hi-speed Program' => 'HS-Priorität',
+        'Hi-speed Program (HyP)' => 'HS-Priorität (Hyper-Programm)',
+        'Illustrations' => 'Dokument',
+        'Kids' => 'Kinder',
         'Landscape' => 'Landschaft',
+        'Light Pet' => 'Haustier (Hell)',
+        'MTF Program' => 'MTF-Priorität',
+        'MTF Program (HyP)' => 'MTF-Priorität (Hyper-Programm)',
         'Macro' => 'Makro',
         'Manual' => 'Manuell',
+        'Manual, Off-Auto-Aperture' => 'Manuell (Blendenring nicht auf A)',
+        'Medium Pet' => 'Haustier (Neutrale Helligkeit)',
         'Natural Light' => 'Umgebungslicht',
         'Natural Light & Flash' => 'Umgebungslicht & Blitz',
+        'Natural Skin Tone' => 'Nat. Hautton',
         'Night Scene' => 'Nachtszene',
+        'Night Scene Portrait' => 'Nacht-Porträt',
+        'No Flash' => 'Kein Blitz',
+        'Pet' => 'Haustier',
         'Portrait' => 'Porträt',
+        'Program' => 'Programm',
+        'Program (HyP)' => 'Programmautomatik (Hyper-Programm)',
         'Program AE' => 'Programmautomatik',
+        'Program Av Shift' => 'Av Shift-Belichtungsprogramm',
+        'Program Tv Shift' => 'Tv Shift-Belichtungsprogramm',
+        'Self Portrait' => 'Selbstporträt',
+        'Sensitivity Priority AE' => 'Blenden- & Zeitautomatik (Sv, ISO-Vorgabe)',
+        'Shutter & Aperture Priority AE' => 'Empfindlichkeitsautomatik (TAv, Zeit-/Blendenvorgabe)',
+        'Shutter Speed Priority' => 'Verschlusspriorität',
         'Shutter speed priority AE' => 'Verschlusspriorität',
         'Snow' => 'Schnee',
+        'Soft' => 'Soft (Weichzeichnung)',
         'Sports' => 'Sport',
         'Sunset' => 'Sonnenuntergang',
+        'Surf & Snow' => 'Surf + Schnee',
+        'Synchro Sound Record' => 'Synchr. Sprachnotiz',
         'Underwater' => 'Tauchen',
       },
     },
@@ -2974,7 +3585,10 @@ package Image::ExifTool::Lang::de;
     },
    'PictureStyle' => {
       PrintConv => {
+        'Faithful' => 'Natürlich',
+        'High Saturation' => 'Hohe Farbsättigung',
         'Landscape' => 'Landschaft',
+        'Low Saturation' => 'Geringe Farbsättigung',
         'Monochrome' => 'Monochrom',
         'None' => 'Keine',
         'Portrait' => 'Porträt',
@@ -3015,8 +3629,11 @@ package Image::ExifTool::Lang::de;
         'Unknown' => 'Unbekannt',
       },
     },
+   'PreviewHeight' => 'Vorschaubild-Höhe',
    'PreviewImage' => 'Vorschaubild',
    'PreviewImageBorders' => 'Vorschaubild-Ränder',
+   'PreviewImageData' => 'Vorschaubild-Daten',
+   'PreviewImageHeight' => 'Vorschaubild-Höhe',
    'PreviewImageLength' => 'Vorschaubild-Datenlänge',
    'PreviewImageSize' => 'Vorschaubild-Größe',
    'PreviewImageStart' => 'Vorschaubild-Datenposition',
@@ -3027,15 +3644,35 @@ package Image::ExifTool::Lang::de;
         'Yes' => 'Ja',
       },
     },
+   'PreviewImageWidth' => 'Vorschaubild-Breite',
    'PreviewQuality' => {
+      Description => 'Vorschaubild-Qualität',
       PrintConv => {
         'Fine' => 'Fein',
         'Superfine' => 'Superfein',
       },
     },
-   'PrimaryAFPoint' => 'Primärer AF-Punkt',
+   'PreviewWidth' => 'Vorschaubild-Breite',
+   'PrimaryAFPoint' => {
+      Description => 'Primärer AF-Punkt',
+      PrintConv => {
+        'Bottom' => 'Unten',
+        'C6 (Center)' => 'C6 (Mitte)',
+        'Center' => 'Mitte',
+        'Far Left' => 'Ganz links',
+        'Far Right' => 'Ganz rechts',
+        'Lower-left' => 'Unten-Links',
+        'Lower-right' => 'Unten-Rechts',
+        'Mid-left' => 'Links-Mitte',
+        'Mid-right' => 'Rechts-Mitte',
+        'Top' => 'Oben',
+        'Upper-left' => 'Oben-Links',
+        'Upper-right' => 'Oben-Rechts',
+      },
+    },
    'PrimaryChromaticities' => 'Chromatizität der Primärfarben',
    'PrimaryPlatform' => 'Hauptplattform',
+   'ProcessingInfo' => 'Verarbeitungsinformationen',
    'ProcessingSoftware' => 'Verarbeitungssoftware',
    'ProductID' => 'Produkt-ID',
    'ProductionCode' => 'Kamera war beim Kundendienst?',
@@ -3082,6 +3719,7 @@ package Image::ExifTool::Lang::de;
     },
    'ProgramShift' => 'Programmverschiebung',
    'ProgramVersion' => 'Programmversion',
+   'Protect' => 'Schutz',
    'Province-State' => 'Bundesland/Kanton',
    'Quality' => {
       Description => 'Bildqualität',
@@ -3102,6 +3740,14 @@ package Image::ExifTool::Lang::de;
    'QualityMode' => {
       PrintConv => {
         'Fine' => 'Fein',
+      },
+    },
+   'QuickControlDialInMeter' => {
+      Description => 'Schnelleinstellrad bei Messung',
+      PrintConv => {
+        'AF point selection' => 'Auswahl des AF-Messfelds',
+        'Exposure comp/Aperture' => 'Belichtungskorrektur/Blende',
+        'ISO speed' => 'ISO-Empfindlichkeit',
       },
     },
    'QuickShot' => {
@@ -3132,6 +3778,12 @@ package Image::ExifTool::Lang::de;
         'RAW+JPEG (PEF, Best)' => 'RAW+JPEG (PEF, Optimal)',
         'RAW+JPEG (PEF, Better)' => 'RAW+JPEG (PEF, Besser)',
         'RAW+JPEG (PEF, Good)' => 'RAW+JPEG (PEF, Gut)',
+        'RAW+Large/Fine' => 'RAW+Groß/Fein',
+        'RAW+Large/Normal' => 'RAW+Groß/Normal',
+        'RAW+Medium/Fine' => 'RAW+Mittel/Fein',
+        'RAW+Medium/Normal' => 'RAW+Mittel/Normal',
+        'RAW+Small/Fine' => 'RAW+Klein/Fein',
+        'RAW+Small/Normal' => 'RAW+Klein/Normal',
       },
     },
    'RawColorAdj' => {
@@ -3139,6 +3791,7 @@ package Image::ExifTool::Lang::de;
         'Custom' => 'Benutzerdefiniert',
       },
     },
+   'RawDataOffset' => 'RAW-Daten-Offset',
    'RawDevAutoGradation' => {
       PrintConv => {
         'Off' => 'Aus',
@@ -3162,6 +3815,11 @@ package Image::ExifTool::Lang::de;
    'RawDevPictureMode' => {
       PrintConv => {
         'Natural' => 'Natürlich',
+      },
+    },
+   'RawDevWhiteBalance' => {
+      PrintConv => {
+        'Color Temperature' => 'Farbtemperatur',
       },
     },
    'RawImageCenter' => 'RAW-Bildmitte',
@@ -3255,9 +3913,9 @@ package Image::ExifTool::Lang::de;
         'Saturation' => 'Sättigungserhaltend',
       },
     },
-   'RepeatingFlashCount' => 'Stroboskopblitz > Anzahl',
+   'RepeatingFlashCount' => 'Stroboskopblitz Anzahl',
    'RepeatingFlashOutput' => 'Stroboskopblitz Leistung',
-   'RepeatingFlashRate' => 'Stroboskopblitz > Freq.',
+   'RepeatingFlashRate' => 'Stroboskopblitz Freq.',
    'ResampleParamsQuality' => {
       PrintConv => {
         'High' => 'Hoch',
@@ -3270,13 +3928,28 @@ package Image::ExifTool::Lang::de;
         'Yes' => 'Ja',
       },
     },
+   'Resolution' => 'Bildauflösung',
    'ResolutionUnit' => {
       Description => 'Einheit der X- und Y-Auflösung',
       PrintConv => {
         'None' => 'Keine',
       },
     },
-   'RetouchHistory' => 'Bildbearbeitungsschritte',
+   'RetouchHistory' => {
+      Description => 'Bildbearbeitungsschritte',
+      PrintConv => {
+        'B & W' => 'Schwarzweiß',
+        'Color Custom' => 'Farbabgleich',
+        'Cyanotype' => 'Blauton',
+        'Image Overlay' => 'Bildmontage',
+        'None' => 'Keine',
+        'Red Eye' => 'Rote-Augen-Korrektur',
+        'Sky Light' => 'Skylight',
+        'Small Picture' => 'Kompaktbild',
+        'Trim' => 'Beschneiden',
+        'Warm Tone' => 'Warmer Farbton',
+      },
+    },
    'ReverseIndicators' => 'Skalen spiegeln',
    'Rotation' => {
       Description => 'Ausrichtung',
@@ -3311,10 +3984,33 @@ package Image::ExifTool::Lang::de;
    'SRResult' => {
       Description => 'Bildstabilisator',
       PrintConv => {
-        'Not stabilized' => 'nicht stabilisiert',
+        'Not stabilized' => 'Nicht stabilisiert',
       },
     },
    'SVGVersion' => 'SVG-Version',
+   'SafetyShift' => {
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable (ISO speed)' => 'Möglich (ISO Empfindlichkeit)',
+        'Enable (Tv/Av)' => 'Möglich (Tv/Av)',
+      },
+    },
+   'SafetyShiftInAvOrTv' => {
+      Description => 'Safety Shift in AV oder TV',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
+      },
+    },
+   'SampleFormat' => {
+      PrintConv => {
+        'Complex integer' => 'Komplexer Integer',
+        'IEEE floating point' => 'Fließkommawert',
+        'Two\'s complement signed integer' => 'Vorzeichenbehafteter Integer',
+        'Undefined' => 'Nicht definiert',
+        'Unsigned integer' => 'Vorzeichenloser Integer',
+      },
+    },
    'SamplesPerPixel' => 'Anzahl der Komponenten',
    'Saturation' => {
       Description => 'Farbsättigung',
@@ -3322,10 +4018,15 @@ package Image::ExifTool::Lang::de;
         'Film Simulation' => 'Film-Simulation',
         'High' => 'Hohe Farbsättigung',
         'Low' => 'Geringe Farbsättigung',
+        'Med High' => 'Leicht erhöht',
+        'Med Low' => 'Leicht verringert',
         'Medium High' => 'Mittel-Hoch',
         'Medium Low' => 'Mittel-Gering',
+        'None' => 'Nicht gesetzt',
         'None (B&W)' => 'Keine (S&W)',
         'Normal' => 'Standard',
+        'Very High' => 'Sehr hoch',
+        'Very Low' => 'Sehr gering',
       },
     },
    'ScanImageEnhancer' => {
@@ -3334,6 +4035,7 @@ package Image::ExifTool::Lang::de;
         'On' => 'Ein',
       },
     },
+   'Scene' => 'Szene',
    'SceneAssist' => 'Szenen-Assistent',
    'SceneCaptureType' => {
       Description => 'Szenenaufnahmetyp',
@@ -3409,6 +4111,14 @@ package Image::ExifTool::Lang::de;
         'Unclassified' => 'Nicht klassifiziert',
       },
     },
+   'SelectableAFPoint' => {
+      Description => 'Wählbares AF-Feld',
+      PrintConv => {
+        '19 points' => '19 Felder',
+        'Inner 9 points' => 'Innere 9 Felder',
+        'Outer 9 points' => 'Äußere 9 Felder',
+      },
+    },
    'SelfTimer' => {
       Description => 'Selbstauslöserzeit',
       PrintConv => {
@@ -3442,6 +4152,12 @@ package Image::ExifTool::Lang::de;
       },
     },
    'SensorBlueLevel' => 'Sensor Blau-Level',
+   'SensorCleaning' => {
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
+      },
+    },
    'SensorPixelSize' => 'Sensor-Pixelgröße',
    'SensorRedLevel' => 'Sensor Rot-Level',
    'SequenceNumber' => 'Bildsequenznummer',
@@ -3453,6 +4169,50 @@ package Image::ExifTool::Lang::de;
    'SerialNumber' => 'Seriennummer',
    'SerialNumberFormat' => 'Seriennummer-Format',
    'ServiceIdentifier' => 'Service-ID',
+   'SetButtonCrossKeysFunc' => {
+      Description => 'SET Taste/Kreuztaste Funkt.',
+      PrintConv => {
+        'Cross keys: AF point select' => 'Kreuztaste:AF Feld Auswahl',
+        'Set: Flash Exposure Comp' => 'SET:Blitzbe. Korr.',
+        'Set: Parameter' => 'SET:Parameter ändern',
+        'Set: Picture Style' => 'SET:Bildstil',
+        'Set: Playback' => 'SET:Wiedergabe',
+        'Set: Quality' => 'SET:Qualität',
+      },
+    },
+   'SetButtonFunction' => 'Funktion SET-Taste b. Aufnahme',
+   'SetButtonWhenShooting' => {
+      Description => 'SET-Taste bei Aufnahme',
+      PrintConv => {
+        'Change parameters' => 'Parameter ändern',
+        'Default (no function)' => 'Normal (gesperrt)',
+        'Disabled' => 'Gesperrt',
+        'Flash exposure compensation' => 'Blitzbelichtungskorrektur',
+        'ISO speed' => 'ISO-Empfindlichkeit',
+        'Image playback' => 'Bildwiedergabe',
+        'Image quality' => 'Qualität ändern',
+        'Image size' => 'Bildgröße',
+        'LCD monitor On/Off' => 'LCD-Monitor Ein/Aus',
+        'Menu display' => 'Menüanzeige',
+        'Normal (disabled)' => 'Normal (gesperrt)',
+        'Picture style' => 'Bildstil',
+        'Quick control screen' => 'Schnelleinstell.bildschirm',
+        'Record func. + media/folder' => 'Aufnahme-Funktion + Medium/Ordner',
+        'Record movie (Live View)' => 'Movie-Aufnahme (Livebild)',
+        'White balance' => 'Weißabgleich',
+      },
+    },
+   'SetFunctionWhenShooting' => {
+      Description => 'SET-Taste bei Aufnahme',
+      PrintConv => {
+        'Change Parameters' => 'Parameter ändern',
+        'Change Picture Style' => 'Bildstil',
+        'Change quality' => 'Qualität ändern',
+        'Default (no function)' => 'Normal (gesperrt)',
+        'Image replay' => 'Bildwiedergabe',
+        'Menu display' => 'Menüanzeige',
+      },
+    },
    'ShadingCompensation' => {
       PrintConv => {
         'Off' => 'Aus',
@@ -3472,23 +4232,30 @@ package Image::ExifTool::Lang::de;
         'On' => 'Ein',
       },
     },
+   'ShakeReductionInfo' => 'Bildstabilisator',
    'Sharpness' => {
       Description => 'Schärfe',
       PrintConv => {
         'Film Simulation' => 'Film-Simulation',
         'Hard' => 'Stark',
         'Hard2' => 'Hart2',
+        'Med Hard' => 'Leicht erhöht',
+        'Med Soft' => 'Leicht verringert',
         'Medium Hard' => 'Mittel-Hart',
         'Medium Soft' => 'Mittel-Weich',
         'Normal' => 'Standard',
+        'Sharp' => 'Weich',
         'Soft' => 'Leicht',
         'Soft2' => 'Weich 2',
+        'Very Hard' => 'Sehr hoch',
+        'Very Soft' => 'Sehr weich',
         'n/a' => 'Nicht gesetzt',
       },
     },
    'SharpnessFrequency' => {
       PrintConv => {
         'High' => 'Hoch',
+        'Highest' => 'Höchste',
         'Low' => 'Leicht',
         'n/a' => 'Nicht gesetzt',
       },
@@ -3533,8 +4300,43 @@ package Image::ExifTool::Lang::de;
     },
    'ShortDocumentID' => 'Kurze Bild-ID',
    'ShortFocal' => 'Kleinste Brennweite',
+   'ShortReleaseTimeLag' => {
+      Description => 'Verkürzte Auslöseverzögerung',
+      PrintConv => {
+        'Disable' => 'Ausgeschaltet',
+        'Enable' => 'Eingeschaltet',
+      },
+    },
    'ShotInfoVersion' => 'Aufnahmeinfo-Version',
+   'Shutter-AELock' => {
+      Description => 'Auslöser/AE-Speicherung',
+      PrintConv => {
+        'AE lock/AF' => 'AE-Speicherung/AF',
+        'AE/AF, No AE lock' => 'AE/AF, keine AE-Spei.',
+        'AF/AE lock' => 'AF/AE-Speicherung',
+        'AF/AF lock' => 'AF/AF-Speicherung',
+        'AF/AF lock, No AE lock' => 'AF/AF-Spei.keine AE-Spei.',
+      },
+    },
+   'ShutterAELButton' => 'Auslöser/AE-Speichertaste',
+   'ShutterButtonAFOnButton' => {
+      Description => 'Auslöser/AF-Starttaste',
+      PrintConv => {
+        'AE lock/Metering + AF start' => 'AESpeicherung/Messung+AFStart',
+        'Metering + AF start' => 'Messung+AFStart',
+        'Metering + AF start / disable' => 'Messung+AFStart/Deaktiviert',
+        'Metering + AF start/AF stop' => 'Messung+AFStart / AFStopp',
+        'Metering start/Meter + AF start' => 'Messung Start/Mess.+AFStart',
+      },
+    },
    'ShutterCount' => 'Anzahl der Auslösungen',
+   'ShutterCurtainSync' => {
+      Description => 'Verschluss-Synchronisation',
+      PrintConv => {
+        '1st-curtain sync' => '1. Verschlussvorhang',
+        '2nd-curtain sync' => '2. Verschlussvorhang',
+      },
+    },
    'ShutterMode' => {
       PrintConv => {
         'Aperture Priority' => 'Blendenpriorität',
@@ -3548,7 +4350,21 @@ package Image::ExifTool::Lang::de;
         'On' => 'Ein',
       },
     },
+   'ShutterReleaseNoCFCard' => {
+      Description => 'Verschlussausl. ohne Karte',
+      PrintConv => {
+        'No' => 'Nein',
+        'Yes' => 'Ja',
+      },
+    },
    'ShutterSpeed' => 'Belichtungsdauer',
+   'ShutterSpeedRange' => {
+      Description => 'Einstellung Blendenbereich',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
+      },
+    },
    'ShutterSpeedValue' => 'Belichtungszeit',
    'SimilarityIndex' => 'Bildgleichheits-Index',
    'SlaveFlashMeteringSegments' => 'Slave-Blitz-Messfeld',
@@ -3584,6 +4400,13 @@ package Image::ExifTool::Lang::de;
    'SpectralSensitivity' => 'Spektralempfindlichkeit',
    'SpotFocusPointX' => 'Spot-Fokuspunkt X',
    'SpotFocusPointY' => 'Spot-Fokuspunkt Y',
+   'SpotMeterLinkToAFPoint' => {
+      Description => 'Spotmessung AF-Feld verknüpft',
+      PrintConv => {
+        'Disable (use center AF point)' => 'Deaktiviert (zentrales AF-Feld)',
+        'Enable (use active AF point)' => 'Aktiviert (aktives AF-Feld)',
+      },
+    },
    'SpotMeteringMode' => {
       Description => 'Spot-Messmethode',
       PrintConv => {
@@ -3599,13 +4422,19 @@ package Image::ExifTool::Lang::de;
    'SubSecTime' => 'DateTime 1/100 Sekunden',
    'SubSecTimeDigitized' => 'DateTimeDigitized 1/100 Sekunden',
    'SubSecTimeOriginal' => 'DateTimeOriginal 1/100 Sekunden',
-   'SubfileType' => 'Neuer Unterdatei-Typ',
+   'SubfileType' => {
+      Description => 'Neuer Unterdatei-Typ',
+      PrintConv => {
+        'Thumbnail image' => 'Miniaturbild',
+      },
+    },
    'SubimageColor' => {
       PrintConv => {
         'Monochrome' => 'Monochrom',
       },
     },
    'Subject' => 'Subjekt',
+   'SubjectArea' => 'Hauptobjektposition',
    'SubjectDistance' => 'Objektentfernung',
    'SubjectDistanceRange' => {
       Description => 'Objektdistanzbereich',
@@ -3640,6 +4469,7 @@ package Image::ExifTool::Lang::de;
       },
     },
    'SuperimposedDisplay' => {
+      Description => 'Eingeblendete Anzeige',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
@@ -3647,6 +4477,13 @@ package Image::ExifTool::Lang::de;
     },
    'SupplementalCategories' => 'Zus. Kategorien',
    'SvISOSetting' => 'Sv ISO-Einstellung',
+   'SwitchToRegisteredAFPoint' => {
+      Description => 'Auf gesp. AF-Messf. schalten',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
+      },
+    },
    'T4Options' => 'Füllbits hinzugefügt',
    'T6Options' => 'T6 Optionen',
    'TTL_DA_ADown' => 'Slave-Blitz-Messfeld 6',
@@ -3698,8 +4535,16 @@ package Image::ExifTool::Lang::de;
         'On' => 'Ein',
       },
     },
-   'ThumbnailImage' => 'Vorschaubild',
-   'ThumbnailImageValidArea' => 'Gültiger Bereich des Vorschaubildes',
+   'ThumbnailFileName' => 'Miniaturbild-Dateiname',
+   'ThumbnailFormat' => 'Miniaturbild-Format',
+   'ThumbnailHeight' => 'Miniaturbild-Höhe',
+   'ThumbnailImage' => 'Miniaturbild',
+   'ThumbnailImageSize' => 'Miniaturbild-Größe',
+   'ThumbnailImageType' => 'Miniaturbild-Typ',
+   'ThumbnailImageValidArea' => 'Gültiger Bereich des Miniaturbildes',
+   'ThumbnailLength' => 'Miniaturbild-Datenlänge',
+   'ThumbnailOffset' => 'Miniaturbild-Datenposition',
+   'ThumbnailWidth' => 'Miniaturbild-Breite',
    'Time' => 'Zeit',
    'TimeCreated' => 'Erstellungszeit',
    'TimeScaleParamsQuality' => {
@@ -3709,6 +4554,8 @@ package Image::ExifTool::Lang::de;
       },
     },
    'TimeSent' => 'Absendezeit',
+   'TimeStamp' => 'Zeitstempel',
+   'TimeStamp1' => 'Zeitstempel (1)',
    'TimeZoneOffset' => 'Zeitzonen-Offset',
    'TimerFunctionButton' => {
       Description => 'Funktionstaste',
@@ -3720,6 +4567,14 @@ package Image::ExifTool::Lang::de;
         'White Balance' => 'Weißabgleich',
       },
     },
+   'TimerLength' => {
+      Description => 'Intervalldauer für Timer',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
+      },
+    },
+   'Timezone' => 'Zeitzone',
    'Title' => 'Titel',
    'ToneComp' => 'Tonwertkorrektur',
    'ToneCurve' => {
@@ -3746,10 +4601,13 @@ package Image::ExifTool::Lang::de;
       PrintConv => {
         'B&W' => 'Schwarz-Weiß',
         'Blue' => 'Blau',
+        'Blue-green' => 'Blau-Grün',
         'Green' => 'Grün',
         'None' => 'Keiner',
         'Purple' => 'Lila',
+        'Purple-blue' => 'Violett-Blau',
         'Red' => 'Rot',
+        'Red-purple' => 'Rot-Violett',
         'Yellow' => 'Gelb',
         'n/a' => 'Nicht gesetzt',
       },
@@ -3782,9 +4640,24 @@ package Image::ExifTool::Lang::de;
       },
     },
    'TvExposureTimeSetting' => 'Tv Belichtungszeit-Einstellung',
-   'Uncompressed' => 'Unkomprimiert',
+   'USMLensElectronicMF' => {
+      Description => 'USM-Objektiv, elektr. MF',
+      PrintConv => {
+        'Disable after one-shot AF' => 'Nicht mögl. nach One-Shot AF',
+        'Disable in AF mode' => 'Nicht möglich im AF-Modus',
+        'Enable after one-shot AF' => 'Möglich nach One-Shot AF',
+      },
+    },
+   'Uncompressed' => {
+      Description => 'Unkomprimiert',
+      PrintConv => {
+        'No' => 'Nein',
+        'Yes' => 'Ja',
+      },
+    },
    'UniqueCameraModel' => 'Eindeutige Kamerabezeichnung',
    'UniqueDocumentID' => 'Eindeutige Bild-ID',
+   'Unknown' => 'Unbekannt',
    'Unsharp1Color' => {
       PrintConv => {
         'Blue' => 'Blau',
@@ -3833,6 +4706,20 @@ package Image::ExifTool::Lang::de;
         '9 (user-defined priority)' => '9 (Reserviert für zukünftige Verwendung)',
       },
     },
+   'UsableMeteringModes' => {
+      Description => 'Wahl nutzbarer Messmethoden',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
+      },
+    },
+   'UsableShootingModes' => {
+      Description => 'Wahl nutzbarer Aufnahmemodi',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
+      },
+    },
    'UserComment' => 'Benutzerkommentar',
    'UserDef1PictureStyle' => {
       PrintConv => {
@@ -3856,6 +4743,8 @@ package Image::ExifTool::Lang::de;
       },
     },
    'VRDVersion' => 'VRD-Version',
+   'VRInfo' => 'Bildstabilisator-Informationen',
+   'VRInfoVersion' => 'VR-Info-Version',
    'VR_0x66' => {
       PrintConv => {
         'Off' => 'Aus',
@@ -3865,6 +4754,7 @@ package Image::ExifTool::Lang::de;
     },
    'ValidAFPoints' => 'Gültige AF-Punke',
    'VariProgram' => 'Aufnahmeprogramm',
+   'Version' => 'PrintIM Version',
    'VibrationReduction' => {
       Description => 'Bildstabilisation',
       PrintConv => {
@@ -3874,6 +4764,13 @@ package Image::ExifTool::Lang::de;
         'On (2)' => 'Ein (2)',
         'On (3)' => 'Ein (3)',
         'n/a' => 'Nicht gesetzt',
+      },
+    },
+   'ViewInfoDuringExposure' => {
+      Description => 'Sucherinfo bei Belichtung',
+      PrintConv => {
+        'Disable' => 'Nicht möglich',
+        'Enable' => 'Möglich',
       },
     },
    'ViewfinderWarning' => {
@@ -3924,12 +4821,20 @@ package Image::ExifTool::Lang::de;
         'Yes' => 'Ja',
       },
     },
+   'WBMediaImageSizeSetting' => {
+      Description => 'WB+Media/Bildgrößeneinstellung',
+      PrintConv => {
+        'LCD monitor' => 'LCD-Monitor',
+        'Rear LCD panel' => 'Hinteres LCD-Panel',
+      },
+    },
    'WBMode' => {
       PrintConv => {
         'Auto' => 'Automatisch',
       },
     },
-   'WBShiftAB' => 'Weißabgleich BA-Korrektur',
+   'WBShiftAB' => 'Weißabgleich AB-Korrektur',
+   'WBShiftGM' => 'Weißabgleich GM-Korrektur',
    'WBShiftMG' => 'Weißabgleich GM-Korrektur',
    'WB_GBRGLevels' => 'Weißabgleich GBRG-Farbverteilung',
    'WB_GRBGLevels' => 'Weißabgleich GRBG-Farbverteilung',
@@ -3999,7 +4904,6 @@ package Image::ExifTool::Lang::de;
         'Manual' => 'Manuell',
         'Manual Temperature (Kelvin)' => 'Manuelle Temperatur (Kelvin)',
         'Shade' => 'Schatten',
-        'Shadow' => 'Schatten',
         'Tungsten' => 'Kunstlicht (Glühbirne)',
         'Underwater' => 'Tauchen',
         'Unknown' => 'Unbekannt',
@@ -4064,6 +4968,7 @@ package Image::ExifTool::Lang::de;
       },
     },
    'WhitePoint' => 'Weißpunkt-Chromatizität',
+   'Wide' => 'Breit',
    'WideFocusZone' => {
       Description => 'Zone des großen AF-Messfeldes',
       PrintConv => {
@@ -4080,6 +4985,8 @@ package Image::ExifTool::Lang::de;
         'On' => 'Ein',
       },
     },
+   'WidthResolution' => 'Horizontale Bildauflösung',
+   'WorldTime' => 'Zeitzone',
    'WorldTimeLocation' => {
       Description => 'Weltzeit-Position',
       PrintConv => {
@@ -4088,6 +4995,7 @@ package Image::ExifTool::Lang::de;
       },
     },
    'Writer-Editor' => 'Verfasser der Beschreibung',
+   'XMP' => 'XMP Metadaten',
    'XPAuthor' => 'Autor',
    'XPComment' => 'Kommentar',
    'XPKeywords' => 'Stichwörter',
@@ -4104,6 +5012,7 @@ package Image::ExifTool::Lang::de;
     },
    'YCbCrSubSampling' => 'Subsampling Rate von Y bis C',
    'YResolution' => 'Vertikale Bildauflösung',
+   'Year' => 'Jahr',
    'ZoneMatching' => {
       Description => 'Zonenabgleich',
       PrintConv => {
@@ -4128,7 +5037,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Lang::de.pm - ExifTool language-specific tag information
+Image::ExifTool::Lang::de.pm - ExifTool German language translations
 
 =head1 DESCRIPTION
 

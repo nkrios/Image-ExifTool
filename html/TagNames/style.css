@@ -10,6 +10,9 @@ table.inner th { padding: 2px }     /* header padding */
 table.inner td { padding: 2px }     /* cell padding */
 table.sep   td { padding: 0 2px;    /* separate table values */
                  font-size: smaller }
+table.cols  tr { background: transparent }
+table.cols  td { padding: 0;        /* PrintConvColumns table */
+                 font-size: smaller }
 table tr   { vertical-align: top }  /* universal text alignment */
 table tr.b { background: #feb }     /* alternate cell color */
 table td.b { background: #feb }     /* alternate cell color */

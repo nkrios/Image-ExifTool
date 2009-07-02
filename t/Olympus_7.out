@@ -1,8 +1,8 @@
-  ExifToolVersion = 7.54
+  ExifToolVersion = 7.80
   FileName = Olympus_7_failed.jpg
   Directory = t
   FileSize = 7335
-  FileModifyDate = 1227201642
+  FileModifyDate = 1245592054
   FileType = JPEG
   MIMEType = image/jpeg
 JPEG APP1 (7080 bytes):
@@ -45,8 +45,8 @@ JPEG APP1 (7080 bytes):
   | |     - Tag 0x9003 (20 bytes, string[20])
   | | 6)  CreateDate = 2007:02:16 15:09:13
   | |     - Tag 0x9004 (20 bytes, string[20])
-  | | 7)  ComponentsConfiguration = ...
-  | |     - Tag 0x9101 (4 bytes, undef[4])
+  | | 7)  ComponentsConfiguration = 1 2 3 0
+  | |     - Tag 0x9101 (4 bytes, undef[4] read as int8u[4])
   | | 8)  ExposureCompensation = -0.7 (-7/10)
   | |     - Tag 0x9204 (8 bytes, rational64s[1])
   | | 9)  MaxApertureValue = 3.53 (353/100)
@@ -198,7 +198,7 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x0800 (36 bytes, float[9])
   | | | | 8)  Olympus_ImageProcessing_0x0801 = 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
   | | | |     - Tag 0x0801 (32 bytes, int16u[16])
-  | | | | 9)  Olympus_ImageProcessing_0x0802 = inf (0/0)
+  | | | | 9)  Olympus_ImageProcessing_0x0802 = undef (0/0)
   | | | |     - Tag 0x0802 (8 bytes, rational64u[1])
   | | | | 10) Olympus_ImageProcessing_0x1000 = 0 0
   | | | |     - Tag 0x1000 (4 bytes, int16u[2])
@@ -243,7 +243,7 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x0203 (2 bytes, int16s[1])
   | | | | 5)  Olympus_FocusInfo_0x0204 = 3086 3072 2897 2928 2957 2987 3011 3034 3051 3072 3091[snip]
   | | | |     - Tag 0x0204 (166 bytes, int16s[83])
-  | | | | 6)  Olympus_FocusInfo_0x0209 = 255
+  | | | | 6)  AutoFocus = 255
   | | | |     - Tag 0x0209 (2 bytes, int16u[1])
   | | | | 7)  Olympus_FocusInfo_0x020a = 0
   | | | |     - Tag 0x020a (2 bytes, int16u[1])
@@ -257,9 +257,9 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x020f (20 bytes, int32u[5])
   | | | | 12) SceneDetect = 0
   | | | |     - Tag 0x0210 (2 bytes, int16u[1])
-  | | | | 13) Olympus_FocusInfo_0x0211 = 0 0 0 0 0 0 0 0
+  | | | | 13) SceneArea = 0 0 0 0 0 0 0 0
   | | | |     - Tag 0x0211 (32 bytes, int32u[8])
-  | | | | 14) Olympus_FocusInfo_0x0212 = 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [snip]
+  | | | | 14) SceneDetectData = 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 [snip]
   | | | |     - Tag 0x0212 (2880 bytes, int32u[720])
   | | | | 15) Olympus_FocusInfo_0x0213 = 0
   | | | |     - Tag 0x0213 (2 bytes, int16u[1])
@@ -325,7 +325,7 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x1201 (4 bytes, int16u[2])
   | | | | 46) Olympus_FocusInfo_0x1202 = 0
   | | | |     - Tag 0x1202 (2 bytes, int16u[1])
-  | | | | 47) Olympus_FocusInfo_0x1203 = 0 (0/1)
+  | | | | 47) ExternalFlashGuideNumber = 0 (0/1)
   | | | |     - Tag 0x1203 (8 bytes, rational64s[1])
   | | | | 48) ExternalFlashBounce = 0
   | | | |     - Tag 0x1204 (2 bytes, int16u[1])

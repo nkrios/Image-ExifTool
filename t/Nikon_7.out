@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.71
 [File, File, Image] FileName - File Name: Nikon.nef
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 6.0 kB
@@ -243,7 +243,6 @@
 [ICC_Profile, ICC_Profile, Image] cprt - Profile Copyright: Nikon Inc. & Nikon Corporation 2001
 [Composite, Composite, Image] Aperture - Aperture: 3.5
 [Composite, Composite, Image] CFAPattern - CFA Pattern: [Blue,Green][Green,Red]
-[Composite, Composite, Camera] FlashOn - Flash: Off
 [Composite, Composite, Image] JpgFromRaw - Jpg From Raw: (Binary data 29 bytes)
 [Composite, Composite, Camera] LensID_2 - Lens ID: AF-S DX Zoom-Nikkor 18-70mm f/3.5-4.5G IF-ED
 [Composite, Composite, Camera] LensSpec - Lens: 18-70mm f/3.5-4.5 G

@@ -1,25 +1,42 @@
 #------------------------------------------------------------------------------
-# File:         jp.pm
+# File:         ja.pm
 #
-# Description:  ExifTool language-specific tag information
+# Description:  ExifTool Japanese language translations
 #
 # Notes:        This file generated automatically by Image::ExifTool::TagInfoXML
 #------------------------------------------------------------------------------
 
-package Image::ExifTool::Lang::jp;
+package Image::ExifTool::Lang::ja;
 
-%Image::ExifTool::Lang::jp::Translate = (
+use vars qw($VERSION);
+
+$VERSION = '1.09';
+
+%Image::ExifTool::Lang::ja::Translate = (
    'AEAperture' => 'AE絞り',
    'AEBAutoCancel' => {
+      Description => 'ブラケティング自動解除',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
       },
     },
    'AEBBracketValue' => 'AEBブラケット値',
+   'AEBSequence' => 'ブラケティング順序',
+   'AEBSequenceAutoCancel' => {
+      Description => 'ブラケティング順序/自動解除',
+      PrintConv => {
+        '-,0,+/Disabled' => '－→0 →＋/しない',
+        '-,0,+/Enabled' => '－→0 →＋/する',
+        '0,-,+/Disabled' => '0 →－→＋/しない',
+        '0,-,+/Enabled' => '0 →－→＋/する',
+      },
+    },
+   'AEBShotCount' => 'ブラケティング時の撮影枚数',
    'AEBXv' => 'AEブラケット 露出補正',
    'AEExposureTime' => 'AE露出時間',
    'AEExtra' => 'AE特別？',
+   'AEInfo' => '自動露出情報',
    'AELock' => {
       Description => 'AEロック',
       PrintConv => {
@@ -41,7 +58,7 @@ package Image::ExifTool::Lang::jp;
    'AEMaxAperture' => 'AE最大絞り',
    'AEMaxAperture2' => 'AE最大絞り(2)',
    'AEMeteringMode' => {
-      Description => 'スポット',
+      Description => 'AE測光モード',
       PrintConv => {
         'Multi-segment' => 'パターン',
       },
@@ -78,7 +95,12 @@ package Image::ExifTool::Lang::jp;
         'Text' => 'テキスト',
       },
     },
-   'AESetting' => '自動露出設定',
+   'AESetting' => {
+      Description => '自動露出設定',
+      PrintConv => {
+        'Exposure Compensation' => '露出補正',
+      },
+    },
    'AEXv' => 'AE 露出補正',
    'AE_ISO' => 'AE ISO感度',
    'AF-CPrioritySelection' => {
@@ -116,6 +138,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'AFAdjustment' => 'AF微調整',
+   'AFArea' => 'AFエリア',
    'AFAreaHeight' => 'AFエリア高さ',
    'AFAreaHeights' => 'AFエリア高さ',
    'AFAreaIllumination' => {
@@ -131,7 +154,11 @@ package Image::ExifTool::Lang::jp;
       PrintConv => {
         'Auto-area AF' => '自動エリアAF',
         'Dynamic Area' => 'ダイナミックエリア',
+        'Dynamic Area (wide)' => 'ダイナミック（ワイド）',
+        'Dynamic Area, Closest Subject' => 'ダイナミック、重点主題',
+        'Group Dynamic' => 'グループダイナミック',
         'Single Area' => 'シングルポイント',
+        'Single Area (wide)' => 'シングルポイント（ワイド）',
       },
     },
    'AFAreaModeSetting' => {
@@ -148,8 +175,20 @@ package Image::ExifTool::Lang::jp;
    'AFAssist' => {
       Description => 'AFアシスト',
       PrintConv => {
+        'Does not emit/Fires' => 'しない/する',
+        'Emits/Does not fire' => 'する/しない',
+        'Emits/Fires' => 'する/する',
         'Off' => 'オフ',
         'On' => 'オン',
+        'Only ext. flash emits/Fires' => '外部ストロボのみする/する',
+      },
+    },
+   'AFAssistBeam' => {
+      Description => 'AF補助光の投光',
+      PrintConv => {
+        'Does not emit' => 'しない',
+        'Emits' => 'する',
+        'Only ext. flash emits' => '外部ストロボのみする',
       },
     },
    'AFAssistIlluminator' => {
@@ -160,9 +199,21 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'AFDefocus' => 'AFぼけ量',
+   'AFDuringLiveView' => {
+      Description => 'ライブビュー撮影中のAF',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+        'Live mode' => 'ライブモード',
+        'Quick mode' => 'クイックモード',
+      },
+    },
    'AFFineTuneAdj' => 'AFファインチューン',
    'AFImageHeight' => 'AF画像高さ',
    'AFImageWidth' => 'AF画像幅',
+   'AFInfo' => 'AFモード',
+   'AFInfo2' => 'AF情報',
+   'AFInfo2Version' => 'AF情報バージョン',
    'AFIntegrationTime' => 'AF集積時間',
    'AFMicroAdjActive' => {
       PrintConv => {
@@ -170,10 +221,34 @@ package Image::ExifTool::Lang::jp;
         'Yes' => 'はい',
       },
     },
+   'AFMicroadjustment' => {
+      Description => 'AFマイクロアジャストメント',
+      PrintConv => {
+        'Adjust all by same amount' => '全レンズ一律調整',
+        'Adjust by lens' => 'レンズごとに調整',
+        'Disable' => 'しない',
+      },
+    },
    'AFMode' => {
       Description => 'AFモード',
       PrintConv => {
+        '1-area' => '１点',
+        '1-area (high speed)' => '高速１点',
+        '3-area (center)?' => '３点中央？',
+        '3-area (left)?' => '３点左？',
+        '3-area (right)?' => '３点右？',
+        '5-area' => '５点',
+        'Face Detect AF' => '顔優先',
         'Normal?' => 'ノーマル？',
+        'Spot Focusing' => 'スポットフォーカス',
+        'Spot Mode On' => 'スポットモードオン',
+      },
+    },
+   'AFOnAELockButtonSwitch' => {
+      Description => 'AF-ON/AEロックボタン入替',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
       },
     },
    'AFPoint' => {
@@ -185,6 +260,8 @@ package Image::ExifTool::Lang::jp;
         'Face Detect' => '顔認識',
         'Left' => '左',
         'Manual AF point selection' => 'マニュアルAFポイント選択',
+        'Mid-left' => '中央左',
+        'Mid-right' => '中央右',
         'None' => '無し',
         'None (MF)' => '無し（MF）',
         'Right' => '右',
@@ -192,19 +269,41 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'AFPointActivationArea' => {
+      Description => 'AFフレームの領域拡大',
       PrintConv => {
         'Standard' => 'スタンダード',
       },
     },
-   'AFPointBrightness' => {
+   'AFPointAreaExpansion' => {
+      Description => '任意選択時のAFフレーム領域拡大',
       PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+        'Enable (left/right assist points)' => 'する(左右1領域アシスト有効)',
+        'Enable (surrounding assist points)' => 'する(周囲1領域アシスト有効)',
+      },
+    },
+   'AFPointAutoSelection' => {
+      Description => 'AFフレーム自動選択の選択可否',
+      PrintConv => {
+        'Control-direct:disable/Main:disable' => 'サブ電子ダイヤル直接:不可/メイン電子ダイヤル→不可',
+        'Control-direct:disable/Main:enable' => 'サブ電子ダイヤル直接:不可/メイン電子ダイヤル→可',
+        'Control-direct:enable/Main:enable' => 'サブ電子ダイヤル直接:可/メイン電子ダイヤル→可',
+      },
+    },
+   'AFPointBrightness' => {
+      Description => 'AFフレーム点灯輝度',
+      PrintConv => {
+        'Brighter' => '明るい',
         'Normal' => '標準',
       },
     },
    'AFPointDisplayDuringFocus' => {
+      Description => '測距時のAFフレーム表示',
       PrintConv => {
-        'Off' => 'オフ',
-        'On' => 'オン',
+        'Off' => 'しない',
+        'On' => 'する',
+        'On (when focus achieved)' => 'する(合焦時)',
       },
     },
    'AFPointIllumination' => {
@@ -222,10 +321,13 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'AFPointRegistration' => {
+      Description => 'AFフレームの登録',
       PrintConv => {
         'Automatic' => 'オート',
         'Bottom' => '下',
         'Center' => '中央',
+        'Extreme Left' => '左端',
+        'Extreme Right' => '右端',
         'Left' => '左',
         'Right' => '右',
         'Top' => '上',
@@ -265,10 +367,14 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'AFPointSelectionMethod' => {
+      Description => 'AFフレーム選択方法',
       PrintConv => {
+        'Multi-controller direct' => 'マルチコントローラーダイレクト',
         'Normal' => '標準',
+        'Quick Control Dial direct' => 'サブ電子ダイヤルダイレクト',
       },
     },
+   'AFPointSpotMetering' => 'AFフレーム数／スポット測光',
    'AFPoints' => 'AFポイント',
    'AFPointsInFocus' => {
       Description => 'AF測距点',
@@ -309,10 +415,23 @@ package Image::ExifTool::Lang::jp;
         'Upper-right, Top' => '右上+上',
       },
     },
+   'AFPointsInFocus1D' => 'AF測距点(1D)',
+   'AFPointsInFocus5D' => 'AF測距点',
    'AFPointsSelected' => 'AFポイント選択',
    'AFPointsUnknown2' => {
+      Description => 'AF測距点 未確認2？',
       PrintConv => {
         'Auto' => 'オート',
+      },
+    },
+   'AFPointsUsed' => {
+      Description => 'AF測距点',
+      PrintConv => {
+        'Bottom' => '下',
+        'Center' => '中央',
+        'Mid-left' => '中央左',
+        'Mid-right' => '中央右',
+        'Top' => '上',
       },
     },
    'AFPredictor' => 'AF予測',
@@ -325,18 +444,41 @@ package Image::ExifTool::Lang::jp;
         'Ready' => '準備完了',
       },
     },
-   'AIServoTrackingSensitivity' => {
+   'AIServoContinuousShooting' => 'AI SERVO 連続撮影・撮影速度優先',
+   'AIServoImagePriority' => {
+      Description => 'AIサーボ1コマ目/2コマ目以降動作',
       PrintConv => {
+        '1: AF, 2: Drive speed' => 'ピント優先/撮影速度優先',
+        '1: AF, 2: Tracking' => 'ピント優先/被写体追従優先',
+        '1: Release, 2: Drive speed' => 'レリーズ優先/撮影速度最優先',
+      },
+    },
+   'AIServoTrackingMethod' => {
+      Description => 'AIサーボ時の測距点選択特性',
+      PrintConv => {
+        'Continuous AF track priority' => '測距連続性優先',
+        'Main focus point priority' => '測距中心優先',
+      },
+    },
+   'AIServoTrackingSensitivity' => {
+      Description => 'AIサーボ時の被写体追従敏感度',
+      PrintConv => {
+        'Fast' => '速い',
+        'Slow' => '遅い',
         'Standard' => 'スタンダード',
       },
     },
    'APEVersion' => 'APEバージョン',
    'ARMIdentifier' => 'ARM識別子',
    'ARMVersion' => 'ARMバージョン',
+   'AToB0' => 'AからB0',
+   'AToB1' => 'AからB1',
+   'AToB2' => 'AからB2',
    'AccessoryType' => 'アクセサリータイプ',
    'ActionAdvised' => '動作推奨',
    'ActiveArea' => 'アクティブ領域',
    'ActiveD-Lighting' => {
+      Description => 'アクティブDライティング',
       PrintConv => {
         'High' => '高い',
         'Low' => 'ソフト',
@@ -354,11 +496,13 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'AddAspectRatioInfo' => {
+      Description => 'アスペクト比情報の付加',
       PrintConv => {
         'Off' => 'オフ',
       },
     },
    'AddOriginalDecisionData' => {
+      Description => 'オリジナル画像判定用データの付加',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
@@ -377,6 +521,11 @@ package Image::ExifTool::Lang::jp;
         'On' => 'オン',
       },
     },
+   'AdvancedSceneMode' => {
+      PrintConv => {
+        'Auto' => 'インテリジェントオート',
+      },
+    },
    'AlphaByteCount' => 'アルファバイト数',
    'AlphaDataDiscard' => {
       Description => 'アルファデータ破棄',
@@ -393,11 +542,20 @@ package Image::ExifTool::Lang::jp;
    'Anti-Blur' => {
       PrintConv => {
         'Off' => 'オフ',
+        'On (Continuous)' => 'オン（連写）',
+        'On (Shooting)' => 'オン（撮影）',
         'n/a' => '該当無し',
       },
     },
    'AntiAliasStrength' => 'カメラのアンチエイリアスフィルタの相対的な強度',
-   'Aperture' => 'F値',
+   'Aperture' => '絞り',
+   'ApertureRange' => {
+      Description => '絞り数値の制御範囲の設定',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
    'ApertureRingUse' => {
       Description => '絞りリングの使用',
       PrintConv => {
@@ -407,15 +565,37 @@ package Image::ExifTool::Lang::jp;
     },
    'ApertureValue' => '絞り',
    'ApplicationRecordVersion' => 'アプリケーションレコードバージョン',
+   'ApplyShootingMeteringMode' => {
+      Description => '撮影・測光モードの呼出',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
    'Artist' => '画像作成者',
    'AsShotICCProfile' => '撮影時ICCプロファイル',
    'AsShotNeutral' => 'ニュートラルショット',
    'AsShotPreProfileMatrix' => '撮影時プロファイルマトリックス',
    'AsShotProfileName' => '撮影時プロフィール名',
    'AsShotWhiteXY' => 'ホワイトX-Yショット',
-   'AssistButtonFunction' => {
+   'AssignFuncButton' => {
+      Description => 'FUNC.ボタンの機能',
       PrintConv => {
+        'Exposure comp./AEB setting' => '露出補正／AEB設定',
+        'Image jump with main dial' => 'メイン電子ダイヤル での画像送り',
+        'Image quality' => '記録画質選択',
+        'LCD brightness' => '液晶の明るさ',
+        'Live view function settings' => 'ライブビュー機能設定',
+      },
+    },
+   'AssistButtonFunction' => {
+      Description => 'アシストボタンの機能',
+      PrintConv => {
+        'Av+/- (AF point by QCD)' => 'Av±（サブ電子：AFフレーム選択）',
+        'FE lock' => 'FEロック',
         'Normal' => '標準',
+        'Select HP (while pressing)' => 'HPに移動（押している間）',
+        'Select Home Position' => 'HPに移動',
       },
     },
    'Audio' => {
@@ -430,6 +610,7 @@ package Image::ExifTool::Lang::jp;
    'AudioSamplingRate' => 'オーディオサンプリングレート',
    'AudioSamplingResolution' => 'オーディオサンプリング解像度',
    'AudioType' => 'オーディオタイプ',
+   'Author' => '作者',
    'AutoAperture' => {
       Description => '自動絞り',
       PrintConv => {
@@ -507,10 +688,14 @@ package Image::ExifTool::Lang::jp;
    'AutoISOMax' => 'ISOオート 最大感度',
    'AutoISOMinShutterSpeed' => 'ISOオート 最小シャッター速度',
    'AutoLightingOptimizer' => {
+      Description => 'オートライティングオプティマイザ',
       PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
         'Low' => 'ソフト',
         'Off' => 'オフ',
         'Standard' => 'スタンダード',
+        'Strong' => '強',
         'n/a' => '該当無し',
       },
     },
@@ -538,6 +723,16 @@ package Image::ExifTool::Lang::jp;
     },
    'AuxiliaryLens' => '補助レンズ',
    'AvApertureSetting' => 'Av絞り設定',
+   'AvSettingWithoutLens' => {
+      Description => 'レンズ未装着時の絞り数値設定',
+      PrintConv => {
+        'Disable' => '不可',
+        'Enable' => '可',
+      },
+    },
+   'BToA0' => 'BからA0',
+   'BToA1' => 'BからA1',
+   'BToA2' => 'BからA2',
    'BWFilter' => '白黒フィルター',
    'BWMode' => {
       Description => '白黒モード',
@@ -570,6 +765,7 @@ package Image::ExifTool::Lang::jp;
    'BatteryADBodyNoLoad' => '電源A/D本体オフ時',
    'BatteryADGripLoad' => '電源A/Dグリップ起動時',
    'BatteryADGripNoLoad' => '電源A/Dグリップオフ時',
+   'BatteryInfo' => '電源',
    'BatteryLevel' => 'バッテリーレベル',
    'BatteryOrder' => {
       Description => 'バッテリー順',
@@ -636,6 +832,7 @@ package Image::ExifTool::Lang::jp;
     },
    'BracketValue' => 'ブラケット値',
    'Brightness' => 'ブライトネス',
+   'BrightnessData' => 'ブライトネスデータ',
    'BrightnessValue' => 'ブライトネス',
    'BulbDuration' => 'バルブ時間',
    'BurstMode' => {
@@ -644,6 +841,13 @@ package Image::ExifTool::Lang::jp;
         'Infinite' => '無限',
         'Off' => 'オフ',
         'On' => 'オン',
+      },
+    },
+   'ButtonFunctionControlOff' => {
+      Description => 'サブ電子ダイヤル〈OFF〉時のボタン操作',
+      PrintConv => {
+        'Disable main, Control, Multi-control' => 'メイン電子ダイヤル、サブ電子ダイヤル、マルチコントローラーは無効',
+        'Normal (enable)' => '通常(有効)',
       },
     },
    'By-line' => '製作者',
@@ -725,15 +929,20 @@ package Image::ExifTool::Lang::jp;
    'CameraCalibration1' => 'カメラキャリブレーション1',
    'CameraCalibration2' => 'カメラキャリブレーション2',
    'CameraCalibrationSig' => 'カメラキャリブレーションサイン',
+   'CameraID' => 'カメラID',
    'CameraISO' => 'カメラISO',
+   'CameraInfo' => 'ペンタックスモデル',
    'CameraOrientation' => {
+      Description => '画像の向き',
       PrintConv => {
         'Horizontal (normal)' => '水平（標準）',
         'Rotate 270 CW' => '270度回転 CW',
         'Rotate 90 CW' => '90度回転 CW',
       },
     },
+   'CameraParameters' => 'カメラパラメーター',
    'CameraSerialNumber' => 'カメラシリアル番号',
+   'CameraSettings' => 'カメラ設定',
    'CameraSettingsVersion' => 'カメラ設定バージョン',
    'CameraTemperature' => 'カメラ温度',
    'CameraType' => {
@@ -746,6 +955,8 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'CameraType2' => 'カメラタイプ2',
+   'CanonAFInfo' => 'AF情報',
+   'CanonAFInfo2' => 'AF情報2',
    'CanonExposureMode' => {
       Description => '露出モード',
       PrintConv => {
@@ -758,6 +969,7 @@ package Image::ExifTool::Lang::jp;
         'Shutter speed priority AE' => 'シャッター優先',
       },
     },
+   'CanonFileInfo' => 'ファイル情報',
    'CanonFileLength' => 'ファイル長',
    'CanonFirmwareVersion' => 'ファームウェアバージョン',
    'CanonFlashMode' => {
@@ -773,6 +985,7 @@ package Image::ExifTool::Lang::jp;
         'Slow-sync' => 'スローシンクロ',
       },
     },
+   'CanonFocalLength' => 'フォーカスタイプ',
    'CanonImageHeight' => '画像高さ',
    'CanonImageSize' => {
       Description => 'イメージサイズ',
@@ -811,8 +1024,10 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'CharTarget' => '目的文字',
+   'CharacterSet' => 'キャラクターセット',
    'ChromaBlurRadius' => '彩度ぼけ半径',
    'ChromaticAdaptation' => '色彩順応化',
+   'Chromaticity' => '色度',
    'ChrominanceNR_TIFF_JPEG' => {
       PrintConv => {
         'High' => '高い',
@@ -847,6 +1062,7 @@ package Image::ExifTool::Lang::jp;
         'On' => 'オン',
       },
     },
+   'ColorBalance' => 'カラーバランス',
    'ColorBalance1' => 'カラーバランス1',
    'ColorBalanceAdj' => {
       Description => 'カラーバランス調整',
@@ -858,6 +1074,8 @@ package Image::ExifTool::Lang::jp;
    'ColorBalanceBlue' => 'カラーバランス青',
    'ColorBalanceGreen' => 'カラーバランス緑',
    'ColorBalanceRed' => 'カラーバランス赤',
+   'ColorBoostData' => 'カラーブーストデータ',
+   'ColorBoostLevel' => 'カラーブーストレベル1',
    'ColorBoostType' => {
       Description => 'カラーブーストタイプ',
       PrintConv => {
@@ -892,6 +1110,7 @@ package Image::ExifTool::Lang::jp;
         'Blue' => '青',
         'Green' => '緑',
         'Off' => 'オフ',
+        'Pink' => 'ピンク',
         'Purple' => '紫',
         'Red' => '赤',
         'Sepia' => 'セピア',
@@ -900,6 +1119,7 @@ package Image::ExifTool::Lang::jp;
     },
    'ColorGain' => 'カラーゲイン',
    'ColorHue' => '色相',
+   'ColorInfo' => '色情報',
    'ColorMap' => 'カラーマップ',
    'ColorMatrix' => 'カラーマトリックス',
    'ColorMatrix1' => 'カラーマトリックス1',
@@ -908,17 +1128,22 @@ package Image::ExifTool::Lang::jp;
    'ColorMode' => {
       Description => 'カラーモード',
       PrintConv => {
+        'Autumn Leaves' => '紅葉',
         'B & W' => '白黒',
         'B&W' => '白黒',
         'Black & White' => '白黒',
         'Black&white' => '白黒',
         'Chrome' => 'クローム',
+        'Clear' => 'クリアー',
+        'Deep' => 'ディープ',
         'Landscape' => '風景',
+        'Light' => 'ライト',
         'Natural' => 'ナチュラル',
         'Natural color' => 'ナチュラルカラー',
         'Neutral' => 'ニュートラル',
         'Night Portrait' => '人物夜景',
         'Night Scene' => '夜景',
+        'Night View' => 'ナイトビュー',
         'Normal' => 'ノーマル',
         'Off' => 'オフ',
         'Portrait' => 'ポートレート',
@@ -966,8 +1191,22 @@ package Image::ExifTool::Lang::jp;
    'ColorSpaceData' => 'カラースペースデータ',
    'ColorTable' => 'カラーテーブル',
    'ColorTemperature' => '色温度',
-   'ColorTone' => 'カラートーン',
+   'ColorTone' => {
+      Description => 'カラートーン',
+      PrintConv => {
+        'Normal' => '標準',
+      },
+    },
+   'ColorToneFaithful' => 'カラートーン忠実設定',
+   'ColorToneLandscape' => 'カラートーン風景',
+   'ColorToneNeutral' => 'カラートーンニュートラル',
+   'ColorTonePortrait' => 'カラートーンポートレート',
+   'ColorToneStandard' => 'カラートーンスタンダード',
+   'ColorToneUserDef1' => 'カラートーンユーザ設定1',
+   'ColorToneUserDef2' => 'カラートーンユーザ設定2',
+   'ColorToneUserDef3' => 'カラートーンユーザ設定3',
    'ColorantOrder' => '着色順',
+   'ColorantTable' => '着色テーブル',
    'ColorimetricReference' => '比色分析参照',
    'CommandDials' => {
       Description => 'コマンダーダイヤル',
@@ -1004,10 +1243,11 @@ package Image::ExifTool::Lang::jp;
         'Yes' => 'はい',
       },
     },
-   'CommanderChannel' => 'コマンダーモード > チャンネル',
+   'CommanderChannel' => 'コマンダーモード チャンネル',
    'CommanderGroupAMode' => {
       Description => 'コマンダーモード グループA モード',
       PrintConv => {
+        'Auto Aperture' => '自動絞り（AA）',
         'Manual' => 'マニュアル',
         'Off' => 'オフ',
       },
@@ -1017,6 +1257,7 @@ package Image::ExifTool::Lang::jp;
    'CommanderGroupBMode' => {
       Description => 'コマンダーモード グループB モード',
       PrintConv => {
+        'Auto Aperture' => '自動絞り（AA）',
         'Manual' => 'マニュアル',
         'Off' => 'オフ',
       },
@@ -1079,19 +1320,46 @@ package Image::ExifTool::Lang::jp;
         'Single' => '１コマ撮影',
       },
     },
+   'ContinuousShootingSpeed' => {
+      Description => '連続撮影速度',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
+   'ContinuousShotLimit' => {
+      Description => '連続撮影時の撮影枚数制限',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
    'Contrast' => {
       Description => 'コントラスト',
       PrintConv => {
         'Film Simulation' => 'フィルムシミュレーション',
         'High' => 'ハード',
         'Low' => 'ソフト',
+        'Med High' => '少し高い',
+        'Med Low' => '少し低い',
         'Medium High' => '少し高い',
         'Medium Low' => '少し低い',
         'Normal' => 'スタンダード',
+        'Very High' => 'かなり高い',
+        'Very Low' => 'かなり低い',
       },
     },
    'ContrastCurve' => 'コントラストカーブ',
+   'ContrastFaithful' => 'コントラスト忠実設定',
+   'ContrastLandscape' => 'コントラスト風景',
+   'ContrastMonochrome' => 'コントラストモノクロ',
+   'ContrastNeutral' => 'コントラストニュートラル',
+   'ContrastPortrait' => 'コントラストポートレート',
    'ContrastSetting' => 'コントラスト設定',
+   'ContrastStandard' => 'コントラストスタンダード',
+   'ContrastUserDef1' => 'コントラストユーザ設定1',
+   'ContrastUserDef2' => 'コントラストユーザ設定2',
+   'ContrastUserDef3' => 'コントラストユーザ設定3',
    'ControlMode' => {
       Description => 'コントロールモード',
       PrintConv => {
@@ -1109,6 +1377,7 @@ package Image::ExifTool::Lang::jp;
         'Wide' => 'ワイド',
       },
     },
+   'Converter' => 'コンバーター',
    'Copyright' => '版権所有者',
    'CopyrightNotice' => '著作権表示',
    'CopyrightStatus' => {
@@ -1121,7 +1390,16 @@ package Image::ExifTool::Lang::jp;
    'Country-PrimaryLocationCode' => 'ISO国コード',
    'Country-PrimaryLocationName' => '国',
    'CreateDate' => 'デジタルデータ作成日時',
+   'CreationDate' => '作成日時',
    'Creator' => '製作者',
+   'CreatorAddress' => 'クリエーター　-　住所',
+   'CreatorCity' => 'クリエーター　-　街',
+   'CreatorCountry' => 'クリエーター　-　国',
+   'CreatorPostalCode' => 'クリエーター　-　郵便番号',
+   'CreatorRegion' => 'クリエーター　-　国/州',
+   'CreatorWorkEmail' => 'クリエーター　-　電子メール',
+   'CreatorWorkTelephone' => 'クリエーター　-　電話番号',
+   'CreatorWorkURL' => 'クリエーター　-　WEBサイト',
    'Credit' => 'プロバイダー',
    'CropActive' => {
       PrintConv => {
@@ -1129,6 +1407,7 @@ package Image::ExifTool::Lang::jp;
         'Yes' => 'はい',
       },
     },
+   'CropData' => 'クロップデータ',
    'CropHeight' => '最終高さ',
    'CropHiSpeed' => 'ハイスピードクロップ',
    'CropLeft' => '開始オフセットX',
@@ -1143,6 +1422,8 @@ package Image::ExifTool::Lang::jp;
         'On' => 'オン',
       },
     },
+   'Custom1' => 'カスタム1',
+   'Custom2' => 'カスタム2',
    'CustomRendered' => {
       Description => 'カスタム画像処理',
       PrintConv => {
@@ -1158,12 +1439,16 @@ package Image::ExifTool::Lang::jp;
         'On' => 'オン',
       },
     },
+   'D-LightingHQColorBoost' => 'DライティングHQカラーブースト',
+   'D-LightingHQHighlight' => 'DライティングHQハイライト',
    'D-LightingHQSelected' => {
+      Description => 'DライティングHQ選択',
       PrintConv => {
         'No' => 'いいえ',
         'Yes' => 'はい',
       },
     },
+   'D-LightingHQShadow' => 'DライティングHQシャドウ',
    'D-LightingHS' => {
       Description => 'DライティングHS',
       PrintConv => {
@@ -1171,6 +1456,8 @@ package Image::ExifTool::Lang::jp;
         'On' => 'オン',
       },
     },
+   'D-LightingHSAdjustment' => 'DライティングHS調整',
+   'D-LightingHSColorBoost' => 'DライティングHSカラーブースト',
    'DECPosition' => {
       Description => 'DEC位置',
       PrintConv => {
@@ -1208,6 +1495,7 @@ package Image::ExifTool::Lang::jp;
    'DateStampMode' => {
       Description => '日付スタンプモード',
       PrintConv => {
+        'Date' => '日付',
         'Off' => 'オフ',
       },
     },
@@ -1243,13 +1531,17 @@ package Image::ExifTool::Lang::jp;
    'DeviceModelDesc' => '機器モデル説明',
    'DeviceSettingDescription' => 'デバイス設定の説明',
    'DialDirectionTvAv' => {
+      Description => 'Tv/Av値設定時のダイヤル回転',
       PrintConv => {
-        'Normal' => '標準',
+        'Normal' => '通常',
+        'Reversed' => '設定方向を反転',
       },
     },
    'DigitalCreationDate' => 'デジタル作成日付',
    'DigitalCreationTime' => 'デジタル作成時間',
+   'DigitalGEM' => 'デジタルGEM',
    'DigitalICE' => 'デジタルICE',
+   'DigitalROC' => 'デジタルROC',
    'DigitalZoom' => {
       Description => 'デジタルズーム',
       PrintConv => {
@@ -1266,6 +1558,8 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'DigitalZoomRatio' => 'デジタルズーム比率',
+   'DirectoryIndex' => 'ディレクトリ索引',
+   'DirectoryNumber' => 'ディレクトリ番号',
    'DisplayAperture' => '絞り表示',
    'DisplaySize' => {
       PrintConv => {
@@ -1294,16 +1588,27 @@ package Image::ExifTool::Lang::jp;
       Description => 'ドライブモード',
       PrintConv => {
         'Bracketing' => 'ブラケット',
+        'Burst' => '高速連射',
         'Continuous' => '連続撮影',
+        'Continuous (Hi)' => '連射 (Hi)',
         'Continuous shooting' => '連続撮影',
         'HS continuous' => 'HS連写',
         'Interval' => 'インターバル',
+        'Multiple Exposure' => '複数の露出',
+        'No Timer' => 'タイマー無し',
         'Off' => 'オフ',
+        'Remote Control' => 'リモコン',
+        'Remote Control (3 s delay)' => 'リモコン (3秒後レリーズ)',
         'Self-timer' => 'セルフタイマー',
+        'Self-timer (12 s)' => 'セルフタイマー (12秒)',
+        'Self-timer (2 s)' => 'セルフタイマー (2秒)',
         'Self-timer Operation' => 'セルフタイマー',
+        'Shutter Button' => 'シャッターボタン',
         'Single' => '１コマ撮影',
+        'Single Exposure' => 'シングル露出',
         'Single Frame' => '１コマ撮影',
         'Single Shot' => '１コマ撮影',
+        'Single-frame' => '1コマ撮影',
         'Single-frame shooting' => '１コマ撮影',
         'UHS continuous' => 'UHS連写',
       },
@@ -1361,8 +1666,10 @@ package Image::ExifTool::Lang::jp;
    'ETTLII' => {
       PrintConv => {
         'Average' => '平均',
+        'Evaluative' => '評価',
       },
     },
+   'EVStepInfo' => 'EVステップ情報',
    'EVStepSize' => {
       Description => 'EVステップ',
       PrintConv => {
@@ -1495,6 +1802,7 @@ package Image::ExifTool::Lang::jp;
    'ExpandSoftware' => '拡張ソフト',
    'ExpirationDate' => '有効日付',
    'ExpirationTime' => '有効時間',
+   'Exposure' => '露出',
    'ExposureBracketStepSize' => '露出ブラケットステップサイズ',
    'ExposureBracketValue' => '露出ブラケット値',
    'ExposureCompensation' => '露出補正値',
@@ -1518,8 +1826,11 @@ package Image::ExifTool::Lang::jp;
    'ExposureLevelIncrements' => {
       Description => '露出制御のEVステップ',
       PrintConv => {
+        '1-stop set, 1/3-stop comp.' => '設定1 露出補正1/3',
         '1/2 Stop' => '1/2ステップ',
+        '1/2-stop set, 1/2-stop comp.' => '設定1/2 露出補正1/2',
         '1/3 Stop' => '1/3ステップ',
+        '1/3-stop set, 1/3-stop comp.' => '設定1/3 露出補正1/3',
       },
     },
    'ExposureMode' => {
@@ -1535,15 +1846,19 @@ package Image::ExifTool::Lang::jp;
         'Night Scene' => '夜景',
         'Portrait' => 'ポートレート',
         'Program' => 'プログラム',
+        'Program AE' => 'プログラムAE',
         'Program-shift' => 'プログラムシフト',
         'Shutter Priority' => 'シャッター優先',
         'Shutter speed priority AE' => 'シャッター優先',
       },
     },
    'ExposureModeInManual' => {
+      Description => 'マニュアル露出時の測光モード',
       PrintConv => {
         'Center-weighted average' => '中央重点',
+        'Evaluative metering' => '評価測光',
         'Partial metering' => '部分',
+        'Specified metering mode' => '設定測光モード',
         'Spot metering' => 'スポット',
       },
     },
@@ -1613,6 +1928,7 @@ package Image::ExifTool::Lang::jp;
         'n/a (Manual Mode)' => '未設定（マニュアルモード）',
       },
     },
+   'ExternalFlashFlags' => '外付フラッシュフラグ',
    'ExternalFlashGuideNumber' => '外付フラッシュガイドナンバー？',
    'ExternalFlashMode' => {
       Description => '外付フラッシュモード',
@@ -1641,7 +1957,15 @@ package Image::ExifTool::Lang::jp;
    'Face6Position' => '顔6位置',
    'Face7Position' => '顔7位置',
    'Face8Position' => '顔8位置',
-   'FaceDetect' => '顔認識',
+   'FaceDetect' => {
+      Description => '顔認識',
+      PrintConv => {
+        'Off' => 'オフ',
+        'On' => 'オン',
+      },
+    },
+   'FaceDetect1' => '顔認識',
+   'FaceDetect2' => '顔認識',
    'FaceDetectArea' => '顔エリア',
    'FaceDetectFrameHeight' => 'フレーム高',
    'FaceDetectFrameWidth' => 'フレーム幅',
@@ -1661,6 +1985,9 @@ package Image::ExifTool::Lang::jp;
    'FaxRecvTime' => 'FAX受信時間',
    'FaxSubAddress' => 'FAXサブアドレス',
    'FileFormat' => 'ファイル形式',
+   'FileIndex' => 'ファイル索引',
+   'FileInfo' => 'ファイル情報',
+   'FileInfoVersion' => 'ファイル情報バージョン',
    'FileName' => 'ファイル名',
    'FileNumber' => 'ファイル番号',
    'FileNumberMemory' => {
@@ -1687,6 +2014,14 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'FileType' => 'ファイルタイプ',
+   'FileVersion' => 'ファイル形式バージョン',
+   'FillFlashAutoReduction' => {
+      Description => '日中シンクロ・ストロボ露出自動低減制御',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
    'FillOrder' => {
       Description => 'フルオーダー',
       PrintConv => {
@@ -1725,6 +2060,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'FilterEffectMonochrome' => {
+      Description => 'モノクロフィルター効果',
       PrintConv => {
         'Green' => '緑',
         'None' => '無し',
@@ -1734,14 +2070,15 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'FinderDisplayDuringExposure' => {
+      Description => '露光中のファインダー内表示',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
       },
     },
-   'FineTuneOptCenterWeighted' => '最適露出微調整 > 中央重点測光',
-   'FineTuneOptMatrixMetering' => '最適露出微調整 > 分割測光',
-   'FineTuneOptSpotMetering' => '最適露出微調整 > スポット測光',
+   'FineTuneOptCenterWeighted' => '最適露出微調整 中央重点測光',
+   'FineTuneOptMatrixMetering' => '最適露出微調整 分割測光',
+   'FineTuneOptSpotMetering' => '最適露出微調整 スポット測光',
    'FineTuneStepSize' => {
       Description => '露出補正/ファインチューン',
       PrintConv => {
@@ -1795,14 +2132,17 @@ package Image::ExifTool::Lang::jp;
    'FlashBits' => 'フラッシュ詳細',
    'FlashChargeLevel' => 'フラッシュチャージレベル',
    'FlashCommanderMode' => {
+      Description => 'コマンダーモード',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
       },
     },
+   'FlashCompensation' => 'フラッシュ補正',
    'FlashControlMode' => {
       Description => 'フラッシュコントロールモード',
       PrintConv => {
+        'Auto Aperture' => '自動絞り（AA）',
         'Manual' => 'マニュアル',
         'Off' => 'オフ',
         'Repeating Flash' => 'リピーティングフラッシュ',
@@ -1828,33 +2168,58 @@ package Image::ExifTool::Lang::jp;
         'On' => 'オン',
       },
     },
-   'FlashFired' => 'フラッシュ発光',
+   'FlashFired' => {
+      Description => 'フラッシュ発光',
+      PrintConv => {
+        'No' => 'いいえ',
+        'Yes' => 'はい',
+      },
+    },
+   'FlashFiring' => {
+      Description => 'ストロボの発光',
+      PrintConv => {
+        'Does not fire' => 'しない',
+        'Fires' => 'する',
+      },
+    },
    'FlashFirmwareVersion' => 'フラッシュファームウェアバージョン',
+   'FlashFocalLength' => 'フラッシュ焦点距離',
    'FlashGroupAControlMode' => {
       Description => 'グループAフラッシュコントロールモード',
       PrintConv => {
+        'Auto Aperture' => '自動絞り（AA）',
         'Manual' => 'マニュアル',
         'Off' => 'オフ',
         'Repeating Flash' => 'リピーティングフラッシュ',
       },
     },
+   'FlashGroupAExposureComp' => 'グループAフラッシュ補正',
+   'FlashGroupAOutput' => 'グループAフラッシュ出力',
    'FlashGroupBControlMode' => {
       Description => 'グループBフラッシュコントロールモード',
       PrintConv => {
+        'Auto Aperture' => '自動絞り（AA）',
         'Manual' => 'マニュアル',
         'Off' => 'オフ',
         'Repeating Flash' => 'リピーティングフラッシュ',
       },
     },
+   'FlashGroupBExposureComp' => 'グループBフラッシュ補正',
+   'FlashGroupBOutput' => 'グループBフラッシュ出力',
    'FlashGroupCControlMode' => {
       Description => 'グループCフラッシュコントロールモード',
       PrintConv => {
+        'Auto Aperture' => '自動絞り（AA）',
         'Manual' => 'マニュアル',
         'Off' => 'オフ',
         'Repeating Flash' => 'リピーティングフラッシュ',
       },
     },
+   'FlashGroupCExposureComp' => 'グループCフラッシュ補正',
+   'FlashGroupCOutput' => 'グループCフラッシュ出力',
    'FlashGuideNumber' => 'フラッシュガイドナンバー',
+   'FlashInfo' => 'ストロボ情報',
+   'FlashInfoVersion' => 'フラッシュ情報バージョン',
    'FlashIntensity' => {
       Description => 'フラッシュ強度',
       PrintConv => {
@@ -1872,34 +2237,51 @@ package Image::ExifTool::Lang::jp;
       Description => 'フラッシュモード',
       PrintConv => {
         'Auto' => 'オート',
+        'Auto, Did not fire' => 'オート、発光無し',
+        'Auto, Did not fire, Red-eye reduction' => 'オート、発光無し、赤目軽減',
+        'Auto, Fired' => 'オート、発光',
+        'Auto, Fired, Red-eye reduction' => 'オート、発光、赤目軽減',
         'Did Not Fire' => '発光禁止',
+        'External, Auto' => '外付、オート',
+        'External, Contrast-control Sync' => '外付、光量比制御シンクロ',
+        'External, Flash Problem' => '外付、フラッシュの問題?',
+        'External, High-speed Sync' => '外付、ハイスピードシンクロ',
+        'External, Manual' => '外付、マニュアル',
+        'External, P-TTL Auto' => '外付、P-TTL自動調光',
+        'External, Wireless' => '外付、ワイヤレス',
+        'External, Wireless, High-speed Sync' => '外付、ワイヤレス、ハイスピードシンクロ',
         'Fill flash' => '強制発光',
         'Fired, Commander Mode' => '発光、コマンダーモード',
         'Fired, External' => '発光、外付',
         'Fired, Manual' => '発光、マニュアル',
         'Fired, TTL Mode' => '発光、TTLモード',
+        'Internal' => '内蔵',
         'Normal' => '標準',
         'Off' => 'オフ',
+        'Off, Did not fire' => 'オフ',
         'Off?' => 'オフ？',
         'On' => 'オン',
+        'On, Did not fire' => 'オン、発光無し',
+        'On, Fired' => 'オン',
+        'On, Red-eye reduction' => 'オン、赤目軽減',
+        'On, Slow-sync' => 'オン、スローシンクロ',
+        'On, Slow-sync, Red-eye reduction' => 'オン、スローシンクロ、赤目軽減',
+        'On, Soft' => 'オン、ソフト',
+        'On, Trailing-curtain Sync' => 'オン、後幕シンクロ',
+        'On, Wireless (Control)' => 'オン、ワイヤレス (コントロール)',
+        'On, Wireless (Master)' => 'オン、ワイヤレス (マスター)',
         'Rear flash sync' => 'リアフラッシュシンクロ',
         'Red-eye Reduction' => '赤目軽減',
         'Red-eye reduction' => '赤目軽減',
         'Unknown' => '不明',
         'Wireless' => 'ワイヤレス',
+        'n/a - Off-Auto-Aperture' => '該当なし-自動絞りオフ',
       },
     },
    'FlashModel' => {
       Description => 'フラッシュモデル',
       PrintConv => {
         'None' => '無し',
-      },
-    },
-   'FlashOn' => {
-      Description => 'ストロボ',
-      PrintConv => {
-        'Off' => 'オフ',
-        'On' => 'オン',
       },
     },
    'FlashOptions' => {
@@ -1946,7 +2328,11 @@ package Image::ExifTool::Lang::jp;
     },
    'FlashSyncSpeed' => 'フラッシュ同調速度',
    'FlashSyncSpeedAv' => {
+      Description => 'Avモード時のストロボ同調速度',
       PrintConv => {
+        '1/200 Fixed' => '1/200秒固定',
+        '1/250 Fixed' => '1/250秒固定',
+        '1/300 Fixed' => '1/300秒固定',
         'Auto' => 'オート',
       },
     },
@@ -2005,6 +2391,7 @@ package Image::ExifTool::Lang::jp;
     },
    'FocalUnits' => '焦点単位/mm',
    'Focus' => {
+      Description => 'フォーカス',
       PrintConv => {
         'Manual' => 'マニュアル',
       },
@@ -2034,28 +2421,29 @@ package Image::ExifTool::Lang::jp;
         'AI Focus AF' => 'AIフォーカスAF',
         'AI Servo AF' => 'AIサーボAF',
         'Auto' => 'オート',
+        'Auto, Continuous' => 'オート、コンティニュアス',
+        'Auto, Focus button' => 'オート、フォーカスボタン',
         'Continuous' => '連写',
+        'Continuous AF' => 'コンティニュアスAF',
         'Custom' => 'カスタム',
         'Infinity' => '無限遠',
         'Macro' => 'マクロ',
         'Macro (1)' => 'マクロ(1)',
         'Macro (2)' => 'マクロ(2)',
         'Manual' => 'マニュアル',
-        'Manual Focus (3)' => 'マニュアルフォーカス',
-        'Manual Focus (6)' => 'マニュアルフォーカス',
+        'Manual Focus (3)' => 'マニュアルフォーカス(3)',
+        'Manual Focus (6)' => 'マニュアルフォーカス(6)',
+        'Multi AF' => 'マルチAF',
         'Normal' => '標準',
         'One-shot AF' => 'ワンショットAF',
         'Pan Focus' => 'パンフォーカス',
+        'Sequential shooting AF' => 'シーケンシャルシューティングAF',
         'Single' => 'シングル',
+        'Single AF' => 'シングルAF',
         'Super Macro' => 'スーパーマクロ',
       },
     },
-   'FocusMode2' => {
-      Description => 'フォーカスモード2',
-      PrintConv => {
-        'Manual' => 'マニュアル',
-      },
-    },
+   'FocusMode2' => 'フォーカスモード2',
    'FocusModeSetting' => {
       Description => 'フォーカスモード',
       PrintConv => {
@@ -2071,7 +2459,13 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'FocusPosition' => 'フォーカス距離',
-   'FocusProcess' => 'フォーカスプロセス',
+   'FocusProcess' => {
+      Description => 'フォーカスプロセス',
+      PrintConv => {
+        'AF Not Used' => 'AF未使用',
+        'AF Used' => 'AF使用',
+      },
+    },
    'FocusRange' => {
       Description => 'フォーカスレンジ',
       PrintConv => {
@@ -2091,6 +2485,8 @@ package Image::ExifTool::Lang::jp;
     },
    'FocusSetting' => 'フォーカス設定',
    'FocusStepCount' => 'フォーカスステップ数',
+   'FocusStepInfinity' => '無限レンズステップ',
+   'FocusStepNear' => 'ニアステップ数',
    'FocusTrackingLockOn' => {
       Description => 'フォーカストラッキングとロックオン',
       PrintConv => {
@@ -2107,6 +2503,7 @@ package Image::ExifTool::Lang::jp;
         'Out of focus' => 'ピンボケ',
       },
     },
+   'FocusingScreen' => 'フォーカシングスクリーン',
    'FolderName' => 'フォルダ名',
    'ForwardMatrix1' => '前行列1',
    'ForwardMatrix2' => '前行列2',
@@ -2138,6 +2535,7 @@ package Image::ExifTool::Lang::jp;
         'Spot Metering' => 'スポット測光',
       },
     },
+   'GEMInfo' => 'GEM情報',
    'GIFVersion' => 'GIFバージョン',
    'GPSAltitude' => '高度',
    'GPSAltitudeRef' => {
@@ -2303,9 +2701,11 @@ package Image::ExifTool::Lang::jp;
    'HCUsage' => 'HC使用',
    'HalftoneHints' => 'ハーフトーンヒント',
    'Headline' => 'ヘッドライン',
+   'HeightResolution' => '高さ方向の画像解像度',
    'HighISONoiseReduction' => {
       Description => '高感度ノイズリダクション',
       PrintConv => {
+        'Disable' => 'しない',
         'High' => '高い',
         'Low' => 'ソフト',
         'Minimal' => '最小',
@@ -2320,7 +2720,10 @@ package Image::ExifTool::Lang::jp;
     },
    'Highlight' => 'ハイライト',
    'HighlightTonePriority' => {
+      Description => '高輝度側・階調優先',
       PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
         'Off' => 'オフ',
         'On' => 'オン',
       },
@@ -2340,6 +2743,7 @@ package Image::ExifTool::Lang::jp;
    'ICC_Profile' => 'ICC入力色プロフィール',
    'IPTC-NAA' => 'IPTC-NAAメタデータ',
    'IPTCBitsPerSample' => 'サンプルあたりビット数',
+   'IPTCData' => 'IPTCデータ',
    'IPTCImageHeight' => 'ライン数',
    'IPTCImageRotation' => 'イメージ回転',
    'IPTCImageWidth' => 'ラインあたりのピクセル数',
@@ -2349,17 +2753,20 @@ package Image::ExifTool::Lang::jp;
    'ISO' => 'ISOスピードレート',
    'ISO2' => 'ISO（2）',
    'ISOExpansion' => {
+      Description => 'ISO感度拡張',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
       },
     },
    'ISOExpansion2' => {
+      Description => 'ISO拡大（2）',
       PrintConv => {
         'Off' => 'オフ',
       },
     },
    'ISOFloor' => '最低感度',
+   'ISOInfo' => 'ISO情報',
    'ISOSelection' => 'ISO選択',
    'ISOSetting' => {
       Description => 'ISO設定',
@@ -2369,6 +2776,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'ISOSpeedExpansion' => {
+      Description => 'ISO感度拡張',
       PrintConv => {
         'No' => 'いいえ',
         'Yes' => 'はい',
@@ -2379,6 +2787,13 @@ package Image::ExifTool::Lang::jp;
       PrintConv => {
         '1 Stop' => '1ステップ',
         '1/3 Stop' => '1/3ステップ',
+      },
+    },
+   'ISOSpeedRange' => {
+      Description => 'ISO感度の制御範囲の設定',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
       },
     },
    'ISOStepSize' => {
@@ -2434,6 +2849,7 @@ package Image::ExifTool::Lang::jp;
    'ImageHeight' => '画像高さ',
    'ImageHistory' => '画像履歴',
    'ImageID' => 'イメージID',
+   'ImageInfo' => '画像情報',
    'ImageLayer' => 'イメージレイヤー',
    'ImageNumber' => 'イメージ番号',
    'ImageNumber2' => 'イメージ番号(2)',
@@ -2468,6 +2884,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'ImageQuality2' => 'イメージ品質2',
+   'ImageResourceBlocks' => 'イメージリソースブロック',
    'ImageReview' => {
       Description => '画像評価',
       PrintConv => {
@@ -2510,6 +2927,13 @@ package Image::ExifTool::Lang::jp;
    'ImageWidth' => '画像幅',
    'Indexed' => 'インデックス',
    'InfinityLensStep' => '無限レンズステップ',
+   'InfoButtonWhenShooting' => {
+      Description => '撮影時のINFOボタン',
+      PrintConv => {
+        'Displays camera settings' => 'カメラ設定内容を表示',
+        'Displays shooting functions' => '撮影機能の設定状態を表示',
+      },
+    },
    'InitialZoomSetting' => {
       Description => '初期ズーム設定',
       PrintConv => {
@@ -2520,6 +2944,7 @@ package Image::ExifTool::Lang::jp;
     },
    'InkNames' => 'インク名',
    'InkSet' => 'インクセット',
+   'IntellectualGenre' => 'インテリジャンル',
    'IntensityStereo' => {
       PrintConv => {
         'Off' => 'オフ',
@@ -2591,15 +3016,17 @@ package Image::ExifTool::Lang::jp;
    'JPEGPointTransforms' => 'JPEG位置変換',
    'JPEGProc' => 'JPEG処理',
    'JPEGQTables' => 'JPEG Q テーブル',
+   'JPEGQuality' => 'JPEG　品質',
    'JPEGRestartInterval' => 'JPEG再開間隔',
    'JPEGTables' => 'JPEGテーブル',
    'JobID' => 'ジョブID',
    'JpgRecordedPixels' => 'JPEG記録サイズ',
+   'Keyword' => 'キーワード',
    'Keywords' => 'キーワード',
    'LC1' => 'レンズデータ',
-   'LC10' => 'mv\' nv\' データ',
+   'LC10' => 'Mv\' nv\' データ',
    'LC11' => 'AVC 1/EXP データ',
-   'LC12' => 'mv1 Avminsifデータ',
+   'LC12' => 'Mv1 Avminsifデータ',
    'LC14' => 'UNT_12 UNT_6 データ',
    'LC15' => '統合フラッシュ最適エンドデータ',
    'LC2' => '距離コードデータ',
@@ -2608,6 +3035,20 @@ package Image::ExifTool::Lang::jp;
    'LC5' => '明色収差訂正データ',
    'LC6' => 'オープン収差データ',
    'LC7' => 'AF最低作動状態データ（LC7）',
+   'LCDDisplayAtPowerOn' => {
+      Description => '電源スイッチ〈ON〉時の液晶点灯',
+      PrintConv => {
+        'Display' => '点灯',
+        'Retain power off status' => '電源〈OFF〉時の状態を保持',
+      },
+    },
+   'LCDDisplayReturnToShoot' => {
+      Description => '液晶モニター表示中の撮影状態復帰',
+      PrintConv => {
+        'Also with * etc.' => '*ボタンなどでも復帰',
+        'With Shutter Button only' => 'シャッターボタンでのみ復帰',
+      },
+    },
    'LCDIllumination' => {
       Description => 'LCDイルミネーション',
       PrintConv => {
@@ -2616,11 +3057,13 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'LCDIlluminationDuringBulb' => {
+      Description => 'バルブ撮影中の表示パネル照明',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
       },
     },
+   'LCDPanels' => '上面表示パネル／背面表示パネル',
    'LCHEditor' => {
       Description => 'LCHエディター',
       PrintConv => {
@@ -2630,12 +3073,37 @@ package Image::ExifTool::Lang::jp;
     },
    'LanguageIdentifier' => '言語識別子',
    'LastFileNumber' => '最終ファイル番号',
+   'LeafData' => 'リーフデータ',
    'Lens' => 'レンズ',
    'Lens35efl' => 'レンズ',
+   'LensAFStopButton' => {
+      Description => 'レンズ・AFストップボタンの機能',
+      PrintConv => {
+        'AE lock' => 'AEロック',
+        'AE lock while metering' => 'AEロック(タイマー中)',
+        'AF Stop' => 'AFストップ',
+        'AF point: M->Auto/Auto->ctr' => '測距点 任意→自動/自動→中央',
+        'AF start' => 'AFスタート',
+        'AF stop' => 'AFストップ',
+        'IS start' => '手ブレ補正機能作動',
+        'One Shot <-> AI servo' => 'ワンショット/AIサーボ',
+        'Switch to registered AF point' => '登録AFフレームへの切り換え',
+      },
+    },
    'LensApertureRange' => 'レンズ絞り範囲',
+   'LensData' => 'K値(LC3)',
    'LensDistortionParams' => 'レンズ歪曲パラメータ',
+   'LensDriveNoAF' => {
+      Description => 'AF測距不能時のレンズ動作',
+      PrintConv => {
+        'Focus search off' => '駆動しない',
+        'Focus search on' => 'サーチ駆動する',
+      },
+    },
    'LensFStops' => 'レンズF値',
    'LensFirmwareVersion' => 'レンズファームウェアバージョン',
+   'LensID' => 'レンズID',
+   'LensInfo' => 'レンズ情報',
    'LensKind' => 'レンズ種類/バージョン(LC0)',
    'LensProperties' => 'レンズ機能？',
    'LensSerialNumber' => 'レンズシリアル番号',
@@ -2654,9 +3122,13 @@ package Image::ExifTool::Lang::jp;
       PrintConv => {
         'Cloudy' => '曇り',
         'Cool White Fluorescent' => '白色蛍光灯',
+        'Cool White Fluorescent (W 3900 - 4500K)' => '冷白色蛍光灯(W 3900 - 4500K)',
+        'Custom 1-4' => 'カスタム1-4',
         'Day White Fluorescent' => '昼白色蛍光灯',
+        'Day White Fluorescent (N 4600 - 5400K)' => '昼白色蛍光灯(N 4600 - 5400K)',
         'Daylight' => '昼光',
         'Daylight Fluorescent' => '昼光色蛍光灯',
+        'Daylight Fluorescent (D 5700 - 7100K)' => '昼光色蛍光灯(D 5700 - 7100K)',
         'Fine Weather' => '良い天気',
         'Flash' => 'ストロボ',
         'Fluorescent' => '蛍光灯',
@@ -2669,6 +3141,7 @@ package Image::ExifTool::Lang::jp;
         'Tungsten' => 'タングステン(白熱灯)',
         'Unknown' => '不明',
         'White Fluorescent' => '温白色蛍光灯',
+        'White Fluorescent (WW 3200 - 3700K)' => '白色蛍光灯(WW 3200 - 3700K)',
       },
     },
    'LightSourceSpecial' => {
@@ -2680,6 +3153,19 @@ package Image::ExifTool::Lang::jp;
     },
    'LinearResponseLimit' => '線型反応限界',
    'LinearizationTable' => '線形化テーブル',
+   'Lit' => {
+      PrintConv => {
+        'No' => 'いいえ',
+        'Yes' => 'はい',
+      },
+    },
+   'LiveViewExposureSimulation' => {
+      Description => 'ライブビュー露出シミュレーション',
+      PrintConv => {
+        'Disable (LCD auto adjust)' => 'しない(適正表示)',
+        'Enable (simulates exposure)' => 'する(撮影露出イメージ表示)',
+      },
+    },
    'LiveViewShooting' => {
       PrintConv => {
         'Off' => 'オフ',
@@ -2687,6 +3173,14 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'LocalizedCameraModel' => '限定カメラモデル',
+   'Location' => '撮影場所',
+   'LockMicrophoneButton' => {
+      Description => 'プロテクト/録音ボタン タンの機能',
+      PrintConv => {
+        'Protect (holding:sound rec.)' => 'プロテクト(長押しで録音)',
+        'Sound rec. (protect:disable)' => '録音(プロテクト不可)',
+      },
+    },
    'LongExposureNoiseReduction' => {
       Description => '長秒露光ノイズリダクション',
       PrintConv => {
@@ -2711,7 +3205,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'MB-D10Batteries' => 'MB-D10電源タイプ',
-   'MB-D80Batteries' => '[32] MB-D80バッテリー',
+   'MB-D80Batteries' => 'MB-D80バッテリー',
    'MIEVersion' => 'MIEバージョン',
    'MIMEType' => 'MIMEタイプ',
    'MSStereo' => {
@@ -2742,6 +3236,13 @@ package Image::ExifTool::Lang::jp;
         'Tele-Macro' => 'テレマクロ',
       },
     },
+   'MagnifiedView' => {
+      Description => '拡大ズーム表示',
+      PrintConv => {
+        'Image playback only' => '再生時のみ',
+        'Image review and playback' => '撮影直後と再生時',
+      },
+    },
    'MainDialExposureComp' => {
       Description => 'Main Dial 露出補正',
       PrintConv => {
@@ -2751,6 +3252,7 @@ package Image::ExifTool::Lang::jp;
     },
    'Make' => 'メーカー',
    'MakeAndModel' => '作成とモデル',
+   'MakerNote' => 'DNGプライベートデータ',
    'MakerNoteOffset' => 'メーカーノートオフセット',
    'MakerNoteSafety' => {
       Description => 'メーカーノートセーフティ',
@@ -2772,6 +3274,13 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'ManualFocusDistance' => 'マニュアルフォーカス距離',
+   'ManualTv' => {
+      Description => 'マニュアル露出時Tv、Av値設定',
+      PrintConv => {
+        'Tv=Control/Av=Main' => 'Tv値=サブ電子ダイヤル/Av値=メイン電子ダイヤル',
+        'Tv=Main/Av=Control' => 'Tv値=メイン電子ダイヤル/Av値=サブ電子ダイヤル',
+      },
+    },
    'ManufactureDate' => '製造日付？',
    'MaskedAreas' => 'マスク領域',
    'MasterDocumentID' => 'マスタ文書ID',
@@ -2787,6 +3296,7 @@ package Image::ExifTool::Lang::jp;
    'MaxSampleValue' => '最大サンプル値',
    'MaximumDensityRange' => '最大密度範囲',
    'MeasuredEV' => '計測EV',
+   'Measurement' => '測定オブザーバー',
    'MeasurementBacking' => 'バック測定',
    'MeasurementFlare' => 'フレア測定',
    'MeasurementGeometry' => '幾何学測定',
@@ -2794,13 +3304,18 @@ package Image::ExifTool::Lang::jp;
    'MeasurementObserver' => '測定オブザーバー',
    'MediaBlackPoint' => 'メディア黒点',
    'MediaWhitePoint' => 'メディア白点',
+   'Medium' => 'ミドル',
    'MenuButtonDisplayPosition' => {
+      Description => 'メニューの表示位置',
       PrintConv => {
-        'Top' => '上',
+        'Previous' => '直前のメニュー',
+        'Previous (top if power off)' => '直前のメニュー（電源切で先頭）',
+        'Top' => 'メニューの先頭',
       },
     },
    'MenuButtonReturn' => {
       PrintConv => {
+        'Previous' => '直前のメニュー',
         'Top' => '上',
       },
     },
@@ -2837,7 +3352,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'MeteringMode3' => {
-      Description => '測光モード(3)',
+      Description => '測光モード3',
       PrintConv => {
         'Multi-segment' => 'パターン',
       },
@@ -2847,6 +3362,8 @@ package Image::ExifTool::Lang::jp;
    'MinFocalLength' => '最小焦点距離',
    'MinSampleValue' => '最小サンプル値',
    'MinoltaCameraSettings2' => 'カメラ設定2',
+   'MinoltaCameraSettings5D' => 'カメラ設定(5D)',
+   'MinoltaCameraSettings7D' => 'カメラ設定(7D)',
    'MinoltaDate' => '日付',
    'MinoltaImageSize' => {
       Description => 'イメージサイズ',
@@ -2857,18 +3374,30 @@ package Image::ExifTool::Lang::jp;
         'Small' => 'スモール',
       },
     },
+   'MinoltaMakerNote' => 'ミノルタメーカーノート',
    'MinoltaModelID' => 'モデルID',
    'MinoltaQuality' => {
       Description => 'イメージ品質',
       PrintConv => {
         'Economy' => 'エコノミー',
+        'Extra Fine' => 'エクストラファイン',
+        'Extra fine' => 'エクストラファイン',
         'Fine' => 'ファイン',
         'Normal' => '標準',
         'Standard' => 'スタンダード',
+        'Super Fine' => 'スーパーファイン',
         'Superfine' => 'S.ファイン',
       },
     },
    'MinoltaTime' => '時間',
+   'MirrorLockup' => {
+      Description => 'ミラーアップ撮影',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+        'Enable: Down with Set' => 'する(SETボタンでダウン)',
+      },
+    },
    'Model' => '画像入力機器モデル',
    'Model2' => '画像入力機器モデル(2)',
    'ModelTiePoint' => 'モデル拘束ポイントタグ',
@@ -2980,27 +3509,34 @@ package Image::ExifTool::Lang::jp;
         'Sepia' => 'セピア',
       },
     },
+   'MultiExposure' => '多重露出データ',
    'MultiExposureAutoGain' => {
+      Description => '多重露出自動ゲイン',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
       },
     },
    'MultiExposureMode' => {
+      Description => '多重露出モード',
       PrintConv => {
+        'Image Overlay' => 'イメージオーバーレイ',
+        'Multiple Exposure' => '多重露出',
         'Off' => 'オフ',
       },
     },
+   'MultiExposureShots' => '多重露出ショット',
+   'MultiExposureVersion' => '多重露出データバージョン',
    'MultiSample' => 'マルチサンプル',
    'MultiSelector' => {
-      Description => '[f2]マルチ選択',
+      Description => 'マルチ選択',
       PrintConv => {
         'Do Nothing' => '何もしない',
         'Reset Meter-off Delay' => 'メーターオフ遅延時間リセット',
       },
     },
    'MultiSelectorPlaybackMode' => {
-      Description => 'マルチ選択 > 再生モード',
+      Description => 'マルチ選択 再生モード',
       PrintConv => {
         'Choose Folder' => 'フォルダー選択',
         'Thumbnail On/Off' => 'サムネイル　オン/オフ',
@@ -3009,7 +3545,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'MultiSelectorShootMode' => {
-      Description => 'マルチ選択 > 撮影モード',
+      Description => 'マルチ選択 撮影モード',
       PrintConv => {
         'Highlight Active Focus Point' => 'ハイライトアクティブフォーカスポイント',
         'Not Used' => '未使用',
@@ -3047,6 +3583,7 @@ package Image::ExifTool::Lang::jp;
         'Vivid Red' => 'ビビッド赤',
       },
     },
+   'MyColors' => 'マイカラーモード',
    'NDFilter' => {
       Description => 'NDフィルター',
       PrintConv => {
@@ -3055,7 +3592,11 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'NEFCompression' => {
+      Description => 'RAW圧縮',
       PrintConv => {
+        'Lossless' => 'ロスレス',
+        'Lossy (type 1)' => '圧縮（タイプ１）',
+        'Lossy (type 2)' => '圧縮（タイプ２）',
         'Uncompressed' => '非圧縮',
       },
     },
@@ -3063,7 +3604,10 @@ package Image::ExifTool::Lang::jp;
    'NativeDisplayInfo' => 'ネイティブディスプレイ情報',
    'NearLensStep' => 'ニアレンズステップ',
    'NewsPhotoVersion' => '報道写真レコードバージョン',
+   'NikonCaptureData' => 'ニコンキャプチャーデータ',
+   'NikonCaptureOffsets' => 'ニコンキャプチャーオフセット',
    'NikonCaptureVersion' => 'ニコンキャプチャーバージョン',
+   'NikonPreview' => 'プレビューIFDポインター',
    'NoMemoryCard' => {
       Description => 'メモリーカード無し',
       PrintConv => {
@@ -3096,6 +3640,7 @@ package Image::ExifTool::Lang::jp;
     },
    'NoiseReduction2' => 'ノイズリダクション2',
    'NoiseReductionApplied' => '適用ノイズリダクション',
+   'NoiseReductionData' => 'ノイズリダクションデータ',
    'NoiseReductionIntensity' => 'ノイズリダクション強度',
    'NoiseReductionMethod' => 'ノイズリダクション方法',
    'NoiseReductionSharpness' => 'ノイズリダクションシャープネス',
@@ -3135,6 +3680,7 @@ package Image::ExifTool::Lang::jp;
       Description => '光学ズームモード',
       PrintConv => {
         'EX Optics' => 'EX光学',
+        'Extended' => 'EX光学',
         'Standard' => 'スタンダード',
       },
     },
@@ -3196,6 +3742,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'PhotoEffectsBlue' => 'フォトエフェクト青',
+   'PhotoEffectsData' => 'フォトエフェクトデータ',
    'PhotoEffectsGreen' => 'フォトエフェクト緑',
    'PhotoEffectsRed' => 'フォトエフェクト赤',
    'PhotoEffectsType' => {
@@ -3226,6 +3773,7 @@ package Image::ExifTool::Lang::jp;
         'WhiteIsZero' => '白はゼロ',
       },
     },
+   'PhotoshopAnnotations' => 'フォトショップ注釈',
    'PhotoshopFormat' => {
       PrintConv => {
         'Standard' => 'スタンダード',
@@ -3233,6 +3781,7 @@ package Image::ExifTool::Lang::jp;
     },
    'PictInfo' => '写真情報',
    'PictureControl' => {
+      Description => 'ピクチャーコントロール',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
@@ -3252,8 +3801,12 @@ package Image::ExifTool::Lang::jp;
         'Quick Adjust' => 'クイック調整',
       },
     },
+   'PictureControlBase' => 'ピクチャーコントロールベース',
+   'PictureControlName' => 'ピクチャーコントロール名',
    'PictureControlQuickAdjust' => 'ピクチャーコントロールクイック調整',
+   'PictureControlVersion' => 'ピクチャーコントロールバージョン',
    'PictureFinish' => {
+      Description => 'ピクチャーフィニッシュ',
       PrintConv => {
         'Monochrome' => 'モノトーン',
         'Natural' => 'ナチュラル',
@@ -3265,29 +3818,83 @@ package Image::ExifTool::Lang::jp;
    'PictureMode' => {
       Description => 'ピクチャーモード',
       PrintConv => {
+        '1/2 EV steps' => '1/2 EVステップ',
+        '1/3 EV steps' => '1/3 EVステップ',
         'Anti-blur' => '手振れ補正',
+        'Aperture Priority' => '絞り優先',
+        'Aperture Priority, Off-Auto-Aperture' => '絞り優先（自動絞りOFF）',
         'Aperture-priority AE' => '絞り優先',
         'Auto' => 'オート',
+        'Auto PICT (Landscape)' => 'オートピクチャー（風景）',
+        'Auto PICT (Macro)' => 'オートピクチャー（マクロ）',
+        'Auto PICT (Portrait)' => 'オートピクチャー（ポートレート）',
+        'Auto PICT (Sport)' => 'オートピクチャー（スポーツ）',
+        'Auto PICT (Standard)' => 'オートピクチャー（標準）',
+        'Autumn' => '秋',
         'Beach' => 'ビーチ',
         'Beach & Snow' => 'ビーチ＆スノー',
+        'Blur Reduction' => 'Digital SR',
+        'Bulb' => 'バルブ',
+        'Bulb, Off-Auto-Aperture' => 'バルブ（自動絞りOFF）',
+        'Candlelight' => 'キャンドルライト',
+        'DOF Program' => '深度優先プログラム',
+        'DOF Program (HyP)' => '深度優先プログラム（ハイパープログラム）',
+        'Dark Pet' => 'ペット黒色',
+        'Digital Filter' => 'デジタルフィルター',
         'Fireworks' => '花火',
+        'Flash X-Sync Speed AE' => 'ストロボ同調速度AE',
         'Flower' => '花',
+        'Food' => '料理',
+        'Frame Composite' => 'フレーム合成',
+        'Green Mode' => 'グリーンモード',
+        'Hi-speed Program' => '高速優先プログラム',
+        'Hi-speed Program (HyP)' => '高速優先プログラム（ハイパープログラム）',
+        'Illustrations' => 'イラスト',
+        'Kids' => 'キッズ',
         'Landscape' => '風景',
+        'Light Pet' => 'ペット白色',
+        'MTF Program' => 'MTF優先プログラム',
+        'MTF Program (HyP)' => 'MTF優先プログラム（ハイパープログラム）',
         'Macro' => 'マクロ',
         'Manual' => 'マニュアル',
+        'Manual, Off-Auto-Aperture' => 'マニュアル（自動絞りOFF）',
+        'Medium Pet' => 'ペット灰色',
+        'Monotone' => 'モノトーン',
         'Museum' => '美術館',
+        'Muted' => '弱める',
+        'Natural' => 'ナチュラル',
         'Natural Light' => 'ナチュラルフォト',
         'Natural Light & Flash' => 'ナチュラルフォト＆フラッシュ',
+        'Natural Skin Tone' => '美肌',
         'Night Scene' => '夜景',
+        'Night Scene Portrait' => '人物、夜景',
+        'No Flash' => 'フラッシュ無し',
+        'Panorama' => 'パノラマ',
         'Party' => 'パーティ',
+        'Pet' => 'ペット',
         'Portrait' => 'ポートレート',
+        'Program' => 'プログラム',
+        'Program (HyP)' => 'プログラムAE（ハイパープログラム）',
         'Program AE' => 'プログラムAE',
+        'Program Av Shift' => 'プログラムAvシフト',
+        'Program Tv Shift' => 'プログラムTvシフト',
+        'Self Portrait' => '自分撮り',
+        'Sensitivity Priority AE' => '感度優先AE',
+        'Sepia' => 'セピア',
+        'Shutter & Aperture Priority AE' => 'シャッター＆絞り優先AE',
+        'Shutter Speed Priority' => 'シャッター優先',
         'Shutter speed priority AE' => 'シャッター優先',
         'Snow' => 'スノー',
+        'Soft' => 'ソフト',
+        'Sport' => 'スポーツ',
         'Sports' => 'スポーツ',
+        'Standard' => 'スタンダード',
         'Sunset' => '夕日',
+        'Surf & Snow' => 'サーフ＆スノー',
+        'Synchro Sound Record' => 'ボイスレコーディング',
         'Text' => 'テキスト',
         'Underwater' => '水中',
+        'Vivid' => 'ビビッド',
       },
     },
    'PictureMode2' => {
@@ -3338,6 +3945,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'PictureStyle' => {
+      Description => 'ピクチャースタイル',
       PrintConv => {
         'CM Set 1' => 'CMセット1',
         'CM Set 2' => 'CMセット2',
@@ -3421,9 +4029,20 @@ package Image::ExifTool::Lang::jp;
     },
    'PreviewSettingsDigest' => 'プレビュー設定要約',
    'PreviewSettingsName' => 'プレビュー設定名',
-   'PrimaryAFPoint' => 'プライマリAFポイント',
+   'PrimaryAFPoint' => {
+      Description => 'プライマリAFポイント',
+      PrintConv => {
+        'Bottom' => '下',
+        'C6 (Center)' => 'C6 (中央)',
+        'Center' => '中央',
+        'Mid-left' => '中央左',
+        'Mid-right' => '中央右',
+        'Top' => '上',
+      },
+    },
    'PrimaryChromaticities' => '原色色度',
    'PrimaryPlatform' => '主要プラットフォーム',
+   'PrintIM' => 'プリントイメージマッチング',
    'ProcessingSoftware' => '処理ソフトウェア',
    'ProductID' => '製品ID',
    'ProductionCode' => 'カメラが修理されたか？',
@@ -3499,13 +4118,8 @@ package Image::ExifTool::Lang::jp;
         'Economy' => 'エコノミー',
         'Fine' => 'ファイン',
         'Good' => 'エコノミー',
-        'High' => '高い',
-        'Low' => 'ソフト',
         'Normal' => 'ノーマル',
-        'Normal Movie' => '標準動画',
         'Premium' => 'プレミアム',
-        'Standard' => 'スタンダード',
-        'Superfine' => 'S.ファイン',
       },
     },
    'QualityMode' => {
@@ -3517,6 +4131,14 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'QuantizationMethod' => '量子化方法',
+   'QuickControlDialInMeter' => {
+      Description => '測光タイマー中のサブ電子ダイヤル',
+      PrintConv => {
+        'AF point selection' => 'AFフレーム選択',
+        'Exposure comp/Aperture' => '露出補正/絞り数値',
+        'ISO speed' => 'ISO感度',
+      },
+    },
    'QuickShot' => {
       Description => 'クイックショット',
       PrintConv => {
@@ -3525,11 +4147,22 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'RAFVersion' => 'RAFバージョン',
+   'ROCInfo' => 'ROC情報',
    'RasterPadding' => 'ラスタパディング',
    'RasterizedCaption' => 'ラスタ化表題',
    'Rating' => '格付け',
    'RatingPercent' => '格付け(%)',
-   'RawAndJpgRecording' => 'RAWとJPEG記録',
+   'RawAndJpgRecording' => {
+      Description => 'RAWとJPEG記録',
+      PrintConv => {
+        'RAW+Large/Fine' => 'RAW+ラージ／ファイン',
+        'RAW+Large/Normal' => 'RAW+ラージ／ノーマル',
+        'RAW+Medium/Fine' => 'RAW+ミドル／ファイン',
+        'RAW+Medium/Normal' => 'RAW+ミドル／ノーマル',
+        'RAW+Small/Fine' => 'RAW+スモール／ファイン',
+        'RAW+Small/Normal' => 'RAW+スモール／ノーマル',
+      },
+    },
    'RawColorAdj' => {
       PrintConv => {
         'Custom' => 'カスタム',
@@ -3562,8 +4195,10 @@ package Image::ExifTool::Lang::jp;
         'High Speed' => '高速',
       },
     },
+   'RawDevExposureBiasValue' => '露出バイアス値',
    'RawDevGrayPoint' => 'グレーポイント',
    'RawDevMemoryColorEmphasis' => '記憶色強調',
+   'RawDevNoiseReduction' => 'ノイズフィルター（増感）',
    'RawDevPMPictureTone' => {
       PrintConv => {
         'Blue' => '青',
@@ -3592,7 +4227,13 @@ package Image::ExifTool::Lang::jp;
    'RawDevSaturationEmphasis' => '彩度強調',
    'RawDevSettings' => 'ノイズリダクション',
    'RawDevSharpnessValue' => 'コントラスト値',
+   'RawDevVersion' => 'RAW展開バージョン',
    'RawDevWBFineAdjustment' => 'ホワイトバランス微調整',
+   'RawDevWhiteBalance' => {
+      PrintConv => {
+        'Color Temperature' => '色温度',
+      },
+    },
    'RawDevWhiteBalanceValue' => 'ホワイトバランス値',
    'RawImageCenter' => 'RAWイメージセンター',
    'RawImageDigest' => 'RAWイメージ要約',
@@ -3651,7 +4292,9 @@ package Image::ExifTool::Lang::jp;
         'Landscape' => '風景',
         'Manual' => 'マニュアル',
         'Night Scene' => '夜景',
+        'Panorama' => 'パノラマ',
         'Portrait' => 'ポートレート',
+        'Single Shutter' => 'シングルシャッター',
       },
     },
    'RedBalance' => 'レッドバランス',
@@ -3661,6 +4304,7 @@ package Image::ExifTool::Lang::jp;
         'Off' => 'オフ',
       },
     },
+   'RedEyeData' => '赤目データ',
    'RedEyeReduction' => {
       PrintConv => {
         'Off' => 'オフ',
@@ -3698,9 +4342,9 @@ package Image::ExifTool::Lang::jp;
         'Saturation' => '飽和',
       },
     },
-   'RepeatingFlashCount' => 'リピーティングフラッシュ > 時間',
+   'RepeatingFlashCount' => 'リピーティングフラッシュ 時間',
    'RepeatingFlashOutput' => 'リピーティングフラッシュ 出力',
-   'RepeatingFlashRate' => 'リピーティングフラッシュ > 周波数',
+   'RepeatingFlashRate' => 'リピーティングフラッシュ 周波数',
    'ResampleParamsQuality' => {
       PrintConv => {
         'High' => '高い',
@@ -3721,7 +4365,13 @@ package Image::ExifTool::Lang::jp;
         'None' => '無し',
       },
     },
-   'RetouchHistory' => 'レタッチ履歴',
+   'RetouchHistory' => {
+      Description => 'レタッチ履歴',
+      PrintConv => {
+        'None' => '無し',
+        'Sepia' => 'セピア',
+      },
+    },
    'ReverseIndicators' => '指標逆転',
    'Rotation' => {
       Description => '回転',
@@ -3763,6 +4413,21 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'SVGVersion' => 'SVGバージョン',
+   'SafetyShift' => {
+      Description => 'セイフティシフト',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable (ISO speed)' => 'する(ISO感度)',
+        'Enable (Tv/Av)' => 'する(Tv/Av値)',
+      },
+    },
+   'SafetyShiftInAvOrTv' => {
+      Description => 'セイフティシフトの設定',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
    'SampleFormat' => 'サンプル形式',
    'SampleStructure' => 'サンプリング構造',
    'SamplesPerPixel' => 'コンポーネント数',
@@ -3774,13 +4439,26 @@ package Image::ExifTool::Lang::jp;
         'Film Simulation' => 'フィルムシミュレーション',
         'High' => '高い彩度',
         'Low' => '低い彩度',
+        'Med High' => '少し高い',
+        'Med Low' => '少し低い',
         'Medium High' => '少し高い',
         'Medium Low' => '少し低い',
+        'None' => '未設定',
         'None (B&W)' => '無し（黒＆白）',
         'Normal' => '標準',
+        'Very High' => 'かなり高い',
+        'Very Low' => 'かなり低い',
       },
     },
+   'SaturationFaithful' => '彩度忠実設定',
+   'SaturationLandscape' => '彩度風景',
+   'SaturationNeutral' => '彩度ニュートラル',
+   'SaturationPortrait' => '彩度ポートレート',
    'SaturationSetting' => '彩度設定',
+   'SaturationStandard' => '彩度スタンダード',
+   'SaturationUserDef1' => '彩度ユーザ設定1',
+   'SaturationUserDef2' => '彩度ユーザ設定2',
+   'SaturationUserDef3' => '彩度ユーザ設定3',
    'ScanImageEnhancer' => {
       PrintConv => {
         'Off' => 'オフ',
@@ -3788,6 +4466,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'ScanningDirection' => '走査方向',
+   'Scene' => '場面',
    'SceneArea' => 'シーンエリア？',
    'SceneAssist' => 'シーン調整',
    'SceneCaptureType' => {
@@ -3843,6 +4522,7 @@ package Image::ExifTool::Lang::jp;
         'Night Portrait' => '人物夜景',
         'Night Scene' => '夜景',
         'Night Scenery' => '夜景',
+        'Night View/Portrait' => 'ナイトビュー/ポートレイト',
         'Night+Portrait' => '夜景+人物',
         'Normal' => 'ノーマル',
         'Off' => 'オフ',
@@ -3929,6 +4609,14 @@ package Image::ExifTool::Lang::jp;
         'Unclassified' => '未分類',
       },
     },
+   'SelectableAFPoint' => {
+      Description => '任意選択可能なAFフレーム',
+      PrintConv => {
+        '19 points' => '19点',
+        'Inner 9 points' => '9点(内側)',
+        'Outer 9 points' => '9点(外側)',
+      },
+    },
    'SelfTimer' => {
       Description => 'セルフタイマー長',
       PrintConv => {
@@ -3961,7 +4649,15 @@ package Image::ExifTool::Lang::jp;
         'As EV Steps' => '露出ステップに従う',
       },
     },
+   'SensorCleaning' => {
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
    'SensorHeight' => 'センサー高さ',
+   'SensorImageHeight' => 'センサー高さ',
+   'SensorImageWidth' => 'センサー幅',
    'SensorLeftBorder' => 'イメージ左部',
    'SensorPixelSize' => 'センサーピクセルサイズ',
    'SensorTemperature' => 'センサー温度',
@@ -3980,8 +4676,46 @@ package Image::ExifTool::Lang::jp;
    'SerialNumberFormat' => 'シリアル番号形式',
    'ServiceIdentifier' => 'サービス識別子',
    'SetButtonCrossKeysFunc' => {
+      Description => 'SETボタン/十字キー機能',
       PrintConv => {
+        'Cross keys: AF point select' => '十字キー:AFフレーム選択',
         'Normal' => '標準',
+        'Set: Flash Exposure Comp' => 'SET:調光補正',
+        'Set: Parameter' => 'SET:現像パラメーター選択',
+        'Set: Picture Style' => 'SET:ピクチャースタイル',
+        'Set: Playback' => 'SET:画像の再生',
+        'Set: Quality' => 'SET:記録画質',
+      },
+    },
+   'SetButtonWhenShooting' => {
+      Description => '撮影時のSETボタン',
+      PrintConv => {
+        'Change parameters' => '現像パラメーター選択',
+        'Default (no function)' => '通常(なし)',
+        'Disabled' => '無効',
+        'Flash exposure compensation' => '調光補正',
+        'ISO speed' => 'ISO感度',
+        'Image playback' => '画像再生',
+        'Image quality' => '記録画質選択',
+        'Image size' => '画像サイズ',
+        'LCD monitor On/Off' => '液晶モニターの入/切',
+        'Menu display' => 'メニュー表示',
+        'Normal (disabled)' => '通常(無効)',
+        'Picture style' => 'ピクチャースタイル',
+        'Quick control screen' => 'クイック設定画面',
+        'Record func. + media/folder' => '記録機能とメディア・フォルダ',
+        'Record movie (Live View)' => '動画撮影(ライブビュー)',
+        'White balance' => 'ホワイトバランス',
+      },
+    },
+   'SetFunctionWhenShooting' => {
+      Description => '撮影時のセットボタン機能',
+      PrintConv => {
+        'Change Parameters' => '現像パラメーター選択',
+        'Change quality' => '記録画質選択',
+        'Default (no function)' => '通常(なし)',
+        'Image replay' => '画像の再生',
+        'Menu display' => 'メニュー表示',
       },
     },
    'ShadingCompensation' => {
@@ -4008,22 +4742,28 @@ package Image::ExifTool::Lang::jp;
         'On' => 'オン',
       },
     },
+   'ShakeReductionInfo' => 'SR効果',
    'Sharpness' => {
       Description => 'シャープネス',
       PrintConv => {
         'Film Simulation' => 'フィルムシミュレーション',
         'Hard' => 'ハード',
         'Hard2' => 'ハード2',
+        'Med Hard' => '少しハード',
+        'Med Soft' => '少しソフト',
         'Medium Hard' => 'ミドルハード',
         'Medium Soft' => 'ミドルソフト',
         'Normal' => 'ノーマル',
         'Sharp' => 'シャープ',
         'Soft' => 'ソフト',
         'Soft2' => 'ソフト2',
+        'Very Hard' => 'かなりハード',
+        'Very Soft' => 'かなりソフト',
         'n/a' => '該当無し',
       },
     },
    'SharpnessFactor' => 'シャープネス要因',
+   'SharpnessFaithful' => 'シャープネス忠実設定',
    'SharpnessFrequency' => {
       PrintConv => {
         'High' => '高い',
@@ -4032,7 +4772,15 @@ package Image::ExifTool::Lang::jp;
         'n/a' => '該当無し',
       },
     },
+   'SharpnessLandscape' => 'シャープネス風景',
+   'SharpnessMonochrome' => 'シャープネスモノクロ',
+   'SharpnessNeutral' => 'シャープネスニュートラル',
+   'SharpnessPortrait' => 'シャープネスポートレート',
    'SharpnessSetting' => 'シャープネス設定',
+   'SharpnessStandard' => 'シャープネススタンダード',
+   'SharpnessUserDef1' => 'シャープネスユーザ設定1',
+   'SharpnessUserDef2' => 'シャープネスユーザ設定2',
+   'SharpnessUserDef3' => 'シャープネスユーザ設定3',
    'ShootingInfoDisplay' => {
       Description => '撮影情報表示',
       PrintConv => {
@@ -4044,10 +4792,14 @@ package Image::ExifTool::Lang::jp;
    'ShootingMode' => {
       Description => '撮影モード',
       PrintConv => {
+        'Aerial Photo' => '空撮',
         'Aperture Priority' => '絞り優先',
         'Baby' => '赤ちゃん',
         'Beach' => 'ビーチ',
         'Candlelight' => 'キャンドルライト',
+        'Clipboard' => 'メモ',
+        'Color Effects' => 'カラーエフェクト',
+        'Economy' => 'エコモード',
         'Fireworks' => '花火',
         'Food' => '料理',
         'High Sensitivity' => '高感度',
@@ -4091,8 +4843,44 @@ package Image::ExifTool::Lang::jp;
     },
    'ShortDocumentID' => '短文書ID',
    'ShortFocal' => '最短焦点',
+   'ShortOwnerName' => '短いオーナー名',
+   'ShortReleaseTimeLag' => {
+      Description => 'レリーズタイムラグ最速化',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
    'ShotInfoVersion' => 'ショット情報バージョン',
+   'Shutter-AELock' => {
+      Description => 'シャッターボタン/AEロックボタン',
+      PrintConv => {
+        'AE lock/AF' => 'AEロック/AF',
+        'AE/AF, No AE lock' => 'AE/AF（AEロックなし）',
+        'AF/AE lock' => 'AF/AEロック',
+        'AF/AF lock' => 'AF/AFロック',
+        'AF/AF lock, No AE lock' => 'AF/AFロック（AEロックなし）',
+      },
+    },
+   'ShutterAELButton' => 'シャッターボタン／AEロックボタン',
+   'ShutterButtonAFOnButton' => {
+      Description => 'シャッター/AF-ONボタン',
+      PrintConv => {
+        'AE lock/Metering + AF start' => 'AEロック/測光・AF開始',
+        'Metering + AF start' => '測光・AF開始',
+        'Metering + AF start / disable' => '測光・AF開始/無効',
+        'Metering + AF start/AF stop' => '測光・AF開始/AFストップ',
+        'Metering start/Meter + AF start' => '測光開始/測光・AF開始',
+      },
+    },
    'ShutterCount' => 'シャッター回数',
+   'ShutterCurtainSync' => {
+      Description => 'ストロボのシンクロタイミング',
+      PrintConv => {
+        '1st-curtain sync' => '先幕シンクロ',
+        '2nd-curtain sync' => '後幕シンクロ',
+      },
+    },
    'ShutterMode' => {
       PrintConv => {
         'Aperture Priority' => '絞り優先',
@@ -4106,7 +4894,21 @@ package Image::ExifTool::Lang::jp;
         'On' => 'オン',
       },
     },
+   'ShutterReleaseNoCFCard' => {
+      Description => 'CFカード未装填時のレリーズ',
+      PrintConv => {
+        'No' => 'いいえ',
+        'Yes' => 'はい',
+      },
+    },
    'ShutterSpeed' => '露出時間',
+   'ShutterSpeedRange' => {
+      Description => 'シャッター速度の制御範囲の設定',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
    'ShutterSpeedValue' => 'シャッタースピード',
    'SimilarityIndex' => '類似インデックス',
    'Site' => 'サイト',
@@ -4143,9 +4945,17 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'SpecialInstructions' => '手順',
+   'SpecialMode' => 'スペシャルモード',
    'SpectralSensitivity' => 'スペクトル感度',
    'SpotFocusPointX' => 'スポットフォーカスポイントX',
    'SpotFocusPointY' => 'スポットフォーカスポイントY',
+   'SpotMeterLinkToAFPoint' => {
+      Description => '測距点連動スポット測光',
+      PrintConv => {
+        'Disable (use center AF point)' => 'しない(中央固定',
+        'Enable (use active AF point)' => 'する(測距点連動)',
+      },
+    },
    'SpotMeteringMode' => {
       Description => 'スポットメーターモード',
       PrintConv => {
@@ -4175,6 +4985,8 @@ package Image::ExifTool::Lang::jp;
         'Monochrome' => 'モノトーン',
       },
     },
+   'Subject' => 'サブジェクト',
+   'SubjectArea' => '対象領域',
    'SubjectDistance' => '対象距離',
    'SubjectDistanceRange' => {
       Description => '被写体距離範囲',
@@ -4212,6 +5024,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'SuperimposedDisplay' => {
+      Description => 'スーパーインポーズの表示',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
@@ -4220,8 +5033,16 @@ package Image::ExifTool::Lang::jp;
    'SupplementalCategories' => '補足カテゴリー',
    'SupplementalType' => '補足タイプ',
    'SvISOSetting' => 'SVISO感度設定',
+   'SwitchToRegisteredAFPoint' => {
+      Description => '登録AFフレームへの切り換え',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
    'T4Options' => 'T4オプション',
    'T6Options' => 'T6オプション',
+   'TIFF-EPStandardID' => 'TIFF/EP標準ID',
    'TTL_DA_ADown' => 'TTL D/A Aチャンネル　ダウン',
    'TTL_DA_AUp' => 'TTL D/A Aチャンネル アップ',
    'TTL_DA_BDown' => 'TTL D/A Bチャンネル　ダウン',
@@ -4268,6 +5089,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'Text' => 'テキスト',
+   'TextInfo' => 'テキスト情報',
    'TextStamp' => {
       PrintConv => {
         'Off' => 'オフ',
@@ -4292,6 +5114,8 @@ package Image::ExifTool::Lang::jp;
     },
    'TimeSent' => '発送時間',
    'TimeSincePowerOn' => '電源オン経過時間',
+   'TimeStamp' => 'タイムスタンプ',
+   'TimeStamp1' => 'タイムスタンプ1',
    'TimeZoneOffset' => 'タイムゾーンオフセット',
    'TimerFunctionButton' => {
       Description => 'ファンクションボタン',
@@ -4303,6 +5127,15 @@ package Image::ExifTool::Lang::jp;
         'White Balance' => 'ホワイトバランス',
       },
     },
+   'TimerLength' => {
+      Description => '各種タイマー保持時間',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
+   'Timezone' => 'タイムゾーン',
+   'Title' => 'タイトル',
    'ToneComp' => 'トーン補正',
    'ToneCurve' => {
       Description => 'トーンカーブ',
@@ -4329,16 +5162,21 @@ package Image::ExifTool::Lang::jp;
       PrintConv => {
         'B&W' => '白黒',
         'Blue' => '青',
+        'Blue-green' => '青緑',
+        'Cyanotype' => '青写真',
         'Green' => '緑',
         'None' => '無し',
         'Purple' => '紫',
+        'Purple-blue' => '青紫',
         'Red' => '赤',
+        'Red-purple' => '赤紫',
         'Sepia' => 'セピア',
         'Yellow' => '黄色',
         'n/a' => '該当無し',
       },
     },
    'ToningEffectMonochrome' => {
+      Description => 'モノクロトーン効果',
       PrintConv => {
         'Blue' => '青',
         'Green' => '緑',
@@ -4368,10 +5206,28 @@ package Image::ExifTool::Lang::jp;
     },
    'TravelDay' => 'トラベル日付',
    'TvExposureTimeSetting' => 'Tv露出時間設定',
-   'Uncompressed' => '非圧縮',
+   'Type' => 'タイプ',
+   'USMLensElectronicMF' => {
+      Description => 'USMレンズの電子式手動フォーカス',
+      PrintConv => {
+        'Disable after one-shot AF' => 'ワンショットAF作動後・不可',
+        'Disable in AF mode' => 'AF時すべて不可',
+        'Enable after one-shot AF' => 'ワンショットAF作動後・可',
+      },
+    },
+   'Uncompressed' => {
+      Description => '非圧縮',
+      PrintConv => {
+        'No' => 'いいえ',
+        'Yes' => 'はい',
+      },
+    },
    'UniqueCameraModel' => 'ユニークカメラモデル',
    'UniqueDocumentID' => 'ユニーク文書ID',
+   'UniqueObjectName' => 'ユニーク・ネーム・オブ・オブジェクト',
+   'Unknown' => '不明',
    'Unsharp1Color' => {
+      Description => 'アンシャープ1カラー',
       PrintConv => {
         'Blue' => '青',
         'Cyan' => 'シアン',
@@ -4385,6 +5241,7 @@ package Image::ExifTool::Lang::jp;
    'Unsharp1Intensity' => 'アンシャープ1強度',
    'Unsharp1Threshold' => 'アンシャープ1起点',
    'Unsharp2Color' => {
+      Description => 'アンシャープ2カラー',
       PrintConv => {
         'Blue' => '青',
         'Cyan' => 'シアン',
@@ -4398,6 +5255,7 @@ package Image::ExifTool::Lang::jp;
    'Unsharp2Intensity' => 'アンシャープ2強度',
    'Unsharp2Threshold' => 'アンシャープ2起点',
    'Unsharp3Color' => {
+      Description => 'アンシャープ3カラー',
       PrintConv => {
         'Blue' => '青',
         'Cyan' => 'シアン',
@@ -4411,6 +5269,7 @@ package Image::ExifTool::Lang::jp;
    'Unsharp3Intensity' => 'アンシャープ3強度',
    'Unsharp3Threshold' => 'アンシャープ3起点',
    'Unsharp4Color' => {
+      Description => 'アンシャープ4カラー',
       PrintConv => {
         'Blue' => '青',
         'Cyan' => 'シアン',
@@ -4424,6 +5283,7 @@ package Image::ExifTool::Lang::jp;
    'Unsharp4Intensity' => 'アンシャープ4強度',
    'Unsharp4Threshold' => 'アンシャープ4起点',
    'UnsharpCount' => 'アンシャープカウント',
+   'UnsharpData' => 'アンシャープデータ',
    'UnsharpMask' => {
       Description => 'アンシャープマスク',
       PrintConv => {
@@ -4432,8 +5292,23 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'Urgency' => '緊急性',
+   'UsableMeteringModes' => {
+      Description => '測光モードの限定',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
+   'UsableShootingModes' => {
+      Description => '撮影モードの限定',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
    'UserComment' => 'ユーザーコメント',
    'UserDef1PictureStyle' => {
+      Description => 'ユーザ設定1 ピクチャースタイル',
       PrintConv => {
         'Faithful' => '忠実設定',
         'Landscape' => '風景',
@@ -4444,6 +5319,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'UserDef2PictureStyle' => {
+      Description => 'ユーザ設定2 ピクチャースタイル',
       PrintConv => {
         'Faithful' => '忠実設定',
         'Landscape' => '風景',
@@ -4454,6 +5330,7 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'UserDef3PictureStyle' => {
+      Description => 'ユーザ設定3 ピクチャースタイル',
       PrintConv => {
         'Faithful' => '忠実設定',
         'Landscape' => '風景',
@@ -4464,6 +5341,8 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'VRDVersion' => 'VRDバージョン',
+   'VRInfo' => 'VR（手振れ補正）情報',
+   'VRInfoVersion' => 'VR情報バージョン',
    'VR_0x66' => {
       PrintConv => {
         'Off' => 'オフ',
@@ -4487,6 +5366,13 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'VideoCardGamma' => 'ビデオカードガンマ',
+   'ViewInfoDuringExposure' => {
+      Description => '露光中のファインダー内表示',
+      PrintConv => {
+        'Disable' => 'しない',
+        'Enable' => 'する',
+      },
+    },
    'ViewfinderWarning' => {
       Description => 'ビューファインダー警告表示',
       PrintConv => {
@@ -4498,6 +5384,7 @@ package Image::ExifTool::Lang::jp;
    'ViewingCondIlluminant' => '視聴状態光源',
    'ViewingCondIlluminantType' => '視聴状態光源タイプ',
    'ViewingCondSurround' => '視聴状態周辺',
+   'ViewingConditions' => '視聴状態光源',
    'VignetteControl' => {
       Description => 'ビネットコントロール',
       PrintConv => {
@@ -4516,6 +5403,7 @@ package Image::ExifTool::Lang::jp;
         'On' => 'オン',
       },
     },
+   'WBAdjData' => 'ホワイトバランス調整データ',
    'WBAdjLighting' => {
       Description => 'ホワイトバランス調整、ライティング',
       PrintConv => {
@@ -4557,6 +5445,13 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'WBGreenLevel' => 'ホワイトバランス緑レベル',
+   'WBMediaImageSizeSetting' => {
+      Description => 'WB/メディア・画像サイズの設定',
+      PrintConv => {
+        'LCD monitor' => '液晶モニター',
+        'Rear LCD panel' => '背面表示パネル',
+      },
+    },
    'WBMode' => {
       Description => 'ホワイトバランスモード',
       PrintConv => {
@@ -4564,7 +5459,8 @@ package Image::ExifTool::Lang::jp;
       },
     },
    'WBRedLevel' => 'ホワイトバランス赤レベル',
-   'WBShiftAB' => 'WB BA補正',
+   'WBShiftAB' => 'WB AB補正',
+   'WBShiftGM' => 'WB GM補正',
    'WBShiftMG' => 'WB GM補正',
    'WB_GBRGLevels' => 'WB GBRG レベル',
    'WB_GRBGLevels' => 'WB GRBG レベル',
@@ -4646,7 +5542,6 @@ package Image::ExifTool::Lang::jp;
         'PC Set4' => 'PC設定4',
         'PC Set5' => 'PC設定5',
         'Shade' => '日陰',
-        'Shadow' => '日陰',
         'Tungsten' => 'タングステン(白熱灯)',
         'Underwater' => '水中',
         'Unknown' => '不明',
@@ -4732,6 +5627,7 @@ package Image::ExifTool::Lang::jp;
    'WhiteBoard' => 'ホワイトボード',
    'WhiteLevel' => '白レベル',
    'WhitePoint' => '白点色度',
+   'Wide' => 'ワイド',
    'WideFocusZone' => 'ワイドフォーカスゾーン',
    'WideRange' => {
       Description => 'ワイドレンジ',
@@ -4740,6 +5636,8 @@ package Image::ExifTool::Lang::jp;
         'On' => 'オン',
       },
     },
+   'WidthResolution' => '幅方向の画像解像度',
+   'WorldTime' => 'タイムゾーン',
    'WorldTimeLocation' => {
       Description => 'ワールドタイム位置',
       PrintConv => {
@@ -4751,6 +5649,7 @@ package Image::ExifTool::Lang::jp;
    'Writer-Editor' => '表題/説明の作家',
    'X3FillLight' => 'X3光を満たす',
    'XClipPathUnits' => 'Xクリップパス単位',
+   'XMP' => 'XMPメタデータ',
    'XPAuthor' => '作者',
    'XPComment' => 'コメント',
    'XPKeywords' => 'キーワード',
@@ -4797,7 +5696,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Lang::jp.pm - ExifTool language-specific tag information
+Image::ExifTool::Lang::ja.pm - ExifTool Japanese language translations
 
 =head1 DESCRIPTION
 

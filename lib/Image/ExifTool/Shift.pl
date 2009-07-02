@@ -151,7 +151,7 @@ sub SplitTime($$;$)
         } else {
             # this is a time (can't come after timezone)
             (defined $v[3] or defined $v[6] or @vals > 3) and $err = 1, last;
-            not $time and @vals != 3 and $err = 1, last;
+            not $time and @vals != 3 and @vals != 2 and $err = 1, last;
             $v[3] = shift(@vals);   # take hour first if only one specified
             $v[4] = shift(@vals) || 0;
             $v[5] = shift(@vals) || 0;

@@ -9,8 +9,6 @@
 #               2) Derived from DMC-FZ3 samples from dpreview.com
 #               3) http://johnst.org/sw/exiftags/
 #               4) Tels (http://bloodgate.com/) private communication (tests with FZ5)
-#               5) CPAN forum post by 'hardloaf' (http://www.cpanforum.com/threads/2183)
-#               6) http://www.cybercom.net/~dcoffin/dcraw/
 #               7) http://homepage3.nifty.com/kamisaka/makernote/makernote_pana.htm (2007/10/02)
 #               8) Marcel Coenen private communication (DMC-FZ50)
 #               9) http://forums.dpreview.com/forums/read.asp?forum=1033&message=22756430
@@ -22,9 +20,10 @@ package Image::ExifTool::Panasonic;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.32';
+$VERSION = '1.39';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -47,7 +46,7 @@ my %shootingMode = (
     14 => 'Simple', #PH (LZ6)
     15 => 'Color Effects', #7
     16 => 'Self Portrait', #PH (TZ5)
-    # 17 => 'Eco Mode?', #7
+    17 => 'Economy', #7
     18 => 'Fireworks',
     19 => 'Party',
     20 => 'Snow',
@@ -65,10 +64,15 @@ my %shootingMode = (
     32 => 'Sunset', #PH (LZ6)
     33 => 'Pet', #JD
     34 => 'Intelligent ISO', #PH (LZ6)
-    # 35 => 'NOTE?', #7
+    35 => 'Clipboard', #7
     36 => 'High Speed Continuous Shooting', #7
     37 => 'Intelligent Auto', #7
     39 => 'Multi-aspect', #PH (TZ5)
+    41 => 'Transform', #PH (FS7)
+    42 => 'Flash Burst', #PH (FZ28)
+    43 => 'Pin Hole', #PH (FZ28)
+    44 => 'Film Grain', #PH (FZ28)
+    46 => 'Photo Frame', #PH (FS7)
 );
 
 %Image::ExifTool::Panasonic::Main = (
@@ -111,11 +115,12 @@ my %shootingMode = (
             1 => 'Auto',
             2 => 'Daylight',
             3 => 'Cloudy',
-            4 => 'Halogen',
+            4 => 'Tungsten', #PH (FS7 manual calls this Incandescent)
             5 => 'Manual',
             8 => 'Flash',
             10 => 'Black & White', #3 (Leica)
             11 => 'Manual', #PH (FZ8)
+            12 => 'Shade', #PH (FS7)
         },
     },
     0x07 => {
@@ -128,24 +133,38 @@ my %shootingMode = (
             5 => 'Auto, Continuous', #4
         },
     },
-    0x0f => {
-        Name => 'AFMode',
-        Writable => 'int8u',
-        Count => 2,
-        PrintConv => { #PH
-            '0 1'   => 'Spot Mode On', # (maybe 9-area for some cameras?)
-            '0 16'  => 'Spot Mode Off or 3-area (high speed)', # (FZ8 is 3-area)
-            '1 0'   => 'Spot Focusing', # (FZ8)
-            '1 1'   => '5-area', # (FZ8)
-            '16'    => 'Normal?', # (only AFMode for DMC-LC20)
-            '16 0'  => '1-area', # (FZ8)
-            '16 16' => '1-area (high speed)', # (FZ8)
-            '32 0'  => '3-area (auto)?', # (DMC-L1 guess)
-            '32 1'  => '3-area (left)?', # (DMC-L1 guess)
-            '32 2'  => '3-area (center)?', # (DMC-L1 guess)
-            '32 3'  => '3-area (right)?', # (DMC-L1 guess)
+    0x0f => [
+        {
+            Name => 'AFMode',
+            Condition => '$$self{Model} =~ /DMC-FZ10\b/', #JD
+            Writable => 'int8u',
+            Count => 2,
+            Notes => 'DMC-FZ10',
+            PrintConv => {
+                '0 1'   => 'Spot Mode On',
+                '0 16'  => 'Spot Mode Off',
+            },
+        },{
+            Name => 'AFMode',
+            Writable => 'int8u',
+            Count => 2,
+            Notes => 'other models',
+            PrintConv => { #PH
+                '0 1'   => '9-area', # (FS7)
+                '0 16'  => '3-area (high speed)', # (FZ8)
+                '1 0'   => 'Spot Focusing', # (FZ8)
+                '1 1'   => '5-area', # (FZ8)
+                '16'    => 'Normal?', # (only AFMode for DMC-LC20)
+                '16 0'  => '1-area', # (FZ8)
+                '16 16' => '1-area (high speed)', # (FZ8)
+                '32 0'  => 'Auto or Face Detect', # (Face Detect for FS7, Auto is DMC-L1 guess)
+                '32 1'  => '3-area (left)?', # (DMC-L1 guess)
+                '32 2'  => '3-area (center)?', # (DMC-L1 guess)
+                '32 3'  => '3-area (right)?', # (DMC-L1 guess)
+                '64 0'  => 'Face Detect',
+            },
         },
-    },
+    ],
     0x1a => {
         Name => 'ImageStabilization',
         Writable => 'int16u',
@@ -162,6 +181,7 @@ my %shootingMode = (
             1 => 'On',
             2 => 'Off',
             0x101 => 'Tele-Macro', #7
+            0x201 => 'Macro Zoom', #PH (FS7)
         },
     },
     0x1f => {
@@ -331,8 +351,18 @@ my %shootingMode = (
             8 => 'Rotate 270 CW', #PH (ref 7 gives 90 CW)
         },
     },
-    # 0x31 - values: 1-5 some sort of mode? (changes with FOC-L) (PH/10)
-    #        - changed from 2 to 4 when AFAssist was turned off - PH (TZ5)
+    0x31 => { #PH (FS7)
+        Name => 'AFAssistLamp',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Fired',
+            2 => 'Enabled but Not Used',
+            3 => 'Disabled but Required',
+            4 => 'Disabled and Not Required',
+            # have seen a value of 5 - PH
+            # values possibly related to FOC-L? - JD
+        },
+    },
     0x32 => { #7
         Name => 'ColorMode',
         Writable => 'int16u',
@@ -354,7 +384,7 @@ my %shootingMode = (
         Writable => 'int16u',
         PrintConv => {
             1 => 'Standard',
-            2 => 'EX Optics',
+            2 => 'Extended',
         },
     },
     0x35 => { #9
@@ -379,8 +409,7 @@ my %shootingMode = (
         Name => 'Contrast',
         Format => 'int16s',
         Writable => 'int16u',
-        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
-        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+        %Image::ExifTool::Exif::printParameter,
     },
     0x3a => {
         Name => 'WorldTimeLocation',
@@ -390,37 +419,61 @@ my %shootingMode = (
             2 => 'Destination',
         },
     },
-    0x3b => { #PH (TZ5)
-        # (same as tags 0x3e, 0x8008 and 0x8009 in all my samples - PH)
+    0x3b => { #PH (TZ5/FS7)
+        # (tags 0x3b, 0x3e, 0x8008 and 0x8009 have the same values in all my samples - PH)
         Name => 'TextStamp',
-        Writable => 'in16u',
+        Writable => 'int16u',
         PrintConv => { 1 => 'Off', 2 => 'On' },
     },
     0x3c => { #PH
-        Name => 'ProgramISO',
+        Name => 'ProgramISO', # (maybe should rename this ISOSetting?)
         Writable => 'int16u',
-        PrintConv => '$val == 65535 ? "n/a" : $val',
-        PrintConvInv => '$val eq "n/a" ? 65535 : $val',
+        PrintConv => {
+            OTHER => sub { return shift },
+            65534 => 'Intelligent ISO', #PH (FS7)
+            65535 => 'n/a',
+        },
     },
-    # 0x3d - values: 5=full auto, 1=program, auto ISO (PH,TZ5)
-    # 0x3e => { #PH (TZ5)
-    #     Name => 'TextStamp2',
-    #     Writable => 'in16u',
-    #     PrintConv => { 1 => 'Off', 2 => 'On' },
-    # },
+    0x3d => {
+        Name => 'AdvancedSceneMode',
+        Writable => 'int16u',
+        # values for the FZ28 (SceneMode/AdvancedSceneMode, "*"=add mode name) - PH:
+        # Portrait: 2/1=Normal*, 24/1=Soft Skin, 2/2=Outdoor*, 2/3=Indoor*, 2/4=Creative*
+        # Scenery: 3/1=Normal*, 3/2=Nature, 3/3=Architecture, 3/4=Creative*
+        # Sports: 4/1=Normal*, 4/2=Outdoor*, 4/3=Indoor*, 4/4=Creative*
+        # Night Scenery: 5/1=Night Portrait, 21/1=*, 21/2=Illuminations, 21/4=Creative*
+        # Macro (Close-up): 9/2=Flower, 22/1=Food, 9/3=Objects, 9/4=Creative*
+        # - have seen value of 5 for TZ5 (Macro) and FS20 (Scenery and Intelligent Auto)
+        #   --> I'm guessing this is "Auto" - PH
+        PrintConv => {
+            1 => 'Normal',
+            2 => 'Outdoor/Illuminations/Flower',
+            3 => 'Indoor/Architecture/Objects',
+            4 => 'Creative',
+            5 => 'Auto',
+        },
+    },
+    0x3e => { #PH (TZ5/FS7)
+        # (tags 0x3b, 0x3e, 0x8008 and 0x8009 have the same values in all my samples - PH)
+        Name => 'TextStamp',
+        Writable => 'int16u',
+        PrintConv => { 1 => 'Off', 2 => 'On' },
+    },
+    0x3f => { #PH (TZ7)
+        Name => 'FacesDetected',
+        Writable => 'int16u',
+    },
     0x40 => { #7 (L1/L10)
         Name => 'Saturation',
         Format => 'int16s',
         Writable => 'int16u',
-        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
-        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+        %Image::ExifTool::Exif::printParameter,
     },
     0x41 => { #7 (L1/L10)
         Name => 'Sharpness',
         Format => 'int16s',
         Writable => 'int16u',
-        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
-        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+        %Image::ExifTool::Exif::printParameter,
     },
     0x42 => { #7 (DMC-L1)
         Name => 'FilmMode',
@@ -435,19 +488,41 @@ my %shootingMode = (
             7 => 'Smooth (B&W)',
             # 8 => 'My Film 1'? (from owner manual)
             # 9 => 'My Film 2'?
+            10 => 'Nostalgic', # GH1
+            11 => 'Vibrant', # GH1
+            # 12 => 'Multi Film'? (in the GH1 specs)
         },
     },
-    0x46 => { #PH/10
+    0x46 => { #PH/JD
         Name => 'WBAdjustAB',
         Format => 'int16s',
         Writable => 'int16u',
         Notes => 'positive is a shift toward blue',
     },
-    0x47 => { #PH/10
+    0x47 => { #PH/JD
         Name => 'WBAdjustGM',
         Format => 'int16s',
         Writable => 'int16u',
         Notes => 'positive is a shift toward green',
+    },
+    0x4d => { #PH (FS7)
+        Name => 'AFPointPosition',
+        Writable => 'rational64u',
+        Count => 2,
+        Notes => 'X Y coordinates of primary AF area center, in the range 0.0 to 1.0',
+        PrintConv => q{
+            return 'none' if $val eq '16777216 16777216';
+            my @a = split ' ', $val;
+            sprintf("%.2g %.2g",@a);
+        },
+        PrintConvInv => '$val eq "none" ? "16777216 16777216" : $val',
+    },
+    0x4e => { #PH
+        Name => 'FaceDetInfo',
+        PrintConv => 'length $val',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::FaceDetInfo',
+        },
     },
     0x51 => {
         Name => 'LensType',
@@ -461,6 +536,40 @@ my %shootingMode = (
         Name => 'AccessoryType',
         Writable => 'string',
     },
+    0x59 => { #PH (FS7)
+        Name => 'Transform',
+        Writable => 'undef',
+        Notes => 'decoded as two 16-bit signed integers',
+        Format => 'int16s',
+        Count => 2,
+        PrintConv => {
+            '-3 2' => 'Slim High',
+            '-1 1' => 'Slim Low',
+            '0 0' => 'Off',
+            '1 1' => 'Stretch Low',
+            '3 2' => 'Stretch High',
+        },
+    },
+    0x61 => { #PH
+        Name => 'FaceRecInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::FaceRecInfo',
+        },
+    },
+    0x62 => { #PH (FS7)
+        Name => 'FlashWarning',
+        Writable => 'int16u',
+        PrintConv => { 0 => 'No', 1 => 'Yes (flash required but disabled)' },
+    },
+    0x63 => { #PH
+        # not sure exactly what this means, but in my samples this is
+        # FacesRecognized bytes of 0x01, padded with 0x00 to a length of 4 - PH
+        Name => 'RecognizedFaceFlags',
+        Format => 'int8u',
+        Count => 4,
+        Writable => 'undef',
+        Unknown => 1,
+    },
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -473,7 +582,7 @@ my %shootingMode = (
         Name => 'MakerNoteVersion',
         Format => 'undef',
     },
-    0x8001 => { #7/PH/10
+    0x8001 => { #7/PH/JD
         Name => 'SceneMode',
         Writable => 'int16u',
         PrintConv => {
@@ -481,17 +590,17 @@ my %shootingMode = (
             %shootingMode,
         },
     },
-    # 0x8002 - values: 1,2 related to focus? (PH/10)
-    # 0x8003 - values: 1,2 related to focus? (PH/10)
-    0x8004 => { #PH/10
+    # 0x8002 - values: 1,2 related to focus? (PH/JD)
+    # 0x8003 - values: 1,2 related to focus? (PH/JD)
+    0x8004 => { #PH/JD
         Name => 'WBRedLevel',
         Writable => 'int16u',
     },
-    0x8005 => { #PH/10
+    0x8005 => { #PH/JD
         Name => 'WBGreenLevel',
         Writable => 'int16u',
     },
-    0x8006 => { #PH/10
+    0x8006 => { #PH/JD
         Name => 'WBBlueLevel',
         Writable => 'int16u',
     },
@@ -500,22 +609,38 @@ my %shootingMode = (
         Writable => 'int16u',
         PrintConv => { 1 => 'No', 2 => 'Yes' },
     },
-    # 0x8008 => { #PH (TZ5)
-    #     Name => 'TextStamp3',
-    #     Writable => 'in16u',
-    #     PrintConv => { 1 => 'Off', 2 => 'On' },
-    # },
-    # 0x8009 => { #PH (TZ5)
-    #     Name => 'TextStamp4',
-    #     Writable => 'in16u',
-    #     PrintConv => { 1 => 'Off', 2 => 'On' },
-    # },
+    0x8008 => { #PH (TZ5/FS7)
+        # (tags 0x3b, 0x3e, 0x8008 and 0x8009 have the same values in all my samples - PH)
+        Name => 'TextStamp',
+        Writable => 'int16u',
+        PrintConv => { 1 => 'Off', 2 => 'On' },
+    },
+    0x8009 => { #PH (TZ5/FS7)
+        # (tags 0x3b, 0x3e, 0x8008 and 0x8009 have the same values in all my samples - PH)
+        Name => 'TextStamp',
+        Writable => 'int16u',
+        PrintConv => { 1 => 'Off', 2 => 'On' },
+    },
     0x8010 => { #PH
         Name => 'BabyAge',
         Writable => 'string',
         Notes => 'or pet age',
         PrintConv => '$val eq "9999:99:99 00:00:00" ? "(not set)" : $val',
         PrintConvInv => '$val =~ /^\d/ ? $val : "9999:99:99 00:00:00"',
+    },
+    0x8012 => { #PH (FS7)
+        Name => 'Transform',
+        Writable => 'undef',
+        Notes => 'decoded as two 16-bit signed integers',
+        Format => 'int16s',
+        Count => 2,
+        PrintConv => {
+            '-3 2' => 'Slim High',
+            '-1 1' => 'Slim Low',
+            '0 0' => 'Off',
+            '1 1' => 'Stretch Low',
+            '3 2' => 'Stretch High',
+        },
     },
 );
 
@@ -561,7 +686,7 @@ my %shootingMode = (
             3 => 'Tungsten',
             4 => 'Flash',
             10 => 'Cloudy',
-            11 => 'Shadow',
+            11 => 'Shade',
             OTHER => \&WhiteBalanceConv,
         },
     },
@@ -686,140 +811,124 @@ my %shootingMode = (
     3 => 'Gain',
 );
 
-# Tags found in Panasonic RAW images
-%Image::ExifTool::Panasonic::Raw = (
-    GROUPS => { 0 => 'EXIF', 1 => 'IFD0', 2 => 'Image'},
-    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
-    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    WRITE_GROUP => 'IFD0',   # default write group
-    NOTES => 'These tags are found in IFD0 of Panasonic RAW and RW2 images.',
-    0x01 => {
-        Name => 'PanasonicRawVersion',
-        Writable => 'undef',
-    },
-    0x02 => 'SensorWidth', #5/PH
-    0x03 => 'SensorHeight', #5/PH
-    0x04 => 'SensorTopBorder', #JD
-    0x05 => 'SensorLeftBorder', #JD
-    0x06 => 'ImageHeight', #5/PH
-    0x07 => 'ImageWidth', #5/PH
-    # observed values for unknown tags - PH
-    # 0x08: 1
-    # 0x09: 1,3,4
-    # 0x0a: 12
-    # 0x0b: 0x860c,0x880a,0x880c
-    # 0x0c: 2 (only Leica Digilux 2)
-    # 0x0d: 0,1
-    # 0x0e,0x0f,0x10: 4095
-    # 0x18,0x19,0x1a,0x1c,0x1d,0x1e: 0
-    # 0x1b,0x27,0x29,0x2a,0x2b,0x2c: [binary data]
-    # 0x2d: 2,3
-    0x11 => { #JD
-        Name => 'RedBalance',
-        Writable => 'int16u',
-        ValueConv => '$val / 256',
-        ValueConvInv => 'int($val * 256 + 0.5)',
-        Notes => 'found in Digilux 2 RAW images',
-    },
-    0x12 => { #JD
-        Name => 'BlueBalance',
-        Writable => 'int16u',
-        ValueConv => '$val / 256',
-        ValueConvInv => 'int($val * 256 + 0.5)',
-    },
-    0x17 => { #5
-        Name => 'ISO',
-        Writable => 'int16u',
-    },
-    0x24 => { #6
-        Name => 'WBRedLevel',
-        Writable => 'int16u',
-    },
-    0x25 => { #6
-        Name => 'WBGreenLevel',
-        Writable => 'int16u',
-    },
-    0x26 => { #6
-        Name => 'WBBlueLevel',
-        Writable => 'int16u',
-    },
-    0x2e => { #JD
-        Name => 'PreviewImage',
-        Writable => 'undef',
-        Binary => 1,
-        # extract information from embedded image since it is metadata-rich,
-        # unless HtmlDump option set (note that the offsets will be relative,
-        # not absolute like they should be in verbose mode)
-        RawConv => q{
-            unless ($self->Options('HtmlDump')) {
-                $$self{DOC_NUM} = 1;
-                $self->ExtractInfo(\$val, {ReEntry => 1});
-                delete $$self{DOC_NUM};
-            }
-            return $val;
+# Face detection position information (ref PH)
+%Image::ExifTool::Panasonic::FaceDetInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    WRITABLE => 1,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 1,
+    DATAMEMBER => [ 0 ],
+    NOTES => 'Face detection position information.',
+    0 => {
+        Name => 'NumFacePositions',
+        Format => 'int16u',
+        DataMember => 'NumFacePositions',
+        RawConv => '$$self{NumFacePositions} = $val',
+        Notes => q{
+            number of detected face positions stored in this record.  May be less than
+            FacesDetected
         },
     },
-    0x10f => {
-        Name => 'Make',
-        Groups => { 2 => 'Camera' },
-        Writable => 'string',
-        DataMember => 'Make',
-        # save this value as an ExifTool member variable
-        RawConv => '$self->{Make} = $val',
-    },
-    0x110 => {
-        Name => 'Model',
-        Description => 'Camera Model Name',
-        Groups => { 2 => 'Camera' },
-        Writable => 'string',
-        DataMember => 'Model',
-        # save this value as an ExifTool member variable
-        RawConv => '$self->{Model} = $val',
-    },
-    0x111 => {
-        Name => 'StripOffsets',
-        Flags => 'IsOffset',
-        OffsetPair => 0x117,  # point to associated byte counts
-        ValueConv => 'length($val) > 32 ? \$val : $val',
-    },
-    0x112 => {
-        Name => 'Orientation',
-        Writable => 'int16u',
-        PrintConv => \%Image::ExifTool::Exif::orientation,
-        Priority => 0,  # so IFD1 doesn't take precedence
-    },
-    0x116 => {
-        Name => 'RowsPerStrip',
-        Priority => 0,
-    },
-    0x117 => {
-        Name => 'StripByteCounts',
-        OffsetPair => 0x111,   # point to associated offset
-        ValueConv => 'length($val) > 32 ? \$val : $val',
-    },
-    0x118 => {
-        Name => 'RawDataOffset', #PH (RW2)
-        IsOffset => 1,
-    },
-    0x8769 => {
-        Name => 'ExifOffset',
-        Groups => { 1 => 'ExifIFD' },
-        Flags => 'SubIFD',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Exif::Main',
-            DirName => 'ExifIFD',
-            Start => '$val',
+    1 => {
+        Name => 'Face1Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{NumFacePositions} < 1 ? undef : $val',
+        Notes => q{
+            4 numbers: 1-2. X-Y coordinates of the face center, 3-4. Width-height of
+            face.  Coordinates are relative to an image twice the size of the thumbnail,
+            or 320 pixels wide
         },
     },
-    0x8825 => {
-        Name => 'GPSInfo',
-        Groups => { 1 => 'GPS' },
-        Flags => 'SubIFD',
-        SubDirectory => {
-            DirName => 'GPS',
-            TagTable => 'Image::ExifTool::GPS::Main',
-            Start => '$val',
-        },
+    5 => {
+        Name => 'Face2Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{NumFacePositions} < 2 ? undef : $val',
+    },
+    9 => {
+        Name => 'Face3Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{NumFacePositions} < 3 ? undef : $val',
+    },
+    13 => {
+        Name => 'Face4Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{NumFacePositions} < 4 ? undef : $val',
+    },
+    17 => {
+        Name => 'Face5Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{NumFacePositions} < 5 ? undef : $val',
+    },
+);
+
+# Face recognition information from DMC-TZ7 (ref PH)
+%Image::ExifTool::Panasonic::FaceRecInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    WRITABLE => 1,
+    FIRST_ENTRY => 1,
+    DATAMEMBER => [ 0 ],
+    NOTES => q{
+        Tags written by cameras with facial recognition.  These cameras not only
+        detect faces in an image, but also recognize specific people based a
+        user-supplied set of known faces.
+    },
+    0 => {
+        Name => 'FacesRecognized',
+        Format => 'int16u',
+        DataMember => 'FacesRecognized',
+        RawConv => '$$self{FacesRecognized} = $val',
+    },
+    4 => {
+        Name => 'RecognizedFace1Name',
+        Format => 'string[20]',
+        RawConv => '$$self{FacesRecognized} < 1 ? undef : $val',
+    },
+    24 => {
+        Name => 'RecognizedFace1Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesRecognized} < 1 ? undef : $val',
+        Notes => 'coordinates in same format as face detection tags above',
+    },
+    32 => {
+        Name => 'RecognizedFace1Age',
+        Format => 'string[20]',
+        RawConv => '$$self{FacesRecognized} < 1 ? undef : $val',
+    },
+    52 => {
+        Name => 'RecognizedFace2Name',
+        Format => 'string[20]',
+        RawConv => '$$self{FacesRecognized} < 2 ? undef : $val',
+    },
+    72 => {
+        Name => 'RecognizedFace2Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesRecognized} < 2 ? undef : $val',
+    },
+    80 => {
+        Name => 'RecognizedFace2Age',
+        Format => 'string[20]',
+        RawConv => '$$self{FacesRecognized} < 2 ? undef : $val',
+    },
+    100 => {
+        Name => 'RecognizedFace3Name',
+        Format => 'string[20]',
+        RawConv => '$$self{FacesRecognized} < 3 ? undef : $val',
+    },
+    120 => {
+        Name => 'RecognizedFace3Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesRecognized} < 3 ? undef : $val',
+    },
+    128 => {
+        Name => 'RecognizedFace3Age',
+        Format => 'string[20]',
+        RawConv => '$$self{FacesRecognized} < 3 ? undef : $val',
     },
 );
 
@@ -870,11 +979,11 @@ under the same terms as Perl itself.
 
 =item L<http://johnst.org/sw/exiftags/>
 
-=item L<http://www.cybercom.net/~dcoffin/dcraw/>
-
 =item L<http://homepage3.nifty.com/kamisaka/makernote/makernote_pana.htm>
 
 =item L<http://bretteville.com/pdfs/M8Metadata_v2.pdf>
+
+=item (...plus lots of testing with store demos and my wife's DMC-FS7!)
 
 =back
 

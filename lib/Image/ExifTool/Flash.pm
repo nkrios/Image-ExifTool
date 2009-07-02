@@ -509,7 +509,7 @@ sub FoundFlashTag($$$)
 # Read data from possibly compressed file
 # Inputs: 0) RAF reference, 1) data buffer, 2) bytes to read, 2) compressed flag
 # Returns: number of bytes read (may be greater than requested bytes if compressed)
-# - concatinates data to current buffer
+# - concatenates data to current buffer
 # - updates compressed flag with reference to inflate object for future calls
 #   (or sets to error message and returns zero on error)
 sub ReadCompressed($$$$)

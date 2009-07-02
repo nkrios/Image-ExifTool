@@ -15,7 +15,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.22';
+$VERSION = '1.27';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -55,7 +55,7 @@ $VERSION = '1.22';
         'FocalLength',
         'ImageSize',
         'Quality',
-        'FlashOn',
+        'Flash',
         'FlashType',
         'ConditionalFEC',
         'RedEyeReduction',
@@ -89,7 +89,7 @@ $VERSION = '1.22';
         'ExifImageWidth', #instead
         'ExifImageHeight', #instead
         'Quality',
-        'FlashOn',
+        'Flash',
         'FlashType',
         'ConditionalFEC',
         'RedEyeReduction',
@@ -165,6 +165,7 @@ $VERSION = '1.22';
         'MakerNoteKodak8a',
         'MakerNoteKodak8b',
         'MakerNoteKodak9',
+        'MakerNoteKodak10',
         'MakerNoteKodakUnknown',
         'MakerNoteKyocera',
         'MakerNoteMinolta',
@@ -186,6 +187,7 @@ $VERSION = '1.22';
         'MakerNotePentax4',
         'MakerNoteRicoh',
         'MakerNoteRicohText',
+        'MakerNoteSamsung',
         'MakerNoteSanyo',
         'MakerNoteSanyoC4',
         'MakerNoteSanyoPatch',
@@ -196,6 +198,19 @@ $VERSION = '1.22';
         'MakerNoteSony4',
         'MakerNoteSonySRF',
         'MakerNoteUnknown',
+    ],
+    # "unsafe" tags we normally don't copy in JPEG images, defined
+    # as a shortcut to use when rebuilding JPEG EXIF from scratch
+    Unsafe => [
+        'IFD0:YCbCrPositioning',
+        'IFD0:YCbCrCoefficients',
+        'IFD0:TransferFunction',
+        'ExifIFD:ComponentsConfiguration',
+        'ExifIFD:CompressedBitsPerPixel',
+        'InteropIFD:InteropIndex',
+        'InteropIFD:InteropVersion',
+        'InteropIFD:RelatedImageWidth',
+        'InteropIFD:RelatedImageHeight',
     ],
     # Iptc4xmpCore tag name conversions for backward compatibility
     # with ExifTool 7.44 and earlier
@@ -209,16 +224,27 @@ $VERSION = '1.22';
     CreatorContactInfoCiUrlWork   => [ 'CreatorWorkURL' ],
 );
 
+#------------------------------------------------------------------------------
 # load user-defined shortcuts if available
-if (defined %Image::ExifTool::Shortcuts::UserDefined) {
+# Inputs: reference to user-defined shortcut hash
+sub LoadShortcuts($)
+{
+    my $shortcuts = shift;
     my $shortcut;
-    foreach $shortcut (keys %Image::ExifTool::Shortcuts::UserDefined) {
-        my $val = $Image::ExifTool::Shortcuts::UserDefined{$shortcut};
+    foreach $shortcut (keys %$shortcuts) {
+        my $val = $$shortcuts{$shortcut};
         # also allow simple aliases
         $val = [ $val ] unless ref $val eq 'ARRAY';
         # save the user-defined shortcut or alias
         $Image::ExifTool::Shortcuts::Main{$shortcut} = $val;
     }
+}
+# (for backward compatibility, renamed in ExifTool 7.75)
+if (defined %Image::ExifTool::Shortcuts::UserDefined) {
+    LoadShortcuts(\%Image::ExifTool::Shortcuts::UserDefined);
+}
+if (defined %Image::ExifTool::UserDefined::Shortcuts) {
+    LoadShortcuts(\%Image::ExifTool::UserDefined::Shortcuts);
 }
 
 
@@ -242,13 +268,13 @@ Image::ExifTool.  You can customize this file to add your own shortcuts.
 Individual users may also add their own shortcuts to the .ExifTool_config
 file in their home directory (or the directory specified by the
 EXIFTOOL_HOME environment variable).  The shortcuts are defined in a hash
-called %Image::ExifTool::Shortcuts::UserDefined.  The keys of the hash are
+called %Image::ExifTool::UserDefined::Shortcuts.  The keys of the hash are
 the shortcut names, and the elements are either tag names or references to
 lists of tag names.
 
 An example shortcut definition in .ExifTool_config:
 
-    %Image::ExifTool::Shortcuts::UserDefined = (
+    %Image::ExifTool::UserDefined::Shortcuts = (
         MyShortcut => ['createdate','exif:exposuretime','aperture'],
         MyAlias => 'FocalLengthIn35mmFormat',
     );

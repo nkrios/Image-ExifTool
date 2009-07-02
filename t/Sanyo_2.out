@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
 [File, File, Image] FileName - File Name: Sanyo.jpg
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 2.1 kB
@@ -14,7 +14,7 @@
 [File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
 [EXIF, IFD0, Image] 270 - Image Description: SANYO DIGITAL CAMERA
 [EXIF, IFD0, Camera] 271 - Make: SANYO Electric Co.,Ltd.
-[EXIF, IFD0, Camera] 272 - Camera Model Name: VPC-MZ3 
+[EXIF, IFD0, Camera] 272 - Camera Model Name: VPC-MZ3
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
 [EXIF, IFD0, Image] 282 - X Resolution: 72
 [EXIF, IFD0, Image] 283 - Y Resolution: 72
@@ -29,7 +29,7 @@
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2003:10:11 12:43:05
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2003:10:11 12:43:05
-[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: Y, Cb, Cr, -
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 2.9
 [EXIF, ExifIFD, Image] 37379 - Brightness Value: 0
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0

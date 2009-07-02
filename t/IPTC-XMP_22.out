@@ -1,6 +1,7 @@
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.50
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.74
 [XMP, XMP-exif, Image] ApertureValue - Aperture Value: 14.0
 [XMP, XMP-exif, Image] ColorSpace - Color Space: sRGB
+[XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -
 [XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 9
 [XMP, XMP-exif, Image] CustomRendered - Custom Rendered: Normal
 [XMP, XMP-exif, Time] DateTimeOriginal - Date/Time Original: 2003:12:04 06:46:52

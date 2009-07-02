@@ -22,7 +22,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.23';
+$VERSION = '1.28';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -76,6 +76,13 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         Name => 'WhiteBalanceFineTune',
         Writable => 'int32s',
     },
+    0x0114 => { #PH
+        Name => 'CameraSettings',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Sony::CameraSettings',
+            ByteOrder => 'Big-Endian',
+        },
+    },
     0x0115 => { #JD
         Name => 'WhiteBalance',
         PrintConv => {
@@ -90,15 +97,18 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             112 => 'Custom',
         },
     },
-    0x2001 => { #PH (A700)
+    0x2001 => { #PH (All DSLR's except the A100)
         Name => 'PreviewImage',
         Writable => 'undef',
         DataTag => 'PreviewImage',
+        # Note: the preview data starts with a 32-byte proprietary Sony header
         WriteCheck => 'return $val=~/^(none|.{32}\xff\xd8\xff)/s ? undef : "Not a valid image"',
         RawConv => q{
             return $val if $val =~ /^Binary/;
             $val = substr($val,0x20) if length($val) > 0x20;
-            return $self->ValidateImage(\$val,$tag);
+            return \$val if $val =~ s/^.(\xd8\xff\xdb)/\xff$1/s;
+            $$self{PreviewError} = 1 unless $val eq 'none';
+            return undef;
         },
         # must construct 0x20-byte header which contains length, width and height
         ValueConvInv => q{
@@ -110,6 +120,13 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             return Set32u(length $val) . $size . ("\0" x 8) . $size . ("\0" x 4) . $val;
         },
     },
+    0x3000 => {
+        Name => 'ShotInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Sony::ShotInfo',
+        },
+    },
+    # 0x3000: data block that includes DateTimeOriginal string
     0xb020 => { #2
         Name => 'ColorReproduction',
         # observed values: None, Standard, Vivid, Real, AdobeRGB - PH
@@ -121,7 +138,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         PrintConv => '$val ? $val : "Auto"',
         PrintConvInv => '$val=~/Auto/i ? 0 : $val',
     },
-    0xb023 => { #PH (A100)
+    0xb023 => { #PH (A100) - (set by mode dial)
         Name => 'SceneMode',
         Writable => 'int32u',
         PrintConv => \%Image::ExifTool::Minolta::minoltaSceneMode,
@@ -160,7 +177,8 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         Notes => q{
             decimal values differentiate lenses which would otherwise have the same
             LensType, and are used by the Composite LensID tag when attempting to
-            identify the specific lens model
+            identify the specific lens model.  "New" or "II" appear in brackets if the
+            original version of the lens has the same LensType
         },
         PrintConv => \%sonyLensTypes,
     },
@@ -176,7 +194,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             Start => '$val',
         },
     },
-    0xb029 => { #2
+    0xb029 => { #2 (set by creative style menu)
         Name => 'ColorMode',
         Writable => 'int32u',
         PrintConv => \%Image::ExifTool::Minolta::sonyColorMode,
@@ -222,6 +240,127 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         Writable => 'int16u',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
+);
+
+# Camera settings (ref PH) (decoded mainly from A200)
+%Image::ExifTool::Sony::CameraSettings = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    FORMAT => 'int16u',
+    0x11 => { #JD (A700)
+        Name => 'AFArea',
+        PrintConv => {
+            0 => 'Wide',
+            1 => 'Local',
+            2 => 'Spot',
+        },
+    },
+    0x16 => {
+        Name => 'ISOSetting',
+        # 0 indicates 'Auto' (I think)
+        ValueConv => '$val ? exp(($val/8-6)*log(2))*100 : $val',
+        ValueConvInv => '$val ? 8*(log($val/100)/log(2)+6) : $val',
+        PrintConv => '$val ? sprintf("%.0f",$val) : "Auto"',
+        PrintConvInv => '$val =~ /auto/i ? 0 : $val',
+    },
+    0x1a => { # style actually used (combination of mode dial + creative style menu)
+        Name => 'CreativeStyle',
+        PrintConv => {
+            1 => 'Standard',
+            2 => 'Vivid',
+            3 => 'Portrait',
+            4 => 'Landscape',
+            5 => 'Sunset',
+            6 => 'Night View/Portrait',
+            8 => 'B&W',
+            9 => 'Adobe RGB', # A900
+            11 => 'Neutral',
+        },
+    },
+    0x1c => {
+        Name => 'Sharpness',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+        PrintConv => '$val > 0 ? "+$val" : $val',
+        PrintConvInv => '$val',
+    },
+    0x1d => {
+        Name => 'Contrast',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+        PrintConv => '$val > 0 ? "+$val" : $val',
+        PrintConvInv => '$val',
+    },
+    0x1e => {
+        Name => 'Saturation',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+        PrintConv => '$val > 0 ? "+$val" : $val',
+        PrintConvInv => '$val',
+    },
+    0x23 => {
+        Name => 'FlashMode',
+        PrintConv => {
+            0 => 'ADI',
+            1 => 'TTL',
+        },
+    },
+    # 0x2d - also related to CreativeStyle:
+    #  A900:1=?,4=?,129=std,130=vivid,131=neutral,132=portrait,133=landscape,134=b&w
+    0x3c => {
+        Name => 'ExposureProgram',
+        Priority => 0,
+        PrintConv => {
+            0 => 'Auto', # (same as 'Program AE'?)
+            1 => 'Manual',
+            2 => 'Program AE',
+            3 => 'Aperture-priority AE',
+            4 => 'Shutter speed priority AE',
+            16 => 'Portrait',
+        },
+    },
+    0x3f => {
+        Name => 'Rotation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW', #(NC)
+            2 => 'Rotate 270 CW',
+        },
+    },
+    0x54 => {
+        Name => 'SonyImageSize',
+        PrintConv => {
+            1 => 'Large',
+            2 => 'Medium',
+            3 => 'Small',
+        },
+    },
+    # 0x56 - something to do with JPEG quality?
+);
+
+# shot information (ref PH)
+%Image::ExifTool::Sony::ShotInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    # 0 - byte order 'II'
+    6 => {
+        Name => 'SonyDateTime',
+        Format => 'string[20]',
+    },
+    #52 => {
+    #    # values: 'DC6303320222000' or 'DC5303320222000'
+    #    Name => 'UnknownString',
+    #    Format => 'string[16]',
+    #    Unknown => 1,
+    #},
 );
 
 # tag table for Sony RAW Format

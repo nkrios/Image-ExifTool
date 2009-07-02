@@ -37,8 +37,8 @@ my $testnum = 1;
     my @writeInfo = (
         ['GPSLatitude' => "12 deg 21' 23.345"],
         ['GPSLatitudeRef' => 'south' ],
-        ['GPSTimeStamp' => '2007:03:02 15:21:10.55' ],
-        ['GPSDateStamp' => '2007:03:02 15:21:10.55' ],
+        ['GPSTimeStamp' => '2007:03:02 18:46:10.55-05:30' ],
+        ['GPSDateStamp' => '2007:03:02 18:46:10.55-05:30' ],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum);
     print "ok $testnum\n";

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>exiftool Application Documentation</title>
-<link rev="made" href="mailto:root@b49.apple.com" />
+<link rev="made" href="mailto:root@b40.apple.com" />
 </head>
 
 <body style="background-color: white">
@@ -36,6 +36,7 @@
 	<li><a href="#writing_examples">WRITING EXAMPLES</a></li>
 	<li><a href="#copying_examples">COPYING EXAMPLES</a></li>
 	<li><a href="#renaming_examples">RENAMING EXAMPLES</a></li>
+	<li><a href="#geotagging_examples">GEOTAGGING EXAMPLES</a></li>
 	<li><a href="#piping_examples">PIPING EXAMPLES</a></li>
 	<li><a href="#bugs">BUGS</a></li>
 	<li><a href="#author">AUTHOR</a></li>
@@ -68,46 +69,47 @@ reading and writing meta information in image, audio and video files.
 input.  Information is read from the source file and output in readable form
 to the console (or written to an output text file with the <strong>-w</strong> option).</p>
 <p>To write or copy information, new values are specified with the
--<em>TAG</em>=[<em>VALUE</em>] syntax or the <strong>-tagsFromFile</strong> option.  This causes
-<em>FILE</em> to be rewritten, and by default the original file is preserved with
-<code>_original</code> appended to the file name.  (Be sure to verify that the new
-file is OK before erasing the original.)  Once in write mode, exiftool will
-ignore any read-specific options.</p>
+-<em>TAG</em>=[<em>VALUE</em>] syntax or the <strong>-tagsFromFile</strong> or <strong>-geotag</strong> options. 
+This causes <em>FILE</em> to be rewritten, and by default the original file is
+preserved with <code>_original</code> appended to the file name.  (Be sure to verify
+that the new file is OK before erasing the original.)  Once in write mode,
+exiftool will ignore any read-specific options.</p>
 <p>Below is a list of file types and meta information formats currently
 supported by ExifTool (r = read, w = write, c = create):</p>
 <pre>
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  3FR   r       HDP   r/w     PPM   r/w    |  EXIF           r/w/c
-  ACR   r       HTML  r       PPT   r      |  GPS            r/w/c
-  AI    r       ICC   r/w/c   PS    r/w    |  IPTC           r/w/c
-  AIFF  r       ITC   r       PSD   r/w    |  XMP            r/w/c
-  APE   r       JNG   r/w     QTIF  r      |  MakerNotes     r/w/c
-  ARW   r       JP2   r/w     RA    r      |  Photoshop IRB  r/w/c
-  ASF   r       JPEG  r/w     RAF   r/w    |  ICC Profile    r/w/c
-  AVI   r       K25   r       RAM   r      |  MIE            r/w/c
-  BMP   r       KDC   r       RAW   r/w    |  JFIF           r/w/c
-  BTF   r       M4A   r       RIFF  r      |  Ducky APP12    r/w/c
-  CR2   r/w     MEF   r/w     RW2   r      |  PDF            r/w/c
-  CRW   r/w     MIE   r/w/c   RWZ   r      |  CIFF           r/w
-  CS1   r/w     MIFF  r       RM    r      |  AFCP           r/w
-  DCM   r       MNG   r/w     SO    r      |  JPEG 2000      r
-  DCP   r/w     MOS   r/w     SR2   r      |  DICOM          r
-  DCR   r       MOV   r       SRF   r      |  Flash          r
-  DIVX  r       MP3   r       SVG   r      |  FlashPix       r
-  DJVU  r       MP4   r       SWF   r      |  QuickTime      r
-  DLL   r       MPC   r       THM   r/w    |  GeoTIFF        r
-  DNG   r/w     MPG   r       TIFF  r/w    |  PrintIM        r
-  DOC   r       MRW   r/w     VRD   r/w/c  |  ID3            r
-  DYLIB r       NEF   r/w     WAV   r      |  Kodak Meta     r
-  EPS   r/w     OGG   r       WDP   r/w    |  Ricoh RMETA    r
-  ERF   r/w     ORF   r/w     WMA   r      |  Picture Info   r
-  EXE   r       PBM   r/w     WMV   r      |  Adobe APP14    r
-  EXIF  r/w/c   PDF   r/w     X3F   r      |  APE            r
-  FLAC  r       PEF   r/w     XLS   r      |  Vorbis         r
-  FLV   r       PGM   r/w     XMP   r/w/c  |  SPIFF          r
-  FPX   r       PICT  r       ZIP   r      |  (and more)
-  GIF   r/w     PNG   r/w</pre>
+  3FR   r       HTML  r       PNG   r/w    |  EXIF           r/w/c
+  ACR   r       ICC   r/w/c   PPM   r/w    |  GPS            r/w/c
+  AI    r       IND   r/w     PPT   r      |  IPTC           r/w/c
+  AIFF  r       ITC   r       PS    r/w    |  XMP            r/w/c
+  APE   r       JNG   r/w     PSD   r/w    |  MakerNotes     r/w/c
+  ARW   r       JP2   r/w     QTIF  r      |  Photoshop IRB  r/w/c
+  ASF   r       JPEG  r/w     RA    r      |  ICC Profile    r/w/c
+  AVI   r       K25   r       RAF   r/w    |  MIE            r/w/c
+  BMP   r       KDC   r       RAM   r      |  JFIF           r/w/c
+  BTF   r       M4A   r       RAW   r/w    |  Ducky APP12    r/w/c
+  CR2   r/w     MEF   r/w     RIFF  r      |  PDF            r/w/c
+  CRW   r/w     MIE   r/w/c   RW2   r/w    |  CIFF           r/w
+  CS1   r/w     MIFF  r       RWL   r/w    |  AFCP           r/w
+  DCM   r       MNG   r/w     RWZ   r      |  JPEG 2000      r
+  DCP   r/w     MOS   r/w     RM    r      |  DICOM          r
+  DCR   r       MOV   r       SO    r      |  Flash          r
+  DIVX  r       MP3   r       SR2   r      |  FlashPix       r
+  DJVU  r       MP4   r       SRF   r      |  QuickTime      r
+  DLL   r       MPC   r       SVG   r      |  GeoTIFF        r
+  DNG   r/w     MPG   r       SWF   r      |  PrintIM        r
+  DOC   r       MPO   r/w     THM   r/w    |  ID3            r
+  DYLIB r       MRW   r/w     TIFF  r/w    |  Kodak Meta     r
+  EPS   r/w     NEF   r/w     VRD   r/w/c  |  Ricoh RMETA    r
+  ERF   r/w     NRW   r/w     WAV   r      |  Picture Info   r
+  EXE   r       OGG   r       WDP   r/w    |  Adobe APP14    r
+  EXIF  r/w/c   ORF   r/w     WMA   r      |  MPF            r
+  FLAC  r       PBM   r/w     WMV   r      |  APE            r
+  FLV   r       PDF   r/w     X3F   r      |  Vorbis         r
+  FPX   r       PEF   r/w     XLS   r      |  SPIFF          r
+  GIF   r/w     PGM   r/w     XMP   r/w/c  |  DjVu           r
+  HDP   r/w     PICT  r       ZIP   r      |  (and more)</pre>
 <p>Note:  If <em>FILE</em> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are processed
 when any tag is written.  However, a filename may be specified or the
@@ -147,6 +149,7 @@ interpreted as a tag name.</p>
   -fast                             Increase speed for slow devices
   -g[NUM...]  (-groupHeadings)      Organize output by tag group
   -G[NUM...]  (-groupNames)         Print group name for each tag
+  -geotag TRKFILE                   Geotag images from specified GPS log
   -h          (-htmlFormat)         Use HMTL formatting for output
   -H          (-hex)                Show tag ID number in hexadecimal
   -htmlDump[OFFSET]                 Generate HTML-format binary dump
@@ -157,14 +160,8 @@ interpreted as a tag name.</p>
   -l          (-long)               Use long 2-line output format
   -L          (-latin)              Use Windows Latin1 encoding
   -lang [LANG]                      Set current language
-  -list [-GROUP:all]                List all tag names
-  -listw [-GROUP:all]               List writable tag names
-  -listf                            List recognized file extensions
-  -listwf                           List writable file extensions
-  -listg[NUM]                       List groups in specified family
-  -listd                            List deletable groups
-  -listx [-GROUP:all]               List tag database in XML format
-  -m          (-ignoreMinorErrors)  Ignore minor errors
+  -list[w|f|wf|g[NUM]|d|x]          List various exiftool attributes
+  -m          (-ignoreMinorErrors)  Ignore minor errors and warnings
   -n          (--printConv)         Disable print conversion
   -o OUTFILE  (-out)                Set output file or directory name
   -overwrite_original               Overwrite original by renaming tmp file
@@ -177,6 +174,7 @@ interpreted as a tag name.</p>
   -S          (-veryShort)          Very short output format
   -scanForXMP                       Brute force XMP scan
   -sep STR    (-separator)          Set separator string for list items
+  -struct                           Use structured XML or JSON output
   -t          (-tab)                Output in tab-delimited list format
   -T          (-table)              Output in tabular format
   -tagsFromFile SRCFILE             Copy tag values from file
@@ -311,8 +309,8 @@ directory or the exiftool directory unless an absolute pathname is given.
 <dt><strong><a name="item_a"><strong>-a</strong>, <strong>--a</strong> (<strong>-duplicates</strong>, <strong>--duplicates</strong>)</a></strong><br />
 </dt>
 <dd>
-Allow (<strong>-a</strong>) or supress (<strong>--a</strong>) duplicate tag names in the output.  By
-default, duplicate tags are suppressed unless the <strong>-X</strong> or <strong>-ee</strong> options
+Allow (<strong>-a</strong>) or suppress (<strong>--a</strong>) duplicate tag names in the output.  By
+default, duplicate tags are suppressed unless the <strong>-ee</strong> or <strong>-X</strong> options
 are used.
 </dd>
 <p></p>
@@ -339,9 +337,14 @@ various formats:
 <pre>
             FMT                  Output
     -------------------    ------------------
-    &quot;%d deg %d' %.2f&quot;\&quot;    54 deg 59' 22.80&quot;   (the default)
+    &quot;%d deg %d' %.2f&quot;\&quot;    54 deg 59' 22.80&quot;  (default for reading)
+    &quot;%d %d %.8f&quot;           54 59 22.80000000  (default for copying)
     &quot;%d deg %.4f min&quot;      54 deg 59.3800 min
     &quot;%.6f degrees&quot;         54.989667 degrees</pre>
+</dd>
+<dd>
+<p>Note:  To avoid loss of precision, the default coordinate format is
+different when copying tags using the <strong>-tagsFromFile</strong> option.</p>
 </dd>
 <p></p>
 <dt><strong><strong>-d</strong> <em>FMT</em> (<strong>-dateFormat</strong>)</strong><br />
@@ -370,6 +373,7 @@ Print existing tags only -- don't calculate composite tags.
 </dt>
 <dd>
 Escape characters in output values for HTML.  Implied with the <strong>-h</strong> option.
+The inverse conversion is not applied when writing tags.
 </dd>
 <p></p>
 <dt><strong><a name="item_ee"><strong>-ee</strong> (<strong>-extractEmbedded</strong>)</a></strong><br />
@@ -400,7 +404,8 @@ may begin with a leading '.', and case is not significant.  For example:
 </dt>
 <dd>
 Force printing of tags even if their values are not found.  This option only
-applies when tag names are specified.
+applies when tag names are specified.  May also be used to add a 'flags'
+attribute to the <strong>-listx</strong> output.
 </dd>
 <p></p>
 <dt><strong><a name="item__2df_5boffset_5d__28_2dfixbase_29"><strong>-F</strong>[<em>OFFSET</em>] (<strong>-fixBase</strong>)</a></strong><br />
@@ -426,7 +431,8 @@ permanently if <strong>-F</strong> is used when writing EXIF to an image. ie)
 <dd>
 Increase speed of extracting information from JPEG images.  With this
 option, ExifTool will not scan to the end of a JPEG image to check for an
-AFCP or PreviewImage trailer.  The speed benefits are small when reading
+AFCP or PreviewImage trailer, or past the audio/video data in WAV/AVI files
+to search for appended metadata.  The speed benefits are small when reading
 images directly from disk, but can be substantial if piping images through a
 network connection.
 </dd>
@@ -448,6 +454,46 @@ can avoided by placing a colon before the first family number (ie.
 </dt>
 <dd>
 Same as <strong>-g</strong> but print group name for each tag.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dgeotag_trkfile"><strong>-geotag</strong> <em>TRKFILE</em></a></strong><br />
+</dt>
+<dd>
+Geotag images from the specified GPS track log file.  Using the <strong>-geotag</strong>
+option is equivalent to writing a value to the <code>Geotag</code> tag.  After the
+<strong>-geotag</strong> option has been specified, the value of the <code>Geotime</code> tag is
+written to define a date/time for the position interpolation.  If <code>Geotime</code>
+is not specified, the value is copied from <code>DateTimeOriginal</code>.  For
+example, the following two commands are equivalent:
+</dd>
+<dd>
+<pre>
+    exiftool -geotag track.log image.jpg
+    exiftool -geotag &quot;-Geotime&lt;DateTimeOriginal&quot; image.jpg</pre>
+</dd>
+<dd>
+<p>When the <code>Geotime</code> value is converted to UTC, the local system timezone is
+assumed unless the date/time value contains a timezone.  Writing <code>Geotime</code>
+causes the following 8 EXIF tags to be created:  GPSLatitude,
+GPSLatitudeRef, GPSLongitude, GPSLongitudeRef, GPSAltitude, GPSAltitudeRef,
+GPSDateStamp and GPSTimeStamp.  Alternately <code>XMP:Geotime</code> may be written to
+create the following 5 XMP tags: GPSLatitude, GPSLongitude, GPSAltitude,
+GPSAltitudeRef and GPSDateTime.</p>
+</dd>
+<dd>
+<p>Multiple <strong>-geotag</strong> options may be used to concatinate GPS track log data.
+Also, a single <strong>-geotag</strong> option may be used to load multiple track log
+files by using wildcards in the <em>TRKFILE</em> name, but note that in this case
+<em>TRKFILE</em> must be quoted on most systems (with the notable exception of
+Windows) to prevent shell globbing.  For example:</p>
+</dd>
+<dd>
+<pre>
+  exiftool -geotag &quot;TRACKDIR/*.log&quot; IMAGEDIR</pre>
+</dd>
+<dd>
+<p>Currently supported track file formats are GPX, NMEA RMC/GGA/GLL, KML,
+Garmin XML and Magellan PMGNRTK.  See <a href="#geotagging_examples">GEOTAGGING EXAMPLES</a> for examples.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item_h"><strong>-h</strong> (<strong>-htmlFormat</strong>)</a></strong><br />
@@ -517,9 +563,12 @@ conditions must be satisfied to process the file.  Below are a few examples:
 Use JSON (JavaScript Object Notation) formatting for console output.  This
 option may be combined with <strong>-g</strong> to organize the output into objects by
 group, or <strong>-G</strong> to add group names to each tag.  List-type tags with
-multiple items are output as JSON arrays unless <strong>-sep</strong> is used.  The <strong>-a</strong>
-option is implied if the <strong>-g</strong> or <strong>-G</strong> options are used, otherwise
-it is ignored and duplicate tags are suppressed.
+multiple items are output as JSON arrays unless <strong>-sep</strong> is used.  By default
+XMP structures are flattened into individual tags in the JSON output, but
+adding the <strong>-struct</strong> option causes this structure to be preserved.  The
+<strong>-a</strong> option is implied if the <strong>-g</strong> or <strong>-G</strong> options are used, otherwise it
+is ignored and duplicate tags are suppressed.  The <strong>-b</strong> and <strong>-L</strong> options
+have no effect on the JSON output.
 </dd>
 <p></p>
 <dt><strong><a name="item_k"><strong>-k</strong> (<strong>-pause</strong>)</a></strong><br />
@@ -533,8 +582,8 @@ Windows drag and drop application.
 <dt><strong><a name="item_l"><strong>-l</strong> (<strong>-long</strong>)</a></strong><br />
 </dt>
 <dd>
-Use long 2-line Canon-style output format.  Adds a description to the XML
-output when <strong>-X</strong> is used.
+Use long 2-line Canon-style output format.  Adds a description and
+unconverted value to the XML output when <strong>-X</strong> is used.
 </dd>
 <p></p>
 <dt><strong><a name="item_l"><strong>-L</strong> (<strong>-latin</strong>)</a></strong><br />
@@ -549,7 +598,7 @@ values are Latin1 instead of UTF-8.
 </dt>
 <dd>
 Set current language for tag descriptions and converted values.  <em>LANG</em> is
-<code>de</code>, <code>fr</code>, <code>jp</code>, etc.  Use <strong>-lang</strong> with no other arguments to get a
+<code>de</code>, <code>fr</code>, <code>ja</code>, etc.  Use <strong>-lang</strong> with no other arguments to get a
 list of available languages.  The default language is <code>en</code> if <strong>-lang</strong> is
 not specified.  Note that tag/group names are always English, independent of
 the <strong>-lang</strong> setting, and translation of warning/error messages has not yet
@@ -581,8 +630,9 @@ options may be followed by an additional argument of the form <code>-GROUP:All</
 to list all tags in a specific group, where <code>GROUP</code> is one or more family
 0-2 group names (excepting EXIF IFD groups) separated by colons.  With
 <strong>-listg</strong>, <em>NUM</em> may be given to specify the group family, otherwise family
-0 is assumed.  The <strong>-s</strong> option may be used before <strong>-listx</strong> to shorten the
-output by omitting the descriptions and values.  Here are some examples:
+0 is assumed.  The <strong>-s</strong> and <strong>-f</strong> options may be used before <strong>-listx</strong> to
+shorten the output by omitting the descriptions and values, and to add a
+'flags' attribute.  Here are some examples:
 </dd>
 <dd>
 <pre>
@@ -651,12 +701,12 @@ be erased after the output file is successfully written.</p>
 </dd>
 <dd>
 <p>A special feature of this option allows it to be used to create certain
-types of files from scratch.  Currently, this can only be done with XMP and
-ICC/ICM files.  The file is created from a combination of information in
-<em>FILE</em> and tag values assigned on the command line.  This is done by
-specifying a file extension of '.XMP', '.ICC' or '.ICM' for <em>OUTFILE</em>.  The
-output file may be created even if no <em>FILE</em> is specified, provided some
-appropriate tag values are specified on the command line.</p>
+types of files from scratch.  Currently, this can only be done with XMP,
+ICC/ICM, MIE, VRD and EXIF files.  The file is created from a combination of
+information in <em>FILE</em> and tag values assigned on the command line.  This is
+done by specifying a file extension of '.XMP', '.ICC' or '.ICM' for
+<em>OUTFILE</em>.  The output file may be created even if no <em>FILE</em> is specified,
+provided some appropriate tag values are specified on the command line.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2doverwrite_original"><strong>-overwrite_original</strong></a></strong><br />
@@ -666,7 +716,8 @@ Overwrite the original <em>FILE</em> (instead of preserving it by adding
 <code>_original</code> to the file name) when writing information to an image.
 Caution: This option should only be used if you already have separate backup
 copies of your image files.  The overwrite is implemented by renaming a
-temporary file.
+temporary file.  When combined with the <strong>-o</strong> option, causes the original
+file to be deleted if the output file was successfully written.
 </dd>
 <p></p>
 <dt><strong><a name="item__2doverwrite_original_in_place"><strong>-overwrite_original_in_place</strong></a></strong><br />
@@ -748,7 +799,7 @@ Short output format.  Prints tag names instead of descriptions.  Add up to 3
     -s -s -s  - print values only</pre>
 </dd>
 <dd>
-<p>Also effective when combined with <strong>-t</strong>, <strong>-h</strong> or <strong>-X</strong> options.</p>
+<p>Also effective when combined with <strong>-t</strong>, <strong>-h</strong>, <strong>-X</strong> or <strong>-listx</strong> options.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item_s"><strong>-S</strong> (<strong>-veryShort</strong>)</a></strong><br />
@@ -774,6 +825,14 @@ default is ``, ''.  When writing, this option causes values assigned to
 list-type tags to be split into individual items at each substring matching
 specified separator.  Space characters in the separator string match zero or
 more whitespace characters.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dstruct"><strong>-struct</strong></a></strong><br />
+</dt>
+<dd>
+Output structured information instead of flattening to individual tags. 
+Effective only for XML and JSON output formats (<strong>-X</strong> and <strong>-j</strong>) when
+extracting XMP information.
 </dd>
 <p></p>
 <dt><strong><a name="item_t"><strong>-t</strong> (<strong>-tab</strong>)</a></strong><br />
@@ -922,10 +981,11 @@ data blocks.  This is the same as two <strong>-u</strong> options.
 <dd>
 Print verbose messages.  <em>NUM</em> specifies the level of verbosity in the
 range 0-5, with higher numbers being more verbose.  If <em>NUM</em> is not given,
-then each <strong>-v</strong> option increases the level of verbosity by 1.  This option
-suppresses normal console output unless specific tags are being extracted.
-<strong>-v0</strong> is used when writing to print only the processed file names, and the
-``Nothing changed'' message for files that were not modified.
+then each <strong>-v</strong> option increases the level of verbosity by 1.  Using <strong>-v</strong>
+overrides most other options and suppresses normal console output unless
+specific tags are being extracted.  <strong>-v0</strong> is used when writing to print
+only the processed file names, and the ``Nothing changed'' message for files
+that were not modified.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dver"><strong>-ver</strong></a></strong><br />
@@ -940,13 +1000,13 @@ Print version number and exit.
 Write console output to a file with name ending in <em>EXT</em> for each source
 file.  The output file name is obtained by replacing the source file
 extension (including the '.') with the specified extension (and a '.' is
-added to the start of <em>EXT</em> if it didn't contain one).  Alternatively, a
-<em>FMT</em> string may be used to give more control over the output file name and
-directory.  In the format string, %d, %f and %e represent the directory,
-filename and extension of the source file, and %c represents a copy number
-which is automatically incremented if the file already exists.  %d includes
-the trailing '/' if necessary, but %e does not include the leading '.'.  For
-example:
+added to the start of <em>EXT</em> if it doesn't already contain one). 
+Alternatively, a <em>FMT</em> string may be used to give more control over the
+output file name and directory.  In the format string, %d, %f and %e
+represent the directory, filename and extension of the source file, and %c
+represents a copy number which is automatically incremented if the file
+already exists.  %d includes the trailing '/' if necessary, but %e does not
+include the leading '.'.  For example:
 </dd>
 <dd>
 <pre>
@@ -960,8 +1020,19 @@ example:
 automatically if necessary.</p>
 </dd>
 <dd>
-<p>Note:  In a Windows BAT file the '%' character is represented by ``%%'', so
-an argument like ``%d%f.txt'' is written as ``%%d%%f.txt''.</p>
+<p>Notes:</p>
+</dd>
+<dd>
+<p>1) In a Windows BAT file the <code>%</code> character is represented by <code>%%</code>, so an
+argument like <code>%d%f.txt</code> is written as <code>%%d%%f.txt</code>.</p>
+</dd>
+<dd>
+<p>2) It is not possible to specify a simple filename as an argument for <strong>-w</strong>.
+Instead, this simple case is accomplished using shell redirection:</p>
+</dd>
+<dd>
+<pre>
+    exiftool FILE &gt; out.txt</pre>
 </dd>
 <dd>
 <p>Advanced features:  A substring of the original file name, directory or
@@ -999,11 +1070,27 @@ adding a decimal point to the modifier.  For example:</p>
     -w H%-lc.txt      # H.txt, H-b.txt, H-c.txt ...</pre>
 </dd>
 <dd>
+<p>A special feature allows the copy number to be incremented for each
+processed file by using %C (upper case) instead of %c.  This allows a
+sequential number to be added to output file names, even if the names are
+different.  For %C, the number before the decimal place gives the starting
+index, and the number after the decimal place gives the field width.  The
+following examples show the output filenames when used with the command
+<code>exiftool rose.jpg star.jpg jet.jpg ...</code>:</p>
+</dd>
+<dd>
+<pre>
+    -w %C%f.txt       # 0rose.txt, 1star.txt, 2jet.txt
+    -w %f-%10C.txt    # rose-10.txt, star-11.txt, jet-12.txt
+    -w %.3C-%f.txt    # 000-rose.txt, 001-star.txt, 002-jet.txt
+    -w %57.4C%f.txt   # 0057rose.txt, 0058star.txt, 0059jet.txt</pre>
+</dd>
+<dd>
 <p>All format codes may be modified by 'l' or 'u' to specify lower or upper
-case respectively (ie. ``%le'' for a lower case file extension).  When used to
-modify the copy number (%c), the numbers are changed to an alphabetical base
-(see example H above).  Also, %c may be modified by 'n' to count using
-natural numbers starting from 1, instead of 0 (see example F).</p>
+case respectively (ie. <code>%le</code> for a lower case file extension).  When used
+to modify %c or %C, the numbers are changed to an alphabetical base (see
+example H above).  Also, %c may be modified by 'n' to count using natural
+numbers starting from 1, instead of 0 (see example F).</p>
 </dd>
 <dd>
 <p>This same <em>FMT</em> syntax is used with the <strong>-o</strong> and <strong>-tagsFromFile</strong> options,
@@ -1021,20 +1108,22 @@ a <strong>-tagsFromFile</strong> option to exclude tags from being copied.
 <dt><strong><a name="item_x"><strong>-X</strong> (<strong>-xmlFormat</strong>)</a></strong><br />
 </dt>
 <dd>
-Use RDF/XML formatting for console output.  Implies the <strong>-a</strong> option so
+Use RDF/XML formatting for console output.  Implies the <strong>-a</strong> option, so
 duplicate tags are extracted.  The formatting options <strong>-b</strong>, <strong>-D</strong>, <strong>-H</strong>,
-<strong>-l</strong>, <strong>-s</strong>, <strong>-sep</strong> and <strong>-t</strong> may be used in combination with <strong>-X</strong> to
-affect the output, but note that the tag ID (<strong>-D</strong>, <strong>-H</strong> and <strong>-t</strong>) and
-binary data (<strong>-b</strong>) options are not effective for the short output (<strong>-s</strong>).
-Another restriction of <strong>-s</strong> is that only one tag with a given group and
-name may appear in the output.  By default, list-type tags with multiple
-values are formatted as an RDF Bag, but they are combined into a single
-string when <strong>-sep</strong> or <strong>-s</strong> is used.  Using <strong>-L</strong> changes the XML encoding
-from ``UTF-8'' to ``windows-1252''. The <strong>-b</strong> option causes binary data values
-to be written, encoded in base64 if necessary.  The <strong>-t</strong> option has a
-different meaning when used with <strong>-X</strong> -- it causes tag table information
-(table <code>name</code>, decimal tag <code>id</code>, and <code>index</code> for cases where multiple
-conditional tags exist with the same ID) to be included in the output.
+<strong>-l</strong>, <strong>-s</strong>, <strong>-sep</strong>, <strong>-struct</strong> and <strong>-t</strong> may be used in combination with
+<strong>-X</strong> to affect the output, but note that the tag ID (<strong>-D</strong>, <strong>-H</strong> and
+<strong>-t</strong>), binary data (<strong>-b</strong>) and structured output (<strong>-struct</strong>) options are
+not effective for the short output (<strong>-s</strong>).  Another restriction of <strong>-s</strong> is
+that only one tag with a given group and name may appear in the output. 
+Note that the tag ID options (<strong>-D</strong>, <strong>-H</strong> and <strong>-t</strong>) will produce
+non-standard RDF/XML unless the <strong>-l</strong> option is also used.  By default,
+list-type tags with multiple values are formatted as an RDF Bag, but they
+are combined into a single string when <strong>-s</strong> or <strong>-sep</strong> is used.  Using
+<strong>-L</strong> changes the XML encoding from ``UTF-8'' to ``windows-1252''.  The <strong>-b</strong>
+option causes binary data values to be written, encoded in base64 if
+necessary.  The <strong>-t</strong> option causes tag table information (table <code>name</code>,
+decimal tag <code>id</code>, and <code>index</code> for cases where multiple conditional tags
+exist with the same ID) to be included in the output.
 </dd>
 <p></p>
 <dt><strong><a name="item_z"><strong>-z</strong> (<strong>-zip</strong>)</a></strong><br />
@@ -1103,7 +1192,7 @@ Print common meta information for all images in <code>dir</code>.
 <dt><strong><a name="item_exiftool__2dt__2dcreatedate__2daperture__2dshutter">exiftool -T -createdate -aperture -shutterspeed -iso dir &gt; out.txt</a></strong><br />
 </dt>
 <dd>
-List meta information in tab-delimited column form for all images in ``dir''
+List meta information in tab-delimited column form for all images in <code>dir</code>
 to an output text file named ``out.txt''.
 </dd>
 <p></p>
@@ -1203,7 +1292,7 @@ directory (which is created if it didn't exist), with names of the form
 special characters such as <code>&gt;</code>, <code>&lt;</code> or any white space.  These
 quoting techniques are shell dependent, but the examples below will work for
 most Unix shells.  With the Windows cmd shell however, double quotes should
-be used (ie. -Comment=``This is a new comment'').</p>
+be used (ie. -Comment=&#34;This is a new comment&#34;).</p>
 <dl>
 <dt><strong><a name="item_exiftool__2dcomment_3d_27this_is_a_new_comment_27_">exiftool -Comment='This is a new comment' dst.jpg</a></strong><br />
 </dt>
@@ -1301,7 +1390,7 @@ See <a href="http://search.cpan.org/dist/Image-ExifTool/lib/Image/ExifTool/Shift
 Add 3 hours to the CreateDate and ModifyDate timestamps of two images.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dalldates_2b_3d1_3a30__2dif__27_24make_">exiftool -AllDates+=1:30 -if '$make eq ``Canon''' dir</a></strong><br />
+<dt><strong><a name="item_exiftool__2dalldates_2b_3d1_3a30__2dif__27_24make_">exiftool -AllDates+=1:30 -if '$make eq &#34;Canon&#34;' dir</a></strong><br />
 </dt>
 <dd>
 Shift the values of DateTimeOriginal, CreateDate and ModifyDate forward by 1
@@ -1328,6 +1417,12 @@ Delete <code>LightSource</code> tag only if it is unknown with a value of 0.
 </dt>
 <dd>
 Set <code>WhiteBalance</code> to <code>Tungsten</code> only if it was previously <code>Auto</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dcomment_2d_3d__2dcomment_3d_27new_comm">exiftool -comment-= -comment='new comment' a.jpg</a></strong><br />
+</dt>
+<dd>
+Write a new comment only if the image doesn't have one already.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2do__25d_25f_2exmp_dir">exiftool -o %d%f.xmp dir</a></strong><br />
@@ -1375,11 +1470,22 @@ Erase all meta information from <code>dst.jpg</code> image, then copy EXIF tags 
 <code>src.jpg</code>.
 </dd>
 <p></p>
+<dt><strong><a name="item_exiftool__2dexif_3aall_3d__2dtagsfromfile__40__2da">exiftool -exif:all= -tagsfromfile @ -all:all -unsafe bad.jpg</a></strong><br />
+</dt>
+<dd>
+Rebuild all EXIF meta information from scratch in an image.  This technique
+can be used in JPEG images to repair corrupted EXIF information which
+otherwise could not be written due to errors. The <code>Unsafe</code> tag is a
+shortcut for unsafe EXIF tags in JPEG images which are not normally copied. 
+See the <a href="TagNames/index.html">tag name documentation</a> for more details
+about unsafe tags.
+</dd>
+<p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile_a_2ejpg_out_2exmp">exiftool -Tagsfromfile a.jpg out.xmp</a></strong><br />
 </dt>
 <dd>
-Copy meta information <code>a.jpg</code> to an XMP data file.  If the XMP data file
-<code>out.xmp</code> already exists, it will be updated with the new information.
+Copy meta information from <code>a.jpg</code> to an XMP data file.  If the XMP data
+file <code>out.xmp</code> already exists, it will be updated with the new information.
 Otherwise the XMP data file will be created.  Only XMP, ICC and MIE files
 may be created like this (other file types may be edited but not created).
 See <a href="#writing_examples">WRITING EXAMPLES</a> above for another technique to generate XMP files.
@@ -1570,6 +1676,75 @@ named by date.
 <dd>
 Set the filename of all JPG images in the current directory from the
 CreateDate and FileNumber tags, in the form ``20060507_118-1861.jpg''.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="geotagging_examples">GEOTAGGING EXAMPLES</a></h1>
+<dl>
+<dt><strong><a name="item_exiftool__2dgeotag_track_2elog_a_2ejpg">exiftool -geotag track.log a.jpg</a></strong><br />
+</dt>
+<dd>
+Geotag an image (<code>a.jpg</code>) from position information in a GPS track log
+(<code>track.log</code>).  Since the <code>Geotime</code> tag is not specified, the value of
+DateTimeOriginal is used for geotagging.  Local system time is assumed
+unless DateTimeOriginal contains a timezone.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dgeotag_t_2elog__2dgeotime_3d_272009_3a">exiftool -geotag t.log -geotime='2009:04:02 13:41:12-05:00' a.jpg</a></strong><br />
+</dt>
+<dd>
+Geotag an image with the GPS position for a specific time.  (Note that the
+<code>Geotag</code> tag must be assigned before <code>Geotime</code> for the GPS data to be
+available when <code>Geotime</code> is set.)
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dgeotag_log_2egpx__27_2dxmp_3ageotime_3">exiftool -geotag log.gpx '-xmp:geotime&lt;createdate' dir</a></strong><br />
+</dt>
+<dd>
+Geotag all images in directory <code>dir</code> with XMP tags instead of EXIF tags,
+based on the image CreateDate.  (In this case, the order of the arguments
+doesn't matter because tags with values copied from other tags are always
+set after constant values.)
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dgeotag_a_2elog__27_2dgeotime_3c_24_7bc">exiftool -geotag a.log '-geotime&lt;${createdate}+01:00' dir</a></strong><br />
+</dt>
+<dd>
+Geotag images in <code>dir</code> using CreateDate with the specified timezone.  If
+CreateDate already contained a timezone, then the timezone specified on the
+command line is ignored.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dgeotag_3d_a_2ejpg">exiftool -geotag= a.jpg</a></strong><br />
+</dt>
+<dd>
+Delete GPS tags which were added by the geotag feature.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dxmp_3ageotag_3d_a_2ejpg">exiftool -xmp:geotag= a.jpg</a></strong><br />
+</dt>
+<dd>
+Delete XMP GPS tags which were added by the geotag feature.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dxmp_3ageotag_3dtrack_2elog_a_2ejpg">exiftool -xmp:geotag=track.log a.jpg</a></strong><br />
+</dt>
+<dd>
+Geotag an image with XMP tags, using the time from DateTimeOriginal.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dgeotag_a_2elog__2dgeotag_b_2elog__2dr_">exiftool -geotag a.log -geotag b.log -r dir</a></strong><br />
+</dt>
+<dd>
+Combine multiple track logs and geotag an entire directory tree of images.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dgeotag__27tracks_2f_2a_2elog_27__2dr_d">exiftool -geotag 'tracks/*.log' -r dir</a></strong><br />
+</dt>
+<dd>
+Read all track logs from the <code>tracks</code> directory.
 </dd>
 <p></p></dl>
 <p>

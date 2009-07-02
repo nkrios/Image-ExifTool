@@ -40,7 +40,7 @@ my $testnum = 1;
     $exifTool->SetNewValue('MIE:FNumber' => 11);
     $exifTool->SetNewValue('XMP:Creator' => 'phil');
     $exifTool->SetNewValue('IPTC:Keywords' => 'cool');
-    $testfile = "t/${testname}_${testnum}_failed.mie";
+    my $testfile = "t/${testname}_${testnum}_failed.mie";
     unlink $testfile;
     $exifTool->WriteInfo('t/images/MIE.mie', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
@@ -58,7 +58,7 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(IgnoreMinorErrors => 1); # to copy invalid thumbnail
     $exifTool->SetNewValuesFromFile('t/images/MIE.mie');
-    $testfile = "t/${testname}_${testnum}_failed.mie";
+    my $testfile = "t/${testname}_${testnum}_failed.mie";
     unlink $testfile;
     $exifTool->WriteInfo(undef, $testfile);
     my $info = $exifTool->ImageInfo($testfile, '-filename', '-directory');

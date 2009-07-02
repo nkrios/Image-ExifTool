@@ -19,7 +19,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 # older Casio maker notes (ref 1)
 %Image::ExifTool::Casio::Main = (
@@ -449,10 +449,12 @@ $VERSION = '1.23';
     },
     0x2021 => { #JD (guess)
         Name => 'AFPointPosition',
+        Writable => 'int16u',
+        Count => 4,
         PrintConv => q{
             my @v = split ' ', $val;
             return 'n/a' if $v[0] == 65535 or not $v[1] or not $v[3];
-            sprintf"%.0f%% %.0f%%", 100*$v[0]/$v[1], 100*$v[2]/$v[3];
+            sprintf "%.2g %.2g", $v[0]/$v[1], $v[2]/$v[3];
         },
     },
     0x2022 => {
@@ -480,6 +482,11 @@ $VERSION = '1.23';
             17 => 'Movie', #PH (UHQ?)
             19 => 'Movie (19)', #PH (HQ?, EX-P505)
             20 => 'YouTube Movie', #PH
+            '2 0' => 'Program AE', #PH (NC)
+            '3 0' => 'Shutter Priority', #PH (NC)
+            '4 0' => 'Aperture Priority', #PH (NC)
+            '5 0' => 'Manual', #PH (NC)
+            '6 0' => 'Best Shot', #PH (NC)
         },
     },
     # 0x3001 is ShutterMode according to ref 3!
@@ -578,6 +585,7 @@ $VERSION = '1.23';
             1 => 'On',
             2 => 'Best Shot',
             # 3 observed in MOV videos (EX-V7)
+            # (newer models write 2 numbers here - PH)
         },
     },
 );

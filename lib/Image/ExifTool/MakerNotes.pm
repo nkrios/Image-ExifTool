@@ -15,7 +15,7 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 
-$VERSION = '1.44';
+$VERSION = '1.49';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -86,7 +86,7 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteHP2', # PhotoSmart E427
-        # (this type of makernote also used by BenQ, Mustek, Sanyo, Traveler and Vivitar)
+        # (this type of maker note also used by BenQ, Mustek, Sanyo, Traveler and Vivitar)
         Condition => '$$valPt =~ /^610[\0-\4]/',
         NotIFD => 1,
         SubDirectory => {
@@ -290,6 +290,22 @@ my $debug;          # set to 1 to enabled debugging code
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type9',
             ByteOrder => 'LittleEndian',
+        },
+    },
+    {
+        Name => 'MakerNoteKodak10',
+        # yet another type of Kodak IFD-format maker notes:
+        # this type begins with a byte order indicator,
+        # followed immediately by the IFD
+        Condition => q{
+            $$self{Make}=~/Kodak/i and
+            $$valPt =~ /^(MM\0[\x02-\x7f]|II[\x02-\x7f]\0)/
+        },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Type10',
+            ProcessProc => \&ProcessUnknown,
+            ByteOrder => 'Unknown',
+            Start => '$valuePtr + 2',
         },
     },
     {
@@ -533,6 +549,12 @@ my $debug;          # set to 1 to enabled debugging code
         Notes => 'Samsung preview image',
     },
     {
+        Name => 'MakerNoteSamsung',
+        Condition => '$$valPt =~ /^STMN\d{4}/',
+        Binary => 1,
+        Notes => 'Samsung unknown maker notes',
+    },
+    {
         Name => 'MakerNoteSanyo',
         # (starts with "SANYO\0")
         Condition => '$$self{Make}=~/^SANYO/ and $$self{Model}!~/^(C4|J\d|S\d)\b/',
@@ -669,6 +691,8 @@ sub GetMakerNoteOffset($)
         # some Canon models (FV-M30, Optura50, Optura60) leave 24 unused bytes
         # at the end of the IFD (2 spare IFD entries?)
         push @offsets, 28 if $model =~ /\b(FV\b|OPTURA)/;
+        # some Canon PowerShot models leave 12 unused bytes
+        push @offsets, 16 if $model =~ /(PowerShot|IXUS|IXY)/;
     } elsif ($make =~ /^CASIO/) {
         # Casio AVI and MOV images use no padding, and their JPEG's use 4,
         # except some models like the EX-S770,Z65,Z70,Z75 and Z700 which use 16
@@ -779,28 +803,50 @@ sub FixBase($$)
     my $fixBase = $exifTool->Options('FixBase');
     my $setBase = (defined $fixBase and $fixBase ne '') ? 1 : 0;
     my ($fix, $fixedBy);
+
+    # get hash of value block positions
+    my ($valBlock, $valBlkAdj) = GetValueBlocks($dataPt, $dirStart);
+    return 0 unless %$valBlock;
+    # get sorted list of value offsets
+    my @valPtrs = sort { $a <=> $b } keys %$valBlock;
 #
-# handle special case of Canon maker notes with TIFF trailer containing original offset
+# handle special case of Canon maker notes with TIFF footer containing original offset
 #
     if ($$exifTool{Make} =~ /^Canon/ and $$dirInfo{DirLen} > 8) {
         my $trailerPos = $dirStart + $$dirInfo{DirLen} - 8;
-        my $trailer = substr($$dataPt, $trailerPos, 8);
-        if ($trailer =~ /^(II\x2a\0|MM\0\x2a)/ and  # check for TIFF trailer
-            substr($trailer,0,2) eq GetByteOrder()) # validate byte ordering
+        my $footer = substr($$dataPt, $trailerPos, 8);
+        if ($footer =~ /^(II\x2a\0|MM\0\x2a)/ and  # check for TIFF footer
+            substr($footer,0,2) eq GetByteOrder()) # validate byte ordering
         {
+            my $oldOffset = Get32u(\$footer, 4);
+            my $newOffset = $dirStart + $dataPos;
             if ($$exifTool{HTML_DUMP}) {
                 my $filePos = ($$dirInfo{Base} || 0) + $dataPos + $trailerPos;
-                $exifTool->HtmlDump($filePos, 8, '[Canon MakerNote trailer]')
+                my $str = sprintf('Original maker note offset: 0x%.4x', $oldOffset);
+                if ($oldOffset != $newOffset) {
+                    $str .= sprintf("\nCurrent maker note offset: 0x%.4x", $newOffset);
+                }
+                $exifTool->HtmlDump($filePos, 8, '[Canon MakerNotes footer]', $str);
             }
             if ($setBase) {
                 $fix = $fixBase;
             } else {
-                my $oldOffset = Get32u(\$trailer, 4);
-                my $newOffset = $dirStart + $dataPos;
                 $fix = $newOffset - $oldOffset;
                 return 0 unless $fix;
+                # Picasa and ACDSee have a bug where they update other offsets without
+                # updating the TIFF footer (PH - 2009/02/25), so test for this case:
+                # validate Canon maker note footer fix by checking offset of last value
+                my $maxPt = $valPtrs[-1] + $$valBlock{$valPtrs[-1]};
+                # compare to end of maker notes, taking 8-byte footer into account
+                my $endDiff = $dirStart + $$dirInfo{DirLen} - ($maxPt - $dataPos) - 8;
+                # ignore footer offset only if end difference is exactly correct
+                # (allow for possible padding byte, although I have never seen this)
+                if (not $endDiff or $endDiff == 1) {
+                    $exifTool->Warn('Canon maker note footer may be invalid (ignored)',1);
+                    return 0;
+                }
             }
-            $exifTool->Warn("Adjusted $dirName base by $fix", 1);
+            $exifTool->Warn("Adjusted $dirName base by $fix",1);
             $$dirInfo{FixedBy} = $fix;
             $$dirInfo{Base} += $fix;
             $$dirInfo{DataPos} -= $fix;
@@ -808,14 +854,11 @@ sub FixBase($$)
         }
     }
 #
-# analyze value offsets to see if they need fixing.  The first task is to
-# determine the minimum valid offset used (this is tricky, because we have
-# to weed out bad offsets written by some cameras)
+# analyze value offsets to see if they need fixing.  The first task is to determine
+# the minimum valid offset used (this is tricky, because we have  to weed out bad
+# offsets written by some cameras)
 #
-    # get hash of value block positions
-    my ($valBlock, $valBlkAdj) = GetValueBlocks($dataPt, $dirStart);
-    return 0 unless %$valBlock;
-
+    my $minPt = $$dirInfo{MinOffset} = $valPtrs[0]; # if life were simple, this would be it
     my $ifdLen = 2 + 12 * Get16u($$dirInfo{DataPt}, $dirStart);
     my $ifdEnd = $dirStart + $ifdLen;
     my ($relative, @offsets) = GetMakerNoteOffset($exifTool);
@@ -827,10 +870,6 @@ sub FixBase($$)
     my $expected = $dataPos + $ifdEnd + (defined $makeDiff ? $makeDiff : 4);
     $debug and print "$expected expected\n";
 
-    # get sorted list of value offsets
-    my @valPtrs = sort { $a <=> $b } keys %$valBlock;
-    my $minPt = $valPtrs[0];    # if life were simple, this would be it
-
     # zero our counters
     my ($countNeg12, $countZero, $countOverlap) = (0, 0, 0);
     my ($valPtr, $last);
@@ -838,16 +877,16 @@ sub FixBase($$)
         printf("%d - %d (%d)\n", $valPtr, $valPtr + $$valBlock{$valPtr},
                $valPtr - ($last || 0)) if $debug;
         if (defined $last) {
-            my $diff = $valPtr - $last;
-            if ($diff == 0 or $diff == 1) {
+            my $gap = $valPtr - $last;
+            if ($gap == 0 or $gap == 1) {
                 ++$countZero;
-            } elsif ($diff == -12 and not $entryBased) {
+            } elsif ($gap == -12 and not $entryBased) {
                 # you get this when value offsets are relative to the IFD entry
                 ++$countNeg12;
-            } elsif ($diff < 0) {
+            } elsif ($gap < 0) {
                 # any other negative difference indicates overlapping values
                 ++$countOverlap if $valPtr; # (but ignore zero value pointers)
-            } elsif ($diff >= $ifdLen) {
+            } elsif ($gap >= $ifdLen) {
                 # ignore previous minimum if we took a jump to near the expected value
                 # (some values can be stored before the IFD)
                 $minPt = $valPtr if abs($valPtr - $expected) <= 4;
@@ -865,14 +904,14 @@ sub FixBase($$)
         # looks like these offsets are entry-based, so use the offsets
         # which have been correcting for individual entry position
         $entryBased = 1;
-        $verbose and $exifTool->Warn("$dirName offsets are entry-based");
+        $verbose and $exifTool->Warn("$dirName offsets are entry-based",1);
     } else {
-        # calculate difference from normal
+        # calculate offset difference from end of IFD to first value
         $diff = ($minPt - $dataPos) - $ifdEnd;
         $shift = 0;
         $countOverlap and $exifTool->Warn("Overlapping $dirName values",1);
         if ($entryBased) {
-            $exifTool->Warn("$dirName offsets do NOT look entry-based");
+            $exifTool->Warn("$dirName offsets do NOT look entry-based",1);
             undef $entryBased;
             undef $relative;
         }
@@ -1119,7 +1158,7 @@ sub ProcessUnknown($$$)
         $success = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
     } else {
         $exifTool->{UnknownByteOrder} = ''; # indicates we tried but didn't set byte order
-        $exifTool->Warn("Unrecognized $$dirInfo{DirName}");
+        $exifTool->Warn("Unrecognized $$dirInfo{DirName}", 1);
     }
     return $success;
 }

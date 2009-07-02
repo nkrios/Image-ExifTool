@@ -17,7 +17,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -516,7 +516,6 @@ sub GetGUID($)
 sub ProcessContentDescription($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $verbose = $exifTool->Options('Verbose');
     my $dataPt = $$dirInfo{DataPt};
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 10;
@@ -541,7 +540,6 @@ sub ProcessContentDescription($$$)
 sub ProcessContentBranding($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $verbose = $exifTool->Options('Verbose');
     my $dataPt = $$dirInfo{DataPt};
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 40;
@@ -598,7 +596,6 @@ sub ReadASF($$$$$)
 sub ProcessExtendedContentDescription($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $verbose = $exifTool->Options('Verbose');
     my $dataPt = $$dirInfo{DataPt};
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 2;
@@ -633,7 +630,6 @@ sub ProcessExtendedContentDescription($$$)
 sub ProcessPreview($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $verbose = $exifTool->Options('Verbose');
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart};
     my $dirLen = $$dirInfo{DirLen};
@@ -661,7 +657,6 @@ sub ProcessPreview($$$)
 sub ProcessCodecList($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $verbose = $exifTool->Options('Verbose');
     my $dataPt = $$dirInfo{DataPt};
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 20;
@@ -697,7 +692,6 @@ sub ProcessCodecList($$$)
 sub ProcessMetadata($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
-    my $verbose = $exifTool->Options('Verbose');
     my $dataPt = $$dirInfo{DataPt};
     my $dirLen = $$dirInfo{DirLen};
     return 0 if $dirLen < 2;

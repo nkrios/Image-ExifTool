@@ -1,12 +1,16 @@
 #------------------------------------------------------------------------------
 # File:         nl.pm
 #
-# Description:  ExifTool language-specific tag information
+# Description:  ExifTool Dutch language translations
 #
 # Notes:        This file generated automatically by Image::ExifTool::TagInfoXML
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Lang::nl;
+
+use vars qw($VERSION);
+
+$VERSION = '1.02';
 
 %Image::ExifTool::Lang::nl::Translate = (
    'AEBAutoCancel' => {
@@ -119,6 +123,12 @@ package Image::ExifTool::Lang::nl;
       PrintConv => {
         'Off' => 'Uit',
         'On' => 'Aan',
+      },
+    },
+   'AFMicroAdjActive' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
       },
     },
    'AFPoint' => {
@@ -264,13 +274,19 @@ package Image::ExifTool::Lang::nl;
         'Off' => 'Uit',
       },
     },
-   'Aperture' => 'F waarde',
+   'Aperture' => 'Diafragma',
    'ApertureValue' => 'Diafragma',
    'ApplicationRecordVersion' => 'Gegevensversie',
    'Artist' => 'Maker van de afbeelding',
    'AssistButtonFunction' => {
       PrintConv => {
         'Normal' => 'Normaal',
+      },
+    },
+   'Audio' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
       },
     },
    'AudioDuration' => 'Audio duur',
@@ -299,6 +315,7 @@ package Image::ExifTool::Lang::nl;
         'Text Only' => 'Alleen tekst (geen objectgegevens)',
       },
     },
+   'Author' => 'Auteur',
    'AutoAperture' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -340,6 +357,13 @@ package Image::ExifTool::Lang::nl;
         'On' => 'Aan',
       },
     },
+   'AutoFP' => {
+      Description => 'Auto FP',
+      PrintConv => {
+        'Off' => 'Uit',
+        'On' => 'Aan',
+      },
+    },
    'AutoFocus' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -360,6 +384,12 @@ package Image::ExifTool::Lang::nl;
         'Low' => 'Laag',
         'Off' => 'Uit',
         'Standard' => 'Standaard',
+      },
+    },
+   'AutoLightingOptimizerOn' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
       },
     },
    'AutoRedEye' => {
@@ -384,6 +414,12 @@ package Image::ExifTool::Lang::nl;
     },
    'BackgroundColorIndicator' => 'Achtergrond kleur indicator',
    'BackgroundColorValue' => 'Achtergrond kleur waarde',
+   'BackgroundTiling' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'BannerImageType' => {
       PrintConv => {
         'None' => 'Geen',
@@ -488,6 +524,7 @@ package Image::ExifTool::Lang::nl;
       },
     },
    'CameraOrientation' => {
+      Description => 'Oriëntatie van de afbeelding',
       PrintConv => {
         'Horizontal (normal)' => '0° (boven/links)',
         'Rotate 270 CW' => 'Draai 270° met de klok mee',
@@ -535,6 +572,7 @@ package Image::ExifTool::Lang::nl;
         'Average' => 'Gemiddeld',
       },
     },
+   'CharacterSet' => 'Tekenset',
    'ChrominanceNR_TIFF_JPEG' => {
       PrintConv => {
         'High' => 'Hoog',
@@ -588,7 +626,7 @@ package Image::ExifTool::Lang::nl;
     },
    'ColorMode' => {
       PrintConv => {
-        'Evening' => 'avond',
+        'Evening' => 'Avond',
         'Landscape' => 'Landschap',
         'Normal' => 'Normaal',
         'Off' => 'Uit',
@@ -617,6 +655,11 @@ package Image::ExifTool::Lang::nl;
     },
    'ColorSpaceData' => 'Gegevenskleurenruimte',
    'ColorTable' => 'Kleur tabel',
+   'ColorTone' => {
+      PrintConv => {
+        'Normal' => 'Normaal',
+      },
+    },
    'CommandDials' => {
       Description => 'Instelschijven',
       PrintConv => {
@@ -652,7 +695,7 @@ package Image::ExifTool::Lang::nl;
         'Yes' => 'Ja',
       },
     },
-   'CommanderChannel' => 'Commanderstand > Kanaal',
+   'CommanderChannel' => 'Commanderstand Kanaal',
    'CommanderGroupAMode' => {
       Description => 'Commanderstand Groep A Stand',
       PrintConv => {
@@ -684,6 +727,12 @@ package Image::ExifTool::Lang::nl;
    'CommanderInternalManualOutput' => 'Commanderstand Ingb. flitsr M Corrct',
    'CommanderInternalTTLComp' => 'Commanderstand Ingb. flitsr DDL Corrct',
    'Comment' => 'Kommentaar',
+   'Compilation' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'ComponentsConfiguration' => 'Betekenis van elke component',
    'CompressedBitsPerPixel' => 'Afbeelding compressie modus',
    'Compression' => {
@@ -701,7 +750,7 @@ package Image::ExifTool::Lang::nl;
         'SGILog24' => 'SGI 24-Bit Log Luminance gecodeerd',
         'Sony ARW Compressed' => 'Sony ARW gecomprimeerd',
         'Thunderscan' => 'ThunderScan 4-Bit codering',
-        'Uncompressed' => 'niet gecomprimeerd',
+        'Uncompressed' => 'Niet gecomprimeerd',
       },
     },
    'CompressionType' => {
@@ -745,8 +794,23 @@ package Image::ExifTool::Lang::nl;
    'Country-PrimaryLocationCode' => 'ISO landcode',
    'Country-PrimaryLocationName' => 'Land',
    'CreateDate' => 'Datum van de originele data generatie',
+   'CreationDate' => 'Opname datum',
    'Creator' => 'Maker',
+   'CreatorAddress' => 'Maker - Adres',
+   'CreatorCity' => 'Maker - Plaats',
+   'CreatorCountry' => 'Maker - Land',
+   'CreatorPostalCode' => 'Maker - Postcode',
+   'CreatorRegion' => 'Maker - Provincie',
+   'CreatorWorkEmail' => 'Maker - E-mail',
+   'CreatorWorkTelephone' => 'Maker - Telefoonnummer',
+   'CreatorWorkURL' => 'Maker - Website(s)',
    'Credit' => 'Leverancier',
+   'CropActive' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'Curves' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -764,6 +828,12 @@ package Image::ExifTool::Lang::nl;
       PrintConv => {
         'Off' => 'Uit',
         'On' => 'Aan',
+      },
+    },
+   'D-LightingHQSelected' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
       },
     },
    'D-LightingHS' => {
@@ -786,8 +856,20 @@ package Image::ExifTool::Lang::nl;
     },
    'DateTime' => 'Datum bestand wijziging',
    'DateTimeOriginal' => 'Datum van de originele data generatie',
+   'DaylightSavings' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'Description' => 'Beschrijving',
    'Destination' => 'Bestemming',
+   'DestinationDST' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'DeviceAttributes' => 'Apparaateigenschappen',
    'DeviceManufacturer' => 'Apparaatproducent',
    'DeviceMfgDesc' => 'Apparaatproducent kenmerk',
@@ -1040,6 +1122,12 @@ package Image::ExifTool::Lang::nl;
         'On' => 'Aan',
       },
     },
+   'ExternalFlashBounce' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'ExternalFlashMode' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -1047,6 +1135,12 @@ package Image::ExifTool::Lang::nl;
     },
    'ExtraSamples' => 'Extra componenten',
    'FNumber' => 'F waarde',
+   'FastSeek' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'FaxProfile' => {
       PrintConv => {
         'Unknown' => 'Onbekend',
@@ -1056,6 +1150,7 @@ package Image::ExifTool::Lang::nl;
    'FaxRecvTime' => 'Fax ontvangst tijd',
    'FaxSubAddress' => 'Fax sub adres',
    'FileFormat' => 'Fileformaat',
+   'FileName' => 'Bestandnaam',
    'FileNumberMemory' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -1069,6 +1164,7 @@ package Image::ExifTool::Lang::nl;
         'On' => 'Aan',
       },
     },
+   'FileSize' => 'Bestandgrootte',
    'FileSource' => {
       Description => 'Bestand bron',
       PrintConv => {
@@ -1077,6 +1173,8 @@ package Image::ExifTool::Lang::nl;
         'Reflection Print Scanner' => 'Scanner',
       },
     },
+   'FileType' => 'Bestandtype',
+   'FileVersion' => 'Fileformaat versie',
    'FillOrder' => {
       Description => 'Vul volgorde',
       PrintConv => {
@@ -1105,9 +1203,9 @@ package Image::ExifTool::Lang::nl;
         'On' => 'Aan',
       },
     },
-   'FineTuneOptCenterWeighted' => 'Fijnafst. voor opt. belichting > Centrumgericht',
-   'FineTuneOptMatrixMetering' => 'Fijnafst. voor opt. belichting > Matrixmeting',
-   'FineTuneOptSpotMetering' => 'Fijnafst. voor opt. belichting > Spotmeting',
+   'FineTuneOptCenterWeighted' => 'Fijnafst. voor opt. belichting Centrumgericht',
+   'FineTuneOptMatrixMetering' => 'Fijnafst. voor opt. belichting Matrixmeting',
+   'FineTuneOptSpotMetering' => 'Fijnafst. voor opt. belichting Spotmeting',
    'FineTuneStepSize' => {
       Description => 'Stapgrootte belichtingscorr.',
       PrintConv => {
@@ -1158,6 +1256,7 @@ package Image::ExifTool::Lang::nl;
         'On' => 'Aan',
       },
     },
+   'FlashCompensation' => 'Flitscorrectie',
    'FlashControlMode' => {
       PrintConv => {
         'Manual' => 'Handmatig',
@@ -1175,6 +1274,12 @@ package Image::ExifTool::Lang::nl;
       PrintConv => {
         'Off' => 'Uit',
         'On' => 'Aan',
+      },
+    },
+   'FlashFired' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
       },
     },
    'FlashGroupAControlMode' => {
@@ -1217,13 +1322,6 @@ package Image::ExifTool::Lang::nl;
    'FlashModel' => {
       PrintConv => {
         'None' => 'Geen',
-      },
-    },
-   'FlashOn' => {
-      Description => 'Flits',
-      PrintConv => {
-        'Off' => 'Uit',
-        'On' => 'Aan',
       },
     },
    'FlashOptions' => {
@@ -1269,6 +1367,12 @@ package Image::ExifTool::Lang::nl;
         'On' => 'Aan',
       },
     },
+   'FlipHorizontal' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'FocalLength' => 'Brandpuntafstand',
    'FocalLength35efl' => 'Brandpuntafstand',
    'FocalLengthIn35mmFormat' => 'Brandpuntafstand in 35 mm kleinbeeld formaat',
@@ -1282,10 +1386,12 @@ package Image::ExifTool::Lang::nl;
    'FocalPlaneXResolution' => 'Horizontale sensor resolutie',
    'FocalPlaneYResolution' => 'Verticale sensor resolutie',
    'Focus' => {
+      Description => 'Scherpstelling',
       PrintConv => {
         'Manual' => 'Handmatig',
       },
     },
+   'FocusArea' => 'Scherpstelveld',
    'FocusAreaSelection' => {
       Description => 'Doorloop scherpstelpunt',
       PrintConv => {
@@ -1295,12 +1401,15 @@ package Image::ExifTool::Lang::nl;
     },
    'FocusContinuous' => {
       PrintConv => {
+        'Continuous' => 'Continu',
         'Manual' => 'Handmatig',
       },
     },
    'FocusMode' => {
+      Description => 'Focus modus',
       PrintConv => {
         'Auto' => 'Automatisch',
+        'Continuous' => 'Continu',
         'Manual' => 'Handmatig',
         'Normal' => 'Normaal',
       },
@@ -1313,6 +1422,9 @@ package Image::ExifTool::Lang::nl;
    'FocusModeSetting' => {
       Description => 'Scherpstelstand',
       PrintConv => {
+        'AF-A' => 'Automatische AF',
+        'AF-C' => 'Continue AF',
+        'AF-S' => 'Enkelvoudige AF',
         'Manual' => 'Handmatig',
       },
     },
@@ -1485,6 +1597,12 @@ package Image::ExifTool::Lang::nl;
         'None' => 'Geen',
       },
     },
+   'Gapless' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'GrayResponseUnit' => {
       PrintConv => {
         '0.0001' => 'Nummer stelt een 1000ste van een eenheid voor',
@@ -1505,6 +1623,7 @@ package Image::ExifTool::Lang::nl;
       },
     },
    'Headline' => 'Opschrift',
+   'HeightResolution' => 'Beeldresolutie verticaal',
    'HighISONoiseReduction' => {
       PrintConv => {
         'Low' => 'Laag',
@@ -1518,6 +1637,12 @@ package Image::ExifTool::Lang::nl;
       PrintConv => {
         'Off' => 'Uit',
         'On' => 'Aan',
+      },
+    },
+   'HometownDST' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
       },
     },
    'IPTC-NAA' => 'IPTC-NAA metadata',
@@ -1537,6 +1662,12 @@ package Image::ExifTool::Lang::nl;
       PrintConv => {
         'Auto' => 'Automatisch',
         'Manual' => 'Handmatig',
+      },
+    },
+   'ISOSpeedExpansion' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
       },
     },
    'ISOSpeedIncrements' => {
@@ -1604,6 +1735,7 @@ package Image::ExifTool::Lang::nl;
         'Normal' => 'Normaal',
       },
     },
+   'ImageQuality2' => 'Bldkwaliteit 2',
    'ImageReview' => {
       Description => 'Beeld terugspelen',
       PrintConv => {
@@ -1612,6 +1744,13 @@ package Image::ExifTool::Lang::nl;
       },
     },
    'ImageReviewTime' => 'Timers uit Beeld terugspelen',
+   'ImageRotated' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
+   'ImageSize' => 'Beeldformaat',
    'ImageStabilization' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -1635,6 +1774,7 @@ package Image::ExifTool::Lang::nl;
         'Medium Magnification' => 'Gemiddelde zoom',
       },
     },
+   'IntellectualGenre' => 'Genre',
    'IntensityStereo' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -1670,6 +1810,7 @@ package Image::ExifTool::Lang::nl;
    'InteropVersion' => 'Interoperabiliteits versie',
    'JFIFVersion' => 'JFIF versie',
    'JobID' => 'ID van baan',
+   'Keyword' => 'Trefwoorden',
    'Keywords' => 'Trefwoord',
    'LCDIllumination' => {
       Description => 'LCD-verlichting',
@@ -1691,6 +1832,7 @@ package Image::ExifTool::Lang::nl;
       },
     },
    'LanguageIdentifier' => 'Taalherkenning',
+   'Lens' => 'Objectief',
    'LicenseType' => {
       PrintConv => {
         'Unknown' => 'Onbekend',
@@ -1724,12 +1866,19 @@ package Image::ExifTool::Lang::nl;
         'On' => 'Aan',
       },
     },
+   'Lit' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'LiveViewShooting' => {
       PrintConv => {
         'Off' => 'Uit',
         'On' => 'Aan',
       },
     },
+   'Location' => 'Lokatie',
    'LongExposureNoiseReduction' => {
       PrintConv => {
         'Auto' => 'Automatisch',
@@ -1750,7 +1899,7 @@ package Image::ExifTool::Lang::nl;
       },
     },
    'MB-D10Batteries' => 'MB-D10 batterijen',
-   'MB-D80Batteries' => '[32] MB-D80 batterijen',
+   'MB-D80Batteries' => 'MB-D80 batterijen',
    'MIEVersion' => 'MIE versie',
    'MSStereo' => {
       PrintConv => {
@@ -1782,6 +1931,7 @@ package Image::ExifTool::Lang::nl;
     },
    'Make' => 'Fabrikant',
    'MakeAndModel' => 'Producent en model',
+   'MakerNote' => 'Fabrikant informatie',
    'ManualFlashOutput' => {
       Description => 'Ingebouwde flitser Handmatig Sterkte',
       PrintConv => {
@@ -1822,7 +1972,12 @@ package Image::ExifTool::Lang::nl;
         'Multi-segment' => 'Multi segment',
       },
     },
-   'MeteringTime' => 'Timers uit Belichtingsmeters',
+   'MeteringTime' => {
+      Description => 'Timers uit Belichtingsmeters',
+      PrintConv => {
+        'No Limit' => 'Altijd aan',
+      },
+    },
    'MinSampleValue' => 'Min sample waarde',
    'MinoltaQuality' => {
       PrintConv => {
@@ -1890,6 +2045,12 @@ package Image::ExifTool::Lang::nl;
         'None' => 'Geen',
       },
     },
+   'MonochromeLinear' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'MonochromeToningEffect' => {
       PrintConv => {
         'None' => 'Geen',
@@ -1907,14 +2068,14 @@ package Image::ExifTool::Lang::nl;
       },
     },
    'MultiSelector' => {
-      Description => '[f2] Multi-selector',
+      Description => 'Multi-selector',
       PrintConv => {
         'Do Nothing' => 'Doe niets',
         'Reset Meter-off Delay' => 'Activeer lichtmeter',
       },
     },
    'MultiSelectorPlaybackMode' => {
-      Description => 'Centrale knop multiselector > Weergavestand',
+      Description => 'Centrale knop multiselector Weergavestand',
       PrintConv => {
         'Choose Folder' => 'Map selecteren',
         'Thumbnail On/Off' => 'Miniatuur aan/uit',
@@ -1923,7 +2084,7 @@ package Image::ExifTool::Lang::nl;
       },
     },
    'MultiSelectorShootMode' => {
-      Description => 'Centrale knop multiselector > Opnamestand',
+      Description => 'Centrale knop multiselector Opnamestand',
       PrintConv => {
         'Highlight Active Focus Point' => 'Actieve AF-punt markeren',
         'Not Used' => 'Geen functie',
@@ -1955,9 +2116,10 @@ package Image::ExifTool::Lang::nl;
     },
    'NEFCompression' => {
       PrintConv => {
-        'Uncompressed' => 'niet gecomprimeerd',
+        'Uncompressed' => 'Niet gecomprimeerd',
       },
     },
+   'NikonImageSize' => 'Beeldformaat',
    'NoMemoryCard' => {
       Description => 'Geen geheugenkaart',
       PrintConv => {
@@ -1975,6 +2137,7 @@ package Image::ExifTool::Lang::nl;
       },
     },
    'NoiseReduction' => {
+      Description => 'Ruisreductie',
       PrintConv => {
         'Auto' => 'Automatisch',
         'Normal' => 'Normaal',
@@ -1987,9 +2150,9 @@ package Image::ExifTool::Lang::nl;
    'ObjectCycle' => {
       Description => 'Objectcyclus',
       PrintConv => {
-        'Both Morning and Evening' => 'beide',
-        'Evening' => 'avond',
-        'Morning' => 'ochtend',
+        'Both Morning and Evening' => 'Beide',
+        'Evening' => 'Avond',
+        'Morning' => 'Ochtend',
       },
     },
    'ObjectFileType' => {
@@ -2106,6 +2269,7 @@ package Image::ExifTool::Lang::nl;
         'Manual' => 'Handmatig',
         'Portrait' => 'Portret',
         'Shutter speed priority AE' => 'Sluiterprioriteit',
+        'Standard' => 'Standaard',
       },
     },
    'PictureMode2' => {
@@ -2136,12 +2300,24 @@ package Image::ExifTool::Lang::nl;
         'Planar' => 'Planar Formaat',
       },
     },
+   'Predictor' => {
+      PrintConv => {
+        'Horizontal differencing' => 'Horizontale differencering',
+        'None' => 'Geen prodictor schema in gebruik',
+      },
+    },
    'PreviewColorSpace' => {
       PrintConv => {
         'Unknown' => 'Onbekend',
       },
     },
    'PreviewImage' => 'Voorbeeld',
+   'PreviewImageValid' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'PreviewQuality' => {
       PrintConv => {
         'Normal' => 'Normaal',
@@ -2222,6 +2398,12 @@ package Image::ExifTool::Lang::nl;
         'Normal' => 'Normaal',
       },
     },
+   'RawLinear' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'RecordMode' => {
       PrintConv => {
         'Aperture Priority' => 'Diafragmaprioriteit',
@@ -2278,17 +2460,28 @@ package Image::ExifTool::Lang::nl;
         'Saturation' => 'Verzadiging',
       },
     },
-   'RepeatingFlashCount' => 'Stroboscopisch flitsen > Aantal',
+   'RepeatingFlashCount' => 'Stroboscopisch flitsen Aantal',
    'RepeatingFlashOutput' => 'Stroboscopisch flitsen Sterkte',
-   'RepeatingFlashRate' => 'Stroboscopisch flitsen > Freq.',
+   'RepeatingFlashRate' => 'Stroboscopisch flitsen Freq.',
    'ResampleParamsQuality' => {
       PrintConv => {
         'High' => 'Hoog',
         'Low' => 'Laag',
       },
     },
+   'Resaved' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'ResolutionUnit' => {
       Description => 'Eenheid van de X und Y resolutie',
+      PrintConv => {
+        'None' => 'Geen',
+      },
+    },
+   'RetouchHistory' => {
       PrintConv => {
         'None' => 'Geen',
       },
@@ -2309,8 +2502,23 @@ package Image::ExifTool::Lang::nl;
     },
    'RowsPerStrip' => 'Aantal lijnen in de afbeelding',
    'SPIFFVersion' => 'SPIFF versie',
+   'SRActive' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'SVGVersion' => 'SVG versie',
-   'SampleFormat' => 'Sample Formaat',
+   'SampleFormat' => {
+      Description => 'Sample Formaat',
+      PrintConv => {
+        'Complex integer' => 'Complexe integer',
+        'IEEE floating point' => 'Drijvende komma waarde',
+        'Two\'s complement signed integer' => 'Integer met voorteken',
+        'Undefined' => 'Niet gedefinierd',
+        'Unsigned integer' => 'Integer zonder voorteken',
+      },
+    },
    'SamplesPerPixel' => 'Aantal van de componenten',
    'Saturation' => {
       Description => 'Kleurverzadiging',
@@ -2487,9 +2695,21 @@ package Image::ExifTool::Lang::nl;
         'On' => 'Aan',
       },
     },
+   'ShutterReleaseNoCFCard' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'ShutterSpeed' => 'Belichtingstijd',
    'ShutterSpeedValue' => 'Belichtingstijd',
    'SimilarityIndex' => 'Fotogelijkheidsindex',
+   'SlideShow' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'SlowShutter' => {
       PrintConv => {
         'None' => 'Geen',
@@ -2521,6 +2741,8 @@ package Image::ExifTool::Lang::nl;
    'SubSecTimeDigitized' => 'DateTimeDigitized 1/100 seconden',
    'SubSecTimeOriginal' => 'DateTimeOriginal 1/100 seconden',
    'SubfileType' => 'Nieuw subbestand type',
+   'Subject' => 'Onderwerp',
+   'SubjectArea' => 'Positie hoofdobject',
    'SubjectDistance' => 'Object afstand',
    'SubjectDistanceRange' => {
       Description => 'Objectief afstandsbereik',
@@ -2557,6 +2779,12 @@ package Image::ExifTool::Lang::nl;
    'SupplementalCategories' => 'Aanvullende categorie',
    'T4Options' => 'Opvul bit toegevoegd',
    'T6Options' => 'T6 Opties',
+   'Tagged' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'TargetPrinter' => 'Doel Printer',
    'Technology' => {
       Description => 'Technologie',
@@ -2614,10 +2842,17 @@ package Image::ExifTool::Lang::nl;
         'White Balance' => 'Witbalans',
       },
     },
+   'Title' => 'Titel',
    'ToneCurve' => {
       PrintConv => {
         'Manual' => 'Handmatig',
         'Standard' => 'Standaard',
+      },
+    },
+   'ToneCurveActive' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
       },
     },
    'ToningEffect' => {
@@ -2648,8 +2883,16 @@ package Image::ExifTool::Lang::nl;
         'Unknown' => 'Onbekend',
       },
     },
-   'Uncompressed' => 'Niet gecomprimeerd',
+   'Uncompressed' => {
+      Description => 'Niet gecomprimeerd',
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'UniqueDocumentID' => 'Uniek foto ID',
+   'UniqueObjectName' => 'Unieke Naam van het Object',
+   'Unknown' => 'Onbekend',
    'UnsharpMask' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -2734,6 +2977,12 @@ package Image::ExifTool::Lang::nl;
         'Off' => 'Uit',
       },
     },
+   'WBFineTuneActive' => {
+      PrintConv => {
+        'No' => 'Nee',
+        'Yes' => 'Ja',
+      },
+    },
    'WBMode' => {
       PrintConv => {
         'Auto' => 'Automatisch',
@@ -2741,7 +2990,7 @@ package Image::ExifTool::Lang::nl;
     },
    'WCSProfiles' => 'Windows kleursysteemprofiel',
    'WhiteBalance' => {
-      Description => 'Witbalance',
+      Description => 'Witbalans',
       PrintConv => {
         'Auto' => 'Automatisch',
         'Cloudy' => 'Bewolkt',
@@ -2753,7 +3002,6 @@ package Image::ExifTool::Lang::nl;
         'Fluorescent' => 'Fluoresceren',
         'Manual' => 'Handmatig',
         'Shade' => 'Schaduw',
-        'Shadow' => 'Schaduw',
         'Tungsten' => 'Kunstlicht (gloeilamp)',
         'Unknown' => 'Onbekend',
         'White Fluorescent' => 'Warm wit TL licht',
@@ -2803,7 +3051,9 @@ package Image::ExifTool::Lang::nl;
         'On' => 'Aan',
       },
     },
+   'WidthResolution' => 'Beeldresolutie horizontaal',
    'Writer-Editor' => 'Titel/Beschrijving auteur',
+   'XMP' => 'XMP metadata',
    'XPAuthor' => 'Auteur',
    'XPComment' => 'Kommentaar',
    'XPKeywords' => 'Trefwoorden',
@@ -2837,7 +3087,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Lang::nl.pm - ExifTool language-specific tag information
+Image::ExifTool::Lang::nl.pm - ExifTool Dutch language translations
 
 =head1 DESCRIPTION
 

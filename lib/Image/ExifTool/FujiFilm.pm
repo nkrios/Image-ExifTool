@@ -11,6 +11,8 @@
 #               3) Michael Meissner private communication
 #               4) Paul Samuelson private communication (S5)
 #               5) http://www.cybercom.net/~dcoffin/dcraw/
+#               6) http://forums.dpreview.com/forums/readflat.asp?forum=1012&thread=31350384
+#                  and http://forum.photome.de/viewtopic.php?f=2&t=353&p=742#p740
 #               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -21,7 +23,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.19';
+$VERSION = '1.23';
 
 sub ProcessFujiDir($$$);
 
@@ -30,6 +32,7 @@ my %testedRAF = (
     '0100' => 'E550 V1.00, E900 V1.00, S5600 V1.00, S6000fd V1.00, S6500fd V2.00',
     '0104' => 'S5Pro V1.04',
     '0106' => 'S5Pro V1.06',
+    '0111' => 'S5Pro V1.11',
     '0114' => 'S9600 V1.00',
     '0159' => 'S2Pro V1.00',
     '0212' => 'S3Pro V2.12',
@@ -247,6 +250,24 @@ my %testedRAF = (
 #        Name => 'ShutterCount',
 #        Writable => 'int16u',
 #    },
+    0x1033 => { #6
+        Name => 'EXRAuto',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Manual',
+        },
+    },
+    0x1034 => { #6
+        Name => 'EXRMode',
+        Writable => 'int16u',
+        PrintHex => 1,
+        PrintConv => {
+            0x100 => 'HR (High Resolution)',
+            0x200 => 'SN (Signal to Noise priority)',
+            0x300 => 'DR (Dynamic Range priority)',
+        },
+    },
     0x1100 => {
         Name => 'AutoBracketing',
         Writable => 'int16u',
@@ -331,7 +352,7 @@ my %testedRAF = (
             0x8000 => 'Film Simulation',
         },
     },
-    0x1403 => { #2
+    0x1403 => { #2 (only valid for manual DR, ref 6)
         Name => 'DevelopmentDynamicRange',
         Writable => 'int16u',
     },
@@ -351,6 +372,24 @@ my %testedRAF = (
         Name => 'MaxApertureAtMaxFocal',
         Writable => 'rational64s',
     },
+    # 0x1408 - values: '0100', 'S100', 'VQ10'
+    # 0x1409 - values: same as 0x1408
+    # 0x140a - values: 0, 1, 3, 5, 7
+    # 0x140b - DR value for AutoDR???? (ref 6) - values: 100
+    0x4100 => { #PH
+        Name => 'FacesDetected',
+        Writable => 'int16u',
+    },
+    0x4103 => { #PH
+        Name => 'FacePositions',
+        Writable => 'int16u',
+        Count => -1,
+        Notes => q{
+            left, top, right and bottom coordinates in full-sized image for each face
+            detected
+        },
+    },
+    # 0x4104 - also related to face detection (same number of entries as FacePositions)
     0x8000 => { #2
         Name => 'FileSource',
         Writable => 'string',
@@ -512,7 +551,9 @@ sub WriteRAF($$)
         RAF     => new File::RandomAccess(\$jpeg),
         OutFile => \$outJpeg,
     );
+    $$exifTool{FILE_TYPE} = 'JPEG';
     my $success = $exifTool->WriteJPEG(\%jpegInfo);
+    $$exifTool{FILE_TYPE} = 'RAF';
     unless ($success and $outJpeg) {
         $exifTool->Error("Invalid RAF format");
         return 1;

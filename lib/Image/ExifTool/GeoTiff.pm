@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 # format codes for geoTiff directory entries
 my %geoTiffFormat = (
@@ -2064,11 +2064,11 @@ my %epsg_units = (
 );
 
 #------------------------------------------------------------------------------
-# Inputs: 0) ExifTool object reference
-#         1) tag table reference
+# Inputs: 0) ExifTool object ref
+# Notes: byte order must be set before calling this routine
 sub ProcessGeoTiff($)
 {
-    my ($exifTool) = @_;
+    my $exifTool = shift;
     my $dirData = $exifTool->GetValue('GeoTiffDirectory', 'ValueConv') or return;
     my $doubleData = $exifTool->GetValue('GeoTiffDoubleParams', 'ValueConv');
     my $asciiData = $exifTool->GetValue('GeoTiffAsciiParams', 'ValueConv');
@@ -2076,8 +2076,6 @@ sub ProcessGeoTiff($)
     my @double;
 
     # restore or original EXIF byte order setting
-    my $byteOrder = $exifTool->{EXIF_BYTE_ORDER};
-    $byteOrder and SetByteOrder($byteOrder);
     if (length($$dirData) >= 8 and
         length($$dirData) >= 8 * (Get16u($dirData,6) + 1))
     {

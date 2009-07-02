@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.80
 [File, File, Image] FileName - File Name: QuickTime.m4a
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 5.1 kB
@@ -12,6 +12,7 @@
 [QuickTime, QuickTime, Video] 4 - Duration: 29.05 s
 [QuickTime, QuickTime, Video] 5 - Preferred Rate: 1
 [QuickTime, QuickTime, Video] 6 - Preferred Volume: 100.00%
+[QuickTime, QuickTime, Video] 9 - Matrix Structure: 1 0 0 0 1 0 0 0 1
 [QuickTime, QuickTime, Video] 18 - Preview Time: 0 s
 [QuickTime, QuickTime, Video] 19 - Preview Duration: 0 s
 [QuickTime, QuickTime, Video] 20 - Poster Time: 0 s
@@ -26,6 +27,7 @@
 [QuickTime, Track1, Video] 5 - Track Duration: 29.05 s
 [QuickTime, Track1, Video] 8 - Track Layer: 0
 [QuickTime, Track1, Video] 9 - Track Volume: 100.00%
+[QuickTime, Track1, Video] 10 - Matrix Structure: 1 0 0 0 1 0 0 0 1
 [QuickTime, Track1, Video] 0 - Media Header Version: 0
 [QuickTime, Track1, Time] 1 - Media Create Date: 2005:06:29 19:02:19
 [QuickTime, Track1, Time] 2 - Media Modify Date: 2006:09:22 11:06:45

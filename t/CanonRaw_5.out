@@ -1,4 +1,4 @@
-  ExifToolVersion = 7.62
+  ExifToolVersion = 7.80
   FileName = CanonRaw.crw
   Directory = t/images
   FileSize = 6255
@@ -56,7 +56,7 @@
   | | | | 3)  CanonFirmwareVersion = Firmware Version 1.1.1
   | | 12) ExifInformation (SubDirectory) -->
   | | + [Raw directory with 23 entries]
-  | | | 0)  CanonRaw_0x1028 = 0
+  | | | 0)  CanonFlashInfo = 0 100 0 0
   | | | 1)  CanonFocalLength (SubDirectory) -->
   | | | + [BinaryData directory, 8 bytes]
   | | | | FocalType = 0
@@ -85,6 +85,7 @@
   | | | | FocusDistanceLower = 119
   | | | | FNumber = 116
   | | | | ExposureTime = 192
+  | | | | MeasuredEV2 = 47
   | | | | BulbDuration = 0
   | | | | CameraType = 252
   | | | | AutoRotate = 0

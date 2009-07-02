@@ -1,6 +1,6 @@
 ApertureValue: 14.0
 ColorSpace: sRGB
-ComponentsConfiguration: YCbCr
+ComponentsConfiguration: Y, Cb, Cr, -
 CompressedBitsPerPixel: 9
 CreateDate: 2003:12:04 06:46:52
 CustomRendered: Normal

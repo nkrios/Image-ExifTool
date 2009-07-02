@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 sub WritePS($$);
 sub ProcessPS($$;$);
@@ -37,6 +37,7 @@ sub ProcessPS($$;$);
         Priority => 0,
         Groups => { 2 => 'Time' },
         Writable => 'string',
+        PrintConv => '$self->ConvertDateTime($val)',
     },
     Creator     => { Priority => 0, Writable => 'string' },
     ImageData   => { Priority => 0 },
@@ -47,6 +48,7 @@ sub ProcessPS($$;$);
         Priority => 0,
         Groups => { 2 => 'Time' },
         Writable => 'string',
+        PrintConv => '$self->ConvertDateTime($val)',
     },
     Pages       => { Priority => 0 },
     Routing     => { Priority => 0, Writable => 'string' }, #2
@@ -156,33 +158,30 @@ sub PSErr($$)
 }
 
 #------------------------------------------------------------------------------
-# set $/ according to the current file
+# Return input record separator to use for the specified file
 # Inputs: 0) RAF reference
-# Returns: Original separator or undefined if on error
-sub SetInputRecordSeparator($)
+# Returns: Input record separator or undef on error
+sub GetInputRecordSeparator($)
 {
     my $raf = shift;
-    my $oldsep = $/;
     my $pos = $raf->Tell(); # save current position
-    my $data;
+    my ($data, $sep);
     $raf->Read($data,256) or return undef;
     my ($a, $d) = (999,999);
     $a = pos($data), pos($data) = 0 if $data =~ /\x0a/g;
     $d = pos($data) if $data =~ /\x0d/g;
     my $diff = $a - $d;
     if ($diff eq 1) {
-        $/ = "\x0d\x0a";
+        $sep = "\x0d\x0a";
     } elsif ($diff eq -1) {
-        $/ = "\x0a\x0d";
+        $sep = "\x0a\x0d";
     } elsif ($diff > 0) {
-        $/ = "\x0d";
+        $sep = "\x0d";
     } elsif ($diff < 0) {
-        $/ = "\x0a";
-    } else {
-        return undef;       # error
-    }
+        $sep = "\x0a";
+    } # else error
     $raf->Seek($pos, 0);    # restore original position
-    return $oldsep;
+    return $sep;
 }
 
 #------------------------------------------------------------------------------
@@ -303,11 +302,11 @@ sub ProcessPS($$;$)
 #
 # set the newline type based on the first newline found in the file
 #
-    my $oldsep = SetInputRecordSeparator($raf);
-    $oldsep or return PSErr($exifTool, 'invalid PS data');
+    local $/ = GetInputRecordSeparator($raf);
+    $/ or return PSErr($exifTool, 'invalid PS data');
 
     # set file type (PostScript or EPS)
-    $raf->ReadLine($data) or return 0;
+    $raf->ReadLine($data) or $data = '';
     $exifTool->SetFileType($data =~ /EPSF/ ? 'EPS' : 'PS') unless $exifTool->{VALUE}->{FileType};
 #
 # extract TIFF information from DOS header
@@ -522,7 +521,6 @@ sub ProcessPS($$;$)
         undef $buff;
         undef $mode;
     }
-    $/ = $oldsep;   # restore original separator
     $mode = 'Document' if $endDoc and not $mode;
     $mode and PSErr($exifTool, "unterminated $mode data");
     return 1;

@@ -1,14 +1,18 @@
 #------------------------------------------------------------------------------
-# File:         cz.pm
+# File:         cs.pm
 #
-# Description:  ExifTool language-specific tag information
+# Description:  ExifTool Czech language translations
 #
 # Notes:        This file generated automatically by Image::ExifTool::TagInfoXML
 #------------------------------------------------------------------------------
 
-package Image::ExifTool::Lang::cz;
+package Image::ExifTool::Lang::cs;
 
-%Image::ExifTool::Lang::cz::Translate = (
+use vars qw($VERSION);
+
+$VERSION = '1.02';
+
+%Image::ExifTool::Lang::cs::Translate = (
    'AEMeteringMode' => {
       PrintConv => {
         'Multi-segment' => 'Multi segment',
@@ -60,7 +64,7 @@ package Image::ExifTool::Lang::cz;
       },
     },
    'Annotations' => 'Poznámky Photoshop',
-   'Aperture' => 'F hodnota',
+   'Aperture' => 'Clona',
    'ApertureValue' => 'Clona',
    'Artist' => 'Autor',
    'AssistButtonFunction' => {
@@ -68,6 +72,7 @@ package Image::ExifTool::Lang::cz;
         'Normal' => 'Normální',
       },
     },
+   'Author' => 'Autor',
    'AutoBracketRelease' => {
       PrintConv => {
         'None' => 'Žádná',
@@ -120,7 +125,7 @@ package Image::ExifTool::Lang::cz;
         'Flash' => 'Blesk',
         'Fluorescent' => 'Žárovka',
         'ISO Studio Tungsten' => 'Studiová světla',
-        'Other' => 'jiné osvětlení',
+        'Other' => 'Jiné osvětlení',
         'Shade' => 'Stíny',
         'Standard Light A' => 'Standardní světlo A',
         'Standard Light B' => 'Standardní světlo B',
@@ -141,7 +146,7 @@ package Image::ExifTool::Lang::cz;
         'Flash' => 'Blesk',
         'Fluorescent' => 'Žárovka',
         'ISO Studio Tungsten' => 'Studiová světla',
-        'Other' => 'jiné osvětlení',
+        'Other' => 'Jiné osvětlení',
         'Shade' => 'Stíny',
         'Standard Light A' => 'Standardní světlo A',
         'Standard Light B' => 'Standardní světlo B',
@@ -152,6 +157,7 @@ package Image::ExifTool::Lang::cz;
       },
     },
    'CameraOrientation' => {
+      Description => 'Orientace',
       PrintConv => {
         'Horizontal (normal)' => '0° (nahoru/vlevo)',
         'Rotate 270 CW' => '90° po směru HR (vlevo/dolů)',
@@ -213,6 +219,11 @@ package Image::ExifTool::Lang::cz;
         'Uncalibrated' => 'Nekalibrován',
       },
     },
+   'ColorTone' => {
+      PrintConv => {
+        'Normal' => 'Normální',
+      },
+    },
    'CommanderGroupAMode' => {
       PrintConv => {
         'Manual' => 'Manuální',
@@ -238,15 +249,15 @@ package Image::ExifTool::Lang::cz;
         'JPEG (old-style)' => 'JPEG (pův. verze)',
         'Kodak DCR Compressed' => 'Kodak DCR komprese',
         'Kodak KDC Compressed' => 'Kodak KDC komprese',
-        'Next' => 'kódování NeXT 2-bit',
+        'Next' => 'Kódování NeXT 2-bit',
         'Nikon NEF Compressed' => 'Nikon NEF komprese',
         'None' => 'Žádná',
         'Pentax PEF Compressed' => 'Pentax PEF komprese',
-        'SGILog' => 'kódování SGI 32-bit Log Luminance',
-        'SGILog24' => 'kódování SGI 24-bit Log Luminance',
+        'SGILog' => 'Kódování SGI 32-bit Log Luminance',
+        'SGILog24' => 'Kódování SGI 24-bit Log Luminance',
         'Sony ARW Compressed' => 'Sony ARW komprese',
-        'Thunderscan' => 'kódování ThunderScan 4-bit',
-        'Uncompressed' => 'bez komprese',
+        'Thunderscan' => 'Kódování ThunderScan 4-bit',
+        'Uncompressed' => 'Bez komprese',
       },
     },
    'CompressionType' => {
@@ -280,14 +291,15 @@ package Image::ExifTool::Lang::cz;
       },
     },
    'CreateDate' => 'Datum a čas generování digitálních dat',
+   'CreationDate' => 'Datum vytvoření',
    'CropUnit' => {
       PrintConv => {
-        'inches' => 'palce',
+        'inches' => 'Palce',
       },
     },
    'CropUnits' => {
       PrintConv => {
-        'inches' => 'palce',
+        'inches' => 'Palce',
       },
     },
    'CustomRendered' => {
@@ -324,7 +336,7 @@ package Image::ExifTool::Lang::cz;
     },
    'DisplayUnits' => {
       PrintConv => {
-        'inches' => 'palce',
+        'inches' => 'Palce',
       },
     },
    'DisplayXResolutionUnit' => {
@@ -339,12 +351,12 @@ package Image::ExifTool::Lang::cz;
     },
    'DisplayedUnitsX' => {
       PrintConv => {
-        'inches' => 'palce',
+        'inches' => 'Palce',
       },
     },
    'DisplayedUnitsY' => {
       PrintConv => {
-        'inches' => 'palce',
+        'inches' => 'Palce',
       },
     },
    'DjVuVersion' => 'DjVu verze',
@@ -429,6 +441,8 @@ package Image::ExifTool::Lang::cz;
    'FaxRecvParams' => 'Parametry příjemce faxu',
    'FaxRecvTime' => 'Čas příjmu faxu',
    'FaxSubAddress' => 'Sub adresa faxu',
+   'FileName' => 'Jméno',
+   'FileSize' => 'Velikost',
    'FileSource' => {
       Description => 'Zdroj dat',
       PrintConv => {
@@ -437,6 +451,7 @@ package Image::ExifTool::Lang::cz;
         'Reflection Print Scanner' => 'Skener',
       },
     },
+   'FileType' => 'Typ',
    'FillOrder' => {
       Description => 'Pořadí výplně',
       PrintConv => {
@@ -530,7 +545,6 @@ package Image::ExifTool::Lang::cz;
         'None' => 'Žádná',
       },
     },
-   'FlashOn' => 'Blesk',
    'FlashOptions' => {
       PrintConv => {
         'Normal' => 'Normální',
@@ -554,7 +568,7 @@ package Image::ExifTool::Lang::cz;
       Description => 'Jednotka rozlišení senzoru',
       PrintConv => {
         'None' => 'Žádná',
-        'inches' => 'palce',
+        'inches' => 'Palce',
         'um' => 'µm (mikrometr)',
       },
     },
@@ -571,6 +585,7 @@ package Image::ExifTool::Lang::cz;
       },
     },
    'FocusMode' => {
+      Description => 'Ostření',
       PrintConv => {
         'Macro' => 'Makro',
         'Manual' => 'Manuální',
@@ -795,6 +810,9 @@ package Image::ExifTool::Lang::cz;
     },
    'InteropVersion' => 'Verze kompatibility',
    'JFIFVersion' => 'JFIF verze',
+   'Keyword' => 'Klíčová slova',
+   'LeafData' => 'Leaf data',
+   'Lens' => 'Objektiv',
    'LicenseType' => {
       PrintConv => {
         'Unknown' => 'Neznámý',
@@ -812,7 +830,7 @@ package Image::ExifTool::Lang::cz;
         'Flash' => 'Blesk',
         'Fluorescent' => 'Žárovka',
         'ISO Studio Tungsten' => 'Studiová světla',
-        'Other' => 'jiné osvětlení',
+        'Other' => 'Jiné osvětlení',
         'Shade' => 'Stíny',
         'Standard Light A' => 'Standardní světlo A',
         'Standard Light B' => 'Standardní světlo B',
@@ -822,6 +840,7 @@ package Image::ExifTool::Lang::cz;
         'White Fluorescent' => 'Bílá zářivka',
       },
     },
+   'Location' => 'Lokalita',
    'LoopStyle' => {
       PrintConv => {
         'Normal' => 'Normální',
@@ -847,6 +866,7 @@ package Image::ExifTool::Lang::cz;
       },
     },
    'Make' => 'Výrobce',
+   'MakerNote' => 'Privátní data výrobce',
    'ManualFlashOutput' => {
       PrintConv => {
         'Low' => 'Méně',
@@ -930,7 +950,7 @@ package Image::ExifTool::Lang::cz;
     },
    'NEFCompression' => {
       PrintConv => {
-        'Uncompressed' => 'bez komprese',
+        'Uncompressed' => 'Bez komprese',
       },
     },
    'Noise' => 'Šum',
@@ -940,6 +960,7 @@ package Image::ExifTool::Lang::cz;
       },
     },
    'NoiseReduction' => {
+      Description => 'Potlačení šumu',
       PrintConv => {
         'Normal' => 'Normální',
       },
@@ -987,6 +1008,7 @@ package Image::ExifTool::Lang::cz;
         'WhiteIsZero' => 'Bílá je nula',
       },
     },
+   'PhotoshopAnnotations' => 'Poznámky Photoshop',
    'PictureFinish' => {
       PrintConv => {
         'Portrait' => 'Portrét',
@@ -1105,7 +1127,12 @@ package Image::ExifTool::Lang::cz;
       Description => 'Jednotka X a Y rozlišení',
       PrintConv => {
         'None' => 'Žádná',
-        'inches' => 'palce',
+        'inches' => 'Palce',
+      },
+    },
+   'RetouchHistory' => {
+      PrintConv => {
+        'None' => 'Žádná',
       },
     },
    'Rotation' => {
@@ -1124,7 +1151,16 @@ package Image::ExifTool::Lang::cz;
    'RowsPerStrip' => 'Počet řádek v části',
    'SPIFFVersion' => 'SPIFF verze',
    'SVGVersion' => 'SVG verze',
-   'SampleFormat' => 'Formát vzorku',
+   'SampleFormat' => {
+      Description => 'Formát vzorku',
+      PrintConv => {
+        'Complex integer' => 'Komplexní číslo',
+        'IEEE floating point' => 'Desetinná čárka',
+        'Two\'s complement signed integer' => 'Záporné číslo',
+        'Undefined' => 'Nedefinované',
+        'Unsigned integer' => 'Kladné číslo',
+      },
+    },
    'SamplesPerPixel' => 'Počet složek',
    'Saturation' => {
       Description => 'Saturace',
@@ -1262,6 +1298,8 @@ package Image::ExifTool::Lang::cz;
    'SubSecTimeDigitized' => 'DateTimeDigitized 1/100 sekund',
    'SubSecTimeOriginal' => 'DateTimeOriginal 1/100 sekund',
    'SubfileType' => 'Nový typ podsekce',
+   'Subject' => 'Popis',
+   'SubjectArea' => 'Pozice hlavního objektu',
    'SubjectDistance' => 'Vzdálenost objektu',
    'SubjectDistanceRange' => {
       Description => 'Rozsah vzdálenosti objektu',
@@ -1303,6 +1341,7 @@ package Image::ExifTool::Lang::cz;
         'Low' => 'Méně',
       },
     },
+   'Title' => 'Název',
    'ToneCurve' => {
       PrintConv => {
         'Manual' => 'Manuální',
@@ -1381,7 +1420,6 @@ package Image::ExifTool::Lang::cz;
         'Fluorescent' => 'Žárovka',
         'Manual' => 'Manuální',
         'Shade' => 'Stíny',
-        'Shadow' => 'Stíny',
         'Tungsten' => 'Zářivka',
         'Unknown' => 'Neznámý',
         'White Fluorescent' => 'Bílá zářivka',
@@ -1416,6 +1454,7 @@ package Image::ExifTool::Lang::cz;
       },
     },
    'WhitePoint' => 'Chromatičnost bílého bodu',
+   'XMP' => 'XMP metadata',
    'XPAuthor' => 'Autor',
    'XPComment' => 'Komentář',
    'XPKeywords' => 'Klíčová slova',
@@ -1443,7 +1482,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Lang::cz.pm - ExifTool language-specific tag information
+Image::ExifTool::Lang::cs.pm - ExifTool Czech language translations
 
 =head1 DESCRIPTION
 
@@ -1459,7 +1498,7 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Jens Duttke and Petr Mich&aacute;lek for providing this
+Thanks to Jens Duttke and Petr MichE<aacute>lek for providing this
 translation.
 
 =head1 SEE ALSO

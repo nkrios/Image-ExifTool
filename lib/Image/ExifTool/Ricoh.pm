@@ -17,7 +17,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.06';
+$VERSION = '1.08';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -119,6 +119,12 @@ sub ProcessRicohRMETA($$$);
         OffsetPair => 30,   # associated byte count tagID
         DataTag => 'PreviewImage',
         Protected => 2,
+        # prevent preview from being written to raw images
+        RawConvInv => q{
+            return $val if $$self{FILE_TYPE} eq "JPEG";
+            warn "Can't write PreviewImage to $$self{TIFF_TYPE} file\n";
+            return undef;
+        },
     },
     30 => {
         Name => 'PreviewImageLength',
@@ -126,6 +132,11 @@ sub ProcessRicohRMETA($$$);
         OffsetPair => 28,   # point to associated offset
         DataTag => 'PreviewImage',
         Protected => 2,
+        RawConvInv => q{
+            return $val if $$self{FILE_TYPE} eq "JPEG";
+            warn "\n"; # suppress warning (already issued for PreviewImageStart)
+            return undef;
+        },
     },
     32 => {
         Name => 'FlashMode',
@@ -262,6 +273,7 @@ sub ProcessRicohRMETA($$$);
 # information stored in Ricoh AVI images (ref PH)
 %Image::ExifTool::Ricoh::AVI = (
     PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunks,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     ucmt => {
         Name => 'Comment',
         ValueConv => '$_=$val; s/^Unicode//; tr/\0//d; s/\s+$//; $_',

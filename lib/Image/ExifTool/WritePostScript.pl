@@ -435,8 +435,8 @@ sub WritePS($$)
 #
 # rewrite PostScript data
 #
-    my $oldsep = SetInputRecordSeparator($raf);
-    unless ($oldsep and $raf->ReadLine($buff)) {
+    local $/ = GetInputRecordSeparator($raf);
+    unless ($/ and $raf->ReadLine($buff)) {
         $exifTool->Error('Invalid PostScript data');
         return 1;
     }

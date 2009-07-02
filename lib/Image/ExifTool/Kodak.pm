@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.17';
+$VERSION = '1.19';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -256,8 +256,7 @@ sub WriteKodakIFD($$$);
     0x6b => {
         Name => 'Sharpness',
         Format => 'int8s',
-        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
-        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+        %Image::ExifTool::Exif::printParameter,
     },
 );
 
@@ -330,8 +329,7 @@ sub WriteKodakIFD($$$);
     0x37 => {
         Name => 'Sharpness',
         Format => 'int8s',
-        PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
-        PrintConvInv => '$val=~/normal/i ? 0 : $val',
+        %Image::ExifTool::Exif::printParameter,
     },
     0x38 => {
         Name => 'ExposureTime',
@@ -517,13 +515,14 @@ sub WriteKodakIFD($$$);
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
-        Kodak models such as the P712, P850, P880, Z612, Z712 and Z8612 use standard
-        TIFF IFD format for the maker notes.  In keeping with Kodak's strategy of
-        inconsitent makernotes, some models such as the Z1085 also use these tags,
-        but for these models the makernotes begin with a TIFF header instead of an
-        IFD entry count and use relative instead of absolute offsets.  There is a
-        large amount of information stored in these maker notes (apparently with
-        much duplication), but relatively few tags have so far been decoded.
+        Kodak models such as the ZD710, P712, P850, P880, V1233, V1253, V1275,
+        V1285, Z612, Z712, Z812, Z885 use standard TIFF IFD format for the maker
+        notes.  In keeping with Kodak's strategy of inconsitent makernotes, models
+        such as the M380, M1033, M1093, V1073, V1273, Z1012, Z1085 and Z8612
+        also use these tags, but these makernotes begin with a TIFF header instead
+        of an IFD entry count and use relative instead of absolute offsets.  There
+        is a large amount of information stored in these maker notes (apparently
+        with much duplication), but relatively few tags have so far been decoded.
     },
     0xfc00 => {
         Name => 'SubIFD0',
@@ -645,6 +644,86 @@ sub WriteKodakIFD($$$);
         Name => 'SerialNumber',
         Format => 'string[12]',
     },
+);
+
+# more Kodak IFD-format maker notes (ref PH)
+%Image::ExifTool::Kodak::Type10 = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PRIORITY => 0,
+    NOTES => q{
+        Another variation of the IFD-format type, this time with just a byte order
+        indicator instead of a full TIFF header.  These tags are used by the Z980.
+    },
+    # 0x01 int16u - always 0
+    0x02 => {
+        Name => 'PreviewImageSize',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    # 0x03 int32u - ranges from about 33940 to 40680
+    # 0x04 int32u - always 18493
+    # 0x06 undef[4] - 07 d9 04 11
+    # 0x07 undef[3] - varies
+    # 0x08 int16u - 1 (mostly), 2
+    # 0x09 int16u - 255
+    # 0x0b int16u[2] - '0 0' (mostly), '20 0', '21 0', '1 0'
+    # 0x0c int16u - 1 (mostly), 3, 259, 260
+    # 0x0d int16u - 0
+    # 0x0e int16u - 0, 1, 2 (MeteringMode? 0=Partial, 1,2=Multi)
+    # 0x0f int16u - 0, 5 (MeteringMode? 0=Multi, 5=Partial)
+    # 0x10 int16u - ranges from about 902 to 2308
+    0x12 => {
+        Name => 'ExposureTime',
+        Writable => 'int32u',
+        ValueConv => '$val / 100000',
+        ValueConvInv => '$val * 100000',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'eval $val',
+    },
+    0x13 => {
+        Name => 'FNumber',
+        Writable => 'int16u',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x14 => {
+        Name => 'ISO',
+        Writable => 'int16u',
+        ValueConv => 'exp($val/3*log(2))*25',
+        ValueConvInv => '3*log($val/25)/log(2)',
+        PrintConv => 'int($val + 0.5)',
+        PrintConvInv => '$val',
+    },
+    # 0x15 int16u - 18-25 (SceneMode? 21=auto, 24=Aperture Priority, 19=high speed)
+    # 0x16 int16u - 50
+    # 0x17 int16u - 0, 65535 (MeteringMode? 0=Multi, 65535=Partial)
+    # 0x19 int16u - 0, 4 (WhiteBalance? 0=Auto, 4=Manual)
+    # 0x1a int16u - 0, 65535
+    # 0x1b int16u - 416-696
+    # 0x1c int16u - 251-439 (low when 0x1b is high)
+    0x1d => {
+        Name => 'FocalLength',
+        Writable => 'int32u',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+        PrintConv => '"$val mm"',
+        PrintConvInv => '$val=~s/\s*mm//;$val',
+    },
+    # 0x1e int16u - 100
+    # 0x1f int16u - 0, 1
+    # 0x20,0x21 int16u - 1
+    # 0x27 undef[4] - fe ff ff ff
+    # 0x32 undef[4] - 00 00 00 00
+    # 0x61 int32u[2] - '0 0' or '34050 0'
+    # 0x62 int8u - 0, 1
+    # 0x63 int8u - 1
+    # 0x64,0x65 int8u - 0, 1, 2
+    # 0x66 int32u - 0
+    # 0x67 int32u - 3
+    # 0x68 int32u - 0
+    # 0x3fe undef[2540]
 );
 
 # Kodak SubIFD0 tags (ref PH)
@@ -1079,6 +1158,7 @@ my %sceneModeUsed = (
             'S' => 'Shutter Priority', #(NC)
             'P' => 'Program', #(NC)
             'B' => 'Bulb', #(NC)
+            # have seen "Manual (M)" written by DCS760C - PH
         },
     },
     'Firmware Version' => 'FirmwareVersion',
@@ -1111,7 +1191,7 @@ my %sceneModeUsed = (
         Name => 'Time',
         Groups => { 2 => 'Time' },
     },
-    'White balance' => 'Whitebalance',
+    'White balance' => 'WhiteBalance',
     'Width'         => 'KodakImageWidth',
     '_other_info'   => {
         Name => 'OtherInfo',

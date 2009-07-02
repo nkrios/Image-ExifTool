@@ -1,12 +1,16 @@
 #------------------------------------------------------------------------------
 # File:         pl.pm
 #
-# Description:  ExifTool language-specific tag information
+# Description:  ExifTool Polish language translations
 #
 # Notes:        This file generated automatically by Image::ExifTool::TagInfoXML
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Lang::pl;
+
+use vars qw($VERSION);
+
+$VERSION = '1.01';
 
 %Image::ExifTool::Lang::pl::Translate = (
    'AFPoint' => {
@@ -19,6 +23,7 @@ package Image::ExifTool::Lang::pl;
         'None' => 'Brak',
       },
     },
+   'Aperture' => 'Przysłona',
    'AutoBracketRelease' => {
       PrintConv => {
         'None' => 'Brak',
@@ -60,6 +65,7 @@ package Image::ExifTool::Lang::pl;
       },
     },
    'CameraOrientation' => {
+      Description => 'Orientacja obrazu',
       PrintConv => {
         'Horizontal (normal)' => '0° (góra/lewo)',
         'Rotate 270 CW' => '90° CW (lewo/dół)',
@@ -67,6 +73,7 @@ package Image::ExifTool::Lang::pl;
       },
     },
    'ColorSpaceData' => 'Dane przestrzeni barw',
+   'Comment' => 'Komentarz',
    'Compression' => {
       Description => 'Algorytm kompresji',
       PrintConv => {
@@ -82,7 +89,7 @@ package Image::ExifTool::Lang::pl;
         'SGILog24' => 'Kodowanie 24-bitowe SGI Log Luminance',
         'Sony ARW Compressed' => 'Skompresowany Sony ARW',
         'Thunderscan' => 'Kodowanie 4-bitowe ThunderScan',
-        'Uncompressed' => 'bez kompresji',
+        'Uncompressed' => 'Bez kompresji',
       },
     },
    'CompressionType' => {
@@ -90,14 +97,15 @@ package Image::ExifTool::Lang::pl;
         'None' => 'Brak',
       },
     },
+   'CreationDate' => 'Data utworzenia',
    'CropUnit' => {
       PrintConv => {
-        'inches' => 'cal',
+        'inches' => 'Cal',
       },
     },
    'CropUnits' => {
       PrintConv => {
-        'inches' => 'cal',
+        'inches' => 'Cal',
       },
     },
    'DNGBackwardVersion' => 'Poprzednia wersja DNG',
@@ -114,17 +122,17 @@ package Image::ExifTool::Lang::pl;
    'DeviceModel' => 'Model urządzenia',
    'DisplayUnits' => {
       PrintConv => {
-        'inches' => 'cal',
+        'inches' => 'Cal',
       },
     },
    'DisplayedUnitsX' => {
       PrintConv => {
-        'inches' => 'cal',
+        'inches' => 'Cal',
       },
     },
    'DisplayedUnitsY' => {
       PrintConv => {
-        'inches' => 'cal',
+        'inches' => 'Cal',
       },
     },
    'Emphasis' => {
@@ -143,11 +151,17 @@ package Image::ExifTool::Lang::pl;
     },
    'ExifImageHeight' => 'Wysokość obrazu',
    'ExifImageWidth' => 'Szerokość obrazu',
+   'ExposureTime' => 'Czas ekspozycji',
+   'FNumber' => 'Przysłona',
+   'FileName' => 'Nazwa pliku',
+   'FileSize' => 'Wielkość pliku',
+   'FileType' => 'Typ pliku',
    'FilterEffectMonochrome' => {
       PrintConv => {
         'None' => 'Brak',
       },
     },
+   'Flash' => 'Lampa',
    'FlashDevice' => {
       PrintConv => {
         'None' => 'Brak',
@@ -163,12 +177,15 @@ package Image::ExifTool::Lang::pl;
         'None' => 'Brak',
       },
     },
+   'FocalLength' => 'Ogniskowa',
    'FocalPlaneResolutionUnit' => {
       PrintConv => {
         'None' => 'Brak',
-        'inches' => 'cal',
+        'inches' => 'Cal',
+        'um' => 'µm (mikrometr)',
       },
     },
+   'FocusMode' => 'Tryb ostrzenia',
    'FreeByteCounts' => 'Liczba wolnych bajtów',
    'FreeOffsets' => 'Wolne offsety',
    'GainControl' => {
@@ -176,11 +193,16 @@ package Image::ExifTool::Lang::pl;
         'None' => 'Brak',
       },
     },
+   'ISO' => 'Czułość ISO',
    'ImageHeight' => 'Wysokość obrazu',
    'ImageWidth' => 'Szerokość obrazu',
+   'Lens' => 'Obiektyw',
    'LocalizedCameraModel' => 'Lokalizowany model aparatu',
+   'Location' => 'Miejsce',
    'Luminance' => 'Luminancja',
+   'Make' => 'Producent',
    'MakeAndModel' => 'Producent i model',
+   'MakerNote' => 'Prywatne dane DNG',
    'MeasurementGeometry' => {
       Description => 'Geometria pomiaru',
       PrintConv => {
@@ -190,6 +212,8 @@ package Image::ExifTool::Lang::pl;
     },
    'MediaBlackPoint' => 'Punkt czerni materiału',
    'MediaWhitePoint' => 'Punkt bieli materiału',
+   'MeteringMode' => 'Tryb pomiaru',
+   'Model' => 'Aparat',
    'ModifiedPictureStyle' => {
       PrintConv => {
         'None' => 'Brak',
@@ -207,10 +231,11 @@ package Image::ExifTool::Lang::pl;
     },
    'NEFCompression' => {
       PrintConv => {
-        'Uncompressed' => 'bez kompresji',
+        'Uncompressed' => 'Bez kompresji',
       },
     },
    'NativeDisplayInfo' => 'Informacja o natywnym(?) wyświetlaczu',
+   'NoiseReduction' => 'Redukcja szumów',
    'ObjectFileType' => {
       PrintConv => {
         'None' => 'Brak',
@@ -299,7 +324,12 @@ package Image::ExifTool::Lang::pl;
       Description => 'Jednostka rozdzielczości X i Y',
       PrintConv => {
         'None' => 'Brak',
-        'inches' => 'cal',
+        'inches' => 'Cal',
+      },
+    },
+   'RetouchHistory' => {
+      PrintConv => {
+        'None' => 'Brak',
       },
     },
    'Rotation' => {
@@ -322,11 +352,13 @@ package Image::ExifTool::Lang::pl;
       },
     },
    'ServiceIdentifier' => 'Identyfikator usługi',
+   'ShutterSpeed' => 'Czas ekspozycji',
    'SlowShutter' => {
       PrintConv => {
         'None' => 'Brak',
       },
     },
+   'Software' => 'Oprogramowanie',
    'SpecialEffectsOpticalFilter' => {
       PrintConv => {
         'None' => 'Brak',
@@ -381,6 +413,7 @@ package Image::ExifTool::Lang::pl;
       },
     },
    'UniqueCameraModel' => 'Unikatowy model aparatu',
+   'Unknown' => 'Nieznany',
    'UserComment' => 'Komentarz użytkownika',
    'VideoCardGamma' => 'Gamma karty graficznej',
    'WBAdjLighting' => {
@@ -388,6 +421,7 @@ package Image::ExifTool::Lang::pl;
         'None' => 'Brak',
       },
     },
+   'WhiteBalance' => 'Balans bieli',
    'XResolution' => 'Rozdzielczość obrazu w poziomie',
    'YCbCrPositioning' => {
       Description => 'Pozycje Y i C',
@@ -407,7 +441,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Lang::pl.pm - ExifTool language-specific tag information
+Image::ExifTool::Lang::pl.pm - ExifTool Polish language translations
 
 =head1 DESCRIPTION
 

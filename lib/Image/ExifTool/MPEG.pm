@@ -517,7 +517,7 @@ sub ProcessMPEGAudioVideo($$)
 }
 
 #------------------------------------------------------------------------------
-# Read information frame an MPEG file
+# Read information from an MPEG file
 # Inputs: 0) ExifTool object reference, 1) Directory information reference
 # Returns: 1 on success, 0 if this wasn't a valid MPEG file
 sub ProcessMPEG($$)

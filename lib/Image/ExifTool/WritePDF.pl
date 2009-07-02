@@ -273,14 +273,7 @@ sub WritePDF($$)
     if ($buff =~ /$endComment(\d+)\s+(startxref\s+\d+\s+%%EOF\s+)?$/s) {
         $prevUpdate = $1;
         # rewrite the file up to the original EOF
-        my $size = $prevUpdate;
-        for (;;) {
-            last unless $size;
-            my $n = $size > 65536 ? 65536 : $size;
-            $raf->Read($buff, $n) == $n or $rtn = -1, last;
-            Write($outfile, $buff) or $rtn = -1;
-            $size -= $n;
-        }
+        Image::ExifTool::CopyBlock($raf, $outfile, $prevUpdate) or $rtn = -1;
         # verify that we are now at the start of an ExifTool update
         unless ($raf->Read($buff, length $beginComment) and $buff eq $beginComment) {
             $exifTool->Error('Previous ExifTool update is corrupted');
@@ -347,8 +340,7 @@ sub WritePDF($$)
     $keyExt = $$infoRef;
 
     # must set line separator before calling WritePDFValue()
-    my $oldSep = $/;
-    $/ = $capture{newline};
+    local $/ = $capture{newline};
 
     # rewrite PDF Info tags
     my $newTags = $exifTool->GetNewTagInfoHash(\%Image::ExifTool::PDF::Info);
@@ -502,7 +494,6 @@ sub WritePDF($$)
     my $rootRef = $$mainDict{Root};
     unless ($rootRef) {
         $exifTool->Error("Can't find Root dictionary");
-        $/ = $oldSep;
         return $rtn;
     }
     if (not $rootChanged and $prevUpdate) {
@@ -665,7 +656,6 @@ sub WritePDF($$)
     }
     undef $newTool;
     undef %capture;
-    $/ = $oldSep;   # restore original separator
     return $rtn;
 }
 

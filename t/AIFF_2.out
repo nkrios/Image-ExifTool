@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.82
 [File, File, Image] FileName - File Name: AIFF.aif
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 290 bytes
@@ -14,9 +14,9 @@
 [AIFF, AIFF, Audio] 4 - Sample Rate: 22050
 [AIFF, AIFF, Audio] NAME - Name: ExifTool test AIFF
 [AIFF, AIFF, Author] AUTH - Author: Phil Harvey
-[ID3, ID3v2_2, Audio] ULT - Lyrics: my lyrics
+[ID3, ID3v2_2, Audio] ULT-eng - Lyrics (eng): my lyrics
 [ID3, ID3v2_2, Audio] TCM - Composer: Composer
-[ID3, ID3v2_2, Audio] COM - Comment: comments
+[ID3, ID3v2_2, Audio] COM-eng - Comment (eng): comments
 [ID3, ID3v2_2, Author] TP1 - Artist: the artist
 [ID3, ID3v2_2, Audio] TAL - Album: the album
 [ID3, ID3v2_2, Audio] TT1 - Grouping: grouping

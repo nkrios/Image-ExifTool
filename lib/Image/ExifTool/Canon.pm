@@ -18,10 +18,10 @@
 #               4) http://www.wonderland.org/crw/
 #               5) Juha Eskelinen private communication (20D)
 #               6) Richard S. Smith private communication (20D)
-#               7) Denny Priebe private communication (1D MkII)
+#               7) Denny Priebe private communication (1DmkII)
 #               8) Irwin Poche private communication
-#               9) Michael Tiemann private communication (1D MkII)
-#              10) Volker Gering private communication (1D MkII)
+#               9) Michael Tiemann private communication (1DmkII)
+#              10) Volker Gering private communication (1DmkII)
 #              11) "cip" private communication
 #              12) Rainer Honle private communication (5D)
 #              13) http://www.cybercom.net/~dcoffin/dcraw/
@@ -49,6 +49,12 @@
 #              34) Andreas Huggel and Pascal de Bruijn private communication
 #              35) Jan Boelsma private communication
 #              36) Karl-Heinz Klotz private communication (http://www.dslr-forum.de/showthread.php?t=430900)
+#              37) Vesa Kivisto private communication (30D)
+#              38) Kurt Garloff private communication (5DmkII)
+#              39) Irwin Poche private communication (5DmkII)
+#              40) Jose Oliver-Didier private communication
+#              41) http://www.cpanforum.com/threads/10730
+#              42) Norbert Wasser private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -60,8 +66,9 @@ use Image::ExifTool::Exif;
 
 sub WriteCanon($$$);
 sub ProcessSerialData($$$);
+sub SwapWords($);
 
-$VERSION = '2.14';
+$VERSION = '2.20';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -126,6 +133,7 @@ my %canonLensTypes = ( #4
     36 => 'Canon EF 38-76mm f/4.5-5.6', #32
     37 => 'Canon EF 35-80mm f/4-5.6 or Tamron Lens', #32
     37.1 => 'Tamron 70-200mm f/2.8 Di LD IF Macro', #PH
+    37.2 => 'Tamron AF 28-300mm f/3.5-6.3 XR Di VC LD Aspherical [IF] Macro Model A20', #38
     38 => 'Canon EF 80-200mm f/4.5-5.6', #32
     39 => 'Canon EF 75-300mm f/4-5.6',
     40 => 'Canon EF 28-80mm f/3.5-5.6',
@@ -192,6 +200,7 @@ my %canonLensTypes = ( #4
     161 => 'Canon EF 28-70mm f/2.8L or Sigma or Tamron Lens',
     161.1 => 'Sigma 24-70mm EX f/2.8',
     161.2 => 'Tamron 90mm f/2.8',
+    161.3 => 'Tamron AF 17-50mm f/2.8 Di-II LD Aspherical', #40
     162 => 'Canon EF 200mm f/2.8L', #32
     163 => 'Canon EF 300mm f/4L', #32
     164 => 'Canon EF 400mm f/5.6L', #32
@@ -269,7 +278,9 @@ my %canonLensTypes = ( #4
     245 => 'Canon EF 70-200mm f/4L IS + 2.8x', #32
     246 => 'Canon EF 16-35mm f/2.8L II', #PH
     247 => 'Canon EF 14mm f/2.8L II USM', #32
+    248 => 'Canon EF 200mm f/2L IS', #42
     249 => 'Canon EF 800mm f/5.6L IS', #35
+    250 => 'Canon EF 24 f/1.4L II', #41
 );
 
 # Canon model ID numbers (PH)
@@ -378,6 +389,15 @@ my %canonLensTypes = ( #4
     0x2530000 => 'PowerShot SD990 IS / Digital IXUS 980 IS / IXY Digital 3000 IS',
     0x2540000 => 'PowerShot SD880 IS / Digital IXUS 870 IS / IXY Digital 920 IS',
     0x2550000 => 'PowerShot E1',
+    0x2560000 => 'PowerShot D10',
+    0x2570000 => 'PowerShot SD960 IS / Digital IXUS 110 IS / IXY Digital 510 IS',
+    0x2580000 => 'PowerShot A2100 IS',
+    0x2590000 => 'PowerShot A480',
+    0x2600000 => 'PowerShot SX200 IS',
+    0x2610000 => 'PowerShot SD970 IS / Digital IXUS 990 IS / IXY Digital 830 IS',
+    0x2620000 => 'PowerShot SD780 IS / Digital IXUS 100 IS / IXY Digital 210 IS',
+    0x2630000 => 'PowerShot A1100 IS',
+    0x2640000 => 'PowerShot SD1200 IS / Digital IXUS 95 IS / IXY Digital 110 IS',
     0x3010000 => 'PowerShot Pro90 IS',
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
@@ -405,6 +425,7 @@ my %canonLensTypes = ( #4
     0x80000232 => 'EOS-1D Mark II N',
     0x80000234 => 'EOS 30D',
     0x80000236 => 'EOS Digital Rebel XTi / 400D / Kiss Digital X (and rare K236)',
+    0x80000252 => 'EOS Rebel T1i / 500D / Kiss X3', #25
     0x80000254 => 'EOS Rebel XS / 1000D / Kiss F',
     0x80000261 => 'EOS 50D',
 );
@@ -501,10 +522,20 @@ my %longBin = (
     ValueConvInv => '$val',
 );
 
-# PrintConv for parameter tags
-my %printParameter = (
-    PrintConv => 'Image::ExifTool::Exif::PrintParameter($val)',
-    PrintConvInv => '$val=~/normal/i ? 0 : $val',
+# conversions, etc for CameraColorCalibration tags
+my %cameraColorCalibration = (
+    Format => 'int16s[4]',
+    Unknown => 1,
+    PrintConv => 'sprintf("%4d %4d %4d (%dK)", split(" ",$val))',
+    PrintConvInv => '$val=~s/\s+/ /g; $val=~tr/()K//d; $val',
+);
+
+# conversions, etc for PowerShot CameraColorCalibration tags
+my %cameraColorCalibration2 = (
+    Format => 'int16s[5]',
+    Unknown => 1,
+    PrintConv => 'sprintf("%4d %4d %4d %4d (%dK)", split(" ",$val))',
+    PrintConvInv => '$val=~s/\s+/ /g; $val=~tr/()K//d; $val',
 );
 
 #------------------------------------------------------------------------------
@@ -546,6 +577,7 @@ my %printParameter = (
     0x6 => {
         Name => 'CanonImageType',
         Writable => 'string',
+        Groups => { 2 => 'Image' },
     },
     0x7 => {
         Name => 'CanonFirmwareVersion',
@@ -554,6 +586,7 @@ my %printParameter = (
     0x8 => {
         Name => 'FileNumber',
         Writable => 'int32u',
+        Groups => { 2 => 'Image' },
         PrintConv => '$_=$val,s/(\d+)(\d{4})/$1-$2/,$_',
         PrintConvInv => '$val=~s/-//g;$val',
     },
@@ -575,8 +608,8 @@ my %printParameter = (
             Description => 'Camera Body No.',
             Condition => '$$self{Model} =~ /EOS D30\b/',
             Writable => 'int32u',
-            PrintConv => 'sprintf("%x-%.5d",$val>>16,$val&0xffff)',
-            PrintConvInv => '$val=~/(.*)-(\d+)/ ? (hex($1)<<16)+$2 : undef',
+            PrintConv => 'sprintf("%.4x%.5d",$val>>16,$val&0xffff)',
+            PrintConvInv => '$val=~/(.*)-?(\d{5})$/ ? (hex($1)<<16)+$2 : undef',
         },
         {
             # serial number of 1D/1Ds/1D Mark II/1Ds Mark II is usually
@@ -659,6 +692,13 @@ my %printParameter = (
             Condition => '$$self{Model} =~ /\b(450D|REBEL XSi|Kiss X2)\b/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Canon::CameraInfo450D',
+            },
+        },
+        {
+            Name => 'CanonCameraInfo500D',
+            Condition => '$$self{Model} =~ /\b(500D|REBEL T1i|Kiss X3)\b/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Canon::CameraInfo500D',
             },
         },
         {
@@ -824,7 +864,7 @@ my %printParameter = (
     },
     0x1a => { #15
         Name => 'SuperMacro',
-        Format => 'int16u',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Off',
             1 => 'On (1)',
@@ -910,7 +950,17 @@ my %printParameter = (
         },
     },
     # 0x27 - value 1 is 1 for high ISO pictures, 0 otherwise
-    # 0x28 - 16-bytes: 0-1=sequence number (encrypted), 2-5=date/time (encrypted) (ref JD)
+    #        value 4 is 9 for Flexizone and FaceDetect AF, 1 for Centre AF, 0 otherwise (SX10IS)
+    0x28 => { #JD
+        # bytes 0-1=sequence number (encrypted), 2-5=date/time (encrypted) (ref JD)
+        Name => 'ImageUniqueID',
+        Format => 'undef',
+        Writable => 'int8u',
+        Groups => { 2 => 'Image' },
+        RawConv => '$val eq "\0" x 16 ? undef : $val',
+        ValueConv => 'unpack("H*", $val)',
+        ValueConvInv => 'pack("H*", $val)',
+    },
     # 0x2d - changes with categories (ref 31)
     0x81 => { #13
         Name => 'RawDataOffset',
@@ -975,6 +1025,9 @@ my %printParameter = (
         {
             Name => 'InternalSerialNumber',
             Writable => 'string',
+            # remove trailing 0xff's if they exist (Kiss X3)
+            ValueConv => '$val=~s/\xff+$//; $val',
+            ValueConvInv => '$val',
         },
     ],
     0x97 => { #PH
@@ -1012,7 +1065,13 @@ my %printParameter = (
             TagTable => 'Image::ExifTool::Canon::ColorBalance',
         },
     },
-    # 0xaa - looks like maybe measured color balance (inverse of RGGBLevels)? - PH
+    0xaa => {
+        Name => 'MeasuredColor',
+        SubDirectory => {
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
+            TagTable => 'Image::ExifTool::Canon::MeasuredColor',
+        },
+    },
     0xae => {
         Name => 'ColorTemperature',
         Writable => 'int16u',
@@ -1068,48 +1127,49 @@ my %printParameter = (
     0x4001 => [ #13
         {   # (int16u[582]) - 20D and 350D
             Condition => '$count == 582',
-            Name => 'ColorBalance1',
+            Name => 'ColorData1',
             SubDirectory => {
-                TagTable => 'Image::ExifTool::Canon::ColorBalance1',
+                TagTable => 'Image::ExifTool::Canon::ColorData1',
             },
         },
         {   # (int16u[653]) - 1DmkII and 1DSmkII
             Condition => '$count == 653',
-            Name => 'ColorBalance2',
+            Name => 'ColorData2',
             SubDirectory => {
-                TagTable => 'Image::ExifTool::Canon::ColorBalance2',
+                TagTable => 'Image::ExifTool::Canon::ColorData2',
             },
         },
         {   # (int16u[796]) - 1DmkIIN, 5D, 30D, 400D
             Condition => '$count == 796',
-            Name => 'ColorBalance3',
+            Name => 'ColorData3',
             SubDirectory => {
-                TagTable => 'Image::ExifTool::Canon::ColorBalance3',
+                TagTable => 'Image::ExifTool::Canon::ColorData3',
             },
         },
         {   # (int16u[692|674|702|1227])
             # 40D (692), 1DmkIII (674), 1DSmkIII (702), 450D/1000D (1227)
-            # 50D/5DmkII (1250)
+            # 50D/5DmkII (1250), 500D (1251)
             Condition => q{
                 $count == 692  or $count == 674  or $count == 702 or
-                $count == 1227 or $count == 1250
+                $count == 1227 or $count == 1250 or $count == 1251
             },
-            Name => 'ColorBalance4',
+            Name => 'ColorData4',
             SubDirectory => {
-                TagTable => 'Image::ExifTool::Canon::ColorBalance4',
+                TagTable => 'Image::ExifTool::Canon::ColorData4',
             },
         },
         {   # (int16u[5120]) - G10
             Condition => '$count == 5120',
-            Name => 'ColorBalance4b',
+            Name => 'ColorData5',
             SubDirectory => {
-                TagTable => 'Image::ExifTool::Canon::ColorBalance4',
-                Start => '$valuePtr + 16',
+                TagTable => 'Image::ExifTool::Canon::ColorData5',
             },
         },
         {
-            Name => 'ColorBalanceUnknown',
-            %longBin,
+            Name => 'ColorDataUnknown',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Canon::ColorDataUnknown',
+            },
         },
     ],
     0x4002 => { #PH
@@ -1271,6 +1331,8 @@ my %printParameter = (
             32 => 'Aquarium', #18
             33 => 'ISO 3200', #18
             # 35 => 'Star Fantasy?', #15
+            38 => 'Creative Auto', #39
+            261 => 'Sunset', #PH (SX10IS)
         },
     },
     12 => {
@@ -1279,18 +1341,18 @@ my %printParameter = (
             0 => 'None',
             1 => '2x',
             2 => '4x',
-            3 => 'Other',  # value obtained from 2*#37/#36
+            3 => 'Other',  # value obtained from 2*$val[37]/$val[36]
         },
     },
     13 => {
         Name => 'Contrast',
         RawConv => '$val == 0x7fff ? undef : $val',
-        %printParameter,
+        %Image::ExifTool::Exif::printParameter,
     },
     14 => {
         Name => 'Saturation',
         RawConv => '$val == 0x7fff ? undef : $val',
-        %printParameter,
+        %Image::ExifTool::Exif::printParameter,
     },
     15 => {
         Name => 'Sharpness',
@@ -1391,8 +1453,11 @@ my %printParameter = (
     },
     25 => {
         Name => 'FocalUnits',
+        # conversion from raw focal length values to mm
         DataMember => 'FocalUnits',
         RawConv => '$$self{FocalUnits} = $val',
+        PrintConv => '"$val/mm"',
+        PrintConvInv => '$val=~s/\s*\/?\s*mm//;$val',
     },
     26 => { #9
         Name => 'MaxAperture',
@@ -1425,7 +1490,7 @@ my %printParameter = (
             7 => '2nd-curtain sync used',
             11 => 'FP sync used',
             13 => 'Built-in',
-            14 => 'External',
+            14 => 'External', #(may not be set in manual mode - ref 37)
         } },
     },
     32 => {
@@ -1454,7 +1519,7 @@ my %printParameter = (
         PrintConv => {
             0 => 'Off',
             1 => 'On',
-            2 => 'On, Shot Only', #15
+            2 => 'On, Shot Only', #15 (panning for SX10IS)
             3 => 'On, Panning', #PH (A570IS)
         },
     },
@@ -1503,7 +1568,7 @@ my %printParameter = (
     42 => {
         Name => 'ColorTone',
         RawConv => '$val == 0x7fff ? undef : $val',
-        %printParameter,
+        %Image::ExifTool::Exif::printParameter,
     },
     46 => { #PH
         Name => 'SRAWQuality',
@@ -1637,7 +1702,9 @@ my %printParameter = (
     },
     5 => { #2
         Name => 'TargetExposureTime',
-        RawConv => '$val > 0 ? $val : undef',
+        # ignore obviously bad values (also, -32768 may be used for n/a)
+        # (note that a few models always write 0: DC211, and video models)
+        RawConv => '($val > -1000 and ($val or $$self{Model}=~/(EOS|PowerShot|IXUS|IXY)/))? $val : undef',
         ValueConv => 'exp(-Image::ExifTool::Canon::CanonEv($val)*log(2))',
         ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(-log($val)/log(2))',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
@@ -1790,6 +1857,13 @@ my %printParameter = (
             PrintConvInv => 'eval $val',
         },
     ],
+    23 => { #37
+        Name => 'MeasuredEV2',
+        Description => 'Measured EV 2',
+        RawConv => '$val ? $val : undef',
+        ValueConv => '$val / 8 - 11',
+        ValueConvInv => 'int(($val + 11) * 8 + 0.5)',
+    },
     24 => {
         Name => 'BulbDuration',
         ValueConv => '$val / 10',
@@ -1830,7 +1904,11 @@ my %printParameter = (
     },
     33 => { #PH (A570IS)
         Name => 'FlashOutput',
-        Notes => 'this has a maximum value of 500 for models like the A570IS',
+        RawConv => '($$self{Model}=~/(PowerShot|IXUS|IXY)/ or $val) ? $val : undef',
+        Notes => q{
+            used only for PowerShot models, this has a maximum value of 500 for models
+            like the A570IS
+        },
     },
 );
 
@@ -2102,12 +2180,12 @@ my %ciLongFocal = (
     0x6e => {
         Name => 'Saturation',
         Format => 'int8s',
-        %printParameter,
+        %Image::ExifTool::Exif::printParameter,
     },
     0x6f => {
         Name => 'ColorTone',
         Format => 'int8s',
-        %printParameter,
+        %Image::ExifTool::Exif::printParameter,
     },
     0x72 => {
         Name => 'Sharpness',
@@ -2116,7 +2194,7 @@ my %ciLongFocal = (
     0x73 => {
         Name => 'Contrast',
         Format => 'int8s',
-        %printParameter,
+        %Image::ExifTool::Exif::printParameter,
     },
     0x75 => {
         Name => 'ISO',
@@ -2168,17 +2246,17 @@ my %ciLongFocal = (
     0x75 => { #15
         Name => 'Contrast',
         Format => 'int8s',
-        %printParameter,
+        %Image::ExifTool::Exif::printParameter,
     },
     0x76 => { #15
         Name => 'Saturation',
         Format => 'int8s',
-        %printParameter,
+        %Image::ExifTool::Exif::printParameter,
     },
     0x77 => { #15
         Name => 'ColorTone',
         Format => 'int8s',
-        %printParameter,
+        %Image::ExifTool::Exif::printParameter,
     },
     0x79 => { #15
         Name => 'ISO',
@@ -2897,6 +2975,109 @@ my %ciLongFocal = (
     },
 );
 
+# Canon camera information for 500D (MakerNotes tag 0x0d)
+%Image::ExifTool::Canon::CameraInfo500D = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int8u',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'CameraInfo tags for the EOS 50D.',
+    0x03 => { %ciFNumber },
+    0x04 => { %ciExposureTime },
+    0x06 => { %ciISO },
+    0x07 => {
+        Name => 'HighlightTonePriority',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x19 => { %ciCameraTemperature },
+    0x1e => { %ciFocalLength },
+    0x31 => {
+        Name => 'CameraOrientation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+        },
+    },
+    0x50 => {
+        Name => 'FocusDistanceUpper',
+        Format => 'int16u',
+        ValueConv => 'unpack("n",pack("v",$val)) * 0.01',
+        ValueConvInv => 'unpack("v",pack("n",$val / 0.01))',
+    },
+    0x52 => {
+        Name => 'FocusDistanceLower',
+        Format => 'int16u',
+        ValueConv => 'unpack("n",pack("v",$val)) * 0.01',
+        ValueConvInv => 'unpack("v",pack("n",$val / 0.01))',
+    },
+    0x73 => { # (50D + 4)
+        Name => 'WhiteBalance',
+        Format => 'int16u',
+        SeparateTable => 1,
+        PrintConv => \%canonWhiteBalance,
+    },
+    0x77 => { # (50D + 4)
+        Name => 'ColorTemperature',
+        Format => 'int16u',
+    },
+    0xab => { # (50D + 4)
+        Name => 'PictureStyle',
+        Format => 'int8u',
+        Flags => ['PrintHex','SeparateTable'],
+        PrintConv => \%pictureStyles,
+    },
+    0xbb => {
+        Name => 'HighISONoiseReduction',
+        PrintConv => {
+            0 => 'Standard',
+            1 => 'Low',
+            2 => 'Strong',
+            3 => 'Off',
+        },
+    },
+    0xbe => {
+        Name => 'AutoLightingOptimizer',
+        PrintConv => {
+            0 => 'Standard',
+            1 => 'Low',
+            2 => 'Strong',
+            3 => 'Off',
+        },
+    },
+    0xf7 => {
+        Name => 'LensType',
+        SeparateTable => 1,
+        Priority => 0,
+        PrintConv => \%canonLensTypes,
+    },
+    0xf8 => { %ciShortFocal },
+    0xfa => { %ciLongFocal },
+    0x190 => {
+        Name => 'FirmwareVersion',
+        Format => 'string[6]',
+        Writable => 0,
+        RawConv => '$val=~/^\d+\.\d+\.\d+\s*$/ ? $val : undef',
+    },
+    0x1d3 => {
+        Name => 'FileIndex',
+        Groups => { 2 => 'Image' },
+        Format => 'int32u',
+        ValueConv => '$val + 1',
+        ValueConvInv => '$val - 1',
+    },
+    0x1df => { # (NC)
+        Name => 'DirectoryIndex',
+        Groups => { 2 => 'Image' },
+        Format => 'int32u',
+        ValueConv => '$val - 1',
+        ValueConvInv => '$val + 1',
+    },
+);
+
 # Canon camera information for 1000D (MakerNotes tag 0x0d)
 %Image::ExifTool::Canon::CameraInfo1000D = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -3056,7 +3237,11 @@ my %ciLongFocal = (
     FORMAT => 'int16s',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    2 => 'PanoramaFrame',
+    # 0 - values: always 1
+    # 1 - values: 0,256,512(3 sequential L->R images); 0,-256(2 R->L images)
+    2 => 'PanoramaFrameNumber', #(some models this is always 0)
+    # 3 - values: 160(SX10IS,A570IS); 871(S30)
+    # 4 - values: always 0
     5 => {
         Name => 'PanoramaDirection',
         PrintConv => {
@@ -3667,235 +3852,470 @@ my %ciLongFocal = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
 );
 
+# Measured color levels (ref 37)
+%Image::ExifTool::Canon::MeasuredColor = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 1,
+    WRITABLE => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    1 => {
+        # this is basically the inverse of WB_RGGBLevelsMeasured (ref 37)
+        Name => 'MeasuredRGGB',
+        Format => 'int16u[4]',
+    },
+);
+
 # Color balance information (MakerNotes tag 0xa9) (ref PH)
 %Image::ExifTool::Canon::ColorBalance = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     NOTES => 'These tags are used by the 10D and 300D.',
-    FORMAT => 'int16u',
+    FORMAT => 'int16s',
     FIRST_ENTRY => 0,
     WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     # red,green1,green2,blue (ref 2)
-    0  => { Name => 'WB_RGGBLevelsAuto',       Format => 'int16u[4]' },
-    4  => { Name => 'WB_RGGBLevelsDaylight',   Format => 'int16u[4]' },
-    8  => { Name => 'WB_RGGBLevelsShade',      Format => 'int16u[4]' },
-    12 => { Name => 'WB_RGGBLevelsCloudy',     Format => 'int16u[4]' },
-    16 => { Name => 'WB_RGGBLevelsTungsten',   Format => 'int16u[4]' },
-    20 => { Name => 'WB_RGGBLevelsFluorescent',Format => 'int16u[4]' },
-    24 => { Name => 'WB_RGGBLevelsFlash',      Format => 'int16u[4]' },
-    28 => { Name => 'WB_RGGBLevelsCustom',     Format => 'int16u[4]' },
-    32 => { Name => 'WB_RGGBLevelsKelvin',     Format => 'int16u[4]' },
+    0  => { Name => 'WB_RGGBLevelsAuto',       Format => 'int16s[4]' },
+    4  => { Name => 'WB_RGGBLevelsDaylight',   Format => 'int16s[4]' },
+    8  => { Name => 'WB_RGGBLevelsShade',      Format => 'int16s[4]' },
+    12 => { Name => 'WB_RGGBLevelsCloudy',     Format => 'int16s[4]' },
+    16 => { Name => 'WB_RGGBLevelsTungsten',   Format => 'int16s[4]' },
+    20 => { Name => 'WB_RGGBLevelsFluorescent',Format => 'int16s[4]' },
+    24 => { Name => 'WB_RGGBLevelsFlash',      Format => 'int16s[4]' },
+    28 => { Name => 'WB_RGGBLevelsCustom',     Format => 'int16s[4]' },
+    32 => { Name => 'WB_RGGBLevelsKelvin',     Format => 'int16s[4]' },
 );
 
-# Color balance (MakerNotes tag 0x4001, count=582) (ref 12)
-%Image::ExifTool::Canon::ColorBalance1 = (
+# Color data (MakerNotes tag 0x4001, count=582) (ref 12)
+%Image::ExifTool::Canon::ColorData1 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     NOTES => 'These tags are used by the 20D and 350D.',
-    FORMAT => 'int16u',
+    FORMAT => 'int16s',
     FIRST_ENTRY => 0,
     WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    # (dcraw 8.81 uses index 25 for WB)
-    25 => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16u[4]' },
-    29 => 'ColorTempAsShot',
-    30 => { Name => 'WB_RGGBLevelsAuto',        Format => 'int16u[4]' },
-    34 => 'ColorTempAuto',
-    35 => { Name => 'WB_RGGBLevelsDaylight',    Format => 'int16u[4]' },
-    39 => 'ColorTempDaylight',
-    40 => { Name => 'WB_RGGBLevelsShade',       Format => 'int16u[4]' },
-    44 => 'ColorTempShade',
-    45 => { Name => 'WB_RGGBLevelsCloudy',      Format => 'int16u[4]' },
-    49 => 'ColorTempCloudy',
-    50 => { Name => 'WB_RGGBLevelsTungsten',    Format => 'int16u[4]' },
-    54 => 'ColorTempTungsten',
-    55 => { Name => 'WB_RGGBLevelsFluorescent', Format => 'int16u[4]' },
-    59 => 'ColorTempFluorescent',
-    60 => { Name => 'WB_RGGBLevelsFlash',       Format => 'int16u[4]' },
-    64 => 'ColorTempFlash',
-    65 => { Name => 'WB_RGGBLevelsCustom1',     Format => 'int16u[4]' },
-    69 => 'ColorTempCustom1',
-    70 => { Name => 'WB_RGGBLevelsCustom2',     Format => 'int16u[4]' },
-    74 => 'ColorTempCustom2',
+    # 0x00: size of record in bytes - PH
+    # (dcraw 8.81 uses index 0x19 for WB)
+    0x19 => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16s[4]' },
+    0x1d => 'ColorTempAsShot',
+    0x1e => { Name => 'WB_RGGBLevelsAuto',        Format => 'int16s[4]' },
+    0x22 => 'ColorTempAuto',
+    0x23 => { Name => 'WB_RGGBLevelsDaylight',    Format => 'int16s[4]' },
+    0x27 => 'ColorTempDaylight',
+    0x28 => { Name => 'WB_RGGBLevelsShade',       Format => 'int16s[4]' },
+    0x2c => 'ColorTempShade',
+    0x2d => { Name => 'WB_RGGBLevelsCloudy',      Format => 'int16s[4]' },
+    0x31 => 'ColorTempCloudy',
+    0x32 => { Name => 'WB_RGGBLevelsTungsten',    Format => 'int16s[4]' },
+    0x36 => 'ColorTempTungsten',
+    0x37 => { Name => 'WB_RGGBLevelsFluorescent', Format => 'int16s[4]' },
+    0x3b => 'ColorTempFluorescent',
+    0x3c => { Name => 'WB_RGGBLevelsFlash',       Format => 'int16s[4]' },
+    0x40 => 'ColorTempFlash',
+    0x41 => { Name => 'WB_RGGBLevelsCustom1',     Format => 'int16s[4]' },
+    0x45 => 'ColorTempCustom1',
+    0x46 => { Name => 'WB_RGGBLevelsCustom2',     Format => 'int16s[4]' },
+    0x4a => 'ColorTempCustom2',
+    0x4b => { Name => 'CameraColorCalibration01', %cameraColorCalibration,
+              Notes => 'A, B, C, Temperature' }, #PH
+    0x4f => { Name => 'CameraColorCalibration02', %cameraColorCalibration }, #PH
+    0x53 => { Name => 'CameraColorCalibration03', %cameraColorCalibration }, #PH
+    0x57 => { Name => 'CameraColorCalibration04', %cameraColorCalibration }, #PH
+    0x5b => { Name => 'CameraColorCalibration05', %cameraColorCalibration }, #PH
+    0x5f => { Name => 'CameraColorCalibration06', %cameraColorCalibration }, #PH
+    0x63 => { Name => 'CameraColorCalibration07', %cameraColorCalibration }, #PH
+    0x67 => { Name => 'CameraColorCalibration08', %cameraColorCalibration }, #PH
+    0x6b => { Name => 'CameraColorCalibration09', %cameraColorCalibration }, #PH
+    0x6f => { Name => 'CameraColorCalibration10', %cameraColorCalibration }, #PH
+    0x73 => { Name => 'CameraColorCalibration11', %cameraColorCalibration }, #PH
+    0x77 => { Name => 'CameraColorCalibration12', %cameraColorCalibration }, #PH
+    0x7b => { Name => 'CameraColorCalibration13', %cameraColorCalibration }, #PH
+    0x7f => { Name => 'CameraColorCalibration14', %cameraColorCalibration }, #PH
+    0x83 => { Name => 'CameraColorCalibration15', %cameraColorCalibration }, #PH
 );
 
-# Color balance (MakerNotes tag 0x4001, count=653) (ref 12)
-%Image::ExifTool::Canon::ColorBalance2 = (
+# Color data (MakerNotes tag 0x4001, count=653) (ref 12)
+%Image::ExifTool::Canon::ColorData2 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     NOTES => 'These tags are used by the 1DmkII and 1DSmkII.',
-    FORMAT => 'int16u',
+    FORMAT => 'int16s',
     FIRST_ENTRY => 0,
     WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    24 => { Name => 'WB_RGGBLevelsAuto',        Format => 'int16u[4]' },
-    28 => 'ColorTempAuto',
-    29 => { Name => 'WB_RGGBLevelsUnknown',     Format => 'int16u[4]', Unknown => 1 },
-    33 => { Name => 'ColorTempUnknown', Unknown => 1 },
-    # (dcraw 8.81 uses index 34 for WB)
-    34 => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16u[4]' },
-    38 => 'ColorTempAsShot',
-    39 => { Name => 'WB_RGGBLevelsDaylight',    Format => 'int16u[4]' },
-    43 => 'ColorTempDaylight',
-    44 => { Name => 'WB_RGGBLevelsShade',       Format => 'int16u[4]' },
-    48 => 'ColorTempShade',
-    49 => { Name => 'WB_RGGBLevelsCloudy',      Format => 'int16u[4]' },
-    53 => 'ColorTempCloudy',
-    54 => { Name => 'WB_RGGBLevelsTungsten',    Format => 'int16u[4]' },
-    58 => 'ColorTempTungsten',
-    59 => { Name => 'WB_RGGBLevelsFluorescent', Format => 'int16u[4]' },
-    63 => 'ColorTempFluorescent',
-    64 => { Name => 'WB_RGGBLevelsKelvin',      Format => 'int16u[4]' },
-    68 => 'ColorTempKelvin',
-    69 => { Name => 'WB_RGGBLevelsFlash',       Format => 'int16u[4]' },
-    73 => 'ColorTempFlash',
-    74 => { Name => 'WB_RGGBLevelsUnknown2',    Format => 'int16u[4]', Unknown => 1 },
-    78 => { Name => 'ColorTempUnknown2', Unknown => 1 },
-    79 => { Name => 'WB_RGGBLevelsUnknown3',    Format => 'int16u[4]', Unknown => 1 },
-    83 => { Name => 'ColorTempUnknown3', Unknown => 1 },
-    84 => { Name => 'WB_RGGBLevelsUnknown4',    Format => 'int16u[4]', Unknown => 1 },
-    88 => { Name => 'ColorTempUnknown4', Unknown => 1 },
-    89 => { Name => 'WB_RGGBLevelsUnknown5',    Format => 'int16u[4]', Unknown => 1 },
-    93 => { Name => 'ColorTempUnknown5', Unknown => 1 },
-    94 => { Name => 'WB_RGGBLevelsUnknown6',    Format => 'int16u[4]', Unknown => 1 },
-    98 => { Name => 'ColorTempUnknown6', Unknown => 1 },
-    99 => { Name => 'WB_RGGBLevelsUnknown7',    Format => 'int16u[4]', Unknown => 1 },
-    103 => { Name => 'ColorTempUnknown7', Unknown => 1 },
-    104 => { Name => 'WB_RGGBLevelsUnknown8',   Format => 'int16u[4]', Unknown => 1 },
-    108 => { Name => 'ColorTempUnknown8', Unknown => 1 },
-    109 => { Name => 'WB_RGGBLevelsUnknown9',   Format => 'int16u[4]', Unknown => 1 },
-    113 => { Name => 'ColorTempUnknown9', Unknown => 1 },
-    114 => { Name => 'WB_RGGBLevelsUnknown10',  Format => 'int16u[4]', Unknown => 1 },
-    118 => { Name => 'ColorTempUnknown10', Unknown => 1 },
-    119 => { Name => 'WB_RGGBLevelsUnknown11',  Format => 'int16u[4]', Unknown => 1 },
-    123 => { Name => 'ColorTempUnknown11', Unknown => 1 },
-    124 => { Name => 'WB_RGGBLevelsUnknown12',  Format => 'int16u[4]', Unknown => 1 },
-    128 => { Name => 'ColorTempUnknown12', Unknown => 1 },
-    129 => { Name => 'WB_RGGBLevelsUnknown13',  Format => 'int16u[4]', Unknown => 1 },
-    133 => { Name => 'ColorTempUnknown13', Unknown => 1 },
-    134 => { Name => 'WB_RGGBLevelsUnknown14',  Format => 'int16u[4]', Unknown => 1 },
-    138 => { Name => 'ColorTempUnknown14', Unknown => 1 },
-    139 => { Name => 'WB_RGGBLevelsUnknown15',  Format => 'int16u[4]', Unknown => 1 },
-    143 => { Name => 'ColorTempUnknown15', Unknown => 1 },
-    144 => { Name => 'WB_RGGBLevelsPC1',        Format => 'int16u[4]' },
-    148 => 'ColorTempPC1',
-    149 => { Name => 'WB_RGGBLevelsPC2',        Format => 'int16u[4]' },
-    153 => 'ColorTempPC2',
-    154 => { Name => 'WB_RGGBLevelsPC3',        Format => 'int16u[4]' },
-    158 => 'ColorTempPC3',
-    159 => { Name => 'WB_RGGBLevelsUnknown16',  Format => 'int16u[4]', Unknown => 1 },
-    163 => { Name => 'ColorTempUnknown16', Unknown => 1 },
+    0x18 => { Name => 'WB_RGGBLevelsAuto',        Format => 'int16s[4]' },
+    0x1c => 'ColorTempAuto',
+    0x1d => { Name => 'WB_RGGBLevelsUnknown',     Format => 'int16s[4]', Unknown => 1 },
+    0x21 => { Name => 'ColorTempUnknown', Unknown => 1 },
+    # (dcraw 8.81 uses index 0x22 for WB)
+    0x22 => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16s[4]' },
+    0x26 => 'ColorTempAsShot',
+    0x27 => { Name => 'WB_RGGBLevelsDaylight',    Format => 'int16s[4]' },
+    0x2b => 'ColorTempDaylight',
+    0x2c => { Name => 'WB_RGGBLevelsShade',       Format => 'int16s[4]' },
+    0x30 => 'ColorTempShade',
+    0x31 => { Name => 'WB_RGGBLevelsCloudy',      Format => 'int16s[4]' },
+    0x35 => 'ColorTempCloudy',
+    0x36 => { Name => 'WB_RGGBLevelsTungsten',    Format => 'int16s[4]' },
+    0x3a => 'ColorTempTungsten',
+    0x3b => { Name => 'WB_RGGBLevelsFluorescent', Format => 'int16s[4]' },
+    0x3f => 'ColorTempFluorescent',
+    0x40 => { Name => 'WB_RGGBLevelsKelvin',      Format => 'int16s[4]' },
+    0x44 => 'ColorTempKelvin',
+    0x45 => { Name => 'WB_RGGBLevelsFlash',       Format => 'int16s[4]' },
+    0x49 => 'ColorTempFlash',
+    0x4a => { Name => 'WB_RGGBLevelsUnknown2',    Format => 'int16s[4]', Unknown => 1 },
+    0x4e => { Name => 'ColorTempUnknown2', Unknown => 1 },
+    0x4f => { Name => 'WB_RGGBLevelsUnknown3',    Format => 'int16s[4]', Unknown => 1 },
+    0x53 => { Name => 'ColorTempUnknown3', Unknown => 1 },
+    0x54 => { Name => 'WB_RGGBLevelsUnknown4',    Format => 'int16s[4]', Unknown => 1 },
+    0x58 => { Name => 'ColorTempUnknown4', Unknown => 1 },
+    0x59 => { Name => 'WB_RGGBLevelsUnknown5',    Format => 'int16s[4]', Unknown => 1 },
+    0x5d => { Name => 'ColorTempUnknown5', Unknown => 1 },
+    0x5e => { Name => 'WB_RGGBLevelsUnknown6',    Format => 'int16s[4]', Unknown => 1 },
+    0x62 => { Name => 'ColorTempUnknown6', Unknown => 1 },
+    0x63 => { Name => 'WB_RGGBLevelsUnknown7',    Format => 'int16s[4]', Unknown => 1 },
+    0x67 => { Name => 'ColorTempUnknown7', Unknown => 1 },
+    0x68 => { Name => 'WB_RGGBLevelsUnknown8',   Format => 'int16s[4]', Unknown => 1 },
+    0x6c => { Name => 'ColorTempUnknown8', Unknown => 1 },
+    0x6d => { Name => 'WB_RGGBLevelsUnknown9',   Format => 'int16s[4]', Unknown => 1 },
+    0x71 => { Name => 'ColorTempUnknown9', Unknown => 1 },
+    0x72 => { Name => 'WB_RGGBLevelsUnknown10',  Format => 'int16s[4]', Unknown => 1 },
+    0x76 => { Name => 'ColorTempUnknown10', Unknown => 1 },
+    0x77 => { Name => 'WB_RGGBLevelsUnknown11',  Format => 'int16s[4]', Unknown => 1 },
+    0x7b => { Name => 'ColorTempUnknown11', Unknown => 1 },
+    0x7c => { Name => 'WB_RGGBLevelsUnknown12',  Format => 'int16s[4]', Unknown => 1 },
+    0x80 => { Name => 'ColorTempUnknown12', Unknown => 1 },
+    0x81 => { Name => 'WB_RGGBLevelsUnknown13',  Format => 'int16s[4]', Unknown => 1 },
+    0x85 => { Name => 'ColorTempUnknown13', Unknown => 1 },
+    0x86 => { Name => 'WB_RGGBLevelsUnknown14',  Format => 'int16s[4]', Unknown => 1 },
+    0x8a => { Name => 'ColorTempUnknown14', Unknown => 1 },
+    0x8b => { Name => 'WB_RGGBLevelsUnknown15',  Format => 'int16s[4]', Unknown => 1 },
+    0x8f => { Name => 'ColorTempUnknown15', Unknown => 1 },
+    0x90 => { Name => 'WB_RGGBLevelsPC1',        Format => 'int16s[4]' },
+    0x94 => 'ColorTempPC1',
+    0x95 => { Name => 'WB_RGGBLevelsPC2',        Format => 'int16s[4]' },
+    0x99 => 'ColorTempPC2',
+    0x9a => { Name => 'WB_RGGBLevelsPC3',        Format => 'int16s[4]' },
+    0x9e => 'ColorTempPC3',
+    0x9f => { Name => 'WB_RGGBLevelsUnknown16',  Format => 'int16s[4]', Unknown => 1 },
+    0xa3 => { Name => 'ColorTempUnknown16', Unknown => 1 },
+    0xa4 => { Name => 'CameraColorCalibration01', %cameraColorCalibration,
+              Notes => 'A, B, C, Temperature' }, #PH
+    0xa8 => { Name => 'CameraColorCalibration02', %cameraColorCalibration }, #PH
+    0xac => { Name => 'CameraColorCalibration03', %cameraColorCalibration }, #PH
+    0xb0 => { Name => 'CameraColorCalibration04', %cameraColorCalibration }, #PH
+    0xb4 => { Name => 'CameraColorCalibration05', %cameraColorCalibration }, #PH
+    0xb8 => { Name => 'CameraColorCalibration06', %cameraColorCalibration }, #PH
+    0xbc => { Name => 'CameraColorCalibration07', %cameraColorCalibration }, #PH
+    0xc0 => { Name => 'CameraColorCalibration08', %cameraColorCalibration }, #PH
+    0xc4 => { Name => 'CameraColorCalibration09', %cameraColorCalibration }, #PH
+    0xc8 => { Name => 'CameraColorCalibration10', %cameraColorCalibration }, #PH
+    0xcc => { Name => 'CameraColorCalibration11', %cameraColorCalibration }, #PH
+    0xd0 => { Name => 'CameraColorCalibration12', %cameraColorCalibration }, #PH
+    0xd4 => { Name => 'CameraColorCalibration13', %cameraColorCalibration }, #PH
+    0xd8 => { Name => 'CameraColorCalibration14', %cameraColorCalibration }, #PH
+    0xdc => { Name => 'CameraColorCalibration15', %cameraColorCalibration }, #PH
+    0x26a => { #PH
+        Name => 'RawMeasuredRGGB',
+        Format => 'int32u[4]',
+        Notes => 'raw MeasuredRGGB values, before normalization',
+        # swap words because the word ordering is big-endian, opposite to the byte ordering
+        ValueConv => \&SwapWords,
+        ValueConvInv => \&SwapWords,
+    },
 );
 
-# Color balance (MakerNotes tag 0x4001, count=796) (ref 12)
-%Image::ExifTool::Canon::ColorBalance3 = (
+# Color data (MakerNotes tag 0x4001, count=796) (ref 12)
+%Image::ExifTool::Canon::ColorData3 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     NOTES => 'These tags are used by the 1DmkIIN, 5D, 30D and 400D.',
-    FORMAT => 'int16u',
+    FORMAT => 'int16s',
     FIRST_ENTRY => 0,
     WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    # (dcraw 8.81 uses index 63 for WB)
-    63 => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16u[4]' },
-    67 => 'ColorTempAsShot',
-    68 => { Name => 'WB_RGGBLevelsAuto',        Format => 'int16u[4]' },
-    72 => 'ColorTempAuto',
+    0x00 => { #PH
+        Name => 'ColorDataVersion',
+        PrintConv => {
+            1 => '1 (1DmkIIN/5D/30D/400D)',
+        },
+    },
+    # 0x01-0x3e: RGGB coefficients, apparently specific to the
+    # individual camera and possibly used for color calibration (ref 37)
+    # (dcraw 8.81 uses index 0x3f for WB)
+    0x3f => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16s[4]' },
+    0x43 => 'ColorTempAsShot',
+    0x44 => { Name => 'WB_RGGBLevelsAuto',        Format => 'int16s[4]' },
+    0x48 => 'ColorTempAuto',
     # not sure exactly what 'Measured' values mean...
-    73 => { Name => 'WB_RGGBLevelsMeasured',    Format => 'int16u[4]' },
-    77 => 'ColorTempMeasured',
-    78 => { Name => 'WB_RGGBLevelsDaylight',    Format => 'int16u[4]' },
-    82 => 'ColorTempDaylight',
-    83 => { Name => 'WB_RGGBLevelsShade',       Format => 'int16u[4]' },
-    87 => 'ColorTempShade',
-    88 => { Name => 'WB_RGGBLevelsCloudy',      Format => 'int16u[4]' },
-    92 => 'ColorTempCloudy',
-    93 => { Name => 'WB_RGGBLevelsTungsten',    Format => 'int16u[4]' },
-    97 => 'ColorTempTungsten',
-    98 => { Name => 'WB_RGGBLevelsFluorescent', Format => 'int16u[4]' },
-    102 => 'ColorTempFluorescent',
-    103 => { Name => 'WB_RGGBLevelsKelvin',     Format => 'int16u[4]' },
-    107 => 'ColorTempKelvin',
-    108 => { Name => 'WB_RGGBLevelsFlash',      Format => 'int16u[4]' },
-    112 => 'ColorTempFlash',
-    113 => { Name => 'WB_RGGBLevelsPC1',        Format => 'int16u[4]' },
-    117 => 'ColorTempPC1',
-    118 => { Name => 'WB_RGGBLevelsPC2',        Format => 'int16u[4]' },
-    122 => 'ColorTempPC2',
-    123 => { Name => 'WB_RGGBLevelsPC3',        Format => 'int16u[4]' },
-    127 => 'ColorTempPC3',
-    128 => { Name => 'WB_RGGBLevelsCustom',     Format => 'int16u[4]' },
-    132 => 'ColorTempCustom',
+    0x49 => { Name => 'WB_RGGBLevelsMeasured',    Format => 'int16s[4]' },
+    0x4d => 'ColorTempMeasured',
+    0x4e => { Name => 'WB_RGGBLevelsDaylight',    Format => 'int16s[4]' },
+    0x52 => 'ColorTempDaylight',
+    0x53 => { Name => 'WB_RGGBLevelsShade',       Format => 'int16s[4]' },
+    0x57 => 'ColorTempShade',
+    0x58 => { Name => 'WB_RGGBLevelsCloudy',      Format => 'int16s[4]' },
+    0x5c => 'ColorTempCloudy',
+    0x5d => { Name => 'WB_RGGBLevelsTungsten',    Format => 'int16s[4]' },
+    0x61 => 'ColorTempTungsten',
+    0x62 => { Name => 'WB_RGGBLevelsFluorescent', Format => 'int16s[4]' },
+    0x66 => 'ColorTempFluorescent',
+    0x67 => { Name => 'WB_RGGBLevelsKelvin',     Format => 'int16s[4]' },
+    0x6b => 'ColorTempKelvin',
+    0x6c => { Name => 'WB_RGGBLevelsFlash',      Format => 'int16s[4]' },
+    0x70 => 'ColorTempFlash',
+    0x71 => { Name => 'WB_RGGBLevelsPC1',        Format => 'int16s[4]' },
+    0x75 => 'ColorTempPC1',
+    0x76 => { Name => 'WB_RGGBLevelsPC2',        Format => 'int16s[4]' },
+    0x7a => 'ColorTempPC2',
+    0x7b => { Name => 'WB_RGGBLevelsPC3',        Format => 'int16s[4]' },
+    0x7f => 'ColorTempPC3',
+    0x80 => { Name => 'WB_RGGBLevelsCustom',     Format => 'int16s[4]' },
+    0x84 => 'ColorTempCustom',
+    # 0x85-0xbd: these coefficients are in a different order compared to older
+    # models (A,B,C in ColorData1/2 vs. C,A,B in ColorData3/4) - PH
+    # Coefficient A most closely matches the blue curvature, and
+    # coefficient B most closely matches the red curvature, but the match
+    # is not perfect, and I don't know what coefficient C is for (certainly
+    # not a green coefficient) - PH
+    0x85 => { Name => 'CameraColorCalibration01', %cameraColorCalibration,
+              Notes => 'B, C, A, Temperature' }, #37
+    0x89 => { Name => 'CameraColorCalibration02', %cameraColorCalibration }, #37
+    0x8d => { Name => 'CameraColorCalibration03', %cameraColorCalibration }, #37
+    0x91 => { Name => 'CameraColorCalibration04', %cameraColorCalibration }, #37
+    0x95 => { Name => 'CameraColorCalibration05', %cameraColorCalibration }, #37
+    0x99 => { Name => 'CameraColorCalibration06', %cameraColorCalibration }, #37
+    0x9d => { Name => 'CameraColorCalibration07', %cameraColorCalibration }, #37
+    0xa1 => { Name => 'CameraColorCalibration08', %cameraColorCalibration }, #37
+    0xa5 => { Name => 'CameraColorCalibration09', %cameraColorCalibration }, #37
+    0xa9 => { Name => 'CameraColorCalibration10', %cameraColorCalibration }, #37
+    0xad => { Name => 'CameraColorCalibration11', %cameraColorCalibration }, #37
+    0xb1 => { Name => 'CameraColorCalibration12', %cameraColorCalibration }, #37
+    0xb5 => { Name => 'CameraColorCalibration13', %cameraColorCalibration }, #37
+    0xb9 => { Name => 'CameraColorCalibration14', %cameraColorCalibration }, #37
+    0xbd => { Name => 'CameraColorCalibration15', %cameraColorCalibration }, #37
+    # 0xc5-0xc7: looks like black levels (ref 37)
+    # 0xc8-0x1c7: some sort of color table (ref 37)
+    0x248 => { #37
+        Name => 'FlashOutput',
+        ValueConv => '$val >= 255 ? 255 : exp(($val-200)/16*log(2))',
+        ValueConvInv => '$val == 255 ? 255 : 200 + log($val)*16/log(2)',
+        PrintConv => '$val == 255 ? "Strobe or Misfire" : sprintf("%.0f%%", $val * 100)',
+        PrintConvInv => '$val =~ /^(\d(\.?\d*))/ ? $1 / 100 : 255',
+    },
+    0x249 => { #37
+        Name => 'FlashBatteryLevel',
+        # calibration points for external flash: 144=3.76V (almost empty), 192=5.24V (full)
+        # - have seen a value of 201 with internal flash
+        PrintConv => '$val ? sprintf("%.2fV", $val * 5 / 186) : "n/a"',
+        PrintConvInv => '$val=~/^(\d+\.\d+)\s*V?$/i ? int($val*186/5+0.5) : 0',
+    },
+    0x24a => { #37
+        Name => 'ColorTempFlashData',
+        # 0 for no external flash, 35980 for 'Strobe or Misfire'
+        # (lower than ColorTempFlash by up to 200 degrees)
+        RawConv => '($val < 2000 or $val > 12000) ? undef : $val',
+    },
+    # 0x24b: inverse relationship with flash power (ref 37)
+    # 0x286: has value 256 for correct exposure, less for under exposure (seen 96 minimum) (ref 37)
+    0x287 => { #37
+        Name => 'MeasuredRGGBData',
+        Format => 'int32u[4]',
+        Notes => 'MeasuredRGGB may be derived from these data values',
+        # swap words because the word ordering is big-endian, opposite to the byte ordering
+        ValueConv => \&SwapWords,
+        ValueConvInv => \&SwapWords,
+    },
+    # 0x297: ranges from -10 to 30, higher for high ISO (ref 37)
 );
 
-# Color balance (MakerNotes tag 0x4001, count=674|692|702|1227|1250) (ref PH)
-# (a similar record with count=5120 is found offset by 16 bytes for the G10)
-%Image::ExifTool::Canon::ColorBalance4 = (
+# Color data (MakerNotes tag 0x4001, count=674|692|702|1227|1250) (ref PH)
+%Image::ExifTool::Canon::ColorData4 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     NOTES => q{
         These tags are used by the 1DmkIII, 1DSmkIII, 40D, 50D, 5DmkII, 450D and
-        1000D, and also by the PowerShot G10 but with a base offset applied to all
-        indices.
+        1000D.
     },
-    FORMAT => 'int16u',
+    FORMAT => 'int16s',
     FIRST_ENTRY => 0,
     WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    # 1,5,9,13,17,21 => unknown RGGB coefficients (int16u[4]) (50D)
-    # (dcraw 8.81 uses index 63 for WB)
-    63 => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16u[4]' },
-    67 => 'ColorTempAsShot',
-    68 => { Name => 'WB_RGGBLevelsAuto',        Format => 'int16u[4]' },
-    72 => 'ColorTempAuto',
-    73 => { Name => 'WB_RGGBLevelsMeasured',    Format => 'int16u[4]' },
-    77 => 'ColorTempMeasured',
+    0x00 => {
+        Name => 'ColorDataVersion',
+        PrintConv => {
+            2 => '2 (1DmkIII)',
+            3 => '3 (40D)',
+            4 => '4 (1DSmkIII)',
+            5 => '5 (450D/1000D)',
+            6 => '6 (50D/5DmkII)',
+            7 => '7 (500D)',
+        },
+    },
+    # 0x01-0x18: unknown RGGB coefficients (int16s[4]) (50D)
+    # (dcraw 8.81 uses index 0x3f for WB)
+    0x3f => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16s[4]' },
+    0x43 => 'ColorTempAsShot',
+    0x44 => { Name => 'WB_RGGBLevelsAuto',        Format => 'int16s[4]' },
+    0x48 => 'ColorTempAuto',
+    0x49 => { Name => 'WB_RGGBLevelsMeasured',    Format => 'int16s[4]' },
+    0x4d => 'ColorTempMeasured',
     # the following Unknown values are set for the 50D and 5DmkII, and the
     # SRAW images of the 40D, and affect thumbnail display for the 50D/5DmkII
     # and conversion for all modes of the 40D
-    78 => { Name => 'WB_RGGBLevelsUnknown',     Format => 'int16u[4]', Unknown => 1 },
-    82 => { Name => 'ColorTempUnknown', Unknown => 1 },
-    83 => { Name => 'WB_RGGBLevelsDaylight',    Format => 'int16u[4]' },
-    87 => 'ColorTempDaylight',
-    88 => { Name => 'WB_RGGBLevelsShade',       Format => 'int16u[4]' },
-    92 => 'ColorTempShade',
-    93 => { Name => 'WB_RGGBLevelsCloudy',      Format => 'int16u[4]' },
-    97 => 'ColorTempCloudy',
-    98 => { Name => 'WB_RGGBLevelsTungsten',    Format => 'int16u[4]' },
-    102 => 'ColorTempTungsten',
-    103 => { Name => 'WB_RGGBLevelsFluorescent',Format => 'int16u[4]' },
-    107 => 'ColorTempFluorescent',
+    0x4e => { Name => 'WB_RGGBLevelsUnknown',     Format => 'int16s[4]', Unknown => 1 },
+    0x52 => { Name => 'ColorTempUnknown', Unknown => 1 },
+    0x53 => { Name => 'WB_RGGBLevelsDaylight',    Format => 'int16s[4]' },
+    0x57 => 'ColorTempDaylight',
+    0x58 => { Name => 'WB_RGGBLevelsShade',       Format => 'int16s[4]' },
+    0x5c => 'ColorTempShade',
+    0x5d => { Name => 'WB_RGGBLevelsCloudy',      Format => 'int16s[4]' },
+    0x61 => 'ColorTempCloudy',
+    0x62 => { Name => 'WB_RGGBLevelsTungsten',    Format => 'int16s[4]' },
+    0x66 => 'ColorTempTungsten',
+    0x67 => { Name => 'WB_RGGBLevelsFluorescent',Format => 'int16s[4]' },
+    0x6b => 'ColorTempFluorescent',
     # (changing the Kelvin values has no effect on image in DPP... why not?)
-    108 => { Name => 'WB_RGGBLevelsKelvin',     Format => 'int16u[4]' },
-    112 => 'ColorTempKelvin',
-    113 => { Name => 'WB_RGGBLevelsFlash',      Format => 'int16u[4]' },
-    117 => 'ColorTempFlash',
-    118 => { Name => 'WB_RGGBLevelsUnknown2',   Format => 'int16u[4]', Unknown => 1 },
-    122 => { Name => 'ColorTempUnknown2', Unknown => 1 },
-    123 => { Name => 'WB_RGGBLevelsUnknown3',   Format => 'int16u[4]', Unknown => 1 },
-    127 => { Name => 'ColorTempUnknown3', Unknown => 1 },
-    128 => { Name => 'WB_RGGBLevelsUnknown4',   Format => 'int16u[4]', Unknown => 1 },
-    132 => { Name => 'ColorTempUnknown4', Unknown => 1 },
-    133 => { Name => 'WB_RGGBLevelsUnknown5',   Format => 'int16u[4]', Unknown => 1 },
-    137 => { Name => 'ColorTempUnknown5', Unknown => 1 },
-    138 => { Name => 'WB_RGGBLevelsUnknown6',   Format => 'int16u[4]', Unknown => 1 },
-    142 => { Name => 'ColorTempUnknown6', Unknown => 1 },
-    143 => { Name => 'WB_RGGBLevelsUnknown7',   Format => 'int16u[4]', Unknown => 1 },
-    147 => { Name => 'ColorTempUnknown7', Unknown => 1 },
-    148 => { Name => 'WB_RGGBLevelsUnknown8',   Format => 'int16u[4]', Unknown => 1 },
-    152 => { Name => 'ColorTempUnknown8', Unknown => 1 },
-    153 => { Name => 'WB_RGGBLevelsUnknown9',   Format => 'int16u[4]', Unknown => 1 },
-    157 => { Name => 'ColorTempUnknown9', Unknown => 1 },
-    158 => { Name => 'WB_RGGBLevelsUnknown10',  Format => 'int16u[4]', Unknown => 1 },
-    162 => { Name => 'ColorTempUnknown10', Unknown => 1 },
-    163 => { Name => 'WB_RGGBLevelsUnknown11',  Format => 'int16u[4]', Unknown => 1 },
-    167 => { Name => 'ColorTempUnknown11', Unknown => 1 },
+    0x6c => { Name => 'WB_RGGBLevelsKelvin',     Format => 'int16s[4]' },
+    0x70 => 'ColorTempKelvin',
+    0x71 => { Name => 'WB_RGGBLevelsFlash',      Format => 'int16s[4]' },
+    0x75 => 'ColorTempFlash',
+    0x76 => { Name => 'WB_RGGBLevelsUnknown2',   Format => 'int16s[4]', Unknown => 1 },
+    0x7a => { Name => 'ColorTempUnknown2', Unknown => 1 },
+    0x7b => { Name => 'WB_RGGBLevelsUnknown3',   Format => 'int16s[4]', Unknown => 1 },
+    0x7f => { Name => 'ColorTempUnknown3', Unknown => 1 },
+    0x80 => { Name => 'WB_RGGBLevelsUnknown4',   Format => 'int16s[4]', Unknown => 1 },
+    0x84 => { Name => 'ColorTempUnknown4', Unknown => 1 },
+    0x85 => { Name => 'WB_RGGBLevelsUnknown5',   Format => 'int16s[4]', Unknown => 1 },
+    0x89 => { Name => 'ColorTempUnknown5', Unknown => 1 },
+    0x8a => { Name => 'WB_RGGBLevelsUnknown6',   Format => 'int16s[4]', Unknown => 1 },
+    0x8e => { Name => 'ColorTempUnknown6', Unknown => 1 },
+    0x8f => { Name => 'WB_RGGBLevelsUnknown7',   Format => 'int16s[4]', Unknown => 1 },
+    0x93 => { Name => 'ColorTempUnknown7', Unknown => 1 },
+    0x94 => { Name => 'WB_RGGBLevelsUnknown8',   Format => 'int16s[4]', Unknown => 1 },
+    0x98 => { Name => 'ColorTempUnknown8', Unknown => 1 },
+    0x99 => { Name => 'WB_RGGBLevelsUnknown9',   Format => 'int16s[4]', Unknown => 1 },
+    0x9d => { Name => 'ColorTempUnknown9', Unknown => 1 },
+    0x9e => { Name => 'WB_RGGBLevelsUnknown10',  Format => 'int16s[4]', Unknown => 1 },
+    0xa2 => { Name => 'ColorTempUnknown10', Unknown => 1 },
+    0xa3 => { Name => 'WB_RGGBLevelsUnknown11',  Format => 'int16s[4]', Unknown => 1 },
+    0xa7 => { Name => 'ColorTempUnknown11', Unknown => 1 },
+    0xa8 => { Name => 'CameraColorCalibration01', %cameraColorCalibration,
+              Notes => 'B, C, A, Temperature' },
+    0xac => { Name => 'CameraColorCalibration02', %cameraColorCalibration },
+    0xb0 => { Name => 'CameraColorCalibration03', %cameraColorCalibration },
+    0xb4 => { Name => 'CameraColorCalibration04', %cameraColorCalibration },
+    0xb8 => { Name => 'CameraColorCalibration05', %cameraColorCalibration },
+    0xbc => { Name => 'CameraColorCalibration06', %cameraColorCalibration },
+    0xc0 => { Name => 'CameraColorCalibration07', %cameraColorCalibration },
+    0xc4 => { Name => 'CameraColorCalibration08', %cameraColorCalibration },
+    0xc8 => { Name => 'CameraColorCalibration09', %cameraColorCalibration },
+    0xcc => { Name => 'CameraColorCalibration10', %cameraColorCalibration },
+    0xd0 => { Name => 'CameraColorCalibration11', %cameraColorCalibration },
+    0xd4 => { Name => 'CameraColorCalibration12', %cameraColorCalibration },
+    0xd8 => { Name => 'CameraColorCalibration13', %cameraColorCalibration },
+    0xdc => { Name => 'CameraColorCalibration14', %cameraColorCalibration },
+    0xe0 => { Name => 'CameraColorCalibration15', %cameraColorCalibration },
+    0x280 => { #PH
+        Name => 'RawMeasuredRGGB',
+        Format => 'int32u[4]',
+        Notes => 'raw MeasuredRGGB values, before normalization',
+        # swap words because the word ordering is big-endian, opposite to the byte ordering
+        ValueConv => \&SwapWords,
+        ValueConvInv => \&SwapWords,
+    },
+);
+
+# Color data (MakerNotes tag 0x4001, count=5120) (ref PH)
+%Image::ExifTool::Canon::ColorData5 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    NOTES => 'These tags are used by the PowerShot G10.',
+    FORMAT => 'int16s',
+    FIRST_ENTRY => 0,
+    WRITABLE => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0x47 => { Name => 'WB_RGGBLevelsAsShot',      Format => 'int16s[4]' },
+    0x4b => 'ColorTempAsShot',
+    0x4c => { Name => 'WB_RGGBLevelsAuto',        Format => 'int16s[4]' },
+    0x50 => 'ColorTempAuto',
+    0x51 => { Name => 'WB_RGGBLevelsMeasured',    Format => 'int16s[4]' },
+    0x55 => 'ColorTempMeasured',
+    0x56 => { Name => 'WB_RGGBLevelsUnknown',     Format => 'int16s[4]', Unknown => 1 },
+    0x5a => { Name => 'ColorTempUnknown', Unknown => 1 },
+    0x5b => { Name => 'WB_RGGBLevelsDaylight',    Format => 'int16s[4]' },
+    0x5f => 'ColorTempDaylight',
+    0x60 => { Name => 'WB_RGGBLevelsShade',       Format => 'int16s[4]' },
+    0x64 => 'ColorTempShade',
+    0x65 => { Name => 'WB_RGGBLevelsCloudy',      Format => 'int16s[4]' },
+    0x69 => 'ColorTempCloudy',
+    0x6a => { Name => 'WB_RGGBLevelsTungsten',    Format => 'int16s[4]' },
+    0x6e => 'ColorTempTungsten',
+    0x6f => { Name => 'WB_RGGBLevelsFluorescent',Format => 'int16s[4]' },
+    0x73 => 'ColorTempFluorescent',
+    0x74 => { Name => 'WB_RGGBLevelsKelvin',     Format => 'int16s[4]' },
+    0x78 => 'ColorTempKelvin',
+    0x79 => { Name => 'WB_RGGBLevelsFlash',      Format => 'int16s[4]' },
+    0x7d => 'ColorTempFlash',
+    0x7e => { Name => 'WB_RGGBLevelsUnknown2',   Format => 'int16s[4]', Unknown => 1 },
+    0x82 => { Name => 'ColorTempUnknown2', Unknown => 1 },
+    0x83 => { Name => 'WB_RGGBLevelsUnknown3',   Format => 'int16s[4]', Unknown => 1 },
+    0x87 => { Name => 'ColorTempUnknown3', Unknown => 1 },
+    0x88 => { Name => 'WB_RGGBLevelsUnknown4',   Format => 'int16s[4]', Unknown => 1 },
+    0x8c => { Name => 'ColorTempUnknown4', Unknown => 1 },
+    0x8d => { Name => 'WB_RGGBLevelsUnknown5',   Format => 'int16s[4]', Unknown => 1 },
+    0x91 => { Name => 'ColorTempUnknown5', Unknown => 1 },
+    0x92 => { Name => 'WB_RGGBLevelsUnknown6',   Format => 'int16s[4]', Unknown => 1 },
+    0x96 => { Name => 'ColorTempUnknown6', Unknown => 1 },
+    0x97 => { Name => 'WB_RGGBLevelsUnknown7',   Format => 'int16s[4]', Unknown => 1 },
+    0x9b => { Name => 'ColorTempUnknown7', Unknown => 1 },
+    0x9c => { Name => 'WB_RGGBLevelsUnknown8',   Format => 'int16s[4]', Unknown => 1 },
+    0xa0 => { Name => 'ColorTempUnknown8', Unknown => 1 },
+    0xa1 => { Name => 'WB_RGGBLevelsUnknown9',   Format => 'int16s[4]', Unknown => 1 },
+    0xa5 => { Name => 'ColorTempUnknown9', Unknown => 1 },
+    0xa6 => { Name => 'WB_RGGBLevelsUnknown10',  Format => 'int16s[4]', Unknown => 1 },
+    0xaa => { Name => 'ColorTempUnknown10', Unknown => 1 },
+    0xab => { Name => 'WB_RGGBLevelsUnknown11',  Format => 'int16s[4]', Unknown => 1 },
+    0xaf => { Name => 'ColorTempUnknown11', Unknown => 1 },
+    0xb0 => { Name => 'WB_RGGBLevelsUnknown12',  Format => 'int16s[4]', Unknown => 1 },
+    0xb4 => { Name => 'ColorTempUnknown12', Unknown => 1 },
+    0xb5 => { Name => 'WB_RGGBLevelsUnknown13',  Format => 'int16s[4]', Unknown => 1 },
+    0xb9 => { Name => 'ColorTempUnknown13', Unknown => 1 },
+    0xba => { Name => 'CameraColorCalibration01', %cameraColorCalibration2,
+              Notes => 'B, C, A, D, Temperature' },
+    0xbf => { Name => 'CameraColorCalibration02', %cameraColorCalibration2 },
+    0xc4 => { Name => 'CameraColorCalibration03', %cameraColorCalibration2 },
+    0xc9 => { Name => 'CameraColorCalibration04', %cameraColorCalibration2 },
+    0xce => { Name => 'CameraColorCalibration05', %cameraColorCalibration2 },
+    0xd3 => { Name => 'CameraColorCalibration06', %cameraColorCalibration2 },
+    0xd8 => { Name => 'CameraColorCalibration07', %cameraColorCalibration2 },
+    0xdd => { Name => 'CameraColorCalibration08', %cameraColorCalibration2 },
+    0xe2 => { Name => 'CameraColorCalibration09', %cameraColorCalibration2 },
+    0xe7 => { Name => 'CameraColorCalibration10', %cameraColorCalibration2 },
+    0xec => { Name => 'CameraColorCalibration11', %cameraColorCalibration2 },
+    0xf1 => { Name => 'CameraColorCalibration12', %cameraColorCalibration2 },
+    0xf6 => { Name => 'CameraColorCalibration13', %cameraColorCalibration2 },
+    0xfb => { Name => 'CameraColorCalibration14', %cameraColorCalibration2 },
+    0x100=> { Name => 'CameraColorCalibration15', %cameraColorCalibration2 },
+);
+
+# Unknown color data
+%Image::ExifTool::Canon::ColorDataUnknown = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16s',
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
 );
 
 # Color information (MakerNotes tag 0x4003) (ref PH)
@@ -3910,11 +4330,11 @@ my %ciLongFocal = (
     1 => {
         Condition => '$$self{Model} =~ /EOS-1D/',
         Name => 'Saturation',
-        %printParameter,
+        %Image::ExifTool::Exif::printParameter,
     },
     2 => {
         Name => 'ColorTone',
-        %printParameter,
+        %Image::ExifTool::Exif::printParameter,
     },
     3 => {
         Name => 'ColorSpace',
@@ -4057,10 +4477,20 @@ my %ciLongFocal = (
             0 => 'CanonExposureMode',
             1 => 'EasyMode',
         },
-        ValueConv => '$val[0] ? $val[0] : $val[1] + 10',
-        PrintConv => '$val[0] ? $prt[0] : $prt[1]',
+        Desire => {
+            2 => 'BulbDuration',
+        },
+        # most Canon models set CanonExposureMode to Manual (4) for Bulb shots,
+        # but the 1DmkIII uses a value of 7 for Bulb, so use this for other
+        # models too (Note that Canon DPP reports "Manual Exposure" here)
+        ValueConv => '$val[0] ? (($val[0] eq "4" and $val[2]) ? 7 : $val[0]) : $val[1] + 10',
+        PrintConv => '$val eq "7" ? "Bulb" : ($val[0] ? $prt[0] : $prt[1])',
     },
     FlashType => {
+        Notes => q{
+            may report "Built-in Flash" for some Canon cameras with external flash in
+            manual mode
+        },
         Require => {
             0 => 'FlashBits',
         },
@@ -4078,19 +4508,6 @@ my %ciLongFocal = (
         },
         RawConv => '$val[1] ? $val : undef',
         ValueConv => '($val[0]==3 or $val[0]==4 or $val[0]==6) ? 1 : 0',
-        PrintConv => {
-            0 => 'Off',
-            1 => 'On',
-        },
-    },
-    # fudge to display simple Flash On/Off for Canon cameras only
-    FlashOn => {
-        Description => 'Flash',
-        Desire => {
-            0 => 'FlashBits',
-            1 => 'Flash',
-        },
-        ValueConv => 'Image::ExifTool::Canon::FlashOn(@val)',
         PrintConv => {
             0 => 'Off',
             1 => 'On',
@@ -4208,7 +4625,7 @@ sub PrintLensID(@)
         for ($i=1; $$printConv{"$lensType.$i"}; ++$i) {
             push @lenses, $$printConv{"$lensType.$i"};
         }
-        my ($tc, @maybe, @matches);
+        my ($tc, @maybe, @likely, @matches);
         # look for lens in user-defined lenses
         foreach $lens (@lenses) {
             next unless $Image::ExifTool::userLens{$lens} and $lens =~ /(\d+)/;
@@ -4235,6 +4652,7 @@ sub PrintLensID(@)
                 $tclens .= " + ${tc}x" if $tc > 1;
                 push @maybe, $tclens;
                 next if abs($longFocal  - $lf * $tc) > 0.9;
+                push @likely, $tclens;
                 if ($maxAperture) {
                     # (not 100% sure that TC affects MaxAperture, but it should!)
                     next if $maxAperture < $sa * $tc - 0.15;
@@ -4245,6 +4663,7 @@ sub PrintLensID(@)
             last if @maybe;
         }
         return join(' or ', @matches) if @matches;
+        return join(' or ', @likely) if @likely;
         return join(' or ', @maybe) if @maybe;
     } elsif ($lensModel and $lensModel =~ /\d/) {
         # use lens model as written by the camera (add "Canon" to the start
@@ -4259,6 +4678,17 @@ sub PrintLensID(@)
     }
     return "Unknown$str" if $lensType < 0;
     return "Unknown ($lensType)$str";
+}
+
+#------------------------------------------------------------------------------
+# Swap 16-bit words in 32-bit integers
+# Inputs: 0) string of integers
+# Returns: string of word-swapped integers
+sub SwapWords($)
+{
+    my @a = split(' ', shift);
+    $_ = (($_ >> 16) | ($_ << 16)) & 0xffffffff foreach @a;
+    return "@a";
 }
 
 #------------------------------------------------------------------------------
@@ -4542,18 +4972,6 @@ sub PrintAFPoints1D($)
 }
 
 #------------------------------------------------------------------------------
-# Decide whether flash was on or off
-# Inputs: 0) Flashbits, 1) Flash
-sub FlashOn(@)
-{
-    my @val = @_;
-    Image::ExifTool::ToFloat(@val);
-    return $val[0] ? 1 : 0 if defined $val[0];
-    return $val[1]&0x07 ? 1 : 0 if defined $val[1];
-    return undef;
-}
-
-#------------------------------------------------------------------------------
 # Convert Canon hex-based EV (modulo 0x20) to real number
 # Inputs: 0) value to convert
 # ie) 0x00 -> 0
@@ -4619,7 +5037,7 @@ sub WriteCanon($$$)
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access to autoload this package
     my $dirData = Image::ExifTool::Exif::WriteExif($exifTool, $dirInfo, $tagTablePtr);
-    # add trailer which is written by some Canon models (it's a TIFF header)
+    # add footer which is written by some Canon models (format of a TIFF header)
     if (defined $dirData and length $dirData and $$dirInfo{Fixup}) {
         $dirData .= GetByteOrder() . Set16u(42) . Set32u(0);
         $dirInfo->{Fixup}->AddFixup(length($dirData) - 4);
@@ -4674,9 +5092,9 @@ Thanks Michael Rommel and Daniel Pittman for information they provided about
 the Digital Ixus and PowerShot S70 cameras, Juha Eskelinen and Emil Sit for
 figuring out the 20D and 30D FileNumber, Denny Priebe for figuring out a
 couple of 1D tags, and Michael Tiemann, Rainer Honle, Dave Nicholson, Chris
-Huebsch, Ger Vermeulen, Darryl Zurn, D.J. Cristi and Bogdan for decoding a
-number of new tags.  Also thanks to everyone who made contributions to the
-LensType lookup list or the meanings of other tag values.
+Huebsch, Ger Vermeulen, Darryl Zurn, D.J. Cristi, Bogdan and Vesa Kivisto for
+decoding a number of new tags.  Also thanks to everyone who made contributions
+to the LensType lookup list or the meanings of other tag values.
 
 =head1 SEE ALSO
 

@@ -34,15 +34,21 @@
 <tr>
 <td>'APP2'</td>
 <td>ICC_Profile
-  <br>FPXR</td>
-<td class=c>-<br>-</td>
+  <br>FPXR
+  <br>MPF
+  <br>PreviewImage</td>
+<td class=c>-<br>-<br>-<br>N</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a>
-  <br>--&gt; <a href='FlashPix.html'>FlashPix Tags</a></td></tr>
+  <br>--&gt; <a href='FlashPix.html'>FlashPix Tags</a>
+  <br>--&gt; <a href='MPF.html'>MPF Tags</a>
+  <br><span class=n>(Samsung large preview)</span></td></tr>
 <tr class=b>
 <td>'APP3'</td>
-<td>Meta</td>
-<td class=c>-</td>
-<td>--&gt; <a href='Kodak.html#Meta'>Kodak Meta Tags</a></td></tr>
+<td>Meta
+  <br>Stim</td>
+<td class=c>-<br>-</td>
+<td>--&gt; <a href='Kodak.html#Meta'>Kodak Meta Tags</a>
+  <br>--&gt; <a href='Stim.html'>Stim Tags</a></td></tr>
 <tr>
 <td>'APP5'</td>
 <td>RMETA</td>
@@ -93,11 +99,16 @@
 <td class=c>Y</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'DQT'</td>
+<td>DefineQuantizationTable</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(used to calculate the Extra:JPEGDigest tag value)</span></span></td></tr>
+<tr>
 <td>'SOF'</td>
 <td>StartOfFrame</td>
 <td class=c>-</td>
 <td>--&gt; <a href='JPEG.html#SOF'>JPEG SOF Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'Trailer'</td>
 <td>AFCP
   <br>CanonVRD
@@ -122,7 +133,7 @@ PrintIM information.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>0xc4a5</td>
+<td title='0xc4a5 = 50341'>0xc4a5</td>
 <td>PrintIM</td>
 <td class=c>undef</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
@@ -138,12 +149,12 @@ Format).</p>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>SPIFFVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>ProfileID</td>
 <td class=c>N</td>
 <td><span class=s>0 = Not Specified
@@ -152,23 +163,23 @@ Format).</p>
   <br>3 = Bi-level Facsimile
   <br>4 = Continuous-tone Facsimile</span></td></tr>
 <tr>
-<td class=r>3</td>
+<td class=r title='3 = 0x3'>3</td>
 <td>ColorComponents</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>6</td>
+<td class=r title='6 = 0x6'>6</td>
 <td>ImageHeight</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(at index 4 in specification, but there are 2 extra bytes here in my only
 SPIFF sample, version 1.2)</span></span></td></tr>
 <tr>
-<td class=r>10</td>
+<td class=r title='10 = 0xa'>10</td>
 <td>ImageWidth</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>14</td>
+<td class=r title='14 = 0xe'>14</td>
 <td>ColorSpace</td>
 <td class=c>N</td>
 <td><span class=s>0 = Bi-level
@@ -184,12 +195,12 @@ SPIFF sample, version 1.2)</span></span></td></tr>
   <br>13 = YCCK
   <br>14 = CIELab</span></td></tr>
 <tr>
-<td class=r>15</td>
+<td class=r title='15 = 0xf'>15</td>
 <td>BitsPerSample</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>16</td>
+<td class=r title='16 = 0x10'>16</td>
 <td>Compression</td>
 <td class=c>N</td>
 <td><span class=s>0 = Uncompressed, interleaved, 8 bits per sample
@@ -199,19 +210,19 @@ SPIFF sample, version 1.2)</span></span></td></tr>
   <br>4 = JBIG
   <br>5 = JPEG</span></td></tr>
 <tr>
-<td class=r>17</td>
+<td class=r title='17 = 0x11'>17</td>
 <td>ResolutionUnit</td>
 <td class=c>N</td>
 <td><span class=s>0 = None
   <br>1 = inches
   <br>2 = cm</span></td></tr>
 <tr class=b>
-<td class=r>18</td>
+<td class=r title='18 = 0x12'>18</td>
 <td>YResolution</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>22</td>
+<td class=r title='22 = 0x16'>22</td>
 <td>XResolution</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -227,7 +238,7 @@ has an idea about what this means, please let me know.</p>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>AdobeCMType</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -241,22 +252,22 @@ has an idea about what this means, please let me know.</p>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>DCTEncodeVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>1</td>
+<td class=r title='1 = 0x1'>1</td>
 <td>APP14Flags0</td>
 <td class=c>N</td>
 <td><span class=s>Bit 15 = Encoded with Blend=1 downsampling</span></td></tr>
 <tr>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>APP14Flags1</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>3</td>
+<td class=r title='3 = 0x3'>3</td>
 <td>ColorTransform</td>
 <td class=c>N</td>
 <td><span class=s>0 = Unknown (RGB or CMYK)
@@ -333,7 +344,7 @@ has an idea about what this means, please let me know.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 12, 2008</i>
+<br><i>Last revised Jun 12, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

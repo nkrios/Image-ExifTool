@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 # ZIP metadata blocks
 %Image::ExifTool::ZIP::Main = (
@@ -118,8 +118,15 @@ sub ProcessZIP($$)
         );
         $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
         my $flags = Get16u(\$buff, 6);
+        if ($flags & 0x08) {
+            # we don't yet support skipping stream mode data
+            # (when this happens, the CRC, compressed size and uncompressed
+            #  sizes are set to 0 in the header.  Instead, they are stored
+            #  after the compressed data with an optional header of 0x08074b50)
+            $exifTool->Warn('Stream mode data encountered, file list may be incomplete');
+            last;
+        }
         $len = Get32u(\$buff, 18);      # file data length
-        $len += 12 if $flags & 0x08;    # optional data descriptor
         $raf->Seek($len, 1) or last;    # skip file data
     }
     return $rtnVal;

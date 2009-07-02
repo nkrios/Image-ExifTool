@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 # MIFF chunks
 %Image::ExifTool::MIFF::Main = (
@@ -119,8 +119,7 @@ sub ProcessMIFF($$)
     # Old MIFF files end with Colon+Linefeed, so this will likely
     # slurp those entire files, which will be slower, but will work
     # OK except that the profile information won't be decoded
-    my $oldsep = $/;
-    $/ = ":\x1a";
+    local $/ = ":\x1a";
 
     my $mode = '';
     my @profiles;
@@ -174,7 +173,6 @@ sub ProcessMIFF($$)
             }
         }
     }
-    $/ = $oldsep;   # restore separator to original value
 
     # process profile information
     foreach (@profiles) {

@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.29';
+$VERSION = '1.31';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -120,6 +120,7 @@ my %fileFormat = (
     0 => {
         Name => 'EnvelopeRecordVersion',
         Format => 'int16u',
+        Mandatory => 1,
     },
     5 => {
         Name => 'Destination',
@@ -220,6 +221,7 @@ my %fileFormat = (
     0 => {
         Name => 'ApplicationRecordVersion',
         Format => 'int16u',
+        Mandatory => 1,
     },
     3 => {
         Name => 'ObjectTypeReference',
@@ -644,6 +646,7 @@ my %fileFormat = (
     0 => {
         Name => 'NewsPhotoVersion',
         Format => 'int16u',
+        Mandatory => 1,
     },
     10 => {
         Name => 'IPTCPictureNumber',

@@ -131,7 +131,7 @@ sub ProcessRWZ($$)
         undef $buf2;
 
         # extract original information by calling ExtractInfo recursively
-        $exifTool->ExtractInfo(\$buff, { ReEntry => 1});
+        $exifTool->ExtractInfo(\$buff, { ReEntry => 1 });
         undef $buff;
     }
     # set OriginalFileType from FileType of original file

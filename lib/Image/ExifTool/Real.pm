@@ -534,7 +534,7 @@ sub ProcessReal($$)
         my $ext = $exifTool->{FILE_EXT};
         $type = ($ext and $ext eq 'RPM') ? 'RPM' : 'RAM';
         require Image::ExifTool::PostScript;
-        my $oldSep = Image::ExifTool::PostScript::SetInputRecordSeparator($raf);
+        local $/ = Image::ExifTool::PostScript::GetInputRecordSeparator($raf) || "\n";
         $raf->Seek(0,0);
         while ($raf->ReadLine($buff)) {
             last if length $buff > 256;
@@ -550,7 +550,6 @@ sub ProcessReal($$)
             my $tag = $buff =~ m{^[a-z]{3,4}://} ? 'url' : 'txt';
             $exifTool->HandleTag($tagTablePtr, $tag, $buff);
         }
-        $/ = $oldSep if $oldSep;
         return 1;
     }
 

@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..32\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..33\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # definitions for user-defined tag test (#28)
@@ -374,6 +374,15 @@ my $testnum = 1;
     $exifTool->SetNewValue('XMP-TIFF:*');
     $exifTool->WriteInfo(undef,$testfile,'XMP'); #(also test output file type option)
     print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);
+    print "ok $testnum\n";
+}
+
+# test 33: Extract structured information
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $info = $exifTool->ImageInfo('t/images/XMP4.xmp', {Struct => 1});
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
 

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.66
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.79
 [File, File, Image] FileName - File Name: DNG.dng
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 13 kB
@@ -116,7 +116,7 @@
 [EXIF, IFD0, Image] 50732 - Baseline Sharpness: 1.5
 [EXIF, IFD0, Image] 50734 - Linear Response Limit: 1
 [EXIF, IFD0, Camera] 50735 - Camera Serial Number: 012345678
-[EXIF, IFD0, Camera] 50736 - DNG Lens Info: 18-55mm f/inf-inf
+[EXIF, IFD0, Camera] 50736 - DNG Lens Info: 18-55mm f/undef-undef
 [EXIF, IFD0, Image] 50739 - Shadow Scale: 1
 [EXIF, IFD0, Image] 50778 - Calibration Illuminant 1: Standard Light A
 [EXIF, IFD0, Image] 50779 - Calibration Illuminant 2: D65
@@ -179,7 +179,7 @@
 [MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
 [MakerNotes, Canon, Camera] 23 - Long Focal: 55 mm
 [MakerNotes, Canon, Camera] 24 - Short Focal: 18 mm
-[MakerNotes, Canon, Camera] 25 - Focal Units: 1
+[MakerNotes, Canon, Camera] 25 - Focal Units: 1/mm
 [MakerNotes, Canon, Camera] 26 - Max Aperture: 4
 [MakerNotes, Canon, Camera] 27 - Min Aperture: 27
 [MakerNotes, Canon, Camera] 28 - Flash Activity: 0
@@ -211,13 +211,13 @@
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
 [MakerNotes, Canon, Image] 21 - F Number: 8
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/16
+[MakerNotes, Canon, Image] 23 - Measured EV 2: 3.125
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
 [MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
 [MakerNotes, Canon, Image] 29 - Self Timer 2: 0
-[MakerNotes, Canon, Image] 33 - Flash Output: 0
-[MakerNotes, Canon, Camera] 6 - Canon Image Type: Canon EOS 350D DIGITAL
+[MakerNotes, Canon, Image] 6 - Canon Image Type: Canon EOS 350D DIGITAL
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware 1.0.2
 [MakerNotes, Canon, Camera] 9 - Owner Name: unknown
 [MakerNotes, Canon, Camera] 12 - Camera Body No.: 0012345678
@@ -266,6 +266,7 @@
 [MakerNotes, Canon, Image] 11 - Digital Gain: 0
 [MakerNotes, Canon, Image] 12 - WB Shift AB: 0
 [MakerNotes, Canon, Image] 13 - WB Shift GM: 0
+[MakerNotes, Canon, Camera] 1 - Measured RGGB: 580 1024 1024 500
 [MakerNotes, Canon, Camera] 208 - VRD Offset: 0
 [MakerNotes, Canon, Image] 1 - Sensor Width: 3516
 [MakerNotes, Canon, Image] 2 - Sensor Height: 2328
@@ -301,7 +302,6 @@
 [Composite, Composite, Image] Aperture - Aperture: 8.0
 [Composite, Composite, Image] CFAPattern - CFA Pattern: [Red,Green][Green,Blue]
 [Composite, Composite, Camera] DriveMode - Drive Mode: Single-frame shooting
-[Composite, Composite, Camera] FlashOn - Flash: Off
 [Composite, Composite, Camera] ISO - ISO: 400
 [Composite, Composite, Image] ImageSize - Image Size: 3516x2328
 [Composite, Composite, Image] JpgFromRaw - Jpg From Raw: (Binary data 29 bytes)

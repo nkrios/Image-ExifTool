@@ -16,7 +16,7 @@ These tags are used in Panasonic/Leica cameras.
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>0x0001</td>
+<td title='0x0001 = 1'>0x0001</td>
 <td>ImageQuality</td>
 <td class=c>int16u</td>
 <td><span class=s>2 = High
@@ -25,25 +25,26 @@ These tags are used in Panasonic/Leica cameras.
   <br>7 = Raw
   <br>9 = Motion Picture</span></td></tr>
 <tr class=b>
-<td>0x0002</td>
+<td title='0x0002 = 2'>0x0002</td>
 <td>FirmwareVersion</td>
 <td class=c>undef</td>
 <td><span class=s><span class=n>(for some camera models such as the FZ30 this may be an internal production
 reference number and not the actual firmware version)</span></span></td></tr>
 <tr>
-<td>0x0003</td>
+<td title='0x0003 = 3'>0x0003</td>
 <td>WhiteBalance</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Auto
   <br>2 = Daylight
   <br>3 = Cloudy
-  <br>4 = Halogen
+  <br>4 = Tungsten
   <br>5 = Manual
   <br>8 = Flash
   <br>10 = Black &amp; White
-  <br>11 = Manual</span></td></tr>
+  <br>11 = Manual
+  <br>12 = Shade</span></td></tr>
 <tr class=b>
-<td>0x0007</td>
+<td title='0x0007 = 7'>0x0007</td>
 <td>FocusMode</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Auto
@@ -51,36 +52,42 @@ reference number and not the actual firmware version)</span></span></td></tr>
   <br>4 = Auto, Focus button
   <br>5 = Auto, Continuous</span></td></tr>
 <tr>
-<td>0x000f</td>
+<td title='0x000f = 15'>0x000f</td>
 <td>AFMode</td>
 <td class=c>int8u[2]</td>
-<td><span class=s>16 = Normal?
+<td><span class=s><span class=n>(DMC-FZ10)</span>
   <br>&#39;0 1&#39; = Spot Mode On
-  <br>&#39;0 16&#39; = Spot Mode Off or 3-area (high speed)
+  <br>&#39;0 16&#39; = Spot Mode Off
+  <br><span class=n>(other models)</span>
+  <br>16 = Normal?
+  <br>&#39;0 1&#39; = 9-area
+  <br>&#39;0 16&#39; = 3-area (high speed)
   <br>&#39;1 0&#39; = Spot Focusing
   <br>&#39;1 1&#39; = 5-area
   <br>&#39;16 0&#39; = 1-area
   <br>&#39;16 16&#39; = 1-area (high speed)
-  <br>&#39;32 0&#39; = 3-area (auto)?
+  <br>&#39;32 0&#39; = Auto or Face Detect
   <br>&#39;32 1&#39; = 3-area (left)?
   <br>&#39;32 2&#39; = 3-area (center)?
-  <br>&#39;32 3&#39; = 3-area (right)?</span></td></tr>
+  <br>&#39;32 3&#39; = 3-area (right)?
+  <br>&#39;64 0&#39; = Face Detect</span></td></tr>
 <tr class=b>
-<td>0x001a</td>
+<td title='0x001a = 26'>0x001a</td>
 <td>ImageStabilization</td>
 <td class=c>int16u</td>
 <td><span class=s>2 = On, Mode 1
   <br>3 = Off
   <br>4 = On, Mode 2</span></td></tr>
 <tr>
-<td>0x001c</td>
+<td title='0x001c = 28'>0x001c</td>
 <td>MacroMode</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = On
   <br>2 = Off
-  <br>257 = Tele-Macro</span></td></tr>
+  <br>257 = Tele-Macro
+  <br>513 = Macro Zoom</span></td></tr>
 <tr class=b>
-<td>0x001f</td>
+<td title='0x001f = 31'>0x001f</td>
 <td>ShootingMode</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Normal
@@ -99,6 +106,7 @@ reference number and not the actual firmware version)</span></span></td></tr>
   <br>14 = Simple
   <br>15 = Color Effects
   <br>16 = Self Portrait
+  <br>17 = Economy
   <br>18 = Fireworks
   <br>19 = Party
   <br>20 = Snow
@@ -116,43 +124,49 @@ reference number and not the actual firmware version)</span></span></td></tr>
   <br>32 = Sunset
   <br>33 = Pet
   <br>34 = Intelligent ISO
+  <br>35 = Clipboard
   <br>36 = High Speed Continuous Shooting
   <br>37 = Intelligent Auto
-  <br>39 = Multi-aspect</span></td></tr>
+  <br>39 = Multi-aspect
+  <br>41 = Transform
+  <br>42 = Flash Burst
+  <br>43 = Pin Hole
+  <br>44 = Film Grain
+  <br>46 = Photo Frame</span></td></tr>
 <tr>
-<td>0x0020</td>
+<td title='0x0020 = 32'>0x0020</td>
 <td>Audio</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Yes
   <br>2 = No</span></td></tr>
 <tr class=b>
-<td>0x0021</td>
+<td title='0x0021 = 33'>0x0021</td>
 <td>DataDump</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0023</td>
+<td title='0x0023 = 35'>0x0023</td>
 <td>WhiteBalanceBias</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0024</td>
+<td title='0x0024 = 36'>0x0024</td>
 <td>FlashBias</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0025</td>
+<td title='0x0025 = 37'>0x0025</td>
 <td>InternalSerialNumber</td>
 <td class=c>undef[16]</td>
 <td><span class=s><span class=n>(this number is unique, and contains the date of manufacture, but is not the
 same as the number printed on the camera body)</span></span></td></tr>
 <tr class=b>
-<td>0x0026</td>
+<td title='0x0026 = 38'>0x0026</td>
 <td>PanasonicExifVersion</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0028</td>
+<td title='0x0028 = 40'>0x0028</td>
 <td>ColorEffect</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Off
@@ -161,13 +175,13 @@ same as the number printed on the camera body)</span></span></td></tr>
   <br>4 = Black &amp; White
   <br>5 = Sepia</span></td></tr>
 <tr class=b>
-<td>0x0029</td>
+<td title='0x0029 = 41'>0x0029</td>
 <td>TimeSincePowerOn</td>
 <td class=c>int32u</td>
 <td><span class=s><span class=n>(time in 1/100 s from when the camera was powered on to when the image is
 written to memory card)</span></span></td></tr>
 <tr>
-<td>0x002a</td>
+<td title='0x002a = 42'>0x002a</td>
 <td>BurstMode</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(decoding may be different for some models)</span>
@@ -176,12 +190,12 @@ written to memory card)</span></span></td></tr>
   <br>2 = Infinite
   <br>4 = Unlimited</span></td></tr>
 <tr class=b>
-<td>0x002b</td>
+<td title='0x002b = 43'>0x002b</td>
 <td>SequenceNumber</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x002c</td>
+<td title='0x002c = 44'>0x002c</td>
 <td>Contrast</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(this decoding seems to work for some models such as the LX2, FZ7, FZ8, FZ18
@@ -196,7 +210,7 @@ and LC80)</span>
   <br>0x110 = Normal
   <br>0x120 = High</span></td></tr>
 <tr class=b>
-<td>0x002d</td>
+<td title='0x002d = 45'>0x002d</td>
 <td>NoiseReduction</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Standard
@@ -205,84 +219,113 @@ and LC80)</span>
   <br>3 = Lowest (-2)
   <br>4 = Highest (+2)</span></td></tr>
 <tr>
-<td>0x002e</td>
+<td title='0x002e = 46'>0x002e</td>
 <td>SelfTimer</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Off
   <br>2 = 10 s
   <br>3 = 2 s</span></td></tr>
 <tr class=b>
-<td>0x0030</td>
+<td title='0x0030 = 48'>0x0030</td>
 <td>Rotation</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Horizontal (normal)
   <br>6 = Rotate 90 CW
   <br>8 = Rotate 270 CW</span></td></tr>
 <tr>
-<td>0x0032</td>
+<td title='0x0031 = 49'>0x0031</td>
+<td>AFAssistLamp</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Fired
+  <br>2 = Enabled but Not Used
+  <br>3 = Disabled but Required
+  <br>4 = Disabled and Not Required</span></td></tr>
+<tr class=b>
+<td title='0x0032 = 50'>0x0032</td>
 <td>ColorMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Normal
   <br>1 = Natural
   <br>2 = Vivid</span></td></tr>
-<tr class=b>
-<td>0x0033</td>
+<tr>
+<td title='0x0033 = 51'>0x0033</td>
 <td>BabyAge</td>
 <td class=c>string</td>
 <td><span class=s><span class=n>(or pet age)</span></span></td></tr>
-<tr>
-<td>0x0034</td>
+<tr class=b>
+<td title='0x0034 = 52'>0x0034</td>
 <td>OpticalZoomMode</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Standard
-  <br>2 = EX Optics</span></td></tr>
-<tr class=b>
-<td>0x0035</td>
+  <br>2 = Extended</span></td></tr>
+<tr>
+<td title='0x0035 = 53'>0x0035</td>
 <td>ConversionLens</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Off
   <br>2 = Wide
   <br>3 = Telephoto
   <br>4 = Macro</span></td></tr>
-<tr>
-<td>0x0036</td>
+<tr class=b>
+<td title='0x0036 = 54'>0x0036</td>
 <td>TravelDay</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x0039</td>
+<tr>
+<td title='0x0039 = 57'>0x0039</td>
 <td>Contrast</td>
 <td class=c>int16u</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>0x003a</td>
+<td><span class=s>0 = Normal</span></td></tr>
+<tr class=b>
+<td title='0x003a = 58'>0x003a</td>
 <td>WorldTimeLocation</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Home
   <br>2 = Destination</span></td></tr>
-<tr class=b>
-<td>0x003b</td>
+<tr>
+<td title='0x003b = 59'>0x003b</td>
 <td>TextStamp</td>
-<td class=c>in16u</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Off
+  <br>2 = On</span></td></tr>
+<tr class=b>
+<td title='0x003c = 60'>0x003c</td>
+<td>ProgramISO</td>
+<td class=c>int16u</td>
+<td><span class=s>65534 = Intelligent ISO
+  <br>65535 = n/a</span></td></tr>
+<tr>
+<td title='0x003d = 61'>0x003d</td>
+<td>AdvancedSceneMode</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Normal
+  <br>2 = Outdoor/Illuminations/Flower
+  <br>3 = Indoor/Architecture/Objects
+  <br>4 = Creative
+  <br>5 = Auto</span></td></tr>
+<tr class=b>
+<td title='0x003e = 62'>0x003e</td>
+<td>TextStamp</td>
+<td class=c>int16u</td>
 <td><span class=s>1 = Off
   <br>2 = On</span></td></tr>
 <tr>
-<td>0x003c</td>
-<td>ProgramISO</td>
+<td title='0x003f = 63'>0x003f</td>
+<td>FacesDetected</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0040</td>
+<td title='0x0040 = 64'>0x0040</td>
 <td>Saturation</td>
 <td class=c>int16u</td>
-<td>&nbsp;</td></tr>
+<td><span class=s>0 = Normal</span></td></tr>
 <tr>
-<td>0x0041</td>
+<td title='0x0041 = 65'>0x0041</td>
 <td>Sharpness</td>
 <td class=c>int16u</td>
-<td>&nbsp;</td></tr>
+<td><span class=s>0 = Normal</span></td></tr>
 <tr class=b>
-<td>0x0042</td>
+<td title='0x0042 = 66'>0x0042</td>
 <td>FilmMode</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Standard (color)
@@ -291,44 +334,82 @@ and LC80)</span>
   <br>4 = Smooth (color)
   <br>5 = Standard (B&amp;W)
   <br>6 = Dynamic (B&amp;W)
-  <br>7 = Smooth (B&amp;W)</span></td></tr>
+  <br>7 = Smooth (B&amp;W)
+  <br>10 = Nostalgic
+  <br>11 = Vibrant</span></td></tr>
 <tr>
-<td>0x0046</td>
+<td title='0x0046 = 70'>0x0046</td>
 <td>WBAdjustAB</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(positive is a shift toward blue)</span></span></td></tr>
 <tr class=b>
-<td>0x0047</td>
+<td title='0x0047 = 71'>0x0047</td>
 <td>WBAdjustGM</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(positive is a shift toward green)</span></span></td></tr>
 <tr>
-<td>0x0051</td>
+<td title='0x004d = 77'>0x004d</td>
+<td>AFPointPosition</td>
+<td class=c>rational64u[2]</td>
+<td><span class=s><span class=n>(X Y coordinates of primary AF area center, in the range 0.0 to 1.0)</span></span></td></tr>
+<tr class=b>
+<td title='0x004e = 78'>0x004e</td>
+<td>FaceDetInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Panasonic.html#FaceDetInfo'>Panasonic FaceDetInfo Tags</a></td></tr>
+<tr>
+<td title='0x0051 = 81'>0x0051</td>
 <td>LensType</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0052</td>
+<td title='0x0052 = 82'>0x0052</td>
 <td>LensSerialNumber</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0053</td>
+<td title='0x0053 = 83'>0x0053</td>
 <td>AccessoryType</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0e00</td>
+<td title='0x0059 = 89'>0x0059</td>
+<td>Transform</td>
+<td class=c>undef[4]</td>
+<td><span class=s><span class=n>(decoded as two 16-bit signed integers)</span>
+  <br>&#39;-1 1&#39; = Slim Low
+  <br>&#39;-3 2&#39; = Slim High
+  <br>&#39;0 0&#39; = Off
+  <br>&#39;1 1&#39; = Stretch Low
+  <br>&#39;3 2&#39; = Stretch High</span></td></tr>
+<tr>
+<td title='0x0061 = 97'>0x0061</td>
+<td>FaceRecInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Panasonic.html#FaceRecInfo'>Panasonic FaceRecInfo Tags</a></td></tr>
+<tr class=b>
+<td title='0x0062 = 98'>0x0062</td>
+<td>FlashWarning</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = No
+  <br>1 = Yes (flash required but disabled)</span></td></tr>
+<tr>
+<td title='0x0063 = 99'>0x0063</td>
+<td>RecognizedFaceFlags?</td>
+<td class=c>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
 <tr>
-<td>0x8000</td>
+<td title='0x8000 = 32768'>0x8000</td>
 <td>MakerNoteVersion</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x8001</td>
+<td title='0x8001 = 32769'>0x8001</td>
 <td>SceneMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
@@ -348,6 +429,7 @@ and LC80)</span>
   <br>14 = Simple
   <br>15 = Color Effects
   <br>16 = Self Portrait
+  <br>17 = Economy
   <br>18 = Fireworks
   <br>19 = Party
   <br>20 = Snow
@@ -365,35 +447,166 @@ and LC80)</span>
   <br>32 = Sunset
   <br>33 = Pet
   <br>34 = Intelligent ISO
+  <br>35 = Clipboard
   <br>36 = High Speed Continuous Shooting
   <br>37 = Intelligent Auto
-  <br>39 = Multi-aspect</span></td></tr>
+  <br>39 = Multi-aspect
+  <br>41 = Transform
+  <br>42 = Flash Burst
+  <br>43 = Pin Hole
+  <br>44 = Film Grain
+  <br>46 = Photo Frame</span></td></tr>
 <tr>
-<td>0x8004</td>
+<td title='0x8004 = 32772'>0x8004</td>
 <td>WBRedLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x8005</td>
+<td title='0x8005 = 32773'>0x8005</td>
 <td>WBGreenLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x8006</td>
+<td title='0x8006 = 32774'>0x8006</td>
 <td>WBBlueLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x8007</td>
+<td title='0x8007 = 32775'>0x8007</td>
 <td>FlashFired</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = No
   <br>2 = Yes</span></td></tr>
 <tr>
-<td>0x8010</td>
+<td title='0x8008 = 32776'>0x8008</td>
+<td>TextStamp</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Off
+  <br>2 = On</span></td></tr>
+<tr class=b>
+<td title='0x8009 = 32777'>0x8009</td>
+<td>TextStamp</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Off
+  <br>2 = On</span></td></tr>
+<tr>
+<td title='0x8010 = 32784'>0x8010</td>
 <td>BabyAge</td>
 <td class=c>string</td>
 <td><span class=s><span class=n>(or pet age)</span></span></td></tr>
+<tr class=b>
+<td title='0x8012 = 32786'>0x8012</td>
+<td>Transform</td>
+<td class=c>undef[4]</td>
+<td><span class=s><span class=n>(decoded as two 16-bit signed integers)</span>
+  <br>&#39;-1 1&#39; = Slim Low
+  <br>&#39;-3 2&#39; = Slim High
+  <br>&#39;0 0&#39; = Off
+  <br>&#39;1 1&#39; = Stretch Low
+  <br>&#39;3 2&#39; = Stretch High</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FaceDetInfo'>Panasonic FaceDetInfo Tags</a></h2>
+<p>Face detection position information.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>NumFacePositions</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(number of detected face positions stored in this record.  May be less than
+FacesDetected)</span></span></td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>Face1Position</td>
+<td class=c>int16u[4]</td>
+<td><span class=s><span class=n>(4 numbers: 1-2. X-Y coordinates of the face center, 3-4. Width-height of
+face.  Coordinates are relative to an image twice the size of the thumbnail,
+or 320 pixels wide)</span></span></td></tr>
+<tr>
+<td class=r title='5 = 0x5'>5</td>
+<td>Face2Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='9 = 0x9'>9</td>
+<td>Face3Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='13 = 0xd'>13</td>
+<td>Face4Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='17 = 0x11'>17</td>
+<td>Face5Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FaceRecInfo'>Panasonic FaceRecInfo Tags</a></h2>
+<p>Tags written by cameras with facial recognition.  These cameras not only
+detect faces in an image, but also recognize specific people based a
+user-supplied set of known faces.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>FacesRecognized</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4</td>
+<td>RecognizedFace1Name</td>
+<td class=c>string[20]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='24 = 0x18'>24</td>
+<td>RecognizedFace1Position</td>
+<td class=c>int16u[4]</td>
+<td><span class=s><span class=n>(coordinates in same format as face detection tags above)</span></span></td></tr>
+<tr class=b>
+<td class=r title='32 = 0x20'>32</td>
+<td>RecognizedFace1Age</td>
+<td class=c>string[20]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='52 = 0x34'>52</td>
+<td>RecognizedFace2Name</td>
+<td class=c>string[20]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='72 = 0x48'>72</td>
+<td>RecognizedFace2Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='80 = 0x50'>80</td>
+<td>RecognizedFace2Age</td>
+<td class=c>string[20]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='100 = 0x64'>100</td>
+<td>RecognizedFace3Name</td>
+<td class=c>string[20]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='120 = 0x78'>120</td>
+<td>RecognizedFace3Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='128 = 0x80'>128</td>
+<td>RecognizedFace3Age</td>
+<td class=c>string[20]</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Leica2'>Panasonic Leica2 Tags</a></h2>
@@ -404,13 +617,13 @@ and LC80)</span>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>0x0300</td>
+<td title='0x0300 = 768'>0x0300</td>
 <td>Quality</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Fine
   <br>2 = Basic</span></td></tr>
 <tr class=b>
-<td>0x0302</td>
+<td title='0x0302 = 770'>0x0302</td>
 <td>UserProfile</td>
 <td class=c>int32u</td>
 <td><span class=s>1 = User Profile 1
@@ -418,12 +631,12 @@ and LC80)</span>
   <br>3 = User Profile 3
   <br>4 = User Profile 0 (Dynamic)</span></td></tr>
 <tr>
-<td>0x0303</td>
+<td title='0x0303 = 771'>0x0303</td>
 <td>SerialNumber</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0304</td>
+<td title='0x0304 = 772'>0x0304</td>
 <td>WhiteBalance</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(values above 0x8000 are converted to Kelvin color temperatures)</span>
@@ -433,9 +646,9 @@ and LC80)</span>
   <br>3 = Tungsten
   <br>4 = Flash
   <br>10 = Cloudy
-  <br>11 = Shadow</span></td></tr>
+  <br>11 = Shade</span></td></tr>
 <tr>
-<td>0x0310</td>
+<td title='0x0310 = 784'>0x0310</td>
 <td>LensType</td>
 <td class=c>int32u</td>
 <td><span class=s><span class=n>(lower 3 bits split into a separate value for the frame selector position)</span>
@@ -476,73 +689,73 @@ and LC80)</span>
   <br>2 = 24/35mm frame lines engaged
   <br>3 = 50/75mm frame lines engaged</span></td></tr>
 <tr class=b>
-<td>0x0311</td>
+<td title='0x0311 = 785'>0x0311</td>
 <td>ExternalSensorBrightnessValue</td>
 <td class=c>rational64s</td>
 <td><span class=s><span class=n>(&quot;blue dot&quot; measurement)</span></span></td></tr>
 <tr>
-<td>0x0312</td>
+<td title='0x0312 = 786'>0x0312</td>
 <td>MeasuredLV</td>
 <td class=c>rational64s</td>
 <td><span class=s><span class=n>(imaging sensor or TTL exposure meter measurement)</span></span></td></tr>
 <tr class=b>
-<td>0x0313</td>
+<td title='0x0313 = 787'>0x0313</td>
 <td>ApproximateFNumber</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0320</td>
+<td title='0x0320 = 800'>0x0320</td>
 <td>CameraTemperature</td>
 <td class=c>int32s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0321</td>
+<td title='0x0321 = 801'>0x0321</td>
 <td>ColorTemperature</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0322</td>
+<td title='0x0322 = 802'>0x0322</td>
 <td>WBRedLevel</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0323</td>
+<td title='0x0323 = 803'>0x0323</td>
 <td>WBGreenLevel</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0324</td>
+<td title='0x0324 = 804'>0x0324</td>
 <td>WBBlueLevel</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0325</td>
+<td title='0x0325 = 805'>0x0325</td>
 <td>UV-IRFilterCorrection</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = Not Active
   <br>1 = Active</span></td></tr>
 <tr>
-<td>0x0330</td>
+<td title='0x0330 = 816'>0x0330</td>
 <td>CCDVersion</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0331</td>
+<td title='0x0331 = 817'>0x0331</td>
 <td>CCDBoardVersion</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0332</td>
+<td title='0x0332 = 818'>0x0332</td>
 <td>ControllerBoardVersion</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0333</td>
+<td title='0x0333 = 819'>0x0333</td>
 <td>M16CVersion</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0340</td>
+<td title='0x0340 = 832'>0x0340</td>
 <td>ImageIDNumber</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
@@ -556,7 +769,7 @@ and LC80)</span>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>0x000d</td>
+<td title='0x000d = 13'>0x000d</td>
 <td>WB_RGBLevels</td>
 <td class=c>int16u[3]</td>
 <td>&nbsp;</td></tr>
@@ -572,151 +785,20 @@ iPalm.</p>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>MakerNoteType</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>3</td>
+<td class=r title='3 = 0x3'>3</td>
 <td>Gain</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='Raw'>Panasonic Raw Tags</a></h2>
-<p>These tags are found in IFD0 of Panasonic RAW and RW2 images.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>0x0001</td>
-<td>PanasonicRawVersion</td>
-<td class=c>undef</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x0002</td>
-<td>SensorWidth</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>0x0003</td>
-<td>SensorHeight</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x0004</td>
-<td>SensorTopBorder</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>0x0005</td>
-<td>SensorLeftBorder</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x0006</td>
-<td>ImageHeight</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>0x0007</td>
-<td>ImageWidth</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x0011</td>
-<td>RedBalance</td>
-<td class=c>int16u</td>
-<td><span class=s><span class=n>(found in Digilux 2 RAW images)</span></span></td></tr>
-<tr>
-<td>0x0012</td>
-<td>BlueBalance</td>
-<td class=c>int16u</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x0017</td>
-<td>ISO</td>
-<td class=c>int16u</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>0x0024</td>
-<td>WBRedLevel</td>
-<td class=c>int16u</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x0025</td>
-<td>WBGreenLevel</td>
-<td class=c>int16u</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>0x0026</td>
-<td>WBBlueLevel</td>
-<td class=c>int16u</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x002e</td>
-<td>PreviewImage</td>
-<td class=c>undef</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>0x010f</td>
-<td>Make</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x0110</td>
-<td>Model</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>0x0111</td>
-<td>StripOffsets</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x0112</td>
-<td>Orientation</td>
-<td class=c>int16u</td>
-<td><span class=s>1 = Horizontal (normal)
-  <br>2 = Mirror horizontal
-  <br>3 = Rotate 180
-  <br>4 = Mirror vertical
-  <br>5 = Mirror horizontal and rotate 270 CW
-  <br>6 = Rotate 90 CW
-  <br>7 = Mirror horizontal and rotate 90 CW
-  <br>8 = Rotate 270 CW</span></td></tr>
-<tr>
-<td>0x0116</td>
-<td>RowsPerStrip</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x0117</td>
-<td>StripByteCounts</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>0x0118</td>
-<td>RawDataOffset</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>0x8769</td>
-<td>ExifOffset</td>
-<td class=c>-</td>
-<td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
-<tr>
-<td>0x8825</td>
-<td>GPSInfo</td>
-<td class=c>-</td>
-<td>--&gt; <a href='GPS.html'>GPS Tags</a></td></tr>
-</table></td></tr></table></blockquote>
-
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 7, 2009</i>
+<br><i>Last revised Jun 20, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

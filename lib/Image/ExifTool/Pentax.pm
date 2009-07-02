@@ -35,6 +35,7 @@
 #              21) Peter (*istD, http://www.cpanforum.com/posts/8078)
 #              22) Bozi (K10D, http://www.cpanforum.com/posts/8480)
 #              23) Anton Bondar private communication
+#              24) Akos Szalkai (https://rt.cpan.org/Ticket/Display.html?id=43743)
 #              JD) Jens Duttke private communication
 #
 # Notes:        See POD documentation at the bottom of this file
@@ -47,7 +48,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '1.96';
+$VERSION = '2.02';
 
 sub CryptShutterCount($$);
 
@@ -142,7 +143,7 @@ my %pentaxLensTypes = (
     '4 24' => 'smc PENTAX-FA 77mm F1.8 Limited',
     '4 25' => 'Tamron SP AF 14mm F2.8', #13
     '4 26' => 'smc PENTAX-FA MACRO 100mm F3.5',
-    '4 27' => 'Tamron AF28-300mm F3.5-6.3 LD Aspherical[IF] Macro (185D/285D)',
+    '4 27' => 'Tamron AF 28-300mm F3.5-6.3 LD Aspherical[IF] Macro (185D/285D)',
     '4 28' => 'smc PENTAX-FA 35mm F2 AL',
     '4 29' => 'Tamron AF 28-200mm F3.8-5.6 LD Super II Macro (371D)', #JD
     '4 34' => 'smc PENTAX-FA 24-90mm F3.5-4.5 AL[IF]',
@@ -165,6 +166,7 @@ my %pentaxLensTypes = (
     '4 230' => 'Tamron SP AF 17-50mm F2.8 XR Di II', #20
     '4 231' => 'smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]', #21
     '4 237' => 'Samsung/Schneider D-XENOGON 10-17mm F3.5-4.5', #JD
+    '4 239' => 'Samsung D-XENON 12-24mm F4 ED AL [IF]', #24
     '4 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #JD
     '4 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #9
     '4 245' => 'Schneider D-XENON 50-200mm F4-5.6', #15
@@ -207,8 +209,11 @@ my %pentaxLensTypes = (
     '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
     '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
     '7 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #23
+    '7 217' => 'smc PENTAX-DA 50-200mm F4-5.6 ED WR', #JD
+    '7 218' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL WR', #JD
     '7 222' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #PH (tag 0x003f -- was '7 229' in LensInfo)
     '7 223' => 'Samsung D-XENON 18-55mm F3.5-5.6 II', #PH
+    '7 224' => 'smc PENTAX-DA 15mm F4 ED AL Limited', #JD
     '7 225' => 'Samsung D-XENON 18-250mm F3.5-6.3', #8/PH
     '7 229' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #JD
     '7 230' => 'Tamron AF 17-50mm F2.8 XR Di-II LD (Model A16)', #JD
@@ -222,6 +227,7 @@ my %pentaxLensTypes = (
     '7 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)', #19
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH
     '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
+    '8 227' => 'smc PENTAX DA* 60-250mm F4 [IF] SDM', #JD
     '8 232' => 'smc PENTAX-DA 17-70mm F4 AL [IF] SDM', #JD
     '8 234' => 'smc PENTAX-DA* 300mm F4 ED [IF] SDM', #19
     '8 235' => 'smc PENTAX-DA* 200mm F2.8 ED [IF] SDM', #JD
@@ -307,6 +313,10 @@ my %pentaxModelID = (
     0x12d68 => 'Optio E60',
     0x12d72 => 'K2000',
     0x12d73 => 'K-m',
+    0x12d86 => 'Optio P70',
+    0x12d9a => 'Optio E70',
+    0x12dae => 'X70',
+    0x12db8 => 'K-7',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -537,6 +547,7 @@ my %lensCode = (
             23 => '3056x2296', #13
             25 => '2816x2212 or 2816x2112', #13 or #14
             27 => '3648x2736', #PH (Optio A20)
+            29 => '4000x3000', #PH (X70)
             '0 0' => '2304x1728', #13
             '4 0' => '1600x1200', #PH (Optio MX4)
             '5 0' => '2048x1536', #13
@@ -588,6 +599,7 @@ my %lensCode = (
             58 => 'Frame Composite', #14
             60 => 'Kids', #13
             61 => 'Blur Reduction', #13
+            65 => 'Half-length Portrait', #JD
             255=> 'Digital Filter?', #13
         }],
     },
@@ -792,6 +804,7 @@ my %lensCode = (
             0 => 'Multi-segment',
             1 => 'Center-weighted average',
             2 => 'Spot',
+            # have seen value of 16 for E70
         },
     },
     0x0018 => { #PH
@@ -1299,6 +1312,7 @@ my %lensCode = (
             1 => 'Weakest',
             2 => 'Weak',
             3 => 'Strong',
+            # have also seen '0 0 56' for K-7 - PH
         },
     },
     0x0072 => { #JD (K20D)
@@ -1465,6 +1479,7 @@ my %lensCode = (
     0x021b => { #19
         Name => 'SaturationInfo',
         Flags => [ 'Unknown', 'Binary' ],
+        Writable => 0,
         Notes => 'only in PEF and DNG images',
         # K10D values with various Saturation settings (ref 19):
         # Very Low: 000000022820f9a0fe4000802660f92002e0fee01e402c40f880fb40ffc02b20f52002e0fe401ee0
@@ -1485,6 +1500,12 @@ my %lensCode = (
             ByteOrder => 'BigEndian',
             TagTable => 'Image::ExifTool::Pentax::AFInfo',
         },
+    },
+    0x0220 => { #6
+        Name => 'HuffmanTable',
+        Flags => [ 'Unknown', 'Binary' ],
+        Writable => 0,
+        Notes => 'found in K10D, K20D and K2000D PEF images',
     },
     0x0222 => { #PH
         Name => 'ColorInfo',
@@ -2497,7 +2518,8 @@ my %lensCode = (
         PrintHex => 1,
         # have seen the upper bit set (value of 0x82) for the
         # *istDS and K100D, but I'm not sure what this means - PH
-        # I've also seen 0x42 for the K2000 - PH
+        # I've also seen: 0x42 (K2000), 0xf2 (K-7) - PH
+        #
         PrintConv => {
             2 => 'Body Battery',
             3 => 'Grip Battery',
@@ -2723,8 +2745,8 @@ my %lensCode = (
     FIRST_ENTRY => 0,
     # first 8 bytes seem to be short integers which change with ISO (value is
     # usually close to ISO/100) possibly smoothing or gain parameters? - PH
-    # byte 0-1 - Higher for high color temperatures (red boost or red noise supression?)
-    # byte 6-7 - Higher for low color temperatures (blue boost or blue noise supression?)
+    # byte 0-1 - Higher for high color temperatures (red boost or red noise suppression?)
+    # byte 6-7 - Higher for low color temperatures (blue boost or blue noise suppression?)
     # also changing are bytes 10,11,14,15
 );
 

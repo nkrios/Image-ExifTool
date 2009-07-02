@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.66
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
 [File, File, Image] FileName - File Name: Pentax_3_failed.jpg
 [File, File, Image] Directory - Directory: t
 [File, File, Image] FileSize - File Size: 2.5 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:07 15:06:34-05:00
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:04:07 11:44:08-04:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
@@ -32,7 +32,7 @@
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2008:03:02 12:01:23
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2008:03:02 12:01:23
-[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: Y, Cb, Cr, -
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: +0.7
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37385 - Flash: Off, Did not fire
@@ -245,7 +245,6 @@
 [PrintIM, PrintIM, Printing] 774 - Print IM 0x0306: 0x83000000
 [PrintIM, PrintIM, Printing] 784 - Print IM 0x0310: 0x80000000
 [Composite, Composite, Image] Aperture - Aperture: 13.0
-[Composite, Composite, Camera] FlashOn - Flash: Off
 [Composite, Composite, Image] ImageSize - Image Size: 8x8
 [Composite, Composite, Camera] LensID - Lens ID: Sigma or Tamron Lens (3 44)
 [Composite, Composite, Image] PreviewImage - Preview Image: (Binary data 26 bytes)

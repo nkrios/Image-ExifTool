@@ -29,7 +29,9 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.53';
+$VERSION = '1.56';
+
+sub PrintLensInfo($$$);
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
@@ -988,8 +990,65 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'LensType',
         Writable => 'int8u',
         Count => 6,
-        Notes => '6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown',
-        PrintConv => 'Image::ExifTool::Olympus::PrintLensInfo($val,"Lens")',
+        Notes => q{
+            6 numbers: 0. Make, 1. Unknown, 2. Model, 3. Sub-model, 4-5. Unknown.  Only
+            the Make, Model and Sub-model are used to determine the lens model
+        },
+        ValueConv => 'my @a = split(" ",$val); "$a[0] $a[2] $a[3]"',
+        # set unknown values to zero when writing
+        ValueConvInv => 'my @a=split(" ",$val); "$a[0] 0 $a[1] $a[2] 0 0"',
+        PrintConv => {
+            '0 0 0'  => 'None',
+            # Olympus lenses
+            '0 1 0'  => 'Olympus Zuiko Digital ED 50mm F2.0 Macro',
+            '0 1 1'  => 'Olympus Zuiko Digital 40-150mm F3.5-4.5', #8
+            '0 1 16' => 'Olympus Zuiko Digital ED 14-42mm F3.5-5.6', #PH (E-P1 pre-production)
+            '0 2 0'  => 'Olympus Zuiko Digital ED 150mm F2.0',
+            '0 2 16' => 'Olympus Zuiko Digital 17mm F2.8 Pancake', #PH (E-P1 pre-production)
+            '0 3 0'  => 'Olympus Zuiko Digital ED 300mm F2.8',
+            '0 5 0'  => 'Olympus Zuiko Digital 14-54mm F2.8-3.5',
+            '0 5 1'  => 'Olympus Zuiko Digital Pro ED 90-250mm F2.8', #9
+            '0 6 0'  => 'Olympus Zuiko Digital ED 50-200mm F2.8-3.5',
+            '0 6 1'  => 'Olympus Zuiko Digital ED 8mm F3.5 Fisheye', #9
+            '0 7 0'  => 'Olympus Zuiko Digital 11-22mm F2.8-3.5',
+            '0 7 1'  => 'Olympus Zuiko Digital 18-180mm F3.5-6.3', #6
+            '0 8 1'  => 'Olympus Zuiko Digital 70-300mm F4.0-5.6', #7 (seen as release 1 - PH)
+            '0 21 0' => 'Olympus Zuiko Digital ED 7-14mm F4.0',
+            '0 23 0' => 'Olympus Zuiko Digital Pro ED 35-100mm F2.0', #7
+            '0 24 0' => 'Olympus Zuiko Digital 14-45mm F3.5-5.6',
+            '0 32 0' => 'Olympus Zuiko Digital 35mm F3.5 Macro', #9
+            '0 34 0' => 'Olympus Zuiko Digital 17.5-45mm F3.5-5.6', #9
+            '0 35 0' => 'Olympus Zuiko Digital ED 14-42mm F3.5-5.6', #PH
+            '0 36 0' => 'Olympus Zuiko Digital ED 40-150mm F4.0-5.6', #PH
+            '0 48 0' => 'Olympus Zuiko Digital ED 50-200mm F2.8-3.5 SWD', #7
+            '0 49 0' => 'Olympus Zuiko Digital ED 12-60mm F2.8-4.0 SWD', #7
+            '0 50 0' => 'Olympus Zuiko Digital ED 14-35mm F2.0 SWD', #PH
+            '0 51 0' => 'Olympus Zuiko Digital 25mm F2.8', #PH
+            '0 52 0' => 'Olympus Zuiko Digital ED 9-18mm F4.0-5.6', #7
+            '0 53 0' => 'Olympus Zuiko Digital 14-54mm F2.8-3.5 II', #PH
+            # Sigma lenses
+            '1 1 0'  => 'Sigma 18-50mm F3.5-5.6', #8
+            '1 2 0'  => 'Sigma 55-200mm F4.0-5.6 DC',
+            '1 3 0'  => 'Sigma 18-125mm F3.5-5.6 DC',
+            '1 4 0'  => 'Sigma 18-125mm F3.5-5.6', #7
+            '1 5 0'  => 'Sigma 30mm F1.4', #10
+            '1 6 0'  => 'Sigma 50-500mm F4.0-6.3 EX DG APO HSM RF', #6
+            '1 7 0'  => 'Sigma 105mm F2.8 DG', #PH
+            '1 8 0'  => 'Sigma 150mm F2.8 DG HSM', #PH
+            '1 17 0' => 'Sigma 135-400mm F4.5-5.6 DG ASP APO RF', #11
+            '1 18 0' => 'Sigma 300-800mm F5.6 EX DG APO', #11
+            '1 20 0' => 'Sigma 50-500mm F4.0-6.3 EX DG APO HSM RF', #11
+            '1 21 0' => 'Sigma 10-20mm F4.0-5.6 EX DC HSM', #11
+            # Leica lenses (ref 11)
+            '2 1 0'  => 'Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
+            '2 2 0'  => 'Leica D Summilux 25mm F1.4 Asph.',
+            '2 3 1'  => 'Leica D Vario Elmar 14-50mm F3.8-5.6 Asph.', #14 (L10 kit)
+            '2 4 0'  => 'Leica D Vario Elmar 14-150mm F3.5-5.6', #13
+            '2 4 16' => 'Lumix G Vario 7-14mm F4 Asph.', #PH (E-P1 pre-production)
+            '3 1 0'  => 'Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
+            '3 2 0'  => 'Leica D Summilux 25mm F1.4 Asph.',
+            # (missing Panasonic Lumix G Vario HD 14-140mm/F4.0-5.8 Asph./Mega OIS)
+        },
     },
     # apparently the first 3 digits of the lens s/n give the type (ref 4):
     # 010 = 50macro
@@ -1054,8 +1113,18 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'Extender',
         Writable => 'int8u',
         Count => 6,
-        Notes => '6 numbers: 1. Make, 2. Unknown, 3. Model, 4. Release, 5-6. Unknown',
-        PrintConv => 'Image::ExifTool::Olympus::PrintLensInfo($val,"Extender")',
+        Notes => q{
+            6 numbers: 0. Make, 1. Unknown, 2. Model, 3. Sub-model, 4-5. Unknown.  Only
+            the Make and Model are used to determine the extender model
+        },
+        ValueConv => 'my @a = split(" ",$val); "$a[0] $a[2]"',
+        ValueConvInv => 'my @a=split(" ",$val); "$a[0] 0 $a[1] 0 0 0"',
+        PrintConv => {
+            '0 0'   => 'None',
+            '0 4'   => 'Olympus Zuiko Digital EC-14 1.4x Teleconverter',
+            '0 8'   => 'Olympus EX-25 Extension Tube',
+            '0 16'  => 'Olympus Zuiko Digital EC-20 2.0x Teleconverter', #7
+        },
     },
     0x302 => { #4
         Name => 'ExtenderSerialNumber',
@@ -1086,8 +1155,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16u',
         PrintConv => {
             0 => 'None',
-            1 => 'FL-20',
-            2 => 'FL-50', # (or Metzblitz+SCA, ref 11)
+            1 => 'FL-20', # (or subtronic digital or Inon UW flash, ref 11)
+            2 => 'FL-50', # (or Metzblitz+SCA or Cullmann 34, ref 11)
             3 => 'RF-11',
             4 => 'TF-22',
             5 => 'FL-36',
@@ -1168,6 +1237,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             1027 => 'Spot+Shadow control', #6
         },
     },
+    0x203 => { #11 (some E-models only)
+        Name => 'ExposureShift',
+        Writable => 'rational64s',
+    },
     0x300 => { #6
         Name => 'MacroMode',
         Writable => 'int16u',
@@ -1188,7 +1261,14 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             2 => 'Continuous AF',
             3 => 'Multi AF',
             10 => 'MF',
-        }, {}], # (E-520 writes 2 values, 2nd is unknown - PH)
+        }, { BITMASK => { #11
+            0 => 'S-AF',
+            2 => 'C-AF',
+            4 => 'MF',
+            5 => 'Face detect',
+            6 => 'Imager AF',
+            8 => 'AF sensor',
+        }}],
     },
     0x302 => { #6
         Name => 'FocusProcess',
@@ -1232,6 +1312,52 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x401 => { #6
         Name => 'FlashExposureComp',
         Writable => 'rational64s',
+    },
+    # 0x402 - FlashMode? bit0=TTL, bit2=SuperFP (ref 11)
+    0x403 => { #11
+        Name => 'FlashRemoteControl',
+        Writable => 'int16u',
+        PrintHex => 1,
+        PrintConv => {
+            0 => 'Off',
+            0x01 => 'Channel 1, Low',
+            0x02 => 'Channel 2, Low',
+            0x03 => 'Channel 3, Low',
+            0x04 => 'Channel 4, Low',
+            0x09 => 'Channel 1, Mid',
+            0x0a => 'Channel 2, Mid',
+            0x0b => 'Channel 3, Mid',
+            0x0c => 'Channel 4, Mid',
+            0x11 => 'Channel 1, High',
+            0x12 => 'Channel 2, High',
+            0x13 => 'Channel 3, High',
+            0x14 => 'Channel 4, High',
+        },
+    },
+    0x404 => { #11
+        Name => 'FlashControlMode',
+        Writable => 'int16u',
+        Count => 3,
+        PrintConv => [{
+            0 => 'Off',
+            3 => 'TTL',
+            4 => 'Auto',
+            5 => 'Manual',
+        }],
+    },
+    0x405 => { #11
+        Name => 'FlashIntensity',
+        Writable => 'rational64s',
+        Count => 3,
+        PrintConv => '$val eq "undef undef undef" ? "n/a" : $val',
+        PrintConvInv => '$val eq "n/a" ? "undef undef undef" : $val',
+    },
+    0x406 => { #11
+        Name => 'ManualFlashStrength',
+        Writable => 'rational64s',
+        Count => 3,
+        PrintConv => '$val eq "undef undef undef" ? "n/a" : $val',
+        PrintConvInv => '$val eq "n/a" ? "undef undef undef" : $val',
     },
     0x500 => { #6
         Name => 'WhiteBalance2',
@@ -1376,6 +1502,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
                 0 => 'Noise Reduction',
                 1 => 'Noise Filter',
                 2 => 'Noise Filter (ISO Boost)',
+                3 => 'Auto', #11
             },
         },
     },
@@ -1487,6 +1614,20 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
            '1 -2 1' => 'High',
         },
     },
+    0x529 => { #PH
+        Name => 'ArtFilter',
+        Writable => 'int16u',
+        Count => 4,
+        PrintConv => {
+            '0 0 0 0'    => 'Off',
+            '1 1280 0 0' => 'Soft Focus',
+            '2 1280 0 0' => 'Pop Art',
+            '3 1280 0 0' => 'Pale & Light Color',
+            '4 1280 0 0' => 'Light Tone',
+            '5 1280 0 0' => 'Pin Hole',
+            '6 1280 0 0' => 'Grainy Film',
+        },
+    },
     0x600 => { #PH/4
         Name => 'DriveMode',
         Writable => 'int16u',
@@ -1561,6 +1702,16 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x902 => { #11
         Name => 'ExtendedWBDetect',
+        Writable => 'int16u',
+        PrintConv => \%offOn,
+    },
+    0x903 => { #11
+        Name => 'LevelGaugeRoll',
+        Writable => 'int16u',
+        PrintConv => \%offOn,
+    },
+    0x904 => { #11
+        Name => 'LevelGaugePitch',
         Writable => 'int16u',
         PrintConv => \%offOn,
     },
@@ -1660,13 +1811,13 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         PrintConv => { #11
             BITMASK => {
                 0 => 'WB Color Temp',
-                2 => 'WB Gray Point',
-                3 => 'Saturation',
-                4 => 'Contrast',
-                5 => 'Sharpness',
-                6 => 'Color Space',
-                7 => 'High Function',
-                8 => 'Noise Reduction',
+                1 => 'WB Gray Point',
+                2 => 'Saturation',
+                3 => 'Contrast',
+                4 => 'Sharpness',
+                5 => 'Color Space',
+                6 => 'High Function',
+                7 => 'Noise Reduction',
             },
         },
     },
@@ -2063,12 +2214,43 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16u',
         PrintConv => \%offOn,
     },
+    0x101c => { #11
+        Name => 'MultipleExposureMode',
+        Writable => 'int16u',
+        Count => 2,
+        PrintConv => [{
+            0 => 'Off',
+            2 => 'On (2 frames)',
+            3 => 'On (3 frames)',
+        }],
+    },
     0x1103 => { #PH
         Name => 'UnknownBlock',
         Writable => 'undef',
         Notes => 'unknown 142kB block in ORF images, not copied to JPEG images',
         # 'Drop' because too large for APP1 in JPEG images
         Flags => [ 'Unknown', 'Binary', 'Drop' ],
+    },
+    0x1112 => { #11
+        Name => 'AspectRatio',
+        Writable => 'int8u',
+        Count => 2,
+        PrintConv => [{
+            1 => '4:3',
+            2 => '3:2',
+            3 => '16:9',
+            4 => '6:6',
+            5 => '5:4',
+            6 => '7:6',
+            7 => '6:5',
+            8 => '7:5',
+            9 => '3:4',
+        }],
+    },
+    0x1113 => { #11
+        Name => 'AspectFrame',
+        Writable => 'int16u',
+        Count => 4,
     },
     0x1200 => { #11
         Name => 'FaceDetect',
@@ -2680,101 +2862,15 @@ sub ExtenderStatus($$$)
     my ($extender, $lensType, $maxAperture) = @_;
     my @info = split ' ', $extender;
     # validate that extender identifier is reasonable
-    return 0 unless @info >= 4 and $info[2];
+    return 0 unless @info >= 2 and $info[1];
     # if it's not an EC-14 (id 0 4) then assume it was really attached
     # (other extenders don't seem to affect the reported max aperture)
-    return 1 if "$info[0] $info[2]" ne "0 4";
+    return 1 if "$info[0] $info[1]" ne '0 4';
     # get the maximum aperture for this lens (in $1)
     $lensType =~ / F(\d+(.\d+)?)/ or return 1;
     # If the maximum aperture at the maximum focal length is greater than the
     # known max/max aperture of the lens, then the extender must be attached
     return ($maxAperture - $1 > 0.2) ? 1 : 2;
-}
-
-#------------------------------------------------------------------------------
-# Print lens information (ref 6)
-# Inputs: 0) Lens info (string of integers: Make, Unknown, Model, Release, ...)
-#         1) 'Lens' or 'Extender'
-sub PrintLensInfo($$)
-{
-    my ($val, $type) = @_;
-    my @info = split ' ', $val;
-    return "Unknown ($val)" unless @info >= 4;
-    return 'None' unless $info[2];
-    my %make = (
-        0 => 'Olympus',
-        1 => 'Sigma',
-        2 => 'Leica',
-        3 => 'Leica',
-    );
-    my %model = (
-        Lens => {
-            # Olympus lenses (key is "make model" with optional "release")
-            '0 1 0' => 'Zuiko Digital ED 50mm F2.0 Macro',
-            '0 1 1' => 'Zuiko Digital 40-150mm F3.5-4.5', #8
-            '0 2'   => 'Zuiko Digital ED 150mm F2.0',
-            '0 3'   => 'Zuiko Digital ED 300mm F2.8',
-            '0 5 0' => 'Zuiko Digital 14-54mm F2.8-3.5',
-            '0 5 1' => 'Zuiko Digital Pro ED 90-250mm F2.8', #9
-            '0 6 0' => 'Zuiko Digital ED 50-200mm F2.8-3.5',
-            '0 6 1' => 'Zuiko Digital ED 8mm F3.5 Fisheye', #9
-            '0 7 0' => 'Zuiko Digital 11-22mm F2.8-3.5',
-            '0 7 1' => 'Zuiko Digital 18-180mm F3.5-6.3', #6
-            '0 8'   => 'Zuiko Digital 70-300mm F4.0-5.6', #7
-            '0 21'  => 'Zuiko Digital ED 7-14mm F4.0',
-            '0 23'  => 'Zuiko Digital Pro ED 35-100mm F2.0', #7
-            '0 24'  => 'Zuiko Digital 14-45mm F3.5-5.6',
-            '0 32'  => 'Zuiko Digital 35mm F3.5 Macro', #9
-            '0 34'  => 'Zuiko Digital 17.5-45mm F3.5-5.6', #9
-            '0 35'  => 'Zuiko Digital ED 14-42mm F3.5-5.6', #PH
-            '0 36'  => 'Zuiko Digital ED 40-150mm F4.0-5.6', #PH
-            '0 48'  => 'Zuiko Digital ED 50-200mm F2.8-3.5 SWD', #7
-            '0 49'  => 'Zuiko Digital ED 12-60mm F2.8-4.0 SWD', #7
-            '0 50'  => 'Zuiko Digital ED 14-35mm F2.0 SWD', #PH
-            '0 51'  => 'Zuiko Digital 25mm F2.8', #PH
-            '0 52'  => 'Zuiko Digital ED 9-18mm F4.0-5.6', #7
-            '0 53'  => 'Zuiko Digital 14-54mm F2.8-3.5 II', #PH
-            # Sigma lenses
-            '1 1'   => '18-50mm F3.5-5.6', #8
-            '1 2'   => '55-200mm F4.0-5.6 DC',
-            '1 3'   => '18-125mm F3.5-5.6 DC',
-            '1 4'   => '18-125mm F3.5-5.6', #7
-            '1 5'   => '30mm F1.4', #10
-            '1 6'   => '50-500mm F4.0-6.3 EX DG APO HSM RF', #6
-            '1 7'   => '105mm F2.8 DG', #PH
-            '1 8'   => '150mm F2.8 DG HSM', #PH
-            '1 17'  => '135-400mm F4.5-5.6 DG ASP APO RF', #11
-            '1 18'  => '300-800mm F5.6 EX DG APO', #11
-            # Leica lenses (ref 11)
-            '2 1'   => 'D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
-            '2 2'   => 'D Summilux 25mm F1.4 Asph.',
-            '2 3 1' => 'D Vario Elmar 14-50mm F3.8-5.6 Asph.', #14 (L10 kit)
-            '2 4'   => 'D Vario Elmar 14-150mm F3.5-5.6', #13
-            '3 1'   => 'D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
-            '3 2'   => 'D Summilux 25mm F1.4 Asph.',
-        },
-        Extender => {
-            # Olympus extenders
-            '0 4'   => 'Zuiko Digital EC-14 1.4x Teleconverter',
-            '0 8'   => 'EX-25 Extension Tube',
-            '0 16'  => 'Zuiko Digital EC-20 2.0x Teleconverter', #7
-        },
-    );
-    my %release = (
-        0 => '', # production
-        1 => ' (pre-release)',
-    );
-    my $make = $make{$info[0]} || "Unknown Make ($info[0])";
-    my $str = "$info[0] $info[2]";
-    my $rel = $release{$info[3]};
-    my $model = $model{$type}->{"$str $info[3]"};
-    if ($model) {
-        $rel = '';  # don't print release if it is used to differentiate models
-    } else {
-        $rel = " Unknown Release ($info[3])" unless defined $rel;
-        $model = $model{$type}->{$str} || "Unknown Model ($str)";
-    }
-    return "$make $model$rel";
 }
 
 #------------------------------------------------------------------------------

@@ -1333,7 +1333,7 @@ sub ReadPDF($$)
     $raf->Read($buff, $len) == $len or return -3;
     # find the last xref table in the file (may be multiple %%EOF marks)
     $buff =~ /.*startxref *(\x0d\x0a|\x0d|\x0a)\s*?(\d+)\s+%%EOF/s or return -4;
-    $/ = $1;    # set input record separator
+    local $/ = $1;    # set input record separator
     push @xrefOffsets, $2, 'Main';
     my (%xref, @mainDicts, %loaded, $mainFree);
     # initialize variables to capture when rewriting
@@ -1499,9 +1499,7 @@ sub ProcessPDF($$)
     my ($exifTool, $dirInfo) = @_;
 
     undef $cryptInfo;   # (must not delete after returning)
-    my $oldsep = $/;
     my $result = ReadPDF($exifTool, $dirInfo);
-    $/ = $oldsep;   # restore input record separator in case it was changed
     if ($result < 0) {
         $exifTool->Warn($pdfWarning{$result}) if $pdfWarning{$result};
         $result = 1;

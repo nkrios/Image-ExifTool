@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ProcessPrintIM($$$);
 
@@ -38,7 +38,7 @@ sub ProcessPrintIM($$$)
     my $verbose = $exifTool->Options('Verbose');
 
     unless ($size) {
-        $exifTool->Warn('Empty PrintIM data');
+        $exifTool->Warn('Empty PrintIM data', 1);
         return 0;
     }
     unless ($size > 15) {

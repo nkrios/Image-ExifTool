@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.68
 [File, File, Image] FileName - File Name: Photoshop_3_failed.psd
 [File, File, Image] Directory - Directory: t
 [File, File, Image] FileSize - File Size: 16 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:01 07:56:29-05:00
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:09 14:06:39-05:00
 [File, File, Image] FileType - File Type: PSD
 [File, File, Image] MIMEType - MIME Type: application/photoshop
 [File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 7eea28616594f46e45fbc9db62cd784e
@@ -41,13 +41,13 @@
 [IPTC, IPTC, Other] 5 - Object Name: Test Picture
 [IPTC, IPTC, Author] 116 - Copyright Notice: Free for all
 [IPTC, IPTC, Author] 80 - By-line: Phil Again
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.64
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.68
 [XMP, XMP-rdf, Document] about - About: uuid:c197d41e-f8f7-11d9-b03e-c023c3939af5
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: This is a teeny weeny white square
 [XMP, XMP-dc, Author] rights - Rights: Free for all
 [XMP, XMP-dc, Image] title - Title: Test Picture
-[XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: Supreme leader
+[XMP, XMP-photoshop, Author] AuthorsPosition - Author's Position: Supreme leader
 [XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: Me too
 [XMP, XMP-xmpBJ, Other] JobRefName - Job Ref Name: This isn't a job
 [XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:c197d41a-f8f7-11d9-b03e-c023c3939af5

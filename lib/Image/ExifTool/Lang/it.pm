@@ -1,12 +1,16 @@
 #------------------------------------------------------------------------------
 # File:         it.pm
 #
-# Description:  ExifTool language-specific tag information
+# Description:  ExifTool Italian language translations
 #
 # Notes:        This file generated automatically by Image::ExifTool::TagInfoXML
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Lang::it;
+
+use vars qw($VERSION);
+
+$VERSION = '1.02';
 
 %Image::ExifTool::Lang::it::Translate = (
    'AEMeteringMode' => {
@@ -20,6 +24,17 @@ package Image::ExifTool::Lang::it;
         'Portrait' => 'Verticale',
       },
     },
+   'AFAperture' => 'Diaframma AF',
+   'AFAreaMode' => {
+      Description => 'Modo AF',
+      PrintConv => {
+        'Dynamic Area' => 'Area Dinamica',
+        'Dynamic Area, Closest Subject' => 'Area Dinamica più Vicina al Soggetto',
+        'Group Dynamic' => 'Gruppo Dinamico',
+        'Single Area' => 'Area Singola',
+      },
+    },
+   'AFInfo' => 'Modo AF',
    'AFMicroAdjActive' => {
       PrintConv => {
         'Yes' => 'Si',
@@ -73,13 +88,33 @@ package Image::ExifTool::Lang::it;
       },
     },
    'AFPointsInFocus' => {
+      Description => 'Punti a Fuoco',
       PrintConv => {
         'Bottom' => 'Basso',
         'Center' => 'Centro',
+        'Far Left' => 'Tutto a Sinistra',
+        'Far Right' => 'Tutto a Destra',
         'Left' => 'Sinistra',
+        'Lower-left' => 'Inferiore Sinistro',
+        'Lower-right' => 'Inferiore Destro',
         'None' => 'Nessuno',
         'Right' => 'Destra',
         'Top' => 'Alto',
+        'Upper-left' => 'Superiore Sinistro',
+        'Upper-right' => 'Superiore Destro',
+      },
+    },
+   'AFPointsUsed' => {
+      PrintConv => {
+        'Bottom' => 'Basso',
+        'Center' => 'Centro',
+        'Far Left' => 'Tutto a Sinistra',
+        'Far Right' => 'Tutto a Destra',
+        'Lower-left' => 'Inferiore Sinistro',
+        'Lower-right' => 'Inferiore Destro',
+        'Top' => 'Alto',
+        'Upper-left' => 'Superiore Sinistro',
+        'Upper-right' => 'Superiore Destro',
       },
     },
    'APEVersion' => 'Versione APE',
@@ -113,7 +148,7 @@ package Image::ExifTool::Lang::it;
       },
     },
    'AnalogBalance' => 'Bilanciamento analogico',
-   'Aperture' => 'Numero F',
+   'Aperture' => 'Diaframma',
    'ApertureValue' => 'Diaframma',
    'ApplicationRecordVersion' => 'Versione Registrazione Applicazione',
    'Artist' => 'Persona che ha creato l\'immagine',
@@ -125,7 +160,13 @@ package Image::ExifTool::Lang::it;
         'Normal' => 'Normale',
       },
     },
+   'Audio' => {
+      PrintConv => {
+        'Yes' => 'Si',
+      },
+    },
    'AudioType' => 'Tipo Audio',
+   'Author' => 'Autore',
    'AutoBracketRelease' => {
       PrintConv => {
         'None' => 'Nessuno',
@@ -227,6 +268,7 @@ package Image::ExifTool::Lang::it;
    'CameraCalibration1' => 'Calibrazione Fotocamera 1',
    'CameraCalibration2' => 'Calibrazione Fotocamera 2',
    'CameraOrientation' => {
+      Description => 'Orientamento dell\'immagine',
       PrintConv => {
         'Horizontal (normal)' => '0° (alto/sinistra)',
         'Rotate 270 CW' => 'Ruota di 270° in senso orario',
@@ -247,7 +289,9 @@ package Image::ExifTool::Lang::it;
         'Average' => 'Media',
       },
     },
+   'CharacterSet' => 'Impostazioni Carattere',
    'ChromaticAdaptation' => 'Adattamento Cromatico',
+   'Chromaticity' => 'Cromatismo',
    'ChrominanceNR_TIFF_JPEG' => {
       PrintConv => {
         'Low' => 'Leggero',
@@ -261,14 +305,22 @@ package Image::ExifTool::Lang::it;
    'City' => 'Città',
    'ClassifyState' => 'Stato di Classificazione',
    'CodedCharacterSet' => 'Impostazione Caratteri Codificati',
+   'ColorBalance' => 'Bilanciamento Colore',
    'ColorBalance1' => 'Bilanciamento Colore',
+   'ColorFilter' => {
+      PrintConv => {
+        'Green' => 'Verde',
+        'Red' => 'Rosso',
+        'Yellow' => 'Giallo',
+      },
+    },
    'ColorHue' => 'Colore Hue',
    'ColorMatrix1' => 'Matrice di Colore 1',
    'ColorMatrix2' => 'Matrice di Colore 2',
    'ColorMode' => {
       Description => 'Modo Colore',
       PrintConv => {
-        'Evening' => 'sera',
+        'Evening' => 'Sera',
         'Landscape' => 'Orizzontale',
         'Normal' => 'Normale',
         'Portrait' => 'Verticale',
@@ -288,14 +340,26 @@ package Image::ExifTool::Lang::it;
       },
     },
    'ColorSpaceData' => 'Dati Spazio Colore',
+   'ColorTone' => {
+      PrintConv => {
+        'Normal' => 'Normale',
+      },
+    },
    'ColorimetricReference' => 'Riferimento Colorimetrico',
+   'CommandDialsReverseRotation' => {
+      PrintConv => {
+        'Yes' => 'Si',
+      },
+    },
    'CommanderGroupAMode' => {
       PrintConv => {
+        'Auto Aperture' => 'Diaframma automatico',
         'Manual' => 'Manuale',
       },
     },
    'CommanderGroupBMode' => {
       PrintConv => {
+        'Auto Aperture' => 'Diaframma automatico',
         'Manual' => 'Manuale',
       },
     },
@@ -319,12 +383,12 @@ package Image::ExifTool::Lang::it;
         'JPEG (old-style)' => 'JPEG (vecchio stile)',
         'Kodak DCR Compressed' => 'Kodak DCR Compresso',
         'Kodak KDC Compressed' => 'Kodak KDC Compresso',
-        'Next' => 'codifica NeXT 2 bits',
+        'Next' => 'Codifica NeXT 2 bits',
         'Nikon NEF Compressed' => 'Nikon NEF Compresso',
         'None' => 'Nessuno',
         'Pentax PEF Compressed' => 'Pentax PEF Compresso',
         'Sony ARW Compressed' => 'Sony ARW Compresso',
-        'Uncompressed' => 'non compresso',
+        'Uncompressed' => 'Non compresso',
       },
     },
    'CompressionType' => {
@@ -360,7 +424,16 @@ package Image::ExifTool::Lang::it;
    'Country-PrimaryLocationCode' => 'Codice ISO Nazione',
    'Country-PrimaryLocationName' => 'Nazione',
    'CreateDate' => 'Data e ora di creazione dei dati digitali',
+   'CreationDate' => 'Data di creazione',
    'Creator' => 'Creatore',
+   'CreatorAddress' => 'Autore - Indirizzo',
+   'CreatorCity' => 'Autore - Città',
+   'CreatorCountry' => 'Autore - Nazione',
+   'CreatorPostalCode' => 'Autore - Codice Postale',
+   'CreatorRegion' => 'Autore - Stato/Provincia',
+   'CreatorWorkEmail' => 'Autore - E.Mail',
+   'CreatorWorkTelephone' => 'Autore - Numero di Telefono',
+   'CreatorWorkURL' => 'Autore - Sito web',
    'Credit' => 'Fornitore',
    'CropActive' => {
       PrintConv => {
@@ -369,12 +442,12 @@ package Image::ExifTool::Lang::it;
     },
    'CropUnit' => {
       PrintConv => {
-        'inches' => 'pollici',
+        'inches' => 'Pollici',
       },
     },
    'CropUnits' => {
       PrintConv => {
-        'inches' => 'pollici',
+        'inches' => 'Pollici',
       },
     },
    'CustomRendered' => {
@@ -409,10 +482,20 @@ package Image::ExifTool::Lang::it;
    'DateSent' => 'Data d\'invio',
    'DateTime' => 'Data e ora di modifica del file',
    'DateTimeOriginal' => 'Data e ora di creazione dei dati originali',
+   'DaylightSavings' => {
+      PrintConv => {
+        'Yes' => 'Si',
+      },
+    },
    'DefaultScale' => 'Scala predefinita',
    'DeletedImageCount' => 'Conteggio Immagini Cancellate',
    'Description' => 'Descrizione',
    'Destination' => 'Destinazione',
+   'DestinationDST' => {
+      PrintConv => {
+        'Yes' => 'Si',
+      },
+    },
    'DeviceAttributes' => 'Attributi Dispositivo',
    'DeviceManufacturer' => 'Costruttore Dispositivo',
    'DeviceMfgDesc' => 'Descrizione del Costruttore Dispositivo',
@@ -440,17 +523,17 @@ package Image::ExifTool::Lang::it;
     },
    'DisplayUnits' => {
       PrintConv => {
-        'inches' => 'pollici',
+        'inches' => 'Pollici',
       },
     },
    'DisplayedUnitsX' => {
       PrintConv => {
-        'inches' => 'pollici',
+        'inches' => 'Pollici',
       },
     },
    'DisplayedUnitsY' => {
       PrintConv => {
-        'inches' => 'pollici',
+        'inches' => 'Pollici',
       },
     },
    'DjVuVersion' => 'Versione DjVu',
@@ -477,9 +560,16 @@ package Image::ExifTool::Lang::it;
         'Additional language' => 'Linguaggio addizionale',
       },
     },
+   'EffectiveMaxAperture' => 'Diaframma Massimo Effettivo',
    'Emphasis' => {
       PrintConv => {
         'None' => 'Nessuno',
+      },
+    },
+   'Enhancement' => {
+      PrintConv => {
+        'Green' => 'Verde',
+        'Red' => 'Rosso',
       },
     },
    'EnvelopePriority' => {
@@ -502,6 +592,7 @@ package Image::ExifTool::Lang::it;
    'ExifImageWidth' => 'Larghezza immagine',
    'ExifToolVersion' => 'Versione ExifTool',
    'ExifVersion' => 'Versione Exif',
+   'ExitPupilPosition' => 'Posizione pupilla d\'uscita',
    'ExpirationDate' => 'Data Scadenza',
    'ExpirationTime' => 'Ora Scadenza',
    'ExposureBracketValue' => 'Valore Esposizione a Forcella',
@@ -545,6 +636,12 @@ package Image::ExifTool::Lang::it;
     },
    'ExposureTime' => 'Tempo di esposizione',
    'ExposureTime2' => 'Tempo di esposizione 2',
+   'ExternalFlashBounce' => {
+      PrintConv => {
+        'Yes' => 'Si',
+      },
+    },
+   'ExternalFlashFlags' => 'Flags Flash Esterno',
    'ExtraSamples' => 'Campioni Extra',
    'FNumber' => 'Numero F',
    'FastSeek' => {
@@ -558,6 +655,8 @@ package Image::ExifTool::Lang::it;
       },
     },
    'FileFormat' => 'Formato File',
+   'FileName' => 'Nome File',
+   'FileSize' => 'Dimensione File',
    'FileSource' => {
       Description => 'Origine file',
       PrintConv => {
@@ -566,6 +665,8 @@ package Image::ExifTool::Lang::it;
         'Reflection Print Scanner' => 'Scanner a riflessione',
       },
     },
+   'FileType' => 'Tipo File',
+   'FileVersion' => 'Versione Formato File',
    'FillOrder' => {
       PrintConv => {
         'Normal' => 'Normale',
@@ -574,12 +675,21 @@ package Image::ExifTool::Lang::it;
    'FilterEffect' => {
       Description => 'Effetto Filtro',
       PrintConv => {
+        'Green' => 'Verde',
         'None' => 'Nessuno',
+        'Orange' => 'Arancio',
+        'Red' => 'Rosso',
+        'Yellow' => 'Giallo',
+        'n/a' => 'Non impostato',
       },
     },
    'FilterEffectMonochrome' => {
       PrintConv => {
+        'Green' => 'Verde',
         'None' => 'Nessuno',
+        'Orange' => 'Arancio',
+        'Red' => 'Rosso',
+        'Yellow' => 'Giallo',
       },
     },
    'FixtureIdentifier' => 'Identificatore d\'installazione',
@@ -610,9 +720,12 @@ package Image::ExifTool::Lang::it;
         'On, Return not detected' => 'Flash emesso, modalità flash forzata, luce di ritorno non rilevata',
       },
     },
+   'FlashCommanderMode' => 'Modo Commander',
+   'FlashCompensation' => 'Compensazionee Flash',
    'FlashControlMode' => {
       Description => 'Modo Controllo Flash',
       PrintConv => {
+        'Auto Aperture' => 'Diaframma automatico',
         'Manual' => 'Manuale',
         'Repeating Flash' => 'Ripetizione Flash',
       },
@@ -625,9 +738,16 @@ package Image::ExifTool::Lang::it;
    'FlashEnergy' => 'Energia del flash',
    'FlashExposureBracketValue' => 'Valore Esposizione a Forcella Flash',
    'FlashExposureComp' => 'Compensazione Esposizione Flash',
+   'FlashFired' => {
+      PrintConv => {
+        'Yes' => 'Si',
+      },
+    },
+   'FlashFocalLength' => 'Lunghezza Focale Flash',
    'FlashGroupAControlMode' => {
       Description => 'Gruppo A Modo Controllo Flash',
       PrintConv => {
+        'Auto Aperture' => 'Diaframma automatico',
         'Manual' => 'Manuale',
         'Repeating Flash' => 'Ripetizione Flash',
       },
@@ -635,6 +755,7 @@ package Image::ExifTool::Lang::it;
    'FlashGroupBControlMode' => {
       Description => 'Gruppo B Modo Controllo Flash',
       PrintConv => {
+        'Auto Aperture' => 'Diaframma automatico',
         'Manual' => 'Manuale',
         'Repeating Flash' => 'Ripetizione Flash',
       },
@@ -646,6 +767,7 @@ package Image::ExifTool::Lang::it;
         'Repeating Flash' => 'Ripetizione Flash',
       },
     },
+   'FlashInfoVersion' => 'Info Versione Flash',
    'FlashIntensity' => {
       PrintConv => {
         'Normal' => 'Normale',
@@ -664,6 +786,7 @@ package Image::ExifTool::Lang::it;
       },
     },
    'FlashModel' => {
+      Description => 'Modello Flash',
       PrintConv => {
         'None' => 'Nessuno',
       },
@@ -698,7 +821,7 @@ package Image::ExifTool::Lang::it;
       Description => 'Unità risoluzione piano focale',
       PrintConv => {
         'None' => 'Nessuno',
-        'inches' => 'pollici',
+        'inches' => 'Pollici',
       },
     },
    'FocalPlaneXResolution' => 'Risoluzione X del piano focale',
@@ -713,6 +836,7 @@ package Image::ExifTool::Lang::it;
         'Manual' => 'Manuale',
       },
     },
+   'FocusDistance' => 'Distanza Fuoco',
    'FocusMode' => {
       Description => 'Modalità Messa a Fuoco',
       PrintConv => {
@@ -731,6 +855,7 @@ package Image::ExifTool::Lang::it;
         'Manual' => 'Manuale',
       },
     },
+   'FocusPosition' => 'Posizione Fuoco',
    'FocusRange' => {
       PrintConv => {
         'Manual' => 'Manuale',
@@ -810,6 +935,11 @@ package Image::ExifTool::Lang::it;
         'Normal' => 'Normale',
       },
     },
+   'HometownDST' => {
+      PrintConv => {
+        'Yes' => 'Si',
+      },
+    },
    'HueAdjustment' => 'Regolazione Hue',
    'IPTC-NAA' => 'Metadati IPTC-NAA',
    'IPTCBitsPerSample' => 'Numero di Bits per Campione',
@@ -817,15 +947,16 @@ package Image::ExifTool::Lang::it;
    'IPTCImageRotation' => {
       Description => 'Rotazione Immagine',
       PrintConv => {
-        '0' => 'nessuna rotazione',
-        '180' => 'rotazione di 180 gradi',
-        '270' => 'rotazione di 270 gradi',
-        '90' => 'rotazione di 90 gradi',
+        '0' => 'Nessuna rotazione',
+        '180' => 'Rotazione di 180 gradi',
+        '270' => 'Rotazione di 270 gradi',
+        '90' => 'Rotazione di 90 gradi',
       },
     },
    'IPTCImageWidth' => 'Pixels per linea',
    'IPTCPictureNumber' => 'Numero Immagine',
    'ISO' => 'Sensibilità ISO',
+   'ISOInfo' => 'Info ISO',
    'ISOSelection' => 'Selezione ISO',
    'ISOSetting' => {
       Description => 'Impostazione ISO',
@@ -857,6 +988,7 @@ package Image::ExifTool::Lang::it;
       },
     },
    'ImageQuality' => {
+      Description => 'Qualità Immagine',
       PrintConv => {
         'Normal' => 'Normale',
       },
@@ -876,6 +1008,7 @@ package Image::ExifTool::Lang::it;
    'ImageType' => 'Tipo Immagine',
    'ImageUniqueID' => 'ID unico immagine',
    'ImageWidth' => 'Larghezza immagine',
+   'IntellectualGenre' => 'Genere Intellettuale',
    'InternalFlash' => {
       PrintConv => {
         'Fired' => 'Flash emesso',
@@ -892,11 +1025,15 @@ package Image::ExifTool::Lang::it;
    'JFIFVersion' => 'Versione JFIF',
    'JPEGTables' => 'Tavole JPEG',
    'JobID' => 'ID Lavoro',
+   'Keyword' => 'Parole Chiave',
    'Keywords' => 'Parala Chiave',
    'LanguageIdentifier' => 'ID Linguaggio',
    'Lens' => 'Obiettivo',
    'Lens35efl' => 'Obiettivo',
+   'LensDataVersion' => 'Versione Dati Obiettivo',
    'LensFStops' => 'F-Stops Obiettivo',
+   'LensID' => 'Obiettivo Utilizzato',
+   'LensIDNumber' => 'Numero ID Obiettivo',
    'LensSpec' => 'Obiettivo',
    'LensType' => 'Tipo Obiettivo',
    'LicenseType' => {
@@ -925,7 +1062,13 @@ package Image::ExifTool::Lang::it;
         'White Fluorescent' => 'Fluorescente bianca',
       },
     },
+   'Lit' => {
+      PrintConv => {
+        'Yes' => 'Si',
+      },
+    },
    'LocalizedCameraModel' => 'Modello Fotocamera Localizzato',
+   'Location' => 'Località',
    'LoopStyle' => {
       PrintConv => {
         'Normal' => 'Normale',
@@ -936,6 +1079,7 @@ package Image::ExifTool::Lang::it;
         'Low' => 'Leggero',
       },
     },
+   'MCUVersion' => 'Versione MCU',
    'MIEVersion' => 'Versione MIE',
    'Macro' => {
       PrintConv => {
@@ -950,6 +1094,7 @@ package Image::ExifTool::Lang::it;
     },
    'Make' => 'Costruttore',
    'MakeAndModel' => 'Marca e Modello',
+   'MakerNote' => 'Dati DNG Privati',
    'MakerNoteVersion' => 'Note Versione Costruttore',
    'ManualFlashOutput' => {
       PrintConv => {
@@ -958,7 +1103,10 @@ package Image::ExifTool::Lang::it;
     },
    'ManualFocusDistance' => 'Messa a Fuoco Manuale',
    'MasterDocumentID' => 'ID Documento Principale',
+   'MaxApertureAtMaxFocal' => 'Diaframma Massimo alla Focale Massima',
+   'MaxApertureAtMinFocal' => 'Diaframma Massimo alla Focale Minima',
    'MaxApertureValue' => 'Diaframma massimo obiettivo',
+   'MaxFocalLength' => 'Lunghezza Focale Massima',
    'MediaBlackPoint' => 'Media Punto Nero',
    'MediaWhitePoint' => 'Media Punto Bianco',
    'MenuButtonDisplayPosition' => {
@@ -992,6 +1140,7 @@ package Image::ExifTool::Lang::it;
         'Multi-segment' => 'Multi zona',
       },
     },
+   'MinFocalLength' => 'Lunghezza Focale Minima',
    'MinoltaQuality' => {
       Description => 'Qualità',
       PrintConv => {
@@ -1029,7 +1178,11 @@ package Image::ExifTool::Lang::it;
    'ModifyDate' => 'Data e ora di modifica del file',
    'MonochromeFilterEffect' => {
       PrintConv => {
+        'Green' => 'Verde',
         'None' => 'Nessuno',
+        'Orange' => 'Arancio',
+        'Red' => 'Rosso',
+        'Yellow' => 'Giallo',
       },
     },
    'MonochromeLinear' => {
@@ -1039,17 +1192,27 @@ package Image::ExifTool::Lang::it;
     },
    'MonochromeToningEffect' => {
       PrintConv => {
+        'Green' => 'Verde',
         'None' => 'Nessuno',
       },
     },
+   'MultiExposure' => 'Dati Esposizione Multipla',
+   'MultiExposureAutoGain' => 'Guadagno Automatico Esposizione Multipla',
+   'MultiExposureMode' => 'Modo Esposizione Multipla',
+   'MultiExposureShots' => 'Scatti Esposizione Multipla',
+   'MultiExposureVersion' => 'Versione Dati Esposizione Multipla',
    'NEFCompression' => {
+      Description => 'Compressione RAW',
       PrintConv => {
-        'Uncompressed' => 'non compresso',
+        'Lossless' => 'Senza perdita',
+        'Uncompressed' => 'Non compresso',
       },
     },
    'NamedColor2' => 'Colore Chiamato 2',
    'NativeDisplayInfo' => 'Info Display Nativo',
+   'NikonCaptureData' => 'Dati Nikon Capture',
    'NikonCaptureVersion' => 'Versione Nikon Capture',
+   'NikonPreview' => 'Anteprima Puntatore IFD',
    'Noise' => 'Rumore',
    'NoiseFilter' => {
       PrintConv => {
@@ -1067,9 +1230,9 @@ package Image::ExifTool::Lang::it;
    'ObjectCycle' => {
       Description => 'Ciclo Oggetto',
       PrintConv => {
-        'Both Morning and Evening' => 'entrambi',
-        'Evening' => 'sera',
-        'Morning' => 'mattino',
+        'Both Morning and Evening' => 'Entrambi',
+        'Evening' => 'Sera',
+        'Morning' => 'Mattino',
       },
     },
    'ObjectFileType' => {
@@ -1141,6 +1304,19 @@ package Image::ExifTool::Lang::it;
         'Shutter Speed Priority' => 'Priorità otturatore',
       },
     },
+   'PictureModeBWFilter' => {
+      PrintConv => {
+        'Green' => 'Verde',
+        'Orange' => 'Arancio',
+        'Red' => 'Rosso',
+        'Yellow' => 'Giallo',
+      },
+    },
+   'PictureModeTone' => {
+      PrintConv => {
+        'Green' => 'Verde',
+      },
+    },
    'PictureStyle' => {
       PrintConv => {
         'Landscape' => 'Orizzontale',
@@ -1168,12 +1344,33 @@ package Image::ExifTool::Lang::it;
     },
    'PreviewDateTime' => 'Anteprima Data Ora',
    'PreviewImage' => 'Anteprima',
+   'PreviewImageValid' => {
+      PrintConv => {
+        'Yes' => 'Si',
+      },
+    },
    'PreviewQuality' => {
       PrintConv => {
         'Normal' => 'Normale',
       },
     },
    'PreviewSettingsName' => 'Anteprima Nome Impostazioni',
+   'PrimaryAFPoint' => {
+      PrintConv => {
+        'Bottom' => 'Basso',
+        'C6 (Center)' => 'C6 (Centro)',
+        'Center' => 'Centro',
+        'Far Left' => 'Tutto a Sinistra',
+        'Far Right' => 'Tutto a Destra',
+        'Lower-left' => 'Inferiore Sinistro',
+        'Lower-right' => 'Inferiore Destro',
+        'Mid-left' => 'Sinistra',
+        'Mid-right' => 'Destra',
+        'Top' => 'Alto',
+        'Upper-left' => 'Superiore Sinistro',
+        'Upper-right' => 'Superiore Destro',
+      },
+    },
    'PrimaryChromaticities' => 'Cromatismo dei colori primari',
    'PrimaryPlatform' => 'Piattaforma primaria',
    'ProductID' => 'ID Prodotto',
@@ -1237,6 +1434,19 @@ package Image::ExifTool::Lang::it;
    'RasterizedCaption' => 'Didascalia Rasterizzata',
    'Rating' => 'Valutazione',
    'RatingPercent' => 'Valutazione in percentuale',
+   'RawDevPMPictureTone' => {
+      PrintConv => {
+        'Green' => 'Verde',
+      },
+    },
+   'RawDevPM_BWFilter' => {
+      PrintConv => {
+        'Green' => 'Verde',
+        'Orange' => 'Arancio',
+        'Red' => 'Rosso',
+        'Yellow' => 'Giallo',
+      },
+    },
    'RawImageCenter' => 'Centro Immagine RAW',
    'RawJpgQuality' => {
       PrintConv => {
@@ -1272,6 +1482,11 @@ package Image::ExifTool::Lang::it;
    'ReferenceService' => 'Riferimento Servizio',
    'RelatedImageHeight' => 'Numero delle righe dei dati immagine',
    'RelatedSoundFile' => 'File audio relativo',
+   'ReleaseButtonToUseDial' => {
+      PrintConv => {
+        'Yes' => 'Si',
+      },
+    },
    'ReleaseDate' => 'Data di Rilascio',
    'ReleaseTime' => 'Ora di Rilascio',
    'RenderingIntent' => {
@@ -1296,11 +1511,18 @@ package Image::ExifTool::Lang::it;
       Description => 'Unità di risoluzione in X e Y',
       PrintConv => {
         'None' => 'Nessuno',
-        'inches' => 'pollici',
+        'inches' => 'Pollici',
       },
     },
-   'RetouchHistory' => 'Cronologia Ritocco',
+   'RetouchHistory' => {
+      Description => 'Cronologia Ritocco',
+      PrintConv => {
+        'None' => 'Nessuno',
+      },
+    },
+   'RevisionNumber' => 'Numero revisione',
    'Rotation' => {
+      Description => 'Orientanento Fotocamera',
       PrintConv => {
         'Horizontal' => '0° (alto/sinistra)',
         'Horizontal (Normal)' => '0° (alto/sinistra)',
@@ -1314,7 +1536,18 @@ package Image::ExifTool::Lang::it;
       },
     },
    'SPIFFVersion' => 'Versione SPIFF',
+   'SRActive' => {
+      PrintConv => {
+        'Yes' => 'Si',
+      },
+    },
    'SVGVersion' => 'Versione SVG',
+   'SampleFormat' => {
+      PrintConv => {
+        'IEEE floating point' => 'Virgola Mobile',
+        'Undefined' => 'Non definito',
+      },
+    },
    'SamplesPerPixel' => 'Numero dei componenti',
    'Saturation' => {
       Description => 'Saturazione',
@@ -1324,6 +1557,7 @@ package Image::ExifTool::Lang::it;
         'Normal' => 'Normale',
       },
     },
+   'Scene' => 'Scena',
    'SceneCaptureType' => {
       Description => 'Tipo di cattura scena',
       PrintConv => {
@@ -1425,6 +1659,11 @@ package Image::ExifTool::Lang::it;
         'Aperture Priority' => 'Priorità diaframma',
       },
     },
+   'ShutterReleaseNoCFCard' => {
+      PrintConv => {
+        'Yes' => 'Si',
+      },
+    },
    'ShutterSpeed' => 'Tempo di esposizione',
    'ShutterSpeedValue' => 'Velocità otturatore',
    'SimilarityIndex' => 'Indice di Somiglianza',
@@ -1457,6 +1696,8 @@ package Image::ExifTool::Lang::it;
    'SubSecModifyDate' => 'Data e ora di modifica del file',
    'SubSecTime' => 'Frazioni di secondo di DataTime',
    'SubfileType' => 'Nuovo tipo subfile',
+   'Subject' => 'Soggetto',
+   'SubjectArea' => 'Area soggetto',
    'SubjectDistance' => 'Distanza dal soggetto',
    'SubjectDistanceRange' => {
       Description => 'Rapporto distanza soggetto',
@@ -1527,6 +1768,7 @@ package Image::ExifTool::Lang::it;
       },
     },
    'TimeSent' => 'Ora d\'invio',
+   'Title' => 'Titolo',
    'ToneComp' => 'Compensazione Tono',
    'ToneCurve' => {
       PrintConv => {
@@ -1540,11 +1782,19 @@ package Image::ExifTool::Lang::it;
     },
    'ToningEffect' => {
       PrintConv => {
+        'Blue-green' => 'Blu-Verde',
+        'Green' => 'Verde',
         'None' => 'Nessuno',
+        'Purple-blue' => 'Viola-Blu',
+        'Red' => 'Rosso',
+        'Red-purple' => 'Rosso-Viola',
+        'Yellow' => 'Giallo',
+        'n/a' => 'Non impostato',
       },
     },
    'ToningEffectMonochrome' => {
       PrintConv => {
+        'Green' => 'Verde',
         'None' => 'Nessuno',
       },
     },
@@ -1574,6 +1824,35 @@ package Image::ExifTool::Lang::it;
     },
    'UniqueCameraModel' => 'Nome Unico Modello Fotocamera',
    'UniqueDocumentID' => 'ID Unico del Documento',
+   'Unknown' => 'Sconosciuto',
+   'Unsharp1Color' => {
+      PrintConv => {
+        'Green' => 'Verde',
+        'Red' => 'Rosso',
+        'Yellow' => 'Giallo',
+      },
+    },
+   'Unsharp2Color' => {
+      PrintConv => {
+        'Green' => 'Verde',
+        'Red' => 'Rosso',
+        'Yellow' => 'Giallo',
+      },
+    },
+   'Unsharp3Color' => {
+      PrintConv => {
+        'Green' => 'Verde',
+        'Red' => 'Rosso',
+        'Yellow' => 'Giallo',
+      },
+    },
+   'Unsharp4Color' => {
+      PrintConv => {
+        'Green' => 'Verde',
+        'Red' => 'Rosso',
+        'Yellow' => 'Giallo',
+      },
+    },
    'Urgency' => {
       Description => 'Urgenza',
       PrintConv => {
@@ -1604,6 +1883,8 @@ package Image::ExifTool::Lang::it;
       },
     },
    'VRDVersion' => 'Versione VRD',
+   'VRInfo' => 'Info Riduzione Vibrazione',
+   'VRInfoVersion' => 'Info Versione VR',
    'Version' => 'Versione',
    'VibrationReduction' => 'Riduzione Vibrazione',
    'VideoCardGamma' => 'Gamma della Scheda Video',
@@ -1636,7 +1917,6 @@ package Image::ExifTool::Lang::it;
         'Fluorescent' => 'Fluorescente',
         'Manual' => 'Manuale',
         'Shade' => 'Ombrato',
-        'Shadow' => 'Ombrato',
         'Tungsten' => 'Tungsteno (luce incandescente)',
         'Unknown' => 'Sconosciuta',
         'White Fluorescent' => 'Fluorescente bianca',
@@ -1697,7 +1977,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Lang::it.pm - ExifTool language-specific tag information
+Image::ExifTool::Lang::it.pm - ExifTool Italian language translations
 
 =head1 DESCRIPTION
 
@@ -1713,7 +1993,8 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Jens Duttke and Emilio Dati for providing this translation.
+Thanks to Jens Duttke, Ferdinando Agovino and Emilio Dati for providing this
+translation.
 
 =head1 SEE ALSO
 

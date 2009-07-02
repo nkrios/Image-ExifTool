@@ -13,7 +13,7 @@ use vars qw($VERSION);
 use Image::ExifTool;    # only for FinishTiffDump()
 use Image::ExifTool::HTML qw(EscapeHTML);
 
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 sub DumpTable($$$;$$$$$);
 sub Open($$$;@);
@@ -314,10 +314,19 @@ sub Print($$;$$$$$)
         if ($len > 0 and not $wasUnused) {
             # we have an unused bytes before this data block
             --$i;           # dump the data block next time around
-            $start = $pos;  # dump the unused bytes now
+            # split unused data into 2 blocks if it spans end of makernotes
+            if (not defined $wasUnused and $bkgEnd and
+                $pos < $bkgEnd + $dataPos and $pos + $len > $bkgEnd + $dataPos)
+            {
+                $start = $pos;
+                $len = $bkgEnd + $dataPos - $pos;
+                $wasUnused = 0;
+            } else {
+                $start = $pos;  # dump the unused bytes now
+                $wasUnused = 1; # avoid re-dumping unused bytes if we get a read error
+            }
             my $str = ($len > 1) ? "unused $len bytes" : 'pad byte';
             $parmList = [ [ $len, "[$str]", undef, 0x108 ] ];
-            $wasUnused = 1; # avoid re-dumping unused bytes if we get a read error
         } else {
             undef $wasUnused;
         }
@@ -340,7 +349,8 @@ sub Print($$;$$$$$)
             }
             if ($flag == 4) {
                 $bkgStart = $start - $dataPos;
-                $bkgEnd = $bkgStart + $len;
+                # (allow for nested makernotes data)
+                $bkgEnd = $bkgStart + $len unless $bkgEnd and $bkgEnd > $bkgStart + $len;
                 $bkgSpan = "<span class='$name M'>";
                 push @{$self->{MSpanList}}, $name;
                 next;
@@ -691,7 +701,29 @@ sub FinishTiffDump($$$)
     foreach $tag (keys %offsetPair) {
         my $info = $exifTool->GetInfo($tag);
         next unless %$info;
-        foreach $key (%$info) {
+        # Panasonic hack: StripOffsets is not valid for Panasonic RW2 files,
+        # and StripRowBytes is not valid for some RAW images
+        if ($tag eq 'StripOffsets' and $exifTool->{TAG_INFO}{$tag}{PanasonicHack}) {
+            # use RawDataOffset instead if available since it is valid in RW2
+            my $info2 = $exifTool->GetInfo('RawDataOffset');
+            $info2 = $info unless %$info2;
+            my @keys = keys %$info2;
+            my $offset = $$info2{$keys[0]};
+            my $raf = $$exifTool{RAF};
+            # ignore StripByteCounts and assume raw data runs to the end of file
+            if (@keys == 1 and $offset =~ /^\d+$/ and $raf) {
+                my $pos = $raf->Tell();
+                $raf->Seek(0, 2);   # seek to end
+                my $len = $raf->Tell() - $offset;
+                $raf->Seek($pos, 0);
+                if ($len > 0) {
+                    $self->Add($offset, $len, "(Panasonic raw data)", "Size: $len bytes", 0x08);
+                    next;
+                }
+            }
+        }
+        # loop through all offsets tags
+        foreach $key (keys %$info) {
             my $name = Image::ExifTool::GetTagName($key);
             my $grp1 = $exifTool->GetGroup($key, 1);
             my $info2 = $exifTool->GetInfo($offsetPair{$tag}, { Group1 => $grp1 });

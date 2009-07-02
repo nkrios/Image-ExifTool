@@ -1,12 +1,16 @@
 #------------------------------------------------------------------------------
 # File:         en_ca.pm
 #
-# Description:  ExifTool language-specific tag information
+# Description:  ExifTool Canadian English language translations
 #
 # Notes:        This file generated automatically by Image::ExifTool::TagInfoXML
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Lang::en_ca;
+
+use vars qw($VERSION);
+
+$VERSION = '1.02';
 
 %Image::ExifTool::Lang::en_ca::Translate = (
    'AlternateDuotoneColors' => 'Alternate Duotone Colours',
@@ -20,6 +24,21 @@ package Image::ExifTool::Lang::en_ca;
    'BluePaletteColorTableDescriptor' => 'Blue Palette Colour Table Descriptor',
    'BorderColor' => 'Border Colour',
    'CFAPlaneColor' => 'CFA Plane Colour',
+   'CameraColorCalibration01' => 'Camera Colour Calibration 01',
+   'CameraColorCalibration02' => 'Camera Colour Calibration 02',
+   'CameraColorCalibration03' => 'Camera Colour Calibration 03',
+   'CameraColorCalibration04' => 'Camera Colour Calibration 04',
+   'CameraColorCalibration05' => 'Camera Colour Calibration 05',
+   'CameraColorCalibration06' => 'Camera Colour Calibration 06',
+   'CameraColorCalibration07' => 'Camera Colour Calibration 07',
+   'CameraColorCalibration08' => 'Camera Colour Calibration 08',
+   'CameraColorCalibration09' => 'Camera Colour Calibration 09',
+   'CameraColorCalibration10' => 'Camera Colour Calibration 10',
+   'CameraColorCalibration11' => 'Camera Colour Calibration 11',
+   'CameraColorCalibration12' => 'Camera Colour Calibration 12',
+   'CameraColorCalibration13' => 'Camera Colour Calibration 13',
+   'CameraColorCalibration14' => 'Camera Colour Calibration 14',
+   'CameraColorCalibration15' => 'Camera Colour Calibration 15',
    'CanonColorInfo1' => 'Canon Colour Info 1',
    'CanonColorInfo2' => 'Canon Colour Info 2',
    'ChromaticityColorant' => 'Chromaticity Colourant',
@@ -47,6 +66,8 @@ package Image::ExifTool::Lang::en_ca;
    'ColorClass' => 'Colour Class',
    'ColorComponents' => 'Colour Components',
    'ColorControl' => 'Colour Control',
+   'ColorDataUnknown' => 'Colour Data Unknown',
+   'ColorDataVersion' => 'Colour Data Version',
    'ColorEffect' => 'Colour Effect',
    'ColorFilter' => 'Colour Filter',
    'ColorGain' => 'Colour Gain',
@@ -104,6 +125,7 @@ package Image::ExifTool::Lang::en_ca;
    'ColorTempCustom2' => 'Colour Temp Custom 2',
    'ColorTempDaylight' => 'Colour Temp Daylight',
    'ColorTempFlash' => 'Colour Temp Flash',
+   'ColorTempFlashData' => 'Colour Temp Flash Data',
    'ColorTempFluorescent' => 'Colour Temp Fluorescent',
    'ColorTempKelvin' => 'Colour Temp Kelvin',
    'ColorTempMeasured' => 'Colour Temp Measured',
@@ -192,7 +214,7 @@ package Image::ExifTool::Lang::en_ca;
     },
    'DisplayUnits' => {
       PrintConv => {
-        'meters' => 'metres',
+        'meters' => 'Metres',
       },
     },
    'EasyMode' => {
@@ -445,7 +467,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Lang::en_ca.pm - ExifTool language-specific tag information
+Image::ExifTool::Lang::en_ca.pm - ExifTool Canadian English language translations
 
 =head1 DESCRIPTION
 

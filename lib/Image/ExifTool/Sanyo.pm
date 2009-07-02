@@ -55,6 +55,7 @@ my %offOn = (
             0x0005 => 'Normal/High',
             0x0006 => 'Normal/Very High',
             0x0007 => 'Normal/Super High',
+            # have seen 0x11 with HD2000 in '8M-H JPEG' mode - PH
             0x0100 => 'Fine/Very Low',
             0x0101 => 'Fine/Low',
             0x0102 => 'Fine/Medium Low',

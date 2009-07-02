@@ -13,7 +13,8 @@
 #
 # Notes:        This example file shows how to define your own shortcuts and
 #               add new EXIF, IPTC, XMP, PNG, MIE and Composite tags, as well
-#               as how to specify preferred lenses for the LensID tag.
+#               as how to specify preferred lenses for the LensID tag and
+#               define default values for ExifTool options.
 #
 #               Note that unknown tags may be extracted even if they aren't
 #               defined, but tags must be defined to be written.  Also note
@@ -55,7 +56,7 @@
 # Shortcut tags are used when extracting information to simplify
 # commonly used commands.  They can be used to represent groups
 # of tags, or to provide an alias for a tag name.</span>
-%Image::ExifTool::Shortcuts::UserDefined = (
+%Image::ExifTool::UserDefined::Shortcuts = (
     MyShortcut =&gt; ['exif:createdate','exposuretime','aperture'],
     MyAlias =&gt; 'FocalLengthIn35mmFormat',
 );
@@ -74,9 +75,10 @@
             WriteGroup =&gt; 'IFD0',
         },
     },
-    <span class='com'># IPTC tags are added to a specific record type (ie. application record):</span>
+    <span class='com'># IPTC tags are added to a specific record type (ie. application record):
+    # (Note: IPTC tags ID's are limited to the range 0-255)</span>
     'Image::ExifTool::IPTC::ApplicationRecord' =&gt; {
-        300 =&gt; {
+        240 =&gt; {
             Name =&gt; 'NewIPTCTag',
             Format =&gt; 'string[0,16]',
         },
@@ -198,6 +200,13 @@ use Image::ExifTool::MIE;
 @Image::ExifTool::UserDefined::Lenses = (
     'Sigma AF 10-20mm F4-5.6 EX DC',
     'Tamron 35-90mm F4 AF',
+);
+
+<span class='com'># Specify default ExifTool option values
+# (see the <a href="ExifTool.html#Options">Options function documentation</a> for available options)</span>
+%Image::ExifTool::UserDefined::Options = (
+    CoordFormat =&gt; '%.6f',  <span class='com'># change default GPS coordinate format</span>
+    Duplicates =&gt; 1,        <span class='com'># make -a default for the exiftool app</span>
 );
 
 <span class='com'>#------------------------------------------------------------------------------</span>

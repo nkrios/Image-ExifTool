@@ -13,7 +13,7 @@ names.  They are used like regular tags to read and write the information
 for a specified set of tags.</p>
 
 <p>The shortcut tags below have been pre-defined, but user-defined shortcuts
-may be added via the %Image::ExifTool::Shortcuts::UserDefined lookup in the
+may be added via the %Image::ExifTool::UserDefined::Shortcuts lookup in the
 ~/.ExifTool_config file.  See the Image::ExifTool::Shortcuts documentation
 for more details.
 </p>
@@ -45,7 +45,7 @@ for more details.
   <br>FocalLength
   <br>ImageSize
   <br>Quality
-  <br>FlashOn
+  <br>Flash
   <br>FlashType
   <br>ConditionalFEC
   <br>RedEyeReduction
@@ -79,7 +79,7 @@ for more details.
   <br>ExifImageWidth
   <br>ExifImageHeight
   <br>Quality
-  <br>FlashOn
+  <br>Flash
   <br>FlashType
   <br>ConditionalFEC
   <br>RedEyeReduction
@@ -181,6 +181,7 @@ for more details.
   <br>MakerNoteKodak8a
   <br>MakerNoteKodak8b
   <br>MakerNoteKodak9
+  <br>MakerNoteKodak10
   <br>MakerNoteKodakUnknown
   <br>MakerNoteKyocera
   <br>MakerNoteMinolta
@@ -202,6 +203,7 @@ for more details.
   <br>MakerNotePentax4
   <br>MakerNoteRicoh
   <br>MakerNoteRicohText
+  <br>MakerNoteSamsung
   <br>MakerNoteSanyo
   <br>MakerNoteSanyoC4
   <br>MakerNoteSanyoPatch
@@ -245,11 +247,24 @@ for more details.
   <br>FlashMode
   <br>FlashExposureComp</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>Unsafe</td>
+<td class=c>Y</td>
+<td>IFD0:YCbCrPositioning
+  <br>IFD0:YCbCrCoefficients
+  <br>IFD0:TransferFunction
+  <br>ExifIFD:ComponentsConfiguration
+  <br>ExifIFD:CompressedBitsPerPixel
+  <br>InteropIFD:InteropIndex
+  <br>InteropIFD:InteropVersion
+  <br>InteropIFD:RelatedImageWidth
+  <br>InteropIFD:RelatedImageHeight</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 1, 2008</i>
+<br><i>Last revised Jun 8, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.66
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
 [File, File, Image] FileName - File Name: CanonRaw_6_failed.cr2
 [File, File, Image] Directory - Directory: t
 [File, File, Image] FileSize - File Size: 11 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:07 15:06:21-05:00
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:04:07 11:43:49-04:00
 [File, File, Image] FileType - File Type: CR2
 [File, File, Image] MIMEType - MIME Type: image/x-raw
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -27,7 +27,7 @@
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2005:08:03 18:59:18
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2005:08:03 18:59:18
-[EXIF, ExifIFD, Image] 37121 - Components Configuration: 
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: -, -, -, -
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 1/15
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 8.0
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
@@ -64,7 +64,7 @@
 [EXIF, IFD3, Image] 273 - Strip Offsets: 11474
 [EXIF, IFD3, Image] 279 - Strip Byte Counts: 16
 [EXIF, IFD3, Image] 50752 - Raw Image Segmentation: 1 1758 1758
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.66
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.74
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [IPTC, IPTC, Other] 25 - Keywords: CR2 test
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
@@ -87,7 +87,7 @@
 [MakerNotes, Canon, Camera] 22 - Lens Type: Unknown (-1)
 [MakerNotes, Canon, Camera] 23 - Long Focal: 55 mm
 [MakerNotes, Canon, Camera] 24 - Short Focal: 18 mm
-[MakerNotes, Canon, Camera] 25 - Focal Units: 1
+[MakerNotes, Canon, Camera] 25 - Focal Units: 1/mm
 [MakerNotes, Canon, Camera] 26 - Max Aperture: 4
 [MakerNotes, Canon, Camera] 27 - Min Aperture: 27
 [MakerNotes, Canon, Camera] 28 - Flash Activity: 0
@@ -119,13 +119,13 @@
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
 [MakerNotes, Canon, Image] 21 - F Number: 8
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/16
+[MakerNotes, Canon, Image] 23 - Measured EV 2: 3.125
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
 [MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
 [MakerNotes, Canon, Image] 29 - Self Timer 2: 0
-[MakerNotes, Canon, Image] 33 - Flash Output: 0
-[MakerNotes, Canon, Camera] 6 - Canon Image Type: Canon EOS 350D DIGITAL
+[MakerNotes, Canon, Image] 6 - Canon Image Type: Canon EOS 350D DIGITAL
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware 1.0.2
 [MakerNotes, Canon, Camera] 9 - Owner Name: Phil Harvey
 [MakerNotes, Canon, Camera] 12 - Camera Body No.: 0123456789
@@ -174,6 +174,7 @@
 [MakerNotes, Canon, Image] 11 - Digital Gain: 0
 [MakerNotes, Canon, Image] 12 - WB Shift AB: 0
 [MakerNotes, Canon, Image] 13 - WB Shift GM: 0
+[MakerNotes, Canon, Camera] 1 - Measured RGGB: 580 1024 1024 500
 [MakerNotes, Canon, Camera] 208 - VRD Offset: 0
 [MakerNotes, Canon, Image] 1 - Sensor Width: 3516
 [MakerNotes, Canon, Image] 2 - Sensor Height: 2328
@@ -208,7 +209,6 @@
 [MakerNotes, Canon, Camera] 2 - Color Tone: Normal
 [Composite, Composite, Image] Aperture - Aperture: 8.0
 [Composite, Composite, Camera] DriveMode - Drive Mode: Single-frame shooting
-[Composite, Composite, Camera] FlashOn - Flash: Off
 [Composite, Composite, Camera] ISO - ISO: 400
 [Composite, Composite, Camera] Lens - Lens: 18.0 - 55.0 mm
 [Composite, Composite, Camera] LensID - Lens ID: Unknown 18-55mm

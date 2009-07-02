@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.68
 [File, File, Image] FileName - File Name: PhotoMechanic.jpg
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 3.3 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:10:31 12:53:49-05:00
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:10:31 12:52:17-05:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 2c19015ea7e2d138576e147a3f093c1a
@@ -47,7 +47,7 @@
 [XMP, XMP-photoshop, Location] State - State: State
 [XMP, XMP-photoshop, Location] Country - Country: Country
 [XMP, XMP-photoshop, Image] Category - Category: Category
-[XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: Title
+[XMP, XMP-photoshop, Author] AuthorsPosition - Author's Position: Title
 [XMP, XMP-photoshop, Author] Credit - Credit: Credit
 [XMP, XMP-photoshop, Author] Source - Source: Source
 [XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: Writers

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
 [File, File, Image] FileName - File Name: IPTC-XMP.jpg
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 20 kB
@@ -35,7 +35,7 @@
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0210
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2001:05:19 18:36:41
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2001:05:19 18:36:41
-[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: Y, Cb, Cr, -
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 1.6
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 1/64
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 3.5
@@ -100,7 +100,7 @@
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey
 [XMP, XMP-dc, Image] subject - Subject: ExifTool, Test, XMP
 [XMP, XMP-dc, Image] title - Title: Test IPTC picture
-[XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: My Position
+[XMP, XMP-photoshop, Author] AuthorsPosition - Author's Position: My Position
 [XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: I wrote it
 [XMP, XMP-photoshop, Image] Category - Category: 1
 [XMP, XMP-photoshop, Location] City - City: Kingston

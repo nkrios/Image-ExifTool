@@ -138,13 +138,13 @@ their name are not extracted unless the Unknown option is set.</p>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>4</td>
+<td class=r title='4 = 0x4'>4</td>
 <td>HandlerClass</td>
 <td class=c>N</td>
 <td><span class=s>&#39;dhlr&#39; = Data Handler
   <br>&#39;mhlr&#39; = Media Handler</span></td></tr>
 <tr class=b>
-<td class=r>8</td>
+<td class=r title='8 = 0x8'>8</td>
 <td>HandlerType</td>
 <td class=c>N</td>
 <td><span class=s>&#39;alis&#39; = Alias Data
@@ -162,12 +162,12 @@ their name are not extracted unless the Unknown option is set.</p>
   <br>&#39;url &#39; = URL
   <br>&#39;vide&#39; = Video Track</span></td></tr>
 <tr>
-<td class=r>12</td>
+<td class=r title='12 = 0xc'>12</td>
 <td>HandlerVendorID</td>
 <td class=c>N</td>
 <td>--&gt; <a href='QuickTime.html#VendorID'>QuickTime VendorID Values</a></td></tr>
 <tr class=b>
-<td class=r>24</td>
+<td class=r title='24 = 0x18'>24</td>
 <td>HandlerDescription</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -505,72 +505,77 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>Version</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>1</td>
+<td class=r title='1 = 0x1'>1</td>
 <td>CreateDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>ModifyDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>3</td>
+<td class=r title='3 = 0x3'>3</td>
 <td>TimeScale</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>4</td>
+<td class=r title='4 = 0x4'>4</td>
 <td>Duration</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>5</td>
+<td class=r title='5 = 0x5'>5</td>
 <td>PreferredRate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>6</td>
+<td class=r title='6 = 0x6'>6</td>
 <td>PreferredVolume</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>18</td>
+<td class=r title='9 = 0x9'>9</td>
+<td>MatrixStructure</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='18 = 0x12'>18</td>
 <td>PreviewTime</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
-<td class=r>19</td>
+<tr class=b>
+<td class=r title='19 = 0x13'>19</td>
 <td>PreviewDuration</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r>20</td>
+<tr>
+<td class=r title='20 = 0x14'>20</td>
 <td>PosterTime</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
-<td class=r>21</td>
+<tr class=b>
+<td class=r title='21 = 0x15'>21</td>
 <td>SelectionTime</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r>22</td>
+<tr>
+<td class=r title='22 = 0x16'>22</td>
 <td>SelectionDuration</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
-<td class=r>23</td>
+<tr class=b>
+<td class=r title='23 = 0x17'>23</td>
 <td>CurrentTime</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r>24</td>
+<tr>
+<td class=r title='24 = 0x18'>24</td>
 <td>NextTrackID</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -588,11 +593,16 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Media'>QuickTime Media Tags</a></td></tr>
 <tr class=b>
+<td>'meta'</td>
+<td>Meta</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Meta'>QuickTime Meta Tags</a></td></tr>
+<tr>
 <td>'tkhd'</td>
 <td>TrackHeader</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#TrackHdr'>QuickTime TrackHdr Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'udta'</td>
 <td>UserData</td>
 <td class=c>-</td>
@@ -632,32 +642,32 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>MediaHeaderVersion</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(version 0)</span></span></td></tr>
 <tr class=b>
-<td class=r>1</td>
+<td class=r title='1 = 0x1'>1</td>
 <td>MediaCreateDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>MediaModifyDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>3</td>
+<td class=r title='3 = 0x3'>3</td>
 <td>MediaTimeScale</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>4</td>
+<td class=r title='4 = 0x4'>4</td>
 <td>MediaDuration</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>5</td>
+<td class=r title='5 = 0x5'>5</td>
 <td>MediaLanguageCode</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -671,32 +681,32 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>MediaHeaderVersion</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(version 1)</span></span></td></tr>
 <tr class=b>
-<td class=r>1</td>
+<td class=r title='1 = 0x1'>1</td>
 <td>MediaCreateDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>3</td>
+<td class=r title='3 = 0x3'>3</td>
 <td>MediaModifyDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>5</td>
+<td class=r title='5 = 0x5'>5</td>
 <td>MediaTimescale</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>6</td>
+<td class=r title='6 = 0x6'>6</td>
 <td>MediaDuration</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>8</td>
+<td class=r title='8 = 0x8'>8</td>
 <td>MediaLanguageCode</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -782,22 +792,22 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>MaxPDUSize</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>3</td>
+<td class=r title='3 = 0x3'>3</td>
 <td>AvgPDUSize</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>4</td>
+<td class=r title='4 = 0x4'>4</td>
 <td>MaxBitrate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>6</td>
+<td class=r title='6 = 0x6'>6</td>
 <td>AvgBitrate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -811,7 +821,7 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>Balance</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -850,32 +860,32 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>AudioFormat</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>10</td>
+<td class=r title='10 = 0xa'>10</td>
 <td>AudioVendorID</td>
 <td class=c>N</td>
 <td>--&gt; <a href='QuickTime.html#VendorID'>QuickTime VendorID Values</a></td></tr>
 <tr>
-<td class=r>12</td>
+<td class=r title='12 = 0xc'>12</td>
 <td>AudioChannels</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>13</td>
+<td class=r title='13 = 0xd'>13</td>
 <td>AudioBitsPerSample</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>16</td>
+<td class=r title='16 = 0x10'>16</td>
 <td>AudioSampleRate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>28</td>
+<td class=r title='28 = 0x1c'>28</td>
 <td>AudioFormat</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(in Casio MOV videos)</span></span></td></tr>
@@ -888,42 +898,42 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>CompressorID</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>10</td>
+<td class=r title='10 = 0xa'>10</td>
 <td>VendorID</td>
 <td class=c>N</td>
 <td>--&gt; <a href='QuickTime.html#VendorID'>QuickTime VendorID Values</a></td></tr>
 <tr>
-<td class=r>16</td>
+<td class=r title='16 = 0x10'>16</td>
 <td>ImageWidth</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>17</td>
+<td class=r title='17 = 0x11'>17</td>
 <td>ImageHeight</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>18</td>
+<td class=r title='18 = 0x12'>18</td>
 <td>XResolution</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>20</td>
+<td class=r title='20 = 0x14'>20</td>
 <td>YResolution</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>25</td>
+<td class=r title='25 = 0x19'>25</td>
 <td>CompressorName</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>41</td>
+<td class=r title='41 = 0x29'>41</td>
 <td>BitDepth</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -937,7 +947,7 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>HintFormat</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -950,7 +960,7 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>OtherFormat</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -964,7 +974,7 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>GraphicsMode</td>
 <td class=c>N</td>
 <td><span class=s>0x0 = srcCopy
@@ -999,7 +1009,7 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
   <br>0x102 = Pre-multiplied Black Alpha
   <br>0x110 = Component Alpha</span></td></tr>
 <tr class=b>
-<td class=r>3</td>
+<td class=r title='3 = 0x3'>3</td>
 <td>OpColor</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -1012,47 +1022,52 @@ InfoList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>TrackVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>1</td>
+<td class=r title='1 = 0x1'>1</td>
 <td>TrackCreateDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>TrackModifyDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>3</td>
+<td class=r title='3 = 0x3'>3</td>
 <td>TrackID</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>5</td>
+<td class=r title='5 = 0x5'>5</td>
 <td>TrackDuration</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>8</td>
+<td class=r title='8 = 0x8'>8</td>
 <td>TrackLayer</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>9</td>
+<td class=r title='9 = 0x9'>9</td>
 <td>TrackVolume</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>19</td>
-<td>ImageWidth</td>
+<td class=r title='10 = 0xa'>10</td>
+<td>MatrixStructure</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>20</td>
+<td class=r title='19 = 0x13'>19</td>
+<td>ImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='20 = 0x14'>20</td>
 <td>ImageHeight</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -1410,7 +1425,7 @@ if they don&#39;t exist in this table.</p>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>DisplaySize</td>
 <td class=c>N</td>
 <td><span class=s>0 = Normal
@@ -1419,7 +1434,7 @@ if they don&#39;t exist in this table.</p>
   <br>3 = Full Screen
   <br>4 = Current Size</span></td></tr>
 <tr class=b>
-<td class=r>6</td>
+<td class=r title='6 = 0x6'>6</td>
 <td>SlideShow</td>
 <td class=c>N</td>
 <td><span class=s>0 = No
@@ -1433,22 +1448,22 @@ if they don&#39;t exist in this table.</p>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r>0</td>
+<td class=r title='0 = 0x0'>0</td>
 <td>PreviewDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>2</td>
+<td class=r title='2 = 0x2'>2</td>
 <td>PreviewVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r>3</td>
+<td class=r title='3 = 0x3'>3</td>
 <td>PreviewAtomType</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r>5</td>
+<td class=r title='5 = 0x5'>5</td>
 <td>PreviewAtomIndex</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -1480,7 +1495,7 @@ if they don&#39;t exist in this table.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 2, 2008</i>
+<br><i>Last revised Jun 23, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -22,10 +22,9 @@ block, and this information is lost when only the maker note block is copied
 to the DNG image.   While this isn&#39;t a big problem for most camera makes, it
 is serious for some makes like Olympus.</p>
 
-<p>The CRW data is from DNG-converted CRW images, but it has been restructured
-to a proprietary Adobe format (which results in a loss of the original
-hierarchical information structure, and creates extra work for everyone else
-who wants to use this information).</p>
+<p>Other entries in this table represent proprietary information that is
+extracted from the original RAW image and restructured to a different (but
+still proprietary) Adobe format.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -36,6 +35,16 @@ who wants to use this information).</p>
 <td>AdobeCRW</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
+<tr class=b>
+<td>'Koda'</td>
+<td>AdobeKoda</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#IFD'>Kodak IFD Tags</a></td></tr>
+<tr>
+<td>'Leaf'</td>
+<td>AdobeLeaf</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Leaf.html#SubIFD'>Leaf SubIFD Tags</a></td></tr>
 <tr class=b>
 <td>'MRW '</td>
 <td>AdobeMRW</td>
@@ -66,6 +75,7 @@ who wants to use this information).</p>
   <br>MakerNoteKodak8a
   <br>MakerNoteKodak8b
   <br>MakerNoteKodak9
+  <br>MakerNoteKodak10
   <br>MakerNoteKodakUnknown
   <br>MakerNoteKyocera
   <br>MakerNoteMinolta
@@ -88,6 +98,7 @@ who wants to use this information).</p>
   <br>MakerNoteRicoh
   <br>MakerNoteRicohText
   <br>PreviewImage
+  <br>MakerNoteSamsung
   <br>MakerNoteSanyo
   <br>MakerNoteSanyoC4
   <br>MakerNoteSanyoPatch
@@ -98,7 +109,7 @@ who wants to use this information).</p>
   <br>MakerNoteSony4
   <br>MakerNoteSonySRF
   <br>MakerNoteUnknown</td>
-<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
 <td>--&gt; <a href='Canon.html'>Canon Tags</a>
   <br>--&gt; <a href='Casio.html'>Casio Tags</a>
   <br>--&gt; <a href='Casio.html#Type2'>Casio Type2 Tags</a>
@@ -122,6 +133,7 @@ who wants to use this information).</p>
   <br>--&gt; <a href='Kodak.html#Type8'>Kodak Type8 Tags</a>
   <br>--&gt; <a href='Kodak.html#Type8'>Kodak Type8 Tags</a>
   <br>--&gt; <a href='Kodak.html#Type9'>Kodak Type9 Tags</a>
+  <br>--&gt; <a href='Kodak.html#Type10'>Kodak Type10 Tags</a>
   <br>--&gt; <a href='Kodak.html#Unknown'>Kodak Unknown Tags</a>
   <br>--&gt; <a href='Unknown.html'>Unknown Tags</a>
   <br>--&gt; <a href='Minolta.html'>Minolta Tags</a>
@@ -144,6 +156,7 @@ who wants to use this information).</p>
   <br>--&gt; <a href='Ricoh.html'>Ricoh Tags</a>
   <br>--&gt; <a href='Ricoh.html#Text'>Ricoh Text Tags</a>
   <br><span class=n>(Samsung preview image)</span>
+  <br><span class=n>(Samsung unknown maker notes)</span>
   <br>--&gt; <a href='Sanyo.html'>Sanyo Tags</a>
   <br>--&gt; <a href='Sanyo.html'>Sanyo Tags</a>
   <br>--&gt; <a href='Sanyo.html'>Sanyo Tags</a>
@@ -158,7 +171,7 @@ who wants to use this information).</p>
 <td>'Pano'</td>
 <td>AdobePano</td>
 <td class=c>-</td>
-<td>--&gt; <a href='Panasonic.html#Raw'>Panasonic Raw Tags</a></td></tr>
+<td>--&gt; <a href='PanasonicRaw.html'>PanasonicRaw Tags</a></td></tr>
 <tr>
 <td>'RAF '</td>
 <td>AdobeRAF</td>
@@ -180,42 +193,42 @@ information.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>0x0000</td>
+<td title='0x0000 = 0'>0x0000</td>
 <td>OriginalRawImage</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0001</td>
+<td title='0x0001 = 1'>0x0001</td>
 <td>OriginalRawResource</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0002</td>
+<td title='0x0002 = 2'>0x0002</td>
 <td>OriginalRawFileType</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0003</td>
+<td title='0x0003 = 3'>0x0003</td>
 <td>OriginalRawCreator</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0004</td>
+<td title='0x0004 = 4'>0x0004</td>
 <td>OriginalTHMImage</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0005</td>
+<td title='0x0005 = 5'>0x0005</td>
 <td>OriginalTHMResource</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>0x0006</td>
+<td title='0x0006 = 6'>0x0006</td>
 <td>OriginalTHMFileType</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>0x0007</td>
+<td title='0x0007 = 7'>0x0007</td>
 <td>OriginalTHMCreator</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -223,7 +236,7 @@ information.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 9, 2008</i>
+<br><i>Last revised Jun 8, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -152,6 +152,9 @@ my $maxXMPLen = $maxSegmentLen; # maximum length of XMP data in JPEG
 # value separators when conversion list is used (in SetNewValue)
 my %listSep = ( PrintConv => '; ?', ValueConv => ' ' );
 
+# printConv hash keys to ignore when doing reverse lookup
+my %ignorePrintConv = ( OTHER => 1, BITMASK => 1, Notes => 1 );
+
 #------------------------------------------------------------------------------
 # Set tag value
 # Inputs: 0) ExifTool object reference
@@ -165,6 +168,7 @@ my %listSep = ( PrintConv => '; ?', ValueConv => ' ' );
 #           Group => family 0 or 1 group name (case insensitive)
 #           Replace => 0, 1 or 2 - overwrite previous new values (2=reset)
 #           Protected => bitmask to write tags with specified protections
+#           EditOnly => true to only edit existing tags (don't create new tag)
 #           Shift => undef, 0, +1 or -1 - shift value if possible
 #           NoShortcut => true to prevent looking up shortcut tags
 #           CreateGroups => [internal use] createGroups hash ref from related tags
@@ -225,9 +229,10 @@ sub SetNewValue($;$$%)
     }
     # make sure the Perl UTF-8 flag is OFF for the value if perl 5.6 or greater
     # (otherwise our byte manipulations get corrupted!!)
-    if ($] >= 5.006 and defined $value) {
+    if (defined $value and $] >= 5.006) {
         if (eval 'require Encode; Encode::is_utf8($value)' or $@) {
-            $value = pack('C*', unpack('C*', $value));
+            # repack by hand if Encode isn't available
+            $value = $@ ? pack('C*',unpack('U0C*',$value)) : Encode::encode('utf8',$value);
         }
     }
     # set group name in options if specified
@@ -369,7 +374,7 @@ sub SetNewValue($;$$%)
                             $e and $err = $e;
                         }
                         undef $err if $numSet;  # no error if any set successfully
-ReturnNow:              return ($numSet, $err) if wantarray;
+                        return ($numSet, $err) if wantarray;
                         $err and warn "$err\n";
                         return $numSet;
                     }
@@ -387,7 +392,10 @@ ReturnNow:              return ($numSet, $err) if wantarray;
             }
             $verbose > 2 and print $out "$err\n";
         }
-        goto ReturnNow; # all done
+        # all done
+        return ($numSet, $err) if wantarray;
+        $err and warn "$err\n";
+        return $numSet;
     }
     # get group name that we're looking for
     my $foundMatch = 0;
@@ -435,7 +443,7 @@ ReturnNow:              return ($numSet, $err) if wantarray;
                         $writeGroup = $tagInfo->{Table}{WRITE_GROUP};
                         $writeGroup =~ s/^MIE/$mieGroup/;
                     }
-                } else {
+                } elsif (not $$tagInfo{AllowGroup} or $wantGroup !~ /^$$tagInfo{AllowGroup}$/i) {
                     # allow group1 name to be specified
                     my $grp1 = $self->GetGroup($tagInfo, 1);
                     unless ($grp1 and lc($grp1) eq $lcWant) {
@@ -550,7 +558,7 @@ ReturnNow:              return ($numSet, $err) if wantarray;
         my $writeGroup = $writeGroup{$tagInfo};
         my $permanent = $$tagInfo{Permanent};
         $writeGroup eq 'MakerNotes' and $permanent = 1 unless defined $permanent;
-        my ($wgrp1, $type);
+        my ($wgrp1, $noConv, $type);
         if ($writeGroup eq 'MakerNotes' or $writeGroup eq 'XMP') {
             $wgrp1 = $self->GetGroup($tagInfo, 1);
         } else {
@@ -566,6 +574,11 @@ ReturnNow:              return ($numSet, $err) if wantarray;
                     $shift = 1 if $options{AddValue};
                     $shift = -1 if $options{DelValue};
                 }
+                if ($shift and (not defined $value or not length $value)) {
+                    $err = "No value for time shift of $wgrp1:$tag";
+                    $verbose > 2 and print $out "$err\n";
+                    next;
+                }
             } elsif ($shift) {
                 $err = "$wgrp1:$tag is not shiftable";
                 $verbose > 2 and print $out "$err\n";
@@ -580,37 +593,105 @@ ReturnNow:              return ($numSet, $err) if wantarray;
                 $verbose > 2 and print $out "$err\n";
                 next;
             }
+            if ($shift) {
+                # add '+' or '-' prefix to indicate shift direction
+                $val = ($shift > 0 ? '+' : '-') . $val;
+                # check the shift for validity
+                require 'Image/ExifTool/Shift.pl';
+                my $err2 = CheckShift($tagInfo->{Shift}, $val);
+                if ($err2) {
+                    $err = "$err2 for $wgrp1:$tag";
+                    $verbose > 2 and print $out "$err\n";
+                    next;
+                }
+                $noConv = 1;    # no conversions if shifting tag
+            }
         } elsif ($permanent) {
             # can't delete permanent tags, so set them to DelValue or empty string instead
             if (defined $$tagInfo{DelValue}) {
                 $val = $$tagInfo{DelValue};
-                goto NoConv;    # DelValue is the raw value, so no conversion necessary
+                $noConv = 1;    # DelValue is the raw value, so no conversion necessary
             } else {
                 $val = '';
             }
-        }
-        # convert the value
-        if ($shift) {
-            # add '+' or '-' prefix to indicate shift direction
-            $val = ($shift > 0 ? '+' : '-') . $val;
-            # check the shift for validity
-            require 'Image/ExifTool/Shift.pl';
-            my $err2 = CheckShift($tagInfo->{Shift}, $val);
-            if ($err2) {
-                $err = "$err2 for $wgrp1:$tag";
-                $verbose > 2 and print $out "$err\n";
-                next;
-            }
+        } elsif ($options{AddValue} or $options{DelValue}) {
+            $err = "No value to add or delete in $wgrp1:$tag";
+            $verbose > 2 and print $out "$err\n";
+            next;
         } else {
-            $type = $options{Type};
-            $type or $type = $self->{OPTIONS}{PrintConv} ? 'PrintConv' : 'ValueConv';
+            if ($tagInfo->{DelCheck}) {
+                #### eval DelCheck ($self, $tagInfo, $wantGroup)
+                my $err2 = eval $tagInfo->{DelCheck};
+                $@ and warn($@), $err2 = 'Error evaluating DelCheck';
+                if ($err2) {
+                    $err = "$err2 for $wgrp1:$tag";
+                    $verbose > 2 and print $out "$err\n";
+                    next;
+                } elsif (defined $err2) {
+                    ++$numSet;  # (allow other tags to be set using DelCheck as a hook)
+                    next;
+                }
+            }
+            $noConv = 1;    # value is not defined, so don't do conversion
         }
-Conv:   while (defined $val and not $shift) {
+        # loop through inverse PrintConv and ValueConv conversions
+Conv:   for (;;) {
+            if (not defined $type) {
+                last if $noConv;
+                # split value into list if necessary
+                if ($$tagInfo{List}) {
+                    my $listSplit = $$tagInfo{AutoSplit} || $self->{OPTIONS}{ListSplit};
+                    if (defined $listSplit) {
+                        $listSplit = ',?\s+' if $listSplit eq '1' and $$tagInfo{AutoSplit};
+                        my @splitVal = split /$listSplit/, $val;
+                        $val = \@splitVal if @splitVal > 1;
+                    }
+                }
+                $type = $options{Type} || ($self->{OPTIONS}{PrintConv} ? 'PrintConv' : 'ValueConv');
+            } elsif ($type ne 'ValueConv') {
+                $type = 'ValueConv';
+            } else {    
+                # finally, do our value check
+                my ($err2, $v);
+                if ($tagInfo->{WriteCheck}) {
+                    #### eval WriteCheck ($self, $tagInfo, $val)
+                    $err2 = eval $tagInfo->{WriteCheck};
+                    $@ and warn($@), $err2 = 'Error evaluating WriteCheck';
+                }
+                unless ($err2) {
+                    my $table = $tagInfo->{Table};
+                    if ($table and $table->{CHECK_PROC} and not $$tagInfo{RawConvInv}) {
+                        my $checkProc = $table->{CHECK_PROC};
+                        if (ref $val eq 'ARRAY') {
+                            # loop through array values
+                            foreach $v (@$val) {
+                                $err2 = &$checkProc($self, $tagInfo, \$v);
+                                last if $err2;
+                            }
+                        } else {
+                            $err2 = &$checkProc($self, $tagInfo, \$val);
+                        }
+                    }
+                }
+                if ($err2) {
+                    $err = "$err2 for $wgrp1:$tag";
+                    $verbose > 2 and print $out "$err\n";
+                    undef $val; # value was invalid
+                }
+                last;
+            }
             my $conv = $tagInfo->{$type};
             my $convInv = $tagInfo->{"${type}Inv"};
+            # nothing to do at this level if no conversion defined
+            next unless defined $conv or defined $convInv;
+
             my (@valList, $index, $convList, $convInvList);
-            # handle conversion lists
-            if (ref $conv eq 'ARRAY' or ref $convInv eq 'ARRAY') {
+            if (ref $val eq 'ARRAY') {
+                # handle ValueConv of ListSplit and AutoSplit values
+                @valList = @$val;
+                $val = $valList[$index = 0];
+            } elsif (ref $conv eq 'ARRAY' or ref $convInv eq 'ARRAY') {
+                # handle conversion lists
                 @valList = split /$listSep{$type}/, $val;
                 $val = $valList[$index = 0];
                 if (ref $conv eq 'ARRAY') {
@@ -631,13 +712,19 @@ Conv:   while (defined $val and not $shift) {
                     if (ref($convInv) eq 'CODE') {
                         $val = &$convInv($val, $self);
                     } else {
-                        #### eval PrintConvInv/ValueConvInv ($val, $self)
+                        #### eval PrintConvInv/ValueConvInv ($val, $self, $writeGroup)
                         $val = eval $convInv;
                         $@ and $evalWarning = $@;
                     }
                     if ($evalWarning) {
-                        $err = CleanWarning() . " in $wgrp1:$tag (${type}Inv)";
-                        $verbose > 2 and print $out "$err\n";
+                        # an empty warning ("\n") ignores tag with no error
+                        if ($evalWarning eq "\n") {
+                            $err = '' unless defined $err;
+                            ++$numSet;
+                        } else {
+                            $err = CleanWarning() . " in $wgrp1:$tag (${type}Inv)";
+                            $verbose > 2 and print $out "$err\n";
+                        }
                         undef $val;
                         last Conv;
                     } elsif (not defined $val) {
@@ -647,7 +734,27 @@ Conv:   while (defined $val and not $shift) {
                     }
                 } elsif ($conv) {
                     if (ref $conv eq 'HASH') {
-                        my $multi;
+                        my ($multi, $lc);
+                        # insert alternate language print conversions if required
+                        if ($$self{CUR_LANG} and $type eq 'PrintConv' and
+                            ref($lc = $self->{CUR_LANG}{$tag}) eq 'HASH' and
+                            ($lc = $$lc{PrintConv}))
+                        {
+                            my %newConv;
+                            foreach (keys %$conv) {
+                                my $val = $$conv{$_};
+                                defined $$lc{$val} or $newConv{$_} = $val, next;
+                                $newConv{$_} = $self->UTF82Charset($$lc{$val});
+                            }
+                            if ($$conv{BITMASK}) {
+                                foreach (keys %{$$conv{BITMASK}}) {
+                                    my $val = $$conv{BITMASK}{$_};
+                                    defined $$lc{$val} or $newConv{BITMASK}{$_} = $val, next;
+                                    $newConv{BITMASK}{$_} = $self->UTF82Charset($$lc{$val});
+                                }
+                            }
+                            $conv = \%newConv;
+                        }
                         if ($$conv{BITMASK}) {
                             my $lookupBits = $$conv{BITMASK};
                             my ($val2, $err2) = EncodeBits($val, $lookupBits);
@@ -667,19 +774,6 @@ Conv:   while (defined $val and not $shift) {
                                 $$conv{BITMASK} = $lookupBits;
                             }
                         } else {
-                            # insert alternate language print conversions if available
-                            while ($$self{CUR_LANG} and $type eq 'PrintConv') {
-                                my $lc = $self->{CUR_LANG}{$tag} or last;
-                                ref $lc eq 'HASH' and ($lc = $$lc{PrintConv}) or last;
-                                my %newConv;
-                                foreach (keys %$conv) {
-                                    my $val = $$conv{$_};
-                                    defined $$lc{$val} or $newConv{$_} = $val, next;
-                                    $newConv{$_} = $self->UTF82Charset($$lc{$val});
-                                }
-                                $conv = \%newConv;
-                                last;
-                            }
                             ($val, $multi) = ReverseLookup($val, $conv);
                         }
                         unless (defined $val) {
@@ -698,46 +792,23 @@ Conv:   while (defined $val and not $shift) {
                 last unless @valList;
                 $valList[$index] = $val;
                 if (++$index >= @valList) {
-                    $val = join ' ', @valList;
+                    # leave AutoSplit lists in ARRAY form, or join conversion lists
+                    $val = $$tagInfo{List} ? \@valList : join ' ', @valList;
                     last;
                 }
                 $conv = $$convList[$index] if $convList;
                 $convInv = $$convInvList[$index] if $convInvList;
                 $val = $valList[$index];
             }
-            # cycle through PrintConv, ValueConv
-            if ($type eq 'PrintConv') {
-                $type = 'ValueConv';
-            } else {
-                # validate the value with WriteCheck and CHECK_PROC if they exist
-                my $err2;
-                if ($tagInfo->{WriteCheck}) {
-                    #### eval WriteCheck ($self, $tagInfo, $val)
-                    $err2 = eval $tagInfo->{WriteCheck};
-                    $@ and warn($@), $err2 = 'Error evaluating WriteCheck';
-                }
-                unless ($err2) {
-                    my $table = $tagInfo->{Table};
-                    if ($table and $table->{CHECK_PROC} and not $$tagInfo{RawConvInv}) {
-                        my $checkProc = $table->{CHECK_PROC};
-                        $err2 = &$checkProc($self, $tagInfo, \$val);
-                    }
-                }
-                if ($err2) {
-                    $err = "$err2 for $wgrp1:$tag";
-                    $verbose > 2 and print $out "$err\n";
-                    undef $val; # value was invalid
-                }
-                last;
-            }
-        }
+        } # end ValueConv/PrintConv loop
+
         if (not defined $val and defined $value) {
             # if value conversion failed, we must still add a NEW_VALUE
             # entry for this tag it it was a DelValue
             next unless $options{DelValue};
             $val = 'xxx never delete xxx';
         }
-NoConv: $self->{NEW_VALUE} or $self->{NEW_VALUE} = { };
+        $self->{NEW_VALUE} or $self->{NEW_VALUE} = { };
         if ($options{Replace}) {
             # delete the previous new value
             $self->GetNewValueHash($tagInfo, $writeGroup, 'delete');
@@ -770,16 +841,15 @@ NoConv: $self->{NEW_VALUE} or $self->{NEW_VALUE} = { };
                 } elsif ($options{DelValue}) {
                     # don't create if we are replacing a specific value
                     $nvHash->{IsCreating} = 0 unless $val eq '' or $tagInfo->{List};
-                    if ($$tagInfo{List} and $self->{OPTIONS}{ListSplit}) {
-                        push @{$nvHash->{DelValue}}, split(/$self->{OPTIONS}{ListSplit}/, $val);
-                    } else {
-                        # add delete value to list
-                        push @{$nvHash->{DelValue}}, $val;
-                    }
+                    # add delete value to list
+                    push @{$nvHash->{DelValue}}, ref $val eq 'ARRAY' ? @$val : $val;
                     if ($verbose > 1) {
                         my $verb = $permanent ? 'Replacing' : 'Deleting';
                         my $fromList = $tagInfo->{List} ? ' from list' : '';
-                        print $out "$verb $wgrp1:$tag$fromList if value is '$val'\n";
+                        my @vals = (ref $val eq 'ARRAY' ? @$val : $val);
+                        foreach (@vals) {
+                            print $out "$verb $wgrp1:$tag$fromList if value is '$_'\n";
+                        }
                     }
                 }
             }
@@ -796,7 +866,7 @@ NoConv: $self->{NEW_VALUE} or $self->{NEW_VALUE} = { };
                          # also create tag if any DelValue value is empty ('')
                          grep(/^$/,@{$nvHash->{DelValue}}))
                 {
-                    $nvHash->{IsCreating} = 1;
+                    $nvHash->{IsCreating} = $options{EditOnly} ? 0 : 1;
                     # add to hash of groups where this tag is being created
                     $createGroups or $createGroups = $options{CreateGroups} || { };
                     $$createGroups{$self->GetGroup($tagInfo, 0)} = 1;
@@ -821,11 +891,9 @@ NoConv: $self->{NEW_VALUE} or $self->{NEW_VALUE} = { };
                 if (not $tagInfo->{List}) {
                     # not a List tag -- overwrite existing value
                     $nvHash->{Value}[0] = $val;
-                } elsif ($self->{OPTIONS}{ListSplit}) {
-                    push @{$nvHash->{Value}}, split(/$self->{OPTIONS}{ListSplit}/, $val);
                 } else {
                     # add to existing list
-                    push @{$nvHash->{Value}}, $val;
+                    push @{$nvHash->{Value}}, ref $val eq 'ARRAY' ? @$val : $val;
                 }
                 if ($verbose > 1) {
                     my $ifExists = $nvHash->{IsCreating} ? '' : ' if tag exists';
@@ -866,8 +934,8 @@ NoConv: $self->{NEW_VALUE} or $self->{NEW_VALUE} = { };
         }
     }
     # print warning if we couldn't set our priority tag
-    if ($err and not $prioritySet) {
-        warn "$err\n" unless wantarray;
+    if (defined $err and not $prioritySet) {
+        warn "$err\n" if $err and not wantarray;
     } elsif (not $numSet) {
         my $pre = $wantGroup ? "$wantGroup:" : '';
         if ($wasProtected) {
@@ -1034,7 +1102,8 @@ sub SetNewValuesFromFile($$;@)
                 return { Error => "Can't redirect from all tags to one tag" };
             }
             # set destination group the same as source if necessary
-            $dstGrp = $grp if $dstGrp eq '*' and $grp;
+          # (removed in 7.72 so '-xmp:*>*:*' will preserve XMP family 1 groups)
+          # $dstGrp = $grp if $dstGrp eq '*' and $grp;
             # write to specified destination group/tag
             $dst = [ $dstGrp, $dstTag ];
         } elsif ($isExclude) {
@@ -1206,8 +1275,11 @@ sub GetNewValues($;$$)
                     $@ and $evalWarning = $@;
                 }
                 if ($evalWarning) {
-                    my $err = CleanWarning() . " in $$tagInfo{Name} (RawConvInv)";
-                    $self->Warn($err);
+                    # an empty warning ("\n") ignores tag with no error
+                    if ($evalWarning ne "\n") {
+                        my $err = CleanWarning() . " in $$tagInfo{Name} (RawConvInv)";
+                        $self->Warn($err);
+                    }
                     @$vals = ();
                     last;
                 }
@@ -1241,12 +1313,18 @@ sub CountNewValues($)
     my $self = shift;
     my $newVal = $self->{NEW_VALUE};
     my $num = 0;
-    $num += scalar keys %$newVal if $newVal;
+    my $tag;
+    if ($newVal) {
+        $num += scalar keys %$newVal;
+        # don't count "fake" tags (only in Extra table)
+        foreach $tag (qw{Geotag}) {
+            --$num if defined $$newVal{$Image::ExifTool::Extra{$tag}};
+        }
+    }
     $num += scalar keys %{$self->{DEL_GROUP}};
     return $num unless wantarray;
     my $pseudo = 0;
     if ($newVal) {
-        my $tag;
         # (Note: all "pseudo" tags must be found in Extra table)
         foreach $tag (qw{FileName Directory FileModifyDate}) {
             ++$pseudo if defined $$newVal{$Image::ExifTool::Extra{$tag}};
@@ -1443,7 +1521,7 @@ sub WriteInfo($$;$$)
 {
     local $_;
     my ($self, $infile, $outfile, $outType) = @_;
-    my (@fileTypeList, $fileType, $tiffType, $hdr, $seekErr, $type);
+    my (@fileTypeList, $fileType, $tiffType, $hdr, $seekErr, $type, $tmpfile);
     my ($inRef, $outRef, $closeIn, $closeOut, $outPos, $outBuff, $eraseIn);
     my $oldRaf = $self->{RAF};
     my $rtnVal = 0;
@@ -1494,25 +1572,26 @@ sub WriteInfo($$;$$)
         $inRef = $infile;
         if (UNIVERSAL::isa($inRef,'GLOB')) {
             seek($inRef, 0, 0); # make sure we are at the start of the file
-        } elsif (eval 'require Encode; Encode::is_utf8($$inRef)') {
+        } elsif ($] >= 5.006 and (eval 'require Encode; Encode::is_utf8($$inRef)' or $@)) {
             # convert image data from UTF-8 to character stream if necessary
+            my $buff = $@ ? pack('C*',unpack('U0C*',$$inRef)) : Encode::encode('utf8',$$inRef);
             if (defined $outfile) {
-                my $buff = pack('C*', unpack('U0U*', $$inRef));
                 $inRef = \$buff;
             } else {
-                $$inRef = pack('C*', unpack('U0U*', $$inRef));
+                $$inRef = $buff;
             }
         }
     } elsif (defined $infile and $infile ne '') {
-        if (open(EXIFTOOL_FILE2, defined $outfile ? $infile : "+<$infile")) {
+        # write to a temporary file if no output file given
+        $outfile = $tmpfile = "${infile}_exiftool_tmp" unless defined $outfile;
+        if (open(EXIFTOOL_FILE2, $infile)) {
             $fileType = GetFileType($infile);
             $tiffType = GetFileExtension($infile);
             $self->VPrint(0, "Rewriting $infile...\n");
             $inRef = \*EXIFTOOL_FILE2;
             $closeIn = 1;   # we must close the file since we opened it
         } else {
-            my $forUpdate = (defined $outfile ? '' : ' for update');
-            $self->Error("Error opening file$forUpdate");
+            $self->Error('Error opening file');
             return 0;
         }
     } elsif (not defined $outfile) {
@@ -1555,6 +1634,7 @@ sub WriteInfo($$;$$)
         }
     } elsif (not defined $outfile) {
         # editing in place, so write to memory first
+        # (only when infile is a file ref or scalar ref)
         $outBuff = '';
         $outRef = \$outBuff;
         $outPos = 0;
@@ -1566,7 +1646,8 @@ sub WriteInfo($$;$$)
         binmode($outRef);
         $outPos = 0;
     } else {
-        $self->Error("Error creating file: $outfile");
+        my $tmp = $tmpfile ? ' temporary' : '';
+        $self->Error("Error creating$tmp file: $outfile");
     }
 #
 # write the file
@@ -1652,6 +1733,9 @@ sub WriteInfo($$;$$)
             } elsif ($type eq 'JP2') {
                 require Image::ExifTool::Jpeg2000;
                 $rtnVal = Image::ExifTool::Jpeg2000::ProcessJP2($self, \%dirInfo);
+            } elsif ($type eq 'IND') {
+                require Image::ExifTool::InDesign;
+                $rtnVal = Image::ExifTool::InDesign::ProcessIND($self, \%dirInfo);
             } elsif ($type eq 'EXIF') {
                 # go through WriteDirectory so block writes, etc are handled
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Exif::Main');
@@ -1677,15 +1761,23 @@ sub WriteInfo($$;$$)
         }
         # print file format errors
         unless ($rtnVal) {
+            my $err;
             if ($seekErr) {
-                $self->Error('Error seeking in file');
+                $err = 'Error seeking in file';
             } elsif ($fileType and defined $rtnVal) {
-                $self->{VALUE}{Error} or $self->Error('Format error in file');
+                if ($self->{VALUE}{Error}) {
+                    # existing error message will do
+                } elsif ($fileType eq 'RAW') {
+                    $err = 'Writing this type of RAW file is not supported';
+                } else {
+                    $err = 'Format error in file';
+                }
             } elsif ($fileType) {
-                $self->Error("ExifTool does not yet support writing of $fileType files");
+                $err = "Writing of $fileType files is not yet supported";
             } else {
-                $self->Error('ExifTool does not support writing of this type of file');
+                $err = 'Writing of this type of file is not supported';
             }
+            $self->Error($err) if $err;
             $rtnVal = 0;    # (in case it was undef)
         }
        # $raf->Close();  # only used to force debug output
@@ -1731,7 +1823,14 @@ sub WriteInfo($$;$$)
         # close file and set $rtnVal to -1 if there was an error
         $rtnVal and $rtnVal = -1 unless close($outRef);
         # erase the output file if we weren't successful
-        $rtnVal > 0 or unlink $outfile;
+        if ($rtnVal <= 0) {
+            unlink $outfile;
+        # else rename temporary file if necessary
+        } elsif ($tmpfile and not rename($tmpfile, $infile)) {
+            unlink $tmpfile;
+            $self->Error('Error renaming temporary file');
+            $rtnVal = 0;
+        }
     }
     # set FileModifyDate if requested (and if possible!)
     if (defined $fileModifyDate and $rtnVal > 0 and
@@ -2084,7 +2183,7 @@ sub ReverseLookup($$)
     my ($val, $conv) = @_;
     return undef unless defined $val;
     my $multi;
-    if ($val =~ /^Unknown\s*\((.+)\)$/i) {
+    if ($val =~ /^Unknown\s*\((.*)\)$/i) {
         $val = $1;    # was unknown
         if ($val =~ /^0x([\da-fA-F]+)$/) {
             $val = hex($val);   # convert hex value
@@ -2097,19 +2196,25 @@ sub ReverseLookup($$)
             "^(?i)$qval",       # beginning of string
             "(?i)$qval",        # substring
         );
+        # hash entries to ignore in reverse lookup
         my ($pattern, $found, $matches);
-        foreach $pattern (@patterns) {
+PAT:    foreach $pattern (@patterns) {
             $matches = scalar grep /$pattern/, values(%$conv);
             next unless $matches;
             # multiple matches are bad unless they were exact
-            last if $matches > 1 and $pattern !~ /\$$/;
+            if ($matches > 1 and $pattern !~ /\$$/) {
+                # don't match entries that we should ignore
+                foreach (keys %ignorePrintConv) {
+                    --$matches if defined $$conv{$_} and $$conv{$_} =~ /$pattern/;
+                }
+                last if $matches > 1;
+            }
             foreach (sort keys %$conv) {
-                next unless $$conv{$_} =~ /$pattern/;
+                next if $$conv{$_} !~ /$pattern/ or $ignorePrintConv{$_};
                 $val = $_;
                 $found = 1;
-                last;
+                last PAT;
             }
-            last;
         }
         unless ($found) {
             # call OTHER conversion routine if available
@@ -2607,7 +2712,7 @@ sub WriteDirectory($$$;$)
                     );
                     $dirInfo = \%dirInfo;
                 } else {
-                    return '';
+                    return '' unless $$dirInfo{NoDelete};
                 }
             }
         }
@@ -2618,7 +2723,7 @@ sub WriteDirectory($$$;$)
     # copy or delete new directory as a block if specified
     my $blockName = $dirName;
     $blockName = 'EXIF' if $blockName eq 'IFD0';
-    my $tagInfo = $Image::ExifTool::Extra{$blockName};
+    my $tagInfo = $Image::ExifTool::Extra{$blockName} || $$dirInfo{TagInfo};
     while ($tagInfo and ($nvHash = $self->{NEW_VALUE}{$tagInfo}) and IsOverwriting($nvHash)) {
         # protect against writing EXIF to wrong file types, etc
         if ($blockName eq 'EXIF') {
@@ -2646,7 +2751,7 @@ sub WriteDirectory($$$;$)
     }
     # guard against writing the same directory twice
     if (defined $dataPt and defined $$dirInfo{DirStart} and defined $$dirInfo{DataPos}) {
-        my $addr = $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base}||0);
+        my $addr = $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base}||0) + $$self{BASE};
         if ($self->{PROCESSED}{$addr}) {
             if ($self->Error("$dirName pointer references previous $self->{PROCESSED}{$addr} directory", 1)) {
                 return undef;
@@ -2659,7 +2764,7 @@ sub WriteDirectory($$$;$)
         $self->{PROCESSED}{$addr} = $dirName;
     }
     my $oldDir = $self->{DIR_NAME};
-    my $isRewriting = ($$dirInfo{DirLen} or (defined $dataPt and length $$dataPt));
+    my $isRewriting = ($$dirInfo{DirLen} or (defined $dataPt and length $$dataPt) or $$dirInfo{RAF});
     if ($out) {
         my $name = ($dirName eq 'MakerNotes' and $$dirInfo{TagInfo}) ?
                     $dirInfo->{TagInfo}{Name} : $dirName;
@@ -3254,7 +3359,7 @@ sub Charset2UTF8($$)
 #               0     - remove timezone and sub-seconds if they exist
 #               1     - add timezone if it doesn't exist
 #               undef - leave timezone alone
-#         3) flag to allow date-only
+#         3) flag to allow date-only (YYYY, YYYY:MM or YYYY:MM:DD)
 # Returns: formatted date/time string (or undef and issues warning on error)
 # Notes: currently accepts different separators, but doesn't use DateFormat yet
 sub InverseDateTime($$;$$)
@@ -3274,29 +3379,27 @@ sub InverseDateTime($$;$$)
     if ($val =~ /(\d{4})/g) {           # get YYYY
         my $yr = $1;
         my @a = ($val =~ /\d{2}/g);     # get MM, DD, and maybe hh, mm, ss
-        if (@a >= 2) {
-            if (@a == 2 and $dateOnly) {
-                $rtnVal = "$yr:$a[0]:$a[1]";
-            } else {
-                push @a, '00' while @a < 5; # add hh, mm, ss if not given
-                # add/remove timezone if necessary
-                if ($tzFlag) {
-                    if (not $tz) {
-                        if (eval 'require Time::Local') {
-                            # determine timezone offset for this time
-                            my @args = ($a[4],$a[3],$a[2],$a[1],$a[0]-1,$yr-1900);
-                            my $diff = Time::Local::timegm(@args) - TimeLocal(@args);
-                            $tz = TimeZoneString($diff / 60);
-                        } else {
-                            $tz = 'Z';  # don't know time zone
-                        }
+        if (@a >= 3) {
+            push @a, '00' while @a < 5; # add mm, ss if not given
+            # add/remove timezone if necessary
+            if ($tzFlag) {
+                if (not $tz) {
+                    if (eval 'require Time::Local') {
+                        # determine timezone offset for this time
+                        my @args = ($a[4],$a[3],$a[2],$a[1],$a[0]-1,$yr-1900);
+                        my $diff = Time::Local::timegm(@args) - TimeLocal(@args);
+                        $tz = TimeZoneString($diff / 60);
+                    } else {
+                        $tz = 'Z';  # don't know time zone
                     }
-                } elsif (defined $tzFlag) {
-                    $tz = $ss = ''; # remove timezone and sub-seconds
                 }
-                # construct properly formatted date/time string
-                $rtnVal = "$yr:$a[0]:$a[1] $a[2]:$a[3]:$a[4]$ss$tz";
+            } elsif (defined $tzFlag) {
+                $tz = $ss = ''; # remove timezone and sub-seconds
             }
+            # construct properly formatted date/time string
+            $rtnVal = "$yr:$a[0]:$a[1] $a[2]:$a[3]:$a[4]$ss$tz";
+        } elsif ($dateOnly) {
+            $rtnVal = join ':', $yr, @a;
         }
     }
     $rtnVal or warn "Invalid date/time (use YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM|Z])\n";
@@ -3339,7 +3442,7 @@ sub AssembleRational($$@)
 }
 
 #------------------------------------------------------------------------------
-# Convert a floating point number into a rational
+# Convert a floating point number (or 'inf' or 'undef') into a rational
 # Inputs: 0) floating point number, 1) optional maximum value (defaults to 0x7fffffff)
 # Returns: numerator, denominator (in list context)
 # Notes:
@@ -3350,6 +3453,8 @@ sub AssembleRational($$@)
 sub Rationalize($;$)
 {
     my $val = shift;
+    return (1, 0) if $val eq 'inf';
+    return (0, 0) if $val eq 'undef';
     # Note: Just testing "if $val" doesn't work because '0.0' is true!  (ugghh!)
     return (0, 1) if $val == 0;
     my $sign = $val < 0 ? ($val = -$val, -1) : 1;
@@ -3506,8 +3611,8 @@ sub WriteValue($$;$$$$)
             # validate numerical formats
             if ($format =~ /^int/) {
                 return undef unless IsInt($val) or IsHex($val);
-            } else {
-                return undef unless IsFloat($val);
+            } elsif (not IsFloat($val)) {
+                return undef unless $format =~ /^rational/ and $val eq 'inf' or $val eq 'undef';
             }
             $packed .= &$proc($val);
         }
@@ -3858,8 +3963,7 @@ sub WriteJPEG($$)
     my $delGroup = $self->{DEL_GROUP};
 
     # set input record separator to 0xff (the JPEG marker) to make reading quicker
-    my $oldsep = $/;
-    $/ = "\xff";
+    local $/ = "\xff";
 #
 # pre-scan image to determine if any create-able segment already exists
 #
@@ -4177,9 +4281,10 @@ sub WriteJPEG($$)
             }
             if ($oldOutfile) {
                 # locate preview image and fix up preview offsets
-                if (length($buff) < 1024) { # make sure we have at least 1kB of trailer
+                my $scanLen = $$self{Make} =~ /Sony/i ? 65536 : 1024;
+                if (length($buff) < $scanLen) { # make sure we have enough trailer to scan
                     my $buf2;
-                    $buff .= $buf2 if $raf->Read($buf2, 1024);
+                    $buff .= $buf2 if $raf->Read($buf2, $scanLen - length($buff));
                 }
                 # get new preview image position (subtract 10 for segment and EXIF headers)
                 my $newPos = length($$outfile) - 10;
@@ -4207,7 +4312,7 @@ sub WriteJPEG($$)
                 Write($outfile, $writeBuffer) or $err = 1;
                 undef $writeBuffer;
                 # write preview image
-                if ($previewInfo->{Data} ne 'LOAD') {
+                if ($previewInfo->{Data} ne 'LOAD_PREVIEW') {
                     # write any junk that existed before the preview image
                     Write($outfile, substr($buff,0,$junkLen)) or $err = 1 if $junkLen;
                     # write the saved preview image
@@ -4236,12 +4341,7 @@ sub WriteJPEG($$)
                         # copy over unknown trailer
                         $verbose and print $out "  Preserving unknown trailer ($extra bytes)\n";
                         $raf->Seek($endPos, 0) or $err = 1;
-                        while ($extra) {
-                            my $n = $extra < 65536 ? $extra : 65536;
-                            $raf->Read($buff, $n) == $n or $err = 1, last;
-                            Write($outfile, $buff) or $err = 1, last;
-                            $extra -= $n;
-                        }
+                        CopyBlock($raf, $outfile, $extra) or $err = 1;
                     }
                 }
             }
@@ -4644,7 +4744,6 @@ sub WriteJPEG($$)
         my $trailPt = $self->AddNewTrailers();
         Write($outfile, $$trailPt) or $err = 1 if $trailPt;
     }
-    $/ = $oldsep;     # restore separator to original value
     # set return value to -1 if we only had a write error
     $rtnVal = -1 if $rtnVal and $err;
     return $rtnVal;
@@ -4719,7 +4818,11 @@ sub CheckValue($$;$)
             return "Value above $format maximum" if $val > $$rng[1] and $val != 0xfeedfeed;
         } elsif ($format =~ /^rational/ or $format eq 'float' or $format eq 'double') {
             # make sure the value is a valid floating point number
-            return 'Not a floating point number' unless IsFloat($val);
+            unless (IsFloat($val)) {
+                # allow 'inf' and 'undef' rational values
+                next if $format =~ /^rational/ and $val eq 'inf' or $val eq 'undef';
+                return 'Not a floating point number' 
+            }
             if ($format =~ /^rational\d+u$/ and $val < 0) {
                 return 'Must be a positive number';
             }
@@ -4756,6 +4859,24 @@ sub CheckBinaryData($$$)
 }
 
 #------------------------------------------------------------------------------
+# Copy data block from RAF to output file in max 64kB chunks
+# Inputs: 0) RAF ref, 1) outfile ref, 2) block size
+# Returns: 1 on success, 0 on read error, undef on write error
+sub CopyBlock($$$)
+{
+    my ($raf, $outfile, $size) = @_;
+    my $buff;
+    for (;;) {
+        last unless $size > 0;
+        my $n = $size > 65536 ? 65536 : $size;
+        $raf->Read($buff, $n) == $n or return 0;
+        Write($outfile, $buff) or return undef;
+        $size -= $n;
+    }
+    return 1;
+}
+
+#------------------------------------------------------------------------------
 # copy image data from one file to another
 # Inputs: 0) ExifTool object reference
 #         1) reference to list of image data [ position, size, pad bytes ]
@@ -4771,13 +4892,8 @@ sub CopyImageData($$$)
     foreach $dataBlock (@$imageDataBlocks) {
         my ($pos, $size, $pad) = @$dataBlock;
         $raf->Seek($pos, 0) or $err = 'read', last;
-        while ($size) {
-            # copy in blocks of 64kB or smaller
-            my $n = $size > 65536 ? 65536 : $size;
-            $raf->Read($buff, $n) == $n or $err = 'read', last;
-            Write($outfile, $buff) or $err = 'writ', last;
-            $size -= $n;
-        }
+        my $result = CopyBlock($raf, $outfile, $size);
+        $result or $err = defined $result ? 'read' : 'writ';
         # pad if necessary
         Write($outfile, "\0" x $pad) or $err = 'writ' if $pad;
         last if $err;
@@ -4821,9 +4937,11 @@ sub WriteBinaryData($$$)
     $dataPt = \$newData;
     foreach $tagInfo ($self->GetNewTagInfoList($tagTablePtr)) {
         my $tagID = $tagInfo->{TagID};
-        # must check to be sure this tagInfo applies (ie. evaluate the condition!)
-        my $writeInfo = $self->GetTagInfo($tagTablePtr, $tagID);
-        next unless $writeInfo and $writeInfo eq $tagInfo;
+        # evaluate conditional tags now if necessary
+        if (ref $$tagTablePtr{$tagID} eq 'ARRAY' or $$tagInfo{Condition}) {
+            my $writeInfo = $self->GetTagInfo($tagTablePtr, $tagID);
+            next unless $writeInfo and $writeInfo eq $tagInfo;
+        }
         my $count = 1;
         my $format = $$tagInfo{Format};
         my $entry = int($tagID) * $increment;   # relative offset of this entry
@@ -4857,6 +4975,10 @@ sub WriteBinaryData($$$)
             warn 'Internal error' unless $newVal == 0xfeedfeed;
             my $data = $self->GetNewValues($$tagInfo{DataTag});
             $newVal = length($data) if defined $data;
+            my $format = $$tagInfo{Format} || $$tagTablePtr{FORMAT} || 'int32u';
+            if ($format =~ /^int16/ and $newVal > 0xffff) {
+                $self->Error("$$tagInfo{DataTag} is too large (64 kB max. for this file)");
+            }
         }
         my $rtnVal = WriteValue($newVal, $format, $count, $dataPt, $entry);
         if (defined $rtnVal) {
@@ -4875,11 +4997,13 @@ sub WriteBinaryData($$$)
             next unless $entry <= $dirLen - 4;
             # (Ricoh has 16-bit preview image offsets, so can't just assume int32u)
             my $format = $$tagInfo{Format} || $$tagTablePtr{FORMAT} || 'int32u';
+            my $offset = ReadValue($dataPt, $entry, $format, 1, $dirLen-$entry);
+            # ignore if offset is zero (ie. Ricoh DNG uses this to indicate no preview)
+            next unless $offset;
             $fixup->AddFixup($entry, $$tagInfo{DataTag}, $format);
             # handle the preview image now if this is a JPEG file
             next unless $self->{FILE_TYPE} eq 'JPEG' and $$tagInfo{DataTag} and
                 $$tagInfo{DataTag} eq 'PreviewImage' and defined $$tagInfo{OffsetPair};
-            my $offset = ReadValue($dataPt, $entry, $format, 1, $dirLen-$entry);
             $entry = $$tagInfo{OffsetPair} * $increment;
             my $size = ReadValue($dataPt, $entry, $format, 1, $dirLen-$entry);
             my $previewInfo = $self->{PREVIEW_INFO};
@@ -4891,7 +5015,7 @@ sub WriteBinaryData($$$)
                 if ($offset >= 0 and $offset + $size <= $$dirInfo{DataLen}) {
                     $previewInfo->{Data} = substr(${$$dirInfo{DataPt}},$offset,$size);
                 } else {
-                    $previewInfo->{Data} = 'LOAD'; # flag to load preview later
+                    $previewInfo->{Data} = 'LOAD_PREVIEW'; # flag to load preview later
                 }
             }
         }

@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.21';
+$VERSION = '1.27';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -31,11 +31,13 @@ my %coordConv = (
         When adding GPS information to an image, it is important to set all of the
         following tags: GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef,
         GPSAltitude and GPSAltitudeRef.  ExifTool will write the required
-        GPSVersionID tag automatically if new a GPS IFD is added to an image.
+        GPSVersionID tag automatically if new a GPS IFD is added to an image.  All
+        GPS tags listed below are part of the EXIF specification.
     },
     0x0000 => {
         Name => 'GPSVersionID',
         Writable => 'int8u',
+        Mandatory => 1,
         Count => 4,
         PrintConv => '$val =~ tr/ /./; $val',
         PrintConvInv => '$val =~ tr/./ /; $val',
@@ -83,7 +85,7 @@ my %coordConv = (
         Writable => 'rational64u',
         # extricate unsigned decimal number from string
         ValueConvInv => '$val=~/((?=\d|\.\d)\d*(?:\.\d*)?)/ ? $1 : undef',
-        PrintConv => '$val eq "inf" ? $val : "$val m"',
+        PrintConv => '$val =~ /^(inf|undef)$/ ? $val : "$val m"',
         PrintConvInv => '$val=~s/\s*m$//;$val',
     },
     0x0007 => {
@@ -92,6 +94,10 @@ my %coordConv = (
         Writable => 'rational64u',
         Count => 3,
         Shift => 'Time',
+        Notes => q{
+            when writing, date is stripped off if present, and time is adjusted to UTC
+            if it includes a timezone
+        },
         ValueConv => sub {
             my $val = shift;
             my ($h,$m,$s) = split ' ', $val;
@@ -109,12 +115,25 @@ my %coordConv = (
         },
         ValueConvInv => '$val=~tr/:/ /;$val',
         # pull time out of any format date/time string
-        # (eventually handle timezones? -- timestamp should be UTC)
+        # (converting to UTC if a timezone is given)
         PrintConvInv => sub {
             my $v = shift;
-            $v =~ s/[-+].*//s; # remove timezone
+            my @tz;
+            if ($v =~ s/([-+])(.*)//s) {    # remove timezone
+                my $s = $1 eq '-' ? 1 : -1; # opposite sign to convert back to UTC
+                my $t = $2;
+                @tz = ($s*$1, $s*$2) if $t =~ /^(\d{2}):?(\d{2})\s*$/;
+            }
             my @a = ($v =~ /((?=\d|\.\d)\d*(?:\.\d*)?)/g);
             push @a, '00' while @a < 3;
+            if (@tz) {
+                # adjust to UTC
+                $a[-2] += $tz[1];
+                $a[-3] += $tz[0];
+                while ($a[-2] >= 60) { $a[-2] -= 60; ++$a[-3] }
+                while ($a[-2] < 0)   { $a[-2] += 60; --$a[-3] }
+                $a[-3] = ($a[-3] + 24) % 24;
+            }
             return "$a[-3]:$a[-2]:$a[-1]";
         },
     },
@@ -266,10 +285,21 @@ my %coordConv = (
         Notes => 'YYYY:MM:DD',
         Count => 11,
         Shift => 'Time',
+        Notes => q{
+            when writing, time is stripped off if present, after adjusting date/time to
+            UTC if time includes a timezone
+        },
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => '$val',
         # pull date out of any format date/time string
-        PrintConvInv => '$val=~/(\d{4}).*?(\d{2}).*?(\d{2})/ ? "$1:$2:$3" : $val',
+        # (and adjust to UTC if this is a full date/time/timezone value)
+        PrintConvInv => q{
+            my $secs;
+            if ($val =~ /[-+]/ and ($secs = Image::ExifTool::GetUnixTime($val, 1))) {
+                $val = Image::ExifTool::ConvertUnixTime($secs);
+            }
+            return $val =~ /(\d{4}).*?(\d{2}).*?(\d{2})/ ? "$1:$2:$3" : undef;
+        },
     },
     0x001e => {
         Name => 'GPSDifferential',
@@ -283,6 +313,7 @@ my %coordConv = (
 
 # Composite GPS tags
 %Image::ExifTool::GPS::Composite = (
+    GROUPS => { 2 => 'Location' },
     GPSDateTime => {
         Description => 'GPS Date/Time',
         Groups => { 2 => 'Time' },
@@ -290,7 +321,7 @@ my %coordConv = (
             0 => 'GPS:GPSDateStamp',
             1 => 'GPS:GPSTimeStamp',
         },
-        ValueConv => '"$val[0] $val[1]"',
+        ValueConv => '"$val[0] $val[1]Z"',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     GPSLatitude => {
@@ -314,8 +345,11 @@ my %coordConv = (
             0 => 'GPS:GPSAltitude',
             1 => 'GPS:GPSAltitudeRef',
         },
-        ValueConv => '$val[1] ? "-$val[0]" : $val[0]',
-        PrintConv => '($val =~ s/^-// ? "$val m Below" : "$val m Above") . " Sea Level"'
+        ValueConv => '$val[1] ? -$val[0] : $val[0]',
+        PrintConv => q{
+            $val = int($val * 10) / 10;
+            return ($val =~ s/^-// ? "$val m Below" : "$val m Above") . " Sea Level";
+        },
     },
 );
 
@@ -340,6 +374,7 @@ sub ToDMS($$;$$)
         }
         $ref = " $ref" unless $doPrintConv and $doPrintConv eq '2';
     } else {
+        $val = abs($val);
         $ref = '';
     }
     if ($doPrintConv) {

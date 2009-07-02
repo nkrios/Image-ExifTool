@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.68
 [File, File, Image] FileName - File Name: PostScript.eps
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 11 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:11:03 19:04:15-05:00
+[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:11:03 09:32:08-05:00
 [File, File, Image] FileType - File Type: EPS
 [File, File, Image] MIMEType - MIME Type: application/postscript
 [File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
@@ -34,7 +34,7 @@
 [Photoshop, Photoshop, Image] 1061 - IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
 [XMP, XMP-x, Document] xmptk - XMP Toolkit: XMP toolkit 2.8.2-33, framework 1.5
 [XMP, XMP-rdf, Document] about - About: uuid:b691db36-f92a-11d9-99a4-8c8e8269c120
-[XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: My Position
+[XMP, XMP-photoshop, Author] AuthorsPosition - Author's Position: My Position
 [XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: I wrote it
 [XMP, XMP-photoshop, Image] Category - Category: 1
 [XMP, XMP-photoshop, Location] City - City: Kingston

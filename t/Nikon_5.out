@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
 [File, File, Image] FileName - File Name: NikonD2Hs.jpg
 [File, File, Image] Directory - Directory: t/images
 [File, File, Image] FileSize - File Size: 3.4 kB
@@ -28,7 +28,7 @@
 [EXIF, ExifIFD, Image] 36864 - Exif Version: 0221
 [EXIF, ExifIFD, Time] 36867 - Date/Time Original: 2005:03:18 02:55:18
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2005:03:18 02:55:18
-[EXIF, ExifIFD, Image] 37121 - Components Configuration: YCbCr
+[EXIF, ExifIFD, Image] 37121 - Components Configuration: Y, Cb, Cr, -
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 4
 [EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 1.7
@@ -129,7 +129,7 @@
 [MakerNotes, Nikon, Camera] 166 - Deleted Image Count: 0
 [MakerNotes, Nikon, Camera] 167 - Shutter Count: 2
 [MakerNotes, Nikon, Camera] 0 - Flash Info Version: 0100
-[MakerNotes, Nikon, Camera] 4 - Flash Model: (none)
+[MakerNotes, Nikon, Camera] 6 - External Flash Firmware: n/a
 [MakerNotes, Nikon, Camera] 8 - External Flash Flags: (none)
 [MakerNotes, Nikon, Camera] 9.1 - Flash Commander Mode: Off
 [MakerNotes, Nikon, Camera] 9.2 - Flash Control Mode: Off
@@ -141,7 +141,6 @@
 [MakerNotes, Nikon, Camera] 170 - Saturation: Normal
 [MakerNotes, Nikon, Camera] 177 - High ISO Noise Reduction: Normal
 [Composite, Composite, Image] Aperture - Aperture: 4.0
-[Composite, Composite, Camera] FlashOn - Flash: Off
 [Composite, Composite, Camera] LensID_2 - Lens ID: AF Nikkor 50mm f/1.8D
 [Composite, Composite, Camera] LensSpec - Lens: 50mm f/1.8 D
 [Composite, Composite, Image] PreviewImage - Preview Image: (Binary data 26 bytes)

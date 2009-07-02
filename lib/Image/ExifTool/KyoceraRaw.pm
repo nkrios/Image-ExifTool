@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessRAW($$);
 
@@ -46,6 +46,7 @@ sub ReverseString($) { pack('C*',reverse unpack('C*',shift)) }
         Groups => { 2 => 'Time' },
         Format => 'string[20]',
         ValueConv => \&ReverseString,
+        PrintConv => '$self->ConvertDateTime($val)',
     },
     0x34 => {
         Name => 'ISO',

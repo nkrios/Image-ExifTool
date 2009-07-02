@@ -30,7 +30,7 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 3: Write a bunch of new information a PNG in memory
+# test 3: Write a bunch of new information to a PNG in memory
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
