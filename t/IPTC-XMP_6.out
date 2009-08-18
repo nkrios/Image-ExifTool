@@ -1,5 +1,5 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.68
-[File, File, Image] FileSize - File Size: 5.8 kB
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.87
+[File, System, Image] FileSize - File Size: 5.8 kB
 [File, File, Image] FileType - File Type: XMP
 [File, File, Image] MIMEType - MIME Type: application/rdf+xml
 [XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 4.73
@@ -22,7 +22,7 @@
 [XMP, XMP-photoshop, Location] State - State: Ont
 [XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: amazing, image, utilities
 [XMP, XMP-photoshop, Image] TransmissionReference - Transmission Reference: What is a transmission reference?
-[XMP, XMP-photoshop, Image] Urgency - Urgency: 8
+[XMP, XMP-photoshop, Image] Urgency - Urgency: 8 (least urgent)
 [XMP, XMP-xmpBJ, Other] JobRefName - Job Ref Name: My Job
 [XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
 [XMP, XMP-xmpRights, Author] Marked - Marked: False

@@ -216,6 +216,7 @@ original version of the lens has the same LensType)</span>
   <br>25 = Minolta AF 100-300mm F4.5-5.6 APO (D) or Sigma Lens
   <br>25.1 = Sigma 100-300mm F4 EX (APO (D) or D IF)
   <br>25.2 = Sigma 70mm F2.8 EX DG Macro
+  <br>25.3 = Sigma 20mm F1.8 EX DG Aspherical RF
   <br>27 = Minolta AF 85mm F1.4 G (D)
   <br>28 = Minolta/Sony AF 100mm F2.8 Macro (D) or Tamron Lens
   <br>28.1 = Tamron SP AF 90mm F2.8 Di Macro
@@ -250,6 +251,7 @@ original version of the lens has the same LensType)</span>
   <br>52 = Sony 70-300mm F4.5-5.6 G SSM
   <br>53 = Sony AF 70-400mm F4.5-5.6 G SSM (SAL-70400G)
   <br>54 = Carl Zeiss Vario-Sonnar T* 16-35mm F2.8 ZA SSM (SAL-1635Z)
+  <br>55 = Sony DT 18-55mm F3.5-5.6 SAM (SAL-1855)
   <br>128 = Tamron or Sigma Lens (128)
   <br>128.1 = Tamron 18-200mm F3.5-6.3
   <br>128.2 = Tamron 28-300mm F3.5-6.3
@@ -1151,6 +1153,43 @@ version)</span></span></td></tr>
   <br>0x100 = Kelvin
   <br>0x200 = Manual</span></td></tr>
 <tr class=b>
+<td class=r title='12 = 0xc'>12</td>
+<td>FocusMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = AF-S
+  <br>1 = AF-C
+  <br>4 = AF-A
+  <br>5 = Manual
+  <br>6 = DMF</span></td></tr>
+<tr>
+<td class=r title='13 = 0xd'>13</td>
+<td>LocalAFArea</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Center
+  <br>2 = Top
+  <br>3 = Top-Right
+  <br>4 = Right
+  <br>5 = Bottom-Right
+  <br>6 = Bottom
+  <br>7 = Bottom-Left
+  <br>8 = Left
+  <br>9 = Top-Left</span></td></tr>
+<tr class=b>
+<td class=r title='14 = 0xe'>14</td>
+<td>AFAreaMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Wide
+  <br>1 = Local
+  <br>2 = Spot</span></td></tr>
+<tr>
+<td class=r title='15 = 0xf'>15</td>
+<td>FlashMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Auto
+  <br>2 = Rear Sync
+  <br>3 = Wireless
+  <br>4 = Fill Flash</span></td></tr>
+<tr class=b>
 <td class=r title='22 = 0x16'>22</td>
 <td>ColorMode</td>
 <td class=c>int16u</td>
@@ -1178,6 +1217,18 @@ version)</span></span></td></tr>
 <td class=c>int16u</td>
 <td><span class=s>0 = Normal</span></td></tr>
 <tr class=b>
+<td class=r title='28 = 0x1c'>28</td>
+<td>FlashMetering</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = ADI (Advanced Distance Integration)
+  <br>1 = Pre-flash TTL</span></td></tr>
+<tr>
+<td class=r title='29 = 0x1d'>29</td>
+<td>PrioritySetupShutterRelease</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = AF
+  <br>1 = Release</span></td></tr>
+<tr class=b>
 <td class=r title='30 = 0x1e'>30</td>
 <td>DriveMode</td>
 <td class=c>int16u</td>
@@ -1188,11 +1239,50 @@ version)</span></span></td></tr>
   <br>4 = Single-Frame Bracketing
   <br>5 = White Balance Bracketing</span></td></tr>
 <tr>
+<td class=r title='39 = 0x27'>39</td>
+<td>DynamicRangeOptimizer</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = Standard
+  <br>2 = Advanced</span></td></tr>
+<tr class=b>
+<td class=r title='50 = 0x32'>50</td>
+<td>FreeMemoryCardImages</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='59 = 0x3b'>59</td>
+<td>SonyImageSize</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Standard
+  <br>1 = Medium
+  <br>2 = Small</span></td></tr>
+<tr class=b>
+<td class=r title='60 = 0x3c'>60</td>
+<td>SonyQuality</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = RAW
+  <br>32 = Fine
+  <br>34 = RAW + JPEG
+  <br>48 = Standard</span></td></tr>
+<tr>
 <td class=r title='63 = 0x3f'>63</td>
 <td>NoiseReduction</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
+<tr class=b>
+<td class=r title='65 = 0x41'>65</td>
+<td>RedEyeReduction</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
+<td class=r title='71 = 0x47'>71</td>
+<td>ExposureCompensationMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Ambient and Flash
+  <br>1 = Ambient Only</span></td></tr>
 <tr class=b>
 <td class=r title='87 = 0x57'>87</td>
 <td>ImageStabilization</td>
@@ -1315,7 +1405,7 @@ DiMAGE X and Xt.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 9, 2009</i>
+<br><i>Last revised Aug 17, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

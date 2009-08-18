@@ -20,6 +20,7 @@
 #              12) Ioannis Panagiotopoulos private communication (E-510)
 #              13) Chris Shaw private communication (E-3)
 #              14) Viktor Lushnikov private communication (E-400)
+#              15) Yrjo Rauste private communication (E-30)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -29,7 +30,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.56';
+$VERSION = '1.60';
 
 sub PrintLensInfo($$$);
 
@@ -42,6 +43,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
 #
 # Tags 0x0000 through 0x0103 are the same as Konica/Minolta cameras (ref 3)
+# (removed 0x0101-0x0103 because they weren't supported by my samples - PH)
 #
     0x0000 => {
         Name => 'MakerNoteVersion',
@@ -90,42 +92,6 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'undef',
         WriteCheck => '$self->CheckImage(\$val)',
         Binary => 1,
-    },
-    0x0101 => {
-        Name => 'ColorMode',
-        Writable => 'int16u',
-        PrintConv => {
-            0 => 'Natural color',
-            1 => 'Black&white',
-            2 => 'Vivid color',
-            3 => 'Solarization',
-            4 => 'Adobe RGB',
-        },
-    },
-    0x0102 => {
-        Name => 'MinoltaQuality',
-        Writable => 'int16u',
-        PrintConv => {
-            0 => 'Raw',
-            1 => 'Superfine',
-            2 => 'Fine',
-            3 => 'Normal',
-            4 => 'Economy',
-            5 => 'Extra fine',
-        },
-    },
-    # (0x0103 is the same as 0x0102 above)
-    0x0103 => {
-        Name => 'MinoltaQuality',
-        Writable => 'int16u',
-        PrintConv => {
-            0 => 'Raw',
-            1 => 'Superfine',
-            2 => 'Fine',
-            3 => 'Normal',
-            4 => 'Economy',
-            5 => 'Extra fine',
-        },
     },
     0x0104 => { #11
         Name => 'BodyFirmwareVersion',
@@ -709,21 +675,24 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 # the size, but also the count is 2 bytes short for the subdirectory itself
 # (presumably the Olympus programmers forgot about the 2-byte entry count at the
 # start of the subdirectory).  This mess is straightened out and these subdirs
-# are written properly when ExifTool rewrites the file.  (This problem has been
-# fixed in the new-style MakerNoteOlympus2 maker notes since a standard SubIFD
-# offset value is used.) - PH
+# are written properly when ExifTool rewrites the file.  Note that this problem
+# has been fixed by Olympus in the new-style IFD maker notes since a standard
+# SubIFD offset value is used.  As written by the camera, the old style
+# directories have format 'undef' or 'string', and the new style has format
+# 'ifd'.  However, some older versions of exiftool may have rewritten the new
+# style as 'int32u', so handle both cases. - PH
 #
     0x2010 => [ #PH
         {
             Name => 'Equipment',
-            Condition => 'not $$self{OlympusType2}',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::Equipment',
                 ByteOrder => 'Unknown',
             },
         },
         {
-            Name => 'Equipment2',
+            Name => 'EquipmentIFD',
             Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
             Flags => 'SubIFD',
             FixFormat => 'ifd',
@@ -736,14 +705,14 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x2020 => [ #PH
         {
             Name => 'CameraSettings',
-            Condition => 'not $$self{OlympusType2}',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::CameraSettings',
                 ByteOrder => 'Unknown',
             },
         },
         {
-            Name => 'CameraSettings2',
+            Name => 'CameraSettingsIFD',
             Groups => { 1 => 'MakerNotes' },
             Flags => 'SubIFD',
             FixFormat => 'ifd',
@@ -756,14 +725,14 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x2030 => [ #PH
         {
             Name => 'RawDevelopment',
-            Condition => 'not $$self{OlympusType2}',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::RawDevelopment',
                 ByteOrder => 'Unknown',
             },
         },
         {
-            Name => 'RawDevelopment2',
+            Name => 'RawDevelopmentIFD',
             Groups => { 1 => 'MakerNotes' },
             Flags => 'SubIFD',
             FixFormat => 'ifd',
@@ -776,14 +745,14 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x2031 => [ #11
         {
             Name => 'RawDev2',
-            Condition => 'not $$self{OlympusType2}',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::RawDevelopment2',
                 ByteOrder => 'Unknown',
             },
         },
         {
-            Name => 'RawDev2_2',
+            Name => 'RawDev2IFD',
             Groups => { 1 => 'MakerNotes' },
             Flags => 'SubIFD',
             FixFormat => 'ifd',
@@ -796,14 +765,14 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x2040 => [ #PH
         {
             Name => 'ImageProcessing',
-            Condition => 'not $$self{OlympusType2}',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::ImageProcessing',
                 ByteOrder => 'Unknown',
             },
         },
         {
-            Name => 'ImageProcessing2',
+            Name => 'ImageProcessingIFD',
             Groups => { 1 => 'MakerNotes' },
             Flags => 'SubIFD',
             FixFormat => 'ifd',
@@ -816,14 +785,14 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x2050 => [ #PH
         {
             Name => 'FocusInfo',
-            Condition => 'not ($$self{OlympusType2} or $$self{OlympusCAMER})',
+            Condition => '$format ne "ifd" and $format ne "int32u" and not $$self{OlympusCAMER}',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::FocusInfo',
                 ByteOrder => 'Unknown',
             },
         },
         {
-            Name => 'FocusInfo2',
+            Name => 'FocusInfoIFD',
             Condition => 'not $$self{OlympusCAMER}',
             Groups => { 1 => 'MakerNotes' },
             Flags => 'SubIFD',
@@ -841,85 +810,251 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Binary => 1,
         },
     ],
-    0x2100 => { #11
-        Name => 'Olympus2100',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::FETags',
-            ByteOrder => 'Unknown',
+    0x2100 => [
+        { #11
+            Name => 'Olympus2100',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+            },
         },
-    },
-    0x2200 => { #11
-        Name => 'Olympus2200',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::FETags',
-            ByteOrder => 'Unknown',
+        { #PH
+            Name => 'Olympus2100IFD',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            FixFormat => 'ifd',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+                Start => '$val',
+            },
         },
-    },
-    0x2300 => { #11
-        Name => 'Olympus2300',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::FETags',
-            ByteOrder => 'Unknown',
+    ],
+    0x2200 => [
+        { #11
+            Name => 'Olympus2200',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+            },
         },
-    },
-    0x2400 => { #11
-        Name => 'Olympus2400',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::FETags',
-            ByteOrder => 'Unknown',
+        { #PH
+            Name => 'Olympus2200IFD',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            FixFormat => 'ifd',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+                Start => '$val',
+            },
         },
-    },
-    0x2500 => { #11
-        Name => 'Olympus2500',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::FETags',
-            ByteOrder => 'Unknown',
+    ],
+    0x2300 => [
+        { #11
+            Name => 'Olympus2300',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+            },
         },
-    },
-    0x2600 => { #11
-        Name => 'Olympus2600',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::FETags',
-            ByteOrder => 'Unknown',
+        { #PH
+            Name => 'Olympus2300IFD',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            FixFormat => 'ifd',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+                Start => '$val',
+            },
         },
-    },
-    0x2700 => { #11
-        Name => 'Olympus2700',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::FETags',
-            ByteOrder => 'Unknown',
+    ],
+    0x2400 => [
+        { #11
+            Name => 'Olympus2400',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+            },
         },
-    },
-    0x2800 => { #11
-        Name => 'Olympus2800',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::FETags',
-            ByteOrder => 'Unknown',
+        { #PH
+            Name => 'Olympus2400IFD',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            FixFormat => 'ifd',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+                Start => '$val',
+            },
         },
-    },
-    0x2900 => { #11
-        Name => 'Olympus2900',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Olympus::FETags',
-            ByteOrder => 'Unknown',
+    ],
+    0x2500 => [
+        { #11
+            Name => 'Olympus2500',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+            },
         },
-    },
+        { #PH
+            Name => 'Olympus2500IFD',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            FixFormat => 'ifd',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+                Start => '$val',
+            },
+        },
+    ],
+    0x2600 => [
+        { #11
+            Name => 'Olympus2600',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+            },
+        },
+        { #PH
+            Name => 'Olympus2600IFD',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            FixFormat => 'ifd',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+                Start => '$val',
+            },
+        },
+    ],
+    0x2700 => [
+        { #11
+            Name => 'Olympus2700',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+            },
+        },
+        { #PH
+            Name => 'Olympus2700IFD',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            FixFormat => 'ifd',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+                Start => '$val',
+            },
+        },
+    ],
+    0x2800 => [
+        { #11
+            Name => 'Olympus2800',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+            },
+        },
+        { #PH
+            Name => 'Olympus2800IFD',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            FixFormat => 'ifd',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+                Start => '$val',
+            },
+        },
+    ],
+    0x2900 => [
+        { #11
+            Name => 'Olympus2900',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+            },
+        },
+        { #PH
+            Name => 'Olympus2900IFD',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            FixFormat => 'ifd',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::FETags',
+                ByteOrder => 'Unknown',
+                Start => '$val',
+            },
+        },
+    ],
     0x3000 => [
         { #6
             Name => 'RawInfo',
-            Condition => 'not $$self{OlympusType2}',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::RawInfo',
                 ByteOrder => 'Unknown',
             },
         },
         { #PH
-            Name => 'RawInfo2',
+            Name => 'RawInfoIFD',
             Groups => { 1 => 'MakerNotes' },
             Flags => 'SubIFD',
             FixFormat => 'ifd',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::RawInfo',
+                Start => '$val',
+            },
+        },
+    ],
+    0x4000 => [ #PH
+        {
+            Name => 'MainInfo',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::Main',
+                ByteOrder => 'Unknown',
+            },
+        },
+        {
+            Name => 'MainInfoIFD',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            FixFormat => 'ifd',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::Main',
+                Start => '$val',
+            },
+        },
+    ],
+    0x5000 => [ #PH
+        {
+            Name => 'UnknownInfo',
+            Condition => '$format ne "ifd" and $format ne "int32u"',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::UnknownInfo',
+                ByteOrder => 'Unknown',
+            },
+        },
+        {
+            Name => 'UnknownInfoIFD',
+            Groups => { 1 => 'MakerNotes' },
+            Flags => 'SubIFD',
+            FixFormat => 'ifd',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::UnknownInfo',
                 Start => '$val',
             },
         },
@@ -1035,6 +1170,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             '1 6 0'  => 'Sigma 50-500mm F4.0-6.3 EX DG APO HSM RF', #6
             '1 7 0'  => 'Sigma 105mm F2.8 DG', #PH
             '1 8 0'  => 'Sigma 150mm F2.8 DG HSM', #PH
+            '1 16 0' => 'Sigma 24mm F1.8 EX DG Aspherical Macro', #PH
             '1 17 0' => 'Sigma 135-400mm F4.5-5.6 DG ASP APO RF', #11
             '1 18 0' => 'Sigma 300-800mm F5.6 EX DG APO', #11
             '1 20 0' => 'Sigma 50-500mm F4.0-6.3 EX DG APO HSM RF', #11
@@ -1293,6 +1429,11 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Format => 'int32u',
         Count => 64,
         PrintConv => 'Image::ExifTool::Olympus::PrintAFAreas($val)',
+    },
+    0x307 => { #15
+        Name => 'AFFineTuneAdj',
+        Format => 'int16s',
+        Count => 3, # not sure what the 3 values mean
     },
     0x400 => { #6
         Name => 'FlashMode',
@@ -2674,6 +2815,13 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16s',
         Count => 3,
     },
+);
+
+# Olympus unknown information tags
+%Image::ExifTool::Olympus::UnknownInfo = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
 );
 
 # Tags found only in some FE models

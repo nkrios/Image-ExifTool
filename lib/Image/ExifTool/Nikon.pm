@@ -50,7 +50,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.12';
+$VERSION = '2.15';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
@@ -258,7 +258,7 @@ my %nikonLensIDs = (
     '32 54 50 50 24 24 35 02' => 'Sigma Macro 50mm F2.8 EX DG',
     '79 48 5C 5C 24 24 1C 06' => 'Sigma Macro 70mm F2.8 EX DG', #JD
     '02 48 65 65 24 24 02 00' => 'Sigma 90mm F2.8 Macro',
-    '32 54 6A 6A 24 24 35 02' => 'Sigma Macro 105mm F2.8 EX DG',
+   # '32 54 6A 6A 24 24 35 02' => 'Sigma Macro 105mm F2.8 EX DG', (Same as Nikon)
     'E5 54 6A 6A 24 24 35 02' => 'Sigma Macro 105mm F2.8 EX DG',
     '48 48 76 76 24 24 4B 06' => 'Sigma 150mm F2.8 EX DG APO Macro HSM',
     'F5 48 76 76 24 24 4B 06' => 'Sigma 150mm F2.8 EX DG APO Macro HSM', #24
@@ -455,7 +455,7 @@ my %flashFirmware = (
     },
 );
 
-my %retouchValues = (
+my %retouchValues = ( #PH
     0 => 'None',
     3 => 'B & W',
     4 => 'Sepia',
@@ -468,6 +468,9 @@ my %retouchValues = (
     11 => 'Warm Tone',
     12 => 'Color Custom',
     13 => 'Image Overlay',
+    30 => 'Color Outline',
+    31 => 'Soft Filter',
+    33 => 'Miniature Effect',
 );
 
 # Nikon maker note tags
@@ -859,11 +862,22 @@ my %retouchValues = (
         { #JD (D300)
             # D3 and D300 use the same version number, but the length is different
             Condition => '$$valPt =~ /^0210/ and $count == 5291',
-            Name => 'ShotInfoD300',
+            Name => 'ShotInfoD300a',
             SubDirectory => {
-                TagTable => 'Image::ExifTool::Nikon::ShotInfoD300',
+                TagTable => 'Image::ExifTool::Nikon::ShotInfoD300a',
                 DecryptStart => 4,
                 DecryptLen => 813,
+                ByteOrder => 'BigEndian',
+            },
+        },
+        { #PH (D300, firmware version 1.10)
+            # yet again the same ShotInfoVersion for different data
+            Condition => '$$valPt =~ /^0210/ and $count == 5303',
+            Name => 'ShotInfoD300b',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::ShotInfoD300b',
+                DecryptStart => 4,
+                DecryptLen => 825,
                 ByteOrder => 'BigEndian',
             },
         },
@@ -960,7 +974,7 @@ my %retouchValues = (
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 WriteProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 DecryptStart => 284,
-                DecryptLen => 18, # but don't need to decrypt it all
+                DecryptLen => 18, # don't need to decrypt it all
                 DirOffset => 10,
             },
         },
@@ -2079,8 +2093,7 @@ my %nikonFocalConversions = (
     NOTES => q{
         Nikon encrypts the LensData information below if LensDataVersion is 0201 or
         higher, but  the decryption algorithm is known so the information can be
-        extracted.  It isn't yet writable, however, because the encryption adds
-        complications which make writing more difficult.
+        extracted.
     },
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
@@ -2169,8 +2182,7 @@ my %nikonFocalConversions = (
     NOTES => q{
         Nikon encrypts the LensData information below if LensDataVersion is 0201 or
         higher, but  the decryption algorithm is known so the information can be
-        extracted.  It isn't yet writable, however, because the encryption adds
-        complications which make writing more difficult.
+        extracted.
     },
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
@@ -3135,16 +3147,19 @@ my %nikonFocalConversions = (
     # note: DecryptLen currently set to 748
 );
 
-# shot information for the D300 (encrypted) - ref JD
-%Image::ExifTool::Nikon::ShotInfoD300 = (
+# shot information for the D300 firmware 1.00 (encrypted) - ref JD
+%Image::ExifTool::Nikon::ShotInfoD300a = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    VARS => { ID_LABEL => 'Index' }, # change TagID label in documentation
+    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    NOTES => 'These tags are extracted from encrypted data in D300 images.',
+    NOTES => q{
+        These tags are extracted from encrypted data in images from the D300 with
+        firmware 1.00.
+    },
     604 => {
         Name => 'ISO2',
         ValueConv => '100*exp(($val/12-5)*log(2))',
@@ -3161,10 +3176,10 @@ my %nikonFocalConversions = (
         Name => 'AFFineTuneAdj',
         Format => 'int16u',
         PrintHex => 1,
+        PrintConvColumns => 3,
         # thanks to Neil Nappe for the samples to decode this!...
         # (have seen various unknown values here when flash is enabled, but
         # these are yet to be decoded: 0x2e,0x619,0xd0d,0x103a,0x2029 - PH)
-        PrintConvColumns => 3,
         PrintConv => {
             0x403e => '+20',
             0x303e => '+19',
@@ -3209,7 +3224,112 @@ my %nikonFocalConversions = (
             0x40c2 => '-20',
         },
     },
-    791.1 => { # CSa1
+    791 => {
+        Name => 'CameraSettingsD300',
+        Format => 'undef[23]',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::CameraSettingsD300',
+        },
+    },
+    # note: DecryptLen currently set to 813
+);
+
+# shot information for the D300 firmware 1.10 (encrypted) - ref PH
+%Image::ExifTool::Nikon::ShotInfoD300b = (
+    PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+    WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        These tags are extracted from encrypted data in images from the D300 with
+        firmware 1.10.
+    },
+    613 => {
+        Name => 'ISO2',
+        ValueConv => '100*exp(($val/12-5)*log(2))',
+        ValueConvInv => '(log($val/100)/log(2)+5)*12',
+        PrintConv => 'int($val + 0.5)',
+        PrintConvInv => '$val',
+    },
+    644 => {
+        Name => 'ShutterCount',
+        Format => 'int32u',
+        Priority => 0,
+    },
+    732 => {
+        Name => 'AFFineTuneAdj',
+        Format => 'int16u',
+        PrintHex => 1,
+        PrintConvColumns => 3,
+        # thanks to Stuart Solomon for the samples to decode this!...
+        PrintConv => {
+            0x903e => '+20',
+            0x7c3e => '+19',
+            0x683e => '+18',
+            0x543e => '+17',
+            0x403e => '+16',
+            0x2c3e => '+15',
+            0x183e => '+14',
+            0x043e => '+13',
+            0xe03d => '+12',
+            0xb83d => '+11',
+            0x903d => '+10',
+            0x683d => '+9',
+            0x403d => '+8',
+            0x183d => '+7',
+            0xe03c => '+6',
+            0x903c => '+5',
+            0x403c => '+4',
+            0xe03b => '+3',
+            0x403b => '+2',
+            0x403a => '+1',
+            0x0000 => '0',
+            0x40c6 => '-1',
+            0x40c5 => '-2',
+            0xe0c5 => '-3',
+            0x40c4 => '-4',
+            0x90c4 => '-5',
+            0xe0c4 => '-6',
+            0x18c3 => '-7',
+            0x40c3 => '-8',
+            0x68c3 => '-9',
+            0x90c3 => '-10',
+            0xb8c3 => '-11',
+            0xe0c3 => '-12',
+            0x04c2 => '-13',
+            0x18c2 => '-14',
+            0x2cc2 => '-15',
+            0x40c2 => '-16',
+            0x54c2 => '-17',
+            0x68c2 => '-18',
+            0x7cc2 => '-19',
+            0x90c2 => '-20',
+        },
+    },
+    803 => {
+        Name => 'CameraSettingsD300',
+        Format => 'undef[23]',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::CameraSettingsD300',
+        },
+    },
+    # note: DecryptLen currently set to 825
+);
+
+# D300 camera settings (ref JD)
+%Image::ExifTool::Nikon::CameraSettingsD300 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    VARS => { ID_LABEL => 'Index' }, # change TagID label in documentation
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'D300 camera settings (firmware 1.00 and 1.10).',
+    0.1 => { # CSa1
         Name => 'AF-CPrioritySelection',
         Mask => 0xc0,
         PrintConv => {
@@ -3218,7 +3338,7 @@ my %nikonFocalConversions = (
             0x80 => 'Focus',
         },
     },
-    791.2 => { # CSa2
+    0.2 => { # CSa2
         Name => 'AF-SPrioritySelection',
         Mask => 0x20,
         PrintConv => {
@@ -3226,7 +3346,7 @@ my %nikonFocalConversions = (
             0x20 => 'Release',
         },
     },
-    791.3 => { # CSa8
+    0.3 => { # CSa8
         Name => 'AFPointSelection',
         Mask => 0x10,
         PrintConv => {
@@ -3234,7 +3354,7 @@ my %nikonFocalConversions = (
             0x10 => '11 Points',
         },
     },
-    791.4 => { # CSa3
+    0.4 => { # CSa3
         Name => 'DynamicAFArea',
         Mask => 0x0c,
         PrintConv => {
@@ -3244,7 +3364,7 @@ my %nikonFocalConversions = (
             0x0c => '51 Points (3D-tracking)',
         },
     },
-    791.5 => { # CSa4
+    0.5 => { # CSa4
         Name => 'FocusTrackingLockOn',
         Mask => 0x03,
         PrintConv => {
@@ -3254,7 +3374,7 @@ my %nikonFocalConversions = (
             0x03 => 'Off',
         },
     },
-    792.1 => { # CSa5
+    1.1 => { # CSa5
         Name => 'AFActivation',
         Mask => 0x80,
         PrintConv => {
@@ -3262,7 +3382,7 @@ my %nikonFocalConversions = (
             0x80 => 'AF-On Only',
         },
     },
-    792.2 => { # CSa7
+    1.2 => { # CSa7
         Name => 'FocusPointWrap',
         Mask => 0x08,
         PrintConv => {
@@ -3270,7 +3390,7 @@ my %nikonFocalConversions = (
             0x08 => 'Wrap',
         },
     },
-    792.3 => { # CSa6
+    1.3 => { # CSa6
         Name => 'AFPointIllumination',
         Mask => 0x06,
         PrintConv => {
@@ -3279,12 +3399,12 @@ my %nikonFocalConversions = (
             0x04 => 'On',
         },
     },
-    792.4 => { # CSa9
+    1.4 => { # CSa9
         Name => 'AFAssistIlluminator',
         Mask => 0x01,
         PrintConv => { 0x00 => 'On', 0x01 => 'Off' },
     },
-    793.1 => { # CSa10
+    2.1 => { # CSa10
         Name => 'AF-OnForMB-D10',
         Mask => 0x70,
         PrintConv => {
@@ -3297,7 +3417,7 @@ my %nikonFocalConversions = (
             0x60 => 'Same as FUNC Button',
         },
     },
-    796.1 => { # CSb1
+    5.1 => { # CSb1
         Name => 'ISOStepSize',
         Mask => 0xc0,
         PrintConv => {
@@ -3306,7 +3426,7 @@ my %nikonFocalConversions = (
             0x80 => '1 EV',
         },
     },
-    796.2 => { # CSb2
+    5.2 => { # CSb2
         Name => 'ExposureControlStepSize',
         Mask => 0x30,
         PrintConv => {
@@ -3315,7 +3435,7 @@ my %nikonFocalConversions = (
             0x20 => '1 EV',
         },
     },
-    796.3 => { # CSb3
+    5.3 => { # CSb3
         Name => 'FineTuneStepSize',
         Mask => 0x0c,
         PrintConv => {
@@ -3324,7 +3444,7 @@ my %nikonFocalConversions = (
             0x08 => '1 EV',
         },
     },
-    796.4 => { # CSb4
+    5.4 => { # CSb4
         Name => 'EasyExposureCompensation',
         Mask => 0x03,
         PrintConv => {
@@ -3333,7 +3453,7 @@ my %nikonFocalConversions = (
             0x02 => 'On (auto reset)',
         },
     },
-    797.1 => { # CSb5
+    6.1 => { # CSb5
         Name => 'CenterWeightedAreaSize',
         Mask => 0xe0,
         PrintConv => {
@@ -3344,7 +3464,7 @@ my %nikonFocalConversions = (
             0x80 => 'Average',
         },
     },
-    797.2 => { # CSb6-b
+    6.2 => { # CSb6-b
         Name => 'FineTuneOptCenterWeighted',
         Mask => 0x0f,
         ValueConv => '($val > 0x7 ? $val - 0x10 : $val) / 6',
@@ -3352,7 +3472,7 @@ my %nikonFocalConversions = (
         PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
         PrintConvInv => 'eval $val',
     },
-    798.1 => { # CSb6-a
+    7.1 => { # CSb6-a
         Name => 'FineTuneOptMatrixMetering',
         Mask => 0xf0,
         ValueConv => '($val > 0x70 ? $val - 0x100 : $val) / 0x60',
@@ -3360,7 +3480,7 @@ my %nikonFocalConversions = (
         PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
         PrintConvInv => 'eval $val',
     },
-    798.2 => { # CSb6-c
+    7.2 => { # CSb6-c
         Name => 'FineTuneOptSpotMetering',
         Mask => 0x0f,
         ValueConv => '($val > 0x7 ? $val - 0x10 : $val) / 6',
@@ -3368,7 +3488,7 @@ my %nikonFocalConversions = (
         PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
         PrintConvInv => 'eval $val',
     },
-    799.1 => { # CSf1-a
+    8.1 => { # CSf1-a
         Name => 'MultiSelectorShootMode',
         Mask => 0xc0,
         PrintConv => {
@@ -3377,7 +3497,7 @@ my %nikonFocalConversions = (
             0x80 => 'Not Used',
         },
     },
-    799.2 => { # CSf1-b
+    8.2 => { # CSf1-b
         Name => 'MultiSelectorPlaybackMode',
         Mask => 0x30,
         PrintConv => {
@@ -3387,7 +3507,7 @@ my %nikonFocalConversions = (
             0x30 => 'Choose Folder',
         },
     },
-    799.3 => { # CSf1-c
+    8.3 => { # CSf1-c
         Name => 'InitialZoomSetting',
         Mask => 0x0c,
         PrintConv => {
@@ -3396,7 +3516,7 @@ my %nikonFocalConversions = (
             0x08 => 'High Magnification',
         },
     },
-    799.4 => { # CSf2
+    8.4 => { # CSf2
         Name => 'MultiSelector',
         Mask => 0x01,
         PrintConv => {
@@ -3404,24 +3524,24 @@ my %nikonFocalConversions = (
             0x01 => 'Reset Meter-off Delay',
         },
     },
-    800.1 => { # CSd9
+    9.1 => { # CSd9
         Name => 'ExposureDelayMode',
         Mask => 0x40,
         PrintConv => { 0x00 => 'Off', 0x40 => 'On' },
     },
-    800.2 => { # CSd4
+    9.2 => { # CSd4
         Name => 'CLModeShootingSpeed',
         Mask => 0x07,
         PrintConv => '"$val fps"',
         PrintConvInv => '$val=~s/\s*fps//i; $val',
     },
-    801.1 => { # CSd5
+    10.1 => { # CSd5
         Name => 'MaxContinuousRelease',
         Mask => 0x7f,
         PrintConv => '"$val fps"',
         PrintConvInv => '$val=~s/\s*fps//i; $val',
     },
-    802.1 => { # CSf10
+    11.1 => { # CSf10
         Name => 'ReverseIndicators',
         Mask => 0x20,
         PrintConv => {
@@ -3429,12 +3549,12 @@ my %nikonFocalConversions = (
             0x20 => '- 0 +',
         },
     },
-    802.2 => { # CSd6
+    11.2 => { # CSd6
         Name => 'FileNumberSequence',
         Mask => 0x08,
         PrintConv => { 0x00 => 'On', 0x08 => 'Off' },
     },
-    802.3 => { # CSd11
+    11.3 => { # CSd11
         Name => 'BatteryOrder',
         Mask => 0x04,
         PrintConv => {
@@ -3442,7 +3562,7 @@ my %nikonFocalConversions = (
             0x04 => 'Camera Battery First',
         },
     },
-    802.4 => { # CSd10
+    11.4 => { # CSd10
         Name => 'MB-D10Batteries',
         Mask => 0x03,
         PrintConv => {
@@ -3452,7 +3572,7 @@ my %nikonFocalConversions = (
             0x03 => 'ZR6 (AA Ni-Mn)',
         },
     },
-    803.1 => { # CSd1
+    12.1 => { # CSd1
         Name => 'Beep',
         Mask => 0xc0,
         PrintConv => {
@@ -3461,7 +3581,7 @@ my %nikonFocalConversions = (
             0x80 => 'Off',
         },
     },
-    803.2 => { # CSd7
+    12.2 => { # CSd7
         Name => 'ShootingInfoDisplay',
         Mask => 0x30,
         PrintConv => {
@@ -3470,27 +3590,27 @@ my %nikonFocalConversions = (
             0x30 => 'Manual (light on dark)',
         },
     },
-    803.3 => { # CSd2
+    12.3 => { # CSd2
         Name => 'GridDisplay',
         Mask => 0x02,
         PrintConv => { 0x00 => 'Off', 0x02 => 'On' },
     },
-    803.4 => { # CSd3
+    12.4 => { # CSd3
         Name => 'ViewfinderWarning',
         Mask => 0x01,
         PrintConv => { 0x00 => 'On', 0x01 => 'Off' },
     },
-    807.1 => { # CSf7-a
+    16.1 => { # CSf7-a
         Name => 'CommandDialsReverseRotation',
         Mask => 0x80,
         PrintConv => { 0x00 => 'No', 0x80 => 'Yes' },
     },
-    807.2 => { # CSf7-b
+    16.2 => { # CSf7-b
         Name => 'CommandDialsChangeMainSub',
         Mask => 0x40,
         PrintConv => { 0x00 => 'Off', 0x40 => 'On' },
     },
-    807.3 => { # CSf7-c
+    16.3 => { # CSf7-c
         Name => 'CommandDialsApertureSetting',
         Mask => 0x20,
         PrintConv => {
@@ -3498,17 +3618,17 @@ my %nikonFocalConversions = (
             0x20 => 'Aperture Ring',
         },
     },
-    807.4 => { # CSf7-d
+    16.4 => { # CSf7-d
         Name => 'CommandDialsMenuAndPlayback',
         Mask => 0x10,
         PrintConv => { 0x00 => 'Off', 0x10 => 'On' },
     },
-    807.5 => { # CSd8
+    16.5 => { # CSd8
         Name => 'LCDIllumination',
         Mask => 0x08,
         PrintConv => { 0x00 => 'Off', 0x08 => 'On' },
     },
-    807.6 => { # CSf3
+    16.6 => { # CSf3
         Name => 'PhotoInfoPlayback',
         Mask => 0x04,
         PrintConv => {
@@ -3516,17 +3636,17 @@ my %nikonFocalConversions = (
             0x04 => 'Info Left-right, Playback Up-down',
         },
     },
-    807.7 => { # CSc1
+    16.7 => { # CSc1
         Name => 'ShutterReleaseButtonAE-L',
         Mask => 0x02,
         PrintConv => { 0x00 => 'Off', 0x02 => 'On' },
     },
-    807.8 => { # CSf7-e
+    16.8 => { # CSf7-e
         Name => 'ReleaseButtonToUseDial',
         Mask => 0x01,
         PrintConv => { 0x00 => 'No', 0x01 => 'Yes' },
     },
-    808.1 => { # CSc3
+    17.1 => { # CSc3
         Name => 'SelfTimerTime',
         Mask => 0x18,
         PrintConv => {
@@ -3536,7 +3656,7 @@ my %nikonFocalConversions = (
             0x18 => '20 s',
         },
     },
-    808.2 => { # CSc4
+    17.2 => { # CSc4
         Name => 'MonitorOffTime',
         Mask => 0x07,
         PrintConv => {
@@ -3547,7 +3667,7 @@ my %nikonFocalConversions = (
             0x04 => '10 min',
         },
     },
-    810.1 => { # CSe1
+    19.1 => { # CSe1
         Name => 'FlashSyncSpeed',
         Mask => 0xf0,
         PrintConv => {
@@ -3562,7 +3682,7 @@ my %nikonFocalConversions = (
             0x80 => '1/60 s',
         },
     },
-    810.2 => { # CSe2
+    19.2 => { # CSe2
         Name => 'FlashShutterSpeed',
         Mask => 0x0f,
         PrintConvColumns => 2,
@@ -3581,7 +3701,7 @@ my %nikonFocalConversions = (
             0x0b => '30 s',
         },
     },
-    811.1 => { # CSe5
+    20.1 => { # CSe5
         Name => 'AutoBracketSet',
         Mask => 0xc0,
         PrintConv => {
@@ -3591,7 +3711,7 @@ my %nikonFocalConversions = (
             0xc0 => 'WB Bracketing',
         },
     },
-    811.2 => { # CSe6
+    20.2 => { # CSe6
         Name => 'AutoBracketModeM',
         Mask => 0x30,
         PrintConv => {
@@ -3601,7 +3721,7 @@ my %nikonFocalConversions = (
             0x30 => 'Flash Only',
         },
     },
-    811.3 => { # CSe7
+    20.3 => { # CSe7
         Name => 'AutoBracketOrder',
         Mask => 0x08,
         PrintConv => {
@@ -3609,12 +3729,12 @@ my %nikonFocalConversions = (
             0x08 => '-,0,+',
         },
     },
-    811.4 => { # CSe4
+    20.4 => { # CSe4
         Name => 'ModelingFlash',
         Mask => 0x01,
         PrintConv => { 0x00 => 'On', 0x01 => 'Off' },
     },
-    812.1 => { # CSf9
+    21.1 => { # CSf9
         Name => 'NoMemoryCard',
         Mask => 0x80,
         PrintConv => {
@@ -3622,7 +3742,7 @@ my %nikonFocalConversions = (
             0x80 => 'Enable Release',
         },
     },
-    812.2 => { # CSc2
+    21.2 => { # CSc2
         Name => 'MeteringTime',
         Mask => 0x0f,
         PrintConvColumns => 2,
@@ -3639,7 +3759,7 @@ my %nikonFocalConversions = (
             0x09 => 'No Limit',
         },
     },
-    813.1 => { # CSe3
+    22.1 => { # CSe3
         Name => 'InternalFlash',
         Mask => 0xc0,
         PrintConv => {
@@ -3649,7 +3769,6 @@ my %nikonFocalConversions = (
             0xc0 => 'Commander Mode',
         },
     },
-    # note: DecryptLen currently set to 813
 );
 
 # Flash information (ref JD)

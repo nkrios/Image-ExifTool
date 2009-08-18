@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub ProcessMRW($$;$);
 
@@ -166,6 +166,7 @@ sub ProcessMRW($$;$);
     },
     6 => {
         Name => 'ISOSetting',
+        RawConv => '$val == 255 ? undef : $val',
         ValueConv => '2 ** (($val-48)/8) * 100',
         ValueConvInv => '48 + 8*log($val/100)/log(2)',
         PrintConv => 'int($val + 0.5)',

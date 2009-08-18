@@ -1,5 +1,5 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
-[File, File, Image] FileSize - File Size: 20 kB
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.87
+[File, System, Image] FileSize - File Size: 20 kB
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -92,7 +92,7 @@
 [Photoshop, Photoshop, Image] 0 - Photoshop Quality: 8
 [Photoshop, Photoshop, Image] 1 - Photoshop Format: Standard
 [Photoshop, Photoshop, Image] 2 - Progressive Scans: 3 Scans
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.74
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.87
 [XMP, XMP-rdf, Document] about - About: uuid:80056b68-1045-fa97-3401-6f4ed84cd53d
 [XMP, XMP-iptcCore, Author] CreatorContactInfoCiAdrCtry - Creator Country: Canada
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey-v2
@@ -113,7 +113,7 @@
 [XMP, XMP-photoshop, Location] State - State: Ont-v2
 [XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: amazing, image, utilities, v2
 [XMP, XMP-photoshop, Image] TransmissionReference - Transmission Reference: What is a transmission reference?-v2
-[XMP, XMP-photoshop, Image] Urgency - Urgency: 9
+[XMP, XMP-photoshop, Image] Urgency - Urgency: 8 (least urgent)
 [XMP, XMP-xmpBJ, Other] JobRefName - Job Ref Name: My Job-v2
 [XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a-v2
 [XMP, XMP-xmpRights, Author] Marked - Marked: False

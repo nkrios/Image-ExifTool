@@ -690,7 +690,7 @@ See L<http://www.iptc.org/IIM/> for the official IPTC specification.
      60    EnvelopePriority                     digits[1]
      70    DateSent                             digits[8]
      80    TimeSent                             string[11]
-     90    CodedCharacterSet                    string[0,32]
+     90    CodedCharacterSet                    string[0,32]!
     100    UniqueObjectName                     string[14,80]
     120    ARMIdentifier                        int16u
     122    ARMVersion                           int16u
@@ -2171,6 +2171,7 @@ this tag is neither extracted nor written unless specified explicitly.
   'calt'   CalibrationDateTime                  N
   'chad'   ChromaticAdaptation                  N
   'chrm'   Chromaticity                         ICC_Profile Chromaticity
+  'clot'   ColorantTableOut                     N
   'clro'   ColorantOrder                        N
   'clrt'   ColorantTable                        ICC_Profile ColorantTable
   'cprt'   ProfileCopyright                     N
@@ -2484,6 +2485,8 @@ This information is found in the PSD file header.
   0x4005   UnknownBlock2?                       N
   0x4008   BlackLevel?                          N
   0x4013   AFMicroAdj                           Canon AFMicroAdj
+  0x4015   VignettingCorr                       Canon VignettingCorr
+  0x4016   VignettingCorr2                      Canon VignettingCorr2
 
 =head3 Canon CameraSettings Tags
 
@@ -3452,6 +3455,19 @@ These tags are used by the PowerShot G10.
    -----   --------                             --------
       1    AFMicroAdjActive                     int32s
       2    AFMicroAdjValue                      rational64s
+
+=head3 Canon VignettingCorr Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      1    PeripheralLighting                   int32s
+      3    PeripheralLightingValue              int32s
+
+=head3 Canon VignettingCorr2 Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      5    PeripheralLightingSetting            int32s
 
 =head2 CanonCustom Tags
 
@@ -4820,12 +4836,24 @@ Camera settings information for the Sony DSLR-A100.
       0    ExposureMode                         int16u
       1    ExposureCompensation                 int16u
      11    WhiteBalance                         int16u
+     12    FocusMode                            int16u
+     13    LocalAFArea                          int16u
+     14    AFAreaMode                           int16u
+     15    FlashMode                            int16u
      22    ColorMode                            int16u
      24    Sharpness                            int16u
      25    Contrast                             int16u
      26    Saturation                           int16u
+     28    FlashMetering                        int16u
+     29    PrioritySetupShutterRelease          int16u
      30    DriveMode                            int16u
+     39    DynamicRangeOptimizer                int16u
+     50    FreeMemoryCardImages                 int16u
+     59    SonyImageSize                        int16u
+     60    SonyQuality                          int16u
      63    NoiseReduction                       int16u
+     65    RedEyeReduction                      int16u
+     71    ExposureCompensationMode             int16u
      87    ImageStabilization                   int32u[0.5]
      90    Rotation                             int16u
      94    ColorTemperature                     int16u
@@ -4924,7 +4952,8 @@ DiMAGE X and Xt.
   0x0090   LightSource                          string
   0x0091   ShotInfoD80                          Nikon ShotInfoD80
            ShotInfoD40                          Nikon ShotInfoD40
-           ShotInfoD300                         Nikon ShotInfoD300
+           ShotInfoD300a                        Nikon ShotInfoD300a
+           ShotInfoD300b                        Nikon ShotInfoD300b
            ShotInfo02xx                         Nikon ShotInfo
            ShotInfoUnknown?                     Nikon ShotInfo
   0x0092   HueAdjustment                        int16s
@@ -5139,67 +5168,88 @@ These tags are extracted from encrypted data in D40 and D40X images.
     739    FocusModeSetting                     int8u
     740    AFAreaModeSetting                    int8u
 
-=head3 Nikon ShotInfoD300 Tags
+=head3 Nikon ShotInfoD300a Tags
 
-These tags are extracted from encrypted data in D300 images.
+These tags are extracted from encrypted data in images from the D300 with
+firmware 1.00.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
     604    ISO2                                 int8u
     633    ShutterCount                         int32u
     721    AFFineTuneAdj                        int16u
-  791.1    AF-CPrioritySelection                int8u
-  791.2    AF-SPrioritySelection                int8u
-  791.3    AFPointSelection                     int8u
-  791.4    DynamicAFArea                        int8u
-  791.5    FocusTrackingLockOn                  int8u
-  792.1    AFActivation                         int8u
-  792.2    FocusPointWrap                       int8u
-  792.3    AFPointIllumination                  int8u
-  792.4    AFAssistIlluminator                  int8u
-  793.1    AF-OnForMB-D10                       int8u
-  796.1    ISOStepSize                          int8u
-  796.2    ExposureControlStepSize              int8u
-  796.3    FineTuneStepSize                     int8u
-  796.4    EasyExposureCompensation             int8u
-  797.1    CenterWeightedAreaSize               int8u
-  797.2    FineTuneOptCenterWeighted            int8u
-  798.1    FineTuneOptMatrixMetering            int8u
-  798.2    FineTuneOptSpotMetering              int8u
-  799.1    MultiSelectorShootMode               int8u
-  799.2    MultiSelectorPlaybackMode            int8u
-  799.3    InitialZoomSetting                   int8u
-  799.4    MultiSelector                        int8u
-  800.1    ExposureDelayMode                    int8u
-  800.2    CLModeShootingSpeed                  int8u
-  801.1    MaxContinuousRelease                 int8u
-  802.1    ReverseIndicators                    int8u
-  802.2    FileNumberSequence                   int8u
-  802.3    BatteryOrder                         int8u
-  802.4    MB-D10Batteries                      int8u
-  803.1    Beep                                 int8u
-  803.2    ShootingInfoDisplay                  int8u
-  803.3    GridDisplay                          int8u
-  803.4    ViewfinderWarning                    int8u
-  807.1    CommandDialsReverseRotation          int8u
-  807.2    CommandDialsChangeMainSub            int8u
-  807.3    CommandDialsApertureSetting          int8u
-  807.4    CommandDialsMenuAndPlayback          int8u
-  807.5    LCDIllumination                      int8u
-  807.6    PhotoInfoPlayback                    int8u
-  807.7    ShutterReleaseButtonAE-L             int8u
-  807.8    ReleaseButtonToUseDial               int8u
-  808.1    SelfTimerTime                        int8u
-  808.2    MonitorOffTime                       int8u
-  810.1    FlashSyncSpeed                       int8u
-  810.2    FlashShutterSpeed                    int8u
-  811.1    AutoBracketSet                       int8u
-  811.2    AutoBracketModeM                     int8u
-  811.3    AutoBracketOrder                     int8u
-  811.4    ModelingFlash                        int8u
-  812.1    NoMemoryCard                         int8u
-  812.2    MeteringTime                         int8u
-  813.1    InternalFlash                        int8u
+    791    CameraSettingsD300                   Nikon CameraSettingsD300
+
+=head3 Nikon ShotInfoD300b Tags
+
+These tags are extracted from encrypted data in images from the D300 with
+firmware 1.10.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+    613    ISO2                                 int8u
+    644    ShutterCount                         int32u
+    732    AFFineTuneAdj                        int16u
+    803    CameraSettingsD300                   Nikon CameraSettingsD300
+
+=head3 Nikon CameraSettingsD300 Tags
+
+D300 camera settings (firmware 1.00 and 1.10).
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+    0.1    AF-CPrioritySelection                int8u
+    0.2    AF-SPrioritySelection                int8u
+    0.3    AFPointSelection                     int8u
+    0.4    DynamicAFArea                        int8u
+    0.5    FocusTrackingLockOn                  int8u
+    1.1    AFActivation                         int8u
+    1.2    FocusPointWrap                       int8u
+    1.3    AFPointIllumination                  int8u
+    1.4    AFAssistIlluminator                  int8u
+    2.1    AF-OnForMB-D10                       int8u
+    5.1    ISOStepSize                          int8u
+    5.2    ExposureControlStepSize              int8u
+    5.3    FineTuneStepSize                     int8u
+    5.4    EasyExposureCompensation             int8u
+    6.1    CenterWeightedAreaSize               int8u
+    6.2    FineTuneOptCenterWeighted            int8u
+    7.1    FineTuneOptMatrixMetering            int8u
+    7.2    FineTuneOptSpotMetering              int8u
+    8.1    MultiSelectorShootMode               int8u
+    8.2    MultiSelectorPlaybackMode            int8u
+    8.3    InitialZoomSetting                   int8u
+    8.4    MultiSelector                        int8u
+    9.1    ExposureDelayMode                    int8u
+    9.2    CLModeShootingSpeed                  int8u
+   10.1    MaxContinuousRelease                 int8u
+   11.1    ReverseIndicators                    int8u
+   11.2    FileNumberSequence                   int8u
+   11.3    BatteryOrder                         int8u
+   11.4    MB-D10Batteries                      int8u
+   12.1    Beep                                 int8u
+   12.2    ShootingInfoDisplay                  int8u
+   12.3    GridDisplay                          int8u
+   12.4    ViewfinderWarning                    int8u
+   16.1    CommandDialsReverseRotation          int8u
+   16.2    CommandDialsChangeMainSub            int8u
+   16.3    CommandDialsApertureSetting          int8u
+   16.4    CommandDialsMenuAndPlayback          int8u
+   16.5    LCDIllumination                      int8u
+   16.6    PhotoInfoPlayback                    int8u
+   16.7    ShutterReleaseButtonAE-L             int8u
+   16.8    ReleaseButtonToUseDial               int8u
+   17.1    SelfTimerTime                        int8u
+   17.2    MonitorOffTime                       int8u
+   19.1    FlashSyncSpeed                       int8u
+   19.2    FlashShutterSpeed                    int8u
+   20.1    AutoBracketSet                       int8u
+   20.2    AutoBracketModeM                     int8u
+   20.3    AutoBracketOrder                     int8u
+   20.4    ModelingFlash                        int8u
+   21.1    NoMemoryCard                         int8u
+   21.2    MeteringTime                         int8u
+   22.1    InternalFlash                        int8u
 
 =head3 Nikon ShotInfo Tags
 
@@ -5264,8 +5314,7 @@ This structure is used by the D100, and D1X with firmware version 1.1.
 
 Nikon encrypts the LensData information below if LensDataVersion is 0201 or
 higher, but  the decryption algorithm is known so the information can be
-extracted.  It isn't yet writable, however, because the encryption adds
-complications which make writing more difficult.
+extracted.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -5288,8 +5337,7 @@ complications which make writing more difficult.
 
 Nikon encrypts the LensData information below if LensDataVersion is 0201 or
 higher, but  the decryption algorithm is known so the information can be
-extracted.  It isn't yet writable, however, because the encryption adds
-complications which make writing more difficult.
+extracted.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -5741,9 +5789,6 @@ and Agfa cameras.
   0x0088   PreviewImageStart                    N
   0x0089   PreviewImageLength                   N
   0x0100   ThumbnailImage                       undef
-  0x0101   ColorMode                            int16u
-  0x0102   MinoltaQuality                       int16u
-  0x0103   MinoltaQuality                       int16u
   0x0104   BodyFirmwareVersion                  string
   0x0200   SpecialMode                          int32u[3]~
   0x0201   Quality                              int16u~
@@ -5833,29 +5878,42 @@ and Agfa cameras.
   0x103e   LightValuePeriphery                  rational64s
   0x103f   FieldCount?                          int16u
   0x2010   Equipment                            Olympus Equipment
-           Equipment2                           Olympus Equipment
+           EquipmentIFD                         Olympus Equipment
   0x2020   CameraSettings                       Olympus CameraSettings
-           CameraSettings2                      Olympus CameraSettings
+           CameraSettingsIFD                    Olympus CameraSettings
   0x2030   RawDevelopment                       Olympus RawDevelopment
-           RawDevelopment2                      Olympus RawDevelopment
+           RawDevelopmentIFD                    Olympus RawDevelopment
   0x2031   RawDev2                              Olympus RawDevelopment2
-           RawDev2_2                            Olympus RawDevelopment2
+           RawDev2IFD                           Olympus RawDevelopment2
   0x2040   ImageProcessing                      Olympus ImageProcessing
-           ImageProcessing2                     Olympus ImageProcessing
+           ImageProcessingIFD                   Olympus ImageProcessing
   0x2050   FocusInfo                            Olympus FocusInfo
-           FocusInfo2                           Olympus FocusInfo
+           FocusInfoIFD                         Olympus FocusInfo
            CameraParameters                     undef
   0x2100   Olympus2100                          Olympus FE
+           Olympus2100IFD                       Olympus FE
   0x2200   Olympus2200                          Olympus FE
+           Olympus2200IFD                       Olympus FE
   0x2300   Olympus2300                          Olympus FE
+           Olympus2300IFD                       Olympus FE
   0x2400   Olympus2400                          Olympus FE
+           Olympus2400IFD                       Olympus FE
   0x2500   Olympus2500                          Olympus FE
+           Olympus2500IFD                       Olympus FE
   0x2600   Olympus2600                          Olympus FE
+           Olympus2600IFD                       Olympus FE
   0x2700   Olympus2700                          Olympus FE
+           Olympus2700IFD                       Olympus FE
   0x2800   Olympus2800                          Olympus FE
+           Olympus2800IFD                       Olympus FE
   0x2900   Olympus2900                          Olympus FE
+           Olympus2900IFD                       Olympus FE
   0x3000   RawInfo                              Olympus RawInfo
-           RawInfo2                             Olympus RawInfo
+           RawInfoIFD                           Olympus RawInfo
+  0x4000   MainInfo                             Olympus
+           MainInfoIFD                          Olympus
+  0x5000   UnknownInfo                          Olympus UnknownInfo
+           UnknownInfoIFD                       Olympus UnknownInfo
 
 =head3 Olympus TextInfo Tags
 
@@ -5913,6 +5971,7 @@ any information found here will be extracted, even if the tag is not listed.
   0x0302   FocusProcess                         int16u[n]
   0x0303   AFSearch                             int16u
   0x0304   AFAreas                              int32u[64]~
+  0x0307   AFFineTuneAdj                        int16s[3]
   0x0400   FlashMode                            int16u
   0x0401   FlashExposureComp                    rational64s
   0x0403   FlashRemoteControl                   int16u
@@ -6130,6 +6189,12 @@ These tags are found only in ORF images of some models (ie. C8080WZ).
   0x2021   CMHue                                int16s[3]
   0x2022   CMContrast                           int16s[3]
   0x2023   CMSharpness                          int16s[3]
+
+=head3 Olympus UnknownInfo Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  [no tags known]
 
 =head3 Olympus MOV1 Tags
 
@@ -6774,7 +6839,12 @@ This information is found in Sanyo MP4 videos.
      24    Model                                N
      50    FNumber                              N
     106    ISO                                  N
-   2048    ThumbnailImage                       N
+    209    Software                             N
+    210    Software                             N
+    253    ThumbnailLength                      N
+    254    ThumbnailLength                      N
+    257    ThumbnailOffset                      N
+    258    ThumbnailOffset                      N
 
 =head2 Sigma Tags
 
@@ -6839,14 +6909,16 @@ tags.
   0x0102   Quality                              int32u
   0x0104   FlashExposureComp                    rational64s
   0x0105   Teleconverter                        int32u
-  0x0112   WhiteBalanceFineTune                 int32s
+  0x0112   WhiteBalanceFineTune                 int32u
   0x0114   CameraSettings                       Sony CameraSettings
+           CameraSettings2                      Sony CameraSettings2
   0x0115   WhiteBalance                         N
   0x0e00   PrintIM                              PrintIM
   0x2001   PreviewImage                         undef
   0x3000   ShotInfo                             Sony ShotInfo
   0xb020   ColorReproduction                    string
   0xb021   ColorTemperature                     int32u
+  0xb022   ColorCompensationFilter              int32u
   0xb023   SceneMode                            int32u
   0xb024   ZoneMatching                         int32u
   0xb025   DynamicRangeOptimizer                int32u
@@ -6862,14 +6934,57 @@ tags.
 
 =head3 Sony CameraSettings Tags
 
+Camera settings for the A200, A300, A350, A700 and A900.
+
    Index   Tag Name                             Writable
    -----   --------                             --------
+      4    DriveMode                            int16u
+      6    WhiteBalanceFineTune                 int16s
+     16    FocusMode                            int16u
      17    AFArea                               int16u
+     18    LocalAFAreaPoint                     int16u
+     21    MeteringMode                         int16u
      22    ISOSetting                           int16u
+     24    DynamicRangeOptimizerMode            int16u
+     25    DynamicRangeOptimizerLevel           int16u
      26    CreativeStyle                        int16u
      28    Sharpness                            int16u
      29    Contrast                             int16u
      30    Saturation                           int16u
+     31    ZoneMatchingValue                    int16u
+     34    Brightness                           int16u
+     35    FlashMode                            int16u
+     40    PrioritySetupShutterRelease          int16u
+     41    AFIlluminator                        int16u
+     42    AFWithShutter                        int16u
+     43    LongExposureNoiseReduction           int16u
+     44    HighISONoiseReduction                int16u
+     45    ImageStyle                           int16u
+     60    ExposureProgram                      int16u
+     61    ImageStabilization                   int16u
+     63    Rotation                             int16u
+     84    SonyImageSize                        int16u
+     85    AspectRatio                          int16u
+     86    Quality                              int16u
+     88    ExposureLevelIncrements              int16u
+
+=head3 Sony CameraSettings2 Tags
+
+Camera settings for the A330 and A380.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+     16    FocusMode                            int16u
+     17    AFArea                               int16u
+     18    LocalAFAreaPoint                     int16u
+     19    MeteringMode                         int16u
+     20    ISOSetting                           int16u
+     22    DynamicRangeOptimizerMode            int16u
+     23    DynamicRangeOptimizerLevel           int16u
+     24    CreativeStyle                        int16u
+     25    Sharpness                            int16u
+     26    Contrast                             int16u
+     27    Saturation                           int16u
      35    FlashMode                            int16u
      60    ExposureProgram                      int16u
      63    Rotation                             int16u
@@ -7712,6 +7827,9 @@ official specification.
   0xb20d   RollAngle                            N
 
 =head3 MPF MPImage Tags
+
+The first MPF "Large Thumbnail" image is extracted as PreviewImage, and the
+rest of the embedded MPF images are extracted as MPImage#.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -9166,6 +9284,9 @@ ID3 version 2.2 tags.  (These are the tags written by iTunes 5.0.)
   'COM'    Comment                              N
   'IPL'    InvolvedPeople                       N
   'PIC'    Picture                              N
+  'PIC-1'  PictureFormat                        N
+  'PIC-2'  PictureType                          N
+  'PIC-3'  PictureDescription                   N
   'SLT'    SynchronizedLyricText                N
   'TAL'    Album                                N
   'TBP'    BeatsPerMinute                       N
@@ -9220,6 +9341,9 @@ ID3 version 2.3 tags
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   'APIC'   Picture                              N
+  'APIC-1' PictureMimeType                      N
+  'APIC-2' PictureType                          N
+  'APIC-3' PictureDescription                   N
   'COMM'   Comment                              N
   'IPLS'   InvolvedPeople                       N
   'MCDI'   MusicCDIdentifier                    N
@@ -9295,6 +9419,9 @@ ID3 version 2.4 tags
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   'APIC'   Picture                              N
+  'APIC-1' PictureMimeType                      N
+  'APIC-2' PictureType                          N
+  'APIC-3' PictureDescription                   N
   'COMM'   Comment                              N
   'MCDI'   MusicCDIdentifier                    N
   'PCNT'   PlayCounter                          N
@@ -9570,6 +9697,38 @@ These tags are extracted for variable bitrate audio.
   VBRFrames                                     N
   VBRBytes                                      N
   VBRScale                                      N
+
+=head2 M2TS Tags
+
+The MPEG-2 transport stream is used as a container for many different
+audio/video formats (including AVCHD).  This table represents information
+extracted from the MPEG-2 transport headers.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  AudioStreamType                               N
+  VideoStreamType                               N
+
+=head3 M2TS H264 Tags
+
+Tags extracted from H.264 video streams.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  DateTimeOriginal                              N
+  ImageHeight                                   N
+  ImageWidth                                    N
+
+=head3 M2TS AC3 Tags
+
+Tags extracted from AC-3 audio streams.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  AudioBitrate                                  N
+  AudioChannels                                 N
+  AudioSampleRate                               N
+  SurroundMode                                  N
 
 =head2 QuickTime Tags
 
@@ -13193,9 +13352,10 @@ This information is extracted from ZIP archives.
 
 The extra tags represent extra information extracted or generated by
 ExifTool that is not directly associated with another tag group.  The three
-writable "pseudo" tags (Filename, Directory and FileModifyDate) may be
+writable "pseudo" tags (FileName, Directory and FileModifyDate) may be
 written without the need to rewrite the file since their values are not
-contained within the file data.
+contained within the file data.  These "pseudo" tags belong to the family 1
+"System" group.
 
   Tag Name                                      Writable
   --------                                      --------

@@ -458,6 +458,13 @@ sub WritePS($$)
     my $editDirs = $exifTool->{EDIT_DIRS};
     my %doneDir;
 
+    # disable writing XMP to PS-format Adobe Illustrator files (it confuses Illustrator)
+    if ($$editDirs{XMP} and $$exifTool{FILE_EXT} and $$exifTool{FILE_EXT} eq 'AI') {
+        $exifTool->Warn("Can't write XMP to PS-format AI files", 1);
+        delete $$addDirs{XMP};
+        delete $$editDirs{XMP}; # (need this too or XMP will still be added)
+    }
+
     # set XMP hint flag (1 for adding, 0 for deleting, undef for no change)
     $xmpHint = 1 if $$addDirs{XMP};
     $xmpHint = 0 if $exifTool->{DEL_GROUP}->{XMP};

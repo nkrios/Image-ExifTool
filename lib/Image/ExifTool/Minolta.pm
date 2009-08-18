@@ -26,6 +26,8 @@
 #              16) Thomas Kassner private communication
 #              17) Mladen Sever private communication
 #              18) Olaf Ulrich private communication
+#              19) Lukasz Stelmach private communication
+#              20) Igal Milchtaich private communication (A100 firmware 1.04)
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -36,7 +38,7 @@ use vars qw($VERSION %minoltaLensTypes %minoltaColorMode %sonyColorMode %minolta
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.53';
+$VERSION = '1.56';
 
 # lens ID numbers (ref 3)
 # ("New" and "II" appear in brackets if original version also has this LensType)
@@ -74,6 +76,7 @@ $VERSION = '1.53';
     25 => 'Minolta AF 100-300mm F4.5-5.6 APO (D) or Sigma Lens',
     25.1 => 'Sigma 100-300mm F4 EX (APO (D) or D IF)', #JD
     25.2 => 'Sigma 70mm F2.8 EX DG Macro', #JD
+    25.3 => 'Sigma 20mm F1.8 EX DG Aspherical RF', #19
     27 => 'Minolta AF 85mm F1.4 G (D)', # added (D) (ref 13)
     28 => 'Minolta/Sony AF 100mm F2.8 Macro (D) or Tamron Lens',
     # 28 => 'Sony 100mm F2.8 Macro (SAL-100M28)' (ref 18)
@@ -112,6 +115,7 @@ $VERSION = '1.53';
     52 => 'Sony 70-300mm F4.5-5.6 G SSM', #JD
     53 => 'Sony AF 70-400mm F4.5-5.6 G SSM (SAL-70400G)', #17
     54 => 'Carl Zeiss Vario-Sonnar T* 16-35mm F2.8 ZA SSM (SAL-1635Z)', #17
+    55 => 'Sony DT 18-55mm F3.5-5.6 SAM (SAL-1855)', #PH
     128 => 'Tamron or Sigma Lens (128)',
     128.1 => 'Tamron 18-200mm F3.5-6.3',
     128.2 => 'Tamron 28-300mm F3.5-6.3',
@@ -1342,6 +1346,47 @@ $VERSION = '1.53';
             0x200 => 'Manual',
         },
     },
+    0x0c => { #20
+        Name => 'FocusMode',
+        PrintConv => {
+            0 => 'AF-S',
+            1 => 'AF-C',
+            4 => 'AF-A',
+            5 => 'Manual',
+            6 => 'DMF',
+        },
+    },
+    0x0d => { #20
+        Name => 'LocalAFArea',
+        PrintConv => {
+            1 => 'Center',
+            2 => 'Top',
+            3 => 'Top-Right',
+            4 => 'Right',
+            5 => 'Bottom-Right',
+            6 => 'Bottom',
+            7 => 'Bottom-Left',
+            8 => 'Left',
+            9 => 'Top-Left',
+        },
+    },
+    0x0e => { #20
+        Name => 'AFAreaMode',
+        PrintConv => {
+            0 => 'Wide',
+            1 => 'Local',
+            2 => 'Spot',
+        },
+    },
+    0x0f => { #20
+        Name => 'FlashMode',
+        PrintConv => {
+            0 => 'Auto',
+            2 => 'Rear Sync',
+            3 => 'Wireless',
+            4 => 'Fill Flash',
+        },
+    },
     # 0x12 => 'MeteringMode' (ref 15)
     # 0x13 => 'ISO' (ref 15)
     # 0x14 => 'ZoneMatching' (ref 15)
@@ -1378,6 +1423,20 @@ $VERSION = '1.53';
         ValueConvInv => '$val + 10',
         %Image::ExifTool::Exif::printParameter,
     },
+    0x1c => { #20
+        Name => 'FlashMetering',
+        PrintConv => {
+            0 => 'ADI (Advanced Distance Integration)',
+            1 => 'Pre-flash TTL',
+        },
+    },
+    0x1d => { #20
+        Name => 'PrioritySetupShutterRelease',
+        PrintConv => {
+            0 => 'AF',
+            1 => 'Release',
+        },
+    },
     0x1e => { #PH
         Name => 'DriveMode',
         PrintConv => {
@@ -1389,9 +1448,46 @@ $VERSION = '1.53';
             5 => 'White Balance Bracketing',
         },
     },
+    0x27 => { #20
+        Name => 'DynamicRangeOptimizer',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Standard',
+            2 => 'Advanced',
+        },
+    },
+    0x32 => 'FreeMemoryCardImages', #20
+    0x3b => { #20
+        Name => 'SonyImageSize',
+        PrintConv => {
+            0 => 'Standard',
+            1 => 'Medium',
+            2 => 'Small',
+        },
+    },
+    0x3c => { #20
+        Name => 'SonyQuality',
+        PrintConv => {
+            0 => 'RAW',
+            32 => 'Fine',
+            34 => 'RAW + JPEG',
+            48 => 'Standard',
+        },
+    },
     0x3f => { #PH
         Name => 'NoiseReduction',
         PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x41 => { #20
+        Name => 'RedEyeReduction',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x47 => { #20
+        Name => 'ExposureCompensationMode',
+        PrintConv => {
+            0 => 'Ambient and Flash',
+            1 => 'Ambient Only',
+        },
     },
     0x5a => { #15
         Name => 'Rotation',
@@ -1603,8 +1699,9 @@ under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Jay Al-Saadi, Niels Kristian Bech Jensen, Shingo Noguchi, Pedro
-Corte-Real, Jeffery Small, Jens Duttke,  Thomas Kassner, Mladen Sever and
-Olaf Ulrich for the information they provided.
+Corte-Real, Jeffery Small, Jens Duttke,  Thomas Kassner, Mladen Sever, Olaf
+Ulrich, Lukasz Stelmach and Igal Milchtaich for the information they
+provided.
 
 =head1 SEE ALSO
 

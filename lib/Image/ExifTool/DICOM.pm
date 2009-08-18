@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 # DICOM VR (Value Representation) format conversions
 my %dicomFormat = (
@@ -935,7 +935,7 @@ my %implicitVR = (
     '0028,0100' => { VR => 'US', Name => 'BitsAllocated' },
     '0028,0101' => { VR => 'US', Name => 'BitsStored' },
     '0028,0102' => { VR => 'US', Name => 'HighBit' },
-    '0028,0103' => { VR => 'US', Name => 'PixelRepresentation' },
+    '0028,0103' => { VR => 'US', Name => 'PixelRepresentation', PrintConv => { 0 => 'Unsigned', 1 => 'Signed' } },
     '0028,0104' => { VR => 'RET',Name => 'SmallestValidPixelValue' },
     '0028,0105' => { VR => 'RET',Name => 'LargestValidPixelValue' },
     '0028,0106' => { VR => 'SS', Name => 'SmallestImagePixelValue' },
@@ -2106,9 +2106,9 @@ my %implicitVR = (
     '60xx,4000' => { VR => 'RET',Name => 'OverlayComments' },
     # pixel data group
     '7FE0,0000' => { VR => 'UL', Name => 'PixelDataGroupLength' },
-    '7FE0,0010' => { VR => 'OB', Name => 'PixelData' },
+    '7FE0,0010' => { VR => 'OB', Name => 'PixelData', Binary => 1 },
     'FFFA,FFFA' => { VR => 'SQ', Name => 'DigitalSignaturesSequence' },
-    'FFFC,FFFC' => { VR => 'OB', Name => 'DataSetTrailingPadding' },
+    'FFFC,FFFC' => { VR => 'OB', Name => 'DataSetTrailingPadding', Binary => 1 },
     # the sequence delimiters have no VR:
     'FFFE,E000' => 'StartOfItem',
     'FFFE,E00D' => 'EndOfItems',

@@ -1055,7 +1055,7 @@ other XMP tags.  (see <a href="http://www.optimasc.com/products/fileid/">http://
 <tr>
 <td>PatientsBirthDate</td>
 <td class=c>date</td>
-<td><span class=s><span class=n>(called PatientDOB by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called PatientDOB by the spec)</span></span></td></tr>
 <tr class=b>
 <td>PatientID</td>
 <td class=c>string</td>
@@ -1063,11 +1063,11 @@ other XMP tags.  (see <a href="http://www.optimasc.com/products/fileid/">http://
 <tr>
 <td>PatientsName</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(called PatientName by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called PatientName by the spec)</span></span></td></tr>
 <tr class=b>
 <td>PatientsSex</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(called PatientSex by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called PatientSex by the spec)</span></span></td></tr>
 <tr>
 <td>SeriesDateTime</td>
 <td class=c>date</td>
@@ -1192,7 +1192,7 @@ other XMP tags.  (see <a href="http://www.optimasc.com/products/fileid/">http://
 <tr class=b>
 <td>ExposureCompensation</td>
 <td class=c>rational</td>
-<td><span class=s><span class=n>(called ExposureBiasValue by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called ExposureBiasValue by the spec)</span></span></td></tr>
 <tr>
 <td>ExposureIndex</td>
 <td class=c>rational</td>
@@ -1268,7 +1268,7 @@ other XMP tags.  (see <a href="http://www.optimasc.com/products/fileid/">http://
 <tr>
 <td>FocalLengthIn35mmFormat</td>
 <td class=c>integer</td>
-<td><span class=s><span class=n>(called FocalLengthIn35mmFilm by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called FocalLengthIn35mmFilm by the spec)</span></span></td></tr>
 <tr class=b>
 <td>FocalPlaneResolutionUnit</td>
 <td class=c>integer</td>
@@ -1418,7 +1418,7 @@ Composite:GPSDateTime when copying from EXIF)</span></span></td></tr>
 <tr>
 <td>ISO</td>
 <td class=c>integer+</td>
-<td><span class=s><span class=n>(called ISOSpeedRatings by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called ISOSpeedRatings by the spec)</span></span></td></tr>
 <tr class=b>
 <td>LightSource</td>
 <td class=c>string</td>
@@ -1484,11 +1484,11 @@ Composite:GPSDateTime when copying from EXIF)</span></span></td></tr>
 <tr>
 <td>ExifImageWidth</td>
 <td class=c>integer</td>
-<td><span class=s><span class=n>(called PixelXDimension by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called PixelXDimension by the spec)</span></span></td></tr>
 <tr class=b>
 <td>ExifImageHeight</td>
 <td class=c>integer</td>
-<td><span class=s><span class=n>(called PixelYDimension by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called PixelYDimension by the spec)</span></span></td></tr>
 <tr>
 <td>RelatedSoundFile</td>
 <td class=c>string</td>
@@ -1684,11 +1684,11 @@ but ExifTool shortens this for the &quot;XMP-iptcExt&quot; family 1 group name.
 <tr class=b>
 <td>ControlledVocabularyTerm</td>
 <td class=c>string+</td>
-<td><span class=s><span class=n>(called CVterm by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called CVterm by the spec)</span></span></td></tr>
 <tr>
 <td>DigitalImageGUID</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(called DigImageGUID by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called DigImageGUID by the spec)</span></span></td></tr>
 <tr class=b>
 <td>DigitalSourceFileType</td>
 <td class=c>string</td>
@@ -2023,7 +2023,7 @@ created to enable writing of XMP-pdfx information.</p>
 <tr>
 <td>ICCProfileName</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(called ICCProfile by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called ICCProfile by the spec)</span></span></td></tr>
 <tr class=b>
 <td>Instructions</td>
 <td class=c>string</td>
@@ -2055,7 +2055,17 @@ created to enable writing of XMP-pdfx information.</p>
 <tr>
 <td>Urgency</td>
 <td class=c>integer</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(should be in the range 1-8 to conform with the XMP spec)</span>
+  <br>0 = 0 (reserved)
+  <br>1 = 1 (most urgent)
+  <br>2 = 2
+  <br>3 = 3
+  <br>4 = 4
+  <br>5 = 5 (normal urgency)
+  <br>6 = 6
+  <br>7 = 7
+  <br>8 = 8 (least urgent)
+  <br>9 = 9 (user-defined priority)</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='PixelLive'>XMP PixelLive Tags</a></h2>
@@ -2482,7 +2492,7 @@ below.  (see <a href="http://ns.useplus.org/">http://ns.useplus.org/</a>)</p>
 <tr>
 <td>PLUSVersion</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(called Version by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called Version by the spec)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='prism'>XMP prism Tags</a></h2>
@@ -2906,7 +2916,7 @@ treated specially to allow it to be set to a specific value if required.</p>
 <tr>
 <td>ImageHeight</td>
 <td class=c>integer</td>
-<td><span class=s><span class=n>(called ImageLength by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called ImageLength by the spec)</span></span></td></tr>
 <tr class=b>
 <td>ImageWidth</td>
 <td class=c>integer</td>
@@ -3027,7 +3037,7 @@ treated specially to allow it to be set to a specific value if required.</p>
 <tr>
 <td>XMPToolkit</td>
 <td class=c>string!</td>
-<td><span class=s><span class=n>(called xmptk by the spec.)</span></span></td></tr>
+<td><span class=s><span class=n>(called xmptk by the spec)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='xmp'>XMP xmp Tags</a></h2>
@@ -4215,7 +4225,7 @@ XMP module for convenience.  (see <a href="http://www.w3.org/TR/SVG11/">http://w
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 19, 2009</i>
+<br><i>Last revised Aug 12, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

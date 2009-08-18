@@ -30,7 +30,7 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 3: Write MIE information
+# test 3: Write MIE information (also test Escape option when writing)
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
@@ -40,6 +40,9 @@ my $testnum = 1;
     $exifTool->SetNewValue('MIE:FNumber' => 11);
     $exifTool->SetNewValue('XMP:Creator' => 'phil');
     $exifTool->SetNewValue('IPTC:Keywords' => 'cool');
+    $exifTool->Options(Escape => 'HTML');
+    $exifTool->SetNewValue('MIE:PhoneNumber' => 'k&uuml;hl');
+    $exifTool->Options(Escape => undef);
     my $testfile = "t/${testname}_${testnum}_failed.mie";
     unlink $testfile;
     $exifTool->WriteInfo('t/images/MIE.mie', $testfile);
@@ -52,15 +55,17 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 4: Create a MIE file from scratch
+# test 4: Create a MIE file from scratch (also test Escape option when copying)
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(IgnoreMinorErrors => 1); # to copy invalid thumbnail
+    $exifTool->Options(Escape => 'HTML');
     $exifTool->SetNewValuesFromFile('t/images/MIE.mie');
     my $testfile = "t/${testname}_${testnum}_failed.mie";
     unlink $testfile;
     $exifTool->WriteInfo(undef, $testfile);
+    $exifTool->Options(Escape => undef); # reset Escape option
     my $info = $exifTool->ImageInfo($testfile, '-filename', '-directory');
     if (check($exifTool, $info, $testname, $testnum, 2)) {
         unlink $testfile;

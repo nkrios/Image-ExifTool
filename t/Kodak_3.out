@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
-[File, File, Image] FileName - File Name: Kodak_3_failed.jpg
-[File, File, Image] Directory - Directory: t
-[File, File, Image] FileSize - File Size: 3.3 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:04:07 11:44:01-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: Kodak_3_failed.jpg
+[File, System, Image] Directory - Directory: t
+[File, System, Image] FileSize - File Size: 3.3 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:29-04:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)

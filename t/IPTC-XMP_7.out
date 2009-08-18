@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
-[File, File, Image] FileName - File Name: IPTC-XMP_7_failed.xmp
-[File, File, Image] Directory - Directory: t
-[File, File, Image] FileSize - File Size: 5.5 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:04:07 08:24:30-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.87
+[File, System, Image] FileName - File Name: IPTC-XMP_7_failed.xmp
+[File, System, Image] Directory - Directory: t
+[File, System, Image] FileSize - File Size: 5.5 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:08:12 09:45:31-04:00
 [File, File, Image] FileType - File Type: XMP
 [File, File, Image] MIMEType - MIME Type: application/rdf+xml
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.74
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.87
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey
@@ -49,7 +49,7 @@
 [XMP, XMP-photoshop, Location] State - State: Ont
 [XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: amazing, image, utilities
 [XMP, XMP-photoshop, Image] TransmissionReference - Transmission Reference: What is a transmission reference?
-[XMP, XMP-photoshop, Image] Urgency - Urgency: 8
+[XMP, XMP-photoshop, Image] Urgency - Urgency: 8 (least urgent)
 [XMP, XMP-tiff, Author] Artist - Artist: Phil Harvey
 [XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)

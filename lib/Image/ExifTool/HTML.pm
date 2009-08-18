@@ -20,7 +20,7 @@ use Image::ExifTool::PostScript;
 use Image::ExifTool::XMP qw(EscapeXML UnescapeXML);
 require Exporter;
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -273,7 +273,7 @@ sub EscapeChar($)
     my $ch = shift;
     my $val;
     if ($] < 5.006001) {
-        ($val) = UnpackUTF8($ch);
+        ($val) = Image::ExifTool::UnpackUTF8($ch);
     } else {
         # the meaning of "U0" is reversed as of Perl 5.10.0!
         ($val) = unpack($] < 5.010000 ? 'U0U' : 'C0U', $ch);

@@ -1218,8 +1218,8 @@ sub CalcRotation($)
     my ($i, $track);
     # get the video track family 1 group (ie. "Track1");
     for ($i=0; ; ++$i) {
-        my $ind = $i ? " ($i)" : '';
-        my $tag = "HandlerType$ind";
+        my $idx = $i ? " ($i)" : '';
+        my $tag = "HandlerType$idx";
         last unless $$value{$tag};
         next unless $$value{$tag} eq 'vide';
         $track = $exifTool->GetGroup($tag, 1);
@@ -1228,8 +1228,8 @@ sub CalcRotation($)
     return undef unless $track;
     # get the video track matrix
     for ($i=0; ; ++$i) {
-        my $ind = $i ? " ($i)" : '';
-        my $tag = "MatrixStructure$ind";
+        my $idx = $i ? " ($i)" : '';
+        my $tag = "MatrixStructure$idx";
         last unless $$value{$tag};
         next unless $exifTool->GetGroup($tag, 1) eq $track;
         my @a = split ' ', $$value{$tag};

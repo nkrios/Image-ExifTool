@@ -141,13 +141,21 @@ of the TIFF header, which is 48 bytes into the file.  Also, the A200 stores the
 StripOffsets and the StripByteCounts values in the wrong byte order.</p>
 
 <p><b>Sony ARW:</b> The A100 with firmware 1.00 sets the high word of the
-thumbnail image offset to zero, but it should be 0x0001.  This problem is fixed
-for firmware 1.04, but may or may not exist in versions between 1.00 and
-1.04.</p>
+thumbnail image offset to zero, but it should sometimes be 0x0001.  (This
+problem is fixed for firmware 1.02, but it is not known if it exists in version
+1.01.) Also, the JpgFromRawLength stored in IFD0 is wrong (although this value
+is also stored in the MakerNotes and is correct here).  As well, much
+information in these images is encrypted, which complicates things somewhat. 
+Even the Sony IDC utility can't properly rewrite ARW files -- it corrupts the
+embedded MRW record when used to edit ARW images.</p>
+
+<p><b>Leica DNG:</b> The makernote offsets for the M8 are relative to the
+start of the makernote IFD in JPEG images, but relative to the start of the
+makernote header (8 bytes earlier) in DNG images.</p>
 
 <hr>
 <i>Created Mar. 25, 2005</i>
-<br><i>Last revised Dec. 10, 2008</i>
+<br><i>Last revised Jul. 14, 2009</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

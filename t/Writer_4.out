@@ -1,5 +1,5 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileSize - File Size: 7.6 kB
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileSize - File Size: 7.6 kB
 [File, File, Image] FileType - File Type: TIFF
 [File, File, Image] MIMEType - MIME Type: image/tiff
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
@@ -24,7 +24,7 @@
 [EXIF, IFD0, Image] 305 - Software: GraphicConverter
 [EXIF, IFD0, Time] 306 - Modify Date: 2004:02:20 08:07:49
 [EXIF, IFD0, Image] 317 - Predictor: None
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.64
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.83
 [XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: new XMP info
 [IPTC, IPTC, Other] 0 - Application Record Version: 2
 [IPTC, IPTC, Other] 120 - Caption-Abstract: The picture caption

@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 %Image::ExifTool::MPEG::Audio = (
     GROUPS => { 2 => 'Audio' },
@@ -377,7 +377,7 @@ sub ProcessFrameHeader($$@)
 # Read MPEG audio frame header
 # Inputs: 0) ExifTool object reference, 1) Reference to audio data
 # Returns: 1 on success, 0 if no audio header was found
-sub ProcessMPEGAudio($$)
+sub ParseMPEGAudio($$)
 {
     my ($exifTool, $buffPt) = @_;
     my ($word, $pos);
@@ -480,12 +480,12 @@ sub ProcessMPEGVideo($$)
 # Read MPEG audio and video frame headers
 # Inputs: 0) ExifTool object reference, 1) Reference to audio/video data
 # Returns: 1 on success, 0 if no video header was found
-sub ProcessMPEGAudioVideo($$)
+sub ParseMPEGAudioVideo($$)
 {
     my ($exifTool, $buffPt) = @_;
     my (%found, $didHdr);
     my $rtnVal = 0;
-    my %proc = ( audio => \&ProcessMPEGAudio, video => \&ProcessMPEGVideo );
+    my %proc = ( audio => \&ParseMPEGAudio, video => \&ProcessMPEGVideo );
 
     delete $exifTool->{AudioBitrate};
     delete $exifTool->{VideoBitrate};
@@ -497,7 +497,7 @@ sub ProcessMPEGAudioVideo($$)
             # (the last byte of the 4-byte MP3 audio frame header word may be zero,
             # but the 2nd last must be non-zero, so we need only check to pos-3)
             my $buff = substr($$buffPt, 0, pos($$buffPt) - 3);
-            $found{audio} = 1 if ProcessMPEGAudio($exifTool, \$buff);
+            $found{audio} = 1 if ParseMPEGAudio($exifTool, \$buff);
             $didHdr = 1;
         }
         next if $found{$type};
@@ -533,7 +533,7 @@ sub ProcessMPEG($$)
     $raf->Seek(0,0);
     $raf->Read($buff, 65536*4) or return 0;
 
-    return ProcessMPEGAudioVideo($exifTool, \$buff);
+    return ParseMPEGAudioVideo($exifTool, \$buff);
 }
 
 1;  # end

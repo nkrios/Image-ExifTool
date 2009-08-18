@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: EXE.elf
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 2.8 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:08:30 13:31:01-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: EXE.elf
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 2.8 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:08:30 11:37:52-04:00
 [File, File, Image] FileType - File Type: ELF executable
 [File, File, Image] MIMEType - MIME Type: application/octet-stream
 [EXE, EXE, Other] 4 - CPU Architecture: 32 bit

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.68
-[File, File, Image] FileName - File Name: Photoshop.psd
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 17 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2007:04:16 07:18:42-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: Photoshop.psd
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 17 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:04:16 07:18:42-04:00
 [File, File, Image] FileType - File Type: PSD
 [File, File, Image] MIMEType - MIME Type: application/photoshop
 [File, File, Image] CurrentIPTCDigest - Current IPTC Digest: b765e54396f2885e9a76ff4ad665b190

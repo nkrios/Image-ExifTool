@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool, Main] ExifToolVersion - ExifTool Version Number: 7.74
-[File, File, Image, Main] FileName - File Name: PostScript_3_failed.eps
-[File, File, Image, Main] Directory - Directory: t
-[File, File, Image, Main] FileSize - File Size: 14 kB
-[File, File, Time, Main] FileModifyDate - File Modification Date/Time: 2009:04:07 11:44:11-04:00
+[ExifTool, ExifTool, ExifTool, Main] ExifToolVersion - ExifTool Version Number: 7.87
+[File, System, Image, Main] FileName - File Name: PostScript_3_failed.eps
+[File, System, Image, Main] Directory - Directory: t
+[File, System, Image, Main] FileSize - File Size: 14 kB
+[File, System, Time, Main] FileModifyDate - File Modification Date/Time: 2009:08:12 09:45:50-04:00
 [File, File, Image, Main] FileType - File Type: EPS
 [File, File, Image, Main] MIMEType - MIME Type: application/postscript
 [File, File, Image, Main] CurrentIPTCDigest - Current IPTC Digest: 32acda5aea9ad1d96e5b56b502e33ff2
@@ -95,7 +95,7 @@
 [EXIF, IFD1, Image, Main] 282 - X Resolution: 72
 [EXIF, IFD1, Image, Main] 283 - Y Resolution: 72
 [EXIF, IFD1, Image, Main] 296 - Resolution Unit: inches
-[XMP, XMP-x, Document, Main] xmptk - XMP Toolkit: Image::ExifTool 7.74
+[XMP, XMP-x, Document, Main] xmptk - XMP Toolkit: Image::ExifTool 7.87
 [XMP, XMP-rdf, Document, Main] about - About: uuid:b691db36-f92a-11d9-99a4-8c8e8269c120
 [XMP, XMP-dc, Author, Main] creator - Creator: phil made it
 [XMP, XMP-dc, Image, Main] description - Description: UTF-16 (big-endian) encoded XMP
@@ -115,7 +115,7 @@
 [XMP, XMP-photoshop, Location, Main] State - State: Ont
 [XMP, XMP-photoshop, Image, Main] SupplementalCategories - Supplemental Categories: amazing, image, utilities
 [XMP, XMP-photoshop, Image, Main] TransmissionReference - Transmission Reference: What is a transmission reference?
-[XMP, XMP-photoshop, Image, Main] Urgency - Urgency: 8
+[XMP, XMP-photoshop, Image, Main] Urgency - Urgency: 8 (least urgent)
 [XMP, XMP-xmpBJ, Other, Main] JobRefName - Job Ref Name: My Job
 [XMP, XMP-xmpMM, Other, Main] DocumentID - Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
 [XMP, XMP-xmpRights, Author, Main] Marked - Marked: False

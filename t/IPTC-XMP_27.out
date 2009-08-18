@@ -1,13 +1,14 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: XMP.svg
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 1402 bytes
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:04:07 14:11:53-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.87
+[File, System, Image] FileName - File Name: XMP.svg
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 1402 bytes
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:04:08 13:45:42-04:00
 [File, File, Image] FileType - File Type: SVG
 [File, File, Image] MIMEType - MIME Type: image/svg+xml
 [SVG, SVG, Image] width - Image Width: 4in
 [SVG, SVG, Image] height - Image Height: 3in
 [SVG, SVG, Image] version - SVG Version: 1.1
+[SVG, SVG, Image] xmlns - Xmlns: http://www.w3.org/2000/svg
 [SVG, SVG-myfoo, Unknown] descTitle - Desc Title: This is a financial report
 [SVG, SVG-myfoo, Unknown] descDescrEmph - Desc Descr Emph: myfoo
 [SVG, SVG-myfoo, Unknown] descSceneWhat - Desc Scene What: widget $growth

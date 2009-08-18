@@ -1742,6 +1742,13 @@ Entry:  for (;;) {
                     if (defined $oldInfo and not $oldInfo) {
                         $oldInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID, \$oldValue, $oldFormName, $oldCount);
                     }
+                    # make sure we are handling the 'ifd' format properly
+                    if (($oldFormat == 13 or $oldFormat == 18) and
+                        (not $oldInfo or not $$oldInfo{SubIFD}))
+                    {
+                        my $str = sprintf('%s tag 0x%.4x IFD format not handled', $dirName, $oldID);
+                        $exifTool->Error($str, $inMakerNotes);
+                    }
                     # override format we use to read the value if specified
                     if ($oldInfo) {
                         if ($$oldInfo{Drop} and $$exifTool{DROP_TAGS}) {
@@ -2329,6 +2336,15 @@ NoOverwrite:            next if $isNew > 0;
                             RAF      => $raf,
                             TagInfo  => $newInfo,
                         );
+                        unless ($oldSize) {
+                            # replace with dummy data if empty to prevent WriteDirectory
+                            # routines from accessing data they shouldn't
+                            my $tmp = '';
+                            $subdirInfo{DataPt} = \$tmp;
+                            $subdirInfo{DataLen} = 0;
+                            $subdirInfo{DirStart} = 0;
+                            $subdirInfo{DataPos} += $subdirStart;
+                        }
                         my $subTable = Image::ExifTool::GetTagTable($$subdir{TagTable});
                         my $oldOrder = GetByteOrder();
                         SetByteOrder($$subdir{ByteOrder}) if $$subdir{ByteOrder};
@@ -2346,7 +2362,10 @@ NoOverwrite:            next if $isNew > 0;
                             $exifTool->Error("Error writing $dirName:$$newInfo{Name}");
                             return undef;
                         }
-                        next unless length $$newValuePt;
+                        unless (length $$newValuePt) {
+                            # don't delete a previously empty makernote directory
+                            next if $oldSize or not $inMakerNotes;
+                        }
                         if ($subFixup->{Pointers} and $subdirInfo{Base} == $base) {
                             $subFixup->{Start} += length $valBuff;
                             push @valFixups, $subFixup;
@@ -2423,7 +2442,11 @@ NoOverwrite:            next if $isNew > 0;
                         # save original values (for updating TIFF_END later)
                         my @vals;
                         if ($isNew <= 0) {
+                            my $oldOrder = GetByteOrder();
+                            # Minolta A200 stores these in the wrong byte order!
+                            SetByteOrder($$newInfo{ByteOrder}) if $$newInfo{ByteOrder};
                             @vals = ReadValue(\$oldValue, 0, $readFormName, $readCount, $oldSize);
+                            SetByteOrder($oldOrder);
                         }
                         # only support int32 pointers (for now)
                         if ($formatSize[$newFormat] != 4 and $$newInfo{IsOffset}) {
@@ -2691,7 +2714,7 @@ NoOverwrite:            next if $isNew > 0;
 # set offsets and generate fixups for tag values which were too large for memory
 #
     my $blockSize = 0;  # total size of blocks to copy later
-    my $blockInfo;
+    my ($blockInfo, @subFixes);
     foreach $blockInfo (@imageData) {
         my ($pos, $size, $pad, $entry, $subFix) = @$blockInfo;
         if (defined $entry) {
@@ -2716,12 +2739,13 @@ NoOverwrite:            next if $isNew > 0;
             }
         }
         # apply additional shift required for SubIFD image data offsets
-        if ($subFix and $$subFix{BlockLen}) {
+        if ($subFix and defined $$subFix{BlockLen}) {
             # our offset expects the data at the end of the SubIFD block (BlockLen + Start),
             # but it will actually be at length($newData) + $blockSize.  So adjust accordingly
             # (and subtract an extra Start because this shift is applied later)
             $subFix->{Shift} += length($newData) - $$subFix{BlockLen} - 2 * $$subFix{Start} + $blockSize;
             $subFix->ApplyFixup(\$newData);
+            push @subFixes, $subFix;    # save for later
         }
         $blockSize += $size + $pad;
     }
@@ -2731,6 +2755,7 @@ NoOverwrite:            next if $isNew > 0;
     if (@offsetInfo) {
         my $ttwLen;     # length of MRW TTW segment
         my @writeLater; # write image data last
+        my $newDataLen = length $newData;
         for ($ifd=$#offsetInfo; $ifd>=-1; --$ifd) {
             # build list of offsets to process
             my @offsetList;
@@ -2829,8 +2854,14 @@ NoOverwrite:            next if $isNew > 0;
                         # use size of new data
                         $size = ReadValue(\$newData, $byteCountPos, $formatStr, 1, 4);
                     }
-                    my $offset = Get32u(\$newData, $offsetPos) - $dpos;
-                    my $newOffset = length($newData) + $blockSize - $wrongBase;
+                    my $offset = $$oldOffset[$n];
+                    if (defined $offset) {
+                        $offset -= $dpos;
+                    } elsif ($size != 0xfeedfeed) {
+                        $exifTool->Error('Internal error (no offset)');
+                        return undef;
+                    }
+                    my $newOffset = length($newData) - $wrongBase;
                     my $buff;
                     # look for 'feed' code to use our new data
                     if ($size == 0xfeedfeed) {
@@ -2867,6 +2898,7 @@ NoOverwrite:            next if $isNew > 0;
                         }
                         # copy data later
                         push @imageData, [$offset+$dbase+$dpos, $size, $pad];
+                        $newOffset += $blockSize;   # data comes after other deferred data
                         # create fixup for SubIFD ImageData
                         if ($imageDataFlag eq 'SubIFD' and not $subIfdDataFixup) {
                             $subIfdDataFixup = new Image::ExifTool::Fixup;
@@ -2950,6 +2982,14 @@ NoOverwrite:            next if $isNew > 0;
                     }
                 }
                 SetByteOrder($oldOrder);
+            }
+        }
+        # must adjust SubIFD offsets if more data was added to value data block
+        if (@subFixes and $newDataLen != length $newData) {
+            my $subFix;
+            foreach $subFix (@subFixes) {
+                $subFix->{Shift} += length($newData) - $newDataLen;
+                $subFix->ApplyFixup(\$newData);
             }
         }
         # verify that nothing else got written after determining TTW length

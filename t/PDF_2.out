@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
-[File, File, Image] FileName - File Name: PDF.pdf
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 8.7 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2007:12:14 12:57:34-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.87
+[File, System, Image] FileName - File Name: PDF.pdf
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 8.7 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:23 11:36:39-04:00
 [File, File, Image] FileType - File Type: PDF
 [File, File, Image] MIMEType - MIME Type: application/pdf
 [File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
@@ -61,10 +61,10 @@
 [EXIF, ExifIFD, Time] 36868 - Create Date: 2001:05:19 18:36:41
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: Y, Cb, Cr, -
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 1.230769231
-[EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 0
+[EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 1/64
 [EXIF, ExifIFD, Image] 37378 - Aperture Value: 3.5
-[EXIF, ExifIFD, Image] 37379 - Brightness Value: 698
-[EXIF, ExifIFD, Image] 37380 - Exposure Compensation: +706
+[EXIF, ExifIFD, Image] 37379 - Brightness Value: 2
+[EXIF, ExifIFD, Image] 37380 - Exposure Compensation: 0
 [EXIF, ExifIFD, Camera] 37381 - Max Aperture Value: 3.5
 [EXIF, ExifIFD, Camera] 37383 - Metering Mode: Multi-segment
 [EXIF, ExifIFD, Camera] 37385 - Flash: Fired
@@ -99,7 +99,7 @@
 [XMP, XMP-photoshop, Author] Source - Source: I'm the source
 [XMP, XMP-photoshop, Location] State - State: Ont
 [XMP, XMP-photoshop, Image] TransmissionReference - Transmission Reference: What is a transmission reference
-[XMP, XMP-photoshop, Image] Urgency - Urgency: 8
+[XMP, XMP-photoshop, Image] Urgency - Urgency: 8 (least urgent)
 [XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: amazing, image, utilities
 [XMP, XMP-xmpBJ, Other] JobRefName - Job Ref Name: My Job
 [XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:cbcc2a62-f127-11d9-ac4d-e8be6f73552e
@@ -110,4 +110,5 @@
 [XMP, XMP-dc, Image] title - Title: Test IPTC picture
 [XMP, XMP-dc, Image] subject - Subject: ExifTool, Test, XMP
 [Composite, Composite, Image] Aperture - Aperture: 3.5
-[Composite, Composite, Image] ShutterSpeed - Shutter Speed: 0
+[Composite, Composite, Image] ShutterSpeed - Shutter Speed: 1/64
+[Composite, Composite, Image] LightValue - Light Value: 9.6

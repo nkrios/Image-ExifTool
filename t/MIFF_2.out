@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
-[File, File, Image] FileName - File Name: MIFF.miff
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 3.7 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2005:11:14 14:47:21-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.87
+[File, System, Image] FileName - File Name: MIFF.miff
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 3.7 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2005:11:14 14:47:21-05:00
 [File, File, Image] FileType - File Type: MIFF
 [File, File, Image] MIMEType - MIME Type: application/x-magick-image
 [File, File, Image] CurrentIPTCDigest - Current IPTC Digest: b9ee34aec50758de410ed147d4b80eca
@@ -94,7 +94,7 @@
 [XMP, XMP-photoshop, Location] Country - Country: Canada
 [XMP, XMP-photoshop, Author] Credit - Credit: My Credit
 [XMP, XMP-photoshop, Time] DateCreated - Date Created: 2004:02:26
-[XMP, XMP-photoshop, Image] Urgency - Urgency: 8
+[XMP, XMP-photoshop, Image] Urgency - Urgency: 8 (least urgent)
 [XMP, XMP-xmpBJ, Other] JobRefName - Job Ref Name: My Job
 [XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:4cc7b857-69d0-11d8-8ac4-bb59c92f0d9a
 [XMP, XMP-xmpRights, Author] Marked - Marked: False

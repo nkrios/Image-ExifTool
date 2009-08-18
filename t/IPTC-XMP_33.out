@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.77
-[File, File, Image] FileName - File Name: XMP4.xmp
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 2.4 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:05:24 11:15:43-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: XMP4.xmp
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 2.4 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:05:24 11:19:39-04:00
 [File, File, Image] FileType - File Type: XMP
 [File, File, Image] MIMEType - MIME Type: application/rdf+xml
 [XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.77

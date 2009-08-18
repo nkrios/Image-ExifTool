@@ -17,7 +17,7 @@ use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
@@ -1364,8 +1364,8 @@ sub ReadPDF($$)
         if ($buff =~ s/^xref\s+//s) {
             # load xref table
             for (;;) {
-                # read another line if necessary
-                $raf->ReadLine($buff) or return -6 unless $buff =~ /\S/;
+                # read another line if necessary (skipping blank lines)
+                $raf->ReadLine($buff) or return -6 until $buff =~ /\S/;
                 last if $buff =~ s/^\s*trailer\s+//s;
                 $buff =~ s/\s*(\d+)\s+(\d+)\s+//s or return -4;
                 my ($start, $num) = ($1, $2);

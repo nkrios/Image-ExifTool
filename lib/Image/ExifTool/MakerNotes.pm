@@ -14,8 +14,9 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
+sub FixLeicaBase($$;$);
 
-$VERSION = '1.49';
+$VERSION = '1.51';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -408,7 +409,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteOlympus2',
         # new Olympus maker notes start with "OLYMPUS\0"
-        Condition => '$$valPt =~ /^OLYMPUS\0/ and $$self{OlympusType2} = 1',
+        Condition => '$$valPt =~ /^OLYMPUS\0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Olympus::Main',
             Start => '$valuePtr + 12',
@@ -433,9 +434,12 @@ my $debug;          # set to 1 to enabled debugging code
         Condition => '$$self{Make} =~ /^Leica Camera AG/ and $$valPt =~ /^LEICA\0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Leica2',
+            # (the offset base is different in JPEG and DNG images, but we
+            # can copy makernotes from one to the other, so we need special
+            # logic to decide which base to apply)
+            ProcessProc => \&FixLeicaBase,
             Start => '$valuePtr + 8',
-            # (the offset base is different in JPEG and DNG images!)
-            Base => '$start - ($$exifTool{FILE_TYPE} eq "JPEG" ? 0 : 8)',
+            Base => '$start', # (- 8 for DNG images!)
             ByteOrder => 'Unknown',
         },
     },
@@ -550,7 +554,7 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteSamsung',
-        Condition => '$$valPt =~ /^STMN\d{4}/',
+        Condition => '$$valPt =~ /^STMN\d{3}/',
         Binary => 1,
         Notes => 'Samsung unknown maker notes',
     },
@@ -700,7 +704,7 @@ sub GetMakerNoteOffset($)
     } elsif ($make =~ /^KYOCERA/) {
         push @offsets, 12;
     } elsif ($make =~ /^Leica Camera AG/) {
-        push @offsets, 6; # R8 and R8
+        push @offsets, 6; # R8, R9 and M8
     } elsif ($make =~ /^OLYMPUS/ and $model =~ /^E-(1|300|330)\b/) {
         push @offsets, 16;
     } elsif ($make =~ /^OLYMPUS/ and
@@ -1038,7 +1042,16 @@ sub LocateIFD($$)
                 $$dirInfo{Base} += $baseShift;
                 $$dirInfo{DataPos} -= $baseShift;
                 # this is a relative directory if Base depends on $start
-                $$dirInfo{Relative} = 1 if $$subdir{Base} =~ /\$start\b/;
+                if ($$subdir{Base} =~ /\$start\b/) {
+                    $$dirInfo{Relative} = 1;
+                    # hack to fix Leica quirk
+                    if ($$subdir{ProcessProc} and $$subdir{ProcessProc} eq \&FixLeicaBase) {
+                        my $oldStart = $$dirInfo{DirStart};
+                        $$dirInfo{DirStart} = $newStart;
+                        FixLeicaBase($exifTool, $dirInfo);
+                        $$dirInfo{DirStart} = $oldStart;
+                    }
+                }
             }
             # add offset to the start of the directory if necessary
             if ($$subdir{OffsetPt}) {
@@ -1136,9 +1149,36 @@ IFD_TRY: for ($offset=$firstTry; $offset<=$lastTry; $offset+=2) {
 }
 
 #------------------------------------------------------------------------------
+# Fix base offset for Leica maker notes
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success, and updates $dirInfo if necessary for new directory
+sub FixLeicaBase($$;$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    # get hash of value block positions
+    my ($valBlock, $valBlkAdj) = GetValueBlocks($dataPt, $dirStart);
+    if (%$valBlock) {
+        # get sorted list of value offsets
+        my @valPtrs = sort { $a <=> $b } keys %$valBlock;
+        my $numEntries = Get16u($dataPt, $dirStart);
+        my $diff = $valPtrs[0] - ($numEntries * 12 + 4);
+        if ($diff > 8) {
+            $$dirInfo{Base} -= 8;
+            $$dirInfo{DataPos} += 8;
+        }
+    }
+    my $success = 1;
+    if ($tagTablePtr) {
+        $success = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
+    }
+    return $success;
+}
+
+#------------------------------------------------------------------------------
 # Process unknown maker notes assuming it is in EXIF IFD format
-# Inputs: 0) ExifTool object reference, 1) reference to directory information
-#         2) pointer to tag table
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success, and updates $dirInfo if necessary for new directory
 sub ProcessUnknown($$$)
 {

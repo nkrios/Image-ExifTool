@@ -133,6 +133,7 @@
         # override CircleOfConfusion tag to use D/1750 instead of D/1440
         CircleOfConfusion => {
             Require => 'ScaleFactor35efl',
+            Groups => { 2 => 'Camera' },
             ValueConv => 'sqrt(24*24+36*36) / ($val * 1750)',
             PrintConv => 'sprintf("%.3f mm",$val)',
         },
@@ -199,6 +200,7 @@ use Image::ExifTool::MIE;
 %Image::ExifTool::UserDefined::Options = (
     CoordFormat => '%.6f',  # change default GPS coordinate format
     Duplicates => 1,        # make -a default for the exiftool app
+    GeoMaxHDOP => 4,        # ignore GPS fixes with HDOP > 4
 );
 
 #------------------------------------------------------------------------------

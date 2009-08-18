@@ -12,7 +12,7 @@
 use strict;
 require 5.004;
 
-my $version = '7.82';
+my $version = '7.88';
 
 # add our 'lib' directory to the include list BEFORE 'use Image::ExifTool'
 my $exeDir;
@@ -410,7 +410,7 @@ while ($_ = shift) {
         my $trkfile = shift or Die "Expecting file name for -geotag option\n";
         # allow wildcards in filename
         if ($trkfile =~ /[*?]/) {
-            my @trks = $doGlob ? File::Glob::bsd_glob($_) : glob($trkfile);
+            my @trks = $doGlob ? File::Glob::bsd_glob($trkfile) : glob($trkfile);
             @trks or Die "No matching file found for -geotag option\n";
             push @newValues, 'geotag='.shift(@trks) while @trks > 1;
             $trkfile = pop(@trks);
@@ -599,8 +599,12 @@ if ($overwriteOrig > 1 and $outOpt) {
     next;
 }
 
-# must be UTF8 for HTML conversion and JSON output
-$mainTool->Options(Charset => 'UTF8') if $escapeHTML or $json;
+if ($escapeHTML or $json) {
+    # must be UTF8 for HTML conversion and JSON output
+    $mainTool->Options(Charset => 'UTF8');
+    # use Escape option to do our HTML escaping unless XML output
+    $mainTool->Options(Escape => 'HTML') if $escapeHTML and not $xml;
+}
 
 # set up for RDF/XML and JSON output formats
 if ($xml) {
@@ -853,7 +857,7 @@ if (($countDir or $totWr or $countFailed or $tot > 1 or $outputExt) and
 }
 
 # set error status if we had any errors
-$rtnVal = 1 if $countBadWr or $countBadCr or $countBad;
+$rtnVal = 1 if $countBadWr or $countBadCr or $countBad or ($countFailed and not $count);
 
 } # end "Command" loop
 
@@ -990,29 +994,12 @@ sub GetImageInfo($$)
             return;
         }
     }
-    # check for file error
-    if ($info->{Error}) {
-        Warn "Error: $info->{Error} - $file\n";
-        ++$countBad;
-        return;
-    }
     # print warnings to stderr if using binary output
     # (because we are likely ignoring them and piping stdout to file)
     # or if there is none of the requested information available
     if ($binaryOutput or not %$info) {
         my $errs = $exifTool->GetInfo('Warning', 'Error');
         PrintErrors($exifTool, $errs, $file);
-    }
-    # escape characters for html or xml if necessary
-    if ($escapeHTML and not $xml) {
-        foreach (values %$info) {
-            if (ref $_) {
-                next unless ref $_ eq 'ARRAY';
-                $_ = Image::ExifTool::HTML::EscapeHTML($_) foreach @$_;
-            } else {
-                $_ = Image::ExifTool::HTML::EscapeHTML($_);
-            }
-        }
     }
 
     # open output file (or stdout if no output file)
@@ -2168,37 +2155,38 @@ supported by ExifTool (r = read, w = write, c = create):
 
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  3FR   r       HTML  r       PNG   r/w    |  EXIF           r/w/c
-  ACR   r       ICC   r/w/c   PPM   r/w    |  GPS            r/w/c
-  AI    r       IND   r/w     PPT   r      |  IPTC           r/w/c
-  AIFF  r       ITC   r       PS    r/w    |  XMP            r/w/c
-  APE   r       JNG   r/w     PSD   r/w    |  MakerNotes     r/w/c
-  ARW   r       JP2   r/w     QTIF  r      |  Photoshop IRB  r/w/c
-  ASF   r       JPEG  r/w     RA    r      |  ICC Profile    r/w/c
-  AVI   r       K25   r       RAF   r/w    |  MIE            r/w/c
-  BMP   r       KDC   r       RAM   r      |  JFIF           r/w/c
-  BTF   r       M4A   r       RAW   r/w    |  Ducky APP12    r/w/c
-  CR2   r/w     MEF   r/w     RIFF  r      |  PDF            r/w/c
-  CRW   r/w     MIE   r/w/c   RW2   r/w    |  CIFF           r/w
-  CS1   r/w     MIFF  r       RWL   r/w    |  AFCP           r/w
-  DCM   r       MNG   r/w     RWZ   r      |  JPEG 2000      r
-  DCP   r/w     MOS   r/w     RM    r      |  DICOM          r
-  DCR   r       MOV   r       SO    r      |  Flash          r
-  DIVX  r       MP3   r       SR2   r      |  FlashPix       r
-  DJVU  r       MP4   r       SRF   r      |  QuickTime      r
-  DLL   r       MPC   r       SVG   r      |  GeoTIFF        r
-  DNG   r/w     MPG   r       SWF   r      |  PrintIM        r
-  DOC   r       MPO   r/w     THM   r/w    |  ID3            r
-  DYLIB r       MRW   r/w     TIFF  r/w    |  Kodak Meta     r
-  EPS   r/w     NEF   r/w     VRD   r/w/c  |  Ricoh RMETA    r
-  ERF   r/w     NRW   r/w     WAV   r      |  Picture Info   r
-  EXE   r       OGG   r       WDP   r/w    |  Adobe APP14    r
-  EXIF  r/w/c   ORF   r/w     WMA   r      |  MPF            r
-  FLAC  r       PBM   r/w     WMV   r      |  APE            r
-  FLV   r       PDF   r/w     X3F   r      |  Vorbis         r
-  FPX   r       PEF   r/w     XLS   r      |  SPIFF          r
-  GIF   r/w     PGM   r/w     XMP   r/w/c  |  DjVu           r
-  HDP   r/w     PICT  r       ZIP   r      |  (and more)
+  3FR   r       ICC   r/w/c   PPM   r/w    |  EXIF           r/w/c
+  ACR   r       IND   r/w     PPT   r      |  GPS            r/w/c
+  AI    r/w     ITC   r       PS    r/w    |  IPTC           r/w/c
+  AIFF  r       JNG   r/w     PSD   r/w    |  XMP            r/w/c
+  APE   r       JP2   r/w     QTIF  r      |  MakerNotes     r/w/c
+  ARW   r       JPEG  r/w     RA    r      |  Photoshop IRB  r/w/c
+  ASF   r       K25   r       RAF   r/w    |  ICC Profile    r/w/c
+  AVI   r       KDC   r       RAM   r      |  MIE            r/w/c
+  BMP   r       M2TS  r       RAW   r/w    |  JFIF           r/w/c
+  BTF   r       M4A   r       RIFF  r      |  Ducky APP12    r/w/c
+  CR2   r/w     MEF   r/w     RW2   r/w    |  PDF            r/w/c
+  CRW   r/w     MIE   r/w/c   RWL   r/w    |  CIFF           r/w
+  CS1   r/w     MIFF  r       RWZ   r      |  AFCP           r/w
+  DCM   r       MNG   r/w     RM    r      |  JPEG 2000      r
+  DCP   r/w     MOS   r/w     SO    r      |  DICOM          r
+  DCR   r       MOV   r       SR2   r      |  Flash          r
+  DIVX  r       MP3   r       SRF   r      |  FlashPix       r
+  DJVU  r       MP4   r       SVG   r      |  QuickTime      r
+  DLL   r       MPC   r       SWF   r      |  GeoTIFF        r
+  DNG   r/w     MPG   r       THM   r/w    |  PrintIM        r
+  DOC   r       MPO   r/w     TIFF  r/w    |  ID3            r
+  DYLIB r       MRW   r/w     VRD   r/w/c  |  Kodak Meta     r
+  EPS   r/w     NEF   r/w     WAV   r      |  Ricoh RMETA    r
+  ERF   r/w     NRW   r/w     WDP   r/w    |  Picture Info   r
+  EXE   r       OGG   r       WMA   r      |  Adobe APP14    r
+  EXIF  r/w/c   ORF   r/w     WMV   r      |  MPF            r
+  FLAC  r       PBM   r/w     X3F   r      |  Stim           r
+  FLV   r       PDF   r/w     XLS   r      |  APE            r
+  FPX   r       PEF   r/w     XMP   r/w/c  |  Vorbis         r
+  GIF   r/w     PGM   r/w     ZIP   r      |  SPIFF          r
+  HDP   r/w     PICT  r                    |  DjVu           r
+  HTML  r       PNG   r/w                  |  (and more)
 
 Note:  If I<FILE> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are processed
@@ -2423,7 +2411,7 @@ Print existing tags only -- don't calculate composite tags.
 =item B<-E> (B<-escapeHTML>)
 
 Escape characters in output values for HTML.  Implied with the B<-h> option.
-The inverse conversion is not applied when writing tags.
+The inverse conversion is applied when writing tags.
 
 =item B<-ee> (B<-extractEmbedded>)
 
@@ -2475,13 +2463,14 @@ network connection.
 =item B<-g>[I<NUM>][:I<NUM>...] (B<-groupHeadings>)
 
 Organize output by tag group.  I<NUM> specifies a group family number, and
-may be 0 (general location), 1 (specific location), 2 (category) or 3
-(document number).  Multiple families may be specified by separating them
-with colons.  By default the resulting group name is simplified by removing
-any leading C<Main:> and collapsing adjacent identical group names, but this
-can avoided by placing a colon before the first family number (ie.
-B<-g:3:1>).  If I<NUM> is not specified, B<-g0> is assumed.  Use the
-B<-listg> option to list group names for a specified family.
+may be 0 (general location), 1 (specific location), 2 (category), 3
+(document number) or 4 (instance number).  Multiple families may be
+specified by separating them with colons.  By default the resulting group
+name is simplified by removing any leading C<Main:> and collapsing adjacent
+identical group names, but this can avoided by placing a colon before the
+first family number (ie. B<-g:3:1>).  If I<NUM> is not specified, B<-g0> is
+assumed.  Use the B<-listg> option to list group names for a specified
+family.
 
 =item B<-G>[I<NUM>][:I<NUM>...] (B<-groupNames>)
 
@@ -2511,12 +2500,13 @@ Multiple B<-geotag> options may be used to concatinate GPS track log data.
 Also, a single B<-geotag> option may be used to load multiple track log
 files by using wildcards in the I<TRKFILE> name, but note that in this case
 I<TRKFILE> must be quoted on most systems (with the notable exception of
-Windows) to prevent shell globbing.  For example:
+Windows) to prevent filename expansion.  For example:
 
   exiftool -geotag "TRACKDIR/*.log" IMAGEDIR
 
 Currently supported track file formats are GPX, NMEA RMC/GGA/GLL, KML,
-Garmin XML and Magellan PMGNRTK.  See L</GEOTAGGING EXAMPLES> for examples.
+Garmin XML and TCX, and Magellan PMGNTRK.  See L</GEOTAGGING EXAMPLES> for
+examples.
 
 =item B<-h> (B<-htmlFormat>)
 
@@ -3172,9 +3162,16 @@ current list of keywords.
 Delete Credit information from all files in a directory where the Credit
 value was (C<xxx>).
 
+=item exiftool -xmp:description-de='k&uuml;hl' -E dst.jpg
+
+Write alternate language for XMP:Description, using HTML character escaping
+to input special characters.
+
 =item exiftool -all= dst.jpg
 
-Delete all meta information from an image.
+Delete all meta information from an image.  Note: You should NOT do this to
+RAW images (except DNG) since proprietary RAW image formats often contain
+information in the makernotes that is necessary for converting the image.
 
 =item exiftool -all= -comment='lonely' dst.jpg
 
@@ -3475,7 +3472,7 @@ command line is ignored.
 
 =item exiftool -geotag= a.jpg
 
-Delete GPS tags which were added by the geotag feature.
+Delete GPS tags which may have been added by the geotag feature.
 
 =item exiftool -xmp:geotag= a.jpg
 

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: Vorbis.ogg
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 5.2 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:11:10 21:57:27-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: Vorbis.ogg
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 5.2 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2006:11:10 21:57:27-05:00
 [File, File, Image] FileType - File Type: OGG
 [File, File, Image] MIMEType - MIME Type: audio/x-ogg
 [Vorbis, Vorbis, Audio] 0 - Vorbis Version: 0

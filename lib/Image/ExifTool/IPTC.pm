@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.31';
+$VERSION = '1.32';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -191,8 +191,13 @@ my %fileFormat = (
             UTF-8 character coding is "ESC % G", but this is displayed as "UTF8" for
             convenience.  Either string may be used when writing.  The value of this tag
             affects the decoding of string values in the Application and NewsPhoto
-            records
+            records.  This tag is marked as "unsafe" to prevent it from being copied by
+            default in a group operation because existing tags in the destination image
+            may use a different encoding. When creating a new IPTC record from scratch,
+            it is suggested that this be set to "UTF8" if special characters are a
+            possibility
         },
+        Protected => 1,
         Format => 'string[0,32]',
         # convert ISO 2022 escape sequences to a more readable format
         PrintConv => \&PrintCodedCharset,

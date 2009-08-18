@@ -15,7 +15,7 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP;
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 @ISA = qw(Exporter);
 
 sub LoadLangModules($);
@@ -63,7 +63,7 @@ my $makeMissing = '';
 # Returns: true on success
 sub Write(;$$$)
 {
-    local $_;
+    local ($_, *PTIFILE);
     my ($file, $group, %opts) = @_;
     my @groups = split ':', $group if $group;
     my $exifTool = new Image::ExifTool;
@@ -313,7 +313,7 @@ sub EscapePerl
 # Notes: Must be run from the directory containing 'lib'
 sub BuildLangModules($;$)
 {
-    local $_;
+    local ($_, *XFILE);
     my ($file, $forceUpdate) = @_;
     my ($table, $tableName, $id, $index, $valIndex, $name, $key, $lang);
     my (%langInfo, %changed);
@@ -488,6 +488,7 @@ sub BuildLangModules($;$)
 # Returns: true on success
 sub WriteLangModule($$;$)
 {
+    local ($_, *XOUT);
     my ($lang, $langTags, $newVersion) = @_;
     my $err;
     -e "lib/Image/ExifTool" or die "Must run from directory containing 'lib'\n";

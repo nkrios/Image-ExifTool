@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: XMP.xml
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 5.9 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:01:16 19:41:51-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: XMP.xml
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 6.0 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:03:03 12:01:55-05:00
 [File, File, Image] FileType - File Type: XMP
 [File, File, Image] MIMEType - MIME Type: application/rdf+xml
 [XMP, XMP-rdf, Document] about - About: t/images/Nikon.jpg

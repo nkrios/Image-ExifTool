@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
-[File, File, Image] FileName - File Name: Sony_3_failed.jpg
-[File, File, Image] Directory - Directory: t
-[File, File, Image] FileSize - File Size: 5.5 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:04:07 11:44:14-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: Sony_3_failed.jpg
+[File, System, Image] Directory - Directory: t
+[File, System, Image] FileSize - File Size: 5.5 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:43-04:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -71,7 +71,7 @@
 [MakerNotes, Sony, Camera] 36872 - Sony 0x9008: ..ªø..¼·’.³ôi.Þ.Ð@÷.]:þïó•±ö;Žî;ä‚.ÕH[...]
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x00000001
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x00000000
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.74
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.83
 [XMP, XMP-exif, Camera] FlashFired - Flash Fired: True
 [Composite, Composite, Image] Aperture - Aperture: 7.1
 [Composite, Composite, Image] ImageSize - Image Size: 8x8

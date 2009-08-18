@@ -38,7 +38,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.86';
+$VERSION = '2.90';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -401,6 +401,7 @@ my %sampleFormat = (
             OffsetPair => 0x111,   # point to associated offset
             # A200 stores this information in the wrong byte order!!
             ValueConv => '$val=join(" ",unpack("N*",pack("V*",split(" ",$val))));\$val',
+            ByteOrder => 'LittleEndian',
         },
         {
             Condition => q[
@@ -1200,6 +1201,7 @@ my %sampleFormat = (
     0x9203 => 'BrightnessValue',
     0x9204 => {
         Name => 'ExposureCompensation',
+        Notes => 'called ExposureBiasValue by the EXIF spec',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x9205 => {
@@ -1759,7 +1761,7 @@ my %sampleFormat = (
 #
     0xc612 => {
         Name => 'DNGVersion',
-        Notes => 'tags 0xc612-0xc726 are used in DNG images unless otherwise noted',
+        Notes => 'tags 0xc612-0xc761 are used in DNG images unless otherwise noted',
         DataMember => 'DNGVersion',
         RawConv => '$$self{DNGVersion} = $val',
         PrintConv => '$val =~ tr/ /./; $val',
@@ -2912,6 +2914,18 @@ sub ExtractImage($$$$)
     } else {
         $image = $exifTool->ExtractBinary($offset, $len, $tag);
         return undef unless defined $image;
+        # patch for incorrect ThumbnailOffset in some Sony DSLR-A100 ARW images
+        if ($image !~ /^(Binary data|\xff\xd8\xff)/ and $tag and
+            $tag eq 'ThumbnailImage' and $$exifTool{TIFF_TYPE} eq 'ARW' and
+            $$exifTool{Model} eq 'DSLR-A100' and $offset < 0x10000)
+        {
+            my $try = $exifTool->ExtractBinary($offset + 0x10000, $len, $tag);
+            if (defined $try and $try =~ /^\xff\xd8\xff/) {
+                $image = $try;
+                $exifTool->{VALUE}->{ThumbnailOffset} += 0x10000;
+                $exifTool->Warn('Adjusted incorrect A100 ThumbnailOffset', 1);
+            }
+        }
     }
     return $exifTool->ValidateImage(\$image, $tag);
 }
@@ -2937,12 +2951,12 @@ sub ProcessExif($$$)
     my $verbose = $exifTool->Options('Verbose');
     my $htmlDump = $exifTool->{HTML_DUMP};
     my $success = 1;
-    my ($tagKey, $name, $dirSize, $makerAddr);
+    my ($tagKey, $dirSize, $makerAddr);
 
     $verbose = -1 if $htmlDump; # mix htmlDump into verbose so we can test for both at once
     $dirName eq 'EXIF' and $dirName = $$dirInfo{DirName} = 'IFD0';
     $$dirInfo{Multi} = 1 if $dirName =~ /^(IFD0|SubIFD)$/ and not defined $$dirInfo{Multi};
-    $htmlDump and $name = ($dirName eq 'MakerNotes') ? $$dirInfo{Name} : $dirName;
+    my $name = ($dirName eq 'MakerNotes') ? $$dirInfo{Name} : $dirName;
 
     my ($numEntries, $dirEnd);
     if ($dirStart >= 0 and $dirStart <= $dataLen-2) {
@@ -3026,7 +3040,11 @@ sub ProcessExif($$$)
 
     # loop through all entries in an EXIF directory (IFD)
     my ($index, $valEnd);
+    my $warnCount = 0;
     for ($index=0; $index<$numEntries; ++$index) {
+        if ($warnCount > 10) {
+            $exifTool->Warn("Too many warnings -- $name parsing aborted", 1) and return 0;
+        }
         my $entry = $dirStart + 2 + 12 * $index;
         my $tagID = Get16u($dataPt, $entry);
         my $format = Get16u($dataPt, $entry+2);
@@ -3035,8 +3053,10 @@ sub ProcessExif($$$)
             $exifTool->HtmlDump($entry+$dataPos+$base,12,"[invalid IFD entry]",
                      "Bad format type: $format", 1);
             # warn unless the IFD was just padded with zeros
-            $format and $exifTool->Warn(
-                sprintf("Unknown format ($format) for $dirName tag 0x%x",$tagID));
+            if ($format) {
+                $exifTool->Warn(sprintf("Unknown format ($format) for $dirName tag 0x%x",$tagID));
+                ++$warnCount;
+            }
             return 0 unless $index; # assume corrupted IFD if this is our first entry
             next;
         }
@@ -3047,9 +3067,11 @@ sub ProcessExif($$$)
         my $valueDataLen = $dataLen;
         my $valuePtr = $entry + 8;      # pointer to value within $$dataPt
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
+        my $readSize = $size;
         if ($size > 4) {
             if ($size > 0x7fffffff) {
                 $exifTool->Warn(sprintf("Invalid size ($size) for $dirName tag 0x%x",$tagID));
+                ++$warnCount;
                 next;
             }
             $valuePtr = Get32u($dataPt, $valuePtr);
@@ -3090,10 +3112,11 @@ sub ProcessExif($$$)
                             # must read value if needed for a condition
                             last if defined $tagInfo;
                         }
-                        $buff = "Binary data $size bytes";
                         # (note: changing the value without changing $size will cause
                         # a warning in the verbose output, but we need to maintain the
                         # proper size for the htmlDump, so we can't change this)
+                        $buff = "Binary data $size bytes";
+                        $readSize = length $buff;
                         last;
                     }
                     # read from file if necessary
@@ -3104,6 +3127,8 @@ sub ProcessExif($$$)
                         my $minor = $dirName eq 'MakerNotes';
                         $exifTool->Warn("Error reading value for $dirName entry $index", $minor);
                         return 0 unless $minor;
+                        ++$warnCount;
+                        $readSize = length $buff;
                     }
                     $valueDataPt = \$buff;
                     $valueDataPos = $valuePtr + $dataPos;
@@ -3129,6 +3154,7 @@ sub ProcessExif($$$)
                         $valuePtr = 0;
                     } else {
                         $exifTool->Warn("Bad $dirName directory pointer for $tagStr");
+                        ++$warnCount;
                     }
                     unless (defined $buff) {
                         next unless $htmlDump and $size < 1000000;
@@ -3149,7 +3175,7 @@ sub ProcessExif($$$)
         {
             # handle special case of Photoshop RAW tags (0xfde8-0xfe58)
             # --> generate tags from the value if possible
-            $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$count,$size);
+            $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$count,$readSize);
             if (defined $val and $val =~ /(.*): (.*)/) {
                 my $tag = $1;
                 $val = $2;
@@ -3166,8 +3192,13 @@ sub ProcessExif($$$)
         }
         if (defined $tagInfo and not $tagInfo) {
             # GetTagInfo() required the value for a Condition
-            my $tmpVal = substr($$valueDataPt, $valuePtr, $size < 48 ? $size : 48);
+            my $tmpVal = substr($$valueDataPt, $valuePtr, $readSize < 48 ? $readSize : 48);
             $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \$tmpVal, $formatStr, $count);
+        }
+        # make sure we are handling the 'ifd' format properly
+        if (($format == 13 or $format == 18) and (not $tagInfo or not $$tagInfo{SubIFD})) {
+            my $str = sprintf('%s tag 0x%.4x IFD format not handled', $dirName, $tagID);
+            $exifTool->Warn($str, $dirName eq 'MakerNotes');
         }
         # override EXIF format if specified
         my $origFormStr;
@@ -3186,13 +3217,13 @@ sub ProcessExif($$$)
             next unless $verbose;
         }
         # convert according to specified format
-        $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$count,$size);
+        $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$count,$readSize);
 
         if ($verbose) {
             my $tval = $val;
             if ($formatStr =~ /^rational64([su])$/) {
                 # show numerator/denominator separately
-                my $f = ReadValue($valueDataPt,$valuePtr,"int32$1",$count*2,$size);
+                my $f = ReadValue($valueDataPt,$valuePtr,"int32$1",$count*2,$readSize);
                 $f =~ s/(-?\d+) (-?\d+)/$1\/$2/g;
                 $tval .= " ($f)";
             }
@@ -3273,6 +3304,13 @@ sub ProcessExif($$$)
 #
         my $subdir = $$tagInfo{SubDirectory};
         if ($subdir) {
+            # don't process empty subdirectories
+            unless ($size) {
+                unless ($$tagInfo{MakerNotes} or $dirName eq 'MakerNotes') {
+                    $exifTool->Warn("Empty $$tagInfo{Name} data", 1);
+                }
+                next;
+            }
             my (@values, $newTagTable, $dirNum, $newByteOrder, $invalid);
             my $tagStr = $$tagInfo{Name};
             if ($$subdir{MaxSubdirs}) {

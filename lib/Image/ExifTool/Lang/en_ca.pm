@@ -10,7 +10,7 @@ package Image::ExifTool::Lang::en_ca;
 
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 %Image::ExifTool::Lang::en_ca::Translate = (
    'AlternateDuotoneColors' => 'Alternate Duotone Colours',
@@ -337,6 +337,12 @@ $VERSION = '1.02';
    'RawColorToneAdj' => 'Raw Colour Tone Adj',
    'RawDevColorSpace' => 'Raw Dev Colour Space',
    'RawDevMemoryColorEmphasis' => 'Raw Dev Memory Colour Emphasis',
+   'RawDevSettings' => {
+      PrintConv => {
+        'Color Space' => 'Colour Space',
+        'WB Color Temp' => 'WB Colour Temp',
+      },
+    },
    'RawDevWhiteBalance' => {
       PrintConv => {
         'Color Temperature' => 'Colour Temperature',
@@ -348,6 +354,11 @@ $VERSION = '1.02';
       PrintConv => {
         'ICC-Absolute Colorimetric' => 'ICC-Absolute Colourimetric',
         'Media-Relative Colorimetric' => 'Media-Relative Colourimetric',
+      },
+    },
+   'RetouchHistory' => {
+      PrintConv => {
+        'Color Custom' => 'Colour Custom',
       },
     },
    'SBAInputImageColorspace' => 'SBA Input Image Colourspace',

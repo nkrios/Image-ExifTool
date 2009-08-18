@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: IPTC-XMP_31_failed.jpg
-[File, File, Image] Directory - Directory: t
-[File, File, Image] FileSize - File Size: 3.2 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:01 07:56:24-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: IPTC-XMP_31_failed.jpg
+[File, System, Image] Directory - Directory: t
+[File, System, Image] FileSize - File Size: 3.2 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:28-04:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ImageWidth - Image Width: 8
@@ -11,7 +11,7 @@
 [File, File, Image] BitsPerSample - Bits Per Sample: 8
 [File, File, Image] ColorComponents - Color Components: 3
 [File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.64
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.83
 [XMP, XMP-pdf, Author] Author - Author: Test
 [XMP, XMP-pdf, Time] CreationDate - Creation Date: 2008:10:20 19:54:15
 [XMP, XMP-pdf, Author] Creator - Creator: Guess Who

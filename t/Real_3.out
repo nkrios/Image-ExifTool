@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: Real.ra
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 130 bytes
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:05:17 14:28:16-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: Real.ra
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 130 bytes
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2006:05:17 14:28:16-04:00
 [File, File, Image] FileType - File Type: RA
 [File, File, Image] MIMEType - MIME Type: audio/x-pn-realaudio
 [Real, Real-RA4, Audio] 6 - Audio Bytes: 704352

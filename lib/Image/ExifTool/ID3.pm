@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -28,6 +28,31 @@ my @audioFormats = qw(APE MPC FLAC OGG MP3);
 my %audioModule = (
     MP3 => 'ID3',
     OGG => 'Vorbis',
+);
+
+# picture types for 'PIC' and 'APIC' tags
+my %pictureType = (
+    0 => 'Other',
+    1 => 'Icon',
+    2 => 'Other Icon',
+    3 => 'Front Cover',
+    4 => 'Back Cover',
+    5 => 'Leaflet',
+    6 => 'Media',
+    7 => 'Lead Artist',
+    8 => 'Artist',
+    9 => 'Conductor',
+    10 => 'Band',
+    11 => 'Composer',
+    12 => 'Lyricist',
+    13 => 'Recording Location',
+    14 => 'During Recording',
+    15 => 'During Performance',
+    16 => 'Video',
+    17 => 'Bright(ly) Colored Fish',
+    18 => 'Illustration',
+    19 => 'Band Logo',
+    20 => 'Publisher Logo',
 );
 
 my %warnedOnce;     # hash of warnings we issued
@@ -265,6 +290,7 @@ my %genre = (
         Notes => 'CR and RX are ID3v2 only',
         Format => 'int8u',
         PrintConv => \%genre,
+        PrintConvColumns => 3,
     },
 );
 
@@ -332,7 +358,15 @@ my %genre = (
     PIC => {
         Name => 'Picture',
         Binary => 1,
+        Notes => 'the 3 tags below are also extracted from this PIC frame',
     },
+    'PIC-1' => 'PictureFormat',
+    'PIC-2' => {
+        Name => 'PictureType',
+        PrintConv => \%pictureType,
+        SeparateTable => 1,
+    },
+    'PIC-3' => 'PictureDescription',
   # POP => 'Popularimeter',
     SLT => {
         Name => 'SynchronizedLyricText',
@@ -395,7 +429,15 @@ my %id3v2_common = (
     APIC => {
         Name => 'Picture',
         Binary => 1,
+        Notes => 'the 3 tags below are also extracted from this PIC frame',
     },
+    'APIC-1' => 'PictureMimeType',
+    'APIC-2' => {
+        Name => 'PictureType',
+        PrintConv => \%pictureType,
+        SeparateTable => 1,
+    },
+    'APIC-3' => 'PictureDescription',
     COMM => 'Comment',
   # COMR => 'Commercial',
   # ENCR => 'EncryptionMethod',
@@ -608,14 +650,18 @@ sub PrintGenre($)
 
 #------------------------------------------------------------------------------
 # Decode ID3 string
-# Inputs: 0) ExifTool object reference, 1) string beginning with encoding byte
+# Inputs: 0) ExifTool object reference
+#         1) string beginning with encoding byte unless specified as argument
+#         2) optional encoding (0=ISO-8859-1, 1=UTF-16 BOM, 2=UTF-16BE, 3=UTF-8)
 # Returns: Decoded string in scalar context, or list of strings in list context
-sub DecodeString($$)
+sub DecodeString($$;$)
 {
-    my ($exifTool, $val) = @_;
+    my ($exifTool, $val, $enc) = @_;
     return '' unless length $val;
-    my $enc = unpack('C', $val);
-    $val = substr($val, 1); # remove encoding byte
+    unless (defined $enc) {
+        $enc = unpack('C', $val);
+        $val = substr($val, 1); # remove encoding byte
+    }
     my @vals;
     if ($enc == 0 or $enc == 3) { # ISO 8859-1 or UTF-8
         $val =~ s/\0+$//;   # remove any null padding
@@ -819,15 +865,13 @@ sub ProcessID3v2($$$)
         } elsif ($id =~ /^(COM|COMM|ULT|USLT)$/) {
             $valLen > 4 or $exifTool->Warn("Short $id frame"), next;
             $lang = substr($val,1,3);
-            substr($val, 1, 3) = '';    # remove language code
-            my @vals = DecodeString($exifTool, $val);
+            my @vals = DecodeString($exifTool, substr($val,4), Get8u(\$val,0));
             foreach (0..1) { $vals[$_] = '' unless defined $vals[$_]; }
             $val = length($vals[0]) ? "($vals[0]) $vals[1]" : $vals[1];
         } elsif ($id eq 'USER') {
             $valLen > 4 or $exifTool->Warn('Short USER frame'), next;
             $lang = substr($val,1,3);
-            substr($val, 1, 3) = '';    # remove language code
-            $val = DecodeString($exifTool, $val);
+            $val = DecodeString($exifTool, substr($val,4), Get8u(\$val,0));
         } elsif ($id =~ /^(CNT|PCNT)$/) {
             $valLen >= 4 or $exifTool->Warn("Short $id frame"), next;
             my $cnt = unpack('N', $val);
@@ -838,11 +882,23 @@ sub ProcessID3v2($$$)
             $val = $cnt;
         } elsif ($id =~ /^(PIC|APIC)$/) {
             $valLen >= 4 or $exifTool->Warn("Short $id frame"), next;
+            my ($hdr, $attr);
             my $enc = unpack('C', $val);
-            my $hdr = ($id eq 'PIC') ? '.{5}.*?\0' : '..*?\0..*?\0';
+            if ($enc == 1 or $enc == 2) {
+                $hdr = ($id eq 'PIC') ? ".(...)(.)((?:..)*?)\0\0" : ".(.*?)\0(.)((?:..)*?)\0\0";
+            } else {
+                $hdr = ($id eq 'PIC') ? ".(...)(.)(.*?)\0"        : ".(.*?)\0(.)(.*?)\0";
+            }
             # remove header (encoding, image format or MIME type, picture type, description)
-            $val =~ s/$hdr//s or $exifTool->Warn("Invalid $id frame"), next;
-            $enc and $val =~ s/^\0//;   # remove 2nd terminator if Unicode encoding
+            $val =~ s/^$hdr//s or $exifTool->Warn("Invalid $id frame"), next;
+            my @attrs = ($1, ord($2), DecodeString($exifTool, $3, $enc));
+            my $i = 1;
+            foreach $attr (@attrs) {
+                # must store descriptions even if they are empty to maintain
+                # sync between copy numbers when multiple images
+                $exifTool->HandleTag($tagTablePtr, "$id-$i", $attr);
+                ++$i;
+            }
         } elsif ($id eq 'PRIV') {
             # save version number to set group1 name for tag later
             $exifTool->{ID3_Ver} = $tagTablePtr->{GROUPS}->{1};
@@ -1045,10 +1101,10 @@ sub ProcessMP3($$)
             # look for A/V headers in first 64kB
             my $buf2;
             $raf->Read($buf2, 0x10000 - $scanLen) and $buff .= $buf2;
-            $rtnVal = 1 if Image::ExifTool::MPEG::ProcessMPEGAudioVideo($exifTool, \$buff);
+            $rtnVal = 1 if Image::ExifTool::MPEG::ParseMPEGAudioVideo($exifTool, \$buff);
         } else {
             # look for audio frame sync in first $scanLen bytes
-            $rtnVal = 1 if Image::ExifTool::MPEG::ProcessMPEGAudio($exifTool, \$buff);
+            $rtnVal = 1 if Image::ExifTool::MPEG::ParseMPEGAudio($exifTool, \$buff);
         }
     }
     return $rtnVal;

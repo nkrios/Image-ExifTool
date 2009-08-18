@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 my %offOn = (
     0 => 'Off',
@@ -239,13 +239,13 @@ my %offOn = (
     0x2a => {
         Name => 'FNumber',
         Format => 'int32u',
-        ValueConv => '$val * 0.1',
+        ValueConv => '$val / 10',
         PrintConv => 'sprintf("%.1f",$val)',
     },
     0x32 => {
         Name => 'ExposureCompensation',
         Format => 'int32s',
-        ValueConv => '$val * 0.1',
+        ValueConv => '$val / 10',
         PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x44 => {
@@ -263,7 +263,7 @@ my %offOn = (
     0x48 => {
         Name => 'FocalLength',
         Format => 'int32u',
-        ValueConv => '$val * 0.1',
+        ValueConv => '$val / 10',
         PrintConv => 'sprintf("%.1f mm",$val)',
     },
 );
@@ -297,23 +297,50 @@ my %offOn = (
         Name => 'ISO',
         Format => 'int32u',
     },
-# (these tags are shifted by +1 byte for the C4 compared to the HD1A, so we can't use them)
-#     0xfe => {
-#         Name => 'ThumbnailLength',
-#         Format => 'int32u',
-#     },
-#     0x102 => {
-#         Name => 'ThumbnailOffset',
-#         IsOffset => 1,
-#         Format => 'int32u',
-#         RawConv => '$val + 0xf2',
-#     },
-    # so instead, look for the JPEG header using brute force...
-    0x800 => {
-        Name => 'ThumbnailImage',
-        Notes => 'position varies',
-        Format => 'undef[$size - 0x800]',
-        RawConv => '$val=~s/.*(?=\xff\xd8\xff\xc4)//; $self->ValidateImage(\$val,$tag)',
+    0xd1 => {
+        Name => 'Software',
+        Notes => 'these tags are shifted up by 1 byte for some models like the HD1A',
+        Format => 'undef[32]',
+        RawConv => q{
+            $val =~ /^SANYO/ or return undef;
+            $val =~ tr/\0//d;
+            $$self{SanyoSledder0xd1} = 1;
+            return $val;
+        },
+    },
+    0xd2 => {
+        Name => 'Software',
+        Format => 'undef[32]',
+        RawConv => q{
+            $val =~ /^SANYO/ or return undef;
+            $val =~ tr/\0//d;
+            $$self{SanyoSledder0xd2} = 1;
+            return $val;
+        },
+    },
+    0xfd => {
+        Name => 'ThumbnailLength',
+        Condition => '$$self{SanyoSledder0xd1}',
+        Format => 'int32u',
+    },
+    0xfe => {
+        Name => 'ThumbnailLength',
+        Condition => '$$self{SanyoSledder0xd2}',
+        Format => 'int32u',
+    },
+    0x101 => {
+        Name => 'ThumbnailOffset',
+        Condition => '$$self{SanyoSledder0xd1}',
+        IsOffset => 1,
+        Format => 'int32u',
+        RawConv => '$val + 0xf1',
+    },
+    0x102 => {
+        Name => 'ThumbnailOffset',
+        Condition => '$$self{SanyoSledder0xd2}',
+        IsOffset => 1,
+        Format => 'int32u',
+        RawConv => '$val + 0xf2',
     },
 );
 

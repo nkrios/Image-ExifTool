@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.68
-[File, File, Image] FileName - File Name: PostScript.eps
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 11 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:11:03 09:32:08-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.87
+[File, System, Image] FileName - File Name: PostScript.eps
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 11 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:11:03 09:32:08-05:00
 [File, File, Image] FileType - File Type: EPS
 [File, File, Image] MIMEType - MIME Type: application/postscript
 [File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 9e02efbd9bdc1dc192279e30a0e27323
@@ -46,7 +46,7 @@
 [XMP, XMP-photoshop, Author] Source - Source: I'm the source
 [XMP, XMP-photoshop, Location] State - State: Ont
 [XMP, XMP-photoshop, Image] TransmissionReference - Transmission Reference: What is a transmission reference
-[XMP, XMP-photoshop, Image] Urgency - Urgency: 8
+[XMP, XMP-photoshop, Image] Urgency - Urgency: 8 (least urgent)
 [XMP, XMP-photoshop, Image] SupplementalCategories - Supplemental Categories: amazing, image, utilities
 [XMP, XMP-xmpBJ, Other] JobRefName - Job Ref Name: My Job
 [XMP, XMP-xmpMM, Other] DocumentID - Document ID: adobe:docid:photoshop:cbcc2a62-f127-11d9-ac4d-e8be6f73552e

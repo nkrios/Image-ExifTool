@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: CanonVRD.vrd
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 1768 bytes
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:11:07 22:13:23-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: CanonVRD.vrd
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 1768 bytes
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2006:11:07 22:13:23-05:00
 [File, File, Image] FileType - File Type: VRD
 [File, File, Image] MIMEType - MIME Type: application/unknown
 [CanonVRD, CanonVRD, Image] 2 - VRD Version: 2.00

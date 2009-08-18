@@ -12,16 +12,105 @@
 
 <p>RSS feed: <a href="http://owl.phy.queensu.ca/~phil/exiftool/rss.xml">http://owl.phy.queensu.ca/~phil/exiftool/rss.xml</a></p>
 
-<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-7.82.tar.gz">Version 7.82</a>. (Other versions are
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-7.88.tar.gz">Version 7.88</a>. (Other versions are
 considered development releases, and are not uploaded to <a href="http://search.cpan.org/dist/Image-ExifTool/">CPAN</a>.)</p>
+
+<a name='v7.88'><b>Aug. 17, 2009 - Version 7.88</b> (production release)</a>
+<ul>
+<li>IMPORTANT: Fixed bug introduced in version 7.77 which causes NRW images to
+    be corrupted when writing
+<li>Decode a number of Sony A100 Camera Settings tags (thanks Igal Milchtaich)
+<li>Improved accuracy of some CameraInfo values for Canon PowerShot models
+<li>Tolerate blank lines in PDF xref tables
+<li>Fixed problem where -E didn't escape values when copying with -tagsFromFile
+<li>Fixed bug identifying AF Micro-Nikkor 105mm f/2.8D lens
+</ul>
+
+<a name='v7.87'><b>Aug. 14, 2009 - Version 7.87</b></a>
+<ul>
+<li>Added a new Sony lens (thanks Lukasz Stelmach)
+<li>Added a few new Pentax City and PictureMode values (thanks Niels Kristian
+    Bech Jensen)
+<li>Added lookup for XMP-photoshop:Urgency
+<li>Added a few new Nikon RetouchHistory values
+<li>Decode a number of new Sony tags for the A700 (thanks R&uuml;diger Lange)
+<li>Decode Canon PeripheralLighting tags (thanks Laurent Clevy)
+<li>Decode Olympus AFFineTuneAdj (thanks Yrjo Rauste)
+<li>Extract System tags from unknown file types
+<li>Enhanced -E option to work when writing, and when used in combination with
+    other options such as -p
+<li>Tolerate white space around "=" in XMP attributes (allowed by XML spec)
+<li>Improved error handling when parsing bad EXIF IFD entries
+<li>API Changes:
+    <ul>
+    <li>Added Escape option
+    </ul>
+</ul>
+
+<a name='v7.86'><b>July 25, 2009 - Version 7.86</b></a>
+<ul>
+<li>Added support for reading Garmin TCX track logs with the -geotag option
+<li>Added a number of new Canon, Olympus and Pentax LensType's
+<li>Enabled writing of .AI (Adobe Illustrator) files
+<li>Minor changes to DICOM decoding
+</ul>
+
+<a name='v7.85'><b>July 21, 2009 - Version 7.85</b></a>
+<ul>
+<li>Added a new Sony LensType
+<li>Added a new Pentax LensType (thanks Albert Bogner)
+<li>Added a new PentaxModelID value (Optio W80)
+<li>Added a few new JPEGDigest values (thanks Franz Buchinger)
+<li>Added check for proper support of IFD-format value types
+<li>Decode Nikon D300 firmware 1.10 camera settings (thanks Stuart Solomon)
+<li>Improved handling of Olympus makernotes for recent models and fixed error
+    messages resulting from makernote format changes in Stylus 550WP images
+<li>Improved geotagging by allowing different NMEA sentences with slightly
+    different timestamps (within 10 seconds) in the same fix
+<li>Fixed decoding of some CameraSettings tags for the new Sony A330 and A380
+<li>API Changes:
+    <ul>
+    <li>Added GeoMinSats option
+    </ul>
+</ul>
+
+<a name='v7.84'><b>July 16, 2009 - Version 7.84</b> (Windows only)</a>
+<ul>
+<li>Fixed bug in -geotag option of Windows version when using wildcards in the
+    GPS track filename
+</ul>
+
+<a name='v7.83'><b>July 13, 2009 - Version 7.83</b></a>
+<ul>
+<li>Added preliminary read support for M2TS/AVCHD video files (much pain for
+    little gain)
+<li>Added family 4 group names (instance number) to provide a technique for
+    differentiating same-named tags extracted from the same location via the
+    command-line application
+<li>Added a new family 1 group ("System") to differentiate tags obtained from
+    the file system
+<li>Added a couple of new Canon LensType values
+<li>Decode ID3 Picture attributes
+<li>Decode ICC_Profile ColorantTableOut
+<li>Changed application to return a value of 1 if all files fail condition
+<li>Made the IPTC CodedCharacterSet tag "unsafe" to copy by default (since this
+    could result in incorrect encoding for existing IPTC in the destination
+    image)
+<li>Fixed bug handing some non-standard offset formats when writing EXIF
+<li>Fixed problem with MakerNote warnings for Samsung WB500
+<li>Fixed problem reading Leica M8 makernotes when copied between JPEG and DNG
+    images
+<li>Fixed problem extracting ThumbnailImage from Sanyo VPC-FH1 MP4 videos
+<li>Fixed problem extracting ThumbnailImage from some Sony DSLR-A100 ARW images
+    (due to a bug in some A100 firmware versions which results in incorrect
+    ThumbnailOffset values)
+</ul>
 
 <a name='v7.82'><b>July 2, 2009 - Version 7.82</b> (production release)</a>
 <ul>
 <li>Added a new Canon LensType (thanks Norbert Wasser)
 <li>Decode another Nikon AVI tag
-<li>Support multi-language ID3 tags in the same way as with XMP and MIE
 <li>A number of improvements, bug fixes and additions to ID3 decoding
-<li>Fixed problem extracting some ID3v2 Lyrics and Comment values
 </ul>
 
 <a name='v7.81'><b>June 28, 2009 - Version 7.81</b></a>
@@ -4592,7 +4681,7 @@ considered development releases, and are not uploaded to <a href="http://search.
 <a name='v2.00'><b>Dec. 09, 2003 - Version 2.00</b></a>
 <ul>
 <li>Added support Olympus, Casio and Nikon cameras
-<li>Now recognized GPS information
+<li>Now recognizes GPS information
 <li>Moved config information to TagTables modules
 <li>Restructured API
 </ul>
@@ -4643,7 +4732,7 @@ considered development releases, and are not uploaded to <a href="http://search.
 
 <a name='v1.30'><b>Nov. 25, 2003 - Version 1.30</b></a>
 <ul>
-<li>Added experimental Canon RAW file support
+<li>Added experimental Canon RAW (CRW) file support
 </ul>
 
 <a name='v1.20'><b>Nov. 22, 2003 - Version 1.20</b></a>

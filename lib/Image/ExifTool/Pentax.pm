@@ -36,6 +36,8 @@
 #              22) Bozi (K10D, http://www.cpanforum.com/posts/8480)
 #              23) Anton Bondar private communication
 #              24) Akos Szalkai (https://rt.cpan.org/Ticket/Display.html?id=43743)
+#              25) Albert Bogner private communication
+#              26) Niels Kristian Bech Jensen private communication
 #              JD) Jens Duttke private communication
 #
 # Notes:        See POD documentation at the bottom of this file
@@ -48,7 +50,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.02';
+$VERSION = '2.04';
 
 sub CryptShutterCount($$);
 
@@ -128,6 +130,7 @@ my %pentaxLensTypes = (
     '3 255.3' => 'Sigma DL Zoom 75-300mm F4-5.6', #12
     '3 255.4' => 'Sigma DF EX Aspherical 28-70mm F2.8', #12
     '3 255.5' => 'Sigma AF Tele 400mm F5.6 Multi-coated', #JD
+    '3 255.6' => 'Sigma 24-60mm F2.8 EX DG', #PH
     '4 1' => 'smc PENTAX-FA SOFT 28mm F2.8',
     '4 2' => 'smc PENTAX-FA 80-320mm F4.5-5.6',
     '4 3' => 'smc PENTAX-FA 43mm F1.9 Limited',
@@ -211,6 +214,7 @@ my %pentaxLensTypes = (
     '7 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #23
     '7 217' => 'smc PENTAX-DA 50-200mm F4-5.6 ED WR', #JD
     '7 218' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL WR', #JD
+    '7 220' => 'Tamron SP AF 10-24mm F3.5-4.5 Di II LD Aspherical [IF]', #25
     '7 222' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #PH (tag 0x003f -- was '7 229' in LensInfo)
     '7 223' => 'Samsung D-XENON 18-55mm F3.5-5.6 II', #PH
     '7 224' => 'smc PENTAX-DA 15mm F4 ED AL Limited', #JD
@@ -317,6 +321,7 @@ my %pentaxModelID = (
     0x12d9a => 'Optio E70',
     0x12dae => 'X70',
     0x12db8 => 'K-7',
+    0x12dcc => 'Optio W80',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -392,6 +397,7 @@ my %pentaxCities = (
     68 => 'Amsterdam',
     69 => 'Stockholm',
     70 => 'Lisbon', #14
+    71 => 'Copenhagen', #26
 );
 
 # decoding for Pentax Firmware ID tags - PH
@@ -586,8 +592,10 @@ my %lensCode = (
             30 => 'Self Portrait', #PH
             31 => 'Illustrations', #13
             33 => 'Digital Filter', #13
+            35 => 'Night Scene Portrait', #26
             37 => 'Museum', #PH
             38 => 'Food', #PH
+            39 => 'Underwater', #26
             40 => 'Green Mode', #PH
             49 => 'Light Pet', #PH
             50 => 'Dark Pet', #PH
@@ -597,6 +605,7 @@ my %lensCode = (
             55 => 'Natural Skin Tone', #PH
             56 => 'Synchro Sound Record', #PH
             58 => 'Frame Composite', #14
+            59 => 'Report', #26
             60 => 'Kids', #13
             61 => 'Blur Reduction', #13
             65 => 'Half-length Portrait', #JD
@@ -3056,9 +3065,10 @@ the information should be stored to deduce the correct offsets.
 
 Thanks to Wayne Smith, John Francis, Douglas O'Brien Cvetan Ivanov, Jens
 Duttke and Dave Nicholson for help figuring out some Pentax tags, Denis
-Bourez, Kazumichi Kawabata, David Buret, Barney Garrett, Axel Kellner and
-Anton Bondar for adding to the LensType list, and Ger Vermeulen for
-contributing print conversion values for some tags.
+Bourez, Kazumichi Kawabata, David Buret, Barney Garrett, Axel Kellner, Anton
+Bondar and Albert Bogner for adding to the LensType list, and Ger Vermeulen
+and Niels Kristian Bech Jensen for contributing print conversion values for
+some tags.
 
 =head1 AUTHOR
 

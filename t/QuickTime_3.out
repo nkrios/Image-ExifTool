@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.80
-[File, File, Image] FileName - File Name: QuickTime.m4a
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 5.1 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:09:23 16:45:18-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: QuickTime.m4a
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 5.1 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2006:09:23 16:45:18-04:00
 [File, File, Image] FileType - File Type: M4A
 [File, File, Image] MIMEType - MIME Type: audio/mp4
 [QuickTime, QuickTime, Video] 0 - Version: 0

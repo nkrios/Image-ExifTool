@@ -45,7 +45,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.08';
+$VERSION = '2.09';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -756,7 +756,22 @@ my %recognizedAttrs = (
     # way Photoshop7.0 writes it - PH
     SupplementalCategories  => { List => 'Bag' },
     TransmissionReference   => { },
-    Urgency         => { Writable => 'integer' },
+    Urgency         => {
+        Writable => 'integer',
+        Notes => 'should be in the range 1-8 to conform with the XMP spec',
+        PrintConv => { # (same values as IPTC:Urgency)
+            0 => '0 (reserved)',              # (not standard XMP)
+            1 => '1 (most urgent)',
+            2 => 2,
+            3 => 3,
+            4 => 4,
+            5 => '5 (normal urgency)',
+            6 => 6,
+            7 => 7,
+            8 => '8 (least urgent)',
+            9 => '9 (user-defined priority)', # (not standard XMP)
+        },
+    },
 );
 
 # Photoshop Camera Raw Schema properties (crs) - (ref 8,PH)
@@ -2449,7 +2464,7 @@ sub ParseXMPElement($$$;$$$)
 
         # extract property attributes
         my (%attrs, @attrs);
-        while ($attrs =~ m/(\S+?)=(['"])(.*?)\2/sg) {
+        while ($attrs =~ m/(\S+?)\s*=\s*(['"])(.*?)\2/sg) {
             push @attrs, $1;    # preserve order
             $attrs{$1} = $3;
         }

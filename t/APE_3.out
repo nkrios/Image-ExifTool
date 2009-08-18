@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.82
-[File, File, Image] FileName - File Name: APE.mpc
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 2.5 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:11:14 14:27:03-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: APE.mpc
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 2.5 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2006:11:14 14:27:03-05:00
 [File, File, Image] FileType - File Type: MPC
 [File, File, Image] MIMEType - MIME Type: audio/x-musepack
 [File, File, Image] ID3Size - ID3 Size: 391
@@ -31,6 +31,9 @@
 [ID3, ID3v2_2, Audio] TRK - Track: 1/5
 [ID3, ID3v2_2, Audio] TPA - Part Of Set: 1/2
 [ID3, ID3v2_2, Audio] ULT-eng - Lyrics (eng): Do-wap she-bang
+[ID3, ID3v2_2, Audio] PIC-1 - Picture Format: JPG
+[ID3, ID3v2_2, Audio] PIC-2 - Picture Type: Other
+[ID3, ID3v2_2, Audio] PIC-3 - Picture Description: comment
 [ID3, ID3v2_2, Audio] PIC - Picture: (Binary data 15 bytes)
 [ID3, ID3v2_2, Audio] TT2 - Title: ExifTool Test
 [ID3, ID3v2_2, Author] TP1 - Artist: Phil Harvey

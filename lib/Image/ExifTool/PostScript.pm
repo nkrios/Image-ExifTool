@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.25';
+$VERSION = '1.26';
 
 sub WritePS($$);
 sub ProcessPS($$;$);
@@ -89,7 +89,6 @@ sub ProcessPS($$;$);
         Notes => 'extracted with ExtractEmbedded option',
     },
     EmbeddedFileName => {
-        Groups => { 3 => 'Doc#' }, # (for GetAllGroups())
         Notes => q{
             not a real tag ID, but the file name from a BeginDocument statement.
             Extracted with document metadata when ExtractEmbedded option is used

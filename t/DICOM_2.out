@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: DICOM.dcm
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 1860 bytes
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2005:11:14 14:47:21-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.85
+[File, System, Image] FileName - File Name: DICOM.dcm
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 1860 bytes
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2005:11:14 14:47:21-05:00
 [File, File, Image] FileType - File Type: DICOM
 [File, File, Image] MIMEType - MIME Type: application/dicom
 [DICOM, DICOM, Image] 0002,0000 - File Meta Info Group Length: 180
@@ -93,7 +93,7 @@
 [DICOM, DICOM, Image] 0028,0100 - Bits Allocated: 16
 [DICOM, DICOM, Image] 0028,0101 - Bits Stored: 16
 [DICOM, DICOM, Image] 0028,0102 - High Bit: 15
-[DICOM, DICOM, Image] 0028,0103 - Pixel Representation: 1
+[DICOM, DICOM, Image] 0028,0103 - Pixel Representation: Signed
 [DICOM, DICOM, Image] 0028,0106 - Smallest Image Pixel Value: 0
 [DICOM, DICOM, Image] 0028,0107 - Largest Image Pixel Value: 784
 [DICOM, DICOM, Image] 0028,0120 - Pixel Padding Value: 0
@@ -102,4 +102,4 @@
 [DICOM, DICOM, Image] 0028,1052 - Rescale Intercept: 0 
 [DICOM, DICOM, Image] 0028,1053 - Rescale Slope: 1 
 [DICOM, DICOM, Image] 0028,1054 - Rescale Type: SIGNAL INTENSITY (UNITLESS) 
-[DICOM, DICOM, Image] 7FE0,0010 - Pixel Data: 17468 28021 31085 20512 30825 27749 25632 29793 15969
+[DICOM, DICOM, Image] 7FE0,0010 - Pixel Data: (Binary data 53 bytes)

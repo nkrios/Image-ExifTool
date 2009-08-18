@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 sub ProcessICC($$);
 sub ProcessICC_Profile($$$);
@@ -96,6 +96,10 @@ my %profileClass = (
             TagTable => 'Image::ExifTool::ICC_Profile::ColorantTable',
             Validate => '$type eq "clrt"',
         },
+    },
+    clot => { # new in version 4.2
+        Name => 'ColorantTableOut',
+        Binary => 1,
     },
     cprt => {
         Name => 'ProfileCopyright',

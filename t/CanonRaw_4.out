@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.73
-[File, File, Image] FileName - File Name: CanonRaw_4_failed.crw
-[File, File, Image] Directory - Directory: t
-[File, File, Image] FileSize - File Size: 6.1 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:03:24 08:28:45-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: CanonRaw_4_failed.crw
+[File, System, Image] Directory - Directory: t
+[File, System, Image] FileSize - File Size: 6.1 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:17-04:00
 [File, File, Image] FileType - File Type: CRW
 [File, File, Image] MIMEType - MIME Type: image/x-raw
 [MakerNotes, CanonRaw, Camera] 8197 - Raw Data: (Binary data 22 bytes)

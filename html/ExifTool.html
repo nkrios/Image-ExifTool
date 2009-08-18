@@ -420,6 +420,11 @@ to some functions.</p>
 <tr><td><a name="Duplicates">Duplicates</a></td><td>Flag to return values from
     tags with duplicate names when extracting information</td>
     <td align='center'>0 or 1</td><td align=center>1</td></tr>
+<tr><td>Escape</td>
+    <td>Escape special characters in extracted values for HTML or XML.  Also unescapes HTML or
+    XML character entities in input values passed to <a href="#SetNewValue">SetNewValue</a>.</td>
+    <td align='center'>HTML, XML or undef</td>
+    <td align='center'>undef</td></tr>
 <tr><td>Exclude</td>
     <td>Exclude specified tags</td>
     <td>Tag name or reference to a list of tag names to exclude.  Case is not significant.
@@ -465,6 +470,11 @@ to some functions.</p>
     <td>Maximum Position (3D) Dilution Of Precision for geotagging.  GPS fixes are
     ignored if the PDOP is greater than this.</td>
     <td align='center'>A floating point number, or undef</td>
+    <td align='center'>undef</td></tr>
+<tr><td>GeoMinSats</td>
+    <td>Minimum number of satellites for geotagging.  GPS fixes are ignored if the
+    number of acquired satellites is less than this.</td>
+    <td align='center'>A positive integer, or undef</td>
     <td align='center'>undef</td></tr>
 <tr><td>Group#</td><td>Extract tags for specified groups</td>
     <td>Group name or reference to list of group names.
@@ -660,8 +670,9 @@ $info = $exifTool-&gt;<b>GetInfo</b>({Group2 =&gt; ['Author', 'Location']});
 </pre></td></tr></table></blockquote>
 <p>The following options are effective in the call to <a href="#GetInfo">GetInfo</a>:</p>
 <blockquote>
-Charset, CoordFormat, DateFormat, Duplicates, Exclude, Group#, Lang, List, ListSep,
-StrictDate, PrintConv, Sort (if a tag list reference is given) and StrictDate.
+Charset, CoordFormat, DateFormat, Duplicates, Escape, Exclude, Group#, Lang,
+List, ListSep, StrictDate, PrintConv, Sort (if a tag list reference is given)
+and StrictDate.
 </blockquote>
 
 <hr><h2><a name="WriteInfo">WriteInfo</a></h2>
@@ -1004,7 +1015,7 @@ of individual tags after deleting a group.</p>
 <p>The following ExifTool options are effective in the call to
 <a href="#SetNewValue">SetNewValue</a>:</p>
 <blockquote>
-Charset, IgnoreMinorErrors, Lang, ListSep, ListSplit, PrintConv and Verbose.
+Charset, Escape, IgnoreMinorErrors, Lang, ListSep, ListSplit, PrintConv and Verbose.
 </blockquote>
 
 <hr><h2><a name="SetNewValuesFromFile">SetNewValuesFromFile</a></h2>
@@ -1342,6 +1353,7 @@ and adjacent identical group names unless the family string begins with a colon.
 <tr><td align='center'>1</td><td>Specific Location</td><td>IFD0, XMP-dc</td></tr>
 <tr><td align='center'>2</td><td>Category</td> <td>Author, Time</td></tr>
 <tr><td align='center'>3</td><td>Document Number</td> <td>Main, Doc1, Doc3-2</td></tr>
+<tr><td align='center'>4</td><td>Instance Number</td> <td>Copy1, Copy2, Copy3...</td></tr>
 </table></blockquote>
 
 <p>Families 0 and 1 are based on the file structure, and are similar except that
@@ -1365,6 +1377,11 @@ they exist) are indicated by numbers separated with dashes in the group name, to
 an arbitrary depth. (ie. '<code>Doc2-3-1</code>' is the 1<sup>st</sup>
 sub-sub-document of the 3<sup>rd</sup> sub-document of the 2<sup>nd</sup>
 embedded document of the main file.)</p>
+<p>Family 4 provides a method for differentiating tags when multiple tags exist
+with the same name in the same location.  The primary instance of a tag (the tag
+extracted when the Duplicates option is disabled and no group is specified) has
+no family 4 group name, but additional instances have have family 4 group names
+of '<code>Copy1</code>', '<code>Copy2</code>', '<code>Copy3</code>', etc.</p>
 <p>See <a href="#GetAllGroups">GetAllGroups</a> for lists of group names.</p>
 
 <p><b>Examples:</b></p>
@@ -1520,7 +1537,7 @@ the specific IFD).
 <p>Get list of all group names in specified family.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetAllGroups($)</td></tr>
-<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> Group family number (0-3)
+<tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> Group family number (0-4)
 </td></tr>
 <tr><td><b>Returns</b></td>
 <td>A list of all groups in the specified family in alphabetical order</td></tr>
@@ -1532,36 +1549,37 @@ the specific IFD).
 <td>AFCP, AIFF, APE, APP12, APP13, APP14, APP15, APP5, APP6, APP8, ASF, BMP,
 CanonVRD, Composite, DICOM, DNG, DjVu, Ducky, EXE, EXIF, ExifTool, FLAC,
 File, Flash, FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC,
-ITC, JFIF, JPEG, Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MPF, MakerNotes,
-Meta, PDF, PICT, PNG, Panasonic, PhotoMechanic, Photoshop, PostScript,
-PrintIM, QuickTime, RAF, RIFF, Rawzor, Real, SVG, SigmaRaw, Sony, Stim,
-Vorbis, XMP, ZIP
+ITC, JFIF, JPEG, Jpeg2000, Leaf, M2TS, MIE, MIFF, MNG, MPC, MPEG, MPF,
+MakerNotes, Meta, PDF, PICT, PNG, PhotoMechanic, Photoshop, PostScript,
+PrintIM, QuickTime, RAF, RIFF, Rawzor, Real, SVG, SigmaRaw, Stim, Vorbis,
+XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom, CanonRaw,
-CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky, EPPIM, EXE,
-EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, FotoStation, FujiFilm,
-GPS, GeoTiff, GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc,
-HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v1_Enh, ID3v2_2,
-ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC, InteropIFD, JFIF, JPEG, JVC,
-Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KodakIFD, KyoceraRaw,
-Leaf, LeafSubIFD, Leica, MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc,
-MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
-MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM,
-MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MPImage#, MPF0, MakerNotes,
-MakerUnknown, MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture,
-NikonPreview, NikonScan, Olympus, PDF, PICT, PNG, Panasonic, Pentax,
-PhotoMechanic, Photoshop, PictureInfo, PostScript, PrintIM, ProfileIFD,
-QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor, Real, Real-CONT, Real-MDPR,
-Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2,
-SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo, Sigma, SigmaRaw, Sony, Stim,
-SubIFD, Track#, Vorbis, XMP, XMP-DICOM, XMP-MP, XMP-PixelLive, XMP-acdsee,
-XMP-album, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif,
-XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf,
-XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism, XMP-prl,
-XMP-pur, XMP-rdf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
-XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
+<td>AC3, AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom,
+CanonRaw, CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky,
+EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix,
+FotoStation, FujiFilm, GPS, GeoTiff, GlobParamIFD, GraphConv, H264, HP,
+HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm,
+ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ICC_Profile#, ID3,
+ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC,
+InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
+KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, M2TS, MAC,
+MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS,
+MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
+MIFF, MNG, MPC, MPEG, MPF0, MPImage, MakerNotes, MakerUnknown, MetaIFD,
+Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus,
+PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
+PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor,
+Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5,
+Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo,
+Sigma, SigmaRaw, Sony, Stim, SubIFD, System, Track#, Vorbis, XMP, XMP-DICOM,
+XMP-MP, XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs,
+XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
+XMP-microsoft, XMP-pdf, XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus,
+XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ,
+XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg,
+ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
@@ -1569,6 +1587,9 @@ Time, Unknown, Video
 </td></tr>
 <tr><td><b>3&nbsp;(Document&nbsp;Number)</b></td>
 <td>Doc#, Main
+</td></tr>
+<tr><td><b>4&nbsp;(Instance&nbsp;Number)</b></td>
+<td>Copy#
 </td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>

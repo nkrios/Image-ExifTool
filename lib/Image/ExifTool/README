@@ -590,6 +590,9 @@ numerical.
   DataTag       : Used in EXIF table to specify the tag name of the data
                   associated with offset/length tags.
 
+  FixFormat     : [Writable EXIF SubIFD SubDirectory's only] Used to specify a
+                  format for writing an IFD pointer other than 'int32u'.
+
   Struct        : [XMP tags only] Used by XMP writer code to specify name of XMP
                   structure so the PropertyPath can be determined.  Tags with
                   Struct entries should also include a dummy SubDirectory entry

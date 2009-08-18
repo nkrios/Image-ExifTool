@@ -47,6 +47,7 @@ html/TagNames/Jpeg2000.html
 html/TagNames/Kodak.html
 html/TagNames/KyoceraRaw.html
 html/TagNames/Leaf.html
+html/TagNames/M2TS.html
 html/TagNames/MIE.html
 html/TagNames/MIFF.html
 html/TagNames/MNG.html
@@ -169,6 +170,7 @@ lib/Image/ExifTool/Lang/tr.pm
 lib/Image/ExifTool/Lang/zh_cn.pm
 lib/Image/ExifTool/Lang/zh_tw.pm
 lib/Image/ExifTool/Leaf.pm
+lib/Image/ExifTool/M2TS.pm
 lib/Image/ExifTool/MIE.pm
 lib/Image/ExifTool/MIEUnits.pod
 lib/Image/ExifTool/MIFF.pm
@@ -384,6 +386,8 @@ t/Lang_6.out
 t/Lang_7.out
 t/Lang_8.out
 t/Lang_9.out
+t/M2TS.t
+t/M2TS_2.out
 t/MIE.t
 t/MIE_2.out
 t/MIE_3.out
@@ -560,6 +564,7 @@ t/images/JVC2.jpg
 t/images/Jpeg2000.jp2
 t/images/Kodak.jpg
 t/images/KyoceraRaw.raw
+t/images/M2TS.mts
 t/images/MIE.mie
 t/images/MIFF.miff
 t/images/MP3.mp3

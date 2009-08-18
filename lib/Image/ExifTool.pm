@@ -25,7 +25,7 @@ use vars qw($VERSION $RELEASE @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             $psAPP13old @loadAllTables %UserDefined $evalWarning %noWriteFile
             %magicNumber @langs $defaultLang %langName);
 
-$VERSION = '7.82';
+$VERSION = '7.88';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -114,6 +114,9 @@ sub UnpackUTF8($);
 sub SetPreferredByteOrder($);
 sub CopyBlock($$$);
 
+# other subroutine definitions
+sub DoEscape($$);
+
 # list of main tag tables to load in LoadAllTables() (sub-tables are recursed
 # automatically).  Note: They will appear in this order in the documentation
 # unless tweaked in BuildTagLookup::GetTableOrder().
@@ -121,10 +124,11 @@ sub CopyBlock($$$);
     PhotoMechanic Exif GeoTiff CanonRaw KyoceraRaw MinoltaRaw PanasonicRaw
     SigmaRaw JPEG Jpeg2000 BMP BMP PICT PNG MNG MIFF PDF PostScript
     Photoshop::Header FujiFilm::RAF Sony::SR2SubIFD ITC ID3 Vorbis FLAC APE
-    APE::NewHeader APE::OldHeader MPC MPEG::Audio MPEG::Video MPEG::VBR
-    QuickTime QuickTime::ImageFile Flash Flash::FLV Real::Media Real::Audio
-    Real::Metafile RIFF AIFF ASF DICOM DjVu MIE HTML XMP::SVG EXE EXE::PEVersion
-    EXE::PEString EXE::MachO EXE::PEF EXE::ELF Rawzor ZIP
+    APE::NewHeader APE::OldHeader MPC MPEG::Audio MPEG::Video MPEG::VBR M2TS
+    M2TS::H264 M2TS::AC3 QuickTime QuickTime::ImageFile Flash Flash::FLV
+    Real::Media Real::Audio Real::Metafile RIFF AIFF ASF DICOM DjVu MIE HTML
+    XMP::SVG EXE EXE::PEVersion EXE::PEString EXE::MachO EXE::PEF EXE::ELF
+    Rawzor ZIP
 );
 
 # alphabetical list of current Lang modules
@@ -157,12 +161,12 @@ $defaultLang = 'en';    # default language
 # Notes: 1) There is no need to test for like types separately here
 # 2) Put types with no file signature at end of list to avoid false matches
 @fileTypes = qw(JPEG CRW TIFF GIF MRW RAF X3F JP2 PNG MIE MIFF PS PDF PSD XMP
-                BMP PPM RIFF AIFF ASF MOV MPEG Real SWF FLV OGG FLAC APE MPC
-                IND ICC ITC HTML VRD QTIF FPX PICT ZIP RWZ EXE RAW MP3 DICM);
+                BMP PPM RIFF AIFF ASF MOV MPEG Real SWF FLV OGG FLAC APE MPC IND
+                ICC ITC HTML VRD QTIF FPX PICT ZIP RWZ EXE RAW M2TS MP3 DICM);
 
 # file types that we can write (edit)
 my @writeTypes = qw(JPEG TIFF GIF CRW MRW ORF RAF RAW PNG MIE PSD XMP PPM
-                    EPS PS PDF ICC VRD JP2 EXIF IND);
+                    EPS PS PDF ICC VRD JP2 EXIF AI IND);
 
 # file extensions that we can't write for various base types
 %noWriteFile = (
@@ -231,6 +235,8 @@ my %fileTypeLookup = (
     JPX  => ['JP2',  'JPEG 2000 file'],
     K25  => ['TIFF', 'Kodak DC25 RAW (TIFF-based)'],
     KDC  => ['TIFF', 'Kodak Digital Camera RAW (TIFF-based)'],
+    M2T  => ['M2TS', 'MPEG2 Transport Stream'],
+    M2TS => ['M2TS', 'MPEG2 Transport Stream'],
     M4A  => ['MOV',  'MPG4 Audio (QuickTime-based)'],
     MEF  => ['TIFF', 'Mamiya (RAW) Electronic Format (TIFF-based)'],
     MIE  => ['MIE',  'Meta Information Encapsulation format'],
@@ -246,6 +252,7 @@ my %fileTypeLookup = (
     MPG  => ['MPEG', 'MPEG audio/video format 1'],
     MPO  => ['JPEG', 'Extended Multi-Picture format'],
     MRW  => ['MRW',  'Minolta RAW format'],
+    MTS  => ['M2TS', 'MPEG2 Transport Stream'],
     NEF  => ['TIFF', 'Nikon (RAW) Electronic Format (TIFF-based)'],
     NRW  => ['TIFF', 'Nikon RAW (2) (TIFF-based)'],
     OGG  => ['OGG',  'Ogg Vorbis audio file'],
@@ -306,6 +313,8 @@ my %mimeType = (
     APE  => 'audio/x-monkeys-audio',
     ASF  => 'video/x-ms-asf',
     ARW  => 'image/x-raw',
+    M2T  => 'video/mpeg',
+    M2TS => 'video/m2ts',
     AVI  => 'video/avi',
     BMP  => 'image/bmp',
     BTF  => 'application/unknown', #TEMPORARY!
@@ -444,6 +453,7 @@ my %moduleName = (
     ITC  => '.{4}itch',
     JP2  => '\0\0\0\x0cjP(  |\x1a\x1a)\x0d\x0a\x87\x0a',
     JPEG => '\xff\xd8\xff',
+    M2TS => '(....)?\x47',
     MIE  => '~[\x10\x18]\x04.0MIE',
     MIFF => 'id=ImageMagick',
     MOV  => '.{4}(free|skip|wide|ftyp|pnot|PICT|pict|moov|mdat|junk|uuid)',
@@ -535,12 +545,14 @@ sub DummyWriteProc { return 1; }
         Priority => 0,  # to preserve order of JPEG COM segments
     },
     Directory => {
+        Groups => { 1 => 'System' },
         Writable => 1,
         Protected => 1,
         # translate backslashes in directory names and add trailing '/'
         ValueConvInv => '$_=$val; tr/\\\\/\//; m{[^/]$} and $_ .= "/"; $_',
     },
     FileName => {
+        Groups => { 1 => 'System' },
         Writable => 1,
         Protected => 1,
         Notes => q{
@@ -550,6 +562,7 @@ sub DummyWriteProc { return 1; }
         ValueConvInv => '$val=~tr/\\\\/\//; $val',
     },
     FileSize => {
+        Groups => { 1 => 'System' },
         PrintConv => sub {
             my $val = shift;
             $val < 2048 and return "$val bytes";
@@ -563,7 +576,7 @@ sub DummyWriteProc { return 1; }
     FileModifyDate => {
         Description => 'File Modification Date/Time',
         Notes => 'the filesystem modification time',
-        Groups => { 2 => 'Time', 3 => 'Main' }, # (Main defined once for GetAllGroups())
+        Groups => { 1 => 'System', 2 => 'Time' },
         Writable => 1,
         # all pseudo-tags must be protected so -tagsfromfile fails with
         # unrecognized files unless a pseudo tag is specified explicitly
@@ -687,7 +700,7 @@ sub DummyWriteProc { return 1; }
         Notes => q{
             this write-only tag is used to define the GPS track log data or track log
             file name.  Currently supported track log formats are GPX, NMEA RMC/GGA/GLL,
-            KML, Garmin XML and Magellan PMGNTRK
+            KML, Garmin XML and TCX, and Magellan PMGNTRK
         },
         ValueConv => 'undef',   # write-only
         ValueConvInv => q{
@@ -728,9 +741,9 @@ sub DummyWriteProc { return 1; }
 # YCbCrSubSampling values (used by JPEG SOF, EXIF and XMP)
 %Image::ExifTool::JPEG::yCbCrSubSampling = (
     '1 1' => 'YCbCr4:4:4 (1 1)', #PH
-    '2 1' => 'YCbCr4:2:2 (2 1)', #14
-    '2 2' => 'YCbCr4:2:0 (2 2)', #14
-    '4 1' => 'YCbCr4:1:1 (4 1)', #14
+    '2 1' => 'YCbCr4:2:2 (2 1)', #14 in Exif.pm
+    '2 2' => 'YCbCr4:2:0 (2 2)', #14 in Exif.pm
+    '4 1' => 'YCbCr4:1:1 (4 1)', #14 in Exif.pm
     '4 2' => 'YCbCr4:1:0 (4 2)', #PH
     '1 2' => 'YCbCr4:4:0 (1 2)', #PH
     '1 4' => 'YCbCr4:4:1 (1 4)', #JD
@@ -1582,6 +1595,22 @@ sub GetValue($$;$)
             $value = join($convType eq 'PrintConv' ? '; ' : ' ', @$value);
         }
     }
+    # escape values if necessary
+    while ($self->{OPTIONS}{Escape}) {
+        my $escapeProc;
+        if ($self->{OPTIONS}{Escape} eq 'XML') {
+            require Image::ExifTool::XMP;
+            $escapeProc = \&Image::ExifTool::XMP::EscapeXML;
+        } elsif ($self->{OPTIONS}{Escape} eq 'HTML') {
+            require Image::ExifTool::HTML;
+            $escapeProc = \&Image::ExifTool::HTML::EscapeHTML;
+        } else {
+            last;
+        }
+        DoEscape($value, $escapeProc);
+        DoEscape($valueConv, $escapeProc) if defined $valueConv;
+        last;
+    }
     if ($type eq 'Both') {
         # $valueConv is undefined if there was no print conversion done
         $valueConv = $value unless defined $valueConv;
@@ -1727,6 +1756,7 @@ sub GetGroup($$;$)
         foreach (0..2) { $groups[$_] = $$groups{$_}; }
     }
     $groups[3] = 'Main';
+    $groups[4] = "Copy$1" if $tag =~ /\((\d+)\)$/;
     # handle dynamic group names if necessary
     my $ex = $self->{TAG_EXTRA}{$tag};
     if ($ex) {
@@ -3362,7 +3392,7 @@ sub ProcessJPEG($$)
     my $htmlDump = $self->{HTML_DUMP};
     my %dumpParms = ( Out => $out );
     my ($success, $icc_profile, $wantPreview, $trailInfo, %extendedXMP, $app2Preview);
-    my (@dqt, $subSampling);
+    my (@dqt, $subSampling, $dumpEnd);
 
     # check to be sure this is a valid JPG file
     return 0 unless $raf->Read($s, 2) == 2 and $s eq "\xff\xd8";
@@ -3373,12 +3403,13 @@ sub ProcessJPEG($$)
         my $pos = $raf->Tell() - 2;
         $self->HtmlDump(0, $pos, '[unknown header]') if $pos;
         $self->HtmlDump($pos, 2, 'JPEG header', 'SOI Marker');
+        $dumpEnd = 2;
     }
 
     # set input record separator to 0xff (the JPEG marker) to make reading quicker
     local $/ = "\xff";
 
-    my ($nextMarker, $nextSegDataPt, $nextSegPos, $combinedSegData, $dumpEnd);
+    my ($nextMarker, $nextSegDataPt, $nextSegPos, $combinedSegData);
 
     # read file until we reach an end of image (EOI) or start of scan (SOS)
     Marker: for (;;) {
@@ -4796,6 +4827,25 @@ sub DeleteTag($$)
     delete $self->{FILE_ORDER}{$tag};
     delete $self->{TAG_INFO}{$tag};
     delete $self->{TAG_EXTRA}{$tag};
+}
+
+#------------------------------------------------------------------------------
+# Escape all elements of a value
+# Inputs: 0) value, 1) escape proc
+sub DoEscape($$)
+{
+    my $val;
+    if (not ref $_[0]) {
+        $_[0] = &{$_[1]}($_[0]);
+    } elsif (ref $_[0] eq 'ARRAY') {
+        foreach $val (@{$_[0]}) {
+            DoEscape($val, $_[1]);
+        }
+    } elsif (ref $_[0] eq 'HASH') {
+        foreach $val (keys %{$_[0]}) {
+            DoEscape($val, $_[1]);
+        }
+    }
 }
 
 #------------------------------------------------------------------------------

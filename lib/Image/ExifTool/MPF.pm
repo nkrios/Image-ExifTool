@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ProcessMPImageList($$$);
 
@@ -91,6 +91,10 @@ sub ProcessMPImageList($$$);
     #CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     #WRITABLE => 1,
     GROUPS => { 0 => 'MPF', 1 => 'MPImage', 2 => 'Image'},
+    NOTES => q{
+        The first MPF "Large Thumbnail" image is extracted as PreviewImage, and the
+        rest of the embedded MPF images are extracted as MPImage#.
+    },
     0.1 => {
         Name => 'MPImageFlags',
         Format => 'int32u',
@@ -153,8 +157,8 @@ sub ProcessMPImageList($$$);
             2 => 'MPImageType',
         },
         Notes => q{
-            the first MPF "Large Thumbnail" is extracted as the PreviewImage, and the
-            rest of the embedded MPF images are extracted as MPImage#
+            the first MPF "Large Thumbnail" is extracted as PreviewImage, and the rest
+            of the embedded MPF images are extracted as MPImage#
         },
         # extract all MPF images (not just one)
         RawConv => q{

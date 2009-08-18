@@ -79,37 +79,38 @@ supported by ExifTool (r = read, w = write, c = create):</p>
 <pre>
                 File Types                 |    Meta Information
   ---------------------------------------  |  --------------------
-  3FR   r       HTML  r       PNG   r/w    |  EXIF           r/w/c
-  ACR   r       ICC   r/w/c   PPM   r/w    |  GPS            r/w/c
-  AI    r       IND   r/w     PPT   r      |  IPTC           r/w/c
-  AIFF  r       ITC   r       PS    r/w    |  XMP            r/w/c
-  APE   r       JNG   r/w     PSD   r/w    |  MakerNotes     r/w/c
-  ARW   r       JP2   r/w     QTIF  r      |  Photoshop IRB  r/w/c
-  ASF   r       JPEG  r/w     RA    r      |  ICC Profile    r/w/c
-  AVI   r       K25   r       RAF   r/w    |  MIE            r/w/c
-  BMP   r       KDC   r       RAM   r      |  JFIF           r/w/c
-  BTF   r       M4A   r       RAW   r/w    |  Ducky APP12    r/w/c
-  CR2   r/w     MEF   r/w     RIFF  r      |  PDF            r/w/c
-  CRW   r/w     MIE   r/w/c   RW2   r/w    |  CIFF           r/w
-  CS1   r/w     MIFF  r       RWL   r/w    |  AFCP           r/w
-  DCM   r       MNG   r/w     RWZ   r      |  JPEG 2000      r
-  DCP   r/w     MOS   r/w     RM    r      |  DICOM          r
-  DCR   r       MOV   r       SO    r      |  Flash          r
-  DIVX  r       MP3   r       SR2   r      |  FlashPix       r
-  DJVU  r       MP4   r       SRF   r      |  QuickTime      r
-  DLL   r       MPC   r       SVG   r      |  GeoTIFF        r
-  DNG   r/w     MPG   r       SWF   r      |  PrintIM        r
-  DOC   r       MPO   r/w     THM   r/w    |  ID3            r
-  DYLIB r       MRW   r/w     TIFF  r/w    |  Kodak Meta     r
-  EPS   r/w     NEF   r/w     VRD   r/w/c  |  Ricoh RMETA    r
-  ERF   r/w     NRW   r/w     WAV   r      |  Picture Info   r
-  EXE   r       OGG   r       WDP   r/w    |  Adobe APP14    r
-  EXIF  r/w/c   ORF   r/w     WMA   r      |  MPF            r
-  FLAC  r       PBM   r/w     WMV   r      |  APE            r
-  FLV   r       PDF   r/w     X3F   r      |  Vorbis         r
-  FPX   r       PEF   r/w     XLS   r      |  SPIFF          r
-  GIF   r/w     PGM   r/w     XMP   r/w/c  |  DjVu           r
-  HDP   r/w     PICT  r       ZIP   r      |  (and more)</pre>
+  3FR   r       ICC   r/w/c   PPM   r/w    |  EXIF           r/w/c
+  ACR   r       IND   r/w     PPT   r      |  GPS            r/w/c
+  AI    r/w     ITC   r       PS    r/w    |  IPTC           r/w/c
+  AIFF  r       JNG   r/w     PSD   r/w    |  XMP            r/w/c
+  APE   r       JP2   r/w     QTIF  r      |  MakerNotes     r/w/c
+  ARW   r       JPEG  r/w     RA    r      |  Photoshop IRB  r/w/c
+  ASF   r       K25   r       RAF   r/w    |  ICC Profile    r/w/c
+  AVI   r       KDC   r       RAM   r      |  MIE            r/w/c
+  BMP   r       M2TS  r       RAW   r/w    |  JFIF           r/w/c
+  BTF   r       M4A   r       RIFF  r      |  Ducky APP12    r/w/c
+  CR2   r/w     MEF   r/w     RW2   r/w    |  PDF            r/w/c
+  CRW   r/w     MIE   r/w/c   RWL   r/w    |  CIFF           r/w
+  CS1   r/w     MIFF  r       RWZ   r      |  AFCP           r/w
+  DCM   r       MNG   r/w     RM    r      |  JPEG 2000      r
+  DCP   r/w     MOS   r/w     SO    r      |  DICOM          r
+  DCR   r       MOV   r       SR2   r      |  Flash          r
+  DIVX  r       MP3   r       SRF   r      |  FlashPix       r
+  DJVU  r       MP4   r       SVG   r      |  QuickTime      r
+  DLL   r       MPC   r       SWF   r      |  GeoTIFF        r
+  DNG   r/w     MPG   r       THM   r/w    |  PrintIM        r
+  DOC   r       MPO   r/w     TIFF  r/w    |  ID3            r
+  DYLIB r       MRW   r/w     VRD   r/w/c  |  Kodak Meta     r
+  EPS   r/w     NEF   r/w     WAV   r      |  Ricoh RMETA    r
+  ERF   r/w     NRW   r/w     WDP   r/w    |  Picture Info   r
+  EXE   r       OGG   r       WMA   r      |  Adobe APP14    r
+  EXIF  r/w/c   ORF   r/w     WMV   r      |  MPF            r
+  FLAC  r       PBM   r/w     X3F   r      |  Stim           r
+  FLV   r       PDF   r/w     XLS   r      |  APE            r
+  FPX   r       PEF   r/w     XMP   r/w/c  |  Vorbis         r
+  GIF   r/w     PGM   r/w     ZIP   r      |  SPIFF          r
+  HDP   r/w     PICT  r                    |  DjVu           r
+  HTML  r       PNG   r/w                  |  (and more)</pre>
 <p>Note:  If <em>FILE</em> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are processed
 when any tag is written.  However, a filename may be specified or the
@@ -373,7 +374,7 @@ Print existing tags only -- don't calculate composite tags.
 </dt>
 <dd>
 Escape characters in output values for HTML.  Implied with the <strong>-h</strong> option.
-The inverse conversion is not applied when writing tags.
+The inverse conversion is applied when writing tags.
 </dd>
 <p></p>
 <dt><strong><a name="item_ee"><strong>-ee</strong> (<strong>-extractEmbedded</strong>)</a></strong><br />
@@ -441,13 +442,14 @@ network connection.
 </dt>
 <dd>
 Organize output by tag group.  <em>NUM</em> specifies a group family number, and
-may be 0 (general location), 1 (specific location), 2 (category) or 3
-(document number).  Multiple families may be specified by separating them
-with colons.  By default the resulting group name is simplified by removing
-any leading <code>Main:</code> and collapsing adjacent identical group names, but this
-can avoided by placing a colon before the first family number (ie.
-<strong>-g:3:1</strong>).  If <em>NUM</em> is not specified, <strong>-g0</strong> is assumed.  Use the
-<strong>-listg</strong> option to list group names for a specified family.
+may be 0 (general location), 1 (specific location), 2 (category), 3
+(document number) or 4 (instance number).  Multiple families may be
+specified by separating them with colons.  By default the resulting group
+name is simplified by removing any leading <code>Main:</code> and collapsing adjacent
+identical group names, but this can avoided by placing a colon before the
+first family number (ie. <strong>-g:3:1</strong>).  If <em>NUM</em> is not specified, <strong>-g0</strong> is
+assumed.  Use the <strong>-listg</strong> option to list group names for a specified
+family.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dg_5bnum_5d_5b_3anum_2e_2e_2e_5d__28_2dgroupname"><strong>-G</strong>[<em>NUM</em>][:<em>NUM</em>...] (<strong>-groupNames</strong>)</a></strong><br />
@@ -485,7 +487,7 @@ GPSAltitudeRef and GPSDateTime.</p>
 Also, a single <strong>-geotag</strong> option may be used to load multiple track log
 files by using wildcards in the <em>TRKFILE</em> name, but note that in this case
 <em>TRKFILE</em> must be quoted on most systems (with the notable exception of
-Windows) to prevent shell globbing.  For example:</p>
+Windows) to prevent filename expansion.  For example:</p>
 </dd>
 <dd>
 <pre>
@@ -493,7 +495,8 @@ Windows) to prevent shell globbing.  For example:</p>
 </dd>
 <dd>
 <p>Currently supported track file formats are GPX, NMEA RMC/GGA/GLL, KML,
-Garmin XML and Magellan PMGNRTK.  See <a href="#geotagging_examples">GEOTAGGING EXAMPLES</a> for examples.</p>
+Garmin XML and TCX, and Magellan PMGNTRK.  See <a href="#geotagging_examples">GEOTAGGING EXAMPLES</a> for
+examples.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item_h"><strong>-h</strong> (<strong>-htmlFormat</strong>)</a></strong><br />
@@ -1327,10 +1330,19 @@ Delete Credit information from all files in a directory where the Credit
 value was (<code>xxx</code>).
 </dd>
 <p></p>
+<dt><strong><a name="item_exiftool__2dxmp_3adescription_2dde_3d_27k_26uuml_3">exiftool -xmp:description-de='k&amp;uuml;hl' -E dst.jpg</a></strong><br />
+</dt>
+<dd>
+Write alternate language for XMP:Description, using HTML character escaping
+to input special characters.
+</dd>
+<p></p>
 <dt><strong><a name="item_exiftool__2dall_3d_dst_2ejpg">exiftool -all= dst.jpg</a></strong><br />
 </dt>
 <dd>
-Delete all meta information from an image.
+Delete all meta information from an image.  Note: You should NOT do this to
+RAW images (except DNG) since proprietary RAW image formats often contain
+information in the makernotes that is necessary for converting the image.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dall_3d__2dcomment_3d_27lonely_27_dst_2">exiftool -all= -comment='lonely' dst.jpg</a></strong><br />
@@ -1720,7 +1732,7 @@ command line is ignored.
 <dt><strong><a name="item_exiftool__2dgeotag_3d_a_2ejpg">exiftool -geotag= a.jpg</a></strong><br />
 </dt>
 <dd>
-Delete GPS tags which were added by the geotag feature.
+Delete GPS tags which may have been added by the geotag feature.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dxmp_3ageotag_3d_a_2ejpg">exiftool -xmp:geotag= a.jpg</a></strong><br />

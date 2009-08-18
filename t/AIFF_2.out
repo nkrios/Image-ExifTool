@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.82
-[File, File, Image] FileName - File Name: AIFF.aif
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 290 bytes
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:01:06 15:05:23-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: AIFF.aif
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 290 bytes
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2006:01:06 15:05:23-05:00
 [File, File, Image] FileType - File Type: AIFF
 [File, File, Image] MIMEType - MIME Type: audio/aiff
 [File, File, Image] ID3Size - ID3 Size: 172

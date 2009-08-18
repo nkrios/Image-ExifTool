@@ -1,8 +1,8 @@
-  ExifToolVersion = 7.80
+  ExifToolVersion = 7.85
   FileName = Olympus_7_failed.jpg
   Directory = t
   FileSize = 7335
-  FileModifyDate = 1245592054
+  FileModifyDate = 1248185492
   FileType = JPEG
   MIMEType = image/jpeg
 JPEG APP1 (7080 bytes):
@@ -80,7 +80,7 @@ JPEG APP1 (7080 bytes):
   | | |     - Tag 0x0207 (6 bytes, string[6])
   | | | 8)  CameraID = OLYMPUS DIGITAL CAMERA         
   | | |     - Tag 0x0209 (32 bytes, undef[32] read as string[32])
-  | | | 9)  Equipment2 (SubDirectory) -->
+  | | | 9)  EquipmentIFD (SubDirectory) -->
   | | |     - Tag 0x2010 (4 bytes, ifd[1])
   | | | + [MakerNotes directory with 6 entries]
   | | | | 0)  EquipmentVersion = 0100
@@ -95,7 +95,7 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x0103 (8 bytes, rational64u[1])
   | | | | 5)  BodyFirmwareVersion = 4097
   | | | |     - Tag 0x0104 (4 bytes, int32u[1])
-  | | | 10) CameraSettings2 (SubDirectory) -->
+  | | | 10) CameraSettingsIFD (SubDirectory) -->
   | | |     - Tag 0x2020 (4 bytes, ifd[1])
   | | | + [MakerNotes directory with 36 entries]
   | | | | 0)  CameraSettingsVersion = 0100
@@ -170,14 +170,14 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x0900 (2 bytes, int16u[1])
   | | | | 35) ManometerReading = 0 0
   | | | |     - Tag 0x0901 (8 bytes, int32s[2])
-  | | | 11) RawDevelopment2 (SubDirectory) -->
+  | | | 11) RawDevelopmentIFD (SubDirectory) -->
   | | |     - Tag 0x2030 (4 bytes, ifd[1])
   | | | + [MakerNotes directory with 2 entries]
   | | | | 0)  RawDevVersion = 0100
   | | | |     - Tag 0x0000 (4 bytes, undef[4])
   | | | | 1)  RawDevEditStatus = 0
   | | | |     - Tag 0x010b (2 bytes, int16u[1])
-  | | | 12) ImageProcessing2 (SubDirectory) -->
+  | | | 12) ImageProcessingIFD (SubDirectory) -->
   | | |     - Tag 0x2040 (4 bytes, ifd[1])
   | | | + [MakerNotes directory with 24 entries]
   | | | | 0)  ImageProcessingVersion = 0111
@@ -228,7 +228,7 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x1011 (2 bytes, int16u[1])
   | | | | 23) ShadingCompensation2 = 1
   | | | |     - Tag 0x1012 (2 bytes, int16u[1])
-  | | | 13) FocusInfo2 (SubDirectory) -->
+  | | | 13) FocusInfoIFD (SubDirectory) -->
   | | |     - Tag 0x2050 (4 bytes, ifd[1])
   | | | + [MakerNotes directory with 54 entries]
   | | | | 0)  FocusInfoVersion = 0100

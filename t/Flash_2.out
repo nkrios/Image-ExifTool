@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: Flash.swf
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 384 bytes
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:10:23 16:26:04-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: Flash.swf
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 384 bytes
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:10:24 08:35:14-04:00
 [File, File, Image] FileType - File Type: SWF
 [File, File, Image] MIMEType - MIME Type: application/x-shockwave-flash
 [Flash, Flash, Video] FlashVersion - Flash Version: 6

@@ -16,20 +16,23 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool;
 
-$VERSION = '1.04';
+$VERSION = '1.07';
 
 sub SetGeoValues($$;$);
 
-# XML tags that we recognize
+# XML tags that we recognize (keys are forced to lower case)
 my %xmlTag = (
     lat         => 'lat',       # GPX
     latitude    => 'lat',       # Garmin
+    latitudedegrees => 'lat',   # Garmin TCX
     lon         => 'lon',       # GPX
     longitude   => 'lon',       # Garmin
+    longitudedegrees => 'lon',  # Garmin TCX
     ele         => 'alt',       # GPX
     elevation   => 'alt',       # PH
     alt         => 'alt',       # PH
     altitude    => 'alt',       # Garmin
+    altitudemeters => 'alt',    # Garmin TCX
    'time'       => 'time',      # GPX/Garmin
     fix         => 'fixtype',   # GPX
     hdop        => 'hdop',      # GPX
@@ -44,6 +47,8 @@ my %xmlTag = (
     trackpoint  => '',          # Garmin
     placemark   => '',          # KML
 );
+
+my $secPerDay = 24 * 3600;      # a useful constant
 
 #------------------------------------------------------------------------------
 # Load GPS track log file
@@ -70,10 +75,10 @@ my %xmlTag = (
 #   for the Geotag tag
 sub LoadTrackLog($$;$)
 {
-    local ($_, $/);
+    local ($_, $/, *EXIFTOOL_TRKFILE);
     my ($exifTool, $val) = @_;
-    my ($raf, $from, $time, $isDate, $noDate, $noDateChanged);
-    my ($nmeaStart, $fixSecs, @fixTimes, $canCut, $cutPDOP, $cutHDOP);
+    my ($raf, $from, $time, $isDate, $noDate, $noDateChanged, $lastDate, $lastSecs);
+    my ($nmeaStart, $fixSecs, @fixTimes, $canCut, $cutPDOP, $cutHDOP, $cutSats, $lastFix);
 
     unless (eval 'require Time::Local') {
         return 'Geotag feature requires Time::Local installed';
@@ -104,7 +109,8 @@ sub LoadTrackLog($$;$)
     # initialize cuts
     my $maxHDOP = $exifTool->Options('GeoMaxHDOP');
     my $maxPDOP = $exifTool->Options('GeoMaxPDOP');
-    my $isCut = $maxHDOP || $maxPDOP;
+    my $minSats = $exifTool->Options('GeoMinSats');
+    my $isCut = $maxHDOP || $maxPDOP || $minSats;
 
     my $numPoints = 0;
     my $skipped = 0;
@@ -118,7 +124,7 @@ sub LoadTrackLog($$;$)
                 $format = 'XML';
             } elsif (/^\$(PMGNTRK|GP(RMC|GGA|GLL|GSA)),/) {
                 $format = 'NMEA';
-                $nmeaStart = $1;    # save type of first sentence
+                $nmeaStart = $2 || $1;    # save type of first sentence
             } else {
                 # search only first 50 lines of file for a valid fix
                 last if ++$skipped > 50;
@@ -126,7 +132,7 @@ sub LoadTrackLog($$;$)
             }
         }
 #
-# XML format (GPX, KML, Garmin XML, etc)
+# XML format (GPX, KML, Garmin XML/TCX etc)
 #
         if ($format eq 'XML') {
             my ($arg, $tok, $td);
@@ -141,10 +147,19 @@ sub LoadTrackLog($$;$)
                 while ($arg =~ m{([^<>]*)<(/)?(\w+:)?(\w+)(>|$)}g) {
                     my $tag = $xmlTag{$tok = lc $4};
                     # parse as a simple property if this element has a value
-                    unless ($2) {
-                        # reset fix when containing property is opened
-                        $fix = { } if defined $tag and not $tag;
-                        next;
+                    if (defined $tag and not $tag) {
+                        # a containing property was opened or closed
+                        if (not $2) {
+                            # opened: start a new fix
+                            $lastFix = $fix = { };
+                            next;
+                        } elsif ($fix and $lastFix and %$fix) {
+                            # closed: transfer additional tags from current fix
+                            foreach (keys %$fix) {
+                                $$lastFix{$_} = $$fix{$_} unless defined $$lastFix{$_};
+                            }
+                            undef $lastFix;
+                        }
                     }
                     if (length $1) {
                         if ($tag) {
@@ -171,7 +186,7 @@ sub LoadTrackLog($$;$)
                         # validate altitude
                         undef $$fix{alt} if $$fix{alt} and $$fix{alt} !~ /^[+-]?\d+\.?\d*/;
                         $isDate = 1;
-                        $canCut = 1 if defined $$fix{pdop} or defined $$fix{hdop};
+                        $canCut= 1 if defined $$fix{pdop} or defined $$fix{hdop} or defined $$fix{nsats};
                         $$points{$time} = $fix;
                         push @fixTimes, $time;  # save times of all fixes in order
                         $fix = { };
@@ -192,7 +207,7 @@ sub LoadTrackLog($$;$)
         my $nmea = $2 || $1;
         my (%fix, $secs, $date);
 #
-# Magellan eXplorist NMEA-like PMGNRTK sentence
+# Magellan eXplorist NMEA-like PMGNTRK sentence (optionally contains date)
 #
         if ($nmea eq 'PMGNTRK') {
             # $PMGNTRK,4415.026,N,07631.091,W,00092,M,185031.06,A,,020409*65
@@ -209,7 +224,7 @@ sub LoadTrackLog($$;$)
                 $date = Time::Local::timegm(0,0,0,$13,$14-1,$year-1900);
             }
 #
-# NMEA RMC sentence
+# NMEA RMC sentence (contains date)
 #
         } elsif ($nmea eq 'RMC') {
             #  $GPRMC,092204.999,A,4250.5589,S,14718.5084,E,0.00,89.68,211200,,*25
@@ -228,13 +243,14 @@ sub LoadTrackLog($$;$)
             #  $GPGGA,092204.999,4250.5589,S,14718.5084,E,1,04,24.4,19.7,M,,,,0000*1F
             #  $GPGGA,hhmmss.sss,ddmm.mmmm,N/S,dddmm.mmmm,E/W,0=invalid,sats,hdop,alt,M,...
             /^\$GPGGA,(\d{2})(\d{2})(\d+)(\.\d+)?,(\d{2})(\d+\.\d+),([NS]),(\d{3})(\d+\.\d+),([EW]),[1-6],(\d+)?,(\.\d+|\d+\.?\d*)?,(-?\d+\.?\d*)?,M?,/ or next;
-            $$fix{lat} = ($5 + $6/60) * ($7 eq 'N' ? 1 : -1);
-            $$fix{lon} = ($8 + $9/60) * ($10 eq 'E' ? 1 : -1);
-            $$fix{nsats} = $11;
-            $$fix{hdop} = $12; $canCut = 1;
-            $$fix{alt} = $13;
+            $fix{lat} = ($5 + $6/60) * ($7 eq 'N' ? 1 : -1);
+            $fix{lon} = ($8 + $9/60) * ($10 eq 'E' ? 1 : -1);
+            $fix{nsats} = $11;
+            $fix{hdop} = $12;
+            $fix{alt} = $13;
             $secs = (($1 * 60) + $2) * 60 + $3;
             $secs += $4 if $4;      # add fractional seconds
+            $canCut = 1;
 #
 # NMEA GLL sentence (no date)
 #
@@ -242,21 +258,46 @@ sub LoadTrackLog($$;$)
             #  $GPGLL,4250.5589,S,14718.5084,E,092204.999,A*2D
             #  $GPGLL,ddmm.mmmm,N/S,dddmm.mmmm,E/W,hhmmss.sss,A/V*cs
             /^\$GPGLL,(\d{2})(\d+\.\d+),([NS]),(\d{3})(\d+\.\d+),([EW]),(\d{2})(\d{2})(\d+)(\.\d+),A/ or next;
-            $$fix{lat} = ($1 + $2/60) * ($3 eq 'N' ? 1 : -1);
-            $$fix{lon} = ($4 + $5/60) * ($6 eq 'E' ? 1 : -1);
+            $fix{lat} = ($1 + $2/60) * ($3 eq 'N' ? 1 : -1);
+            $fix{lon} = ($4 + $5/60) * ($6 eq 'E' ? 1 : -1);
             $secs = (($7 * 60) + $8) * 60 + $9;
             $secs += $10 if $10;    # add fractional seconds
 #
-# NMEA GSA sentence (satellite status)
+# NMEA GSA sentence (satellite status, no date)
 #
         } elsif ($nmea eq 'GSA') {
             # $GPGSA,A,3,04,05,,,,,,,,,,,pdop,hdop,vdop*HH
             /^\$GPGSA,[AM],([23]),((?:\d*,){11}(?:\d*)),(\d+\.?\d*|\.\d+)?,(\d+\.?\d*|\.\d+)?,(\d+\.?\d*|\.\d+)?\*/ or next;
-            @$fix{qw(fixtype sats pdop hdop vdop)} = ($1.'d',$2,$3,$4,$5);
+            @fix{qw(fixtype sats pdop hdop vdop)} = ($1.'d',$2,$3,$4,$5);
+            # count the number of acquired satellites
+            my @a = ($fix{sats} =~ /\d+/g);
+            $fix{nsats} = scalar @a;
             $canCut = 1;
 
         } else {
             next;   # this shouldn't happen
+        }
+        # use last date if necessary (and appropriate)
+        if (defined $secs and not defined $date and defined $lastDate) {
+            # wrap to next day if necessary
+            if ($secs < $lastSecs) {
+                $lastSecs -= $secPerDay;
+                $lastDate += $secPerDay;
+            }
+            # use earlier date only if we are within 10 seconds
+            if ($secs - $lastSecs < 10) {
+                # last date is close, use it for this fix
+                $date = $lastDate;
+            } else {
+                # last date is old, discard it
+                undef $lastDate;
+                undef $lastSecs;
+            }
+        }
+        # save our last date/time
+        if (defined $date) {
+            $lastDate = $date;
+            $lastSecs = $secs;
         }
 #
 # Add NMEA fix to our lookup
@@ -266,8 +307,10 @@ sub LoadTrackLog($$;$)
         # assumptions for each NMEA sentence:
         # - we only parse a time if we get a lat/lon
         # - we always get a time if we have a date
-        if ($nmea eq $nmeaStart or (defined $secs and
-            (not defined $fixSecs or $secs != $fixSecs)))
+        if ($nmea eq $nmeaStart or (defined $secs and (not defined $fixSecs or
+            # don't combine sentences that are outside 10 seconds apart
+            ($secs >= $fixSecs and $secs - $fixSecs >= 10) or
+            ($secs <  $fixSecs and $secs + $secPerDay - $fixSecs >= 10))))
         {
             # start a new fix
             $fix = \%fix;
@@ -275,7 +318,7 @@ sub LoadTrackLog($$;$)
             undef $noDateChanged;
             # does this fix have a date/time or time stamp?
             if (defined $date) {
-                $$fix{isDate} = $isDate = 1;
+                $fix{isDate} = $isDate = 1;
                 $time = $date + $secs;
             } elsif (defined $secs) {
                 $time = $secs;
@@ -284,18 +327,25 @@ sub LoadTrackLog($$;$)
                 next;   # wait until we have a time before adding to lookup
             }
         } else {
-            # add new data to existing fix
-            $$fix{$_} = $fix{$_} foreach keys %fix;
+            # add new data to existing fix (but don't overwrite earlier values to
+            # keep the coordinates in sync with the fix time)
+            foreach (keys %fix) {
+                $$fix{$_} = $fix{$_} unless defined $$fix{$_};
+            }
             if (defined $date) {
                 next if $$fix{isDate};
                 # move this fix to the proper date
-                $time = $date + $secs;
                 if (defined $fixSecs) {
                     delete $$points{$fixSecs};
                     pop @fixTimes if @fixTimes and $fixTimes[-1] == $fixSecs;
                     --$numPoints;
+                    # if we wrapped to the next day since the start of this fix,
+                    # we must shift the date back to the day of $fixSecs
+                    $date -= $secPerDay if $secs < $fixSecs;
+                } else {
+                    $fixSecs = $secs;
                 }
-                $fixSecs = $secs;
+                $time = $date + $fixSecs;
                 $$fix{isDate} = $isDate = 1;
                 # revert noDate flag if it was set for this fix
                 $noDate = 0 if $noDateChanged;
@@ -314,12 +364,19 @@ sub LoadTrackLog($$;$)
     $raf->Close();
 
     # set date flags
-    $$geotag{NoDate} = 1 if $noDate;
+    if ($noDate and not $$geotag{NoDate}) {
+        if ($isDate) {
+            $exifTool->Warn('Fixes are date-less -- will use time-only interpolation');
+        } else {
+            $exifTool->Warn('Some fixes are date-less -- may use time-only interpolation');
+        }
+        $$geotag{NoDate} = 1;
+    }
     $$geotag{IsDate} = 1 if $isDate;
 
     # cut bad fixes if necessary
     if ($isCut and $canCut) {
-        $cutPDOP = $cutHDOP = 0;
+        $cutPDOP = $cutHDOP = $cutSats = 0;
         my @goodTimes;
         foreach (@fixTimes) {
             $fix = $$points{$_} or next;
@@ -329,6 +386,11 @@ sub LoadTrackLog($$;$)
             } elsif ($maxHDOP and $$fix{hdop} and $$fix{hdop} > $maxHDOP) {
                 delete $$points{$_};
                 ++$cutHDOP;
+            } elsif ($minSats and defined $$fix{nsats} and $$fix{nsats} ne '' and
+                $$fix{nsats} < $minSats)
+            {
+                delete $$points{$_};
+                ++$cutSats;
             } else {
                 push @goodTimes, $_;
             }
@@ -336,6 +398,7 @@ sub LoadTrackLog($$;$)
         @fixTimes = @goodTimes; # update fix times
         $numPoints -= $cutPDOP;
         $numPoints -= $cutHDOP;
+        $numPoints -= $cutSats;
     }
     # mark first fix of the track
     while (@fixTimes) {
@@ -349,6 +412,7 @@ sub LoadTrackLog($$;$)
         print $out "Loaded $numPoints points from GPS track log $from\n";
         print $out "Ignored $cutPDOP points due to GeoMaxPDOP cut\n" if $cutPDOP;
         print $out "Ignored $cutHDOP points due to GeoMaxHDOP cut\n" if $cutHDOP;
+        print $out "Ignored $cutSats points due to GeoMinSats cut\n" if $cutSats;
         if ($numPoints and $verbose > 1) {
             print $out '  GPS track start: ' . Image::ExifTool::ConvertUnixTime($fixTimes[0]) . " UTC\n";
             if ($verbose > 3) {
@@ -444,7 +508,7 @@ sub SetGeoValues($$;$)
             $time = Time::Local::timelocal($sec,$min,$hr,$day,$mon-1,$year-1900);
         }
         # bring UTC time back to Jan. 1 if no date is given
-        $time %= 24 * 3600 if $noDate;
+        $time %= $secPerDay if $noDate;
         # handle fractional seconds
         if ($fs) {
             $fsec = $fs;    # save fractional seconds string
@@ -582,7 +646,8 @@ This module is used by Image::ExifTool
 
 This module loads GPS track logs, interpolates to determine position based
 on time, and sets new GPS values for geotagging images.  Currently supported
-formats are GPX, NMEA RMC/GGA/GLL, KML, Garmin XML and Magellan PMGNRTK.
+formats are GPX, NMEA RMC/GGA/GLL, KML, Garmin XML and TCX, and Magellan
+PMGNTRK.
 
 =head1 AUTHOR
 

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: IPTC-XMP_30_failed.xml
-[File, File, Image] Directory - Directory: t
-[File, File, Image] FileSize - File Size: 3.0 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:02:01 07:56:24-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: IPTC-XMP_30_failed.xml
+[File, System, Image] Directory - Directory: t
+[File, System, Image] FileSize - File Size: 3.0 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:28-04:00
 [File, File, Image] FileType - File Type: XMP
 [File, File, Image] MIMEType - MIME Type: application/rdf+xml
 [XMP, XMP-rdf, Document] about - About: t/images/Nikon.jpg

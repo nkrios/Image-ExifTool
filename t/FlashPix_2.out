@@ -1,7 +1,7 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: FlashPix.ppt
-[File, File, Image] Directory - Directory: t/images
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2007:02:09 11:47:07-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: FlashPix.ppt
+[File, System, Image] Directory - Directory: t/images
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:02:09 12:59:16-05:00
 [File, File, Image] FileType - File Type: PPT
 [File, File, Image] MIMEType - MIME Type: application/vnd.ms-powerpoint
 [FlashPix, FlashPix, Other] 1 - Code Page: 10000

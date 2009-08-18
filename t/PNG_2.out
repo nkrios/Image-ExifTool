@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: PNG.png
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 572 bytes
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:10:27 11:44:00-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: PNG.png
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 572 bytes
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2006:10:27 11:40:18-04:00
 [File, File, Image] FileType - File Type: PNG
 [File, File, Image] MIMEType - MIME Type: image/png
 [PNG, PNG, Image] 0 - Image Width: 16

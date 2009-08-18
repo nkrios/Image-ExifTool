@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
-[File, File, Image] FileName - File Name: CanonRaw_6_failed.cr2
-[File, File, Image] Directory - Directory: t
-[File, File, Image] FileSize - File Size: 11 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:04:07 11:43:49-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: CanonRaw_6_failed.cr2
+[File, System, Image] Directory - Directory: t
+[File, System, Image] FileSize - File Size: 11 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:17-04:00
 [File, File, Image] FileType - File Type: CR2
 [File, File, Image] MIMEType - MIME Type: image/x-raw
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -64,7 +64,7 @@
 [EXIF, IFD3, Image] 273 - Strip Offsets: 11474
 [EXIF, IFD3, Image] 279 - Strip Byte Counts: 16
 [EXIF, IFD3, Image] 50752 - Raw Image Segmentation: 1 1758 1758
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.74
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.83
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [IPTC, IPTC, Other] 25 - Keywords: CR2 test
 [IPTC, IPTC, Other] 0 - Application Record Version: 4

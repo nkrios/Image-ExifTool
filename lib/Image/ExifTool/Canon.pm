@@ -68,7 +68,7 @@ sub WriteCanon($$$);
 sub ProcessSerialData($$$);
 sub SwapWords($);
 
-$VERSION = '2.20';
+$VERSION = '2.23';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -113,10 +113,11 @@ my %canonLensTypes = ( #4
     23 => 'Canon EF 35-105mm f/3.5-4.5', #32
     24 => 'Canon EF 35-80mm f/4-5.6 Power Zoom', #32
     25 => 'Canon EF 35-80mm f/4-5.6 Power Zoom', #32
-    26 => 'Canon EF 100mm f/2.8 Macro or Cosina or Tamron Lens',
+    26 => 'Canon EF 100mm f/2.8 Macro or Other Lens',
     26.1 => 'Cosina 100mm f/3.5 Macro AF',
     26.2 => 'Tamron SP AF 90mm f/2.8 Di Macro', #15
     26.3 => 'Tamron SP AF 180mm f/3.5 Di Macro', #15
+    26.4 => 'Carl Zeiss Planar T* 50mm f/1.4', #PH
     27 => 'Canon EF 35-80mm f/4-5.6', #32
     28 => 'Canon EF 80-200mm f/4.5-5.6 or Tamron Lens', #32
     28.1 => 'Tamron SP AF 28-105mm f/2.8 LD Aspherical IF', #15
@@ -156,8 +157,8 @@ my %canonLensTypes = ( #4
     131 => 'Canon EF 28-80mm f/2.8-4L or Sigma Lens', #32
     131.1 => 'Sigma 8mm f/3.5 EX DG Circular Fisheye', #15
     131.2 => 'Sigma 17-35mm f/2.8-4 EX DG Aspherical HSM', #15
-    131.3 => 'Sigma 17-70mm F2.8-4.5 DC Macro', #PH (NC)
-    131.4 => 'Sigma APO 50-150mm f/2.8 EX DC HSM', #15
+    131.3 => 'Sigma 17-70mm f/2.8-4.5 DC Macro', #PH (NC)
+    131.4 => 'Sigma APO 50-150mm f/2.8 [II] EX DC HSM', #15 ([II] ref PH)
     131.5 => 'Sigma APO 120-300mm f/2.8 EX DG HSM', #15
            # 'Sigma APO 120-300mm f/2.8 EX DG HSM + 1.4x', #15
            # 'Sigma APO 120-300mm f/2.8 EX DG HSM + 2x', #15
@@ -165,7 +166,12 @@ my %canonLensTypes = ( #4
     134 => 'Canon EF 600mm f/4L IS', #15
     135 => 'Canon EF 200mm f/1.8L',
     136 => 'Canon EF 300mm f/2.8L',
-    137 => 'Canon EF 85mm f/1.2L', #10
+    137 => 'Canon EF 85mm f/1.2L or Sigma Lens', #10
+    137.1 => 'Sigma 18-50mm f/2.8-4.5 DC OS HSM', #PH
+    137.2 => 'Sigma 50-200mm f/4-5.6 DC OS HSM', #PH
+    137.3 => 'Sigma 18-250mm f/3.5-6.3 DC OS HSM', #PH
+    137.4 => 'Sigma 24-70mm f/2.8 IF EX DG HSM', #PH
+    137.5 => 'Sigma 18-125mm f/3.8-5.6 DC OS HSM', #PH
     138 => 'Canon EF 28-80mm f/2.8-4L', #32
     139 => 'Canon EF 400mm f/2.8L',
     140 => 'Canon EF 500mm f/4.5L', #32
@@ -192,7 +198,7 @@ my %canonLensTypes = ( #4
     153.1 => 'Sigma 50-500mm f/4-6.3 APO HSM EX', #15
     153.2 => 'Tamron AF 28-300mm f/3.5-6.3 XR LD Aspherical [IF] Macro',
     153.3 => 'Tamron AF 18-200mm f/3.5-6.3 XR Di II LD Aspherical [IF] Macro Model A14', #15
-    153.4 => 'Tamron 18-250mm f/3.5-6.3 Di II_LD Aspherical [IF] Macro', #PH
+    153.4 => 'Tamron 18-250mm f/3.5-6.3 Di II LD Aspherical [IF] Macro', #PH
     154 => 'Canon EF 20mm f/2.8 USM', #15
     155 => 'Canon EF 85mm f/1.8 USM',
     156 => 'Canon EF 28-105mm f/3.5-4.5 USM',
@@ -212,6 +218,7 @@ my %canonLensTypes = ( #4
     169.1 => 'Sigma 18-200mm f/3.5-6.3 DC OS', #23
     169.2 => 'Sigma 15-30mm f/3.5-4.5 EX DG Aspherical', #4
     169.3 => 'Sigma 18-50mm f/2.8 Macro', #26
+    169.4 => 'Sigma 50mm f/1.4 EX DG HSM', #PH
     170 => 'Canon EF 200mm f/2.8L II', #9
     171 => 'Canon EF 300mm f/4L', #15
     172 => 'Canon EF 400mm f/5.6L', #32
@@ -1200,6 +1207,22 @@ my %cameraColorCalibration2 = (
         SubDirectory => {
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
             TagTable => 'Image::ExifTool::Canon::AFMicroAdj',
+        },
+    },
+    0x4015 => { #25
+        Name => 'VignettingCorr',
+        SubDirectory => {
+            # (the size word is at byte 2 in this structure)
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart+2,$size)',
+            TagTable => 'Image::ExifTool::Canon::VignettingCorr',
+        },
+    },
+    0x4016 => { #25
+        Name => 'VignettingCorr2',
+        SubDirectory => {
+            # (the size word is actually 4 bytes, but it doesn't matter if little-endian)
+            Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
+            TagTable => 'Image::ExifTool::Canon::VignettingCorr2',
         },
     },
 );
@@ -3167,8 +3190,8 @@ my %ciLongFocal = (
         Name => 'ISO',
         Groups => { 2 => 'Image' },
         Priority => 0,
-        ValueConv => '100*exp(($val/100-4)*log(2))',
-        ValueConvInv => '(log($val/100)/log(2)+4)*100',
+        ValueConv => '100*exp((($val-411)/96)*log(2))',
+        ValueConvInv => 'log($val/100)/log(2)*96+411',
         PrintConv => 'sprintf("%.0f",$val)',
         PrintConvInv => '$val',
     },
@@ -3176,8 +3199,8 @@ my %ciLongFocal = (
         Name => 'FNumber',
         Groups => { 2 => 'Image' },
         Priority => 0,
-        ValueConv => 'exp(($val+16)/200*log(2))',
-        ValueConvInv => 'log($val)*200/log(2)-16',
+        ValueConv => 'exp($val/192*log(2))',
+        ValueConvInv => 'log($val)*192/log(2)',
         PrintConv => 'sprintf("%.2g",$val)',
         PrintConvInv => '$val',
     },
@@ -3185,9 +3208,8 @@ my %ciLongFocal = (
         Name => 'ExposureTime',
         Groups => { 2 => 'Image' },
         Priority => 0,
-        RawConv => '$val ? $val : undef',
-        ValueConv => 'exp(-($val+24)/100*log(2))',
-        ValueConvInv => '-log($val)*100/log(2)-24',
+        ValueConv => 'exp(-$val/96*log(2))',
+        ValueConvInv => '-log($val)*96/log(2)',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
     },
@@ -4365,6 +4387,37 @@ my %ciLongFocal = (
     2 => {
         Name => 'AFMicroAdjValue',
         Format => 'rational64s',
+    },
+);
+
+# Vignetting correction information (MakerNotes tag 0x4015) (ref 25)
+%Image::ExifTool::Canon::VignettingCorr = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int32s',
+    FIRST_ENTRY => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    1 => {
+        Name => 'PeripheralLighting',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    3 => 'PeripheralLightingValue',
+);
+
+# More Vignetting correction information (MakerNotes tag 0x4016) (ref 25)
+%Image::ExifTool::Canon::VignettingCorr2 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int32s',
+    FIRST_ENTRY => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    5 => {
+        Name => 'PeripheralLightingSetting',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
     },
 );
 

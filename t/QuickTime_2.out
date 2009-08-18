@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.80
-[File, File, Image] FileName - File Name: QuickTime.mov
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 2.7 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:09:12 11:51:21-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: QuickTime.mov
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 2.7 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:09:12 11:51:21-04:00
 [File, File, Image] FileType - File Type: MOV
 [File, File, Image] MIMEType - MIME Type: video/quicktime
 [QuickTime, QuickTime, Video] 0 - Version: 0

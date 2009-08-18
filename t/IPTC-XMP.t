@@ -92,7 +92,7 @@ my $testnum = 1;
     }
     # also try writing a few specific tags
     $exifTool->SetNewValue(CreatorContactInfoCiAdrCtry => 'Canada');
-    $exifTool->SetNewValue(CodedCharacterSet => 'UTF8');
+    $exifTool->SetNewValue(CodedCharacterSet => 'UTF8', Protected => 1);
     undef $info;
     my $image;
     $exifTool->WriteInfo('t/images/IPTC-XMP.jpg',\$image);
@@ -293,7 +293,9 @@ my $testnum = 1;
 {
     ++$testnum;
     my @writeInfo = (
-        ['IPTC:CopyrightNotice' => "\xc2\xa9 2008 Phil Harvey"],
+        # (don't put special character hex codes in string in an attempt to patch failed
+        # test by dcollins on Perl 5.95 and i686-linux-thread-multi 2.6.28-11-generic)
+        ['IPTC:CopyrightNotice' => chr(0xc2) . chr(0xa9) . " 2008 Phil Harvey"],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
                                    't/images/Writer.jpg', 1);

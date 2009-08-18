@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: ITC.itc
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 672 bytes
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2008:01:12 21:30:37-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: ITC.itc
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 672 bytes
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:01:12 21:30:37-05:00
 [File, File, Image] FileType - File Type: ITC
 [File, File, Image] MIMEType - MIME Type: application/itunes
 [ITC, ITC, Image] 16 - Data Type: Artwork

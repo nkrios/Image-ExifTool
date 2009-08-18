@@ -11,6 +11,7 @@
 #               4) Philippe Devaux private communication (A700)
 #               5) Marcus Holland-Moritz private communication (A700)
 #               6) Andrey Tverdokhleb private communication
+#               7) Rudiger Lange private communication (A700)
 #               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -22,7 +23,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.28';
+$VERSION = '1.30';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -74,15 +75,26 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     },
     0x0112 => { #JD
         Name => 'WhiteBalanceFineTune',
-        Writable => 'int32s',
+        Format => 'int32s',
+        Writable => 'int32u',
     },
-    0x0114 => { #PH
-        Name => 'CameraSettings',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Sony::CameraSettings',
-            ByteOrder => 'Big-Endian',
+    0x0114 => [ #PH
+        {
+            Name => 'CameraSettings',
+            Condition => '$$self{Model} !~ /DSLR-A(330|380)\b/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Sony::CameraSettings',
+                ByteOrder => 'Big-Endian',
+            },
         },
-    },
+        {
+            Name => 'CameraSettings2',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Sony::CameraSettings2',
+                ByteOrder => 'Big-Endian',
+            },
+        },
+    ],
     0x0115 => { #JD
         Name => 'WhiteBalance',
         PrintConv => {
@@ -137,6 +149,12 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         Writable => 'int32u',
         PrintConv => '$val ? $val : "Auto"',
         PrintConvInv => '$val=~/Auto/i ? 0 : $val',
+    },
+    0xb022 => { #7
+        Name => 'ColorCompensationFilter',
+        Format => 'int32s',
+        Writable => 'int32u',
+        Notes => 'negative is green, positive is magenta',
     },
     0xb023 => { #PH (A100) - (set by mode dial)
         Name => 'SceneMode',
@@ -251,12 +269,69 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     FORMAT => 'int16u',
+    NOTES => 'Camera settings for the A200, A300, A350, A700 and A900.',
+    0x04 => { #7 (A700, not valid for other models)
+        Name => 'DriveMode',
+        Condition => '$$self{Model} =~ /DSLR-A700\b/',
+        Notes => 'A700 only',
+        PrintConv => {
+            1 => 'Single Frame',
+            2 => 'Continuous High',
+            4 => 'Self-timer 10 sec',
+            5 => 'Self-timer 2 sec',
+            7 => 'Continuous Bracketing',
+            12 => 'Continuous Low',
+            18 => 'White Balance Bracketing Low',
+            19 => 'D-Range Optimizer Bracketing Low',
+        },
+    },
+    0x06 => { #7 (A700, not valid for other models)
+        Name => 'WhiteBalanceFineTune',
+        Condition => '$$self{Model} =~ /DSLR-A700\b/',
+        Format => 'int16s',
+        Notes => 'A700 only',
+    },
+    0x10 => { #7 (A700, not confirmed for other models)
+        Name => 'FocusMode',
+        PrintConv => {
+            0 => 'Manual',
+            1 => 'AF-S',
+            2 => 'AF-C',
+            3 => 'AF-A',
+        },
+    },
     0x11 => { #JD (A700)
         Name => 'AFArea',
         PrintConv => {
             0 => 'Wide',
             1 => 'Local',
             2 => 'Spot',
+        },
+    },
+    0x12 => { #7 (A700, not confirmed for other models)
+        Name => 'LocalAFAreaPoint',
+        Format => 'int16u',
+        PrintConv => {
+            1 => 'Center',
+            2 => 'Top',
+            3 => 'Top-Right',
+            4 => 'Right',
+            5 => 'Bottom-Right',
+            6 => 'Bottom',
+            7 => 'Bottom-Left',
+            8 => 'Left',
+            9 => 'Top-Left',
+            10 => 'Far Right',
+            11 => 'Far Left',
+            # see value of 128 for some models
+        },
+    },
+    0x15 => { #7
+        Name => 'MeteringMode',
+        PrintConv => {
+            1 => 'Multi-segment',
+            2 => 'Center-weighted Average',
+            4 => 'Spot',
         },
     },
     0x16 => {
@@ -266,6 +341,18 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         ValueConvInv => '$val ? 8*(log($val/100)/log(2)+6) : $val',
         PrintConv => '$val ? sprintf("%.0f",$val) : "Auto"',
         PrintConvInv => '$val =~ /auto/i ? 0 : $val',
+    },
+    0x18 => { #7
+        Name => 'DynamicRangeOptimizerMode',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Standard',
+            2 => 'Advanced Auto',
+            3 => 'Advanced Level',
+        },
+    },
+    0x19 => { #7
+        Name => 'DynamicRangeOptimizerLevel',
     },
     0x1a => { # style actually used (combination of mode dial + creative style menu)
         Name => 'CreativeStyle',
@@ -279,6 +366,11 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             8 => 'B&W',
             9 => 'Adobe RGB', # A900
             11 => 'Neutral',
+            12 => 'Clear', #7
+            13 => 'Deep', #7
+            14 => 'Light', #7
+            15 => 'Autumn', #7
+            16 => 'Sepia', #7
         },
     },
     0x1c => {
@@ -302,6 +394,20 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         PrintConv => '$val > 0 ? "+$val" : $val',
         PrintConvInv => '$val',
     },
+    0x1f => { #7
+        Name => 'ZoneMatchingValue',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+        PrintConv => '$val > 0 ? "+$val" : $val',
+        PrintConvInv => '$val',
+    },
+    0x22 => { #7
+        Name => 'Brightness',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+        PrintConv => '$val > 0 ? "+$val" : $val',
+        PrintConvInv => '$val',
+    },
     0x23 => {
         Name => 'FlashMode',
         PrintConv => {
@@ -309,8 +415,239 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             1 => 'TTL',
         },
     },
-    # 0x2d - also related to CreativeStyle:
-    #  A900:1=?,4=?,129=std,130=vivid,131=neutral,132=portrait,133=landscape,134=b&w
+    0x28 => { #7
+        Name => 'PrioritySetupShutterRelease',
+        Condition => '$$self{Model} =~ /DSLR-A700\b/',
+        Notes => 'A700 only',
+        PrintConv => {
+            0 => 'AF',
+            1 => 'Release',
+        },
+    },
+    0x29 => { #7
+        Name => 'AFIlluminator',
+        Condition => '$$self{Model} =~ /DSLR-A700\b/',
+        Notes => 'A700 only',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Off',
+        },
+    },
+    0x2a => { #7
+        Name => 'AFWithShutter',
+        Condition => '$$self{Model} =~ /DSLR-A700\b/',
+        Notes => 'A700 only',
+        PrintConv => { 0 => 'On', 1 => 'Off' },
+    },
+    0x2b => { #7
+        Name => 'LongExposureNoiseReduction',
+        Condition => '$$self{Model} =~ /DSLR-A700\b/',
+        Notes => 'A700 only',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x2c => { #7
+        Name => 'HighISONoiseReduction',
+        Condition => '$$self{Model} =~ /DSLR-A700\b/',
+        Notes => 'A700 only',
+        0 => 'Normal',
+        1 => 'Low',
+        2 => 'High',
+        3 => 'Off',
+    },
+    0x2d => { #7
+        Name => 'ImageStyle',
+        Condition => '$$self{Model} =~ /DSLR-A700\b/',
+        Notes => 'A700 only',
+        PrintConv => {
+            1 => 'Standard',
+            2 => 'Vivid',
+            9 => 'Adobe RGB',
+            11 => 'Neutral',
+            129 => 'StyleBox1',
+            130 => 'StyleBox2',
+            131 => 'StyleBox3',
+        },
+    },
+    # 0x2d - A900:1=?,4=?,129=std,130=vivid,131=neutral,132=portrait,133=landscape,134=b&w
+    0x3c => {
+        Name => 'ExposureProgram',
+        Priority => 0,
+        PrintConv => {
+            0 => 'Auto', # (same as 'Program AE'?)
+            1 => 'Manual',
+            2 => 'Program AE',
+            3 => 'Aperture-priority AE',
+            4 => 'Shutter speed priority AE',
+            8 => 'Program Shift A', #7
+            9 => 'Program Shift S', #7
+            16 => 'Portrait',
+        },
+    },
+    0x3d => {
+        Name => 'ImageStabilization',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x3f => { # (verified for A330/A380)
+        Name => 'Rotation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW', #(NC)
+            2 => 'Rotate 270 CW',
+        },
+    },
+    0x54 => {
+        Name => 'SonyImageSize',
+        PrintConv => {
+            1 => 'Large',
+            2 => 'Medium',
+            3 => 'Small',
+        },
+    },
+    0x55 => { #7
+        Name => 'AspectRatio',
+        PrintConv => {
+            1 => '3:2',
+            2 => '16:9',
+        },
+    },
+    0x56 => { #PH/7
+        Name => 'Quality',
+        PrintConv => {
+            0 => 'RAW',
+            2 => 'CRAW',
+            34 => 'RAW + JPEG',
+            35 => 'CRAW + JPEG',
+            16 => 'Extra Fine',
+            32 => 'Fine',
+            48 => 'Standard',
+        },
+    },
+    0x58 => { #7
+        Name => 'ExposureLevelIncrements',
+        PrintConv => {
+            33 => '1/3 EV',
+            50 => '1/2 EV',
+        },
+    },            
+);
+
+# Camera settings (ref PH) (A330 and A380)
+%Image::ExifTool::Sony::CameraSettings2 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    FORMAT => 'int16u',
+    NOTES => 'Camera settings for the A330 and A380.',
+    0x10 => { #7 (A700, not confirmed for other models)
+        Name => 'FocusMode',
+        PrintConv => {
+            0 => 'Manual',
+            1 => 'AF-S',
+            2 => 'AF-C',
+            3 => 'AF-A',
+        },
+    },
+    0x11 => { #JD (A700)
+        Name => 'AFArea',
+        PrintConv => {
+            0 => 'Wide',
+            1 => 'Local',
+            2 => 'Spot',
+        },
+    },
+    0x12 => { #7 (A700, not confirmed for other models)
+        Name => 'LocalAFAreaPoint',
+        Format => 'int16u',
+        PrintConv => {
+            1 => 'Center',
+            2 => 'Top',
+            3 => 'Top-Right',
+            4 => 'Right',
+            5 => 'Bottom-Right',
+            6 => 'Bottom',
+            7 => 'Bottom-Left',
+            8 => 'Left',
+            9 => 'Top-Left',
+            10 => 'Far Right',
+            11 => 'Far Left',
+            # see value of 128 for some models
+        },
+    },
+    0x13 => {
+        Name => 'MeteringMode',
+        PrintConv => {
+            1 => 'Multi-segment',
+            2 => 'Center-weighted Average',
+            4 => 'Spot',
+        },
+    },
+    0x14 => { # A330/A380
+        Name => 'ISOSetting',
+        # 0 indicates 'Auto' (?)
+        ValueConv => '$val ? exp(($val/8-6)*log(2))*100 : $val',
+        ValueConvInv => '$val ? 8*(log($val/100)/log(2)+6) : $val',
+        PrintConv => '$val ? sprintf("%.0f",$val) : "Auto"',
+        PrintConvInv => '$val =~ /auto/i ? 0 : $val',
+    },
+    0x16 => {
+        Name => 'DynamicRangeOptimizerMode',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Standard',
+            2 => 'Advanced Auto',
+            3 => 'Advanced Level',
+        },
+    },
+    0x17 => {
+        Name => 'DynamicRangeOptimizerLevel',
+    },
+    0x18 => { # A380
+        Name => 'CreativeStyle',
+        PrintConv => {
+            1 => 'Standard',
+            2 => 'Vivid',
+            3 => 'Portrait',
+            4 => 'Landscape',
+            5 => 'Sunset',
+            6 => 'Night View/Portrait',
+            8 => 'B&W',
+            9 => 'Adobe RGB',
+            11 => 'Neutral',
+        },
+    },
+    0x19 => {
+        Name => 'Sharpness',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+        PrintConv => '$val > 0 ? "+$val" : $val',
+        PrintConvInv => '$val',
+    },
+    0x1a => {
+        Name => 'Contrast',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+        PrintConv => '$val > 0 ? "+$val" : $val',
+        PrintConvInv => '$val',
+    },
+    0x1b => {
+        Name => 'Saturation',
+        ValueConv => '$val - 10',
+        ValueConvInv => '$val + 10',
+        PrintConv => '$val > 0 ? "+$val" : $val',
+        PrintConvInv => '$val',
+    },
+    0x23 => {
+        Name => 'FlashMode',
+        PrintConv => {
+            0 => 'ADI',
+            1 => 'TTL',
+        },
+    },
+    # 0x27 - also related to CreativeStyle:
+    #  A380:1=std,2=vivid,3=portrait,4=landscape,5=sunset,7=night view,8=b&w
     0x3c => {
         Name => 'ExposureProgram',
         Priority => 0,
@@ -323,7 +660,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             16 => 'Portrait',
         },
     },
-    0x3f => {
+    0x3f => { # (verified for A330/A380)
         Name => 'Rotation',
         PrintConv => {
             0 => 'Horizontal (normal)',
@@ -698,7 +1035,8 @@ under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Thomas Bodenmann, Philippe Devaux, Jens Duttke, Marcus
-Holland-Moritz and Andrey Tverdokhleb for help decoding some tags.
+Holland-Moritz, Andrey Tverdokhleb and Rudiger Lange for help decoding some
+tags.
 
 =head1 SEE ALSO
 

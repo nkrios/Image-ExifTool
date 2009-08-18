@@ -48,13 +48,15 @@ tags.
 <tr class=b>
 <td title='0x0112 = 274'>0x0112</td>
 <td>WhiteBalanceFineTune</td>
-<td class=c>int32s</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x0114 = 276'>0x0114</td>
-<td>CameraSettings</td>
-<td class=c>-</td>
-<td>--&gt; <a href='Sony.html#CameraSettings'>Sony CameraSettings Tags</a></td></tr>
+<td>CameraSettings
+  <br>CameraSettings2</td>
+<td class=c>-<br>-</td>
+<td>--&gt; <a href='Sony.html#CameraSettings'>Sony CameraSettings Tags</a>
+  <br>--&gt; <a href='Sony.html#CameraSettings2'>Sony CameraSettings2 Tags</a></td></tr>
 <tr class=b>
 <td title='0x0115 = 277'>0x0115</td>
 <td>WhiteBalance</td>
@@ -94,6 +96,11 @@ tags.
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td title='0xb022 = 45090'>0xb022</td>
+<td>ColorCompensationFilter</td>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(negative is green, positive is magenta)</span></span></td></tr>
+<tr>
 <td title='0xb023 = 45091'>0xb023</td>
 <td>SceneMode</td>
 <td class=c>int32u</td>
@@ -109,14 +116,14 @@ tags.
   <br>9 = Super Macro
   <br>16 = Auto
   <br>17 = Night View/Portrait</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xb024 = 45092'>0xb024</td>
 <td>ZoneMatching</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = ISO Setting Used
   <br>1 = High Key
   <br>2 = Low Key</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0xb025 = 45093'>0xb025</td>
 <td>DynamicRangeOptimizer</td>
 <td class=c>int32u</td>
@@ -128,13 +135,13 @@ tags.
   <br>10 = Advanced Lv3
   <br>11 = Advanced Lv4
   <br>12 = Advanced Lv5</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xb026 = 45094'>0xb026</td>
 <td>ImageStabilization</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0xb027 = 45095'>0xb027</td>
 <td>LensType</td>
 <td class=c>int32u</td>
@@ -174,6 +181,7 @@ original version of the lens has the same LensType)</span>
   <br>25 = Minolta AF 100-300mm F4.5-5.6 APO (D) or Sigma Lens
   <br>25.1 = Sigma 100-300mm F4 EX (APO (D) or D IF)
   <br>25.2 = Sigma 70mm F2.8 EX DG Macro
+  <br>25.3 = Sigma 20mm F1.8 EX DG Aspherical RF
   <br>27 = Minolta AF 85mm F1.4 G (D)
   <br>28 = Minolta/Sony AF 100mm F2.8 Macro (D) or Tamron Lens
   <br>28.1 = Tamron SP AF 90mm F2.8 Di Macro
@@ -208,6 +216,7 @@ original version of the lens has the same LensType)</span>
   <br>52 = Sony 70-300mm F4.5-5.6 G SSM
   <br>53 = Sony AF 70-400mm F4.5-5.6 G SSM (SAL-70400G)
   <br>54 = Carl Zeiss Vario-Sonnar T* 16-35mm F2.8 ZA SSM (SAL-1635Z)
+  <br>55 = Sony DT 18-55mm F3.5-5.6 SAM (SAL-1855)
   <br>128 = Tamron or Sigma Lens (128)
   <br>128.1 = Tamron 18-200mm F3.5-6.3
   <br>128.2 = Tamron 28-300mm F3.5-6.3
@@ -432,12 +441,12 @@ original version of the lens has the same LensType)</span>
   <br>65535.1 = Arax MC 35mm F2.8 Tilt+Shift
   <br>65535.2 = Arax MC 80mm F2.8 Tilt+Shift
   <br>65535.3 = Zenitar MF 16mm F2.8 Fisheye M42</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xb028 = 45096'>0xb028</td>
 <td>MinoltaMakerNote</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Minolta.html'>Minolta Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0xb029 = 45097'>0xb029</td>
 <td>ColorMode</td>
 <td class=c>int32u</td>
@@ -456,13 +465,13 @@ original version of the lens has the same LensType)</span>
   <br>103 = Light
   <br>104 = Night View
   <br>105 = Autumn Leaves</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xb040 = 45120'>0xb040</td>
 <td>Macro</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0xb041 = 45121'>0xb041</td>
 <td>ExposureMode</td>
 <td class=c>int16u</td>
@@ -473,13 +482,13 @@ original version of the lens has the same LensType)</span>
   <br>8 = Shutter Priority
   <br>9 = Night Scene
   <br>15 = Manual</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xb047 = 45127'>0xb047</td>
 <td>Quality</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Normal
   <br>1 = Fine</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0xb04b = 45131'>0xb04b</td>
 <td>Anti-Blur</td>
 <td class=c>int16u</td>
@@ -487,7 +496,7 @@ original version of the lens has the same LensType)</span>
   <br>1 = On (Continuous)
   <br>2 = On (Shooting)
   <br>65535 = n/a</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xb04e = 45134'>0xb04e</td>
 <td>LongExposureNoiseReduction</td>
 <td class=c>int16u</td>
@@ -496,24 +505,86 @@ original version of the lens has the same LensType)</span>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Sony CameraSettings Tags</a></h2>
+<p>Camera settings for the A200, A300, A350, A700 and A900.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>DriveMode</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(A700 only)</span>
+  <br>1 = Single Frame
+  <br>2 = Continuous High
+  <br>4 = Self-timer 10 sec
+  <br>5 = Self-timer 2 sec
+  <br>7 = Continuous Bracketing
+  <br>12 = Continuous Low
+  <br>18 = White Balance Bracketing Low
+  <br>19 = D-Range Optimizer Bracketing Low</span></td></tr>
+<tr class=b>
+<td class=r title='6 = 0x6'>6</td>
+<td>WhiteBalanceFineTune</td>
+<td class=c>int16s</td>
+<td><span class=s><span class=n>(A700 only)</span></span></td></tr>
+<tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>FocusMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Manual
+  <br>1 = AF-S
+  <br>2 = AF-C
+  <br>3 = AF-A</span></td></tr>
+<tr class=b>
 <td class=r title='17 = 0x11'>17</td>
 <td>AFArea</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Wide
   <br>1 = Local
   <br>2 = Spot</span></td></tr>
+<tr>
+<td class=r title='18 = 0x12'>18</td>
+<td>LocalAFAreaPoint</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Center
+  <br>2 = Top
+  <br>3 = Top-Right
+  <br>4 = Right
+  <br>5 = Bottom-Right
+  <br>6 = Bottom
+  <br>7 = Bottom-Left
+  <br>8 = Left
+  <br>9 = Top-Left
+  <br>10 = Far Right
+  <br>11 = Far Left</span></td></tr>
 <tr class=b>
+<td class=r title='21 = 0x15'>21</td>
+<td>MeteringMode</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Multi-segment
+  <br>2 = Center-weighted Average
+  <br>4 = Spot</span></td></tr>
+<tr>
 <td class=r title='22 = 0x16'>22</td>
 <td>ISOSetting</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='24 = 0x18'>24</td>
+<td>DynamicRangeOptimizerMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = Standard
+  <br>2 = Advanced Auto
+  <br>3 = Advanced Level</span></td></tr>
 <tr>
+<td class=r title='25 = 0x19'>25</td>
+<td>DynamicRangeOptimizerLevel</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td class=r title='26 = 0x1a'>26</td>
 <td>CreativeStyle</td>
 <td class=c>int16u</td>
@@ -525,29 +596,242 @@ original version of the lens has the same LensType)</span>
   <br>6 = Night View/Portrait
   <br>8 = B&amp;W
   <br>9 = Adobe RGB
-  <br>11 = Neutral</span></td></tr>
-<tr class=b>
+  <br>11 = Neutral
+  <br>12 = Clear
+  <br>13 = Deep
+  <br>14 = Light
+  <br>15 = Autumn
+  <br>16 = Sepia</span></td></tr>
+<tr>
 <td class=r title='28 = 0x1c'>28</td>
 <td>Sharpness</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='29 = 0x1d'>29</td>
 <td>Contrast</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='30 = 0x1e'>30</td>
 <td>Saturation</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='31 = 0x1f'>31</td>
+<td>ZoneMatchingValue</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
 <tr>
+<td class=r title='34 = 0x22'>34</td>
+<td>Brightness</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td class=r title='35 = 0x23'>35</td>
 <td>FlashMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = ADI
   <br>1 = TTL</span></td></tr>
+<tr>
+<td class=r title='40 = 0x28'>40</td>
+<td>PrioritySetupShutterRelease</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(A700 only)</span>
+  <br>0 = AF
+  <br>1 = Release</span></td></tr>
 <tr class=b>
+<td class=r title='41 = 0x29'>41</td>
+<td>AFIlluminator</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(A700 only)</span>
+  <br>0 = Auto
+  <br>1 = Off</span></td></tr>
+<tr>
+<td class=r title='42 = 0x2a'>42</td>
+<td>AFWithShutter</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(A700 only)</span>
+  <br>0 = On
+  <br>1 = Off</span></td></tr>
+<tr class=b>
+<td class=r title='43 = 0x2b'>43</td>
+<td>LongExposureNoiseReduction</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(A700 only)</span>
+  <br>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
+<td class=r title='44 = 0x2c'>44</td>
+<td>HighISONoiseReduction</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(A700 only)</span></span></td></tr>
+<tr class=b>
+<td class=r title='45 = 0x2d'>45</td>
+<td>ImageStyle</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(A700 only)</span>
+  <br>1 = Standard
+  <br>2 = Vivid
+  <br>9 = Adobe RGB
+  <br>11 = Neutral
+  <br>129 = StyleBox1
+  <br>130 = StyleBox2
+  <br>131 = StyleBox3</span></td></tr>
+<tr>
+<td class=r title='60 = 0x3c'>60</td>
+<td>ExposureProgram</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Auto
+  <br>1 = Manual
+  <br>2 = Program AE
+  <br>3 = Aperture-priority AE
+  <br>4 = Shutter speed priority AE
+  <br>8 = Program Shift A
+  <br>9 = Program Shift S
+  <br>16 = Portrait</span></td></tr>
+<tr class=b>
+<td class=r title='61 = 0x3d'>61</td>
+<td>ImageStabilization</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
+<td class=r title='63 = 0x3f'>63</td>
+<td>Rotation</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Horizontal (normal)
+  <br>1 = Rotate 90 CW
+  <br>2 = Rotate 270 CW</span></td></tr>
+<tr class=b>
+<td class=r title='84 = 0x54'>84</td>
+<td>SonyImageSize</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Large
+  <br>2 = Medium
+  <br>3 = Small</span></td></tr>
+<tr>
+<td class=r title='85 = 0x55'>85</td>
+<td>AspectRatio</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = 3:2
+  <br>2 = 16:9</span></td></tr>
+<tr class=b>
+<td class=r title='86 = 0x56'>86</td>
+<td>Quality</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = RAW
+  <br>2 = CRAW
+  <br>16 = Extra Fine
+  <br>32 = Fine
+  <br>34 = RAW + JPEG
+  <br>35 = CRAW + JPEG
+  <br>48 = Standard</span></td></tr>
+<tr>
+<td class=r title='88 = 0x58'>88</td>
+<td>ExposureLevelIncrements</td>
+<td class=c>int16u</td>
+<td><span class=s>33 = 1/3 EV
+  <br>50 = 1/2 EV</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraSettings2'>Sony CameraSettings2 Tags</a></h2>
+<p>Camera settings for the A330 and A380.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>FocusMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Manual
+  <br>1 = AF-S
+  <br>2 = AF-C
+  <br>3 = AF-A</span></td></tr>
+<tr class=b>
+<td class=r title='17 = 0x11'>17</td>
+<td>AFArea</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Wide
+  <br>1 = Local
+  <br>2 = Spot</span></td></tr>
+<tr>
+<td class=r title='18 = 0x12'>18</td>
+<td>LocalAFAreaPoint</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Center
+  <br>2 = Top
+  <br>3 = Top-Right
+  <br>4 = Right
+  <br>5 = Bottom-Right
+  <br>6 = Bottom
+  <br>7 = Bottom-Left
+  <br>8 = Left
+  <br>9 = Top-Left
+  <br>10 = Far Right
+  <br>11 = Far Left</span></td></tr>
+<tr class=b>
+<td class=r title='19 = 0x13'>19</td>
+<td>MeteringMode</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Multi-segment
+  <br>2 = Center-weighted Average
+  <br>4 = Spot</span></td></tr>
+<tr>
+<td class=r title='20 = 0x14'>20</td>
+<td>ISOSetting</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='22 = 0x16'>22</td>
+<td>DynamicRangeOptimizerMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = Standard
+  <br>2 = Advanced Auto
+  <br>3 = Advanced Level</span></td></tr>
+<tr>
+<td class=r title='23 = 0x17'>23</td>
+<td>DynamicRangeOptimizerLevel</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='24 = 0x18'>24</td>
+<td>CreativeStyle</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Standard
+  <br>2 = Vivid
+  <br>3 = Portrait
+  <br>4 = Landscape
+  <br>5 = Sunset
+  <br>6 = Night View/Portrait
+  <br>8 = B&amp;W
+  <br>9 = Adobe RGB
+  <br>11 = Neutral</span></td></tr>
+<tr>
+<td class=r title='25 = 0x19'>25</td>
+<td>Sharpness</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='26 = 0x1a'>26</td>
+<td>Contrast</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='27 = 0x1b'>27</td>
+<td>Saturation</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='35 = 0x23'>35</td>
+<td>FlashMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = ADI
+  <br>1 = TTL</span></td></tr>
+<tr>
 <td class=r title='60 = 0x3c'>60</td>
 <td>ExposureProgram</td>
 <td class=c>int16u</td>
@@ -557,14 +841,14 @@ original version of the lens has the same LensType)</span>
   <br>3 = Aperture-priority AE
   <br>4 = Shutter speed priority AE
   <br>16 = Portrait</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='63 = 0x3f'>63</td>
 <td>Rotation</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Horizontal (normal)
   <br>1 = Rotate 90 CW
   <br>2 = Rotate 270 CW</span></td></tr>
-<tr class=b>
+<tr>
 <td class=r title='84 = 0x54'>84</td>
 <td>SonyImageSize</td>
 <td class=c>int16u</td>
@@ -717,7 +1001,7 @@ containing these tags.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 11, 2009</i>
+<br><i>Last revised Aug 12, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

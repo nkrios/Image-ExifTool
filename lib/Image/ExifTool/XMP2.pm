@@ -16,6 +16,7 @@
 
 package Image::ExifTool::XMP;
 
+use strict;
 use Image::ExifTool qw(:Utils);
 use Image::ExifTool::XMP;
 
@@ -839,7 +840,11 @@ my %plusVocab = (
 
 # set "Avoid" flag for all PRISM tags
 my ($table, $key);
-foreach $table (\%prism, \%prl, \%pur) {
+foreach $table (
+    \%Image::ExifTool::XMP::prism,
+    \%Image::ExifTool::XMP::prl,
+    \%Image::ExifTool::XMP::pur)
+{
     foreach $key (TagTableKeys($table)) {
         $table->{$key}->{Avoid} = 1;
     }

@@ -39,7 +39,7 @@ GPSLatitudeRef  GPSLongitudeRef  GPSAltitudeRef  GPSTimeStamp
 <li>GPX</li>
 <li>NMEA (RMC, GGA, GLL and GSA sentences)</li>
 <li>KML</li>
-<li>Garmin XML</li>
+<li>Garmin XML and TCX</li>
 <li>Magellan eXplorist PMGNTRK</li>
 </ul>
 
@@ -99,10 +99,10 @@ lines illustrating various aspects of the geotagging feature.</p>
 
 <blockquote class=lt><i>Programmers:  You may write either a GPS log file name
 or the GPS log data as the value for <code>Geotag</code>.  If the value contains
-a newline it is assumed to be data, otherwise it is taken as a file name.  Note
-that <code>Geotime</code> must always be specified when geotagging via the API
--- the default value of <code>DateTimeOriginal</code> is implemented only by the
-exiftool application.</i></blockquote>
+a newline or a null byte it is assumed to be data, otherwise it is taken as a
+file name.  Note that <code>Geotime</code> must always be specified when
+geotagging via the API -- the default value of <code>DateTimeOriginal</code> is
+implemented only by the exiftool application.</i></blockquote>
 
 <a name="Examples"></a>
 <h3>Examples</h3>
@@ -159,6 +159,11 @@ images:</p>
 
 <pre>exiftool -geotag a.log -geotag b.log -r dir</pre>
 
+<p>Use wildcards to load multiple track files (the quotes are necessary for most
+operating systems to prevent filename expansion):</p>
+
+<pre>exiftool -geotag "logs/*.log" dir</pre>
+
 <a name="Options"></a>
 <h3>Options</h3>
 
@@ -192,6 +197,11 @@ for details about how to use the config file.)</p>
     <td>Maximum Position (3D) Dilution Of Precision for geotagging.  GPS fixes are
     ignored if the PDOP is greater than this.</td>
     <td align='center'>A&nbsp;floating&nbsp;point&nbsp;number, or undef to disable</td>
+    <td align='center'>undef</td></tr>
+<tr><td>GeoMinSats</td>
+    <td>Minimum number of satellites for geotagging.  GPS fixes are ignored if the
+    number of acquired satellites is less than this.</td>
+    <td align='center'>A positive integer, or undef to disable</td>
     <td align='center'>undef</td></tr>
 </table></blockquote>
 
@@ -288,7 +298,7 @@ directory).  The geotagging will be more accurate after synchronizing the image
 times like this.</blockquote>
 
 <hr>
-<i>Last revised June 17, 2009</i>
+<i>Last revised July 22, 2009</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

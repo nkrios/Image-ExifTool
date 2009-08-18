@@ -229,10 +229,20 @@ sub SetNewValue($;$$%)
     }
     # make sure the Perl UTF-8 flag is OFF for the value if perl 5.6 or greater
     # (otherwise our byte manipulations get corrupted!!)
-    if (defined $value and $] >= 5.006) {
-        if (eval 'require Encode; Encode::is_utf8($value)' or $@) {
+    if (defined $value) {
+        if ($] >= 5.006 and (eval 'require Encode; Encode::is_utf8($value)' or $@)) {
             # repack by hand if Encode isn't available
             $value = $@ ? pack('C*',unpack('U0C*',$value)) : Encode::encode('utf8',$value);
+        }
+        # un-escape value if necessary
+        if ($self->{OPTIONS}{Escape}) {
+            if ($self->{OPTIONS}{Escape} eq 'XML') {
+                require Image::ExifTool::XMP;
+                $value = Image::ExifTool::XMP::UnescapeXML($value);
+            } elsif ($self->{OPTIONS}{Escape} eq 'HTML') {
+                require Image::ExifTool::HTML;
+                $value = Image::ExifTool::HTML::UnescapeHTML($value);
+            }
         }
     }
     # set group name in options if specified
@@ -999,6 +1009,7 @@ sub SetNewValuesFromFile($$;@)
         Composite   => $$options{Composite},
         Charset     => $$options{Charset},
         Lang        => $$options{Lang},
+        Escape      => $$options{Escape},
         MissingTagValue   => $$options{MissingTagValue},
         IgnoreMinorErrors => $$options{IgnoreMinorErrors},
     );
@@ -1474,6 +1485,7 @@ sub SetFileName($$;$)
     }
     # attempt to rename the file
     unless (rename $file, $newName) {
+        local (*EXIFTOOL_SFN_IN, *EXIFTOOL_SFN_OUT);
         # renaming didn't work, so copy the file instead
         unless (open EXIFTOOL_SFN_IN, $file) {
             $self->Warn("Error opening '$file'");
@@ -1520,6 +1532,7 @@ sub SetFileName($$;$)
 sub WriteInfo($$;$$)
 {
     local $_;
+    local (*EXIFTOOL_FILE2, *EXIFTOOL_OUTFILE);
     my ($self, $infile, $outfile, $outType) = @_;
     my (@fileTypeList, $fileType, $tiffType, $hdr, $seekErr, $type, $tmpfile);
     my ($inRef, $outRef, $closeIn, $closeOut, $outPos, $outBuff, $eraseIn);
@@ -1586,7 +1599,8 @@ sub WriteInfo($$;$$)
         $outfile = $tmpfile = "${infile}_exiftool_tmp" unless defined $outfile;
         if (open(EXIFTOOL_FILE2, $infile)) {
             $fileType = GetFileType($infile);
-            $tiffType = GetFileExtension($infile);
+            @fileTypeList = GetFileType($infile);
+            $tiffType = $$self{FILE_EXT} = GetFileExtension($infile);
             $self->VPrint(0, "Rewriting $infile...\n");
             $inRef = \*EXIFTOOL_FILE2;
             $closeIn = 1;   # we must close the file since we opened it
@@ -1613,11 +1627,13 @@ sub WriteInfo($$;$$)
             return 0;
         }
     }
-    if ($fileType) {
-        @fileTypeList = ( $fileType );
-    } else {
-        @fileTypeList = @fileTypes;
-        $tiffType = 'TIFF';
+    unless (@fileTypeList) {
+        if ($fileType) {
+            @fileTypeList = ( $fileType );
+        } else {
+            @fileTypeList = @fileTypes;
+            $tiffType = 'TIFF';
+        }
     }
 #
 # set up output file
@@ -1947,6 +1963,9 @@ sub GetAllGroups($)
 {
     local $_;
     my $family = shift || 0;
+
+    $family == 3 and return('Doc#', 'Main');
+    $family == 4 and return('Copy#');
 
     LoadAllTables();    # first load all our tables
 
@@ -2765,9 +2784,10 @@ sub WriteDirectory($$$;$)
     }
     my $oldDir = $self->{DIR_NAME};
     my $isRewriting = ($$dirInfo{DirLen} or (defined $dataPt and length $$dataPt) or $$dirInfo{RAF});
+    my $name;
     if ($out) {
-        my $name = ($dirName eq 'MakerNotes' and $$dirInfo{TagInfo}) ?
-                    $dirInfo->{TagInfo}{Name} : $dirName;
+        $name = ($dirName eq 'MakerNotes' and $$dirInfo{TagInfo}) ?
+                 $dirInfo->{TagInfo}{Name} : $dirName;
         if (not defined $oldDir or $oldDir ne $name) {
             my $verb = $isRewriting ? 'Rewriting' : 'Creating';
             print $out "  $verb $name\n";
@@ -2782,7 +2802,7 @@ sub WriteDirectory($$$;$)
     $self->{CHANGED} = $oldChanged unless defined $newData and (length($newData) or $isRewriting);
     $self->{DIR_NAME} = $oldDir;
     SetByteOrder($saveOrder);
-    print $out "  Deleting $dirName\n" if $out and defined $newData and not length $newData;
+    print $out "  Deleting $name\n" if $out and defined $newData and not length $newData;
     return $newData;
 }
 

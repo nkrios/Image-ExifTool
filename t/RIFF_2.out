@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: RIFF.wav
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 224 bytes
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2006:01:01 09:26:57-05:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: RIFF.wav
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 224 bytes
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2006:01:01 09:26:57-05:00
 [File, File, Image] FileType - File Type: WAV
 [File, File, Image] MIMEType - MIME Type: audio/x-wav
 [RIFF, RIFF, Audio] 0 - Encoding: Microsoft PCM

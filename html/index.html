@@ -76,9 +76,9 @@ div.index       { float: right; clear: both;
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-7.82.tar.gz">
-Download        Version 7.82</a> (2.1 MB) -
-<a href="history.html">July 2, 2009</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-7.88.tar.gz">
+Download        Version 7.88</a> (2.1 MB) -
+<a href="history.html">Aug. 17, 2009</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -120,8 +120,8 @@ distribution above.</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-7.82.zip">
-         exiftool-7.82.zip</a> (2.4 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-7.88.zip">
+         exiftool-7.88.zip</a> (2.5 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -131,8 +131,8 @@ drag-and-drop files and folders to view meta information, or rename to
 
 <blockquote><table class='dl lg'><tr><td><b>
 Mac OS X Package:
-<a href="ExifTool-7.82.dmg">
-         ExifTool-7.82.dmg</a> (1.3 MB)</b></td></tr></table></blockquote>
+<a href="ExifTool-7.88.dmg">
+         ExifTool-7.88.dmg</a> (1.4 MB)</b></td></tr></table></blockquote>
 
 <p><b>The OS X package</b> installs the ExifTool command-line application and
 libraries in /usr/bin. After installing, type "<code>exiftool</code>" in a
@@ -228,7 +228,7 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><th>File Type</th><th>Support</th><th>Description</th></tr>
 <tr><td>3FR</td><td>R</td><td>Hasselblad RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/DICOM.html">ACR</a></td><td>R</td><td>American College of Radiology ACR-NEMA (DICOM-like)</td></tr>
-<tr><td>AI</td><td>R</td><td>Adobe Illustrator (<a href="TagNames/PostScript.html">EPS</a> or <a href="TagNames/PDF.html">PDF</a>)</td></tr>
+<tr><td>AI</td><td>R/w</td><td>Adobe Illustrator (<a href="TagNames/PostScript.html">PS</a> or <a href="TagNames/PDF.html">PDF</a>)</td></tr>
 <tr><td><a href="TagNames/AIFF.html">AIFF, AIF, AIFC</a></td><td>R</td><td>Audio Interchange File Format</td></tr>
 <tr><td><a href="TagNames/APE.html">APE</a></td><td>R</td><td>Monkey's Audio</td></tr>
 <tr><td>ARW</td><td>R</td><td>Sony Alpha RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
@@ -264,7 +264,8 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td><a href="TagNames/JPEG.html">JPEG, JPG</a></td><td>R/W</td><td>Joint Photographic Experts Group image (<a href="#JPEG">see table below</a>)</td></tr>
 <tr><td>K25</td><td>R</td><td>Kodak DC25 RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td>KDC</td><td>R</td><td>Kodak Digital Camera RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
-<tr><td><a href="TagNames/QuickTime.html">M4A</a></td><td>R</td><td>MPEG 4 Audio</td></tr>
+<tr><td><a href="TagNames/M2TS.html">M2TS, MTS, M2T</a></td><td>R</td><td>MPEG-2 Transport Stream (used for AVCHD video)</td></tr>
+<tr><td><a href="TagNames/QuickTime.html">M4A</a></td><td>R</td><td>MPEG-4 Audio</td></tr>
 <tr><td>MEF</td><td>R/W</td><td>Mamiya (RAW) Electronic Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/MIE.html">MIE</a></td><td>R/W/C</td><td>Meta Information Encapsulation (<a href="MIE1.1-20070121.pdf">MIE specification</a>)</td></tr>
 <tr><td><a href="TagNames/MIFF.html">MIFF, MIF</a></td><td>R</td><td>Magick Image File Format</td></tr>
@@ -555,9 +556,9 @@ option may be used to extract all tags.</li>
 <p>Shortcut tags represent one or more other tags, and are used like any other
 tag when reading, writing or copying information.</p>
 
-<p>ExifTool defines a few shortcut tags in the Image::ExifTool::Shortcuts
-module, and allows users to define their own shortcuts in a
-<a href="config.html">configuration file</a> called
+<p>ExifTool defines <a href="TagNames/Shortcuts.html">a few shortcut tags</a>
+in the Image::ExifTool::Shortcuts module, and allows users to define their own
+shortcuts in a <a href="config.html">configuration file</a> called
 "<code>.ExifTool_config</code>" in their home directory or exiftool application
 directory.  Here is a simple example that defines two shortcuts:</p>
 
@@ -585,7 +586,7 @@ with a '<code>.</code>' in the Windows GUI, but it can be done with the
 <h2><a name="groups">Tag Groups</a>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
 
-<p>ExifTool classifies tags into groups in four different families.
+<p>ExifTool classifies tags into groups in five different families.
 These groups are:</p>
 
 <blockquote><table class='norm'>
@@ -594,36 +595,37 @@ These groups are:</p>
 <td>AFCP, AIFF, APE, APP12, APP13, APP14, APP15, APP5, APP6, APP8, ASF, BMP,
 CanonVRD, Composite, DICOM, DNG, DjVu, Ducky, EXE, EXIF, ExifTool, FLAC,
 File, Flash, FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC,
-ITC, JFIF, JPEG, Jpeg2000, Leaf, MIE, MIFF, MNG, MPC, MPEG, MPF, MakerNotes,
-Meta, PDF, PICT, PNG, Panasonic, PhotoMechanic, Photoshop, PostScript,
-PrintIM, QuickTime, RAF, RIFF, Rawzor, Real, SVG, SigmaRaw, Sony, Stim,
-Vorbis, XMP, ZIP
+ITC, JFIF, JPEG, Jpeg2000, Leaf, M2TS, MIE, MIFF, MNG, MPC, MPEG, MPF,
+MakerNotes, Meta, PDF, PICT, PNG, PhotoMechanic, Photoshop, PostScript,
+PrintIM, QuickTime, RAF, RIFF, Rawzor, Real, SVG, SigmaRaw, Stim, Vorbis,
+XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom, CanonRaw,
-CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky, EPPIM, EXE,
-EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, FotoStation, FujiFilm,
-GPS, GeoTiff, GlobParamIFD, GraphConv, HP, HTML, HTML-dc, HTML-ncc,
-HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-view, ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v1_Enh, ID3v2_2,
-ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC, InteropIFD, JFIF, JPEG, JVC,
-Jpeg2000, Kodak, KodakBordersIFD, KodakEffectsIFD, KodakIFD, KyoceraRaw,
-Leaf, LeafSubIFD, Leica, MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc,
-MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
-MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM,
-MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MPImage#, MPF0, MakerNotes,
-MakerUnknown, MetaIFD, Minolta, MinoltaRaw, Nikon, NikonCapture,
-NikonPreview, NikonScan, Olympus, PDF, PICT, PNG, Panasonic, Pentax,
-PhotoMechanic, Photoshop, PictureInfo, PostScript, PrintIM, ProfileIFD,
-QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor, Real, Real-CONT, Real-MDPR,
-Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2,
-SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo, Sigma, SigmaRaw, Sony, Stim,
-SubIFD, Track#, Vorbis, XMP, XMP-DICOM, XMP-MP, XMP-PixelLive, XMP-acdsee,
-XMP-album, XMP-aux, XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif,
-XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf,
-XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism, XMP-prl,
-XMP-pur, XMP-rdf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
-XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
+<td>AC3, AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom,
+CanonRaw, CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky,
+EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix,
+FotoStation, FujiFilm, GPS, GeoTiff, GlobParamIFD, GraphConv, H264, HP,
+HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm,
+ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ICC_Profile#, ID3,
+ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC,
+InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
+KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, M2TS, MAC,
+MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS,
+MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
+MIFF, MNG, MPC, MPEG, MPF0, MPImage, MakerNotes, MakerUnknown, MetaIFD,
+Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus,
+PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
+PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor,
+Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5,
+Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo,
+Sigma, SigmaRaw, Sony, Stim, SubIFD, System, Track#, Vorbis, XMP, XMP-DICOM,
+XMP-MP, XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs,
+XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
+XMP-microsoft, XMP-pdf, XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus,
+XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ,
+XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg,
+ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
@@ -632,10 +634,15 @@ Time, Unknown, Video
 <tr><td><b>3&nbsp;(Document&nbsp;Number)</b></td>
 <td>Doc#, Main
 </td></tr>
+<tr><td><b>4&nbsp;(Instance&nbsp;Number)</b></td>
+<td>Copy#
+</td></tr>
 </table></blockquote>
 
 <p>The exiftool output can be organized based on these groups using the
-<code>-g</code> or <code>-G</code> option.</p>
+<code>-g</code> or <code>-G</code> option.  See the
+<a href="ExifTool.html#GetGroup">GetGroup</a> function in the ExifTool library
+for a description of the group families.</p>
 
 <h2><a name="writing">Writing Meta Information</a>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
@@ -736,7 +743,7 @@ if the file is rewritten.  (The resource fork is also typically dropped if the
 file is simply transferred to a non-Macintosh system.)</li>
 <li>In Windows, ExifTool will not process files with Unicode characters in their
 name.  This is due to an underlying lack of support for Unicode filenames in the
-standard C I/O libraries.</li>
+Windows standard C I/O libraries.</li>
 </ul>
 <h2><a name="shift">Date/Time Shift Feature</a>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>

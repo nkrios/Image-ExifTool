@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.64
-[File, File, Image] FileName - File Name: Flash.flv
-[File, File, Image] Directory - Directory: t/images
-[File, File, Image] FileSize - File Size: 1358 bytes
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2007:06:12 12:15:04-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: Flash.flv
+[File, System, Image] Directory - Directory: t/images
+[File, System, Image] FileSize - File Size: 1358 bytes
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:06:12 12:12:29-04:00
 [File, File, Image] FileType - File Type: FLV
 [File, File, Image] MIMEType - MIME Type: video/x-flv
 [Flash, Flash, Video] hasKeyframes - Has Key Frames: Yes

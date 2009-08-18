@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.74
-[File, File, Image] FileName - File Name: Writer_10_failed.jpg
-[File, File, Image] Directory - Directory: t
-[File, File, Image] FileSize - File Size: 6.5 kB
-[File, File, Time] FileModifyDate - File Modification Date/Time: 2009:04:07 11:44:17-04:00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[File, System, Image] FileName - File Name: Writer_10_failed.jpg
+[File, System, Image] Directory - Directory: t
+[File, System, Image] FileSize - File Size: 6.5 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:45-04:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -205,7 +205,7 @@
 [MakerNotes, Pentax, Camera] 11 - AF Points In Focus: Center (horizontal)
 [MakerNotes, Pentax, Image] 16 - WB Shift AB: 0
 [MakerNotes, Pentax, Image] 17 - WB Shift MG: 0
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.74
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.83
 [XMP, XMP-dc, Time] date - Date: 2008:03:02
 [XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -
 [XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8
