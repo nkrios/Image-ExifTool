@@ -1860,7 +1860,9 @@ my %cameraColorCalibration2 = (
             # (but note that encoding is the same for TargetExposureTime - PH)
             Condition => '$$self{Model} =~ /\b(20D|350D|REBEL XT|Kiss Digital N)\b/',
             Priority => 0,
-            # apparently a value of 0 is valid in a CRW image (=1s, D60 sample)
+            # many models write 0 here in JPEG images (even though 0 is the
+            # value for an exposure time of 1 sec), but apparently a value of 0
+            # is valid in a CRW image (=1s, D60 sample)
             RawConv => '($val or $$self{FILE_TYPE} eq "CRW") ? $val : undef',
             # approximate big translation table by simple calculation - PH
             ValueConv => 'exp(-Image::ExifTool::Canon::CanonEv($val)*log(2))*1000/32',
@@ -1871,7 +1873,9 @@ my %cameraColorCalibration2 = (
         {
             Name => 'ExposureTime',
             Priority => 0,
-            # apparently a value of 0 is valid in a CRW image (=1s, D60 sample)
+            # many models write 0 here in JPEG images (even though 0 is the
+            # value for an exposure time of 1 sec), but apparently a value of 0
+            # is valid in a CRW image (=1s, D60 sample)
             RawConv => '($val or $$self{FILE_TYPE} eq "CRW") ? $val : undef',
             # approximate big translation table by simple calculation - PH
             ValueConv => 'exp(-Image::ExifTool::Canon::CanonEv($val)*log(2))',

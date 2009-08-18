@@ -12,13 +12,19 @@
 
 <p>RSS feed: <a href="http://owl.phy.queensu.ca/~phil/exiftool/rss.xml">http://owl.phy.queensu.ca/~phil/exiftool/rss.xml</a></p>
 
-<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-7.88.tar.gz">Version 7.88</a>. (Other versions are
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-7.89.tar.gz">Version 7.89</a>. (Other versions are
 considered development releases, and are not uploaded to <a href="http://search.cpan.org/dist/Image-ExifTool/">CPAN</a>.)</p>
+
+<a name='v7.89'><b>Aug. 18, 2009 - Version 7.89</b> (production release)</a>
+<ul>
+<li>IMPORTANT: Not quite done with NRW fixes -- fixed similar bug which could
+    corrupt NRW images when writing new values larger than 10 MB
+</ul>
 
 <a name='v7.88'><b>Aug. 17, 2009 - Version 7.88</b> (production release)</a>
 <ul>
-<li>IMPORTANT: Fixed bug introduced in version 7.77 which causes NRW images to
-    be corrupted when writing
+<li>IMPORTANT: Fixed bug introduced in version 7.77 which causes Nikon NRW
+    images to be corrupted when writing
 <li>Decode a number of Sony A100 Camera Settings tags (thanks Igal Milchtaich)
 <li>Improved accuracy of some CameraInfo values for Canon PowerShot models
 <li>Tolerate blank lines in PDF xref tables

@@ -2711,42 +2711,13 @@ NoOverwrite:            next if $isNew > 0;
     # do our fixups now so we can more easily calculate offsets below
     $fixup->ApplyFixup(\$newData);
 #
-# set offsets and generate fixups for tag values which were too large for memory
+# determine total block size for deferred data
 #
+    my $numBlocks = scalar @imageData;  # save this so we scan only existing blocks later
     my $blockSize = 0;  # total size of blocks to copy later
-    my ($blockInfo, @subFixes);
+    my $blockInfo;
     foreach $blockInfo (@imageData) {
         my ($pos, $size, $pad, $entry, $subFix) = @$blockInfo;
-        if (defined $entry) {
-            my $format = Get16u(\$newData, $entry + 2);
-            if ($format < 1 or $format > 13) {
-                $exifTool->Error('Internal error copying huge value');
-                last;
-            } else {
-                # set count and offset in directory entry
-                Set32u($size / $formatSize[$format], \$newData, $entry + 4);
-                Set32u(length($newData)+$blockSize, \$newData, $entry + 8);
-                $fixup->AddFixup($entry + 8);
-                # create special fixup for SubIFD data
-                if ($imageDataFlag eq 'SubIFD') {
-                    my $subIfdDataFixup = new Image::ExifTool::Fixup;
-                    $subIfdDataFixup->AddFixup($entry + 8);
-                    # save fixup in imageData list
-                    $$blockInfo[4] = $subIfdDataFixup; 
-                }
-                # must reset entry pointer so we don't use it again in a parent IFD!
-                $$blockInfo[3] = undef;
-            }
-        }
-        # apply additional shift required for SubIFD image data offsets
-        if ($subFix and defined $$subFix{BlockLen}) {
-            # our offset expects the data at the end of the SubIFD block (BlockLen + Start),
-            # but it will actually be at length($newData) + $blockSize.  So adjust accordingly
-            # (and subtract an extra Start because this shift is applied later)
-            $subFix->{Shift} += length($newData) - $$subFix{BlockLen} - 2 * $$subFix{Start} + $blockSize;
-            $subFix->ApplyFixup(\$newData);
-            push @subFixes, $subFix;    # save for later
-        }
         $blockSize += $size + $pad;
     }
 #
@@ -2984,18 +2955,48 @@ NoOverwrite:            next if $isNew > 0;
                 SetByteOrder($oldOrder);
             }
         }
-        # must adjust SubIFD offsets if more data was added to value data block
-        if (@subFixes and $newDataLen != length $newData) {
-            my $subFix;
-            foreach $subFix (@subFixes) {
-                $subFix->{Shift} += length($newData) - $newDataLen;
-                $subFix->ApplyFixup(\$newData);
-            }
-        }
         # verify that nothing else got written after determining TTW length
         if (defined $ttwLen and $ttwLen != length($newData)) {
             $exifTool->Error('Internal error writing MRW TTW');
         }
+    }
+#
+# set offsets and generate fixups for tag values which were too large for memory
+#
+    $blockSize = 0;
+    foreach $blockInfo (@imageData) {
+        my ($pos, $size, $pad, $entry, $subFix) = @$blockInfo;
+        if (defined $entry) {
+            my $format = Get16u(\$newData, $entry + 2);
+            if ($format < 1 or $format > 13) {
+                $exifTool->Error('Internal error copying huge value');
+                last;
+            } else {
+                # set count and offset in directory entry
+                Set32u($size / $formatSize[$format], \$newData, $entry + 4);
+                Set32u(length($newData)+$blockSize, \$newData, $entry + 8);
+                $fixup->AddFixup($entry + 8);
+                # create special fixup for SubIFD data
+                if ($imageDataFlag eq 'SubIFD') {
+                    my $subIfdDataFixup = new Image::ExifTool::Fixup;
+                    $subIfdDataFixup->AddFixup($entry + 8);
+                    # save fixup in imageData list
+                    $$blockInfo[4] = $subIfdDataFixup; 
+                }
+                # must reset entry pointer so we don't use it again in a parent IFD!
+                $$blockInfo[3] = undef;
+            }
+        }
+        # apply additional shift required for contained SubIFD image data offsets
+        if ($subFix and defined $$subFix{BlockLen} and $numBlocks > 0) {
+            # our offset expects the data at the end of the SubIFD block (BlockLen + Start),
+            # but it will actually be at length($newData) + $blockSize.  So adjust
+            # accordingly (and subtract an extra Start because this shift is applied later)
+            $subFix->{Shift} += length($newData) - $$subFix{BlockLen} - 2 * $$subFix{Start} + $blockSize;
+            $subFix->ApplyFixup(\$newData);
+        }
+        $blockSize += $size + $pad;
+        --$numBlocks;
     }
 #
 # apply final shift to new data position if this is the top level IFD

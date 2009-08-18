@@ -12,7 +12,7 @@
 use strict;
 require 5.004;
 
-my $version = '7.88';
+my $version = '7.89';
 
 # add our 'lib' directory to the include list BEFORE 'use Image::ExifTool'
 my $exeDir;

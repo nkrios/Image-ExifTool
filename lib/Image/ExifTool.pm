@@ -25,7 +25,7 @@ use vars qw($VERSION $RELEASE @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             $psAPP13old @loadAllTables %UserDefined $evalWarning %noWriteFile
             %magicNumber @langs $defaultLang %langName);
 
-$VERSION = '7.88';
+$VERSION = '7.89';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (

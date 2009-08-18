@@ -5,13 +5,18 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 7.88. (Other versions are
+Note: The most recent production release is Version 7.89. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+Aug. 18, 2009 - Version 7.89 (production release)
+
+  - IMPORTANT: Not quite done with NRW fixes -- fixed similar bug which could
+    corrupt NRW images when writing new values larger than 10 MB
 
 Aug. 17, 2009 - Version 7.88 (production release)
 
-  - IMPORTANT: Fixed bug introduced in version 7.77 which causes NRW images to
-    be corrupted when writing
+  - IMPORTANT: Fixed bug introduced in version 7.77 which causes Nikon NRW
+    images to be corrupted when writing
   - Decode a number of Sony A100 Camera Settings tags (thanks Igal Milchtaich)
   - Improved accuracy of some CameraInfo values for Canon PowerShot models
   - Tolerate blank lines in PDF xref tables
