@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.94
 [File, System, Image] FileName - File Name: Kodak.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 3.3 kB
@@ -76,7 +76,7 @@
 [MakerNotes, Kodak, Camera] 102 - Color Mode: Saturated Color
 [MakerNotes, Kodak, Camera] 104 - Digital Zoom: 1
 [MakerNotes, Kodak, Camera] 107 - Sharpness: Normal
-[FlashPix, FlashPix, Other] 1 - Code Page: 1200
+[FlashPix, FlashPix, Other] 1 - Code Page: Unicode UTF-16, little endian
 [FlashPix, FlashPix, Other] 268435456 - Used Extension Numbers: 1, 2
 [FlashPix, FlashPix, Other] 1 - Extension Name: Screen nail
 [FlashPix, FlashPix, Other] 2 - Extension Class ID: 10000230-6FC0-11D0-BD01-00609719A180
@@ -95,7 +95,7 @@
 [FlashPix, FlashPix, Other] 7 - Extension Description: Audio storage
 [FlashPix, FlashPix, Other] 4096 - Storage-Stream Pathname: /Audio_bd0100609719a180
 [FlashPix, FlashPix, Audio] Audio Stream - Audio Stream: (Binary data 18 bytes)
-[FlashPix, FlashPix, Other] 1 - Code Page: 1200
+[FlashPix, FlashPix, Other] 1 - Code Page: Unicode UTF-16, little endian
 [FlashPix, FlashPix, Other] Screen Nail - Screen Nail: (Binary data 166 bytes)
 [Composite, Composite, Image] Aperture - Aperture: 6.7
 [Composite, Composite, Time] DateCreated - Date Created: 2002:05:01

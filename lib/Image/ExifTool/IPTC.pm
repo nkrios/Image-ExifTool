@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.32';
+$VERSION = '1.34';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -877,6 +877,34 @@ my %fileFormat = (
     },
 );
 
+# IPTC Composite tags
+%Image::ExifTool::IPTC::Composite = (
+    GROUPS => { 2 => 'Image' },
+    DateTimeCreated => {
+        Description => 'Date/Time Created',
+        Groups => { 2 => 'Time' },
+        Require => {
+            0 => 'IPTC:DateCreated',
+            1 => 'IPTC:TimeCreated',
+        },
+        ValueConv => '"$val[0] $val[1]"',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    DigitalCreationDateTime => {
+        Description => 'Digital Creation Date/Time',
+        Groups => { 2 => 'Time' },
+        Require => {
+            0 => 'IPTC:DigitalCreationDate',
+            1 => 'IPTC:DigitalCreationTime',
+        },
+        ValueConv => '"$val[0] $val[1]"',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+);
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags('Image::ExifTool::IPTC');
+
 
 #------------------------------------------------------------------------------
 # AutoLoad our writer routines when necessary
@@ -902,27 +930,27 @@ sub PrintCodedCharset($)
 #------------------------------------------------------------------------------
 # Handle CodedCharacterSet
 # Inputs: 0) ExifTool ref, 1) CodedCharacterSet value
-# Returns: external character set if translation required (or 'bad' if unknown)
+# Returns: IPTC character set if translation required (or 'bad' if unknown)
 sub HandleCodedCharset($$)
 {
     my ($exifTool, $val) = @_;
-    my $xlat = $exifTool->Options('Charset');
-    if ($iptcCharset{$val}) {
-        # no need to translate if destination is the same
-        undef $xlat if $xlat eq $iptcCharset{$val};
-    } elsif ($val =~ /^\x1b\x25/) {
-        # some unknown character set invoked
-        $xlat = 'bad';  # flag unsupported coding
-    } else {
-        # translate all other codes as Latin
-        undef $xlat if $xlat eq 'Latin';
+    my $xlat = $iptcCharset{$val};
+    unless ($xlat) {
+        if ($val =~ /^\x1b\x25/) {
+            # some unknown character set invoked
+            $xlat = 'bad';  # flag unsupported coding
+        } else {
+            $xlat = $exifTool->Options('IPTCCharset');
+        }
     }
+    # no need to translate if Charset is the same
+    undef $xlat if $xlat eq $exifTool->Options('Charset');
     return $xlat;
 }
 
 #------------------------------------------------------------------------------
 # Encode or decode coded string
-# Inputs: 0) ExifTool ref, 1) value ptr, 2) destination charset ('Latin','UTF8' or 'bad')
+# Inputs: 0) ExifTool ref, 1) value ptr, 2) IPTC charset (or 'bad') ref
 #         3) flag set to decode (read) value from IPTC
 # Updates value on return
 sub TranslateCodedString($$$$)
@@ -932,20 +960,16 @@ sub TranslateCodedString($$$$)
     if ($$xlatPtr eq 'bad') {
         $exifTool->Warn('Some IPTC characters not converted (unsupported CodedCharacterSet)');
         undef $$xlatPtr;
-    } elsif ($$xlatPtr eq 'Latin' xor $read) {
+    } elsif (not $read) {
+        my $val = $exifTool->Charset2Unicode($$valPtr, 'MM');
+        $$valPtr = $exifTool->Unicode2Charset($val, 'MM', $$xlatPtr);
+    } elsif ($$valPtr !~ /[\x14\x15\x1b]/) {
+        my $val = $exifTool->Charset2Unicode($$valPtr, 'MM', $$xlatPtr);
+        $$valPtr = $exifTool->Unicode2Charset($val, 'MM');
+    } elsif (not $$exifTool{WarnShift2022}) {
         # don't yet support reading ISO 2022 shifted character sets
-        if (not $read or $$valPtr !~ /[\x14\x15\x1b]/) {
-            # convert from Latin to UTF-8
-            my $val = Image::ExifTool::Latin2Unicode($$valPtr,'n');
-            $$valPtr = Image::ExifTool::Unicode2UTF8($val,'n');
-        } elsif (not $$exifTool{WarnShift2022}) {
-            $exifTool->Warn('Some IPTC characters not converted (ISO 2022 shifting not supported)');
-            $$exifTool{WarnShift2022} = 1;
-        }
-    } else {
-        # convert from UTF-8 to Latin
-        my $val = Image::ExifTool::UTF82Unicode($$valPtr,'n',$exifTool);
-        $$valPtr = Image::ExifTool::Unicode2Latin($val,'n',$exifTool);
+        $exifTool->Warn('Some IPTC characters not converted (ISO 2022 shifting not supported)');
+        $$exifTool{WarnShift2022} = 1;
     }
 }
 
@@ -965,9 +989,9 @@ sub ProcessIPTC($$$)
     my $success = 0;
     my ($lastRec, $recordPtr, $recordName);
 
-    # begin by assuming IPTC is Latin (so no translation if Charset is Latin)
-    my $xlat = $exifTool->Options('Charset');
-    undef $xlat if $xlat eq 'Latin';
+    # begin by assuming default IPTC encoding
+    my $xlat = $exifTool->Options('IPTCCharset');
+    undef $xlat if $xlat eq $exifTool->Options('Charset');
 
     $verbose and $dirInfo and $exifTool->VerboseDir('IPTC', 0, $$dirInfo{DirLen});
     if ($tagTablePtr eq \%Image::ExifTool::IPTC::Main) {
@@ -976,15 +1000,19 @@ sub ProcessIPTC($$$)
         $exifTool->{SET_GROUP1} = '+' . $dirCount if $dirCount > 1;
     }
     # calculate MD5 if Digest::MD5 is available
+    my $md5;
     if (eval 'require Digest::MD5') {
-        my $md5;
         if ($pos or $dirLen != length($$dataPt)) {
             $md5 = Digest::MD5::md5(substr $$dataPt, $pos, $dirLen);
         } else {
             $md5 = Digest::MD5::md5($$dataPt);
         }
-        $exifTool->FoundTag('CurrentIPTCDigest', $md5);
+    } else {
+        # a zero digest indicates IPTC exists but we don't have Digest::MD5
+        $md5 = "\0" x 16;
     }
+    $exifTool->FoundTag('CurrentIPTCDigest', $md5);
+
     # quick check for improperly byte-swapped IPTC
     if ($dirLen >= 4 and substr($$dataPt, $pos, 1) ne "\x1c" and
                          substr($$dataPt, $pos + 3, 1) eq "\x1c")

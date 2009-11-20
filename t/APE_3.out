@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.98
 [File, System, Image] FileName - File Name: APE.mpc
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 2.5 kB
@@ -50,3 +50,4 @@
 [ID3, ID3v1, Audio] 97 - Comment: a nice comment
 [ID3, ID3v1, Audio] 125 - Track: 1
 [ID3, ID3v1, Audio] 127 - Genre: Funk
+[Composite, Composite, Time] DateTimeOriginal - Date/Time Original: 2005

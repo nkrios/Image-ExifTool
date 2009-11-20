@@ -13,7 +13,7 @@ use vars qw($VERSION);
 use Image::ExifTool;    # only for FinishTiffDump()
 use Image::ExifTool::HTML qw(EscapeHTML);
 
-$VERSION = '1.25';
+$VERSION = '1.27';
 
 sub DumpTable($$$;$$$$$);
 sub Open($$$;@);
@@ -268,7 +268,9 @@ sub Add($$$$;$$)
 #         2) data pointer, 3) data position, 4) output file or scalar reference,
 #         5) limit level (1-3), 6) title
 # Returns: non-zero if useful output was generated,
-#          or -1 on error loading data and ERROR is set to offending data name
+#          or -1 on error loading data and "ERROR" is set to offending data name
+# Note: The "Error" member may be set externally to print a specific error
+#       message instead of doing the dump.
 sub Print($$;$$$$$)
 {
     local $_;
@@ -280,7 +282,6 @@ sub Print($$;$$$$$)
     $title = 'HtmlDump' unless $title;
     $level or $level = 0;
     my $tell = $raf->Tell();
-    my @starts = sort { $a <=> $b } keys %$block;
     my $pos = 0;
     my $dataEnd = $dataPos + ($dataPt ? length($$dataPt) : 0);
     # initialize member variables
@@ -306,7 +307,9 @@ sub Print($$;$$$$$)
     $bkgStart = $bkgEnd = 0;
     $bkgSpan = '';
     my $index = 0;  # initialize tooltip index
-    my (@names, $wasUnused);
+    my (@names, $wasUnused, @starts);
+    # only do dump if we didn't have a serious error
+    @starts = sort { $a <=> $b } keys %$block unless $$self{Error};
     for ($i=0; $i<@starts; ++$i) {
         my $start = $starts[$i];
         my $parmList = $$block{$start};
@@ -379,7 +382,7 @@ sub Print($$;$$$$$)
                                 # reset $len to the actual length of available data
                                 $raf->Seek(0, 2);
                                 $len = $raf->Tell() - $start;
-                                $tip .= "\nError: Only $len bytes available!" if $tip;
+                                $tip .= "<br>Error: Only $len bytes available!" if $tip;
                                 next;
                             }
                             $buff .= $buf2;
@@ -387,6 +390,8 @@ sub Print($$;$$$$$)
                         }
                     } else {
                         $err = $msg;
+                        $len = length $buff;
+                        $tip .= "<br>Error: Only $len bytes available!" if $tip;
                     }
                 }
                 last;
@@ -433,8 +438,8 @@ sub Print($$;$$$$$)
         delete $$self{TipList};
         $rtnVal = 1;
     } else {
-        Write($outfile, "$title</title></head><body>\n",
-                        "No EXIF or TIFF information found in image\n");
+        my $err = $$self{Error} || 'No EXIF or TIFF information found in image';
+        Write($outfile, "$title</title></head><body>\n$err\n");
         $rtnVal = 0;
     }
     Write($outfile, "</body></html>\n");
@@ -695,6 +700,7 @@ sub FinishTiffDump($$$)
         OtherImageStart   => 'OtherImageLength',
         ImageOffset       => 'ImageByteCount',
         AlphaOffset       => 'AlphaByteCount',
+        MPImageStart      => 'MPImageLength',
     );
 
     # add TIFF data to html dump
@@ -731,6 +737,8 @@ sub FinishTiffDump($$$)
             my ($key2) = keys %$info2;
             my $offsets = $$info{$key};
             my $byteCounts = $$info2{$key2};
+            # ignore primary MPImage (this is the whole JPEG)
+            next if $tag eq 'MPImageStart' and $offsets eq '0';
             # (long lists may be SCALAR references)
             my @offsets = split ' ', (ref $offsets ? $$offsets : $offsets);
             my @byteCounts = split ' ', (ref $byteCounts ? $$byteCounts : $byteCounts);

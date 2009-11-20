@@ -7,6 +7,8 @@
 #
 # References:   1) http://www.mp3-tech.org/
 #               2) http://www.getid3.org/
+#               3) http://dvd.sourceforge.net/dvdinfo/dvdmpeg.html
+#               4) http://ffmpeg.org/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::MPEG;
@@ -15,7 +17,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.08';
+$VERSION = '1.11';
 
 %Image::ExifTool::MPEG::Audio = (
     GROUPS => { 2 => 'Audio' },
@@ -43,6 +45,7 @@ $VERSION = '1.08';
             Name => 'AudioBitrate',
             Condition => '$self->{MPEG_Vers} == 3 and $self->{MPEG_Layer} == 3',
             Notes => 'version 1, layer 1',
+            PrintConvColumns => 3,
             PrintConv => {
                 0 => 'free',
                 1 => 32000,
@@ -65,6 +68,7 @@ $VERSION = '1.08';
             Name => 'AudioBitrate',
             Condition => '$self->{MPEG_Vers} == 3 and $self->{MPEG_Layer} == 2',
             Notes => 'version 1, layer 2',
+            PrintConvColumns => 3,
             PrintConv => {
                 0 => 'free',
                 1 => 32000,
@@ -87,6 +91,7 @@ $VERSION = '1.08';
             Name => 'AudioBitrate',
             Condition => '$self->{MPEG_Vers} == 3 and $self->{MPEG_Layer} == 1',
             Notes => 'version 1, layer 3',
+            PrintConvColumns => 3,
             PrintConv => {
                 0 => 'free',
                 1 => 32000,
@@ -109,6 +114,7 @@ $VERSION = '1.08';
             Name => 'AudioBitrate',
             Condition => '$self->{MPEG_Vers} != 3 and $self->{MPEG_Layer} == 3',
             Notes => 'version 2 or 2.5, layer 1',
+            PrintConvColumns => 3,
             PrintConv => {
                 0 => 'free',
                 1 => 32000,
@@ -131,6 +137,7 @@ $VERSION = '1.08';
             Name => 'AudioBitrate',
             Condition => '$self->{MPEG_Vers} != 3 and $self->{MPEG_Layer}',
             Notes => 'version 2 or 2.5, layer 2 or 3',
+            PrintConvColumns => 3,
             PrintConv => {
                 0 => 'free',
                 1 => 8000,
@@ -330,6 +337,7 @@ $VERSION = '1.08';
             5 => 'MPEG:SampleRate',
             6 => 'MPEG:MPEGAudioVersion',
         },
+        Priority => -1, # (don't want to replace any other Duration tag)
         ValueConv => q{
             if ($val[4] and defined $val[5] and defined $val[6]) {
                 # calculate from number of VBR audio frames
@@ -408,7 +416,7 @@ sub ParseMPEGAudio($$)
         last;
     }
     # set file type if not done already
-    $exifTool->SetFileType() unless $exifTool->{VALUE}->{FileType};
+    $exifTool->SetFileType();
 
     my $tagTablePtr = GetTagTable('Image::ExifTool::MPEG::Audio');
     ProcessFrameHeader($exifTool, $tagTablePtr, $word);
@@ -480,6 +488,20 @@ sub ProcessMPEGVideo($$)
 # Read MPEG audio and video frame headers
 # Inputs: 0) ExifTool object reference, 1) Reference to audio/video data
 # Returns: 1 on success, 0 if no video header was found
+# To Do: Properly parse MPEG streams:
+#   0xb7 - sequence end
+#   0xb9 - end code
+#   0xba - pack start code
+#   0xbb - system header
+#   0xbc - program map <-- should parse this
+#   0xbd - private stream 1 --> for VOB, this contains sub-streams:
+#           0x20-0x3f - pictures
+#           0x80-0x87 - audio (AC3,DTS,SDDS)
+#           0xa0-0xa7 - audio (LPCM)
+#   0xbe - padding
+#   0xbf - private stream 2
+#   0xc0-0xdf - audio stream
+#   0xe0-0xef - video stream
 sub ParseMPEGAudioVideo($$)
 {
     my ($exifTool, $buffPt) = @_;
@@ -572,6 +594,10 @@ under the same terms as Perl itself.
 =item L<http://www.mp3-tech.org/>
 
 =item L<http://www.getid3.org/>
+
+=item L<http://dvd.sourceforge.net/dvdinfo/dvdmpeg.html>
+
+=item L<http://ffmpeg.org/>
 
 =back
 

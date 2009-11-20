@@ -32,6 +32,12 @@
 #                   3. HOMEDRIVE + HOMEPATH
 #                   4. (the current directory)
 #
+#               Alternatively, the -config option of the exiftool application
+#               may be used to load a specific configuration file (note that
+#               it must be the first option on the command line):
+#
+#                   exiftool -config ExifTool_config ...
+#
 #               This sample file defines the following 13 new tags as well as a
 #               number of Shortcut and Composite tags:
 #
@@ -107,7 +113,7 @@
     'Image::ExifTool::MIE::Meta' =&gt; {
         NewMieTag1 =&gt; {
             Writable =&gt; 'rational64u',
-            Units =&gt; [ qw(cm in) ],
+            Units =&gt; [ 'cm', 'in' ],
         },
         Test =&gt; {
             SubDirectory =&gt; {
@@ -134,7 +140,7 @@
         # used if only one tag is Require'd or Desire'd:
         # 1) the Require/Desire lookup may be replaced with a simple tag name
         # 2) "$val" may be used to represent "$val[0]" in the expression</span>
-        Extension =&gt; {
+        FileExtension =&gt; {
             Require =&gt; 'FileName',
             ValueConv =&gt; '$val=~/\.([^.]*)$/; $1',
         },

@@ -17,11 +17,13 @@
 <td>'APP0'</td>
 <td>JFIF
   <br>JFXX
-  <br>CIFF</td>
-<td class=c>-<br>-<br>-</td>
+  <br>CIFF
+  <br>AVI1</td>
+<td class=c>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='JFIF.html'>JFIF Tags</a>
   <br>--&gt; <a href='JFIF.html#Extension'>JFIF Extension Tags</a>
-  <br>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a></td></tr>
+  <br>--&gt; <a href='CanonRaw.html'>CanonRaw Tags</a>
+  <br>--&gt; <a href='JPEG.html#AVI1'>JPEG AVI1 Tags</a></td></tr>
 <tr class=b>
 <td>'APP1'</td>
 <td>EXIF
@@ -56,9 +58,11 @@
 <td>--&gt; <a href='Ricoh.html#RMETA'>Ricoh RMETA Tags</a></td></tr>
 <tr class=b>
 <td>'APP6'</td>
-<td>EPPIM</td>
-<td class=c>-</td>
-<td>--&gt; <a href='JPEG.html#EPPIM'>JPEG EPPIM Tags</a></td></tr>
+<td>EPPIM
+  <br>NITF</td>
+<td class=c>-<br>-</td>
+<td>--&gt; <a href='JPEG.html#EPPIM'>JPEG EPPIM Tags</a>
+  <br>--&gt; <a href='JPEG.html#NITF'>JPEG NITF Tags</a></td></tr>
 <tr>
 <td>'APP8'</td>
 <td>SPIFF</td>
@@ -124,6 +128,22 @@
   <br>--&gt; <a href='MIE.html'>MIE Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='AVI1'>JPEG AVI1 Tags</a></h2>
+<p>This information may be found in APP0 of JPEG image data from AVI videos.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>InterleavedField</td>
+<td class=c>N</td>
+<td><span class=s>0 = Not Interleaved
+  <br>1 = Odd
+  <br>2 = Even</span></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='EPPIM'>JPEG EPPIM Tags</a></h2>
 <p>APP6 is used in by the Toshiba PDR-M700 to store a TIFF structure containing
 PrintIM information.</p>
@@ -139,10 +159,84 @@ PrintIM information.</p>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='NITF'>JPEG NITF Tags</a></h2>
+<p>Information in APP6 used by the National Imagery Transmission Format.  See
+<a href="http://www.gwg.nga.mil/ntb/baseline/docs/n010697/bwcguide25aug98.pdf">http://www.gwg.nga.mil/ntb/baseline/docs/n010697/bwcguide25aug98.pdf</a> for
+the official specification.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>NITFVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='2 = 0x2'>2</td>
+<td>ImageFormat</td>
+<td class=c>N</td>
+<td><span class=s>&#39;B&#39; = IMode B</span></td></tr>
+<tr>
+<td class=r title='3 = 0x3'>3</td>
+<td>BlocksPerRow</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='5 = 0x5'>5</td>
+<td>BlocksPerColumn</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='7 = 0x7'>7</td>
+<td>ImageColor</td>
+<td class=c>N</td>
+<td><span class=s>0 = Monochrome</span></td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>BitDepth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='9 = 0x9'>9</td>
+<td>ImageClass</td>
+<td class=c>N</td>
+<td><span class=s>0 = General Purpose
+  <br>4 = Tactical Imagery</span></td></tr>
+<tr class=b>
+<td class=r title='10 = 0xa'>10</td>
+<td>JPEGProcess</td>
+<td class=c>N</td>
+<td><span class=s>1 = Baseline sequential DCT, Huffman coding, 8-bit samples
+  <br>4 = Extended sequential DCT, Huffman coding, 12-bit samples</span></td></tr>
+<tr>
+<td class=r title='11 = 0xb'>11</td>
+<td>Quality</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='12 = 0xc'>12</td>
+<td>StreamColor</td>
+<td class=c>N</td>
+<td><span class=s>0 = Monochrome</span></td></tr>
+<tr>
+<td class=r title='13 = 0xd'>13</td>
+<td>StreamBitDepth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='14 = 0xe'>14</td>
+<td>Flags</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='SPIFF'>JPEG SPIFF Tags</a></h2>
 <p>This information is found in APP8 of SPIFF-style JPEG images (the &quot;official&quot;
 yet rarely used JPEG file format standard: Still Picture Interchange File
-Format).</p>
+Format).  See <a href="http://www.jpeg.org/public/spiff.pdf">http://www.jpeg.org/public/spiff.pdf</a> for the official
+specification.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -344,7 +438,7 @@ has an idea about what this means, please let me know.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 12, 2009</i>
+<br><i>Last revised Oct 2, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

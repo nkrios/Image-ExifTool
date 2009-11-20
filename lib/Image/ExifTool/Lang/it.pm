@@ -10,7 +10,7 @@ package Image::ExifTool::Lang::it;
 
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 %Image::ExifTool::Lang::it::Translate = (
    'AEMeteringMode' => {
@@ -29,7 +29,7 @@ $VERSION = '1.02';
       Description => 'Modo AF',
       PrintConv => {
         'Dynamic Area' => 'Area Dinamica',
-        'Dynamic Area, Closest Subject' => 'Area Dinamica più Vicina al Soggetto',
+        'Dynamic Area (closest subject)' => 'Area Dinamica più Vicina al Soggetto',
         'Group Dynamic' => 'Gruppo Dinamico',
         'Single Area' => 'Area Singola',
       },
@@ -1544,7 +1544,7 @@ $VERSION = '1.02';
    'SVGVersion' => 'Versione SVG',
    'SampleFormat' => {
       PrintConv => {
-        'IEEE floating point' => 'Virgola Mobile',
+        'Float' => 'Virgola Mobile',
         'Undefined' => 'Non definito',
       },
     },

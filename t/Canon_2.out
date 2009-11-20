@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
 [File, System, Image] FileName - File Name: Canon1DmkIII.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 8.1 kB
@@ -88,7 +88,7 @@
 [MakerNotes, Canon, Image] 1 - Focal Length: 35 mm
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
 [MakerNotes, Canon, Image] 2 - Base ISO: 3200
-[MakerNotes, Canon, Image] 3 - Measured EV: -1.38
+[MakerNotes, Canon, Image] 3 - Measured EV: 3.62
 [MakerNotes, Canon, Image] 4 - Target Aperture: 5.7
 [MakerNotes, Canon, Image] 5 - Target Exposure Time: 1/128
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
@@ -102,7 +102,7 @@
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
 [MakerNotes, Canon, Image] 21 - F Number: 5.7
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/128
-[MakerNotes, Canon, Image] 23 - Measured EV 2: -1.25
+[MakerNotes, Canon, Image] 23 - Measured EV 2: 3.75
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS High-end
 [MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
@@ -150,6 +150,7 @@
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0
 [MakerNotes, Canon, Image] 5 - Bracket Shot Number: 0
 [MakerNotes, Canon, Image] 7 - Raw Jpg Size: Large
+[MakerNotes, Canon, Image] 8 - Long Exposure Noise Reduction 2: Off
 [MakerNotes, Canon, Image] 9 - WB Bracket Mode: Off
 [MakerNotes, Canon, Image] 12 - WB Bracket Value AB: 0
 [MakerNotes, Canon, Image] 13 - WB Bracket Value GM: 0
@@ -206,7 +207,7 @@
 [MakerNotes, CanonCustom, Camera] 1798 - Dial Direction Tv Av: Normal
 [MakerNotes, CanonCustom, Camera] 1799 - Av Setting Without Lens: Disable
 [MakerNotes, CanonCustom, Camera] 1800 - WB Media Image Size Setting: Rear LCD panel
-[MakerNotes, CanonCustom, Camera] 1801 - Lock Microphone Button: Protect (holding:sound rec.)
+[MakerNotes, CanonCustom, Camera] 1801 - Lock Microphone Button: Protect (hold:record memo)
 [MakerNotes, CanonCustom, Camera] 1802 - Button Function Control Off: Normal (enable)
 [MakerNotes, CanonCustom, Camera] 2059 - Focusing Screen: Ec-CIV
 [MakerNotes, CanonCustom, Camera] 2060 - Timer Length: Disable; 6 s: 6; 16 s: 16; After release: 2

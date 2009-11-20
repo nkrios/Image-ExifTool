@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.98
 [File, System, Image] FileName - File Name: RIFF.wav
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 224 bytes
@@ -18,3 +18,4 @@
 [RIFF, RIFF, Camera] emdl - Model: PENTAX Optio WP
 [RIFF, RIFF, Audio] emnt - Maker Notes: (Binary data 16 bytes)
 [Composite, Composite, Time] DateTimeOriginal - Date/Time Original: 2005:08:08 16:23:35
+[Composite, Composite, Other] Duration2 - Duration: 0.03 s

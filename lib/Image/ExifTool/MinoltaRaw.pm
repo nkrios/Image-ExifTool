@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 sub ProcessMRW($$;$);
 
@@ -266,7 +266,7 @@ sub ProcessMRW($$;$)
     # "\0MRI" for little-endian (MRWInfo in ARW images)
     $data =~ /^\0MR([MI])/ or return 0;
     SetByteOrder($1 . $1);
-    $exifTool->SetFileType() unless $exifTool->{VALUE}->{FileType};
+    $exifTool->SetFileType();
     $tagTablePtr = GetTagTable('Image::ExifTool::MinoltaRaw::Main');
     if ($outfile) {
         $exifTool->InitWriteDirs('TIFF'); # use same write dirs as TIFF

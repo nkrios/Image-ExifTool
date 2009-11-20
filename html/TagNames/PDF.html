@@ -15,9 +15,15 @@ number of available PDF tags.</p>
 <p>When writing PDF files, ExifTool uses an increment update.  This has the
 advantages of being fast and reversible.  The original PDF can be easily
 recovered by deleting the <code>PDF-update</code> pseudo-group (with
-<code>-PDF-update:all=</code> on the command line).  A disadvantage of the incremental
-update is that a linearized PDF file is no longer linearized after the
-update, so it must be subsequently re-linearized if this is required.
+<code>-PDF-update:all=</code> on the command line).  But there are two main
+disadvantages to this technique:</p>
+
+<p>1) A linearized PDF file is no longer linearized after the update, so it
+must be subsequently re-linearized if this is required.</p>
+
+<p>2) All metadata edits are reversible.  While this would normally be
+considered an advantage, it is a potential security problem because old
+information is never actually deleted from the file.
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -352,7 +358,7 @@ PostScript documents in the AIPrivateData stream)</span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 27, 2009</i>
+<br><i>Last revised Oct 27, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -8,10 +8,11 @@
 <body>
 <h2 class=top>Sony Tags</h2>
 <p>
-The maker notes in images from current Sony camera models contain a wealth
-of information, but very little is known about these tags.  Use the ExifTool
-Unknown (-u) or Verbose (-v) options to see information about the unknown
-tags.
+The maker notes in images from most recent Sony camera models contain a
+wealth of information, but for some models very little has been decoded. 
+Use the ExifTool Unknown (-u) or Verbose (-v) options to see information
+about the unknown tags.  Also see the Minolta tags which are used by some
+Sony models.
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -53,23 +54,25 @@ tags.
 <tr>
 <td title='0x0114 = 276'>0x0114</td>
 <td>CameraSettings
-  <br>CameraSettings2</td>
-<td class=c>-<br>-</td>
+  <br>CameraSettings2
+  <br>CameraSettingsUnknown</td>
+<td class=c>-<br>-<br>-</td>
 <td>--&gt; <a href='Sony.html#CameraSettings'>Sony CameraSettings Tags</a>
-  <br>--&gt; <a href='Sony.html#CameraSettings2'>Sony CameraSettings2 Tags</a></td></tr>
+  <br>--&gt; <a href='Sony.html#CameraSettings2'>Sony CameraSettings2 Tags</a>
+  <br>--&gt; <a href='Sony.html#CameraSettingsUnknown'>Sony CameraSettingsUnknown Tags</a></td></tr>
 <tr class=b>
 <td title='0x0115 = 277'>0x0115</td>
 <td>WhiteBalance</td>
-<td class=c>N</td>
-<td><span class=s>0 = Auto
-  <br>1 = Color Temperature/Color Filter
-  <br>16 = Daylight
-  <br>32 = Cloudy
-  <br>48 = Shade
-  <br>64 = Tungsten
-  <br>80 = Flash
-  <br>96 = Fluorescent
-  <br>112 = Custom</span></td></tr>
+<td class=c>int32u</td>
+<td><span class=s>0x0 = Auto
+  <br>0x1 = Color Temperature/Color Filter
+  <br>0x10 = Daylight
+  <br>0x20 = Cloudy
+  <br>0x30 = Shade
+  <br>0x40 = Tungsten
+  <br>0x50 = Flash
+  <br>0x60 = Fluorescent
+  <br>0x70 = Custom</span></td></tr>
 <tr>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
@@ -81,26 +84,59 @@ tags.
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td title='0x200a = 8202'>0x200a</td>
+<td>AutoHDR</td>
+<td class=c>int32u</td>
+<td><span class=s>0x0 = Off
+  <br>0x10001 = On</span></td></tr>
+<tr class=b>
 <td title='0x3000 = 12288'>0x3000</td>
 <td>ShotInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Sony.html#ShotInfo'>Sony ShotInfo Tags</a></td></tr>
+<tr>
+<td title='0xb000 = 45056'>0xb000</td>
+<td>FileFormat</td>
+<td class=c>int8u[4]</td>
+<td><span class=s>&#39;0 0 0 2&#39; = JPEG
+  <br>&#39;1 0 0 0&#39; = SR2
+  <br>&#39;2 0 0 0&#39; = ARW 1.0
+  <br>&#39;3 0 0 0&#39; = ARW 2.0
+  <br>&#39;3 1 0 0&#39; = ARW 2.1</span></td></tr>
 <tr class=b>
+<td title='0xb001 = 45057'>0xb001</td>
+<td>SonyModelID</td>
+<td class=c>int16u</td>
+<td><table class=cols><tr>
+  <td>2 = DSC-R1
+  <br>256 = DSLR-A100
+  <br>257 = DSLR-A900
+  <br>258 = DSLR-A700
+  <br>259 = DSLR-A200
+  <br>260 = DSLR-A350</td><td>&nbsp;&nbsp;</td>
+  <td>261 = DSLR-A300
+  <br>263 = DSLR-A380
+  <br>264 = DSLR-A330
+  <br>265 = DSLR-A230
+  <br>269 = DSLR-A850
+  <br>273 = DSLR-A550</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr>
 <td title='0xb020 = 45088'>0xb020</td>
 <td>ColorReproduction</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0xb021 = 45089'>0xb021</td>
 <td>ColorTemperature</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0xb022 = 45090'>0xb022</td>
 <td>ColorCompensationFilter</td>
 <td class=c>int32u</td>
 <td><span class=s><span class=n>(negative is green, positive is magenta)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xb023 = 45091'>0xb023</td>
 <td>SceneMode</td>
 <td class=c>int32u</td>
@@ -116,32 +152,33 @@ tags.
   <br>9 = Super Macro
   <br>16 = Auto
   <br>17 = Night View/Portrait</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0xb024 = 45092'>0xb024</td>
 <td>ZoneMatching</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = ISO Setting Used
   <br>1 = High Key
   <br>2 = Low Key</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xb025 = 45093'>0xb025</td>
 <td>DynamicRangeOptimizer</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = Off
   <br>1 = Standard
   <br>2 = Advanced Auto
+  <br>3 = Auto
   <br>8 = Advanced Lv1
   <br>9 = Advanced Lv2
   <br>10 = Advanced Lv3
   <br>11 = Advanced Lv4
   <br>12 = Advanced Lv5</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0xb026 = 45094'>0xb026</td>
 <td>ImageStabilization</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xb027 = 45095'>0xb027</td>
 <td>LensType</td>
 <td class=c>int32u</td>
@@ -199,7 +236,8 @@ original version of the lens has the same LensType)</span>
   <br>36 = Minolta AF 28-100mm F3.5-5.6 (D)
   <br>38 = Minolta AF 17-35mm F2.8-4 (D)
   <br>39 = Minolta AF 28-75mm F2.8 (D)
-  <br>40 = Minolta/Sony AF DT 18-70mm F3.5-5.6 (D)
+  <br>40 = Minolta/Sony AF DT 18-70mm F3.5-5.6 (D) or 18-200m F3.5-6.3
+  <br>40.1 = Sony AF DT 18-200mm F3.5-6.3
   <br>41 = Minolta/Sony AF DT 11-18mm F4.5-5.6 (D) or Tamron Lens
   <br>41.1 = Tamron SP AF 11-18mm F4.5-5.6 Di II LD Aspherical IF
   <br>42 = Minolta/Sony AF DT 18-200mm F3.5-6.3 (D)
@@ -223,7 +261,8 @@ original version of the lens has the same LensType)</span>
   <br>128.3 = Tamron 80-300mm F3.5-6.3
   <br>128.4 = Tamron AF 28-200mm F3.8-5.6 XR Di Aspherical [IF] MACRO
   <br>128.5 = Tamron SP AF 17-35mm F2.8-4 Di LD Aspherical IF
-  <br>128.6 = Sigma AF 50-150mm f/2.8 EX DC APO HSM II
+  <br>128.6 = Sigma AF 50-150mm F2.8 EX DC APO HSM II
+  <br>128.7 = Sigma 10-20mm F3.5 EX DC HSM
   <br>129 = Tamron Lens (129)
   <br>129.1 = Tamron 200-400mm F5.6
   <br>129.2 = Tamron 70-300mm F4-5.6 LD
@@ -275,18 +314,19 @@ original version of the lens has the same LensType)</span>
   <br>2563.1 = Sigma AF 50-500mm F4-6.3 EX DG APO
   <br>2563.2 = Sigma AF 170-500mm F5-6.3 APO Aspherical
   <br>2563.3 = Sigma AF 500mm F4.5 EX DG APO
-  <br>2564 = Minolta AF 50mm F2.8 Macro
+  <br>2564 = Minolta AF 50mm F2.8 Macro or Sigma Lens
+  <br>2564.1 = Sigma 50mm F2.8 EX Macro
   <br>2565 = Minolta AF 600mm F4
   <br>2566 = Minolta AF 24mm F2.8
   <br>2572 = Minolta/Sony AF 500mm F8 Reflex
   <br>2578 = Minolta/Sony AF 16mm F2.8 Fisheye or Sigma Lens
-  <br>2578.1 = Sigma 8mm F4 Fisheye
+  <br>2578.1 = Sigma 8mm F4 EX [DG] Fisheye
   <br>2578.2 = Sigma 14mm F3.5
   <br>2578.3 = Sigma 15mm F2.8 Fisheye
-  <br>2579 = Minolta AF 20mm F2.8
+  <br>2579 = Minolta/Sony AF 20mm F2.8
   <br>2581 = Minolta AF 100mm F2.8 Macro [New] or Sigma or Tamron Lens
   <br>2581.1 = Sigma AF 90mm F2.8 Macro
-  <br>2581.2 = Sigma AF 105mm F2.8 EX DG Macro
+  <br>2581.2 = Sigma AF 105mm F2.8 EX [DG] Macro
   <br>2581.3 = Sigma 180mm F5.6 Macro
   <br>2581.4 = Tamron 90mm F2.8 Macro
   <br>2585 = Minolta AF 35-105mm F3.5-4.5 New or Tamron Lens
@@ -340,6 +380,10 @@ original version of the lens has the same LensType)</span>
   <br>6553.1 = Arax MC 35mm F2.8 Tilt+Shift
   <br>6553.2 = Arax MC 80mm F2.8 Tilt+Shift
   <br>6553.3 = Zenitar MF 16mm F2.8 Fisheye M42
+  <br>6553.4 = Samyang 500mm Mirror F8.0
+  <br>6553.5 = Pentacon Auto 135mm F2.8
+  <br>6553.6 = Pentacon Auto 29mm F2.8
+  <br>6553.7 = Helios 44-2 58mm F2.0
   <br>25501 = Minolta AF 50mm F1.7
   <br>25511 = Minolta AF 35-70mm F4 or Other Lens
   <br>25511.1 = Sigma UC AF 28-70mm F3.5-4.5
@@ -376,18 +420,19 @@ original version of the lens has the same LensType)</span>
   <br>25631.1 = Sigma AF 50-500mm F4-6.3 EX DG APO
   <br>25631.2 = Sigma AF 170-500mm F5-6.3 APO Aspherical
   <br>25631.3 = Sigma AF 500mm F4.5 EX DG APO
-  <br>25641 = Minolta AF 50mm F2.8 Macro
+  <br>25641 = Minolta AF 50mm F2.8 Macro or Sigma Lens
+  <br>25641.1 = Sigma 50mm F2.8 EX Macro
   <br>25651 = Minolta AF 600mm F4
   <br>25661 = Minolta AF 24mm F2.8
   <br>25721 = Minolta/Sony AF 500mm F8 Reflex
   <br>25781 = Minolta/Sony AF 16mm F2.8 Fisheye or Sigma Lens
-  <br>25781.1 = Sigma 8mm F4 Fisheye
+  <br>25781.1 = Sigma 8mm F4 EX [DG] Fisheye
   <br>25781.2 = Sigma 14mm F3.5
   <br>25781.3 = Sigma 15mm F2.8 Fisheye
-  <br>25791 = Minolta AF 20mm F2.8
+  <br>25791 = Minolta/Sony AF 20mm F2.8
   <br>25811 = Minolta AF 100mm F2.8 Macro [New] or Sigma or Tamron Lens
   <br>25811.1 = Sigma AF 90mm F2.8 Macro
-  <br>25811.2 = Sigma AF 105mm F2.8 EX DG Macro
+  <br>25811.2 = Sigma AF 105mm F2.8 EX [DG] Macro
   <br>25811.3 = Sigma 180mm F5.6 Macro
   <br>25811.4 = Tamron 90mm F2.8 Macro
   <br>25851 = Beroflex 35-135mm F3.5-4.5
@@ -440,13 +485,17 @@ original version of the lens has the same LensType)</span>
   <br>65535 = T-Mount or Other Lens or no lens
   <br>65535.1 = Arax MC 35mm F2.8 Tilt+Shift
   <br>65535.2 = Arax MC 80mm F2.8 Tilt+Shift
-  <br>65535.3 = Zenitar MF 16mm F2.8 Fisheye M42</span></td></tr>
-<tr class=b>
+  <br>65535.3 = Zenitar MF 16mm F2.8 Fisheye M42
+  <br>65535.4 = Samyang 500mm Mirror F8.0
+  <br>65535.5 = Pentacon Auto 135mm F2.8
+  <br>65535.6 = Pentacon Auto 29mm F2.8
+  <br>65535.7 = Helios 44-2 58mm F2.0</span></td></tr>
+<tr>
 <td title='0xb028 = 45096'>0xb028</td>
 <td>MinoltaMakerNote</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Minolta.html'>Minolta Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0xb029 = 45097'>0xb029</td>
 <td>ColorMode</td>
 <td class=c>int32u</td>
@@ -465,30 +514,44 @@ original version of the lens has the same LensType)</span>
   <br>103 = Light
   <br>104 = Night View
   <br>105 = Autumn Leaves</span></td></tr>
+<tr>
+<td title='0xb02b = 45099'>0xb02b</td>
+<td>FullImageSize</td>
+<td class=c>int32u[2]</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
+<td title='0xb02c = 45100'>0xb02c</td>
+<td>PreviewImageSize</td>
+<td class=c>int32u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td title='0xb040 = 45120'>0xb040</td>
 <td>Macro</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xb041 = 45121'>0xb041</td>
 <td>ExposureMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Auto
+  <br>1 = Portrait
   <br>5 = Landscape
   <br>6 = Program
   <br>7 = Aperture Priority
   <br>8 = Shutter Priority
   <br>9 = Night Scene
-  <br>15 = Manual</span></td></tr>
-<tr class=b>
+  <br>15 = Manual
+  <br>34 = Panorama
+  <br>35 = Handheld Twilight
+  <br>36 = Anti Motion Blur</span></td></tr>
+<tr>
 <td title='0xb047 = 45127'>0xb047</td>
 <td>Quality</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Normal
   <br>1 = Fine</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xb04b = 45131'>0xb04b</td>
 <td>Anti-Blur</td>
 <td class=c>int16u</td>
@@ -496,16 +559,38 @@ original version of the lens has the same LensType)</span>
   <br>1 = On (Continuous)
   <br>2 = On (Shooting)
   <br>65535 = n/a</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0xb04e = 45134'>0xb04e</td>
 <td>LongExposureNoiseReduction</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
+<tr class=b>
+<td title='0xb04f = 45135'>0xb04f</td>
+<td>DynamicRangeOptimizer</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = Standard
+  <br>2 = Plus</span></td></tr>
+<tr>
+<td title='0xb052 = 45138'>0xb052</td>
+<td>IntelligentAuto</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr class=b>
+<td title='0xb054 = 45140'>0xb054</td>
+<td>WhiteBalance</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Auto
+  <br>4 = Manual
+  <br>5 = Daylight
+  <br>14 = Incandescent</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Sony CameraSettings Tags</a></h2>
-<p>Camera settings for the A200, A300, A350, A700 and A900.</p>
+<p>Camera settings for the A200, A230, A300, A350, A700, A850 and A900.  Some
+tags are only valid for certain models.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -539,7 +624,7 @@ original version of the lens has the same LensType)</span>
   <br>3 = AF-A</span></td></tr>
 <tr class=b>
 <td class=r title='17 = 0x11'>17</td>
-<td>AFArea</td>
+<td>AFAreaMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Wide
   <br>1 = Local
@@ -578,7 +663,8 @@ original version of the lens has the same LensType)</span>
 <td><span class=s>0 = Off
   <br>1 = Standard
   <br>2 = Advanced Auto
-  <br>3 = Advanced Level</span></td></tr>
+  <br>3 = Advanced Level
+  <br>4097 = Auto</span></td></tr>
 <tr>
 <td class=r title='25 = 0x19'>25</td>
 <td>DynamicRangeOptimizerLevel</td>
@@ -752,7 +838,7 @@ original version of the lens has the same LensType)</span>
   <br>3 = AF-A</span></td></tr>
 <tr class=b>
 <td class=r title='17 = 0x11'>17</td>
-<td>AFArea</td>
+<td>AFAreaMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Wide
   <br>1 = Local
@@ -857,6 +943,15 @@ original version of the lens has the same LensType)</span>
   <br>3 = Small</span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='CameraSettingsUnknown'>Sony CameraSettingsUnknown Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr><td colspan=4 class=c><i>[no tags known]</i></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='ShotInfo'>Sony ShotInfo Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -874,7 +969,8 @@ original version of the lens has the same LensType)</span>
 <p>The maker notes in SRF (Sony Raw Format) images contain 7 IFD&#39;s (with family
 1 group names SRF0 through SRF6).  SRF0 through SRF5 use these Sony tags,
 while SRF6 uses standard EXIF tags.  All information other than SRF0 is
-encrypted, but thanks to Dave Coffin the decryption algorithm is known.</p>
+encrypted, but thanks to Dave Coffin the decryption algorithm is known. SRF
+images are written by the Sony DSC-F828 and DSC-V3.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -894,7 +990,7 @@ encrypted, but thanks to Dave Coffin the decryption algorithm is known.</p>
 
 <h2><a name='SR2Private'>Sony SR2Private Tags</a></h2>
 <p>The SR2 format uses the DNGPrivateData tag to reference a private IFD
-containing these tags.</p>
+containing these tags.  SR2 images are written by the Sony DSC-R1.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -1001,7 +1097,7 @@ containing these tags.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Aug 12, 2009</i>
+<br><i>Last revised Nov 11, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -10,7 +10,7 @@ package Image::ExifTool::Lang::de;
 
 use vars qw($VERSION);
 
-$VERSION = '1.07';
+$VERSION = '1.10';
 
 %Image::ExifTool::Lang::de::Translate = (
    'AEAperture' => 'AE-Blende',
@@ -154,10 +154,10 @@ $VERSION = '1.07';
    'AFAreaMode' => {
       Description => 'Messfeldsteuerung',
       PrintConv => {
-        'Auto-area AF' => 'Autom. Messfeldgr.',
+        'Auto-area' => 'Autom. Messfeldgr.',
         'Dynamic Area' => 'Dynamisch',
         'Dynamic Area (wide)' => 'Dynamische Messfeldsteuerung (groß)',
-        'Dynamic Area, Closest Subject' => 'Dynamic Messfeldgruppensteuerung, Priorität der kürzesten Aufnahmedistanz',
+        'Dynamic Area (closest subject)' => 'Dynamic Messfeldgruppensteuerung (priorität der kürzesten Aufnahmedistanz)',
         'Group Dynamic' => 'Dynamische Messfeldgruppensteuerung',
         'Single Area' => 'Einzelfeld',
         'Single Area (wide)' => 'Einzelfeldmessung (groß)',
@@ -191,13 +191,6 @@ $VERSION = '1.07';
         'Does not emit' => 'Deaktiv',
         'Emits' => 'Aktiv',
         'Only ext. flash emits' => 'Nur bei ext. Blitz aktiv',
-      },
-    },
-   'AFAssistIlluminator' => {
-      Description => 'Integriertes AF-Hilfslicht',
-      PrintConv => {
-        'Off' => 'Aus',
-        'On' => 'Ein',
       },
     },
    'AFDefocus' => 'AF-Defocus',
@@ -1046,9 +1039,11 @@ $VERSION = '1.07';
         'Night Portrait' => 'Nachtporträt',
         'Night Scene' => 'Nachtszene',
         'Night View' => 'Abendszene',
+        'Night View/Portrait' => 'Abendszene',
         'Off' => 'Aus',
         'Portrait' => 'Porträt',
         'Solarization' => 'Solarisation',
+        'Sunset' => 'Sonnenuntergang',
         'Vivid' => 'Lebhafte Farbe',
         'Vivid color' => 'Lebhafte Farbe',
       },
@@ -1257,6 +1252,7 @@ $VERSION = '1.07';
    'Country-PrimaryLocationName' => 'Land',
    'CreateDate' => 'Datum der Digitaldatengenerierung',
    'CreationDate' => 'Aufnahmedatum',
+   'CreativeStyle' => 'Kreativmodus',
    'Creator' => 'Ersteller',
    'CreatorAddress' => 'Ersteller - Adresse',
    'CreatorCity' => 'Ersteller - Ort',
@@ -4004,11 +4000,11 @@ $VERSION = '1.07';
     },
    'SampleFormat' => {
       PrintConv => {
-        'Complex integer' => 'Komplexer Integer',
-        'IEEE floating point' => 'Fließkommawert',
-        'Two\'s complement signed integer' => 'Vorzeichenbehafteter Integer',
+        'Complex int' => 'Komplexer Integer',
+        'Float' => 'Fließkommawert',
+        'Signed' => 'Vorzeichenbehafteter Integer',
         'Undefined' => 'Nicht definiert',
-        'Unsigned integer' => 'Vorzeichenloser Integer',
+        'Unsigned' => 'Vorzeichenloser Integer',
       },
     },
    'SamplesPerPixel' => 'Anzahl der Komponenten',
@@ -4114,7 +4110,9 @@ $VERSION = '1.07';
    'SelectableAFPoint' => {
       Description => 'Wählbares AF-Feld',
       PrintConv => {
+        '11 points' => '11 Felder',
         '19 points' => '19 Felder',
+        '45 points' => '45 Felder',
         'Inner 9 points' => 'Innere 9 Felder',
         'Outer 9 points' => 'Äußere 9 Felder',
       },

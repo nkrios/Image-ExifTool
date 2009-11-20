@@ -22,7 +22,7 @@ require Exporter;
 use Image::ExifTool qw(ImageInfo);
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.13';
+$VERSION = '1.14';
 @ISA = qw(Exporter);
 @EXPORT = qw(check writeCheck testCompare binaryCompare testVerbose);
 
@@ -79,19 +79,6 @@ sub testCompare($$$)
                 $line2 = <FILE2>;
                 if (defined $line2) {
                     next if $line1 eq $line2;
-                    # allow CurrentIPTCDigest to be missing if Digest::MD5 isn't installed
-                    if ($line1 =~ /Current IPTC Digest/ and not
-                        $line2 =~ /Current IPTC Digest/ and not
-                        eval 'require Digest::MD5')
-                    {
-                        for (;;) {
-                            $line1 = <FILE1>;
-                            last unless defined $line1;
-                            last unless $line1 =~ /Current IPTC Digest/;
-                        }
-                        last unless defined $line1;
-                        next if $line1 eq $line2;
-                    }
                     next if closeEnough($line1, $line2);
                 }
                 $success = 0;
@@ -142,6 +129,11 @@ sub closeEnough($$)
     # allow different FileModifyDate's
     return 1 if $line1 =~ /File\s?Modif.*Date/ and
                 $line2 =~ /File\s?Modif.*Date/;
+
+    # allow CurrentIPTCDigest to be zero if Digest::MD5 isn't installed
+    return 1 if $line1 =~ /Current IPTC Digest/ and
+                $line2 =~ /Current IPTC Digest: 0{32}/ and
+                not eval 'require Digest::MD5';
 
     # analyze every token in the line, and allow rounding
     # or format differences in floating point numbers

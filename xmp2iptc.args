@@ -10,6 +10,7 @@
 #                            IntellectualGenre and SubjectCode
 #               2008/09/30 - PH Added writing of Photoshop:IPTCDigest
 #               2009/01/20 - PH Updated to conform with MWG spec
+#               2009/10/21 - PH Write IPTC:DigitalCreationDate/Time tags
 #
 # References:   http://www.iptc.org/IPTC4XMP/
 #               http://www.iptc.org/IIM/
@@ -41,6 +42,8 @@
 -IPTC:Urgency < XMP-photoshop:Urgency
 -IPTC:Country-PrimaryLocationCode < XMP-iptcCore:CountryCode
 -IPTC:Sub-location < XMP-iptcCore:Location
+-IPTC:DigitalCreationDate < XMP-xmp:CreateDate
+-IPTC:DigitalCreationTime < XMP-xmp:CreateDate
 # these tags are not free-form text, and may need special handling:
 #-IPTC:ObjectAttributeReference < XMP-iptcCore:IntellectualGenre
 #-IPTC:SubjectReference < XMP-iptcCore:SubjectCode

@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.17';
+$VERSION = '1.19';
 
 sub ProcessICC($$);
 sub ProcessICC_Profile($$$);
@@ -79,7 +79,10 @@ my %profileClass = (
         Groups => { 2 => 'Time' },
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    targ => 'CharTarget',
+    targ => {
+        Name => 'CharTarget',
+        ValueConv => 'length $val > 128 ? \$val : $val',
+    },
     chad => 'ChromaticAdaptation',
     chrm => {
         Name => 'Chromaticity',
@@ -160,7 +163,7 @@ my %profileClass = (
     scrn => 'Screening',
    'bfd '=> {
         Name => 'UCRBG',
-        Description => 'Under Color Removal & Black Gen.',
+        Description => 'Under Color Removal and Black Gen.',
     },
     tech => {
         Name => 'Technology',
@@ -677,6 +680,8 @@ sub ProcessICC_Profile($$$)
     my $dirLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
     my $raf;
+
+    return 0 if $dirLen < 4;
 
     # extract binary ICC_Profile data block if binary mode or requested
     if ($exifTool->{OPTIONS}->{Binary} or $exifTool->{REQ_TAG_LOOKUP}->{icc_profile} and

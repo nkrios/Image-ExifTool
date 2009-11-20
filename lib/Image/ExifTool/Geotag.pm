@@ -4,10 +4,12 @@
 # Description:  Geotagging utility routines
 #
 # Revisions:    2009/04/01 - P. Harvey Created
+#               2009/09/27 - PH Added Geosync feature
 #
 # References:   1) http://www.topografix.com/GPX/1/1/
 #               2) http://www.gpsinformation.org/dale/nmea.htm#GSA
 #               3) http://code.google.com/apis/kml/documentation/kmlreference.html
+#               4) http://www.fai.org/gliding/system/files/tech_spec_gnss.pdf
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Geotag;
@@ -16,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool;
 
-$VERSION = '1.07';
+$VERSION = '1.12';
 
 sub SetGeoValues($$;$);
 
@@ -116,6 +118,7 @@ sub LoadTrackLog($$;$)
     my $skipped = 0;
     my $format = '';
     my $fix = { };
+    my $dateFlarm = 0;
     for (;;) {
         $raf->ReadLine($_) or last;
         # determine file format
@@ -125,6 +128,14 @@ sub LoadTrackLog($$;$)
             } elsif (/^\$(PMGNTRK|GP(RMC|GGA|GLL|GSA)),/) {
                 $format = 'NMEA';
                 $nmeaStart = $2 || $1;    # save type of first sentence
+            } elsif (/^A(FLA|XSY|FIL)/) {
+                $format = 'IGC';
+                $nmeaStart = 'B' ;
+                $raf->ReadLine($_) or last;
+                /^HFDTE(\d{2})(\d{2})(\d{2})/ or next;
+                my $year = $3 + ($3 >= 70 ? 1900 : 2000);
+                $dateFlarm = Time::Local::timegm(0,0,0,$1,$2-1,$year-1900);
+                $lastSecs = 0;
             } else {
                 # search only first 50 lines of file for a valid fix
                 last if ++$skipped > 50;
@@ -136,6 +147,7 @@ sub LoadTrackLog($$;$)
 #
         if ($format eq 'XML') {
             my ($arg, $tok, $td);
+            s/\s*=\s*(['"])\s*/=$1/g;  # remove unnecessary white space in attributes
             foreach $arg (split) {
                 # parse attributes (ie. GPX 'lat' and 'lon')
                 # (note: ignore namespace prefixes if they exist)
@@ -165,7 +177,6 @@ sub LoadTrackLog($$;$)
                         if ($tag) {
                             if ($tag eq 'coords') {
                                 # read KML "Point" coordinates
-                                my @coords = split ',', $1;
                                 @$fix{'lat','lon','alt'} = split ',', $1;
                             } else {
                                 $$fix{$tag} = $1;
@@ -199,20 +210,36 @@ sub LoadTrackLog($$;$)
                 /[\s>](\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2}:\d{2}(\.\d+)?)/;
             next;
         }
+        my (%fix, $secs, $date, $nmea);
+        if ($format eq 'NMEA') {
+            # ignore unrecognized NMEA sentences
+            next unless /^\$(PMGNTRK|GP(RMC|GGA|GLL|GSA)),/;
+            $nmea = $2 || $1;
+        }
 #
-# NMEA format:
+# IGC (flarm) (ref 4)
 #
-        # ignore unrecognized NMEA sentences
-        next unless /^\$(PMGNTRK|GP(RMC|GGA|GLL|GSA)),/;
-        my $nmea = $2 || $1;
-        my (%fix, $secs, $date);
+        if ( $format eq 'IGC' ) {
+            # B0939564531208N00557021EA007670089100207
+            # BHHMMSSDDMMmmmNDDDMMmmmEAaaaaaAAAAAxxyy
+            #    HH     MM     SS     DD     MM     mmm          DDD    MM     mmm                aaaaa AAAAA
+            #    1      2      3      4      5      6      7     8      9      10     11    12    13    14
+            /^B(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{3})([NS])(\d{3})(\d{2})(\d{3})([EW])([AV])(\d{5})(\d{5})/ or next;
+            $fix{lat} = ($4 + ($5 + $6/1000)/60) * ($7  eq 'N' ? 1 : -1);
+            $fix{lon} = ($8 + ($9 +$10/1000)/60) * ($11 eq 'E' ? 1 : -1);
+            $fix{alt} = $12 eq 'A' ? $14 : undef;
+            $secs = (($1 * 60) + $2) * 60 + $3;
+            # wrap to next day if necessary
+            $dateFlarm += $secPerDay if $secs < $lastSecs;
+            $date = $dateFlarm;
+            $nmea = 'B';
 #
 # Magellan eXplorist NMEA-like PMGNTRK sentence (optionally contains date)
 #
-        if ($nmea eq 'PMGNTRK') {
+        } elsif ($nmea eq 'PMGNTRK') {
             # $PMGNTRK,4415.026,N,07631.091,W,00092,M,185031.06,A,,020409*65
             # $PMGNTRK,ddmm.mmm,N/S,dddmm.mmm,E/W,alt,F/M,hhmmss.ss,A/V,trkname,DDMMYY*cs
-            /^\$PMGNTRK,(\d{2})(\d+\.\d+),([NS]),(\d{3})(\d+\.\d+),([EW]),(-?\d+\.?\d*),([MF]),(\d{2})(\d{2})(\d+)(\.\d+)?,A,(?:[^,]*,(\d{2})(\d{2})(\d+))?/ or next;
+            /^\$PMGNTRK,(\d+)(\d{2}\.\d+),([NS]),(\d+)(\d{2}\.\d+),([EW]),(-?\d+\.?\d*),([MF]),(\d{2})(\d{2})(\d+)(\.\d+)?,A,(?:[^,]*,(\d{2})(\d{2})(\d+))?/ or next;
             $fix{lat} = ($1 + $2/60) * ($3 eq 'N' ? 1 : -1);
             $fix{lon} = ($4 + $5/60) * ($6 eq 'E' ? 1 : -1);
             $fix{alt} = $8 eq 'M' ? $7 : $7 * 12 * 0.0254;
@@ -229,7 +256,7 @@ sub LoadTrackLog($$;$)
         } elsif ($nmea eq 'RMC') {
             #  $GPRMC,092204.999,A,4250.5589,S,14718.5084,E,0.00,89.68,211200,,*25
             #  $GPRMC,hhmmss.sss,A/V,ddmm.mmmm,N/S,ddmmm.mmmm,E/W,spd(knots),dir(deg),DDMMYY,,*cs
-            /^\$GPRMC,(\d{2})(\d{2})(\d+)(\.\d+)?,A,(\d{2})(\d+\.\d+),([NS]),(\d{3})(\d+\.\d+),([EW]),[^,]*,[^,]*,(\d{2})(\d{2})(\d+)/ or next;
+            /^\$GPRMC,(\d{2})(\d{2})(\d+)(\.\d+)?,A,(\d+)(\d{2}\.\d+),([NS]),(\d+)(\d{2}\.\d+),([EW]),[^,]*,[^,]*,(\d{2})(\d{2})(\d+)/ or next;
             $fix{lat} = ($5 + $6/60) * ($7 eq 'N' ? 1 : -1);
             $fix{lon} = ($8 + $9/60) * ($10 eq 'E' ? 1 : -1);
             my $year = $13 + ($13 >= 70 ? 1900 : 2000);
@@ -242,7 +269,7 @@ sub LoadTrackLog($$;$)
         } elsif ($nmea eq 'GGA') {
             #  $GPGGA,092204.999,4250.5589,S,14718.5084,E,1,04,24.4,19.7,M,,,,0000*1F
             #  $GPGGA,hhmmss.sss,ddmm.mmmm,N/S,dddmm.mmmm,E/W,0=invalid,sats,hdop,alt,M,...
-            /^\$GPGGA,(\d{2})(\d{2})(\d+)(\.\d+)?,(\d{2})(\d+\.\d+),([NS]),(\d{3})(\d+\.\d+),([EW]),[1-6],(\d+)?,(\.\d+|\d+\.?\d*)?,(-?\d+\.?\d*)?,M?,/ or next;
+            /^\$GPGGA,(\d{2})(\d{2})(\d+)(\.\d+)?,(\d+)(\d{2}\.\d+),([NS]),(\d+)(\d{2}\.\d+),([EW]),[1-6],(\d+)?,(\.\d+|\d+\.?\d*)?,(-?\d+\.?\d*)?,M?,/ or next;
             $fix{lat} = ($5 + $6/60) * ($7 eq 'N' ? 1 : -1);
             $fix{lon} = ($8 + $9/60) * ($10 eq 'E' ? 1 : -1);
             $fix{nsats} = $11;
@@ -257,7 +284,7 @@ sub LoadTrackLog($$;$)
         } elsif ($nmea eq 'GLL') {
             #  $GPGLL,4250.5589,S,14718.5084,E,092204.999,A*2D
             #  $GPGLL,ddmm.mmmm,N/S,dddmm.mmmm,E/W,hhmmss.sss,A/V*cs
-            /^\$GPGLL,(\d{2})(\d+\.\d+),([NS]),(\d{3})(\d+\.\d+),([EW]),(\d{2})(\d{2})(\d+)(\.\d+),A/ or next;
+            /^\$GPGLL,(\d+)(\d{2}\.\d+),([NS]),(\d+)(\d{2}\.\d+),([EW]),(\d{2})(\d{2})(\d+)(\.\d+),A/ or next;
             $fix{lat} = ($1 + $2/60) * ($3 eq 'N' ? 1 : -1);
             $fix{lon} = ($4 + $5/60) * ($6 eq 'E' ? 1 : -1);
             $secs = (($7 * 60) + $8) * 60 + $9;
@@ -450,7 +477,7 @@ sub SetGeoValues($$;$)
     my ($fix, $time, $fsec, $noDate, $secondTry);
 
     # remove date if none of our fixes had date information
-    $val =~ s/^\S+\s+// if $geotag and not $$geotag{IsDate};
+    $val =~ s/^\S+\s+// if $val and $geotag and not $$geotag{IsDate};
 
     # maximum time (sec) from nearest GPS fix when position is still considered valid
     my $geoMaxIntSecs = $exifTool->Options('GeoMaxIntSecs');
@@ -507,18 +534,22 @@ sub SetGeoValues($$;$)
             # assume local timezone
             $time = Time::Local::timelocal($sec,$min,$hr,$day,$mon-1,$year-1900);
         }
+        # add fractional seconds
+        $time += $fs if $fs and $fs ne '.';
+
+        # apply time synchronization if available
+        my $sync = $exifTool->GetNewValues('Geosync');
+        $time += $sync if $sync;
+
         # bring UTC time back to Jan. 1 if no date is given
         $time %= $secPerDay if $noDate;
-        # handle fractional seconds
-        if ($fs) {
-            $fsec = $fs;    # save fractional seconds string
-            $time += $fs;
-        } else {
-            $fsec = '';
-        }
+
+        # save fractional seconds string
+        $fsec = ($time =~ /(\.\d+)$/) ? $1 : '';
+
         if ($exifTool->Options('Verbose') > 1 and not $secondTry) {
             my $out = $exifTool->Options('TextOut');
-            print $out '  Geotime value:   ' . Image::ExifTool::ConvertUnixTime($time) . " UTC\n";
+            print $out '  Geotime value:   ' . Image::ExifTool::ConvertUnixTime(int $time) . "$fsec UTC\n";
         }
         # interpolate GPS track at $time
         if ($time < $$times[0]) {
@@ -630,6 +661,27 @@ sub SetGeoValues($$;$)
 }
 
 #------------------------------------------------------------------------------
+# Convert Geotagging time synchronization value
+# Inputs: 0) time difference string ("[+-]DD MM:HH:SS.ss")
+# Returns: sync time in seconds
+sub ConvertGeosync($)
+{
+    my $sync = shift;
+    my @vals = $sync =~ /(?=\d|\.\d)\d*(?:\.\d*)?/g; # (allow decimal values too)
+    unless (@vals) {
+        warn qq{Invalid time for Geosync (use "[+-][[[DD ]HH:]MM:]SS[.ss]")\n};
+        return undef;
+    }
+    my $val = 0;
+    my $mult;
+    foreach $mult (1, 60, 3600, $secPerDay) {
+        $val += $mult * pop(@vals);
+        last unless @vals;
+    }
+    return $sync =~ /^\s*-/ ? -$val : $val;
+}
+
+#------------------------------------------------------------------------------
 1;  # end
 
 __END__
@@ -646,8 +698,8 @@ This module is used by Image::ExifTool
 
 This module loads GPS track logs, interpolates to determine position based
 on time, and sets new GPS values for geotagging images.  Currently supported
-formats are GPX, NMEA RMC/GGA/GLL, KML, Garmin XML and TCX, and Magellan
-PMGNTRK.
+formats are GPX, NMEA RMC/GGA/GLL, KML, IGC, Garmin XML and TCX, and
+Magellan PMGNTRK.
 
 =head1 AUTHOR
 
@@ -666,7 +718,13 @@ under the same terms as Perl itself.
 
 =item L<http://code.google.com/apis/kml/documentation/kmlreference.html>
 
+=item L<http://www.fai.org/gliding/system/files/tech_spec_gnss.pdf>
+
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Lionel Genet for the ability to read IGC format track logs.
 
 =head1 SEE ALSO
 

@@ -50,7 +50,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.04';
+$VERSION = '2.10';
 
 sub CryptShutterCount($$);
 
@@ -76,12 +76,16 @@ my %pentaxLensTypes = (
     '3 20' => 'smc PENTAX-F 35-80mm F4-5.6',
     '3 21' => 'smc PENTAX-F 80-200mm F4.7-5.6',
     '3 22' => 'smc PENTAX-F FISH-EYE 17-28mm F3.5-4.5',
-    '3 23' => 'smc PENTAX-F 100-300mm F4.5-5.6',
+    '3 23' => 'smc PENTAX-F 100-300mm F4.5-5.6 or Sigma Lens',
+    '3 23.1' => 'Sigma AF 28-300mm F3.5-5.6 DL IF', #JD
+    '3 23.2' => 'Sigma AF 28-300mm F3.5-6.3 DG IF Macro', #JD
     '3 24' => 'smc PENTAX-F 35-135mm F3.5-4.5',
     '3 25' => 'smc PENTAX-F 35-105mm F4-5.6 or Sigma or Tokina Lens',
     '3 25.1' => 'Sigma AF 28-300mm F3.5-5.6 DL IF', #11
     '3 25.2' => 'Sigma 55-200mm F4-5.6 DC', #JD
-    '3 25.3' => 'Tokina 80-200mm F2.8 ATX-Pro', #12
+    '3 25.3' => 'Sigma AF 28-300mm F3.5-5.6 DL IF', #JD
+    '3 25.4' => 'Sigma AF 28-300mm F3.5-6.3 DG IF Macro', #JD
+    '3 25.5' => 'Tokina 80-200mm F2.8 ATX-Pro', #12
     '3 26' => 'smc PENTAX-F* 250-600mm F5.6 ED[IF]',
     '3 27' => 'smc PENTAX-F 28-80mm F3.5-4.5 or Tokina Lens',
     '3 27.1' => 'Tokina AT-X Pro AF 28-70mm F2.6-2.8', #JD
@@ -91,8 +95,9 @@ my %pentaxLensTypes = (
     '3 29.1' => 'Sigma AF 18-125mm F3.5-5.6 DC', #11
     '3 29.2' => 'Tokina AT-X PRO 28-70mm F2.6-2.8', #22
     '3 30' => 'PENTAX-F 70-200mm F4-5.6',
-    '3 31' => 'smc PENTAX-F 70-210mm F4-5.6 or Tokina Lens',
+    '3 31' => 'smc PENTAX-F 70-210mm F4-5.6 or Tokina or Takumar Lens',
     '3 31.1' => 'Tokina AF 730 75-300mm F4.5-5.6',
+    '3 31.2' => 'Takumar-F 70-210mm F4-5.6', #JD
     '3 32' => 'smc PENTAX-F 50mm F1.4',
     '3 33' => 'smc PENTAX-F 50mm F1.7',
     '3 34' => 'smc PENTAX-F 135mm F2.8 [IF]',
@@ -131,6 +136,9 @@ my %pentaxLensTypes = (
     '3 255.4' => 'Sigma DF EX Aspherical 28-70mm F2.8', #12
     '3 255.5' => 'Sigma AF Tele 400mm F5.6 Multi-coated', #JD
     '3 255.6' => 'Sigma 24-60mm F2.8 EX DG', #PH
+    '3 255.7' => 'Sigma 70-300mm F4-5.6 Macro', #JD
+    '3 255.8' => 'Sigma 55-200mm F4-5.6 DC', #JD
+    '3 255.9' => 'Sigma 18-50mm F2.8 EX DC', #JD
     '4 1' => 'smc PENTAX-FA SOFT 28mm F2.8',
     '4 2' => 'smc PENTAX-FA 80-320mm F4.5-5.6',
     '4 3' => 'smc PENTAX-FA 43mm F1.9 Limited',
@@ -145,7 +153,8 @@ my %pentaxLensTypes = (
     '4 23' => 'smc PENTAX-FA 20-35mm F4 AL',
     '4 24' => 'smc PENTAX-FA 77mm F1.8 Limited',
     '4 25' => 'Tamron SP AF 14mm F2.8', #13
-    '4 26' => 'smc PENTAX-FA MACRO 100mm F3.5',
+    '4 26' => 'smc PENTAX-FA MACRO 100mm F3.5 or Cosina Lens',
+    '4 26.1' => 'Cosina 100mm F3.5 Macro', #JD
     '4 27' => 'Tamron AF 28-300mm F3.5-6.3 LD Aspherical[IF] Macro (185D/285D)',
     '4 28' => 'smc PENTAX-FA 35mm F2 AL',
     '4 29' => 'Tamron AF 28-200mm F3.8-5.6 LD Super II Macro (371D)', #JD
@@ -158,7 +167,9 @@ my %pentaxLensTypes = (
     '4 41' => 'Tamron AF 28-200mm Super Zoom F3.8-5.6 Aspherical XR [IF] Macro (A03)',
     '4 43' => 'smc PENTAX-FA 28-90mm F3.5-5.6',
     '4 44' => 'smc PENTAX-FA J 75-300mm F4.5-5.8 AL',
-    '4 45' => 'Tamron 28-300mm F3.5-6.3 Ultra zoom XR',
+    '4 45' => 'Tamron Lens (4 45)',
+    '4 45.1' => 'Tamron 28-300mm F3.5-6.3 Ultra zoom XR',
+    '4 45.2' => 'Tamron AF 28-300mm F3.5-6.3 XR Di LD Aspherical [IF] Macro', #JD
     '4 46' => 'smc PENTAX-FA J 28-80mm F3.5-5.6 AL',
     '4 47' => 'smc PENTAX-FA J 18-35mm F4-5.6 AL',
     '4 49' => 'Tamron SP AF 28-75mm F2.8 XR Di (A09)',
@@ -198,6 +209,7 @@ my %pentaxLensTypes = (
     '5 14' => 'smc PENTAX-FA* 250-600mm F5.6 ED[IF]',
     '5 15' => 'smc PENTAX-FA 28-105mm F4-5.6',
     '5 16' => 'smc PENTAX-FA 100-300mm F4.5-5.6',
+    '5 98' => 'smc PENTAX-FA 100-300mm F4.5-5.6', #JD (pre-production? - PH)
     '6 1' => 'smc PENTAX-FA* 85mm F1.4 [IF]',
     '6 2' => 'smc PENTAX-FA* 200mm F2.8 ED[IF]',
     '6 3' => 'smc PENTAX-FA* 300mm F2.8 ED[IF]',
@@ -231,13 +243,16 @@ my %pentaxLensTypes = (
     '7 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)', #19
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH
     '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
+    '8 226' => 'smc PENTAX-DA* 55mm F1.4 SDM', #JD
     '8 227' => 'smc PENTAX DA* 60-250mm F4 [IF] SDM', #JD
     '8 232' => 'smc PENTAX-DA 17-70mm F4 AL [IF] SDM', #JD
     '8 234' => 'smc PENTAX-DA* 300mm F4 ED [IF] SDM', #19
     '8 235' => 'smc PENTAX-DA* 200mm F2.8 ED [IF] SDM', #JD
     '8 241' => 'smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM', #JD
     '8 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM', #JD
-    '8 255' => 'Sigma 70-200mm F2.8 EX DG Macro HSM II', #JD
+    '8 255' => 'Sigma Lens (8 255)',
+    '8 255.1' => 'Sigma 70-200mm F2.8 EX DG Macro HSM II', #JD
+    '8 255.2' => 'Sigma APO 150-500mm F5-6.3 DG OS HSM', #JD
 );
 
 # Pentax model ID codes - PH
@@ -322,6 +337,9 @@ my %pentaxModelID = (
     0x12dae => 'X70',
     0x12db8 => 'K-7',
     0x12dcc => 'Optio W80',
+    0x12dea => 'Optio P80',
+    0x12df4 => 'Optio WS80',
+    0x12dfe => 'K-x',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -1123,6 +1141,8 @@ my %lensCode = (
             '13 0' => 'Shutter & Aperture Priority AE',
             '15 0' => 'Sensitivity Priority AE',
             '16 0' => 'Flash X-Sync Speed AE',
+            '254 0' => 'Video (30 fps)', #PH (K-7)
+            '255 4' => 'Video (24 fps)', #PH (K-x)
         },{
             # EV step size (ref 19)
             0 => '1/2 EV steps',
@@ -1138,11 +1158,13 @@ my %lensCode = (
             1 => 'Continuous',
             2 => 'Continuous (Hi)', #PH (NC) (K200D)
             3 => 'Burst', #PH (K20D)
+            255 => 'Video', #PH (K-x)
             # (K20D also has an Interval mode that needs decoding)
         },{
             0 => 'No Timer',
             1 => 'Self-timer (12 s)',
             2 => 'Self-timer (2 s)',
+            255 => 'n/a', #PH (K-x)
         },{
             0 => 'Shutter Button', # (also computer remote control - PH)
             1 => 'Remote Control (3 s delay)', #19
@@ -1150,6 +1172,7 @@ my %lensCode = (
         },{
             0 => 'Single Exposure',
             1 => 'Multiple Exposure',
+            255 => 'Video', #PH (K-x)
         }],
     },
     # 0x0035 - 2 numbers: 11894 7962 (not in JPEG images) - PH
@@ -1529,6 +1552,20 @@ my %lensCode = (
         },
     },
     # 0x0226: undef[9] (K20D,K200D) - PH
+    0x0229 => { #PH (verified) (K-m, K-x, K-7)
+        Name => 'SerialNumber',
+        Writable => 'string',
+        Notes => 'left blank by some cameras',
+    },
+    0x0230 => { #PH (K-x AVI videos)
+        Name => 'FirmwareVersion',
+        Notes => 'only in AVI videos',
+        # this tag only exists in AVI videos, and for the K-x the value of
+        # this tag is "K-x Ver 1.00", which is the same as the EXIF Software
+        # tag.  I used a different tag name for this because Pentax uses the
+        # AVI Software tag for a different string, "PENTAX K-x".
+        Writable => 'string',
+    },
     0x03fe => { #PH
         Name => 'DataDump',
         Writable => 0,
@@ -1583,9 +1620,11 @@ my %lensCode = (
         PrintConv => {
             0 => 'Off',
             1 => 'On',
-            4 => 'Off (4)', #(NC) (K20D, K200D)
+            4 => 'Off (4)', # (K20D, K200D, K-7)
             5 => 'On (5)', #(guess) (K20D)
-            7 => 'On (7)', #(NC) (K20D, K200D)
+            6 => 'On (Video)', # (K-7)
+            7 => 'On (7)', #(NC) (K20D, K200D, K-m)
+            15 => 'On (15)', # (K20D (with Tamron 10-20mm @ 10mm))
         },
     },
     2 => {
@@ -2143,7 +2182,6 @@ my %lensCode = (
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     VARS => { HAS_SUBDIR => 1 },
-    DATAMEMBER => [ 0 ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     NOTES => 'Pentax lens information structure.',
@@ -2168,7 +2206,6 @@ my %lensCode = (
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     VARS => { HAS_SUBDIR => 1 },
-    DATAMEMBER => [ 0 ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     NOTES => 'Pentax lens information structure for newer models (K10D and later).',
@@ -2198,7 +2235,6 @@ my %lensCode = (
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    DATAMEMBER => [ 0 ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     NOTES => q{
@@ -2489,6 +2525,7 @@ my %lensCode = (
     },
     1 => {
         Name => 'ManufactureDate',
+        Groups => { 2 => 'Time' },
         Notes => q{
             this value, and the values of the tags below, may change if the camera is
             serviced
@@ -2947,6 +2984,21 @@ my %lensCode = (
     0xaf => {
         Name => 'ISO',
         Format => 'int16u',
+    },
+);
+
+# Pentax metadata in AVI videos (PH)
+%Image::ExifTool::Pentax::AVI = (
+    NOTES => 'Pentax-specific RIFF tags found in AVI videos.',
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Video' },
+    hymn => {
+        Name => 'MakerNotes',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::Main',
+            Start => 10,
+            Base => '$start',
+            ByteOrder => 'BigEndian',
+        },
     },
 );
 

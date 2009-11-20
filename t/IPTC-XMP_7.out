@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.87
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.93
 [File, System, Image] FileName - File Name: IPTC-XMP_7_failed.xmp
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 5.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:08:12 09:45:31-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:09:01 11:27:50-04:00
 [File, File, Image] FileType - File Type: XMP
 [File, File, Image] MIMEType - MIME Type: application/rdf+xml
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.87
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.93
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey
@@ -36,7 +36,7 @@
 [XMP, XMP-exif, Camera] SensingMethod - Sensing Method: One-chip color area
 [XMP, XMP-exif, Image] ShutterSpeedValue - Shutter Speed Value: 1/64
 [XMP, XMP-pdf, Image] Keywords - Keywords: ExifTool, Test, XMP
-[XMP, XMP-photoshop, Author] AuthorsPosition - Author's Position: My Position
+[XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: My Position
 [XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: I wrote it
 [XMP, XMP-photoshop, Image] Category - Category: 1
 [XMP, XMP-photoshop, Location] City - City: Kingston
@@ -74,6 +74,6 @@
 [XMP, XMP-xmpRights, Author] WebStatement - Web Statement: http://owl.phy.queensu.ca/~phil/exiftool/
 [Composite, Composite, Image] Aperture - Aperture: 3.5
 [Composite, Composite, Image] ShutterSpeed - Shutter Speed: 1/64
-[Composite, Composite, Camera] FocalLength35efl - Focal Length: 6.0 mm
 [Composite, Composite, Image] ImageSize - Image Size: 100x80
 [Composite, Composite, Image] LightValue - Light Value: 9.6
+[Composite, Composite, Camera] FocalLength35efl - Focal Length: 6.0 mm

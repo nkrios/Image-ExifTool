@@ -19,7 +19,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.25';
+$VERSION = '1.26';
 
 # older Casio maker notes (ref 1)
 %Image::ExifTool::Casio::Main = (
@@ -443,6 +443,7 @@ $VERSION = '1.25';
            3 => 'Shade', #3
            4 => 'Flash?',
            6 => 'Fluorescent', #3
+           9 => 'Tungsten?', #PH (EX-Z77)
            10 => 'Tungsten', #3
            12 => 'Flash',
         },
@@ -466,9 +467,24 @@ $VERSION = '1.25';
         PrintConvInv => '$val=~s/\s*m$//;$val',
     },
     # 0x2023 looks interesting (values 0,1,2,3,5 in samples) - PH
+    #        - 1 for makeup mode shots (portrait?) (EX-Z450)
     0x2034 => {
         Name => 'FlashDistance',
         Writable => 'int16u',
+    },
+    # 0x203e - normally 62000, but 62001 for anti-shake mode - PH
+    0x2076 => { #PH (EX-Z450)
+        # ("Enhancement" was taken already, so call this "SpecialEffect" for lack of a better name)
+        Name => 'SpecialEffectMode',
+        Writable => 'int8u',
+        Count => 3,
+        PrintConv => {
+            '0 0 0' => 'Off',
+            '1 0 0' => 'Makeup',
+            '2 0 0' => 'Mist Removal',
+            '3 0 0' => 'Vivid Landscape',
+            # have also seen '1 1 1', '2 2 4', '4 3 3', '4 4 4'
+        },
     },
     0x3000 => {
         Name => 'RecordMode',
@@ -512,6 +528,7 @@ $VERSION = '1.25';
            1 => 'Focus Lock', #(guess at translation)
            2 => 'Macro', #3
            3 => 'Single-Area Auto Focus',
+           5 => 'Infinity', #PH
            6 => 'Multi-Area Auto Focus',
         },
     },
@@ -530,7 +547,22 @@ $VERSION = '1.25';
     0x3008 => { #3
         Name => 'AutoISO',
         Writable => 'int16u',
-        PrintConv => { 1 => 'On', 2 => 'Off' },
+        PrintConv => {
+            1 => 'On',
+            2 => 'Off',
+            7 => 'On (high sensitivity)', #PH
+            8 => 'On (anti-shake)', #PH
+        },
+    },
+    0x3009 => { #PH (EX-Z77)
+        Name => 'AFMode',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+            # have seen 2 and 3
+            4 => 'Face Recognition', # "Family First"
+        },
     },
     0x3011 => { #3
         Name => 'Sharpness',
@@ -555,17 +587,35 @@ $VERSION = '1.25';
     0x3015 => {
         Name => 'ColorMode',
         Writable => 'int16u',
-        PrintConv => { 0 => 'Off' },
+        PrintConv => {  
+            0 => 'Off',
+            2 => 'Black & White', #PH (EX-Z400,FH20)
+            3 => 'Sepia', #PH (EX-Z400)
+        },
     },
     0x3016 => {
         Name => 'Enhancement',
         Writable => 'int16u',
-        PrintConv => { 0 => 'Off' },
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Scenery', #PH (NC) (EX-Z77)
+            3 => 'Green', #PH (EX-Z77)
+            5 => 'Underwater', #PH (NC) (EX-Z77)
+            9 => 'Flesh Tones', #PH (EX-Z77)
+        },
     },
     0x3017 => {
-        Name => 'Filter',
+        Name => 'ColorFilter',
         Writable => 'int16u',
-        PrintConv => { 0 => 'Off' },
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Blue', #PH (FH20,Z400)
+            3 => 'Green', #PH (FH20)
+            4 => 'Yellow', #PH (FH20)
+            5 => 'Red', #PH (FH20,Z77)
+            6 => 'Purple', #PH (FH20,Z77,Z400)
+            7 => 'Pink', #PH (FH20)
+        },
     },
     0x301c => { #3
         Name => 'SequenceNumber', # for continuous shooting
@@ -586,6 +636,43 @@ $VERSION = '1.25';
             2 => 'Best Shot',
             # 3 observed in MOV videos (EX-V7)
             # (newer models write 2 numbers here - PH)
+            '0 0' => 'Off', #PH
+            '16 0' => 'Slow Shutter', #PH (EX-Z77)
+            '18 0' => 'Anti-Shake', #PH (EX-Z77)
+            '20 0' => 'High Sensitivity', #PH (EX-Z77)
+        },
+    },
+    0x302a => { #PH (EX-Z450)
+        Name => 'LightingMode', #(just guessing here)
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'High Dynamic Range', # (EX-Z77 anti-blur shot)
+            5 => 'Shadow Enhance Low', #(NC)
+            6 => 'Shadow Enhance High', #(NC)
+        },
+    },
+    0x302b => { #PH (EX-Z77)
+        Name => 'PortraitRefiner',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => '+1',
+            2 => '+2',
+        },
+    },
+    0x3030 => { #PH (EX-Z450)
+        Name => 'SpecialEffectLevel',
+        Writable => 'int16u',
+    },
+    0x3031 => { #PH (EX-Z450)
+        Name => 'SpecialEffectSetting',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Makeup',
+            2 => 'Mist Removal',
+            3 => 'Vivid Landscape',
         },
     },
 );
@@ -637,7 +724,8 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Joachim Loehr for adding support for the type 2 maker notes.
+Thanks to Joachim Loehr for adding support for the type 2 maker notes, and
+Jens Duttke for decoding some tags.
 
 =head1 SEE ALSO
 

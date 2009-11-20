@@ -508,11 +508,11 @@ sub CheckXMP($$$)
     my $format = $tagInfo->{Writable};
     # (if no format specified, value is a simple string)
     if (not $format or $format eq 'string' or $format eq 'lang-alt') {
-        # convert value from Latin if necessary
-        if ($exifTool->{OPTIONS}->{Charset} eq 'Latin') {
+        # convert value to UTF8 if necessary
+        if ($exifTool->{OPTIONS}->{Charset} ne 'UTF8') {
             if ($$valPtr =~ /[\x80-\xff]/) {
-                # convert from Latin to UTF-8
-                my $val = Image::ExifTool::Latin2Unicode($$valPtr,'n');
+                # convert from Charset to UTF-8
+                my $val = $exifTool->Charset2Unicode($$valPtr, 'MM');
                 $$valPtr = Image::ExifTool::Unicode2UTF8($val,'n');
             }
         } else {

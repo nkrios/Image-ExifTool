@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
 [File, System, Image] FileName - File Name: CanonRaw_7_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 12 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:17-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:10 16:09:42-05:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -86,7 +86,7 @@
 [MakerNotes, Canon, Camera] 3 - Canon Flash Info: 100 0 0 0
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
 [MakerNotes, Canon, Image] 2 - Base ISO: 400
-[MakerNotes, Canon, Image] 3 - Measured EV: 3.00
+[MakerNotes, Canon, Image] 3 - Measured EV: 8.00
 [MakerNotes, Canon, Image] 4 - Target Aperture: 8
 [MakerNotes, Canon, Image] 5 - Target Exposure Time: 1/15
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
@@ -101,7 +101,7 @@
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
 [MakerNotes, Canon, Image] 21 - F Number: 8
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/16
-[MakerNotes, Canon, Image] 23 - Measured EV 2: 3.125
+[MakerNotes, Canon, Image] 23 - Measured EV 2: 8.125
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
@@ -140,7 +140,7 @@
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0
 [MakerNotes, Canon, Image] 5 - Bracket Shot Number: 0
-[MakerNotes, Canon, Image] 8 - Noise Reduction: Off
+[MakerNotes, Canon, Image] 8 - Long Exposure Noise Reduction 2: Off
 [MakerNotes, Canon, Image] 9 - WB Bracket Mode: Off
 [MakerNotes, Canon, Image] 12 - WB Bracket Value AB: 0
 [MakerNotes, Canon, Image] 13 - WB Bracket Value GM: 0
@@ -206,7 +206,7 @@
 [MakerNotes, Canon, Camera] 131 - Camera Color Calibration 15:  949  307  397 (2413K)
 [MakerNotes, Canon, Camera] 16386 - Unknown Block 1: (Binary data 5352 bytes)
 [MakerNotes, Canon, Camera] 2 - Color Tone: Normal
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.83
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.00
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: unknown
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0123456789

@@ -8,9 +8,6 @@
 <!--
 pre         { margin: 0 }
 code        { white-space: nowrap }
-div.index   { float: right; clear: both;
-              border-left: 1px solid gray;
-              margin: .5em 0 .5em .5em; padding: 0 .5em }
 ol.index    { margin: 0; padding: 0 0 0 2em }
 -->
 </style>
@@ -40,8 +37,9 @@ option is used to specify the language for this conversion.</li></ol>
 
 <ol start=2><li>The "<b>ValueConv</b>" value is a numerical value, suitable for
 use in calculations.  Typically, this value is converted to standard units (ie.
-degrees, meters, or seconds) to make calculations simpler.  This value is returned
-when the <code>-n</code> option is used.</li></ol>
+degrees, meters, or seconds) to make calculations simpler.  This value is
+returned for all tags when the <code>-n</code> option is used, or for individual
+tags by suffixing the tag name with a <code>#</code> character.</li></ol>
 
 <ol start=1><li>The "<b>Raw</b>" value is the value after initial formatting is
 applied to the binary data from the file.  Most tags have no separate "ValueConv"
@@ -60,15 +58,15 @@ presented in a simple text format.</li></ol>
 <blockquote><table class=norm>
 <tr><th>Tag</th><th>3.&nbsp;PrintConv</th><th>2.&nbsp;ValueConv</th><th>1.&nbsp;Raw</th><th>0.&nbsp;Binary</th></tr>
 <tr align='center'><td>Orientation</td><td>Horizontal (normal)</td><td>1</td><td>1</td><td><pre>00 01</pre></td></tr>
-<tr align='center'><td>GPSLatitude</td><td>45 deg 20' 11.00"</td><td>45.3363888888889</td><td>45 20 11</td>
+<tr align='center'><td>GPSLatitude</td><td>45 deg 20' 11.00"</td><td>45.3363888888889</td><td>45 20 11<br>(45/1 20/1 11/1)</td>
   <td><pre>00 00 00 2d 00 00 00 01<br>00 00 00 14 00 00 00 01<br>00 00 00 0b 00 00 00 01</pre></td></tr>
-<tr align='center'><td>ExposureTime</td><td>1/30</td><td>0.03333333333</td><td>0.03333333333</td>
+<tr align='center'><td>ExposureTime</td><td>1/30</td><td>0.03333333333</td><td>0.03333333333<br>(1/30)</td>
   <td><pre>00 00 00 01 00 00 00 1e</pre></td></tr>
-<tr align='center'><td>ShutterSpeedValue</td><td>1/30</td><td>0.0333333334629176</td><td>4.90689059</td>
+<tr align='center'><td>ShutterSpeedValue</td><td>1/30</td><td>0.0333333334629176</td><td>4.90689059<br>(19868/4049)</td>
   <td><pre>00 00 4d 9c 00 00 0f d1</pre></td></tr>
 </table></blockquote>
 <hr>
-<i>Last revised June 25, 2009</i>
+<i>Last revised Oct 10, 2009</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

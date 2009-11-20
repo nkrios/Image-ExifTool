@@ -876,7 +876,7 @@ Mark III.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='FunctionsD30'>CanonCustom FunctionsD30 Tags</a></h2>
-<p>Custom functions for the EOS-D30 and D60.</p>
+<p>Custom functions for the EOS D30 and D60.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -990,7 +990,7 @@ Mark III.</p>
 <table class=inner cellspacing=1>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr><td colspan=4 class=c>[no tags known]</td></tr>
+<tr><td colspan=4 class=c><i>[no tags known]</i></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='PersonalFuncs'>CanonCustom PersonalFuncs Tags</a></h2>
@@ -1293,7 +1293,7 @@ well as newer tags and values added by later models.</p>
 <td title='0x0101 = 257'>0x0101</td>
 <td>ExposureLevelIncrements</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(1D Mark III)</span>
+<td><span class=s><span class=n>(1DmkIII and 1DmkIV)</span>
   <br>0 = 1/3-stop set, 1/3-stop comp.
   <br>1 = 1-stop set, 1/3-stop comp.
   <br>2 = 1/2-stop set, 1/2-stop comp.
@@ -1311,11 +1311,11 @@ well as newer tags and values added by later models.</p>
 <td>ISOSpeedRange
   <br>ISOExpansion</td>
 <td class=c>int32s[3]<br>int32s</td>
-<td><span class=s><span class=n>(1D Mark III)</span>
+<td><span class=s><span class=n>(1DmkIII and 1DmkIV)</span>
   <br>[Value 0]
   <br>0 = Disable
   <br>1 = Enable
-  <br><span class=n>(40D, 50D, 5DmkII and 500D)</span>
+  <br><span class=n>(other models)</span>
   <br>0 = Off
   <br>1 = On</span></td></tr>
 <tr class=b>
@@ -1328,15 +1328,17 @@ well as newer tags and values added by later models.</p>
 <td title='0x0105 = 261'>0x0105</td>
 <td>AEBSequence</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 2 not used by 40D, 50D and 5DmkII)</span>
+<td><span class=s><span class=n>(value of 2 not used by 40D, 50D, 5DmkII and 7D)</span>
   <br>0 = 0,-,+
   <br>1 = -,0,+
   <br>2 = +,0,-</span></td></tr>
 <tr class=b>
 <td title='0x0106 = 262'>0x0106</td>
 <td>AEBShotCount</td>
-<td class=c>int32s</td>
-<td><span class=s>0 = 3
+<td class=c>int32s[n]</td>
+<td><span class=s><span class=n>(1 value for the 1DmkIII, 2 for the 1DmkIV)</span>
+  <br>[Value 0]
+  <br>0 = 3
   <br>1 = 2
   <br>2 = 5
   <br>3 = 7</span></td></tr>
@@ -1350,7 +1352,7 @@ well as newer tags and values added by later models.</p>
 <td title='0x0108 = 264'>0x0108</td>
 <td>SafetyShift</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 2 not used by 40D, 50D and 5DmkII)</span>
+<td><span class=s><span class=n>(value of 2 not used by 40D, 50D, 5DmkII and 7D)</span>
   <br>0 = Disable
   <br>1 = Enable (Tv/Av)
   <br>2 = Enable (ISO speed)</span></td></tr>
@@ -1405,7 +1407,7 @@ well as newer tags and values added by later models.</p>
 <td><span class=s><span class=n>(40D)</span>
   <br>0 = Auto
   <br>1 = 1/250 Fixed
-  <br><span class=n>(50D)</span>
+  <br><span class=n>(50D and 7D)</span>
   <br>0 = Auto
   <br>1 = 1/250-1/60 Auto
   <br>2 = 1/250 Fixed
@@ -1416,9 +1418,27 @@ well as newer tags and values added by later models.</p>
   <br>0 = Auto
   <br>1 = 1/200-1/60 Auto
   <br>2 = 1/200 Fixed
+  <br><span class=n>(1D Mark IV)</span>
+  <br>0 = Auto
+  <br>1 = 1/300-1/60 Auto
+  <br>2 = 1/300 Fixed
   <br><span class=n>(1D Mark III)</span>
   <br>0 = Auto
   <br>1 = 1/300 Fixed</span></td></tr>
+<tr class=b>
+<td title='0x0110 = 272'>0x0110</td>
+<td>FEMicroadjustment</td>
+<td class=c>int32s[3]</td>
+<td><span class=s>[Value 0]
+  <br>0 = Disable
+  <br>1 = Enable</span></td></tr>
+<tr>
+<td title='0x0111 = 273'>0x0111</td>
+<td>AEMicroadjustment</td>
+<td class=c>int32s[3]</td>
+<td><span class=s>[Value 0]
+  <br>0 = Disable
+  <br>1 = Enable</span></td></tr>
 <tr class=b>
 <td title='0x0201 = 513'>0x0201</td>
 <td>LongExposureNoiseReduction</td>
@@ -1430,11 +1450,11 @@ well as newer tags and values added by later models.</p>
 <td title='0x0202 = 514'>0x0202</td>
 <td>HighISONoiseReduction</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(50D, 500D and 5DmkII)</span>
+<td><span class=s><span class=n>(50D, 500D, 5DmkII and 7D)</span>
   <br>0 = Standard
   <br>1 = Low
   <br>2 = Strong
-  <br>3 = Disable
+  <br>3 = Off
   <br><span class=n>(other models)</span>
   <br>0 = Off
   <br>1 = On</span></td></tr>
@@ -1448,7 +1468,7 @@ well as newer tags and values added by later models.</p>
 <td title='0x0204 = 516'>0x0204</td>
 <td>AutoLightingOptimizer</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(50D, 500D and 5DmkII)</span>
+<td><span class=s><span class=n>(50D, 500D, 5DmkII and 1DmkIV)</span>
   <br>0 = Standard
   <br>1 = Low
   <br>2 = Strong
@@ -1490,8 +1510,12 @@ well as newer tags and values added by later models.</p>
 <td title='0x0409 = 1033'>0x0409</td>
 <td>InfoButtonWhenShooting</td>
 <td class=c>int32s</td>
-<td><span class=s>0 = Displays camera settings
-  <br>1 = Displays shooting functions</span></td></tr>
+<td><span class=s><span class=n>(1D Mark III)</span>
+  <br>0 = Displays camera settings
+  <br>1 = Displays shooting functions
+  <br><span class=n>(1D Mark IV)</span>
+  <br>0 = Displays shooting functions
+  <br>1 = Displays camera settings</span></td></tr>
 <tr class=b>
 <td title='0x0501 = 1281'>0x0501</td>
 <td>USMLensElectronicMF</td>
@@ -1514,7 +1538,8 @@ well as newer tags and values added by later models.</p>
 <td class=c>int32s</td>
 <td><span class=s>0 = 1: AF, 2: Tracking
   <br>1 = 1: AF, 2: Drive speed
-  <br>2 = 1: Release, 2: Drive speed</span></td></tr>
+  <br>2 = 1: Release, 2: Drive speed
+  <br>3 = 1: Release, 2: Tracking</span></td></tr>
 <tr>
 <td title='0x0504 = 1284'>0x0504</td>
 <td>AIServoTrackingMethod</td>
@@ -1538,7 +1563,8 @@ well as newer tags and values added by later models.</p>
   <br>3 = AF point: M-&gt;Auto/Auto-&gt;ctr
   <br>4 = One Shot &lt;-&gt; AI servo
   <br>5 = IS start
-  <br>6 = Switch to registered AF point</span></td></tr>
+  <br>6 = Switch to registered AF point
+  <br>7 = Spot AF</span></td></tr>
 <tr class=b>
 <td title='0x0507 = 1287'>0x0507</td>
 <td>AFMicroadjustment</td>
@@ -1555,13 +1581,21 @@ well as newer tags and values added by later models.</p>
   <br>0 = Disable
   <br>1 = Enable
   <br>0 = Disable
-  <br>1 = Enable (left/right assist points)
-  <br>2 = Enable (surrounding assist points)</span></td></tr>
+  <br>1 = Left/right AF points
+  <br>2 = Surrounding AF points
+  <br>3 = All 45 points area</span></td></tr>
 <tr class=b>
 <td title='0x0509 = 1289'>0x0509</td>
 <td>SelectableAFPoint</td>
 <td class=c>int32s</td>
-<td><span class=s>0 = 19 points
+<td><span class=s><span class=n>(1D Mark IV)</span>
+  <br>0 = 45 points
+  <br>1 = 19 points
+  <br>2 = 11 points
+  <br>3 = Inner 9 points
+  <br>4 = Outer 9 points
+  <br><span class=n>(other models)</span>
+  <br>0 = 19 points
   <br>1 = Inner 9 points
   <br>2 = Outer 9 points
   <br>3 = 19 Points, Multi-controller selectable
@@ -1571,7 +1605,12 @@ well as newer tags and values added by later models.</p>
 <td title='0x050a = 1290'>0x050a</td>
 <td>SwitchToRegisteredAFPoint</td>
 <td class=c>int32s</td>
-<td><span class=s>0 = Disable
+<td><span class=s><span class=n>(1D Mark IV)</span>
+  <br>0 = Disable
+  <br>1 = Switch with multi-controller
+  <br>2 = Only while AEL is pressed
+  <br><span class=n>(other models)</span>
+  <br>0 = Disable
   <br>1 = Enable</span></td></tr>
 <tr class=b>
 <td title='0x050b = 1291'>0x050b</td>
@@ -1597,10 +1636,15 @@ well as newer tags and values added by later models.</p>
 <td title='0x050e = 1294'>0x050e</td>
 <td>AFAssistBeam</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 2 not used by 1DmkIII or 5DmkII)</span>
+<td><span class=s><span class=n>(1D Mark IV)</span>
   <br>0 = Emits
   <br>1 = Does not emit
-  <br>2 = Only ext. flash emits</span></td></tr>
+  <br>2 = IR AF assist bean only
+  <br><span class=n>(values 2-3 not used by 1DmkIII or 5DmkII, value 3 new for 7D)</span>
+  <br>0 = Emits
+  <br>1 = Does not emit
+  <br>2 = Only ext. flash emits
+  <br>3 = IR AF assist bean only</span></td></tr>
 <tr class=b>
 <td title='0x050f = 1295'>0x050f</td>
 <td>AFPointSelectionMethod</td>
@@ -1610,9 +1654,15 @@ well as newer tags and values added by later models.</p>
   <br>2 = Quick Control Dial direct</span></td></tr>
 <tr>
 <td title='0x0510 = 1296'>0x0510</td>
-<td>SuperimposedDisplay</td>
-<td class=c>int32s</td>
-<td><span class=s>0 = On
+<td>VFDisplayIllumination
+  <br>SuperimposedDisplay</td>
+<td class=c>int32s<br>int32s</td>
+<td><span class=s><span class=n>(7D)</span>
+  <br>0 = Auto
+  <br>1 = Enable
+  <br>2 = Disable
+  <br><span class=n>(other models)</span>
+  <br>0 = On
   <br>1 = Off</span></td></tr>
 <tr class=b>
 <td title='0x0511 = 1297'>0x0511</td>
@@ -1625,6 +1675,45 @@ well as newer tags and values added by later models.</p>
   <br>0 = Disable
   <br>1 = Quick mode
   <br>2 = Live mode</span></td></tr>
+<tr>
+<td title='0x0512 = 1298'>0x0512</td>
+<td>SelectAFAreaSelectMode</td>
+<td class=c>int32s</td>
+<td><span class=s>[Value 0]
+  <br>0 = Disable
+  <br>1 = Enable
+  <br>2 = Register
+  <br>3 = Select AF-modes</span></td></tr>
+<tr class=b>
+<td title='0x0513 = 1299'>0x0513</td>
+<td>ManualAFPointSelectPattern</td>
+<td class=c>int32s</td>
+<td><span class=s>0 = Stops at AF area edges
+  <br>1 = Continuous</span></td></tr>
+<tr>
+<td title='0x0514 = 1300'>0x0514</td>
+<td>DisplayAllAFPoints</td>
+<td class=c>int32s</td>
+<td><span class=s>0 = Enable
+  <br>1 = Disable</span></td></tr>
+<tr class=b>
+<td title='0x0515 = 1301'>0x0515</td>
+<td>FocusDisplayAIServoAndMF</td>
+<td class=c>int32s</td>
+<td><span class=s>0 = Enable
+  <br>1 = Disable</span></td></tr>
+<tr>
+<td title='0x0516 = 1302'>0x0516</td>
+<td>OrientationLinkedAFPoint</td>
+<td class=c>int32s</td>
+<td><span class=s>0 = Same for verical and horizontal
+  <br>1 = Select different AF points</span></td></tr>
+<tr class=b>
+<td title='0x0517 = 1303'>0x0517</td>
+<td>MultiControllerWhileMetering</td>
+<td class=c>int32s</td>
+<td><span class=s>0 = Off
+  <br>1 = AF point selection</span></td></tr>
 <tr>
 <td title='0x060f = 1551'>0x060f</td>
 <td>MirrorLockup</td>
@@ -1662,7 +1751,7 @@ well as newer tags and values added by later models.</p>
   <br>1 = Metering + AF start/AF stop
   <br>2 = Metering start/Meter + AF start
   <br>3 = AE lock/Metering + AF start
-  <br>4 = Metering + AF start / disable</span></td></tr>
+  <br>4 = Metering + AF start/disable</span></td></tr>
 <tr>
 <td title='0x0702 = 1794'>0x0702</td>
 <td>AFOnAELockButtonSwitch</td>
@@ -1709,7 +1798,7 @@ well as newer tags and values added by later models.</p>
   <br>3 = LCD monitor On/Off
   <br>4 = Menu display
   <br>5 = Disabled
-  <br><span class=n>(1D Mark III)</span>
+  <br><span class=n>(1DmkIII and 1DmkIV)</span>
   <br>0 = Normal (disabled)
   <br>1 = White balance
   <br>2 = Image size
@@ -1746,8 +1835,9 @@ well as newer tags and values added by later models.</p>
 <td title='0x0709 = 1801'>0x0709</td>
 <td>LockMicrophoneButton</td>
 <td class=c>int32s</td>
-<td><span class=s>0 = Protect (holding:sound rec.)
-  <br>1 = Sound rec. (protect:disable)</span></td></tr>
+<td><span class=s>0 = Protect (hold:record memo)
+  <br>1 = Record memo (protect:disable)
+  <br>2 = Play memo (hold:record memo)</span></td></tr>
 <tr>
 <td title='0x070a = 1802'>0x070a</td>
 <td>ButtonFunctionControlOff</td>
@@ -1764,6 +1854,17 @@ well as newer tags and values added by later models.</p>
   <br>3 = Image jump with main dial
   <br>4 = Live view function settings</span></td></tr>
 <tr>
+<td title='0x070c = 1804'>0x070c</td>
+<td>CustomControls</td>
+<td class=c>int32s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x070d = 1805'>0x070d</td>
+<td>StartMovieShooting</td>
+<td class=c>int32s</td>
+<td><span class=s>0 = Default (from LV)
+  <br>1 = Quick start (FEL button)</span></td></tr>
+<tr>
 <td title='0x080b = 2059'>0x080b</td>
 <td>FocusingScreen</td>
 <td class=c>int32s</td>
@@ -1775,7 +1876,7 @@ well as newer tags and values added by later models.</p>
   <br>0 = Eg-A
   <br>1 = Eg-D
   <br>2 = Eg-S
-  <br><span class=n>(1D Mark III)</span>
+  <br><span class=n>(1DmkIII and 1DmkIV)</span>
   <br>0 = Ec-CIV
   <br>1 = Ec-A,B,C,CII,CIII,D,H,I,L
   <br>2 = Ec-S
@@ -1826,7 +1927,7 @@ well as newer tags and values added by later models.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 25, 2009</i>
+<br><i>Last revised Nov 20, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

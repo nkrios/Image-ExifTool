@@ -20,7 +20,7 @@ use Image::ExifTool::PostScript;
 use Image::ExifTool::XMP qw(EscapeXML UnescapeXML);
 require Exporter;
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
 
@@ -194,7 +194,7 @@ my %entityName; # look up entity names by number (built as necessary)
 # ref 2
 %Image::ExifTool::HTML::ncc = (
     GROUPS => { 1 => 'HTML-ncc', 2 => 'Document' },
-    charset         => { },
+    charset         => { Name => 'CharacterSet' }, # name changed to avoid conflict with -charset option
     depth           => { },
     files           => { },
     footnotes       => { },

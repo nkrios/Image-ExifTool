@@ -21,6 +21,7 @@
 #              13) Chris Shaw private communication (E-3)
 #              14) Viktor Lushnikov private communication (E-400)
 #              15) Yrjo Rauste private communication (E-30)
+#              16) Godfrey DiGiorgi private communcation (E-P1) + http://forums.dpreview.com/forums/read.asp?message=33187567
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -30,7 +31,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.60';
+$VERSION = '1.63';
 
 sub PrintLensInfo($$$);
 
@@ -166,7 +167,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x0203 => { #6
         Name => 'BWMode',
-        Description => 'Black & White Mode',
+        Description => 'Black And White Mode',
         Writable => 'int16u',
         PrintConv => \%offOn,
     },
@@ -1129,6 +1130,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             6 numbers: 0. Make, 1. Unknown, 2. Model, 3. Sub-model, 4-5. Unknown.  Only
             the Make, Model and Sub-model are used to determine the lens model
         },
+        # Have seen these values for the unknown numbers:
+        # 1: 0
+        # 4: 0, 2(Olympus lenses for which I have also seen 0 for this number)
+        # 5: 0, 16(new Lumix lenses)
         ValueConv => 'my @a = split(" ",$val); "$a[0] $a[2] $a[3]"',
         # set unknown values to zero when writing
         ValueConvInv => 'my @a=split(" ",$val); "$a[0] 0 $a[1] $a[2] 0 0"',
@@ -1177,13 +1182,16 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             '1 21 0' => 'Sigma 10-20mm F4.0-5.6 EX DC HSM', #11
             # Leica lenses (ref 11)
             '2 1 0'  => 'Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
+            '2 1 16' => 'Lumix G Vario 14-45mm F3.5-5.6 Asph. Mega OIS', #16
             '2 2 0'  => 'Leica D Summilux 25mm F1.4 Asph.',
+            '2 2 16' => 'Lumix G Vario 45-200mm F4-5.6 Mega OIS', #16
             '2 3 1'  => 'Leica D Vario Elmar 14-50mm F3.8-5.6 Asph.', #14 (L10 kit)
+            '2 3 16' => 'Lumix G Vario HD 14-140mm F4-5.8 Asph. Mega OIS', #16
             '2 4 0'  => 'Leica D Vario Elmar 14-150mm F3.5-5.6', #13
             '2 4 16' => 'Lumix G Vario 7-14mm F4 Asph.', #PH (E-P1 pre-production)
+            '2 5 16' => 'Lumix G 20mm F1.7 Asph.', #16
             '3 1 0'  => 'Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
             '3 2 0'  => 'Leica D Summilux 25mm F1.4 Asph.',
-            # (missing Panasonic Lumix G Vario HD 14-140mm/F4.0-5.8 Asph./Mega OIS)
         },
     },
     # apparently the first 3 digits of the lens s/n give the type (ref 4):
@@ -1414,7 +1422,11 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         PrintConv => [{
             0 => 'AF Not Used',
             1 => 'AF Used',
-        }, {}], # (E-520 writes 2 values, 2nd is unknown - PH)
+        }],
+        # 2nd value written only by some models (u1050SW, u9000, uT6000, uT6010,
+        # uT8000, E-30, E-420, E-450, E-520, E-620, E-P1 and E-P2): - PH
+        # observed values when "AF Not Used": 0, 16
+        # observed values when "AF Used": 64, 96(face detect on), 256
     },
     0x303 => { #6
         Name => 'AFSearch',
@@ -1767,6 +1779,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             '4 1280 0 0' => 'Light Tone',
             '5 1280 0 0' => 'Pin Hole',
             '6 1280 0 0' => 'Grainy Film',
+            '9 1280 0 0' => 'Diorama',
+            '10 1280 0 0' => 'Cross Process',
         },
     },
     0x600 => { #PH/4
@@ -2397,12 +2411,11 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'FaceDetect',
         Writable => 'int32u',
         Count => -1,
-        Notes => '2 or 3 values',
-        Relist => [ [0, 1], 2 ],
+        Notes => '1, 2 or 3 values',
         PrintConv => [{
-            '0 0' => 'Off',
-            '1 0' => 'On',
-        }, {}],
+            0 => 'Off',
+            1 => 'On',
+        }], # (other values are usually 0, but have seen 1 for 2nd value with FaceDetect On)
     },
     0x1201 => { #11
         Name => 'FaceDetectArea',
@@ -2598,7 +2611,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'int16s',
         Notes => q{
             approximately Celsius for E-1, unknown calibration for E-3/410/420/510, and
-            always zero for E-300/330/400/500
+            always zero for E-300/330/400/500, divide by 10 for E-P1?
         },
     },
     0x1600 => { # ref http://fourthirdsphoto.com/vbb/showpost.php?p=107607&postcount=15

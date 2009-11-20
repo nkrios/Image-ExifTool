@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
 [File, System, Image] FileName - File Name: Ricoh2.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 3.1 kB
@@ -82,13 +82,14 @@
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 2492
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Ricoh, Camera] 1 - Maker Note Type: Rdc
-[MakerNotes, Ricoh, Camera] 2 - Maker Note Version: Rev2219
+[MakerNotes, Ricoh, Camera] 2 - Firmware Version: 22.19
+[MakerNotes, Ricoh, Camera] 5 - Internal Serial Number: 00000000000000012207000003100957
 [MakerNotes, Ricoh, Image] 0 - Ricoh Image Width: 2048
 [MakerNotes, Ricoh, Image] 2 - Ricoh Image Height: 1536
 [MakerNotes, Ricoh, Time] 6 - Ricoh Date: 2006:05:26 11:48:48
 [MakerNotes, Ricoh, Camera] 4099 - Sharpness: Sharp
-[MakerNotes, Ricoh, Time] 4 - Ricoh Date Time 1: 2005:06:06          
-[MakerNotes, Ricoh, Time] 5 - Ricoh Date Time 2: 2003:08:19          
+[MakerNotes, Ricoh, Time] 4 - Manufacture Date 1: 2005:06:06          
+[MakerNotes, Ricoh, Time] 5 - Manufacture Date 2: 2003:08:19          
 [APP5, RMETA, Image] Sign type - Sign Type: Information
 [APP5, RMETA, Image] Location - Location: Roundabout
 [APP5, RMETA, Image] Lit - Lit: No

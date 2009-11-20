@@ -7,7 +7,6 @@
 </head>
 <body>
 <h2 class=top>Ricoh Tags</h2>
-<p>These tags are used by Ricoh Caplio camera models.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -20,27 +19,35 @@
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0002 = 2'>0x0002</td>
-<td>MakerNoteVersion</td>
+<td>FirmwareVersion</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td title='0x0005 = 5'>0x0005</td>
+<td>SerialNumber
+  <br>InternalSerialNumber</td>
+<td class=c>undef[16]<br>undef[16]</td>
+<td><span class=s><span class=n>(the serial number stamped on the camera begins with 2 model-specific letters
+followed by the last 8 digits of this value.  For the GXR, this is the
+serial number of the lens unit)</span></span></td></tr>
+<tr class=b>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x1001 = 4097'>0x1001</td>
 <td>ImageInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Ricoh.html#ImageInfo'>Ricoh ImageInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x1003 = 4099'>0x1003</td>
 <td>Sharpness</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = Sharp
   <br>1 = Normal
   <br>2 = Soft</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x2001 = 8193'>0x2001</td>
 <td>RicohSubdir
   <br>RicohRR1Subdir</td>
@@ -108,7 +115,10 @@
   <br>1 = Daylight
   <br>2 = Cloudy
   <br>3 = Tungsten
-  <br>4 = Fluorescent</span></td></tr>
+  <br>4 = Fluorescent
+  <br>5 = Manual
+  <br>7 = Detail
+  <br>9 = Multi-pattern Auto</span></td></tr>
 <tr class=b>
 <td class=r title='39 = 0x27'>39</td>
 <td>ISOSetting</td>
@@ -138,21 +148,54 @@
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td title='0x0004 = 4'>0x0004</td>
-<td>RicohDateTime1</td>
-<td class=c>N</td>
+<td>ManufactureDate1</td>
+<td class=c>string[20]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0005 = 5'>0x0005</td>
-<td>RicohDateTime2</td>
-<td class=c>N</td>
+<td>ManufactureDate2</td>
+<td class=c>string[20]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x002c = 44'>0x002c</td>
+<td>SerialInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Ricoh.html#SerialInfo'>Ricoh SerialInfo Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SerialInfo'>Ricoh SerialInfo Tags</a></h2>
+<p>This information is found in images from the GXR.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>BodyFirmware</td>
+<td class=c>string[16]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='16 = 0x10'>16</td>
+<td>BodySerialNumber</td>
+<td class=c>string[16]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='32 = 0x20'>32</td>
+<td>LensFirmware</td>
+<td class=c>string[16]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='48 = 0x30'>48</td>
+<td>LensSerialNumber</td>
+<td class=c>string[16]</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Text'>Ricoh Text Tags</a></h2>
-<p>Ricoh RDC models such as the RDC-i700, RDC-5000, RDC-6000, RDC-7 and
-RDC-4300 use a text-based format for their maker notes instead of the IFD
-format used by the Caplio models.  Below is a list of known tags in this
-information.</p>
+<p>Some Ricoh DC and RDC models use a text-based format for their maker notes
+instead of the IFD format used by the Caplio models.  Below is a list of known
+tags in this information.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -170,7 +213,7 @@ information.</p>
 <td>&nbsp;</td></tr>
 <tr>
 <td>'Rev'</td>
-<td>Revision</td>
+<td>FirmwareVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -180,7 +223,7 @@ information.</p>
 <td>&nbsp;</td></tr>
 <tr>
 <td>'Rv'</td>
-<td>Revision</td>
+<td>FirmwareVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -273,9 +316,21 @@ defined below, ExifTool will extract any information found here.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='LensID'>Ricoh LensID Values</a></h2>
+Lens units available for the GXR, used by the Ricoh Composite LensID tag.  Note
+that unlike lenses for all other makes of cameras, the focal lengths in these
+model names have already been scaled to include the 35mm crop factor.
+<blockquote>
+<table class=frame><tr><td>
+<table class='inner sep' cellspacing=1>
+<tr class=h><th>Value</th><th>LensID</th></tr>
+<tr><td>'RL1'</td><td>= GR Lens A12 50mm F2.5 Macro</td>
+</tr><tr><td>'RL2'</td><td>= Ricoh Lens S10 24-70mm F2.5-4.4 VC</td>
+</tr></table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 7, 2008</i>
+<br><i>Last revised Nov 11, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

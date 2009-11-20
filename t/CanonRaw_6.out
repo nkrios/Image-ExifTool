@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
 [File, System, Image] FileName - File Name: CanonRaw_6_failed.cr2
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 11 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:17-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:10 16:09:42-05:00
 [File, File, Image] FileType - File Type: CR2
 [File, File, Image] MIMEType - MIME Type: image/x-raw
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -13,7 +13,7 @@
 [EXIF, IFD0, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD0, Camera] 271 - Make: Canon
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS 350D DIGITAL
-[EXIF, IFD0, Image] 273 - Preview Image Start: 11506
+[EXIF, IFD0, Image] 273 - Preview Image Start: 11526
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
 [EXIF, IFD0, Image] 279 - Preview Image Length: 26
 [EXIF, IFD0, Image] 282 - X Resolution: 72
@@ -48,23 +48,23 @@
 [EXIF, ExifIFD, Camera] 41986 - Exposure Mode: Auto
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 11446
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 11466
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD2, Image] 256 - Image Width: 384
 [EXIF, IFD2, Image] 257 - Image Height: 256
 [EXIF, IFD2, Image] 258 - Bits Per Sample: 8 8 8
 [EXIF, IFD2, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD2, Image] 262 - Photometric Interpretation: RGB
-[EXIF, IFD2, Image] 273 - Strip Offsets: 11490
+[EXIF, IFD2, Image] 273 - Strip Offsets: 11510
 [EXIF, IFD2, Image] 277 - Samples Per Pixel: 3
 [EXIF, IFD2, Image] 278 - Rows Per Strip: 256
 [EXIF, IFD2, Image] 279 - Strip Byte Counts: 16
 [EXIF, IFD2, Image] 284 - Planar Configuration: Chunky
 [EXIF, IFD3, Image] 259 - Compression: JPEG (old-style)
-[EXIF, IFD3, Image] 273 - Strip Offsets: 11474
+[EXIF, IFD3, Image] 273 - Strip Offsets: 11494
 [EXIF, IFD3, Image] 279 - Strip Byte Counts: 16
 [EXIF, IFD3, Image] 50752 - Raw Image Segmentation: 1 1758 1758
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.83
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.00
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [IPTC, IPTC, Other] 25 - Keywords: CR2 test
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
@@ -104,7 +104,7 @@
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.37 mm
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
 [MakerNotes, Canon, Image] 2 - Base ISO: 400
-[MakerNotes, Canon, Image] 3 - Measured EV: 3.00
+[MakerNotes, Canon, Image] 3 - Measured EV: 8.00
 [MakerNotes, Canon, Image] 4 - Target Aperture: 8
 [MakerNotes, Canon, Image] 5 - Target Exposure Time: 1/15
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
@@ -119,7 +119,7 @@
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
 [MakerNotes, Canon, Image] 21 - F Number: 8
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/16
-[MakerNotes, Canon, Image] 23 - Measured EV 2: 3.125
+[MakerNotes, Canon, Image] 23 - Measured EV 2: 8.125
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
@@ -157,7 +157,7 @@
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0
 [MakerNotes, Canon, Image] 5 - Bracket Shot Number: 0
-[MakerNotes, Canon, Image] 8 - Noise Reduction: Off
+[MakerNotes, Canon, Image] 8 - Long Exposure Noise Reduction 2: Off
 [MakerNotes, Canon, Image] 9 - WB Bracket Mode: Off
 [MakerNotes, Canon, Image] 12 - WB Bracket Value AB: 0
 [MakerNotes, Canon, Image] 13 - WB Bracket Value GM: 0
@@ -223,7 +223,7 @@
 [Composite, Composite, Image] FOV - Field Of View: 22.8 deg
 [Composite, Composite, Camera] FocalLength35efl - Focal Length: 55.0 mm (35 mm equivalent: 89.2 mm)
 [Composite, Composite, Camera] HyperfocalDistance - Hyperfocal Distance: 20.42 m
-[Composite, Composite, Image] ImageSize - Image Size: 1536x1024
+[Composite, Composite, Image] ImageSize - Image Size: 3456x2304
 [Composite, Composite, Camera] Lens35efl - Lens: 18.0 - 55.0 mm (35 mm equivalent: 29.2 - 89.2 mm)
 [Composite, Composite, Image] LightValue - Light Value: 7.9
 [Composite, Composite, Camera] RedBalance - Red Balance: 1.688027

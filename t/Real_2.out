@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.98
 [File, System, Image] FileName - File Name: Real.rm
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1915 bytes
@@ -62,3 +62,4 @@
 [ID3, ID3v1, Time] 93 - Year: 2003
 [ID3, ID3v1, Audio] 97 - Comment: This is a comment
 [ID3, ID3v1, Audio] 127 - Genre: Rock & Roll
+[Composite, Composite, Time] DateTimeOriginal - Date/Time Original: 2003

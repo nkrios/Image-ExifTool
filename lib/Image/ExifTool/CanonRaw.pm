@@ -22,7 +22,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.49';
+$VERSION = '1.50';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -314,10 +314,13 @@ sub BuildMakerNotes($$$$$$);
     0x1814 => { #3
         Name => 'MeasuredEV',
         Notes => q{
-            this the Canon name for what could better be called MeasuredLV, and is
-            offset by about -5 EV from the calculated LV for most models
+            this is the Canon name for what could better be called MeasuredLV, and
+            should be close to the calculated LightValue for a proper exposure with most
+            models
         },
         Format => 'float',
+        ValueConv => '$val + 5',
+        ValueConvInv => '$val - 5',
     },
     0x1817 => {
         Name => 'FileNumber',

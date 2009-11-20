@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.26';
+$VERSION = '1.27';
 
 sub WritePS($$);
 sub ProcessPS($$;$);
@@ -306,7 +306,7 @@ sub ProcessPS($$;$)
 
     # set file type (PostScript or EPS)
     $raf->ReadLine($data) or $data = '';
-    $exifTool->SetFileType($data =~ /EPSF/ ? 'EPS' : 'PS') unless $exifTool->{VALUE}->{FileType};
+    $exifTool->SetFileType($data =~ /EPSF/ ? 'EPS' : 'PS');
 #
 # extract TIFF information from DOS header
 #

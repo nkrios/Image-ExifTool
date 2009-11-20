@@ -86,12 +86,13 @@ my $testfile2;
     print "ok $testnum\n";
 }
 
-# test 6: Geotag from Garmin XML track log
+# test 6: Geotag from Garmin XML track log and test Geosync too
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     my $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
+    $exifTool->SetNewValue(Geosync => '1:30');
     $exifTool->SetNewValue(Geotag => 't/images/Geotag.xml');
     $exifTool->SetNewValuesFromFile('t/images/Panasonic.jpg',
         'Geotime<${DateTimeOriginal}+02:00'

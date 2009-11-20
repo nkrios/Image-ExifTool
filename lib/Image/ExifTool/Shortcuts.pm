@@ -15,7 +15,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.27';
+$VERSION = '1.29';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -179,6 +179,7 @@ $VERSION = '1.27';
         'MakerNoteLeica',
         'MakerNoteLeica2',
         'MakerNoteLeica3',
+        'MakerNoteLeica4',
         'MakerNotePanasonic',
         'MakerNotePanasonic2',
         'MakerNotePentax',
@@ -212,16 +213,6 @@ $VERSION = '1.27';
         'InteropIFD:RelatedImageWidth',
         'InteropIFD:RelatedImageHeight',
     ],
-    # Iptc4xmpCore tag name conversions for backward compatibility
-    # with ExifTool 7.44 and earlier
-    CreatorContactInfoCiAdrCity   => [ 'CreatorCity' ],
-    CreatorContactInfoCiAdrCtry   => [ 'CreatorCountry' ],
-    CreatorContactInfoCiAdrExtadr => [ 'CreatorAddress' ],
-    CreatorContactInfoCiAdrPcode  => [ 'CreatorPostalCode' ],
-    CreatorContactInfoCiAdrRegion => [ 'CreatorRegion' ],
-    CreatorContactInfoCiEmailWork => [ 'CreatorWorkEmail' ],
-    CreatorContactInfoCiTelWork   => [ 'CreatorWorkTelephone' ],
-    CreatorContactInfoCiUrlWork   => [ 'CreatorWorkURL' ],
 );
 
 #------------------------------------------------------------------------------

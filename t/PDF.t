@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..21\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..22\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -150,5 +150,17 @@ my $testnum = 1;
         unlink $testfile1 if $lastOK;
     }
 }
+
+# test 22: Delete all tags
+{
+    ++$testnum;
+    my @writeInfo = (
+        [ 'all' => undef ],
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
+                                   't/images/PDF.pdf', ['pdf:all','xmp:all']);
+    print "ok $testnum\n";
+}
+
 
 # end

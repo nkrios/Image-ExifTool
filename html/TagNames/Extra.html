@@ -31,7 +31,8 @@ contained within the file data.  These &quot;pseudo&quot; tags belong to the fam
 <tr>
 <td>CurrentIPTCDigest</td>
 <td class=c>N</td>
-<td><span class=s><span class=n>(MD5 digest of IPTC data, computed if Digest::MD5 is available)</span></span></td></tr>
+<td><span class=s><span class=n>(MD5 digest of IPTC data.  All zeros if IPTC exists but Digest::MD5 is not
+installed)</span></span></td></tr>
 <tr class=b>
 <td>Directory</td>
 <td class=c>Y!</td>
@@ -89,12 +90,19 @@ operation)</span></span></td></tr>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>Geosync</td>
+<td class=c>Y</td>
+<td><span class=s><span class=n>(this write-only tag specifies a time difference to add to Geotime for
+synchronization with the GPS clock.  For example, set this to &quot;-12&quot; if the
+camera clock is 12 seconds faster than GPS time.  Input format is
+&quot;[+-][[[DD ]HH:]MM:]SS[.ss]&quot;.  Must be set before Geotime to be effective)</span></span></td></tr>
+<tr>
 <td>Geotag</td>
 <td class=c>Y</td>
 <td><span class=s><span class=n>(this write-only tag is used to define the GPS track log data or track log
 file name.  Currently supported track log formats are GPX, NMEA RMC/GGA/GLL,
-KML, Garmin XML and TCX, and Magellan PMGNTRK)</span></span></td></tr>
-<tr>
+KML, IGC, Garmin XML and TCX, and Magellan PMGNTRK)</span></span></td></tr>
+<tr class=b>
 <td>Geotime</td>
 <td class=c>Y</td>
 <td><span class=s><span class=n>(this write-only tag is used to define a date/time for interpolating a
@@ -104,24 +112,24 @@ GPSLongitude, GPSLongitudeRef, GPSAltitude, GPSAltitudeRef, GPSDateStamp and
 GPSTimeStamp.  The local system timezone is assumed if the date/time value
 does not contain a timezone.  May be deleted to delete associated GPS tags.
 A group name of &#39;EXIF&#39; or &#39;XMP&#39; may be specified to write or delete only
-EXIF or XMP GPS tags)</span></span></td></tr>
-<tr class=b>
+EXIF or XMP GPS tags.  The value of Geotag must be assigned before this tag)</span></span></td></tr>
+<tr>
 <td>ICC_Profile</td>
 <td class=c>Y!</td>
 <td><span class=s><span class=n>(the full ICC_Profile data block)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>ID3Size</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ImageHeight</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ImageWidth</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>JPEGDigest</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(an MD5 digest of the JPEG quantization tables is combined with the component
@@ -129,40 +137,40 @@ sub-sampling values to generate the value of this tag.  The result is
 compared to known values in an attempt to deduce the originating software
 based only on the JPEG image data.  For performance reasons, this tag is
 calculated only if specifically requested)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>MIMEType</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>MaxVal</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Now</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(used to set the value of a tag to the current date/time. Not generated unless
 specified)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>PreviewImage</td>
 <td class=c>Y</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RAFVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Warning</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>XMP</td>
 <td class=c>Y!</td>
 <td><span class=s><span class=n>(the full XMP data block)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>XResolution</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>YResolution</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -170,7 +178,7 @@ specified)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 23, 2009</i>
+<br><i>Last revised Oct 28, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
 [File, System, Image] FileName - File Name: Nikon.nef
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 6.0 kB
@@ -89,7 +89,7 @@
 [IPTC, IPTC2, Location] 101 - Country-Primary Location Name: Canada
 [MakerNotes, Nikon, Camera] 1 - Maker Note Version: 2.10
 [MakerNotes, Nikon, Image] 2 - ISO: 200
-[MakerNotes, Nikon, Camera] 4 - Quality: Raw
+[MakerNotes, Nikon, Camera] 4 - Quality: RAW
 [MakerNotes, Nikon, Camera] 5 - White Balance: Auto
 [MakerNotes, Nikon, Camera] 6 - Sharpness: None
 [MakerNotes, Nikon, Camera] 7 - Focus Mode: AF-S
@@ -252,7 +252,7 @@
 [Composite, Composite, Time] SubSecDateTimeOriginal - Date/Time Original: 2004:06:09 16:02:35.00
 [Composite, Composite, Time] SubSecModifyDate - Modify Date: 2005:08:25 13:09:05.00
 [Composite, Composite, Camera] BlueBalance - Blue Balance: 1.860377
-[Composite, Composite, Camera] FocalLength35efl - Focal Length: 18.0 mm
 [Composite, Composite, Image] ImageSize - Image Size: 3040x2014
 [Composite, Composite, Image] LightValue - Light Value: 6.9
 [Composite, Composite, Camera] RedBalance - Red Balance: 1.803774
+[Composite, Composite, Camera] FocalLength35efl - Focal Length: 18.0 mm

@@ -10,7 +10,7 @@ package Image::ExifTool::JPEG;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.08';
+$VERSION = '1.10';
 
 # (this main JPEG table is for documentation purposes only)
 %Image::ExifTool::JPEG::Main = (
@@ -27,6 +27,10 @@ $VERSION = '1.08';
         Name => 'CIFF',
         Condition => '$$valPt =~ /^(II|MM).{4}HEAPJPGM/s',
         SubDirectory => { TagTable => 'Image::ExifTool::CanonRaw::Main' },
+      }, {
+        Name => 'AVI1',
+        Condition => '$$valPt =~ /^AVI1/',
+        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::AVI1' },
     }],
     APP1 => [{
         Name => 'EXIF',
@@ -72,11 +76,15 @@ $VERSION = '1.08';
         Condition => '$$valPt =~ /^RMETA\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::RMETA' },
     },
-    APP6 => {
+    APP6 => [{
         Name => 'EPPIM',
         Condition => '$$valPt =~ /^EPPIM\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::JPEG::EPPIM' },
-    },
+      },{
+        Name => 'NITF',
+        Condition => '$$valPt =~ /^NTIF\0/',
+        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::NITF' },
+    }],
     APP8 => {
         Name => 'SPIFF',
         Condition => '$$valPt =~ /^SPIFF\0/',
@@ -186,7 +194,8 @@ $VERSION = '1.08';
     NOTES => q{
         This information is found in APP8 of SPIFF-style JPEG images (the "official"
         yet rarely used JPEG file format standard: Still Picture Interchange File
-        Format).
+        Format).  See L<http://www.jpeg.org/public/spiff.pdf> for the official
+        specification.
     },
     0 => {
         Name => 'SPIFFVersion',
@@ -311,6 +320,82 @@ $VERSION = '1.08';
     GROUPS => { 0 => 'APP15', 1 => 'GraphConv', 2 => 'Image' },
     NOTES => 'APP15 is used by GraphicConverter to store JPEG quality.',
     'Q' => 'Quality',
+);
+
+# AVI1 APP0 segment (ref http://www.schnarff.com/file-formats/bmp/BMPDIB.TXT)
+%Image::ExifTool::JPEG::AVI1 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'APP0', 1 => 'AVI1', 2 => 'Image' },
+    NOTES => 'This information may be found in APP0 of JPEG image data from AVI videos.',
+    FIRST_ENTRY => 0,
+    0 => {
+        Name => 'InterleavedField',
+        PrintConv => {
+            0 => 'Not Interleaved',
+            1 => 'Odd',
+            2 => 'Even',
+        },
+    },    
+);
+
+# NITF APP6 segment (National Imagery Transmission Format)
+# ref http://www.gwg.nga.mil/ntb/baseline/docs/n010697/bwcguide25aug98.pdf
+%Image::ExifTool::JPEG::NITF = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'APP6', 1 => 'NITF', 2 => 'Image' },
+    NOTES => q{
+        Information in APP6 used by the National Imagery Transmission Format.  See
+        L<http://www.gwg.nga.mil/ntb/baseline/docs/n010697/bwcguide25aug98.pdf> for
+        the official specification.
+    },
+    0 => {
+        Name => 'NITFVersion',
+        Format => 'int8u[2]',
+        ValueConv => 'sprintf("%d.%.2d", split(" ",$val))',
+    },
+    2 => {
+        Name => 'ImageFormat',
+        ValueConv => 'chr($val)',
+        PrintConv => { B => 'IMode B' },
+    },
+    3 => {
+        Name => 'BlocksPerRow',
+        Format => 'int16u',
+    },
+    5 => {
+        Name => 'BlocksPerColumn',
+        Format => 'int16u',
+    },
+    7 => {
+        Name => 'ImageColor',
+        PrintConv => { 0 => 'Monochrome' },
+    },
+    8 => 'BitDepth',
+    9 => {
+        Name => 'ImageClass',
+        PrintConv => {
+            0 => 'General Purpose',
+            4 => 'Tactical Imagery',
+        },
+    },
+    10 => {
+        Name => 'JPEGProcess',
+        PrintConv => {
+            1 => 'Baseline sequential DCT, Huffman coding, 8-bit samples',
+            4 => 'Extended sequential DCT, Huffman coding, 12-bit samples',
+        },
+    },
+    11 => 'Quality',
+    12 => {
+        Name => 'StreamColor',
+        PrintConv => { 0 => 'Monochrome' },
+    },
+    13 => 'StreamBitDepth',
+    14 => {
+        Name => 'Flags',
+        Format => 'int32u',
+        PrintConv => 'sprintf("0x%x", $val)',
+    },
 );
 
 1;  # end

@@ -107,8 +107,8 @@ currently writes only EXIF, IPTC and XMP tags in these images.</p>
 <tr class=b>
 <td>'ftyp'</td>
 <td>FileType</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td class=c>-</td>
+<td>--&gt; <a href='Jpeg2000.html#FileType'>Jpeg2000 FileType Tags</a></td></tr>
 <tr>
 <td>'gtso'</td>
 <td>GraphicsTechnologyStandardOutput</td>
@@ -248,6 +248,31 @@ currently writes only EXIF, IPTC and XMP tags in these images.</p>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='FileType'>Jpeg2000 FileType Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>MajorBrand</td>
+<td class=c>N</td>
+<td><span class=s>&#39;jp2 &#39; = JPEG 2000 Image (.JP2)
+  <br>&#39;jpm &#39; = JPEG 2000 Compound Image (.JPM)
+  <br>&#39;jpx &#39; = JPEG 2000 with extensions (.JPX)</span></td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>MinorVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>CompatibleBrands</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='ImageHeader'>Jpeg2000 ImageHeader Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -364,7 +389,7 @@ currently writes only EXIF, IPTC and XMP tags in these images.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 5, 2007</i>
+<br><i>Last revised Oct 26, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

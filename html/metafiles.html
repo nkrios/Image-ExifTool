@@ -13,9 +13,6 @@ pre.code    { color: #000; padding: 0; margin: 0 }
 .l2         { color: #666; margin-left: 1.2em }
 .l2p        { color: #666; margin-left: 2.2em }
 .ind        { margin-left: 2.5em }
-div.index   { float: right; clear: both;
-              border-left: 1px solid gray;
-              margin: .5em 0 .5em .5em; padding: 0 .5em }
 -->
 </style>
 </head>
@@ -43,34 +40,38 @@ used to generate metadata sidecar files.</p>
 <p>There are a number of different ways to generate an XMP sidecar file with
 exiftool, and the method you choose depends on your circumstances and
 preferences. Below are a number of example commands which write an output XMP
-file from information in a source PDF file.</p>
+file from information in a source file of any type.</p>
 
-<p>1. Copy all information, writing to preferred locations in XMP:<br>
+<p>1. Copy same-named tags from all information types to preferred locations in XMP:<br>
 <span class=l2>(<code><i>SRC</i>.<i>EXT</i></code> is the source file name and
 extension, and <code><i>DST</i></code> is the destination file name)</span></p>
 <pre>exiftool -tagsfromfile <i>SRC</i>.<i>EXT</i> <i>DST</i>.xmp</pre>
 
-<p>2. Rewrite source PDF file to destination XMP file:<br>
-<span class=l2>(same effect as above, but an existing file will not be overwritten)</span></p>
+<p>2. Rewrite source file to destination XMP file:<br>
+<span class=l2>(same effect as above, but the command will exit with an error if the output XMP file already exists)</span></p>
 <pre>exiftool <i>SRC</i>.<i>EXT</i> -o <i>DST</i>.xmp</pre>
 
 <p>3. Copy XMP, preserving original locations:<br>
 <span class=l2>(ie. copies XMP tags only to the same namespaces in the destination file)</span></p>
 <pre>exiftool -tagsfromfile <i>SRC</i>.<i>EXT</i> -all:all <i>DST</i>.xmp</pre>
 
-<p>4. Rewrite source PDF to XMP file, preserving locations:<br>
-<span class=l2>(same effect as above, but an existing file will not be overwritten)</span></p>
+<p>4. Rewrite source to XMP file, preserving locations:<br>
+<span class=l2>(same effect as above, but the command will fail if the XMP file already exists)</span></p>
 <pre>exiftool <i>SRC</i>.<i>EXT</i> -o <i>DST</i>.xmp -all:all</pre>
 
-<p>5. Copy XMP as a block to an XMP file:<br>
+<p>5. Generate XMP from EXIF and IPTC using standard tag name mappings:<br>
+<span class=l2> (the <code>.args</code> files are available in the full ExifTool distribution)</span></p>
+<pre>exiftool -tagsfromfile <i>SRC</i>.<i>EXT</i> -@ exif2xmp.args -@ iptc2xmp.args <i>DST</i>.xmp</pre>
+
+<p>6. Copy XMP as a block to an XMP file:<br>
 <span class=l2>(writing as a block is the only way to transfer unknown or non-writable XMP tags)</span></p>
 <pre>exiftool -tagsfromfile <i>SRC</i>.<i>EXT</i> -xmp <i>DST</i>.xmp</pre>
 
-<p>6. Extract XMP as a block and write to output XMP file: <span class=lt>(same effect as above)</span></p>
+<p>7. Extract XMP as a block and write to output XMP file: <span class=lt>(same effect as above)</span></p>
 <pre>exiftool -xmp -b <i>SRC</i>.<i>EXT</i> > <i>DST</i>.xmp</pre>
 
-<p>7. Extract XMP as a block to an output text file with .xmp extension:<br>
-<span class=l2>(same effect as above, but an existing file will not be overwritten
+<p>8. Extract XMP as a block to an output text file with .xmp extension:<br>
+<span class=l2>(same effect as above, but the command will fail if the XMP file exists
 and the destination file name is the same as the source)</span></p>
 <pre>exiftool -xmp -b -w xmp <i>SRC</i>.<i>EXT</i></pre>
 
@@ -110,19 +111,19 @@ from images in <code><i>SRCDIR</i></code>.</p>
 
 <p>By specifying different tags in the
 <a href="ExifTool.html#SetNewValuesFromFile">SetNewValuesFromFile</a>
-call, the above examples numbered 1-5 are programmed like this:</p>
+call, the above examples numbered 1-6 are programmed like this:</p>
 
 <blockquote><table class='box'><tr><td><pre class='code'>
-$exifTool-><a href="ExifTool.html#SetNewValuesFromFile">SetNewValuesFromFile</a>('a.pdf', @tags_to_copy);
-$exifTool-><a href="ExifTool.html#WriteInfo">WriteInfo</a>(undef, 'a.xmp');
+$exifTool-><a href="ExifTool.html#SetNewValuesFromFile">SetNewValuesFromFile</a>('SRC.EXT', @tags_to_copy);
+$exifTool-><a href="ExifTool.html#WriteInfo">WriteInfo</a>(undef, 'DST.xmp');
 </pre></td></tr></table></blockquote>
 
-<p>and examples 6 and 7 use this general technique:</p>
+<p>and examples 7 and 8 use this general technique:</p>
 
 <blockquote><table class='box'><tr><td><pre class='code'>
-my $info = <a href="ExifTool.html#ImageInfo">ImageInfo</a>('a.pdf', 'xmp');
+my $info = <a href="ExifTool.html#ImageInfo">ImageInfo</a>('SRC.EXT', 'xmp');
 die "No XMP" unless $$info{XMP};
-open FILE, '&gt;a.xmp';
+open FILE, '&gt;DST.xmp';
 print FILE ${$$info{XMP}};
 close FILE;
 </pre></td></tr></table></blockquote>
@@ -216,7 +217,7 @@ which may be useful if disk space is at a premium.</p>
 
 <hr>
 <i>Created Nov 12, 2008</i><br>
-<i>Last revised Jan 17, 2009</i>
+<i>Last revised Sep 15, 2009</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

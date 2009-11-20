@@ -10,7 +10,7 @@ package Image::ExifTool::Lang::ja;
 
 use vars qw($VERSION);
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 %Image::ExifTool::Lang::ja::Translate = (
    'AEAperture' => 'AE絞り',
@@ -152,10 +152,10 @@ $VERSION = '1.09';
    'AFAreaMode' => {
       Description => 'AFエリアモード',
       PrintConv => {
-        'Auto-area AF' => '自動エリアAF',
+        'Auto-area' => '自動エリアAF',
         'Dynamic Area' => 'ダイナミックエリア',
         'Dynamic Area (wide)' => 'ダイナミック（ワイド）',
-        'Dynamic Area, Closest Subject' => 'ダイナミック、重点主題',
+        'Dynamic Area (closest subject)' => 'ダイナミック（重点主題）',
         'Group Dynamic' => 'グループダイナミック',
         'Single Area' => 'シングルポイント',
         'Single Area (wide)' => 'シングルポイント（ワイド）',
@@ -189,13 +189,6 @@ $VERSION = '1.09';
         'Does not emit' => 'しない',
         'Emits' => 'する',
         'Only ext. flash emits' => '外部ストロボのみする',
-      },
-    },
-   'AFAssistIlluminator' => {
-      Description => '内蔵AFアシストイルミネーター',
-      PrintConv => {
-        'Off' => 'オフ',
-        'On' => 'オン',
       },
     },
    'AFDefocus' => 'AFぼけ量',
@@ -4612,7 +4605,9 @@ $VERSION = '1.09';
    'SelectableAFPoint' => {
       Description => '任意選択可能なAFフレーム',
       PrintConv => {
+        '11 points' => '11点',
         '19 points' => '19点',
+        '45 points' => '45点',
         'Inner 9 points' => '9点(内側)',
         'Outer 9 points' => '9点(外側)',
       },

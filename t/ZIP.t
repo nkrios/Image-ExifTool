@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..2\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..6\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -21,14 +21,33 @@ use t::TestLib;
 my $testname = 'ZIP';
 my $testnum = 1;
 
-# test 2: Extract information from test file
+# tests 2-3: Extract information from test ZIP and GZIP files
 {
-    ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/images/ZIP.zip');
-    print 'not ' unless check($exifTool, $info, $testname, $testnum);
-    print "ok $testnum\n";
+    my $type;
+    foreach $type (qw(zip gz)) {
+        ++$testnum;
+        my $info = $exifTool->ImageInfo("t/images/ZIP.$type");
+        print 'not ' unless check($exifTool, $info, $testname, $testnum);
+        print "ok $testnum\n";
+    }
 }
 
+# tests 4-6: Extract information from other ZIP-based files (requires Archive::Zip)
+{
+    my $exifTool = new Image::ExifTool;
+    my $file;
+    foreach $file ('OOXML.docx', 'CaptureOne.eip', 'iWork.numbers') {
+        ++$testnum;
+        my $skip = '';
+        if (eval 'require Archive::Zip') {
+            my $info = $exifTool->ImageInfo("t/images/$file");
+            print 'not ' unless check($exifTool, $info, $testname, $testnum);
+        } else {
+            $skip = ' # skip Requires Archive::Zip';
+        }
+        print "ok $testnum$skip\n";
+    }
+}
 
 # end

@@ -46,6 +46,7 @@ html/TagNames/JVC.html
 html/TagNames/Jpeg2000.html
 html/TagNames/Kodak.html
 html/TagNames/KyoceraRaw.html
+html/TagNames/LNK.html
 html/TagNames/Leaf.html
 html/TagNames/M2TS.html
 html/TagNames/MIE.html
@@ -54,10 +55,12 @@ html/TagNames/MNG.html
 html/TagNames/MPC.html
 html/TagNames/MPEG.html
 html/TagNames/MPF.html
+html/TagNames/MWG.html
 html/TagNames/Minolta.html
 html/TagNames/MinoltaRaw.html
 html/TagNames/Nikon.html
 html/TagNames/NikonCapture.html
+html/TagNames/OOXML.html
 html/TagNames/Olympus.html
 html/TagNames/PDF.html
 html/TagNames/PICT.html
@@ -84,6 +87,7 @@ html/TagNames/Unknown.html
 html/TagNames/Vorbis.html
 html/TagNames/XMP.html
 html/TagNames/ZIP.html
+html/TagNames/iWork.html
 html/TagNames/index.html
 html/TagNames/style.css
 html/canon_raw.html
@@ -101,6 +105,7 @@ html/index.html
 html/install.html
 html/metafiles.html
 html/models.html
+html/standards.html
 html/style.css
 html/under.html
 html/verbose.html
@@ -123,7 +128,9 @@ lib/Image/ExifTool/Canon.pm
 lib/Image/ExifTool/CanonCustom.pm
 lib/Image/ExifTool/CanonRaw.pm
 lib/Image/ExifTool/CanonVRD.pm
+lib/Image/ExifTool/CaptureOne.pm
 lib/Image/ExifTool/Casio.pm
+lib/Image/ExifTool/Charset.pm
 lib/Image/ExifTool/DICOM.pm
 lib/Image/ExifTool/DNG.pm
 lib/Image/ExifTool/DjVu.pm
@@ -153,6 +160,7 @@ lib/Image/ExifTool/JVC.pm
 lib/Image/ExifTool/Jpeg2000.pm
 lib/Image/ExifTool/Kodak.pm
 lib/Image/ExifTool/KyoceraRaw.pm
+lib/Image/ExifTool/LNK.pm
 lib/Image/ExifTool/Lang/cs.pm
 lib/Image/ExifTool/Lang/de.pm
 lib/Image/ExifTool/Lang/en_ca.pm
@@ -178,11 +186,13 @@ lib/Image/ExifTool/MNG.pm
 lib/Image/ExifTool/MPC.pm
 lib/Image/ExifTool/MPEG.pm
 lib/Image/ExifTool/MPF.pm
+lib/Image/ExifTool/MWG.pm
 lib/Image/ExifTool/MakerNotes.pm
 lib/Image/ExifTool/Minolta.pm
 lib/Image/ExifTool/MinoltaRaw.pm
 lib/Image/ExifTool/Nikon.pm
 lib/Image/ExifTool/NikonCapture.pm
+lib/Image/ExifTool/OOXML.pm
 lib/Image/ExifTool/Olympus.pm
 lib/Image/ExifTool/PDF.pm
 lib/Image/ExifTool/PICT.pm
@@ -225,6 +235,7 @@ lib/Image/ExifTool/Writer.pl
 lib/Image/ExifTool/XMP.pm
 lib/Image/ExifTool/XMP2.pm
 lib/Image/ExifTool/ZIP.pm
+lib/Image/ExifTool/iWork.pm
 perl-Image-ExifTool.spec
 t/AFCP.t
 t/AFCP_2.out
@@ -280,6 +291,7 @@ t/ExifTool_20.out
 t/ExifTool_21.out
 t/ExifTool_22.out
 t/ExifTool_23.out
+t/ExifTool_24.out
 t/ExifTool_3.out
 t/ExifTool_4.out
 t/ExifTool_5.out
@@ -346,6 +358,7 @@ t/IPTC-XMP_30.out
 t/IPTC-XMP_31.out
 t/IPTC-XMP_32.out
 t/IPTC-XMP_33.out
+t/IPTC-XMP_34.out
 t/IPTC-XMP_4.out
 t/IPTC-XMP_6.out
 t/IPTC-XMP_7.out
@@ -368,6 +381,8 @@ t/Kodak_2.out
 t/Kodak_3.out
 t/KyoceraRaw.t
 t/KyoceraRaw_2.out
+t/LNK.t
+t/LNK_2.out
 t/Lang.t
 t/Lang_1.out
 t/Lang_10.out
@@ -391,10 +406,16 @@ t/M2TS_2.out
 t/MIE.t
 t/MIE_2.out
 t/MIE_3.out
+t/MIE_5.out
+t/MIE_6.out
 t/MIFF.t
 t/MIFF_2.out
 t/MP3.t
 t/MP3_2.out
+t/MWG.t
+t/MWG_2.out
+t/MWG_3.out
+t/MWG_4.out
 t/Minolta.t
 t/Minolta_2.out
 t/Minolta_3.out
@@ -425,6 +446,7 @@ t/PDF_18.out
 t/PDF_19.out
 t/PDF_2.out
 t/PDF_20.out
+t/PDF_22.out
 t/PDF_4.out
 t/PDF_5.out
 t/PDF_6.out
@@ -447,6 +469,7 @@ t/Panasonic_5.out
 t/Pentax.t
 t/Pentax_2.out
 t/Pentax_3.out
+t/Pentax_4.out
 t/PhotoMechanic.t
 t/PhotoMechanic_2.out
 t/PhotoMechanic_3.out
@@ -519,6 +542,10 @@ t/Writer_7.out
 t/Writer_9.out
 t/ZIP.t
 t/ZIP_2.out
+t/ZIP_3.out
+t/ZIP_4.out
+t/ZIP_5.out
+t/ZIP_6.out
 t/images/AFCP.jpg
 t/images/AIFF.aif
 t/images/APE.ape
@@ -530,6 +557,7 @@ t/images/Canon1DmkIII.jpg
 t/images/CanonRaw.cr2
 t/images/CanonRaw.crw
 t/images/CanonVRD.vrd
+t/images/CaptureOne.eip
 t/images/Casio.jpg
 t/images/Casio2.jpg
 t/images/DICOM.dcm
@@ -564,16 +592,19 @@ t/images/JVC2.jpg
 t/images/Jpeg2000.jp2
 t/images/Kodak.jpg
 t/images/KyoceraRaw.raw
+t/images/LNK.lnk
 t/images/M2TS.mts
 t/images/MIE.mie
 t/images/MIFF.miff
 t/images/MP3.mp3
+t/images/MWG.jpg
 t/images/Minolta.jpg
 t/images/Minolta.mrw
 t/images/Nikon.jpg
 t/images/Nikon.nef
 t/images/NikonD2Hs.jpg
 t/images/NikonD70.jpg
+t/images/OOXML.docx
 t/images/Olympus.jpg
 t/images/Olympus2.jpg
 t/images/OlympusE1.jpg
@@ -584,6 +615,7 @@ t/images/PNG.png
 t/images/PPM.ppm
 t/images/Panasonic.jpg
 t/images/Panasonic.rw2
+t/images/Pentax.avi
 t/images/Pentax.jpg
 t/images/PhotoMechanic.jpg
 t/images/Photoshop.psd
@@ -610,7 +642,9 @@ t/images/XMP.xmp
 t/images/XMP2.xmp
 t/images/XMP3.xmp
 t/images/XMP4.xmp
+t/images/ZIP.gz
 t/images/ZIP.zip
+t/images/iWork.numbers
 xmp2exif.args
 xmp2gps.args
 xmp2iptc.args

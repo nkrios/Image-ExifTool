@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
 [File, System, Image] FileName - File Name: RIFF.avi
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1262 bytes
@@ -12,11 +12,15 @@
 [RIFF, RIFF, Video] 8 - Image Width: 320
 [RIFF, RIFF, Video] 9 - Image Height: 240
 [RIFF, RIFF, Video] 0 - Stream Type: Video
-[RIFF, RIFF, Video] 1 - Codec: mjpg
+[RIFF, RIFF, Video] 1 - Video Codec: mjpg
+[RIFF, RIFF, Video] 5 - Video Frame Rate: 15
+[RIFF, RIFF, Video] 8 - Video Frame Count: 233
 [RIFF, RIFF, Video] 10 - Quality: 10000
 [RIFF, RIFF, Video] 11 - Sample Size: Variable
 [RIFF, RIFF, Video] 0 - Stream Type: Audio
-[RIFF, RIFF, Video] 1 - Codec: 
+[RIFF, RIFF, Video] 1 - Audio Codec: 
+[RIFF, RIFF, Video] 5 - Audio Sample Rate: 11024
+[RIFF, RIFF, Video] 8 - Audio Sample Count: 171240
 [RIFF, RIFF, Video] 10 - Quality: 10000
 [RIFF, RIFF, Video] 11 - Sample Size: 1 byte
 [RIFF, RIFF, Audio] 0 - Encoding: Microsoft PCM

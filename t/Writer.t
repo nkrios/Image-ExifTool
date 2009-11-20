@@ -102,6 +102,7 @@ my $testfile;
     $exifTool->SetNewValue(ExposureCompensation => 999, Group => 'EXIF');
     $exifTool->SetNewValue(LightSource => 'cloud');
     $exifTool->SetNewValue(Flash => '0x1', Type => 'ValueConv');
+    $exifTool->SetNewValue('Orientation#' => 3);
     $exifTool->SetNewValue(FocalPlaneResolutionUnit => 'mm');
     $exifTool->SetNewValue(Category => 'IPTC test');
     $exifTool->SetNewValue(Description => 'New description');
@@ -117,11 +118,13 @@ my $testfile;
     $exifTool->SetNewValue(ExposureCompensation => 0, Group => 'EXIF');
     $exifTool->SetNewValue(LightSource);
     $exifTool->SetNewValue(Flash => '0x0', Type => 'ValueConv');
+    $exifTool->SetNewValue('Orientation#' => 1);
     $exifTool->SetNewValue(FocalPlaneResolutionUnit => 'in');
     $exifTool->SetNewValue(Category);
     $exifTool->SetNewValue(Description);
     my $image;
     $exifTool->WriteInfo($testfile1, \$image);
+    $exifTool->Options(Composite => 0);
     $info = $exifTool->ImageInfo(\$image, '-filesize');
     my $testfile2 = "t/${testname}_${testnum}_failed.jpg";
     if (check($exifTool, $info, $testname, $testnum)) {
@@ -153,7 +156,8 @@ my $testfile;
     undef $info;
     my $image;
     $exifTool->WriteInfo('t/images/Canon.jpg', \$image);
-    $exifTool->Options(Unknown => 1, Binary => 0, List => 0);
+    # (must drop Composite tags because their order may change)
+    $exifTool->Options(Unknown => 1, Binary => 0, List => 0, Composite => 0);
     # (must ignore filesize because it changes as null padding is discarded)
     $info = $exifTool->ImageInfo(\$image, '-filesize');
     $testfile = "t/${testname}_${testnum}_failed.jpg";
@@ -492,9 +496,17 @@ my $testOK;
     $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
     $exifTool->SetNewValue();
     $exifTool->SetNewValue('exif:datetimeoriginal', '2000:01:02 03:04:05');
-    $exifTool->WriteInfo($testfile);
-    my $info = $exifTool->ImageInfo($testfile, 'XResolution', 'YResolution', 'DateTimeOriginal');
-    if (check($exifTool, $info, $testname, $testnum)) {
+    my $result = $exifTool->WriteInfo($testfile);
+    my $err = '';
+    $err .= "  Error: WriteInfo() returned $result\n" if $result != 1;
+    my $info = $exifTool->GetInfo('Warning', 'Error');
+    foreach (sort keys %$info) {
+        my $tag = Image::ExifTool::GetTagName($_);
+        $err .= "  $tag: $$info{$_}\n";
+    }
+    warn "\n$err" if $err;
+    $info = $exifTool->ImageInfo($testfile, 'XResolution', 'YResolution', 'DateTimeOriginal');
+    if (check($exifTool, $info, $testname, $testnum) and not $err) {
         unlink $testfile;
     } else {
         print 'not ';

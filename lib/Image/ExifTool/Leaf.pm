@@ -13,7 +13,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessLeaf($$$);
 
@@ -335,13 +335,13 @@ they don't appear in these tables.
 
 # table for Leaf SubIFD entries
 %Image::ExifTool::Leaf::SubIFD = (
-    GROUPS => { 0 => 'EXIF', 1 => 'LeafSubIFD', 2 => 'Image'},
+    GROUPS => { 0 => 'MakerNotes', 1 => 'LeafSubIFD', 2 => 'Image'},
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     NOTES => q{
-Leaf also writes a TIFF-format sub-IFD inside IFD0 of a MOS image.  No tags
-in this sub-IFD are currently known, except for tag 0x8606 which really
-shouldn't be here anyway (so it doesn't appear in the table below) because
-it duplicates a reference to the same data of tag 0x8606 in IFD0.
+        Leaf writes a TIFF-format sub-IFD inside IFD0 of a MOS image.  No tags in
+        this sub-IFD are currently known, except for tag 0x8606 which really
+        shouldn't be here anyway (so it doesn't appear in the table below) because
+        it duplicates a reference to the same data of tag 0x8606 in IFD0.
     },
 );
 

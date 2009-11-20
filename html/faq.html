@@ -8,9 +8,6 @@
 <!--
 pre         { color: #800; margin-left: 2em }
 code        { white-space: nowrap }
-div.index   { float: right; clear: both;
-              border-left: 1px solid gray;
-              margin: .5em 0 .5em .5em; padding: 0 .5em }
 ol.index    { margin: 0; padding: 0 0 0 2em }
 -->
 </style>
@@ -144,8 +141,8 @@ format unless the <code>-n</code> option is used.
 </blockquote>
 
 <a name="Q6"></a>
-<p>6. <b>"I get the following error when writing a tag:
-'<code>Can't convert TAG (not in PrintConv)</code>'"</b></p>
+<p>6. <b>"I get '<code>Can't convert TAG (not in PrintConv)</code>' errors when
+writing a tag"</b></p>
 
 <blockquote>
 By default, ExifTool applies a print conversion (PrintConv) to extracted
@@ -167,22 +164,27 @@ For example, to write GPSAltitudeRef you can type:
 or any unambiguous short form may be used and ExifTool will know what you mean, ie)
 <pre>exiftool -gpsaltituderef=above image.jpg
 </pre>
-Alternatively, the print conversion can be disabled with the <code>-n</code>
-option. In this case the printed value of GPSAltitudeRef will be '0' or '1', and
-the value is written in the same way. So the following command has exactly the
-same effect as the commands above:
+Alternatively, the print conversion can be disabled for all tags with the
+<code>-n</code> option, or for individual tags by suffixing the tag name with a
+'<code>#</code>' character.  In either case the printed value of GPSAltitudeRef
+will be '0' or '1' when extracting information, and the value is written in the
+same way. So following two commands have exactly the same effect as above:
 <pre>exiftool -gpsaltituderef=0 -n image.jpg
+exiftool -gpsaltituderef#=0 image.jpg
 </pre>
 Integer values may also be specified in hexadecimal (with a leading '0x').  For
 example, the following commands are all valid and accomplish the same thing:
 <pre>exiftool -flash=1 -n image.jpg
 exiftool -flash=0x1 -n image.jpg
+exiftool -flash#=1 image.jpg
+exiftool -flash#=0x1 image.jpg
 exiftool -flash=fired image.jpg
 </pre>
-Programmers: The two techniques look like this when calling Image::ExifTool
+Programmers: These techniques look like this when calling Image::ExifTool
 functions from a Perl script:
 <pre>$exifTool->SetNewValue(GPSAltitudeRef => 'Above Sea Level');
 $exifTool->SetNewValue(GPSAltitudeRef => 0, Type => 'ValueConv');
+$exifTool->SetNewValue('GPSAltitudeRef#' => 0);
 </pre>
 </blockquote>
 
@@ -195,7 +197,7 @@ This is because of the way a TIFF file is structured.  With a JPEG image, this
 command will remove IFD0 (the main Image File Directory) as well as any
 subdirectories, thus removing all EXIF information.  But with the TIFF format,
 the main image itself is stored in IFD0, so deleting this directory would
-destroy the image.  Instead, ExifTool just deletes the ExifIFD subdirectory, so
+destroy the image.  Instead, ExifTool just deletes the ExifIFD subdirectory, and
 any information stored in other directories is preserved.</blockquote>
 
 <blockquote>Use "<code>exiftool -a -G1 -s img.tif</code>" to
@@ -320,51 +322,67 @@ special characters in a Windows console.]</i></blockquote>
 
 <blockquote>
 Certain meta information formats allow coded character sets other than plain
-ASCII.   When reading, 8&#8209;bit encodings are passed straight through ExifTool
-without translation (unless otherwise specified below), and multi-byte encodings
-are translated to UTF&#8209;8 by default, or Windows Latin1 with the
-<code>-L</code> option (or by setting the "<code>Charset</code>" option to
-"<code>Latin</code>" via the API).  When writing, the inverse translations are
-performed.  (Alternatively, special characters may be translated to/from HTML
-character entities when reading/writing with the <code>-E</code> option.)  More
-specific details are given below about how character coding is handled for EXIF,
-IPTC, XMP, ID3 and PDF information:</blockquote>
+ASCII.  When reading, 8&#8209;bit encodings are passed straight through ExifTool
+without translation (unless specified otherwise below), and multi-byte encodings
+are translated according to the exiftool <code>-charset</code> option, or to
+UTF&#8209;8 by default.  The <code>-L</code> option is equivalent to
+"<code>-charset Latin</code>", "<code>-charset Latin1</code>" and
+"<code>-charset cp1252</code>".  When writing, the inverse translations are
+performed.  Alternatively, special characters may be translated to/from HTML
+character entities when reading/writing with the <code>-E</code> option.
+</blockquote>
+
+<blockquote>Valid <code>-charset</code> values are (with aliases given in
+brackets): UTF8 (UTF-8, cp65001), Latin (Latin1, cp1252), Latin2 (cp1250),
+Cyrillic (Russian, cp1251), Greek (cp1253), Turkish (cp1254), Hebrew (cp1255),
+Arabic (cp1256), Baltic (cp1257), Vietnam (cp1258), Thai (cp874), MacRoman (Mac,
+Roman, cp10000), MacLatin2 (cp10029), MacCyrillic (cp10007), MacGreek (cp10006),
+MacTurkish (cp10081), MacRomanian (cp10010), MacIceland (cp10079) and
+MacCroatian (cp10082).</blockquote>
+
+<blockquote>More specific details are given below about how character coding is
+handled for EXIF, IPTC, XMP, ID3, PDF and MIE information:</blockquote>
 
 <blockquote><b>EXIF</b>: Most textual information in EXIF is stored in ASCII
 format, and ExifTool does not translate these tags.  However it is not uncommon
 for applications to write UTF-8 or other encodings where ASCII is expected, and
 ExifTool will quite happily read/write any encoding without translation.  For a
 few EXIF tags (UserComment, GPSProcessingMethod and GPSAreaInformation) the
-stored text may be encoded either in ASCII, Unicode or JIS.  When reading these
-tags, Unicode text is translated to UTF&#8209;8, or Windows Latin1 with the
-<code>-L</code> option.  Other encodings are not translated.  When writing, text
-is stored as ASCII unless the string contains special characters, in which case
-it is translated from UTF&#8209;8 or Latin1 (depending on the <code>-L</code>
-option) and stored as Unicode.  The EXIF "XP" tags (XPTitle, XPComment, etc) are
-always stored as Unicode, and are read and written as either UTF&#8209;8, or
-Windows Latin1 with the <code>-L</code> option.</blockquote>
+stored text may be encoded either in ASCII, Unicode (UCS-2) or JIS.  When
+reading these tags, Unicode text is translated to the character set specified by
+the <code>-charset</code> or <code>-L</code> option, or to UTF&#8209;8 by
+default. Other encodings are not translated.  When writing, text is stored as
+ASCII unless the string contains special characters, in which case it is
+translated from the specified character set and stored as Unicode.  The EXIF
+"XP" tags (XPTitle, XPComment, etc) are always stored as Unicode, and are read
+and written using the specified character set.</blockquote>
 
 <blockquote><b>IPTC</b>: The value of the IPTC:CodedCharacterSet tag determines
 how the internal IPTC string values are interpreted.  If CodedCharacterSet
 exists and has a value of "<code>UTF8</code>" (or
 "<code>ESC&nbsp;%&nbsp;G</code>") then string values are assumed to be stored as
-UTF&#8209;8, otherwise Windows Latin1 (cp1252) coding is assumed. When reading,
-these strings are translated to UTF&#8209;8 by default, or Latin1 with the
-<code>-L</code> option.  When writing, the inverse translation is performed.  No
-translation is done if the internal (IPTC) and external (ExifTool) character
-sets are the same. Note that ISO 2022 character set shifting is not supported. 
-Instead, a warning is issued and the string is not translated if an ISO 2022
-shift code is found. See the <a href="http://www.iptc.org/IIM/">IPTC
-specification</a> for more information about IPTC character coding.</blockquote>
+UTF&#8209;8, otherwise Windows Latin1 (cp1252) coding is assumed by default, but
+this can be changed with "<code>-charset iptc=CHARSET</code>".  When reading,
+these strings are translated to UTF&#8209;8 by default, or to the character set
+specified by the <code>-charset</code> or <code>-L</code> option.  When writing,
+the inverse translations are performed.  No translation is done if the internal
+(IPTC) and external (ExifTool) character sets are the same.  Note that ISO 2022
+character set shifting is not supported. Instead, a warning is issued and the
+string is not translated if an ISO 2022 shift code is found.  See the <a
+href="http://www.iptc.org/IIM/">IPTC specification</a> for more information
+about IPTC character coding.</blockquote>
 
 <blockquote>ExifTool may be used to convert IPTC values to a different internal
 encoding.  To do this, all IPTC tags must be rewritten along with the desired
 value of CodedCharacterSet. For example, the following command changes the
 internal IPTC encoding to UTF&#8209;8:
-<pre>exiftool -tagsfromfile a.jpg -iptc:all -codedcharacterset=utf8 a.jpg
-</pre>and this command changes it to Windows cp1252:
-<pre>exiftool -tagsfromfile a.jpg -iptc:all -codedcharacterset= a.jpg
-</pre></blockquote>
+<pre>exiftool -tagsfromfile @ -iptc:all -codedcharacterset=utf8 a.jpg
+</pre>and this command changes it back from UTF&#8209;8 to Windows Latin1 (cp1252):
+<pre>exiftool -tagsfromfile @ -iptc:all -codedcharacterset= a.jpg
+</pre>or this command changes it back from UTF&#8209;8 to Windows Latin2 (cp1250):
+<pre>exiftool -tagsfromfile @ -iptc:all -codedcharacterset= -charset iptc=latin2 a.jpg
+</pre>But note that unless UTF&#8209;8 is used, applications have no reliable
+way to determine the IPTC character encoding.</blockquote>
 
 <blockquote><b>XMP</b>: Exiftool reads XMP encoded as UTF&#8209;8, UTF&#8209;16
 or UTF&#8209;32, and converts them all to UTF&#8209;8 internally.  Also, all XML
@@ -372,34 +390,34 @@ character entity references and numeric character references are converted.
 When writing, ExifTool always encodes XMP as UTF&#8209;8, converting the
 following 5 characters to XML character references: <code>&amp; &lt; &gt; &#39;
 &quot;</code>. By default no further translation is performed, however the
-<code>-L</code> option may be used used to translate text to Windows Latin1 when
-reading or from Windows Latin1 when writing.</blockquote>
+<code>-charset</code> or <code>-L</code> option may be used used to translate
+text to/from a specified character set when reading/writing.</blockquote>
 
 <blockquote><b>ID3</b>: The ID3v1 specification officially supports only ISO
 8859&#8209;1 encoding although some applications may incorrectly use other
 character sets.  ExifTool assumes proper ISO 8859&#8209;1 encoding and
 translates to UTF&#8209;8 by default, or disables translation with the
-<code>-L</code> option (since ISO 8859&#8209;1 is a subset of Windows Latin1). 
-ID3v2 text may be stored with a number of different encodings, and ExifTool
-translates them all to UTF&#8209;8 by default or Windows Latin1 with the
-<code>-L</code> option.  ExifTool does not currently write ID3
-information.</blockquote>
+"<code>-charset Latin</code>" or <code>-L</code> (since ISO 8859&#8209;1 is a
+subset of Windows Latin1). ID3v2 text may be stored with a number of different
+encodings, and ExifTool translates them to the character set specified by
+<code>-charset</code> or <code>-L</code>, or to UTF&#8209;8 by default. 
+ExifTool does not currently write ID3 information.</blockquote>
 
 <blockquote><b>PDF</b>: PDF text strings are stored in either PDFDocEncoding
 (similar to Windows Latin1) or Unicode (UCS&#8209;2).  When reading, ExifTool
-translates to UTF&#8209;8 by default, or Windows Latin1 with the <code>-L</code>
-option.  When writing, exiftool encodes UTF&#8209;8 or Latin1 text as Unicode
-only if the string contains special characters, otherwise PDFDocEncoding is
+translates to the character set specified by the <code>-charset</code> or
+<code>-L</code> option, or to UTF&#8209;8 by default.  When writing, exiftool
+encodes input text from the specified character set as Unicode only if the
+string contains special characters, otherwise PDFDocEncoding is
 used.</blockquote>
 
 <blockquote><b>MIE</b>: MIE strings are stored as either UTF&#8209;8 or ISO
-8859&#8209;1. When reading, UTF&#8209;8 strings are translated to Latin only if
-the <code>-L</code> option is used, and ISO 8859&#8209;1 strings are never
-translated.  When writing, input strings are translated from Latin1 to
-UTF&#8209;8 only if the <code>-L</code> option is used, otherwise no translation
-is performed.  The resulting strings are stored as UTF&#8209;8 if they contain
-multi-byte UTF&#8209;8 character sequences, otherwise they are assumed to be ISO
-8859&#8209;1.</blockquote>
+8859&#8209;1. When reading, UTF&#8209;8 strings are translated according to
+the <code>-charset</code> or <code>-L</code> option, and ISO 8859&#8209;1
+strings are never translated.  When writing, input strings are translated from
+the specified character set to UTF&#8209;8.  The resulting strings are stored as
+UTF&#8209;8 if they contain multi-byte UTF&#8209;8 character sequences,
+otherwise they are stored as ISO 8859&#8209;1.</blockquote>
 
 <a name="Q11"></a>
 <p>11. <b>"My user-defined tags don't work"</b></p>
@@ -596,12 +614,12 @@ problem.</blockquote>
 written.  However, most Makernote errors are designated as <b>minor</b>, which
 allows them to be ignored by using the <code>-m</code> option.  For example:
 
-<pre>Error: [minor] Bad format (65535) for MakerNotes entry 17 - image.jpg
+<pre>Error: [minor] Bad format (65535) for MakerNotes entry 17
 </pre>
 
-Using <b>-m</b> will downgrade the minor error to a warning, allowing the file
-to be written, but some Makernote information may be lost when ignoring certain
-types of errors like this.
+Using <code>-m</code> will downgrade the minor error to a warning, allowing the
+file to be written, but some Makernote information may be lost when ignoring
+certain types of errors like this.
 </blockquote>
 
 <a name="Q16"></a>
@@ -731,12 +749,12 @@ existing keywords, use "<code>+&lt;</code>" or "<code>-&lt;</code>".
 
 <blockquote>The Windows cmd.exe console uses an MS-DOS encoding by default
 (cp437 or something similar, depending on your region).  The exiftool
-<code>-L</code> option changes exiftool to use Windows Latin1 (cp1252) which may
-help display some special characters, but for better results you can switch the
-console to UTF&#8209;8 (the native ExifTool character encoding). This is
-especially useful if you are using the <code>-lang</code> option to translate
-exiftool output to another language.  To change the the Windows console to
-UTF&#8209;8, follow these steps:
+<code>-charset</code> option may be used to encodes the exiftool output for a
+specific Windows code page, which may help display some special characters, but
+instead it may be better to switch the console to UTF&#8209;8 (the native
+ExifTool character encoding). This is especially useful if you are using the
+<code>-lang</code> option to translate exiftool output to another language.  To
+change the the Windows console to UTF&#8209;8, follow these steps:
 
 <ol><li>Run "cmd.exe" to open a Windows console (select "Run..." from the
 Start menu and enter "cmd").</li>
@@ -761,9 +779,11 @@ can figure out how to do this, please let me know.)
 </blockquote>
 
 <blockquote>On some Windows systems, using UTF&#8209;8 doesn't seem to work. In
-this case, cp1252 may be the best alternative:  Type "<code>chcp 1252</code>" in
-the console to switch to cp1252, then run exiftool with the <code>-L</code>
-option.</blockquote>
+this case, a Windows character set may be the best alternative:  For instance,
+for Windows Latin1 (cp1252) type "<code>chcp 1252</code>" in the console to
+switch to cp1252, then run exiftool with "<code>-charset cp1252</code>" (or
+<code>-L</code>).  This same technique can be used for other supported Windows
+code pages.</blockquote>
 
 <a name="Q19"></a>
 <p>19. <b>"How do I change the format of an extracted tag value?"</b></p>
@@ -829,7 +849,7 @@ without errors, but note that some metadata from the original image may have
 been lost in the process.</blockquote>
 
 <hr>
-<i>Last revised Aug. 14, 2009</i>
+<i>Last revised Oct. 5, 2009</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

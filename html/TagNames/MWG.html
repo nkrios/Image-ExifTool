@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>MWG Tags</title>
+<link rel=stylesheet type='text/css' href='style.css' title='Style'>
+</head>
+<body>
+<h2 class=top><a name='Composite'>MWG Composite Tags</a></h2>
+<p>This table lists special Composite tags which are used to access other tags
+based on the Metadata Working Group 1.01 recommendations.  These tags are
+only accessible when the MWG module is loaded (via <code>-use MWG</code> on the
+command line, or <code>use Image::ExifTool::MWG</code> in the API).  When reading, the
+value of each MWG tag is <b>Derived From</b> the specified tags based on the MWG
+guidelines.  When writing, the value of the IPTCDigest tag is updated
+automatically when the IPTC is changed if either the IPTCDigest tag didn&#39;t
+exist beforehand or its value agreed with the original IPTC digest
+(indicating that the XMP is synchronized with the IPTC).  IPTC information
+is written only if the original file contained IPTC.  For more information
+about the MWG recommendation, see <a href="http://www.metadataworkinggroup.org/">http://www.metadataworkinggroup.org/</a>.</p>
+
+<p>A problem with the MWG specification is that although XMP:Creator and
+IPTC:By-line are list-type tags, the corresponding EXIF tag, EXIF:Artist, is
+not.  So, short of changing the EXIF specification to allow EXIF:Artist to
+store a list of strings, the only reasonable alternative is to NOT allow
+MWG:Creator to be written as a list.  (It is insufficient to say that
+EXIF:Artist may store multiple strings separated with semicolons because
+there is nothing in any of the MWG, EXIF, XMP or IPTC specifications that
+states an individual Creator string may not contain a semicolon, and for
+this to be feasible all of these specifications would require this
+restriction.)  For this reason, the MWG:Creator tag is written as a single
+string.  Multiple names may of course be written within the string (and it
+would be reasonable to separate them with semicolons as suggested by the MWG
+and EXIF specifications), but this tag is not treated as a list by ExifTool
+when writing.</p>
+
+<p>Another potential stumbling block for MWG compatibility is the fact that
+ExifTool will quite happily read and write (but not create) EXIF, IPTC and
+XMP which has been stored in non-standard locations while the MWG
+recommendation states that this metadata should be ignored.  This may lead
+to non-compliant behaviour for these types of files.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Derived From</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>City</td>
+<td class=c>Y</td>
+<td class=n>IPTC:City
+  <br>XMP-photoshop:City
+  <br>CurrentIPTCDigest
+  <br>IPTCDigest</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Copyright</td>
+<td class=c>Y</td>
+<td class=n>EXIF:Copyright
+  <br>IPTC:CopyrightNotice
+  <br>XMP-dc:Rights
+  <br>CurrentIPTCDigest
+  <br>IPTCDigest</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Country</td>
+<td class=c>Y</td>
+<td class=n>IPTC:Country-PrimaryLocationName
+  <br>XMP-photoshop:Country
+  <br>CurrentIPTCDigest
+  <br>IPTCDigest</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CreateDate</td>
+<td class=c>Y</td>
+<td class=n>EXIF:CreateDate
+  <br>EXIF:SubSecTimeDigitized
+  <br>IPTC:DigitalCreationDate
+  <br>IPTC:DigitalCreationTime
+  <br>XMP-xmp:CreateDate
+  <br>CurrentIPTCDigest
+  <br>IPTCDigest</td>
+<td><span class=s><span class=n>(&quot;creation date of the digital representation&quot; - MWG)</span></span></td></tr>
+<tr>
+<td>Creator</td>
+<td class=c>Y</td>
+<td class=n>EXIF:Artist
+  <br>IPTC:By-line
+  <br>XMP-dc:Creator
+  <br>CurrentIPTCDigest
+  <br>IPTCDigest</td>
+<td><span class=s><span class=n>(NOT a list-type tag.  See &quot;A problem with the MWG specification&quot; above)</span></span></td></tr>
+<tr class=b>
+<td>DateTimeOriginal</td>
+<td class=c>Y</td>
+<td class=n>EXIF:DateTimeOriginal
+  <br>EXIF:SubSecTimeOriginal
+  <br>IPTC:DateCreated
+  <br>IPTC:TimeCreated
+  <br>XMP-photoshop:DateCreated
+  <br>CurrentIPTCDigest
+  <br>IPTCDigest</td>
+<td><span class=s><span class=n>(&quot;creation date of the intellectual content being shown&quot; - MWG)</span></span></td></tr>
+<tr>
+<td>Description</td>
+<td class=c>Y</td>
+<td class=n>EXIF:ImageDescription
+  <br>IPTC:Caption-Abstract
+  <br>XMP-dc:Description
+  <br>CurrentIPTCDigest
+  <br>IPTCDigest</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Keywords</td>
+<td class=c>Y+</td>
+<td class=n>IPTC:Keywords
+  <br>XMP-dc:Subject
+  <br>CurrentIPTCDigest
+  <br>IPTCDigest</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Location</td>
+<td class=c>Y</td>
+<td class=n>IPTC:Sub-location
+  <br>XMP-iptcCore:Location
+  <br>CurrentIPTCDigest
+  <br>IPTCDigest</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>ModifyDate</td>
+<td class=c>Y</td>
+<td class=n>EXIF:ModifyDate
+  <br>EXIF:SubSecTime
+  <br>XMP-xmp:ModifyDate
+  <br>CurrentIPTCDigest
+  <br>IPTCDigest</td>
+<td><span class=s><span class=n>(&quot;modification date of the digital image file&quot; - MWG)</span></span></td></tr>
+<tr>
+<td>Orientation</td>
+<td class=c>Y</td>
+<td class=n>EXIF:Orientation</td>
+<td><span class=s>1 = Horizontal (normal)
+  <br>2 = Mirror horizontal
+  <br>3 = Rotate 180
+  <br>4 = Mirror vertical
+  <br>5 = Mirror horizontal and rotate 270 CW
+  <br>6 = Rotate 90 CW
+  <br>7 = Mirror horizontal and rotate 90 CW
+  <br>8 = Rotate 270 CW</span></td></tr>
+<tr class=b>
+<td>Rating</td>
+<td class=c>Y</td>
+<td class=n>XMP-xmp:Rating</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>State</td>
+<td class=c>Y</td>
+<td class=n>IPTC:Province-State
+  <br>XMP-photoshop:State
+  <br>CurrentIPTCDigest
+  <br>IPTCDigest</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<hr>
+(This document generated automatically by Image::ExifTool::BuildTagLookup)
+<br><i>Last revised Oct 28, 2009</i>
+<p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
+</body>
+</html>

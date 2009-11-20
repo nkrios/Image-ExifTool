@@ -127,13 +127,21 @@ BEGIN { $Image::ExifTool::noConfig = 1 }
 use Image::ExifTool;
 </pre></td></tr></table></blockquote>
 
+<p>Or the ExifTool "configFile" variable may be set before loading
+Image::ExifTool to use a specific configuration file:</p>
+
+<blockquote><table class='box'><tr><td><pre>
+BEGIN { $Image::ExifTool::configFile = "/Users/phil/.myconfig" }
+use Image::ExifTool;
+</pre></td></tr></table></blockquote>
+
 <hr><h2><a name="ImageInfo">ImageInfo</a></h2>
 
-<p>Obtain meta information from image.  This is the one-step function for obtaining
-meta information from an image.  Internally, <a href="#ImageInfo">ImageInfo</a>
+<p>Read image file and return meta information.  This is the one-step function for
+retrieving meta information from an image.  Internally, <a href="#ImageInfo">ImageInfo</a>
 calls <a href="#ExtractInfo">ExtractInfo</a> to extract data from the image, and
-<a href="#GetInfo">GetInfo</a> and <a href="#GetTagList">GetTagList</a> to
-generate the returned information hash and tag list.</p>
+<a href="#GetInfo">GetInfo</a> and <a href="#GetTagList">GetTagList</a> to generate the
+returned information hash and tag list.</p>
 
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>ImageInfo($;@)</td></tr>
@@ -212,7 +220,7 @@ argument specified the image data via a file reference (file ref) or data
 reference (SCALAR ref).  The remaining scalar arguments are names of tags
 for requested information.  If no tags are specified, all possible information
 is extracted.<br>&nbsp;<br> Tag names are case-insensitive and may be prefixed
-by a optional group names separated by colons.  A group name may begin with a
+by optional group names separated by colons.  A group name may begin with a
 family number (ie. '<code>1IPTC:Keywords</code>'), to restrict matches to a
 specific family.  A tag name of '<code>*</code>' may be used, thus allowing
 '<code>GROUP:*</code>' to represent all tags in a specific group, or a group
@@ -220,8 +228,9 @@ name of '<code>*</code>' may be used, in which case all available instances of
 the specified tag are returned regardless of the
 <a href="#Duplicates">Duplicates</a> setting (ie. '<code>*:WhiteBalance</code>').
 Multiple groups may be specified (ie. '<code>EXIF:Time:*</code>' extracts
-all EXIF Time tags).  And finally, a leading '<code>-</code>' indicates tags
-to be excluded (ie. '<code>-IFD1:*</code>').
+all EXIF Time tags).  And finally, a leading '<code>-</code>' indicates a tag
+to be excluded (ie. '<code>-IFD1:*</code>'), or a trailing '<code>#</code>'
+causes the ValueConv value to be returned for this tag.
 <br>&nbsp;<br>
 Note that keys in the returned information hash and elements of the
 returned tag list are not necessarily the same as these tag names -- group
@@ -238,7 +247,7 @@ reference) to access information in an image, the FileName and Directory tags
 will not be returned.  (Also, the FileSize and FileModifyDate tags will not be
 returned unless it is a plain file.)  Image processing begins at the current
 file position, and on return the file position is unspecified. May be either a
-standard GLOB reference or a reference to a File::RandomAccess object.
+standard filehandle or a reference to a File::RandomAccess object.
 <br>&nbsp;<br>
 [Advanced:  To allow a non-rewindable stream (ie. a network socket) to be
 re-read after processing with ExifTool, first wrap the file reference in a
@@ -351,7 +360,7 @@ sub AUTOLOAD
 The following functions require an ExifTool object as the first argument
 </b></center></td></tr></table>
 
-<hr><h2><a name="Options">Options</a></h2>
+<hr><h2><a name='options'></a><a name="Options">Options</a></h2>
 <p>Get/set ExifTool options.  This function can be called to set the default
 options for an ExifTool object.  Options set this way are in effect for
 all function calls but may be overridden by options passed as arguments
@@ -387,13 +396,31 @@ to some functions.</p>
     This can also be set via the ExifByteOrder tag, but the ByteOrder option takes
     precedence if both are set.</td>
     <td align='center'>'MM','II' or undef</td><td align=center>undef</td></tr>
-<tr><td>Charset</td><td>Character set for encoding character strings containing code
-    points above U+007F.  Note that this option affects some types of information when
-    reading/writing the file and other types when getting/setting tag values, so it must
-    be defined for both types of access.</td>
-    <td><table class='clear'>
-    <tr><td valign='top' align=center><b>UTF8</b>&nbsp;-</td><td>UTF-8 characters</td></tr>
-    <tr><td valign='top' align=center><b>Latin</b>&nbsp;-</td><td>Windows Latin1 (cp1252)</td></tr>
+<tr><td><a name="Charset">Charset</a></td><td>Character set for encoding character strings containing code
+    points above U+007F.  Note that this option affects some types of information
+    when reading/writing the file and other types when getting/setting tag values, so
+    it must be defined for both types of access. Charset values listed to the right
+    have aliases which are given in brackets. Case is not significant.</td>
+    <td align='center'><table class='clear'>
+    <tr><td valign='top' align=right>UTF8</td><td>(cp65001, UTF-8)</td></tr>
+    <tr><td valign='top' align=right>Latin</td><td>(cp1252, Latin1)</td></tr>
+    <tr><td valign='top' align=right>Latin2</td><td>(cp1250)</td></tr>
+    <tr><td valign='top' align=right>Cyrillic</td><td>(cp1251, Russian)</td></tr>
+    <tr><td valign='top' align=right>Greek</td><td>(cp1253)</td></tr>
+    <tr><td valign='top' align=right>Turkish</td><td>(cp1254)</td></tr>
+    <tr><td valign='top' align=right>Hebrew</td><td>(cp1255)</td></tr>
+    <tr><td valign='top' align=right>Arabic</td><td>(cp1256)</td></tr>
+    <tr><td valign='top' align=right>Baltic</td><td>(cp1257)</td></tr>
+    <tr><td valign='top' align=right>Vietnam</td><td>(cp1258)</td></tr>
+    <tr><td valign='top' align=right>Thai</td><td>(cp874)</td></tr>
+    <tr><td valign='top' align=right>MacRoman</td><td>(cp10000, Mac, Roman)</td></tr>
+    <tr><td valign='top' align=right>MacLatin2</td><td>(cp10029)</td></tr>
+    <tr><td valign='top' align=right>MacCyrillic</td><td>(cp10007)</td></tr>
+    <tr><td valign='top' align=right>MacGreek</td><td>(cp10006)</td></tr>
+    <tr><td valign='top' align=right>MacTurkish</td><td>(cp10081)</td></tr>
+    <tr><td valign='top' align=right>MacRomanian</td><td>(cp10010)</td></tr>
+    <tr><td valign='top' align=right>MacIceland</td><td>(cp10079)</td></tr>
+    <tr><td valign='top' align=right>MacCroatian</td><td>(cp10082)</td></tr>
     </table></td><td align=center>'UTF8'</td></tr>
 <tr><td>Compact</td><td>Flag to write compact output.  The XMP specification suggests
     that the data be padded with blanks to allow in-place editing.  By setting this
@@ -431,8 +458,8 @@ to some functions.</p>
     Tags may also be excluded by preceding their name with a '-' in the arguments to ImageInfo.</td>
     <td align='center'>undef</td></tr>
 <tr><td><a name="Embedded">ExtractEmbedded</a></td>
-    <td>Flag to extract information from embedded documents in PostScript files and
-    the AIPrivateData stream in PDF files</td>
+    <td>Flag to extract information from embedded documents in PostScript files and the
+    AIPrivateData stream in PDF files, and embedded MPF images in JPEG and MPO files</td>
     <td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td><a name="FastScan">FastScan</a></td>
     <td>Flag to increase speed of extracting information from JPEG images.  With this
@@ -504,11 +531,16 @@ to some functions.</p>
     occur, but also allows thumbnail and preview images to be extracted even if
     they don't have a recognizable header.</td>
     <td align='center'>0 or 1</td><td align='center'>0</td></tr>
+<tr><td>IPTCCharset</td><td>Fallback IPTC character set to assume if IPTC information
+    contains no CodedCharacterSet tag.</td>
+    <td align=center><i>(see <a href="#Charset">Charset</a> option)</i></td><td align=center>'Latin'</td></tr>
 <tr><td>Lang</td><td>Localized language for exiftool tag descriptions, etc.  If the
     specified language isn't available, the option is not changed.  May be set to
     undef to select the built-in default language.</td>
     <td align='left'>Image::ExifTool::Lang module name (ie. 'fr'), or 'en' or undef for the default language.</td>
     <td align='center'>'en'</td></tr>
+<tr><td>LargeFileSupport</td><td>Flag to indicate that 64-bit file offsets are supported on this system</td>
+    <td align='center'>0 or 1</td><td align='center'>0</td></tr>
 <tr><td>List</td><td>Flag to extract lists of PrintConv values into arrays instead of combining
     them into a string of values.</td><td align='center'>0 or 1</td><td align='center'>0</td></tr>
 <tr><td>ListSep</td><td>Separator string used to join lists of PrintConv values when
@@ -637,8 +669,9 @@ $success = $exifTool-&gt;<b>ExtractInfo</b>('image.jpg', \%options);
 </pre></td></tr></table></blockquote>
 <p>The following options are effective in the call to <a href="#ExtractInfo">ExtractInfo</a>:</p>
 <blockquote>
-Binary, Charset, Composite, ExtractEmbedded, FastScan, FixBase, HtmlDump, HtmlDumpBase,
-IgnoreMinorErrors, Lang, MakerNotes, ScanForXMP, Struct, TextOut, Unknown and Verbose.
+Binary, Charset, Composite, ExtractEmbedded, FastScan, FixBase, HtmlDump,
+HtmlDumpBase, IgnoreMinorErrors, IPTCCharset, Lang, LargeFileSupport,
+MakerNotes, ScanForXMP, Struct, TextOut, Unknown and Verbose.
 </blockquote>
 
 <hr><h2><a name="GetInfo">GetInfo</a></h2>
@@ -739,7 +772,8 @@ Error and Warning tags.</p>
 <p>The following ExifTool options are effective in the call to
 <a href="#WriteInfo">WriteInfo</a>:</p>
 <blockquote>
-ByteOrder, Charset, Compact, Compress, FixBase, IgnoreMinorErrors and Verbose.
+ByteOrder, Charset, Compact, Compress, FixBase, IgnoreMinorErrors, IPTCCharset
+and Verbose.
 </blockquote>
 
 <hr><h2><a name="CombineInfo">CombineInfo</a></h2>
@@ -845,7 +879,7 @@ The value of the specified tag.  If the tag represents a list of values and
 the List option is disabled then PrintConv returns a string of values,
 otherwise a reference to the list is returned in scalar context.  The list
 itself is returned in list context.  Values may also be scalar references to
-binary data.<br>&nbsp;<br>
+binary data, or hash references if the Struct option is set.<br>&nbsp;<br>
 Note: It is possible for <a href="#GetValue">GetValue</a> to return an
 undefined ValueConv or PrintConv value (or an empty list in list context)
 even if the tag exists, since it is possible for these conversions to yield
@@ -892,8 +926,10 @@ the same tag name for each value, or call with a reference to the list of values
  <br><b>1)</b> [<i>optional</i>] Tag key or tag name, or undef to clear all
  new values. A tag name of '<code>*</code>' can be used when deleting tags to
  delete all tags, or all tags in a specified group.  The tag name may be
- prefixed by group name, separated by a colon (ie. '<code>GROUP:TAG</code>'),
- which is equivalent to using a 'Group' option argument.
+ prefixed by group name, separated by a colon (ie. '<code>EXIF:Artist</code>'),
+ which is equivalent to using a Group option argument.  Also, a '<code>#</code>'
+ may be appended to the tag name (ie. '<code>EXIF:Orientation#</code>'), with
+ the same effect as setting Type to 'ValueConv'.
  <br><b>2)</b> [<i>optional</i>] New value for tag.  Undefined to delete tag from file.
      May be a scalar, scalar reference, or list reference to set a list
      of values.
@@ -911,12 +947,14 @@ errors are printed to STDERR.
     replacing the list</td><td align=center>0 or 1</td><td align=center>0</td></tr>
 <tr><td>DelValue</td><td>Delete an existing tag if it has the specified value</td>
     <td align=center>0 or 1</td><td align=center>0</td></tr>
+<tr><td>EditGroup</td><td>Create tags in existing groups only. Don't create new group</td>
+    <td align=center>0 or 1</td><td align=center>0</td></tr>
 <tr><td>EditOnly</td><td>Edit tag only if it already exists. Don't create new tag</td>
     <td align=center>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Group</td><td>Specifies group name where tag should be written.
     If not specified, tag is written to highest priority group as specified
     by <a href="#SetNewGroups">SetNewGroups</a>.  Case is not significant</td>
-    <td>Any family 0 or 1 group name</td><td align=center>undef</td></tr>
+    <td align=center>Any family 0 or 1 group name</td><td align=center>undef</td></tr>
 <tr><td>NoShortcut</td><td>Disables default behaviour of looking up tag in
     shortcuts if not found otherwise.</td><td align=center>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Protected</td><td>Allow protected tags to be written</td>
@@ -993,12 +1031,25 @@ $exifTool-&gt;<b>SetNewValue</b>(Keywords =&gt; $word, AddValue =&gt; 1);
 <blockquote><table class='box'><tr><td><pre>
 <span class='com'># set a tag in a specific group</span>
 $exifTool-&gt;<b>SetNewValue</b>(Headline =&gt; $val, Group =&gt; 'XMP');
-$exifTool-&gt;<b>SetNewValue</b>('XMP:Headline' =&gt; $val);  <span class='com'># equivalent</span>
+$exifTool-&gt;<b>SetNewValue</b>('XMP:Headline' =&gt; $val);  <span class='com'># (equivalent)</span>
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
 <span class='com'># shift original date/time back by 1 hour</span>
 $exifTool-&gt;<b>SetNewValue</b>(DateTimeOriginal =&gt; '1:00', Shift =&gt; -1);
+</pre></td></tr></table></blockquote>
+
+<blockquote><table class='box'><tr><td><pre>
+<span class='com'># write a tag only if it had a specific value
+# (the order of the following calls is not significant)</span>
+$exifTool-&gt;<b>SetNewValue</b>(Title =&gt; $oldVal, DelValue =&gt; 1);
+$exifTool-&gt;<b>SetNewValue</b>(Title =&gt; $newVal);
+</pre></td></tr></table></blockquote>
+
+<blockquote><table class='box'><tr><td><pre>
+<span class='com'># write tag by numerical value</span>
+$exifTool-&gt;<b>SetNewValue</b>(Orientation =&gt; 6, Type =&gt; 'ValueConv');
+$exifTool-&gt;<b>SetNewValue</b>('Orientation#' =&gt; 6);  <span class='com'># (equivalent)</span>
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
@@ -1030,25 +1081,27 @@ in a specified file.</p>
  names are not case sensitive, and may be prefixed by an optional family 0
  or 1 group name, separated by a colon (ie. '<code>exif:iso</code>'). A
  leading '<code>-</code>' indicates tags to be excluded (ie.
- '<code>-comment</code>').  An asterisk ('<code>*</code>') may be used for
- the tag name, and is useful when a group is specified to set all tags from
- a group (ie. '<code>XMP:*</code>'). <br>&nbsp;<br>
- A special feature allows tag names of the form '<code>SRCTAG&gt;DSTTAG</code>'
- (or '<code>DSTTAG&lt;SRCTAG</code>') to be specified to copy information to a
- tag with a different name or a specified group.  Both '<code>SRCTAG</code>' and
- '<code>DSTTAG</code>' may use '<code>*</code>' and/or be prefixed by a group
- name (ie. '<code>modifyDate&gt;fileModifyDate</code>' or
- '<code>*&gt;xmp:*</code>').  Copied tags may also be added or deleted from a
- list with arguments of the form '<code>SRCTAG+&gt;DSTTAG</code>' or
- '<code>SRCTAG-&gt;DSTTAG</code>'.  Tags are evaluated in order, so exclusions
- apply only to tags included earlier in the list.  An extension of this feature
- allows the tag value to be set from an expression containing tag names with
- leading '<code>$</code>' symbols (ie. '<code>Comment&lt;Filename:
- $filename</code>'). Braces '<code>{}</code>' may be used around the tag name to
- separate it from subsequent text, and a '<code>$$</code>' is used to to
- represent a '<code>$</code>' symbol.  (The behaviour for missing tags in
- expressions is defined by the <a href="#MissingTagValue">MissingTagValue</a>
- option.)
+ '<code>-comment</code>').  A trailing '<code>#</code>' causes the ValueConv
+ value to be copied (ie. '<code>orientation#</code>'), which has the same effect
+ as setting the Type option to 'ValueConv' for this tag only.  An asterisk
+ ('<code>*</code>') may be used for the tag name, and is useful when a group is
+ specified to set all tags from a group (ie. '<code>XMP:*</code>').
+ <br>&nbsp;<br> A special feature allows tag names of the form
+ '<code>SRCTAG&gt;DSTTAG</code>' (or '<code>DSTTAG&lt;SRCTAG</code>') to be
+ specified to copy information to a tag with a different name or a specified
+ group.  Both '<code>SRCTAG</code>' and '<code>DSTTAG</code>' may use
+ '<code>*</code>' and/or be prefixed by a group name (ie.
+ '<code>modifyDate&gt;fileModifyDate</code>' or '<code>*&gt;xmp:*</code>').
+ Copied tags may also be added or deleted from a list with arguments of the form
+ '<code>SRCTAG+&gt;DSTTAG</code>' or '<code>SRCTAG-&gt;DSTTAG</code>'.  Tags are
+ evaluated in order, so exclusions apply only to tags included earlier in the
+ list.  An extension of this feature allows the tag value to be set from an
+ expression containing tag names with leading '<code>$</code>' symbols (ie.
+ '<code>Comment&lt;the file is $filename</code>'). Braces '<code>{}</code>' may be
+ used around the tag name to separate it from subsequent text, and a
+ '<code>$$</code>' is used to to represent a '<code>$</code>' symbol.  (The
+ behaviour for missing tags in expressions is defined by the <a
+ href="#MissingTagValue">MissingTagValue</a> option.)
  <br>&nbsp;<br>
  Multiple options hash references may be passed to set different options for
  different tags.  Options apply to subsequent tags in the argument list. 
@@ -1120,7 +1173,8 @@ $exifTool-&gt;<b>SetNewValuesFromFile</b>($file, { Replace =&gt; 0 },
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
-<span class='com'># copy all EXIF information, preserving the original IFD</span>
+<span class='com'># copy all EXIF information, preserving the original IFD
+# (without '&gt;*.*' tags would be copied to the preferred EXIF IFD)</span>
 $exifTool-&gt;<b>SetNewValuesFromFile</b>($file, 'EXIF:*&gt;*:*');
 </pre></td></tr></table></blockquote>
 
@@ -1546,40 +1600,40 @@ the specific IFD).
 <blockquote><table class='norm'>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (Information&nbsp;Type)</b></td>
-<td>AFCP, AIFF, APE, APP12, APP13, APP14, APP15, APP5, APP6, APP8, ASF, BMP,
-CanonVRD, Composite, DICOM, DNG, DjVu, Ducky, EXE, EXIF, ExifTool, FLAC,
-File, Flash, FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3, IPTC,
-ITC, JFIF, JPEG, Jpeg2000, Leaf, M2TS, MIE, MIFF, MNG, MPC, MPEG, MPF,
-MakerNotes, Meta, PDF, PICT, PNG, PhotoMechanic, Photoshop, PostScript,
+<td>AFCP, AIFF, APE, APP0, APP12, APP13, APP14, APP15, APP5, APP6, APP8, ASF,
+BMP, CanonVRD, Composite, DICOM, DNG, DjVu, Ducky, EXE, EXIF, ExifTool,
+FLAC, File, Flash, FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3,
+IPTC, ITC, JFIF, JPEG, Jpeg2000, LNK, Leaf, M2TS, MIE, MIFF, MNG, MPC, MPEG,
+MPF, MakerNotes, Meta, PDF, PICT, PNG, PhotoMechanic, Photoshop, PostScript,
 PrintIM, QuickTime, RAF, RIFF, Rawzor, Real, SVG, SigmaRaw, Stim, Vorbis,
-XMP, ZIP
+XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>AC3, AFCP, AIFF, APE, ASF, Adobe, AdobeCM, BMP, Canon, CanonCustom,
+<td>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, BMP, Canon, CanonCustom,
 CanonRaw, CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky,
 EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix,
 FotoStation, FujiFilm, GPS, GeoTiff, GlobParamIFD, GraphConv, H264, HP,
 HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm,
 ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ICC_Profile#, ID3,
 ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC,
-InteropIFD, JFIF, JPEG, JVC, Jpeg2000, Kodak, KodakBordersIFD,
-KodakEffectsIFD, KodakIFD, KyoceraRaw, Leaf, LeafSubIFD, Leica, M2TS, MAC,
-MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS,
-MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+InteropIFD, JFIF, JPEG, JVC, Jpeg2000, KDC_IFD, Kodak, KodakBordersIFD,
+KodakEffectsIFD, KodakIFD, KyoceraRaw, LNK, Leaf, LeafSubIFD, Leica, M2TS,
+MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash,
+MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
 MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
 MIFF, MNG, MPC, MPEG, MPF0, MPImage, MakerNotes, MakerUnknown, MetaIFD,
-Minolta, MinoltaRaw, Nikon, NikonCapture, NikonPreview, NikonScan, Olympus,
-PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
-PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, Rawzor,
-Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5,
-Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Sanyo,
-Sigma, SigmaRaw, Sony, Stim, SubIFD, System, Track#, Vorbis, XMP, XMP-DICOM,
-XMP-MP, XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs,
-XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
-XMP-microsoft, XMP-pdf, XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus,
-XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ,
-XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg,
-ZIP
+Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonPreview, NikonScan,
+Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop,
+PictureInfo, PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF,
+RMETA, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4,
+Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG,
+Sanyo, Sigma, SigmaRaw, Sony, Stim, SubIFD, System, Track#, Vorbis, XML,
+XMP, XMP-DICOM, XMP-MP, XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux,
+XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-iptcExt,
+XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-pdfx, XMP-photomech,
+XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-tiff,
+XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS,
+XMP-xmpRights, XMP-xmpTPg, ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,

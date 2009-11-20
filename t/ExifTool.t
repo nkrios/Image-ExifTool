@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..23\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..24\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -55,7 +55,7 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
 # don't test DateFormat because strftime output varies with locale
 #    $exifTool->Options(DateFormat => '%H:%M:%S %a. %b. %e, %Y');
-    my @tags = ('CreateDate', 'DateTimeOriginal', 'ModifyDate');
+    my @tags = ('CreateDate', 'DateTimeOriginal', 'ModifyDate', 'Orientation#');
     my $info = $exifTool->ImageInfo('t/images/Canon.jpg', \@tags);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
@@ -110,10 +110,10 @@ my $testnum = 1;
 # don't test DateFormat because strftime output is system dependent
 #    $exifTool->Options(DateFormat => '%H:%M:%S %a. %b. %e, %Y');
     $exifTool->ExtractInfo('t/images/Canon.jpg');
-    my @tags = ('createdate', 'datetimeoriginal', 'modifydate');
+    my @tags = ('createdate', 'datetimeoriginal', 'modifydate', 'orientation#');
     my $info = $exifTool->GetInfo(\@tags);
     my $good = 1;
-    my @expectedTags = ('CreateDate', 'DateTimeOriginal', 'ModifyDate');
+    my @expectedTags = ('CreateDate', 'DateTimeOriginal', 'ModifyDate', 'Orientation');
     for (my $i=0; $i<scalar(@tags); ++$i) {
         $tags[$i] = $expectedTags[$i] or $good = 0;
     }
@@ -252,6 +252,15 @@ my $testnum = 1;
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     my $info = $exifTool->ImageInfo('t/images/ExifTool.jpg', 'main:Author:IPTC3:all');
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
+    print "ok $testnum\n";
+}
+
+# test 24: Test a shortcut with multiple group names and a ValueConv suffix
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $info = $exifTool->ImageInfo('t/images/Canon.jpg', 'exififd:camera:common#');
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }

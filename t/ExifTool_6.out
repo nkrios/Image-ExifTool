@@ -1,7 +1,7 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
 [File, System, Image] FileName - File Name: Canon.jpg
 [File, System, Image] Directory - Directory: t/images
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:05:01 07:34:38-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2006:10:03 15:10:31-04:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)

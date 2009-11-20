@@ -109,7 +109,7 @@ my $testnum = 1;
     ++$testnum;
     my $lensIDs = $Image::ExifTool::Nikon::Composite{LensID}->{PrintConv};
     foreach (sort keys %$lensIDs) {
-        next if /^(([0-9A-F]{2} ){7}[0-9A-F]{2}|Notes|OTHER)$/;
+        next if /^(([0-9A-F]{2} ){7}[0-9A-F]{2}(\.\d+)?|Notes|OTHER)$/;
         warn "\n  Bad LensID '$_' in test $testnum\n";
         print 'not ';
         last;

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.97
 [File, System, Image] FileName - File Name: Casio_4_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 1203 bytes
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:19-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:10:08 13:58:03-04:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
@@ -71,5 +71,5 @@
 [Composite, Composite, Image] ImageSize - Image Size: 8x8
 [Composite, Composite, Image] ShutterSpeed - Shutter Speed: 1/114
 [Composite, Composite, Image] ThumbnailImage - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera] FocalLength35efl - Focal Length: 13.3 mm
 [Composite, Composite, Image] LightValue - Light Value: 9.5
+[Composite, Composite, Camera] FocalLength35efl - Focal Length: 13.3 mm

@@ -61,7 +61,7 @@ explanation of the meaning of each special key:
   The function takes three arguments: 0) ExifTool object reference, 1) tagInfo
   reference, 2) value reference, and returns undefined (and possibly modifies
   the input value) if successful, or an error message if there was a format
-  problem.
+  problem.  May set ExifTool CHECK_WARN datamember for success with a warning.
 
   GROUPS : A hash lookup for the default group names for all entries in this
   table. If not specified, the Group 0 and 1 names will be set automatically
@@ -69,7 +69,9 @@ explanation of the meaning of each special key:
 
   FORMAT : Specifies the default tag Format and corresponding pointer increment
   for entries in a BinaryData table, and defaults to 'int8u' if not specified.
-  The possible values of FORMAT are:
+  Format names starting with 'var_' cause subsequent tag ID's in BinaryData
+  tables to be incremented according to the size of the data (not including the
+  terminator).  The possible values of FORMAT are:
 
     int8s       - Signed 8-bit integer                    (EXIF 'SBYTE')
     int8u       - Unsigned 8-bit integer                  (EXIF 'BYTE')
@@ -91,11 +93,14 @@ explanation of the meaning of each special key:
     double      - 64-bit IEEE floating point value        (EXIF 'DOUBLE')
     extended    - 80-bit extended floating float
     ifd         - Unsigned 32-bit integer sub-IFD pointer (EXIF 'IFD')
-    ifd8        - Unsigned 64-bit integer sub-IFD pointer (BigTIFF 'IFD8')
+    ifd64       - Unsigned 64-bit integer sub-IFD pointer (BigTIFF 'IFD8')
     string      - Series of 8-bit ASCII characters        (EXIF 'ASCII')
     pstring     - Pascal string [BinaryData tables only]
     undef       - Undefined-format binary data            (EXIF 'UNDEFINED')
     binary      - Binary data
+    var_string  - variable-length null-terminated ASCII string [r/o BinaryData]
+    var_ustring - variable-length null-terminated UCS-2 string [r/o BinaryData]
+    var_pstring - variable-length null-terminated Pascal string[r/o BinaryData]
 
   FIRST_ENTRY : Specifies the index for the first tag entry in a binary table.
   This value is only used if the Unknown option is set to 2 or higher, and
@@ -104,18 +109,21 @@ explanation of the meaning of each special key:
   TAG_PREFIX : Prefix for names of unknown tags.
 
   PRINT_CONV : Default print conversion tags where PrintConv isn't specified.
+  PrintConv may be set to undef for individual tags to disable print conversion
+  when PRINT_CONV is defined for a table.
 
   WRITABLE : Indicates that all tags in this table are writable.  This is the
   same as setting the Writable flag for each individual tag in the table, except
   for SubDirectory tags which are not made Writable.
 
-  TABLE_DESC : Short description for this table.  Plain text only.
+  TABLE_DESC : Short description for this table.  Plain text only.  Used only
+  for XML tag database output.
 
   NOTES : Notes to introduce the table in the TagNames documentation.  Pod
   formatting codes B<> and C<> may be used in this text.
 
-  IS_OFFSET : Reference to list of TagID's representing offsets for binary
-  data tables only.  Not used for EXIF tables.
+  IS_OFFSET : Reference to list of TagID's representing offsets for writable
+  binary data tables only.  Not used for EXIF tables.
 
   EXTRACT_UNKNOWN : Used in PDF tables to specify a directory where all unknown
   tags should be extracted.  Set to 0 to extract only unknown numbered tags for
@@ -212,14 +220,15 @@ numerical.
                   above. For BinaryData tables, the format may have a size in
                   trailing brackets which is a perl expression to be evaluated.
                   The expression may access any of the previous table entries
-                  through a %val hash, or the data size via $size. For example,
-                  'string[$val{3}]' defines a string with length given by the
-                  table entry with tag index '3'. If not specified, the format
-                  of an EXIF entry is taken from the EXIF information, and the
-                  format of a BinaryData entry is taken from the FORMAT
-                  specified for the table (or int8u if FORMAT is not specified).
-                  Must be specified for Writable tags where the value must be
-                  converted for a Condition.
+                  through a %val hash, the data size via $size, or the ExifTool
+                  object via $self. For example, 'string[$val{3}]' defines a
+                  string with length given by the table entry with tag index
+                  '3'.  If not specified, the format of an EXIF entry is taken
+                  from the EXIF information, and the format of a BinaryData
+                  entry is taken from the FORMAT specified for the table (or
+                  int8u if FORMAT is not specified). Must be specified for
+                  Writable tags where the value must be converted for a
+                  Condition.
 
   Count         : Used when writing EXIF information to specify the number
                   values to write, or the number of characters in a fixed-length
@@ -228,6 +237,10 @@ numerical.
                   Note that this count that corresponds to the specified Format,
                   so if a different-sized Writable format is defined, the actual
                   count written to the file will be different.
+
+  FixCount      : Flag set to determine correct count from offsets in IFD.  This
+                  is necessary for some Kodak tags which write an incorrect
+                  Count value.
 
   Flags         : Flags to specify characteristics for this tag.  May be a
                   simple scalar flag name, a reference to a list of flag names,
@@ -254,7 +267,7 @@ numerical.
                   information which are extracted by default.  Otherwise
                   writable directories are only extracted as a block if
                   specified explicitly.
-                  
+
                   'DataMember' - name of exiftool data member associated with
                   this tag if it should be stored as a special data member when
                   writing information.  Necessary only if the value of the tag
@@ -274,6 +287,9 @@ numerical.
 
                   'GotGroups' - [reserved] flag used internally to indicate that
                   the Groups hash has been initialized for this tag.
+
+                  'Hidden' - set to hide tag from the TagName documentation. 
+                  Also suppresses verbose output of a BinaryData tag.
 
                   'IsOffset' - flag set if the tag represents an offset to some
                   data, and causes value will be adjusted to an absolute file
@@ -314,7 +330,9 @@ numerical.
                   MakerNotes tags are permanent unless otherwise specified.
 
                   'PrintHex' - specifies that unknown PrintConv values should
-                  be printed in hex (ie. 'Unknown (0x01)')
+                  be printed in hex (ie. 'Unknown (0x01)').  Also causes
+                  numerical tag values to be printed in hex in the HTML tag name
+                  documentation.
 
                   'PrintString' - flag set to force PrintConv values to be
                   printed as strings in the documentation.
@@ -326,7 +344,9 @@ numerical.
                   their priority is equal to or greater than this priority.  A
                   special feature is that Priority 0 tags are automatically
                   incremented to Priority 1 if they exist in the IFD of the full
-                  resolution image (as determined by SubFileType).
+                  resolution image (as determined by SubfileType).  If not
+                  defined, the priority defaults to 1 for all tags except except
+                  tags in IFD1 of JPEG images which default to priority 0.
 
                   'Protected' - bit mask to protect tags from writing:
                   Bit 0x01 indicates an 'unsafe' tag, which is not set via
@@ -351,7 +371,9 @@ numerical.
 
                   'SubIFD' - used in writing to determine that the tag specifies
                   an offset to a sub-IFD.  When this flag is set, the Group1
-                  name gives the name of the IFD.
+                  name gives the name of the IFD.  Must be set if and only if
+                  the tag has a SubDirectory Start of '$val' (this is validated
+                  by BuildTagLookup).
 
                   'Unknown' - this is an unknown tag (only extracted when the
                   Unknown option is set).
@@ -366,17 +388,20 @@ numerical.
                   a scalar expression using $val (the Raw tag value), $self (the
                   current ExifTool object) and $tag (the tag key), or a code
                   reference with $val and $self as arguments.  For Composite
-                  tags, $val is a reference to a hash of component tag names,
-                  and @val may be used to access the Raw values of these tags.
-                  The returned value may be a scalar which is used as the new
-                  Raw value, a scalar reference to a binary data value, a hash
-                  reference for Composite tags, an ARRAY reference for a list of
-                  values, or undefined to indicate that the tag should be
-                  ignored.  Also, RawConv may generate Warning or Error tags,
-                  while ValueConv and PrintConv may not. Note: RawConv should
-                  only be used if necessary (in general, only if the tag may be
-                  ignored).  It is preferable to use ValueConv instead of
-                  RawConv because ValueConv is only executed if the tag value is
+                  tags, $val is a reference to a hash of source ("derived from")
+                  tag names, and @val may be used to access the Raw values of
+                  these tags. If RawConv is specified for a Composite tag, then
+                  ValueConv and PrintConv evals will no longer have access to
+                  the source @val and @prt values. The returned value may be a
+                  scalar which is used as the new Raw value, a scalar reference
+                  to a binary data value, a hash reference for Composite tags,
+                  an ARRAY reference for a list of values, or undefined to
+                  indicate that the tag should be ignored.  Also, RawConv may
+                  generate Warning or Error tags, while ValueConv and PrintConv
+                  may not. Note: RawConv should only be used if necessary (in
+                  general, only if the conversion may return undef to ignore the
+                  tag).  It is preferable to use ValueConv instead of RawConv
+                  because ValueConv is only executed if the tag value is
                   requested, while RawConv is executed for all extracted tags.
 
   ValueConv     : Used to convert the Raw value to a useable form. May be a hash
@@ -409,19 +434,21 @@ numerical.
                   evaluated, the expression or subroutine returns a scalar for
                   the converted value, a SCALAR reference to a binary data value
                   (see the 'Binary' flag), or an ARRAY reference for a list of
-                  values.  Except for Composite tags, the return value should
-                  always be defined -- use RawConv instead to return undef if it
-                  is necessary to test the value for validity, otherwise an
-                  undef tag may hide a previously defined value when the
-                  Duplicates option is not enabled.  Composite tags which
-                  Require or Desire other tags may access the ValueConv,
-                  PrintConv and Raw values of these tags through the elements of
-                  the @val, @prt and @raw lists respectively (only if there was
-                  no RawConv or it returned a hash reference).  For these tags,
-                  $val may be used in an expression to represent $val[0], and
-                  the first argument passed for a code reference is a reference
-                  to @val.  If ValueConv is not specified, the Raw value is not
-                  converted.
+                  values.  The return value should always be defined -- use
+                  RawConv instead to return undef if it is necessary to test the
+                  value for validity, otherwise an undef tag may hide a
+                  previously defined value when the Duplicates option is not
+                  enabled.  If this isn't possible (as with Composite tags where
+                  the converted values of the source tags are needed), set the
+                  Priority to 0 to avoid taking priority over a valid tag. 
+                  Composite tags which Require or Desire other tags may access
+                  the ValueConv, PrintConv and Raw values of these tags through
+                  the elements of the @val, @prt and @raw lists respectively
+                  (only if there was no RawConv or it returned a hash
+                  reference).  For these tags, $val may be used in an expression
+                  to represent $val[0], and the first argument passed for a code
+                  reference is a reference to @val. If ValueConv is not
+                  specified, the Raw value is not converted.
 
   PrintConv     : This entry is similar to ValueConv above, except that it is
                   used to further convert the tag value to a human readable
@@ -457,8 +484,10 @@ numerical.
                   warning is generated when undef is returned.  An empty warning
                   ("\n") may be issued to suppress warning messages when undef
                   is returned.  If a scalar, the expression may use the
-                  variables $val, $self and $wantgroup.  If a code ref, the
-                  routine is passed 2 arguments: $val and $self.
+                  variables $val, $self, $wantgroup, and %options (the
+                  SetNewValue options hash).  If a code ref, the routine is
+                  passed 2 arguments: $val and $self.  Note that this conversion
+                  is not applied for deleted tags (ie. $val is undef).
 
   PrintConvInv  : The inverse of PrintConv.  Only necessary if for Writable tags
                   when PrintConv is specified (unless WriteAlso is used).  See
@@ -550,16 +579,27 @@ numerical.
                   tag is written.  The value is a hash reference.  The hash keys
                   are the names of the tags to write, and the values are
                   evaluated to obtain the ValueConv values of each tag (or undef
-                  to delete the tag).  In the eval, $val may be used as the Raw
-                  value of the parent tag.  This will write Protected tags that
-                  aren't directly writable (Protected bit 0x02 set).
+                  to delete the tag).  In the eval, $val is the Raw value of the
+                  parent tag (which may be undef if the tag is being deleted),
+                  and the %opts hash may be accessed to modify SetNewValue
+                  options for each tag.  By default, Type is set to "ValueConv"
+                  and the Protected option has bit 0x02 set to allow writing of
+                  Protected tags that aren't directly writable.  The AddValue
+                  and DelValue options from the parent tag are also defined, but
+                  no other options are set by default.  Previous new values of
+                  WriteAlso tags have already been removed prior to the eval if
+                  the Replace option was used for the parent tag.  If an empty
+                  warning is issued ("\n"), the target tag is not written and no
+                  error is reported.
 
   WriteCheck    : If given, specifies a scalar which is evaluated as a Perl
                   expression for a one-time validatation the value being
                   written.  The expression has access to 3 variables: $val is
                   the value to be written, $self is the ExifTool object, and
                   $tagInfo is the tag information hash reference.  It returns an
-                  error string or undef if the value is good.
+                  error string, or undef if the value is good.  If the error
+                  string is empty, the tag is not written and no warnings are
+                  issued, but WriteAlso is still evaluated if it exists.
 
   DelCheck      : Similar to WriteCheck, but called when the tag is deleted. The
                   expression may access $self, $tagInfo and $wantGroup.  Returns
@@ -582,7 +622,7 @@ numerical.
   AllowGroup    : [Writable tags only] Regular expression string (case
                   insensitive) to match group names which are allowed when
                   writing this tag.  Only needed if tag can be written to
-                  non-standard groups (very rare).
+                  groups other than the normal groups for this tag (very rare).
 
   OffsetPair    : Used in EXIF table to specify the tagID for the corresponding
                   offset or length tag.
@@ -604,6 +644,10 @@ numerical.
                   The default units are the first item in the list.
 
   TagID         : [reserved] Used internally to save the table key for this tag.
+
+  NewTagID      : [reserved] Used internally to save new ID of tag in Composite
+                  table if it is different that the original TagID (happens if
+                  there was a conflict with an existing entry in the table)
 
   Index         : [reserved] Used internally to save the index of tagInfo records
                   which are in a conditional list.

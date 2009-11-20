@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
 [File, System, Image] FileName - File Name: Ricoh_3_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 1907 bytes
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:41-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:11 08:09:48-05:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
@@ -52,7 +52,7 @@
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 1630
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Ricoh, Camera] 1 - Maker Note Type: RDC
-[MakerNotes, Ricoh, Camera] 2 - Maker Note Version: Rev1234
+[MakerNotes, Ricoh, Camera] 2 - Firmware Version: 1.04
 [MakerNotes, Ricoh, Camera] 3 - Ricoh 0x0003: 3
 [MakerNotes, Ricoh, Camera] 4 - Ricoh 0x0004: 13104 12853
 [MakerNotes, Ricoh, Image] 0 - Ricoh Image Width: 2272
@@ -64,8 +64,8 @@
 [MakerNotes, Ricoh, Camera] 1 - Ricoh Subdir 0x0001: 532 314
 [MakerNotes, Ricoh, Camera] 2 - Ricoh Subdir 0x0002: 42
 [MakerNotes, Ricoh, Camera] 3 - Ricoh Subdir 0x0003: 314572848
-[MakerNotes, Ricoh, Time] 4 - Ricoh Date Time 1: 2001:10:23 00:00:00
-[MakerNotes, Ricoh, Time] 5 - Ricoh Date Time 2: 0000:00:00 00:00:00
+[MakerNotes, Ricoh, Time] 4 - Manufacture Date 1: 2001:10:23 00:00:00
+[MakerNotes, Ricoh, Time] 5 - Manufacture Date 2: 0000:00:00 00:00:00
 [MakerNotes, Ricoh, Camera] 6 - Ricoh Subdir 0x0006: 12 0
 [MakerNotes, Ricoh, Camera] 7 - Ricoh Subdir 0x0007: 0
 [MakerNotes, Ricoh, Camera] 8 - Ricoh Subdir 0x0008: 32

@@ -15,21 +15,58 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
-use Image::ExifTool::RIFF;
 
-$VERSION = '1.08';
+$VERSION = '1.10';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
+
+# lens types for Ricoh GXR
+my %ricohLensIDs = (
+    Notes => q{
+        Lens units available for the GXR, used by the Ricoh Composite LensID tag.  Note
+        that unlike lenses for all other makes of cameras, the focal lengths in these
+        model names have already been scaled to include the 35mm crop factor.
+    },
+    # (the exact lens model names used by Ricoh, except for a change in case)
+    'RL1' => 'GR Lens A12 50mm F2.5 Macro',
+    'RL2' => 'Ricoh Lens S10 24-70mm F2.5-4.4 VC',
+);
 
 %Image::ExifTool::Ricoh::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
-    NOTES => 'These tags are used by Ricoh Caplio camera models.',
-    0x0001 => { Name => 'MakerNoteType',    Writable => 'string' },
-    0x0002 => { Name => 'MakerNoteVersion', Writable => 'string' },
+    0x0001 => { Name => 'MakerNoteType',   Writable => 'string' },
+    0x0002 => { #PH
+        Name => 'FirmwareVersion',
+        Writable => 'string',
+        # ie. "Rev0113" is firmware version 1.13
+        PrintConv => '$val=~/^Rev(\d+)$/ ? sprintf("%.2f",$1/100) : $val',
+        PrintConvInv => '$val=~/^(\d+)\.(\d+)$/ ? sprintf("Rev%.2d%.2d",$1,$2) : $val',
+    },
+    0x0005 => [ #PH
+        {
+            Condition => '$$valPt =~ /^[-\w ]+$/',
+            Name => 'SerialNumber', # (verified for GXR)
+            Writable => 'undef',
+            Count => 16,
+            Notes => q{
+                the serial number stamped on the camera begins with 2 model-specific letters
+                followed by the last 8 digits of this value.  For the GXR, this is the
+                serial number of the lens unit
+            },
+            PrintConv => '$val=~s/^(.*)(.{8})$/($1)$2/; $val',
+            PrintConvInv => '$val=~tr/()//d; $val',
+        },{
+            Name => 'InternalSerialNumber',
+            Writable => 'undef',
+            Count => 16,
+            PrintConv => 'unpack("H*", $val)',
+            PrintConvInv => 'pack("H*", $val)',
+        },
+    ],
     0x0e00 => {
         Name => 'PrintIM',
         Writable => 0,
@@ -166,8 +203,9 @@ sub ProcessRicohRMETA($$$);
             2 => 'Cloudy',
             3 => 'Tungsten',
             4 => 'Fluorescent',
-            # 5 (One Pushes, flake setting?)
-            # 7 (details setting?)
+            5 => 'Manual', #PH (GXR)
+            7 => 'Detail',
+            9 => 'Multi-pattern Auto', #PH (GXR)
         },
     },
     39 => {
@@ -199,9 +237,60 @@ sub ProcessRicohRMETA($$$);
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    0x0004 => { Name => 'RicohDateTime1', Groups => { 2 => 'Time' } }, #PH
-    0x0005 => { Name => 'RicohDateTime2', Groups => { 2 => 'Time' } }, #PH
-    # 0x000E ProductionNumber? (ref 2)
+    # the significance of the following 2 dates is not known.  They are usually
+    # within a month of each other, but I have seen differences of nearly a year.
+    # Sometimes the first is more recent, and sometimes the second.
+    0x0004 => { #PH (NC)
+        Name => 'ManufactureDate1',
+        Groups => { 2 => 'Time' },
+        Writable => 'string',
+        Count => 20,
+    },
+    0x0005 => { #PH (NC)
+        Name => 'ManufactureDate2',
+        Groups => { 2 => 'Time' },
+        Writable => 'string',
+        Count => 20,
+    },
+    0x002c => { #PH (GXR)
+        Name => 'SerialInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::SerialInfo' },
+    }
+    # 0x000E ProductionNumber? (ref 2) [no. zero for most models - PH]
+);
+
+# serial/version number information written by GXR (ref PH)
+%Image::ExifTool::Ricoh::SerialInfo = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    NOTES => 'This information is found in images from the GXR.',
+    0 => {
+        Name => 'BodyFirmware', #(NC)
+        Format => 'string[16]',
+        # observed: "RS1 :V00560000" --> FirmwareVersion "Rev0056"
+        #           "RS1 :V01020200" --> FirmwareVersion "Rev0102"
+    },
+    16 => {
+        Name => 'BodySerialNumber',
+        Format => 'string[16]',
+        # observed: "SID:00100056" --> "WD00100056" on plate
+    },
+    32 => {
+        Name => 'LensFirmware', #(NC)
+        Format => 'string[16]',
+        # observed: "RL1 :V00560000", "RL1 :V01020200" - A12 50mm F2.5 Macro
+        #           "RL2 :V00560000", "RL2 :V01020300" - S10 24-70mm F2.5-4.4 VC
+        # --> used in a Composite tag to determine LensType
+    },
+    48 => {
+        Name => 'LensSerialNumber',
+        Format => 'string[16]',
+        # observed: (S10) "LID:00010024" --> "WF00010024" on plate
+        #           (A12) "LID:00010054" --> "WE00010029" on plate??
+    },
 );
 
 # Ricoh text-type maker notes (PH)
@@ -209,13 +298,20 @@ sub ProcessRicohRMETA($$$);
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&ProcessRicohText,
     NOTES => q{
-        Ricoh RDC models such as the RDC-i700, RDC-5000, RDC-6000, RDC-7 and
-        RDC-4300 use a text-based format for their maker notes instead of the IFD
-        format used by the Caplio models.  Below is a list of known tags in this
-        information.
+        Some Ricoh DC and RDC models use a text-based format for their maker notes
+        instead of the IFD format used by the Caplio models.  Below is a list of known
+        tags in this information.
     },
-    Rev => 'Revision',
-    Rv => 'Revision',
+    Rev => {
+        Name => 'FirmwareVersion',
+        PrintConv => '$val=~/^\d+$/ ? sprintf("%.2f",$val/100) : $val',
+        PrintConvInv => '$val=~/^(\d+)\.(\d+)$/ ? sprintf("%.2d%.2d",$1,$2) : $val',
+    },
+    Rv => {
+        Name => 'FirmwareVersion',
+        PrintConv => '$val=~/^\d+$/ ? sprintf("%.2f",$val/100) : $val',
+        PrintConvInv => '$val=~/^(\d+)\.(\d+)$/ ? sprintf("%.2d%.2d",$1,$2) : $val',
+    },
     Rg => 'RedGain',
     Gg => 'GreenGain',
     Bg => 'BlueGain',
@@ -272,8 +368,7 @@ sub ProcessRicohRMETA($$$);
 
 # information stored in Ricoh AVI images (ref PH)
 %Image::ExifTool::Ricoh::AVI = (
-    PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunks,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Video' },
     ucmt => {
         Name => 'Comment',
         ValueConv => '$_=$val; s/^Unicode//; tr/\0//d; s/\s+$//; $_',
@@ -298,6 +393,21 @@ sub ProcessRicohRMETA($$$);
         Binary => 1,
     },
 );
+
+# Ricoh composite tags
+%Image::ExifTool::Ricoh::Composite = (
+    GROUPS => { 2 => 'Camera' },
+    LensID => {
+        SeparateTable => 'Ricoh LensID',
+        Require => 'Ricoh:LensFirmware',
+        ValueConv => '$val=~s/\s*:.*//; $val',
+        PrintConv => \%ricohLensIDs,
+    },
+);
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags('Image::ExifTool::Ricoh');
+
 
 #------------------------------------------------------------------------------
 # Process Ricoh text-based maker notes

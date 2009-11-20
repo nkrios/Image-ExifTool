@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.96
 [File, System, Image] FileName - File Name: Panasonic_3_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 7.0 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:34-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:10:01 09:49:45-04:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -83,7 +83,7 @@
 [MakerNotes, Panasonic, Camera] 41 - Time Since Power On: 00:00:06.96
 [MakerNotes, Panasonic, Camera] 42 - Burst Mode: Off
 [MakerNotes, Panasonic, Camera] 43 - Sequence Number: 0
-[MakerNotes, Panasonic, Camera] 44 - Contrast: Normal
+[MakerNotes, Panasonic, Camera] 44 - Contrast Mode: Normal
 [MakerNotes, Panasonic, Camera] 45 - Noise Reduction: Standard
 [MakerNotes, Panasonic, Camera] 46 - Self Timer: Off
 [MakerNotes, Panasonic, Camera] 47 - Panasonic 0x002f: 4

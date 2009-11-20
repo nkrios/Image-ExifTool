@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
 [File, System, Image] FileName - File Name: Writer_13_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 4.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:46-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:10 16:10:07-05:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -69,7 +69,7 @@
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49 mm
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
 [MakerNotes, Canon, Image] 2 - Base ISO: 100
-[MakerNotes, Canon, Image] 3 - Measured EV: -5.00
+[MakerNotes, Canon, Image] 3 - Measured EV: 0.00
 [MakerNotes, Canon, Image] 4 - Target Aperture: 3.6
 [MakerNotes, Canon, Image] 5 - Target Exposure Time: 1/60
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
@@ -85,7 +85,7 @@
 [MakerNotes, Canon, Image] 20 - Focus Distance Lower: 1.19
 [MakerNotes, Canon, Image] 21 - F Number: 3.6
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/64
-[MakerNotes, Canon, Image] 23 - Measured EV 2: -5.125
+[MakerNotes, Canon, Image] 23 - Measured EV 2: -0.125
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
@@ -125,7 +125,7 @@
 [MakerNotes, Canon, Camera] 1 - Measured RGGB: 554 1022 1026 754
 [MakerNotes, Canon, Camera] 174 - Color Temperature: 5200
 [MakerNotes, Canon, Camera] 180 - Color Space: sRGB
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.83
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.00
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0560018150

@@ -8,10 +8,8 @@
 <!--
 pre  { color: #800; margin-left: 4em }
 code { white-space: nowrap }
+.nr  { white-space: nowrap }
 .lt  { color: #666 }
-div.index   { float: right; clear: both;
-              border-left: 1px solid gray;
-              margin: .5em 0 .5em .5em; padding: 0 .5em }
 -->
 </style>
 </head>
@@ -39,6 +37,7 @@ GPSLatitudeRef  GPSLongitudeRef  GPSAltitudeRef  GPSTimeStamp
 <li>GPX</li>
 <li>NMEA (RMC, GGA, GLL and GSA sentences)</li>
 <li>KML</li>
+<li>IGC (glider format)</li>
 <li>Garmin XML and TCX</li>
 <li>Magellan eXplorist PMGNTRK</li>
 </ul>
@@ -46,8 +45,15 @@ GPSLatitudeRef  GPSLongitudeRef  GPSAltitudeRef  GPSTimeStamp
 <a name="Implementation"></a>
 <h3>Implementation</h3>
 
-<p>Geotagging is accomplished in ExifTool through the use of two special tags:
-<code>Geotag</code> and <code>Geotime</code>.</p>
+<p>Geotagging is accomplished in ExifTool through the use of three special tags:
+<code>Geotag</code>, <code>Geosync</code> and <code>Geotime</code>.</p>
+
+<blockquote class=lt><i>Note: When writing these tags, order is important. If
+<code>Geotime</code> is written, it must be done after both <code>Geotag</code>
+and <code>Geosync</code>.  Normally this is not a concern because the exiftool
+order of operations will copy all tags in batch processing after other directly
+assigned tags, but this should be kept in mind for cases where the value of
+<code>Geotime</code> is set directly from a date/time string.</i></blockquote>
 
 <h4>Geotag</h4>
 
@@ -68,11 +74,40 @@ above:</p>
 </pre>
 
 <p>Multiple GPS log files may be loaded simultaneously by using more than one
-<code>-geotag</code> option.  This allows batch processing of images spanning
-different tracks with a single command.</p>
+<code>-geotag</code> option (or by using wildcards in the filename argument
+for the <code>-geotag</code> option,  but note that here the filename may need
+to be quoted -- see the last <a href="#Examples">example</a> below).  This
+allows batch processing of images spanning different tracks with a single
+command.</p>
 
 <p>Deleting the <code>Geotag</code> tag causes the associated GPS tags to be
 deleted from an image.</p>
+
+<blockquote class=lt><i>Programmers:  You may write either a GPS log file name
+or the GPS log data as the value for <code>Geotag</code>.  If the value contains
+a newline or a null byte it is assumed to be data, otherwise it is taken as a
+file name.</i></blockquote>
+
+<h4>Geosync</h4>
+
+<p>The <code>Geosync</code> tag is needed only when the image timestamps are not
+properly synchronized with GPS time.  The <code>Geosync</code> value is added to
+<code>Geotime</code> before interpolating the GPS position in the track log. 
+<code>Geosync</code> values should be in the format "SS", "MM:SS", "HH:MM:SS" or
+"DD HH:MM:SS" (where SS=seconds, MM=minutes, HH=hours and DD=days).  A leading
+"+" or "-" may be added for positive or negative differences (negative if the
+camera clock was ahead of GPS time), and fractional seconds are allowed (ie.
+"SS.ss").</p>
+
+<p>For example, "<code>-geosync=-1:20</code>" specifies that synchronization
+with GPS time is achieved by subtracting 1 minute and 20 seconds from the
+<code>Geotime</code> value.  See the <a href="#TP1">Time Synchronization Tip</a>
+below for more details.</p>
+
+<blockquote class=lt><i>Note that a single decimal value is interpreted as
+seconds when written to <code>Geosync</code>.  This is different from of other
+date/time shift values where a single value is normally taken as hours.</i>
+</blockquote>
 
 <h4>Geotime</h4>
 
@@ -82,7 +117,12 @@ Unless a group is specified, exiftool writes the generated tags to the default
 groups.  If a value for <code>Geotime</code> is not given, it is taken from
 <code>DateTimeOriginal</code> for each image (as if
 <code>"-Geotime&lt;DateTimeOriginal"</code> had been specified), but the value
-may be copied from any other date/time tag or set to a date/time string.</p>
+may be copied from any other date/time tag or set directly from a date/time
+string.</p>
+
+<p>If the date/time tag does not include a timezone then one may be added (ie.
+<code>"-Geotime&lt;${CreateDate}-05:00"</code>), otherwise the local system time
+is assumed.</p>
 
 <p>By default, GPS tags are created in EXIF and the corresponding
 XMP tags are updated only if they already exist.  However, an EXIF or XMP group
@@ -97,12 +137,10 @@ tags.</p>
 <p>See the <a href="#Examples">Examples</a> section below for sample command
 lines illustrating various aspects of the geotagging feature.</p>
 
-<blockquote class=lt><i>Programmers:  You may write either a GPS log file name
-or the GPS log data as the value for <code>Geotag</code>.  If the value contains
-a newline or a null byte it is assumed to be data, otherwise it is taken as a
-file name.  Note that <code>Geotime</code> must always be specified when
-geotagging via the API -- the default value of <code>DateTimeOriginal</code> is
-implemented only by the exiftool application.</i></blockquote>
+<blockquote class=lt><i>Programmers:  Note that <code>Geotime</code> must always
+be specified when geotagging via the API -- the default value of
+<code>DateTimeOriginal</code> is implemented at the application level.</i>
+</blockquote>
 
 <a name="Examples"></a>
 <h3>Examples</h3>
@@ -113,6 +151,11 @@ of <code>DateTimeOriginal</code> is used.  Local system time is assumed
 unless <code>DateTimeOriginal</code> contains a timezone:</p>
 
 <pre>exiftool -geotag track.log a.jpg</pre>
+
+<p>Geotag all images in directory "dir" from the GPS positions in "track.log",
+for a camera clock that was running 25 seconds slower than the GPS clock:</p>
+
+<pre>exiftool -geotag track.log -geosync=+25 dir</pre>
 
 <p>Geotag an image with the GPS position for a specific time.  (Note that the
 <code>Geotag</code> tag must be assigned before <code>Geotime</code> for the GPS
@@ -163,6 +206,12 @@ images:</p>
 operating systems to prevent filename expansion):</p>
 
 <pre>exiftool -geotag "logs/*.log" dir</pre>
+
+<p>Geotag from a sub-second date/time value with a sub-second time synchronization
+(only possible if the EXIF sub-second time stamps are available):</p>
+
+<pre>exiftool -Geotag a.log -Geosync=+13.42 "-Geotime&lt;SubSecDateTimeOriginal" dir
+</pre>
 
 <a name="Options"></a>
 <h3>Options</h3>
@@ -267,14 +316,17 @@ UTC time for the image:
 </pre>
 
 The "Geotime value" must lie within 1/2 hour of a valid GPS fix in the track log
-for a position to be calculated.  The time calibration relies on proper
-synchronization between the GPS time and your camera's clock.  If a timezone is
-not specified, <code>Geotime</code> is converted to UTC using the local system
-timezone.  You should specify the timezone for <code>Geotime</code> if your
-images were taken in a different timezone (see <a href="#Examples">Examples</a>
-above).  If the camera clock was wrong, the ExifTool time shift feature may be
-used to adjust the image times before geotagging (see the <a href="#TP1">Time
-Synchronization</a> tip below for an example). </blockquote>
+for a position to be calculated. (1/2 hour is the default, but this can be
+configured via the geotagging <a href="#Options">Options</a>.)  The time
+calibration relies on proper synchronization between the GPS time and your
+camera's clock.  If a timezone is not specified, <code>Geotime</code> is
+converted to UTC using the local system timezone.  You should specify the
+timezone for <code>Geotime</code> if your images were taken in a different
+timezone (see <a href="#Examples">Examples</a> above).  If the camera clock was
+wrong, the <code>Geosync</code> tag may be used to apply a time correction, or
+the ExifTool time shift feature may be used to adjust the image times before
+geotagging -- see the <a href="#TP1">Time Synchronization</a> tip below for
+examples. </blockquote>
 
 <a name="Tips"></a>
 <h3>Tips</h3>
@@ -284,21 +336,39 @@ Synchronization</a> tip below for an example). </blockquote>
 
 <blockquote>One way to accurately synchronize your images with GPS time is to
 take a picture of the time displayed on your GPS unit while you are out
-shooting. Then, after you download your images, you can look at this image to
-get the GPS time and use ExifTool to extract DateTimeOriginal.  Say, for
-example, that the GPS clock reads 19:32:21, DateTimeOriginal is 14:31:49, and
-your timezone is -05:00. In this case, your camera clock is 32 seconds slow, so
-you would synchronize your pictures using the following exiftool command:
+shooting.  Then after you download your images you can use this image to
+synchronize the image timestamps for geotagging.  This is done by using an image
+viewer to read the time from the GPS display in the image, and exiftool to
+extract <code>DateTimeOriginal</code> from the file. For example, if the time in
+the GPS display reads 19:32:21 UTC and <code>DateTimeOriginal</code> is
+14:31:49, then for this image the camera clock was 32 seconds slow (assuming
+that the timezone of the camera clock was <span class=nr>-05:00</span>). There
+are two different ways to use this time synchronization to improve your
+geotagging accuracy:
+</blockquote>
 
-<pre>exiftool -alldates+=00:00:32 C:\Images
+<blockquote>A) Use the <code>Geosync</code> tag to specify the time difference
+while geotagging.  Using this technique the existing image timestamps will not
+be corrected, but the <code>GPSTimeStamp</code> tag created by the geotagging
+process will contain the correct GPS time:
+
+<pre>exiftool -geosync=+00:00:32 -geotag my_gps.log C:\Images
 </pre>
 
-(assuming that you downloaded the images to the <code>C:\Images</code>
-directory).  The geotagging will be more accurate after synchronizing the image
-times like this.</blockquote>
+or B) First fix the image timestamps by shifting them to synchronize with GPS
+time, then geotag using the corrected timestamps:
+
+<pre>exiftool -alldates+=00:00:32 C:\Images
+exiftool -geotag my_gps.log C:\Images
+</pre>
+
+Both examples above assume that your track log file (<code>my_gps.log</code>)
+is in the current directory, that the images were downloaded to the
+<code>C:\Images</code> directory, and that the computer and camera clocks are
+in the same timezone.</blockquote>
 
 <hr>
-<i>Last revised July 22, 2009</i>
+<i>Last revised Oct. 3, 2009</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

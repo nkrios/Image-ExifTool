@@ -90,7 +90,8 @@ reference number and not the actual firmware version)</span></span></td></tr>
 <td title='0x001f = 31'>0x001f</td>
 <td>ShootingMode</td>
 <td class=c>int16u</td>
-<td><span class=s>1 = Normal
+<td><table class=cols><tr>
+  <td>1 = Normal
   <br>2 = Portrait
   <br>3 = Scenery
   <br>4 = Sports
@@ -112,8 +113,8 @@ reference number and not the actual firmware version)</span></span></td></tr>
   <br>20 = Snow
   <br>21 = Night Scenery
   <br>22 = Food
-  <br>23 = Baby
-  <br>24 = Soft Skin
+  <br>23 = Baby</td><td>&nbsp;&nbsp;</td>
+  <td>24 = Soft Skin
   <br>25 = Candlelight
   <br>26 = Starry Night
   <br>27 = High Sensitivity
@@ -132,7 +133,10 @@ reference number and not the actual firmware version)</span></span></td></tr>
   <br>42 = Flash Burst
   <br>43 = Pin Hole
   <br>44 = Film Grain
-  <br>46 = Photo Frame</span></td></tr>
+  <br>45 = My Color
+  <br>46 = Photo Frame
+  <br>51 = HDR</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr>
 <td title='0x0020 = 32'>0x0020</td>
 <td>Audio</td>
@@ -196,11 +200,11 @@ written to memory card)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x002c = 44'>0x002c</td>
-<td>Contrast</td>
+<td>ContrastMode</td>
 <td class=c>int16u</td>
-<td><span class=s><span class=n>(this decoding seems to work for some models such as the LX2, FZ7, FZ8, FZ18
-and FZ50, but may not be correct for other models such as the FX10, L1, L10
-and LC80)</span>
+<td><span class=s><span class=n>(this decoding seems to work for some models such as the LC1, LX2, FZ7, FZ8,
+FZ18 and FZ50, but may not be correct for other models such as the FX10, G1, L1,
+L10 and LC80)</span>
   <br>0x0 = Normal
   <br>0x1 = Low
   <br>0x2 = High
@@ -208,7 +212,23 @@ and LC80)</span>
   <br>0x7 = Medium High
   <br>0x100 = Low
   <br>0x110 = Normal
-  <br>0x120 = High</span></td></tr>
+  <br>0x120 = High
+  <br><span class=n>(these values are used by the GF1)</span>
+  <br>0 = -2
+  <br>1 = -1
+  <br>2 = Normal
+  <br>3 = +1
+  <br>4 = +2
+  <br>7 = Nature (Color Film)
+  <br>12 = Smooth (Color Film) or Pure (My Color)
+  <br>17 = Dynamic (B&amp;W Film)
+  <br>22 = Smooth (B&amp;W Film)
+  <br>27 = Dynamic (Color Film)
+  <br>32 = Vibrant (Color Film) or Expressive (My Color)
+  <br>33 = Elegant (My Color)
+  <br>37 = Nostalgic (Color Film)
+  <br>41 = Dynamic Art (My Color)
+  <br>42 = Retro (My Color)</span></td></tr>
 <tr class=b>
 <td title='0x002d = 45'>0x002d</td>
 <td>NoiseReduction</td>
@@ -230,6 +250,7 @@ and LC80)</span>
 <td>Rotation</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Horizontal (normal)
+  <br>3 = Rotate 180
   <br>6 = Rotate 90 CW
   <br>8 = Rotate 270 CW</span></td></tr>
 <tr>
@@ -299,10 +320,17 @@ and LC80)</span>
 <td>AdvancedSceneMode</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Normal
-  <br>2 = Outdoor/Illuminations/Flower
-  <br>3 = Indoor/Architecture/Objects
+  <br>2 = Outdoor/Illuminations/Flower/HDR Art
+  <br>3 = Indoor/Architecture/Objects/HDR B&amp;W
   <br>4 = Creative
-  <br>5 = Auto</span></td></tr>
+  <br>5 = Auto
+  <br>7 = Expressive
+  <br>8 = Retro
+  <br>9 = Pure
+  <br>10 = Elegant
+  <br>12 = Monochrome
+  <br>13 = Dynamic Art
+  <br>14 = Silhouette</span></td></tr>
 <tr class=b>
 <td title='0x003e = 62'>0x003e</td>
 <td>TextStamp</td>
@@ -383,36 +411,45 @@ and LC80)</span>
   <br>&#39;1 1&#39; = Stretch Low
   <br>&#39;3 2&#39; = Stretch High</span></td></tr>
 <tr>
+<td title='0x005d = 93'>0x005d</td>
+<td>IntelligentExposure</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = Low
+  <br>2 = Standard
+  <br>3 = High</span></td></tr>
+<tr class=b>
 <td title='0x0061 = 97'>0x0061</td>
 <td>FaceRecInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Panasonic.html#FaceRecInfo'>Panasonic FaceRecInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0062 = 98'>0x0062</td>
 <td>FlashWarning</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = No
   <br>1 = Yes (flash required but disabled)</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0063 = 99'>0x0063</td>
 <td>RecognizedFaceFlags?</td>
 <td class=c>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x8000 = 32768'>0x8000</td>
 <td>MakerNoteVersion</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x8001 = 32769'>0x8001</td>
 <td>SceneMode</td>
 <td class=c>int16u</td>
-<td><span class=s>0 = Off
+<td><table class=cols><tr>
+  <td>0 = Off
   <br>1 = Normal
   <br>2 = Portrait
   <br>3 = Scenery
@@ -434,8 +471,8 @@ and LC80)</span>
   <br>19 = Party
   <br>20 = Snow
   <br>21 = Night Scenery
-  <br>22 = Food
-  <br>23 = Baby
+  <br>22 = Food</td><td>&nbsp;&nbsp;</td>
+  <td>23 = Baby
   <br>24 = Soft Skin
   <br>25 = Candlelight
   <br>26 = Starry Night
@@ -455,46 +492,49 @@ and LC80)</span>
   <br>42 = Flash Burst
   <br>43 = Pin Hole
   <br>44 = Film Grain
-  <br>46 = Photo Frame</span></td></tr>
-<tr>
+  <br>45 = My Color
+  <br>46 = Photo Frame
+  <br>51 = HDR</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr class=b>
 <td title='0x8004 = 32772'>0x8004</td>
 <td>WBRedLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x8005 = 32773'>0x8005</td>
 <td>WBGreenLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x8006 = 32774'>0x8006</td>
 <td>WBBlueLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x8007 = 32775'>0x8007</td>
 <td>FlashFired</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = No
   <br>2 = Yes</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x8008 = 32776'>0x8008</td>
 <td>TextStamp</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Off
   <br>2 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x8009 = 32777'>0x8009</td>
 <td>TextStamp</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Off
   <br>2 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x8010 = 32784'>0x8010</td>
 <td>BabyAge</td>
 <td class=c>string</td>
 <td><span class=s><span class=n>(or pet age)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x8012 = 32786'>0x8012</td>
 <td>Transform</td>
 <td class=c>undef[4]</td>
@@ -684,6 +724,11 @@ user-supplied set of known faces.</p>
   <br>44 = Summarit-M 50mm f/2.5
   <br>45 = Summarit-M 75mm f/2.5
   <br>46 = Summarit-M 90mm f/2.5
+  <br>47 = Summilux-M 21mm f/1.4 ASPH.
+  <br>48 = Summilux-M 24mm f/1.4 ASPH.
+  <br>49 = Noctilux-M 50mm f/0.95 ASPH.
+  <br>50 = Elmar-M 24mm f/3.8 ASPH.
+  <br>52 = Super-Elmar-M 18mm f/3.8 ASPH.
   <br>[Value 1]
   <br>1 = 28/90mm frame lines engaged
   <br>2 = 24/35mm frame lines engaged
@@ -775,6 +820,114 @@ user-supplied set of known faces.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Leica4'>Panasonic Leica4 Tags</a></h2>
+<p>This information is written by the M9.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td title='0x3000 = 12288'>0x3000</td>
+<td>Subdir3000</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Panasonic.html#Subdir'>Panasonic Subdir Tags</a></td></tr>
+<tr class=b>
+<td title='0x3100 = 12544'>0x3100</td>
+<td>Subdir3100</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Panasonic.html#Subdir'>Panasonic Subdir Tags</a></td></tr>
+<tr>
+<td title='0x3400 = 13312'>0x3400</td>
+<td>Subdir3400</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Panasonic.html#Subdir'>Panasonic Subdir Tags</a></td></tr>
+<tr class=b>
+<td title='0x3900 = 14592'>0x3900</td>
+<td>Subdir3900</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Panasonic.html#Subdir'>Panasonic Subdir Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Subdir'>Panasonic Subdir Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td title='0x3036 = 12342'>0x3036</td>
+<td>WB_RGBLevels</td>
+<td class=c>rational64u[3]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x3038 = 12344'>0x3038</td>
+<td>UserProfile</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x3109 = 12553'>0x3109</td>
+<td>FirmwareVersion</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x312b = 12587'>0x312b</td>
+<td>SensorWidth</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x312c = 12588'>0x312c</td>
+<td>SensorHeight</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x3405 = 13317'>0x3405</td>
+<td>LensType</td>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(lower 3 bits split into a separate value for the frame selector position)</span>
+  <br>[Value 0]
+  <br>1 = Elmarit-M 21mm f/2.8
+  <br>3 = Elmarit-M 28mm f/2.8 (III)
+  <br>4 = Tele-Elmarit-M 90mm f/2.8 (II)
+  <br>5 = Summilux-M 50mm f/1.4 (II)
+  <br>6 = Summicron-M 35mm f/2 (IV)
+  <br>7 = Summicron-M 90mm f/2 (II)
+  <br>9 = Elmarit-M 135mm f/2.8 (I/II)
+  <br>16 = Tri-Elmar-M 16-18-21mm f/4 ASPH.
+  <br>23 = Summicron-M 50mm f/2 (III)
+  <br>24 = Elmarit-M 21mm f/2.8 ASPH.
+  <br>25 = Elmarit-M 24mm f/2.8 ASPH.
+  <br>26 = Summicron-M 28mm f/2 ASPH.
+  <br>27 = Elmarit-M 28mm f/2.8 (IV)
+  <br>28 = Elmarit-M 28mm f/2.8 ASPH.
+  <br>29 = Summilux-M 35mm f/1.4 ASPH.
+  <br>30 = Summicron-M 35mm f/2 ASPH.
+  <br>31 = Noctilux-M 50mm f/1
+  <br>32 = Summilux-M 50mm f/1.4 ASPH.
+  <br>33 = Summicron-M 50mm f/2 (IV, V)
+  <br>34 = Elmar-M 50mm f/2.8
+  <br>35 = Summilux-M 75mm f/1.4
+  <br>36 = Apo-Summicron-M 75mm f/2 ASPH.
+  <br>37 = Apo-Summicron-M 90mm f/2 ASPH.
+  <br>38 = Elmarit-M 90mm f/2.8
+  <br>39 = Macro-Elmar-M 90mm f/4
+  <br>40 = Macro-Adapter M
+  <br>42 = Tri-Elmar-M 28-35-50mm f/4 ASPH.
+  <br>43 = Summarit-M 35mm f/2.5
+  <br>44 = Summarit-M 50mm f/2.5
+  <br>45 = Summarit-M 75mm f/2.5
+  <br>46 = Summarit-M 90mm f/2.5
+  <br>47 = Summilux-M 21mm f/1.4 ASPH.
+  <br>48 = Summilux-M 24mm f/1.4 ASPH.
+  <br>49 = Noctilux-M 50mm f/0.95 ASPH.
+  <br>50 = Elmar-M 24mm f/3.8 ASPH.
+  <br>52 = Super-Elmar-M 18mm f/3.8 ASPH.
+  <br>[Value 1]
+  <br>1 = 28/90mm frame lines engaged
+  <br>2 = 24/35mm frame lines engaged
+  <br>3 = 50/75mm frame lines engaged</span></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='Type2'>Panasonic Type2 Tags</a></h2>
 <p>This type of maker notes is used by models such as the NV-DS65, PV-D2002,
 PV-DC3000, PV-DV203, PV-DV401, PV-DV702, PV-L2001, PV-SD4090, PV-SD5000 and
@@ -798,7 +951,7 @@ iPalm.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 20, 2009</i>
+<br><i>Last revised Nov 18, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

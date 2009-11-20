@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.98
 [File, System, Image] FileName - File Name: DNG.dng
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 13 kB
@@ -196,7 +196,7 @@
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.37 mm
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
 [MakerNotes, Canon, Image] 2 - Base ISO: 400
-[MakerNotes, Canon, Image] 3 - Measured EV: 3.00
+[MakerNotes, Canon, Image] 3 - Measured EV: 8.00
 [MakerNotes, Canon, Image] 4 - Target Aperture: 8
 [MakerNotes, Canon, Image] 5 - Target Exposure Time: 1/15
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
@@ -211,7 +211,7 @@
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
 [MakerNotes, Canon, Image] 21 - F Number: 8
 [MakerNotes, Canon, Image] 22 - Exposure Time: 1/16
-[MakerNotes, Canon, Image] 23 - Measured EV 2: 3.125
+[MakerNotes, Canon, Image] 23 - Measured EV 2: 8.125
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
@@ -249,7 +249,7 @@
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0
 [MakerNotes, Canon, Image] 5 - Bracket Shot Number: 0
-[MakerNotes, Canon, Image] 8 - Noise Reduction: Off
+[MakerNotes, Canon, Image] 8 - Long Exposure Noise Reduction 2: Off
 [MakerNotes, Canon, Image] 9 - WB Bracket Mode: Off
 [MakerNotes, Canon, Image] 12 - WB Bracket Value AB: 0
 [MakerNotes, Canon, Image] 13 - WB Bracket Value GM: 0

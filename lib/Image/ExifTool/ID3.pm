@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.18';
+$VERSION = '1.21';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -55,11 +55,16 @@ my %pictureType = (
     20 => 'Publisher Logo',
 );
 
+my %dateTimeConv = (
+    ValueConv => 'require Image::ExifTool::XMP; Image::ExifTool::XMP::ConvertXMPDate($val)',
+    PrintConv => '$self->ConvertDateTime($val)',
+);
+
 my %warnedOnce;     # hash of warnings we issued
 
 # This table is just for documentation purposes
 %Image::ExifTool::ID3::Main = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData, # (not really)
+    VARS => { NO_ID => 1 },
     NOTES => q{
         ExifTool extracts ID3 information from MP3, MPEG, AIFF, OGG, FLAC, APE and
         RealAudio files.  Tags which support multiple languages (ie. Comment and
@@ -256,18 +261,18 @@ my %genre = (
     3 => {
         Name => 'Title',
         Format => 'string[30]',
-        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
+        ValueConv => '$self->Latin2Charset($val)',
     },
     33 => {
         Name => 'Artist',
         Groups => { 2 => 'Author' },
         Format => 'string[30]',
-        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
+        ValueConv => '$self->Latin2Charset($val)',
     },
     63 => {
         Name => 'Album',
         Format => 'string[30]',
-        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
+        ValueConv => '$self->Latin2Charset($val)',
     },
     93 => {
         Name => 'Year',
@@ -277,7 +282,7 @@ my %genre = (
     97 => {
         Name => 'Comment',
         Format => 'string[30]',
-        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
+        ValueConv => '$self->Latin2Charset($val)',
     },
     125 => { # ID3v1.1 (ref http://en.wikipedia.org/wiki/ID3#Layout)
         Name => 'Track',
@@ -303,18 +308,18 @@ my %genre = (
     4 => {
         Name => 'Title2',
         Format => 'string[60]',
-        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
+        ValueConv => '$self->Latin2Charset($val)',
     },
     64 => {
         Name => 'Artist2',
         Groups => { 2 => 'Author' },
         Format => 'string[60]',
-        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
+        ValueConv => '$self->Latin2Charset($val)',
     },
     124 => {
         Name => 'Album2',
         Format => 'string[60]',
-        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
+        ValueConv => '$self->Latin2Charset($val)',
     },
     184 => {
         Name => 'Speed',
@@ -329,7 +334,7 @@ my %genre = (
     185 => {
         Name => 'Genre',
         Format => 'string[30]',
-        ValueConv => 'Image::ExifTool::Latin2Charset($self,$val)',
+        ValueConv => '$self->Latin2Charset($val)',
     },
     215 => {
         Name => 'StartTime',
@@ -545,11 +550,11 @@ my %id3v2_common = (
   # RVA2 => 'RelativeVolumeAdjustment',
   # SEEK => 'Seek',
   # SIGN => 'Signature',
-    TDEN => { Name => 'EncodingTime',       Groups => { 2 => 'Time' } },
-    TDOR => { Name => 'OriginalReleaseTime',Groups => { 2 => 'Time' } },
-    TDRC => { Name => 'RecordingTime',      Groups => { 2 => 'Time' } },
-    TDRL => { Name => 'ReleaseTime',        Groups => { 2 => 'Time' } },
-    TDTG => { Name => 'TaggingTime',        Groups => { 2 => 'Time' } },
+    TDEN => { Name => 'EncodingTime',       Groups => { 2 => 'Time' }, %dateTimeConv },
+    TDOR => { Name => 'OriginalReleaseTime',Groups => { 2 => 'Time' }, %dateTimeConv },
+    TDRC => { Name => 'RecordingTime',      Groups => { 2 => 'Time' }, %dateTimeConv },
+    TDRL => { Name => 'ReleaseTime',        Groups => { 2 => 'Time' }, %dateTimeConv },
+    TDTG => { Name => 'TaggingTime',        Groups => { 2 => 'Time' }, %dateTimeConv },
     TIPL => 'InvolvedPeople',
     TMCL => 'MusicianCredits',
     TMOO => 'Mood',
@@ -578,6 +583,34 @@ my %id3v2_common = (
         ValueConv => 'length($val)==4 ? unpack("V",$val) : \$val',
     },
 );
+
+# ID3 Composite tags
+%Image::ExifTool::ID3::Composite = (
+    GROUPS => { 2 => 'Image' },
+    DateTimeOriginal => {
+        Description => 'Date/Time Original',
+        Groups => { 2 => 'Time' },
+        Priority => 0,
+        Desire => {
+            0 => 'ID3:RecordingTime',
+            1 => 'ID3:Year',
+            2 => 'ID3:Date',
+            3 => 'ID3:Time',
+        },
+        ValueConv => q{
+            return $val[0] if $val[0];
+            return undef unless $val[1];
+            return $val[1] unless $val[2] and $val[2] =~ /^(\d{2})(\d{2})$/;
+            $val[1] .= ":$1:$2";
+            return $val[1] unless $val[3] and $val[3] =~ /^(\d{2})(\d{2})$/;
+            return "$val[1] $1:$2";
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+);
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags('Image::ExifTool::ID3');
 
 # can't share tagInfo hashes between two tables, so we must make
 # copies of the necessary hashes
@@ -1044,7 +1077,7 @@ sub ProcessID3($$)
             $exifTool->{FILE_TYPE} = $oldType;      # restore original file type
         }
         # set file type to MP3 if we didn't find audio data
-        $exifTool->SetFileType('MP3') unless $exifTool->{VALUE}->{FileType};
+        $exifTool->SetFileType('MP3');
         # record the size if the ID3 metadata
         $exifTool->FoundTag('ID3Size', $id3Len);
         # process ID3v2 header if it exists

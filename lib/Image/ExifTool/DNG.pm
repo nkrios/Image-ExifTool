@@ -17,7 +17,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::MakerNotes;
 use Image::ExifTool::CanonRaw;
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 sub ProcessOriginalRaw($$$);
 sub ProcessAdobeData($$$);
@@ -58,9 +58,9 @@ sub WriteAdobeStuff($$$);
         have been lost by the Adobe DNG Converter.  This is because the Adobe DNG
         Converter (as of version 4.3) doesn't properly handle information referenced
         from inside the maker notes that lies outside the original maker notes
-        block, and this information is lost when only the maker note block is copied
-        to the DNG image.   While this isn't a big problem for most camera makes, it
-        is serious for some makes like Olympus.
+        block.  This information is lost when only the maker note block is copied to
+        the DNG image.   While this doesn't effect all makes of cameras, it is a
+        problem for some major brands such as Olympus and Sony.
 
         Other entries in this table represent proprietary information that is
         extracted from the original RAW image and restructured to a different (but

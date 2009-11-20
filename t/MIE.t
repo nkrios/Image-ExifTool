@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..4\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..6\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -72,6 +72,16 @@ my $testnum = 1;
     } else {
         print 'not ';
     }
+    print "ok $testnum\n";
+}
+
+# tests 5-6: Test reading different Charsets
+foreach (qw(Latin Cyrillic)) {
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->Options(Charset => $_);
+    my $info = $exifTool->ImageInfo('t/images/MIE.mie', 'comment-ru_ru');
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
 

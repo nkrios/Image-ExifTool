@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ProcessBitStream($$$);
 
@@ -59,10 +59,9 @@ sub ProcessBitStream($$$);
     Duration => {
         Require => {
             0 => 'FLAC:SampleRate',
-            1 => 'FLAC:Channels',
-            2 => 'FLAC:TotalSamples',
+            1 => 'FLAC:TotalSamples',
         },
-        ValueConv => '$val[0] and $val[1] and $val[2] ? $val[2] / ($val[0] * $val[1]) : undef',
+        ValueConv => '$val[0] and $val[1] ? $val[1] / $val[0] : undef',
         PrintConv => 'ConvertDuration($val)',
     },
 );
@@ -169,7 +168,7 @@ sub ProcessFLAC($$)
 
     # check FLAC signature
     $raf->Read($buff, 4) == 4 and $buff eq 'fLaC' or return 0;
-    $exifTool->SetFileType() unless $exifTool->{VALUE}->{FileType};
+    $exifTool->SetFileType();
     SetByteOrder('MM');
     my $tagTablePtr = GetTagTable('Image::ExifTool::FLAC::Main');
     for (;;) {

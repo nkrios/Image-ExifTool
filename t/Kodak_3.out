@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.94
 [File, System, Image] FileName - File Name: Kodak_3_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 3.3 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:29-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:09:07 18:55:11-04:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
@@ -85,7 +85,7 @@
 [MakerNotes, Kodak, Camera] 102 - Color Mode: Saturated Color
 [MakerNotes, Kodak, Camera] 104 - Digital Zoom: 2
 [MakerNotes, Kodak, Camera] 107 - Sharpness: Normal
-[FlashPix, FlashPix, Other] 1 - Code Page: 1200
+[FlashPix, FlashPix, Other] 1 - Code Page: Unicode UTF-16, little endian
 [FlashPix, FlashPix, Other] 268435456 - Used Extension Numbers: 1, 2
 [FlashPix, FlashPix, Other] 1 - Extension Name: Screen nail
 [FlashPix, FlashPix, Other] 2 - Extension Class ID: 10000230-6FC0-11D0-BD01-00609719A180
@@ -104,7 +104,7 @@
 [FlashPix, FlashPix, Other] 7 - Extension Description: Audio storage
 [FlashPix, FlashPix, Other] 4096 - Storage-Stream Pathname: /Audio_bd0100609719a180
 [FlashPix, FlashPix, Audio] Audio Stream - Audio Stream: (Binary data 18 bytes)
-[FlashPix, FlashPix, Other] 1 - Code Page: 1200
+[FlashPix, FlashPix, Other] 1 - Code Page: Unicode UTF-16, little endian
 [FlashPix, FlashPix, Audio] 2 - Flash Pix Audio Info 0x0002: 0
 [FlashPix, FlashPix, Other] Screen Nail - Screen Nail: (Binary data 166 bytes)
 [Composite, Composite, Image] Aperture - Aperture: 6.7
@@ -112,5 +112,5 @@
 [Composite, Composite, Image] ImageSize - Image Size: 8x8
 [Composite, Composite, Image] ShutterSpeed - Shutter Speed: 1/216
 [Composite, Composite, Image] ThumbnailImage - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera] FocalLength35efl - Focal Length: 10.2 mm
 [Composite, Composite, Image] LightValue - Light Value: 13.1
+[Composite, Composite, Camera] FocalLength35efl - Focal Length: 10.2 mm

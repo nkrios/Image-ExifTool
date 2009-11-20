@@ -45,7 +45,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.09';
+$VERSION = '2.12';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -736,7 +736,7 @@ my %recognizedAttrs = (
     NAMESPACE => 'photoshop',
     TABLE_DESC => 'XMP Photoshop',
     NOTES => 'Adobe Photoshop schema tags.',
-    AuthorsPosition => { Groups => { 2 => 'Author' }, Description => "Author's Position" },
+    AuthorsPosition => { Groups => { 2 => 'Author' } },
     CaptionWriter   => { Groups => { 2 => 'Author' } },
     Category        => { },
     City            => { Groups => { 2 => 'Location' } },
@@ -779,8 +779,8 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-crs', 2 => 'Image' },
     NAMESPACE => 'crs',
-    TABLE_DESC => 'Photoshop Camera Raw Schema tags.',
-    NOTES => 'XMP Photoshop Camera Raw',
+    TABLE_DESC => 'Photoshop Camera Raw Schema',
+    NOTES => 'Photoshop Camera Raw Schema tags.',
     AlreadyApplied  => { Writable => 'boolean' }, #PH (written by LightRoom beta 4.1)
     AutoBrightness  => { Writable => 'boolean' },
     AutoContrast    => { Writable => 'boolean' },
@@ -1866,8 +1866,8 @@ my %recognizedAttrs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-lr', 2 => 'Image' },
     NAMESPACE => 'lr',
-    NOTES => 'Adobe Lightroom "lr" schema tags.',
     TABLE_DESC => 'XMP Adobe Lightroom',
+    NOTES => 'Adobe Lightroom "lr" schema tags.',
     privateRTKInfo => { },
     hierarchicalSubject => { List => 'Bag' },
 );
@@ -2135,7 +2135,7 @@ sub GetXMPTagID($;$)
                 my $info = $Image::ExifTool::XMP::Main{$xlatNS};
                 my $table;
                 if (ref $info eq 'HASH' and $info->{SubDirectory}) {
-                    $table = GetTagTable($info->{SubDirectory}->{TagTable});
+                    $table = GetTagTable($info->{SubDirectory}{TagTable});
                 }
                 unless ($table and $table->{$nm}) {
                     $nm = lc($nm);
@@ -2224,7 +2224,7 @@ sub ScanForXMP($$)
             undef $buff;
         }
     }
-    unless ($exifTool->{VALUE}->{FileType}) {
+    unless ($exifTool->{VALUE}{FileType}) {
         $exifTool->{FILE_TYPE} = $exifTool->{FILE_EXT};
         $exifTool->SetFileType('<unknown file containing XMP>');
     }
@@ -2244,7 +2244,7 @@ sub ScanForXMP($$)
 sub ConvertXMPDate($;$)
 {
     my ($val, $unsure) = @_;
-    if ($val =~ /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}:\d{2})(:\d{2})?(\S*)$/) {
+    if ($val =~ /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}:\d{2})(:\d{2})?\s*(\S*)$/) {
         my $s = $5 || ':00';        # seconds may be missing
         $val = "$1:$2:$3 $4$s$6";   # convert back to EXIF time format
     } elsif (not $unsure and $val =~ /^(\d{4})(-\d{2}){0,2}/) {
@@ -2272,7 +2272,7 @@ sub FoundXMP($$$$;$)
     my $info = $tagTablePtr->{$ns};
     my ($table, $tagID, $added);
     if ($info) {
-        $table = $info->{SubDirectory}->{TagTable} or warn "Missing TagTable for $tag!\n";
+        $table = $info->{SubDirectory}{TagTable} or warn "Missing TagTable for $tag!\n";
     } elsif ($$props[0] eq 'svg:svg') {
         if (not $ns) {
             # disambiguate MetadataID by adding back the 'metadata' we ignored
@@ -2342,8 +2342,10 @@ sub FoundXMP($$$$;$)
         my $langInfo = GetLangInfo($tagInfo, $lang);
         $tagInfo = $langInfo if $langInfo;
     }
-    if ($exifTool->{OPTIONS}->{Charset} ne 'UTF8' and $val =~ /[\x80-\xff]/) {
-        # convert from UTF-8 to specified character set
+    # un-escape XML character entities
+    $val = UnescapeXML($val);
+    # convert from UTF-8 to specified character set if necessary
+    if ($exifTool->{OPTIONS}{Charset} ne 'UTF8' and $val =~ /[\x80-\xff]/) {
         $val = $exifTool->UTF82Charset($val);
     }
     # convert rational and date values to a more sensible format
@@ -2363,7 +2365,7 @@ sub FoundXMP($$$$;$)
         }
     }
     # store the value for this tag
-    my $key = $exifTool->FoundTag($tagInfo, UnescapeXML($val));
+    my $key = $exifTool->FoundTag($tagInfo, $val);
     # save structure/list information if necessary
     if (@structProps and (@structProps > 1 or defined $structProps[0][1])) {
         $exifTool->{TAG_EXTRA}{$key}{Struct} = \@structProps;
@@ -2373,9 +2375,9 @@ sub FoundXMP($$$$;$)
     }
     if ($ns and not $$tagInfo{StaticGroup1}) {
         # set group1 dynamically according to the namespace
-        $exifTool->SetGroup1($key, "$tagTablePtr->{GROUPS}->{0}-$ns");
+        $exifTool->SetGroup1($key, "$tagTablePtr->{GROUPS}{0}-$ns");
     }
-    if ($exifTool->{OPTIONS}->{Verbose}) {
+    if ($exifTool->{OPTIONS}{Verbose}) {
         if ($added) {
             my $g1 = $exifTool->GetGroup($key, 1);
             $exifTool->VPrint(0, $exifTool->{INDENT}, "[adding $g1:$tag]\n");
@@ -2402,6 +2404,14 @@ sub ParseXMPElement($$$;$$$)
     my $isWriting = $exifTool->{XMP_CAPTURE};
     my $isSVG = $$exifTool{XMP_IS_SVG};
 
+    # get our parse procs
+    my ($attrProc, $foundProc);
+    if ($$exifTool{XMPParseOpts}) {
+        $attrProc = $$exifTool{XMPParseOpts}{AttrProc};
+        $foundProc = $$exifTool{XMPParseOpts}{FoundProc} || \&FoundXMP;
+    } else {
+        $foundProc = \&FoundXMP;
+    }
     $start or $start = 0;
     $propListPt or $propListPt = [ ];
 
@@ -2469,21 +2479,9 @@ sub ParseXMPElement($$$;$$$)
             $attrs{$1} = $3;
         }
 
-#TESTcode to extract tags from .cos files
-#if ($val eq '' and defined $attrs{K} and defined $attrs{V}) {
-#    $prop = $attrs{K};
-#    $val = $attrs{V};
-#    my @a = @attrs;
-#    undef @attrs;
-#    my $a;
-#    foreach $a (@a) {
-#        if ($a eq 'K' or $a eq 'V') {
-#            delete $attrs{$a};
-#        } else {
-#            push @attrs, $a;
-#        }
-#    }
-#}
+        # hook for special parsing of attributes
+        $attrProc and &$attrProc(\@attrs, \%attrs, \$prop, \$val);
+            
         # add nodeID to property path (with leading ' #') if it exists
         if (defined $attrs{'rdf:nodeID'}) {
             $nodeID = $$blankInfo{NodeID} = $attrs{'rdf:nodeID'};
@@ -2497,7 +2495,7 @@ sub ParseXMPElement($$$;$$$)
 
         if ($isSVG) {
             # ignore everything but top level SVG tags and metadata unless Unknown set
-            unless ($exifTool->{OPTIONS}->{Unknown} > 1 or $exifTool->{OPTIONS}->{Verbose}) {
+            unless ($exifTool->{OPTIONS}{Unknown} > 1 or $exifTool->{OPTIONS}{Verbose}) {
                 if (@$propListPt > 1 and $$propListPt[1] !~ /\b(metadata|desc|title)$/) {
                     pop @$propListPt;
                     next;
@@ -2549,7 +2547,7 @@ sub ParseXMPElement($$$;$$$)
                         my $nsUsed = $exifTool->{XMP_NS};
                         $$nsUsed{$name} = $attrs{$shortName} unless defined $$nsUsed{$name};
                     }
-                    delete $attrs{$shortName};  # (handled my namespace logic)
+                    delete $attrs{$shortName};  # (handled by namespace logic)
                     next;
                 } elsif ($recognizedAttrs{$propName}) {
                     # save UUID to use same ID when writing
@@ -2570,7 +2568,7 @@ sub ParseXMPElement($$$;$$$)
                 if (ref $recognizedAttrs{$propName} and $shortVal) {
                     my ($tbl, $id, $name) = @{$recognizedAttrs{$propName}};
                     my $val = UnescapeXML($shortVal);
-                    unless (defined $exifTool->{VALUE}->{$name} and $exifTool->{VALUE}->{$name} eq $val) {
+                    unless (defined $$exifTool{VALUE}{$name} and $$exifTool{VALUE}{$name} eq $val) {
                         $exifTool->HandleTag(GetTagTable($tbl), $id, $val);
                     }
                 }
@@ -2584,7 +2582,7 @@ sub ParseXMPElement($$$;$$$)
             } elsif ($isWriting) {
                 CaptureXMP($exifTool, $propListPt, $shortVal);
             } else {
-                FoundXMP($exifTool, $tagTablePtr, $propListPt, $shortVal);
+                &$foundProc($exifTool, $tagTablePtr, $propListPt, $shortVal);
             }
             pop @$propListPt;
             $shorthand = 1;
@@ -2627,7 +2625,7 @@ sub ParseXMPElement($$$;$$$)
                         # ignore et:desc, and et:val if preceeded by et:prt
                         --$count;
                     } else {
-                        FoundXMP($exifTool, $tagTablePtr, $propListPt, $val, \%attrs);
+                        &$foundProc($exifTool, $tagTablePtr, $propListPt, $val, \%attrs);
                     }
                 }
             }
@@ -2674,6 +2672,7 @@ sub ProcessXMP($$;$)
         $dirLen = $$dirInfo{DirLen} || (length($$dataPt) - $dirStart);
         $dataLen = $$dirInfo{DataLen} || length($$dataPt);
     } else {
+        my $type;
         # read information from XMP file
         my $raf = $$dirInfo{RAF} or return 0;
         $raf->Read($buff, 256) or return 0;
@@ -2718,8 +2717,13 @@ sub ProcessXMP($$;$)
                 } else {
                     # identify SVG images by DOCTYPE if available
                     if ($buf2 =~ /<!DOCTYPE\s+(\w+)/) {
-                        return 0 unless $1 eq 'svg';
-                        $isSVG = 1;
+                        if ($1 eq 'svg') {
+                            $isSVG = 1;
+                        } elsif ($1 eq 'plist') {
+                            $type = 'PLIST';
+                        } else {
+                            return 0;
+                        }
                     } elsif ($buf2 =~ /<svg[\s>]/) {
                         $isSVG = 1;
                     } elsif ($buf2 =~ /<rdf:RDF/) {
@@ -2775,11 +2779,12 @@ sub ProcessXMP($$;$)
         $dataPt = \$buff;
         $dirStart = 0;
         $dirLen = $dataLen = $size;
-        my $type;
-        if ($isSVG) {
-            $type = 'SVG';
-        } elsif ($isXML and not $hasXMP and not $isRDF) {
-            $type = 'XML';
+        unless ($type) {
+            if ($isSVG) {
+                $type = 'SVG';
+            } elsif ($isXML and not $hasXMP and not $isRDF) {
+                $type = 'XML';
+            }
         }
         $exifTool->SetFileType($type);
     }
@@ -2791,7 +2796,7 @@ sub ProcessXMP($$;$)
         $dirStart = 0;
     }
     # extract XMP as a block if specified
-    if (($exifTool->{REQ_TAG_LOOKUP}->{xmp} or $exifTool->{OPTIONS}->{Binary}) and not $isSVG) {
+    if (($exifTool->{REQ_TAG_LOOKUP}{xmp} or $exifTool->{OPTIONS}{Binary}) and not $isSVG) {
         $exifTool->FoundTag('XMP', substr($$dataPt, $dirStart, $dirLen));
     }
     if ($exifTool->Options('Verbose') and not $exifTool->{XMP_CAPTURE}) {
@@ -2856,6 +2861,9 @@ sub ProcessXMP($$;$)
 
     # avoid scanning for XMP later in case ScanForXMP is set
     $$exifTool{FoundXMP} = 1;
+
+    # set XMP parsing options
+    $$exifTool{XMPParseOpts} = $$dirInfo{XMPParseOpts};
 
     # parse the XMP
     $tagTablePtr or $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');

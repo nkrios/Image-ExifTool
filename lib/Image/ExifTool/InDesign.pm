@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 # GUID's used in InDesign files
 my $masterPageGUID    = "\x06\x06\xed\xf5\xd8\x1d\x46\xe5\xbd\x31\xef\xe7\xfe\x74\xb7\x1d";
@@ -68,8 +68,8 @@ sub ProcessIND($$)
     my $pages = Get32u($curPage, 280);
     $pages < 2 and $err = 'Invalid page count', goto DONE;
     my $pos = $pages * 4096;
-    if ($pos > 0x7fffffff) {
-        $err = 'InDesign files larger than 2 GB currently not supported';
+    if ($pos > 0x7fffffff and not $exifTool->Options('LargeFileSupport')) {
+        $err = 'InDesign files larger than 2 GB not supported (LargeFileSupport not set)';
         goto DONE;
     }
     if ($outfile) {

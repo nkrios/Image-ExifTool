@@ -10,7 +10,7 @@ package Image::ExifTool::Lang::pl;
 
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 %Image::ExifTool::Lang::pl::Translate = (
    'AFPoint' => {
@@ -24,6 +24,7 @@ $VERSION = '1.01';
       },
     },
    'Aperture' => 'Przysłona',
+   'Artist' => 'Artysta',
    'AutoBracketRelease' => {
       PrintConv => {
         'None' => 'Brak',
@@ -135,6 +136,7 @@ $VERSION = '1.01';
         'inches' => 'Cal',
       },
     },
+   'Duration' => 'Czas',
    'Emphasis' => {
       PrintConv => {
         'None' => 'Brak',
@@ -193,6 +195,7 @@ $VERSION = '1.01';
         'None' => 'Brak',
       },
     },
+   'Genre' => 'Gatunek',
    'ISO' => 'Czułość ISO',
    'ImageHeight' => 'Wysokość obrazu',
    'ImageWidth' => 'Szerokość obrazu',
@@ -395,11 +398,13 @@ $VERSION = '1.01';
       },
     },
    'ThumbnailImage' => 'Miniatura',
+   'Title' => 'Tytuł',
    'ToningEffectMonochrome' => {
       PrintConv => {
         'None' => 'Brak',
       },
     },
+   'Track' => 'Ścieżka',
    'Transformation' => {
       PrintConv => {
         'Horizontal (normal)' => '0° (góra/lewo)',
@@ -432,6 +437,7 @@ $VERSION = '1.01';
     },
    'YCbCrSubSampling' => 'Współczynnik podpróbkowania(?) Y do C',
    'YResolution' => 'Rozdzielczość obrazu w pionie',
+   'Year' => 'Rok',
 );
 
 1;  # end

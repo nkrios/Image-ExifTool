@@ -23,10 +23,10 @@
 package Image::ExifTool::Photoshop;
 
 use strict;
-use vars qw($VERSION $AUTOLOAD);
+use vars qw($VERSION $AUTOLOAD $iptcDigestInfo);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.37';
+$VERSION = '1.38';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -146,7 +146,7 @@ my %psdMap = (
     0x0411 => { Unknown => 1, Name => 'ICC_Untagged' },
     0x0412 => { Unknown => 1, Name => 'EffectsVisible' },
     0x0413 => { Unknown => 1, Name => 'SpotHalftone' },
-    0x0414 => { Unknown => 1, Name => 'IDsBaseValue', Description => "ID's Base Value" },
+    0x0414 => { Unknown => 1, Name => 'IDsBaseValue', Description => 'IDs Base Value' },
     0x0415 => { Unknown => 1, Name => 'UnicodeAlphaNames' },
     0x0416 => { Unknown => 1, Name => 'IndexedColourTableCount' },
     0x0417 => { Unknown => 1, Name => 'TransparentIndex' },
@@ -182,19 +182,23 @@ my %psdMap = (
         Writable => 'string',
         Protected => 1,
         Notes => q{
-            when writing, a special value of "new" represents the new IPTC digest of the
-            output file, or deletes this tag if no IPTC exists
+            when writing, special values of "new" and "old" represent the digests of the
+            IPTC from the output and original files respectively, and are undefined if
+            the IPTC does not exist in the respective file
         },
         # also note the 'new' feature requires that the IPTC comes before this tag is written
         ValueConv => 'unpack("H*", $val)',
         ValueConvInv => q{
-            if (lc($val) eq 'new') {
-                return 'new' if eval 'require Digest::MD5';
+            if (lc($val) eq 'new' or lc($val) eq 'old') {
+                {
+                    local $SIG{'__WARN__'} = sub { };
+                    return lc($val) if eval 'require Digest::MD5';
+                }
                 warn "Digest::MD5 must be installed\n";
                 return undef;
             }
             return pack('H*', $val) if $val =~ /^[0-9a-f]{32}$/i;
-            warn "Value must be 32 hexadecimal digits or 'new'\n";
+            warn "Value must be 'new', 'old' or 32 hexadecimal digits\n";
             return undef;
         }
     },
@@ -320,6 +324,10 @@ my %psdMap = (
 %Image::ExifTool::Photoshop::Unknown = (
     GROUPS => { 2 => 'Unknown' },
 );
+
+# define reference to IPTCDigest tagInfo hash for convenience
+$iptcDigestInfo = $Image::ExifTool::Photoshop::Main{0x0425};
+
 
 #------------------------------------------------------------------------------
 # AutoLoad our writer routines when necessary

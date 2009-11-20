@@ -3,11 +3,13 @@
 #
 # Description:  Read DICOM and ACR-NEMA medical images
 #
-# Revisions:    11/09/2005 - P. Harvey Created
+# Revisions:    2005/11/09 - P. Harvey Created
+#               2009/11/19 - P. Harvey Added private GE tags from ref 4
 #
 # References:   1) http://medical.nema.org/dicom/2004.html
 #               2) http://www.sph.sc.edu/comd/rorden/dicom.html
 #               3) http://www.dclunie.com/
+#               4) http://www.gehealthcare.com/usen/interoperability/dicom/docs/2258357r3.pdf
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::DICOM;
@@ -16,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 # DICOM VR (Value Representation) format conversions
 my %dicomFormat = (
@@ -50,7 +52,9 @@ my %implicitVR = (
         The DICOM format is based on the ACR-NEMA specification, but adds a file
         header and a number of new tags.  ExifTool will extract information from
         either type of file.  The Tag ID's in the following table are the tag group
-        and element numbers in hexadecimal, as given in the DICOM specification.
+        and element numbers in hexadecimal, as given in the DICOM specification
+        (L<http://medical.nema.org/dicom/2004.html>).  The table below contains
+        standard DICOM tags plus some vendor-specific private tags.
     },
     # file meta information group (names end with VR)
     '0002,0000' => { VR => 'UL', Name => 'FileMetaInfoGroupLength' },
@@ -227,6 +231,16 @@ my %implicitVR = (
     '0008,9209' => { VR => 'CS', Name => 'AcquisitionContrast' },
     '0008,9215' => { VR => 'SQ', Name => 'DerivationCodeSequence' },
     '0008,9237' => { VR => 'SQ', Name => 'GrayscalePresentationStateSequence' },
+    '0009,1001' => { VR => 'LO', Name => 'FullFidelity' }, #4
+    '0009,1002' => { VR => 'SH', Name => 'SuiteID' }, #4
+    '0009,1004' => { VR => 'SH', Name => 'ProductID' }, #4
+    '0009,1027' => { VR => 'SL', Name => 'ImageActualDate' }, #4
+    '0009,1030' => { VR => 'SH', Name => 'ServiceID' }, #4
+    '0009,1031' => { VR => 'SH', Name => 'MobileLocationNumber' }, #4
+    '0009,10E3' => { VR => 'UI', Name => 'EquipmentUID' }, #4
+    '0009,10E6' => { VR => 'SH', Name => 'GenesisVersionNow' }, #4
+    '0009,10E7' => { VR => 'UL', Name => 'ExamRecordChecksum' }, #4
+    '0009,10E9' => { VR => 'SL', Name => 'ActualSeriesDataTimeStamp' }, #4
     # patient group
     '0010,0000' => { VR => 'UL', Name => 'PatientGroupLength' },
     '0010,0010' => { VR => 'PN', Name => 'PatientsName' },
@@ -263,6 +277,7 @@ my %implicitVR = (
     '0010,21D0' => { VR => 'DA', Name => 'LastMenstrualDate' },
     '0010,21F0' => { VR => 'LO', Name => 'PatientsReligiousPreference' },
     '0010,4000' => { VR => 'LT', Name => 'PatientComments' },
+    '0011,1010' => { VR => 'SS', Name => 'PatientStatus' }, #4
     '0012,0010' => { VR => 'LO', Name => 'ClinicalTrialSponsorName' },
     '0012,0020' => { VR => 'LO', Name => 'ClinicalTrialProtocolID' },
     '0012,0021' => { VR => 'LO', Name => 'ClinicalTrialProtocolName' },
@@ -800,6 +815,149 @@ my %implicitVR = (
     '0018,A001' => { VR => 'SQ', Name => 'ContributingEquipmentSequence' },
     '0018,A002' => { VR => 'DT', Name => 'ContributionDateTime' },
     '0018,A003' => { VR => 'ST', Name => 'ContributionDescription' },
+    '0019,1002' => { VR => 'SL', Name => 'NumberOfCellsIInDetector' }, #4
+    '0019,1003' => { VR => 'DS', Name => 'CellNumberAtTheta' }, #4
+    '0019,1004' => { VR => 'DS', Name => 'CellSpacing' }, #4
+    '0019,100F' => { VR => 'DS', Name => 'HorizFrameOfRef' }, #4
+    '0019,1011' => { VR => 'SS', Name => 'SeriesContrast' }, #4
+    '0019,1012' => { VR => 'SS', Name => 'LastPseq' }, #4
+    '0019,1013' => { VR => 'SS', Name => 'StartNumberForBaseline' }, #4
+    '0019,1014' => { VR => 'SS', Name => 'EndNumberForBaseline' }, #4
+    '0019,1015' => { VR => 'SS', Name => 'StartNumberForEnhancedScans' }, #4
+    '0019,1016' => { VR => 'SS', Name => 'EndNumberForEnhancedScans' }, #4
+    '0019,1017' => { VR => 'SS', Name => 'SeriesPlane' }, #4
+    '0019,1018' => { VR => 'LO', Name => 'FirstScanRas' }, #4
+    '0019,1019' => { VR => 'DS', Name => 'FirstScanLocation' }, #4
+    '0019,101A' => { VR => 'LO', Name => 'LastScanRas' }, #4
+    '0019,101B' => { VR => 'DS', Name => 'LastScanLoc' }, #4
+    '0019,101E' => { VR => 'DS', Name => 'DisplayFieldOfView' }, #4
+    '0019,1023' => { VR => 'DS', Name => 'TableSpeed' }, #4
+    '0019,1024' => { VR => 'DS', Name => 'MidScanTime' }, #4
+    '0019,1025' => { VR => 'SS', Name => 'MidScanFlag' }, #4
+    '0019,1026' => { VR => 'SL', Name => 'DegreesOfAzimuth' }, #4
+    '0019,1027' => { VR => 'DS', Name => 'GantryPeriod' }, #4
+    '0019,102A' => { VR => 'DS', Name => 'XRayOnPosition' }, #4
+    '0019,102B' => { VR => 'DS', Name => 'XRayOffPosition' }, #4
+    '0019,102C' => { VR => 'SL', Name => 'NumberOfTriggers' }, #4
+    '0019,102E' => { VR => 'DS', Name => 'AngleOfFirstView' }, #4
+    '0019,102F' => { VR => 'DS', Name => 'TriggerFrequency' }, #4
+    '0019,1039' => { VR => 'SS', Name => 'ScanFOVType' }, #4
+    '0019,1040' => { VR => 'SS', Name => 'StatReconFlag' }, #4
+    '0019,1041' => { VR => 'SS', Name => 'ComputeType' }, #4
+    '0019,1042' => { VR => 'SS', Name => 'SegmentNumber' }, #4
+    '0019,1043' => { VR => 'SS', Name => 'TotalSegmentsRequested' }, #4
+    '0019,1044' => { VR => 'DS', Name => 'InterscanDelay' }, #4
+    '0019,1047' => { VR => 'SS', Name => 'ViewCompressionFactor' }, #4
+    '0019,104A' => { VR => 'SS', Name => 'TotalNoOfRefChannels' }, #4
+    '0019,104B' => { VR => 'SL', Name => 'DataSizeForScanData' }, #4
+    '0019,1052' => { VR => 'SS', Name => 'ReconPostProcflag' }, #4
+    '0019,1057' => { VR => 'SS', Name => 'CTWaterNumber' }, #4
+    '0019,1058' => { VR => 'SS', Name => 'CTBoneNumber' }, #4
+    '0019,105A' => { VR => 'FL', Name => 'AcquisitionDuration' }, #4
+    '0019,105E' => { VR => 'SL', Name => 'NumberOfChannels' }, #4
+    '0019,105F' => { VR => 'SL', Name => 'IncrementBetweenChannels' }, #4
+    '0019,1060' => { VR => 'SL', Name => 'StartingView' }, #4
+    '0019,1061' => { VR => 'SL', Name => 'NumberOfViews' }, #4
+    '0019,1062' => { VR => 'SL', Name => 'IncrementBetweenViews' }, #4
+    '0019,106A' => { VR => 'SS', Name => 'DependantOnNoViewsProcessed' }, #4
+    '0019,106B' => { VR => 'SS', Name => 'FieldOfViewInDetectorCells' }, #4
+    '0019,1070' => { VR => 'SS', Name => 'ValueOfBackProjectionButton' }, #4
+    '0019,1071' => { VR => 'SS', Name => 'SetIfFatqEstimatesWereUsed' }, #4
+    '0019,1072' => { VR => 'DS', Name => 'ZChanAvgOverViews' }, #4
+    '0019,1073' => { VR => 'DS', Name => 'AvgOfLeftRefChansOverViews' }, #4
+    '0019,1074' => { VR => 'DS', Name => 'MaxLeftChanOverViews' }, #4
+    '0019,1075' => { VR => 'DS', Name => 'AvgOfRightRefChansOverViews' }, #4
+    '0019,1076' => { VR => 'DS', Name => 'MaxRightChanOverViews' }, #4
+    '0019,107D' => { VR => 'DS', Name => 'SecondEcho' }, #4
+    '0019,107E' => { VR => 'SS', Name => 'NumberOfEchoes' }, #4
+    '0019,107F' => { VR => 'DS', Name => 'TableDelta' }, #4
+    '0019,1081' => { VR => 'SS', Name => 'Contiguous' }, #4
+    '0019,1084' => { VR => 'DS', Name => 'PeakSAR' }, #4
+    '0019,1085' => { VR => 'SS', Name => 'MonitorSAR' }, #4
+    '0019,1087' => { VR => 'DS', Name => 'CardiacRepetitionTime' }, #4
+    '0019,1088' => { VR => 'SS', Name => 'ImagesPerCardiacCycle' }, #4
+    '0019,108A' => { VR => 'SS', Name => 'ActualReceiveGainAnalog' }, #4
+    '0019,108B' => { VR => 'SS', Name => 'ActualReceiveGainDigital' }, #4
+    '0019,108D' => { VR => 'DS', Name => 'DelayAfterTrigger' }, #4
+    '0019,108F' => { VR => 'SS', Name => 'Swappf' }, #4
+    '0019,1090' => { VR => 'SS', Name => 'PauseInterval' }, #4
+    '0019,1091' => { VR => 'DS', Name => 'PulseTime' }, #4
+    '0019,1092' => { VR => 'SL', Name => 'SliceOffsetOnFreqAxis' }, #4
+    '0019,1093' => { VR => 'DS', Name => 'CenterFrequency' }, #4
+    '0019,1094' => { VR => 'SS', Name => 'TransmitGain' }, #4
+    '0019,1095' => { VR => 'SS', Name => 'AnalogReceiverGain' }, #4
+    '0019,1096' => { VR => 'SS', Name => 'DigitalReceiverGain' }, #4
+    '0019,1097' => { VR => 'SL', Name => 'BitmapDefiningCVs' }, #4
+    '0019,1098' => { VR => 'SS', Name => 'CenterFreqMethod' }, #4
+    '0019,109B' => { VR => 'SS', Name => 'PulseSeqMode' }, #4
+    '0019,109C' => { VR => 'LO', Name => 'PulseSeqName' }, #4
+    '0019,109D' => { VR => 'DT', Name => 'PulseSeqDate' }, #4
+    '0019,109E' => { VR => 'LO', Name => 'InternalPulseSeqName' }, #4
+    '0019,109F' => { VR => 'SS', Name => 'TransmittingCoil' }, #4
+    '0019,10A0' => { VR => 'SS', Name => 'SurfaceCoilType' }, #4
+    '0019,10A1' => { VR => 'SS', Name => 'ExtremityCoilFlag' }, #4
+    '0019,10A2' => { VR => 'SL', Name => 'RawDataRunNumber' }, #4
+    '0019,10A3' => { VR => 'UL', Name => 'CalibratedFieldStrength' }, #4
+    '0019,10A4' => { VR => 'SS', Name => 'SATFatWaterBone' }, #4
+    '0019,10A5' => { VR => 'DS', Name => 'ReceiveBandwidth' }, #4
+    '0019,10A7' => { VR => 'DS', Name => 'UserData01' }, #4
+    '0019,10A8' => { VR => 'DS', Name => 'UserData02' }, #4
+    '0019,10A9' => { VR => 'DS', Name => 'UserData03' }, #4
+    '0019,10AA' => { VR => 'DS', Name => 'UserData04' }, #4
+    '0019,10AB' => { VR => 'DS', Name => 'UserData05' }, #4
+    '0019,10AC' => { VR => 'DS', Name => 'UserData06' }, #4
+    '0019,10AD' => { VR => 'DS', Name => 'UserData07' }, #4
+    '0019,10AE' => { VR => 'DS', Name => 'UserData08' }, #4
+    '0019,10AF' => { VR => 'DS', Name => 'UserData09' }, #4
+    '0019,10B0' => { VR => 'DS', Name => 'UserData10' }, #4
+    '0019,10B1' => { VR => 'DS', Name => 'UserData11' }, #4
+    '0019,10B2' => { VR => 'DS', Name => 'UserData12' }, #4
+    '0019,10B3' => { VR => 'DS', Name => 'UserData13' }, #4
+    '0019,10B4' => { VR => 'DS', Name => 'UserData14' }, #4
+    '0019,10B5' => { VR => 'DS', Name => 'UserData15' }, #4
+    '0019,10B6' => { VR => 'DS', Name => 'UserData16' }, #4
+    '0019,10B7' => { VR => 'DS', Name => 'UserData17' }, #4
+    '0019,10B8' => { VR => 'DS', Name => 'UserData18' }, #4
+    '0019,10B9' => { VR => 'DS', Name => 'UserData19' }, #4
+    '0019,10BA' => { VR => 'DS', Name => 'UserData20' }, #4
+    '0019,10BB' => { VR => 'DS', Name => 'UserData21' }, #4
+    '0019,10BC' => { VR => 'DS', Name => 'UserData22' }, #4
+    '0019,10BD' => { VR => 'DS', Name => 'UserData23' }, #4
+    '0019,10BE' => { VR => 'DS', Name => 'ProjectionAngle' }, #4
+    '0019,10C0' => { VR => 'SS', Name => 'SaturationPlanes' }, #4
+    '0019,10C1' => { VR => 'SS', Name => 'SurfaceCoilIntensity' }, #4
+    '0019,10C2' => { VR => 'SS', Name => 'SATLocationR' }, #4
+    '0019,10C3' => { VR => 'SS', Name => 'SATLocationL' }, #4
+    '0019,10C4' => { VR => 'SS', Name => 'SATLocationA' }, #4
+    '0019,10C5' => { VR => 'SS', Name => 'SATLocationP' }, #4
+    '0019,10C6' => { VR => 'SS', Name => 'SATLocationH' }, #4
+    '0019,10C7' => { VR => 'SS', Name => 'SATLocationF' }, #4
+    '0019,10C8' => { VR => 'SS', Name => 'SATThicknessR-L' }, #4
+    '0019,10C9' => { VR => 'SS', Name => 'SATThicknessA-P' }, #4
+    '0019,10CA' => { VR => 'SS', Name => 'SATThicknessH-F' }, #4
+    '0019,10CB' => { VR => 'SS', Name => 'PrescribedFlowAxis' }, #4
+    '0019,10CC' => { VR => 'SS', Name => 'VelocityEncoding' }, #4
+    '0019,10CD' => { VR => 'SS', Name => 'ThicknessDisclaimer' }, #4
+    '0019,10CE' => { VR => 'SS', Name => 'PrescanType' }, #4
+    '0019,10CF' => { VR => 'SS', Name => 'PrescanStatus' }, #4
+    '0019,10D0' => { VR => 'SH', Name => 'RawDataType' }, #4
+    '0019,10D2' => { VR => 'SS', Name => 'ProjectionAlgorithm' }, #4
+    '0019,10D3' => { VR => 'SH', Name => 'ProjectionAlgorithm' }, #4
+    '0019,10D5' => { VR => 'SS', Name => 'FractionalEcho' }, #4
+    '0019,10D6' => { VR => 'SS', Name => 'PrepPulse' }, #4
+    '0019,10D7' => { VR => 'SS', Name => 'CardiacPhases' }, #4
+    '0019,10D8' => { VR => 'SS', Name => 'VariableEchoflag' }, #4
+    '0019,10D9' => { VR => 'DS', Name => 'ConcatenatedSAT' }, #4
+    '0019,10DA' => { VR => 'SS', Name => 'ReferenceChannelUsed' }, #4
+    '0019,10DB' => { VR => 'DS', Name => 'BackProjectorCoefficient' }, #4
+    '0019,10DC' => { VR => 'SS', Name => 'PrimarySpeedCorrectionUsed' }, #4
+    '0019,10DD' => { VR => 'SS', Name => 'OverrangeCorrectionUsed' }, #4
+    '0019,10DE' => { VR => 'DS', Name => 'DynamicZAlphaValue' }, #4
+    '0019,10DF' => { VR => 'DS', Name => 'UserData' }, #4
+    '0019,10E0' => { VR => 'DS', Name => 'UserData' }, #4
+    '0019,10E2' => { VR => 'DS', Name => 'VelocityEncodeScale' }, #4
+    '0019,10F2' => { VR => 'SS', Name => 'FastPhases' }, #4
+    '0019,10F9' => { VR => 'DS', Name => 'TransmissionGain' }, #4
     # relationship group
     '0020,0000' => { VR => 'UL', Name => 'RelationshipGroupLength' },
     '0020,000D' => { VR => 'UI', Name => 'StudyInstanceUID' },
@@ -879,6 +1037,44 @@ my %implicitVR = (
     '0020,9222' => { VR => 'SQ', Name => 'DimensionIndexSequence' },
     '0020,9228' => { VR => 'UL', Name => 'ConcatenationFrameOffsetNumber' },
     '0020,9238' => { VR => 'LO', Name => 'FunctionalGroupPrivateCreator' },
+    '0021,1003' => { VR => 'SS', Name => 'SeriesFromWhichPrescribed' }, #4
+    '0021,1005' => { VR => 'SH', Name => 'GenesisVersionNow' }, #4
+    '0021,1005' => { VR => 'SH', Name => 'GenesisVersionNow' }, #4
+    '0021,1007' => { VR => 'UL', Name => 'SeriesRecordChecksum' }, #4
+    '0021,1018' => { VR => 'SH', Name => 'GenesisVersionNow' }, #4
+    '0021,1018' => { VR => 'SH', Name => 'GenesisVersionNow' }, #4
+    '0021,1019' => { VR => 'UL', Name => 'AcqReconRecordChecksum' }, #4
+    '0021,1019' => { VR => 'UL', Name => 'AcqreconRecordChecksum' }, #4
+    '0021,1020' => { VR => 'DS', Name => 'TableStartLocation' }, #4
+    '0021,1035' => { VR => 'SS', Name => 'SeriesFromWhichPrescribed' }, #4
+    '0021,1036' => { VR => 'SS', Name => 'ImageFromWhichPrescribed' }, #4
+    '0021,1037' => { VR => 'SS', Name => 'ScreenFormat' }, #4
+    '0021,104A' => { VR => 'LO', Name => 'AnatomicalReferenceForScout' }, #4
+    '0021,104F' => { VR => 'SS', Name => 'LocationsInAcquisition' }, #4
+    '0021,1050' => { VR => 'SS', Name => 'GraphicallyPrescribed' }, #4
+    '0021,1051' => { VR => 'DS', Name => 'RotationFromSourceXRot' }, #4
+    '0021,1052' => { VR => 'DS', Name => 'RotationFromSourceYRot' }, #4
+    '0021,1053' => { VR => 'DS', Name => 'RotationFromSourceZRot' }, #4
+    '0021,1054' => { VR => 'SH', Name => 'ImagePosition' }, #4
+    '0021,1055' => { VR => 'SH', Name => 'ImageOrientation' }, #4
+    '0021,1056' => { VR => 'SL', Name => 'IntegerSlop' }, #4
+    '0021,1057' => { VR => 'SL', Name => 'IntegerSlop' }, #4
+    '0021,1058' => { VR => 'SL', Name => 'IntegerSlop' }, #4
+    '0021,1059' => { VR => 'SL', Name => 'IntegerSlop' }, #4
+    '0021,105A' => { VR => 'SL', Name => 'IntegerSlop' }, #4
+    '0021,105B' => { VR => 'DS', Name => 'FloatSlop' }, #4
+    '0021,105C' => { VR => 'DS', Name => 'FloatSlop' }, #4
+    '0021,105D' => { VR => 'DS', Name => 'FloatSlop' }, #4
+    '0021,105E' => { VR => 'DS', Name => 'FloatSlop' }, #4
+    '0021,105F' => { VR => 'DS', Name => 'FloatSlop' }, #4
+    '0021,1081' => { VR => 'DS', Name => 'AutoWindowLevelAlpha' }, #4
+    '0021,1082' => { VR => 'DS', Name => 'AutoWindowLevelBeta' }, #4
+    '0021,1083' => { VR => 'DS', Name => 'AutoWindowLevelWindow' }, #4
+    '0021,1084' => { VR => 'DS', Name => 'ToWindowLevelLevel' }, #4
+    '0021,1090' => { VR => 'SS', Name => 'TubeFocalSpotPosition' }, #4
+    '0021,1091' => { VR => 'SS', Name => 'BiopsyPosition' }, #4
+    '0021,1092' => { VR => 'FL', Name => 'BiopsyTLocation' }, #4
+    '0021,1093' => { VR => 'FL', Name => 'BiopsyRefLocation' }, #4
     '0022,0001' => { VR => 'US', Name => 'LightPathFilterPassThroughWavelen' },
     '0022,0002' => { VR => 'US', Name => 'LightPathFilterPassBand' },
     '0022,0003' => { VR => 'US', Name => 'ImagePathFilterPassThroughWavelen' },
@@ -910,6 +1106,59 @@ my %implicitVR = (
     '0022,0020' => { VR => 'SQ', Name => 'StereoPairsSequence' },
     '0022,0021' => { VR => 'SQ', Name => 'LeftImageSequence' },
     '0022,0022' => { VR => 'SQ', Name => 'RightImageSequence' },
+    '0023,1001' => { VR => 'SL', Name => 'NumberOfSeriesInStudy' }, #4
+    '0023,1002' => { VR => 'SL', Name => 'NumberOfUnarchivedSeries' }, #4
+    '0023,1010' => { VR => 'SS', Name => 'ReferenceImageField' }, #4
+    '0023,1050' => { VR => 'SS', Name => 'SummaryImage' }, #4
+    '0023,1070' => { VR => 'FD', Name => 'StartTimeSecsInFirstAxial' }, #4
+    '0023,1074' => { VR => 'SL', Name => 'NoofUpdatesToHeader' }, #4
+    '0023,107D' => { VR => 'SS', Name => 'IndicatesIfStudyHasCompleteInfo' }, #4
+    '0023,107D' => { VR => 'SS', Name => 'IndicatesIfTheStudyHasCompleteInfo' }, #4
+    '0025,1006' => { VR => 'SS', Name => 'LastPulseSequenceUsed' }, #4
+    '0025,1007' => { VR => 'SL', Name => 'ImagesInSeries' }, #4
+    '0025,1010' => { VR => 'SL', Name => 'LandmarkCounter' }, #4
+    '0025,1011' => { VR => 'SS', Name => 'NumberOfAcquisitions' }, #4
+    '0025,1014' => { VR => 'SL', Name => 'IndicatesNoofUpdatesToHeader' }, #4
+    '0025,1017' => { VR => 'SL', Name => 'SeriesCompleteFlag' }, #4
+    '0025,1018' => { VR => 'SL', Name => 'NumberOfImagesArchived' }, #4
+    '0025,1019' => { VR => 'SL', Name => 'LastImageNumberUsed' }, #4
+    '0025,101A' => { VR => 'SH', Name => 'PrimaryReceiverSuiteAndHost' }, #4
+    '0027,1006' => { VR => 'SL', Name => 'ImageArchiveFlag' }, #4
+    '0027,1010' => { VR => 'SS', Name => 'ScoutType' }, #4
+    '0027,101C' => { VR => 'SL', Name => 'VmaMamp' }, #4
+    '0027,101D' => { VR => 'SS', Name => 'VmaPhase' }, #4
+    '0027,101E' => { VR => 'SL', Name => 'VmaMod' }, #4
+    '0027,101F' => { VR => 'SL', Name => 'VmaClip' }, #4
+    '0027,1020' => { VR => 'SS', Name => 'SmartScanOnOffFlag' }, #4
+    '0027,1030' => { VR => 'SH', Name => 'ForeignImageRevision' }, #4
+    '0027,1031' => { VR => 'SS', Name => 'ImagingMode' }, #4
+    '0027,1032' => { VR => 'SS', Name => 'PulseSequence' }, #4
+    '0027,1033' => { VR => 'SL', Name => 'ImagingOptions' }, #4
+    '0027,1035' => { VR => 'SS', Name => 'PlaneType' }, #4
+    '0027,1036' => { VR => 'SL', Name => 'ObliquePlane' }, #4
+    '0027,1040' => { VR => 'SH', Name => 'RASLetterOfImageLocation' }, #4
+    '0027,1041' => { VR => 'FL', Name => 'ImageLocation' }, #4
+    '0027,1042' => { VR => 'FL', Name => 'CenterRCoordOfPlaneImage' }, #4
+    '0027,1043' => { VR => 'FL', Name => 'CenterACoordOfPlaneImage' }, #4
+    '0027,1044' => { VR => 'FL', Name => 'CenterSCoordOfPlaneImage' }, #4
+    '0027,1045' => { VR => 'FL', Name => 'NormalRCoord' }, #4
+    '0027,1046' => { VR => 'FL', Name => 'NormalACoord' }, #4
+    '0027,1047' => { VR => 'FL', Name => 'NormalSCoord' }, #4
+    '0027,1048' => { VR => 'FL', Name => 'RCoordOfTopRightCorner' }, #4
+    '0027,1049' => { VR => 'FL', Name => 'ACoordOfTopRightCorner' }, #4
+    '0027,104A' => { VR => 'FL', Name => 'SCoordOfTopRightCorner' }, #4
+    '0027,104B' => { VR => 'FL', Name => 'RCoordOfBottomRightCorner' }, #4
+    '0027,104C' => { VR => 'FL', Name => 'ACoordOfBottomRightCorner' }, #4
+    '0027,104D' => { VR => 'FL', Name => 'SCoordOfBottomRightCorner' }, #4
+    '0027,1050' => { VR => 'FL', Name => 'TableStartLocation' }, #4
+    '0027,1051' => { VR => 'FL', Name => 'TableEndLocation' }, #4
+    '0027,1052' => { VR => 'SH', Name => 'RASLetterForSideOfImage' }, #4
+    '0027,1053' => { VR => 'SH', Name => 'RASLetterForAnteriorPosterior' }, #4
+    '0027,1054' => { VR => 'SH', Name => 'RASLetterForScoutStartLoc' }, #4
+    '0027,1055' => { VR => 'SH', Name => 'RASLetterForScoutEndLoc' }, #4
+    '0027,1060' => { VR => 'FL', Name => 'ImageDimensionX' }, #4
+    '0027,1061' => { VR => 'FL', Name => 'ImageDimensionY' }, #4
+    '0027,1062' => { VR => 'FL', Name => 'NumberOfExcitations' }, #4
     # image presentation group
     '0028,0000' => { VR => 'UL', Name => 'ImagePresentationGroupLength' },
     '0028,0002' => { VR => 'US', Name => 'SamplesPerPixel' },
@@ -1008,6 +1257,21 @@ my %implicitVR = (
     '0028,9132' => { VR => 'SQ', Name => 'FrameVOILUTSequence' },
     '0028,9145' => { VR => 'SQ', Name => 'PixelValueTransformationSequence' },
     '0028,9235' => { VR => 'CS', Name => 'SignalDomainRows' },
+    '0029,1004' => { VR => 'SL', Name => 'LowerRangeOfPixels1a' }, #4
+    '0029,1005' => { VR => 'DS', Name => 'LowerRangeOfPixels1b' }, #4
+    '0029,1006' => { VR => 'DS', Name => 'LowerRangeOfPixels1c' }, #4
+    '0029,1007' => { VR => 'SL', Name => 'LowerRangeOfPixels1d' }, #4
+    '0029,1008' => { VR => 'SH', Name => 'LowerRangeOfPixels1e' }, #4
+    '0029,1009' => { VR => 'SH', Name => 'LowerRangeOfPixels1f' }, #4
+    '0029,100A' => { VR => 'SS', Name => 'LowerRangeOfPixels1g' }, #4
+    '0029,1015' => { VR => 'SL', Name => 'LowerRangeOfPixels1h' }, #4
+    '0029,1016' => { VR => 'SL', Name => 'LowerRangeOfPixels1i' }, #4
+    '0029,1017' => { VR => 'SL', Name => 'LowerRangeOfPixels2' }, #4
+    '0029,1018' => { VR => 'SL', Name => 'UpperRangeOfPixels2' }, #4
+    '0029,101A' => { VR => 'SL', Name => 'LenOfTotHdrInBytes' }, #4
+    '0029,1026' => { VR => 'SS', Name => 'VersionOfTheHdrStruct' }, #4
+    '0029,1034' => { VR => 'SL', Name => 'AdvantageCompOverflow' }, #4
+    '0029,1035' => { VR => 'SL', Name => 'AdvantageCompUnderflow' }, #4
     # study group
     '0032,0000' => { VR => 'UL', Name => 'StudyGroupLength' },
     '0032,000A' => { VR => 'CS', Name => 'StudyStatusID' },
@@ -1272,6 +1536,113 @@ my %implicitVR = (
     '0040,DB0C' => { VR => 'RET',Name => 'TemplateExtensionOrganizationUID' },
     '0040,DB0D' => { VR => 'RET',Name => 'TemplateExtensionCreatorUID' },
     '0040,DB73' => { VR => 'UL', Name => 'ReferencedContentItemIdentifier' },
+    '0043,1001' => { VR => 'SS', Name => 'BitmapOfPrescanOptions' }, #4
+    '0043,1002' => { VR => 'SS', Name => 'GradientOffsetInX' }, #4
+    '0043,1003' => { VR => 'SS', Name => 'GradientOffsetInY' }, #4
+    '0043,1004' => { VR => 'SS', Name => 'GradientOffsetInZ' }, #4
+    '0043,1005' => { VR => 'SS', Name => 'ImgIsOriginalOrUnoriginal' }, #4
+    '0043,1006' => { VR => 'SS', Name => 'NumberOfEPIShots' }, #4
+    '0043,1007' => { VR => 'SS', Name => 'ViewsPerSegment' }, #4
+    '0043,1008' => { VR => 'SS', Name => 'RespiratoryRateBpm' }, #4
+    '0043,1009' => { VR => 'SS', Name => 'RespiratoryTriggerPoint' }, #4
+    '0043,100A' => { VR => 'SS', Name => 'TypeOfReceiverUsed' }, #4
+    '0043,100B' => { VR => 'DS', Name => 'PeakRateOfChangeOfGradientField' }, #4
+    '0043,100C' => { VR => 'DS', Name => 'LimitsInUnitsOfPercent' }, #4
+    '0043,100D' => { VR => 'DS', Name => 'PSDEstimatedLimit' }, #4
+    '0043,100E' => { VR => 'DS', Name => 'PSDEstimatedLimitInTeslaPerSecond' }, #4
+    '0043,100F' => { VR => 'DS', Name => 'Saravghead' }, #4
+    '0043,1010' => { VR => 'US', Name => 'WindowValue' }, #4
+    '0043,1011' => { VR => 'US', Name => 'TotalInputViews' }, #4
+    '0043,1012' => { VR => 'SS', Name => 'X-RayChain' }, #4
+    '0043,1013' => { VR => 'SS', Name => 'DeconKernelParameters' }, #4
+    '0043,1014' => { VR => 'SS', Name => 'CalibrationParameters' }, #4
+    '0043,1015' => { VR => 'SS', Name => 'TotalOutputViews' }, #4
+    '0043,1016' => { VR => 'SS', Name => 'NumberOfOverranges' }, #4
+    '0043,1017' => { VR => 'DS', Name => 'IBHImageScaleFactors' }, #4
+    '0043,1018' => { VR => 'DS', Name => 'BBHCoefficients' }, #4
+    '0043,1019' => { VR => 'SS', Name => 'NumberOfBBHChainsToBlend' }, #4
+    '0043,101A' => { VR => 'SL', Name => 'StartingChannelNumber' }, #4
+    '0043,101B' => { VR => 'SS', Name => 'PpscanParameters' }, #4
+    '0043,101C' => { VR => 'SS', Name => 'GEImageIntegrity' }, #4
+    '0043,101D' => { VR => 'SS', Name => 'LevelValue' }, #4
+    '0043,101E' => { VR => 'DS', Name => 'DeltaStartTime' }, #4
+    '0043,101F' => { VR => 'SL', Name => 'MaxOverrangesInAView' }, #4
+    '0043,1020' => { VR => 'DS', Name => 'AvgOverrangesAllViews' }, #4
+    '0043,1021' => { VR => 'SS', Name => 'CorrectedAfterGlowTerms' }, #4
+    '0043,1025' => { VR => 'SS', Name => 'ReferenceChannels' }, #4
+    '0043,1026' => { VR => 'US', Name => 'NoViewsRefChansBlocked' }, #4
+    '0043,1027' => { VR => 'SH', Name => 'ScanPitchRatio' }, #4
+    '0043,1028' => { VR => 'OB', Name => 'UniqueImageIden' }, #4
+    '0043,1029' => { VR => 'OB', Name => 'HistogramTables' }, #4
+    '0043,102A' => { VR => 'OB', Name => 'UserDefinedData' }, #4
+    '0043,102B' => { VR => 'SS', Name => 'PrivateScanOptions' }, #4
+    '0043,102C' => { VR => 'SS', Name => 'EffectiveEchoSpacing' }, #4
+    '0043,102D' => { VR => 'SH', Name => 'StringSlopField1' }, #4
+    '0043,102E' => { VR => 'SH', Name => 'StringSlopField2' }, #4
+    '0043,102F' => { VR => 'SS', Name => 'RawDataType' }, #4
+    '0043,1030' => { VR => 'SS', Name => 'RawDataType' }, #4
+    '0043,1031' => { VR => 'DS', Name => 'RACordOfTargetReconCenter' }, #4
+    '0043,1032' => { VR => 'SS', Name => 'RawDataType' }, #4
+    '0043,1033' => { VR => 'FL', Name => 'NegScanspacing' }, #4
+    '0043,1034' => { VR => 'IS', Name => 'OffsetFrequency' }, #4
+    '0043,1035' => { VR => 'UL', Name => 'UserUsageTag' }, #4
+    '0043,1036' => { VR => 'UL', Name => 'UserFillMapMSW' }, #4
+    '0043,1037' => { VR => 'UL', Name => 'UserFillMapLSW' }, #4
+    '0043,1038' => { VR => 'FL', Name => 'User25-48' }, #4
+    '0043,1039' => { VR => 'IS', Name => 'SlopInt6-9' }, #4
+    '0043,1040' => { VR => 'FL', Name => 'TriggerOnPosition' }, #4
+    '0043,1041' => { VR => 'FL', Name => 'DegreeOfRotation' }, #4
+    '0043,1042' => { VR => 'SL', Name => 'DASTriggerSource' }, #4
+    '0043,1043' => { VR => 'SL', Name => 'DASFpaGain' }, #4
+    '0043,1044' => { VR => 'SL', Name => 'DASOutputSource' }, #4
+    '0043,1045' => { VR => 'SL', Name => 'DASAdInput' }, #4
+    '0043,1046' => { VR => 'SL', Name => 'DASCalMode' }, #4
+    '0043,1047' => { VR => 'SL', Name => 'DASCalFrequency' }, #4
+    '0043,1048' => { VR => 'SL', Name => 'DASRegXm' }, #4
+    '0043,1049' => { VR => 'SL', Name => 'DASAutoZero' }, #4
+    '0043,104A' => { VR => 'SS', Name => 'StartingChannelOfView' }, #4
+    '0043,104B' => { VR => 'SL', Name => 'DASXmPattern' }, #4
+    '0043,104C' => { VR => 'SS', Name => 'TGGCTriggerMode' }, #4
+    '0043,104D' => { VR => 'FL', Name => 'StartScanToXrayOnDelay' }, #4
+    '0043,104E' => { VR => 'FL', Name => 'DurationOfXrayOn' }, #4
+    '0043,1060' => { VR => 'IS', Name => 'SlopInt10-17' }, #4
+    '0043,1061' => { VR => 'UI', Name => 'ScannerStudyEntityUID' }, #4
+    '0043,1062' => { VR => 'SH', Name => 'ScannerStudyID' }, #4
+    '0043,106f' => { VR => 'DS', Name => 'ScannerTableEntry' }, #4
+    '0045,1001' => { VR => 'LO', Name => 'NumberOfMacroRowsInDetector' }, #4
+    '0045,1002' => { VR => 'FL', Name => 'MacroWidthAtISOCenter' }, #4
+    '0045,1003' => { VR => 'SS', Name => 'DASType' }, #4
+    '0045,1004' => { VR => 'SS', Name => 'DASGain' }, #4
+    '0045,1005' => { VR => 'SS', Name => 'DASTemperature' }, #4
+    '0045,1006' => { VR => 'CS', Name => 'TableDirectionInOrOut' }, #4
+    '0045,1007' => { VR => 'FL', Name => 'ZSmoothingFactor' }, #4
+    '0045,1008' => { VR => 'SS', Name => 'ViewWeightingMode' }, #4
+    '0045,1009' => { VR => 'SS', Name => 'SigmaRowNumberWhichRowsWereUsed' }, #4
+    '0045,100A' => { VR => 'FL', Name => 'MinimumDasValueFoundInTheScanData' }, #4
+    '0045,100B' => { VR => 'FL', Name => 'MaximumOffsetShiftValueUsed' }, #4
+    '0045,100C' => { VR => 'SS', Name => 'NumberOfViewsShifted' }, #4
+    '0045,100D' => { VR => 'SS', Name => 'ZTrackingFlag' }, #4
+    '0045,100E' => { VR => 'FL', Name => 'MeanZError' }, #4
+    '0045,100F' => { VR => 'FL', Name => 'ZTrackingMaximumError' }, #4
+    '0045,1010' => { VR => 'SS', Name => 'StartingViewForRow2a' }, #4
+    '0045,1011' => { VR => 'SS', Name => 'NumberOfViewsInRow2a' }, #4
+    '0045,1012' => { VR => 'SS', Name => 'StartingViewForRow1a' }, #4
+    '0045,1013' => { VR => 'SS', Name => 'SigmaMode' }, #4
+    '0045,1014' => { VR => 'SS', Name => 'NumberOfViewsInRow1a' }, #4
+    '0045,1015' => { VR => 'SS', Name => 'StartingViewForRow2b' }, #4
+    '0045,1016' => { VR => 'SS', Name => 'NumberOfViewsInRow2b' }, #4
+    '0045,1017' => { VR => 'SS', Name => 'StartingViewForRow1b' }, #4
+    '0045,1018' => { VR => 'SS', Name => 'NumberOfViewsInRow1b' }, #4
+    '0045,1019' => { VR => 'SS', Name => 'AirFilterCalibrationDate' }, #4
+    '0045,101A' => { VR => 'SS', Name => 'AirFilterCalibrationTime' }, #4
+    '0045,101B' => { VR => 'SS', Name => 'PhantomCalibrationDate' }, #4
+    '0045,101C' => { VR => 'SS', Name => 'PhantomCalibrationTime' }, #4
+    '0045,101D' => { VR => 'SS', Name => 'ZSlopeCalibrationDate' }, #4
+    '0045,101E' => { VR => 'SS', Name => 'ZSlopeCalibrationTime' }, #4
+    '0045,101F' => { VR => 'SS', Name => 'CrosstalkCalibrationDate' }, #4
+    '0045,1020' => { VR => 'SS', Name => 'CrosstalkCalibrationTime' }, #4
+    '0045,1021' => { VR => 'SS', Name => 'IterboneOptionFlag' }, #4
+    '0045,1022' => { VR => 'SS', Name => 'PeristalticFlagOption' }, #4
     # calibration group
     '0050,0004' => { VR => 'CS', Name => 'CalibrationImage' },
     '0050,0010' => { VR => 'SQ', Name => 'DeviceSequence' },
@@ -2639,6 +3010,8 @@ under the same terms as Perl itself.
 =item L<http://www.sph.sc.edu/comd/rorden/dicom.html>
 
 =item L<http://www.dclunie.com/>
+
+=item L<http://www.gehealthcare.com/usen/interoperability/dicom/docs/2258357r3.pdf>
 
 =back
 

@@ -512,7 +512,7 @@ sub WritePDF($$)
 
         # write new objects
         foreach $objRef (sort keys %newObj) {
-            $objRef =~ /^(\d+) (\d+)/ or $rtn = -1, print("xxx $objRef-\n"), last;
+            $objRef =~ /^(\d+) (\d+)/ or $rtn = -1, last;
             ($id, $gen) = ($1, $2);
             if (not $newObj{$objRef}) {
                 ++$gen if $gen < 65535;

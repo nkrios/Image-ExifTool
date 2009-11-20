@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessMPImageList($$$);
 
@@ -158,7 +158,8 @@ sub ProcessMPImageList($$$);
         },
         Notes => q{
             the first MPF "Large Thumbnail" is extracted as PreviewImage, and the rest
-            of the embedded MPF images are extracted as MPImage#
+            of the embedded MPF images are extracted as MPImage#.  The ExtractEmbedded
+            option may be used to extract information from these embedded images.
         },
         # extract all MPF images (not just one)
         RawConv => q{
@@ -178,7 +179,10 @@ Image::ExifTool::AddCompositeTags('Image::ExifTool::MPF');
 sub ExtractMPImages($)
 {
     my $exifTool = shift;
+    my $ee = $exifTool->Options('ExtractEmbedded');
+    my $saveBinary = $exifTool->Options('Binary');
     my ($i, $didPreview, $xtra);
+
     for ($i=1; $xtra or not defined $xtra; ++$i) {
         # run through MP images in the same order they were extracted
         $xtra = defined $$exifTool{VALUE}{"MPImageStart ($i)"} ? " ($i)" : '';
@@ -192,7 +196,9 @@ sub ExtractMPImages($)
                 $tag = 'PreviewImage';
                 $didPreview = 1;
             }
+            $exifTool->Options('Binary', 1) if $ee;
             my $val = Image::ExifTool::Exif::ExtractImage($exifTool, $off, $len, $tag);
+            $exifTool->Options('Binary', $saveBinary) if $ee;
             next unless defined $val;
             unless ($Image::ExifTool::Extra{$tag}) {
                 Image::ExifTool::AddTagToTable(\%Image::ExifTool::Extra, $tag, {
@@ -201,6 +207,12 @@ sub ExtractMPImages($)
                 });
             }
             $exifTool->FoundTag($tag, $val);
+            # extract information from MP images if ExtractEmbedded option used
+            if ($ee) {
+                $$exifTool{DOC_NUM} = $i;
+                $exifTool->ExtractInfo($val, { ReEntry => 1 });
+                delete $$exifTool{DOC_NUM};
+            }
         }
     }
     return undef;

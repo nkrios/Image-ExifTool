@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 my $maxOffset = 0x7fffffff; # currently supported maximum data offset/size
 
@@ -36,8 +36,8 @@ sub ProcessBigIFD($$$)
 
     # loop through IFD chain
     for (;;) {
-        if ($dirStart > $maxOffset) {
-            $exifTool->Warn('Huge offsets not yet supported');
+        if ($dirStart > $maxOffset and not $exifTool->Options('LargeFileSupport')) {
+            $exifTool->Warn('Huge offsets not supported (LargeFileSupport not set)');
             last;
         }
         unless ($raf->Seek($dirStart, 0)) {
@@ -92,12 +92,12 @@ sub ProcessBigIFD($$$)
             my ($valBuff, $valBase);
             if ($size > 8) {
                 if ($size > $maxOffset) {
-                    $exifTool->Warn("Can't yet handle $dirName entry $index (huge size)");
+                    $exifTool->Warn("Can't handle $dirName entry $index (huge size)");
                     next;
                 }
                 $valuePtr = Image::ExifTool::Get64u(\$dirBuff, $valuePtr);
-                if ($valuePtr > $maxOffset) {
-                    $exifTool->Warn("Can't yet handle $dirName entry $index (huge offset)");
+                if ($valuePtr > $maxOffset and not $exifTool->Options('LargeFileSupport')) {
+                    $exifTool->Warn("Can't handle $dirName entry $index (LargeFileSupport not set)");
                     next;
                 }
                 unless ($raf->Seek($valuePtr, 0) and $raf->Read($valBuff, $size) == $size) {

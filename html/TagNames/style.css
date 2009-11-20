@@ -19,6 +19,7 @@ table td.b { background: #feb }     /* alternate cell color */
 table tr.h { background: #fb7 }     /* table header */
 table td.c { text-align: center }   /* centered text cells */
 table td.r { text-align: right }    /* numerical tag ID's */
+table td.n { white-space: nowrap }  /* to avoid wrapping some tag names */
 
 h2         { margin: .6em 0 .6em 0 }/* table headings */
 h2.top     { margin: .3em 0 .6em 0 }/* top heading */

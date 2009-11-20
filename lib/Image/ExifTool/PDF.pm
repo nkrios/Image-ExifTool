@@ -17,7 +17,7 @@ use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.20';
+$VERSION = '1.22';
 
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
@@ -28,6 +28,7 @@ sub CheckPDF($$$);
 
 my $cryptInfo;      # encryption object reference (plus additional information)
 my $lastFetched;    # last fetched object reference (used for decryption)
+my $lastOffset;     # last fetched object offset
 my %warnedOnce;     # hash of warnings we issued
 my %streamObjs;     # hash of stream objects
 my %fetched;        # dicts fetched in verbose mode (to avoid cyclical recursion)
@@ -351,9 +352,14 @@ sub ConvertPDFDate($)
     $date =~ /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(.*)/ or return $date;
     $date = "$1:$2:$3 $4:$5:$6";
     if ($7) {
-        my @t = split /'/, $7;
-        $date .= $t[0];
-        $date .= ':' . ($t[1] || 0) if $t[0] ne 'Z';
+        my $tz = $7;
+        if ($tz =~ /^\s*Z/i) {
+            # ignore any "HH'mm'" after the Z (OS X 10.6 does this)
+            $date .= 'Z';
+        # tolerate some improper formatting in timezone specification
+        } elsif ($tz =~ /^\s*([-+])\s*(\d+)[': ]+(\d*)/) {
+            $date .= $1 . $2 . ':' . ($3 || '00');
+        }
     }
     return $date;
 }
@@ -463,6 +469,7 @@ sub FetchObject($$$$)
     my ($exifTool, $ref, $xref, $tag) = @_;
     $lastFetched = $ref;    # save this for decoding if necessary
     my $offset = LocateAnyObject($xref, $ref);
+    $lastOffset = $offset;
     unless ($offset) {
         $exifTool->Warn("Bad $tag reference") unless defined $offset;
         return undef;
@@ -605,6 +612,7 @@ sub ExtractObject($$;$$)
     for (;;) {
         if ($$dataPt =~ /^\s*(<{1,2}|\[|\()/s) {
             $delim = $1;
+            $$dataPt =~ s/^\s+//;   # remove leading white space
             $objData = ReadToNested($dataPt, $raf);
             return undef unless defined $objData;
             last;
@@ -704,7 +712,7 @@ sub ExtractObject($$;$$)
         $length = $$length;
         my $oldpos = $raf->Tell();
         # get the location of the object specifying the length
-        # (compressed objects are not allowd)
+        # (compressed objects are not allowed)
         my $offset = LocateObject($xref, $length) or return $dict;
         $offset or $exifTool->Warn('Bad Length object'), return $dict;
         $raf->Seek($offset, 0) or $exifTool->Warn('Bad Length offset'), return $dict;
@@ -759,16 +767,15 @@ sub ExtractObject($$;$$)
 # Returns: data up to and including matching delimiter (or undef on error)
 # - updates data reference with trailing data
 # - unescapes characters in literal strings
+my %closingDelim = (    # lookup for matching delimiter
+    '(' => ')',
+    '[' => ']',
+    '<' => '>',
+   '<<' => '>>',
+);
 sub ReadToNested($;$)
 {
     my ($dataPt, $raf) = @_;
-    # matching closing delimiters
-    my %closingDelim = (
-        '<<' => '>>',
-        '('  => ')',
-        '['  => ']',
-        '<'  => '>',
-    );
     my @delim = ('');   # closing delimiter list, most deeply nested first
     pos($$dataPt) = 0;  # begin at start of data
     for (;;) {
@@ -1115,8 +1122,15 @@ sub ProcessDict($$$$;$$)
                     $fetched{$$val} = 1;
                     $val = FetchObject($exifTool, $$val, $xref, $tag);
                     unless (defined $val) {
-                        $val2 = '<err>';
-                        $exifTool->VPrint(0, "$$exifTool{INDENT}Error reading object:\n");
+                        my $str;
+                        if (defined $lastOffset) {
+                            $val2 = '<free>';
+                            $str = 'Object was freed';
+                        } else {
+                            $val2 = '<err>';
+                            $str = 'Error reading object';
+                        }
+                        $exifTool->VPrint(0, "$$exifTool{INDENT}${str}:\n");
                     }
                 }
             } elsif (ref $val eq 'HASH') {
@@ -1159,6 +1173,7 @@ sub ProcessDict($$$$;$$)
                 Extra => $extra,
                 Index => $index++,
             );
+            next unless defined $val;
         }
         unless ($tagInfo) {
             # add any tag found in Info directory to table
@@ -1169,6 +1184,13 @@ sub ProcessDict($$$$;$$)
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
         unless ($$tagInfo{SubDirectory}) {
+            # fetch object if necessary
+            # (OS X 10.6 writes indirect objects in the Info dictionary!)
+            if (ref $val eq 'SCALAR') {
+                # (note: fetching the same object multiple times is OK here)
+                $val = FetchObject($exifTool, $$val, $xref, $tag);
+                next unless defined $val;
+            }
             $val = ReadPDFValue($val);
             my $format = $$tagInfo{Format} || $$tagInfo{Writable} || 'string';
             $val = ConvertPDFDate($val) if $format eq 'date';
@@ -1216,7 +1238,12 @@ sub ProcessDict($$$$;$$)
                 # load dictionary via an indirect reference
                 $fetched{$$subDict} = 1;
                 my $obj = FetchObject($exifTool, $$subDict, $xref, $tag);
-                $obj or $exifTool->Warn("Error reading $tag object ($$subDict)"), next;
+                unless (defined $obj) {
+                    unless (defined $lastOffset) {
+                        $exifTool->Warn("Error reading $tag object ($$subDict)");
+                    }
+                    next;
+                }
                 $subDict = $obj;
             }
             if (ref $subDict eq 'ARRAY') {

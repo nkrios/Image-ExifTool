@@ -16,6 +16,8 @@
 #               7) http://atomicparsley.sourceforge.net/mpeg-4files.html
 #               8) http://wiki.multimedia.cx/index.php?title=QuickTime_container
 #               9) http://www.adobe.com/devnet/xmp/pdfs/XMPSpecificationPart3.pdf (Oct 2008)
+#               10) http://code.google.com/p/mp4v2/wiki/iTunesMetadata
+#               11) http://www.canieti.com.mx/assets/files/1011/IEC_100_1384_DC.pdf
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::QuickTime;
@@ -25,11 +27,12 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.24';
+$VERSION = '1.27';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
 sub ProcessKeys($$$);
+sub ProcessMetaData($$$);
 
 # information for time/date-based tags (time zero is Jan 1, 1904)
 my %timeInfo = (
@@ -62,25 +65,169 @@ my %vendorID = (
     # HandlerVendorID - ZORA, pr01, 'GIC '
 );
 
+# MIME types for all entries in the ftypLookup with file extensions
+# (defaults to 'video/mp4' if not found in this lookup)
+my %mimeLookup = (
+   '3G2' => 'video/3gpp2',
+   '3GP' => 'video/3gpp',
+    DVB  => 'video/vnd.dvb.file',
+    F4A  => 'audio/mp4',
+    F4B  => 'audio/mp4',
+    JP2  => 'image/jp2',
+    JPM  => 'image/jpm',
+    JPX  => 'image/jpx',
+    M4A  => 'audio/mp4',
+    M4B  => 'audio/mp4',
+    M4P  => 'audio/mp4',
+    M4V  => 'video/x-m4v',
+    MOV  => 'video/quicktime',
+    MQV  => 'video/quicktime',
+);
+
+my %graphicsMode = (
+    # (ref http://homepage.mac.com/vanhoek/MovieGuts%20docs/64.html)
+    0x00 => 'srcCopy',
+    0x01 => 'srcOr',
+    0x02 => 'srcXor',
+    0x03 => 'srcBic',
+    0x04 => 'notSrcCopy',
+    0x05 => 'notSrcOr',
+    0x06 => 'notSrcXor',
+    0x07 => 'notSrcBic',
+    0x08 => 'patCopy',
+    0x09 => 'patOr',
+    0x0a => 'patXor',
+    0x0b => 'patBic',
+    0x0c => 'notPatCopy',
+    0x0d => 'notPatOr',
+    0x0e => 'notPatXor',
+    0x0f => 'notPatBic',
+    0x20 => 'blend',
+    0x21 => 'addPin',
+    0x22 => 'addOver',
+    0x23 => 'subPin',
+    0x24 => 'transparent',
+    0x25 => 'addMax',
+    0x26 => 'subOver',
+    0x27 => 'addMin',
+    0x31 => 'grayishTextOr',
+    0x32 => 'hilite',
+    0x40 => 'ditherCopy',
+    # the following ref ISO/IEC 15444-3
+    0x100 => 'Alpha',
+    0x101 => 'White Alpha',
+    0x102 => 'Pre-multiplied Black Alpha',
+    0x110 => 'Component Alpha',
+);
+
+# look up file type from ftyp atom type, with MIME type in comment if known
+# (ref http://www.ftyps.com/)
+my %ftypLookup = (
+    '3g2a' => '3GPP2 Media (.3G2) compliant with 3GPP2 C.S0050-0 V1.0', # video/3gpp2
+    '3g2b' => '3GPP2 Media (.3G2) compliant with 3GPP2 C.S0050-A V1.0.0', # video/3gpp2
+    '3g2c' => '3GPP2 Media (.3G2) compliant with 3GPP2 C.S0050-B v1.0', # video/3gpp2
+    '3ge6' => '3GPP (.3GP) Release 6 MBMS Extended Presentations', # video/3gpp
+    '3ge7' => '3GPP (.3GP) Release 7 MBMS Extended Presentations', # video/3gpp
+    '3gg6' => '3GPP Release 6 General Profile', # video/3gpp
+    '3gp1' => '3GPP Media (.3GP) Release 1 (probably non-existent)', # video/3gpp
+    '3gp2' => '3GPP Media (.3GP) Release 2 (probably non-existent)', # video/3gpp
+    '3gp3' => '3GPP Media (.3GP) Release 3 (probably non-existent)', # video/3gpp
+    '3gp4' => '3GPP Media (.3GP) Release 4', # video/3gpp
+    '3gp5' => '3GPP Media (.3GP) Release 5', # video/3gpp
+    '3gp6' => '3GPP Media (.3GP) Release 6 Basic Profile', # video/3gpp
+    '3gp6' => '3GPP Media (.3GP) Release 6 Progressive Download', # video/3gpp
+    '3gp6' => '3GPP Media (.3GP) Release 6 Streaming Servers', # video/3gpp
+    '3gs7' => '3GPP Media (.3GP) Release 7 Streaming Servers', # video/3gpp
+    'avc1' => 'MP4 Base w/ AVC ext [ISO 14496-12:2005]', # video/mp4
+    'CAEP' => 'Canon Digital Camera',
+    'caqv' => 'Casio Digital Camera',
+    'CDes' => 'Convergent Design',
+    'da0a' => 'DMB MAF w/ MPEG Layer II aud, MOT slides, DLS, JPG/PNG/MNG images',
+    'da0b' => 'DMB MAF, extending DA0A, with 3GPP timed text, DID, TVA, REL, IPMP',
+    'da1a' => 'DMB MAF audio with ER-BSAC audio, JPG/PNG/MNG images',
+    'da1b' => 'DMB MAF, extending da1a, with 3GPP timed text, DID, TVA, REL, IPMP',
+    'da2a' => 'DMB MAF aud w/ HE-AAC v2 aud, MOT slides, DLS, JPG/PNG/MNG images',
+    'da2b' => 'DMB MAF, extending da2a, with 3GPP timed text, DID, TVA, REL, IPMP',
+    'da3a' => 'DMB MAF aud with HE-AAC aud, JPG/PNG/MNG images',
+    'da3b' => 'DMB MAF, extending da3a w/ BIFS, 3GPP timed text, DID, TVA, REL, IPMP',
+    'dmb1' => 'DMB MAF supporting all the components defined in the specification',
+    'dmpf' => 'Digital Media Project', # various
+    'drc1' => 'Dirac (wavelet compression), encapsulated in ISO base media (MP4)',
+    'dv1a' => 'DMB MAF vid w/ AVC vid, ER-BSAC aud, BIFS, JPG/PNG/MNG images, TS',
+    'dv1b' => 'DMB MAF, extending dv1a, with 3GPP timed text, DID, TVA, REL, IPMP',
+    'dv2a' => 'DMB MAF vid w/ AVC vid, HE-AAC v2 aud, BIFS, JPG/PNG/MNG images, TS',
+    'dv2b' => 'DMB MAF, extending dv2a, with 3GPP timed text, DID, TVA, REL, IPMP',
+    'dv3a' => 'DMB MAF vid w/ AVC vid, HE-AAC aud, BIFS, JPG/PNG/MNG images, TS',
+    'dv3b' => 'DMB MAF, extending dv3a, with 3GPP timed text, DID, TVA, REL, IPMP',
+    'dvr1' => 'DVB (.DVB) over RTP', # video/vnd.dvb.file
+    'dvt1' => 'DVB (.DVB) over MPEG-2 Transport Stream', # video/vnd.dvb.file
+    'F4A ' => 'Audio for Adobe Flash Player 9+ (.F4A)', # audio/mp4
+    'F4B ' => 'Audio Book for Adobe Flash Player 9+ (.F4B)', # audio/mp4
+    'F4P ' => 'Protected Video for Adobe Flash Player 9+ (.F4P)', # video/mp4
+    'F4V ' => 'Video for Adobe Flash Player 9+ (.F4V)', # video/mp4
+    'isc2' => 'ISMACryp 2.0 Encrypted File', # ?/enc-isoff-generic
+    'iso2' => 'MP4 Base Media v2 [ISO 14496-12:2005]', # video/mp4
+    'isom' => 'MP4  Base Media v1 [IS0 14496-12:2003]', # video/mp4
+    'JP2 ' => 'JPEG 2000 Image (.JP2) [ISO 15444-1 ?]', # image/jp2
+    'JP20' => 'Unknown, from GPAC samples (prob non-existent)',
+    'jpm ' => 'JPEG 2000 Compound Image (.JPM) [ISO 15444-6]', # image/jpm
+    'jpx ' => 'JPEG 2000 with extensions (.JPX) [ISO 15444-2]', # image/jpx
+    'KDDI' => '3GPP2 EZmovie for KDDI 3G cellphones', # video/3gpp2
+    'M4A ' => 'Apple iTunes AAC-LC (.M4A) Audio', # audio/x-m4a
+    'M4B ' => 'Apple iTunes AAC-LC (.M4B) Audio Book', # audio/mp4
+    'M4P ' => 'Apple iTunes AAC-LC (.M4P) AES Protected Audio', # audio/mp4
+    'M4V ' => 'Apple iTunes Video (.M4V) Video', # video/x-m4v
+    'M4VH' => 'Apple TV (.M4V)', # video/x-m4v
+    'M4VP' => 'Apple iPhone (.M4V)', # video/x-m4v
+    'mj2s' => 'Motion JPEG 2000 [ISO 15444-3] Simple Profile', # video/mj2
+    'mjp2' => 'Motion JPEG 2000 [ISO 15444-3] General Profile', # video/mj2
+    'mmp4' => 'MPEG-4/3GPP Mobile Profile (.MP4/3GP) (for NTT)', # video/mp4
+    'mp21' => 'MPEG-21 [ISO/IEC 21000-9]', # various
+    'mp41' => 'MP4 v1 [ISO 14496-1:ch13]', # video/mp4
+    'mp42' => 'MP4 v2 [ISO 14496-14]', # video/mp4
+    'mp71' => 'MP4 w/ MPEG-7 Metadata [per ISO 14496-12]', # various
+    'MPPI' => 'Photo Player, MAF [ISO/IEC 23000-3]', # various
+    'mqt ' => 'Sony / Mobile QuickTime (.MQV) US Patent 7,477,830 (Sony Corp)', # video/quicktime
+    'MSNV' => 'MPEG-4 (.MP4) for SonyPSP', # audio/mp4
+    'NDAS' => 'MP4 v2 [ISO 14496-14] Nero Digital AAC Audio', # audio/mp4
+    'NDSC' => 'MPEG-4 (.MP4) Nero Cinema Profile', # video/mp4
+    'NDSH' => 'MPEG-4 (.MP4) Nero HDTV Profile', # video/mp4
+    'NDSM' => 'MPEG-4 (.MP4) Nero Mobile Profile', # video/mp4
+    'NDSP' => 'MPEG-4 (.MP4) Nero Portable Profile', # video/mp4
+    'NDSS' => 'MPEG-4 (.MP4) Nero Standard Profile', # video/mp4
+    'NDXC' => 'H.264/MPEG-4 AVC (.MP4) Nero Cinema Profile', # video/mp4
+    'NDXH' => 'H.264/MPEG-4 AVC (.MP4) Nero HDTV Profile', # video/mp4
+    'NDXM' => 'H.264/MPEG-4 AVC (.MP4) Nero Mobile Profile', # video/mp4
+    'NDXP' => 'H.264/MPEG-4 AVC (.MP4) Nero Portable Profile', # video/mp4
+    'NDXS' => 'H.264/MPEG-4 AVC (.MP4) Nero Standard Profile', # video/mp4
+    'odcf' => 'OMA DCF DRM Format 2.0 (OMA-TS-DRM-DCF-V2_0-20060303-A)', # various
+    'opf2' => 'OMA PDCF DRM Format 2.1 (OMA-TS-DRM-DCF-V2_1-20070724-C)',
+    'opx2' => 'OMA PDCF DRM + XBS extensions (OMA-TS-DRM_XBS-V1_0-20070529-C)',
+    'pana' => 'Panasonic Digital Camera',
+    'qt  ' => 'Apple QuickTime (.MOV/QT)', # video/quicktime
+    'ROSS' => 'Ross Video',
+    'sdv ' => 'SD Memory Card Video', # various?
+    'ssc1' => 'Samsung stereoscopic, single stream',
+    'ssc2' => 'Samsung stereoscopic, dual stream',
+);
+
 # QuickTime atoms
 %Image::ExifTool::QuickTime::Main = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     GROUPS => { 2 => 'Video' },
     NOTES => q{
-        The QuickTime file format is used for MOV and MP4 videos and QTIF images.
-        Exiftool extracts meta information from the UserData atom (including some
-        proprietary manufacturer-specific information), as well as extracting
-        various audio, video and image parameters.  Tags with a question mark after
-        their name are not extracted unless the Unknown option is set.
+        The QuickTime format is used for many different types of audio, video and
+        image files.  Exiftool extracts meta information from the UserData atom
+        (including some proprietary manufacturer-specific information), as well as
+        extracting various audio, video and image parameters.  Tags with a question
+        mark after their name are not extracted unless the Unknown option is set.
     },
     free => { Unknown => 1, Binary => 1 },
     skip => { Unknown => 1, Binary => 1 },
     wide => { Unknown => 1, Binary => 1 },
     ftyp => { #MP4
-        Name => 'FrameType',
-        Unknown => 1,
-        Notes => 'MP4 only',
-        Binary => 1,
+        Name => 'FileType',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::FileType' },
     },
     pnot => {
         Name => 'Preview',
@@ -109,12 +256,44 @@ my %vendorID = (
                 Start => 16,
             },
         },
+        { #11 (MP4 files)
+            Name => 'UUID-PROF',
+            Condition => '$$valPt=~/^PROF!\xd2\x4f\xce\xbb\x88\x69\x5c\xfa\xc9\xc7\x40/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::QuickTime::Profile',
+                Start => 24, # uid(16) + version(1) + flags(3) + count(4)
+            },
+        },
         { #8
             Name => 'UUID-Unknown',
             Unknown => 1,
             Binary => 1,
         },
     ],
+);
+
+# MPEG-4 'ftyp' atom
+# (ref http://developer.apple.com/mac/library/documentation/QuickTime/QTFF/QTFFChap1/qtff1.html)
+%Image::ExifTool::QuickTime::FileType = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    FORMAT => 'int32u',
+    0 => {
+        Name => 'MajorBrand',
+        Format => 'undef[4]',
+        PrintConv => \%ftypLookup,
+    },
+    1 => {
+        Name => 'MinorVersion',
+        Format => 'undef[4]',
+        ValueConv => 'sprintf("%x.%x.%x", unpack("nCC", $val))',
+    },
+    2 => {
+        Name => 'CompatibleBrands',
+        Format => 'undef[$size-8]',
+        # ignore any entry with a null, and return others as a list
+        ValueConv => 'my @a=($val=~/.{4}/sg); @a=grep(!/\0/,@a); \@a', 
+    },
 );
 
 # atoms used in QTIF files
@@ -141,7 +320,39 @@ my %vendorID = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Image' },
     FORMAT => 'int16u',
-    2 => { Name => 'CompressorID',  Format => 'string[4]' },
+    2 => {
+        Name => 'CompressorID',
+        Format => 'string[4]',
+# not very useful since this isn't a complete list and name is given below
+#        # ref http://developer.apple.com/mac/library/documentation/QuickTime/QTFF/QTFFChap3/qtff3.html
+#        PrintConv => {
+#            cvid => 'Cinepak',
+#            jpeg => 'JPEG',
+#           'smc '=> 'Graphics',
+#           'rle '=> 'Animation',
+#            rpza => 'Apple Video',
+#            kpcd => 'Kodak Photo CD',
+#           'png '=> 'Portable Network Graphics',
+#            mjpa => 'Motion-JPEG (format A)',
+#            mjpb => 'Motion-JPEG (format B)',
+#            SVQ1 => 'Sorenson video, version 1',
+#            SVQ3 => 'Sorenson video, version 3',
+#            mp4v => 'MPEG-4 video',
+#           'dvc '=> 'NTSC DV-25 video',
+#            dvcp => 'PAL DV-25 video',
+#           'gif '=> 'Compuserve Graphics Interchange Format',
+#            h263 => 'H.263 video',
+#            tiff => 'Tagged Image File Format',
+#           'raw '=> 'Uncompressed RGB',
+#           '2vuY'=> "Uncompressed Y'CbCr, 3x8-bit 4:2:2 (2vuY)",
+#           'yuv2'=> "Uncompressed Y'CbCr, 3x8-bit 4:2:2 (yuv2)",
+#            v308 => "Uncompressed Y'CbCr, 8-bit 4:4:4",
+#            v408 => "Uncompressed Y'CbCr, 8-bit 4:4:4:4",
+#            v216 => "Uncompressed Y'CbCr, 10, 12, 14, or 16-bit 4:2:2",
+#            v410 => "Uncompressed Y'CbCr, 10-bit 4:4:4",
+#            v210 => "Uncompressed Y'CbCr, 10-bit 4:2:2",
+#        },
+    },
     10 => {
         Name => 'VendorID',
         Format => 'string[4]',
@@ -150,8 +361,8 @@ my %vendorID = (
         SeparateTable => 'VendorID',
     },
   # 14 - ("Quality" in QuickTime docs) ??
-    16 => 'ImageWidth',
-    17 => 'ImageHeight',
+    16 => 'SourceImageWidth',
+    17 => 'SourceImageHeight',
     18 => { Name => 'XResolution',  Format => 'fixed32u' },
     20 => { Name => 'YResolution',  Format => 'fixed32u' },
   # 24 => 'FrameCount', # always 1 (what good is this?)
@@ -206,6 +417,25 @@ my %vendorID = (
         Name => 'Meta',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Meta' },
     },
+    iods => {
+        Name => 'InitialObjectDescriptor',
+        Flags => ['Binary','Unknown'],
+    },
+    uuid => [
+        { #11 (MP4 files) (also found in QuickTime::Track)
+            Name => 'UUID-USMT',
+            Condition => '$$valPt=~/^USMT!\xd2\x4f\xce\xbb\x88\x69\x5c\xfa\xc9\xc7\x40/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::QuickTime::UserMedia',
+                Start => 16,
+            },
+        },
+        {
+            Name => 'UUID-Unknown',
+            Unknown => 1,
+            Binary => 1,
+        },
+    ],
 );
 
 # movie header data block
@@ -278,12 +508,30 @@ my %vendorID = (
         Name => 'Meta',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Meta' },
     },
+    tref => {
+        Name => 'TrackRef',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::TrackRef' },
+    },
+    uuid => [
+        { #11 (MP4 files) (also found in QuickTime::Movie)
+            Name => 'UUID-USMT',
+            Condition => '$$valPt=~/^USMT!\xd2\x4f\xce\xbb\x88\x69\x5c\xfa\xc9\xc7\x40/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::QuickTime::UserMedia',
+                Start => 16,
+            },
+        },
+        {
+            Name => 'UUID-Unknown',
+            Unknown => 1,
+            Binary => 1,
+        },
+    ],
     # edts - edits --> contains elst (edit list)
     # tapt - TrackApertureModeDimensionsAID --> contains clef (TrackCleanApertureDimensionsAID),
     #        prof (TrackProductionApertureDimensionsAID), enof (TrackEncodedPixelsDimensionsAID)
     # clip - clipping --> contains crgn (clip region)
     # matt - track matt --> contains kmat (compressed matt)
-    # tref - track reference --> contains tmcd, chap, sync, scpt, ssrc, hint
     # load - track loading settings
     # imap - track input map --> contains '  in' --> contains '  ty', obid
 );
@@ -363,8 +611,8 @@ my %vendorID = (
         record.  ExifTool will extract any multi-language user data tags found, even
         if they don't exist in this table.
     },
-    "\xa9cpy" => 'Copyright',
-    "\xa9day" => 'CreateDate',
+    "\xa9cpy" => { Name => 'Copyright',  Groups => { 2 => 'Author' } },
+    "\xa9day" => { Name => 'CreateDate', Groups => { 2 => 'Time' } },
     "\xa9dir" => 'Director',
     "\xa9ed1" => 'Edit1',
     "\xa9ed2" => 'Edit2',
@@ -540,6 +788,180 @@ my %vendorID = (
     CNCV => 'CompressorVersion', #PH (Canon 5D Mark II)
 );
 
+# User-specific media data atoms (ref 11)
+%Image::ExifTool::QuickTime::UserMedia = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
+    MTDT => {
+        Name => 'MetaData',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::MetaData' },
+    },
+);
+
+# User-specific media data atoms (ref 11)
+%Image::ExifTool::QuickTime::MetaData = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMetaData,
+    GROUPS => { 2 => 'Video' },
+    TAG_PREFIX => 'MetaData',
+    0x01 => 'Title',
+    0x03 => {
+        Name => 'ProductionDate',
+        # translate from format "yyyy/mm/dd hh:mm:ss"
+        ValueConv => '$val=~tr{/}{:}; $val',
+        PrintConv => '$exifTool->ConvertDateTime($val)',
+    },
+    0x04 => 'Software',
+    0x05 => 'Product',
+    0x0a => {
+        Name => 'TrackProperty',
+        RawConv => 'my @a=unpack("Nnn",$val); "@a"',
+        PrintConv => [
+            { 0 => 'No presentation', BITMASK => { 0 => 'Main track' } },
+            { 0 => 'No attributes',   BITMASK => { 0x8000 => 'Read only' } },
+            '"Priority $val"',
+        ],
+    },
+    0x0b => {
+        Name => 'TimeZone',
+        Groups => { 2 => 'Time' },
+        RawConv => 'Get16s(\$val,0)',
+        PrintConv => 'TimeZoneString($val)',
+    },
+    0x0c => {
+        Name => 'ModifyDate',
+        Groups => { 2 => 'Time' },
+        # translate from format "yyyy/mm/dd hh:mm:ss"
+        ValueConv => '$val=~tr{/}{:}; $val',
+        PrintConv => '$exifTool->ConvertDateTime($val)',
+    },
+);
+
+# Profile atoms (ref 11)
+%Image::ExifTool::QuickTime::Profile = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
+    FPRF => {
+        Name => 'FileGlobalProfile',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::FileProf' },
+    },
+    APRF => {
+        Name => 'AudioProfile',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::AudioProf' },
+    },
+    VPRF => {
+        Name => 'VideoProfile',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::VideoProf' },
+    },
+);
+
+# FPRF atom information (ref 11)
+%Image::ExifTool::QuickTime::FileProf = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    FORMAT => 'int32u',
+    0 => { Name => 'FileProfileVersion', Unknown => 1 }, # unknown = uninteresting
+    1 => {
+        Name => 'FileFunctionFlags',
+        PrintConv => { BITMASK => {
+            28 => 'Fragmented',
+            29 => 'Additional tracks',
+            30 => 'Edited', # (main AV track is edited)
+        }},
+    },
+    # 2 - reserved
+);
+
+# APRF atom information (ref 11)
+%Image::ExifTool::QuickTime::AudioProf = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Audio' },
+    FORMAT => 'int32u',
+    0 => { Name => 'AudioProfileVersion', Unknown => 1 },
+    1 => 'AudioTrackID',
+    2 => {
+        Name => 'AudioCodec',
+        Format => 'undef[4]',
+    },
+    3 => {
+        Name => 'AudioCodecInfo',
+        Unknown => 1,
+        PrintConv => 'sprintf("0x%.4x", $val)',
+    },
+    4 => {
+        Name => 'AudioAttributes',
+        PrintConv => { BITMASK => {
+            0 => 'Encrypted',
+            1 => 'Variable bitrate',
+            2 => 'Dual mono',
+        }},
+    },
+    5 => {
+        Name => 'AudioAvgBitrate',
+        ValueConv => '$val * 1000',
+    },
+    6 => {
+        Name => 'AudioMaxBitrate',
+        ValueConv => '$val * 1000',
+    },
+    7 => 'AudioSampleRate',
+    8 => 'AudioChannels',
+);
+
+# VPRF atom information (ref 11)
+%Image::ExifTool::QuickTime::VideoProf = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    FORMAT => 'int32u',
+    0 => { Name => 'VideoProfileVersion', Unknown => 1 },
+    1 => 'VideoTrackID',
+    2 => {
+        Name => 'VideoCodec',
+        Format => 'undef[4]',
+    },
+    3 => {
+        Name => 'VideoCodecInfo',
+        Unknown => 1,
+        PrintConv => 'sprintf("0x%.4x", $val)',
+    },
+    4 => {
+        Name => 'VideoAttributes',
+        PrintConv => { BITMASK => {
+            0 => 'Encrypted',
+            1 => 'Variable bitrate',
+            2 => 'Variable frame rate',
+            3 => 'Interlaced',
+        }},
+    },
+    5 => {
+        Name => 'VideoAvgBitrate',
+        ValueConv => '$val * 1000',
+    },
+    6 => {
+        Name => 'VideoMaxBitrate',
+        ValueConv => '$val * 1000',
+    },
+    7 => {
+        Name => 'VideoAvgFrameRate',
+        Format => 'fixed32u',
+        PrintConv => 'sprintf("%.2f", $val)',
+    },
+    8 => {
+        Name => 'VideoMaxFrameRate',
+        Format => 'fixed32u',
+        PrintConv => 'sprintf("%.2f", $val)',
+    },
+    9 => {
+        Name => 'VideoSize',
+        Format => 'int16u[2]',
+        PrintConv => '$val=~tr/ /x/; $val',
+    },
+    10 => {
+        Name => 'PixelAspectRatio',
+        Format => 'int16u[2]',
+        PrintConv => '$val=~tr/ /:/; $val',
+    },
+);
+
 # meta atoms
 %Image::ExifTool::QuickTime::Meta = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
@@ -556,11 +978,26 @@ my %vendorID = (
         Name => 'Handler',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Handler' },
     },
-    # dinf - MP4 data information
-    # ipmc - MP4 IPMP control
-    # iloc - MP4 item location
-    # ipro - MP4 item protection
-    # iinf - MP4 item information
+    dinf => {
+        Name => 'DataInformation',
+        Flags => ['Binary','Unknown'],
+    },
+    ipmc => {
+        Name => 'IPMPControl',
+        Flags => ['Binary','Unknown'],
+    },
+    iloc => {
+        Name => 'ItemLocation',
+        Flags => ['Binary','Unknown'],
+    },
+    ipro => {
+        Name => 'ItemProtection',
+        Flags => ['Binary','Unknown'],
+    },
+    iinf => {
+        Name => 'ItemInformation',
+        Flags => ['Binary','Unknown'],
+    },
    'xml ' => {
         Name => 'XML',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
@@ -569,8 +1006,22 @@ my %vendorID = (
         Name => 'Keys',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Keys' },
     },
-    # bxml - MP4 binary XML
-    # pitm - MP4 primary item reference
+    bxml => {
+        Name => 'BinaryXML',
+        Flags => ['Binary','Unknown'],
+    },
+    pitm => {
+        Name => 'PrimaryItemReference',
+        Flags => ['Binary','Unknown'],
+    },
+);
+
+# track reference atoms
+%Image::ExifTool::QuickTime::TrackRef = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Video' },
+    chap => { Name => 'ChapterList', Format => 'int32u' },
+    # also: tmcd, sync, scpt, ssrc, iTunesInfo
 );
 
 # info list atoms
@@ -588,10 +1039,12 @@ my %vendorID = (
     "\xa9com" => 'Composer',
     "\xa9day" => 'Year',
     "\xa9des" => 'Description', #4
+    "\xa9enc" => 'EncodedBy', #10
     "\xa9gen" => 'Genre',
     "\xa9grp" => 'Grouping',
     "\xa9lyr" => 'Lyrics',
     "\xa9nam" => 'Title',
+    # "\xa9st3" ? (ref 10)
     "\xa9too" => 'Encoder',
     "\xa9trk" => 'Track',
     "\xa9wrt" => 'Composer',
@@ -600,10 +1053,21 @@ my %vendorID = (
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::iTunesInfo' },
     },
     aART => 'AlbumArtist',
-    apID => 'AppleStoreID',
-    # (also cnID,atID,cmID,plID,geID,sfID,akID)
+    akID => { #10
+        Name => 'AppleStoreAccountType',
+        PrintConv => {
+            0 => 'iTunes',
+            1 => 'AOL',
+        },
+    },
+    apID => 'AppleStoreAccount',
+    # atID ?
     auth => 'Author',
     catg => 'Category', #7
+    cnID => { #10
+        Name => 'AppleStoreCatalogID',
+        Format => 'int32u',
+    },
     covr => 'CoverArt',
     cpil => {
         Name => 'Compilation',
@@ -618,7 +1082,14 @@ my %vendorID = (
     desc => 'Description', #7
     gnre => 'Genre',
     egid => 'EpisodeGlobalUniqueID', #7
+    # geID ?
+    grup => 'Grouping', #10
+    hdvd => { #10
+        Name => 'HDVideo',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
+    },
     keyw => 'Keyword', #7
+    ldes => 'LongDescription', #10
     pcst => 'Podcast', #7
     perf => 'Performer',
     pgap => {
@@ -628,14 +1099,56 @@ my %vendorID = (
             1 => 'No Gap',
         },
     },
+    # plID ?
     purd => 'PurchaseDate', #7
     purl => 'PodcastURL', #7
-    rtng => 'Rating', # int
-    stik => { #(requires testing)
-        Name => 'ContentType', #(PH guess)
+    rtng => {
+        Name => 'Rating',
+        PrintConv => { #10
+            0 => 'none',
+            2 => 'Clean',
+            4 => 'Explicit',
+        },
+    },
+    sfID => { #10
+        Name => 'AppleStoreCountry',
+        Format => 'int32u',
+        PrintConv => {
+            143460 => 'Australia',
+            143445 => 'Austria',
+            143446 => 'Belgium',
+            143455 => 'Canada',
+            143458 => 'Denmark',
+            143447 => 'Finland',
+            143442 => 'France',
+            143443 => 'Germany',
+            143448 => 'Greece',
+            143449 => 'Ireland',
+            143450 => 'Italy',
+            143462 => 'Japan',
+            143451 => 'Luxembourg',
+            143452 => 'Netherlands',
+            143461 => 'New Zealand',
+            143457 => 'Norway',
+            143453 => 'Portugal',
+            143454 => 'Spain',
+            143456 => 'Sweden',
+            143459 => 'Switzerland',
+            143444 => 'United Kingdom',
+            143441 => 'United States',
+        },
+    },
+    soaa => 'SortAlbumArtist', #10
+    soal => 'SortAlbum', #10
+    soar => 'SortArtist', #10
+    soco => 'SortComposer', #10
+    sonm => 'SortName', #10
+    sosn => 'SortShow', #10
+    stik => {
+        Name => 'MediaType',
         PrintConv => { #(http://weblog.xanga.com/gryphondwb/615474010/iphone-ringtones---what-did-itunes-741-really-do.html)
             0 => 'Movie',
-            1 => 'Normal',
+            1 => 'Normal (Music)',
             2 => 'Audiobook',
             5 => 'Whacked Bookmark',
             6 => 'Music Video',
@@ -654,10 +1167,17 @@ my %vendorID = (
         Name => 'TrackNumber',
         ValueConv => 'length($val) >= 6 ? join(" of ",unpack("x2nn",$val)) : \$val',
     },
+    tven => 'TVEpisodeID', #7
+    tves => { #7/10
+        Name => 'TVEpisode',
+        Format => 'int32u',
+    },
     tvnn => 'TVNetworkName', #7
-    tven => 'TVEpisodeNumber', #7
-    tvsn => 'TVSeason', #7
-    tves => 'TVEpisode', #7
+    tvsh => 'TVShow', #10
+    tvsn => { #7/10
+        Name => 'TVSeason',
+        Format => 'int32u',
+    },
 );
 
 # info list keys
@@ -690,6 +1210,23 @@ my %vendorID = (
 %Image::ExifTool::QuickTime::iTunesInfo = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
     GROUPS => { 2 => 'Audio' },
+    # 'mean'/'name'/'data' atoms form a triplet, but unfortunately
+    # I can't find any source for decoding 'data'.
+    # 'mean' is normally 'com.apple.iTunes'
+    # 'name' values: 'tool', 'iTunNORM' (volume normalization),
+    #   'iTunSMPB', 'iTunes_CDDB_IDs', 'iTunes_CDDB_TrackNumber'
+    mean => {
+        Name => 'Mean',
+        Unknown => 1,
+    },
+    name => {
+        Name => 'Name',
+        Unknown => 1,
+    },
+    data => {
+        Name => 'Data',
+        Flags => ['Binary','Unknown'],
+    },
 );
 
 # print to video data block
@@ -916,10 +1453,17 @@ my %vendorID = (
         Name => 'HintHeader',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::HintHeader' },
     },
-    # nmhd - null media header
+    nmhd => {
+        Name => 'NullMediaHeader',
+        Flags => ['Binary','Unknown'],
+    },
     dinf => {
         Name => 'DataInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::DataInfo' },
+    },
+    gmhd => {
+        Name => 'GenMediaHeader',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::GenMediaHeader' },
     },
     hdlr => { #PH
         Name => 'Handler',
@@ -940,41 +1484,8 @@ my %vendorID = (
     2 => {
         Name => 'GraphicsMode',
         PrintHex => 1,
-        PrintConv => {
-            # (ref http://homepage.mac.com/vanhoek/MovieGuts%20docs/64.html)
-            0x00 => 'srcCopy',
-            0x01 => 'srcOr',
-            0x02 => 'srcXor',
-            0x03 => 'srcBic',
-            0x04 => 'notSrcCopy',
-            0x05 => 'notSrcOr',
-            0x06 => 'notSrcXor',
-            0x07 => 'notSrcBic',
-            0x08 => 'patCopy',
-            0x09 => 'patOr',
-            0x0a => 'patXor',
-            0x0b => 'patBic',
-            0x0c => 'notPatCopy',
-            0x0d => 'notPatOr',
-            0x0e => 'notPatXor',
-            0x0f => 'notPatBic',
-            0x20 => 'blend',
-            0x21 => 'addPin',
-            0x22 => 'addOver',
-            0x23 => 'subPin',
-            0x24 => 'transparent',
-            0x25 => 'addMax',
-            0x26 => 'subOver',
-            0x27 => 'addMin',
-            0x31 => 'grayishTextOr',
-            0x32 => 'hilite',
-            0x40 => 'ditherCopy',
-            # the following ref ISO/IEC 15444-3
-            0x100 => 'Alpha',
-            0x101 => 'White Alpha',
-            0x102 => 'Pre-multiplied Black Alpha',
-            0x110 => 'Component Alpha',
-        },
+        SeparateTable => 'GraphicsMode',
+        PrintConv => \%graphicsMode,
     },
     3 => { Name => 'OpColor', Format => 'int16u[3]' },
 );
@@ -1042,23 +1553,69 @@ my %vendorID = (
             Condition => '$$self{HandlerType} and $$self{HandlerType} eq "vide"',
             # (must be RawConv so appropriate MediaTS is used in calculation)
             RawConv => 'Image::ExifTool::QuickTime::CalcSampleRate($self, \$val)',
-            PrintConv => 'sprintf("%.1f", $val)',
+            PrintConv => 'sprintf("%.2f", $val)',
+        },
+        {
+            Name => 'TimeToSampleTable',
+            Flags => ['Binary','Unknown'],
         },
     ],
-    # ctts - (composition) time to sample
-    # stsc - sample to chunk
-    # stsz - sample sizes
-    # stz2 - compact sample sizes
-    # stco - chunk offset
-    # co64 - 64-bit chunk offset
-    # stss - sync sample table
-    # stsh - shadow sync sample table
-    # padb - sample padding bits
-    # stdp - sample degradation priority
-    # sdtp - independent and disposable samples
-    # sbgp - sample to group
-    # sgpd - sample group description
-    # subs - sub-sample information
+    ctts => {
+        Name => 'CompositionTimeToSample',
+        Flags => ['Binary','Unknown'],
+    },
+    stsc => {
+        Name => 'SampleToChunk',
+        Flags => ['Binary','Unknown'],
+    },
+    stsz => {
+        Name => 'SampleSizes',
+        Flags => ['Binary','Unknown'],
+    },
+    stz2 => {
+        Name => 'CompactSampleSizes',
+        Flags => ['Binary','Unknown'],
+    },
+    stco => {
+        Name => 'ChunkOffset',
+        Flags => ['Binary','Unknown'],
+    },
+    co64 => {
+        Name => 'ChunkOffset64',
+        Flags => ['Binary','Unknown'],
+    },
+    stss => {
+        Name => 'SyncSampleTable',
+        Flags => ['Binary','Unknown'],
+    },
+    stsh => {
+        Name => 'ShadowSyncSampleTable',
+        Flags => ['Binary','Unknown'],
+    },
+    padb => {
+        Name => 'SamplePaddingBits',
+        Flags => ['Binary','Unknown'],
+    },
+    stdp => {
+        Name => 'SampleDegradationPriority',
+        Flags => ['Binary','Unknown'],
+    },
+    sdtp => {
+        Name => 'IdependentAndDisposableSamples',
+        Flags => ['Binary','Unknown'],
+    },
+    sbgp => {
+        Name => 'SampleToGroup',
+        Flags => ['Binary','Unknown'],
+    },
+    sgpd => {
+        Name => 'SampleGroupDescription',
+        Flags => ['Binary','Unknown'],
+    },
+    subs => {
+        Name => 'Sub-sampleInformation',
+        Flags => ['Binary','Unknown'],
+    },
 );
 
 # MP4 audio sample description box (ref 5)
@@ -1118,6 +1675,35 @@ my %vendorID = (
     },
 );
 
+# Generic media header
+%Image::ExifTool::QuickTime::GenMediaHeader = (
+    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    gmin => {
+        Name => 'GenMediaInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::GenMediaInfo' },
+    },
+    text => {
+        Name => 'Text',
+        Flags => ['Binary','Unknown'],
+    },
+);
+
+# Generic media info (ref http://sourceforge.jp/cvs/view/ntvrec/ntvrec/libqtime/gmin.h?view=co)
+%Image::ExifTool::QuickTime::GenMediaInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    0  => 'GenMediaVersion',
+    1  => { Name => 'GenFlags',   Format => 'int8u[3]' },
+    4  => { Name => 'GenGraphicsMode',
+        Format => 'int16u',
+        PrintHex => 1,
+        SeparateTable => 'GraphicsMode',
+        PrintConv => \%graphicsMode,
+    },
+    6  => { Name => 'GenOpColor', Format => 'int16u[3]' },
+    12 => { Name => 'GenBalance', Format => 'fixed16s' },
+);
+
 # MP4 data reference box (ref 5)
 %Image::ExifTool::QuickTime::DataRef = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
@@ -1157,20 +1743,21 @@ my %vendorID = (
         Format => 'undef[4]',
         RawConv => '$$self{HandlerType} = $val unless $val eq "alis"; $val',
         PrintConv => {
-            vide => 'Video Track',
-            soun => 'Audio Track',
-            hint => 'Hint Track',
             alis => 'Alias Data', #PH
+            crsm => 'Clock Reference', #3
+            hint => 'Hint Track',
+            ipsm => 'IPMP', #3
+            m7sm => 'MPEG-7 Stream', #3
             mdir => 'Metadata', #3
             mdta => 'Metadata Tags', #PH
+            mjsm => 'MPEG-J', #3
+            ocsm => 'Object Content', #3
             odsm => 'Object Descriptor', #3
             sdsm => 'Scene Description', #3
-            crsm => 'Clock Reference', #3
-            m7sm => 'MPEG-7 Stream', #3
-            ocsm => 'Object Content', #3
-            ipsm => 'IPMP', #3
-            mjsm => 'MPEG-J', #3
+            soun => 'Audio Track',
+            text => 'Text', #PH (but what type? subtitle?)
            'url '=> 'URL', #3
+            vide => 'Video Track',
         },
     },
     12 => { #PH
@@ -1273,6 +1860,60 @@ sub FixWrongFormat($)
 }
 
 #------------------------------------------------------------------------------
+# Process MPEG-4 MTDT atom (ref 11)
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessMetaData($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirLen = length $$dataPt;
+    my $verbose = $exifTool->Options('Verbose');
+    return 0 unless $dirLen >= 2;
+    my $count = Get16u($dataPt, 0);
+    $verbose and $exifTool->VerboseDir('MetaData', $count);
+    my $i;
+    my $pos = 2;
+    for ($i=0; $i<$count; ++$i) {
+        last if $pos + 10 > $dirLen;
+        my $size = Get16u($dataPt, $pos);
+        last if $size < 10 or $size + $pos > $dirLen;
+        my $tag  = Get32u($dataPt, $pos + 2);
+        my $lang = Get16u($dataPt, $pos + 6);
+        my $enc  = Get16u($dataPt, $pos + 8);
+        my $val  = substr($$dataPt, $pos + 10, $size);
+        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        if ($tagInfo) {
+            # convert language code to ASCII (ignore read-only bit)
+            $lang = pack('C*',(($lang >> 10) & 0x1f) + 0x60,
+                              (($lang >>  5) & 0x1f) + 0x60, 
+                               ($lang        & 0x1f) + 0x60);
+            # handle alternate languages
+            if ($lang ne 'und' and $lang ne 'eng' and $lang =~ /^[a-z]+$/) {
+                my $langInfo = Image::ExifTool::GetLangInfo($tagInfo, $lang);
+                $tagInfo = $langInfo if $langInfo;
+            }
+            $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
+                Value  => $val,
+                DataPt => $dataPt,
+                Start  => $pos + 10,
+                Size   => $size - 10,
+            );
+            # convert from UTF-16 BE if necessary
+            $val = $exifTool->Unicode2Charset($val) if $enc == 1;
+            if ($enc == 0 and $$tagInfo{Unknown}) {
+                # binary data
+                $exifTool->FoundTag($tagInfo, \$val);
+            } else {
+                $exifTool->FoundTag($tagInfo, $val);
+            }
+        }
+        $pos += $size;
+    }
+    return 1;
+}
+
+#------------------------------------------------------------------------------
 # Process Meta keys and add tags to the InfoList table ('mdta' handler) (ref PH)
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success
@@ -1356,13 +1997,15 @@ sub ProcessMOV($$;$)
         # check on file type if called with a RAF
         $$tagTablePtr{$tag} or return 0;
         if ($tag eq 'ftyp') {
-            # read ahead 4 bytes to see if this is an M4A file
-            my $ftyp = 'MP4';
+            # read ahead 4 bytes to see what type of file this is
+            my $fileType;
             if ($raf->Read($buff, 4) == 4) {
                 $raf->Seek(-4, 1);
-                $ftyp = 'M4A' if $buff eq 'M4A ';
+                # see if we know the extension for this file type
+                $fileType = $1 if $ftypLookup{$buff} and $ftypLookup{$buff} =~ /\(\.(\w+)/;
             }
-            $exifTool->SetFileType($ftyp);  # MP4 or M4A
+            $fileType or $fileType = 'MP4'; # default to MP4
+            $exifTool->SetFileType($fileType, $mimeLookup{$fileType} || 'video/mp4');
         } else {
             $exifTool->SetFileType();       # MOV
         }
@@ -1375,11 +2018,17 @@ sub ProcessMOV($$;$)
             $raf->Read($buff, 8) == 8 or last;
             $dataPos += 8;
             my ($hi, $lo) = unpack('NN', $buff);
-            if ($hi or $lo > 0x7fffffff) {
-                $exifTool->Warn('End of processing at large atom');
-                last;
-            }
             $size = $lo;
+            if ($hi or $lo > 0x7fffffff) {
+                if ($hi > 0x7fffffff) {
+                    $exifTool->Warn('Invalid atom size');
+                    last;
+                } elsif (not $exifTool->Options('LargeFileSupport')) {
+                    $exifTool->Warn('End of processing at large atom (LargeFileSupport not set)');
+                    last;
+                }
+            }
+            $size = $hi * 4294967296 + $lo;
         }
         $size -= 8;
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
@@ -1574,6 +2223,10 @@ under the same terms as Perl itself.
 =item L<http://atomicparsley.sourceforge.net/mpeg-4files.html>
 
 =item L<http://wiki.multimedia.cx/index.php?title=QuickTime_container>
+
+=item L<http://code.google.com/p/mp4v2/wiki/iTunesMetadata>
+
+=item L<http://www.canieti.com.mx/assets/files/1011/IEC_100_1384_DC.pdf>
 
 =back
 

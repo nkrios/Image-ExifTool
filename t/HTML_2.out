@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.91
 [File, System, Image] FileName - File Name: HTML.html
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 2.1 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:02:18 10:47:47-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:02:17 19:44:20-05:00
 [File, File, Image] FileType - File Type: HTML
 [File, File, Image] MIMEType - MIME Type: text/html
 [HTML, HTML, Document] title - Title: ExifTool HTML Test
@@ -19,7 +19,7 @@
 [HTML, HTML-ncc, Time] sourcedate - Source Date: 1993
 [HTML, HTML-ncc, Document] sourceedition - Source Edition: 1
 [HTML, HTML-ncc, Document] sourcepublisher - Source Publisher: Phil's Desktop
-[HTML, HTML-ncc, Document] charset - Charset: iso-8859-1
+[HTML, HTML-ncc, Document] charset - Character Set: iso-8859-1
 [HTML, HTML-ncc, Document] generator - Generator: ExifTool 6.73
 [HTML, HTML-ncc, Document] narrator - Narrator: a narrator
 [HTML, HTML-ncc, Document] tocitems - TOC Items: 1024

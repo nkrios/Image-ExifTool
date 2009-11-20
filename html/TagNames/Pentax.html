@@ -509,6 +509,8 @@ step size)</span></span></td></tr>
   <br>&#39;13 0&#39; = Shutter &amp; Aperture Priority AE
   <br>&#39;15 0&#39; = Sensitivity Priority AE
   <br>&#39;16 0&#39; = Flash X-Sync Speed AE
+  <br>&#39;254 0&#39; = Video (30 fps)
+  <br>&#39;255 4&#39; = Video (24 fps)
   <br>[Value 2]
   <br>0 = 1/2 EV steps
   <br>1 = 1/3 EV steps</span></td></tr>
@@ -521,17 +523,20 @@ step size)</span></span></td></tr>
   <br>1 = Continuous
   <br>2 = Continuous (Hi)
   <br>3 = Burst
+  <br>255 = Video
   <br>[Value 1]
   <br>0 = No Timer
   <br>1 = Self-timer (12 s)
   <br>2 = Self-timer (2 s)
+  <br>255 = n/a
   <br>[Value 2]
   <br>0 = Shutter Button
   <br>1 = Remote Control (3 s delay)
   <br>2 = Remote Control
   <br>[Value 3]
   <br>0 = Single Exposure
-  <br>1 = Multiple Exposure</span></td></tr>
+  <br>1 = Multiple Exposure
+  <br>255 = Video</span></td></tr>
 <tr>
 <td title='0x0037 = 55'>0x0037</td>
 <td>ColorSpace</td>
@@ -782,6 +787,16 @@ step size)</span></span></td></tr>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#EVStepInfo'>Pentax EVStepInfo Tags</a></td></tr>
 <tr class=b>
+<td title='0x0229 = 553'>0x0229</td>
+<td>SerialNumber</td>
+<td class=c>string</td>
+<td><span class=s><span class=n>(left blank by some cameras)</span></span></td></tr>
+<tr>
+<td title='0x0230 = 560'>0x0230</td>
+<td>FirmwareVersion</td>
+<td class=c>string</td>
+<td><span class=s><span class=n>(only in AVI videos)</span></span></td></tr>
+<tr class=b>
 <td title='0x03fe = 1022'>0x03fe</td>
 <td>DataDump</td>
 <td class=c>N</td>
@@ -814,85 +829,89 @@ step size)</span></span></td></tr>
 <table class='inner sep' cellspacing=1>
 <tr class=h><th>Value</th><th>PentaxModelID</th><th>Value</th><th>PentaxModelID</th></tr>
 <tr><td class=r>0xd</td><td>= Optio 330/430</td>
-<td class='r b'>0x12ba2</td><td class=b>= K100D Super</td>
-</tr><tr><td class=r>0x12926</td><td>= Optio 230</td>
-<td class='r b'>0x12bb0</td><td class=b>= Optio T10/T20</td>
-</tr><tr><td class=r>0x12958</td><td>= Optio 330GS</td>
 <td class='r b'>0x12be2</td><td class=b>= Optio W10</td>
-</tr><tr><td class=r>0x12962</td><td>= Optio 450/550</td>
+</tr><tr><td class=r>0x12926</td><td>= Optio 230</td>
 <td class='r b'>0x12bf6</td><td class=b>= Optio M10</td>
-</tr><tr><td class=r>0x1296c</td><td>= Optio S</td>
+</tr><tr><td class=r>0x12958</td><td>= Optio 330GS</td>
 <td class='r b'>0x12c1e</td><td class=b>= K10D</td>
-</tr><tr><td class=r>0x12994</td><td>= *ist D</td>
+</tr><tr><td class=r>0x12962</td><td>= Optio 450/550</td>
 <td class='r b'>0x12c20</td><td class=b>= Samsung GX10</td>
-</tr><tr><td class=r>0x129b2</td><td>= Optio 33L</td>
+</tr><tr><td class=r>0x1296c</td><td>= Optio S</td>
 <td class='r b'>0x12c28</td><td class=b>= Optio S7</td>
-</tr><tr><td class=r>0x129bc</td><td>= Optio 33LF</td>
+</tr><tr><td class=r>0x12994</td><td>= *ist D</td>
 <td class='r b'>0x12c2d</td><td class=b>= Optio L20</td>
-</tr><tr><td class=r>0x129c6</td><td>= Optio 33WR/43WR/555</td>
+</tr><tr><td class=r>0x129b2</td><td>= Optio 33L</td>
 <td class='r b'>0x12c32</td><td class=b>= Optio M20</td>
-</tr><tr><td class=r>0x129d5</td><td>= Optio S4</td>
+</tr><tr><td class=r>0x129bc</td><td>= Optio 33LF</td>
 <td class='r b'>0x12c3c</td><td class=b>= Optio W20</td>
-</tr><tr><td class=r>0x12a02</td><td>= Optio MX</td>
+</tr><tr><td class=r>0x129c6</td><td>= Optio 33WR/43WR/555</td>
 <td class='r b'>0x12c46</td><td class=b>= Optio A20</td>
-</tr><tr><td class=r>0x12a0c</td><td>= Optio S40</td>
+</tr><tr><td class=r>0x129d5</td><td>= Optio S4</td>
 <td class='r b'>0x12c78</td><td class=b>= Optio E30</td>
-</tr><tr><td class=r>0x12a16</td><td>= Optio S4i</td>
+</tr><tr><td class=r>0x12a02</td><td>= Optio MX</td>
 <td class='r b'>0x12c7d</td><td class=b>= Optio E35</td>
-</tr><tr><td class=r>0x12a34</td><td>= Optio 30</td>
+</tr><tr><td class=r>0x12a0c</td><td>= Optio S40</td>
 <td class='r b'>0x12c82</td><td class=b>= Optio T30</td>
-</tr><tr><td class=r>0x12a52</td><td>= Optio S30</td>
+</tr><tr><td class=r>0x12a16</td><td>= Optio S4i</td>
 <td class='r b'>0x12c8c</td><td class=b>= Optio M30</td>
-</tr><tr><td class=r>0x12a66</td><td>= Optio 750Z</td>
+</tr><tr><td class=r>0x12a34</td><td>= Optio 30</td>
 <td class='r b'>0x12c96</td><td class=b>= Optio W30</td>
-</tr><tr><td class=r>0x12a70</td><td>= Optio SV</td>
+</tr><tr><td class=r>0x12a52</td><td>= Optio S30</td>
 <td class='r b'>0x12ca0</td><td class=b>= Optio A30</td>
-</tr><tr><td class=r>0x12a75</td><td>= Optio SVi</td>
+</tr><tr><td class=r>0x12a66</td><td>= Optio 750Z</td>
 <td class='r b'>0x12cb4</td><td class=b>= Optio E40</td>
-</tr><tr><td class=r>0x12a7a</td><td>= Optio X</td>
+</tr><tr><td class=r>0x12a70</td><td>= Optio SV</td>
 <td class='r b'>0x12cbe</td><td class=b>= Optio M40</td>
-</tr><tr><td class=r>0x12a8e</td><td>= Optio S5i</td>
+</tr><tr><td class=r>0x12a75</td><td>= Optio SVi</td>
 <td class='r b'>0x12cc8</td><td class=b>= Optio Z10</td>
-</tr><tr><td class=r>0x12a98</td><td>= Optio S50</td>
+</tr><tr><td class=r>0x12a7a</td><td>= Optio X</td>
 <td class='r b'>0x12cd2</td><td class=b>= K20D</td>
-</tr><tr><td class=r>0x12aa2</td><td>= *ist DS</td>
+</tr><tr><td class=r>0x12a8e</td><td>= Optio S5i</td>
 <td class='r b'>0x12cd4</td><td class=b>= Samsung GX20</td>
-</tr><tr><td class=r>0x12ab6</td><td>= Optio MX4</td>
+</tr><tr><td class=r>0x12a98</td><td>= Optio S50</td>
 <td class='r b'>0x12cdc</td><td class=b>= Optio S10</td>
-</tr><tr><td class=r>0x12ac0</td><td>= Optio S5n</td>
+</tr><tr><td class=r>0x12aa2</td><td>= *ist DS</td>
 <td class='r b'>0x12ce6</td><td class=b>= Optio A40</td>
-</tr><tr><td class=r>0x12aca</td><td>= Optio WP</td>
+</tr><tr><td class=r>0x12ab6</td><td>= Optio MX4</td>
 <td class='r b'>0x12cf0</td><td class=b>= Optio V10</td>
-</tr><tr><td class=r>0x12afc</td><td>= Optio S55</td>
+</tr><tr><td class=r>0x12ac0</td><td>= Optio S5n</td>
 <td class='r b'>0x12cfa</td><td class=b>= K200D</td>
-</tr><tr><td class=r>0x12b10</td><td>= Optio S5z</td>
+</tr><tr><td class=r>0x12aca</td><td>= Optio WP</td>
 <td class='r b'>0x12d04</td><td class=b>= Optio S12</td>
-</tr><tr><td class=r>0x12b1a</td><td>= *ist DL</td>
+</tr><tr><td class=r>0x12afc</td><td>= Optio S55</td>
 <td class='r b'>0x12d0e</td><td class=b>= Optio E50</td>
-</tr><tr><td class=r>0x12b24</td><td>= Optio S60</td>
+</tr><tr><td class=r>0x12b10</td><td>= Optio S5z</td>
 <td class='r b'>0x12d18</td><td class=b>= Optio M50</td>
-</tr><tr><td class=r>0x12b2e</td><td>= Optio S45</td>
+</tr><tr><td class=r>0x12b1a</td><td>= *ist DL</td>
 <td class='r b'>0x12d2c</td><td class=b>= Optio V20</td>
-</tr><tr><td class=r>0x12b38</td><td>= Optio S6</td>
+</tr><tr><td class=r>0x12b24</td><td>= Optio S60</td>
 <td class='r b'>0x12d40</td><td class=b>= Optio W60</td>
-</tr><tr><td class=r>0x12b4c</td><td>= Optio WPi</td>
+</tr><tr><td class=r>0x12b2e</td><td>= Optio S45</td>
 <td class='r b'>0x12d4a</td><td class=b>= Optio M60</td>
-</tr><tr><td class=r>0x12b56</td><td>= BenQ DC X600</td>
+</tr><tr><td class=r>0x12b38</td><td>= Optio S6</td>
 <td class='r b'>0x12d68</td><td class=b>= Optio E60</td>
-</tr><tr><td class=r>0x12b60</td><td>= *ist DS2</td>
+</tr><tr><td class=r>0x12b4c</td><td>= Optio WPi</td>
 <td class='r b'>0x12d72</td><td class=b>= K2000</td>
-</tr><tr><td class=r>0x12b62</td><td>= Samsung GX-1S</td>
+</tr><tr><td class=r>0x12b56</td><td>= BenQ DC X600</td>
 <td class='r b'>0x12d73</td><td class=b>= K-m</td>
-</tr><tr><td class=r>0x12b6a</td><td>= Optio A10</td>
+</tr><tr><td class=r>0x12b60</td><td>= *ist DS2</td>
 <td class='r b'>0x12d86</td><td class=b>= Optio P70</td>
-</tr><tr><td class=r>0x12b7e</td><td>= *ist DL2</td>
+</tr><tr><td class=r>0x12b62</td><td>= Samsung GX-1S</td>
 <td class='r b'>0x12d9a</td><td class=b>= Optio E70</td>
-</tr><tr><td class=r>0x12b80</td><td>= Samsung GX-1L</td>
+</tr><tr><td class=r>0x12b6a</td><td>= Optio A10</td>
 <td class='r b'>0x12dae</td><td class=b>= X70</td>
-</tr><tr><td class=r>0x12b9c</td><td>= K100D</td>
+</tr><tr><td class=r>0x12b7e</td><td>= *ist DL2</td>
 <td class='r b'>0x12db8</td><td class=b>= K-7</td>
-</tr><tr><td class=r>0x12b9d</td><td>= K110D</td>
+</tr><tr><td class=r>0x12b80</td><td>= Samsung GX-1L</td>
 <td class='r b'>0x12dcc</td><td class=b>= Optio W80</td>
+</tr><tr><td class=r>0x12b9c</td><td>= K100D</td>
+<td class='r b'>0x12dea</td><td class=b>= Optio P80</td>
+</tr><tr><td class=r>0x12b9d</td><td>= K110D</td>
+<td class='r b'>0x12df4</td><td class=b>= Optio WS80</td>
+</tr><tr><td class=r>0x12ba2</td><td>= K100D Super</td>
+<td class='r b'>0x12dfe</td><td class=b>= K-x</td>
+</tr><tr><td class=r>0x12bb0</td><td>= Optio T10/T20</td>
+<td class='r b'>&nbsp;</td><td class=b>&nbsp;</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='City'>Pentax City Values</a></h2>
@@ -995,12 +1014,16 @@ lens model.
 </tr><tr><td>'3 20'</td><td>= smc PENTAX-F 35-80mm F4-5.6</td>
 </tr><tr><td>'3 21'</td><td>= smc PENTAX-F 80-200mm F4.7-5.6</td>
 </tr><tr><td>'3 22'</td><td>= smc PENTAX-F FISH-EYE 17-28mm F3.5-4.5</td>
-</tr><tr><td>'3 23'</td><td>= smc PENTAX-F 100-300mm F4.5-5.6</td>
+</tr><tr><td>'3 23'</td><td>= smc PENTAX-F 100-300mm F4.5-5.6 or Sigma Lens</td>
+</tr><tr><td>'3 23.1'</td><td>= Sigma AF 28-300mm F3.5-5.6 DL IF</td>
+</tr><tr><td>'3 23.2'</td><td>= Sigma AF 28-300mm F3.5-6.3 DG IF Macro</td>
 </tr><tr><td>'3 24'</td><td>= smc PENTAX-F 35-135mm F3.5-4.5</td>
 </tr><tr><td>'3 25'</td><td>= smc PENTAX-F 35-105mm F4-5.6 or Sigma or Tokina Lens</td>
 </tr><tr><td>'3 25.1'</td><td>= Sigma AF 28-300mm F3.5-5.6 DL IF</td>
 </tr><tr><td>'3 25.2'</td><td>= Sigma 55-200mm F4-5.6 DC</td>
-</tr><tr><td>'3 25.3'</td><td>= Tokina 80-200mm F2.8 ATX-Pro</td>
+</tr><tr><td>'3 25.3'</td><td>= Sigma AF 28-300mm F3.5-5.6 DL IF</td>
+</tr><tr><td>'3 25.4'</td><td>= Sigma AF 28-300mm F3.5-6.3 DG IF Macro</td>
+</tr><tr><td>'3 25.5'</td><td>= Tokina 80-200mm F2.8 ATX-Pro</td>
 </tr><tr><td>'3 26'</td><td>= smc PENTAX-F* 250-600mm F5.6 ED[IF]</td>
 </tr><tr><td>'3 27'</td><td>= smc PENTAX-F 28-80mm F3.5-4.5 or Tokina Lens</td>
 </tr><tr><td>'3 27.1'</td><td>= Tokina AT-X Pro AF 28-70mm F2.6-2.8</td>
@@ -1010,8 +1033,9 @@ lens model.
 </tr><tr><td>'3 29.1'</td><td>= Sigma AF 18-125mm F3.5-5.6 DC</td>
 </tr><tr><td>'3 29.2'</td><td>= Tokina AT-X PRO 28-70mm F2.6-2.8</td>
 </tr><tr><td>'3 30'</td><td>= PENTAX-F 70-200mm F4-5.6</td>
-</tr><tr><td>'3 31'</td><td>= smc PENTAX-F 70-210mm F4-5.6 or Tokina Lens</td>
+</tr><tr><td>'3 31'</td><td>= smc PENTAX-F 70-210mm F4-5.6 or Tokina or Takumar Lens</td>
 </tr><tr><td>'3 31.1'</td><td>= Tokina AF 730 75-300mm F4.5-5.6</td>
+</tr><tr><td>'3 31.2'</td><td>= Takumar-F 70-210mm F4-5.6</td>
 </tr><tr><td>'3 32'</td><td>= smc PENTAX-F 50mm F1.4</td>
 </tr><tr><td>'3 33'</td><td>= smc PENTAX-F 50mm F1.7</td>
 </tr><tr><td>'3 34'</td><td>= smc PENTAX-F 135mm F2.8 [IF]</td>
@@ -1050,6 +1074,9 @@ lens model.
 </tr><tr><td>'3 255.4'</td><td>= Sigma DF EX Aspherical 28-70mm F2.8</td>
 </tr><tr><td>'3 255.5'</td><td>= Sigma AF Tele 400mm F5.6 Multi-coated</td>
 </tr><tr><td>'3 255.6'</td><td>= Sigma 24-60mm F2.8 EX DG</td>
+</tr><tr><td>'3 255.7'</td><td>= Sigma 70-300mm F4-5.6 Macro</td>
+</tr><tr><td>'3 255.8'</td><td>= Sigma 55-200mm F4-5.6 DC</td>
+</tr><tr><td>'3 255.9'</td><td>= Sigma 18-50mm F2.8 EX DC</td>
 </tr><tr><td>'4 1'</td><td>= smc PENTAX-FA SOFT 28mm F2.8</td>
 </tr><tr><td>'4 2'</td><td>= smc PENTAX-FA 80-320mm F4.5-5.6</td>
 </tr><tr><td>'4 3'</td><td>= smc PENTAX-FA 43mm F1.9 Limited</td>
@@ -1064,7 +1091,8 @@ lens model.
 </tr><tr><td>'4 23'</td><td>= smc PENTAX-FA 20-35mm F4 AL</td>
 </tr><tr><td>'4 24'</td><td>= smc PENTAX-FA 77mm F1.8 Limited</td>
 </tr><tr><td>'4 25'</td><td>= Tamron SP AF 14mm F2.8</td>
-</tr><tr><td>'4 26'</td><td>= smc PENTAX-FA MACRO 100mm F3.5</td>
+</tr><tr><td>'4 26'</td><td>= smc PENTAX-FA MACRO 100mm F3.5 or Cosina Lens</td>
+</tr><tr><td>'4 26.1'</td><td>= Cosina 100mm F3.5 Macro</td>
 </tr><tr><td>'4 27'</td><td>= Tamron AF 28-300mm F3.5-6.3 LD Aspherical[IF] Macro (185D/285D)</td>
 </tr><tr><td>'4 28'</td><td>= smc PENTAX-FA 35mm F2 AL</td>
 </tr><tr><td>'4 29'</td><td>= Tamron AF 28-200mm F3.8-5.6 LD Super II Macro (371D)</td>
@@ -1077,7 +1105,9 @@ lens model.
 </tr><tr><td>'4 41'</td><td>= Tamron AF 28-200mm Super Zoom F3.8-5.6 Aspherical XR [IF] Macro (A03)</td>
 </tr><tr><td>'4 43'</td><td>= smc PENTAX-FA 28-90mm F3.5-5.6</td>
 </tr><tr><td>'4 44'</td><td>= smc PENTAX-FA J 75-300mm F4.5-5.8 AL</td>
-</tr><tr><td>'4 45'</td><td>= Tamron 28-300mm F3.5-6.3 Ultra zoom XR</td>
+</tr><tr><td>'4 45'</td><td>= Tamron Lens (4 45)</td>
+</tr><tr><td>'4 45.1'</td><td>= Tamron 28-300mm F3.5-6.3 Ultra zoom XR</td>
+</tr><tr><td>'4 45.2'</td><td>= Tamron AF 28-300mm F3.5-6.3 XR Di LD Aspherical [IF] Macro</td>
 </tr><tr><td>'4 46'</td><td>= smc PENTAX-FA J 28-80mm F3.5-5.6 AL</td>
 </tr><tr><td>'4 47'</td><td>= smc PENTAX-FA J 18-35mm F4-5.6 AL</td>
 </tr><tr><td>'4 49'</td><td>= Tamron SP AF 28-75mm F2.8 XR Di (A09)</td>
@@ -1117,6 +1147,7 @@ lens model.
 </tr><tr><td>'5 14'</td><td>= smc PENTAX-FA* 250-600mm F5.6 ED[IF]</td>
 </tr><tr><td>'5 15'</td><td>= smc PENTAX-FA 28-105mm F4-5.6</td>
 </tr><tr><td>'5 16'</td><td>= smc PENTAX-FA 100-300mm F4.5-5.6</td>
+</tr><tr><td>'5 98'</td><td>= smc PENTAX-FA 100-300mm F4.5-5.6</td>
 </tr><tr><td>'6 1'</td><td>= smc PENTAX-FA* 85mm F1.4 [IF]</td>
 </tr><tr><td>'6 2'</td><td>= smc PENTAX-FA* 200mm F2.8 ED[IF]</td>
 </tr><tr><td>'6 3'</td><td>= smc PENTAX-FA* 300mm F2.8 ED[IF]</td>
@@ -1150,13 +1181,16 @@ lens model.
 </tr><tr><td>'7 242'</td><td>= smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)</td>
 </tr><tr><td>'7 243'</td><td>= smc PENTAX-DA 70mm F2.4 Limited</td>
 </tr><tr><td>'7 244'</td><td>= smc PENTAX-DA 21mm F3.2 AL Limited</td>
+</tr><tr><td>'8 226'</td><td>= smc PENTAX-DA* 55mm F1.4 SDM</td>
 </tr><tr><td>'8 227'</td><td>= smc PENTAX DA* 60-250mm F4 [IF] SDM</td>
 </tr><tr><td>'8 232'</td><td>= smc PENTAX-DA 17-70mm F4 AL [IF] SDM</td>
 </tr><tr><td>'8 234'</td><td>= smc PENTAX-DA* 300mm F4 ED [IF] SDM</td>
 </tr><tr><td>'8 235'</td><td>= smc PENTAX-DA* 200mm F2.8 ED [IF] SDM</td>
 </tr><tr><td>'8 241'</td><td>= smc PENTAX-DA* 50-135mm F2.8 ED [IF] SDM</td>
 </tr><tr><td>'8 242'</td><td>= smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM</td>
-</tr><tr><td>'8 255'</td><td>= Sigma 70-200mm F2.8 EX DG Macro HSM II</td>
+</tr><tr><td>'8 255'</td><td>= Sigma Lens (8 255)</td>
+</tr><tr><td>'8 255.1'</td><td>= Sigma 70-200mm F2.8 EX DG Macro HSM II</td>
+</tr><tr><td>'8 255.2'</td><td>= Sigma APO 150-500mm F5-6.3 DG OS HSM</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='SRInfo'>Pentax SRInfo Tags</a></h2>
@@ -1181,7 +1215,9 @@ lens model.
   <br>1 = On
   <br>4 = Off (4)
   <br>5 = On (5)
-  <br>7 = On (7)</span></td></tr>
+  <br>6 = On (Video)
+  <br>7 = On (7)
+  <br>15 = On (15)</span></td></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
 <td>SRHalfPressTime</td>
@@ -2056,7 +2092,7 @@ selected, in which case the selected AFPoint is the first reported)</span>
 <table class=inner cellspacing=1>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr><td colspan=4 class=c>[no tags known]</td></tr>
+<tr><td colspan=4 class=c><i>[no tags known]</i></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Type2'>Pentax Type2 Tags</a></h2>
@@ -2233,9 +2269,23 @@ stored as ASCII text in a format very similar to some HP models.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='AVI'>Pentax AVI Tags</a></h2>
+<p>Pentax-specific RIFF tags found in AVI videos.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'hymn'</td>
+<td>MakerNotes</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Pentax.html'>Pentax Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Aug 12, 2009</i>
+<br><i>Last revised Nov 2, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

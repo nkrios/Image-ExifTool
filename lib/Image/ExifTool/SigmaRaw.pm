@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
@@ -164,7 +164,28 @@ sub ProcessX3FProperties($$$);
     LENSFRANGE  => 'LensFocalRange',
     LENSMODEL   => {
         Name => 'LensType',
-        PrintConv => { }, # no models yet known
+        Notes => q{
+            decimal values differentiate lenses which would otherwise have the same
+            LensType, and are used by the Composite LensID tag when attempting to
+            identify the specific lens model
+        },
+        PrintConv => { #PH
+            # 0 => 'Sigma 50mm F2.8 EX Macro', (0 used for other lenses too)
+            # 8 - 18-125mm LENSARANGE@18mm=22-4
+            16 => 'Sigma 18-50mm F3.5-5.6 DC',
+            129 => 'Sigma 14mm F2.8 EX Aspherical',
+            131 => 'Sigma 17-70mm F2.8-4.5 DC Macro',
+            145 => 'Sigma Lens (145)',
+            145.1 => 'Sigma 15-30mm F3.5-4.5 EX DG Aspherical',
+            145.2 => 'Sigma 18-50mm F2.8 EX DG', #(NC)
+            145.3 => 'Sigma 20-40mm F2.8 EX DG',
+            165 => 'Sigma 70-200mm F2.8 EX', # ...but what specific model?:
+            # 70-200mm F2.8 EX APO - Original version, minimum focus distance 1.8m (1999)
+            # 70-200mm F2.8 EX DG - Adds 'digitally optimized' lens coatings to reduce flare (2005)
+            # 70-200mm F2.8 EX DG Macro (HSM) - Minimum focus distance reduced to 1m (2006)
+            # 70-200mm F2.8 EX DG Macro HSM II - Improved optical performance (2007)
+            169 => 'Sigma 18-50mm F2.8 EX DC', #(NC)
+        },
     },
     PMODE => {
         Name => 'ExposureProgram',

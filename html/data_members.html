@@ -33,6 +33,10 @@ allows them to be tested without having to check for an undefined value.</p>
 
 <tr><td>CHANGED</td><td>Number of tags changed during writing</td></tr>
 
+<tr><td>CHARSET</td><td>Lookup table for current Charset setting</td></tr>
+
+<tr><td>CHECK_WARN</td><td>Used to return CHECK_PROC warnings</td></tr>
+
 <tr><td>CUR_LANG</td><td>Hash reference for localized language lookup corresponding
     to current 'Lang' options setting.</td></tr>
 
@@ -60,6 +64,8 @@ allows them to be tested without having to check for an undefined value.</p>
 <tr><td>EDIT_DIRS</td><td>Hash of parent directories for each directory edited during
 	writing (Note: entry may exist but be undefined for top-level
 	directory!)</td></tr>
+
+<tr><td>ESCAPE_PROC</td><td>Routine for XML or HTML escaping if Escape option is set</td></tr>
 
 <tr><td>EXIF_DATA</td><td>EXIF data block (valid while reading from file)</td></tr>
 
@@ -110,8 +116,9 @@ allows them to be tested without having to check for an undefined value.</p>
     <table class='clear'><tr><td>TagInfo</td><td>-</td><td>tag information reference</td></tr>
     <tr><td>DelValue</td><td>-</td><td>list of specific values to delete</td></tr>
     <tr><td>Value</td><td>-</td><td>list of values to add</td></tr>
-    <tr valign='top'><td>IsCreating</td><td>-</td><td>must be set for the tag to be added.  otherwise just
-    	changed if it already exists</td></tr>
+    <tr valign='top'><td>IsCreating</td><td>-</td><td>must be set for the tag to be added, otherwise just
+    	changed if it already exists.  A value of 2 will create a new tag if its group already
+    	exists, but won't add a new group</td></tr>
     <tr valign='top'><td>Next</td><td>-</td><td>reference to next new value hash in linked list
         if there is more than one new value hash (for writing to different groups) for this
         tagInfo</td></tr>
@@ -120,13 +127,18 @@ allows them to be tested without having to check for an undefined value.</p>
     </table></td></tr>
 
 <tr><td>NewIPTCDigest</td><td>MD5 digest for most recently written IPTC data (undefined if IPTC doesn't
-    exist or if it was deleted</td></tr>
+    exist or if it was deleted).  Calculated only if a value of 'new' is being written/deleted
+    to/from the Photoshop:IPTCDigest tag</td></tr>
 
 <tr><td>NO_LIST</td><td>Set if List tags shouldn't be accumulated into a list</td></tr>
 
 <tr><td>NO_UNKNOWN</td><td>Don't generate unknown tags automatically even if Unknown option is set</td></tr>
 
 <tr><td>NUM_FOUND</td><td>Number of tags found</td></tr>
+
+<tr><td>OldIPTCDigest</td><td>MD5 digest for original IPTC data (undefined if IPTC didn't
+    exist).  Calculated only if a value of 'old' is being written/deleted to/from the
+    Photoshop:IPTCDigest tag</td></tr>
 
 <tr><td>OPTIONS</td><td>ExifTool options</td></tr>
 
@@ -145,7 +157,10 @@ allows them to be tested without having to check for an undefined value.</p>
 
 <tr><td>PRIORITY</td><td>Hash of tag Priority values for current tag, keyed by tag name (not tag key!)</td></tr>
 
-<tr><td>PRIORITY_DIR</td><td>Name of priority IFD (ie. the IFD for the full resolution image)</td></tr>
+<tr><td>PRIORITY_DIR</td><td>Name of priority directory (ie. the IFD for the full resolution image)</td></tr>
+
+<tr><td>PRIORITY0_DIR</td><td>Name of directory where undefined Priority tags get set to Priority 0
+    (used for IFD1 in JPEG images)</td></tr>
 
 <tr><td>PROCESSED</td><td>Reference to hash of address/directory names which were processed
     during reading and/or writing</td></tr>
@@ -156,13 +171,15 @@ allows them to be tested without having to check for an undefined value.</p>
 
 <tr><td>REQ_TAG_LOOKUP</td><td>Hash for looking up requested tags (keys are lower case tag names)</td></tr>
 
+<tr><td>SAVE_DEL_GROUP</td><td>Hash of saved DEL_GROUP entries</td></tr>
+
 <tr><td>SAVE_NEW_VALUE</td><td>Hash of new value information which was overwritten after
     a call to SaveNewValues()</td></tr>
 
 <tr><td>SET_GROUP1</td><td>Value to use for family 1 group name when new tags
     are found.  May start with a '+' sign to add to existing group name</td></tr>
 
-<tr><td>TAG_EXTRA</td><td>Hash of extra tag information for each tag.  Current extra
+<tr><td>TAG_EXTRA</td><td>Hash of extra tag information keyed by tag key.  Current extra
 information may include:
     <table class='clear'>
     <tr valign='top'><td>G1</td><td>-</td><td>dynamic family 1 group name (ie. IFD name or XMP

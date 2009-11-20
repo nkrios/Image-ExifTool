@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.27';
+$VERSION = '1.30';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -298,7 +298,12 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     EMail       => { Groups => { 2 => 'Author' } },
     Keywords    => { List => 1 },
     ModifyDate  => { Groups => { 2 => 'Time' }, %dateInfo },
-    OriginalDate=> { Name => 'DateTimeOriginal', Groups => { 2 => 'Time' }, %dateInfo },
+    OriginalDate=> {
+        Name => 'DateTimeOriginal',
+        Description => 'Date/Time Original',
+        Groups => { 2 => 'Time' },
+        %dateInfo,
+    },
     Phone       => { Name => 'PhoneNumber', Groups => { 2 => 'Author' } },
     References  => { List => 1 },
     Software    => { },
@@ -834,11 +839,6 @@ sub ReadMIEValue($$$$$)
             # read the 8-bit string
             $val = substr($$dataPt, $offset, $size);
             # (as of ExifTool 7.62, leave string values unconverted)
-            ## convert ISO 8859-1 string to UTF-8 if necessary
-            #if ($1 eq 'string' and $val =~ /[\x80-\xff]/) {
-            #    $val = Image::ExifTool::Latin2Unicode($val,'n');
-            #    $val = Image::ExifTool::Unicode2UTF8($val,'n');
-            #}
         } else {
             # convert to UTF8
             my $fmt;
@@ -887,12 +887,11 @@ sub CheckMIE($$$)
     } elsif ($format !~ /^(utf|string|undef)/ and $$valPtr =~ /\)$/) {
         return 'Units not supported';
     } else {
-        if ($format eq 'string' and $exifTool->{OPTIONS}->{Charset} eq 'Latin' and
+        if ($format eq 'string' and $exifTool->{OPTIONS}->{Charset} ne 'UTF8' and
             $$valPtr =~ /[\x80-\xff]/)
         {
-            # convert from Latin to UTF-8
-            my $val = Image::ExifTool::Latin2Unicode($$valPtr,'n');
-            $$valPtr = Image::ExifTool::Unicode2UTF8($val,'n');
+            # convert from Charset to UTF-8
+            $$valPtr = $exifTool->Charset2UTF8($$valPtr);
         }
         $err = Image::ExifTool::CheckValue($valPtr, $format, $$tagInfo{Count});
     }
@@ -1751,7 +1750,7 @@ sub ProcessMIE($$)
         # this is a new MIE document -- increment document count
         unless ($numDocs) {
             # this is a valid MIE file (unless a trailer on another file)
-            $exifTool->SetFileType() unless $exifTool->{VALUE}->{FileType};
+            $exifTool->SetFileType();
             $exifTool->{NO_LIST} = 1;   # handle lists ourself
             $exifTool->{MIE_COUNT} = { };
             undef $hasZlib;

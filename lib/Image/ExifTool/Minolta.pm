@@ -38,7 +38,7 @@ use vars qw($VERSION %minoltaLensTypes %minoltaColorMode %sonyColorMode %minolta
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.56';
+$VERSION = '1.60';
 
 # lens ID numbers (ref 3)
 # ("New" and "II" appear in brackets if original version also has this LensType)
@@ -98,11 +98,12 @@ $VERSION = '1.56';
     36 => 'Minolta AF 28-100mm F3.5-5.6 (D)',
     38 => 'Minolta AF 17-35mm F2.8-4 (D)', # (Konica Minolta, ref 13)
     39 => 'Minolta AF 28-75mm F2.8 (D)', # (Konica Minolta, ref 13)
-    40 => 'Minolta/Sony AF DT 18-70mm F3.5-5.6 (D)', # (Konica Minolta, ref 13)
+    40 => 'Minolta/Sony AF DT 18-70mm F3.5-5.6 (D) or 18-200m F3.5-6.3', # (Konica Minolta, ref 13)
+    40.1 => 'Sony AF DT 18-200mm F3.5-6.3', #11
     41 => 'Minolta/Sony AF DT 11-18mm F4.5-5.6 (D) or Tamron Lens', # (Konica Minolta, ref 13)
     41.1 => 'Tamron SP AF 11-18mm F4.5-5.6 Di II LD Aspherical IF', #JD
     42 => 'Minolta/Sony AF DT 18-200mm F3.5-6.3 (D)', # Sony added (ref 13) (Konica Minolta, ref 13)
-    43 => 'Sony 35mm F1.4 G (SAL-35F14G)', # changed from Minolta to Sony (ref 13/18)
+    43 => 'Sony 35mm F1.4 G (SAL-35F14G)', # changed from Minolta to Sony (ref 13/18) (but ref 11 shows both!)
     44 => 'Sony 50mm F1.4 (SAL-50F14)', # changed from Minolta to Sony (ref 13/18)
     45 => 'Carl Zeiss Planar T* 85mm F1.4 ZA',
     46 => 'Carl Zeiss Vario-Sonnar T* DT 16-80mm F3.5-4.5 ZA',
@@ -122,7 +123,8 @@ $VERSION = '1.56';
     128.3 => 'Tamron 80-300mm F3.5-6.3',
     128.4 => 'Tamron AF 28-200mm F3.8-5.6 XR Di Aspherical [IF] MACRO', #JD
     128.5 => 'Tamron SP AF 17-35mm F2.8-4 Di LD Aspherical IF', #JD
-    128.6 => 'Sigma AF 50-150mm f/2.8 EX DC APO HSM II', #JD
+    128.6 => 'Sigma AF 50-150mm F2.8 EX DC APO HSM II', #JD
+    128.7 => 'Sigma 10-20mm F3.5 EX DC HSM', #11 (model 202-205)
     129 => 'Tamron Lens (129)',
     129.1 => 'Tamron 200-400mm F5.6', #12
     129.2 => 'Tamron 70-300mm F4-5.6 LD', #12
@@ -175,19 +177,20 @@ $VERSION = '1.56';
     25631.1 => 'Sigma AF 50-500mm F4-6.3 EX DG APO', #JD
     25631.2 => 'Sigma AF 170-500mm F5-6.3 APO Aspherical', #JD
     25631.3 => 'Sigma AF 500mm F4.5 EX DG APO', #JD
-    25641 => 'Minolta AF 50mm F2.8 Macro',
+    25641 => 'Minolta AF 50mm F2.8 Macro or Sigma Lens',
+    25641.1 => 'Sigma 50mm F2.8 EX Macro', #11
     25651 => 'Minolta AF 600mm F4',
     25661 => 'Minolta AF 24mm F2.8',
     25721 => 'Minolta/Sony AF 500mm F8 Reflex',
     25781 => 'Minolta/Sony AF 16mm F2.8 Fisheye or Sigma Lens', # Sony added (ref 13/18)
     # 25781 => 'Sony 16mm F2.8 Fisheye (SAL-16F28)' (ref 18)
-    25781.1 => 'Sigma 8mm F4 Fisheye',
+    25781.1 => 'Sigma 8mm F4 EX [DG] Fisheye',
     25781.2 => 'Sigma 14mm F3.5',
     25781.3 => 'Sigma 15mm F2.8 Fisheye', #JD (writes 16mm to EXIF)
-    25791 => 'Minolta AF 20mm F2.8',
+    25791 => 'Minolta/Sony AF 20mm F2.8', # Sony added (ref 11)
     25811 => 'Minolta AF 100mm F2.8 Macro [New] or Sigma or Tamron Lens', # not Sony (ref 13/18)
     25811.1 => 'Sigma AF 90mm F2.8 Macro', #JD
-    25811.2 => 'Sigma AF 105mm F2.8 EX DG Macro', #JD
+    25811.2 => 'Sigma AF 105mm F2.8 EX [DG] Macro', #JD
     25811.3 => 'Sigma 180mm F5.6 Macro',
     25811.4 => 'Tamron 90mm F2.8 Macro',
     25851 => 'Beroflex 35-135mm F3.5-4.5', #16
@@ -237,10 +240,15 @@ $VERSION = '1.56';
     45741.3 => 'Tokina 300mm F2.8 x2',
     45751 => '1.4x Teleconverter', #18
     45851 => 'Tamron SP AF 300mm F2.8 LD IF', #11
+    # all M42-type lenses give a value of 65535 (and FocalLength=0, FNumber=1)
     65535 => 'T-Mount or Other Lens or no lens', #JD
     65535.1 => 'Arax MC 35mm F2.8 Tilt+Shift', #JD
     65535.2 => 'Arax MC 80mm F2.8 Tilt+Shift', #JD
     65535.3 => 'Zenitar MF 16mm F2.8 Fisheye M42', #JD
+    65535.4 => 'Samyang 500mm Mirror F8.0', #19
+    65535.5 => 'Pentacon Auto 135mm F2.8', #19
+    65535.6 => 'Pentacon Auto 29mm F2.8', #19
+    65535.7 => 'Helios 44-2 58mm F2.0', #19
 );
 
 %minoltaColorMode = (
@@ -292,6 +300,34 @@ $VERSION = '1.56';
     16 => 'Auto',
     17 => 'Night View/Portrait',
 );
+
+my %exposureIndicator = (
+    0 => 'Not Indicated',
+    1 => 'Under Scale',
+    119 => 'Bottom of Scale',
+    120 => '-2.0',
+    121 => '-1.7',
+    122 => '-1.5',
+    123 => '-1.3',
+    124 => '-1.0',
+    125 => '-0.7',
+    126 => '-0.5',
+    127 => '-0.3',
+    128 => '0',
+    129 => '+0.3',
+    130 => '+0.5',
+    131 => '+0.7',
+    132 => '+1.0',
+    133 => '+1.3',
+    134 => '+1.5',
+    135 => '+1.7',
+    136 => '+2.0',
+    253 => 'Top of Scale',
+    254 => 'Over Scale',
+);
+
+my %onOff = ( 0 => 'On', 1 => 'Off' );
+my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # Minolta tag table
 %Image::ExifTool::Minolta::Main = (
@@ -454,6 +490,10 @@ $VERSION = '1.56';
             5 => 'On',
         },
     },
+    0x0109 => { #20
+        Name => 'RawAndJpgRecording',
+        PrintConv => \%offOn,
+    },
     0x010a => {
         Name => 'ZoneMatching',
         Writable => 'int32u',
@@ -479,12 +519,22 @@ $VERSION = '1.56';
         PrintConv => \%minoltaLensTypes,
     },
     # 0x010e - WhiteBalance according to ref #10
+    0x0111 => { #20
+        Name => 'ColorCompensationFilter',
+        Writable => 'int32s',
+        Notes => 'ranges from -2 for green to +2 for magenta',
+    },
+    0x0112 => { #PH (from Sony tags, NC)
+        Name => 'WhiteBalanceFineTune',
+        Format => 'int32s',
+        Writable => 'int32u',
+    },
     0x0113 => { #PH
         Name => 'ImageStabilization',
         Condition => '$self->{Model} eq "DSLR-A100"',
         Notes => 'valid for Sony A100 only',
         Writable => 'int32u',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        PrintConv => \%offOn,
     },
     0x0114 => [
         { #8
@@ -496,7 +546,7 @@ $VERSION = '1.56';
             },
         },
         { #PH
-            Name => 'MinoltaCameraSettingsA100',
+            Name => 'CameraSettingsA100',
             Condition => '$self->{Model} eq "DSLR-A100"',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Minolta::CameraSettingsA100',
@@ -504,6 +554,22 @@ $VERSION = '1.56';
             },
         },
     ],
+    0x0115 => { #20
+        Name => 'WhiteBalance',
+        Writable => 'int32u',
+        PrintHex => 1,
+        PrintConv => {
+            0x00 => 'Auto',
+            0x01 => 'Color Temperature/Color Filter',
+            0x10 => 'Daylight',
+            0x20 => 'Cloudy',
+            0x30 => 'Shade',
+            0x40 => 'Tungsten',
+            0x50 => 'Flash',
+            0x60 => 'Fluorescent',
+            0x70 => 'Custom',
+        },
+    },
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -533,7 +599,7 @@ $VERSION = '1.56';
         models (and sometimes even between different firmware versions), so this
         information may not be as reliable as it should be.  Because of this, tags
         in the following tables are set to lower priority to prevent them from
-        superceeding the values of same-named tags in other locations when duplicate
+        superceding the values of same-named tags in other locations when duplicate
         tags are disabled.
     },
     1 => {
@@ -699,10 +765,7 @@ $VERSION = '1.56';
     },
     26 => {
         Name => 'FileNumberMemory',
-        PrintConv => {
-            0 => 'Off',
-            1 => 'On',
-        },
+        PrintConv => \%offOn,
     },
     27 => 'LastFileNumber',
     28 => {
@@ -972,7 +1035,7 @@ $VERSION = '1.56';
     },
     0x15 => {
         Name => 'Flash',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        PrintConv => \%offOn,
     },
     0x16 => { #10
         Name => 'FlashMode',
@@ -1071,7 +1134,7 @@ $VERSION = '1.56';
     },
     0x60 => {
         Name => 'NoiseReduction',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        PrintConv => \%offOn,
     },
     0x62 => {
         Name => 'ImageNumber2',
@@ -1080,11 +1143,11 @@ $VERSION = '1.56';
     },
     0x71 => {
         Name => 'ImageStabilization',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        PrintConv => \%offOn,
     },
     0x75 => {
         Name => 'ZoneMatchingOn',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        PrintConv => \%offOn,
     },
 );
 
@@ -1293,11 +1356,11 @@ $VERSION = '1.56';
     },
     0xb0 => {
         Name => 'NoiseReduction',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        PrintConv => \%offOn,
     },
     0xbd => {
         Name => 'ImageStabilization',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        PrintConv => \%offOn,
     },
 );
 
@@ -1308,7 +1371,7 @@ $VERSION = '1.56';
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     NOTES => 'Camera settings information for the Sony DSLR-A100.',
     WRITABLE => 1,
-    PRIORITY => 0,
+    PRIORITY => 0, # may not be as reliable as other information
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     FORMAT => 'int16u',
     FIRST_ENTRY => 0,
@@ -1321,16 +1384,71 @@ $VERSION = '1.56';
             2 => 'Shutter Priority',
             3 => 'Manual',
             4 => 'Auto',
+            5 => 'Program Shift A', #20
+            6 => 'Program Shift S', #20
             0x1013 => 'Portrait',
+            0x1023 => 'Sports', #20
+            0x1033 => 'Sunset', #20
+            0x1043 => 'Night View/Portrait', #20
             0x1053 => 'Landscape',
+            0x1083 => 'Macro', #20
         },
     },
     0x01 => { #15
-        Name => 'ExposureCompensation',
+        Name => 'ExposureCompensationSetting',
+        # (differs from ExposureCompensation for exposure bracketing shots, ref 20)
         ValueConv => '$val / 100 - 3',
         ValueConvInv => 'int(($val + 3) * 100 + 0.5)',
     },
-    # 0x09 some sort of APEX value (ref 15)
+    0x05 => { #20 (requires external flash)
+        Name => 'HighSpeedSync',
+        PrintConv => \%offOn,
+    },
+    0x06 => { #20
+        Name => 'ManualExposureTime',
+        Notes => 'the most recent exposure time set manually by the user',
+        ValueConv => '$val ? 2 ** ((48-$val)/8) : $val',
+        ValueConvInv => '$val ? 48 - 8*log($val)/log(2) : $val',
+        PrintConv => '$val ? Image::ExifTool::Exif::PrintExposureTime($val) : "Bulb"',
+        PrintConvInv => 'lc($val) eq "bulb" ? 0 : eval $val',
+    },
+    0x07 => { #20
+        Name => 'ManualFNumber',
+        Notes => 'the most recent aperture set manually by the user',
+        ValueConv => '2 ** (($val-8)/16)',
+        ValueConvInv => '8 + 16*log($val)/log(2)',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    0x08 => { #20
+        Name => 'ExposureTime',
+        ValueConv => '$val ? 2 ** ((48-$val)/8) : $val',
+        ValueConvInv => '$val ? 48 - 8*log($val)/log(2) : $val',
+        PrintConv => '$val ? Image::ExifTool::Exif::PrintExposureTime($val) : "Bulb"',
+        PrintConvInv => 'lc($val) eq "bulb" ? 0 : eval $val',
+    },
+    0x09 => { #15/20
+        Name => 'FNumber',
+        ValueConv => '2 ** (($val / 8 - 1) / 2)',
+        ValueConvInv => '$val>0 ? (2*log($val)/log(2)+1) * 8 : undef',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    0x0a => { #20
+        Name => 'DriveMode2',
+        PrintConv => {
+            0 => 'Self-timer 10 sec',
+            1 => 'Continuous',
+            4 => 'Self-timer 2 sec',
+            5 => 'Single Frame',
+            8 => 'White Balance Bracketing Low',
+            9 => 'White Balance Bracketing High',
+            770 => 'Single-frame Bracketing Low',
+            771 => 'Continous Bracketing Low',
+            1794 => 'Single-frame Bracketing High',
+            1795 => 'Continuous Bracketing High',
+        },
+    },
     0x0b => { #15
         Name => 'WhiteBalance',
         PrintHex => 1,
@@ -1357,7 +1475,7 @@ $VERSION = '1.56';
         },
     },
     0x0d => { #20
-        Name => 'LocalAFArea',
+        Name => 'LocalAFAreaPoint',
         PrintConv => {
             1 => 'Center',
             2 => 'Top',
@@ -1387,10 +1505,55 @@ $VERSION = '1.56';
             4 => 'Fill Flash',
         },
     },
-    # 0x12 => 'MeteringMode' (ref 15)
-    # 0x13 => 'ISO' (ref 15)
-    # 0x14 => 'ZoneMatching' (ref 15)
-    # 0x15 => 'DynamicRangeOptimizer' (ref 15)
+    0x10 => { #20
+        Name => 'FlashExposureCompSetting',
+        Description => 'Flash Exposure Comp. Setting',
+        # (may differ from FlashExposureComp for flash bracketing shots)
+        ValueConv => '$val / 100 - 3',
+        ValueConvInv => 'int(($val + 3) * 100 + 0.5)',
+    },
+    0x12 => { #15/20
+        Name => 'MeteringMode',
+        PrintConv => {
+            0 => 'Multi-segment',
+            1 => 'Center-weighted average',
+            2 => 'Spot',
+        },
+    },
+    0x13 => { #15/20
+        Name => 'ISOSetting',
+        PrintConv => {
+            0 => 'Auto',
+            48 => 100,
+            56 => 200,
+            64 => 400,
+            72 => 800,
+            80 => 1600,
+            174 => '80 (Zone Matching Low)',
+            184 => '200 (Zone Matching High)',
+        },
+    },
+    0x14 => { #15/20
+        Name => 'ZoneMatching',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Standard',
+            2 => 'Advanced',
+        },
+    },
+    0x15 => { #15/20
+        Name => 'DynamicRangeOptimizer',
+        # this and the Sony tag 0xb025 DynamicRangeOptimizer give the actual mode
+        # applied to the image. The Minolta CameraSettingsA100 0x0027 tag gives
+        # the setting. There is a longish list of scenarios in which, regardless
+        # of the latter, DRO is not applied (ref 20)
+        Notes => 'as applied to image',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Standard',
+            2 => 'Advanced',
+        },
+    },
     0x16 => { #15
         Name => 'ColorMode',
         PrintConv => {
@@ -1404,7 +1567,13 @@ $VERSION = '1.56';
             8 => 'Adobe RGB',
         },
     },
-    # 0x17 => 'ColorSpace' (ref 15)
+    0x17 => { # 15/20
+        Name => 'ColorSpace',
+        PrintConv => {
+            0 => 'sRGB',
+            5 => 'Adobe RGB',
+        },
+    },
     0x18 => { #15
         Name => 'Sharpness',
         ValueConv => '$val - 10',
@@ -1448,8 +1617,79 @@ $VERSION = '1.56';
             5 => 'White Balance Bracketing',
         },
     },
+    0x1f => { #20
+        Name => 'SelfTimerTime',
+        PrintConv => {
+            0 => '10 s',
+            4 => '2 s',
+        },
+    },
+    0x20 => { #20
+        Name => 'ContinuousBracketing',
+        PrintHex => 1,
+        PrintConv => {
+            0x303 => 'Low',
+            0x703 => 'High',
+        },
+    },
+    0x21 => { #20
+        Name => 'SingleFrameBracketing',
+        PrintHex => 1,
+        PrintConv => {
+            0x302 => 'Low',
+            0x702 => 'High',
+        },
+    },
+    0x22 => { #20
+        Name => 'WhiteBalanceBracketing',
+        PrintHex => 1,
+        PrintConv => {
+            0x08 => 'Low',
+            0x09 => 'High',
+        },
+    },
+    0x023 => { #20
+        Name => 'WhiteBalanceSetting',
+        PrintHex => 1,
+        # (not sure what bit 0x8000 indicates)
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Preset',
+            2 => 'Custom',
+            3 => 'Color Temperature/Color Filter',
+            0x8001 => 'Preset',
+            0x8002 => 'Custom',
+            0x8003 => 'Color Temperature/Color Filter',
+        },
+    },
+    0x24 => { #20
+        Name => 'PresetWhiteBalance',
+        PrintConv => {
+            1 => 'Daylight',
+            2 => 'Cloudy',
+            3 => 'Shade',
+            4 => 'Tungsten',
+            5 => 'Fluorescent',
+            6 => 'Flash',
+        },
+    },
+    0x25 => { #20
+        Name => 'ColorTemperatureSetting',
+        PrintConv => {
+            0 => 'Temperature',
+            2 => 'Color Filter',
+        },
+    },
+    0x26 => { #20
+        Name => 'CustomWBSetting',
+        PrintConv => {
+            0 => 'Setup',
+            1 => 'Recall',
+        },
+    },
     0x27 => { #20
-        Name => 'DynamicRangeOptimizer',
+        Name => 'DynamicRangeOptimizerSetting',
+        Notes => 'as set in camera',
         PrintConv => {
             0 => 'Off',
             1 => 'Standard',
@@ -1457,6 +1697,30 @@ $VERSION = '1.56';
         },
     },
     0x32 => 'FreeMemoryCardImages', #20
+    0x34 => 'CustomWBRedLevel', #20
+    0x35 => 'CustomWBGreenLevel', #20
+    0x36 => 'CustomWBBlueLevel', #20
+    0x37 => { #20
+        Name => 'CustomWBError',
+        PrintConv => {
+            0 => 'OK',
+            1 => 'Error',
+        },
+    },
+    0x38 => { #20
+        Name => 'WhiteBalanceFineTune',
+        Format => 'int16s',
+    },
+    0x39 => { #20
+        Name => 'ColorTemperature',
+        ValueConv => '$val * 100',
+        ValueConvInv => '$val / 100',
+    },
+    0x3a => { #20
+        Name => 'ColorCompensationFilter',
+        Format => 'int16s',
+        Notes => 'ranges from -2 for green to +2 for magenta',
+    },
     0x3b => { #20
         Name => 'SonyImageSize',
         PrintConv => {
@@ -1474,19 +1738,173 @@ $VERSION = '1.56';
             48 => 'Standard',
         },
     },
+    0x3d => { #20
+        Name => 'InstantPlaybackTime',
+        PrintConv => '"$val s"',
+        PrintConvInv => '$val=~s/\s*s//; $val',
+    },
+    0x3e => { #20
+        Name => 'InstantPlaybackSetup',
+        PrintConv => {
+            0 => 'Image and Information',
+            1 => 'Image Only',
+            # 2 appears to be unused
+            3 => 'Image and Histogram',
+        },
+    },
     0x3f => { #PH
         Name => 'NoiseReduction',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        PrintConv => \%offOn,
+    },
+    0x40 => { #20
+        Name => 'EyeStartAF',
+        PrintConv => \%onOff,
     },
     0x41 => { #20
         Name => 'RedEyeReduction',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        PrintConv => \%offOn,
+    },
+    0x42 => { #20
+        Name => 'FlashDefault',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Fill Flash',
+        },
+    },
+    0x43 => { #20
+        Name => 'AutoBracketOrder',
+        PrintConv => {
+            0 => '0 - +',
+            1 => '- 0 +',
+        },
+    },
+    0x44 => { #20
+        Name => 'FocusHoldButton',
+        PrintConv => {
+            0 => 'Focus Hold',
+            1 => 'DOF Preview',
+        },
+    },
+    0x45 => { #20
+        Name => 'AELButton',
+        PrintConv => {
+            0 => 'Hold',
+            1 => 'Toggle',
+            2 => 'Spot Hold',
+            3 => 'Spot Toggle',
+        },
+    },
+    0x46 => { #20
+        Name => 'ControlDialSet',
+        PrintConv => {
+            0 => 'Shutter Speed',
+            1 => 'Aperture',
+        },
     },
     0x47 => { #20
         Name => 'ExposureCompensationMode',
         PrintConv => {
             0 => 'Ambient and Flash',
             1 => 'Ambient Only',
+        },
+    },
+    0x48 => { #20
+        Name => 'AFAssist',
+        PrintConv => \%onOff,
+    },
+    0x49 => { #20
+        Name => 'CardShutterLock',
+        PrintConv => \%onOff,
+    },
+    0x4a => { #20
+        Name => 'LensShutterLock',
+        PrintConv => \%onOff,
+    },
+    0x4b => { #20
+        Name => 'AFAreaIllumination',
+        PrintConv => {
+            0 => '0.3 s',
+            1 => '0.6 s',
+            2 => 'Off',
+        },
+    },
+    0x4c => { #20
+        Name => 'MonitorDisplayOff',
+        PrintConv => {
+            0 => 'Automatic',
+            1 => 'Manual',
+        },
+    },
+    0x4d => { #20
+        Name => 'RecordDisplay',
+        PrintConv => {
+            0 => 'Auto Rotate',
+            1 => 'Horizontal',
+        },
+    },
+    0x4e => { #20
+        Name => 'PlayDisplay',
+        PrintConv => {
+            0 => 'Auto Rotate',
+            1 => 'Manual Rotate',
+        },
+    },
+    0x50 => { #20
+        Name => 'ExposureIndicator',
+        SeparateTable => 'ExposureIndicator',
+        PrintConv => \%exposureIndicator,
+    },
+    0x51 => { #20
+        Name => 'AELExposureIndicator',
+        Notes => 'also indicates exposure for next shot when bracketing',
+        SeparateTable => 'ExposureIndicator',
+        PrintConv => \%exposureIndicator,
+    },
+    0x52 => { #20
+        Name => 'ExposureBracketingIndicatorLast',
+        Notes => 'indicator for last shot when bracketing',
+        SeparateTable => 'ExposureIndicator',
+        PrintConv => \%exposureIndicator,
+    },
+    0x53 => { #20
+        Name => 'MeteringOffScaleIndicator',
+        Notes => 'two flashing triangles when under or over metering scale',
+        PrintConv => {
+            0 => 'Within Range',
+            1 => 'Under/Over Range',
+            255 => 'Out of Range',
+        },
+    },
+    0x54 => { #20
+        Name => 'FlashExposureIndicator',
+        SeparateTable => 'ExposureIndicator',
+        PrintConv => \%exposureIndicator,
+    },
+    0x55 => { #20
+        Name => 'FlashExposureIndicatorNext',
+        Notes => 'indicator for next shot when bracketing',
+        SeparateTable => 'ExposureIndicator',
+        PrintConv => \%exposureIndicator,
+    },
+    0x56 => { #20
+        Name => 'FlashExposureIndicatorLast',
+        Notes => 'indicator for last shot when bracketing',
+        SeparateTable => 'ExposureIndicator',
+        PrintConv => \%exposureIndicator,
+    },
+    0x58 => { #20
+        Name => 'FocusModeSwitch',
+        PrintConv => {
+            0 => 'AF',
+            1 => 'MF',
+        },
+    },
+    0x59 => { #20
+        Name => 'FlashType',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Built-in', # (also when built-in flash is a trigger in wireless mode)
+            2 => 'External',
         },
     },
     0x5a => { #15
@@ -1497,15 +1915,33 @@ $VERSION = '1.56';
             2 => 'Rotate 90 CW',
         },
     },
+    0x5b => { #20
+        Name => 'AELock',
+        PrintConv => \%offOn,
+    },
     0x57 => { #15
         Name => 'ImageStabilization',
         Writable => 'int32u',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        PrintConv => \%offOn,
     },
     0x5e => { #15
         Name => 'ColorTemperature',
         ValueConv => '$val * 100',
         ValueConvInv => '$val / 100',
+    },
+    0x5f => { #20
+        Name => 'ColorCompensationFilter',
+        Format => 'int16s',
+        Notes => 'ranges from -2 for green to +2 for magenta',
+    },
+    0x60 => { #20
+        Name => 'BatteryLevel',
+        PrintConv => {
+            3 => 'Very Low',
+            4 => 'Low',
+            5 => 'Half Full',
+            6 => 'Sufficient Power Remaining',
+        },
     },
 );
 

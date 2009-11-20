@@ -8,11 +8,11 @@
 <body>
 <h2 class=top>Minolta Tags</h2>
 <p>
-These tags are used by Minolta and Konica/Minolta cameras.  Minolta doesn&#39;t
-make things easy for decoders because the meaning of some tags and the
-location where some information is stored is different for different camera
-models.  (Take MinoltaQuality for example, which may be located in 5
-different places.)
+These tags are used by Minolta, Konica/Minolta as well as some Sony cameras.
+Minolta doesn&#39;t make things easy for decoders because the meaning of some
+tags and the location where some information is stored is different for
+different camera models.  (Take MinoltaQuality for example, which may be
+located in 5 different places.)
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -165,18 +165,24 @@ image stabilization is enabled)</span></span></td></tr>
 <td><span class=s>1 = Off
   <br>5 = On</span></td></tr>
 <tr>
+<td title='0x0109 = 265'>0x0109</td>
+<td>RawAndJpgRecording</td>
+<td class=c>Y</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr class=b>
 <td title='0x010a = 266'>0x010a</td>
 <td>ZoneMatching</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = ISO Setting Used
   <br>1 = High Key
   <br>2 = Low Key</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x010b = 267'>0x010b</td>
 <td>ColorTemperature</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x010c = 268'>0x010c</td>
 <td>LensType</td>
 <td class=c>int32u</td>
@@ -234,7 +240,8 @@ original version of the lens has the same LensType)</span>
   <br>36 = Minolta AF 28-100mm F3.5-5.6 (D)
   <br>38 = Minolta AF 17-35mm F2.8-4 (D)
   <br>39 = Minolta AF 28-75mm F2.8 (D)
-  <br>40 = Minolta/Sony AF DT 18-70mm F3.5-5.6 (D)
+  <br>40 = Minolta/Sony AF DT 18-70mm F3.5-5.6 (D) or 18-200m F3.5-6.3
+  <br>40.1 = Sony AF DT 18-200mm F3.5-6.3
   <br>41 = Minolta/Sony AF DT 11-18mm F4.5-5.6 (D) or Tamron Lens
   <br>41.1 = Tamron SP AF 11-18mm F4.5-5.6 Di II LD Aspherical IF
   <br>42 = Minolta/Sony AF DT 18-200mm F3.5-6.3 (D)
@@ -258,7 +265,8 @@ original version of the lens has the same LensType)</span>
   <br>128.3 = Tamron 80-300mm F3.5-6.3
   <br>128.4 = Tamron AF 28-200mm F3.8-5.6 XR Di Aspherical [IF] MACRO
   <br>128.5 = Tamron SP AF 17-35mm F2.8-4 Di LD Aspherical IF
-  <br>128.6 = Sigma AF 50-150mm f/2.8 EX DC APO HSM II
+  <br>128.6 = Sigma AF 50-150mm F2.8 EX DC APO HSM II
+  <br>128.7 = Sigma 10-20mm F3.5 EX DC HSM
   <br>129 = Tamron Lens (129)
   <br>129.1 = Tamron 200-400mm F5.6
   <br>129.2 = Tamron 70-300mm F4-5.6 LD
@@ -310,18 +318,19 @@ original version of the lens has the same LensType)</span>
   <br>25631.1 = Sigma AF 50-500mm F4-6.3 EX DG APO
   <br>25631.2 = Sigma AF 170-500mm F5-6.3 APO Aspherical
   <br>25631.3 = Sigma AF 500mm F4.5 EX DG APO
-  <br>25641 = Minolta AF 50mm F2.8 Macro
+  <br>25641 = Minolta AF 50mm F2.8 Macro or Sigma Lens
+  <br>25641.1 = Sigma 50mm F2.8 EX Macro
   <br>25651 = Minolta AF 600mm F4
   <br>25661 = Minolta AF 24mm F2.8
   <br>25721 = Minolta/Sony AF 500mm F8 Reflex
   <br>25781 = Minolta/Sony AF 16mm F2.8 Fisheye or Sigma Lens
-  <br>25781.1 = Sigma 8mm F4 Fisheye
+  <br>25781.1 = Sigma 8mm F4 EX [DG] Fisheye
   <br>25781.2 = Sigma 14mm F3.5
   <br>25781.3 = Sigma 15mm F2.8 Fisheye
-  <br>25791 = Minolta AF 20mm F2.8
+  <br>25791 = Minolta/Sony AF 20mm F2.8
   <br>25811 = Minolta AF 100mm F2.8 Macro [New] or Sigma or Tamron Lens
   <br>25811.1 = Sigma AF 90mm F2.8 Macro
-  <br>25811.2 = Sigma AF 105mm F2.8 EX DG Macro
+  <br>25811.2 = Sigma AF 105mm F2.8 EX [DG] Macro
   <br>25811.3 = Sigma 180mm F5.6 Macro
   <br>25811.4 = Tamron 90mm F2.8 Macro
   <br>25851 = Beroflex 35-135mm F3.5-4.5
@@ -374,21 +383,48 @@ original version of the lens has the same LensType)</span>
   <br>65535 = T-Mount or Other Lens or no lens
   <br>65535.1 = Arax MC 35mm F2.8 Tilt+Shift
   <br>65535.2 = Arax MC 80mm F2.8 Tilt+Shift
-  <br>65535.3 = Zenitar MF 16mm F2.8 Fisheye M42</span></td></tr>
+  <br>65535.3 = Zenitar MF 16mm F2.8 Fisheye M42
+  <br>65535.4 = Samyang 500mm Mirror F8.0
+  <br>65535.5 = Pentacon Auto 135mm F2.8
+  <br>65535.6 = Pentacon Auto 29mm F2.8
+  <br>65535.7 = Helios 44-2 58mm F2.0</span></td></tr>
+<tr>
+<td title='0x0111 = 273'>0x0111</td>
+<td>ColorCompensationFilter</td>
+<td class=c>int32s</td>
+<td><span class=s><span class=n>(ranges from -2 for green to +2 for magenta)</span></span></td></tr>
 <tr class=b>
+<td title='0x0112 = 274'>0x0112</td>
+<td>WhiteBalanceFineTune</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td title='0x0113 = 275'>0x0113</td>
 <td>ImageStabilization</td>
 <td class=c>int32u</td>
 <td><span class=s><span class=n>(valid for Sony A100 only)</span>
   <br>0 = Off
   <br>1 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0114 = 276'>0x0114</td>
 <td>MinoltaCameraSettings5D
-  <br>MinoltaCameraSettingsA100</td>
+  <br>CameraSettingsA100</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='Minolta.html#CameraSettings5D'>Minolta CameraSettings5D Tags</a>
   <br>--&gt; <a href='Minolta.html#CameraSettingsA100'>Minolta CameraSettingsA100 Tags</a></td></tr>
+<tr>
+<td title='0x0115 = 277'>0x0115</td>
+<td>WhiteBalance</td>
+<td class=c>int32u</td>
+<td><span class=s>0x0 = Auto
+  <br>0x1 = Color Temperature/Color Filter
+  <br>0x10 = Daylight
+  <br>0x20 = Cloudy
+  <br>0x30 = Shade
+  <br>0x40 = Tungsten
+  <br>0x50 = Flash
+  <br>0x60 = Fluorescent
+  <br>0x70 = Custom</span></td></tr>
 <tr class=b>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
@@ -406,7 +442,7 @@ original version of the lens has the same LensType)</span>
 models (and sometimes even between different firmware versions), so this
 information may not be as reliable as it should be.  Because of this, tags
 in the following tables are set to lower priority to prevent them from
-superceeding the values of same-named tags in other locations when duplicate
+superceding the values of same-named tags in other locations when duplicate
 tags are disabled.</p>
 <blockquote>
 <table class=frame><tr><td>
@@ -1132,13 +1168,59 @@ version)</span></span></td></tr>
   <br>0x2 = Shutter Priority
   <br>0x3 = Manual
   <br>0x4 = Auto
+  <br>0x5 = Program Shift A
+  <br>0x6 = Program Shift S
   <br>0x1013 = Portrait
-  <br>0x1053 = Landscape</span></td></tr>
+  <br>0x1023 = Sports
+  <br>0x1033 = Sunset
+  <br>0x1043 = Night View/Portrait
+  <br>0x1053 = Landscape
+  <br>0x1083 = Macro</span></td></tr>
 <tr class=b>
 <td class=r title='1 = 0x1'>1</td>
-<td>ExposureCompensation</td>
+<td>ExposureCompensationSetting</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td class=r title='5 = 0x5'>5</td>
+<td>HighSpeedSync</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr class=b>
+<td class=r title='6 = 0x6'>6</td>
+<td>ManualExposureTime</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(the most recent exposure time set manually by the user)</span></span></td></tr>
+<tr>
+<td class=r title='7 = 0x7'>7</td>
+<td>ManualFNumber</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(the most recent aperture set manually by the user)</span></span></td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>ExposureTime</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='9 = 0x9'>9</td>
+<td>FNumber</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='10 = 0xa'>10</td>
+<td>DriveMode2</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Self-timer 10 sec
+  <br>1 = Continuous
+  <br>4 = Self-timer 2 sec
+  <br>5 = Single Frame
+  <br>8 = White Balance Bracketing Low
+  <br>9 = White Balance Bracketing High
+  <br>770 = Single-frame Bracketing Low
+  <br>771 = Continous Bracketing Low
+  <br>1794 = Single-frame Bracketing High
+  <br>1795 = Continuous Bracketing High</span></td></tr>
 <tr>
 <td class=r title='11 = 0xb'>11</td>
 <td>WhiteBalance</td>
@@ -1163,7 +1245,7 @@ version)</span></span></td></tr>
   <br>6 = DMF</span></td></tr>
 <tr>
 <td class=r title='13 = 0xd'>13</td>
-<td>LocalAFArea</td>
+<td>LocalAFAreaPoint</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Center
   <br>2 = Top
@@ -1190,6 +1272,45 @@ version)</span></span></td></tr>
   <br>3 = Wireless
   <br>4 = Fill Flash</span></td></tr>
 <tr class=b>
+<td class=r title='16 = 0x10'>16</td>
+<td>FlashExposureCompSetting</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='18 = 0x12'>18</td>
+<td>MeteringMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Multi-segment
+  <br>1 = Center-weighted average
+  <br>2 = Spot</span></td></tr>
+<tr class=b>
+<td class=r title='19 = 0x13'>19</td>
+<td>ISOSetting</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Auto
+  <br>48 = 100
+  <br>56 = 200
+  <br>64 = 400
+  <br>72 = 800
+  <br>80 = 1600
+  <br>174 = 80 (Zone Matching Low)
+  <br>184 = 200 (Zone Matching High)</span></td></tr>
+<tr>
+<td class=r title='20 = 0x14'>20</td>
+<td>ZoneMatching</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = Standard
+  <br>2 = Advanced</span></td></tr>
+<tr class=b>
+<td class=r title='21 = 0x15'>21</td>
+<td>DynamicRangeOptimizer</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(as applied to image)</span>
+  <br>0 = Off
+  <br>1 = Standard
+  <br>2 = Advanced</span></td></tr>
+<tr>
 <td class=r title='22 = 0x16'>22</td>
 <td>ColorMode</td>
 <td class=c>int16u</td>
@@ -1201,6 +1322,12 @@ version)</span></span></td></tr>
   <br>5 = Night Scene
   <br>7 = B&amp;W
   <br>8 = Adobe RGB</span></td></tr>
+<tr class=b>
+<td class=r title='23 = 0x17'>23</td>
+<td>ColorSpace</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = sRGB
+  <br>5 = Adobe RGB</span></td></tr>
 <tr>
 <td class=r title='24 = 0x18'>24</td>
 <td>Sharpness</td>
@@ -1239,10 +1366,68 @@ version)</span></span></td></tr>
   <br>4 = Single-Frame Bracketing
   <br>5 = White Balance Bracketing</span></td></tr>
 <tr>
-<td class=r title='39 = 0x27'>39</td>
-<td>DynamicRangeOptimizer</td>
+<td class=r title='31 = 0x1f'>31</td>
+<td>SelfTimerTime</td>
 <td class=c>int16u</td>
-<td><span class=s>0 = Off
+<td><span class=s>0 = 10 s
+  <br>4 = 2 s</span></td></tr>
+<tr class=b>
+<td class=r title='32 = 0x20'>32</td>
+<td>ContinuousBracketing</td>
+<td class=c>int16u</td>
+<td><span class=s>0x303 = Low
+  <br>0x703 = High</span></td></tr>
+<tr>
+<td class=r title='33 = 0x21'>33</td>
+<td>SingleFrameBracketing</td>
+<td class=c>int16u</td>
+<td><span class=s>0x302 = Low
+  <br>0x702 = High</span></td></tr>
+<tr class=b>
+<td class=r title='34 = 0x22'>34</td>
+<td>WhiteBalanceBracketing</td>
+<td class=c>int16u</td>
+<td><span class=s>0x8 = Low
+  <br>0x9 = High</span></td></tr>
+<tr>
+<td class=r title='35 = 0x23'>35</td>
+<td>WhiteBalanceSetting</td>
+<td class=c>int16u</td>
+<td><span class=s>0x0 = Auto
+  <br>0x1 = Preset
+  <br>0x2 = Custom
+  <br>0x3 = Color Temperature/Color Filter
+  <br>0x8001 = Preset
+  <br>0x8002 = Custom
+  <br>0x8003 = Color Temperature/Color Filter</span></td></tr>
+<tr class=b>
+<td class=r title='36 = 0x24'>36</td>
+<td>PresetWhiteBalance</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Daylight
+  <br>2 = Cloudy
+  <br>3 = Shade
+  <br>4 = Tungsten
+  <br>5 = Fluorescent
+  <br>6 = Flash</span></td></tr>
+<tr>
+<td class=r title='37 = 0x25'>37</td>
+<td>ColorTemperatureSetting</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Temperature
+  <br>2 = Color Filter</span></td></tr>
+<tr class=b>
+<td class=r title='38 = 0x26'>38</td>
+<td>CustomWBSetting</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Setup
+  <br>1 = Recall</span></td></tr>
+<tr>
+<td class=r title='39 = 0x27'>39</td>
+<td>DynamicRangeOptimizerSetting</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(as set in camera)</span>
+  <br>0 = Off
   <br>1 = Standard
   <br>2 = Advanced</span></td></tr>
 <tr class=b>
@@ -1251,13 +1436,49 @@ version)</span></span></td></tr>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r title='52 = 0x34'>52</td>
+<td>CustomWBRedLevel</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='53 = 0x35'>53</td>
+<td>CustomWBGreenLevel</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='54 = 0x36'>54</td>
+<td>CustomWBBlueLevel</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='55 = 0x37'>55</td>
+<td>CustomWBError</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = OK
+  <br>1 = Error</span></td></tr>
+<tr>
+<td class=r title='56 = 0x38'>56</td>
+<td>WhiteBalanceFineTune</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='57 = 0x39'>57</td>
+<td>ColorTemperature</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='58 = 0x3a'>58</td>
+<td>ColorCompensationFilter</td>
+<td class=c>int16s</td>
+<td><span class=s><span class=n>(ranges from -2 for green to +2 for magenta)</span></span></td></tr>
+<tr class=b>
 <td class=r title='59 = 0x3b'>59</td>
 <td>SonyImageSize</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Standard
   <br>1 = Medium
   <br>2 = Small</span></td></tr>
-<tr class=b>
+<tr>
 <td class=r title='60 = 0x3c'>60</td>
 <td>SonyQuality</td>
 <td class=c>int16u</td>
@@ -1265,12 +1486,30 @@ version)</span></span></td></tr>
   <br>32 = Fine
   <br>34 = RAW + JPEG
   <br>48 = Standard</span></td></tr>
+<tr class=b>
+<td class=r title='61 = 0x3d'>61</td>
+<td>InstantPlaybackTime</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
 <tr>
+<td class=r title='62 = 0x3e'>62</td>
+<td>InstantPlaybackSetup</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Image and Information
+  <br>1 = Image Only
+  <br>3 = Image and Histogram</span></td></tr>
+<tr class=b>
 <td class=r title='63 = 0x3f'>63</td>
 <td>NoiseReduction</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
+<tr>
+<td class=r title='64 = 0x40'>64</td>
+<td>EyeStartAF</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = On
+  <br>1 = Off</span></td></tr>
 <tr class=b>
 <td class=r title='65 = 0x41'>65</td>
 <td>RedEyeReduction</td>
@@ -1278,30 +1517,208 @@ version)</span></span></td></tr>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr>
+<td class=r title='66 = 0x42'>66</td>
+<td>FlashDefault</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Auto
+  <br>1 = Fill Flash</span></td></tr>
+<tr class=b>
+<td class=r title='67 = 0x43'>67</td>
+<td>AutoBracketOrder</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = 0 - +
+  <br>1 = - 0 +</span></td></tr>
+<tr>
+<td class=r title='68 = 0x44'>68</td>
+<td>FocusHoldButton</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Focus Hold
+  <br>1 = DOF Preview</span></td></tr>
+<tr class=b>
+<td class=r title='69 = 0x45'>69</td>
+<td>AELButton</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Hold
+  <br>1 = Toggle
+  <br>2 = Spot Hold
+  <br>3 = Spot Toggle</span></td></tr>
+<tr>
+<td class=r title='70 = 0x46'>70</td>
+<td>ControlDialSet</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Shutter Speed
+  <br>1 = Aperture</span></td></tr>
+<tr class=b>
 <td class=r title='71 = 0x47'>71</td>
 <td>ExposureCompensationMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Ambient and Flash
   <br>1 = Ambient Only</span></td></tr>
+<tr>
+<td class=r title='72 = 0x48'>72</td>
+<td>AFAssist</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = On
+  <br>1 = Off</span></td></tr>
 <tr class=b>
+<td class=r title='73 = 0x49'>73</td>
+<td>CardShutterLock</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = On
+  <br>1 = Off</span></td></tr>
+<tr>
+<td class=r title='74 = 0x4a'>74</td>
+<td>LensShutterLock</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = On
+  <br>1 = Off</span></td></tr>
+<tr class=b>
+<td class=r title='75 = 0x4b'>75</td>
+<td>AFAreaIllumination</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = 0.3 s
+  <br>1 = 0.6 s
+  <br>2 = Off</span></td></tr>
+<tr>
+<td class=r title='76 = 0x4c'>76</td>
+<td>MonitorDisplayOff</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Automatic
+  <br>1 = Manual</span></td></tr>
+<tr class=b>
+<td class=r title='77 = 0x4d'>77</td>
+<td>RecordDisplay</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Auto Rotate
+  <br>1 = Horizontal</span></td></tr>
+<tr>
+<td class=r title='78 = 0x4e'>78</td>
+<td>PlayDisplay</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Auto Rotate
+  <br>1 = Manual Rotate</span></td></tr>
+<tr class=b>
+<td class=r title='80 = 0x50'>80</td>
+<td>ExposureIndicator</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Minolta.html#ExposureIndicator'>Minolta ExposureIndicator Values</a></td></tr>
+<tr>
+<td class=r title='81 = 0x51'>81</td>
+<td>AELExposureIndicator</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Minolta.html#ExposureIndicator'>Minolta ExposureIndicator Values</a>
+  <br><span class='n s'>(also indicates exposure for next shot when bracketing)</span></td></tr>
+<tr class=b>
+<td class=r title='82 = 0x52'>82</td>
+<td>ExposureBracketingIndicatorLast</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Minolta.html#ExposureIndicator'>Minolta ExposureIndicator Values</a>
+  <br><span class='n s'>(indicator for last shot when bracketing)</span></td></tr>
+<tr>
+<td class=r title='83 = 0x53'>83</td>
+<td>MeteringOffScaleIndicator</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(two flashing triangles when under or over metering scale)</span>
+  <br>0 = Within Range
+  <br>1 = Under/Over Range
+  <br>255 = Out of Range</span></td></tr>
+<tr class=b>
+<td class=r title='84 = 0x54'>84</td>
+<td>FlashExposureIndicator</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Minolta.html#ExposureIndicator'>Minolta ExposureIndicator Values</a></td></tr>
+<tr>
+<td class=r title='85 = 0x55'>85</td>
+<td>FlashExposureIndicatorNext</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Minolta.html#ExposureIndicator'>Minolta ExposureIndicator Values</a>
+  <br><span class='n s'>(indicator for next shot when bracketing)</span></td></tr>
+<tr class=b>
+<td class=r title='86 = 0x56'>86</td>
+<td>FlashExposureIndicatorLast</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Minolta.html#ExposureIndicator'>Minolta ExposureIndicator Values</a>
+  <br><span class='n s'>(indicator for last shot when bracketing)</span></td></tr>
+<tr>
 <td class=r title='87 = 0x57'>87</td>
 <td>ImageStabilization</td>
 <td class=c>int32u[0.5]</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
+<tr class=b>
+<td class=r title='88 = 0x58'>88</td>
+<td>FocusModeSwitch</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = AF
+  <br>1 = MF</span></td></tr>
 <tr>
+<td class=r title='89 = 0x59'>89</td>
+<td>FlashType</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = Built-in
+  <br>2 = External</span></td></tr>
+<tr class=b>
 <td class=r title='90 = 0x5a'>90</td>
 <td>Rotation</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Horizontal (Normal)
   <br>1 = Rotate 270 CW
   <br>2 = Rotate 90 CW</span></td></tr>
+<tr>
+<td class=r title='91 = 0x5b'>91</td>
+<td>AELock</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
 <tr class=b>
 <td class=r title='94 = 0x5e'>94</td>
 <td>ColorTemperature</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td class=r title='95 = 0x5f'>95</td>
+<td>ColorCompensationFilter</td>
+<td class=c>int16s</td>
+<td><span class=s><span class=n>(ranges from -2 for green to +2 for magenta)</span></span></td></tr>
+<tr class=b>
+<td class=r title='96 = 0x60'>96</td>
+<td>BatteryLevel</td>
+<td class=c>int16u</td>
+<td><span class=s>3 = Very Low
+  <br>4 = Low
+  <br>5 = Half Full
+  <br>6 = Sufficient Power Remaining</span></td></tr>
 </table></td></tr></table></blockquote>
+
+<h2><a name='ExposureIndicator'>Minolta ExposureIndicator Values</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class='inner sep' cellspacing=1>
+<tr class=h><th>Value</th><th>ExposureIndicator</th><th>Value</th><th>ExposureIndicator</th></tr>
+<tr><td class=r>0</td><td>= Not Indicated</td>
+<td class='r b'>128</td><td class=b>= 0</td>
+</tr><tr><td class=r>1</td><td>= Under Scale</td>
+<td class='r b'>129</td><td class=b>= +0.3</td>
+</tr><tr><td class=r>119</td><td>= Bottom of Scale</td>
+<td class='r b'>130</td><td class=b>= +0.5</td>
+</tr><tr><td class=r>120</td><td>= -2.0</td>
+<td class='r b'>131</td><td class=b>= +0.7</td>
+</tr><tr><td class=r>121</td><td>= -1.7</td>
+<td class='r b'>132</td><td class=b>= +1.0</td>
+</tr><tr><td class=r>122</td><td>= -1.5</td>
+<td class='r b'>133</td><td class=b>= +1.3</td>
+</tr><tr><td class=r>123</td><td>= -1.3</td>
+<td class='r b'>134</td><td class=b>= +1.5</td>
+</tr><tr><td class=r>124</td><td>= -1.0</td>
+<td class='r b'>135</td><td class=b>= +1.7</td>
+</tr><tr><td class=r>125</td><td>= -0.7</td>
+<td class='r b'>136</td><td class=b>= +2.0</td>
+</tr><tr><td class=r>126</td><td>= -0.5</td>
+<td class='r b'>253</td><td class=b>= Top of Scale</td>
+</tr><tr><td class=r>127</td><td>= -0.3</td>
+<td class='r b'>254</td><td class=b>= Over Scale</td>
+</tr></table></td></tr></table></blockquote>
 
 <h2><a name='MMA'>Minolta MMA Tags</a></h2>
 <p>This information is found in MOV videos from Minolta models such as the
@@ -1405,7 +1822,7 @@ DiMAGE X and Xt.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Aug 17, 2009</i>
+<br><i>Last revised Nov 11, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

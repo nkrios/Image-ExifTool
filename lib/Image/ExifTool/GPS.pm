@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -409,8 +409,8 @@ sub ToDMS($$;$$)
 sub ToDegrees($;$)
 {
     my ($val, $doSign) = @_;
-    # extract decimal values out of any other garbage
-    my ($d, $m, $s) = ($val =~ /((?:[+-]?)(?=\d|\.\d)\d*(?:\.\d*)?)/g);
+    # extract decimal or floating point values out of any other garbage
+    my ($d, $m, $s) = ($val =~ /((?:[+-]?)(?=\d|\.\d)\d*(?:\.\d*)?(?:[Ee][+-]\d+)?)/g);
     my $deg = ($d || 0) + (($m || 0) + ($s || 0)/60) / 60;
     # make negative if S or W coordinate
     $deg = -$deg if $doSign ? $val =~ /[^A-Z](S|W)$/i : $deg < 0;

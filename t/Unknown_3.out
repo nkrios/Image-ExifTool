@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.90
 [File, System, Image] FileName - File Name: Unknown_3_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 7.0 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:43-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:08:22 09:29:28-04:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -82,5 +82,5 @@
 [Composite, Composite, Time] SubSecDateTimeOriginal - Date/Time Original: 2005:08:10 06:24:38.331
 [Composite, Composite, Time] SubSecModifyDate - Modify Date: 2005:08:10 06:24:38.331
 [Composite, Composite, Image] ThumbnailImage - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera] FocalLength35efl - Focal Length: 200.0 mm
 [Composite, Composite, Image] LightValue - Light Value: 10.1
+[Composite, Composite, Camera] FocalLength35efl - Focal Length: 200.0 mm

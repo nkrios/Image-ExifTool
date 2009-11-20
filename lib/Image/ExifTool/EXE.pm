@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessPEResources($$);
 sub ProcessPEVersion($$);
@@ -98,7 +98,7 @@ my %resourceType = (
         Name => 'TimeStamp',
         Format => 'int32u',
         Groups => { 2 => 'Time' },
-        ValueConv => 'Image::ExifTool::ConvertUnixTime($val,"local")',
+        ValueConv => 'ConvertUnixTime($val,1)',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     10 => {

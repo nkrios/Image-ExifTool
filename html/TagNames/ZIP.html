@@ -7,7 +7,12 @@
 </head>
 <body>
 <h2 class=top>ZIP Tags</h2>
-<p>This information is extracted from ZIP archives.</p>
+<p>The following tags are extracted from ZIP archives.  ExifTool also extracts
+additional meta information from compressed documents inside some ZIP-based
+files such as DOCX, PPTX, XLSX (Office Open XML) and EIP (Capture One
+Enhanced Image Package).  The ExifTool family 3 groups may be used to
+organize the output by embedded document number (ie. the exiftool <code>-g3</code>
+option).</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -15,17 +20,17 @@
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
-<td>ZipVersion</td>
+<td>ZipRequiredVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='3 = 0x3'>3</td>
-<td>BitFlag</td>
+<td>ZipBitFlag</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='4 = 0x4'>4</td>
-<td>Compression</td>
+<td>ZipCompression</td>
 <td class=c>N</td>
 <td><span class=s>0 = None
   <br>1 = Shrunk
@@ -47,44 +52,99 @@
   <br>98 = PPMd version I, Rev 1</span></td></tr>
 <tr class=b>
 <td class=r title='5 = 0x5'>5</td>
-<td>ModifyDate</td>
+<td>ZipModifyDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='7 = 0x7'>7</td>
-<td>CRC</td>
+<td>ZipCRC</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='9 = 0x9'>9</td>
-<td>CompressedSize</td>
+<td>ZipCompressedSize</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='11 = 0xb'>11</td>
-<td>UncompressedSize</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='13 = 0xd'>13</td>
-<td>FileNameLength</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='14 = 0xe'>14</td>
-<td>ExtraFieldLength</td>
+<td>ZipUncompressedSize</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='15 = 0xf'>15</td>
+<td>ZipFileName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='GZIP'>ZIP GZIP Tags</a></h2>
+<p>These tags are extracted from GZIP (GNU ZIP) archives, but currently only
+for the first file in the archive.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>Compression</td>
+<td class=c>N</td>
+<td><span class=s>8 = Deflated</span></td></tr>
+<tr class=b>
+<td class=r title='3 = 0x3'>3</td>
+<td>Flags</td>
+<td class=c>N</td>
+<td><span class=s>Bit 0 = Text
+  <br>Bit 1 = CRC16
+  <br>Bit 2 = ExtraFields
+  <br>Bit 3 = FileName
+  <br>Bit 4 = Comment</span></td></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>ModifyDate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>ExtraFlags</td>
+<td class=c>N</td>
+<td><span class=s>0 = (none)
+  <br>2 = Maximum Compression
+  <br>4 = Fastest Algorithm</span></td></tr>
+<tr>
+<td class=r title='9 = 0x9'>9</td>
+<td>OperatingSystem</td>
+<td class=c>N</td>
+<td><span class=s>0 = FAT filesystem (MS-DOS, OS/2, NT/Win32)
+  <br>1 = Amiga
+  <br>2 = VMS (or OpenVMS)
+  <br>3 = Unix
+  <br>4 = VM/CMS
+  <br>5 = Atari TOS
+  <br>6 = HPFS filesystem (OS/2, NT)
+  <br>7 = Macintosh
+  <br>8 = Z-System
+  <br>9 = CP/M
+  <br>10 = TOPS-20
+  <br>11 = NTFS filesystem (NT)
+  <br>12 = QDOS
+  <br>13 = Acorn RISCOS
+  <br>255 = unknown</span></td></tr>
+<tr class=b>
+<td class=r title='10 = 0xa'>10</td>
 <td>ArchivedFileName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='11 = 0xb'>11</td>
+<td>Comment</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 14, 2008</i>
+<br><i>Last revised Nov 5, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

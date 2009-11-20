@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.87
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.93
 [File, System, Image] FileName - File Name: PhotoMechanic.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 3.3 kB
@@ -47,7 +47,7 @@
 [XMP, XMP-photoshop, Location] State - State: State
 [XMP, XMP-photoshop, Location] Country - Country: Country
 [XMP, XMP-photoshop, Image] Category - Category: Category
-[XMP, XMP-photoshop, Author] AuthorsPosition - Author's Position: Title
+[XMP, XMP-photoshop, Author] AuthorsPosition - Authors Position: Title
 [XMP, XMP-photoshop, Author] Credit - Credit: Credit
 [XMP, XMP-photoshop, Author] Source - Source: Source
 [XMP, XMP-photoshop, Author] CaptionWriter - Caption Writer: Writers

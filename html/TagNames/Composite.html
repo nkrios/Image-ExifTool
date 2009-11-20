@@ -20,13 +20,20 @@ information is extracted.
 <tr>
 <td>Aperture</td>
 <td class=c>N</td>
-<td>FNumber
+<td class=n>FNumber
   <br>ApertureValue</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>AutoFocus</td>
+<td class=c>N</td>
+<td class=n>Nikon:PhaseDetectAF
+  <br>Nikon:ContrastDetectAF</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
 <td>BlueBalance</td>
 <td class=c>N</td>
-<td>WB_RGGBLevels
+<td class=n>WB_RGGBLevels
   <br>WB_RGBGLevels
   <br>WB_RBGGLevels
   <br>WB_GRBGLevels
@@ -37,77 +44,92 @@ information is extracted.
   <br>WBBlueLevel
   <br>WBGreenLevel</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>CFAPattern</td>
 <td class=c>N</td>
-<td>CFARepeatPatternDim
+<td class=n>CFARepeatPatternDim
   <br>CFAPattern2</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>CircleOfConfusion</td>
 <td class=c>N</td>
-<td>ScaleFactor35efl</td>
+<td class=n>ScaleFactor35efl</td>
 <td><span class=s><span class=n>(this value may be incorrect if the image has been resized.  Calculated as
 D/1440, where D is the focal plane diagonal in mm)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>ConditionalFEC</td>
 <td class=c>N</td>
-<td>FlashExposureComp
+<td class=n>FlashExposureComp
   <br>FlashBits</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>DOF</td>
 <td class=c>N</td>
-<td>FocusDistance
-  <br>FocalLength
+<td class=n>FocalLength
   <br>Aperture
-  <br>CircleOfConfusion</td>
+  <br>CircleOfConfusion
+  <br>FocusDistance
+  <br>SubjectDistance
+  <br>ObjectDistance</td>
 <td><span class=s><span class=n>(this value may be incorrect if the image has been resized)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>DateCreated</td>
 <td class=c>N</td>
-<td>Kodak:YearCreated
+<td class=n>Kodak:YearCreated
   <br>Kodak:MonthDayCreated</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>DateTimeCreated</td>
 <td class=c>N</td>
-<td>IPTC:DateCreated
+<td class=n>IPTC:DateCreated
   <br>IPTC:TimeCreated</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>DateTimeOriginal</td>
+<td class=c>N</td>
+<td class=n>DateTimeCreated
+  <br>DateCreated
+  <br>TimeCreated</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>DateTimeOriginal</td>
 <td class=c>N</td>
-<td>DateTimeCreated
-  <br>DateCreated
-  <br>TimeCreated</td>
+<td class=n>ID3:RecordingTime
+  <br>ID3:Year
+  <br>ID3:Date
+  <br>ID3:Time</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>DigitalCreationDateTime</td>
+<td class=c>N</td>
+<td class=n>IPTC:DigitalCreationDate
+  <br>IPTC:DigitalCreationTime</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>DigitalZoom</td>
 <td class=c>N</td>
-<td>Canon:ZoomSourceWidth
+<td class=n>Canon:ZoomSourceWidth
   <br>Canon:ZoomTargetWidth
   <br>Canon:DigitalZoom</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>DriveMode</td>
 <td class=c>N</td>
-<td>ContinuousDrive
+<td class=n>ContinuousDrive
   <br>SelfTimer</td>
 <td><span class=s>0 = Continuous shooting
   <br>1 = Self-timer Operation
   <br>2 = Single-frame shooting</span></td></tr>
-<tr class=b>
-<td>Duration</td>
-<td class=c>N</td>
-<td>FLAC:SampleRate
-  <br>FLAC:Channels
-  <br>FLAC:TotalSamples</td>
-<td>&nbsp;</td></tr>
 <tr>
 <td>Duration</td>
 <td class=c>N</td>
-<td>FileSize
+<td class=n>FLAC:SampleRate
+  <br>FLAC:TotalSamples</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Duration</td>
+<td class=c>N</td>
+<td class=n>FileSize
   <br>ID3Size
   <br>MPEG:AudioBitrate
   <br>MPEG:VideoBitrate
@@ -115,16 +137,25 @@ D/1440, where D is the focal plane diagonal in mm)</span></span></td></tr>
   <br>MPEG:SampleRate
   <br>MPEG:MPEGAudioVersion</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>Duration</td>
+<td class=c>N</td>
+<td class=n>FrameRate
+  <br>FrameCount
+  <br>VideoFrameRate
+  <br>VideoFrameCount</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
 <td>Duration</td>
 <td class=c>N</td>
-<td>FrameRate
+<td class=n>AvgBytesPerSec
+  <br>FileSize
   <br>FrameCount</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>ExtenderStatus</td>
 <td class=c>N</td>
-<td>Olympus:Extender
+<td class=n>Olympus:Extender
   <br>Olympus:LensType
   <br>MaxApertureValue</td>
 <td><span class=s><span class=n>(Olympus cameras have the quirk that they may retain the extender settings
@@ -136,21 +167,21 @@ an attempt to represent the actual status of the extender.)</span>
 <tr class=b>
 <td>FOV</td>
 <td class=c>N</td>
-<td>FocalLength
+<td class=n>FocalLength
   <br>ScaleFactor35efl
   <br>FocusDistance</td>
 <td><span class=s><span class=n>(calculated for the long image dimension, this value may be incorrect for
 fisheye lenses, or if the image has been resized)</span></span></td></tr>
 <tr>
 <td>FileNumber</td>
-<td class=c>N</td>
-<td>DirectoryIndex
+<td class=c>Y</td>
+<td class=n>DirectoryIndex
   <br>FileIndex</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>FlashType</td>
 <td class=c>N</td>
-<td>FlashBits</td>
+<td class=n>FlashBits</td>
 <td><span class=s><span class=n>(may report &quot;Built-in Flash&quot; for some Canon cameras with external flash in
 manual mode)</span>
   <br>0 = Built-In Flash
@@ -158,99 +189,101 @@ manual mode)</span>
 <tr>
 <td>FocalLength35efl</td>
 <td class=c>N</td>
-<td>FocalLength
+<td class=n>FocalLength
   <br>ScaleFactor35efl</td>
 <td><span class=s><span class=n>(this value may be incorrect if the image has been resized)</span></span></td></tr>
 <tr class=b>
 <td>GPSAltitude</td>
 <td class=c>N</td>
-<td>GPS:GPSAltitude
+<td class=n>GPS:GPSAltitude
   <br>GPS:GPSAltitudeRef</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>GPSDateTime</td>
 <td class=c>N</td>
-<td>GPS:GPSDateStamp
+<td class=n>GPS:GPSDateStamp
   <br>GPS:GPSTimeStamp</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>GPSLatitude</td>
 <td class=c>N</td>
-<td>GPS:GPSLatitude
+<td class=n>GPS:GPSLatitude
   <br>GPS:GPSLatitudeRef</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>GPSLatitudeRef</td>
 <td class=c>N</td>
-<td>XMP:GPSLatitude</td>
+<td class=n>XMP:GPSLatitude</td>
 <td><span class=s>&#39;N&#39; = North
   <br>&#39;S&#39; = South</span></td></tr>
 <tr class=b>
 <td>GPSLongitude</td>
 <td class=c>N</td>
-<td>GPS:GPSLongitude
+<td class=n>GPS:GPSLongitude
   <br>GPS:GPSLongitudeRef</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>GPSLongitudeRef</td>
 <td class=c>N</td>
-<td>XMP:GPSLongitude</td>
+<td class=n>XMP:GPSLongitude</td>
 <td><span class=s>&#39;E&#39; = East
   <br>&#39;W&#39; = West</span></td></tr>
 <tr class=b>
 <td>GPSPosition</td>
 <td class=c>N</td>
-<td>GPSLatitude
+<td class=n>GPSLatitude
   <br>GPSLongitude</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>HyperfocalDistance</td>
 <td class=c>N</td>
-<td>FocalLength
+<td class=n>FocalLength
   <br>Aperture
   <br>CircleOfConfusion</td>
 <td><span class=s><span class=n>(this value may be incorrect if the image has been resized)</span></span></td></tr>
 <tr class=b>
 <td>ISO</td>
 <td class=c>N</td>
-<td>Canon:CameraISO
+<td class=n>Canon:CameraISO
   <br>Canon:BaseISO
   <br>Canon:AutoISO</td>
 <td><span class=s><span class=n>(use CameraISO if numerical, otherwise calculate as BaseISO * AutoISO / 100)</span></span></td></tr>
 <tr>
 <td>ImageHeight</td>
 <td class=c>N</td>
-<td>Main:PostScript:ImageData
+<td class=n>Main:PostScript:ImageData
   <br>PostScript:BoundingBox</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>ImageSize</td>
 <td class=c>N</td>
-<td>ImageWidth
-  <br>ImageHeight</td>
+<td class=n>ImageWidth
+  <br>ImageHeight
+  <br>ExifImageWidth
+  <br>ExifImageHeight</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>ImageWidth</td>
 <td class=c>N</td>
-<td>Main:PostScript:ImageData
+<td class=n>Main:PostScript:ImageData
   <br>PostScript:BoundingBox</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>JpgFromRaw</td>
 <td class=c>Y</td>
-<td>JpgFromRawStart
+<td class=n>JpgFromRawStart
   <br>JpgFromRawLength</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>Lens</td>
 <td class=c>N</td>
-<td>ShortFocal
+<td class=n>ShortFocal
   <br>LongFocal</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>Lens35efl</td>
 <td class=c>N</td>
-<td>ShortFocal
+<td class=n>ShortFocal
   <br>LongFocal
   <br>Lens
   <br>ScaleFactor35efl</td>
@@ -258,20 +291,21 @@ manual mode)</span>
 <tr>
 <td>LensID</td>
 <td class=c>N</td>
-<td>LensType
+<td class=n>LensType
   <br>FocalLength
   <br>MaxAperture
   <br>MaxApertureValue
   <br>ShortFocal
   <br>LongFocal
-  <br>LensModel</td>
+  <br>LensModel
+  <br>LensFocalRange</td>
 <td><span class=s><span class=n>(attempt to identify the actual lens from all lenses with a given LensType.
 Applies only to LensType values with a lookup table.  May be configured
 by adding user-defined lenses)</span></span></td></tr>
 <tr class=b>
 <td>LensID</td>
 <td class=c>N</td>
-<td>Nikon:LensIDNumber
+<td class=n>Nikon:LensIDNumber
   <br>LensFStops
   <br>MinFocalLength
   <br>MaxFocalLength
@@ -281,61 +315,67 @@ by adding user-defined lenses)</span></span></td></tr>
   <br>Nikon:LensType</td>
 <td>--&gt; <a href='Nikon.html#LensID'>Nikon LensID Values</a></td></tr>
 <tr>
+<td>LensID</td>
+<td class=c>N</td>
+<td class=n>Ricoh:LensFirmware</td>
+<td>--&gt; <a href='Ricoh.html#LensID'>Ricoh LensID Values</a></td></tr>
+<tr class=b>
 <td>LensSpec</td>
 <td class=c>N</td>
-<td>Nikon:Lens
+<td class=n>Nikon:Lens
   <br>Nikon:LensType</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LightValue</td>
 <td class=c>N</td>
-<td>Aperture
+<td class=n>Aperture
   <br>ShutterSpeed
   <br>ISO</td>
 <td><span class=s><span class=n>(calculated LV -- similar to exposure value but includes ISO speed)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>MPImage</td>
 <td class=c>N</td>
-<td>MPImageStart
+<td class=n>MPImageStart
   <br>MPImageLength
   <br>MPImageType</td>
 <td><span class=s><span class=n>(the first MPF &quot;Large Thumbnail&quot; is extracted as PreviewImage, and the rest
-of the embedded MPF images are extracted as MPImage#)</span></span></td></tr>
-<tr class=b>
+of the embedded MPF images are extracted as MPImage#.  The ExtractEmbedded
+option may be used to extract information from these embedded images.)</span></span></td></tr>
+<tr>
 <td>OriginalDecisionData</td>
 <td class=c>Y!</td>
-<td>OriginalDecisionDataOffset</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>OtherImage</td>
-<td class=c>N</td>
-<td>OtherImageStart
-  <br>OtherImageLength</td>
+<td class=n>OriginalDecisionDataOffset</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>OtherImage</td>
+<td class=c>N</td>
+<td class=n>OtherImageStart
+  <br>OtherImageLength</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>PreviewImage</td>
 <td class=c>Y</td>
-<td>PreviewImageStart
+<td class=n>PreviewImageStart
   <br>PreviewImageLength
   <br>PreviewImageValid
   <br>PreviewImageStart (1)
   <br>PreviewImageLength (1)</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>PreviewImageSize</td>
 <td class=c>N</td>
-<td>PreviewImageWidth
+<td class=n>PreviewImageWidth
   <br>PreviewImageHeight</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>PreviewImage</td>
 <td class=c>N</td>
-<td>ScreenNail</td>
+<td class=n>ScreenNail</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RedBalance</td>
 <td class=c>N</td>
-<td>WB_RGGBLevels
+<td class=n>WB_RGGBLevels
   <br>WB_RGBGLevels
   <br>WB_RBGGLevels
   <br>WB_GRBGLevels
@@ -346,23 +386,23 @@ of the embedded MPF images are extracted as MPImage#)</span></span></td></tr>
   <br>WBRedLevel
   <br>WBGreenLevel</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RedEyeReduction</td>
 <td class=c>N</td>
-<td>CanonFlashMode
+<td class=n>CanonFlashMode
   <br>FlashBits</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td>Rotation</td>
 <td class=c>N</td>
-<td>QuickTime:MatrixStructure
+<td class=n>QuickTime:MatrixStructure
   <br>QuickTime:HandlerType</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ScaleFactor35efl</td>
 <td class=c>N</td>
-<td>FocalLength
+<td class=n>FocalLength
   <br>FocalLengthIn35mmFormat
   <br>Composite:DigitalZoom
   <br>FocalPlaneDiagonal
@@ -378,55 +418,82 @@ of the embedded MPF images are extracted as MPImage#)</span></span></td></tr>
   <br>ImageWidth
   <br>ImageHeight</td>
 <td><span class=s><span class=n>(this value and any derived values may be incorrect if image has been resized)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>ShootingMode</td>
 <td class=c>N</td>
-<td>CanonExposureMode
+<td class=n>CanonExposureMode
   <br>EasyMode
   <br>BulbDuration</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ShutterCurtainHack</td>
 <td class=c>N</td>
-<td>FlashBits
+<td class=n>FlashBits
   <br>ShutterCurtainSync</td>
 <td><span class=s>0 = 1st-curtain sync
   <br>1 = 2nd-curtain sync</span></td></tr>
-<tr>
+<tr class=b>
 <td>ShutterSpeed</td>
 <td class=c>N</td>
-<td>ExposureTime
+<td class=n>ExposureTime
   <br>ShutterSpeedValue
   <br>BulbDuration</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SubSecCreateDate</td>
 <td class=c>N</td>
-<td>EXIF:CreateDate
+<td class=n>EXIF:CreateDate
   <br>SubSecTimeDigitized</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SubSecDateTimeOriginal</td>
 <td class=c>N</td>
-<td>EXIF:DateTimeOriginal
+<td class=n>EXIF:DateTimeOriginal
   <br>SubSecTimeOriginal</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SubSecModifyDate</td>
 <td class=c>N</td>
-<td>EXIF:ModifyDate
+<td class=n>EXIF:ModifyDate
   <br>SubSecTime</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ThumbnailImage</td>
 <td class=c>Y</td>
-<td>ThumbnailOffset
+<td class=n>ThumbnailOffset
   <br>ThumbnailLength</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>WB_RGBLevels</td>
+<td class=c>N</td>
+<td class=n>KDC_IFD:WhiteBalance
+  <br>WB_RGBLevelsAuto
+  <br>WB_RGBLevelsFluorescent
+  <br>WB_RGBLevelsTungsten
+  <br>WB_RGBLevelsDaylight
+  <br>WB_RGBLevels4
+  <br>WB_RGBLevels5
+  <br>WB_RGBLevelsShade</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
+<td>WB_RGBLevels</td>
+<td class=c>N</td>
+<td class=n>KodakIFD:WhiteBalance
+  <br>WB_RGBMul0
+  <br>WB_RGBMul1
+  <br>WB_RGBMul2
+  <br>WB_RGBMul3
+  <br>WB_RGBCoeffs0
+  <br>WB_RGBCoeffs1
+  <br>WB_RGBCoeffs2
+  <br>WB_RGBCoeffs3
+  <br>KodakIFD:ColorTemperature
+  <br>Kodak:WB_RGBLevels</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>WB_RGGBLevels</td>
 <td class=c>N</td>
-<td>Canon:WhiteBalance
+<td class=n>Canon:WhiteBalance
   <br>WB_RGGBLevelsAsShot
   <br>WB_RGGBLevelsAuto
   <br>WB_RGGBLevelsDaylight
@@ -442,7 +509,7 @@ of the embedded MPF images are extracted as MPImage#)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 21, 2009</i>
+<br><i>Last revised Nov 19, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -445,11 +445,22 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteLeica3', # used by the R8 and R9
-        # (starts with "LEICA\0")
-        Condition => '$$self{Make} =~ /^Leica Camera AG/',
+        # (starts with IFD)
+        Condition => '$$self{Make} =~ /^Leica Camera AG/ and $$valPt !~ /^LEICA/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Leica3',
             Start => '$valuePtr',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteLeica4', # used by the M9
+        # (M9 starts with "LEICA0\x03\0")
+        Condition => '$$self{Make} =~ /^Leica Camera AG/ and $$valPt =~ /^LEICA0/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::Leica4',
+            Start => '$valuePtr + 8',
+            Base => '$start - 8', # (yay! Leica fixed the M8 problem)
             ByteOrder => 'Unknown',
         },
     },

@@ -13,6 +13,8 @@
 #               8) Marcel Coenen private communication (DMC-FZ50)
 #               9) http://forums.dpreview.com/forums/read.asp?forum=1033&message=22756430
 #              10) http://bretteville.com/pdfs/M8Metadata_v2.pdf
+#              11) http://www.digital-leica.com/lens_codes/index.html
+#              12) Joerg - http://www.cpanforum.com/threads/11602 (LX3 firmware 2.0)
 #              JD) Jens Duttke private communication (TZ3,FZ30,FZ50)
 #------------------------------------------------------------------------------
 
@@ -23,10 +25,50 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.39';
+$VERSION = '1.44';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
+
+# Leica lens types (ref 10)
+my %leicaLensType = (
+    1 => 'Elmarit-M 21mm f/2.8',
+    3 => 'Elmarit-M 28mm f/2.8 (III)',
+    4 => 'Tele-Elmarit-M 90mm f/2.8 (II)',
+    5 => 'Summilux-M 50mm f/1.4 (II)',
+    6 => 'Summicron-M 35mm f/2 (IV)',
+    7 => 'Summicron-M 90mm f/2 (II)',
+    9 => 'Elmarit-M 135mm f/2.8 (I/II)',
+    16 => 'Tri-Elmar-M 16-18-21mm f/4 ASPH.',
+    23 => 'Summicron-M 50mm f/2 (III)',
+    24 => 'Elmarit-M 21mm f/2.8 ASPH.',
+    25 => 'Elmarit-M 24mm f/2.8 ASPH.',
+    26 => 'Summicron-M 28mm f/2 ASPH.',
+    27 => 'Elmarit-M 28mm f/2.8 (IV)',
+    28 => 'Elmarit-M 28mm f/2.8 ASPH.',
+    29 => 'Summilux-M 35mm f/1.4 ASPH.',
+    30 => 'Summicron-M 35mm f/2 ASPH.',
+    31 => 'Noctilux-M 50mm f/1',
+    32 => 'Summilux-M 50mm f/1.4 ASPH.',
+    33 => 'Summicron-M 50mm f/2 (IV, V)',
+    34 => 'Elmar-M 50mm f/2.8',
+    35 => 'Summilux-M 75mm f/1.4',
+    36 => 'Apo-Summicron-M 75mm f/2 ASPH.',
+    37 => 'Apo-Summicron-M 90mm f/2 ASPH.',
+    38 => 'Elmarit-M 90mm f/2.8',
+    39 => 'Macro-Elmar-M 90mm f/4',
+    40 => 'Macro-Adapter M',
+    42 => 'Tri-Elmar-M 28-35-50mm f/4 ASPH.',
+    43 => 'Summarit-M 35mm f/2.5',
+    44 => 'Summarit-M 50mm f/2.5',
+    45 => 'Summarit-M 75mm f/2.5',
+    46 => 'Summarit-M 90mm f/2.5',
+    47 => 'Summilux-M 21mm f/1.4 ASPH.', #11
+    48 => 'Summilux-M 24mm f/1.4 ASPH.', #11
+    49 => 'Noctilux-M 50mm f/0.95 ASPH.', #11
+    50 => 'Elmar-M 24mm f/3.8 ASPH.', #11
+    52 => 'Super-Elmar-M 18mm f/3.8 ASPH.', #PH/11
+);
 
 # conversions for ShootingMode and SceneMode
 my %shootingMode = (
@@ -72,7 +114,9 @@ my %shootingMode = (
     42 => 'Flash Burst', #PH (FZ28)
     43 => 'Pin Hole', #PH (FZ28)
     44 => 'Film Grain', #PH (FZ28)
+    45 => 'My Color', #PH (GF1)
     46 => 'Photo Frame', #PH (FS7)
+    51 => 'HDR', #12
 );
 
 %Image::ExifTool::Panasonic::Main = (
@@ -131,6 +175,7 @@ my %shootingMode = (
             2 => 'Manual',
             4 => 'Auto, Focus button', #4
             5 => 'Auto, Continuous', #4
+            # have seens 6 for GF1 - PH
         },
     },
     0x0f => [
@@ -172,6 +217,7 @@ my %shootingMode = (
             2 => 'On, Mode 1',
             3 => 'Off',
             4 => 'On, Mode 2',
+            # GF1 also has a mode 3
         },
     },
     0x1c => {
@@ -187,6 +233,7 @@ my %shootingMode = (
     0x1f => {
         Name => 'ShootingMode',
         Writable => 'int16u',
+        PrintConvColumns => 2,
         PrintConv => \%shootingMode,
     },
     0x20 => {
@@ -297,30 +344,58 @@ my %shootingMode = (
         Name => 'SequenceNumber',
         Writable => 'int32u',
     },
-    0x2c => {
-        Name => 'Contrast',
-        Flags => 'PrintHex',
-        Writable => 'int16u',
-        Priority => 0,
-        Notes => q{
-            this decoding seems to work for some models such as the LX2, FZ7, FZ8, FZ18
-            and FZ50, but may not be correct for other models such as the FX10, L1, L10
-            and LC80
+    0x2c => [
+        {
+            Name => 'ContrastMode',
+            Condition => '$$self{Model} !~ /^DMC-(FX10|G1|L1|L10|LC80|GF1)$/',
+            Flags => 'PrintHex',
+            Writable => 'int16u',
+            Notes => q{
+                this decoding seems to work for some models such as the LC1, LX2, FZ7, FZ8,
+                FZ18 and FZ50, but may not be correct for other models such as the FX10, G1, L1,
+                L10 and LC80
+            },
+            PrintConv => {
+                0 => 'Normal',
+                1 => 'Low',
+                2 => 'High',
+                # 3 - observed with LZ6 and TZ5 in Fireworks mode - PH
+                # 5 - observed with FX01 and FX40 (EXIF contrast "Normal") - PH
+                6 => 'Medium Low', #PH (FZ18)
+                7 => 'Medium High', #PH (FZ18)
+                # DMC-LC1 values:
+                0x100 => 'Low',
+                0x110 => 'Normal',
+                0x120 => 'High',
+            }
+        },{
+            Name => 'ContrastMode',
+            Condition => '$$self{Model} eq "DMC-GF1"',
+            Notes => 'these values are used by the GF1',
+            Writable => 'int16u',
+            PrintConv => {
+                0 => '-2',
+                1 => '-1',
+                2 => 'Normal',
+                3 => '+1',
+                4 => '+2',
+                # Note: Other Contrast tags will be "Normal" in any of these modes:
+                7 => 'Nature (Color Film)',
+                12 => 'Smooth (Color Film) or Pure (My Color)',
+                17 => 'Dynamic (B&W Film)',
+                22 => 'Smooth (B&W Film)',
+                27 => 'Dynamic (Color Film)',
+                32 => 'Vibrant (Color Film) or Expressive (My Color)',
+                33 => 'Elegant (My Color)',
+                37 => 'Nostalgic (Color Film)',
+                41 => 'Dynamic Art (My Color)',
+                42 => 'Retro (My Color)',
+            },
+        },{
+            Name => 'ContrastMode',
+            Writable => 'int16u',
         },
-        PrintConv => {
-            0 => 'Normal',
-            1 => 'Low',
-            2 => 'High',
-            # 3 - observed with LZ6 and TZ5 in Fireworks mode - PH
-            # 5 - observed with FX01 - PH
-            6 => 'Medium Low', #PH (FZ18)
-            7 => 'Medium High', #PH (FZ18)
-            # DMC-LC1 values:
-            0x100 => 'Low',
-            0x110 => 'Normal',
-            0x120 => 'High',
-        }
-    },
+    ],
     0x2d => {
         Name => 'NoiseReduction',
         Writable => 'int16u',
@@ -347,6 +422,7 @@ my %shootingMode = (
         Writable => 'int16u',
         PrintConv => {
             1 => 'Horizontal (normal)',
+            3 => 'Rotate 180', #PH
             6 => 'Rotate 90 CW', #PH (ref 7 gives 270 CW)
             8 => 'Rotate 270 CW', #PH (ref 7 gives 90 CW)
         },
@@ -434,7 +510,7 @@ my %shootingMode = (
             65535 => 'n/a',
         },
     },
-    0x3d => {
+    0x3d => { #PH
         Name => 'AdvancedSceneMode',
         Writable => 'int16u',
         # values for the FZ28 (SceneMode/AdvancedSceneMode, "*"=add mode name) - PH:
@@ -445,12 +521,20 @@ my %shootingMode = (
         # Macro (Close-up): 9/2=Flower, 22/1=Food, 9/3=Objects, 9/4=Creative*
         # - have seen value of 5 for TZ5 (Macro) and FS20 (Scenery and Intelligent Auto)
         #   --> I'm guessing this is "Auto" - PH
+        # - values for HDR mode (ref 12): 1=Standard, 2=Art, 3=B&W
         PrintConv => {
             1 => 'Normal',
-            2 => 'Outdoor/Illuminations/Flower',
-            3 => 'Indoor/Architecture/Objects',
+            2 => 'Outdoor/Illuminations/Flower/HDR Art',
+            3 => 'Indoor/Architecture/Objects/HDR B&W',
             4 => 'Creative',
             5 => 'Auto',
+            7 => 'Expressive', #(GF1)
+            8 => 'Retro', #(GF1)
+            9 => 'Pure', #(GF1)
+            10 => 'Elegant', #(GF1)
+            12 => 'Monochrome', #(GF1)
+            13 => 'Dynamic Art', #(GF1)
+            14 => 'Silhouette', #(GF1)
         },
     },
     0x3e => { #PH (TZ5/FS7)
@@ -550,6 +634,16 @@ my %shootingMode = (
             '3 2' => 'Stretch High',
         },
     },
+    0x5d => { #PH (GF1)
+        Name => 'IntelligentExposure',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Low',
+            2 => 'Standard',
+            3 => 'High',
+        },
+    },
     0x61 => { #PH
         Name => 'FaceRecInfo',
         SubDirectory => {
@@ -585,12 +679,14 @@ my %shootingMode = (
     0x8001 => { #7/PH/JD
         Name => 'SceneMode',
         Writable => 'int16u',
+        PrintConvColumns => 2,
         PrintConv => {
             0  => 'Off',
             %shootingMode,
         },
     },
     # 0x8002 - values: 1,2 related to focus? (PH/JD)
+    #          1 for HDR modes, 2 for Portrait (ref 12)
     # 0x8003 - values: 1,2 related to focus? (PH/JD)
     0x8004 => { #PH/JD
         Name => 'WBRedLevel',
@@ -696,39 +792,9 @@ my %shootingMode = (
         Notes => 'lower 3 bits split into a separate value for the frame selector position',
         ValueConv => '($val >> 2) . " " . ($val & 0x03)',
         ValueConvInv => 'my @a=split " ",$val; ($a[0] << 2) + ($a[1] & 0x03)',
-        PrintConv => [{
-            1 => 'Elmarit-M 21mm f/2.8',
-            3 => 'Elmarit-M 28mm f/2.8 (III)',
-            4 => 'Tele-Elmarit-M 90mm f/2.8 (II)',
-            5 => 'Summilux-M 50mm f/1.4 (II)',
-            6 => 'Summicron-M 35mm f/2 (IV)',
-            7 => 'Summicron-M 90mm f/2 (II)',
-            9 => 'Elmarit-M 135mm f/2.8 (I/II)',
-            16 => 'Tri-Elmar-M 16-18-21mm f/4 ASPH.',
-            23 => 'Summicron-M 50mm f/2 (III)',
-            24 => 'Elmarit-M 21mm f/2.8 ASPH.',
-            25 => 'Elmarit-M 24mm f/2.8 ASPH.',
-            26 => 'Summicron-M 28mm f/2 ASPH.',
-            27 => 'Elmarit-M 28mm f/2.8 (IV)',
-            28 => 'Elmarit-M 28mm f/2.8 ASPH.',
-            29 => 'Summilux-M 35mm f/1.4 ASPH.',
-            30 => 'Summicron-M 35mm f/2 ASPH.',
-            31 => 'Noctilux-M 50mm f/1',
-            32 => 'Summilux-M 50mm f/1.4 ASPH.',
-            33 => 'Summicron-M 50mm f/2 (IV, V)',
-            34 => 'Elmar-M 50mm f/2.8',
-            35 => 'Summilux-M 75mm f/1.4',
-            36 => 'Apo-Summicron-M 75mm f/2 ASPH.',
-            37 => 'Apo-Summicron-M 90mm f/2 ASPH.',
-            38 => 'Elmarit-M 90mm f/2.8',
-            39 => 'Macro-Elmar-M 90mm f/4',
-            40 => 'Macro-Adapter M',
-            42 => 'Tri-Elmar-M 28-35-50mm f/4 ASPH.',
-            43 => 'Summarit-M 35mm f/2.5',
-            44 => 'Summarit-M 50mm f/2.5',
-            45 => 'Summarit-M 75mm f/2.5',
-            46 => 'Summarit-M 90mm f/2.5',
-        },{
+        PrintConv => [
+            \%leicaLensType,
+        {
             1 => '28/90mm frame lines engaged',
             2 => '24/35mm frame lines engaged',
             3 => '50/75mm frame lines engaged',
@@ -791,6 +857,96 @@ my %shootingMode = (
     },
 );
 
+# Leica type4 maker notes (ref PH) (M9)
+%Image::ExifTool::Panasonic::Leica4 = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
+    WRITABLE => 1,
+    NOTES => 'This information is written by the M9.',
+    0x3000 => {
+        Name => 'Subdir3000',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::Subdir',
+            ByteOrder => 'Unknown',
+        },
+    },
+    0x3100 => {
+        Name => 'Subdir3100',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::Subdir',
+            ByteOrder => 'Unknown',
+        },
+    },
+    0x3400 => {
+        Name => 'Subdir3400',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::Subdir',
+            ByteOrder => 'Unknown',
+        },
+    },
+    0x3900 => {
+        Name => 'Subdir3900',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::Subdir',
+            ByteOrder => 'Unknown',
+        },
+    },
+);
+
+# Leica M9 SubDirectory tags (ref PH)
+%Image::ExifTool::Panasonic::Subdir = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
+    TAG_PREFIX => 'Leica_Subdir',
+    WRITABLE => 1,
+    0x3038 => {
+        Name => 'UserProfile', # (guess)
+        Writable => 'string',
+    },
+    # 0x3104 body-dependent string ("00012905000000") (not serial number)
+    # 0x3105 body-dependent string ("00012905000000")
+    0x3109 => {
+        Name => 'FirmwareVersion',
+        Writable => 'string',
+    },
+    # 0x3032 - some sort of RGB coefficients?  (zeros when manual WB)
+    # 0x3033 - WhiteBalance (0=Auto, 4=Manual)
+    0x3036 => {
+        Name => 'WB_RGBLevels',
+        Writable => 'rational64u',
+        Count => 3,
+    },
+    # 0x3103 - string ("*******")
+    # 0x3107 - body-dependent string ("4H205800116800") (not serial number)
+    0x312b => {
+        Name => 'SensorWidth',
+        Writable => 'int32u',
+    },
+    0x312c => {
+        Name => 'SensorHeight',
+        Writable => 'int32u',
+    },
+    # 0x3402 - int32s (camera temperature?)
+    0x3405 => {
+        Name => 'LensType',
+        Writable => 'int32u',
+        # (assuming the frame selector is the same as the M8)
+        Notes => 'lower 3 bits split into a separate value for the frame selector position',
+        ValueConv => '($val >> 2) . " " . ($val & 0x03)',
+        ValueConvInv => 'my @a=split " ",$val; ($a[0] << 2) + ($a[1] & 0x03)',
+        PrintConv => [
+            \%leicaLensType,
+        {
+            1 => '28/90mm frame lines engaged',
+            2 => '24/35mm frame lines engaged',
+            3 => '50/75mm frame lines engaged',
+        }],
+    },
+    # 0x3406 - rational64u (approximate FNumber?)
+);
+
 # Type 2 tags (ref PH)
 %Image::ExifTool::Panasonic::Type2 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -819,7 +975,7 @@ my %shootingMode = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     WRITABLE => 1,
     FORMAT => 'int16u',
-    FIRST_ENTRY => 1,
+    FIRST_ENTRY => 0,
     DATAMEMBER => [ 0 ],
     NOTES => 'Face detection position information.',
     0 => {
@@ -871,7 +1027,7 @@ my %shootingMode = (
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     WRITABLE => 1,
-    FIRST_ENTRY => 1,
+    FIRST_ENTRY => 0,
     DATAMEMBER => [ 0 ],
     NOTES => q{
         Tags written by cameras with facial recognition.  These cameras not only
@@ -982,6 +1138,8 @@ under the same terms as Perl itself.
 =item L<http://homepage3.nifty.com/kamisaka/makernote/makernote_pana.htm>
 
 =item L<http://bretteville.com/pdfs/M8Metadata_v2.pdf>
+
+=item L<http://www.digital-leica.com/lens_codes/index.html>
 
 =item (...plus lots of testing with store demos and my wife's DMC-FS7!)
 

@@ -10,7 +10,7 @@ package Image::ExifTool::Lang::nl;
 
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 %Image::ExifTool::Lang::nl::Translate = (
    'AEBAutoCancel' => {
@@ -98,7 +98,7 @@ $VERSION = '1.02';
    'AFAreaMode' => {
       Description => 'AF-veldstand',
       PrintConv => {
-        'Auto-area AF' => 'Automatischveld AF',
+        'Auto-area' => 'Automatischveld AF',
         'Dynamic Area' => 'Dynamisch veld',
         'Single Area' => 'Enkelveld',
       },
@@ -112,13 +112,6 @@ $VERSION = '1.02';
       },
     },
    'AFAssist' => {
-      Description => 'AF-hulpverlichting',
-      PrintConv => {
-        'Off' => 'Uit',
-        'On' => 'Aan',
-      },
-    },
-   'AFAssistIlluminator' => {
       Description => 'AF-hulpverlichting',
       PrintConv => {
         'Off' => 'Uit',
@@ -2512,11 +2505,11 @@ $VERSION = '1.02';
    'SampleFormat' => {
       Description => 'Sample Formaat',
       PrintConv => {
-        'Complex integer' => 'Complexe integer',
-        'IEEE floating point' => 'Drijvende komma waarde',
-        'Two\'s complement signed integer' => 'Integer met voorteken',
+        'Complex int' => 'Complexe integer',
+        'Float' => 'Drijvende komma waarde',
+        'Signed' => 'Integer met voorteken',
         'Undefined' => 'Niet gedefinierd',
-        'Unsigned integer' => 'Integer zonder voorteken',
+        'Unsigned' => 'Integer zonder voorteken',
       },
     },
    'SamplesPerPixel' => 'Aantal van de componenten',

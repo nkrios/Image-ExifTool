@@ -242,7 +242,7 @@ necessarily correspond to the camera body number -- this needs to be checked)</s
 <td>DynamicRangeSetting</td>
 <td class=c>int16u</td>
 <td><span class=s>0x0 = Auto (100-400%)
-  <br>0x1 = RAW
+  <br>0x1 = Manual
   <br>0x100 = Standard (100%)
   <br>0x200 = Wide1 (230%)
   <br>0x201 = Wide2 (400%)
@@ -298,6 +298,11 @@ detected)</span></span></td></tr>
 <td>FrameNumber</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0xb211 = 45585'>0xb211</td>
+<td>Parallax</td>
+<td class=c>rational64s</td>
+<td><span class=s><span class=n>(only found in MPImage2 of .MPO images)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='RAF'>FujiFilm RAF Tags</a></h2>
@@ -334,7 +339,7 @@ RAF-format information.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 15, 2009</i>
+<br><i>Last revised Nov 13, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

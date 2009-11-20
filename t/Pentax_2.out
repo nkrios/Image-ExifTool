@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
 [File, System, Image] FileName - File Name: Pentax.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 2.7 kB
@@ -184,7 +184,7 @@
 [MakerNotes, Pentax, Camera] 531 - WB RGGB Levels Fluorescent W: 13088 8192 8192 12206
 [MakerNotes, Pentax, Camera] 532 - WB RGGB Levels Flash: 13632 8192 8192 8601
 [MakerNotes, Pentax, Camera] 0 - Pentax Model ID: K10D
-[MakerNotes, Pentax, Camera] 1 - Manufacture Date: 2007:09:13
+[MakerNotes, Pentax, Time] 1 - Manufacture Date: 2007:09:13
 [MakerNotes, Pentax, Camera] 2 - Production Code: 2.1
 [MakerNotes, Pentax, Camera] 4 - Internal Serial Number: 132352
 [MakerNotes, Pentax, Camera] 0 - Power Source: Body Battery

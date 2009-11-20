@@ -9,7 +9,8 @@
 <h2 class=top>DNG Tags</h2>
 <p>
 The main DNG tags are found in the EXIF table.  The tables below define only
-information found within structures of these main DNG tag values.
+information found within structures of these main DNG tag values.  See
+<a href="http://www.adobe.com/products/dng/">http://www.adobe.com/products/dng/</a> for the official DNG specification.
 </p>
 <h2><a name='AdobeData'>DNG AdobeData Tags</a></h2>
 <p>This information is found in the &quot;Adobe&quot; DNGPrivateData.</p>
@@ -18,9 +19,9 @@ information found within structures of these main DNG tag values.
 have been lost by the Adobe DNG Converter.  This is because the Adobe DNG
 Converter (as of version 4.3) doesn&#39;t properly handle information referenced
 from inside the maker notes that lies outside the original maker notes
-block, and this information is lost when only the maker note block is copied
-to the DNG image.   While this isn&#39;t a big problem for most camera makes, it
-is serious for some makes like Olympus.</p>
+block.  This information is lost when only the maker note block is copied to
+the DNG image.   While this doesn&#39;t effect all makes of cameras, it is a
+problem for some major brands such as Olympus and Sony.</p>
 
 <p>Other entries in this table represent proprietary information that is
 extracted from the original RAW image and restructured to a different (but
@@ -89,6 +90,7 @@ still proprietary) Adobe format.</p>
   <br>MakerNoteLeica
   <br>MakerNoteLeica2
   <br>MakerNoteLeica3
+  <br>MakerNoteLeica4
   <br>MakerNotePanasonic
   <br>MakerNotePanasonic2
   <br>MakerNotePentax
@@ -109,7 +111,7 @@ still proprietary) Adobe format.</p>
   <br>MakerNoteSony4
   <br>MakerNoteSonySRF
   <br>MakerNoteUnknown</td>
-<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
 <td>--&gt; <a href='Canon.html'>Canon Tags</a>
   <br>--&gt; <a href='Casio.html'>Casio Tags</a>
   <br>--&gt; <a href='Casio.html#Type2'>Casio Type2 Tags</a>
@@ -147,6 +149,7 @@ still proprietary) Adobe format.</p>
   <br>--&gt; <a href='Panasonic.html'>Panasonic Tags</a>
   <br>--&gt; <a href='Panasonic.html#Leica2'>Panasonic Leica2 Tags</a>
   <br>--&gt; <a href='Panasonic.html#Leica3'>Panasonic Leica3 Tags</a>
+  <br>--&gt; <a href='Panasonic.html#Leica4'>Panasonic Leica4 Tags</a>
   <br>--&gt; <a href='Panasonic.html'>Panasonic Tags</a>
   <br>--&gt; <a href='Panasonic.html#Type2'>Panasonic Type2 Tags</a>
   <br>--&gt; <a href='Pentax.html'>Pentax Tags</a>
@@ -236,7 +239,7 @@ information.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 8, 2009</i>
+<br><i>Last revised Oct 29, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

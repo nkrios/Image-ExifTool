@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 sub ProcessJpeg2000Box($$$);
 
@@ -60,7 +60,7 @@ my %uuid = (
   # 'UUID-GeoJP2' => "\xb1\x4b\xf8\xbd\x08\x3d\x4b\x43\xa5\xae\x8c\xd7\xd5\xa6\xce\x03",
 );
 
-# JPEG 2000 "box" (ie. segment) names
+# JPEG 2000 "box" (ie. atom) names
 %Image::ExifTool::Jpeg2000::Main = (
     GROUPS => { 2 => 'Image' },
     PROCESS_PROC => \&ProcessJpeg2000Box,
@@ -72,7 +72,10 @@ my %uuid = (
    'jP  ' => 'JP2Signature', # (ref 1)
    "jP\x1a\x1a" => 'JP2Signature', # (ref 2)
     prfl => 'Profile',
-    ftyp => { Name => 'FileType', Priority => 0 },
+    ftyp => {
+        Name => 'FileType',
+        SubDirectory => { TagTable => 'Image::ExifTool::Jpeg2000::FileType' },
+    },
     rreq => 'ReaderRequirements',
     jp2h => {
         Name => 'JP2Header',
@@ -274,6 +277,34 @@ my %uuid = (
             7 => 'JPEG 2000',
             8 => 'JBIG2',
         },
+    },
+);
+
+# (ref fcd15444-1/2/6.pdf)
+# (also see http://developer.apple.com/mac/library/documentation/QuickTime/QTFF/QTFFChap1/qtff1.html)
+%Image::ExifTool::Jpeg2000::FileType = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    FORMAT => 'int32u',
+    0 => {
+        Name => 'MajorBrand',
+        Format => 'undef[4]',
+        PrintConv => {
+            'jp2 ' => 'JPEG 2000 Image (.JP2)',           # image/jp2
+            'jpm ' => 'JPEG 2000 Compound Image (.JPM)',  # image/jpm
+            'jpx ' => 'JPEG 2000 with extensions (.JPX)', # image/jpx
+        },
+    },
+    1 => {
+        Name => 'MinorVersion',
+        Format => 'undef[4]',
+        ValueConv => 'sprintf("%x.%x.%x", unpack("nCC", $val))',
+    },
+    2 => {
+        Name => 'CompatibleBrands',
+        Format => 'undef[$size-8]',
+        # ignore any entry with a null, and return others as a list
+        ValueConv => 'my @a=($val=~/.{4}/sg); @a=grep(!/\0/,@a); \@a', 
     },
 );
 
@@ -570,7 +601,14 @@ sub ProcessJP2($$)
         my %addDirs = %{$$exifTool{ADD_DIRS}};
         $$exifTool{AddJp2Dirs} = \%addDirs;
     } else {
-        $exifTool->SetFileType();
+        my ($buff, $fileType);
+        # recognize JPX and JPM as unique types of JP2
+        if ($raf->Read($buff, 12) == 12 and $buff =~ /^.{4}ftyp(.{4})/s) {
+            $fileType = 'JPX' if $1 eq 'jpx ';
+            $fileType = 'JPM' if $1 eq 'jpm ';
+        }
+        $raf->Seek(-length($buff), 1) if defined $buff;
+        $exifTool->SetFileType($fileType);
     }
     SetByteOrder('MM'); # JPEG 2000 files are big-endian
     my %dirInfo = (

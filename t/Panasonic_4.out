@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.96
 [File, System, Image] FileName - File Name: Panasonic.rw2
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 12 kB
@@ -112,7 +112,7 @@
 [MakerNotes, Panasonic, Camera] 41 - Time Since Power On: 00:10:33.08
 [MakerNotes, Panasonic, Camera] 42 - Burst Mode: Off
 [MakerNotes, Panasonic, Camera] 43 - Sequence Number: 0
-[MakerNotes, Panasonic, Camera] 44 - Contrast: Normal
+[MakerNotes, Panasonic, Camera] 44 - Contrast Mode: Normal
 [MakerNotes, Panasonic, Camera] 45 - Noise Reduction: Standard
 [MakerNotes, Panasonic, Camera] 46 - Self Timer: Off
 [MakerNotes, Panasonic, Camera] 48 - Rotation: Horizontal (normal)

@@ -17,7 +17,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.11';
+$VERSION = '1.13';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -608,7 +608,7 @@ sub ProcessExtendedContentDescription($$$)
         my $nameLen = unpack("x${pos}v", $$dataPt);
         $pos += 2;
         return 0 if $pos + $nameLen + 4 > $dirLen;
-        my $tag = Image::ExifTool::Unicode2Latin(substr($$dataPt,$pos,$nameLen),'v');
+        my $tag = Image::ExifTool::Unicode2Charset(undef,substr($$dataPt,$pos,$nameLen),'II','Latin');
         $tag =~ s/^WM\///; # remove leading "WM/"
         $pos += $nameLen;
         my ($dType, $dLen) = unpack("x${pos}v2", $$dataPt);
@@ -704,7 +704,7 @@ sub ProcessMetadata($$$)
         my ($index, $stream, $nameLen, $dType, $dLen) = unpack("x${pos}v4V", $$dataPt);
         $pos += 12;
         return 0 if $pos + $nameLen + $dLen > $dirLen;
-        my $tag = Image::ExifTool::Unicode2Latin(substr($$dataPt,$pos,$nameLen),'v');
+        my $tag = Image::ExifTool::Unicode2Charset(undef,substr($$dataPt,$pos,$nameLen),'II','Latin');
         my $val = ReadASF($exifTool,$dataPt,$pos+$nameLen,$dType,$dLen);
         $exifTool->HandleTag($tagTablePtr, $tag, $val,
             DataPt => $dataPt,
@@ -749,7 +749,18 @@ sub ProcessASF($$;$)
             last;
         }
         if ($size > 0x7fffffff) {
-            $err = 'Large ASF objects not supported';
+            if ($size > 0x7fffffff * 4294967296) {
+                $err = 'Invalid ASF object size';
+            } elsif ($exifTool->Options('LargeFileSupport')) {
+                if ($raf->Seek($size, 1)) {
+                    $exifTool->VPrint(0, "  Skipped large ASF object ($size bytes)\n");
+                    $pos += $size;
+                    next;
+                }
+                $err = 'Error seeking past large ASF object';
+            } else {
+                $err = 'Large ASF objects not supported (LargeFileSupport not set)';
+            }
             last;
         }
         # go back to parent tag table if done with previous children

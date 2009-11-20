@@ -1154,11 +1154,11 @@ $VERSION = '1.02';
    'SampleFormat' => {
       Description => 'Formát vzorku',
       PrintConv => {
-        'Complex integer' => 'Komplexní číslo',
-        'IEEE floating point' => 'Desetinná čárka',
-        'Two\'s complement signed integer' => 'Záporné číslo',
+        'Complex int' => 'Komplexní číslo',
+        'Float' => 'Desetinná čárka',
+        'Signed' => 'Záporné číslo',
         'Undefined' => 'Nedefinované',
-        'Unsigned integer' => 'Kladné číslo',
+        'Unsigned' => 'Kladné číslo',
       },
     },
    'SamplesPerPixel' => 'Počet složek',

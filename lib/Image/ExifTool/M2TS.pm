@@ -31,7 +31,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 # program map table "stream_type" lookup (ref 6/1)
 my %streamType = (
@@ -138,6 +138,7 @@ my %noSyntax = (
     VARS => { NO_ID => 1 },
     NOTES => 'Tags extracted from H.264 video streams.',
     DateTimeOriginal => {
+        Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
         PrintConv => '$self->ConvertDateTime($val)',
     },
@@ -158,6 +159,7 @@ my %noSyntax = (
         },
     },
     AudioBitrate => {
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 32000,
             1 => 40000,
@@ -198,7 +200,6 @@ my %noSyntax = (
             49 => '576000 max',
             50 => '640000 max',
         },
-        PrintConvColumns => 2,
     },
     SurroundMode => {
         PrintConv => {
@@ -208,6 +209,7 @@ my %noSyntax = (
         },
     },
     AudioChannels => {
+        PrintConvColumns => 2,
         PrintConv => {
             0 => '1 + 1',
             1 => 1,
@@ -224,7 +226,6 @@ my %noSyntax = (
             12 => '5 max',
             13 => '6 max',
         },
-        PrintConvColumns => 2,
     },
 );
 

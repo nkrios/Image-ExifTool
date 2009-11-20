@@ -10,7 +10,7 @@ package Image::ExifTool::Lang::fr;
 
 use vars qw($VERSION);
 
-$VERSION = '1.09';
+$VERSION = '1.12';
 
 %Image::ExifTool::Lang::fr::Translate = (
    'AEAperture' => 'Ouverture AE',
@@ -105,12 +105,6 @@ $VERSION = '1.09';
         'Does not emit' => 'Désactivé',
         'Emits' => 'Activé',
         'Only ext. flash emits' => 'Uniquement par flash ext.',
-      },
-    },
-   'AFAssistIlluminator' => {
-      PrintConv => {
-        'Off' => 'Désactivé',
-        'On' => 'Activé',
       },
     },
    'AFDefocus' => 'Défocalisation AF',
@@ -3006,6 +3000,13 @@ $VERSION = '1.09';
     },
    'PentaxModelID' => 'Modèle Pentax',
    'PentaxVersion' => 'Version Pentax',
+   'PeripheralLighting' => {
+      Description => 'Correction éclairage périphérique',
+      PrintConv => {
+        'Off' => 'Désactiver',
+        'On' => 'Activer',
+      },
+    },
    'PersonInImage' => 'Personnage sur l\'Image',
    'PhotoEffect' => {
       PrintConv => {
@@ -3554,11 +3555,11 @@ $VERSION = '1.09';
    'SampleFormat' => {
       Description => 'Format d\'échantillon',
       PrintConv => {
-        'Complex integer' => 'Entier complexe',
-        'IEEE floating point' => 'Réel à virgule flottante',
-        'Two\'s complement signed integer' => 'Entier signé',
+        'Complex int' => 'Entier complexe',
+        'Float' => 'Réel à virgule flottante',
+        'Signed' => 'Entier signé',
         'Undefined' => 'Non défini',
-        'Unsigned integer' => 'Entier non signé',
+        'Unsigned' => 'Entier non signé',
       },
     },
    'SampleStructure' => {
@@ -3662,7 +3663,9 @@ $VERSION = '1.09';
    'SelectableAFPoint' => {
       Description => 'Collimateurs AF sélectionnables',
       PrintConv => {
+        '11 points' => '11 collimateurs',
         '19 points' => '19 collimateurs',
+        '45 points' => '45 collimateurs',
         'Inner 9 points' => '9 collimateurs centraux',
         'Outer 9 points' => '9 collimateurs périphériques',
       },

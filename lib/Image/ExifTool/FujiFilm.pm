@@ -23,7 +23,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.23';
+$VERSION = '1.25';
 
 sub ProcessFujiDir($$$);
 
@@ -345,7 +345,7 @@ my %testedRAF = (
         PrintHex => 1,
         PrintConv => {
             0x000 => 'Auto (100-400%)',
-            0x001 => 'RAW',
+            0x001 => 'Manual', #(ref http://forum.photome.de/viewtopic.php?f=2&t=353)
             0x100 => 'Standard (100%)',
             0x200 => 'Wide1 (230%)',
             0x201 => 'Wide2 (400%)',
@@ -402,6 +402,13 @@ my %testedRAF = (
         Name => 'FrameNumber',
         Writable => 'int16u',
     },
+    0xb211 => { #PH
+        Name => 'Parallax',
+        # (value set in camera is -0.5 times this value in MPImage2... why?)
+        Writable => 'rational64s',
+        Notes => 'only found in MPImage2 of .MPO images',
+    },
+    # 0xb212 - also found in MPIMage2 images - PH
 );
 
 # tags in RAF images (ref 5)

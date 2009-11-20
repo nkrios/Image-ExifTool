@@ -32,7 +32,7 @@ ExifTool.</p>
 <p>In Windows, there is a choice of two different versions of ExifTool to
 install.  The Perl distribution requires Perl to be installed on your system.
 (A good, free Perl interpreter can be downloaded from
-<a href="http://www.activeperl.com/Products/ActivePerl/">activeperl.com</a>.)</p>
+<a href="http://www.activestate.com/activeperl/">activeperl.com</a>.)</p>
 <p>If you don't already have Perl, it is easier to install the stand-alone ExifTool
 executable, but note that the stand-alone version doesn't include the HTML
 documentation or some other files of the full distribution.</p>
@@ -56,23 +56,28 @@ following steps:</p>
 (or any other directory in your PATH).</li>
 </ol>
 <p>You can now run exiftool by typing "<code>exiftool</code>" at the command
-prompt.</p>
-<p><span class='lt'>(Note: Occasionally compile errors have been reported when
-running this version of exiftool for this first time.  If this happens, follow the
-Uninstalling instructions below then re-download and re-install exiftool.)</span></p>
+prompt.  (To get to the command prompt, select "Run..." from the Windows "Start"
+menu, then type "<code>cmd</code>" and press Return.)</p>
+<p><span class='lt'>(Note: Occasionally users have reported that exiftool gives
+errors when running this version for this first time.  It is possible this may
+happen if a file gets corrupted during the download/installation process. In
+this case, follow the Uninstalling instructions below then re-install exiftool. 
+Be sure that you have sufficient disk space in your TEMP directory for exiftool
+to unpack the required files.)</span></p>
 <p><b>Uninstalling:</b></p>
 <ol type='i'>
 <li>Drag "<code>exiftool(-k).exe</code>" (or "<code>C:\WINDOWS\exiftool.exe</code>")
 into the Recycle bin.</li>
 <li>Drag the directory "<code>par-USER</code>" from your temporary directory to
 the Recycle bin. Here "<code>USER</code>" is your Windows user name and the
-temporary directory depends on the value of the TEMP environment variable
-("<code>C:\Documents and Settings\USER\Temp</code>" on most Windows XP systems).</li>
+location of the temporary directory depends on the value of the TEMP environment
+variable (usually "<code>C:\Documents and Settings\USER\Temp</code>" with Windows
+XP, or "<code>C:\Users\USER\AppData\Local\Temp\par-USER</code> with Windows 7).</li>
 </ol>
 <h3>Full Perl Distribution</h3>
 <p>You must have Perl installed to use this version.  (A free version of Perl
 can be downloaded from
-<a href="http://www.activeperl.com/Products/ActivePerl/">activeperl.com</a>.)</p>
+<a href="http://www.activestate.com/activeperl/">activeperl.com</a>.)</p>
 <ol>
 <li><b>Download</b> the <b>Image-ExifTool distribution</b> from the <a href="index.html">ExifTool home page</a>
 <br><span class='lt'>(The file you download will have a name like "<code>Image-ExifTool-#.##.tar.gz</code>".)</span></li>
@@ -92,10 +97,10 @@ can run exiftool by typing "<code>exiftool.pl</code>" at the
 <p><b>Uninstalling:</b></p>
 <ol type='i'>
 <li>Drag "<code>C:\WINDOWS\exiftool.pl</code>" and
-"<code>C:\WINDOWS\lib</code>" into the Recycle bin.  (First, confirm
+"<code>C:\WINDOWS\lib</code>" into the Recycle bin.  You should first confirm
 that "<code>C:\WINDOWS\lib</code>" contains only the "<code>File</code>"
 and "<code>Image</code>" sub-directories.  Do not delete it if it
-contains anything else.)</li>
+contains anything else.</li>
 </ol>
 
 <hr>
@@ -150,7 +155,7 @@ sets of libraries exist, /usr/bin/lib takes precedence for exiftool, but
 
 <h3>Uninstalling</h3>
 <ol type='i'>
-<li>Open the "Terminal" application.</li>
+<li>Launch the "Terminal" application from the Applications Utilities folder.</li>
 <li>Type "<code>open /usr/bin</code>" (without the quotes) in the Terminal
 window, then press RETURN. (This opens a folder that you normally can't access
 from OS X.)</li>

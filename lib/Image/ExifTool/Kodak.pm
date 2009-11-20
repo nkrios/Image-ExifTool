@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.19';
+$VERSION = '1.22';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -526,7 +526,7 @@ sub WriteKodakIFD($$$);
     },
     0xfc00 => {
         Name => 'SubIFD0',
-        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
         Flags => 'SubIFD',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::SubIFD0',
@@ -537,7 +537,8 @@ sub WriteKodakIFD($$$);
     # the byte ordering used
     0xfc01 => {
         Name => 'SubIFD1',
-        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Condition => '$$valPt ne "\0\0\0\0"',   # may be zero if dir doesn't exist
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
         Flags => 'SubIFD',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::SubIFD1',
@@ -547,7 +548,8 @@ sub WriteKodakIFD($$$);
     },
     0xfc02 => {
         Name => 'SubIFD2',
-        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Condition => '$$valPt ne "\0\0\0\0"',   # may be zero if dir doesn't exist
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
         Flags => 'SubIFD',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::SubIFD2',
@@ -557,7 +559,8 @@ sub WriteKodakIFD($$$);
     },
     0xfc03 => {
         Name => 'SubIFD3',
-        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Condition => '$$valPt ne "\0\0\0\0"',   # may be zero if dir doesn't exist
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
         Flags => 'SubIFD',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::SubIFD3',
@@ -569,7 +572,8 @@ sub WriteKodakIFD($$$);
     # in case it is used by future models -- ignored if pointer is zero)
     0xfc04 => {
         Name => 'SubIFD4',
-        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Condition => '$$valPt ne "\0\0\0\0"',   # may be zero if dir doesn't exist
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
         Flags => 'SubIFD',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::SubIFD4',
@@ -579,7 +583,8 @@ sub WriteKodakIFD($$$);
     },
     0xfc05 => {
         Name => 'SubIFD5',
-        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Condition => '$$valPt ne "\0\0\0\0"',   # may be zero if dir doesn't exist
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
         Flags => 'SubIFD',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::SubIFD5',
@@ -589,7 +594,8 @@ sub WriteKodakIFD($$$);
     },
     0xff00 => {
         Name => 'CameraInfo',
-        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Condition => '$$valPt ne "\0\0\0\0"',   # may be zero if dir doesn't exist
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
         Flags => 'SubIFD',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::CameraInfo',
@@ -968,6 +974,101 @@ my %sceneModeUsed = (
     },
     # 0x1002 - related to focal length (1=wide, 32=full zoom)
     # 0x1006 - pictures remaining? (gradually decreases as pictures are taken)
+#
+# the following unknown Kodak tags in subIFD3 may store an IFD count of 0 or 1 instead
+# of the correct value (which changes from model to model).  This bad count is fixed
+# with the "FixCount" patch.  Models known to have this problem include:
+# M380, M1033, M1093IS, V1073, V1233, V1253, V1273, V1275, V1285, Z612, Z712,
+# Z812, Z885, Z915, Z950, Z1012IS, Z1085IS, ZD710
+#
+    0x2007 => {
+        Name => 'Kodak_SubIFD3_0x2007',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x2008 => {
+        Name => 'Kodak_SubIFD3_0x2008',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x2009 => {
+        Name => 'Kodak_SubIFD3_0x2009',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x200a => {
+        Name => 'Kodak_SubIFD3_0x200a',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x200b => {
+        Name => 'Kodak_SubIFD3_0x200b',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x3020 => {
+        Name => 'Kodak_SubIFD3_0x3020',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x3030 => {
+        Name => 'Kodak_SubIFD3_0x3030',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x3040 => {
+        Name => 'Kodak_SubIFD3_0x3040',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x3050 => {
+        Name => 'Kodak_SubIFD3_0x3050',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x3060 => {
+        Name => 'Kodak_SubIFD3_0x3060',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x8001 => {
+        Name => 'Kodak_SubIFD3_0x8001',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x8002 => {
+        Name => 'Kodak_SubIFD3_0x8002',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x8003 => {
+        Name => 'Kodak_SubIFD3_0x8003',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x8004 => {
+        Name => 'Kodak_SubIFD3_0x8004',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x8005 => {
+        Name => 'Kodak_SubIFD3_0x8005',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x8006 => {
+        Name => 'Kodak_SubIFD3_0x8006',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x8007 => {
+        Name => 'Kodak_SubIFD3_0x8007',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x8008 => {
+        Name => 'Kodak_SubIFD3_0x8008',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x8009 => {
+        Name => 'Kodak_SubIFD3_0x8009',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x800a => {
+        Name => 'Kodak_SubIFD3_0x800a',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x800b => {
+        Name => 'Kodak_SubIFD3_0x800b',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
+    0x800c => {
+        Name => 'Kodak_SubIFD3_0x800c',
+        Flags => [ 'FixCount', 'Unknown', 'Hidden' ],
+    },
 );
 
 # Kodak SubIFD4 tags (ref PH)
@@ -1070,7 +1171,7 @@ my %sceneModeUsed = (
 
 # tags found in the KodakIFD (in IFD0 of KDC, DCR, TIFF and JPEG images) (ref PH)
 %Image::ExifTool::Kodak::IFD = (
-    GROUPS => { 0 => 'EXIF', 1 => 'KodakIFD', 2 => 'Image'},
+    GROUPS => { 0 => 'MakerNotes', 1 => 'KodakIFD', 2 => 'Image'},
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITE_GROUP => 'KodakIFD',
@@ -1107,23 +1208,98 @@ my %sceneModeUsed = (
             TagTable => 'Image::ExifTool::Kodak::TextualInfo',
         },
     },
-    # 0x03fc: some sort of white balance index (ref 3)
-    # 0x03fd: manual white balance information (ref 3)
+    0x03fc => { #3
+        Name => 'WhiteBalance',
+        Writable => 'int16u',
+        Priority => 0,
+        PrintConv => { },   # no values yet known
+    },
+    0x03fd => { #3
+        Name => 'Processing',
+        Condition => '$count == 72',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Processing',
+        },
+    },
     0x0401 => {
         Name => 'Time',
         Groups => { 2 => 'Time' },
         Writable => 'string',
     },
     0x0414 => { Name => 'NCDFileInfo',      Writable => 'string' },
-    0x0846 => { Name => 'ColorTemperature', Writable => 'int16u' }, #3
-    # 0x0852: used in calculating WB levels (ref 3)
-    # 0x085c: used in calculating WB levels (ref 3)
+    0x0846 => { #3
+        Name => 'ColorTemperature',
+        Writable => 'int16u',
+    },
+    0x0852 => 'WB_RGBMul0', #3
+    0x0853 => 'WB_RGBMul1', #3
+    0x0854 => 'WB_RGBMul2', #3
+    0x0855 => 'WB_RGBMul3', #3
+    0x085c => { Name => 'WB_RGBCoeffs0', Binary => 1 }, #3
+    0x085d => { Name => 'WB_RGBCoeffs1', Binary => 1 }, #3
+    0x085e => { Name => 'WB_RGBCoeffs2', Binary => 1 }, #3
+    0x085f => { Name => 'WB_RGBCoeffs3', Binary => 1 }, #3
     # 0x090d: linear table (ref 3)
     # 0x0c81: some sort of date (manufacture date?) - PH
     0x0ce5 => { Name => 'FirmwareVersion',  Writable => 'string' },
     # 0x1390: value: "DCSProSLRn" (tone curve name?) - PH
     0x1391 => { Name => 'ToneCurveFileName',Writable => 'string' },
     0x1784 => { Name => 'ISO',              Writable => 'int32u' }, #3
+);
+
+# contains WB adjust set in software (ref 3)
+%Image::ExifTool::Kodak::Processing = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    20 => {
+        Name => 'WB_RGBLevels',
+        Format => 'int16u[3]',
+        ValueConv => q{
+            my @a = split ' ',$val;
+            foreach (@a) {
+                $_ = 2048 / $_ if $_;
+            }
+            return join ' ', @a;
+        }
+    },
+);
+
+# tags found in the Kodak KDC_IFD (in IFD0 of KDC images) (ref 3)
+%Image::ExifTool::Kodak::KDC_IFD = (
+    GROUPS => { 0 => 'MakerNotes', 1 => 'KDC_IFD', 2 => 'Image'},
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITE_GROUP => 'KDC_IFD',
+    SET_GROUP1 => 1,
+    NOTES => q{
+        These tags are found in a separate IFD of KDC images from some newer Kodak
+        models such as the P880 and Z1015IS.
+    },
+    0xfa00 => {
+        Name => 'SerialNumber', #PH (unverified)
+        Writable => 'string',
+    },
+    0xfa0d => {
+        Name => 'WhiteBalance',
+        Writable => 'int8u',
+        PrintConv => { #PH
+            0 => 'Auto',
+            1 => 'Fluorescent', # (NC)
+            2 => 'Tungsten', # (NC)
+            3 => 'Daylight', # (NC)
+            6 => 'Shade', # (NC, called "Open Shade" by Kodak)
+        },
+    },
+    # the following tags are numbered for use in the Composite tag lookup
+    0xfa25 => 'WB_RGBLevelsAuto',
+    0xfa27 => 'WB_RGBLevelsTungsten', # (NC)
+    0xfa28 => 'WB_RGBLevelsFluorescent', # (NC)
+    0xfa29 => 'WB_RGBLevelsDaylight', # (NC)
+    0xfa2a => 'WB_RGBLevelsShade', # (NC)
 );
 
 # textual-based Kodak TextualInfo tags (not found in KDC images) (ref PH)
@@ -1341,6 +1517,7 @@ my %sceneModeUsed = (
 
 # Kodak composite tags
 %Image::ExifTool::Kodak::Composite = (
+    GROUPS => { 2 => 'Camera' },
     DateCreated => {
         Groups => { 2 => 'Time' },
         Require => {
@@ -1349,10 +1526,70 @@ my %sceneModeUsed = (
         },
         ValueConv => '"$val[0]:$val[1]"',
     },
+    WB_RGBLevels => {
+        Require => {
+            0 => 'KDC_IFD:WhiteBalance',
+        },
+        # indices of the following entries are KDC_IFD:WhiteBalance + 1
+        Desire => {
+            1 => 'WB_RGBLevelsAuto',
+            2 => 'WB_RGBLevelsFluorescent',
+            3 => 'WB_RGBLevelsTungsten',
+            4 => 'WB_RGBLevelsDaylight',
+            5 => 'WB_RGBLevels4',
+            6 => 'WB_RGBLevels5',
+            7 => 'WB_RGBLevelsShade',
+        },
+        ValueConv => '$val[$val[0] + 1]',
+    },
+    WB_RGBLevels2 => {
+        Name => 'WB_RGBLevels',
+        Require => {
+            0 => 'KodakIFD:WhiteBalance',
+            1 => 'WB_RGBMul0',
+            2 => 'WB_RGBMul1',
+            3 => 'WB_RGBMul2',
+            4 => 'WB_RGBMul3',
+            5 => 'WB_RGBCoeffs0',
+            6 => 'WB_RGBCoeffs1',
+            7 => 'WB_RGBCoeffs2',
+            8 => 'WB_RGBCoeffs3',
+        },
+        # indices of the following entries are KDC_IFD:WhiteBalance + 1
+        Desire => {
+            9 => 'KodakIFD:ColorTemperature',
+            10 => 'Kodak:WB_RGBLevels',
+        },
+        ValueConv => 'Image::ExifTool::Kodak::CalculateRGBLevels(@val)',
+    },
 );
 
 # add our composite tags
 Image::ExifTool::AddCompositeTags('Image::ExifTool::Kodak');
+
+#------------------------------------------------------------------------------
+# Calculate RGB levels from associated tags (ref 3)
+# Inputs: 0) KodakIFD:WhiteBalance, 1-4) WB_RGBMul0-3, 5-8) WB_RGBCoeffs0-3
+#         9) (optional) KodakIFD:ColorTemperature, 10) (optional) Kodak:WB_RGBLevels
+# Returns: WB_RGBLevels or undef
+sub CalculateRGBLevels(@)
+{
+    return undef if $_[10]; # use existing software levels if they exist
+    my $wbi = $_[0];
+    return undef if $wbi < 0 or $wbi > 3;
+    my @mul = split ' ', $_[$wbi + 1], 13; # (only use the first 12 coeffs)
+    my @coefs = split ' ', ${$_[$wbi + 5]}; # (extra de-reference for Binary data)
+    my $wbtemp100 = ($_[9] || 6500) / 100;
+    return undef unless @mul >= 3 and @coefs >= 12;
+    my ($i, $c, $n, $num, @cam_mul);
+    for ($c=$n=0; $c<3; ++$c) {
+        for ($num=$i=0; $i<4; ++$i) {
+            $num += $coefs[$n++] * ($wbtemp100 ** $i);
+        }
+        $cam_mul[$c] = 2048 / ($num * $mul[$c]);
+    }
+    return join(' ', @cam_mul);
+}
 
 #------------------------------------------------------------------------------
 # Process Kodak textual TextualInfo

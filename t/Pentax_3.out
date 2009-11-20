@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
 [File, System, Image] FileName - File Name: Pentax_3_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 2.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:36-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:17 10:33:13-05:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
@@ -194,7 +194,7 @@
 [MakerNotes, Pentax, Camera] 531 - WB RGGB Levels Fluorescent W: 13088 8192 8192 12206
 [MakerNotes, Pentax, Camera] 532 - WB RGGB Levels Flash: 13632 8192 8192 8601
 [MakerNotes, Pentax, Camera] 0 - Pentax Model ID: K10D
-[MakerNotes, Pentax, Camera] 1 - Manufacture Date: 2007:09:13
+[MakerNotes, Pentax, Time] 1 - Manufacture Date: 2007:09:13
 [MakerNotes, Pentax, Camera] 2 - Production Code: 2.1
 [MakerNotes, Pentax, Camera] 4 - Internal Serial Number: 132352
 [MakerNotes, Pentax, Camera] 0 - Power Source: Body Battery
@@ -248,10 +248,10 @@
 [Composite, Composite, Image] ImageSize - Image Size: 8x8
 [Composite, Composite, Camera] LensID - Lens ID: Sigma or Tamron Lens (3 44)
 [Composite, Composite, Image] PreviewImage - Preview Image: (Binary data 26 bytes)
-[Composite, Composite, Camera] ScaleFactor35efl - Scale Factor To 35 mm Equivalent: 0.7
 [Composite, Composite, Image] ShutterSpeed - Shutter Speed: 1/100
+[Composite, Composite, Image] LightValue - Light Value: 14.0
+[Composite, Composite, Camera] ScaleFactor35efl - Scale Factor To 35 mm Equivalent: 0.7
 [Composite, Composite, Camera] CircleOfConfusion - Circle Of Confusion: 0.044 mm
 [Composite, Composite, Image] FOV - Field Of View: 100.4 deg
 [Composite, Composite, Camera] FocalLength35efl - Focal Length: 22.0 mm (35 mm equivalent: 15.0 mm)
 [Composite, Composite, Camera] HyperfocalDistance - Hyperfocal Distance: 0.84 m
-[Composite, Composite, Image] LightValue - Light Value: 14.0

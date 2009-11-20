@@ -734,7 +734,7 @@ with much duplication), but relatively few tags have so far been decoded.</p>
 <table class=inner cellspacing=1>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr><td colspan=4 class=c>[no tags known]</td></tr>
+<tr><td colspan=4 class=c><i>[no tags known]</i></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SubIFD5'>Kodak SubIFD5 Tags</a></h2>
@@ -899,7 +899,7 @@ indicator instead of a full TIFF header.  These tags are used by the Z980.</p>
 <table class=inner cellspacing=1>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr><td colspan=4 class=c>[no tags known]</td></tr>
+<tr><td colspan=4 class=c><i>[no tags known]</i></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='IFD'>Kodak IFD Tags</a></h2>
@@ -952,6 +952,16 @@ from some older Kodak models such as the DC50, DC120, DCS760C, DCS Pro 14N,
 <td class=c>-</td>
 <td>--&gt; <a href='Kodak.html#TextualInfo'>Kodak TextualInfo Tags</a></td></tr>
 <tr>
+<td title='0x03fc = 1020'>0x03fc</td>
+<td>WhiteBalance</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x03fd = 1021'>0x03fd</td>
+<td>Processing</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#Processing'>Kodak Processing Tags</a></td></tr>
+<tr>
 <td title='0x0401 = 1025'>0x0401</td>
 <td>Time</td>
 <td class=c>string</td>
@@ -965,6 +975,46 @@ from some older Kodak models such as the DC50, DC120, DCS760C, DCS Pro 14N,
 <td title='0x0846 = 2118'>0x0846</td>
 <td>ColorTemperature</td>
 <td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0852 = 2130'>0x0852</td>
+<td>WB_RGBMul0</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0853 = 2131'>0x0853</td>
+<td>WB_RGBMul1</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0854 = 2132'>0x0854</td>
+<td>WB_RGBMul2</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0855 = 2133'>0x0855</td>
+<td>WB_RGBMul3</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x085c = 2140'>0x085c</td>
+<td>WB_RGBCoeffs0</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x085d = 2141'>0x085d</td>
+<td>WB_RGBCoeffs1</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x085e = 2142'>0x085e</td>
+<td>WB_RGBCoeffs2</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x085f = 2143'>0x085f</td>
+<td>WB_RGBCoeffs3</td>
+<td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0ce5 = 3301'>0x0ce5</td>
@@ -1155,6 +1205,19 @@ data, however ExifTool will extract information from any tags found here.</p>
 <td>OtherInfo</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(any other information without a tag name)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Processing'>Kodak Processing Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='20 = 0x14'>20</td>
+<td>WB_RGBLevels</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Meta'>Kodak Meta Tags</a></h2>
@@ -1404,6 +1467,55 @@ Kodak JPEG APP3 &quot;Meta&quot; segment.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='KDC_IFD'>Kodak KDC_IFD Tags</a></h2>
+<p>These tags are found in a separate IFD of KDC images from some newer Kodak
+models such as the P880 and Z1015IS.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td title='0xfa00 = 64000'>0xfa00</td>
+<td>SerialNumber</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0xfa0d = 64013'>0xfa0d</td>
+<td>WhiteBalance</td>
+<td class=c>int8u</td>
+<td><span class=s>0 = Auto
+  <br>1 = Fluorescent
+  <br>2 = Tungsten
+  <br>3 = Daylight
+  <br>6 = Shade</span></td></tr>
+<tr>
+<td title='0xfa25 = 64037'>0xfa25</td>
+<td>WB_RGBLevelsAuto</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0xfa27 = 64039'>0xfa27</td>
+<td>WB_RGBLevelsTungsten</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0xfa28 = 64040'>0xfa28</td>
+<td>WB_RGBLevelsFluorescent</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0xfa29 = 64041'>0xfa29</td>
+<td>WB_RGBLevelsDaylight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0xfa2a = 64042'>0xfa2a</td>
+<td>WB_RGBLevelsShade</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='MOV'>Kodak MOV Tags</a></h2>
 <p>This information is found in Kodak MOV videos from models such as the P880.</p>
 <blockquote>
@@ -1450,7 +1562,7 @@ Kodak JPEG APP3 &quot;Meta&quot; segment.
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 8, 2009</i>
+<br><i>Last revised Oct 2, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

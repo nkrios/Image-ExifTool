@@ -12,6 +12,7 @@
 #               5) Marcus Holland-Moritz private communication (A700)
 #               6) Andrey Tverdokhleb private communication
 #               7) Rudiger Lange private communication (A700)
+#               8) Igal Milchtaich private communication
 #               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -23,7 +24,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.30';
+$VERSION = '1.36';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -34,13 +35,6 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    0x0e00 => {
-        Name => 'PrintIM',
-        Description => 'Print Image Matching',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::PrintIM::Main',
-        },
-    },
     0x0102 => { #5/JD
         Name => 'Quality',
         Writable => 'int32u',
@@ -81,32 +75,49 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     0x0114 => [ #PH
         {
             Name => 'CameraSettings',
-            Condition => '$$self{Model} !~ /DSLR-A(330|380)\b/',
+            Condition => '$$self{Model} =~ /DSLR-A(200|230|300|350|700|850|900)\b/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Sony::CameraSettings',
-                ByteOrder => 'Big-Endian',
+                ByteOrder => 'BigEndian',
             },
         },
         {
             Name => 'CameraSettings2',
+            Condition => '$$self{Model} =~ /DSLR-A(330|380)\b/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Sony::CameraSettings2',
-                ByteOrder => 'Big-Endian',
+                ByteOrder => 'BigEndian',
+            },
+        },
+        {
+            Name => 'CameraSettingsUnknown',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Sony::CameraSettingsUnknown',
+                ByteOrder => 'BigEndian',
             },
         },
     ],
     0x0115 => { #JD
         Name => 'WhiteBalance',
+        Writable => 'int32u',
+        PrintHex => 1,
         PrintConv => {
-            0 => 'Auto',
-            1 => 'Color Temperature/Color Filter',
-            16 => 'Daylight',
-            32 => 'Cloudy',
-            48 => 'Shade',
-            64 => 'Tungsten',
-            80 => 'Flash',
-            96 => 'Fluorescent',
-            112 => 'Custom',
+            0x00 => 'Auto',
+            0x01 => 'Color Temperature/Color Filter',
+            0x10 => 'Daylight',
+            0x20 => 'Cloudy',
+            0x30 => 'Shade',
+            0x40 => 'Tungsten',
+            0x50 => 'Flash',
+            0x60 => 'Fluorescent',
+            0x70 => 'Custom',
+        },
+    },
+    0x0e00 => {
+        Name => 'PrintIM',
+        Description => 'Print Image Matching',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::PrintIM::Main',
         },
     },
     0x2001 => { #PH (All DSLR's except the A100)
@@ -116,7 +127,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         # Note: the preview data starts with a 32-byte proprietary Sony header
         WriteCheck => 'return $val=~/^(none|.{32}\xff\xd8\xff)/s ? undef : "Not a valid image"',
         RawConv => q{
-            return $val if $val =~ /^Binary/;
+            return \$val if $val =~ /^Binary/;
             $val = substr($val,0x20) if length($val) > 0x20;
             return \$val if $val =~ s/^.(\xd8\xff\xdb)/\xff$1/s;
             $$self{PreviewError} = 1 unless $val eq 'none';
@@ -132,6 +143,15 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             return Set32u(length $val) . $size . ("\0" x 8) . $size . ("\0" x 4) . $val;
         },
     },
+    0x200a => { #PH (A550)
+        Name => 'AutoHDR',
+        Writable => 'int32u',
+        PrintHex => 1,
+        PrintConv => {
+            0x0 => 'Off',
+            0x10001 => 'On',
+        },
+    },
     0x3000 => {
         Name => 'ShotInfo',
         SubDirectory => {
@@ -139,6 +159,39 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         },
     },
     # 0x3000: data block that includes DateTimeOriginal string
+    0xb000 => { #8
+        Name => 'FileFormat',
+        Writable => 'int8u',
+        Count => 4,
+        PrintConv => {
+            '0 0 0 2' => 'JPEG',
+            '1 0 0 0' => 'SR2',
+            '2 0 0 0' => 'ARW 1.0',
+            '3 0 0 0' => 'ARW 2.0',
+            '3 1 0 0' => 'ARW 2.1',
+            # what about cRAW images?
+        },
+    },
+    0xb001 => { # ref http://forums.dpreview.com/forums/read.asp?forum=1037&message=33609644
+        # (ARW and SR2 images only)
+        Name => 'SonyModelID',
+        Writable => 'int16u',
+        PrintConvColumns => 2,
+        PrintConv => {
+            2 => 'DSC-R1',
+            256 => 'DSLR-A100',
+            257 => 'DSLR-A900',
+            258 => 'DSLR-A700',
+            259 => 'DSLR-A200',
+            260 => 'DSLR-A350',
+            261 => 'DSLR-A300',
+            263 => 'DSLR-A380',
+            264 => 'DSLR-A330',
+            265 => 'DSLR-A230',
+            269 => 'DSLR-A850',
+            273 => 'DSLR-A550',
+        },
+    },
     0xb020 => { #2
         Name => 'ColorReproduction',
         # observed values: None, Standard, Vivid, Real, AdobeRGB - PH
@@ -177,6 +230,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             0 => 'Off',
             1 => 'Standard',
             2 => 'Advanced Auto',
+            3 => 'Auto', #PH (A550)
             8 => 'Advanced Lv1', #JD
             9 => 'Advanced Lv2', #JD
             10 => 'Advanced Lv3', #JD
@@ -217,6 +271,25 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         Writable => 'int32u',
         PrintConv => \%Image::ExifTool::Minolta::sonyColorMode,
     },
+    0xb02b => { #PH (A550 JPEG, A230 and A900 ARW)
+        Name => 'FullImageSize',
+        Writable => 'int32u',
+        Count => 2,
+        # values stored height first, so swap to get "width height"
+        ValueConv => 'join(" ", reverse split(" ", $val))',
+        ValueConvInv => 'join(" ", reverse split(" ", $val))',
+        PrintConv => '$val =~ tr/ /x/; $val',
+        PrintConvInv => '$val =~ tr/x/ /; $val',
+    },
+    0xb02c => { #PH (A550 JPEG, A230 and A900 ARW)
+        Name => 'PreviewImageSize',
+        Writable => 'int32u',
+        Count => 2,
+        ValueConv => 'join(" ", reverse split(" ", $val))',
+        ValueConvInv => 'join(" ", reverse split(" ", $val))',
+        PrintConv => '$val =~ tr/ /x/; $val',
+        PrintConvInv => '$val =~ tr/x/ /; $val',
+    },
     0xb040 => { #2
         Name => 'Macro',
         Writable => 'int16u',
@@ -227,14 +300,19 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         Writable => 'int16u',
         PrintConv => {
             0 => 'Auto',
+            1 => 'Portrait', #PH (HX1)
             5 => 'Landscape',
             6 => 'Program',
             7 => 'Aperture Priority',
             8 => 'Shutter Priority',
             9 => 'Night Scene',
             15 => 'Manual',
+            34 => 'Panorama', #PH (HX1)
+            35 => 'Handheld Twilight', #PH (HX1/TX1)
+            36 => 'Anti Motion Blur', #PH (TX1)
         },
     },
+    # 0xb043 - some sort of mode: values - 0,1,2,3,4,15(face detect?),65535
     0xb047 => { #2
         Name => 'Quality',
         Writable => 'int16u',
@@ -258,6 +336,31 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         Writable => 'int16u',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
+    0xb04f => { #PH (TX1)
+        Name => 'DynamicRangeOptimizer',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Standard',
+            2 => 'Plus',
+        },
+    },
+    0xb052 => { #PH (TX1)
+        Name => 'IntelligentAuto',
+        Writable => 'int16u',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0xb054 => { #PH (TX1)
+        Name => 'WhiteBalance',
+        Writable => 'int16u',
+        Priority => 0, # (until more values are filled in)
+        PrintConv => {
+            0 => 'Auto',
+            4 => 'Manual',
+            5 => 'Daylight',
+            14 => 'Incandescent',
+        },
+    },
 );
 
 # Camera settings (ref PH) (decoded mainly from A200)
@@ -269,7 +372,10 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     FORMAT => 'int16u',
-    NOTES => 'Camera settings for the A200, A300, A350, A700 and A900.',
+    NOTES => q{
+        Camera settings for the A200, A230, A300, A350, A700, A850 and A900.  Some
+        tags are only valid for certain models.
+    },
     0x04 => { #7 (A700, not valid for other models)
         Name => 'DriveMode',
         Condition => '$$self{Model} =~ /DSLR-A700\b/',
@@ -301,7 +407,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         },
     },
     0x11 => { #JD (A700)
-        Name => 'AFArea',
+        Name => 'AFAreaMode',
         PrintConv => {
             0 => 'Wide',
             1 => 'Local',
@@ -311,6 +417,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     0x12 => { #7 (A700, not confirmed for other models)
         Name => 'LocalAFAreaPoint',
         Format => 'int16u',
+        Condition => '$$self{Model} !~ /DSLR-A230/',
         PrintConv => {
             1 => 'Center',
             2 => 'Top',
@@ -323,11 +430,12 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             9 => 'Top-Left',
             10 => 'Far Right',
             11 => 'Far Left',
-            # see value of 128 for some models
+            # see value of 128 for A230
         },
     },
     0x15 => { #7
         Name => 'MeteringMode',
+        Condition => '$$self{Model} !~ /DSLR-A230/',
         PrintConv => {
             1 => 'Multi-segment',
             2 => 'Center-weighted Average',
@@ -336,6 +444,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     },
     0x16 => {
         Name => 'ISOSetting',
+        Condition => '$$self{Model} !~ /DSLR-A230/',
         # 0 indicates 'Auto' (I think)
         ValueConv => '$val ? exp(($val/8-6)*log(2))*100 : $val',
         ValueConvInv => '$val ? 8*(log($val/100)/log(2)+6) : $val',
@@ -344,18 +453,22 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     },
     0x18 => { #7
         Name => 'DynamicRangeOptimizerMode',
+        Condition => '$$self{Model} !~ /DSLR-A230/',
         PrintConv => {
             0 => 'Off',
             1 => 'Standard',
             2 => 'Advanced Auto',
             3 => 'Advanced Level',
+            4097 => 'Auto', #PH (A550)
         },
     },
     0x19 => { #7
         Name => 'DynamicRangeOptimizerLevel',
+        Condition => '$$self{Model} !~ /DSLR-A230/',
     },
     0x1a => { # style actually used (combination of mode dial + creative style menu)
         Name => 'CreativeStyle',
+        Condition => '$$self{Model} !~ /DSLR-A230/',
         PrintConv => {
             1 => 'Standard',
             2 => 'Vivid',
@@ -396,6 +509,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     },
     0x1f => { #7
         Name => 'ZoneMatchingValue',
+        Condition => '$$self{Model} !~ /DSLR-A230/',
         ValueConv => '$val - 10',
         ValueConvInv => '$val + 10',
         PrintConv => '$val > 0 ? "+$val" : $val',
@@ -403,6 +517,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     },
     0x22 => { #7
         Name => 'Brightness',
+        Condition => '$$self{Model} !~ /DSLR-A230/',
         ValueConv => '$val - 10',
         ValueConvInv => '$val + 10',
         PrintConv => '$val > 0 ? "+$val" : $val',
@@ -551,7 +666,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         },
     },
     0x11 => { #JD (A700)
-        Name => 'AFArea',
+        Name => 'AFAreaMode',
         PrintConv => {
             0 => 'Wide',
             1 => 'Local',
@@ -679,6 +794,17 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     # 0x56 - something to do with JPEG quality?
 );
 
+# Camera settings for other models
+%Image::ExifTool::Sony::CameraSettingsUnknown = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    FORMAT => 'int16u',
+);
+
 # shot information (ref PH)
 %Image::ExifTool::Sony::ShotInfo = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -708,7 +834,8 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         The maker notes in SRF (Sony Raw Format) images contain 7 IFD's (with family
         1 group names SRF0 through SRF6).  SRF0 through SRF5 use these Sony tags,
         while SRF6 uses standard EXIF tags.  All information other than SRF0 is
-        encrypted, but thanks to Dave Coffin the decryption algorithm is known.
+        encrypted, but thanks to Dave Coffin the decryption algorithm is known. SRF
+        images are written by the Sony DSC-F828 and DSC-V3.
     },
     0 => {
         Name => 'SRF2_Key',
@@ -728,7 +855,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     GROUPS => { 0 => 'MakerNotes', 1 => 'SR2', 2 => 'Camera' },
     NOTES => q{
         The SR2 format uses the DNGPrivateData tag to reference a private IFD
-        containing these tags.
+        containing these tags.  SR2 images are written by the Sony DSC-R1.
     },
     0x7200 => {
         Name => 'SR2SubIFDOffset',
@@ -1006,14 +1133,13 @@ This module is loaded automatically by Image::ExifTool when required.
 
 =head1 DESCRIPTION
 
-This module contains definitions required by Image::ExifTool to
-interpret Sony maker notes EXIF meta information.
+This module contains definitions required by Image::ExifTool to interpret
+Sony maker notes EXIF meta information.
 
 =head1 NOTES
 
-The Sony maker notes use the standard EXIF IFD structure, but unfortunately
-the entries are large blocks of binary data for which I can find no
-documentation.  You can use "exiftool -v3" to dump these blocks in hex.
+Also see Minolta.pm since Sony DSLR models use structures originating from
+Minolta.
 
 =head1 AUTHOR
 
@@ -1035,12 +1161,13 @@ under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Thomas Bodenmann, Philippe Devaux, Jens Duttke, Marcus
-Holland-Moritz, Andrey Tverdokhleb and Rudiger Lange for help decoding some
-tags.
+Holland-Moritz, Andrey Tverdokhleb, Rudiger Lange and Igal Milchtaich for
+help decoding some tags.
 
 =head1 SEE ALSO
 
 L<Image::ExifTool::TagNames/Sony Tags>,
+L<Image::ExifTool::TagNames/Minolta Tags>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

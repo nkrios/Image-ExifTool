@@ -5,7 +5,7 @@
 
 # Change "1..N" below to so that N matches last test number
 
-BEGIN { $| = 1; print "1..33\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..34\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # definitions for user-defined tag test (#28)
@@ -91,7 +91,7 @@ my $testnum = 1;
         my @x = $exifTool->SetNewValue($tag, $val, Group=>$group, Replace=>1);
     }
     # also try writing a few specific tags
-    $exifTool->SetNewValue(CreatorContactInfoCiAdrCtry => 'Canada');
+    $exifTool->SetNewValue(CreatorCountry => 'Canada');
     $exifTool->SetNewValue(CodedCharacterSet => 'UTF8', Protected => 1);
     undef $info;
     my $image;
@@ -295,7 +295,10 @@ my $testnum = 1;
     my @writeInfo = (
         # (don't put special character hex codes in string in an attempt to patch failed
         # test by dcollins on Perl 5.95 and i686-linux-thread-multi 2.6.28-11-generic)
-        ['IPTC:CopyrightNotice' => chr(0xc2) . chr(0xa9) . " 2008 Phil Harvey"],
+        # ['IPTC:CopyrightNotice' => chr(0xc2) . chr(0xa9) . " 2008 Phil Harvey"],
+        # - didn't fix it, so change it back again:
+        # (dcollins is the only tester with this problem)
+        ['IPTC:CopyrightNotice' => "\xc2\xa9 2008 Phil Harvey"],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
                                    't/images/Writer.jpg', 1);
@@ -388,5 +391,24 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
+# test 34: Write and read using different default IPTC encoding
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    $exifTool->Options(Charset => 'Cyrillic');
+    $exifTool->SetNewValuesFromFile('t/images/MIE.mie', 'Comment-ru_RU>Caption-Abstract');
+    $exifTool->Options(IPTCCharset => 'Cyrillic');
+    $exifTool->WriteInfo('t/images/Writer.jpg',$testfile);
+    $exifTool->Options(Charset => 'UTF8');
+    my $info = $exifTool->ImageInfo($testfile, 'IPTC:*');
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
 
 # end

@@ -8,7 +8,7 @@
 # References:   1) http://www.exif.org/Exif2-2.PDF
 #               2) http://www.graphcomp.com/info/specs/livepicture/fpx.pdf
 #               3) http://search.cpan.org/~jdb/libwin32/
-#               4) http://msdn2.microsoft.com/en-us/library/aa380374.aspx
+#               4) http://msdn.microsoft.com/en-us/library/aa380374.aspx
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::FlashPix;
@@ -19,12 +19,12 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.09';
+$VERSION = '1.13';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
 sub ProcessProperties($$$);
-sub ReadFPXValue($$$$$;$);
+sub ReadFPXValue($$$$$;$$);
 sub ConvertTimeSpan($);
 sub ProcessHyperlinks($$);
 
@@ -114,6 +114,177 @@ my %oleFormatSize = (
 # names for each type of directory entry
 my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
 
+# list of code pages used by Microsoft
+# (ref http://msdn.microsoft.com/en-us/library/dd317756(VS.85).aspx)
+my %codePage = (
+    037 => 'IBM EBCDIC US-Canada',
+    437 => 'DOS United States',
+    500 => 'IBM EBCDIC International',
+    708 => 'Arabic (ASMO 708)',
+    709 => 'Arabic (ASMO-449+, BCON V4)',
+    710 => 'Arabic - Transparent Arabic',
+    720 => 'DOS Arabic (Transparent ASMO)',
+    737 => 'DOS Greek (formerly 437G)',
+    775 => 'DOS Baltic',
+    850 => 'DOS Latin 1 (Western European)',
+    852 => 'DOS Latin 2 (Central European)',
+    855 => 'DOS Cyrillic (primarily Russian)',
+    857 => 'DOS Turkish',
+    858 => 'DOS Multilingual Latin 1 with Euro',
+    860 => 'DOS Portuguese',
+    861 => 'DOS Icelandic',
+    862 => 'DOS Hebrew',
+    863 => 'DOS French Canadian',
+    864 => 'DOS Arabic',
+    865 => 'DOS Nordic',
+    866 => 'DOS Russian (Cyrillic)',
+    869 => 'DOS Modern Greek',
+    870 => 'IBM EBCDIC Multilingual/ROECE (Latin 2)',
+    874 => 'Windows Thai (same as 28605, ISO 8859-15)',
+    875 => 'IBM EBCDIC Greek Modern',
+    932 => 'Windows Japanese (Shift-JIS)',
+    936 => 'Windows Simplified Chinese (PRC, Singapore)',
+    949 => 'Windows Korean (Unified Hangul Code)',
+    950 => 'Windows Traditional Chinese (Taiwan)',
+    1026 => 'IBM EBCDIC Turkish (Latin 5)',
+    1047 => 'IBM EBCDIC Latin 1/Open System',
+    1140 => 'IBM EBCDIC US-Canada with Euro',
+    1141 => 'IBM EBCDIC Germany with Euro',
+    1142 => 'IBM EBCDIC Denmark-Norway with Euro',
+    1143 => 'IBM EBCDIC Finland-Sweden with Euro',
+    1144 => 'IBM EBCDIC Italy with Euro',
+    1145 => 'IBM EBCDIC Latin America-Spain with Euro',
+    1146 => 'IBM EBCDIC United Kingdom with Euro',
+    1147 => 'IBM EBCDIC France with Euro',
+    1148 => 'IBM EBCDIC International with Euro',
+    1149 => 'IBM EBCDIC Icelandic with Euro',
+    1200 => 'Unicode UTF-16, little endian',
+    1201 => 'Unicode UTF-16, big endian',
+    1250 => 'Windows Latin 2 (Central European)',
+    1251 => 'Windows Cyrillic',
+    1252 => 'Windows Latin 1 (Western European)',
+    1253 => 'Windows Greek',
+    1254 => 'Windows Turkish',
+    1255 => 'Windows Hebrew',
+    1256 => 'Windows Arabic',
+    1257 => 'Windows Baltic',
+    1258 => 'Windows Vietnamese',
+    1361 => 'Korean (Johab)',
+    10000 => 'Mac Roman (Western European)',
+    10001 => 'Mac Japanese',
+    10002 => 'Mac Traditional Chinese',
+    10003 => 'Mac Korean',
+    10004 => 'Mac Arabic',
+    10005 => 'Mac Hebrew',
+    10006 => 'Mac Greek',
+    10007 => 'Mac Cyrillic',
+    10008 => 'Mac Simplified Chinese',
+    10010 => 'Mac Romanian',
+    10017 => 'Mac Ukrainian',
+    10021 => 'Mac Thai',
+    10029 => 'Mac Latin 2 (Central European)',
+    10079 => 'Mac Icelandic',
+    10081 => 'Mac Turkish',
+    10082 => 'Mac Croatian',
+    12000 => 'Unicode UTF-32, little endian',
+    12001 => 'Unicode UTF-32, big endian',
+    20000 => 'CNS Taiwan',
+    20001 => 'TCA Taiwan',
+    20002 => 'Eten Taiwan',
+    20003 => 'IBM5550 Taiwan',
+    20004 => 'TeleText Taiwan',
+    20005 => 'Wang Taiwan',
+    20105 => 'IA5 (IRV International Alphabet No. 5, 7-bit)',
+    20106 => 'IA5 German (7-bit)',
+    20107 => 'IA5 Swedish (7-bit)',
+    20108 => 'IA5 Norwegian (7-bit)',
+    20127 => 'US-ASCII (7-bit)',
+    20261 => 'T.61',
+    20269 => 'ISO 6937 Non-Spacing Accent',
+    20273 => 'IBM EBCDIC Germany',
+    20277 => 'IBM EBCDIC Denmark-Norway',
+    20278 => 'IBM EBCDIC Finland-Sweden',
+    20280 => 'IBM EBCDIC Italy',
+    20284 => 'IBM EBCDIC Latin America-Spain',
+    20285 => 'IBM EBCDIC United Kingdom',
+    20290 => 'IBM EBCDIC Japanese Katakana Extended',
+    20297 => 'IBM EBCDIC France',
+    20420 => 'IBM EBCDIC Arabic',
+    20423 => 'IBM EBCDIC Greek',
+    20424 => 'IBM EBCDIC Hebrew',
+    20833 => 'IBM EBCDIC Korean Extended',
+    20838 => 'IBM EBCDIC Thai',
+    20866 => 'Russian/Cyrillic (KOI8-R)',
+    20871 => 'IBM EBCDIC Icelandic',
+    20880 => 'IBM EBCDIC Cyrillic Russian',
+    20905 => 'IBM EBCDIC Turkish',
+    20924 => 'IBM EBCDIC Latin 1/Open System with Euro',
+    20932 => 'Japanese (JIS 0208-1990 and 0121-1990)',
+    20936 => 'Simplified Chinese (GB2312)',
+    20949 => 'Korean Wansung',
+    21025 => 'IBM EBCDIC Cyrillic Serbian-Bulgarian',
+    21027 => 'Extended Alpha Lowercase (deprecated)',
+    21866 => 'Ukrainian/Cyrillic (KOI8-U)',
+    28591 => 'ISO 8859-1 Latin 1 (Western European)',
+    28592 => 'ISO 8859-2 (Central European)',
+    28593 => 'ISO 8859-3 Latin 3',
+    28594 => 'ISO 8859-4 Baltic',
+    28595 => 'ISO 8859-5 Cyrillic',
+    28596 => 'ISO 8859-6 Arabic',
+    28597 => 'ISO 8859-7 Greek',
+    28598 => 'ISO 8859-8 Hebrew (Visual)',
+    28599 => 'ISO 8859-9 Turkish',
+    28603 => 'ISO 8859-13 Estonian',
+    28605 => 'ISO 8859-15 Latin 9',
+    29001 => 'Europa 3',
+    38598 => 'ISO 8859-8 Hebrew (Logical)',
+    50220 => 'ISO 2022 Japanese with no halfwidth Katakana (JIS)',
+    50221 => 'ISO 2022 Japanese with halfwidth Katakana (JIS-Allow 1 byte Kana)',
+    50222 => 'ISO 2022 Japanese JIS X 0201-1989 (JIS-Allow 1 byte Kana - SO/SI)',
+    50225 => 'ISO 2022 Korean',
+    50227 => 'ISO 2022 Simplified Chinese',
+    50229 => 'ISO 2022 Traditional Chinese',
+    50930 => 'EBCDIC Japanese (Katakana) Extended',
+    50931 => 'EBCDIC US-Canada and Japanese',
+    50933 => 'EBCDIC Korean Extended and Korean',
+    50935 => 'EBCDIC Simplified Chinese Extended and Simplified Chinese',
+    50936 => 'EBCDIC Simplified Chinese',
+    50937 => 'EBCDIC US-Canada and Traditional Chinese',
+    50939 => 'EBCDIC Japanese (Latin) Extended and Japanese',
+    51932 => 'EUC Japanese',
+    51936 => 'EUC Simplified Chinese',
+    51949 => 'EUC Korean',
+    51950 => 'EUC Traditional Chinese',
+    52936 => 'HZ-GB2312 Simplified Chinese',
+    54936 => 'Windows XP and later: GB18030 Simplified Chinese (4 byte)',
+    57002 => 'ISCII Devanagari',
+    57003 => 'ISCII Bengali',
+    57004 => 'ISCII Tamil',
+    57005 => 'ISCII Telugu',
+    57006 => 'ISCII Assamese',
+    57007 => 'ISCII Oriya',
+    57008 => 'ISCII Kannada',
+    57009 => 'ISCII Malayalam',
+    57010 => 'ISCII Gujarati',
+    57011 => 'ISCII Punjabi',
+    65000 => 'Unicode (UTF-7)',
+    65001 => 'Unicode (UTF-8)',
+);
+
+# test for file extensions which could be MSOffice files instead of FPX images
+# (have seen one password-protected DOCX file that is FPX-like, so assume
+#  that all the rest could be as well)
+my %isMSOffice = (
+    DOC => 1,  DOCX => 1,  DOCM => 1,
+    DOT => 1,  DOTX => 1,  DOTM => 1,
+    POT => 1,  POTX => 1,  POTM => 1,
+    PPS => 1,  PPSX => 1,  PPSM => 1,
+    PPT => 1,  PPTX => 1,  PPTM => 1,  THMX => 1,
+    XLA => 1,  XLAM => 1,
+    XLS => 1,  XLSX => 1,  XLSM => 1,  XLSB => 1,
+    XLT => 1,  XLTX => 1,  XLTM => 1,
+);
+
 %Image::ExifTool::FlashPix::Main = (
     PROCESS_PROC => \&ProcessFPXR,
     GROUPS => { 2 => 'Image' },
@@ -129,7 +300,7 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
 
         ExifTool extracts FlashPix information from both FPX images and the APP2
         FPXR segment of JPEG images.  As well, FlashPix information is extracted
-        from DOC, XLS and PPT (Microsoft Word, Excel and PowerPoint) documents since
+        from DOC, PPT and XLS (Microsoft Word, PowerPoint and Excel) documents since
         the FlashPix file format is closely related to the formats of these files.
     },
     "\x05SummaryInformation" => {
@@ -244,13 +415,17 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
 # Summary Information properties
 %Image::ExifTool::FlashPix::SummaryInfo = (
     PROCESS_PROC => \&ProcessProperties,
-    GROUPS => { 2 => 'Image' },
+    GROUPS => { 2 => 'Document' },
     NOTES => q{
         The Dictionary, CodePage and LocalIndicator tags are common to all FlashPix
         property tables, even though they are only listed in the SummaryInfo table.
     },
     0x00 => { Name => 'Dictionary', Groups => { 2 => 'Other' }, Binary => 1 },
-    0x01 => { Name => 'CodePage',   Groups => { 2 => 'Other' } },
+    0x01 => {
+        Name => 'CodePage',
+        Groups => { 2 => 'Other' },
+        PrintConv => \%codePage,
+    },
     0x02 => 'Title',
     0x03 => 'Subject',
     0x04 => { Name => 'Author',     Groups => { 2 => 'Author' } },
@@ -299,22 +474,33 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     0x08 => 'Notes',
     0x09 => 'HiddenSlides',
     0x0a => 'MMClips',
-    0x0b => 'ScaleCrop',
+    0x0b => {
+        Name => 'ScaleCrop',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
+    },
     0x0c => 'HeadingPairs',
     0x0d => 'TitleOfParts',
     0x0e => 'Manager',
     0x0f => 'Company',
-    0x10 => 'LinksUpToDate',
+    0x10 => {
+        Name => 'LinksUpToDate',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
+    },
     0x11 => 'CharCountWithSpaces',
   # 0x12 ?
-    0x13 => 'SharedDoc', #PH (unconfirmed)
+    0x13 => { #PH (unconfirmed)
+        Name => 'SharedDoc',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
+    },
   # 0x14 ?
   # 0x15 ?
-    0x16 => 'HyperlinksChanged',
-    0x17 => { #PH (unconfirmed)
+    0x16 => {
+        Name => 'HyperlinksChanged',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
+    },
+    0x17 => { #PH (unconfirmed handling of lower 16 bits)
         Name => 'AppVersion',
-        # (not sure what the lower 16 bits mean, so print them in hex inside brackets)
-        ValueConv => 'sprintf("%d (%.4x)",$val >> 16, $val & 0xffff)',
+        ValueConv => 'sprintf("%d.%.4d",$val >> 16, $val & 0xffff)',
     },
    '_PID_LINKBASE' => {
         Name => 'HyperlinkBase',
@@ -376,6 +562,7 @@ my @dirEntryType = qw(INVALID STORAGE STREAM LOCKBYTES PROPERTY ROOT);
     0x23000007 => 'Things',
     0x2300000A => {
         Name => 'DateTimeOriginal',
+        Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
         PrintConv => '$self->ConvertDateTime($val)',
     },
@@ -811,6 +998,8 @@ sub ProcessHyperlinks($$)
 
 #------------------------------------------------------------------------------
 # Print conversion for time span value
+# Inputs: 0) time in seconds
+# Returns: readable time
 sub ConvertTimeSpan($)
 {
     my $val = shift;
@@ -831,13 +1020,12 @@ sub ConvertTimeSpan($)
 #------------------------------------------------------------------------------
 # Read FlashPix value
 # Inputs: 0) ExifTool ref, 1) data ref, 2) value offset, 3) FPX format number,
-#         4) end offset, 5) options: 0x01=no padding, 0x02=translate to UTF8
+#         4) end offset, 5) flag for no padding, 6) code page
 # Returns: converted value (or list of values in list context) and updates
 #          value offset to end of value if successful, or returns undef on error
-sub ReadFPXValue($$$$$;$)
+sub ReadFPXValue($$$$$;$$)
 {
-    my ($exifTool, $dataPt, $valPos, $type, $dirEnd, $opts) = @_;
-    $opts = 0 unless defined $opts;
+    my ($exifTool, $dataPt, $valPos, $type, $dirEnd, $noPad, $codePage) = @_;
     my @vals;
 
     my $format = $oleFormat{$type & 0x0fff};
@@ -847,7 +1035,7 @@ sub ReadFPXValue($$$$$;$)
         my $flags = $type & 0xf000;
         if ($flags) {
             if ($flags == VT_VECTOR) {
-                $opts |= 0x01;  # values don't seem to be padded inside vectors
+                $noPad = 1;     # values don't seem to be padded inside vectors
                 my $size = $oleFormatSize{VT_VECTOR};
                 last if $valPos + $size > $dirEnd;
                 $count = Get32u($dataPt, $valPos);
@@ -873,7 +1061,7 @@ sub ReadFPXValue($$$$$;$)
             if ($format eq 'VT_VARIANT') {
                 my $subType = Get32u($dataPt, $valPos);
                 $valPos += $size;
-                $val = ReadFPXValue($exifTool, $dataPt, $valPos, $subType, $dirEnd, $opts);
+                $val = ReadFPXValue($exifTool, $dataPt, $valPos, $subType, $dirEnd, $noPad, $codePage);
                 last unless defined $val;
                 push @vals, $val;
                 next;   # avoid adding $size to $valPos again
@@ -899,16 +1087,20 @@ sub ReadFPXValue($$$$$;$)
                 if ($format eq 'VT_LPWSTR') {
                     # convert wide string from Unicode
                     $val = $exifTool->Unicode2Charset($val);
-                } elsif ($opts & 0x02) {
-                    # convert from Latin1 to UTF-8
-                    $val = Image::ExifTool::Latin2Unicode($val,'v');
-                    $val = Image::ExifTool::Unicode2UTF8($val,'v');
+                } elsif ($codePage) {
+                    my $charset = $Image::ExifTool::charsetName{"cp$codePage"};
+                    if ($charset and $charset ne $exifTool->Options('Charset')) {
+                        $val = $exifTool->Charset2Unicode($val, 'II', $charset);
+                        $val = $exifTool->Unicode2Charset($val, 'II');
+                    } elsif ($codePage eq 1200) {   # UTF-16, little endian
+                        $val = $exifTool->Unicode2Charset($val, 'II');
+                    }
                 }
                 $val =~ s/\0.*//s;  # truncate at null terminator
                 # update position for string length
                 # (the spec states that strings should be padded to align
                 #  on even 32-bit boundaries, but this isn't always the case)
-                $valPos += ($opts & 0x01) ? $len : ($len + 3) & 0xfffffffc;
+                $valPos += $noPad ? $len : ($len + 3) & 0xfffffffc;
             } elsif ($format eq 'VT_BLOB' or $format eq 'VT_CF') {
                 my $len = Get32u($dataPt, $valPos);
                 last if $valPos + $len + 4 > $dirEnd;
@@ -982,7 +1174,7 @@ sub ProcessProperties($$$)
     }
     for ($n=0; $n<2; ++$n) {
         my %dictionary;     # dictionary to translate user-defined properties
-        my $opts = 0;       # option flags for converting values
+        my $codePage;
         last if $pos + 8 > $dirEnd;
         # read property section header
         my $size = Get32u($dataPt, $pos);
@@ -1017,9 +1209,11 @@ sub ProcessProperties($$$)
                     $dictionary{$tag} = $name;
                     next if $$tagTablePtr{$name};
                     $tag = $name;
-                    $name =~ tr/a-zA-Z0-9//dc;
+                    $name =~ s/(^| )([a-z])/\U$2/g; # start with uppercase
+                    $name =~ tr/-_a-zA-Z0-9//dc;    # remove illegal characters
                     next unless length $name;
-                    Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => ucfirst($name) });
+                    $exifTool->VPrint(0, "$$exifTool{INDENT}\[adding $name]\n") if $verbose;
+                    Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => $name });
                 }
                 next;
             }
@@ -1029,7 +1223,7 @@ sub ProcessProperties($$$)
                 $tag = $dictionary{$tag};
                 $custom = 1;
             }
-            my @vals = ReadFPXValue($exifTool, $dataPt, $valPos, $type, $dirEnd, $opts);
+            my @vals = ReadFPXValue($exifTool, $dataPt, $valPos, $type, $dirEnd, undef, $codePage);
             @vals or $exifTool->Warn('Error reading property value');
             $val = @vals > 1 ? \@vals : $vals[0];
             my $format = $type & 0x0fff;
@@ -1043,10 +1237,9 @@ sub ProcessProperties($$$)
                 # get tagInfo from SummaryInfo table
                 my $summaryTable = GetTagTable('Image::ExifTool::FlashPix::SummaryInfo');
                 $tagInfo = $exifTool->GetTagInfo($summaryTable, $tag);
-                if ($tag == 1 and $val == 1252 and $exifTool->Options('Charset') eq 'UTF8') {
-                    # set flag to translate 8-bit text only if
-                    # code page is cp1252 and Charset is UTF8
-                    $opts |= 0x02;
+                if ($tag == 1) {
+                    $val += 0x10000 if $val < 0; # (may be incorrectly stored as int16s)
+                    $codePage = $val;            # save code page for translating values
                 }
             } elsif ($$tagTablePtr{$tag}) {
                 $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
@@ -1094,7 +1287,7 @@ sub LoadChain($$$$$)
         return undef if $loadedSect{$sect}; # avoid infinite loop
         $loadedSect{$sect} = 1;
         my $offset = $sect * $sectSize + $hdrSize;
-        return undef unless $offset <= 0x7fffffff and
+        return undef unless ($offset <= 0x7fffffff or $$raf{LargeFileSupport}) and
                             $raf->Seek($offset, 0) and
                             $raf->Read($buff, $sectSize) == $sectSize;
         $chain .= $buff;
@@ -1152,7 +1345,7 @@ sub ProcessFPXR($$$)
                 return 0;
             }
             # convert stream pathname to ascii
-            my $name = Image::ExifTool::Unicode2Latin($1, 'v');
+            my $name = Image::ExifTool::Unicode2Charset(undef, $1, 'II', 'Latin');
             if ($verbose) {
                 my $psize = ($size == 0xffffffff) ? 'storage' : "$size bytes";
                 $exifTool->VPrint(0,"  |  $entry) Name: '$name' [$psize]\n");
@@ -1296,11 +1489,13 @@ sub ProcessFPX($$)
     return 0 unless $buff =~ /^\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1/;
 
     my $fileType = $exifTool->{FILE_EXT};
-    $fileType = 'FPX' unless $fileType and $fileType =~ /^(DOC|XLS|PPT)$/;
+    $fileType = 'FPX' unless $fileType and $isMSOffice{$fileType};
     $exifTool->SetFileType($fileType);
     SetByteOrder(substr($buff, 0x1c, 2) eq "\xff\xfe" ? 'MM' : 'II');
     my $tagTablePtr = GetTagTable('Image::ExifTool::FlashPix::Main');
     my $verbose = $exifTool->Options('Verbose');
+    # copy LargeFileSupport option to RAF for use in LoadChain
+    $$raf{LargeFileSupport} = $exifTool->Options('LargeFileSupport');
 
     my $sectSize = 1 << Get16u(\$buff, 0x1e);
     my $miniSize = 1 << Get16u(\$buff, 0x20);
@@ -1352,6 +1547,7 @@ sub ProcessFPX($$)
             return 1;
         }
         # set end of sector information in this DIF
+        $pos = 0;
         $endPos = $sectSize - 4;
         # next time around we want to read next DIF in chain
         $difStart = Get32u(\$buff, $endPos);
@@ -1403,7 +1599,7 @@ sub ProcessFPX($$)
         # be very tolerant of this count -- it's null terminated anyway)
         my $len = Get16u(\$dir, $pos + 0x40);
         $len > 32 and $len = 32;
-        my $tag = Image::ExifTool::Unicode2Latin(substr($dir, $pos, $len * 2), 'v');
+        my $tag = Image::ExifTool::Unicode2Charset(undef, substr($dir,$pos,$len*2), 'II', 'Latin');
         $tag =~ s/\0.*//s;  # truncate at null (in case length was wrong)
 
         my $sect = Get32u(\$dir, $pos + 0x74);  # start sector number
@@ -1528,11 +1724,14 @@ under the same terms as Perl itself.
 
 =item L<http://search.cpan.org/~jdb/libwin32/>
 
+=item L<http://msdn.microsoft.com/en-us/library/aa380374.aspx>
+
 =back
 
 =head1 SEE ALSO
 
 L<Image::ExifTool::TagNames/FlashPix Tags>,
+L<Image::ExifTool::TagNames/OOXML Tags>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

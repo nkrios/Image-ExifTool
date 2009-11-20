@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.98
 [File, System, Image] FileName - File Name: M2TS.mts
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1344 bytes
@@ -12,6 +12,6 @@
 [M2TS, AC3, Audio] AudioChannels - Audio Channels: 2
 [M2TS, H264, Video] ImageWidth - Image Width: 1920
 [M2TS, H264, Video] ImageHeight - Image Height: 1080
-[M2TS, H264, Time] DateTimeOriginal - Date Time Original: 2008:12:31 23:16:24
+[M2TS, H264, Time] DateTimeOriginal - Date/Time Original: 2008:12:31 23:16:24
 [M2TS, AC3, Audio] AudioSampleRate - Audio Sample Rate: 48000
 [Composite, Composite, Image] ImageSize - Image Size: 1920x1080

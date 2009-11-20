@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.99
 [File, System, Image] FileName - File Name: QuickTime.mov
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 2.7 kB
@@ -45,8 +45,8 @@
 [QuickTime, Track1, Video] 12 - Handler Vendor ID: Pentax
 [QuickTime, Track1, Image] 2 - Compressor ID: jpeg
 [QuickTime, Track1, Image] 10 - Vendor ID: Pentax
-[QuickTime, Track1, Image] 16 - Image Width: 320
-[QuickTime, Track1, Image] 17 - Image Height: 240
+[QuickTime, Track1, Image] 16 - Source Image Width: 320
+[QuickTime, Track1, Image] 17 - Source Image Height: 240
 [QuickTime, Track1, Image] 18 - X Resolution: 72
 [QuickTime, Track1, Image] 20 - Y Resolution: 72
 [QuickTime, Track1, Image] 25 - Compressor Name: Photo - JPEG

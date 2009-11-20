@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.98
 [File, System, Image] FileName - File Name: MP3.mp3
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 395 bytes
@@ -37,4 +37,5 @@
 [ID3, ID3v1, Time] 93 - Year: 2003
 [ID3, ID3v1, Audio] 97 - Comment: Comment
 [ID3, ID3v1, Audio] 127 - Genre: Hip-Hop
+[Composite, Composite, Time] DateTimeOriginal - Date/Time Original: 2005
 [Composite, Composite, Video] Duration - Duration: 0.00 s (approx)

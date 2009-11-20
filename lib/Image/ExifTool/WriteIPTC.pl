@@ -97,8 +97,7 @@ sub PrintInvCodedCharset($)
 
 #------------------------------------------------------------------------------
 # validate raw values for writing
-# Inputs: 0) ExifTool object reference, 1) tagInfo hash reference,
-#         2) raw value reference
+# Inputs: 0) ExifTool object ref, 1) tagInfo hash ref, 2) raw value ref
 # Returns: error string or undef (and possibly changes value) on success
 sub CheckIPTC($$$)
 {
@@ -128,10 +127,13 @@ sub CheckIPTC($$$)
                 $len = $minlen;
             }
         }
-        if ($minlen) {
+        if (defined $minlen) {
             $maxlen or $maxlen = $minlen;
             return "String too short (minlen is $minlen)" if $len < $minlen;
-            return "String too long (maxlen is $maxlen)" if $len > $maxlen;
+            if ($len > $maxlen and not $exifTool->Options('IgnoreMinorErrors')) {
+                $$exifTool{CHECK_WARN} = "[minor] IPTC:$$tagInfo{Name} exceeds length limit (truncated)";
+                $$valPtr = substr($$valPtr, 0, $maxlen);
+            }
         }
     } else {
         return "Bad IPTC Format ($format)";
@@ -298,9 +300,9 @@ sub DoWriteIPTC($$$)
     my $dirLen = $$dirInfo{DirLen};
     my ($tagInfo, %iptcInfo, $tag);
 
-    # begin by assuming IPTC is coded in Latin unless otherwise specified
-    my $xlat = $exifTool->Options('Charset');
-    undef $xlat if $xlat eq 'Latin';
+    # start by assuming default IPTC encoding
+    my $xlat = $exifTool->Options('IPTCCharset');
+    undef $xlat if $xlat eq $exifTool->Options('Charset');
 
     # make sure our dataLen is defined (note: allow zero length directory)
     unless (defined $dirLen) {
@@ -569,20 +571,51 @@ sub WriteIPTC($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access to autoload this package
+
     my $newData = DoWriteIPTC($exifTool, $dirInfo, $tagTablePtr);
-    return $newData unless eval 'require Digest::MD5';
-    my $dataPt;
-    if (defined $newData) {
-        $dataPt = \$newData;
-    } else {
-        $dataPt = $$dirInfo{DataPt};
-        if ($$dirInfo{DirStart} or length($$dataPt) != $$dirInfo{DirLen}) {
-            my $buff = substr($$dataPt, $$dirInfo{DirStart}, $$dirInfo{DirLen});
-            $dataPt = \$buff;
+
+    # calculate IPTC digests only if we are writing or deleting
+    # Photoshop:IPTCDigest with a value of 'new' or 'old'
+    while ($Image::ExifTool::Photoshop::iptcDigestInfo) {
+        my $nvHash = $exifTool->{NEW_VALUE}{$Image::ExifTool::Photoshop::iptcDigestInfo};
+        last unless defined $nvHash;
+        my @values = Image::ExifTool::GetNewValues($nvHash);
+        push @values, @{$$nvHash{DelValue}} if $$nvHash{DelValue};
+        my $new = grep /^new$/, @values;
+        my $old = grep /^old$/, @values;
+        last unless $new or $old;
+        unless (eval 'require Digest::MD5') {
+            $exifTool->Warn('Digest::MD5 must be installed to calculate IPTC digest');
+            last;
         }
+        my $dataPt;
+        if ($new) {
+            if (defined $newData) {
+                $dataPt = \$newData;
+            } else {
+                $dataPt = $$dirInfo{DataPt};
+                if ($$dirInfo{DirStart} or length($$dataPt) != $$dirInfo{DirLen}) {
+                    my $buff = substr($$dataPt, $$dirInfo{DirStart}, $$dirInfo{DirLen});
+                    $dataPt = \$buff;
+                }
+            }
+            # set NewIPTCDigest data member unless IPTC is being deleted
+            $$exifTool{NewIPTCDigest} = Digest::MD5::md5($$dataPt) if length $$dataPt;
+        }
+        if ($old) {
+            if ($new and not defined $newData) {
+                $$exifTool{OldIPTCDigest} = $$exifTool{NewIPTCDigest};
+            } else {
+                $dataPt = $$dirInfo{DataPt};
+                if ($$dirInfo{DirStart} or length($$dataPt) != $$dirInfo{DirLen}) {
+                    my $buff = substr($$dataPt, $$dirInfo{DirStart}, $$dirInfo{DirLen});
+                    $dataPt = \$buff;
+                }
+                $$exifTool{OldIPTCDigest} = Digest::MD5::md5($$dataPt) if length $$dataPt;
+            }
+        }
+        last;
     }
-    # set NewIPTCDigest data member unless IPTC is being deleted
-    $$exifTool{NewIPTCDigest} = Digest::MD5::md5($$dataPt) if length $$dataPt;
     return $newData;
 }
 

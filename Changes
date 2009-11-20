@@ -5,8 +5,219 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 7.89. (Other versions are
+Note: The most recent production release is Version 8.00. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+Nov. 20, 2009 - Version 8.00 (production release)
+
+  - Added read support for Apple iWork '09 files (Keynote, Pages and Numbers)
+  - Added ability to write Nikon SerialNumber and ShutterCount tags
+  - Added a few new Nikon LensID's and changed Tamron lens names to include
+    model number (thanks Robert Rottmerhusen)
+  - Decode a number of new Nikon tags (thanks Warren Hatch for much of this)
+  - Decode a few new Sony tags and improved others (thanks Igal Milchtaich)
+  - Decode a few new Ricoh tags, renamed RicohDateTime1/2, Revision and
+    MakerNoteVersion tags, and added some print conversions
+  - Decode Parallax in FujiFilm MPO MPImage2 images (thanks John Goodman)
+  - Decode Canon EOS 1D Mark IV custom functions
+  - Decode a number of new tags in MPEG-4 videos
+  - Decode a large number of private GE DICOM tags
+  - Decode a few more tags in AVI videos and attempt to fix problem calculating
+    duration when multiple video streams exist
+  - Enhanced -ee option to extract information from embedded MPF images
+  - Improved Nikon LensID conversion to recognize user-defined lenses
+  - Improved decoding of a few Olympus tags (ArtFilter, FaceDetect and 
+    FocusProcess)
+  - Improved handling of warnings when processing corrupted ZIP files
+  - Improved recognition of Canon teleconverters in Composite LensID tag
+  - Added patch for Leica M8 bug which writes incorrect format for EXIF
+    ExposureCompensation and ShutterSpeedValue
+  - Changed prefix of unknown Leica M9 tags from LeicaSubdir to Leica_Subdir
+  - Fixed problem writing encrypted Nikon WB Levels
+  - Fixed problems reading PDF tags written by OS X 10.6 utilities
+  - Fixed problem where the -charset option didn't work properly for some XML
+    character entities when reading XMP
+
+Nov. 6, 2009 - Version 7.99
+
+  - Added read support for Office Open XML files and improved recognition of
+    many MS Office file types
+  - Added read support for Phase One IIQ and Capture One COS and EIP files
+  - Added read support for GZIP information (first archived file only)
+  - Added a new Canon LensType (thanks Karsten S&ouml;te)
+  - Added a new Nikon LensID (thanks Geert De Soete)
+  - Decode a few new Sony tags
+  - Decode MakerNotes in Pentax AVI videos
+  - Decode SerialNumber for newer Pentax cameras
+  - Decode Canon FlashMeteringMode for most EOS models
+  - Disabled some Sony A230 CameraInfo tags which weren't valid for this model
+  - Give names to a number of unknown QuickTime atoms
+  - Recognize VOB file extension (but audio information in MPEG private stream
+    is not yet decoded)
+  - Tolerate extra white space in GPX attributes when geotagging (fixes problem
+    reading GlobalSat GPX files)
+  - Minor improvements to FlashPix decoding
+  - Changed names of all ZIP tags to avoid name conflicts with other tags
+  - Changed Composite ImageSize to use ExifImageWidth/Height for CR2 images
+  - Changed names of QuickTime image and video track description
+    ImageWidth/Height tags to SourceImageWidth/Height
+  - Fixed problems when -if option was combined with -v or -htmlDump
+  - Fixed problem parsing NMEA track logs where coordinates have the wrong
+    number of digits due to missing leading zeros (Holux M-241)
+  - Fixed an incorrect Pentax LensType
+
+Oct. 28, 2009 - Version 7.98
+
+  - Added -config and -use options
+  - Added MWG support via a plug-in module ("-use MWG")
+  - Added ability to read Sony Vegas tags in AVI videos
+  - Added a couple of new Canon LensType's
+  - Added a new Panasonic ShootingMode (thanks Joerg)
+  - Added a new PentaxModelID (Optio P80)
+  - Added a new CanonModelID (thanks Laurent Clevy)
+  - Added a few new Canon 1D Mark IV custom functions values
+  - Added warning for superfluous tag names on the command line when writing
+  - Decode a few more tags for the Canon EOS 5D and 7D
+  - Decode a number of new tags in Quicktime-based files (including MP4 and JP2)
+  - Impose length limit on IPTC values when writing as per spec. (for backward
+    compatibility, the length check may be disabled with the -m option)
+  - Improved checks for invalid EXIF offsets and changed some warning messages
+  - Improved decoding for a few Canon tags (and renamed NoiseReduction tag)
+  - Improved date/time formatting to accept date-only values
+  - Implemented print conversion for ID3 date/time tags
+  - Enhanced writing of Photoshop:IPTCDigest to allow a special value of 'old'
+    to represent the digest of the IPTC from the original file
+  - Updated iptc2xmp.args and xmp2iptc.args to handle IPTC
+    DigitalCreationDate/Time
+  - Recognize a number of Sigma LensType's in X3F images
+  - Recognize a large number of additional audio/video file extensions
+  - Minor improvements to -htmldump output
+  - Minor changes to some application warning messages
+  - Fixed problem writing Canon CameraTemperature tags
+  - Fixed "Error reading Info object" warning when reading a PDF file after
+    deleting all PDF tags
+  - API Changes:
+      - Added ability to specify config file via $Image::ExifTool::configFile
+      - Added EditGroup option for SetNewValue()
+
+Oct. 13, 2009 - Version 7.97
+
+  - Added ability to disable print conversion on a per-tag basis by suffixing
+    the tag name with a '#' character
+  - Added a new PentaxModelID (Optio WS80)
+  - Decode a few more Sony tags
+  - Decode a number of new Casio tags and values
+  - Decode CameraTemperature for Canon PowerShot models (thanks Vesa Kivisto)
+  - Improved warning messages for the -ext option
+  - Improved DOF calculation to use ObjectDistance if SubjectDistance and
+    FocusDistance are not available
+  - Improved -X output to support more of the new -charset encodings
+  - Made Composite:FileNumber writable
+  - Use more detailed makernote directory names in EXIF warning messages
+  - Decreased priority of tags in IFD1 of JPEG images to avoid taking precedence
+    over tags from IFD0 or ExifIFD
+  - Changed print conversion strings for TIFF SampleFormat tag
+  - Renamed Casio ObjectDistance tag to FocusDistance
+  - Fixed invalid character in a Minolta/Sony LensType string
+  - Fixed bug decoding NITFVersion tag
+  - Fixed bug where binary data was returned without the -b option when using an
+    expression involving tag names for some tags such as ThumbnailImage
+  - Fixed two problems which could result in runtime warnings when:
+      - reading truncated ICC_Profile information
+      - using -htmldump on an image containing invalid EXIF offsets
+  - API Changes:
+      - Added ability to disable print conversion by suffixing tag name with '#'
+      - Changed name of BigTIFF 'ifd8' format to 'ifd64' for consistency
+
+Oct. 2, 2009 - Version 7.96
+
+  - Added new Geosync tag to allow geotagging of images with timestamps which
+    are not pre-synchronized to GPS time
+  - Added patch to avoid crash bug in Canon DPP software when OwnerName is set
+    to a value that is exactly 3 characters long (doh!)
+  - Added a few new Olympus LensType's (thanks Godfrey DiGiorgi)
+  - Added a couple more Nikon LensID's (thanks Robert Rottmerhusen)
+  - Added minor warning when fixing invalid counts in Kodak MakerNotes
+  - Decode a few new tags and values for the Panasonic GF1
+  - Improved parsing of command-line arguments to remove order dependencies of
+    certain options
+  - Minor improvement to decoding of Olympus FaceDetect tag
+  - Changed "Error reading PreviewImage from file" to a minor warning
+  - Changed conversion of Canon MeasuredEV to correspond more closely to
+    LightValue (by adding 5 to the MeasuredEV value, which seems to be good for
+    all EOS models, but it may be high by up to 1 EV for some PowerShot models)
+  - Fixed problems decoding some CameraInfo tags for the Canon 7D with the new
+    production firmware (1.0.7)
+  - Fixed problems writing some CameraInfo tags for the Canon 50D and 5DmkII
+
+Sept. 24, 2009 - Version 7.95
+
+  - Added read support for LNK (Windows shortcut) file metadata
+  - Added patch to fix incorrect count written by a number of recent Kodak
+    cameras to some tags in SubIFD3 of the MakerNotes
+  - Added a few more Sony/Minolta LensType's
+  - Added a couple more Canon LensType's (thanks Norbert Wasser)
+  - Added a PentaxModelID for the new K-x
+  - Decode a couple more Canon VignettingCorr tags (thanks Laurent Clevy)
+  - Improved Canon FocusDistance conversions to indicate "inf" for maximum value
+  - Improved DOF calculation to use SubjectDistance if FocusDistance is not
+    available
+  - Changed -fast, -scanForXMP and -unknown options to also apply when copying
+    tags with -tagsFromFile
+
+Sept. 11, 2009 - Version 7.94
+
+  - Added support for Leica M9 makernote format and decode a few new tags
+  - Added a few new Leica LensType's
+  - Added support for IGC GPS track logs (thanks Lionel Genet)
+  - Added a number of alternate Macintosh character sets and changed a couple of
+    character set names for -charset option
+  - Decode even more Sony A100 tags (thanks Igal Milchtaich!)
+  - Improved handling of FlashPix character translations
+  - Changed a couple of Sony and Minolta AF tag names to be more consistent
+
+Sept. 5, 2009 - Version 7.93
+
+  - Added a new CanonModelID (thanks Laurent Clevy)
+  - Added a couple of new Nikon LensType's (thanks Robert Rottmerhusen)
+  - Added a few new Pentax LensType's
+  - Decode a number of new tags for the Canon EOS 7D
+  - Calculate Duration for WAV audio files
+  - Allow exponents when writing GPS coordinates (ie. "-gpslatitude=7.657e+01")
+  - Print available character sets if no CHARSET is given for -charset option
+  - Improved -v3 and -htmldump output to show MPF image data
+  - Fixed -E option to work with tag descriptions when -lang option used
+  - Fixed problem reading large FlashPix-format documents
+  - API Changes:
+      - Added LargeFileSupport option
+
+Aug. 29, 2009 - Version 7.92
+
+  - Fixed new "-charset iptc=CHARSET" feature to work with -tagsFromFile
+
+Aug. 29, 2009 - Version 7.91
+
+  - Added -charset option and support for additional Windows and Mac character
+    sets.  Character sets now supported are: UTF-8, Latin1, Latin2, Cyrillic,
+    Greek, Turkish, Hebrew, Arabic, Baltic, Vietnam, Thai and MacRoman
+  - Fixed problem with some duplicate Nikon LensID's
+  - Fixed incorrect Duration calculation for multi-channel FLAC audio files
+  - Compatibility Notice: Removed "CreatorContactInfo" shortcuts which were
+    added to ease the transition when some Iptc4xmpCore tag names were changed
+    in version 7.45
+  - API Changes:
+      - Added IPTCCharset option and support for additional character sets
+
+Aug. 24, 2009 - Version 7.90
+
+  - Added -ex (-escapeXML) option
+  - Added a few more Minolta M42-type lenses (thanks Lukasz Stelmach)
+  - Added a number of new CanonModelID's
+  - Decode more Sony A100 tags (thanks Igal Milchtaich)
+  - Decode a few more Kodak WhiteBalance tags
+  - Decode a couple more JPEG APP segments
+  - Internal changes to Composite tag calculation algorithm
+  - Patched problem with renaming files on OS/2 that caused failed tests
 
 Aug. 18, 2009 - Version 7.89 (production release)
 
@@ -3687,7 +3898,7 @@ Oct. 22, 2004 - Version 3.61
   - Moved POD documentation into separate .pod files
   - Started referencing sources for tag definitions in the source code
 
-Oct. 1, 2004 - Version 3.60 (production release)
+Oct. 1, 2004 - Version 3.60 (production release) - initial CPAN release!
 
   - Changed group family 0 to divide EXIF group into individual IFD groups
   - Fixed typos in some Casio tag names

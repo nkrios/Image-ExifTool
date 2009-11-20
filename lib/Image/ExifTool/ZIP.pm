@@ -7,6 +7,7 @@
 #
 # References:   1) http://www.pkware.com/documents/casestudies/APPNOTE.TXT
 #               2) http://www.cpanforum.com/threads/9046
+#               3) http://www.gzip.org/zlib/rfc-gzip.html
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::ZIP;
@@ -15,18 +16,31 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
+
+my $didWarn;
+sub WarnProc($) { $didWarn = 1; }
 
 # ZIP metadata blocks
 %Image::ExifTool::ZIP::Main = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Other' },
     FORMAT => 'int16u',
-    NOTES => 'This information is extracted from ZIP archives.',
-    2 => 'ZipVersion',
-    3 => 'BitFlag',
+    NOTES => q{
+        The following tags are extracted from ZIP archives.  ExifTool also extracts
+        additional meta information from compressed documents inside some ZIP-based
+        files such as DOCX, PPTX, XLSX (Office Open XML) and EIP (Capture One
+        Enhanced Image Package).  The ExifTool family 3 groups may be used to
+        organize the output by embedded document number (ie. the exiftool C<-g3>
+        option).
+    },
+    2 => 'ZipRequiredVersion',
+    3 => {
+        Name => 'ZipBitFlag',
+        PrintConv => '$val ? sprintf("0x%.4x",$val) : $val',
+    },
     4 => {
-        Name => 'Compression',
+        Name => 'ZipCompression',
         PrintConv => {
             0 => 'None',
             1 => 'Shrunk',
@@ -49,7 +63,7 @@ $VERSION = '1.02';
        },
     },
     5 => {
-        Name => 'ModifyDate',
+        Name => 'ZipModifyDate',
         Format => 'int32u',
         Groups => { 2 => 'Time' },
         ValueConv => sub {
@@ -65,13 +79,151 @@ $VERSION = '1.02';
         },
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    7 => { Name => 'CRC', Format => 'int32u', PrintConv => 'sprintf("0x%.8x",$val)' },
-    9 => { Name => 'CompressedSize',    Format => 'int32u' },
-    11 => { Name => 'UncompressedSize', Format => 'int32u' },
-    13 => 'FileNameLength',
-    14 => 'ExtraFieldLength',
-    15 => { Name => 'ArchivedFileName', Format => 'string[$val{13}]' },
+    7 => { Name => 'ZipCRC', Format => 'int32u', PrintConv => 'sprintf("0x%.8x",$val)' },
+    9 => { Name => 'ZipCompressedSize',    Format => 'int32u' },
+    11 => { Name => 'ZipUncompressedSize', Format => 'int32u' },
+    13 => {
+        Name => 'ZipFileNameLength',
+        # don't store a tag -- just extract the value for use with ZipFileName
+        Hidden => 1,
+        RawConv => '$$self{ZipFileNameLength} = $val; undef',
+    },
+    # 14 => 'ZipExtraFieldLength',
+    15 => {
+        Name => 'ZipFileName',
+        Format => 'string[$$self{ZipFileNameLength}]',
+    },
 );
+
+# GNU ZIP tags (ref 3)
+%Image::ExifTool::ZIP::GZIP = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Other' },
+    NOTES => q{
+        These tags are extracted from GZIP (GNU ZIP) archives, but currently only
+        for the first file in the archive.
+    },
+    2 => {
+        Name => 'Compression',
+        PrintConv => {
+            8 => 'Deflated',
+        },
+    },
+    3 => {
+        Name => 'Flags',
+        PrintConv => { BITMASK => {
+            0 => 'Text',
+            1 => 'CRC16',
+            2 => 'ExtraFields',
+            3 => 'FileName',
+            4 => 'Comment',
+        }},
+    },
+    4 => {
+        Name => 'ModifyDate',
+        Format => 'int32u',
+        Groups => { 2 => 'Time' },
+        ValueConv => 'ConvertUnixTime($val,1)',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    8 => {
+        Name => 'ExtraFlags',
+        PrintConv => {
+            0 => '(none)',
+            2 => 'Maximum Compression',
+            4 => 'Fastest Algorithm',
+        },
+    },
+    9 => {
+        Name => 'OperatingSystem',
+        PrintConv => {
+            0 => 'FAT filesystem (MS-DOS, OS/2, NT/Win32)',
+            1 => 'Amiga',
+            2 => 'VMS (or OpenVMS)',
+            3 => 'Unix',
+            4 => 'VM/CMS',
+            5 => 'Atari TOS',
+            6 => 'HPFS filesystem (OS/2, NT)',
+            7 => 'Macintosh',
+            8 => 'Z-System',
+            9 => 'CP/M',
+            10 => 'TOPS-20',
+            11 => 'NTFS filesystem (NT)',
+            12 => 'QDOS',
+            13 => 'Acorn RISCOS',
+            255 => 'unknown',
+        },
+    },
+    10 => 'ArchivedFileName',
+    11 => 'Comment',
+);
+
+#------------------------------------------------------------------------------
+# Extract information from a GNU ZIP file (ref 3)
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
+# Returns: 1 on success, 0 if this wasn't a valid GZIP file
+sub ProcessGZIP($$)
+{
+    my ($exifTool, $dirInfo) = @_;
+    my $raf = $$dirInfo{RAF};
+    my ($flags, $buff);
+
+    return 0 unless $raf->Read($buff, 10) and $buff =~ /^\x1f\x8b\x08/;
+
+    $exifTool->SetFileType();
+    SetByteOrder('II');
+
+    my $tagTablePtr = GetTagTable('Image::ExifTool::ZIP::GZIP');
+    $exifTool->HandleTag($tagTablePtr, 2, Get8u(\$buff, 2));
+    $exifTool->HandleTag($tagTablePtr, 3, $flags = Get8u(\$buff, 3));
+    $exifTool->HandleTag($tagTablePtr, 4, Get32u(\$buff, 4));
+    $exifTool->HandleTag($tagTablePtr, 8, Get8u(\$buff, 8));
+    $exifTool->HandleTag($tagTablePtr, 9, Get8u(\$buff, 9));
+
+    # extract file name and comment if they exist
+    if ($flags & 0x18) {
+        if ($flags & 0x04) {
+            # skip extra field
+            $raf->Read($buff, 2) == 2 or return 1;
+            my $len = Get16u(\$buff, 0);
+            $raf->Read($buff, $len) == $len or return 1;
+        }
+        $raf->Read($buff, 4096) or return 1;
+        my $pos = 0;
+        my $tagID;
+        # loop for ArchivedFileName (10) and Comment (11) tags
+        foreach $tagID (10, 11) {
+            my $mask = $tagID == 10 ? 0x08 : 0x10;
+            next unless $flags & $mask;
+            my $end = $buff =~ /\0/g ? pos($buff) - 1 : length($buff);
+            # (the doc specifies the string should be ISO 8859-1,
+            # but in OS X it seems to be UTF-8, so don't translate
+            # it because I could just as easily screw it up)
+            my $str = substr($buff, $pos, $end - $pos);
+            $exifTool->HandleTag($tagTablePtr, $tagID, $str);
+            last if $end >= length $buff;
+            $pos = $end + 1;
+        }
+    }
+    return 1;
+}
+
+#------------------------------------------------------------------------------
+# Call HandleTags for attributes of an Archive::Zip member
+# Inputs: 0) ExifTool object ref, 1) member ref, 2) optional tag table ref
+sub HandleMember($$;$)
+{
+    my ($exifTool, $member, $tagTablePtr) = @_;
+    $tagTablePtr or  $tagTablePtr = GetTagTable('Image::ExifTool::ZIP::Main');
+    $exifTool->HandleTag($tagTablePtr, 2, $member->versionNeededToExtract());
+    $exifTool->HandleTag($tagTablePtr, 3, $member->bitFlag());
+    $exifTool->HandleTag($tagTablePtr, 4, $member->compressionMethod());
+    $exifTool->HandleTag($tagTablePtr, 5, $member->lastModFileDateTime());
+    $exifTool->HandleTag($tagTablePtr, 7, $member->crc32());
+    $exifTool->HandleTag($tagTablePtr, 9, $member->compressedSize());
+    $exifTool->HandleTag($tagTablePtr, 11, $member->uncompressedSize());
+    $exifTool->HandleTag($tagTablePtr, 15, $member->fileName());
+}
 
 #------------------------------------------------------------------------------
 # Extract information from an ZIP file
@@ -81,8 +233,111 @@ sub ProcessZIP($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
-    my $rtnVal = 0;
-    my ($buff, $buf2, $tagTablePtr);
+    my ($buff, $buf2, $zip, $docNum);
+
+    return 0 unless $raf->Read($buff, 30) and $buff =~ /^PK\x03\x04/;
+
+    my $tagTablePtr = GetTagTable('Image::ExifTool::ZIP::Main');
+
+    # use Archive::Zip if avilable
+    for (;;) {
+        unless (eval 'require Archive::Zip' and eval 'require IO::File') {
+            if ($$exifTool{FILE_EXT} and $$exifTool{FILE_EXT} ne 'ZIP') {
+                $exifTool->Warn("Install Archive::Zip to decode compressed ZIP information");
+            }
+            last;
+        }
+        # Archive::Zip requires a seekable IO::File object
+        my $fh = $raf->{FILE_PT};
+        if ($fh and seek($fh, 0, 0)) {
+            unless (eval 'require IO::File') {
+                # (this shouldn't happen because IO::File is a prerequisite of Archive::Zip)
+                $exifTool->Warn("Install IO::File to decode compressed ZIP information");
+                last;
+            }
+            bless $fh, 'IO::File';  # Archive::Zip expects an IO::File object
+        } elsif (eval 'require IO::String') {
+            # read the whole file into memory (what else can I do?)
+            $raf->Slurp();
+            $fh = new IO::String ${$raf->{BUFF_PT}};
+        } else {
+            my $type = $fh ? 'pipe or socket' : 'scalar reference';
+            $exifTool->Warn("Install IO::String to decode compressed ZIP information from a $type");
+            last;
+        }
+        $exifTool->VPrint(1, "  --- using Archive::Zip ---\n");
+        $zip = new Archive::Zip;
+        # catch all warnings! (Archive::Zip is bad for this)
+        local $SIG{'__WARN__'} = \&WarnProc;
+        my $status = $zip->readFromFileHandle($fh);
+        if ($status) {
+            undef $zip;
+            $exifTool->Warn('ZIP file may be corrupt');
+            last;
+        }
+        $$dirInfo{ZIP} = $zip;
+
+        # check for an Office Open file (DOCX, etc)
+        # --> read '[Content_Types].xml' to determine the file type
+        my ($mime, @members);
+        my $cType = $zip->memberNamed('[Content_Types].xml');
+        if ($cType) {
+            ($buff, $status) = $zip->contents($cType);
+            if (not $status and $buff =~ /ContentType\s*=\s*(['"])([^"']+)\.main(\+xml)?\1/) {
+                $mime = $2;
+            }
+        }
+        # check for docProps if we couldn't find a MIME type
+        $mime or @members = $zip->membersMatching('^docProps/.*\.(xml|XML)$');
+        if ($mime or @members) {
+            $$dirInfo{MIME} = $mime;
+            require Image::ExifTool::OOXML;
+            Image::ExifTool::OOXML::ProcessDOCX($exifTool, $dirInfo);
+            delete $$dirInfo{MIME};
+            last;
+        }
+
+        # check for an EIP file
+        @members = $zip->membersMatching('^CaptureOne/.*\.(cos|COS)$');
+        if (@members) {
+            require Image::ExifTool::CaptureOne;
+            Image::ExifTool::CaptureOne::ProcessEIP($exifTool, $dirInfo);
+            last;
+        }
+
+        # check for an iWork file
+        @members = $zip->membersMatching('^(index\.(xml|apxl)|QuickLook/Thumbnail\.jpg)$');
+        if (@members) {
+            require Image::ExifTool::iWork;
+            Image::ExifTool::iWork::Process_iWork($exifTool, $dirInfo);
+            last;
+        }
+
+        # otherwise just extract general ZIP information
+        $exifTool->SetFileType;
+        @members = $zip->members();
+        $docNum = 0;
+        my $member;
+        foreach $member (@members) {
+            $$exifTool{DOC_NUM} = ++$docNum;
+            HandleMember($exifTool, $member, $tagTablePtr);
+        }
+        last;
+    }
+    # all done if we processed this using Archive::Zip
+    if ($zip) {
+        delete $$dirInfo{ZIP};
+        delete $$exifTool{DOC_NUM};
+        return 1;
+    }
+#
+# process the ZIP file by hand (funny, but this seems easier than using Archive::Zip)
+#
+    $docNum = 0;
+    $exifTool->VPrint(1, "  -- processing as binary data --\n");
+    $raf->Seek(30, 0);
+    $exifTool->SetFileType();
+    SetByteOrder('II');
 
     #  A.  Local file header:
     #  local file header signature     0) 4 bytes  (0x04034b50)
@@ -97,17 +352,10 @@ sub ProcessZIP($$)
     #  file name length               26) 2 bytes
     #  extra field length             28) 2 bytes
     for (;;) {
-        $raf->Read($buff, 30) == 30 and $buff =~ /^PK\x03\x04/ or last;
-        unless ($rtnVal) {
-            $rtnVal = 1;
-            $exifTool->SetFileType();
-            SetByteOrder('II');
-            $tagTablePtr = GetTagTable('Image::ExifTool::ZIP::Main');
-        }
         my $len = Get16u(\$buff, 26) + Get16u(\$buff, 28);
         $raf->Read($buf2, $len) == $len or last;
 
-        $rtnVal = 1;
+        $$exifTool{DOC_NUM} = ++$docNum;
         $buff .= $buf2;
         my %dirInfo = (
             DataPt => \$buff,
@@ -128,8 +376,10 @@ sub ProcessZIP($$)
         }
         $len = Get32u(\$buff, 18);      # file data length
         $raf->Seek($len, 1) or last;    # skip file data
+        $raf->Read($buff, 30) == 30 and $buff =~ /^PK\x03\x04/ or last;
     }
-    return $rtnVal;
+    delete $$exifTool{DOC_NUM};
+    return 1;
 }
 
 1;  # end
@@ -147,7 +397,8 @@ This module is used by Image::ExifTool
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to extract meta
-information from ZIP archives.
+information from ZIP and GZIP archives.  This includes ZIP-based file types
+like DOCX, PPTX, XLSX and EIP.
 
 =head1 AUTHOR
 
@@ -162,11 +413,14 @@ under the same terms as Perl itself.
 
 =item L<http://www.pkware.com/documents/casestudies/APPNOTE.TXT>
 
+=item L<http://www.gzip.org/zlib/rfc-gzip.html>
+
 =back
 
 =head1 SEE ALSO
 
 L<Image::ExifTool::TagNames/ZIP Tags>,
+L<Image::ExifTool::TagNames/OOXML Tags>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

@@ -75,10 +75,10 @@ $VERSION = '1.00';
    'AFAreaMode' => {
       Description => 'AF 영역 모드',
       PrintConv => {
-        'Auto-area AF' => '자동 영역 AF',
+        'Auto-area' => '자동 영역 AF',
         'Dynamic Area' => '다이내믹 영역',
         'Dynamic Area (wide)' => '다이내믹 영역 (와이드)',
-        'Dynamic Area, Closest Subject' => '다이내믹 영역, 지근거리 우선',
+        'Dynamic Area (closest subject)' => '다이내믹 영역 (지근거리 우선)',
         'Group Dynamic' => '그룹 다이내믹',
         'Single Area' => '싱글 영역',
         'Single Area (wide)' => '싱글 영역 (와이드)',
@@ -93,13 +93,6 @@ $VERSION = '1.00';
       },
     },
    'AFAssist' => {
-      Description => '내장 AF 보조광',
-      PrintConv => {
-        'Off' => '꺼짐',
-        'On' => '켜짐',
-      },
-    },
-   'AFAssistIlluminator' => {
       Description => '내장 AF 보조광',
       PrintConv => {
         'Off' => '꺼짐',
@@ -1947,11 +1940,11 @@ $VERSION = '1.00';
       PrintConv => {
         'Auto' => '자동',
         'Cloudy' => '흐린날',
+        'Daylight' => '맑은날',
         'Flash' => '플래시',
         'Fluorescent' => '형광등',
         'Manual' => '수동',
         'Shade' => '그늘',
-        'Daylight' => '맑은날',
         'Tungsten' => '백열등',
       },
     },

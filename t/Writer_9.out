@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
 [File, System, Image] FileName - File Name: Writer_9_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 9.3 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:13 12:50:45-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:10 16:10:06-05:00
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -99,7 +99,7 @@
 [MakerNotes, Canon, Image] 3 - Focal Plane Y Size: 15.49 mm
 [MakerNotes, Canon, Image] 1 - Auto ISO: 100
 [MakerNotes, Canon, Image] 2 - Base ISO: 100
-[MakerNotes, Canon, Image] 3 - Measured EV: -6.25
+[MakerNotes, Canon, Image] 3 - Measured EV: -1.25
 [MakerNotes, Canon, Image] 4 - Target Aperture: 14
 [MakerNotes, Canon, Image] 6 - Exposure Compensation: 0
 [MakerNotes, Canon, Image] 7 - White Balance: Auto
@@ -111,11 +111,11 @@
 [MakerNotes, Canon, Image] 16 - Auto Exposure Bracketing: Off
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
-[MakerNotes, Canon, Image] 19 - Focus Distance Upper: -0.01
+[MakerNotes, Canon, Image] 19 - Focus Distance Upper: inf
 [MakerNotes, Canon, Image] 20 - Focus Distance Lower: 5.46
 [MakerNotes, Canon, Image] 21 - F Number: 14
 [MakerNotes, Canon, Image] 22 - Exposure Time: 128
-[MakerNotes, Canon, Image] 23 - Measured EV 2: -6.25
+[MakerNotes, Canon, Image] 23 - Measured EV 2: -1.25
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 4
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
@@ -156,7 +156,7 @@
 [MakerNotes, Canon, Camera] 9 - AF Area Y Positions: 0 0 -506 0 506 0 0
 [MakerNotes, Canon, Camera] 10 - AF Points In Focus: (none)
 [MakerNotes, Canon, Camera] 19 - Thumbnail Image Valid Area: 0 159 7 112
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.83
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.00
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0560018150

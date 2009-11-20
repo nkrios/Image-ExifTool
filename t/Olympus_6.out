@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.93
 [File, System, Image] FileName - File Name: Olympus2.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 7.5 kB
@@ -62,7 +62,7 @@
 [MakerNotes, Olympus, Camera] 512 - Special Mode: Normal, Sequence: 0, Panorama: (none)
 [MakerNotes, Olympus, Camera] 513 - Quality: SHQ (Fine)
 [MakerNotes, Olympus, Camera] 514 - Macro: Off
-[MakerNotes, Olympus, Camera] 515 - Black & White Mode: Off
+[MakerNotes, Olympus, Camera] 515 - Black And White Mode: Off
 [MakerNotes, Olympus, Camera] 516 - Digital Zoom: 1.0
 [MakerNotes, Olympus, Camera] 517 - Focal Plane Diagonal: 7.58 mm
 [MakerNotes, Olympus, Camera] 518 - Lens Distortion Params: 0 0 0 0 0 0
