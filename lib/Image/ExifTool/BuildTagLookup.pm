@@ -18,18 +18,19 @@ require Exporter;
 
 BEGIN {
     # prevent ExifTool from loading the user config file
-    $Image::ExifTool::noConfig = 1;
+    $Image::ExifTool::configFile = '';
 }
 
 use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
+use Image::ExifTool::Exif;
 use Image::ExifTool::Shortcuts;
 use Image::ExifTool::HTML qw(EscapeHTML);
 use Image::ExifTool::IPTC;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.01';
+$VERSION = '2.06';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -45,6 +46,29 @@ my $docType = q{<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 };
 
+# list of all recognized Format strings
+# (not a complete list, but this is all we use so far)
+my %formatOK = (
+    %Image::ExifTool::Exif::formatNumber,
+    0 => 1,
+    1 => 1,
+    real    => 1,
+    integer => 1,
+    date    => 1,
+    boolean => 1,
+    rational  => 1,
+   'lang-alt' => 1,
+    fixed16u => 1,
+    fixed16s => 1,
+    fixed32u => 1,
+    fixed32s => 1,
+    extended => 1,
+    resize   => 1,
+    digits   => 1,
+    rational32u => 1,
+    rational32s => 1,
+    var_string  => 1,
+);
 
 my $caseInsensitive;    # flag to ignore case when sorting tag names
 
@@ -111,8 +135,7 @@ them manually since they may affect the way an image is rendered.  An
 asterisk (C<*>) indicates a "protected" tag which is not writable directly,
 but is written automatically by exiftool (often when a corresponding
 Composite or Extra tag is written).  A colon (C<:>) indicates a mandatory
-tag which may be added automatically when writing certain types of
-information.
+tag which may be added automatically when writing.
 
 The HTML version of these tables also lists possible B<Values> for
 discrete-valued tags, as well as B<Notes> for some tags.
@@ -127,8 +150,8 @@ question.
     EXIF => q{
 EXIF stands for "Exchangeable Image File Format".  This type of information
 is formatted according to the TIFF specification, and may be found in JPG,
-TIFF, PNG, MIFF and HDP images, as well as many TIFF-based RAW images, and
-even some AVI and MOV videos.
+TIFF, PNG, MIFF, HDP and PSP images, as well as many TIFF-based RAW images,
+and even some AVI and MOV videos.
 
 The EXIF meta information is organized into different Image File Directories
 (IFD's) within an image.  The names of these IFD's correspond to the
@@ -180,15 +203,14 @@ HH:MM:SS[.SS][+/-HH:MM]", C<boolean> is either "True" or "False", and
 C<lang-alt> is a list of string alternatives in different languages.
 
 Individual languages for C<lang-alt> tags are accessed by suffixing the tag
-name with a '-', followed by an
-L<RFC 3066|http://www.ietf.org/rfc/rfc3066.txt> language code (ie.
-"XMP:Title-fr", or "Rights-en-US").  A C<lang-alt> tag with no language code
-accesses the "x-default" language, but causes other languages for this tag
-to be deleted when writing.  The "x-default" language code may be specified
-when writing to preserve other existing languages (ie.
-"XMP-dc:Description-x-default"), but note that other languages are still
-deleted if the "x-default" language is deleted.  When reading, "x-default"
-is not specified.
+name with a '-', followed by an RFC 3066 language code (ie. "XMP:Title-fr",
+or "Rights-en-US").  (See L<http://www.ietf.org/rfc/rfc3066.txt> for the RFC
+3066 specification.)  A C<lang-alt> tag with no language code accesses the
+"x-default" language, but causes other languages for this tag to be deleted
+when writing.  The "x-default" language code may be specified when writing
+to preserve other existing languages (ie. "XMP-dc:Description-x-default"),
+but note that other languages are still deleted if the "x-default" language
+is deleted.  When reading, "x-default" is not specified.
 
 The XMP tags are organized according to schema B<Namespace> in the following
 tables.  Note that a few of the longer namespace prefixes given below have
@@ -216,6 +238,11 @@ values.  These lengths are given in square brackets after the B<Writable>
 format name.  For tags where a range of lengths is allowed, the minimum and
 maximum lengths are separated by a comma within the brackets.  IPTC strings
 are not null terminated.
+
+When writing, ExifTool issues a minor warning and truncates the value if it
+is longer than allowed by the IPTC specification.  Minor errors may be
+ignored to allow writing of longer values, but beware that values like this
+may cause problems for other IPTC readers.
 
 IPTC information is separated into different records, each of which has its
 own set of tags.
@@ -350,7 +377,7 @@ L<Image::ExifTool::BuildTagLookup|Image::ExifTool::BuildTagLookup>.
 
 ~head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -460,6 +487,7 @@ sub new
     }
 
     my $tableNum = 0;
+    my $exifTool = new Image::ExifTool;
     my ($tableName, $tag);
     # create lookup for short table names
     foreach $tableName (@tableNames) {
@@ -471,6 +499,11 @@ sub new
         $short =~ s/^Exif\b/EXIF/;
         $shortName{$tableName} = $short;    # remember short name
         $tableNum{$tableName} = $tableNum++;
+    }
+    # validate DICOM UID values
+    foreach (values %Image::ExifTool::DICOM::uid) {
+        next unless /[\0-\x1f\x7f-\xff]/;
+        warn "Warning: Special characters in DICOM UID value ($_)\n";
     }
     # make lookup table to check for shortcut tags
     foreach $tag (keys %Image::ExifTool::Shortcuts::Main) {
@@ -507,8 +540,9 @@ sub new
         $isIPTC = 1 if $writeProc and $writeProc eq \&Image::ExifTool::IPTC::WriteIPTC;
         $isXMP = 1 if $short =~ /^XMP\b/;
         $noID = 1 if $short =~ /^(XMP|Shortcuts|ASF.*)$/ or $$vars{NO_ID};
-        my $processBinaryData = ($$table{PROCESS_PROC} and
-            $$table{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData);
+        my $processBinaryData = ($$table{PROCESS_PROC} and (
+            $$table{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData or
+            $$table{PROCESS_PROC} eq \&Image::ExifTool::Nikon::ProcessNikonEncrypted));
         if ($$vars{ID_LABEL} or $processBinaryData) {
             $binaryTable = 1;
             $id{$tableName} = $$vars{ID_LABEL} || 'Index';
@@ -558,6 +592,29 @@ TagID:  foreach $tagID (@keys) {
                     warn "Warning: Hidden tag in list - $short $name\n" if @infoArray > 1;
                     next TagID;
                 }
+                my $writable;
+                if (defined $$tagInfo{Writable}) {
+                    $writable = $$tagInfo{Writable};
+                    # validate Writable
+                    unless ($formatOK{$writable} or  ($writable =~ /(.*)\[/ and $formatOK{$1})) {
+                        warn "Warning: Unknown Writable ($writable) for $short $name\n", 
+                    }
+                } elsif (not $$tagInfo{SubDirectory}) {
+                    $writable = $$table{WRITABLE};
+                }
+                # validate some characteristics of obvious date/time tags
+                if ($$tagInfo{PrintConv} and $$tagInfo{PrintConv} eq '$self->ConvertDateTime($val)') {
+                    my @g = $exifTool->GetGroup($tagInfo);
+                    warn "$short $name should be in 'Time' group!\n" unless $g[2] eq 'Time';
+                    if ($writable and not $$tagInfo{Shift} and $g[0] ne 'Composite' and
+                        $short ne 'PostScript')
+                    {
+                        warn "$short $name is not shiftable!\n";
+                    }
+                } elsif ($name =~ /DateTime(?!Stamp)/ and (not $$tagInfo{Groups}{2} or
+                    $$tagInfo{Groups}{2} ne 'Time') and $short ne 'DICOM') {
+                    warn "$short $name should be in 'Time' group!\n";
+                }
                 # validate Description (can't contain special characters)
                 if ($$tagInfo{Description} and
                     $$tagInfo{Description} ne EscapeHTML($$tagInfo{Description}))
@@ -575,12 +632,6 @@ TagID:  foreach $tagID (@keys) {
                     warn "Warning: SubIFD flag not set for $short $name\n" if $isSub;
                 }
 
-                my $writable;
-                if (defined $$tagInfo{Writable}) {
-                    $writable = $$tagInfo{Writable};
-                } elsif (not $$tagInfo{SubDirectory}) {
-                    $writable = $$table{WRITABLE};
-                }
                 if ($$tagInfo{Notes}) {
                     my $note = $$tagInfo{Notes};
                     # remove leading/trailing blank lines
@@ -598,11 +649,19 @@ TagID:  foreach $tagID (@keys) {
                     $writeGroup = $$table{WRITE_GROUP} if $writable;
                     $writeGroup = '-' unless $writeGroup;
                 }
-                $format = $$tagInfo{Format} if defined $$tagInfo{Format};
+                if (defined $$tagInfo{Format}) {
+                    $format = $$tagInfo{Format};
+                    # validate Format
+                    unless ($formatOK{$format} or $short eq 'PICT' or
+                        ($format =~ /(.*)\[/ and $formatOK{$1}))
+                    {
+                        warn "Warning: Unknown Format ($format) for $short $name\n";
+                    }
+                }
                 if ($subdir) {
                     # don't show XMP structure tags
                     next TagID if $short =~ /^XMP /;
-                    my $subTable = $tagInfo->{SubDirectory}->{TagTable} || $tableName;
+                    my $subTable = $$subdir{TagTable} || $tableName;
                     push @values, $shortName{$subTable}
                 }
                 my $type;
@@ -618,8 +677,21 @@ TagID:  foreach $tagID (@keys) {
                 }
                 my $printConv = $$tagInfo{PrintConv};
                 if ($$tagInfo{Mask}) {
-                    push @values, sprintf('[Mask 0x%x]',$$tagInfo{Mask});
+                    my $val = $$tagInfo{Mask};
+                    push @values, sprintf('[Mask 0x%.2x]',$val);
                     $$tagInfo{PrintHex} = 1 unless defined $$tagInfo{PrintHex};
+                    # verify that all values are within the mask
+                    if (ref $printConv eq 'HASH') {
+                        # convert mask if necessary
+                        if ($$tagInfo{ValueConv}) {
+                            my $v = eval $$tagInfo{ValueConv};
+                            $val = $v if defined $v;
+                        }
+                        foreach (keys %$printConv) {
+                            next if $_ !~ /^\d+$/ or ($_ & $val) == $_;
+                            warn "$short $name PrintConv value $_ is not in Mask!\n";
+                        }
+                    }
                 }
                 if (ref($printConv) =~ /^(HASH|ARRAY)$/) {
                     my (@printConvList, @indexList, $index);
@@ -1103,6 +1175,8 @@ sub Doc2Html($)
     $doc =~ s/\n\n/<\/p>\n\n<p>/g;
     $doc =~ s/B&lt;(.*?)&gt;/<b>$1<\/b>/sg;
     $doc =~ s/C&lt;(.*?)&gt;/<code>$1<\/code>/sg;
+    # Note: the following illegal L<> syntax should only be used in Notes
+    #       which are using in the HTML documentation only (not in POD)
     $doc =~ s/L&lt;([^&]+?)\|(.+?)&gt;/<a href="$2">$1<\/a>/sg;
     $doc =~ s/L&lt;(.*?)&gt;/<a href="$1">$1<\/a>/sg;
     return $doc;
@@ -1183,13 +1257,15 @@ sub GetTableOrder()
         IPTC    => 'Exif',  # put IPTC after EXIF,
         GPS     => 'XMP',   # etc...
         GeoTiff => 'GPS',
+        CanonVRD=> 'CanonCustom',
         Kodak   => 'JVC',
        'Kodak::IFD' => 'Kodak::Unknown',
        'Kodak::TextualInfo' => 'Kodak::IFD',
        'Kodak::Processing' => 'Kodak::TextualInfo',
         Leaf    => 'Kodak',
         Minolta => 'Leaf',
-        Unknown => 'Sony',
+        SonyIDC => 'Sony',
+        Unknown => 'SonyIDC',
         DNG     => 'Unknown',
         PrintIM => 'ICC_Profile',
         ID3     => 'PostScript',
@@ -1203,6 +1279,7 @@ sub GetTableOrder()
         PhotoMechanic => 'FotoStation',
        'Nikon::CameraSettingsD300' => 'Nikon::ShotInfoD300b',
        'Pentax::LensData' => 'Pentax::LensInfo2',
+       'Sony::SRF2' => 'Sony::SRF',
     );
     my @tweak = sort keys %tweakOrder;
     while (@tweak) {
@@ -1350,6 +1427,7 @@ sub CloseHtmlFiles($)
 #         1) output pod file (ie. 'lib/Image/ExifTool/TagNames.pod')
 #         2) output html directory (ie. 'html')
 # Returns: true on success
+# Notes: My apologies for the patchwork code, but this is only used to generate the docs.
 sub WriteTagNames($$)
 {
     my ($self, $podFile, $htmldir) = @_;
@@ -1467,7 +1545,7 @@ sub WriteTagNames($$)
                         my ($index, $prt);
                         if (defined $key) {
                             $index = $key;
-                            $prt = "= $$printConv{$key}";
+                            $prt = '= ' . EscapeHTML($$printConv{$key});
                             if ($$printConv{PrintHex}) {
                                 $index = sprintf('0x%x',$index);
                             } elsif ($$printConv{PrintString} or
@@ -1630,16 +1708,29 @@ sub WriteTagNames($$)
             my @vals = @$writable;
             my $wrStr = shift @vals;
             my $subdir;
+            my @masks = grep /^\[Mask 0x[\da-f]+\]/, @$values;
+            my $tag = shift @tags;
             # if this is a subdirectory, print subdir name (from values) instead of writable
             if ($wrStr =~ /^-/) {
                 $subdir = 1;
-                @vals = @$values;
+                if (@masks) {
+                    # combine any mask into the format string
+                    $wrStr .= " & $1" if $masks[0] =~ /(0x[\da-f]+)/;
+                    shift @masks;
+                    @vals = grep !/^\[Mask 0x[\da-f]+\]/, @$values;
+                } else {
+                    @vals = @$values;
+                }
                 # remove Notes if subdir has Notes as well
                 shift @vals if $vals[0] =~ /^\(/ and @vals >= @$writable;
                 foreach (@vals) { /^\(/ and $_ = '-' }
                 my $i;  # fill in any missing entries from non-directory tags
                 for ($i=0; $i<@$writable; ++$i) {
                     $vals[$i] = $$writable[$i] unless defined $vals[$i];
+                    if (@masks) {
+                        $vals[$i] .= " & $1" if $masks[0] =~ /(0x[\da-f]+)/;
+                        shift @masks;
+                    }
                 }
                 if ($$sepTable{$vals[0]}) {
                     $wrStr =~ s/^-//;
@@ -1648,8 +1739,17 @@ sub WriteTagNames($$)
                     $wrStr = $vals[0];
                 }
                 shift @vals;
+            } elsif ($wrStr and $wrStr ne 'N' and @masks) {
+                # fill in missing entries if masks are different
+                my $mask = shift @masks;
+                while (@masks > @vals) {
+                    last if $masks[@vals] eq $mask;
+                    push @vals, $wrStr;
+                    push @tags, $tag if @tags < @vals;
+                }
+                # add Mask to Writable column in POD doc
+                $wrStr .= " & $1" if $mask =~ /(0x[\da-f]+)/;
             }
-            my $tag = shift @tags;
             printf PODFILE "%s%-${wTag}s", $idStr, $tag;
             warn "Warning: Pushed $tag\n" if $id and length($tag) > $wTag;
             printf PODFILE " %-${wGrp}s", shift(@wGrp) || '-' if $showGrp;
@@ -1683,7 +1783,13 @@ sub WriteTagNames($$)
                             last unless $more;
                         }
                     }
-                    $line .= " $val" if defined $val;
+                    if (defined $val) {
+                        $line .= " $val";
+                        if (@masks) {
+                            $line .= " & $1" if $masks[0] =~ /(0x[\da-f]+)/;
+                            shift @masks;
+                        }
+                    }
                 }
                 $line =~ s/\s+$//;  # trim trailing white space
                 print PODFILE "$line\n";
@@ -1707,6 +1813,7 @@ sub WriteTagNames($$)
                     s/^-(.+)/$1/;
                 }
             }
+            # add tooltip for hex conversion of Tag ID
             if ($tagIDstr =~ /^0x[0-9a-f]+$/i) {
                 $tip = sprintf(" title='$tagIDstr = %u'",hex $tagIDstr);
             } elsif ($tagIDstr =~ /^(\d+)(\.\d*)?$/) {
@@ -1716,10 +1823,38 @@ sub WriteTagNames($$)
                 # use copyright symbol in QuickTime UserData tags
                 $tagIDstr =~ s/^"\\xa9/"&copy;/;
             }
+            # add tooltip for special writable attributes
+            my $wtip = '';
+            my %wattr = (
+                '+' => 'List',
+                '/' => 'Avoided',
+                '~' => 'Writable only with -n',
+                '!' => 'Unsafe',
+                '*' => 'Protected',
+                ':' => 'Mandatory',
+            );
+            my %hasAttr;
+            my $wstr;
+            foreach $wstr (@$writable) {
+                next unless $wstr =~ m{([+/~!*:]+)$};
+                my @a = split //, $1;
+                $hasAttr{$_} = 1 foreach @a;
+            }
+            if (%hasAttr) {
+                $wtip = " title='";
+                my $n = 0;
+                foreach (sort keys %hasAttr) {
+                    $wtip .= "\n" if $n;
+                    $wtip .= "$_ = $wattr{$_}";
+                    ++$n;
+                }
+                $wtip .= "'";
+            }
+            # print this row in the tag table
             print HTMLFILE "<tr$rowClass>\n";
             print HTMLFILE "<td$align$tip>$tagIDstr</td>\n" if $id;
             print HTMLFILE "<td>", join("\n  <br>",@htmlTags), "</td>\n";
-            print HTMLFILE "<td class=c>",join('<br>',@$writable),"</td>\n";
+            print HTMLFILE "<td class=c$wtip>",join('<br>',@$writable),"</td>\n";
             print HTMLFILE '<td class=n>',join("\n  <br>",@$require),"</td>\n" if $composite;
             print HTMLFILE "<td class=c>",join('<br>',@$writeGroup),"</td>\n" if $showGrp;
             print HTMLFILE "<td>";
@@ -1727,11 +1862,14 @@ sub WriteTagNames($$)
                 if ($isSubdir) {
                     my ($smallNote, @values);
                     foreach (@$values) {
-                        if (/^[[(]/) {
+                        if (/^\(/) {
+                            # set the note font
                             $smallNote = 1 if $numTags < 2;
                             push @values, ($smallNote ? $noteFontSmall : $noteFont) . "$_</span>";
                             next;
                         }
+                        # make text in square brackets small
+                        /^\[/ and push(@values, "<span class=s>$_</span>"), next;
                         /=/ and push(@values, $_), next;
                         my @names = split;
                         $url = (shift @names) . '.html';
@@ -1754,8 +1892,12 @@ sub WriteTagNames($$)
                             print HTMLFILE $_;
                             $close = $br = '';
                         } else {
-                            $_ = EscapeHTML($_);
-                            /^\(/ and $_ = "$noteFont$_</span>";
+                            if (/^\(/) {
+                                # notes can use POD syntax
+                                $_ = $noteFont . Doc2Html($_) . "</span>";
+                            } else {
+                                $_ = EscapeHTML($_);
+                            }
                             $close or $_ = "<span class=s>$_", $close = '</span>';
                             print HTMLFILE $br, $_;
                             $br = "\n  <br>";
@@ -1831,7 +1973,7 @@ WriteTagNames().
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

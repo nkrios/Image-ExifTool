@@ -99,10 +99,14 @@ JEITA<a class=ref href="#ref5">[5]</a>.</p>
 <p>Current problems with the EXIF specification are:</p>
 
 <ol>
-<li>Maker note data structure has no restrictions and is easily invalidated when editing EXIF.</li>
+<li>Maker note data structure has no restrictions and is easily invalidated when
+editing EXIF.</li>
 <li>No facility for storing the time zone for date/time values.</li>
-<li>Very limited support for alternate character sets (essentially only the UserComment tag has this feature).</li>
+<li>Very limited support for alternate character sets (essentially only the
+UserComment tag has this feature).</li>
 <li>No alternate language support.</li>
+<li>Byte ordering for "Unicode" text strings, and the meaning of "Unicode"
+itself is not clearly specified.</li>
 <li>Mandatory tags are unnecessary and painful to implement.</li>
 </ol>
 
@@ -122,6 +126,12 @@ by the MWG<a class=ref href="#ref6">[6]</a>.</li>
 <li>No simple solution for this.  XMP<a class=ref href="#ref7">[7]</a>
 is the only reasonable alternative if alternate language support is
 required.</li>
+<li>Specify that the Unicode byte order must be the same as the EXIF byte
+ordering. (This is the only reasonable choice, but for some reason both
+Microsoft and Apple seem to write Unicode using the native processor byte
+ordering. regardless of the EXIF byte order.)  Also, it should be made clear
+that by "Unicode" the EXIF specification actually means UCS-2, although updating
+this to allow UTF-16 surrogate pairs may be a good idea.</li>
 <li>Define reasonable fallback values for required tags which are missing.</li>
 </ol>
 

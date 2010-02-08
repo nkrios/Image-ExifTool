@@ -13,13 +13,12 @@
 package Image::ExifTool::ZIP;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION $warnString);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
-my $didWarn;
-sub WarnProc($) { $didWarn = 1; }
+sub WarnProc($) { $warnString = $_[0]; }
 
 # ZIP metadata blocks
 %Image::ExifTool::ZIP::Main = (
@@ -272,7 +271,9 @@ sub ProcessZIP($$)
         my $status = $zip->readFromFileHandle($fh);
         if ($status) {
             undef $zip;
-            $exifTool->Warn('ZIP file may be corrupt');
+            my %err = ( 1=>'Stream end error', 3=>'Format error', 4=>'IO error' );
+            my $err = $err{$status} || "Error $status";
+            $exifTool->Warn("$err reading ZIP file");
             last;
         }
         $$dirInfo{ZIP} = $zip;
@@ -402,7 +403,7 @@ like DOCX, PPTX, XLSX and EIP.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.90
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: Minolta_4_failed.mrw
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 2.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:08:22 09:29:15-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:48-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: MRW
 [File, File, Image] MIMEType - MIME Type: image/x-raw
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)

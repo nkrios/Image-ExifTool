@@ -16,9 +16,9 @@ package Image::ExifTool::Geotag;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool;
+use Image::ExifTool qw(:Public);
 
-$VERSION = '1.12';
+$VERSION = '1.15';
 
 sub SetGeoValues($$;$);
 
@@ -79,7 +79,7 @@ sub LoadTrackLog($$;$)
 {
     local ($_, $/, *EXIFTOOL_TRKFILE);
     my ($exifTool, $val) = @_;
-    my ($raf, $from, $time, $isDate, $noDate, $noDateChanged, $lastDate, $lastSecs);
+    my ($raf, $from, $time, $isDate, $noDate, $noDateChanged, $lastDate, $dateFlarm);
     my ($nmeaStart, $fixSecs, @fixTimes, $canCut, $cutPDOP, $cutHDOP, $cutSats, $lastFix);
 
     unless (eval 'require Time::Local') {
@@ -116,9 +116,9 @@ sub LoadTrackLog($$;$)
 
     my $numPoints = 0;
     my $skipped = 0;
+    my $lastSecs = 0;
     my $format = '';
     my $fix = { };
-    my $dateFlarm = 0;
     for (;;) {
         $raf->ReadLine($_) or last;
         # determine file format
@@ -129,13 +129,18 @@ sub LoadTrackLog($$;$)
                 $format = 'NMEA';
                 $nmeaStart = $2 || $1;    # save type of first sentence
             } elsif (/^A(FLA|XSY|FIL)/) {
-                $format = 'IGC';
+                # (don't set format yet because we want to read HFDTE first)
                 $nmeaStart = 'B' ;
-                $raf->ReadLine($_) or last;
-                /^HFDTE(\d{2})(\d{2})(\d{2})/ or next;
+                next;
+            } elsif (/^HFDTE(\d{2})(\d{2})(\d{2})/) {
                 my $year = $3 + ($3 >= 70 ? 1900 : 2000);
                 $dateFlarm = Time::Local::timegm(0,0,0,$1,$2-1,$year-1900);
-                $lastSecs = 0;
+                $nmeaStart = 'B' ;
+                $format = 'IGC';
+                next;
+            } elsif ($nmeaStart and /^B/) {
+                # parse IGC fixes without a date
+                $format = 'IGC';                
             } else {
                 # search only first 50 lines of file for a valid fix
                 last if ++$skipped > 50;
@@ -230,8 +235,10 @@ sub LoadTrackLog($$;$)
             $fix{alt} = $12 eq 'A' ? $14 : undef;
             $secs = (($1 * 60) + $2) * 60 + $3;
             # wrap to next day if necessary
-            $dateFlarm += $secPerDay if $secs < $lastSecs;
-            $date = $dateFlarm;
+            if ($dateFlarm) {
+                $dateFlarm += $secPerDay if $secs < $lastSecs;
+                $date = $dateFlarm;
+            }
             $nmea = 'B';
 #
 # Magellan eXplorist NMEA-like PMGNTRK sentence (optionally contains date)
@@ -464,6 +471,42 @@ sub LoadTrackLog($$;$)
 }
 
 #------------------------------------------------------------------------------
+# Apply Geosync time correction
+# Inputs: 0) ExifTool ref, 1) Unix UTC time value
+# Returns: sync time difference (and updates input time), or undef if no sync
+sub ApplySyncCorr($$)
+{
+    my ($exifTool, $time) = @_;
+    my $sync = $exifTool->GetNewValues('Geosync');
+    if (ref $sync eq 'HASH') {
+        my $syncTimes = $$sync{Times};
+        if ($syncTimes) {
+            # find the nearest 2 sync points
+            my ($i0, $i1) = (0, scalar(@$syncTimes) - 1);
+            while ($i1 > $i0 + 1) {
+                my $pt = int(($i0 + $i1) / 2);
+                if ($time < $$syncTimes[$pt]) {
+                    $i1 = $pt;
+                } else {
+                    $i0 = $pt;
+                }
+            }
+            my ($t0, $t1) = ($$syncTimes[$i0], $$syncTimes[$i1]);
+            # interpolate/extrapolate to account for linear camera clock drift
+            my $syncPoints = $$sync{Points};
+            my $f = ($time - $t0) / ($t1 - $t0);
+            $sync = $$syncPoints{$t1} * $f + $$syncPoints{$t0} * (1 - $f);
+        } else {
+            $sync = $$sync{Offset}; # use fixed time offset
+        }
+        $_[1] += $sync;
+    } else {
+        undef $sync;
+    }
+    return $sync;
+}
+
+#------------------------------------------------------------------------------
 # Set new geotagging values according to date/time
 # Inputs: 0) ExifTool object ref, 1) date/time value (or undef to delete tags)
 #         2) optional write group
@@ -532,24 +575,25 @@ sub SetGeoValues($$;$)
             }
         } else {
             # assume local timezone
-            $time = Time::Local::timelocal($sec,$min,$hr,$day,$mon-1,$year-1900);
+            $time = Image::ExifTool::TimeLocal($sec,$min,$hr,$day,$mon-1,$year-1900);
         }
         # add fractional seconds
         $time += $fs if $fs and $fs ne '.';
 
-        # apply time synchronization if available
-        my $sync = $exifTool->GetNewValues('Geosync');
-        $time += $sync if $sync;
-
         # bring UTC time back to Jan. 1 if no date is given
         $time %= $secPerDay if $noDate;
+
+        # apply time synchronization if available
+        my $sync = ApplySyncCorr($exifTool, $time);
 
         # save fractional seconds string
         $fsec = ($time =~ /(\.\d+)$/) ? $1 : '';
 
         if ($exifTool->Options('Verbose') > 1 and not $secondTry) {
             my $out = $exifTool->Options('TextOut');
-            print $out '  Geotime value:   ' . Image::ExifTool::ConvertUnixTime(int $time) . "$fsec UTC\n";
+            my $str = "$fsec UTC";
+            $str .= sprintf(" (incl. Geosync offset of %+.3f sec)", $sync) if defined $sync;
+            print $out '  Geotime value:   ' . Image::ExifTool::ConvertUnixTime(int $time) . "$str\n";
         }
         # interpolate GPS track at $time
         if ($time < $$times[0]) {
@@ -662,23 +706,127 @@ sub SetGeoValues($$;$)
 
 #------------------------------------------------------------------------------
 # Convert Geotagging time synchronization value
-# Inputs: 0) time difference string ("[+-]DD MM:HH:SS.ss")
-# Returns: sync time in seconds
-sub ConvertGeosync($)
+# Inputs: 0) exiftool object ref,
+#         1) time difference string ("[+-]DD MM:HH:SS.ss"), geosync'd file name,
+#            "GPSTIME@IMAGETIME", or "GPSTIME@FILENAME"
+# Returns: geosync hash
+# Notes: calling this routine with more than one geosync'd file causes time drift
+#        correction to be implemented
+sub ConvertGeosync($$)
 {
-    my $sync = shift;
-    my @vals = $sync =~ /(?=\d|\.\d)\d*(?:\.\d*)?/g; # (allow decimal values too)
-    unless (@vals) {
-        warn qq{Invalid time for Geosync (use "[+-][[[DD ]HH:]MM:]SS[.ss]")\n};
-        return undef;
+    my ($exifTool, $val) = @_;
+    my $sync = $exifTool->GetNewValues('Geosync') || { };
+    my ($syncFile, $gpsTime, $imgTime);
+
+    if ($val =~ /(.*?)@(.*)/) {
+        $gpsTime = $1;
+        if (-f $2) {
+            $syncFile = $2;
+        } else {
+            $imgTime = $2;
+        }
+    } else {
+        $syncFile = $val if -f $val;
     }
-    my $val = 0;
-    my $mult;
-    foreach $mult (1, 60, 3600, $secPerDay) {
-        $val += $mult * pop(@vals);
-        last unless @vals;
+    if ($gpsTime or defined $syncFile) {
+        # (this is a time synchronization vector)
+        if (defined $syncFile) {
+            # check the following tags in order to obtain the image timestamp
+            my @timeTags = qw(SubSecDateTimeOriginal SubSecCreateDate SubSecModifyDate
+                              DateTimeOriginal CreateDate ModifyDate FileModifyDate);
+            my $info = ImageInfo($syncFile, { PrintConv => 0 }, @timeTags,
+                                 'GPSDateTime', 'GPSTimeStamp');
+            $$info{Error} and warn("$$info{Err}\n"), return undef;
+            $gpsTime or $gpsTime = $$info{GPSDateTime} || $$info{GPSTimeStamp};
+            my $tag;
+            foreach $tag (@timeTags) {
+                if ($$info{$tag}) {
+                    $imgTime = $$info{$tag};
+                    $exifTool->VPrint(2, "Geosyncing with $tag from '$syncFile'\n");
+                    last;
+                }
+            }
+            $gpsTime or warn("No GPSTimeStamp in '$syncFile\n"), return undef;
+            $imgTime or warn("No image timestamp in '$syncFile'\n"), return undef;
+        }
+        # add date to date-less timestamps
+        my ($imgDateTime, $gpsDateTime, $noDate);
+        if ($imgTime =~ /^(\d+:\d+:\d+)\s+\d+/) {
+            $imgDateTime = $imgTime;
+            my $date = $1;
+            if ($gpsTime =~ /^\d+:\d+:\d+\s+\d+/) {
+                $gpsDateTime = $gpsTime;
+            } else {
+                $gpsDateTime = "$date $gpsTime";
+            }
+        } elsif ($gpsTime =~ /^(\d+:\d+:\d+)\s+\d+/) {
+            $imgDateTime = "$1 $imgTime";
+            $gpsDateTime = $gpsTime;
+        } else {
+            # use a today's date (so hopefully the DST setting will be intuitive)
+            my @tm = localtime;
+            my $date = sprintf('%.4d:%.2d:%.2d', $tm[5]+1900, $tm[4]+1, $tm[3]);
+            $gpsDateTime = "$date $gpsTime";
+            $imgDateTime = "$date $imgTime";
+            $noDate = 1;
+        }
+        # calculate Unix seconds since the epoch
+        my $imgSecs = Image::ExifTool::GetUnixTime($imgDateTime, 1);
+        defined $imgSecs or warn("Invalid image time '$imgTime'\n"), return undef;
+        my $gpsSecs = Image::ExifTool::GetUnixTime($gpsDateTime, 1);
+        defined $gpsSecs or warn("Invalid GPS time '$gpsTime'\n"), return undef;
+        # add fractional seconds
+        $gpsSecs += $1 if $gpsTime =~ /(\.\d+)/;
+        $imgSecs += $1 if $imgTime =~ /(\.\d+)/;
+        # shift dates within 12 hours of each other if either timestamp was date-less
+        if ($gpsDateTime ne $gpsTime or $imgDateTime ne $imgTime) {
+            my $diff = ($imgSecs - $gpsSecs) % (24 * 3600);
+            $diff -= 24 * 3600 if $diff > 12 * 3600;
+            $diff += 24 * 3600 if $diff < -12 * 3600;
+            if ($gpsDateTime ne $gpsTime) {
+                $gpsSecs = $imgSecs - $diff;
+            } else {
+                $imgSecs = $gpsSecs + $diff;
+            }
+        }
+        # save the synchronization offset
+        $$sync{Offset} = $gpsSecs - $imgSecs;
+        # save this synchronization point if either timestamp had a date
+        unless ($noDate) {
+            $$sync{Points} or $$sync{Points} = { };
+            $$sync{Points}{$imgSecs} = $$sync{Offset};
+            # print verbose output
+            if ($exifTool->Options('Verbose') > 1) {
+                # print GPS and image timestamps in UTC
+                my $gps = Image::ExifTool::ConvertUnixTime($gpsSecs);
+                my $img = Image::ExifTool::ConvertUnixTime($imgSecs);
+                $gps .= $1 if $gpsTime =~ /(\.\d+)/;
+                $img .= $1 if $imgTime =~ /(\.\d+)/;
+                $exifTool->VPrint(1, "Added Geosync point:\n",
+                                     "  GPS time stamp:  $gps UTC\n",
+                                     "  Image date/time: $img UTC\n");
+            }
+            # save sorted list of image sync times if we have more than one
+            my @times = keys %{$$sync{Points}};
+            if (@times > 1) {
+                @times = sort { $a <=> $b } @times;
+                $$sync{Times} = \@times;
+            }
+        }
+    } else {
+        # (this is a simple time difference)
+        my @vals = $val =~ /(?=\d|\.\d)\d*(?:\.\d*)?/g; # (allow decimal values too)
+        @vals or warn("Invalid value (please refer to geotag documentation)\n"), return undef;
+        my $secs = 0;
+        my $mult;
+        foreach $mult (1, 60, 3600, $secPerDay) {
+            $secs += $mult * pop(@vals);
+            last unless @vals;
+        }
+        # set constant sync offset
+        $$sync{Offset} = $val =~ /^\s*-/ ? -$secs : $secs;
     }
-    return $sync =~ /^\s*-/ ? -$val : $val;
+    return $sync;
 }
 
 #------------------------------------------------------------------------------
@@ -701,9 +849,14 @@ on time, and sets new GPS values for geotagging images.  Currently supported
 formats are GPX, NMEA RMC/GGA/GLL, KML, IGC, Garmin XML and TCX, and
 Magellan PMGNTRK.
 
+Methods in this module should not be called directly.  Instead, the Geotag
+feature is accessed by writing the values of the ExifTool Geotag, Geosync
+and Geotime tags (see the L<Extra Tags|Image::ExifTool::TagNames/Extra Tags>
+in the tag name documentation).
+
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -728,6 +881,7 @@ Thanks to Lionel Genet for the ability to read IGC format track logs.
 
 =head1 SEE ALSO
 
+L<Image::ExifTool::TagNames/Extra Tags>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

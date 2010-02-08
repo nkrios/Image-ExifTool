@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.05
 [File, System, Image] FileName - File Name: AFCP.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1110 bytes
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2006:01:04 14:02:27-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ImageWidth - Image Width: 8
@@ -11,7 +12,6 @@
 [File, File, Image] BitsPerSample - Bits Per Sample: 8
 [File, File, Image] ColorComponents - Color Components: 3
 [File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
-[File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 793d95f5342045485fbaf9ccc84f6164
 [IPTC, IPTC, Other] 0 - Application Record Version: 2
 [IPTC, IPTC, Other] 15 - Category: p
 [IPTC, IPTC, Time] 55 - Date Created: 2005:12:23

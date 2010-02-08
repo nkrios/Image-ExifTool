@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.93
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.10
 [File, System, Image] FileName - File Name: Olympus2.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 7.5 kB
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2007:02:27 20:01:26-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -126,7 +127,7 @@
 [MakerNotes, Olympus, Camera] 771 - Focus Step Infinity: 320
 [MakerNotes, Olympus, Camera] 772 - Focus Step Near: 375
 [MakerNotes, Olympus, Camera] 773 - Focus Distance: 385.8 m
-[MakerNotes, Olympus, Camera] 776 - AF Point: Left
+[MakerNotes, Olympus, Camera] 776 - AF Point: Left (or n/a)
 [MakerNotes, Olympus, Camera] 4609 - External Flash: Off
 [MakerNotes, Olympus, Camera] 4612 - External Flash Bounce: Bounce or Off
 [MakerNotes, Olympus, Camera] 4613 - External Flash Zoom: 0

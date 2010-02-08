@@ -200,12 +200,12 @@
 <tr class=b>
 <td title='0x0003 = 3'>0x0003</td>
 <td>PreviewImageLength</td>
-<td class=c>int32u*</td>
+<td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x0004 = 4'>0x0004</td>
 <td>PreviewImageStart</td>
-<td class=c>int32u*</td>
+<td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0008 = 8'>0x0008</td>
@@ -310,7 +310,7 @@
 <tr class=b>
 <td title='0x2021 = 8225'>0x2021</td>
 <td>AFPointPosition</td>
-<td class=c>int16u[4]~</td>
+<td class=c title='~ = Writable only with -n'>int16u[4]~</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x2022 = 8226'>0x2022</td>
@@ -349,9 +349,13 @@
   <br>&#39;6 0&#39; = Best Shot</span></td></tr>
 <tr>
 <td title='0x3001 = 12289'>0x3001</td>
-<td>SelfTimer</td>
+<td>ReleaseMode</td>
 <td class=c>int16u</td>
-<td><span class=s>1 = Off</span></td></tr>
+<td><span class=s>1 = Normal
+  <br>3 = AE Bracketing
+  <br>11 = WB Bracketing
+  <br>13 = Contrast Bracketing
+  <br>19 = High Speed Burst</span></td></tr>
 <tr class=b>
 <td title='0x3002 = 12290'>0x3002</td>
 <td>Quality</td>
@@ -386,7 +390,8 @@
 <td><span class=s>1 = On
   <br>2 = Off
   <br>7 = On (high sensitivity)
-  <br>8 = On (anti-shake)</span></td></tr>
+  <br>8 = On (anti-shake)
+  <br>10 = High Speed</span></td></tr>
 <tr>
 <td title='0x3009 = 12297'>0x3009</td>
 <td>AFMode</td>
@@ -442,16 +447,22 @@
   <br>6 = Purple
   <br>7 = Pink</span></td></tr>
 <tr>
+<td title='0x301b = 12315'>0x301b</td>
+<td>UnknownMode?</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Normal
+  <br>8 = Silent Movie</span></td></tr>
+<tr class=b>
 <td title='0x301c = 12316'>0x301c</td>
 <td>SequenceNumber</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x301d = 12317'>0x301d</td>
 <td>BracketSequence</td>
 <td class=c>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x3020 = 12320'>0x3020</td>
 <td>ImageStabilization</td>
 <td class=c>int16u</td>
@@ -459,10 +470,12 @@
   <br>1 = On
   <br>2 = Best Shot
   <br>&#39;0 0&#39; = Off
+  <br>&#39;0 3&#39; = CCD Shift
+  <br>&#39;2 3&#39; = High Speed Anti-Shake
   <br>&#39;16 0&#39; = Slow Shutter
   <br>&#39;18 0&#39; = Anti-Shake
   <br>&#39;20 0&#39; = High Sensitivity</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x302a = 12330'>0x302a</td>
 <td>LightingMode</td>
 <td class=c>int16u</td>
@@ -470,19 +483,19 @@
   <br>1 = High Dynamic Range
   <br>5 = Shadow Enhance Low
   <br>6 = Shadow Enhance High</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x302b = 12331'>0x302b</td>
 <td>PortraitRefiner</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = +1
   <br>2 = +2</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x3030 = 12336'>0x3030</td>
 <td>SpecialEffectLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x3031 = 12337'>0x3031</td>
 <td>SpecialEffectSetting</td>
 <td class=c>int16u</td>
@@ -490,6 +503,18 @@
   <br>1 = Makeup
   <br>2 = Mist Removal
   <br>3 = Vivid Landscape</span></td></tr>
+<tr>
+<td title='0x4001 = 16385'>0x4001</td>
+<td>CaptureFrameRate</td>
+<td class=c>int16u[n]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x4003 = 16387'>0x4003</td>
+<td>VideoQuality</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = Standard
+  <br>3 = HD
+  <br>5 = Low</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='AVI'>Casio AVI Tags</a></h2>
@@ -508,7 +533,7 @@
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 9, 2009</i>
+<br><i>Last revised Jan 4, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

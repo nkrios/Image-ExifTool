@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.96
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: CanonRaw.crw
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 6.1 kB
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2005:11:14 14:47:21-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: CRW
 [File, File, Image] MIMEType - MIME Type: image/x-raw
 [MakerNotes, CanonRaw, Camera] 8197 - Raw Data: (Binary data 22 bytes)

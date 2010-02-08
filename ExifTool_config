@@ -130,7 +130,7 @@
         },
         # the following examples demonstrate simplifications which may be
         # used if only one tag is Require'd or Desire'd:
-        # 1) the Require/Desire lookup may be replaced with a simple tag name
+        # 1) the Require lookup may be replaced with a simple tag name
         # 2) "$val" may be used to represent "$val[0]" in the expression
         FileExtension => {
             Require => 'FileName',
@@ -142,6 +142,11 @@
             Groups => { 2 => 'Camera' },
             ValueConv => 'sqrt(24*24+36*36) / ($val * 1750)',
             PrintConv => 'sprintf("%.3f mm",$val)',
+        },
+        # generate a description for this file type
+        FileTypeDescription => {
+            Require => 'FileType',
+            ValueConv => 'GetFileType($val,1) || $val',
         },
     },
 );
@@ -161,7 +166,7 @@
     NewXMPxxxTag3 => { List => 'Bag' },
     # XMP structures are defined as SubDirectory's
     NewXMPxxxStruct => {
-        SubDirectory => { },
+        SubDirectory => { },  # treat as a subdirectory containing other tags
         Struct => 'MyStruct', # arbitrary name identifies entry in xmpStruct
         List => 'Seq',        # structures may also be elements of a list
     },

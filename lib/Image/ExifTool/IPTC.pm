@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.34';
+$VERSION = '1.36';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -940,7 +940,7 @@ sub HandleCodedCharset($$)
             # some unknown character set invoked
             $xlat = 'bad';  # flag unsupported coding
         } else {
-            $xlat = $exifTool->Options('IPTCCharset');
+            $xlat = $exifTool->Options('CharsetIPTC');
         }
     }
     # no need to translate if Charset is the same
@@ -961,11 +961,9 @@ sub TranslateCodedString($$$$)
         $exifTool->Warn('Some IPTC characters not converted (unsupported CodedCharacterSet)');
         undef $$xlatPtr;
     } elsif (not $read) {
-        my $val = $exifTool->Charset2Unicode($$valPtr, 'MM');
-        $$valPtr = $exifTool->Unicode2Charset($val, 'MM', $$xlatPtr);
+        $$valPtr = $exifTool->Decode($$valPtr, undef, undef, $$xlatPtr);
     } elsif ($$valPtr !~ /[\x14\x15\x1b]/) {
-        my $val = $exifTool->Charset2Unicode($$valPtr, 'MM', $$xlatPtr);
-        $$valPtr = $exifTool->Unicode2Charset($val, 'MM');
+        $$valPtr = $exifTool->Decode($$valPtr, $$xlatPtr);
     } elsif (not $$exifTool{WarnShift2022}) {
         # don't yet support reading ISO 2022 shifted character sets
         $exifTool->Warn('Some IPTC characters not converted (ISO 2022 shifting not supported)');
@@ -989,29 +987,37 @@ sub ProcessIPTC($$$)
     my $success = 0;
     my ($lastRec, $recordPtr, $recordName);
 
-    # begin by assuming default IPTC encoding
-    my $xlat = $exifTool->Options('IPTCCharset');
-    undef $xlat if $xlat eq $exifTool->Options('Charset');
-
     $verbose and $dirInfo and $exifTool->VerboseDir('IPTC', 0, $$dirInfo{DirLen});
+
     if ($tagTablePtr eq \%Image::ExifTool::IPTC::Main) {
+        # calculate MD5 if Digest::MD5 is available (for standard IPTC only)
+        my $path = join('-', @{$$exifTool{PATH}});
+        if ($path =~ /^(JPEG-APP13-Photoshop-IPTC|TIFF-IFD0-IPTC|PSD-IPTC|MIE-IPTC)$/) {
+            my $md5;
+            if (eval 'require Digest::MD5') {
+                if ($pos or $dirLen != length($$dataPt)) {
+                    $md5 = Digest::MD5::md5(substr $$dataPt, $pos, $dirLen);
+                } else {
+                    $md5 = Digest::MD5::md5($$dataPt);
+                }
+            } else {
+                # a zero digest indicates IPTC exists but we don't have Digest::MD5
+                $md5 = "\0" x 16;
+            }
+            $exifTool->FoundTag('CurrentIPTCDigest', $md5);
+        } elsif ($Image::ExifTool::MWG::strict and $$exifTool{FILE_TYPE} =~ /^(JPEG|TIFF|PSD)$/) {
+            # ignore non-standard IPTC while in strict MWG compatibility mode
+            $exifTool->Warn("Ignored non-standard IPTC at $path");
+            return 1;
+        }
+        # set family 1 group name if multiple IPTC directories
         my $dirCount = ($exifTool->{DIR_COUNT}->{IPTC} || 0) + 1;
         $exifTool->{DIR_COUNT}->{IPTC} = $dirCount;
         $exifTool->{SET_GROUP1} = '+' . $dirCount if $dirCount > 1;
     }
-    # calculate MD5 if Digest::MD5 is available
-    my $md5;
-    if (eval 'require Digest::MD5') {
-        if ($pos or $dirLen != length($$dataPt)) {
-            $md5 = Digest::MD5::md5(substr $$dataPt, $pos, $dirLen);
-        } else {
-            $md5 = Digest::MD5::md5($$dataPt);
-        }
-    } else {
-        # a zero digest indicates IPTC exists but we don't have Digest::MD5
-        $md5 = "\0" x 16;
-    }
-    $exifTool->FoundTag('CurrentIPTCDigest', $md5);
+    # begin by assuming default IPTC encoding
+    my $xlat = $exifTool->Options('CharsetIPTC');
+    undef $xlat if $xlat eq $exifTool->Options('Charset');
 
     # quick check for improperly byte-swapped IPTC
     if ($dirLen >= 4 and substr($$dataPt, $pos, 1) ne "\x1c" and
@@ -1083,6 +1089,8 @@ sub ProcessIPTC($$$)
 
         my $tagInfo = $exifTool->GetTagInfo($recordPtr, $tag);
         my $format;
+        # (could use $$recordPtr{FORMAT} if no Format below, but don't do this to
+        #  be backward compatible with improperly written PhotoMechanic tags)
         $format = $$tagInfo{Format} if $tagInfo;
         # use logic to determine format if not specified
         unless ($format) {
@@ -1152,7 +1160,7 @@ image files.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

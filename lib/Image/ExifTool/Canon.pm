@@ -57,6 +57,9 @@
 #              41) http://www.cpanforum.com/threads/10730
 #              42) Norbert Wasser private communication
 #              43) Karsten Sote private communication
+#              44) Hugh Griffiths private communication (5DmkII)
+#              45) Mark Berger private communication (5DmkII)
+#              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Canon;
@@ -70,7 +73,7 @@ sub WriteCanon($$$);
 sub ProcessSerialData($$$);
 sub SwapWords($);
 
-$VERSION = '2.32';
+$VERSION = '2.36';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -132,6 +135,7 @@ my %canonLensTypes = ( #4
     31.1 => 'Tamron SP AF 300mm f/2.8 LD IF', #15
     32 => 'Canon EF 24mm f/2.8 or Sigma Lens', #10
     32.1 => 'Sigma 15mm f/2.8 EX Fisheye', #11
+    33 => 'Voigtlander Ultron 40mm f/2 SLII Aspherical', #45
     35 => 'Canon EF 35-80mm f/4-5.6', #32
     36 => 'Canon EF 38-76mm f/4.5-5.6', #32
     37 => 'Canon EF 35-80mm f/4-5.6 or Tamron Lens', #32
@@ -207,7 +211,8 @@ my %canonLensTypes = ( #4
     154 => 'Canon EF 20mm f/2.8 USM', #15
     155 => 'Canon EF 85mm f/1.8 USM',
     156 => 'Canon EF 28-105mm f/3.5-4.5 USM',
-    160 => 'Canon EF 20-35mm f/3.5-4.5 USM',
+    160 => 'Canon EF 20-35mm f/3.5-4.5 USM or Tamron Lens',
+    160.1 => 'Tamron AF 19-35mm f/3.5-4.5', #44
     161 => 'Canon EF 28-70mm f/2.8L or Sigma or Tamron Lens',
     161.1 => 'Sigma 24-70mm EX f/2.8',
     161.2 => 'Tamron 90mm f/2.8',
@@ -229,7 +234,7 @@ my %canonLensTypes = ( #4
     172 => 'Canon EF 400mm f/5.6L', #32
     173 => 'Canon EF 180mm Macro f/3.5L or Sigma Lens', #9
     173.1 => 'Sigma 180mm EX HSM Macro f/3.5', #14
-    173.2 => 'Sigma APO Macro 150mm f/3.5 EX DG IF HSM', #14
+    173.2 => 'Sigma APO Macro 150mm f/2.8 EX DG HSM', #14
     174 => 'Canon EF 135mm f/2L', #9
     175 => 'Canon EF 400mm f/2.8L', #32
     176 => 'Canon EF 24-85mm f/3.5-4.5 USM',
@@ -419,6 +424,9 @@ my %canonLensTypes = ( #4
     0x2750000 => 'PowerShot SX20 IS',
     0x2760000 => 'PowerShot SD980 IS / Digital IXUS 200 IS / IXY Digital 930 IS',
     0x2770000 => 'PowerShot SD940 IS / Digital IXUS 120 IS / IXY Digital 220 IS',
+    0x2800000 => 'PowerShot A495',
+    0x2820000 => 'PowerShot A3100 IS',
+    0x2830000 => 'PowerShot A3000 IS',
     0x3010000 => 'PowerShot Pro90 IS',
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
@@ -1292,7 +1300,7 @@ my %focusDistanceByteSwap = (
     WRITABLE => 1,
     FORMAT => 'int16s',
     FIRST_ENTRY => 1,
-    DATAMEMBER => [ 25 ],   # FocalUnits necessary for writing
+    DATAMEMBER => [ 22, 25 ],   # necessary for writing
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     1 => {
         Name => 'MacroMode',
@@ -1507,9 +1515,10 @@ my %focusDistanceByteSwap = (
     },
     22 => { #4
         Name => 'LensType',
-        RawConv => '$val ? $val : undef', # don't use if value is zero
+        RawConv => '$val ? $$self{LensType}=$val : undef', # don't use if value is zero
         Notes => 'this value is incorrect for EOS 7D images with lenses of type 256 or greater',
         SeparateTable => 1,
+        DataMember => 'LensType',
         PrintConv => \%canonLensTypes,
     },
     23 => {
@@ -2667,6 +2676,15 @@ my %ciLongFocal = (
         Name => 'HighlightTonePriority',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
+    0x1b => { #PH
+        Name => 'MacroMagnification',
+        Notes => 'currently decoded only for the MP-E 65mm f/2.8 1-5x Macro Photo',
+        Condition => '$$self{LensType} and $$self{LensType} == 124',
+        ValueConv => 'exp((75-$val) * log(2) * 3 / 40)',
+        ValueConvInv => '$val > 0 ? 75 - log($val) / log(2) * 40 / 3 : undef',
+        PrintConv => 'sprintf("%.1fx",$val)',
+        PrintConvInv => '$val=~s/\s*x//; $val',
+    },
     0x15 => { #PH (580 EX II)
         Name => 'FlashMeteringMode',
         PrintConv => {
@@ -2678,6 +2696,7 @@ my %ciLongFocal = (
         },
     },
     0x19 => { %ciCameraTemperature }, #36
+    # 0x1b, 0x1c, 0x1d - same as FileInfo 0x10 - PH
     0x1e => { %ciFocalLength },
     0x31 => {
         Name => 'CameraOrientation',
@@ -2954,6 +2973,15 @@ my %ciLongFocal = (
         },
     },
     0x18 => { %ciCameraTemperature }, #36
+    0x1b => { #PH
+        Name => 'MacroMagnification',
+        Notes => 'currently decoded only for the MP-E 65mm f/2.8 1-5x Macro Photo',
+        Condition => '$$self{LensType} and $$self{LensType} == 124',
+        ValueConv => 'exp((75-$val) * log(2) * 3 / 40)',
+        ValueConvInv => '$val > 0 ? 75 - log($val) / log(2) * 40 / 3 : undef',
+        PrintConv => 'sprintf("%.1fx",$val)',
+        PrintConvInv => '$val=~s/\s*x//; $val',
+    },
     0x1d => { %ciFocalLength }, #PH
     0x30 => { #20
         Name => 'CameraOrientation',
@@ -4158,7 +4186,22 @@ my %ciLongFocal = (
             4 => 'Green',
         },
     },
-    # 16 - values: 86, 99, 104, 113, 120, 136, 163
+    # 16 - values: 86, 99, 104, 113, 120, 136, 163 (lens dependent?)
+    # MP-E 65mm on 5DmkII: 44=5x,52~=3.9x,56~=3.3x,62~=2.6x,75=1x
+    # ME-E 65mm on 40D: 72=1x(?) for all samples -- decoded here as 1.4x (35efl=1.6)?
+    16 => { #PH
+        Name => 'MacroMagnification',
+        Condition => '$$self{LensType} and $$self{LensType} == 124',
+        Priority => 0,
+        Notes => q{
+            currently decoded only for the MP-E 65mm f/2.8 1-5x Macro Photo, and not
+            valid for all camera models
+        },
+        ValueConv => 'exp((75-$val) * log(2) * 3 / 40)',
+        ValueConvInv => '$val > 0 ? 75 - log($val) / log(2) * 40 / 3 : undef',
+        PrintConv => 'sprintf("%.1fx",$val)',
+        PrintConvInv => '$val=~s/\s*x//; $val',
+    },
     # 17 - values: 0, 3, 4
     # 18 - same as LiveViewShooting for all my samples (5DmkII, 50D) - PH
     19 => { #PH
@@ -5563,7 +5606,7 @@ Canon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

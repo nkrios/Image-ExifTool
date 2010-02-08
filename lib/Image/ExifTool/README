@@ -369,6 +369,13 @@ numerical.
                   resource name to use when writing if an appended name is not
                   provided.
 
+                  'SubDoc' - [Composite tags only] set to cause this composite
+                  tag to also be generated for each sub-document.  To achieve
+                  this, 'Main:' and 'Doc#:' prefixes are added to all Require'd
+                  and Desire'd tag names which don't already start with 'Main:'
+                  or 'Doc#:', and the composite tag is built once for each of
+                  the main document and all sub-documents.
+
                   'SubIFD' - used in writing to determine that the tag specifies
                   an offset to a sub-IFD.  When this flag is set, the Group1
                   name gives the name of the IFD.  Must be set if and only if
@@ -518,16 +525,15 @@ numerical.
                   valid.  If used in a list of alternate tag definitions, the
                   first list entry with a true condition is taken.  If no
                   condition exists, then a 'true' condition is assumed.  The
-                  expression may use $self to access the ExifTool object, and
-                  $oldVal to access the previous Raw value of the tag (if it
-                  exists).  The first 48 bytes of the raw data value are
-                  accessible through the reference $valPt for EXIF and Jpeg2000
-                  tags only.  EXIF tags may also reference the format string and
-                  value count through $format and $count.  Note that if the
-                  value is writable and $valPt is used, the tag must have a
-                  Format (unless 'undef' or 'string'), and a Count (unless 1 or
-                  length of the 'undef' or 'string'), so the raw data may be
-                  generated for evaluating the Condition.
+                  expression may use $self to access the ExifTool object.  The
+                  first 48 bytes of the raw data value are accessible through
+                  the reference $valPt for EXIF and Jpeg2000 tags only.  EXIF
+                  tags may also reference the format string and value count
+                  through $format and $count.  Note that if the value is
+                  writable and $valPt is used, the tag must have a Format
+                  (unless 'undef' or 'string'), and a Count (unless 1 or length
+                  of the 'undef' or 'string'), so the raw data may be generated
+                  for evaluating the Condition.
 
   Require       : [Composite tags only] A hash reference specifying the tags
                   required to calculate the composite tag value.  The hash
@@ -610,7 +616,7 @@ numerical.
   WriteCondition: [Writable EXIF tags only] Specifies a condition to be
                   evaluated before the tag can be written to a specific file.
                   The condition may use $self to reference the ExifTool object,
-                  and returns true if it is OK for writing. Unlike WriteCheck
+                  and returns true if it is OK for writing.  Unlike WriteCheck
                   which is done only once when the new value is set, this
                   condition is evaluated before the information is written in
                   each file.
@@ -732,12 +738,17 @@ numerical.
 
      FixBase    : Flag set if base offsets should be fixed.  Used to add a
                   constant to maker notes offsets to fix damage done by some
-                  image editing utilities. (maker notes only)
+                  image editing utilities. (maker notes only)  Set to 2 for
+                  unknown maker notes to be a bit more flexible in adjusting
+                  the base offset.
 
      FixOffsets : Expression to evaluate for each value pointer to patch
                   problems with some EXIF maker note offsets.  May access the
                   following variables: $valuePtr, $valEnd, $size, $tagID and
                   $wFlag.  May return undef when writing to ignore the entry.
+
+     RelativeBase:[EXIF directories only] Flag to adjust all offsets relative
+                  to the start of the IFD when writing.
 
      Multi      : [EXIF directories only] Flag to allow multiple linked IFD's.
                   1 is assumed if DirName is IFD0 or SubIFD unless otherwise

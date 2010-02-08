@@ -469,28 +469,28 @@ my %writeTable = (
             with the -L option. XPTitle is ignored by Windows Explorer if
             ImageDescription exists
         },
-        ValueConvInv => '$self->Charset2Unicode($val,"II") . "\0\0"',
+        ValueConvInv => '$self->Encode($val,"UCS2","II") . "\0\0"',
     },
     0x9c9c => {             # XPComment
         Writable => 'int8u',
         WriteGroup => 'IFD0',
-        ValueConvInv => '$self->Charset2Unicode($val,"II") . "\0\0"',
+        ValueConvInv => '$self->Encode($val,"UCS2","II") . "\0\0"',
     },
     0x9c9d => {             # XPAuthor
         Writable => 'int8u',
         WriteGroup => 'IFD0',
         Notes => 'ignored by Windows Explorer if Artist exists',
-        ValueConvInv => '$self->Charset2Unicode($val,"II") . "\0\0"',
+        ValueConvInv => '$self->Encode($val,"UCS2","II") . "\0\0"',
     },
     0x9c9e => {             # XPKeywords
         Writable => 'int8u',
         WriteGroup => 'IFD0',
-        ValueConvInv => '$self->Charset2Unicode($val,"II") . "\0\0"',
+        ValueConvInv => '$self->Encode($val,"UCS2","II") . "\0\0"',
     },
     0x9c9f => {             # XPSubject
         Writable => 'int8u',
         WriteGroup => 'IFD0',
-        ValueConvInv => '$self->Charset2Unicode($val,"II") . "\0\0"',
+        ValueConvInv => '$self->Encode($val,"UCS2","II") . "\0\0"',
     },
     0xa000 => {             # FlashpixVersion
         Writable => 'undef',
@@ -758,12 +758,12 @@ my %writeTable = (
     0xc6d2 => {             # PanasonicTitle (Panasonic DMC-TZ5, not a DNG tag)
         Writable => 'undef',
         WriteGroup => 'IFD0',
-        ValueConvInv => '$self->Charset2UTF8($val)',
+        ValueConvInv => '$self->Encode($val,"UTF8")',
     },
     0xc6d3 => {             # PanasonicTitle2 (Panasonic DMC-FS7, not a DNG tag)
         Writable => 'undef',
         WriteGroup => 'IFD0',
-        ValueConvInv => '$self->Charset2UTF8($val)',
+        ValueConvInv => '$self->Encode($val,"UTF8")',
     },
     0xc6f3 => {             # CameraCalibrationSig
         Writable => 'string',
@@ -1074,7 +1074,7 @@ sub EncodeExifText($$)
     # does the string contain special characters?
     if ($val =~ /[\x80-\xff]/) {
         my $order = $exifTool->GetNewValues('ExifUnicodeByteOrder');
-        return "UNICODE\0" . $exifTool->Charset2Unicode($val, $order);
+        return "UNICODE\0" . $exifTool->Encode($val,'UCS2',$order);
     } else {
         return "ASCII\0\0\0$val";
     }
@@ -1207,7 +1207,7 @@ sub SortIFD($$$)
     my ($dataPt, $dirStart, $numEntries) = @_;
     my ($index, %entries);
     # split the directory into separate entries
-    my ($padding, $newDir) = ('','');
+    my $newDir = '';
     for ($index=0; $index<$numEntries; ++$index) {
         my $entry = $dirStart + 2 + 12 * $index;
         my $tagID = Get16u($dataPt, $entry);
@@ -1215,8 +1215,11 @@ sub SortIFD($$$)
         # silly software can pad directories with zero entries -- put these at the end
         $tagID = 0x10000 unless $tagID or $index == 0;
         # add new entry (allow for duplicate tag ID's, which shouldn't normally happen)
-        $entries{$tagID} or $entries{$tagID} = '';
-        $entries{$tagID} .= $entryData;
+        if ($entries{$tagID}) {
+            $entries{$tagID} .= $entryData;
+        } else {
+            $entries{$tagID} = $entryData;
+        }
     }
     # sort the directory entries
     my @sortedTags = sort { $a <=> $b } keys %entries;
@@ -1224,7 +1227,7 @@ sub SortIFD($$$)
         $newDir .= $entries{$_};
     }
     # replace original directory with new, sorted one
-    substr($$dataPt, $dirStart + 2, 12 * $numEntries) = $newDir . $padding;
+    substr($$dataPt, $dirStart + 2, 12 * $numEntries) = $newDir;
 }
 
 #------------------------------------------------------------------------------
@@ -1248,7 +1251,7 @@ sub ValidateIFD($;$)
     for ($index=0; $index<$numEntries; ++$index) {
         my $entry = 12 * $index;
         my $tagID = Get16u(\$buff, $entry);
-        $tagID > $lastID or return 0;
+        $tagID > $lastID or $$dirInfo{AllowOutOfOrderTags} or return 0;
         my $format = Get16u(\$buff, $entry+2);
         $format > 0 and $format <= 13 or return 0;
         my $count = Get32u(\$buff, $entry+4);
@@ -1563,6 +1566,7 @@ sub WriteExif($$$)
         
         # fix base offsets (some cameras incorrectly write maker notes in IFD0)
         if ($dirName eq 'MakerNotes' and $$dirInfo{Parent} =~ /^(ExifIFD|IFD0)$/ and
+            $$exifTool{TIFF_TYPE} !~ /^(ARW|SR2)$/ and
             Image::ExifTool::MakerNotes::FixBase($exifTool, $dirInfo))
         {
             # update local variables from fixed values
@@ -2295,13 +2299,15 @@ NoOverwrite:            next if $isNew > 0;
                                 #### eval Base ($start)
                                 $subdirBase += eval $$subdir{Base};
                             }
+                            # add IFD number if more than one
+                            $subdirName =~ s/\d*$/$i/ if $i;
                             my %subdirInfo = (
                                 Base     => $subdirBase,
                                 DataPt   => $dataPt,
                                 DataPos  => $dataPos - $subdirBase + $base,
                                 DataLen  => $dataLen,
                                 DirStart => $subdirStart,
-                                DirName  => $subdirName . ($i ? $i : ''),
+                                DirName  => $subdirName,
                                 Name     => $$newInfo{Name},
                                 Parent   => $dirName,
                                 Fixup    => new Image::ExifTool::Fixup,
@@ -2310,6 +2316,11 @@ NoOverwrite:            next if $isNew > 0;
                                 # set ImageData only for 1st level SubIFD's
                                 ImageData=> $imageDataFlag eq 'Main' ? 'SubIFD' : undef,
                             );
+                            if ($$subdir{RelativeBase}) {
+                                # apply one-time fixup if offsets are relative (Sony IDC hack)
+                                delete $subdirInfo{Fixup};
+                                delete $subdirInfo{ImageData};
+                            }
                             # is the subdirectory outside our current data?
                             if ($subdirStart < 0 or $subdirStart + 2 > $dataLen) {
                                 if ($raf) {
@@ -2329,10 +2340,18 @@ NoOverwrite:            next if $isNew > 0;
                             }
                             my $subdirData = $exifTool->WriteDirectory(\%subdirInfo, $subTable, $$subdir{WriteProc});
                             unless (defined $subdirData) {
-                                $exifTool->Error("Error writing $subdirInfo{DirName}");
+                                # WriteDirectory should have issued an error, but check just in case
+                                $exifTool->Error("Error writing $subdirName") unless $$exifTool{VALUE}{Error};
                                 return undef;
                             }
-                            next unless length($subdirData);
+                            unless (length $subdirData) {
+                                next unless $inMakerNotes;
+                                # don't delete MakerNote Sub-IFD's, write empty IFD instead
+                                $subdirData = "\0" x 6;
+                                # reset SubIFD ImageData and Fixup just to be safe
+                                delete $subdirInfo{ImageData};
+                                delete $subdirInfo{Fixup};
+                            }
                             # handle data blocks that we will transfer later
                             if (ref $subdirInfo{ImageData}) {
                                 push @imageData, @{$subdirInfo{ImageData}};
@@ -2542,7 +2561,16 @@ NoOverwrite:            next if $isNew > 0;
                 } elsif ($$newInfo{DataMember}) {
 
                     # save any necessary data members (Make, Model, etc)
-                    my $v = ReadValue($newValuePt,0,$newFormName,$newCount,length($$newValuePt));
+                    my $formatStr = $newFormName;
+                    my $count = $newCount;
+                    # change to specified format if necessary
+                    if ($$newInfo{Format} and $$newInfo{Format} ne $formatStr) {
+                        $formatStr = $$newInfo{Format};
+                        my $format = $formatNumber{$formatStr};
+                        # adjust number of items for new format size
+                        $count = int(length($$newValuePt) / $formatSize[$format]) if $format;
+                    }
+                    my $v = ReadValue($newValuePt,0,$formatStr,$count,length($$newValuePt));
                     $$exifTool{$$newInfo{DataMember}} = $v;
                 }
             }
@@ -2679,8 +2707,10 @@ NoOverwrite:            next if $isNew > 0;
             foreach $subdir (@subdirs) {
                 my $len = length($newData);         # position of subdirectory in data
                 my $subdirFixup = $$subdir{Fixup};
-                $$subdirFixup{Start} += $len;
-                $fixup->AddFixup($subdirFixup);
+                if ($subdirFixup) {
+                    $$subdirFixup{Start} += $len;
+                    $fixup->AddFixup($subdirFixup);
+                }
                 my $imageData = $$subdir{ImageData};
                 my $blockSize = 0;
                 # must also update start position for ImageData fixups
@@ -2968,7 +2998,22 @@ NoOverwrite:            next if $isNew > 0;
                     } elsif ($raf and $raf->Seek($offset+$dbase+$dpos,0) and
                              $raf->Read($buff,$size) == $size)
                     {
-                        # data read OK
+                        # (data was read OK)
+                        # patch incorrect ThumbnailOffset in Sony A100 1.00 ARW images
+                        if ($$exifTool{TIFF_TYPE} eq 'ARW' and $$tagInfo{Name} eq 'ThumbnailOffset' and
+                            $$exifTool{Model} eq 'DSLR-A100' and $buff !~ /^\xff\xd8\xff/)
+                        {
+                            my $pos = $offset + $dbase + $dpos;
+                            my $try;
+                            if ($pos < 0x10000 and $raf->Seek($pos+0x10000,0) and
+                                $raf->Read($try,$size) == $size and $try =~ /^\xff\xd8\xff/)
+                            {
+                                $buff = $try;
+                                $exifTool->Warn('Adjusted incorrect A100 ThumbnailOffset', 1);
+                            } else {
+                                $exifTool->Error('Invalid ThumbnailImage');
+                            }
+                        }
                     } elsif ($$tagInfo{Name} eq 'ThumbnailOffset' and $offset>=0 and $offset<$dataLen) {
                         # Grrr.  The Canon 350D writes the thumbnail with an incorrect byte count
                         my $diff = $offset + $size - $dataLen;
@@ -2999,14 +3044,21 @@ NoOverwrite:            next if $isNew > 0;
                         return undef if $exifTool->Error("Error reading $dataName data in $name", $inMakerNotes);
                         $buff = '';
                     }
-                    if ($$tagInfo{Name} eq 'PreviewImageStart' and $exifTool->{FILE_TYPE} eq 'JPEG') {
-                        # hold onto the PreviewImage until we can determine if it fits
-                        $exifTool->{PREVIEW_INFO} or $exifTool->{PREVIEW_INFO} = { };
-                        $exifTool->{PREVIEW_INFO}{Data} = $buff;
-                        if ($$tagInfo{IsOffset} and $$tagInfo{IsOffset} eq '2') {
-                            $exifTool->{PREVIEW_INFO}{NoBaseShift} = 1;
+                    if ($$tagInfo{Name} eq 'PreviewImageStart') {
+                        if ($$exifTool{FILE_TYPE} eq 'JPEG') {
+                            # hold onto the PreviewImage until we can determine if it fits
+                            $exifTool->{PREVIEW_INFO} or $exifTool->{PREVIEW_INFO} = { };
+                            $exifTool->{PREVIEW_INFO}{Data} = $buff;
+                            if ($$tagInfo{IsOffset} and $$tagInfo{IsOffset} eq '2') {
+                                $exifTool->{PREVIEW_INFO}{NoBaseShift} = 1;
+                            }
+                            $buff = '';
+                        } elsif ($$exifTool{TIFF_TYPE} eq 'ARW' and $$exifTool{Model}  eq 'DSLR-A100') {
+                            # the A100 double-references the same preview, so ignore the
+                            # second one (the offset and size will be patched later)
+                            next if $$exifTool{A100PreviewLength};
+                            $$exifTool{A100PreviewLength} = length $buff if defined $buff;
                         }
-                        $buff = '';
                     }
                     # update offset accordingly and add to end of new data
                     Set32u($newOffset, \$newData, $offsetPos);
@@ -3116,14 +3168,27 @@ NoOverwrite:            next if $isNew > 0;
                 $previewInfo->{Fixup} or $previewInfo->{Fixup} = new Image::ExifTool::Fixup;
                 $previewInfo->{Fixup}->AddFixup($fixup);
             }
-        } else {
-            # delete both IFD0 and IFD1 if only mandatory tags remain
-            $newData = '' if defined $newData and $deleteAll;
+        } elsif (defined $newData and $deleteAll) {
+            $newData = '';  # delete both IFD0 and IFD1 since only mandatory tags remain
+        } elsif ($$exifTool{A100PreviewLength}) {
+            # save preview image start for patching A100 quirks later
+            $$exifTool{A100PreviewStart} = $fixup->GetMarkerPointers(\$newData, 'PreviewImage');
         }
         # save location of last IFD for use in Canon RAW header
         if ($newDataPos == 16) {
             my @ifdPos = $fixup->GetMarkerPointers(\$newData,'NextIFD');
             $$origDirInfo{LastIFD} = pop @ifdPos;
+        }
+        # recrypt SR2 SubIFD data if necessary
+        my $key = $$exifTool{SR2SubIFDKey};
+        if ($key) {
+            my $start = $fixup->GetMarkerPointers(\$newData, 'SR2SubIFDOffset');
+            my $len = $$exifTool{SR2SubIFDLength};
+            # (must subtract 8 for size of TIFF header)
+            if ($start and $start - 8 + $len <= length $newData) {
+                require Image::ExifTool::Sony;
+                Image::ExifTool::Sony::Decrypt(\$newData, $start - 8, $len, $key);
+            }
         }
     }
     # return empty string if no entries in directory
@@ -3151,7 +3216,7 @@ This file contains routines to write EXIF metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

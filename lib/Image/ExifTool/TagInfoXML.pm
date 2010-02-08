@@ -15,7 +15,7 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP;
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 @ISA = qw(Exporter);
 
 sub LoadLangModules($);
@@ -27,7 +27,7 @@ my %credits = (
     cs   => 'Jens Duttke and Petr MichE<aacute>lek',
     de   => 'Jens Duttke',
     es   => 'Jens Duttke and Santiago del BrE<iacute>o GonzE<aacute>lez',
-    fr   => 'Jens Duttke, Bernard Guillotin, Jean Glasser and Jean Piquemal',
+    fr   => 'Jens Duttke, Bernard Guillotin, Jean Glasser, Jean Piquemal and Harry Nizard',
     it   => 'Jens Duttke, Ferdinando Agovino and Emilio Dati',
     ja   => 'Jens Duttke and Kazunari Nishina',
     ko   => 'Jens Duttke and Jeong Beom Kim',
@@ -584,7 +584,7 @@ and values.
 
 ~head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -743,7 +743,7 @@ Number of modules updated, or negative on error.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

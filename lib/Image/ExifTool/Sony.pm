@@ -24,10 +24,11 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.36';
+$VERSION = '1.37';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
+sub WriteSR2($$$);
 
 my %sonyLensTypes;  # filled in based on Minolta LensType's
 
@@ -120,7 +121,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
     },
-    0x2001 => { #PH (All DSLR's except the A100)
+    0x2001 => { #PH (JPEG images from all DSLR's except the A100)
         Name => 'PreviewImage',
         Writable => 'undef',
         DataTag => 'PreviewImage',
@@ -163,6 +164,11 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         Name => 'FileFormat',
         Writable => 'int8u',
         Count => 4,
+        # dynamically set the file type to SR2 because we could have assumed ARW up till now
+        RawConv => q{
+            $self->OverrideFileType($$self{TIFF_TYPE} = 'SR2') if $val eq '1 0 0 0';
+            return $val;
+        },
         PrintConv => {
             '0 0 0 2' => 'JPEG',
             '1 0 0 0' => 'SR2',
@@ -190,6 +196,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             265 => 'DSLR-A230',
             269 => 'DSLR-A850',
             273 => 'DSLR-A550',
+            274 => 'DSLR-A500', #PH
         },
     },
     0xb020 => { #2
@@ -271,7 +278,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         Writable => 'int32u',
         PrintConv => \%Image::ExifTool::Minolta::sonyColorMode,
     },
-    0xb02b => { #PH (A550 JPEG, A230 and A900 ARW)
+    0xb02b => { #PH (A550 JPEG and A200, A230, A300, A350, A380, A700 and A900 ARW)
         Name => 'FullImageSize',
         Writable => 'int32u',
         Count => 2,
@@ -281,7 +288,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         PrintConv => '$val =~ tr/ /x/; $val',
         PrintConvInv => '$val =~ tr/x/ /; $val',
     },
-    0xb02c => { #PH (A550 JPEG, A230 and A900 ARW)
+    0xb02c => { #PH (A550 JPEG and A200, A230, A300, A350, A380, A700 and A900 ARW)
         Name => 'PreviewImageSize',
         Writable => 'int32u',
         Count => 2,
@@ -817,6 +824,10 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     6 => {
         Name => 'SonyDateTime',
         Format => 'string[20]',
+        Groups => { 2 => 'Time' },
+        Shift => 'Time',
+        PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$self->InverseDateTime($val,0)',
     },
     #52 => {
     #    # values: 'DC6303320222000' or 'DC5303320222000'
@@ -826,57 +837,107 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     #},
 );
 
-# tag table for Sony RAW Format
+# tag table for SRF0 IFD (ref 1)
 %Image::ExifTool::Sony::SRF = (
     PROCESS_PROC => \&ProcessSRF,
     GROUPS => { 0 => 'MakerNotes', 1 => 'SRF#', 2 => 'Camera' },
     NOTES => q{
-        The maker notes in SRF (Sony Raw Format) images contain 7 IFD's (with family
-        1 group names SRF0 through SRF6).  SRF0 through SRF5 use these Sony tags,
-        while SRF6 uses standard EXIF tags.  All information other than SRF0 is
-        encrypted, but thanks to Dave Coffin the decryption algorithm is known. SRF
-        images are written by the Sony DSC-F828 and DSC-V3.
+        The maker notes in SRF (Sony Raw Format) images contain 7 IFD's with family
+        1 group names SRF0 through SRF6.  SRF0 and SRF1 use the tags in this table,
+        while SRF2 through SRF5 use the tags in the next table, and SRF6 uses
+        standard EXIF tags.  All information other than SRF0 is encrypted, but
+        thanks to Dave Coffin the decryption algorithm is known.  SRF images are
+        written by the Sony DSC-F828 and DSC-V3.
     },
+    # tags 0-1 are used in SRF1
     0 => {
-        Name => 'SRF2_Key',
+        Name => 'SRF2Key',
         Notes => 'key to decrypt maker notes from the start of SRF2',
-        RawConv => '$self->{SRF2_Key} = $val',
+        RawConv => '$self->{SRF2Key} = $val',
     },
     1 => {
         Name => 'DataKey',
         Notes => 'key to decrypt the rest of the file from the end of the maker notes',
         RawConv => '$self->{SRFDataKey} = $val',
     },
+    # SRF0 contains a single unknown tag with TagID 0x0003
+);
+
+# tag table for Sony RAW Format (ref 1)
+%Image::ExifTool::Sony::SRF2 = (
+    PROCESS_PROC => \&ProcessSRF,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'SRF#', 2 => 'Camera' },
+    NOTES => "These tags are found in the SRF2 through SRF5 IFD's.",
+    # the following tags are used in SRF2-5
+    2 => 'SRF6Offset', #PH
+    # SRFDataOffset references 2220 bytes of unknown data for the DSC-F828 - PH
+    3 => { Name => 'SRFDataOffset', Unknown => 1 }, #PH
+    4 => { Name => 'RawDataOffset' }, #PH
+    5 => { Name => 'RawDataLength' }, #PH
 );
 
 # tag table for Sony RAW 2 Format Private IFD (ref 1)
 %Image::ExifTool::Sony::SR2Private = (
     PROCESS_PROC => \&ProcessSR2,
+    WRITE_PROC => \&WriteSR2,
     GROUPS => { 0 => 'MakerNotes', 1 => 'SR2', 2 => 'Camera' },
     NOTES => q{
         The SR2 format uses the DNGPrivateData tag to reference a private IFD
-        containing these tags.  SR2 images are written by the Sony DSC-R1.
+        containing these tags.  SR2 images are written by the Sony DSC-R1, but
+        this information is also written to ARW images by other models.
     },
     0x7200 => {
         Name => 'SR2SubIFDOffset',
         # (adjusting offset messes up calculations for AdobeSR2 in DNG images)
         # Flags => 'IsOffset',
-        OffsetPair => 0x7201,
-        RawConv => '$self->{SR2SubIFDOffset} = $val',
+        # (can't set OffsetPair or else DataMember won't be set when writing)
+        # OffsetPair => 0x7201,
+        DataMember => 'SR2SubIFDOffset',
+        RawConv => '$$self{SR2SubIFDOffset} = $val',
     },
     0x7201 => {
         Name => 'SR2SubIFDLength',
-        OffsetPair => 0x7200,
-        RawConv => '$self->{SR2SubIFDLength} = $val',
+        # (can't set OffsetPair or else DataMember won't be set when writing)
+        # OffsetPair => 0x7200,
+        DataMember => 'SR2SubIFDLength',
+        RawConv => '$$self{SR2SubIFDLength} = $val',
     },
     0x7221 => {
         Name => 'SR2SubIFDKey',
         Format => 'int32u',
         Notes => 'key to decrypt SR2SubIFD',
-        RawConv => '$self->{SR2SubIFDKey} = $val',
+        DataMember => 'SR2SubIFDKey',
+        RawConv => '$$self{SR2SubIFDKey} = $val',
+        PrintConv => 'sprintf("0x%.8x", $val)',
+    },
+    0x7240 => { #PH
+        Name => 'IDC_IFD',
+        Groups => { 1 => 'SonyIDC' },
+        Condition => '$$valPt !~ /^\0\0\0\0/',   # (just in case this could be zero)
+        Flags => 'SubIFD',
+        SubDirectory => {
+            DirName => 'SonyIDC',
+            TagTable => 'Image::ExifTool::SonyIDC::Main',
+            Start => '$val',
+        },
+    },
+    0x7241 => { #PH
+        Name => 'IDC2_IFD',
+        Groups => { 1 => 'SonyIDC' },
+        Condition => '$$valPt !~ /^\0\0\0\0/',   # may be zero if dir doesn't exist
+        Flags => 'SubIFD',
+        SubDirectory => {
+            DirName => 'SonyIDC2',
+            TagTable => 'Image::ExifTool::SonyIDC::Main',
+            Start => '$val',
+            Base => '$start',
+            MaxSubdirs => 20,   # (A900 has 10 null entries, but IDC writes only 1)
+            RelativeBase => 1,  # needed to write SubIFD with relative offsets
+        },
     },
     0x7250 => { #1
         Name => 'MRWInfo',
+        Condition => '$$valPt !~ /^\0\0\0\0/',   # (just in case this could be zero)
         SubDirectory => {
             TagTable => 'Image::ExifTool::MinoltaRaw::Main',
         },
@@ -884,6 +945,8 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
 );
 
 %Image::ExifTool::Sony::SR2SubIFD = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 1 => 'SR2SubIFD', 2 => 'Camera' },
     SET_GROUP1 => 1, # set group1 name to directory name for all tags in table
     NOTES => 'Tags in the encrypted SR2SubIFD',
@@ -910,6 +973,8 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
 );
 
 %Image::ExifTool::Sony::SR2DataIFD = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 1 => 'SR2DataIFD', 2 => 'Camera' },
     SET_GROUP1 => 1, # set group1 name to directory name for all tags in table
     # 0x7313 => 'WB_RGGBLevels', (duplicated in all SR2DataIFD's)
@@ -947,14 +1012,15 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
 }
 
 #------------------------------------------------------------------------------
-# decrypt Sony data (ref 1)
+# Decrypt Sony data (ref 1)
 # Inputs: 0) data reference, 1) start offset, 2) data length, 3) decryption key
 # Returns: nothing (original data buffer is updated with decrypted data)
+# Notes: data length should be a multiple of 4
 sub Decrypt($$$$)
 {
     my ($dataPt, $start, $len, $key) = @_;
     my ($i, $j, @pad);
-    my $words = $len / 4;
+    my $words = int ($len / 4);
 
     for ($i=0; $i<4; ++$i) {
         my $lo = ($key & 0xffff) * 0x0edd + 1;
@@ -974,9 +1040,105 @@ sub Decrypt($$$$)
 }
 
 #------------------------------------------------------------------------------
+# Set the ARW file type and decide between SubIFD and A100DataOffset
+# Inputs: 0) ExifTool object ref, 1) reference to tag 0x14a raw data
+# Returns: true if tag 0x14a is a SubIFD, false otherwise
+sub SetARW($$)
+{
+    my ($exifTool, $valPt) = @_;
+
+    # assume ARW for now -- SR2's get identified when FileFormat is parsed
+    $exifTool->OverrideFileType($$exifTool{TIFF_TYPE} = 'ARW');
+
+    # this should always be a SubIFD for models other than the A100
+    return 1 unless $$exifTool{Model} eq 'DSLR-A100' and length $$valPt == 4;
+
+    # for the A100, IFD0 tag 0x14a is either a pointer to the raw data if this is
+    # an original image, or a SubIFD offset if the image was edited by Sony IDC,
+    # so assume it points to the raw data if it isn't a valid IFD (this assumption
+    # will be checked later when we try to parse the SR2Private directory)
+    my %subdir = (
+        DirStart => Get32u($valPt, 0),
+        Base     => 0,
+        RAF      => $$exifTool{RAF},
+        AllowOutOfOrderTags => 1, # doh!
+    );
+    return Image::ExifTool::Exif::ValidateIFD(\%subdir);
+}
+
+#------------------------------------------------------------------------------
+# Finish writing ARW image, patching necessary Sony quirks, etc
+# Inputs: 0) ExifTool ref, 1) dirInfo ref, 2) EXIF data ref, 3) image data reference
+# Returns: undef on success, error string otherwise
+# Notes: (it turns that all of this is for the A100 only)
+sub FinishARW($$$)
+{
+    my ($exifTool, $dirInfo, $dataPt, $imageData) = @_;
+
+    # pre-scan IFD0 to get IFD entry offsets for each tag
+    my $dataLen = length $$dataPt;
+    return 'Truncated IFD0' if $dataLen < 2;
+    my $n = Get16u($dataPt, 0);
+    return 'Truncated IFD0' if $dataLen < 2 + 12 * $n;
+    my ($i, %entry, $dataBlock, $pad, $dataOffset);
+    for ($i=0; $i<$n; ++$i) {
+        my $entry = 2 + $i * 12;
+        $entry{Get16u($dataPt, $entry)} = $entry;
+    }
+    # fix up SR2Private offset and A100DataOffset (A100 only)
+    if ($entry{0xc634} and $$exifTool{MRWDirData}) {
+        return 'Unexpected MRW block' unless $$exifTool{Model} eq 'DSLR-A100';
+        return 'Missing A100DataOffset' unless $entry{0x14a} and $$exifTool{A100DataOffset};
+        # account for total length of image data
+        my $totalLen = 8 + $dataLen;
+        if (ref $imageData) {
+            foreach $dataBlock (@$imageData) {
+                my ($pos, $size, $pad) = @$dataBlock;
+                $totalLen += $size + $pad;
+            }
+        }
+        # align MRW block on an even 4-byte boundary
+        my $remain = $totalLen & 0x03;
+        $pad = 4 - $remain and $totalLen += $pad if $remain;
+        # set offset for the MRW directory data
+        Set32u($totalLen, $dataPt, $entry{0xc634} + 8);
+        # also pad MRWDirData data to an even 4 bytes (just to be safe)
+        $remain = length($$exifTool{MRWDirData}) & 0x03;
+        $$exifTool{MRWDirData} .= "\0" x (4 - $remain) if $remain;
+        $totalLen += length $$exifTool{MRWDirData};
+        # fix up A100DataOffset
+        $dataOffset = $$exifTool{A100DataOffset};
+        Set32u($totalLen, $dataPt, $entry{0x14a} + 8);
+    }
+    # patch double-referenced and incorrectly-sized A100 PreviewImage
+    if ($entry{0x201} and $$exifTool{A100PreviewStart} and
+        $entry{0x202} and $$exifTool{A100PreviewLength})
+    {
+        Set32u($$exifTool{A100PreviewStart}, $dataPt, $entry{0x201} + 8);
+        Set32u($$exifTool{A100PreviewLength}, $dataPt, $entry{0x202} + 8);
+    }
+    # write TIFF IFD structure
+    my $outfile = $$dirInfo{OutFile};
+    my $header = GetByteOrder() . Set16u(0x2a) . Set32u(8);
+    Write($outfile, $header, $$dataPt) or return 'Error writing';
+    # copy over image data
+    if (ref $imageData) {
+        $exifTool->CopyImageData($imageData, $outfile) or return 'Error copying image data';
+    }
+    # write MRW data if necessary
+    if ($$exifTool{MRWDirData}) {
+        Write($outfile, "\0" x $pad) if $pad;   # write padding if necessary
+        Write($outfile, $$exifTool{MRWDirData});
+        delete $$exifTool{MRWDirData};
+        # set TIFF_END to copy over the MRW image data
+        $$exifTool{TIFF_END} = $dataOffset if $dataOffset;
+    }
+    return undef;
+}
+
+#------------------------------------------------------------------------------
 # Process SRF maker notes
-# Inputs: 0) ExifTool object reference, 1) reference to directory information
-#         2) pointer to tag table
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success
 sub ProcessSRF($$$)
 {
@@ -989,12 +1151,16 @@ sub ProcessSRF($$$)
     # process IFD chain
     my ($ifd, $success);
     for ($ifd=0; ; ) {
+        # switch tag table for SRF2-5 and SRF6
+        if ($ifd == 2) {
+            $tagTablePtr = GetTagTable('Image::ExifTool::Sony::SRF2');
+        } elsif ($ifd == 6) {
+            # SRF6 uses standard EXIF tags
+            $tagTablePtr = GetTagTable('Image::ExifTool::Exif::Main');
+        }
         my $srf = $$dirInfo{DirName} = "SRF$ifd";
-        my $srfTable = $tagTablePtr;
-        # SRF6 uses standard EXIF tags
-        $srfTable = GetTagTable('Image::ExifTool::Exif::Main') if $ifd == 6;
         $exifTool->{SET_GROUP1} = $srf;
-        $success = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $srfTable);
+        $success = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
         delete $exifTool->{SET_GROUP1};
         last unless $success;
 #
@@ -1020,7 +1186,7 @@ sub ProcessSRF($$$)
             $len = $cp + $nextIFD;  # decrypt up to $cp
         } elsif ($ifd == 2) {
             # get the key to decrypt IFD2
-            $key = $exifTool->{SRF2_Key};
+            $key = $exifTool->{SRF2Key};
             $len = length($$dataPt) - $nextIFD; # decrypt rest of maker notes
         } else {
             next;   # no decryption needed
@@ -1039,10 +1205,22 @@ sub ProcessSRF($$$)
 }
 
 #------------------------------------------------------------------------------
-# Process SR2 data
-# Inputs: 0) ExifTool object reference, 1) reference to directory information
-#         2) pointer to tag table
-# Returns: 1 on success
+# Write SR2 data
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success when reading, or SR2 directory or undef when writing
+sub WriteSR2($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    $exifTool or return 1;      # allow dummy access
+    my $buff = '';
+    $$dirInfo{OutFile} = \$buff;
+    return ProcessSR2($exifTool, $dirInfo, $tagTablePtr);
+}
+
+#------------------------------------------------------------------------------
+# Read/Write SR2 IFD and its encrypted subdirectories
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success when reading, or SR2 directory or undef when writing
 sub ProcessSR2($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
@@ -1051,6 +1229,12 @@ sub ProcessSR2($$$)
     my $dataPos = $$dirInfo{DataPos};
     my $dataLen = $$dirInfo{DataLen} || length $$dataPt;
     my $base = $$dirInfo{Base} || 0;
+    my $outfile = $$dirInfo{OutFile};
+
+    # clear SR2 member variables to be safe
+    delete $$exifTool{SR2SubIFDOffset};
+    delete $$exifTool{SR2SubIFDLength};
+    delete $$exifTool{SR2SubIFDKey};
 
     # make sure we have the first 4 bytes available to test directory type
     my $buff;
@@ -1062,20 +1246,67 @@ sub ProcessSR2($$$)
             $raf->Seek($pos, 0);
         }
     }
-    # this may either be a normal IFD, or a MRW-file-like data block in newer ARW images
+    # this may either be a normal IFD, or a MRW data block
+    # (only original ARW images from the A100 use the MRW block)
+    my $dataOffset;
     if ($dataPt and $$dataPt =~ /^\0MR[IM]/) {
+        my ($err, $srfPos, $srfLen, $dataOffset);
+        $dataOffset = $$exifTool{A100DataOffset};
+        if ($dataOffset) {
+            # save information about the RAW data trailer so it will be preserved
+            $$exifTool{KnownTrailer} = { Name => 'A100 RAW Data', Start => $dataOffset };
+        } else {
+            $err = 'A100DataOffset tag is missing from A100 ARW image';
+        }
+        $raf or $err = 'Unrecognized SR2 structure';
+        unless ($err) {
+            $srfPos = $raf->Tell();
+            $srfLen = $dataOffset - $srfPos;
+            unless ($srfLen > 0 and $raf->Read($buff, $srfLen) == $srfLen) {
+                $err = 'Error reading MRW directory';
+            }
+        }
+        if ($err) {
+            $outfile and $exifTool->Error($err), return undef;
+            $exifTool->Warn($err);
+            return 0;
+        }
+        my %dirInfo = ( DataPt => \$buff );
         require Image::ExifTool::MinoltaRaw;
-        return Image::ExifTool::MinoltaRaw::ProcessMRW($exifTool, $dirInfo);
+        if ($outfile) {
+            # save MRW data to be written last
+            $$exifTool{MRWDirData} = Image::ExifTool::MinoltaRaw::WriteMRW($exifTool, \%dirInfo);
+            return $$exifTool{MRWDirData} ? "\0\0\0\0\0\0" : undef;
+        } else {
+            if (not $outfile and $$exifTool{HTML_DUMP}) {
+                $exifTool->HtmlDump($srfPos, $srfLen, '[A100 SRF Data]');
+            }
+            return Image::ExifTool::MinoltaRaw::ProcessMRW($exifTool, \%dirInfo);
+        }
+    } elsif ($$exifTool{A100DataOffset}) {
+        my $err = 'Unexpected A100DataOffset tag';
+        $outfile and $exifTool->Error($err), return undef;
+        $exifTool->Warn($err);
+        return 0;
     }
     my $dirLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
-    my $result = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
-    return $result unless $result;
+    my $result;
+    if ($outfile) {
+        $result = Image::ExifTool::Exif::WriteExif($exifTool, $dirInfo, $tagTablePtr);
+        return undef unless $result;
+        $$outfile .= $result;
+
+    } else {
+        $result = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
+    }
+    return $result unless $result and $$exifTool{SR2SubIFDOffset};
     # only take first offset value if more than one!
     my @offsets = split ' ', $exifTool->{SR2SubIFDOffset};
     my $offset = shift @offsets;
     my $length = $exifTool->{SR2SubIFDLength};
     my $key = $exifTool->{SR2SubIFDKey};
+    my @subifdPos;
     if ($offset and $length and defined $key) {
         my $buff;
         # read encrypted SR2SubIFD from file
@@ -1087,7 +1318,7 @@ sub ProcessSR2($$$)
         {
             Decrypt(\$buff, 0, $length, $key);
             # display decrypted data in verbose mode
-            if ($verbose > 2) {
+            if ($verbose > 2 and not $outfile) {
                 $exifTool->VerboseDir("Decrypted SR2SubIFD", 0, $length);
                 $exifTool->VerboseDump(\$buff, Addr => $offset + $base);
             }
@@ -1103,7 +1334,20 @@ sub ProcessSR2($$$)
                     DataPos => $dPos,
                 );
                 my $subTable = GetTagTable('Image::ExifTool::Sony::SR2SubIFD');
-                $result = $exifTool->ProcessDirectory(\%dirInfo, $subTable);
+                if ($outfile) {
+                    my $fixup = new Image::ExifTool::Fixup;
+                    $dirInfo{Fixup} = $fixup;
+                    $result = $exifTool->WriteDirectory(\%dirInfo, $subTable);
+                    return undef unless $result;
+                    # save position of this SubIFD
+                    push @subifdPos, length($$outfile);
+                    # add this directory to the returned data
+                    $$fixup{Start} += length($$outfile);
+                    $$outfile .= $result;
+                    $dirInfo->{Fixup}->AddFixup($fixup);
+                } else {
+                    $result = $exifTool->ProcessDirectory(\%dirInfo, $subTable);
+                }
                 last unless @offsets;
                 $offset = shift @offsets;
                 $num = ($num || 1) + 1;
@@ -1113,10 +1357,52 @@ sub ProcessSR2($$$)
             $exifTool->Warn('Error reading SR2 data');
         }
     }
-    delete $exifTool->{SR2SubIFDOffset};
-    delete $exifTool->{SR2SubIFDLength};
-    delete $exifTool->{SR2SubIFDKey};
-    return $result;
+    if ($outfile and @subifdPos) {
+        # the SR2SubIFD must be padded to a multiple of 4 bytes for the encryption
+        my $sr2Len = length($$outfile) - $subifdPos[0];
+        if ($sr2Len & 0x03) {
+            my $pad = 4 - ($sr2Len & 0x03);
+            $sr2Len += $pad;
+            $$outfile .= ' ' x $pad;
+        }
+        # save the new SR2SubIFD Length and Key to be used later for encryption
+        $$exifTool{SR2SubIFDLength} = $sr2Len;
+        my $newKey = $$exifTool{VALUE}{SR2SubIFDKey};
+        $$exifTool{SR2SubIFDKey} = $newKey if defined $newKey;
+        # update SubIFD pointers manually and add to fixup, and set SR2SubIFDLength
+        my $n = Get16u($outfile, 0);
+        my ($i, %found);
+        for ($i=0; $i<$n; ++$i) {
+            my $entry = 2 + 12 * $i;
+            my $tagID = Get16u($outfile, $entry);
+            # only interested in SR2SubIFDOffset (0x7200) and SR2SubIFDLength (0x7201)
+            next unless $tagID == 0x7200 or $tagID == 0x7201;
+            $found{$tagID} = 1;
+            my $fmt = Get16u($outfile, $entry + 2);
+            if ($fmt != 0x04) { # must be int32u
+                $exifTool->Error("Unexpected format ($fmt) for SR2SubIFD tag");
+                return undef;
+            }
+            if ($tagID == 0x7201) { # SR2SubIFDLength
+                Set32u($sr2Len, $outfile, $entry + 8);
+                next;
+            }
+            my $tag = 'SR2SubIFDOffset';
+            my $valuePtr = @subifdPos < 2 ? $entry+8 : Get32u($outfile, $entry+8);
+            my $pos;
+            foreach $pos (@subifdPos) {
+                Set32u($pos, $outfile, $valuePtr);
+                $dirInfo->{Fixup}->AddFixup($valuePtr, $tag);
+                undef $tag;
+                $valuePtr += 4;
+            }
+        }
+        unless ($found{0x7200} and $found{0x7201}) {
+            $exifTool->Error('Missing SR2SubIFD tag');
+            return undef;
+        }
+    }
+    return $outfile ? $$outfile : $result;
 }
 
 1; # end
@@ -1143,7 +1429,7 @@ Minolta.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

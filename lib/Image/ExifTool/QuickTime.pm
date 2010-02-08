@@ -27,7 +27,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.27';
+$VERSION = '1.30';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -786,6 +786,7 @@ my %ftypLookup = (
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
     },
     CNCV => 'CompressorVersion', #PH (Canon 5D Mark II)
+    vndr => 'Vendor', #PH (Samsung PL70)
 );
 
 # User-specific media data atoms (ref 11)
@@ -1028,11 +1029,13 @@ my %ftypLookup = (
 # -> these atoms are unique, and contain one or more 'data' atoms
 %Image::ExifTool::QuickTime::InfoList = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    GROUPS => { 2 => 'Audio' },
     NOTES => q{
         As well as these tags, the 'mdta' handler uses numerical tag ID's which are
         added dynamically to this table after processing the Meta Keys information.
     },
-    GROUPS => { 2 => 'Audio' },
+    # in this table, binary 1 and 2-byte "data"-type tags are interpreted as
+    # int8u and int16u.  Multi-byte binary "data" tags are extracted as binary data
     "\xa9ART" => 'Artist',
     "\xa9alb" => 'Album',
     "\xa9cmt" => 'Comment',
@@ -1044,7 +1047,7 @@ my %ftypLookup = (
     "\xa9grp" => 'Grouping',
     "\xa9lyr" => 'Lyrics',
     "\xa9nam" => 'Title',
-    # "\xa9st3" ? (ref 10)
+    # "\xa9st3" ? #10
     "\xa9too" => 'Encoder',
     "\xa9trk" => 'Track',
     "\xa9wrt" => 'Composer',
@@ -1053,6 +1056,34 @@ my %ftypLookup = (
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::iTunesInfo' },
     },
     aART => 'AlbumArtist',
+    covr => 'CoverArt',
+    cpil => { #10
+        Name => 'Compilation',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
+    },
+    disk => {
+        Name => 'DiskNumber',
+        ValueConv => 'length($val) >= 6 ? join(" of ",unpack("x2nn",$val)) : \$val',
+    },
+    pgap => { #10
+        Name => 'PlayGap',
+        PrintConv => {
+            0 => 'Insert Gap',
+            1 => 'No Gap',
+        },
+    },
+    tmpo => {
+        Name => 'BeatsPerMinute',
+        Format => 'int16u', # marked as boolean but really int16u in my sample
+    },
+    trkn => {
+        Name => 'TrackNumber',
+        ValueConv => 'length($val) >= 6 ? join(" of ",unpack("x2nn",$val)) : \$val',
+    },
+#
+# Note: it is possible that the tags below are not being decoded properly
+# because I don't have samples to verify many of these - PH
+#
     akID => { #10
         Name => 'AppleStoreAccountType',
         PrintConv => {
@@ -1060,29 +1091,36 @@ my %ftypLookup = (
             1 => 'AOL',
         },
     },
+    albm => 'Album', #(ffmpeg source)
     apID => 'AppleStoreAccount',
-    # atID ?
+    atID => { #10 (or TV series)
+        Name => 'AlbumTitleID',
+        Format => 'int32u',
+    },
     auth => 'Author',
     catg => 'Category', #7
     cnID => { #10
         Name => 'AppleStoreCatalogID',
         Format => 'int32u',
     },
-    covr => 'CoverArt',
-    cpil => {
-        Name => 'Compilation',
-        PrintConv => { 0 => 'No', 1 => 'Yes' },
-    },
     cprt => 'Copyright',
-    disk => {
-        Name => 'DiskNumber',
-        ValueConv => 'length($val) >= 6 ? join(" of ",unpack("x2nn",$val)) : \$val',
-    },
     dscp => 'Description',
     desc => 'Description', #7
-    gnre => 'Genre',
+    gnre => { #10
+        Name => 'Genre',
+        PrintConv => q{
+            return $val unless $val =~ /^\d+$/;
+            require Image::ExifTool::ID3;
+            Image::ExifTool::ID3::PrintGenre($val - 1); # note the "- 1"
+        },
+    },
     egid => 'EpisodeGlobalUniqueID', #7
-    # geID ?
+    geID => { #10
+        Name => 'GenreID',
+        Format => 'int32u',
+        # 4005 = Kids
+        # 4010 = Teens
+    },
     grup => 'Grouping', #10
     hdvd => { #10
         Name => 'HDVideo',
@@ -1090,21 +1128,20 @@ my %ftypLookup = (
     },
     keyw => 'Keyword', #7
     ldes => 'LongDescription', #10
-    pcst => 'Podcast', #7
-    perf => 'Performer',
-    pgap => {
-        Name => 'PlayGap',
-        PrintConv => {
-            0 => 'Insert Gap',
-            1 => 'No Gap',
-        },
+    pcst => { #7
+        Name => 'Podcast',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
     },
-    # plID ?
+    perf => 'Performer',
+    plID => { #10 (or TV season)
+        Name => 'PlayListID',
+        Format => 'int8u',  # actually int64u, but split it up
+    },
     purd => 'PurchaseDate', #7
     purl => 'PodcastURL', #7
-    rtng => {
+    rtng => { #10
         Name => 'Rating',
-        PrintConv => { #10
+        PrintConv => {
             0 => 'none',
             2 => 'Clean',
             4 => 'Explicit',
@@ -1144,7 +1181,7 @@ my %ftypLookup = (
     soco => 'SortComposer', #10
     sonm => 'SortName', #10
     sosn => 'SortShow', #10
-    stik => {
+    stik => { #10
         Name => 'MediaType',
         PrintConv => { #(http://weblog.xanga.com/gryphondwb/615474010/iphone-ringtones---what-did-itunes-741-really-do.html)
             0 => 'Movie',
@@ -1159,14 +1196,6 @@ my %ftypLookup = (
         },
     },
     titl => 'Title',
-    tmpo => {
-        Name => 'BeatsPerMinute',
-        Format => 'int16u', # marked as boolean but really int16u in my sample
-    },
-    trkn => {
-        Name => 'TrackNumber',
-        ValueConv => 'length($val) >= 6 ? join(" of ",unpack("x2nn",$val)) : \$val',
-    },
     tven => 'TVEpisodeID', #7
     tves => { #7/10
         Name => 'TVEpisode',
@@ -1178,6 +1207,7 @@ my %ftypLookup = (
         Name => 'TVSeason',
         Format => 'int32u',
     },
+    yrrc => 'Year', #(ffmpeg source)
 );
 
 # info list keys
@@ -1900,7 +1930,7 @@ sub ProcessMetaData($$$)
                 Size   => $size - 10,
             );
             # convert from UTF-16 BE if necessary
-            $val = $exifTool->Unicode2Charset($val) if $enc == 1;
+            $val = $exifTool->Decode($val, 'UCS2') if $enc == 1;
             if ($enc == 0 and $$tagInfo{Unknown}) {
                 # binary data
                 $exifTool->FoundTag($tagInfo, \$val);
@@ -1941,6 +1971,15 @@ sub ProcessKeys($$$)
         next unless $tag;
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         my $newInfo;
+        if (not $tagInfo and $tag =~ /^\w{3}\xa9$/) {
+            # I have some samples where the tag is a reversed InfoList or UserData tag ID
+            $tag = pack('N', unpack('V', $tag));
+            $tagInfo = $exifTool->GetTagInfo($infoTable, $tag);
+            unless ($tagInfo) {
+                my $tbl = GetTagTable('Image::ExifTool::QuickTime::UserData');
+                $tagInfo = $exifTool->GetTagInfo($tbl, $tag);
+            }
+        }
         if ($tagInfo) {
             $newInfo = {
                 Name      => $$tagInfo{Name},
@@ -2024,7 +2063,7 @@ sub ProcessMOV($$;$)
                     $exifTool->Warn('Invalid atom size');
                     last;
                 } elsif (not $exifTool->Options('LargeFileSupport')) {
-                    $exifTool->Warn('End of processing at large atom (LargeFileSupport not set)');
+                    $exifTool->Warn('End of processing at large atom (LargeFileSupport not enabled)');
                     last;
                 }
             }
@@ -2122,16 +2161,26 @@ sub ProcessMOV($$;$)
                             $value = substr($val, $pos, $len);
                             # format flags: 0x0=binary, 0x1=text, 0xd=image,
                             #   0x15=boolean, 0x17=float
-                            unless ($format) {
-                                if ($flags == 0x0015) {
-                                    $format = 'int8u';
-                                } elsif ($flags == 0x0017) {
-                                    $format = 'float';
+                            # (I have a sample where 0x3 looks like string data,
+                            #  but this should be verified - PH)
+                            if ($format) {
+                                # don't apply format to text
+                                undef $format if $flags == 0x01;
+                            } elsif ($flags == 0x0015) {
+                                $format = 'int8u';
+                            } elsif ($flags == 0x0017) {
+                                $format = 'float';
+                            } elsif ($flags == 0) {
+                                # read 1 and 2-byte binary as integers
+                                if ($len == 1) {
+                                    $format = 'int8u',
+                                } elsif ($len == 2) {
+                                    $format = 'int16u',
                                 }
                             }
                             if ($format) {
                                 $value = ReadValue(\$value, 0, $format, $$tagInfo{Count}, $len);
-                            } elsif ($flags != 0x01 and not $$tagInfo{ValueConv}) {
+                            } elsif ($flags != 0x01 and $flags != 0x03 and not $$tagInfo{ValueConv}) {
                                 # make binary data a scalar reference unless a ValueConv exists
                                 my $buf = $value;
                                 $value = \$buf;
@@ -2203,7 +2252,7 @@ information from QuickTime and MP4 video, and M4A audio files.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

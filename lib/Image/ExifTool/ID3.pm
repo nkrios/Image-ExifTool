@@ -16,10 +16,11 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.21';
+$VERSION = '1.23';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
+sub ConvertID3v1Text($$);
 
 # audio formats that we process after an ID3v2 header (in order)
 my @audioFormats = qw(APE MPC FLAC OGG MP3);
@@ -67,11 +68,14 @@ my %warnedOnce;     # hash of warnings we issued
     VARS => { NO_ID => 1 },
     NOTES => q{
         ExifTool extracts ID3 information from MP3, MPEG, AIFF, OGG, FLAC, APE and
-        RealAudio files.  Tags which support multiple languages (ie. Comment and
-        Lyrics) are extracted by specifying the tag name, followed by a dash ('-'),
-        then a 3-character
-        L<ISO 639-2|http://www.loc.gov/standards/iso639-2/php/code_list.php>
-        language code (ie. "Comment-spa").
+        RealAudio files.  ID3v2 tags which support multiple languages (ie. Comment
+        and Lyrics) are extracted by specifying the tag name, followed by a dash
+        ('-'), then a 3-character
+        ISO 639-2
+        language code (ie. "Comment-spa"). See L<http://www.id3.org/> for the
+        official ID3 specification and
+        L<http://www.loc.gov/standards/iso639-2/php/code_list.php> for a list of ISO
+        639-2 language codes.
     },
     ID3v1 => {
         Name => 'ID3v1',
@@ -261,18 +265,18 @@ my %genre = (
     3 => {
         Name => 'Title',
         Format => 'string[30]',
-        ValueConv => '$self->Latin2Charset($val)',
+        ValueConv => 'Image::ExifTool::ID3::ConvertID3v1Text($self,$val)',
     },
     33 => {
         Name => 'Artist',
         Groups => { 2 => 'Author' },
         Format => 'string[30]',
-        ValueConv => '$self->Latin2Charset($val)',
+        ValueConv => 'Image::ExifTool::ID3::ConvertID3v1Text($self,$val)',
     },
     63 => {
         Name => 'Album',
         Format => 'string[30]',
-        ValueConv => '$self->Latin2Charset($val)',
+        ValueConv => 'Image::ExifTool::ID3::ConvertID3v1Text($self,$val)',
     },
     93 => {
         Name => 'Year',
@@ -282,7 +286,7 @@ my %genre = (
     97 => {
         Name => 'Comment',
         Format => 'string[30]',
-        ValueConv => '$self->Latin2Charset($val)',
+        ValueConv => 'Image::ExifTool::ID3::ConvertID3v1Text($self,$val)',
     },
     125 => { # ID3v1.1 (ref http://en.wikipedia.org/wiki/ID3#Layout)
         Name => 'Track',
@@ -308,18 +312,18 @@ my %genre = (
     4 => {
         Name => 'Title2',
         Format => 'string[60]',
-        ValueConv => '$self->Latin2Charset($val)',
+        ValueConv => 'Image::ExifTool::ID3::ConvertID3v1Text($self,$val)',
     },
     64 => {
         Name => 'Artist2',
         Groups => { 2 => 'Author' },
         Format => 'string[60]',
-        ValueConv => '$self->Latin2Charset($val)',
+        ValueConv => 'Image::ExifTool::ID3::ConvertID3v1Text($self,$val)',
     },
     124 => {
         Name => 'Album2',
         Format => 'string[60]',
-        ValueConv => '$self->Latin2Charset($val)',
+        ValueConv => 'Image::ExifTool::ID3::ConvertID3v1Text($self,$val)',
     },
     184 => {
         Name => 'Speed',
@@ -334,7 +338,7 @@ my %genre = (
     185 => {
         Name => 'Genre',
         Format => 'string[30]',
-        ValueConv => '$self->Latin2Charset($val)',
+        ValueConv => 'Image::ExifTool::ID3::ConvertID3v1Text($self,$val)',
     },
     215 => {
         Name => 'StartTime',
@@ -627,6 +631,16 @@ Image::ExifTool::AddCompositeTags('Image::ExifTool::ID3');
 }
 
 #------------------------------------------------------------------------------
+# Convert ID3v1 text to exiftool character set
+# Inputs: 0) ExifTool object ref, 1) text string
+# Returns: converted text
+sub ConvertID3v1Text($$)
+{
+    my ($exifTool, $val) = @_;
+    return $exifTool->Decode($val, $exifTool->Options('CharsetID3'));
+}
+
+#------------------------------------------------------------------------------
 # Process ID3 PRIV data
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 sub ProcessPrivate($$$)
@@ -701,7 +715,7 @@ sub DecodeString($$;$)
         # (must split before converting because conversion routines truncate at null)
         @vals = split "\0", $val;
         foreach $val (@vals) {
-            $val = $enc ? $exifTool->UTF82Charset($val) : $exifTool->Latin2Charset($val);
+            $val = $exifTool->Decode($val, $enc ? 'UTF8' : 'Latin');
         }
     } elsif ($enc == 1 or $enc == 2) {  # UTF-16 with BOM, or UTF-16BE
         my $bom = "\xfe\xff";
@@ -717,7 +731,7 @@ sub DecodeString($$;$)
                 $val = '';
             }
             $bom = $1 if $v =~ s/^(\xfe\xff|\xff\xfe)//;
-            push @vals, $exifTool->Unicode2Charset($v, $order{$bom});
+            push @vals, $exifTool->Decode($v, 'UCS2', $order{$bom});
         }
     } else {
         $val =~ s/\0+$//;
@@ -1163,7 +1177,7 @@ other types of audio files.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

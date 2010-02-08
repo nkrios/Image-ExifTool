@@ -218,7 +218,7 @@
 <tr>
 <td title='0x0083 = 131'>0x0083</td>
 <td>OriginalDecisionDataOffset</td>
-<td class=c>int32u*</td>
+<td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0090 = 144'>0x0090</td>
@@ -340,7 +340,7 @@
 <tr>
 <td title='0x00d0 = 208'>0x00d0</td>
 <td>VRDOffset</td>
-<td class=c>int32u*</td>
+<td class=c title='* = Protected'>int32u*</td>
 <td><span class=s><span class=n>(offset of VRD &quot;recipe data&quot; if it exists)</span></span></td></tr>
 <tr class=b>
 <td title='0x00e0 = 224'>0x00e0</td>
@@ -528,6 +528,9 @@
 </tr><tr><td class=r>0x2750000</td><td>= PowerShot SX20 IS</td>
 </tr><tr><td class=r>0x2760000</td><td>= PowerShot SD980 IS / Digital IXUS 200 IS / IXY Digital 930 IS</td>
 </tr><tr><td class=r>0x2770000</td><td>= PowerShot SD940 IS / Digital IXUS 120 IS / IXY Digital 220 IS</td>
+</tr><tr><td class=r>0x2800000</td><td>= PowerShot A495</td>
+</tr><tr><td class=r>0x2820000</td><td>= PowerShot A3100 IS</td>
+</tr><tr><td class=r>0x2830000</td><td>= PowerShot A3000 IS</td>
 </tr><tr><td class=r>0x3010000</td><td>= PowerShot Pro90 IS</td>
 </tr><tr><td class=r>0x4040000</td><td>= PowerShot G1</td>
 </tr><tr><td class=r>0x6040000</td><td>= PowerShot S100 / Digital IXUS / IXY Digital</td>
@@ -955,6 +958,7 @@ identify the specific lens model.
 </tr><tr><td>31.1</td><td>= Tamron SP AF 300mm f/2.8 LD IF</td>
 </tr><tr><td>32</td><td>= Canon EF 24mm f/2.8 or Sigma Lens</td>
 </tr><tr><td>32.1</td><td>= Sigma 15mm f/2.8 EX Fisheye</td>
+</tr><tr><td>33</td><td>= Voigtlander Ultron 40mm f/2 SLII Aspherical</td>
 </tr><tr><td>35</td><td>= Canon EF 35-80mm f/4-5.6</td>
 </tr><tr><td>36</td><td>= Canon EF 38-76mm f/4.5-5.6</td>
 </tr><tr><td>37</td><td>= Canon EF 35-80mm f/4-5.6 or Tamron Lens</td>
@@ -1028,7 +1032,8 @@ identify the specific lens model.
 </tr><tr><td>154</td><td>= Canon EF 20mm f/2.8 USM</td>
 </tr><tr><td>155</td><td>= Canon EF 85mm f/1.8 USM</td>
 </tr><tr><td>156</td><td>= Canon EF 28-105mm f/3.5-4.5 USM</td>
-</tr><tr><td>160</td><td>= Canon EF 20-35mm f/3.5-4.5 USM</td>
+</tr><tr><td>160</td><td>= Canon EF 20-35mm f/3.5-4.5 USM or Tamron Lens</td>
+</tr><tr><td>160.1</td><td>= Tamron AF 19-35mm f/3.5-4.5</td>
 </tr><tr><td>161</td><td>= Canon EF 28-70mm f/2.8L or Sigma or Tamron Lens</td>
 </tr><tr><td>161.1</td><td>= Sigma 24-70mm EX f/2.8</td>
 </tr><tr><td>161.2</td><td>= Tamron 90mm f/2.8</td>
@@ -1050,7 +1055,7 @@ identify the specific lens model.
 </tr><tr><td>172</td><td>= Canon EF 400mm f/5.6L</td>
 </tr><tr><td>173</td><td>= Canon EF 180mm Macro f/3.5L or Sigma Lens</td>
 </tr><tr><td>173.1</td><td>= Sigma 180mm EX HSM Macro f/3.5</td>
-</tr><tr><td>173.2</td><td>= Sigma APO Macro 150mm f/3.5 EX DG IF HSM</td>
+</tr><tr><td>173.2</td><td>= Sigma APO Macro 150mm f/2.8 EX DG HSM</td>
 </tr><tr><td>174</td><td>= Canon EF 135mm f/2L</td>
 </tr><tr><td>175</td><td>= Canon EF 400mm f/2.8L</td>
 </tr><tr><td>176</td><td>= Canon EF 24-85mm f/3.5-4.5 USM</td>
@@ -1341,7 +1346,7 @@ like the A570IS)</span></span></td></tr>
 <td class='r b'>17</td><td class=b>= Underwater</td>
 </tr><tr><td class=r>6</td><td>= Custom</td>
 <td class='r b'>18</td><td class=b>= Custom 3</td>
-</tr><tr><td class=r>7</td><td>= Black & White</td>
+</tr><tr><td class=r>7</td><td>= Black &amp; White</td>
 <td class='r b'>19</td><td class=b>= Custom 4</td>
 </tr><tr><td class=r>8</td><td>= Shade</td>
 <td class='r b'>20</td><td class=b>= PC Set4</td>
@@ -2174,43 +2179,48 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=c>int8u</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r title='27 = 0x1b'>27</td>
+<td>MacroMagnification</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(currently decoded only for the MP-E 65mm f/2.8 1-5x Macro Photo)</span></span></td></tr>
+<tr class=b>
 <td class=r title='30 = 0x1e'>30</td>
 <td>FocalLength</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='49 = 0x31'>49</td>
 <td>CameraOrientation</td>
 <td class=c>int8u</td>
 <td><span class=s>0 = Horizontal (normal)
   <br>1 = Rotate 90 CW
   <br>2 = Rotate 270 CW</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='80 = 0x50'>80</td>
 <td>FocusDistanceUpper</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='82 = 0x52'>82</td>
 <td>FocusDistanceLower</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='111 = 0x6f'>111</td>
 <td>WhiteBalance</td>
 <td class=c>int16u</td>
 <td>--&gt; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance Values</a></td></tr>
-<tr class=b>
+<tr>
 <td class=r title='115 = 0x73'>115</td>
 <td>ColorTemperature</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='167 = 0xa7'>167</td>
 <td>PictureStyle</td>
 <td class=c>int8u</td>
 <td>--&gt; <a href='Canon.html#PictureStyle'>Canon PictureStyle Values</a></td></tr>
-<tr class=b>
+<tr>
 <td class=r title='189 = 0xbd'>189</td>
 <td>HighISONoiseReduction</td>
 <td class=c>int8u</td>
@@ -2218,7 +2228,7 @@ lists CameraInfo tags for the 1D and 1DS.</p>
   <br>1 = Low
   <br>2 = Strong
   <br>3 = Off</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='191 = 0xbf'>191</td>
 <td>AutoLightingOptimizer</td>
 <td class=c>int8u</td>
@@ -2226,47 +2236,47 @@ lists CameraInfo tags for the 1D and 1DS.</p>
   <br>1 = Low
   <br>2 = Strong
   <br>3 = Off</span></td></tr>
-<tr class=b>
+<tr>
 <td class=r title='231 = 0xe7'>231</td>
 <td>LensType</td>
 <td class=c>int8u</td>
 <td>--&gt; <a href='Canon.html#LensType'>Canon LensType Values</a></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='232 = 0xe8'>232</td>
 <td>ShortFocal</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='234 = 0xea'>234</td>
 <td>LongFocal</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='346 = 0x15a'>346</td>
 <td>FirmwareVersion</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(at this location for firmware 3.4.6 and 3.6.1)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td class=r title='382 = 0x17e'>382</td>
 <td>FirmwareVersion</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(at this location for firmware 1.0.6 and 4.1.1)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='407 = 0x197'>407</td>
 <td>FileIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='419 = 0x1a3'>419</td>
 <td>DirectoryIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='443 = 0x1bb'>443</td>
 <td>FileIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='455 = 0x1c7'>455</td>
 <td>DirectoryIndex</td>
 <td class=c>int32u</td>
@@ -2445,68 +2455,73 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=c>int8u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td class=r title='27 = 0x1b'>27</td>
+<td>MacroMagnification</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(currently decoded only for the MP-E 65mm f/2.8 1-5x Macro Photo)</span></span></td></tr>
+<tr>
 <td class=r title='29 = 0x1d'>29</td>
 <td>FocalLength</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='48 = 0x30'>48</td>
 <td>CameraOrientation</td>
 <td class=c>int8u</td>
 <td><span class=s>0 = Horizontal (normal)
   <br>1 = Rotate 90 CW
   <br>2 = Rotate 270 CW</span></td></tr>
-<tr class=b>
+<tr>
 <td class=r title='67 = 0x43'>67</td>
 <td>FocusDistanceUpper</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='69 = 0x45'>69</td>
 <td>FocusDistanceLower</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='111 = 0x6f'>111</td>
 <td>WhiteBalance</td>
 <td class=c>int16u</td>
 <td>--&gt; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance Values</a></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='115 = 0x73'>115</td>
 <td>ColorTemperature</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='215 = 0xd7'>215</td>
 <td>LensType</td>
 <td class=c>int8u</td>
 <td>--&gt; <a href='Canon.html#LensType'>Canon LensType Values</a></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='216 = 0xd8'>216</td>
 <td>ShortFocal</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='218 = 0xda'>218</td>
 <td>LongFocal</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='255 = 0xff'>255</td>
 <td>FirmwareVersion</td>
 <td class=c>string[6]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='307 = 0x133'>307</td>
 <td>FileIndex</td>
 <td class=c>int32u</td>
 <td><span class=s><span class=n>(combined with DirectoryIndex to give the Composite FileNumber tag)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='319 = 0x13f'>319</td>
 <td>DirectoryIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='2347 = 0x92b'>2347</td>
 <td>LensModel</td>
 <td class=c>string[64]</td>
@@ -3502,12 +3517,18 @@ whether or not it was applied)</span>
   <br>3 = Purple
   <br>4 = Green</span></td></tr>
 <tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>MacroMagnification</td>
+<td class=c>int16s</td>
+<td><span class=s><span class=n>(currently decoded only for the MP-E 65mm f/2.8 1-5x Macro Photo, and not
+valid for all camera models)</span></span></td></tr>
+<tr class=b>
 <td class=r title='19 = 0x13'>19</td>
 <td>LiveViewShooting</td>
 <td class=c>int16s</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td class=r title='25 = 0x19'>25</td>
 <td>FlashExposureLock</td>
 <td class=c>int16s</td>
@@ -3777,7 +3798,7 @@ whether or not it was applied)</span>
 <tr class=b>
 <td class=r title='2 = 0x2'>2</td>
 <td>PreviewImageLength</td>
-<td class=c>int32u*</td>
+<td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='3 = 0x3'>3</td>
@@ -3792,7 +3813,7 @@ whether or not it was applied)</span>
 <tr>
 <td class=r title='5 = 0x5'>5</td>
 <td>PreviewImageStart</td>
-<td class=c>int32u*</td>
+<td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -5397,7 +5418,7 @@ the average black level)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 5, 2009</i>
+<br><i>Last revised Jan 28, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub ProcessMPImageList($$$);
 
@@ -93,7 +93,9 @@ sub ProcessMPImageList($$$);
     GROUPS => { 0 => 'MPF', 1 => 'MPImage', 2 => 'Image'},
     NOTES => q{
         The first MPF "Large Thumbnail" image is extracted as PreviewImage, and the
-        rest of the embedded MPF images are extracted as MPImage#.
+        rest of the embedded MPF images are extracted as MPImage#.  The
+        ExtractEmbedded option may be used to extract information from these
+        embedded images.
     },
     0.1 => {
         Name => 'MPImageFlags',
@@ -175,7 +177,7 @@ Image::ExifTool::AddCompositeTags('Image::ExifTool::MPF');
 #------------------------------------------------------------------------------
 # Extract all MP images
 # Inputs: 0) ExifTool object ref
-# returns: undef
+# Returns: undef
 sub ExtractMPImages($)
 {
     my $exifTool = shift;
@@ -257,7 +259,7 @@ Format (MPF) information from JPEG images.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

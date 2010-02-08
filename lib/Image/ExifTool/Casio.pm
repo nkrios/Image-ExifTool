@@ -19,7 +19,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.26';
+$VERSION = '1.28';
 
 # older Casio maker notes (ref 1)
 %Image::ExifTool::Casio::Main = (
@@ -505,11 +505,17 @@ $VERSION = '1.26';
             '6 0' => 'Best Shot', #PH (NC)
         },
     },
-    # 0x3001 is ShutterMode according to ref 3!
-    0x3001 => {
-        Name => 'SelfTimer',
+    0x3001 => { #3
+        Name => 'ReleaseMode',
         Writable => 'int16u',
-        PrintConv => { 1 => 'Off' },
+        PrintConv => {
+            1 => 'Normal',
+            3 => 'AE Bracketing',
+            11 => 'WB Bracketing',
+            13 => 'Contrast Bracketing', #(not sure about translation - PH)
+            19 => 'High Speed Burst', #PH (EX-FH25, 40fps)
+            # have also seen: 2, 7(common), 14, 18 - PH
+        },
     },
     0x3002 => {
         Name => 'Quality',
@@ -552,6 +558,7 @@ $VERSION = '1.26';
             2 => 'Off',
             7 => 'On (high sensitivity)', #PH
             8 => 'On (anti-shake)', #PH
+            10 => 'High Speed', #PH (EX-FC150)
         },
     },
     0x3009 => { #PH (EX-Z77)
@@ -560,7 +567,7 @@ $VERSION = '1.26';
         PrintConv => {
             0 => 'Off',
             1 => 'On',
-            # have seen 2 and 3
+            # have seen 2, 3(portrait) and 5(auto mode)
             4 => 'Face Recognition', # "Family First"
         },
     },
@@ -617,6 +624,15 @@ $VERSION = '1.26';
             7 => 'Pink', #PH (FH20)
         },
     },
+    0x301b => { #PH
+        Name => 'UnknownMode',
+        Writable => 'int16u',
+        Unknown => 1,
+        PrintConv => {
+            0 => 'Normal',
+            8 => 'Silent Movie',
+        },
+    },
     0x301c => { #3
         Name => 'SequenceNumber', # for continuous shooting
         Writable => 'int16u',
@@ -640,6 +656,8 @@ $VERSION = '1.26';
             '16 0' => 'Slow Shutter', #PH (EX-Z77)
             '18 0' => 'Anti-Shake', #PH (EX-Z77)
             '20 0' => 'High Sensitivity', #PH (EX-Z77)
+            '0 3' => 'CCD Shift', #PH (guess)
+            '2 3' => 'High Speed Anti-Shake', #PH (EX-FC150)
         },
     },
     0x302a => { #PH (EX-Z450)
@@ -673,6 +691,28 @@ $VERSION = '1.26';
             1 => 'Makeup',
             2 => 'Mist Removal',
             3 => 'Vivid Landscape',
+        },
+    },
+    0x4001 => { #PH (AVI videos)
+        Name => 'CaptureFrameRate',
+        Writable => 'int16u',
+        Count => -1,
+        ValueConv => q{
+            my @v=split(" ",$val);
+            return $val / 1000 if @v == 1;
+            return $v[1] ? "$v[1]-$v[0]" : ($v[0] > 10000 ? $v[0] / 1000 : $v[0]);
+        },
+        ValueConvInv => '$val <= 60 ? $val * 1000 : int($val) . " 0"',
+    },
+    # 0x4002 - AVI videos, related to video quality or size - PH
+    0x4003 => { #PH (AVI videos)
+        Name => 'VideoQuality',
+        Writable => 'int16u',
+        PrintConv => {
+            1 => 'Standard',
+            # 2 - could this be LP?
+            3 => 'HD',
+            5 => 'Low', # used in High Speed modes
         },
     },
 );
@@ -709,7 +749,7 @@ Casio maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

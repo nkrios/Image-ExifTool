@@ -10,7 +10,7 @@ package Image::ExifTool::Lang::ko;
 
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 %Image::ExifTool::Lang::ko::Translate = (
    'AELock' => {
@@ -23,7 +23,7 @@ $VERSION = '1.00';
    'AELockButton' => {
       Description => 'AE-L/AF-L',
       PrintConv => {
-        'AE Lock Hold' => 'AE 고정(유지)',
+        'AE Lock (hold)' => 'AE 고정(유지)',
         'AE Lock Only' => 'AE 고정',
         'AE/AF Lock' => 'AE/AF 고정',
         'AF Lock Only' => 'AF 고정',
@@ -77,8 +77,8 @@ $VERSION = '1.00';
       PrintConv => {
         'Auto-area' => '자동 영역 AF',
         'Dynamic Area' => '다이내믹 영역',
-        'Dynamic Area (wide)' => '다이내믹 영역 (와이드)',
         'Dynamic Area (closest subject)' => '다이내믹 영역 (지근거리 우선)',
+        'Dynamic Area (wide)' => '다이내믹 영역 (와이드)',
         'Group Dynamic' => '그룹 다이내믹',
         'Single Area' => '싱글 영역',
         'Single Area (wide)' => '싱글 영역 (와이드)',
@@ -99,6 +99,7 @@ $VERSION = '1.00';
         'On' => '켜짐',
       },
     },
+   'AFFineTune' => 'AF 미세 조정',
    'AFFineTuneAdj' => 'AF 미세 조정',
    'AFInfo' => 'AF 모드',
    'AFInfo2' => 'AF 정보',
@@ -113,6 +114,8 @@ $VERSION = '1.00';
         'Left' => '왼쪽',
         'Lower-left' => '좌하단',
         'Lower-right' => '우하단',
+        'Mid-left' => '왼쪽',
+        'Mid-right' => '오른쪽',
         'Right' => '오른쪽',
         'Top' => '상단',
         'Upper-left' => '좌상단',
@@ -377,6 +380,7 @@ $VERSION = '1.00';
     },
    'ColorBalance' => '컬러 밸런스',
    'ColorBalance1' => '컬러 밸런스 1',
+   'ColorBalanceA' => '컬러 밸런스 A',
    'ColorBalanceAdj' => {
       PrintConv => {
         'Off' => '꺼짐',
@@ -672,6 +676,7 @@ $VERSION = '1.00';
    'ExifVersion' => 'Exif 버전',
    'ExitPupilPosition' => '출구공 위치',
    'ExposureBracketValue' => '노출 브라케팅 값',
+   'ExposureCompStepSize' => '노출보정/미세조정',
    'ExposureCompensation' => '노출 보정',
    'ExposureControlStepSize' => '노출 조정 EV 스텝',
    'ExposureDelayMode' => {
@@ -785,7 +790,6 @@ $VERSION = '1.00';
    'FineTuneOptCenterWeighted' => '최적 노출 조정 중앙 중점',
    'FineTuneOptMatrixMetering' => '최적 노출 조정 평가 측광',
    'FineTuneOptSpotMetering' => '최적 노출 조정 스팟',
-   'FineTuneStepSize' => '노출보정/미세조정',
    'Flash' => {
       Description => '플래시',
       PrintConv => {
@@ -1054,6 +1058,7 @@ $VERSION = '1.00';
     },
    'HueAdjustment' => '색조',
    'ISO' => 'ISO 속도',
+   'ISODisplay' => 'ISO 표시',
    'ISOExpansion' => {
       Description => 'ISO 확장',
       PrintConv => {
@@ -1456,6 +1461,13 @@ $VERSION = '1.00';
         'Rotate 180' => '180° (아래/우측)',
         'Rotate 270 CW' => '90° 시계방향 (좌측/아래)',
         'Rotate 90 CW' => '90° 반시계방향 (우측/위쪽)',
+      },
+    },
+   'PhaseDetectAF' => {
+      Description => '오토포커스',
+      PrintConv => {
+        'Off' => '비활성',
+        'On (51-point)' => '활성',
       },
     },
    'PhotoEffect' => {
@@ -2001,7 +2013,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

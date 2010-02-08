@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.85
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: DICOM.dcm
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1860 bytes
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2005:11:14 14:47:21-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: DICOM
 [File, File, Image] MIMEType - MIME Type: application/dicom
 [DICOM, DICOM, Image] 0002,0000 - File Meta Info Group Length: 180
@@ -102,4 +103,4 @@
 [DICOM, DICOM, Image] 0028,1052 - Rescale Intercept: 0 
 [DICOM, DICOM, Image] 0028,1053 - Rescale Slope: 1 
 [DICOM, DICOM, Image] 0028,1054 - Rescale Type: SIGNAL INTENSITY (UNITLESS) 
-[DICOM, DICOM, Image] 7FE0,0010 - Pixel Data: (Binary data 53 bytes)
+[DICOM, DICOM, Image] 7Fxx,0010 - Pixel Data: (Binary data 53 bytes)

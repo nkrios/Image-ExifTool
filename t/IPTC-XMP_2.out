@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.93
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: IPTC-XMP.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 20 kB
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2005:12:31 16:05:50-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)

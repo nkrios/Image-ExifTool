@@ -10,7 +10,7 @@ package Image::ExifTool::Lang::it;
 
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 %Image::ExifTool::Lang::it::Translate = (
    'AEMeteringMode' => {
@@ -50,6 +50,8 @@ $VERSION = '1.03';
         'Left' => 'Sinistra',
         'Lower-left' => 'Inferiore Sinistro',
         'Lower-right' => 'Inferiore Destro',
+        'Mid-left' => 'Sinistra',
+        'Mid-right' => 'Destra',
         'None' => 'Nessuno',
         'Right' => 'Destra',
         'Top' => 'Alto',
@@ -307,6 +309,7 @@ $VERSION = '1.03';
    'CodedCharacterSet' => 'Impostazione Caratteri Codificati',
    'ColorBalance' => 'Bilanciamento Colore',
    'ColorBalance1' => 'Bilanciamento Colore',
+   'ColorBalanceA' => 'Bilanciamento Colore',
    'ColorFilter' => {
       PrintConv => {
         'Green' => 'Verde',
@@ -1986,7 +1989,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

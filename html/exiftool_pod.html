@@ -38,6 +38,7 @@
 	<li><a href="#renaming_examples">RENAMING EXAMPLES</a></li>
 	<li><a href="#geotagging_examples">GEOTAGGING EXAMPLES</a></li>
 	<li><a href="#piping_examples">PIPING EXAMPLES</a></li>
+	<li><a href="#diagnostics">DIAGNOSTICS</a></li>
 	<li><a href="#bugs">BUGS</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
@@ -74,52 +75,57 @@ This causes <em>FILE</em> to be rewritten, and by default the original file is
 preserved with <code>_original</code> appended to the file name.  (Be sure to verify
 that the new file is OK before erasing the original.)  Once in write mode,
 exiftool will ignore any read-specific options.</p>
-<p>Below is a list of file types and meta information formats currently
-supported by ExifTool (r = read, w = write, c = create):</p>
-<pre>
-                File Types                 |    Meta Information
-  ---------------------------------------  |  --------------------
-  3FR   r       GZ    r       PEF   r/w    |  EXIF           r/w/c
-  3G2   r       HDP   r/w     PGM   r/w    |  GPS            r/w/c
-  3GP   r       HTML  r       PICT  r      |  IPTC           r/w/c
-  ACR   r       ICC   r/w/c   PNG   r/w    |  XMP            r/w/c
-  AI    r/w     IIQ   r       PPM   r/w    |  MakerNotes     r/w/c
-  AIFF  r       IND   r/w     PPT   r      |  Photoshop IRB  r/w/c
-  APE   r       ITC   r       PPTX  r      |  ICC Profile    r/w/c
-  ARW   r       JNG   r/w     PS    r/w    |  MIE            r/w/c
-  ASF   r       JP2   r/w     PSD   r/w    |  JFIF           r/w/c
-  AVI   r       JPEG  r/w     QTIF  r      |  Ducky APP12    r/w/c
-  BMP   r       K25   r       RA    r      |  PDF            r/w/c
-  BTF   r       KDC   r       RAF   r/w    |  CIFF           r/w
-  COS   r       KEY   r       RAM   r      |  AFCP           r/w
-  CR2   r/w     LNK   r       RAW   r/w    |  JPEG 2000      r
-  CRW   r/w     M2TS  r       RIFF  r      |  DICOM          r
-  CS1   r/w     M4A/V r       RW2   r/w    |  Flash          r
-  DCM   r       MEF   r/w     RWL   r/w    |  FlashPix       r
-  DCP   r/w     MIE   r/w/c   RWZ   r      |  QuickTime      r
-  DCR   r       MIFF  r       RM    r      |  GeoTIFF        r
-  DIVX  r       MNG   r/w     SO    r      |  PrintIM        r
-  DJVU  r       MOS   r/w     SR2   r      |  ID3            r
-  DLL   r       MOV   r       SRF   r      |  Kodak Meta     r
-  DNG   r/w     MP3   r       SVG   r      |  Ricoh RMETA    r
-  DOC   r       MP4   r       SWF   r      |  Picture Info   r
-  DOCX  r       MPC   r       THM   r/w    |  Adobe APP14    r
-  DVB   r       MPG   r       TIFF  r/w    |  MPF            r
-  DYLIB r       MPO   r/w     VRD   r/w/c  |  Stim           r
-  EIP   r       MQV   r       WAV   r      |  APE            r
-  EPS   r/w     MRW   r/w     WDP   r/w    |  Vorbis         r
-  ERF   r/w     NEF   r/w     WMA   r      |  SPIFF          r
-  EXE   r       NRW   r/w     WMV   r      |  DjVu           r
-  EXIF  r/w/c   NUMBERS r     X3F   r      |  M2TS           r
-  F4A/V r       OGG   r       XLS   r      |  PE/COFF        r
-  FLAC  r       ORF   r/w     XLSX  r      |  AVCHD          r
-  FLV   r       PAGES r       XMP   r/w/c  |  ZIP            r
-  FPX   r       PBM   r/w     ZIP   r      |  (and more)
-  GIF   r/w     PDF   r/w</pre>
 <p>Note:  If <em>FILE</em> is a directory name, then only file types with recognized
 extensions are processed when reading, and only writable types are processed
 when any tag is written.  However, a filename may be specified or the
 <strong>-ext</strong> option may be used to force processing of files with any extension.</p>
+<p>Below is a list of file types and meta information formats currently
+supported by ExifTool (r = read, w = write, c = create):</p>
+<pre>
+  File Types
+  ------------+-------------+-------------+-------------+------------
+  3FR   r     | DOC   r     | K25   r     | PAGES r     | RWZ   r
+  3G2   r     | DOCX  r     | KDC   r     | PBM   r/w   | RM    r
+  3GP   r     | DVB   r     | KEY   r     | PDF   r/w   | SO    r
+  ACR   r     | DYLIB r     | LNK   r     | PEF   r/w   | SR2   r/w
+  AFM   r     | EIP   r     | M2TS  r     | PFA   r     | SRF   r
+  AI    r/w   | EPS   r/w   | M4A/V r     | PFB   r     | SVG   r
+  AIFF  r     | ERF   r/w   | MEF   r/w   | PFM   r     | SWF   r
+  APE   r     | EXE   r     | MIE   r/w/c | PGM   r/w   | THM   r/w
+  ARW   r/w   | EXIF  r/w/c | MIFF  r     | PICT  r     | TIFF  r/w
+  ASF   r     | F4A/V r     | MNG   r/w   | PNG   r/w   | TTC   r
+  AVI   r     | FLA   r     | MOS   r/w   | PPM   r/w   | TTF   r
+  BMP   r     | FLAC  r     | MOV   r     | PPT   r     | VRD   r/w/c
+  BTF   r     | FLV   r     | MP3   r     | PPTX  r     | WAV   r
+  COS   r     | FPX   r     | MP4   r     | PS    r/w   | WDP   r/w
+  CR2   r/w   | GIF   r/w   | MPC   r     | PSB   r/w   | WMA   r
+  CRW   r/w   | GZ    r     | MPG   r     | PSD   r/w   | WMV   r
+  CS1   r/w   | HDP   r/w   | MPO   r/w   | PSP   r     | X3F   r
+  DCM   r     | HTML  r     | MQV   r     | QTIF  r     | XLS   r
+  DCP   r/w   | ICC   r/w/c | MRW   r/w   | RA    r     | XLSX  r
+  DCR   r     | IIQ   r     | NEF   r/w   | RAF   r/w   | XMP   r/w/c
+  DFONT r     | IND   r/w   | NRW   r/w   | RAM   r     | ZIP   r
+  DIVX  r     | ITC   r     | NUMBERS r   | RAW   r/w   |
+  DJVU  r     | JNG   r/w   | OGG   r     | RIFF  r     |
+  DLL   r     | JP2   r/w   | ORF   r/w   | RW2   r/w   |
+  DNG   r/w   | JPEG  r/w   | OTF   r     | RWL   r/w   |</pre>
+<pre>
+  Meta Information
+  ----------------------+----------------------+---------------------
+  EXIF           r/w/c  |  JPEG 2000      r    |  APE            r
+  GPS            r/w/c  |  DICOM          r    |  Vorbis         r
+  IPTC           r/w/c  |  Flash          r    |  SPIFF          r
+  XMP            r/w/c  |  FlashPix       r    |  DjVu           r
+  MakerNotes     r/w/c  |  QuickTime      r    |  M2TS           r
+  Photoshop IRB  r/w/c  |  GeoTIFF        r    |  PE/COFF        r
+  ICC Profile    r/w/c  |  PrintIM        r    |  AVCHD          r
+  MIE            r/w/c  |  ID3            r    |  ZIP            r
+  JFIF           r/w/c  |  Kodak Meta     r    |  (and more)
+  Ducky APP12    r/w/c  |  Ricoh RMETA    r    |
+  PDF            r/w/c  |  Picture Info   r    |
+  CIFF           r/w    |  Adobe APP14    r    |
+  AFCP           r/w    |  MPF            r    |
+  PhotoMechanic  r/w    |  Stim           r    |</pre>
 <p>
 </p>
 <hr />
@@ -153,7 +159,8 @@ interpreted as a tag name.</p>
   -ext EXT    (-extension)         Process files with specified extension
   -f          (-forcePrint)        Force printing of all specified tags
   -F[OFFSET]  (-fixBase)           Fix the base for maker notes offsets
-  -fast                            Increase speed for slow devices
+  -fast[NUM]                       Increase speed for slow devices
+  -fileOrder [-]TAG                Set file processing order
   -g[NUM...]  (-groupHeadings)     Organize output by tag group
   -G[NUM...]  (-groupNames)        Print group name for each tag
   -geotag TRKFILE                  Geotag images from specified GPS log
@@ -372,11 +379,13 @@ different when copying tags using the <strong>-tagsFromFile</strong> option.</p>
 <dd>
 If <em>TYPE</em> is <code>ExifTool</code> or not specified, this option sets the ExifTool
 character encoding for output tag values when reading and input values when
-writing.  The default ExifTool encoding is <code>UTF8</code>.  If <em>TYPE</em> is <code>IPTC</code>,
-this sets the internal IPTC encoding to use when IPTC:CodedCharacterSet is
-not defined.  The default IPTC charset is <code>Latin</code>.  If no <em>CHARSET</em> is
-given, a list of available character sets is returned.  Valid <em>CHARSET</em>
-values are:
+writing.  The default ExifTool encoding is <code>UTF8</code>.  <em>TYPE</em> may also be
+<code>ID3</code> to specify the internal encoding of ID3v1 information, or <code>IPTC</code> to
+set the internal IPTC encoding when IPTC:CodedCharacterSet is not defined. 
+The default ID3 and IPTC charsets are <code>Latin</code>.  If no <em>CHARSET</em> is given,
+a list of available character sets is returned.  See
+<a href="http://owl.phy.queensu.ca/~phil/exiftool/faq.html#Q10">http://owl.phy.queensu.ca/~phil/exiftool/faq.html#Q10</a> for more
+information about character sets.  Valid <em>CHARSET</em> values are:
 </dd>
 <dd>
 <pre>
@@ -394,7 +403,7 @@ values are:
     Vietnam     cp1258           Windows Vietnamese
     Thai        cp874            Windows Thai
     MacRoman    cp10000, Roman   Macintosh Roman
-    MacLatin2   cp10029          Macintosh Latin 2 (Central Europe)
+    MacLatin2   cp10029          Macintosh Latin2 (Central Europe)
     MacCyrillic cp10007          Macintosh Cyrillic
     MacGreek    cp10006          Macintosh Greek
     MacTurkish  cp10081          Macintosh Turkish
@@ -440,12 +449,12 @@ escaped.  The <strong>-E</strong> option is implied with <strong>-h</strong>, an
 <dt><strong><a name="item_ee"><strong>-ee</strong> (<strong>-extractEmbedded</strong>)</a></strong><br />
 </dt>
 <dd>
-Extract information from embedded documents in EPS and PDF files, and
-embedded MPF images in JPEG and MPO files.  Implies the <strong>-a</strong> option.  Use
-<strong>-g3</strong> or <strong>-G3</strong> to identify the originating document for extracted
-information. Embedded documents containing sub-documents are indicated with
-dashes in the family 3 group name.  (ie. <code>Doc2-3</code> is the 3rd sub-document
-of the 2nd embedded document.)
+Extract information from embedded documents in EPS and PDF files, embedded
+MPF images in JPEG and MPO files, and streaming metadata from AVCHD videos. 
+Implies the <strong>-a</strong> option.  Use <strong>-g3</strong> or <strong>-G3</strong> to identify the originating
+document for extracted information. Embedded documents containing
+sub-documents are indicated with dashes in the family 3 group name.  (ie.
+<code>Doc2-3</code> is the 3rd sub-document of the 2nd embedded document.)
 </dd>
 <p></p>
 <dt><strong><a name="item_ext"><strong>-ext</strong> <em>EXT</em>, <strong>--ext</strong> <em>EXT</em> (<strong>-extension</strong>)</a></strong><br />
@@ -488,15 +497,34 @@ permanently if <strong>-F</strong> is used when writing EXIF to an image. ie)
     exiftool -F -exif:resolutionunit=inches image.jpg</pre>
 </dd>
 <p></p>
-<dt><strong><a name="item__2dfast"><strong>-fast</strong></a></strong><br />
+<dt><strong><a name="item__2dfast_5bnum_5d"><strong>-fast</strong>[<em>NUM</em>]</a></strong><br />
 </dt>
 <dd>
 Increase speed of extracting information from JPEG images.  With this
 option, ExifTool will not scan to the end of a JPEG image to check for an
-AFCP or PreviewImage trailer, or past the audio/video data in WAV/AVI files
-to search for appended metadata.  The speed benefits are small when reading
-images directly from disk, but can be substantial if piping images through a
-network connection.
+AFCP or PreviewImage trailer, or past the first comment in GIF images or the
+audio/video data in WAV/AVI files to search for additional metadata.  These
+speed benefits are small when reading images directly from disk, but can be
+substantial if piping images through a network connection.  For more
+substantial speed benefits, <strong>-fast2</strong> also causes exiftool to avoid
+extracting any EXIF MakerNote information.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dfileorder__5b_2d_5dtag"><strong>-fileOrder</strong> [-]<em>TAG</em></a></strong><br />
+</dt>
+<dd>
+Set file processing order according to the sorted value of the specified
+<em>TAG</em>.  For example, to process files in order of date:
+</dd>
+<dd>
+<pre>
+    exiftool -fileOrder DateTimeOriginal DIR</pre>
+</dd>
+<dd>
+<p>Additional <strong>-fileOrder</strong> options may be added as secondary sort keys.  The
+sort order may be reversed by prefixing the tag name with a <code>-</code>, ie.
+<code>-fileOrder -createdate</code>.  Note that this option has a large performance
+impact since it adds an additional processing pass for each file.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2dg_5bnum_5d_5b_3anum_2e_2e_2e_5d__28_2dgrouphead"><strong>-g</strong>[<em>NUM</em>][:<em>NUM</em>...] (<strong>-groupHeadings</strong>)</a></strong><br />
@@ -567,7 +595,7 @@ Windows) to prevent filename expansion.  For example:</p>
 <dd>
 <p>Currently supported track file formats are GPX, NMEA RMC/GGA/GLL, KML, IGC,
 Garmin XML and TCX, and Magellan PMGNTRK.  See <a href="#geotagging_examples">GEOTAGGING EXAMPLES</a> for
-examples.  Also see geotag.html in the full ExifTool distribution and the
+examples.  Also see ``geotag.html'' in the full ExifTool distribution and the
 <a href="ExifTool.html#options">Image::ExifTool Options</a> for more details and
 for information about geotag configuration options.</p>
 </dd>
@@ -799,11 +827,11 @@ be erased after the output file is successfully written.</p>
 <dd>
 <p>A special feature of this option allows it to be used to create certain
 types of files from scratch.  Currently, this can only be done with XMP,
-ICC/ICM, MIE, VRD and EXIF files.  The file is created from a combination of
-information in <em>FILE</em> and tag values assigned on the command line.  This is
-done by specifying a file extension of '.XMP', '.ICC' or '.ICM' for
-<em>OUTFILE</em>.  The output file may be created even if no <em>FILE</em> is specified,
-provided some appropriate tag values are specified on the command line.</p>
+ICC/ICM, MIE, VRD and EXIF files by specifying the appropriate extension for
+<em>OUTFILE</em>.  The file is created from a combination of information in
+<em>FILE</em> (as if the <strong>-tagsFromFile</strong> option was used), and tag values
+assigned on the command line.  If no <em>FILE</em> is specified, the output file
+may be created from scratch using only tags assigned on the command line.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2doverwrite_original"><strong>-overwrite_original</strong></a></strong><br />
@@ -837,28 +865,49 @@ other format options).  Tag names in the format file or string begin with a
 <code>$</code> symbol and may contain an optional group name.  Case is not
 significant.  Braces <code>{}</code> may be used around the tag name to separate it
 from subsequent text.  Use <code>$$</code> to represent a <code>$</code> symbol.  <code>$/</code> may be
-used for a newline.  In the file, lines beginning with <code>#</code> are ignored. For
+used for a newline.  Multiple <strong>-p</strong> options may be used, each contributing a
+line of text to the output.  Lines beginning with <code>#[HEAD]</code> and <code>#[TAIL]</code>
+are output only for the first and last processed files respectively.  Lines
+beginning with <code>#[BODY]</code> and lines not beginning with <code>#</code> are output for
+each processed file.  Other lines beginning with <code>#</code> are ignored.  For
 example, this format file:
 </dd>
 <dd>
 <pre>
     # this is a comment line
-    File $FileName was created on $DateTimeOriginal
-    (f/$Aperture, ${ShutterSpeed}s, ISO $EXIF:ISO)</pre>
+    #[HEAD]# Generated by ExifTool $exifToolVersion
+    File: $FileName - $DateTimeOriginal
+    (f/$Aperture, ${ShutterSpeed}s, ISO $EXIF:ISO)
+    #[TAIL]# end</pre>
+</dd>
+<dd>
+<p>with this command:</p>
+</dd>
+<dd>
+<pre>
+    exiftool -p test.fmt a.jpg b.jpg</pre>
 </dd>
 <dd>
 <p>produces output like this:</p>
 </dd>
 <dd>
 <pre>
-    File test.jpg was created on 2003:10:31 15:44:19
-    (f/5.6, 1/60s, ISO 100)</pre>
+    # Generated by ExifTool 8.10
+    File: a.jpg - 2003:10:31 15:44:19
+    (f/5.6, 1/60s, ISO 100)
+    File: b.jpg - 2006:05:23 11:57:38
+    (f/8.0, 1/13s, ISO 100)
+    # end</pre>
 </dd>
 <dd>
-<p>If a tag does not exist, the output value is set to '-' if the <strong>-f</strong> option
-is used.  Otherwise a minor warning is issued and the line with the missing
-tag is not printed.  However, if the <strong>-m</strong> option is used, minor warnings
-are ignored and the line is printed with an empty tag value.</p>
+<p>When <strong>-ee</strong> (<strong>-extractEmbedded</strong>) is combined with <strong>-p</strong>, embedded documents
+are effectively processed as separate input files.</p>
+</dd>
+<dd>
+<p>If a specified tag does not exist, the output value is set to '-' if the
+<strong>-f</strong> option is used.  Otherwise a minor warning is issued and the line with
+the missing tag is not printed.  However, if the <strong>-m</strong> option is used, minor
+warnings are ignored and the line is printed with an empty tag value.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item_p"><strong>-P</strong> (<strong>-preserve</strong>)</a></strong><br />
@@ -1066,14 +1115,18 @@ options are equivalent.</p>
 </dt>
 <dd>
 Extract values of unknown tags.  Add another <strong>-u</strong> to also extract unknown
-information from binary data blocks.
+information from binary data blocks.  This option applies to tags with
+numerical tag ID's, and causes tag names like ``Exif_0xc5d9'' to be generated
+for unknown information.  It has no effect on information types which have
+human-readable tag ID's (such as XMP), since unknown tags are extracted
+automatically from these formats.
 </dd>
 <p></p>
 <dt><strong><a name="item_u"><strong>-U</strong> (<strong>-unknown2</strong>)</a></strong><br />
 </dt>
 <dd>
-Extract values of unknown tags as well as unknown information from binary
-data blocks.  This is the same as two <strong>-u</strong> options.
+Extract values of unknown tags as well as unknown information from some
+binary data blocks.  This is the same as two <strong>-u</strong> options.
 </dd>
 <p></p>
 <dt><strong><a name="item__2duse_module"><strong>-use</strong> <em>MODULE</em></a></strong><br />
@@ -1093,11 +1146,12 @@ details.
 <dd>
 Print verbose messages.  <em>NUM</em> specifies the level of verbosity in the
 range 0-5, with higher numbers being more verbose.  If <em>NUM</em> is not given,
-then each <strong>-v</strong> option increases the level of verbosity by 1.  Using <strong>-v</strong>
-overrides most other options and suppresses normal console output unless
-specific tags are being extracted.  <strong>-v0</strong> is used when writing to print
-only the processed file names, and the ``Nothing changed'' message for files
-that were not modified.
+then each <strong>-v</strong> option increases the level of verbosity by 1.  With any
+level greater than 0, most other options are ignored and normal console
+output is suppressed unless specific tags are extracted.  Using <strong>-v0</strong>
+causes the console output buffer to be flushed after each line (which may be
+useful to avoid delays when piping exiftool output), and prints the name of
+each processed file when writing.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dver"><strong>-ver</strong></a></strong><br />
@@ -1234,10 +1288,9 @@ are combined into a single string when <strong>-s</strong> or <strong>-sep</stro
 <strong>-L</strong> changes the XML encoding from ``UTF-8'' to ``windows-1252''.  Other
 <strong>-charset</strong> settings change the encoding only if there is a corresponding
 standard XML character set.  The <strong>-b</strong> option causes binary data values to
-be written, encoded in base64 if necessary.  The <strong>-t</strong> option causes tag
-table information (table <code>name</code>, decimal tag <code>id</code>, and <code>index</code> for cases
-where multiple conditional tags exist with the same ID) to be included in
-the output.
+be written, encoded in base64 if necessary.  The <strong>-t</strong> option adds tag table
+information to the output (table <code>name</code>, decimal tag <code>id</code>, and <code>index</code>
+for cases where multiple conditional tags exist with the same ID).
 </dd>
 <p></p>
 <dt><strong><a name="item_z"><strong>-z</strong> (<strong>-zip</strong>)</a></strong><br />
@@ -1346,13 +1399,6 @@ directory, writing text output into files with the same names but with a
 <code>.txt</code> extension.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dp__27_24filename_has_date__24datetimeo">exiftool -p '$filename has date $dateTimeOriginal' -q -f dir</a></strong><br />
-</dt>
-<dd>
-Print one line of output containing the file name and DateTimeOriginal for
-each image in directory <code>dir</code>.
-</dd>
-<p></p>
 <dt><strong><a name="item_exiftool__2db__2dthumbnailimage_image_2ejpg__3e_th">exiftool -b -ThumbnailImage image.jpg &gt; thumbnail.jpg</a></strong><br />
 </dt>
 <dd>
@@ -1396,6 +1442,19 @@ Extract all author-related XMP information from an image.
 Extract complete XMP data record intact from <code>a.jpg</code> and write it to
 <code>out.xmp</code> using the special <code>XMP</code> tag (see the Extra tags in
 <a href="TagNames/index.html">Image::ExifTool::TagNames</a>).
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dp__27_24filename_has_date__24datetimeo">exiftool -p '$filename has date $dateTimeOriginal' -q -f dir</a></strong><br />
+</dt>
+<dd>
+Print one line of output containing the file name and DateTimeOriginal for
+each image in directory <code>dir</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dee__2dp__27_24gpslatitude_2c__24gpslon">exiftool -ee -p '$gpslatitude, $gpslongitude, $gpstimestamp' a.m2ts</a></strong><br />
+</dt>
+<dd>
+Extract all GPS positions from an AVCHD video.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dicc_profile__2db__2dw_icc_image_2ejpg">exiftool -icc_profile -b -w icc image.jpg</a></strong><br />
@@ -1770,7 +1829,9 @@ and %c may be used to add a copy number if the file already exists (see the
 an extra '%' must be added to pass these codes through the date/time parser.
 (And further note that in a Windows batch file, all '%' characters must also
 be escaped, so in this extreme case '%%%%f' is necessary to pass a simple
-'%f' through the two levels of parsing.)</p>
+'%f' through the two levels of parsing.)  See
+<a href="http://owl.phy.queensu.ca/~phil/exiftool/renaming.html">http://owl.phy.queensu.ca/~phil/exiftool/renaming.html</a> for additional
+documentation and examples.</p>
 <dl>
 <dt><strong><a name="item_exiftool__2dfilename_3dnew_2ejpg_dir_2fold_2ejpg">exiftool -filename=new.jpg dir/old.jpg</a></strong><br />
 </dt>
@@ -1792,6 +1853,12 @@ Move all files in <code>dir</code> into a directory hierarchy based on year, mon
 day of <code>DateTimeOriginal</code>.  ie) This command would move the file
 <code>dir/image.jpg</code> with a <code>DateTimeOriginal</code> of <code>2005:10:12 16:05:56</code> to
 <code>2005/10/12/image.jpg</code>.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2do__2e__27_2ddirectory_3cdatetimeorigin">exiftool -o . '-Directory&lt;DateTimeOriginal' -d %Y/%m/%d dir</a></strong><br />
+</dt>
+<dd>
+Same effect as above except files are copied instead of moved.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__27_2dfilename_3c_25f__24_7bfocallength_7">exiftool '-filename&lt;%f_${focallength}.%e' dir</a></strong><br />
@@ -1831,6 +1898,11 @@ CreateDate and FileNumber tags, in the form ``20060507_118-1861.jpg''.
 </p>
 <hr />
 <h1><a name="geotagging_examples">GEOTAGGING EXAMPLES</a></h1>
+<p>ExifTool implements geotagging via 3 special tags: Geotag (which for
+convenience is also implemented as an exiftool option), Geosync and Geotime.
+The examples below highlight some geotagging features.  See
+<a href="http://owl.phy.queensu.ca/~phil/exiftool/geotag.html">http://owl.phy.queensu.ca/~phil/exiftool/geotag.html</a> for additional
+documentation.</p>
 <dl>
 <dt><strong><a name="item_exiftool__2dgeotag_track_2elog_a_2ejpg">exiftool -geotag track.log a.jpg</a></strong><br />
 </dt>
@@ -1863,6 +1935,14 @@ set after constant values.)
 <dd>
 Geotag images in directory <code>dir</code>, accounting for image timestamps which
 were 20 seconds ahead of GPS.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dgeotag_a_2elog__2dgeosync_3d1_2ejpg__2">exiftool -geotag a.log -geosync=1.jpg -geosync=2.jpg dir</a></strong><br />
+</dt>
+<dd>
+Geotag images using time synchronization from two previously geotagged images
+(1.jpg and 2.jpg), synchronizing the image and GPS times using a linear time
+drift correction.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dgeotag_a_2elog__27_2dgeotime_3c_24_7bc">exiftool -geotag a.log '-geotime&lt;${createdate}+01:00' dir</a></strong><br />
@@ -1901,6 +1981,14 @@ Combine multiple track logs and geotag an entire directory tree of images.
 </dt>
 <dd>
 Read all track logs from the <code>tracks</code> directory.
+</dd>
+<p></p>
+<dt><strong><a name="item_exiftool__2dp_gpx_2efmt__2dd__25y_3a_25m_3a_25dt_2">exiftool -p gpx.fmt -d %Y:%m:%dT%H:%M:%SZ dir &gt; out.gpx</a></strong><br />
+</dt>
+<dd>
+Generate a GPX track log from all images in directory <code>dir</code>.  This example
+uses the <code>gpx.fmt</code> file included in the full ExifTool distribution package
+and assumes that the images in <code>dir</code> have all been previously geotagged.
 </dd>
 <p></p></dl>
 <p>
@@ -1946,6 +2034,12 @@ flexibility of ExifTool.)
 <p>
 </p>
 <hr />
+<h1><a name="diagnostics">DIAGNOSTICS</a></h1>
+<p>The exiftool application exits with a status of 0 on success, or 1 if an
+error occured or if all files failed the <strong>-if</strong> condition.</p>
+<p>
+</p>
+<hr />
 <h1><a name="bugs">BUGS</a></h1>
 <p>ExifTool does not handle information stored in the resource fork on
 Macintosh filesystems.</p>
@@ -1953,7 +2047,7 @@ Macintosh filesystems.</p>
 </p>
 <hr />
 <h1><a name="author">AUTHOR</a></h1>
-<p>Copyright 2003-2009, Phil Harvey</p>
+<p>Copyright 2003-2010, Phil Harvey</p>
 <p>This is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.</p>
 <p>

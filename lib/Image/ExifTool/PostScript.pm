@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.27';
+$VERSION = '1.29';
 
 sub WritePS($$);
 sub ProcessPS($$;$);
@@ -266,6 +266,41 @@ sub DecodeComment($$$;$)
 }
 
 #------------------------------------------------------------------------------
+# Unescape PostScript string
+# Inputs: 0) string
+# Returns: unescaped string
+sub UnescapePostScript($)
+{
+    my $str = shift;
+    # decode escape sequences in literal strings
+    while ($str =~ /\\(.)/sg) {
+        my $n = pos($str) - 2;
+        my $c = $1;
+        my $r;
+        if ($c =~ /[0-7]/) {
+            # get up to 2 more octal digits
+            $c .= $1 if $str =~ /\G([0-7]{1,2})/g;
+            # convert octal escape code
+            $r = chr(oct($c) & 0xff);
+        } elsif ($c eq "\x0d") {
+            # the string is continued if the line ends with '\'
+            # (also remove "\x0d\x0a")
+            $c .= $1 if $str =~ /\G(\x0a)/g;
+            $r = '';
+        } elsif ($c eq "\x0a") {
+            $r = '';
+        } else {
+            # convert escaped characters
+            ($r = $c) =~ tr/nrtbf/\n\r\t\b\f/;
+        }
+        substr($str, $n, length($c)+1) = $r;
+        # continue search after this character
+        pos($str) = $n + length($r);
+    }
+    return $str;
+}
+
+#------------------------------------------------------------------------------
 # Extract information from EPS, PS or AI file
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference, 2) optional tag table ref
 # Returns: 1 if this was a valid PostScript file
@@ -274,7 +309,7 @@ sub ProcessPS($$;$)
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $raf = $$dirInfo{RAF};
     my $embedded = $exifTool->Options('ExtractEmbedded');
-    my ($data, $dos, $endDoc);
+    my ($data, $dos, $endDoc, $fontTable, $comment);
 
     # allow read from data
     $raf = new File::RandomAccess($$dirInfo{DataPt}) unless $raf;
@@ -283,7 +318,7 @@ sub ProcessPS($$;$)
 #
     $raf->Read($data, 4) == 4 or return 0;
     # accept either ASCII or DOS binary postscript file format
-    return 0 unless $data =~ /^(%!PS|%!Ad|\xc5\xd0\xd3\xc6)/;
+    return 0 unless $data =~ /^(%!PS|%!Ad|%!Fo|\xc5\xd0\xd3\xc6)/;
     if ($data =~ /^%!Ad/) {
         # I've seen PS files start with "%!Adobe-PS"...
         return 0 unless $raf->Read($data, 6) == 6 and $data eq "obe-PS";
@@ -297,6 +332,18 @@ sub ProcessPS($$;$)
         {
             return PSErr($exifTool, 'invalid header');
         }
+    } else {
+        # check for PostScript font file (PFA or PFB)
+        my $d2;
+        $data .= $d2 if $raf->Read($d2,12);
+        if ($data =~ /^(%!PS-AdobeFont-|%!FontType1-)/) {
+            $exifTool->SetFileType('PFA');  # PostScript ASCII font file
+            $fontTable = GetTagTable('Image::ExifTool::Font::PSInfo');
+            # PostScript font files may contain an unformatted comments which may
+            # contain useful information, so accumulate thes for the Comment tag
+            $comment = 1;
+        }
+        $raf->Seek(-length($data), 1);
     }
 #
 # set the newline type based on the first newline found in the file
@@ -417,8 +464,7 @@ sub ProcessPS($$;$)
                     $docNum .= '-' . (++$subDocNum);
                 } else {
                     # this is the Nth document
-                    $$exifTool{DOC_COUNT} = ($$exifTool{DOC_COUNT} || 0) + 1;
-                    $docNum = $$exifTool{DOC_COUNT};
+                    $docNum = $$exifTool{DOC_COUNT} + 1;
                 }
                 $subDocNum = 0; # new level, so reset subDocNum
                 next unless $embedded;  # skip over this document
@@ -502,6 +548,32 @@ sub ProcessPS($$;$)
             $val =  # add PS header in case it needs one
             ProcessPS($exifTool, { DataPt => \$val });
             last;
+        } elsif ($fontTable) {
+            if (defined $comment) {
+                # extract initial comments from PostScript Font files
+                if ($data =~ /^%\s+(.*?)[\x0d\x0a]/) {
+                    $comment .= "\n" if $comment;
+                    $comment .= $1;
+                    next;
+                } elsif ($data !~ /^%/) {
+                    # stop extracting comments at the first non-comment line
+                    $exifTool->FoundTag('Comment', $comment) if length $comment;
+                    undef $comment;
+                }
+            }
+            if ($data =~ m{^\s*/(\w+)\s*(.*)} and $$fontTable{$1}) {
+                my ($tag, $val) = ($1, $2);
+                if ($val =~ /^\((.*)\)/) {
+                    $val = UnescapePostScript($1);
+                } elsif ($val =~ m{/?(\S+)}) {
+                    $val = $1;
+                }
+                $exifTool->HandleTag($fontTable, $tag, $val);
+            } elsif ($data =~ /^currentdict end/) {
+                # only extract tags from initial FontInfo dict
+                undef $fontTable;
+            }
+            next;
         } else {
             next;
         }
@@ -554,7 +626,7 @@ This code reads meta information from EPS (Encapsulated PostScript), PS
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

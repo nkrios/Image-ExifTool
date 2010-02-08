@@ -1,9 +1,5 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl t/ExifTool.t'
-
-######################### We start with some black magic to print on failure.
-
-# Change "1..N" below to so that N matches last test number
+# Before "make install", this script should be runnable with "make test".
+# After "make install" it should work as "perl t/ExifTool.t".
 
 BEGIN { $| = 1; print "1..24\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
@@ -12,8 +8,6 @@ END {print "not ok 1\n" unless $loaded;}
 use Image::ExifTool 'ImageInfo';
 $loaded = 1;
 print "ok 1\n";
-
-######################### End of black magic.
 
 use t::TestLib;
 

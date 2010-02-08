@@ -130,6 +130,10 @@ sub closeEnough($$)
     return 1 if $line1 =~ /File\s?Modif.*Date/ and
                 $line2 =~ /File\s?Modif.*Date/;
 
+    # allow different FilePermission's
+    return 1 if $line1 =~ /File\s?Permissions/ and
+                $line2 =~ /File\s?Permissions/;
+
     # allow CurrentIPTCDigest to be zero if Digest::MD5 isn't installed
     return 1 if $line1 =~ /Current IPTC Digest/ and
                 $line2 =~ /Current IPTC Digest: 0{32}/ and

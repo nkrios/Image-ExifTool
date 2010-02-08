@@ -37,7 +37,7 @@ sub CheckPDF($$$)
     } elsif ($format eq 'string') {
         # convert to Unicode if necessary
         if ($$valPtr =~ /[\x80-\xff]/) {
-            $$valPtr = "\xfe\xff" . $exifTool->Charset2Unicode($$valPtr, 'MM');
+            $$valPtr = "\xfe\xff" . $exifTool->Encode($$valPtr,'UCS2','MM');
         }
     } elsif ($format eq 'date') {
         # be flexible about this for now
@@ -685,7 +685,7 @@ C<PDF-update> pseudo group).
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

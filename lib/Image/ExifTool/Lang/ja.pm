@@ -10,7 +10,7 @@ package Image::ExifTool::Lang::ja;
 
 use vars qw($VERSION);
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 %Image::ExifTool::Lang::ja::Translate = (
    'AEAperture' => 'AE絞り',
@@ -154,8 +154,8 @@ $VERSION = '1.10';
       PrintConv => {
         'Auto-area' => '自動エリアAF',
         'Dynamic Area' => 'ダイナミックエリア',
-        'Dynamic Area (wide)' => 'ダイナミック（ワイド）',
         'Dynamic Area (closest subject)' => 'ダイナミック（重点主題）',
+        'Dynamic Area (wide)' => 'ダイナミック（ワイド）',
         'Group Dynamic' => 'グループダイナミック',
         'Single Area' => 'シングルポイント',
         'Single Area (wide)' => 'シングルポイント（ワイド）',
@@ -201,6 +201,7 @@ $VERSION = '1.10';
         'Quick mode' => 'クイックモード',
       },
     },
+   'AFFineTune' => 'AFファインチューン',
    'AFFineTuneAdj' => 'AFファインチューン',
    'AFImageHeight' => 'AF画像高さ',
    'AFImageWidth' => 'AF画像幅',
@@ -1057,6 +1058,7 @@ $VERSION = '1.10';
     },
    'ColorBalance' => 'カラーバランス',
    'ColorBalance1' => 'カラーバランス1',
+   'ColorBalanceA' => 'カラーバランスA',
    'ColorBalanceAdj' => {
       Description => 'カラーバランス調整',
       PrintConv => {
@@ -1798,6 +1800,14 @@ $VERSION = '1.10';
    'Exposure' => '露出',
    'ExposureBracketStepSize' => '露出ブラケットステップサイズ',
    'ExposureBracketValue' => '露出ブラケット値',
+   'ExposureCompStepSize' => {
+      Description => '露出補正/ファインチューン',
+      PrintConv => {
+        '1 EV' => '1ステップ',
+        '1/2 EV' => '1/2ステップ',
+        '1/3 EV' => '1/3ステップ',
+      },
+    },
    'ExposureCompensation' => '露出補正値',
    'ExposureControlStepSize' => {
       Description => '露出制御のEVステップ',
@@ -2072,14 +2082,6 @@ $VERSION = '1.10';
    'FineTuneOptCenterWeighted' => '最適露出微調整 中央重点測光',
    'FineTuneOptMatrixMetering' => '最適露出微調整 分割測光',
    'FineTuneOptSpotMetering' => '最適露出微調整 スポット測光',
-   'FineTuneStepSize' => {
-      Description => '露出補正/ファインチューン',
-      PrintConv => {
-        '1 EV' => '1ステップ',
-        '1/2 EV' => '1/2ステップ',
-        '1/3 EV' => '1/3ステップ',
-      },
-    },
    'Firmware' => 'ファームウェア',
    'FirmwareDate' => 'ファームウェア日付',
    'FirmwareRevision' => 'ファームウェアリビジョン',
@@ -2745,6 +2747,7 @@ $VERSION = '1.10';
    'IPTCPixelWidth' => 'スキャン方向ピクセルサイズ',
    'ISO' => 'ISOスピードレート',
    'ISO2' => 'ISO（2）',
+   'ISODisplay' => 'ISO表示',
    'ISOExpansion' => {
       Description => 'ISO感度拡張',
       PrintConv => {
@@ -3716,6 +3719,13 @@ $VERSION = '1.10';
    'PentaxImageSize' => 'ペンタックスイメージサイズ',
    'PentaxModelID' => 'ペンタックスモデル',
    'PentaxVersion' => 'ペンタックスバージョン',
+   'PhaseDetectAF' => {
+      Description => 'オートフォーカス',
+      PrintConv => {
+        'Off' => 'オフ',
+        'On (51-point)' => 'オン',
+      },
+    },
    'PhotoEffect' => {
       Description => '写真効果',
       PrintConv => {
@@ -5700,7 +5710,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

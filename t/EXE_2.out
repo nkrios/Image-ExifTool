@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: EXE.exe
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 5.0 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:09:08 08:01:30-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:09:08 17:37:41-04:00
+[File, System, Image] FilePermissions - File Permissions: rwxr-xr-x
 [File, File, Image] FileType - File Type: Win32 EXE
 [File, File, Image] MIMEType - MIME Type: application/octet-stream
 [EXE, EXE, Other] 0 - Machine Type: Intel 386 or later, and compatibles

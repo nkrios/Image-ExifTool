@@ -19,6 +19,11 @@ format name.  For tags where a range of lengths is allowed, the minimum and
 maximum lengths are separated by a comma within the brackets.  IPTC strings
 are not null terminated.</p>
 
+<p>When writing, ExifTool issues a minor warning and truncates the value if it
+is longer than allowed by the IPTC specification.  Minor errors may be
+ignored to allow writing of longer values, but beware that values like this
+may cause problems for other IPTC readers.</p>
+
 <p>IPTC information is separated into different records, each of which has its
 own set of tags.</p>
 
@@ -71,12 +76,12 @@ official IPTC specification.
 <tr>
 <td class=r title='0 = 0x0'>0</td>
 <td>EnvelopeRecordVersion</td>
-<td class=c>int16u:</td>
+<td class=c title=': = Mandatory'>int16u:</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='5 = 0x5'>5</td>
 <td>Destination</td>
-<td class=c>string[0,1024]+</td>
+<td class=c title='+ = List'>string[0,1024]+</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='20 = 0x14'>20</td>
@@ -130,7 +135,7 @@ official IPTC specification.
 <tr>
 <td class=r title='50 = 0x32'>50</td>
 <td>ProductID</td>
-<td class=c>string[0,32]+</td>
+<td class=c title='+ = List'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='60 = 0x3c'>60</td>
@@ -159,7 +164,7 @@ official IPTC specification.
 <tr>
 <td class=r title='90 = 0x5a'>90</td>
 <td>CodedCharacterSet</td>
-<td class=c>string[0,32]!</td>
+<td class=c title='! = Unsafe'>string[0,32]!</td>
 <td><span class=s><span class=n>(values are entered in the form &quot;ESC X Y[, ...]&quot;.  The escape sequence for
 UTF-8 character coding is &quot;ESC % G&quot;, but this is displayed as &quot;UTF8&quot; for
 convenience.  Either string may be used when writing.  The value of this tag
@@ -195,7 +200,7 @@ possibility)</span></span></td></tr>
 <tr>
 <td class=r title='0 = 0x0'>0</td>
 <td>ApplicationRecordVersion</td>
-<td class=c>int16u:</td>
+<td class=c title=': = Mandatory'>int16u:</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='3 = 0x3'>3</td>
@@ -205,7 +210,7 @@ possibility)</span></span></td></tr>
 <tr>
 <td class=r title='4 = 0x4'>4</td>
 <td>ObjectAttributeReference</td>
-<td class=c>string[4,68]+</td>
+<td class=c title='+ = List'>string[4,68]+</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='5 = 0x5'>5</td>
@@ -239,7 +244,7 @@ possibility)</span></span></td></tr>
 <tr class=b>
 <td class=r title='12 = 0xc'>12</td>
 <td>SubjectReference</td>
-<td class=c>string[13,236]+</td>
+<td class=c title='+ = List'>string[13,236]+</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='15 = 0xf'>15</td>
@@ -249,7 +254,7 @@ possibility)</span></span></td></tr>
 <tr class=b>
 <td class=r title='20 = 0x14'>20</td>
 <td>SupplementalCategories</td>
-<td class=c>string[0,32]+</td>
+<td class=c title='+ = List'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='22 = 0x16'>22</td>
@@ -259,17 +264,17 @@ possibility)</span></span></td></tr>
 <tr class=b>
 <td class=r title='25 = 0x19'>25</td>
 <td>Keywords</td>
-<td class=c>string[0,64]+</td>
+<td class=c title='+ = List'>string[0,64]+</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='26 = 0x1a'>26</td>
 <td>ContentLocationCode</td>
-<td class=c>string[3]+</td>
+<td class=c title='+ = List'>string[3]+</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='27 = 0x1b'>27</td>
 <td>ContentLocationName</td>
-<td class=c>string[0,64]+</td>
+<td class=c title='+ = List'>string[0,64]+</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='30 = 0x1e'>30</td>
@@ -307,17 +312,17 @@ possibility)</span></span></td></tr>
 <tr>
 <td class=r title='45 = 0x2d'>45</td>
 <td>ReferenceService</td>
-<td class=c>string[0,10]+</td>
+<td class=c title='+ = List'>string[0,10]+</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='47 = 0x2f'>47</td>
 <td>ReferenceDate</td>
-<td class=c>digits[8]+</td>
+<td class=c title='+ = List'>digits[8]+</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='50 = 0x32'>50</td>
 <td>ReferenceNumber</td>
-<td class=c>digits[8]+</td>
+<td class=c title='+ = List'>digits[8]+</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='55 = 0x37'>55</td>
@@ -359,12 +364,12 @@ possibility)</span></span></td></tr>
 <tr>
 <td class=r title='80 = 0x50'>80</td>
 <td>By-line</td>
-<td class=c>string[0,32]+</td>
+<td class=c title='+ = List'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='85 = 0x55'>85</td>
 <td>By-lineTitle</td>
-<td class=c>string[0,32]+</td>
+<td class=c title='+ = List'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='90 = 0x5a'>90</td>
@@ -419,7 +424,7 @@ possibility)</span></span></td></tr>
 <tr>
 <td class=r title='118 = 0x76'>118</td>
 <td>Contact</td>
-<td class=c>string[0,128]+</td>
+<td class=c title='+ = List'>string[0,128]+</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='120 = 0x78'>120</td>
@@ -437,7 +442,7 @@ won&#39;t be able to read these tags as written by ExifTool.)</span></span></td>
 <tr class=b>
 <td class=r title='122 = 0x7a'>122</td>
 <td>Writer-Editor</td>
-<td class=c>string[0,32]+</td>
+<td class=c title='+ = List'>string[0,32]+</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='125 = 0x7d'>125</td>
@@ -612,7 +617,7 @@ won&#39;t be able to read these tags as written by ExifTool.)</span></span></td>
 <tr>
 <td class=r title='0 = 0x0'>0</td>
 <td>NewsPhotoVersion</td>
-<td class=c>int16u:</td>
+<td class=c title=': = Mandatory'>int16u:</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='10 = 0xa'>10</td>
@@ -822,7 +827,7 @@ won&#39;t be able to read these tags as written by ExifTool.)</span></span></td>
 <tr>
 <td class=r title='10 = 0xa'>10</td>
 <td>SubFile</td>
-<td class=c>N+</td>
+<td class=c title='+ = List'>N+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -841,7 +846,7 @@ won&#39;t be able to read these tags as written by ExifTool.)</span></span></td>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 9, 2009</i>
+<br><i>Last revised Nov 25, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -15,14 +15,16 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.09';
+$VERSION = '1.10';
 
 sub ProcessMRW($$;$);
+sub WriteMRW($$;$);
 
 # Minolta MRW tags
 %Image::ExifTool::MinoltaRaw::Main = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PROCESS_PROC => \&Image::ExifTool::MinoltaRaw::ProcessMRW,
+    WRITE_PROC => \&Image::ExifTool::MinoltaRaw::WriteMRW,
     NOTES => 'These tags are used in Minolta RAW format (MRW) images.',
     "\0TTW" => { # TIFF Tags
         Name => 'MinoltaTTW',
@@ -242,8 +244,22 @@ sub ConvertWBMode($)
 }
 
 #------------------------------------------------------------------------------
+# Write MRW directory (ie. in ARW images)
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) optional tag table ref
+# Returns: new MRW data or undef on error
+sub WriteMRW($$;$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    $exifTool or return 1;      # allow dummy access
+    my $buff = '';
+    $$dirInfo{OutFile} = \$buff;
+    ProcessMRW($exifTool, $dirInfo, $tagTablePtr) > 0 or undef $buff;
+    return $buff;
+}
+
+#------------------------------------------------------------------------------
 # Read or write Minolta MRW file
-# Inputs: 0) ExifTool object reference, 1) dirInfo reference
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) optional tag table ref
 # Returns: 1 on success, 0 if this wasn't a valid MRW file, or -1 on write error
 # Notes: File pointer must be set to start of MRW in RAF upon entry
 sub ProcessMRW($$;$)
@@ -265,6 +281,7 @@ sub ProcessMRW($$;$)
     # "\0MRM" for big-endian (MRW images), and
     # "\0MRI" for little-endian (MRWInfo in ARW images)
     $data =~ /^\0MR([MI])/ or return 0;
+    my $hdr = "\0MR$1";
     SetByteOrder($1 . $1);
     $exifTool->SetFileType();
     $tagTablePtr = GetTagTable('Image::ExifTool::MinoltaRaw::Main');
@@ -335,12 +352,14 @@ sub ProcessMRW($$;$)
 
     if ($outfile) {
         # write the file header then the buffered meta information
-        Write($outfile, "\0MRM", Set32u(length $outBuff), $outBuff) or $rtnVal = -1;
+        Write($outfile, $hdr, Set32u(length $outBuff), $outBuff) or $rtnVal = -1;
         # copy over image data
         while ($raf->Read($outBuff, 65536)) {
             Write($outfile, $outBuff) or $rtnVal = -1;
         }
-        $err and $exifTool->Error("MRW format error");
+        # Sony IDC utility corrupts MRWInfo when writing ARW images,
+        # so make this a minor error for these images
+        $err and $exifTool->Error("MRW format error", $$exifTool{TIFF_TYPE} eq 'ARW');
     } else {
         $err and $exifTool->Warn("MRW format error");
     }
@@ -366,7 +385,7 @@ write Konica-Minolta RAW (MRW) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

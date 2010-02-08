@@ -726,7 +726,21 @@ my %plusVocab = (
     %xmpTableDefaults,
     GROUPS => { 0 => 'XMP', 1 => 'XMP-acdsee', 2 => 'Image' },
     NAMESPACE => 'acdsee',
-    NOTES => 'ACD Systems ACDSee schema tags.',
+    NOTES => q{
+        ACD Systems ACDSee schema tags.  To software developers: Re-inventing your
+        own private tags instead of using the equivalent tags in standard XMP
+        namespaces defeats one of the most valuable features of metadata -- the
+        ability to transfer information.  Your applications mumble to themselves
+        instead of speaking out for the rest of the world to hear.
+    },
+    author     => { Avoid => 1, Groups => { 2 => 'Author' } },
+    caption    => { Avoid => 1 },
+    categories => { Avoid => 1 },
+    datetime   => { Avoid => 1, Groups => { 2 => 'Time' }, %dateTimeInfo },
+    keywords   => { Avoid => 1, List => 'Bag' },
+    notes      => { Avoid => 1 },
+    rating     => { Avoid => 1, Writable => 'real' }, # integer?
+    tagged     => { Avoid => 1, Writable => 'boolean' },
     rpp => {
         Name => 'RPP',
         Writable => 'lang-alt',
@@ -813,6 +827,28 @@ my %plusVocab = (
     CatalogSets => { List => 'Bag' },
 );
 
+# DigiKam schema tags (ref PH)
+%Image::ExifTool::XMP::digiKam = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-digiKam', 2 => 'Image' },
+    NAMESPACE => 'digiKam',
+    NOTES => 'DigiKam schema tags.',
+    CaptionsAuthorNames    => { Writable => 'lang-alt' },
+    CaptionsDateTimeStamps => { Writable => 'lang-alt' },
+    TagsList               => { List => 'Seq' },
+);
+
+# SWF schema tags (ref PH)
+%Image::ExifTool::XMP::swf = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-swf', 2 => 'Image' },
+    NAMESPACE => 'swf',
+    NOTES => 'Adobe SWF schema tags.',
+    type         => { Avoid => 1 },
+    bgalpha      => { Name => 'BackgroundAlpha', Writable => 'integer' },
+    forwardlock  => { Name => 'ForwardLock',     Writable => 'boolean' },
+);
+
 # SVG schema properties (ref 9)
 %Image::ExifTool::XMP::SVG = (
     GROUPS => { 0 => 'SVG', 1 => 'SVG', 2 => 'Image' },
@@ -865,15 +901,11 @@ This module is loaded automatically by Image::ExifTool when required.
 
 =head1 DESCRIPTION
 
-This file contains definitions for the following XMP schemas:
-
-1) PLUS License Data Format 1.2.0
-
-2) Publishing Requirements for Industry Standard Metadata (PRISM) 2.1
+This file contains definitions for less common XMP schemas.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

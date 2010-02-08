@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: Nikon.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1703 bytes
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2006:01:04 14:02:27-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)

@@ -17,7 +17,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -526,7 +526,7 @@ sub ProcessContentDescription($$$)
         my $len = shift @len;
         next unless $len;
         return 0 if $pos + $len > $dirLen;
-        my $val = $exifTool->Unicode2Charset(substr($$dataPt,$pos,$len),'II');
+        my $val = $exifTool->Decode(substr($$dataPt,$pos,$len),'UCS2','II');
         $exifTool->HandleTag($tagTablePtr, $tag, $val);
         $pos += $len;
     }
@@ -571,7 +571,7 @@ sub ReadASF($$$$$)
     my ($exifTool, $dataPt, $pos, $format, $size) = @_;
     my @vals;
     if ($format == 0) { # unicode string
-        $vals[0] = $exifTool->Unicode2Charset(substr($$dataPt,$pos,$size),'II');
+        $vals[0] = $exifTool->Decode(substr($$dataPt,$pos,$size),'UCS2','II');
     } elsif ($format == 2) { # 4-byte boolean
         @vals = ReadValue($dataPt, $pos, 'int32u', undef, $size);
         foreach (@vals) {
@@ -608,7 +608,7 @@ sub ProcessExtendedContentDescription($$$)
         my $nameLen = unpack("x${pos}v", $$dataPt);
         $pos += 2;
         return 0 if $pos + $nameLen + 4 > $dirLen;
-        my $tag = Image::ExifTool::Unicode2Charset(undef,substr($$dataPt,$pos,$nameLen),'II','Latin');
+        my $tag = Image::ExifTool::Decode(undef,substr($$dataPt,$pos,$nameLen),'UCS2','II','Latin');
         $tag =~ s/^WM\///; # remove leading "WM/"
         $pos += $nameLen;
         my ($dType, $dLen) = unpack("x${pos}v2", $$dataPt);
@@ -643,8 +643,8 @@ sub ProcessPreview($$$)
     my $str = substr($$dataPt, $dirStart+5, $n);
     if ($str =~ /^((?:..)*?)\0\0((?:..)*?)\0\0/) {
         my ($mime, $desc) = ($1, $2);
-        $exifTool->HandleTag($tagTablePtr, 1, $exifTool->Unicode2Charset($mime,'II'));
-        $exifTool->HandleTag($tagTablePtr, 2, $exifTool->Unicode2Charset($desc,'II')) if length $desc;
+        $exifTool->HandleTag($tagTablePtr, 1, $exifTool->Decode($mime,'UCS2','II'));
+        $exifTool->HandleTag($tagTablePtr, 2, $exifTool->Decode($desc,'UCS2','II')) if length $desc;
     }
     $exifTool->HandleTag($tagTablePtr, 3, substr($$dataPt, $dirStart+5+$n, $picLen));
     return 1;
@@ -672,12 +672,12 @@ sub ProcessCodecList($$$)
         my $nameLen = Get16u($dataPt, $pos + 2) * 2;
         $pos += 4;
         return 0 if $pos + $nameLen + 2 > $dirLen;
-        my $name = $exifTool->Unicode2Charset(substr($$dataPt,$pos,$nameLen),'II');
+        my $name = $exifTool->Decode(substr($$dataPt,$pos,$nameLen),'UCS2','II');
         $exifTool->HandleTag($tagTablePtr, "${type}Name", $name);
         my $descLen = Get16u($dataPt, $pos + $nameLen) * 2;
         $pos += $nameLen + 2;
         return 0 if $pos + $descLen + 2 > $dirLen;
-        my $desc = $exifTool->Unicode2Charset(substr($$dataPt,$pos,$descLen),'II');
+        my $desc = $exifTool->Decode(substr($$dataPt,$pos,$descLen),'UCS2','II');
         $exifTool->HandleTag($tagTablePtr, "${type}Description", $desc);
         my $infoLen = Get16u($dataPt, $pos + $descLen);
         $pos += $descLen + 2 + $infoLen;
@@ -704,7 +704,7 @@ sub ProcessMetadata($$$)
         my ($index, $stream, $nameLen, $dType, $dLen) = unpack("x${pos}v4V", $$dataPt);
         $pos += 12;
         return 0 if $pos + $nameLen + $dLen > $dirLen;
-        my $tag = Image::ExifTool::Unicode2Charset(undef,substr($$dataPt,$pos,$nameLen),'II','Latin');
+        my $tag = Image::ExifTool::Decode(undef,substr($$dataPt,$pos,$nameLen),'UCS2','II','Latin');
         my $val = ReadASF($exifTool,$dataPt,$pos+$nameLen,$dType,$dLen);
         $exifTool->HandleTag($tagTablePtr, $tag, $val,
             DataPt => $dataPt,
@@ -848,7 +848,7 @@ Windows Media Audio (WMA) and Windows Media Video (WMV) files.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

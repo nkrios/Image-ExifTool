@@ -150,8 +150,9 @@ sub CheckIPTC($$$)
 sub FormatIPTC($$$$$;$)
 {
     my ($exifTool, $tagInfo, $valPtr, $xlatPtr, $rec, $read) = @_;
-    return unless $$tagInfo{Format};
-    if ($$tagInfo{Format} =~ /^int(\d+)/) {
+    my $format = $$tagInfo{Format} || $$tagInfo{Table}{FORMAT};
+    return unless $format;
+    if ($format =~ /^int(\d+)/) {
         if ($read) {
             my $len = length($$valPtr);
             if ($len <= 8) {    # limit integer conversion to 8 bytes long
@@ -172,7 +173,7 @@ sub FormatIPTC($$$$$;$)
                 $$valPtr = pack('N', $$valPtr);
             }
         }
-    } elsif ($$tagInfo{Format} =~ /^string/) {
+    } elsif ($format =~ /^string/) {
         if ($rec == 1) {
             if ($$tagInfo{Name} eq 'CodedCharacterSet') {
                 $$xlatPtr = HandleCodedCharset($exifTool, $$valPtr);
@@ -301,7 +302,7 @@ sub DoWriteIPTC($$$)
     my ($tagInfo, %iptcInfo, $tag);
 
     # start by assuming default IPTC encoding
-    my $xlat = $exifTool->Options('IPTCCharset');
+    my $xlat = $exifTool->Options('CharsetIPTC');
     undef $xlat if $xlat eq $exifTool->Options('Charset');
 
     # make sure our dataLen is defined (note: allow zero length directory)
@@ -639,7 +640,7 @@ seldom-used routines.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

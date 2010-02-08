@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: DjVu.djvu
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 955 bytes
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:11:11 09:28:57-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:11:11 19:32:19-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: DJVU (multi-page)
 [File, File, Image] MIMEType - MIME Type: image/vnd.djvu
 [DjVu, DjVu, Image] 0 - Subfile Type: Single-page image

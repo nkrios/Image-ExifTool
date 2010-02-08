@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: Olympus_5_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 7.2 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:10 16:09:58-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:50-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)

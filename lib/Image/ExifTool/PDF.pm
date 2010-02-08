@@ -17,7 +17,7 @@ use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.22';
+$VERSION = '1.23';
 
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
@@ -1207,7 +1207,7 @@ sub ProcessDict($$$$;$$)
                     # text string is already in Unicode if it starts with "\xfe\xff",
                     # otherwise we must first convert from PDFDocEncoding
                     $val = PDF2Unicode($val, 'n') unless $val =~ s/^\xfe\xff//;
-                    $val = $exifTool->Unicode2Charset($val, 'MM');
+                    $val = $exifTool->Decode($val, 'UCS2', 'MM');
                 }
                 if ($$tagInfo{List}) {
                     # separate tokens in comma or whitespace delimited lists
@@ -1560,7 +1560,7 @@ information but only with a limited number of algorithms.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

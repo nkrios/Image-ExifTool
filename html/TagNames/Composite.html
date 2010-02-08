@@ -195,8 +195,10 @@ manual mode)</span>
 <tr class=b>
 <td>GPSAltitude</td>
 <td class=c>N</td>
-<td class=n>GPS:GPSAltitude
-  <br>GPS:GPSAltitudeRef</td>
+<td class=n>GPSAltitudeRef
+  <br>GPS:GPSAltitude
+  <br>XMP:GPSAltitude
+  <br>H264:GPSAltitude</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>GPSDateTime</td>
@@ -207,8 +209,9 @@ manual mode)</span>
 <tr class=b>
 <td>GPSLatitude</td>
 <td class=c>N</td>
-<td class=n>GPS:GPSLatitude
-  <br>GPS:GPSLatitudeRef</td>
+<td class=n>GPSLatitudeRef
+  <br>GPS:GPSLatitude
+  <br>H264:GPSLatitude</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>GPSLatitudeRef</td>
@@ -219,8 +222,9 @@ manual mode)</span>
 <tr class=b>
 <td>GPSLongitude</td>
 <td class=c>N</td>
-<td class=n>GPS:GPSLongitude
-  <br>GPS:GPSLongitudeRef</td>
+<td class=n>GPSLongitudeRef
+  <br>GPS:GPSLongitude
+  <br>H264:GPSLongitude</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>GPSLongitudeRef</td>
@@ -242,19 +246,25 @@ manual mode)</span>
   <br>CircleOfConfusion</td>
 <td><span class=s><span class=n>(this value may be incorrect if the image has been resized)</span></span></td></tr>
 <tr class=b>
+<td>IDCPreviewImage</td>
+<td class=c>N</td>
+<td class=n>IDCPreviewStart
+  <br>IDCPreviewLength</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>ISO</td>
 <td class=c>N</td>
 <td class=n>Canon:CameraISO
   <br>Canon:BaseISO
   <br>Canon:AutoISO</td>
 <td><span class=s><span class=n>(use CameraISO if numerical, otherwise calculate as BaseISO * AutoISO / 100)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>ImageHeight</td>
 <td class=c>N</td>
 <td class=n>Main:PostScript:ImageData
   <br>PostScript:BoundingBox</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ImageSize</td>
 <td class=c>N</td>
 <td class=n>ImageWidth
@@ -262,25 +272,25 @@ manual mode)</span>
   <br>ExifImageWidth
   <br>ExifImageHeight</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ImageWidth</td>
 <td class=c>N</td>
 <td class=n>Main:PostScript:ImageData
   <br>PostScript:BoundingBox</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>JpgFromRaw</td>
 <td class=c>Y</td>
 <td class=n>JpgFromRawStart
   <br>JpgFromRawLength</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Lens</td>
 <td class=c>N</td>
 <td class=n>ShortFocal
   <br>LongFocal</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Lens35efl</td>
 <td class=c>N</td>
 <td class=n>ShortFocal
@@ -288,7 +298,7 @@ manual mode)</span>
   <br>Lens
   <br>ScaleFactor35efl</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LensID</td>
 <td class=c>N</td>
 <td class=n>LensType
@@ -302,7 +312,7 @@ manual mode)</span>
 <td><span class=s><span class=n>(attempt to identify the actual lens from all lenses with a given LensType.
 Applies only to LensType values with a lookup table.  May be configured
 by adding user-defined lenses)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>LensID</td>
 <td class=c>N</td>
 <td class=n>Nikon:LensIDNumber
@@ -314,25 +324,25 @@ by adding user-defined lenses)</span></span></td></tr>
   <br>MCUVersion
   <br>Nikon:LensType</td>
 <td>--&gt; <a href='Nikon.html#LensID'>Nikon LensID Values</a></td></tr>
-<tr>
+<tr class=b>
 <td>LensID</td>
 <td class=c>N</td>
 <td class=n>Ricoh:LensFirmware</td>
 <td>--&gt; <a href='Ricoh.html#LensID'>Ricoh LensID Values</a></td></tr>
-<tr class=b>
+<tr>
 <td>LensSpec</td>
 <td class=c>N</td>
 <td class=n>Nikon:Lens
   <br>Nikon:LensType</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LightValue</td>
 <td class=c>N</td>
 <td class=n>Aperture
   <br>ShutterSpeed
   <br>ISO</td>
 <td><span class=s><span class=n>(calculated LV -- similar to exposure value but includes ISO speed)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>MPImage</td>
 <td class=c>N</td>
 <td class=n>MPImageStart
@@ -341,18 +351,18 @@ by adding user-defined lenses)</span></span></td></tr>
 <td><span class=s><span class=n>(the first MPF &quot;Large Thumbnail&quot; is extracted as PreviewImage, and the rest
 of the embedded MPF images are extracted as MPImage#.  The ExtractEmbedded
 option may be used to extract information from these embedded images.)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>OriginalDecisionData</td>
-<td class=c>Y!</td>
+<td class=c title='! = Unsafe'>Y!</td>
 <td class=n>OriginalDecisionDataOffset</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>OtherImage</td>
 <td class=c>N</td>
 <td class=n>OtherImageStart
   <br>OtherImageLength</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>PreviewImage</td>
 <td class=c>Y</td>
 <td class=n>PreviewImageStart
@@ -361,18 +371,18 @@ option may be used to extract information from these embedded images.)</span></s
   <br>PreviewImageStart (1)
   <br>PreviewImageLength (1)</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>PreviewImageSize</td>
 <td class=c>N</td>
 <td class=n>PreviewImageWidth
   <br>PreviewImageHeight</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>PreviewImage</td>
 <td class=c>N</td>
 <td class=n>ScreenNail</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RedBalance</td>
 <td class=c>N</td>
 <td class=n>WB_RGGBLevels
@@ -386,20 +396,20 @@ option may be used to extract information from these embedded images.)</span></s
   <br>WBRedLevel
   <br>WBGreenLevel</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RedEyeReduction</td>
 <td class=c>N</td>
 <td class=n>CanonFlashMode
   <br>FlashBits</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td>Rotation</td>
 <td class=c>N</td>
 <td class=n>QuickTime:MatrixStructure
   <br>QuickTime:HandlerType</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ScaleFactor35efl</td>
 <td class=c>N</td>
 <td class=n>FocalLength
@@ -418,52 +428,52 @@ option may be used to extract information from these embedded images.)</span></s
   <br>ImageWidth
   <br>ImageHeight</td>
 <td><span class=s><span class=n>(this value and any derived values may be incorrect if image has been resized)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>ShootingMode</td>
 <td class=c>N</td>
 <td class=n>CanonExposureMode
   <br>EasyMode
   <br>BulbDuration</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ShutterCurtainHack</td>
 <td class=c>N</td>
 <td class=n>FlashBits
   <br>ShutterCurtainSync</td>
 <td><span class=s>0 = 1st-curtain sync
   <br>1 = 2nd-curtain sync</span></td></tr>
-<tr class=b>
+<tr>
 <td>ShutterSpeed</td>
 <td class=c>N</td>
 <td class=n>ExposureTime
   <br>ShutterSpeedValue
   <br>BulbDuration</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SubSecCreateDate</td>
 <td class=c>N</td>
 <td class=n>EXIF:CreateDate
   <br>SubSecTimeDigitized</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SubSecDateTimeOriginal</td>
 <td class=c>N</td>
 <td class=n>EXIF:DateTimeOriginal
   <br>SubSecTimeOriginal</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SubSecModifyDate</td>
 <td class=c>N</td>
 <td class=n>EXIF:ModifyDate
   <br>SubSecTime</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ThumbnailImage</td>
 <td class=c>Y</td>
 <td class=n>ThumbnailOffset
   <br>ThumbnailLength</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>WB_RGBLevels</td>
 <td class=c>N</td>
 <td class=n>KDC_IFD:WhiteBalance
@@ -475,7 +485,7 @@ option may be used to extract information from these embedded images.)</span></s
   <br>WB_RGBLevels5
   <br>WB_RGBLevelsShade</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>WB_RGBLevels</td>
 <td class=c>N</td>
 <td class=n>KodakIFD:WhiteBalance
@@ -490,7 +500,7 @@ option may be used to extract information from these embedded images.)</span></s
   <br>KodakIFD:ColorTemperature
   <br>Kodak:WB_RGBLevels</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>WB_RGGBLevels</td>
 <td class=c>N</td>
 <td class=n>Canon:WhiteBalance
@@ -509,7 +519,7 @@ option may be used to extract information from these embedded images.)</span></s
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 19, 2009</i>
+<br><i>Last revised Jan 28, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ProcessPEResources($$);
 sub ProcessPEVersion($$);
@@ -384,15 +384,15 @@ my %resourceType = (
         # (also see http://blog.chinaunix.net/u1/41189/showart_345768.html)
         PrintString => 1,
         PrintConv => {
-            '0000' => '7-bit ASCII',
-            '03A4' => 'Windows, Japan (Shift - JIS X-0208)',
-            '03A8' => 'Windows, Chinese (Simplified)',
-            '03B5' => 'Windows, Korea (Shift - KSC 5601)',
-            '03B6' => 'Windows, Taiwan (GB5)',
-            '04B0' => 'Unicode',
-            '04E2' => 'Windows, Latin-2 (Eastern European)',
+            '0000' => 'ASCII',
+            '03A4' => 'Windows, Japan (Shift - JIS X-0208)', # cp932
+            '03A8' => 'Windows, Chinese (Simplified)', # cp936
+            '03B5' => 'Windows, Korea (Shift - KSC 5601)', # cp949
+            '03B6' => 'Windows, Taiwan (Big5)', # cp950
+            '04B0' => 'Unicode', # UCS-2
+            '04E2' => 'Windows, Latin2 (Eastern European)',
             '04E3' => 'Windows, Cyrillic',
-            '04E4' => 'Windows, Multilingual',
+            '04E4' => 'Windows, Latin1',
             '04E5' => 'Windows, Greek',
             '04E6' => 'Windows, Turkish',
             '04E7' => 'Windows, Hebrew',
@@ -688,8 +688,8 @@ sub ReadUnicodeStr($$;$)
         $str .= $ch;
     }
     $pos += 2 if $pos & 0x03;
-    $str = $exifTool ? $exifTool->Unicode2Charset($str) : Image::ExifTool::Unicode2UTF8($str,'v');
-    return ($str, $pos);
+    my $to = $exifTool ? $exifTool->Options('Charset') : 'UTF8';
+    return (Image::ExifTool::Decode(undef,$str,'UCS2','II',$to), $pos);
 }
 
 #------------------------------------------------------------------------------
@@ -738,6 +738,9 @@ sub ProcessPEVersion($$)
                 ($string, $pt) = ReadUnicodeStr($dataPt, $pt + 6);
                 unless ($index) {
                     # separate the language code and character set
+                    # (not sure what the CharacterSet tag is for, but the string
+                    # values stored here are UCS-2 in all my files even if the
+                    # CharacterSet is otherwise)
                     my ($lang, $char);
                     if (length($string) > 4) {
                         $char = substr($string, 4);
@@ -1122,7 +1125,7 @@ library files.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

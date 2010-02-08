@@ -164,17 +164,17 @@ original locations in an image.</p>
 <h3>EXIF Files</h3>
 
 <p>EXIF files store EXIF information in the same format as in the APP1 segment
-of a JPEG image (<i>with the exception that there is no size limit for an EXIF
-file, while data in a JPEG segment is limited to a maximum of 65533 bytes</i>). 
-The three commands below illustrate techniques for copying the entire EXIF block
-from a source image (<code>SRCFILE</code>) to an output EXIF file
-(<code>out.exif</code>):</p>
+of a JPEG image (<i>with the exception that there is no size limit for an
+EXIF file, while EXIF data in a JPEG image is limited to a maximum of 65527
+bytes</i>). The three commands below illustrate techniques for copying the
+entire EXIF block from a source image (<code><i>SRCFILE</i></code>) to an
+output EXIF file (<code>out.exif</code>):</p>
 
-<pre>exiftool -exif -b SRCFILE > out.exif
+<pre>exiftool -exif -b <i>SRCFILE</i> > out.exif
 
-exiftool -tagsfromfile SRCFILE -exif out.exif
+exiftool -tagsfromfile <i>SRCFILE</i> -exif out.exif
 
-exiftool -o out.exif -exif SRCFILE</pre>
+exiftool -o out.exif -exif <i>SRCFILE</i></pre>
 
 <p>It is the specification of the <a href="TagNames/Extra.html">Extra</a> EXIF
 tag in each of the above commands (the "<code>-exif</code>" argument) that
@@ -183,7 +183,17 @@ MIFF files all support storage of EXIF data blocks in this format, although
 exiftool does not current write MIFF images.</p>
 
 <p>Tags may also be copied individually to and from an EXIF file, but remember
-that this will not copy "unsafe" tags unless they are specified explicitly.</p>
+that this will not copy "unsafe" tags unless they are specified explicitly. This
+technique must be used when creating an EXIF sidecar file if the source file
+does not contain EXIF:</p>
+
+<pre>exiftool -o out.exif -all -unsafe <i>SRCFILE</i>
+</pre>
+
+<p>or for all files in a directory:</p>
+
+<pre>exiftool -o %f.exif -all -unsafe <i>DIR</i>
+</pre>
 
 <hr>
 <a name="mie"></a>
@@ -217,7 +227,7 @@ which may be useful if disk space is at a premium.</p>
 
 <hr>
 <i>Created Nov 12, 2008</i><br>
-<i>Last revised Sep 15, 2009</i>
+<i>Last revised Nov 30, 2009</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

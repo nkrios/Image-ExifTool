@@ -25,7 +25,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.44';
+$VERSION = '1.45';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -360,7 +360,7 @@ my %shootingMode = (
                 1 => 'Low',
                 2 => 'High',
                 # 3 - observed with LZ6 and TZ5 in Fireworks mode - PH
-                # 5 - observed with FX01 and FX40 (EXIF contrast "Normal") - PH
+                # 5 - observed with FX01, FX40 and FP8 (EXIF contrast "Normal") - PH
                 6 => 'Medium Low', #PH (FZ18)
                 7 => 'Medium High', #PH (FZ18)
                 # DMC-LC1 values:
@@ -947,6 +947,33 @@ my %shootingMode = (
     # 0x3406 - rational64u (approximate FNumber?)
 );
 
+# Leica type5 maker notes (ref PH) (X1)
+%Image::ExifTool::Panasonic::Leica5 = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
+    WRITABLE => 1,
+    NOTES => 'This information is written by the X1.',
+    # 0x0406 - saturation or sharpness
+    0x0407 => { Name => 'OriginalFileName', Writable => 'string' },
+    0x0408 => { Name => 'OriginalDirectory',Writable => 'string' },
+    # 0x040b - related to white balance
+    0x040d => {
+        Name => 'ExposureMode',
+        Format => 'int8u',
+        Count => 4,
+        PrintConv => {
+            '0 0 0 0' => 'Program AE',
+            '1 0 0 0' => 'Aperture-priority AE',
+            '2 0 0 0' => 'Shutter speed priority AE', #(guess)
+            '3 0 0 0' => 'Manual',
+        },
+    },
+    # 0x0411 - saturation or sharpness
+    0x0412 => { Name => 'FilmMode',         Writable => 'string' },
+    0x0413 => { Name => 'WB_RGBLevels',     Writable => 'rational64u', Count => 3 },
+);
+
 # Type 2 tags (ref PH)
 %Image::ExifTool::Panasonic::Type2 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -1122,7 +1149,7 @@ Panasonic and Leica maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

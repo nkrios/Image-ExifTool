@@ -110,7 +110,7 @@ my %testedRAF = (
             0xf02 => 'Custom3', #2
             0xf03 => 'Custom4', #2
             0xf04 => 'Custom5', #2
-            # 0xfe0 => 'Grey Point?', #2
+            # 0xfe0 => 'Gray Point?', #2
             0xff0 => 'Kelvin', #4
         },
     },
@@ -683,7 +683,7 @@ FujiFilm maker notes in EXIF information, and to read/write FujiFilm RAW
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: RIFF.avi
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1262 bytes
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:09:12 11:29:23-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:09:12 16:31:11-04:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: AVI
 [File, File, Image] MIMEType - MIME Type: video/avi
 [RIFF, RIFF, Video] 0 - Frame Rate: 15

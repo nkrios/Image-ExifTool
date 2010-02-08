@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.97
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.04
 [File, System, Image] FileName - File Name: Casio_5_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 1699 bytes
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:10:09 12:54:12-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:01:04 11:54:41-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
@@ -76,7 +77,7 @@
 [MakerNotes, Casio, Camera] 8243 - Casio Type 2 0x2033: 1
 [MakerNotes, Casio, Camera] 8244 - Flash Distance: 0
 [MakerNotes, Casio, Camera] 12288 - Record Mode: Program AE
-[MakerNotes, Casio, Camera] 12289 - Self Timer: Off
+[MakerNotes, Casio, Camera] 12289 - Release Mode: Normal
 [MakerNotes, Casio, Camera] 12290 - Quality: Fine
 [MakerNotes, Casio, Camera] 12291 - Focus Mode: Single-Area Auto Focus
 [MakerNotes, Casio, Camera] 12293 - Casio Type 2 0x3005: 0 1
@@ -92,7 +93,7 @@
 [MakerNotes, Casio, Camera] 12312 - Casio Type 2 0x3018: 0
 [MakerNotes, Casio, Camera] 12313 - Casio Type 2 0x3019: 1
 [MakerNotes, Casio, Camera] 12314 - Casio Type 2 0x301a: 0
-[MakerNotes, Casio, Camera] 12315 - Casio Type 2 0x301b: 0
+[MakerNotes, Casio, Camera] 12315 - Unknown Mode: Normal
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00140014
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x01000000
 [PrintIM, PrintIM, Printing] 256 - Print IM 0x0100: 0x05000000

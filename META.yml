@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Image-ExifTool
-version:             8.00
+version:             8.10
 abstract:            Read and write meta information
 license:             perl
 author:              

@@ -1,10 +1,11 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: iWork.numbers
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1359 bytes
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:11 14:38:11-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:11 14:40:00-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: Apple Numbers
-[File, File, Image] MIMEType - MIME Type: application/unknown
+[File, File, Image] MIMEType - MIME Type: application/x-iwork-numbers-sffnumbers
 [File, File, Image] PreviewImage - Preview Image: (Binary data 27 bytes)
 [ZIP, ZIP, Other] 2 - Zip Required Version: 10
 [ZIP, ZIP, Other] 3 - Zip Bit Flag: 0

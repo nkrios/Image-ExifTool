@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.13';
+$VERSION = '1.15';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
@@ -27,6 +27,7 @@ sub ProcessProperties($$$);
 sub ReadFPXValue($$$$$;$$);
 sub ConvertTimeSpan($);
 sub ProcessHyperlinks($$);
+sub ProcessContents($$$);
 
 # sector type constants
 sub HDR_SIZE           () { 512; }
@@ -292,16 +293,16 @@ my %isMSOffice = (
         The FlashPix file format, introduced in 1996, was developed by Kodak,
         Hewlett-Packard and Microsoft.  Internally the FPX file structure mimics
         that of an old DOS disk with fixed-sized "sectors" (usually 512 bytes) and a
-        "file allocation table" (FAT).  No wonder the format never became popular.
-
-        However, some of the structures used in FlashPix streams are part of the
-        EXIF specification, and are still being used in the APP2 FPXR segment of
-        JPEG images by some Kodak and Hewlett-Packard digital cameras.
+        "file allocation table" (FAT).  No wonder this image format never became
+        popular.  However, some of the structures used in FlashPix streams are part
+        of the EXIF specification, and are still being used in the APP2 FPXR segment
+        of JPEG images by some Kodak and Hewlett-Packard digital cameras.
 
         ExifTool extracts FlashPix information from both FPX images and the APP2
         FPXR segment of JPEG images.  As well, FlashPix information is extracted
-        from DOC, PPT and XLS (Microsoft Word, PowerPoint and Excel) documents since
-        the FlashPix file format is closely related to the formats of these files.
+        from DOC, PPT, XLS (Microsoft Word, PowerPoint and Excel) documents and FLA
+        (Macromedia/Adobe Flash project) files since these are based on the same
+        format as FlashPix.
     },
     "\x05SummaryInformation" => {
         Name => 'SummaryInfo',
@@ -333,6 +334,14 @@ my %isMSOffice = (
         Name => 'Image',
         SubDirectory => {
             TagTable => 'Image::ExifTool::FlashPix::Image',
+        },
+    },
+    "Contents" => {
+        Name => 'Contents',
+        Notes => 'found in FLA files; may contain XMP',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::XMP::Main',
+            ProcessProc => \&ProcessContents,
         },
     },
     "ICC Profile 0001" => {
@@ -504,7 +513,7 @@ my %isMSOffice = (
     },
    '_PID_LINKBASE' => {
         Name => 'HyperlinkBase',
-        ValueConv => '$self->Unicode2Charset($val,"II")',
+        ValueConv => '$self->Decode($val, "UCS2","II")',
     },
    '_PID_HLINKS' => {
         Name => 'Hyperlinks',
@@ -938,6 +947,12 @@ my %isMSOffice = (
     GROUPS => { 2 => 'Audio' },
 );
 
+# MacroMedia flash contents
+%Image::ExifTool::FlashPix::Contents = (
+    PROCESS_PROC => \&ProcessProperties,
+    GROUPS => { 2 => 'Image' },
+);
+
 # CompObj tags
 %Image::ExifTool::FlashPix::CompObj = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -1086,14 +1101,13 @@ sub ReadFPXValue($$$$$;$$)
                 $val = substr($$dataPt, $valPos + 4, $len);
                 if ($format eq 'VT_LPWSTR') {
                     # convert wide string from Unicode
-                    $val = $exifTool->Unicode2Charset($val);
+                    $val = $exifTool->Decode($val, 'UCS2');
                 } elsif ($codePage) {
                     my $charset = $Image::ExifTool::charsetName{"cp$codePage"};
-                    if ($charset and $charset ne $exifTool->Options('Charset')) {
-                        $val = $exifTool->Charset2Unicode($val, 'II', $charset);
-                        $val = $exifTool->Unicode2Charset($val, 'II');
+                    if ($charset) {
+                        $val = $exifTool->Decode($val, $charset);
                     } elsif ($codePage eq 1200) {   # UTF-16, little endian
-                        $val = $exifTool->Unicode2Charset($val, 'II');
+                        $val = $exifTool->Decode(undef, 'UCS2', 'II');
                     }
                 }
                 $val =~ s/\0.*//s;  # truncate at null terminator
@@ -1127,6 +1141,41 @@ sub ReadFPXValue($$$$$;$$)
     } else {
         return $vals[0];
     }
+}
+
+#------------------------------------------------------------------------------
+# Scan for XMP in FLA Contents (ref PH)
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+# Notes: FLA format is proprietary and I couldn't find any documentation,
+#        so this routine is entirely based on observations from sample files
+sub ProcessContents($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $isFLA;
+
+    # all of my FLA samples contain "Contents" data, an no other FPX-like samples have
+    # this, but check the data for a familiar pattern to be sure this is FLA: the
+    # Contents of all of my FLA samples start with two bytes (0x29,0x38,0x3f,0x43 or 0x47,
+    # then 0x01) followed by a number of zero bytes (from 0x18 to 0x26 of them, related
+    # somehow to the value of the first byte), followed by the string "DocumentPage"
+    $isFLA = 1 if $$dataPt =~ /^..\0+\xff\xff\x01\0\x0d\0CDocumentPage/;
+    
+    # do a brute-force scan of the "Contents" for UTF-16 XMP
+    # (this may always be little-endian, but allow for either endianness)
+    if ($$dataPt =~ /<\0\?\0x\0p\0a\0c\0k\0e\0t\0 \0b\0e\0g\0i\0n\0=\0['"](\0\xff\xfe|\xfe\xff)/g) {
+        $$dirInfo{DirStart} = pos($$dataPt) - 36;
+        if ($$dataPt =~ /<\0\?\0x\0p\0a\0c\0k\0e\0t\0 \0e\0n\0d\0=\0['"]\0[wr]\0['"]\0\?\0>\0?/g) {
+            $$dirInfo{DirLen} = pos($$dataPt) - $$dirInfo{DirStart};
+            Image::ExifTool::XMP::ProcessXMP($exifTool, $dirInfo, $tagTablePtr);
+            # override format if not already FLA but XMP-dc:Format indicates it is
+            $isFLA = 1 if $$exifTool{FILE_TYPE} ne 'FLA' and $$exifTool{VALUE}{Format} and
+                          $$exifTool{VALUE}{Format} eq 'application/vnd.adobe.fla';
+        }
+    }
+    $exifTool->OverrideFileType('FLA') if $isFLA;
+    return 1;
 }
 
 #------------------------------------------------------------------------------
@@ -1255,13 +1304,13 @@ sub ProcessProperties($$$)
                 }
             }
             $exifTool->HandleTag($tagTablePtr, $tag, $val,
-                DataPt => $dataPt,
-                Start => $valStart,
-                Size => $valPos - $valStart,
-                Format => $formStr,
-                Index => $index,
+                DataPt  => $dataPt,
+                Start   => $valStart,
+                Size    => $valPos - $valStart,
+                Format  => $formStr,
+                Index   => $index,
                 TagInfo => $tagInfo,
-                Extra => ", type=$type",
+                Extra   => ", type=$type",
             );
         }
         # issue warning if we hit end of property section prematurely
@@ -1283,7 +1332,7 @@ sub LoadChain($$$$$)
     my $chain = '';
     my ($buff, %loadedSect);
     for (;;) {
-        last if $sect == END_OF_CHAIN;
+        last if $sect >= END_OF_CHAIN;
         return undef if $loadedSect{$sect}; # avoid infinite loop
         $loadedSect{$sect} = 1;
         my $offset = $sect * $sectSize + $hdrSize;
@@ -1345,7 +1394,7 @@ sub ProcessFPXR($$$)
                 return 0;
             }
             # convert stream pathname to ascii
-            my $name = Image::ExifTool::Unicode2Charset(undef, $1, 'II', 'Latin');
+            my $name = Image::ExifTool::Decode(undef, $1, 'UCS2', 'II', 'Latin');
             if ($verbose) {
                 my $psize = ($size == 0xffffffff) ? 'storage' : "$size bytes";
                 $exifTool->VPrint(0,"  |  $entry) Name: '$name' [$psize]\n");
@@ -1476,7 +1525,7 @@ sub ProcessFPXR($$$)
 #------------------------------------------------------------------------------
 # Extract information from a FlashPix (FPX) file
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref
-# Returns: 1 on success, 0 if this wasn't a valid FPX image
+# Returns: 1 on success, 0 if this wasn't a valid FPX-format file
 sub ProcessFPX($$)
 {
     my ($exifTool, $dirInfo) = @_;
@@ -1488,8 +1537,9 @@ sub ProcessFPX($$)
     # check signature
     return 0 unless $buff =~ /^\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1/;
 
+    # set FileType initially based on file extension (we may override this later)
     my $fileType = $exifTool->{FILE_EXT};
-    $fileType = 'FPX' unless $fileType and $isMSOffice{$fileType};
+    $fileType = 'FPX' unless $fileType and ($isMSOffice{$fileType} or $fileType eq 'FLA');
     $exifTool->SetFileType($fileType);
     SetByteOrder(substr($buff, 0x1c, 2) eq "\xff\xfe" ? 'MM' : 'II');
     my $tagTablePtr = GetTagTable('Image::ExifTool::FlashPix::Main');
@@ -1539,7 +1589,7 @@ sub ProcessFPX($$)
             $fat .= $fatSect;
             ++$fatCountCheck;
         }
-        last if $difStart == END_OF_CHAIN;
+        last if $difStart >= END_OF_CHAIN;
         # read next DIF (Dual Indirect FAT) sector
         my $offset = $difStart * $sectSize + HDR_SIZE;
         unless ($raf->Seek($offset, 0) and $raf->Read($buff, $sectSize) == $sectSize) {
@@ -1599,7 +1649,7 @@ sub ProcessFPX($$)
         # be very tolerant of this count -- it's null terminated anyway)
         my $len = Get16u(\$dir, $pos + 0x40);
         $len > 32 and $len = 32;
-        my $tag = Image::ExifTool::Unicode2Charset(undef, substr($dir,$pos,$len*2), 'II', 'Latin');
+        my $tag = Image::ExifTool::Decode(undef, substr($dir,$pos,$len*2), 'UCS2', 'II', 'Latin');
         $tag =~ s/\0.*//s;  # truncate at null (in case length was wrong)
 
         my $sect = Get32u(\$dir, $pos + 0x74);  # start sector number
@@ -1663,23 +1713,24 @@ sub ProcessFPX($$)
             $extra .= " Right=$rSib" unless $rSib == FREE_SECT;
             $extra .= " Child=$chld" unless $chld == FREE_SECT;
             $exifTool->VerboseInfo($tag, $tagInfo,
-                Index => $index++,
-                Value => $buff,
+                Index  => $index++,
+                Value  => $buff,
                 DataPt => \$buff,
-                Extra => $extra,
-                Size => $size,
+                Extra  => $extra,
+                Size   => $size,
             );
         }
         if ($tagInfo and $buff) {
-            if ($$tagInfo{SubDirectory}) {
+            my $subdir = $$tagInfo{SubDirectory};
+            if ($subdir) {
                 my %dirInfo = (
-                    DataPt => \$buff,
-                    DirStart => $tagInfo->{SubDirectory}->{DirStart},
-                    DirLen => length $buff,
-                    Multi => $$tagInfo{Multi},
+                    DataPt   => \$buff,
+                    DirStart => $$subdir{DirStart},
+                    DirLen   => length $buff,
+                    Multi    => $$tagInfo{Multi},
                 );
-                my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
-                $exifTool->ProcessDirectory(\%dirInfo, $subTablePtr);
+                my $subTablePtr = GetTagTable($$subdir{TagTable});
+                $exifTool->ProcessDirectory(\%dirInfo, $subTablePtr,  $$subdir{ProcessProc});
             } else {
                 $exifTool->FoundTag($tagInfo, $buff);
             }
@@ -1709,7 +1760,7 @@ JPEG images.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

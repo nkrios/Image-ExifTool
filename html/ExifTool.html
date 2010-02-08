@@ -16,58 +16,68 @@ ul   { margin-top: 0 }
 
 <h2>Description</h2>
 
-<p>The Image::ExifTool library provides an extensible set of Perl modules to read and
-write meta information in a wide variety of image, audio and video files.</p>
+<p>The Image::ExifTool library provides an extensible set of Perl modules to
+read and write meta information in a wide variety of image, audio, video and
+document files.</p>
 
-<hr><h2>Index</h2>
+<hr><h2>Methods</h2>
 
-<p>The following sections of this document give examples of how to use Image::ExifTool,
-and explain the following individual functions in more detail:</p>
+<p>All ExifTool features are accessed through the methods of the public
+interface listed below.  Other Image::ExifTool methods and modules should not be
+accessed directly because their interface may change with future versions.</p>
+
+<p>The ExifTool methods should never die or issue a warning to STDERR if
+called with the proper arguments (with the exception of
+<a href="#SetNewValue">SetNewValue</a> which returns an error string when
+called in list context, or sends the error to STDERR otherwise).  Error and
+warning messages that occur during processing are stored in the values of the
+Error and Warning tags, and are accessible via
+<a href="#GetValue">GetValue</a>.</p>
 
 <table><tr><td>
 <ul>
-<li><a href="#ImageInfo">ImageInfo</a>
-<li><a href="#new">new</a>
-<li><a href="#Options">Options</a>
-<li><a href="#ClearOptions">ClearOptions</a>
-<li><a href="#ExtractInfo">ExtractInfo</a>
-<li><a href="#GetInfo">GetInfo</a>
-<li><a href="#WriteInfo">WriteInfo</a>
-<li><a href="#CombineInfo">CombineInfo</a>
-<li><a href="#GetTagList">GetTagList</a>
-<li><a href="#GetFoundTags">GetFoundTags</a>
-<li><a href="#GetRequestedTags">GetRequestedTags</a>
-<li><a href="#GetValue">GetValue</a>
+<li><a href="#ImageInfo">ImageInfo</a></li>
+<li><a href="#new">new</a></li>
+<li><a href="#Options">Options</a></li>
+<li><a href="#ClearOptions">ClearOptions</a></li>
+<li><a href="#ExtractInfo">ExtractInfo</a></li>
+<li><a href="#GetInfo">GetInfo</a></li>
+<li><a href="#WriteInfo">WriteInfo</a></li>
+<li><a href="#CombineInfo">CombineInfo</a></li>
+<li><a href="#GetTagList">GetTagList</a></li>
+<li><a href="#GetFoundTags">GetFoundTags</a></li>
+<li><a href="#GetRequestedTags">GetRequestedTags</a></li>
+<li><a href="#GetValue">GetValue</a></li>
 </ul>
 </td><td>
 <ul>
-<li><a href="#SetNewValue">SetNewValue</a>
-<li><a href="#SetNewValuesFromFile">SetNewValuesFromFile</a>
-<li><a href="#GetNewValues">GetNewValues</a>
-<li><a href="#CountNewValues">CountNewValues</a>
-<li><a href="#SaveNewValues">SaveNewValues</a>
-<li><a href="#RestoreNewValues">RestoreNewValues</a>
-<li><a href="#SetFileModifyDate">SetFileModifyDate</a>
-<li><a href="#SetFileName">SetFileName</a>
-<li><a href="#SetNewGroups">SetNewGroups</a>
-<li><a href="#GetNewGroups">GetNewGroups</a>
-<li><a href="#GetTagID">GetTagID</a>
-<li><a href="#GetDescription">GetDescription</a>
+<li><a href="#SetNewValue">SetNewValue</a></li>
+<li><a href="#SetNewValuesFromFile">SetNewValuesFromFile</a></li>
+<li><a href="#GetNewValues">GetNewValues</a></li>
+<li><a href="#CountNewValues">CountNewValues</a></li>
+<li><a href="#SaveNewValues">SaveNewValues</a></li>
+<li><a href="#RestoreNewValues">RestoreNewValues</a></li>
+<li><a href="#SetFileModifyDate">SetFileModifyDate</a></li>
+<li><a href="#SetFileName">SetFileName</a></li>
+<li><a href="#SetNewGroups">SetNewGroups</a></li>
+<li><a href="#GetNewGroups">GetNewGroups</a></li>
+<li><a href="#GetTagID">GetTagID</a></li>
+<li><a href="#GetDescription">GetDescription</a></li>
 </ul>
 </td><td valign=top>
 <ul>
-<li><a href="#GetGroup">GetGroup</a>
-<li><a href="#GetGroups">GetGroups</a>
-<li><a href="#BuildCompositeTags">BuildCompositeTags</a>
-<li><a href="#GetTagName">GetTagName</a>
-<li><a href="#GetShortcuts">GetShortcuts</a>
-<li><a href="#GetAllTags">GetAllTags</a>
-<li><a href="#GetWritableTags">GetWritableTags</a>
-<li><a href="#GetAllGroups">GetAllGroups</a>
-<li><a href="#GetDeleteGroups">GetDeleteGroups</a>
-<li><a href="#GetFileType">GetFileType</a>
-<li><a href="#CanWrite">CanWrite</a>
-<li><a href="#CanCreate">CanCreate</a>
+<li><a href="#GetGroup">GetGroup</a></li>
+<li><a href="#GetGroups">GetGroups</a></li>
+<li><a href="#BuildCompositeTags">BuildCompositeTags</a></li>
+<li><a href="#GetTagName">GetTagName</a></li>
+<li><a href="#GetShortcuts">GetShortcuts</a></li>
+<li><a href="#GetAllTags">GetAllTags</a></li>
+<li><a href="#GetWritableTags">GetWritableTags</a></li>
+<li><a href="#GetAllGroups">GetAllGroups</a></li>
+<li><a href="#GetDeleteGroups">GetDeleteGroups</a></li>
+<li><a href="#GetFileType">GetFileType</a></li>
+<li><a href="#CanWrite">CanWrite</a></li>
+<li><a href="#CanCreate">CanCreate</a></li>
 </ul>
 </td></tr></table>
 
@@ -116,22 +126,26 @@ $exifTool-&gt;<a href="#WriteInfo">WriteInfo</a>('image.jpg','modified_image.jpg
 
 <hr><h2><a name="Config">Configuration</a></h2>
 
-<p>User-defined tags can be added via the ExifTool configuration file or by defining
-the %Image::ExifTool::UserDefined hash before calling any ExifTool functions.  See
-"<a href="config.html">ExifTool_config</a>" in the ExifTool distribution for
-more details. If necessary, the configuration feature can be disabled by setting
-the ExifTool "noConfig" flag before loading Image::ExifTool.  ie)</p>
+<p>User-defined tags can be added via the ExifTool configuration file, or by
+defining the %Image::ExifTool::UserDefined hash before calling any ExifTool
+functions.  See "<a href="config.html">ExifTool_config</a>" in the ExifTool
+distribution for more details.</p>
+
+<p>By default ExifTool looks for a configuration file named ".ExifTool_config"
+in your home directory, but a different file may be specified by setting the
+ExifTool "<code>configFile</code>" variable before using Image::ExifTool.  For
+example:</p>
 
 <blockquote><table class='box'><tr><td><pre>
-BEGIN { $Image::ExifTool::noConfig = 1 }
+BEGIN { $Image::ExifTool::configFile = '/Users/phil/myconfig.cfg' }
 use Image::ExifTool;
 </pre></td></tr></table></blockquote>
 
-<p>Or the ExifTool "configFile" variable may be set before loading
-Image::ExifTool to use a specific configuration file:</p>
+<p>or the configuration feature may be disabled by setting
+"<code>configFile</code>" to an empty string:</p>
 
 <blockquote><table class='box'><tr><td><pre>
-BEGIN { $Image::ExifTool::configFile = "/Users/phil/.myconfig" }
+BEGIN { $Image::ExifTool::configFile = '' }
 use Image::ExifTool;
 </pre></td></tr></table></blockquote>
 
@@ -422,6 +436,14 @@ to some functions.</p>
     <tr><td valign='top' align=right>MacIceland</td><td>(cp10079)</td></tr>
     <tr><td valign='top' align=right>MacCroatian</td><td>(cp10082)</td></tr>
     </table></td><td align=center>'UTF8'</td></tr>
+<tr><td>CharsetID3</td><td>Character encoding to assume for ID3v1 strings.  By
+    the specification ID3v1 strings should be encoded in ISO 8859-1 (essentially
+    'Latin'), but some applications may use local encoding instead.  This option
+    allows different encodings to be specified.</td>
+    <td align=center><i>(see <a href="#Charset">Charset</a> option)</i></td><td align=center>'Latin'</td></tr>
+<tr><td>CharsetIPTC</td><td>Fallback IPTC character set to assume if IPTC information
+    contains no CodedCharacterSet tag.</td>
+    <td align=center><i>(see <a href="#Charset">Charset</a> option)</i></td><td align=center>'Latin'</td></tr>
 <tr><td>Compact</td><td>Flag to write compact output.  The XMP specification suggests
     that the data be padded with blanks to allow in-place editing.  By setting this
     flag, 2kB is saved for files with XMP data.</td>
@@ -462,14 +484,16 @@ to some functions.</p>
     AIPrivateData stream in PDF files, and embedded MPF images in JPEG and MPO files</td>
     <td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td><a name="FastScan">FastScan</a></td>
-    <td>Flag to increase speed of extracting information from JPEG images.  With this
-    option set, ExifTool will not scan to the end of a JPEG image to check for an AFCP,
-    CanonVRD, FotoStation, PhotoMechanic, MIE or PreviewImage trailer.  With
-    RIFF-format files (AVI, WAV, etc), this option stops the parsing at the audio/video
-    data, so any trailing metadata (ie. XMP written by Adobe Bridge) may be missed. 
-    Also, when combined with the ScanForXMP option, prevents scanning for XMP in
-    recognized file types.</td>
-    <td align='center'>0 or 1</td><td align='center'>0</td></tr>
+    <td>Flag to increase speed of extracting information from JPEG images.  With
+    this option set to 1, ExifTool will not scan to the end of a JPEG image to
+    check for an AFCP, CanonVRD, FotoStation, PhotoMechanic, MIE or PreviewImage
+    trailer.  This also stops the parsing after the first comment in GIF images,
+    and at the audio/video data with RIFF-format files (AVI, WAV, etc), so any
+    trailing metadata (ie. XMP written by some utilities) may be missed.  When
+    combined with the ScanForXMP option, prevents scanning for XMP in recognized
+    file types.  With a value of 2, ExifTool will also avoid extracting any EXIF
+    MakerNote information.</td>
+    <td align='center'>0, 1 or 2</td><td align='center'>0</td></tr>
 <tr><td>FixBase</td>
     <td>Fix maker notes base offset.  Allows values to be extracted from maker notes
     which have been corrupted by editing with 3rd party software.</td>
@@ -522,7 +546,7 @@ to some functions.</p>
     defined, the EXIF/TIFF base offset is used.</td>
     <td><table class='clear'>
     <tr><td valign='top' align=right><b>0</b>&nbsp;=</td><td>Absolute offsets</td></tr>
-    <tr><td valign='top' align=right><b><i>non-zero</i></b>&nbsp;=</td><td>Relative offsets</td></tr>
+    <tr><td valign='top' align=right><b><i>non&#8209;zero</i></b>&nbsp;=</td><td>Relative offsets</td></tr>
     <tr><td valign='top' align=right><b>undef</b>&nbsp;=</td><td>EXIF/TIFF offsets</td></tr>
     </table></td><td align=center>undef</td></tr>
 <tr><td>IgnoreMinorErrors</td><td>Flag to ignore minor errors.  Causes minor errors
@@ -531,9 +555,6 @@ to some functions.</p>
     occur, but also allows thumbnail and preview images to be extracted even if
     they don't have a recognizable header.</td>
     <td align='center'>0 or 1</td><td align='center'>0</td></tr>
-<tr><td>IPTCCharset</td><td>Fallback IPTC character set to assume if IPTC information
-    contains no CodedCharacterSet tag.</td>
-    <td align=center><i>(see <a href="#Charset">Charset</a> option)</i></td><td align=center>'Latin'</td></tr>
 <tr><td>Lang</td><td>Localized language for exiftool tag descriptions, etc.  If the
     specified language isn't available, the option is not changed.  May be set to
     undef to select the built-in default language.</td>
@@ -661,7 +682,7 @@ the .ExifTool_config file if it exists.</p>
     <br><b>1-N)</b> Same as <a href="#ImageInfo">ImageInfo</a> except that a list of tag
     keys is not returned if an ARRAY reference is given.
 </td></tr>
-<tr><td><b>Returns</b></td><td>1 if this was a valid image, 0 otherwise</td></tr>
+<tr><td><b>Returns</b></td><td>1 if this was a recognized file format, 0 otherwise</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -669,8 +690,8 @@ $success = $exifTool-&gt;<b>ExtractInfo</b>('image.jpg', \%options);
 </pre></td></tr></table></blockquote>
 <p>The following options are effective in the call to <a href="#ExtractInfo">ExtractInfo</a>:</p>
 <blockquote>
-Binary, Charset, Composite, ExtractEmbedded, FastScan, FixBase, HtmlDump,
-HtmlDumpBase, IgnoreMinorErrors, IPTCCharset, Lang, LargeFileSupport,
+Binary, Charset, CharsetID3, CharsetIPTC, Composite, ExtractEmbedded, FastScan,
+FixBase, HtmlDump, HtmlDumpBase, IgnoreMinorErrors, Lang, LargeFileSupport,
 MakerNotes, ScanForXMP, Struct, TextOut, Unknown and Verbose.
 </blockquote>
 
@@ -772,8 +793,8 @@ Error and Warning tags.</p>
 <p>The following ExifTool options are effective in the call to
 <a href="#WriteInfo">WriteInfo</a>:</p>
 <blockquote>
-ByteOrder, Charset, Compact, Compress, FixBase, IgnoreMinorErrors, IPTCCharset
-and Verbose.
+ByteOrder, Charset, CharsetID3, CharsetIPTC, Compact, Compress, FixBase,
+IgnoreMinorErrors and Verbose.
 </blockquote>
 
 <hr><h2><a name="CombineInfo">CombineInfo</a></h2>
@@ -1125,12 +1146,12 @@ are passed directly to <a href="#SetNewValue">SetNewValue</a> internally,
 with a few exceptions:</p>
 <ul>
 <li>The Replace option defaults to 1 instead of 0 as with
-<a href="#SetNewValue">SetNewValue</a>.
+<a href="#SetNewValue">SetNewValue</a>.</li>
 <li>The AddValue or DelValue option is set for individual tags if '+&gt;' or
-'-&gt;' (or '+&lt;' or '-&lt;') are used.
-<li>The Group option is set for tags where a group name is given.
-<li>The Protected flag is set to 1 for individually specified tags.
-<li>The Type option also applies to extracted tags.
+'-&gt;' (or '+&lt;' or '-&lt;') are used.</li>
+<li>The Group option is set for tags where a group name is given.</li>
+<li>The Protected flag is set to 1 for individually specified tags.</li>
+<li>The Type option also applies to extracted tags.</li>
 </ul>
 <p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -1195,11 +1216,11 @@ more than one value.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetNewValues($$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
- <br><b>1)</b> Tag key or tag name
+ <br><b>1)</b> Tag name (case sensitive, group names not allowed)
 </td></tr>
 <tr><td><b>Returns</b></td><td>List of new Raw tag values.
-The list may be empty if the tag is being deleted
-(ie. if SetNewValue was called without a value).
+The list may be empty either if the tag isn't being written, or if it is being
+deleted (ie. if <a href="#SetNewValue">SetNewValue</a> was called without a value).
 </td></tr>
 </table></blockquote>
 <p><b>Examples:</b></p>
@@ -1509,7 +1530,7 @@ automatically by <a href="#ImageInfo">ImageInfo</a> if the Composite option is s
 <ol>
 <li>Tag values are calculated in alphabetical order unless a tag Require's
 or Desire's another composite tag, in which case the calculation is
-deferred until after the other tag is calculated.
+deferred until after the other tag is calculated.</li>
 <li>Composite tags may need to read data from the image for their value to be
 determined, so for these <a href="#BuildCompositeTags">BuildCompositeTags</a>
 must be called while the image is available.  This is only a problem if
@@ -1517,7 +1538,7 @@ must be called while the image is available.  This is only a problem if
 file reference or scalar reference) since in this case the file is closed before
 <a href="#ImageInfo">ImageInfo</a> returns.  However if you enable the Composite
 option, <a href="#BuildCompositeTags">BuildCompositeTags</a> is called from
-within <a href="#ImageInfo">ImageInfo</a> before the file is closed.
+within <a href="#ImageInfo">ImageInfo</a> before the file is closed.</li>
 </ol>
 <hr><table bgcolor='#ffaaaa' width='100%' cellpadding=8><tr><td><center><b>
 The following functions access only static data and are not called with an
@@ -1600,19 +1621,19 @@ the specific IFD).
 <blockquote><table class='norm'>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (Information&nbsp;Type)</b></td>
-<td>AFCP, AIFF, APE, APP0, APP12, APP13, APP14, APP15, APP5, APP6, APP8, ASF,
-BMP, CanonVRD, Composite, DICOM, DNG, DjVu, Ducky, EXE, EXIF, ExifTool,
-FLAC, File, Flash, FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3,
-IPTC, ITC, JFIF, JPEG, Jpeg2000, LNK, Leaf, M2TS, MIE, MIFF, MNG, MPC, MPEG,
-MPF, MakerNotes, Meta, PDF, PICT, PNG, PhotoMechanic, Photoshop, PostScript,
-PrintIM, QuickTime, RAF, RIFF, Rawzor, Real, SVG, SigmaRaw, Stim, Vorbis,
-XML, XMP, ZIP
+<td>AFCP, AIFF, APE, APP0, APP12, APP13, APP14, APP15, APP4, APP5, APP6, APP8,
+ASF, BMP, CanonVRD, Composite, DICOM, DNG, DjVu, Ducky, EXE, EXIF, ExifTool,
+FLAC, File, Flash, FlashPix, Font, FotoStation, GIF, GeoTiff, H264, HTML,
+ICC_Profile, ID3, IPTC, ITC, JFIF, JPEG, Jpeg2000, LNK, Leaf, M2TS, MIE,
+MIFF, MNG, MPC, MPEG, MPF, MakerNotes, Meta, PDF, PICT, PNG, PSP,
+PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF, Rawzor,
+Real, SVG, SigmaRaw, SonyIDC, Stim, Vorbis, XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, BMP, Canon, CanonCustom,
 CanonRaw, CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky,
-EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix,
-FotoStation, FujiFilm, GPS, GeoTiff, GlobParamIFD, GraphConv, H264, HP,
+EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, Font,
+FotoStation, FujiFilm, GIF, GPS, GeoTiff, GlobParamIFD, GraphConv, H264, HP,
 HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm,
 ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ICC_Profile#, ID3,
 ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC,
@@ -1622,15 +1643,16 @@ MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash,
 MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
 MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
 MIFF, MNG, MPC, MPEG, MPF0, MPImage, MakerNotes, MakerUnknown, MetaIFD,
-Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonPreview, NikonScan,
-Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop,
-PictureInfo, PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF,
-RMETA, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4,
-Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG,
-Sanyo, Sigma, SigmaRaw, Sony, Stim, SubIFD, System, Track#, Vorbis, XML,
-XMP, XMP-DICOM, XMP-MP, XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux,
-XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-iptcExt,
-XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-pdfx, XMP-photomech,
+Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom, NikonPreview,
+NikonScan, Olympus, PDF, PICT, PNG, PSP, Panasonic, Pentax, PhotoMechanic,
+Photoshop, PictureInfo, PostScript, PrintIM, ProfileIFD, QuickTime, RAF,
+RAF2, RIFF, RMETA, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3,
+Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
+SRF#, SVG, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD,
+System, Track#, Version#, Vorbis, XML, XMP, XMP-DICOM, XMP-MP,
+XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
+XMP-dex, XMP-digiKam, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr,
+XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-pdfx, XMP-photomech,
 XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-tiff,
 XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS,
 XMP-xmpRights, XMP-xmpTPg, ZIP
@@ -1683,15 +1705,17 @@ my @delGroups = Image::ExifTool::<b>GetDelGroups</b>();
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetFileType(;$$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td>
-<td><b>0)</b> [<i>optional</i>] File name (or just an extension)
+<td><b>0)</b> [<i>optional</i>] File name or extension
 <br><b>1)</b> [<i>optional</i>] Flag to return a description instead of a type
 </td></tr>
 <tr><td><b>Returns</b></td><td>A string, based on the file extension, which
-represents the type of file (or a description of the file type).  Returns
-undefined if the file type isn't supported by ExifTool.  In array context,
-may return more than one file type if the file may be different formats. 
-With no arguments, returns a list of extensions for all recognized file types.
-</td></tr>
+indicates the basic format of the file.  Note that some files may be based on
+other formats (like many RAW image formats are based on TIFF).  In array
+context, may return more than one file type if the file may be based on
+different formats.  Returns undef if files with this extension are not yet
+supported by ExifTool.  Returns a list of extensions for all recognized file
+types if no input extension is specified.  Returns a more detailed description
+of the specific file format when the description flag is set.</td></tr>
 </table></blockquote>
 <p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -1700,13 +1724,13 @@ my $desc = Image::ExifTool::<b>GetFileType</b>($filename, 1);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="CanWrite">CanWrite</a></h2>
-<p>Can the specified file or file type be written?</p>
+<p>Can the specified file be written?</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>CanWrite($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td>
-<td><b>0)</b> File name, file extension, or file type</td></tr>
-<tr><td><b>Returns</b></td><td>True if the file type can be
-written (edited).</td></tr>
+<td><b>0)</b> File name or extension</td></tr>
+<tr><td><b>Returns</b></td><td>True if ExifTool supports writing files of
+this type (based on the file extension).</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -1714,13 +1738,13 @@ my $writable = Image::ExifTool::<b>CanWrite</b>($filename);
 </pre></td></tr></table></blockquote>
 
 <hr><h2><a name="CanCreate">CanCreate</a></h2>
-<p>Can the specified file or file type be created?</p>
+<p>Can the specified file be created?</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>CanCreate($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td>
-<td><b>0)</b> File name, file extension, or file type</td></tr>
-<tr><td><b>Returns</b></td><td>True if the file type can be created
-from scratch.  Currently, this can only be done with XMP, MIE, ICC,
+<td><b>0)</b> File name or extension</td></tr>
+<tr><td><b>Returns</b></td><td>True if ExifTool can create files with this
+extension from scratch.<br>Currently, this can only be done with XMP, MIE, ICC,
 VRD and EXIF files.</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>

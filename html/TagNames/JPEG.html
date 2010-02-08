@@ -52,67 +52,72 @@
 <td>--&gt; <a href='Kodak.html#Meta'>Kodak Meta Tags</a>
   <br>--&gt; <a href='Stim.html'>Stim Tags</a></td></tr>
 <tr>
+<td>'APP4'</td>
+<td>Scalado</td>
+<td class=c>-</td>
+<td>--&gt; <a href='JPEG.html#Scalado'>JPEG Scalado Tags</a></td></tr>
+<tr class=b>
 <td>'APP5'</td>
 <td>RMETA</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Ricoh.html#RMETA'>Ricoh RMETA Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'APP6'</td>
 <td>EPPIM
   <br>NITF</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='JPEG.html#EPPIM'>JPEG EPPIM Tags</a>
   <br>--&gt; <a href='JPEG.html#NITF'>JPEG NITF Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'APP8'</td>
 <td>SPIFF</td>
 <td class=c>-</td>
 <td>--&gt; <a href='JPEG.html#SPIFF'>JPEG SPIFF Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'APP10'</td>
 <td>Comment</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(PhotoStudio Unicode comment)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>'APP12'</td>
 <td>PictureInfo
   <br>Ducky</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='APP12.html#PictureInfo'>APP12 PictureInfo Tags</a>
   <br>--&gt; <a href='APP12.html#Ducky'>APP12 Ducky Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'APP13'</td>
 <td>Photoshop
   <br>Adobe_CM</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a>
   <br>--&gt; <a href='JPEG.html#AdobeCM'>JPEG AdobeCM Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'APP14'</td>
 <td>Adobe</td>
 <td class=c>-</td>
 <td>--&gt; <a href='JPEG.html#Adobe'>JPEG Adobe Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'APP15'</td>
 <td>GraphicConverter</td>
 <td class=c>-</td>
 <td>--&gt; <a href='JPEG.html#GraphConv'>JPEG GraphConv Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'COM'</td>
 <td>Comment</td>
 <td class=c>Y</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'DQT'</td>
 <td>DefineQuantizationTable</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(used to calculate the Extra:JPEGDigest tag value)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>'SOF'</td>
 <td>StartOfFrame</td>
 <td class=c>-</td>
 <td>--&gt; <a href='JPEG.html#SOF'>JPEG SOF Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'Trailer'</td>
 <td>AFCP
   <br>CanonVRD
@@ -142,6 +147,36 @@
 <td><span class=s>0 = Not Interleaved
   <br>1 = Odd
   <br>2 = Even</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Scalado'>JPEG Scalado Tags</a></h2>
+<p>Tags extracted from the JPEG APP4 &quot;SCALADO&quot; segment (presumably written by
+Scalado mobile software, <a href="http://www.scalado.com/">http://www.scalado.com/</a>).</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'HGHT'</td>
+<td>PreviewImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'QUAL'</td>
+<td>PreviewQuality</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'SPMO'</td>
+<td>DataLength</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'WDTH'</td>
+<td>PreviewImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='EPPIM'>JPEG EPPIM Tags</a></h2>
@@ -438,7 +473,7 @@ has an idea about what this means, please let me know.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 2, 2009</i>
+<br><i>Last revised Jan 1, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

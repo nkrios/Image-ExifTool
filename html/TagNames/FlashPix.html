@@ -10,16 +10,16 @@
 <p>The FlashPix file format, introduced in 1996, was developed by Kodak,
 Hewlett-Packard and Microsoft.  Internally the FPX file structure mimics
 that of an old DOS disk with fixed-sized &quot;sectors&quot; (usually 512 bytes) and a
-&quot;file allocation table&quot; (FAT).  No wonder the format never became popular.</p>
-
-<p>However, some of the structures used in FlashPix streams are part of the
-EXIF specification, and are still being used in the APP2 FPXR segment of
-JPEG images by some Kodak and Hewlett-Packard digital cameras.</p>
+&quot;file allocation table&quot; (FAT).  No wonder this image format never became
+popular.  However, some of the structures used in FlashPix streams are part
+of the EXIF specification, and are still being used in the APP2 FPXR segment
+of JPEG images by some Kodak and Hewlett-Packard digital cameras.</p>
 
 <p>ExifTool extracts FlashPix information from both FPX images and the APP2
 FPXR segment of JPEG images.  As well, FlashPix information is extracted
-from DOC, PPT and XLS (Microsoft Word, PowerPoint and Excel) documents since
-the FlashPix file format is closely related to the formats of these files.</p>
+from DOC, PPT, XLS (Microsoft Word, PowerPoint and Excel) documents and FLA
+(Macromedia/Adobe Flash project) files since these are based on the same
+format as FlashPix.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -91,16 +91,22 @@ the FlashPix file format is closely related to the formats of these files.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'Contents'</td>
+<td>Contents</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html'>XMP Tags</a>
+  <br><span class='n s'>(found in FLA files; may contain XMP)</span></td></tr>
+<tr>
 <td>'Current User'</td>
 <td>CurrentUser</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'ICC Profile 0001'</td>
 <td>ICC_Profile</td>
 <td class=c>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'Subimage 0000 Header'</td>
 <td>SubimageHdr</td>
 <td class=c>-</td>
@@ -1400,7 +1406,7 @@ property tables, even though they are only listed in the SummaryInfo table.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 4, 2009</i>
+<br><i>Last revised Jan 14, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

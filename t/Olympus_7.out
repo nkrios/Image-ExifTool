@@ -1,8 +1,9 @@
-  ExifToolVersion = 7.85
+  ExifToolVersion = 8.02
   FileName = Olympus_7_failed.jpg
   Directory = t
   FileSize = 7335
-  FileModifyDate = 1248185492
+  FileModifyDate = 1260754790
+  FilePermissions = 33188
   FileType = JPEG
   MIMEType = image/jpeg
 JPEG APP1 (7080 bytes):

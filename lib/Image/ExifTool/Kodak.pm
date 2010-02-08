@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.22';
+$VERSION = '1.23';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -517,7 +517,7 @@ sub WriteKodakIFD($$$);
     NOTES => q{
         Kodak models such as the ZD710, P712, P850, P880, V1233, V1253, V1275,
         V1285, Z612, Z712, Z812, Z885 use standard TIFF IFD format for the maker
-        notes.  In keeping with Kodak's strategy of inconsitent makernotes, models
+        notes.  In keeping with Kodak's strategy of inconsistent makernotes, models
         such as the M380, M1033, M1093, V1073, V1273, Z1012, Z1085 and Z8612
         also use these tags, but these makernotes begin with a TIFF header instead
         of an IFD entry count and use relative instead of absolute offsets.  There
@@ -1605,6 +1605,7 @@ sub ProcessKodakText($$$)
     $data =~ s/\0.*//s;     # truncate at null if it exists
     my @lines = split /[\n\r]+/, $data;
     my ($line, $success, @other, $tagInfo);
+    $exifTool->VerboseDir('Kodak Text');
     foreach $line (@lines) {
         if ($line =~ /(.*?):\s*(.*)/) {
             my ($tag, $val) = ($1, $2);
@@ -1620,7 +1621,7 @@ sub ProcessKodakText($$$)
                 $tagInfo = { Name => $tagName };
                 Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
             }
-            $exifTool->FoundTag($tagInfo, $val);
+            $exifTool->HandleTag($tagTablePtr, $tag, $val, TagInfo => $tagInfo);
             $success = 1;
         } else {
             # strip off leading/trailing white space and ignore blank lines
@@ -1701,7 +1702,7 @@ interpret Kodak maker notes EXIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

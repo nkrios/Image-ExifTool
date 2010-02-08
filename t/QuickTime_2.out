@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.99
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: QuickTime.mov
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 2.7 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:09:12 11:51:21-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:09:12 16:31:11-04:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: MOV
 [File, File, Image] MIMEType - MIME Type: video/quicktime
 [QuickTime, QuickTime, Video] 0 - Version: 0
@@ -51,7 +52,7 @@
 [QuickTime, Track1, Image] 20 - Y Resolution: 72
 [QuickTime, Track1, Image] 25 - Compressor Name: Photo - JPEG
 [QuickTime, Track1, Image] 41 - Bit Depth: 24
-[QuickTime, Track1, Video] stts - Video Frame Rate: 30.0
+[QuickTime, Track1, Video] stts - Video Frame Rate: 30.00
 [QuickTime, Track2, Video] 0 - Track Version: 0
 [QuickTime, Track2, Time] 1 - Track Create Date: 2005:08:11 14:03:54
 [QuickTime, Track2, Time] 2 - Track Modify Date: 2005:08:11 14:03:54

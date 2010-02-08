@@ -58,12 +58,12 @@ image stabilization is enabled)</span></span></td></tr>
 <tr class=b>
 <td title='0x0088 = 136'>0x0088</td>
 <td>PreviewImageStart</td>
-<td class=c>int32u*</td>
+<td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x0089 = 137'>0x0089</td>
 <td>PreviewImageLength</td>
-<td class=c>int32u*</td>
+<td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0100 = 256'>0x0100</td>
@@ -167,7 +167,7 @@ image stabilization is enabled)</span></span></td></tr>
 <tr>
 <td title='0x0109 = 265'>0x0109</td>
 <td>RawAndJpgRecording</td>
-<td class=c>Y</td>
+<td class=c>int32u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr class=b>
@@ -218,11 +218,14 @@ original version of the lens has the same LensType)</span>
   <br>24.1 = Sigma 18-50mm F2.8
   <br>24.2 = Sigma 17-70mm F2.8-4.5 (D)
   <br>24.3 = Sigma 20-40mm F2.8 EX DG Aspherical IF
-  <br>24.4 = Tamron SP AF 28-75mm F2.8 XR Di (IF) Macro
+  <br>24.4 = Sigma 18-200mm F3.5-6.3 DC
+  <br>24.5 = Sigma 20-40mm F2.8 EX DG Aspherical IF
+  <br>24.6 = Tamron SP AF 28-75mm F2.8 XR Di (IF) Macro
   <br>25 = Minolta AF 100-300mm F4.5-5.6 APO (D) or Sigma Lens
   <br>25.1 = Sigma 100-300mm F4 EX (APO (D) or D IF)
   <br>25.2 = Sigma 70mm F2.8 EX DG Macro
   <br>25.3 = Sigma 20mm F1.8 EX DG Aspherical RF
+  <br>25.4 = Sigma 30mm F1.4 DG EX
   <br>27 = Minolta AF 85mm F1.4 G (D)
   <br>28 = Minolta/Sony AF 100mm F2.8 Macro (D) or Tamron Lens
   <br>28.1 = Tamron SP AF 90mm F2.8 Di Macro
@@ -259,6 +262,9 @@ original version of the lens has the same LensType)</span>
   <br>53 = Sony AF 70-400mm F4.5-5.6 G SSM (SAL-70400G)
   <br>54 = Carl Zeiss Vario-Sonnar T* 16-35mm F2.8 ZA SSM (SAL-1635Z)
   <br>55 = Sony DT 18-55mm F3.5-5.6 SAM (SAL-1855)
+  <br>56 = Sony AF DT 55-200mm F4-5.6 SAM
+  <br>57 = Sony AF DT 50mm F1.8 SAM
+  <br>58 = Sony AF DT 30mm F2.8 SAM Macro
   <br>128 = Tamron or Sigma Lens (128)
   <br>128.1 = Tamron 18-200mm F3.5-6.3
   <br>128.2 = Tamron 28-300mm F3.5-6.3
@@ -267,9 +273,11 @@ original version of the lens has the same LensType)</span>
   <br>128.5 = Tamron SP AF 17-35mm F2.8-4 Di LD Aspherical IF
   <br>128.6 = Sigma AF 50-150mm F2.8 EX DC APO HSM II
   <br>128.7 = Sigma 10-20mm F3.5 EX DC HSM
+  <br>128.8 = Sigma 70-200mm F2.8 II EX DG APO MACRO HSM
   <br>129 = Tamron Lens (129)
-  <br>129.1 = Tamron 200-400mm F5.6
+  <br>129.1 = Tamron 200-400mm F5.6 LD
   <br>129.2 = Tamron 70-300mm F4-5.6 LD
+  <br>131 = Tamron 20-40mm F2.7-3.5 SP Aspherical IF
   <br>135 = Vivitar 28-210mm F3.5-5.6
   <br>136 = Tokina EMZ M100 AF 100mm F3.5
   <br>137 = Cosina 70-210mm F2.8-4 AF
@@ -282,6 +290,9 @@ original version of the lens has the same LensType)</span>
   <br>255.3 = Tamron AF 55-200mm F4-5.6 Di II
   <br>255.4 = Tamron AF 70-300mm F4-5.6 Di LD MACRO 1:2
   <br>255.5 = Tamron SP AF 200-500mm F5.0-6.3 Di LD IF
+  <br>255.6 = Tamron SP AF 10-24mm F3.5-4.5 Di II LD Aspherical IF
+  <br>255.7 = Tamron SP AF 70-200mm F2.8 Di LD IF Macro
+  <br>255.8 = Tamron SP AF 28-75mm F2.8 XR Di LD Aspherical IF
   <br>25501 = Minolta AF 50mm F1.7
   <br>25511 = Minolta AF 35-70mm F4 or Other Lens
   <br>25511.1 = Sigma UC AF 28-70mm F3.5-4.5
@@ -293,8 +304,9 @@ original version of the lens has the same LensType)</span>
   <br>25521.2 = Tokina 28-70mm F2.8 AT-X
   <br>25521.3 = Tokina 80-400mm F4.5-5.6 AT-X AF II 840
   <br>25521.4 = Tokina AF PRO 28-80mm F2.8 AT-X 280
-  <br>25521.5 = Tamron AF 19-35mm F3.5-4.5
-  <br>25521.6 = Angenieux AF 28-70mm F2.6
+  <br>25521.5 = Tokina AT-X PRO II AF 28-70mm F2.6-2.8 270
+  <br>25521.6 = Tamron AF 19-35mm F3.5-4.5
+  <br>25521.7 = Angenieux AF 28-70mm F2.6
   <br>25531 = Minolta AF 28-135mm F4-4.5 or Sigma Lens
   <br>25531.1 = Sigma ZOOM-alpha 35-135mm F3.5-4.5
   <br>25531.2 = Sigma 28-105mm F2.8-4 Aspherical
@@ -302,6 +314,7 @@ original version of the lens has the same LensType)</span>
   <br>25551 = Minolta AF 70-210mm F4 Macro or Sigma Lens
   <br>25551.1 = Sigma 70-210mm F4-5.6 APO
   <br>25551.2 = Sigma M-AF 70-200mm F2.8 EX APO
+  <br>25551.3 = Sigma 75-200mm F2.8-3.5
   <br>25561 = Minolta AF 135mm F2.8
   <br>25571 = Minolta/Sony AF 28mm F2.8
   <br>25581 = Minolta AF 24-50mm F4
@@ -312,12 +325,14 @@ original version of the lens has the same LensType)</span>
   <br>25611.3 = Sigma AF 500mm F4.5 APO
   <br>25611.4 = Sigma AF 170-500mm F5-6.3 APO Aspherical
   <br>25611.5 = Tokina AT-X AF 300mm F4
-  <br>25611.6 = Tokina AF 730 II 75-300mm F4.5-5.6
+  <br>25611.6 = Tokina AT-X AF 400mm F5.6 SD
+  <br>25611.7 = Tokina AF 730 II 75-300mm F4.5-5.6
   <br>25621 = Minolta AF 50mm F1.4 [New]
   <br>25631 = Minolta AF 300mm F2.8 APO or Sigma Lens
   <br>25631.1 = Sigma AF 50-500mm F4-6.3 EX DG APO
   <br>25631.2 = Sigma AF 170-500mm F5-6.3 APO Aspherical
   <br>25631.3 = Sigma AF 500mm F4.5 EX DG APO
+  <br>25631.4 = Sigma 400mm F5.6 APO
   <br>25641 = Minolta AF 50mm F2.8 Macro or Sigma Lens
   <br>25641.1 = Sigma 50mm F2.8 EX Macro
   <br>25651 = Minolta AF 600mm F4
@@ -374,6 +389,7 @@ original version of the lens has the same LensType)</span>
   <br>26671 = Minolta AF 35mm F2 New
   <br>26681 = Minolta AF 28mm F2 New
   <br>26721 = Minolta AF 24-105mm F3.5-4.5 (D)
+  <br>45671 = Tokina 70-210mm F4-5.6
   <br>45741 = 2x Teleconverter or Tamron or Tokina Lens
   <br>45741.1 = Tamron SP AF 90mm F2.5
   <br>45741.2 = Tokina RF 500mm F8.0 x2
@@ -469,7 +485,7 @@ tags are disabled.</p>
 <tr>
 <td class=r title='3 = 0x3'>3</td>
 <td>WhiteBalance</td>
-<td class=c>int32u~</td>
+<td class=c title='~ = Writable only with -n'>int32u~</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='4 = 0x4'>4</td>
@@ -1642,7 +1658,7 @@ version)</span></span></td></tr>
 <tr>
 <td class=r title='87 = 0x57'>87</td>
 <td>ImageStabilization</td>
-<td class=c>int32u[0.5]</td>
+<td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr class=b>
@@ -1822,7 +1838,7 @@ DiMAGE X and Xt.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 11, 2009</i>
+<br><i>Last revised Feb 4, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

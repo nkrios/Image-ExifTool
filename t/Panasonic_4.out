@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.96
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: Panasonic.rw2
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 12 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:03:25 11:54:31-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:03:25 12:10:29-04:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: RW2
 [File, File, Image] MIMEType - MIME Type: image/x-raw
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)

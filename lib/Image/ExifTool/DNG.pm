@@ -17,7 +17,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::MakerNotes;
 use Image::ExifTool::CanonRaw;
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 sub ProcessOriginalRaw($$$);
 sub ProcessAdobeData($$$);
@@ -231,6 +231,9 @@ sub ProcessAdobeData($$$)
     return 0 unless $$dataPt =~ /^Adobe\0/;
     unless ($outfile) {
         $exifTool->VerboseDir($dirInfo);
+        # don't parse makernotes if FastScan > 1
+        my $fast = $exifTool->Options('FastScan');
+        return 1 if $fast and $fast > 1;
     }
     $htmlDump and $exifTool->HtmlDump($dataPos, 6, 'Adobe DNGPrivateData header');
     SetByteOrder('MM'); # always big endian
@@ -806,7 +809,7 @@ information in DNG (Digital Negative) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

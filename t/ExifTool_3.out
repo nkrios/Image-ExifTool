@@ -1,6 +1,7 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.83
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileSize - File Size: 4.8 kB
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2005:11:23 15:49:37-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: TIFF
 [File, File, Image] MIMEType - MIME Type: image/tiff
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)

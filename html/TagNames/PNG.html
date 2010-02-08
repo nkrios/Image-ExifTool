@@ -33,65 +33,75 @@
 <td class=c>-</td>
 <td>--&gt; <a href='PNG.html#PrimaryChromaticities'>PNG PrimaryChromaticities Tags</a></td></tr>
 <tr>
+<td>'dSIG'</td>
+<td>DigitalSignature</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'fRAc'</td>
 <td>FractalParameters</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'gAMA'</td>
 <td>Gamma</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'gIFg'</td>
 <td>GIFGraphicControlExtension</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'gIFt'</td>
 <td>GIFPlainTextExtension</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'gIFx'</td>
 <td>GIFApplicationExtension</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'hIST'</td>
 <td>PaletteHistogram</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'iCCP'</td>
 <td>ICC_Profile</td>
 <td class=c>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'iTXt'</td>
 <td>InternationalText</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PNG.html#TextualData'>PNG TextualData Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'oFFs'</td>
 <td>ImageOffset</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'pCAL'</td>
 <td>PixelCalibration</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'pHYs'</td>
 <td>PhysicalPixel</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PNG.html#PhysicalPixel'>PNG PhysicalPixel Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'sBIT'</td>
 <td>SignificantBits</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>'sCAL'</td>
+<td>SubjectScale</td>
+<td class=c>-</td>
+<td>--&gt; <a href='PNG.html#SubjectScale'>PNG SubjectScale Tags</a></td></tr>
 <tr>
 <td>'sPLT'</td>
 <td>SuggestedPalette</td>
@@ -106,26 +116,36 @@
   <br>2 = Saturation
   <br>3 = Absolute Colorimetric</span></td></tr>
 <tr>
+<td>'sTER'</td>
+<td>StereoImage</td>
+<td class=c>-</td>
+<td>--&gt; <a href='PNG.html#StereoImage'>PNG StereoImage Tags</a></td></tr>
+<tr class=b>
 <td>'tEXt'</td>
 <td>TextualData</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PNG.html#TextualData'>PNG TextualData Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'tIME'</td>
 <td>ModifyDate</td>
 <td class=c>Y</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'tRNS'</td>
 <td>Transparency</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'tXMP'</td>
 <td>XMP</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a>
   <br><span class='n s'>(obsolete location specified by older XMP draft)</span></td></tr>
+<tr class=b>
+<td>'vpAg'</td>
+<td>VirtualPage</td>
+<td class=c>-</td>
+<td>--&gt; <a href='PNG.html#VirtualPage'>PNG VirtualPage Tags</a></td></tr>
 <tr>
 <td>'zTXt'</td>
 <td>CompressedText</td>
@@ -373,6 +393,16 @@ ImageMagick.</p>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a>
   <br><span class='n s'>(location according to the XMP specification -- this is where ExifTool will
 add a new XMP chunk if the image didn't already contain XMP)</span></td></tr>
+<tr>
+<td>'create-date'</td>
+<td>CreateDate</td>
+<td class=c>string</td>
+<td><span class=s><span class=n>(unregistered)</span></span></td></tr>
+<tr class=b>
+<td>'modify-date'</td>
+<td>ModDate</td>
+<td class=c>string</td>
+<td><span class=s><span class=n>(unregistered)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='PhysicalPixel'>PNG PhysicalPixel Tags</a></h2>
@@ -399,9 +429,70 @@ add a new XMP chunk if the image didn't already contain XMP)</span></td></tr>
   <br>1 = Meters</span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='SubjectScale'>PNG SubjectScale Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>SubjectUnits</td>
+<td class=c>N</td>
+<td><span class=s>1 = Meters
+  <br>2 = Radians</span></td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>SubjectPixelWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>SubjectPixelHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='StereoImage'>PNG StereoImage Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>StereoMode</td>
+<td class=c>N</td>
+<td><span class=s>0 = Cross-fuse Layout
+  <br>1 = Diverging-fuse Layout</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='VirtualPage'>PNG VirtualPage Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>VirtualImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>VirtualImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>VirtualPageUnits</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 14, 2007</i>
+<br><i>Last revised Nov 24, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

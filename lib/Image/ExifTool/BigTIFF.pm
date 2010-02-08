@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 my $maxOffset = 0x7fffffff; # currently supported maximum data offset/size
 
@@ -87,7 +87,7 @@ sub ProcessBigIFD($$$)
             my $formatStr = $Image::ExifTool::Exif::formatName[$format];
             my $size = $count * $formatSize;
             my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
-            next unless $tagInfo or $verbose;
+            next unless defined $tagInfo or $verbose;
             my $valuePtr = $entry + 12;
             my ($valBuff, $valBase);
             if ($size > 8) {
@@ -108,6 +108,10 @@ sub ProcessBigIFD($$$)
             } else {
                 $valBuff = substr($dirBuff, $valuePtr, $size);
                 $valBase = $bufPos;
+            }
+            if (defined $tagInfo and not $tagInfo) {
+                # GetTagInfo() required the value for a Condition
+                $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \$valBuff);
             }
             my $val = ReadValue(\$valBuff, 0, $formatStr, $count, $size);
             if ($htmlDump) {
@@ -260,7 +264,7 @@ information in BigTIFF images.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

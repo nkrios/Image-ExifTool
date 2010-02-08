@@ -138,7 +138,7 @@
         },
         <span class='com'># the following examples demonstrate simplifications which may be
         # used if only one tag is Require'd or Desire'd:
-        # 1) the Require/Desire lookup may be replaced with a simple tag name
+        # 1) the Require lookup may be replaced with a simple tag name
         # 2) "$val" may be used to represent "$val[0]" in the expression</span>
         FileExtension =&gt; {
             Require =&gt; 'FileName',
@@ -150,6 +150,11 @@
             Groups =&gt; { 2 =&gt; 'Camera' },
             ValueConv =&gt; 'sqrt(24*24+36*36) / ($val * 1750)',
             PrintConv =&gt; 'sprintf("%.3f mm",$val)',
+        },
+        <span class='com'># generate a description for this file type</span>
+        FileTypeDescription =&gt; {
+            Require =&gt; 'FileType',
+            ValueConv =&gt; 'GetFileType($val,1) || $val',
         },
     },
 );
@@ -169,7 +174,7 @@
     NewXMPxxxTag3 =&gt; { List =&gt; 'Bag' },
     <span class='com'># XMP structures are defined as SubDirectory's</span>
     NewXMPxxxStruct =&gt; {
-        SubDirectory =&gt; { },
+        SubDirectory =&gt; { },  <span class='com'># treat as a subdirectory containing other tags</span>
         Struct =&gt; 'MyStruct', <span class='com'># arbitrary name identifies entry in xmpStruct</span>
         List =&gt; 'Seq',        <span class='com'># structures may also be elements of a list</span>
     },

@@ -14,13 +14,33 @@ ol.index    { margin: 0; padding: 0 0 0 2em }
 </head>
 <body>
 <div class='index'>
-<a href="#conversions">Value Conversions</a>
+<a href="#overview">Overview</a>
+<br><a href="#conversions">Value Conversions</a>
+<br><a href="#philophies">Underlying Philosophies</a>
 </div>
 
 <h1 class='up'>"Under the Hood" of ExifTool</h1>
 
-<p>This page is a work in progress, and will be used to explain some of the details
-about how ExifTool works.</p>
+<p>This page is a work in progress, and will be used to explain some details
+of ExifTool's inner workings.</p>
+
+<a name="overview"></a>
+<h2>Overview of ExifTool</h2>
+
+<p>Below is a diagram showing the flow of information for the exiftool
+application.  Indicated outside the boxes on the diagram are some command-line
+options associated with the various stages of processing.  All of these options
+are directly associated with options or function calls available via the API
+(Application Programming Interface), with the exception of the output text
+formatting which is handled at the application level.</p>
+
+<center><img src="overview.png" alt="ExifTool Overview" width="680" height="460"></center>
+
+<p>The information flow is separated into two distinct modes: 1) Reading or
+extracting information, and 2) Writing or editing.  The application runs in
+<b>read</b> mode by default, but switches to <b>write</b> mode if a new value is
+assigned to any tag (via "<code>-TAG=VALUE</code>", "<code>-tagsFromFile</code>"
+or "<code>-geotag</code>" on the command line).<p>
 
 <a name="conversions"></a>
 <h2>Value Conversions</h2>
@@ -65,8 +85,32 @@ presented in a simple text format.</li></ol>
 <tr align='center'><td>ShutterSpeedValue</td><td>1/30</td><td>0.0333333334629176</td><td>4.90689059<br>(19868/4049)</td>
   <td><pre>00 00 4d 9c 00 00 0f d1</pre></td></tr>
 </table></blockquote>
+
+<a name="philophies"></a>
+<h2>Underlying Philosophies</h2>
+
+<p>In the design of exiftool, there have been a number of underlying philosophies
+which have helped to influence the overall development:</p>
+
+<ol>
+<li>Keep Image::ExifTool as independent as possible from other libraries to make
+    it portable and easy to install.  (Portable to a wide range of systems
+    and Perl versions.)</li>
+<li>Keep the interface simple for simple tasks (sometimes at the expense of making
+    it more complicated for complex tasks).
+<li>Maintain flexibility to allow users the freedom to do what they want.
+<li>Design the code to be efficient for batch processing, even if it increases the
+    initial overhead.</li>
+<li>For writing, remember 3 things: 1) data integrity, 2) data integrity, and 3)
+    data integrity.  If you can't do it right, don't do it at all.</li>
+<li>When processing, recognize file types by their structure, not by their extension
+    (if at all possible).</li>
+<li>Maintain backward compatibility when making changes to the ExifTool API or
+    command line application.</li>
+</ol>
+
 <hr>
-<i>Last revised Oct 10, 2009</i>
+<i>Last revised Feb. 3, 2010</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

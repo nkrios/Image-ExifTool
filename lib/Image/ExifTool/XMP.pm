@@ -45,7 +45,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.12';
+$VERSION = '2.18';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -127,6 +127,8 @@ my %stdXlatNS = (
     prl       => 'http://prismstandard.org/namespaces/prl/2.1/',
     prismusagerights => 'http://prismstandard.org/namespaces/prismusagerights/2.1/',
     acdsee    => 'http://ns.acdsee.com/iptc/1.0/',
+    digiKam   => 'http://www.digikam.org/ns/1.0/',
+    swf       => 'http://ns.adobe.com/swf/1.0',
 );
 
 # build reverse namespace lookup
@@ -334,6 +336,14 @@ my %recognizedAttrs = (
     acdsee => {
         Name => 'acdsee',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::acdsee' },
+    },
+    digiKam => {
+        Name => 'digiKam',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::digiKam' },
+    },
+    swf => {
+        Name => 'swf',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::swf' },
     },
 );
 
@@ -752,8 +762,10 @@ my %recognizedAttrs = (
     SidecarForExtension => { }, #PH (CS3)
     Source          => { Groups => { 2 => 'Author' } },
     State           => { Groups => { 2 => 'Location' } },
-    # the documentation doesn't show this as a 'Bag', but that's the
-    # way Photoshop7.0 writes it - PH
+    # the XMP spec doesn't show SupplementalCategories as a 'Bag', but
+    # that's the way Photoshop writes it [fixed in the June 2005 XMP spec].
+    # Also, it is incorrectly listed as "SupplementalCategory" in the
+    # IPTC Standard Photo Metadata docs (2008rev2 and July 2009rev1) - PH
     SupplementalCategories  => { List => 'Bag' },
     TransmissionReference   => { },
     Urgency         => {
@@ -1176,6 +1188,7 @@ my %recognizedAttrs = (
     BitsPerSample => { Writable => 'integer', List => 'Seq', AutoSplit => 1 },
     Compression => {
         Writable => 'integer',
+        SeparateTable => 'EXIF Compression',
         PrintConv => \%Image::ExifTool::Exif::compression,
     },
     PhotometricInterpretation => {
@@ -1375,6 +1388,7 @@ my %recognizedAttrs = (
     },
     LightSource => {
         Groups => { 2 => 'Camera' },
+        SeparateTable => 'EXIF LightSource',
         PrintConv =>  \%Image::ExifTool::Exif::lightSource,
     },
     Flash => {
@@ -1585,6 +1599,7 @@ my %recognizedAttrs = (
     GPSAltitude => {
         Groups => { 2 => 'Location' },
         Writable => 'rational',
+        RawConv => 'require Image::ExifTool::GPS; $val', # to load Composite tags and routines
         # extricate unsigned decimal number from string
         ValueConvInv => '$val=~/((?=\d|\.\d)\d*(?:\.\d*)?)/ ? $1 : undef',
         PrintConv => '$val =~ /^(inf|undef)$/ ? $val : "$val m"',
@@ -1688,7 +1703,7 @@ my %recognizedAttrs = (
     Firmware        => { }, #7
     FlashCompensation => { Writable => 'rational' }, #7
     ImageNumber     => { }, #7
-    LensInfo        => { }, #7
+    LensInfo        => { Notes => '4 rational values giving focal and aperture ranges' }, #7
     Lens            => { },
     OwnerName       => { }, #7
     SerialNumber    => { },
@@ -2342,12 +2357,8 @@ sub FoundXMP($$$$;$)
         my $langInfo = GetLangInfo($tagInfo, $lang);
         $tagInfo = $langInfo if $langInfo;
     }
-    # un-escape XML character entities
-    $val = UnescapeXML($val);
-    # convert from UTF-8 to specified character set if necessary
-    if ($exifTool->{OPTIONS}{Charset} ne 'UTF8' and $val =~ /[\x80-\xff]/) {
-        $val = $exifTool->UTF82Charset($val);
-    }
+    # un-escape XML character entities and decode from UTF8
+    $val = $exifTool->Decode(UnescapeXML($val), 'UTF8');
     # convert rational and date values to a more sensible format
     my $fmt = $$tagInfo{Writable};
     my $new = $$tagInfo{WasAdded};
@@ -2667,6 +2678,16 @@ sub ProcessXMP($$;$)
     my $bom = 0;
     undef %curNS;
 
+    # ignore non-standard XMP while in strict MWG compatibility mode
+    if ($Image::ExifTool::MWG::strict and not $$exifTool{XMP_CAPTURE} and
+        $$exifTool{FILE_TYPE} =~ /^(JPEG|TIFF|PSD)$/)
+    {
+        my $path = join('-', @{$$exifTool{PATH}});
+        unless ($path =~ /^(JPEG-APP1-XMP|TIFF-IFD0-XMP|PSD-XMP)$/) {
+            $exifTool->Warn("Ignored non-standard XMP at $path");
+            return 1;
+        }
+    }
     if ($dataPt) {
         $dirStart = $$dirInfo{DirStart} || 0;
         $dirLen = $$dirInfo{DirLen} || (length($$dataPt) - $dirStart);
@@ -2763,7 +2784,9 @@ sub ProcessXMP($$;$)
             # assume that character data has been re-encoded in UTF, so re-pack
             # as characters and look for warnings indicating a false assumption
             if ($double eq "\xef\xbb\xbf") {
-                $tmp = Image::ExifTool::UTF82Unicode($buff, 'C');
+                require Image::ExifTool::Charset;
+                my $uni = Image::ExifTool::Charset::Decompose(undef,$buff,'UTF8');
+                $tmp = pack('C*', @$uni);
             } else {
                 my $fmt = ($double eq "\xfe\xff") ? 'n' : 'v';
                 $tmp = pack('C*', unpack("$fmt*",$buff));
@@ -2847,14 +2870,20 @@ sub ProcessXMP($$;$)
         defined $fmt or $exifTool->Warn('XMP character encoding error');
     }
     if ($fmt) {
-        # translate into UTF-8
+        # trim if necessary to avoid converting non-UTF data
+        if ($dirStart or $dirLen != length($$dataPt) - $dirStart) {
+            $buff = substr($$dataPt, $dirStart, $dirLen);
+            $dataPt = \$buff;
+        }
+        # convert into UTF-8
         if ($] >= 5.006001) {
-            $buff = pack('C0U*', unpack("x$dirStart$fmt*",$$dataPt));
+            $buff = pack('C0U*', unpack("$fmt*",$$dataPt));
         } else {
-            $buff = Image::ExifTool::PackUTF8(unpack("x$dirStart$fmt*",$$dataPt));
+            $buff = Image::ExifTool::PackUTF8(unpack("$fmt*",$$dataPt));
         }
         $dataPt = \$buff;
         $dirStart = 0;
+        $dirLen = length $$dataPt;
     }
     # initialize namespace translation
     $xlatNamespace = \%stdXlatNS;
@@ -2903,7 +2932,7 @@ information.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -2912,7 +2941,7 @@ under the same terms as Perl itself.
 
 =over 4
 
-=item L<http://www.adobe.com/products/xmp/pdfs/xmpspec.pdf>
+=item L<http://www.adobe.com/devnet/xmp/>
 
 =item L<http://www.w3.org/TR/rdf-syntax-grammar/>
 

@@ -19,6 +19,16 @@ exist beforehand or its value agreed with the original IPTC digest
 is written only if the original file contained IPTC.  For more information
 about the MWG recommendation, see <a href="http://www.metadataworkinggroup.org/">http://www.metadataworkinggroup.org/</a>.</p>
 
+<p>Loading the MWG module activates &quot;strict MWG conformance mode&quot;, which has
+the effect of causing EXIF, IPTC and XMP in non-standard locations to be
+ignored when reading, as per the MWG recommendations.  Instead, a &quot;Warning&quot;
+tag is generated when non-standard metadata is encountered.  This feature
+may be disabled by setting <code>$Image::ExifTool::MWG::strict = 0</code> in the
+ExifTool config file (or from your Perl script when using the API).  Note
+that the behaviour when writing is not changed:  ExifTool always creates new
+records only in the standard location, but writes new tags to any
+EXIF/IPTC/XMP records that exist.</p>
+
 <p>A problem with the MWG specification is that although XMP:Creator and
 IPTC:By-line are list-type tags, the corresponding EXIF tag, EXIF:Artist, is
 not.  So, short of changing the EXIF specification to allow EXIF:Artist to
@@ -33,12 +43,6 @@ string.  Multiple names may of course be written within the string (and it
 would be reasonable to separate them with semicolons as suggested by the MWG
 and EXIF specifications), but this tag is not treated as a list by ExifTool
 when writing.</p>
-
-<p>Another potential stumbling block for MWG compatibility is the fact that
-ExifTool will quite happily read and write (but not create) EXIF, IPTC and
-XMP which has been stored in non-standard locations while the MWG
-recommendation states that this metadata should be ignored.  This may lead
-to non-compliant behaviour for these types of files.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -111,7 +115,7 @@ to non-compliant behaviour for these types of files.</p>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>Keywords</td>
-<td class=c>Y+</td>
+<td class=c title='+ = List'>Y+</td>
 <td class=n>IPTC:Keywords
   <br>XMP-dc:Subject
   <br>CurrentIPTCDigest
@@ -163,7 +167,7 @@ to non-compliant behaviour for these types of files.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 28, 2009</i>
+<br><i>Last revised Jan 13, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

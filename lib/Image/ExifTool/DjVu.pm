@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ParseAnt($);
 sub ProcessAnt($$$);
@@ -174,13 +174,13 @@ sub ProcessBZZ($$$);
         Name => 'CreateDate',
         Groups => { 2 => 'Time' },
         # RFC 3339 date/time format
-        ValueConv => 'use Image::ExifTool::XMP; Image::ExifTool::XMP::ConvertXMPDate($val)',
+        ValueConv => 'require Image::ExifTool::XMP; Image::ExifTool::XMP::ConvertXMPDate($val)',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     ModDate => {
         Name => 'ModifyDate',
         Groups => { 2 => 'Time' },
-        ValueConv => 'use Image::ExifTool::XMP; Image::ExifTool::XMP::ConvertXMPDate($val)',
+        ValueConv => 'require Image::ExifTool::XMP; Image::ExifTool::XMP::ConvertXMPDate($val)',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     Trapped => {
@@ -349,7 +349,7 @@ Image::ExifTool::AIFF.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

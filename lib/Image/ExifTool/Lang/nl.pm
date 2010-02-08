@@ -10,7 +10,7 @@ package Image::ExifTool::Lang::nl;
 
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 %Image::ExifTool::Lang::nl::Translate = (
    'AEBAutoCancel' => {
@@ -29,7 +29,7 @@ $VERSION = '1.03';
    'AELockButton' => {
       Description => 'AE-L/AF-L',
       PrintConv => {
-        'AE Lock Hold' => 'AE-vergrendeling vast',
+        'AE Lock (hold)' => 'AE-vergrendeling vast',
         'AE Lock Only' => 'AE-vergrendeling',
         'AE-L/AF Area' => 'AE-L/AF veld',
         'AE-L/AF-L/AF Area' => 'AE-L/AF-L/AF veld',
@@ -1041,6 +1041,14 @@ $VERSION = '1.03';
    'ExpandSoftware' => 'Breid software uit',
    'ExpirationDate' => 'Verloopdatum',
    'ExpirationTime' => 'Verlooptijdstip',
+   'ExposureCompStepSize' => {
+      Description => 'Stapgrootte belichtingscorr.',
+      PrintConv => {
+        '1 EV' => '1 stop',
+        '1/2 EV' => '1/2 stop',
+        '1/3 EV' => '1/3 stop',
+      },
+    },
    'ExposureCompensation' => 'Belichtingscorrectie',
    'ExposureControlStepSize' => {
       Description => 'Stapgrootte inst. belichting',
@@ -1199,14 +1207,6 @@ $VERSION = '1.03';
    'FineTuneOptCenterWeighted' => 'Fijnafst. voor opt. belichting Centrumgericht',
    'FineTuneOptMatrixMetering' => 'Fijnafst. voor opt. belichting Matrixmeting',
    'FineTuneOptSpotMetering' => 'Fijnafst. voor opt. belichting Spotmeting',
-   'FineTuneStepSize' => {
-      Description => 'Stapgrootte belichtingscorr.',
-      PrintConv => {
-        '1 EV' => '1 stop',
-        '1/2 EV' => '1/2 stop',
-        '1/3 EV' => '1/3 stop',
-      },
-    },
    'FixtureIdentifier' => 'Kenmerk',
    'Flash' => {
       Description => 'Flits',
@@ -1640,6 +1640,7 @@ $VERSION = '1.03';
     },
    'IPTC-NAA' => 'IPTC-NAA metadata',
    'ISO' => 'ISO gevoeligheid',
+   'ISODisplay' => 'ISO-weergave',
    'ISOExpansion' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -3089,7 +3090,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

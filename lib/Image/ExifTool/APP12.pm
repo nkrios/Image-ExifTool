@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub ProcessAPP12($$$);
 sub ProcessDucky($$$);
@@ -113,8 +113,8 @@ sub WriteDucky($$$);
         Priority => 0,
         Avoid => 1,
         # (ignore 4-byte character count at start of value)
-        ValueConv => '$self->Unicode2Charset(substr($val,4),"MM")',
-        ValueConvInv => 'pack("N",length $val) . $self->Charset2Unicode($val,"MM")',
+        ValueConv => '$self->Decode(substr($val,4),"UCS2","MM")',
+        ValueConvInv => 'pack("N",length $val) . $self->Encode($val,"UCS2","MM")',
     },
     3 => { #PH
         Name => 'Copyright',
@@ -122,8 +122,8 @@ sub WriteDucky($$$);
         Avoid => 1,
         Groups => { 2 => 'Author' },
         # (ignore 4-byte character count at start of value)
-        ValueConv => '$self->Unicode2Charset(substr($val,4),"MM")',
-        ValueConvInv => 'pack("N",length $val) . $self->Charset2Unicode($val,"MM")',
+        ValueConv => '$self->Decode(substr($val,4),"UCS2","MM")',
+        ValueConvInv => 'pack("N",length $val) . $self->Encode($val,"UCS2","MM")',
     },
 );
 
@@ -306,7 +306,7 @@ APP12 meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

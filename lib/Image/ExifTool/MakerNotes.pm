@@ -16,7 +16,7 @@ use Image::ExifTool::Exif;
 sub ProcessUnknown($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.51';
+$VERSION = '1.53';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -419,8 +419,8 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteLeica',
-        # (starts with "LEICA\0")
-        Condition => '$$self{Make} =~ /^LEICA/',
+        # (starts with "LEICA\0\0\0")
+        Condition => '$$self{Make} eq "LEICA"',
         SubDirectory => {
             # many Leica models use the same format as Panasonic
             TagTable => 'Image::ExifTool::Panasonic::Main',
@@ -430,7 +430,7 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteLeica2', # used by the M8
-        # (starts with "LEICA\0")
+        # (starts with "LEICA\0\0\0")
         Condition => '$$self{Make} =~ /^Leica Camera AG/ and $$valPt =~ /^LEICA\0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Leica2',
@@ -461,6 +461,17 @@ my $debug;          # set to 1 to enabled debugging code
             TagTable => 'Image::ExifTool::Panasonic::Leica4',
             Start => '$valuePtr + 8',
             Base => '$start - 8', # (yay! Leica fixed the M8 problem)
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteLeica5', # used by the X1
+        # (X1 starts with "LEICA\0\x01\0", Make is "LEICA CAMERA AG")
+        Condition => '$$valPt =~ /^LEICA\0\x01\0/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::Leica5',
+            Start => '$valuePtr + 8',
+            Base => '$start - 8',
             ByteOrder => 'Unknown',
         },
     },
@@ -669,7 +680,8 @@ my $debug;          # set to 1 to enabled debugging code
             TagTable => 'Image::ExifTool::Unknown::Main',
             ProcessProc => \&ProcessUnknown,
             ByteOrder => 'Unknown',
-        },
+            FixBase => 2,
+       },
     },
 );
 
@@ -758,14 +770,15 @@ sub GetMakerNoteOffset($)
 
 #------------------------------------------------------------------------------
 # Get hash of value offsets / block sizes
-# Inputs: 0) Data pointer, 1) offset to start of directory
+# Inputs: 0) Data pointer, 1) offset to start of directory,
+#         2) hash ref to return value pointers based in tag ID
 # Returns: 0) hash reference: keys are offsets, values are block sizes
 #          1) same thing, but with keys adjusted for value-based offsets
 # Notes: Directory size should be validated before calling this routine
 # - calculates MIN and MAX offsets in entry-based hash
-sub GetValueBlocks($$)
+sub GetValueBlocks($$;$)
 {
-    my ($dataPt, $dirStart) = @_;
+    my ($dataPt, $dirStart, $tagPtr) = @_;
     my $numEntries = Get16u($dataPt, $dirStart);
     my ($index, $valPtr, %valBlock, %valBlkAdj, $end);
     for ($index=0; $index<$numEntries; ++$index) {
@@ -776,6 +789,7 @@ sub GetValueBlocks($$)
         my $size = $count * $Image::ExifTool::Exif::formatSize[$format];
         next if $size <= 4;
         $valPtr = Get32u($dataPt, $entry+8);
+        $tagPtr and $$tagPtr{Get16u($dataPt, $entry)} = $valPtr;
         # save location and size of longest block at this offset
         unless (defined $valBlock{$valPtr} and $valBlock{$valPtr} > $size) {
             $valBlock{$valPtr} = $size;
@@ -817,10 +831,10 @@ sub FixBase($$)
     my $dirName = $$dirInfo{DirName};
     my $fixBase = $exifTool->Options('FixBase');
     my $setBase = (defined $fixBase and $fixBase ne '') ? 1 : 0;
-    my ($fix, $fixedBy);
+    my ($fix, $fixedBy, %tagPtr);
 
     # get hash of value block positions
-    my ($valBlock, $valBlkAdj) = GetValueBlocks($dataPt, $dirStart);
+    my ($valBlock, $valBlkAdj) = GetValueBlocks($dataPt, $dirStart, \%tagPtr);
     return 0 unless %$valBlock;
     # get sorted list of value offsets
     my @valPtrs = sort { $a <=> $b } keys %$valBlock;
@@ -870,7 +884,7 @@ sub FixBase($$)
     }
 #
 # analyze value offsets to see if they need fixing.  The first task is to determine
-# the minimum valid offset used (this is tricky, because we have  to weed out bad
+# the minimum valid offset used (this is tricky, because we have to weed out bad
 # offsets written by some cameras)
 #
     my $minPt = $$dirInfo{MinOffset} = $valPtrs[0]; # if life were simple, this would be it
@@ -929,6 +943,16 @@ sub FixBase($$)
             $exifTool->Warn("$dirName offsets do NOT look entry-based",1);
             undef $entryBased;
             undef $relative;
+        }
+        # use PrintIM tag to do special check for correct absolute offsets
+        if ($tagPtr{0xe00}) {
+            my $ptr = $tagPtr{0xe00} - $dataPos;
+            return 0 if $ptr > 0 and $ptr <= length($$dataPt) - 8 and
+                        substr($$dataPt, $ptr, 8) eq "PrintIM\0";
+        }
+        # allow a range of reasonable differences for Unknown maker notes
+        if ($$dirInfo{FixBase} and $$dirInfo{FixBase} == 2) {
+            return 0 if $diff >=0 and $diff <= 24;
         }
         # (used for testing to extract differences)
         # $exifTool->FoundTag('Diff', $diff);
@@ -1234,7 +1258,7 @@ maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

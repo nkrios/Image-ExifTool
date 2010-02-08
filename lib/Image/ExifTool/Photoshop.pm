@@ -18,6 +18,7 @@
 #               3) Matt Mueller private communication (tests with PS CS2)
 #               4) http://www.fileformat.info/format/psd/egff.htm
 #               5) http://www.telegraphics.com.au/svn/psdparse/trunk/resources.c
+#               6) http://libpsd.graphest.com/files/Photoshop%20File%20Formats.pdf
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Photoshop;
@@ -26,7 +27,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD $iptcDigestInfo);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.38';
+$VERSION = '1.39';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -450,9 +451,9 @@ sub ProcessPSD($$)
     my ($data, $err, $tagTablePtr);
 
     $raf->Read($data, 30) == 30 or return 0;
-    $data =~ /^8BPS\0\x01/ or return 0;
+    $data =~ /^8BPS\0([\x01\x02])/ or return 0;
     SetByteOrder('MM');
-    $exifTool->SetFileType();    # set the FileType tag
+    $exifTool->SetFileType($1 eq "\x01" ? 'PSD' : 'PSB'); # set the FileType tag
     my %dirInfo = (
         DataPt => \$data,
         DirStart => 0,
@@ -564,7 +565,7 @@ be preserved when copying Photoshop information via user-defined tags.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -578,6 +579,8 @@ under the same terms as Perl itself.
 =item L<http://www.ozhiker.com/electronics/pjmt/jpeg_info/irb_jpeg_qual.html>
 
 =item L<http://www.fileformat.info/format/psd/egff.htm>
+
+=item L<http://libpsd.graphest.com/files/Photoshop%20File%20Formats.pdf>
 
 =back
 

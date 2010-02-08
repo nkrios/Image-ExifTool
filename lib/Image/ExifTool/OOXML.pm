@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::XMP;
 use Image::ExifTool::ZIP;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 # test for recognized OOXML document extensions
 my %isOOXML = (
@@ -223,10 +223,8 @@ sub FoundTag($$$$;$)
 
     # un-escape XML character entities
     $val = Image::ExifTool::XMP::UnescapeXML($val);
-    # convert to specified character set if necessary
-    if ($exifTool->{OPTIONS}{Charset} ne 'UTF8' and $val =~ /[\x80-\xff]/) {
-        $val = $exifTool->UTF82Charset($val);
-    }
+    # convert from UTF8 to ExifTool Charset
+    $val = $exifTool->Decode($val, 'UTF8');
     # queue this attribute for later if necessary
     if ($queueAttrs{$tag}) {
         $queuedAttrs{$tag} = $val;
@@ -399,7 +397,7 @@ archives of XML files.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

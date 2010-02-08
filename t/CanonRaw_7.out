@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: CanonRaw_7_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 12 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:10 16:09:42-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:39-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -206,7 +207,7 @@
 [MakerNotes, Canon, Camera] 131 - Camera Color Calibration 15:  949  307  397 (2413K)
 [MakerNotes, Canon, Camera] 16386 - Unknown Block 1: (Binary data 5352 bytes)
 [MakerNotes, Canon, Camera] 2 - Color Tone: Normal
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.00
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.02
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: unknown
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0123456789

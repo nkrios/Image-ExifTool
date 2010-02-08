@@ -13,7 +13,7 @@ use vars qw($VERSION);
 use Image::ExifTool;    # only for FinishTiffDump()
 use Image::ExifTool::HTML qw(EscapeHTML);
 
-$VERSION = '1.27';
+$VERSION = '1.29';
 
 sub DumpTable($$$;$$$$$);
 sub Open($$$;@);
@@ -645,7 +645,7 @@ sub DumpTable($$$;$$$$$)
                 my $n = ($len - $p + $pos - $lim) & ~0x0f;
                 if ($n > 16) { # (no use just cutting out one line)
                     $self->Open('bkg', '', 1, 2); # no underline
-                    my $note = "[snip $n bytes]";
+                    my $note = sprintf "[snip %d lines]", $n / 16;
                     $note = (' ' x (24-length($note)/2)) . $note;
                     $c[0] .= "  ...\n";
                     $c[1] .= $note . (' ' x (48-length($note))) . "\n";
@@ -701,6 +701,7 @@ sub FinishTiffDump($$$)
         ImageOffset       => 'ImageByteCount',
         AlphaOffset       => 'AlphaByteCount',
         MPImageStart      => 'MPImageLength',
+        IDCPreviewStart   => 'IDCPreviewLength',
     );
 
     # add TIFF data to html dump
@@ -733,8 +734,9 @@ sub FinishTiffDump($$$)
             my $name = Image::ExifTool::GetTagName($key);
             my $grp1 = $exifTool->GetGroup($key, 1);
             my $info2 = $exifTool->GetInfo($offsetPair{$tag}, { Group1 => $grp1 });
-            next unless %$info2;
-            my ($key2) = keys %$info2;
+            my $key2 = $offsetPair{$tag};
+            $key2 .= $1 if $key =~ /( .*)/; # use same instance number as $tag
+            next unless $$info2{$key2};
             my $offsets = $$info{$key};
             my $byteCounts = $$info2{$key2};
             # ignore primary MPImage (this is the whole JPEG)
@@ -832,7 +834,7 @@ This module contains code used to generate an HTML-based hex dump of
 information for debugging purposes.  This is code is called when the
 ExifTool 'HtmlDump' option is used.
 
-Currently, only EXIF and TIFF information is dumped.
+Currently, only EXIF/TIFF and JPEG information is dumped.
 
 =head1 BUGS
 
@@ -841,12 +843,11 @@ may run extremely slowly when processing large files with this version of
 Perl.
 
 An HTML 4 compliant browser is needed to properly display the generated HTML
-page, but note that some of these browsers (like Mozilla) may not properly
-display linefeeds in the tool tips.
+page.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

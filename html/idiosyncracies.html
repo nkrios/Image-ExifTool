@@ -12,12 +12,12 @@
 seem to be when it comes to writing what should be a fairly simple file
 format.</p>
 
-<p>One positive thing is that most manufacturers seem to have adopted the use of
-an EXIF-like IFD (Image File Directory) structure for their maker notes.  But
-many problems arise because of a fundamental design flaw in the EXIF/TIFF
-format.  Values longer than 4 bytes are stored at a location referenced by an
-offset from an absolute position in the file (where offset 0 is the start of the
-EXIF/TIFF information).</p>
+<p>One positive thing is that most manufacturers seem to have standardized on an
+EXIF-like IFD (Image File Directory) structure for their maker notes.  But many
+problems arise because of a fundamental design flaw in the EXIF/TIFF format. 
+Values longer than 4 bytes are stored at a location referenced by an offset from
+an absolute position in the file (where offset 0 is the start of the EXIF/TIFF
+information).</p>
 
 <p>The difficulty is that these offsets must be recalculated when a file is
 rewritten, but in general this is not possible (particularly for the maker
@@ -166,13 +166,16 @@ StripOffsets and the StripByteCounts values in the wrong byte order.</p>
 <p><b>Sony ARW:</b> The maker notes of ARW images are not self-contained, so
 some information is lost when the images are rewritten by other software
 (including the Adobe DNG converter).  The A100 with firmware 1.00 sets the high
-word of the thumbnail image offset to zero, but it should sometimes be 0x0001. 
-(This problem is fixed for firmware 1.02, but it is not known if it exists in
-version 1.01.) Also with the A100, the JpgFromRawLength stored in IFD0 is wrong
-(although this value is also stored in the MakerNotes and is correct here).  As
-well, much information in these images is encrypted, which complicates things
-somewhat. Even the Sony IDC utility can't properly rewrite ARW files -- it
-corrupts the embedded MRW record when used to edit ARW images.</p>
+word of the thumbnail image offset to zero, but it should sometimes be 0x0001.
+(This problem is fixed for firmware 1.01.)  Also with the A100, the
+JpgFromRawLength stored in IFD0 may be wrong (although this value is also stored
+in the MakerNotes and is correct here).  As well, much information in these
+images is encrypted, which complicates things somewhat.  Even the Sony IDC
+utility can't properly rewrite ARW files -- it corrupts the embedded MRW record
+when used to edit ARW images.  Even funnier:  IDC v3.0 will crash when loading
+some original A100 firmware 1.00 images, but no longer crashes if the images are
+first edited with ExifTool (probably because ExifTool fixes the above mentioned
+problems when it rewrites the image).</p>
 
 <p><b>Leica DNG:</b> The makernote offsets for the M8 are relative to the start
 of the makernote IFD in JPEG images, but relative to the start of the makernote
@@ -180,9 +183,18 @@ header (8 bytes earlier) in DNG images.  <i>[2009-09-09: This is fixed for the
 M9 which has offsets relative to the start of the makernote header for both JPEG
 and DNG.]</i></p>
 
+<p><b>Nikon NEF:</b> Aside from the encryption that Nikon uses to try to hide
+some information in their maker notes, the NEF files in general seem fairly well
+behaved.  Even so, the Nikon Transfer utility (version 1.3) still manages to
+corrupt some information in the 0th SubIFD when it is used to process NEF
+images.  (Beware that other Nikon utilities may have this same problem if they
+use the same NEF writing routines.)  But luckly  the lost information isn't very
+important.  (Only a few tags from the embedded full-sized preview image are lost:
+XResolution, YResolution and YCbCrPositioning.)</p>
+
 <hr>
 <i>Created Mar. 25, 2005</i>
-<br><i>Last revised Nov. 17, 2009</i>
+<br><i>Last revised Jan. 10, 2010</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

@@ -15,7 +15,11 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.00';
+$VERSION = '1.02';
+
+# enable MWG strict mode by default
+# (causes non-standard EXIF, IPTC and XMP to be ignored)
+$Image::ExifTool::MWG::strict = 1 unless defined $Image::ExifTool::MWG::strict;
 
 sub RecoverTruncatedIPTC($$$);
 
@@ -36,6 +40,16 @@ sub RecoverTruncatedIPTC($$$);
         is written only if the original file contained IPTC.  For more information
         about the MWG recommendation, see L<http://www.metadataworkinggroup.org/>.
 
+        Loading the MWG module activates "strict MWG conformance mode", which has
+        the effect of causing EXIF, IPTC and XMP in non-standard locations to be
+        ignored when reading, as per the MWG recommendations.  Instead, a "Warning"
+        tag is generated when non-standard metadata is encountered.  This feature
+        may be disabled by setting C<$Image::ExifTool::MWG::strict = 0> in the
+        ExifTool config file (or from your Perl script when using the API).  Note
+        that the behaviour when writing is not changed:  ExifTool always creates new
+        records only in the standard location, but writes new tags to any
+        EXIF/IPTC/XMP records that exist.
+
         A problem with the MWG specification is that although XMP:Creator and
         IPTC:By-line are list-type tags, the corresponding EXIF tag, EXIF:Artist, is
         not.  So, short of changing the EXIF specification to allow EXIF:Artist to
@@ -50,12 +64,6 @@ sub RecoverTruncatedIPTC($$$);
         would be reasonable to separate them with semicolons as suggested by the MWG
         and EXIF specifications), but this tag is not treated as a list by ExifTool
         when writing.
-
-        Another potential stumbling block for MWG compatibility is the fact that
-        ExifTool will quite happily read and write (but not create) EXIF, IPTC and
-        XMP which has been stored in non-standard locations while the MWG
-        recommendation states that this metadata should be ignored.  This may lead
-        to non-compliant behaviour for these types of files.
     },
     Keywords => {
         Flags  => ['Writable','List'],
@@ -416,17 +424,31 @@ Image::ExifTool::MWG - Metadata Working Group support
 
 =head1 SYNOPSIS
 
-The special composite MWG compatibility tags are enabled simply by loading
-this module.
+    # enable MWG tags (strict mode enabled by default)
+    use Image::ExifTool::MWG;
+
+    # disable MWG strict mode
+    $Image::ExifTool::MWG::strict = 0;
 
 =head1 DESCRIPTION
 
-This module contains tag definitions which are designed to simplify
-implementation of the Metadata Working Group guidelines.
+The MWG module contains tag definitions which are designed to simplify
+implementation of the Metadata Working Group guidelines.  These special MWG
+composite tags are enabled simply by loading this module:
+
+    use Image::ExifTool::MWG;
+
+When the MWG module is loaded, "strict MWG conformance" is enabled by
+default.  In this mode, ExifTool will generate a Warning tag instead of
+extracting EXIF, IPTC and XMP from non-standard locations.  The strict mode
+may be disabled by setting the MWG "strict" flag to zero (either before or
+after loading the MWG module):
+
+    $Image::ExifTool::MWG::strict = 0;
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

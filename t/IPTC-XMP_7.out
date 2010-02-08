@@ -1,11 +1,12 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.93
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: IPTC-XMP_7_failed.xmp
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 5.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:09:01 11:27:50-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:45-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: XMP
 [File, File, Image] MIMEType - MIME Type: application/rdf+xml
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.93
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.02
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: UTF-16 (big-endian) encoded XMP
 [XMP, XMP-dc, Author] rights - Rights: Copyright 2004 Phil Harvey

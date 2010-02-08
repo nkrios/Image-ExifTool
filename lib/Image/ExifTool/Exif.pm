@@ -28,17 +28,19 @@
 #              16) http://www.cybercom.net/~dcoffin/dcraw/
 #              17) http://www.digitalpreservation.gov/formats/content/tiff_tags.shtml
 #              18) http://www.asmail.be/msg0055568584.html
+#              19) http://libpsd.graphest.com/files/Photoshop%20File%20Formats.pdf
+#              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Exif;
 
 use strict;
 use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
-            %lightSource %compression %photometricInterpretation %orientation);
+            %lightSource %flash %compression %photometricInterpretation %orientation);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '2.96';
+$VERSION = '3.02';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -123,6 +125,37 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
     23 => 'D50',
     24 => 'ISO Studio Tungsten',
     255 => 'Other',
+);
+
+# EXIF Flash values
+%flash = (
+    0x00 => 'No Flash',
+    0x01 => 'Fired',
+    0x05 => 'Fired, Return not detected',
+    0x07 => 'Fired, Return detected',
+    0x08 => 'On, Did not fire', # not charged up?
+    0x09 => 'On, Fired',
+    0x0d => 'On, Return not detected',
+    0x0f => 'On, Return detected',
+    0x10 => 'Off, Did not fire',
+    0x14 => 'Off, Did not fire, Return not detected',
+    0x18 => 'Auto, Did not fire',
+    0x19 => 'Auto, Fired',
+    0x1d => 'Auto, Fired, Return not detected',
+    0x1f => 'Auto, Fired, Return detected',
+    0x20 => 'No flash function',
+    0x30 => 'Off, No flash function',
+    0x41 => 'Fired, Red-eye reduction',
+    0x45 => 'Fired, Red-eye reduction, Return not detected',
+    0x47 => 'Fired, Red-eye reduction, Return detected',
+    0x49 => 'On, Red-eye reduction',
+    0x4d => 'On, Red-eye reduction, Return not detected',
+    0x4f => 'On, Red-eye reduction, Return detected',
+    0x50 => 'Off, Red-eye reduction',
+    0x58 => 'Auto, Did not fire, Red-eye reduction',
+    0x59 => 'Auto, Fired, Red-eye reduction',
+    0x5d => 'Auto, Fired, Red-eye reduction, Return not detected',
+    0x5f => 'Auto, Fired, Red-eye reduction, Return detected',
 );
 
 %compression = (
@@ -244,7 +277,8 @@ my %sampleFormat = (
     0xfe => {
         Name => 'SubfileType',
         # set priority directory if this is the full resolution image
-        RawConv => '$self->SetPriorityDir() if $val eq "0"; $val',
+        DataMember => 'SubfileType',
+        RawConv => '$self->SetPriorityDir() if $val eq "0"; $$self{SubfileType} = $val',
         PrintConv => {
             0 => 'Full-resolution Image',
             1 => 'Reduced-resolution image',
@@ -288,6 +322,9 @@ my %sampleFormat = (
     },
     0x103 => {
         Name => 'Compression',
+        DataMember => 'Compression',
+        SeparateTable => 'Compression',
+        RawConv => '$$self{Compression} = $val',
         PrintConv => \%compression,
         Priority => 0,
     },
@@ -597,7 +634,18 @@ my %sampleFormat = (
     0x14a => [
         {
             Name => 'SubIFD',
-            Condition => '$$self{TIFF_TYPE} ne "ARW" or $$self{Model} !~ /^DSLR-A100\b/',
+            # use this opportunity to identify an ARW image, and if so we
+            # must decide if this is a SubIFD or the A100 raw data
+            # (use SubfileType, Compression and FILE_TYPE to identify ARW/SR2,
+            # then call SetARW to finish the job)
+            Condition => q{
+                $$self{DIR_NAME} ne 'IFD0' or $$self{FILE_TYPE} ne 'TIFF' or
+                $$self{Make} !~ /^SONY/ or
+                not $$self{SubfileType} or $$self{SubfileType} != 1 or
+                not $$self{Compression} or $$self{Compression} != 6 or
+                not require Image::ExifTool::Sony or
+                Image::ExifTool::Sony::SetARW($self, $valPt)
+            },
             Groups => { 1 => 'SubIFD' },
             Flags => 'SubIFD',
             SubDirectory => {
@@ -606,8 +654,10 @@ my %sampleFormat = (
             },
         },
         { #16
-            Name => 'DataOffset',
-            Notes => 'the data offset in Sony DSLR-A100 ARW images',
+            Name => 'A100DataOffset',
+            Notes => 'the data offset in original Sony DSLR-A100 ARW images',
+            DataMember => 'A100DataOffset',
+            RawConv => '$$self{A100DataOffset} = $val',
             IsOffset => 1,
         },
     ],
@@ -691,6 +741,10 @@ my %sampleFormat = (
     0x195 => 'ModeNumber', #3
     0x1b1 => 'Decode', #3
     0x1b2 => 'DefaultImageColor', #3
+    0x1b5 => { #19
+        Name => 'JPEGTables',
+        Binary => 1,
+    },
     0x200 => {
         Name => 'JPEGProc',
         PrintConv => {
@@ -703,8 +757,8 @@ my %sampleFormat = (
             Name => 'ThumbnailOffset',
             Notes => q{
                 ThumbnailOffset in IFD1 of JPEG and some TIFF-based images, and IFD0 of MRW
-                images and AVI videos; PreviewImageStart in MakerNotes; JpgFromRawStart in
-                SubIFD of NEF images, IFD2 of PEF images, and IFD0 of SR2 and ARW images;
+                images and AVI videos; PreviewImageStart in MakerNotes and IFD0 of ARW and
+                SR2 images; JpgFromRawStart in SubIFD of NEF images and IFD2 of PEF images;
                 and OtherImageStart in everything else
             },
             # thumbnail is found in IFD1 of JPEG and TIFF images, and
@@ -747,6 +801,18 @@ my %sampleFormat = (
             Protected => 2,
         },
         {
+            Name => 'PreviewImageStart',
+            # PreviewImage in IFD0 of ARW and SR2 files for all models
+            Condition => '$$self{DIR_NAME} eq "IFD0" and $$self{TIFF_TYPE} =~ /^(ARW|SR2)$/',
+            IsOffset => 1,
+            OffsetPair => 0x202,
+            DataTag => 'PreviewImage',
+            Writable => 'int32u',
+            WriteGroup => 'IFD0',
+            WriteCondition => '$$self{TIFF_TYPE} =~ /^(ARW|SR2)$/',
+            Protected => 2,
+        },
+        {
             Name => 'JpgFromRawStart',
             Condition => '$$self{DIR_NAME} eq "SubIFD"',
             IsOffset => 1,
@@ -771,19 +837,6 @@ my %sampleFormat = (
             Protected => 2,
         },
         {
-            Name => 'JpgFromRawStart',
-            # JpgFromRaw in IFD0 of SR2 and ARW files for all models
-            # (well, actually a thumbnail size for the A100)
-            Condition => '$$self{DIR_NAME} eq "IFD0" and $$self{TIFF_TYPE} =~ /^(SR2|ARW)$/',
-            IsOffset => 1,
-            OffsetPair => 0x202,
-            DataTag => 'JpgFromRaw',
-            Writable => 'int32u', #(but SR2/ARW aren't yet writable)
-            WriteGroup => 'IFD0',
-            WriteCondition => '$$self{TIFF_TYPE} =~ /^(SR2|ARW)$/',
-            Protected => 2,
-        },
-        {
             Name => 'OtherImageStart',
             IsOffset => 1,
             OffsetPair => 0x202,
@@ -793,10 +846,10 @@ my %sampleFormat = (
         {
             Name => 'ThumbnailLength',
             Notes => q{
-                ThumbnailLength in IFD1 of JPEG and some TIFF-based images, and IFD0 of MRW
-                images and AVI videos; PreviewImageLength in MakerNotes; JpgFromRawLength in
-                SubIFD of NEF images, IFD2 of PEF images, and IFD0 of SR2 and ARW images;
-                and OtherImageLength in everything else
+                ThumbnailLength in IFD1 of JPEG and some TIFF-based images and IFD0 of MRW
+                images and AVI videos; PreviewImageLength in MakerNotes and IFD0 of ARW and
+                SR2 images; JpgFromRawLength in SubIFD of NEF images, and IFD2 of PEF
+                images; and OtherImageLength in everything else
             },
             Condition => q{
                 $$self{DIR_NAME} eq 'IFD1' or
@@ -831,6 +884,17 @@ my %sampleFormat = (
             Protected => 2,
         },
         {
+            Name => 'PreviewImageLength',
+            # PreviewImage in IFD0 of ARW and SR2 files for all models
+            Condition => '$$self{DIR_NAME} eq "IFD0" and $$self{TIFF_TYPE} =~ /^(ARW|SR2)$/',
+            OffsetPair => 0x201,
+            DataTag => 'PreviewImage',
+            Writable => 'int32u',
+            WriteGroup => 'IFD0',
+            WriteCondition => '$$self{TIFF_TYPE} =~ /^(ARW|SR2)$/',
+            Protected => 2,
+        },
+        {
             Name => 'JpgFromRawLength',
             Condition => '$$self{DIR_NAME} eq "SubIFD"',
             OffsetPair => 0x201,
@@ -848,18 +912,6 @@ my %sampleFormat = (
             Writable => 'int32u',
             WriteGroup => 'IFD2',
             WriteCondition => '$$self{TIFF_TYPE} eq "PEF"',
-            Protected => 2,
-        },
-        {
-            Name => 'JpgFromRawLength',
-            # JpgFromRaw in IFD0 of SR2 and ARW files for all models
-            # (well, actually a thumbnail size for the A100)
-            Condition => '$$self{DIR_NAME} eq "IFD0" and $$self{TIFF_TYPE} =~ /^(SR2|ARW)$/',
-            OffsetPair => 0x201,
-            DataTag => 'JpgFromRaw',
-            Writable => 'int32u',
-            WriteGroup => 'IFD0',
-            WriteCondition => '$$self{TIFF_TYPE} =~ /^(SR2|ARW)$/',
             Protected => 2,
         },
         {
@@ -894,6 +946,7 @@ my %sampleFormat = (
     },
     0x212 => {
         Name => 'YCbCrSubSampling',
+        PrintConvColumns => 2,
         PrintConv => \%Image::ExifTool::JPEG::yCbCrSubSampling,
         Priority => 0,
     },
@@ -1061,7 +1114,7 @@ my %sampleFormat = (
             TagTable => 'Image::ExifTool::Leaf::Main',
         },
     },
-    0x8649 => {
+    0x8649 => { #19
         Name => 'PhotoshopSettings',
         Format => 'binary',
         SubDirectory => {
@@ -1250,41 +1303,15 @@ my %sampleFormat = (
     0x9208 => {
         Name => 'LightSource',
         Groups => { 2 => 'Camera' },
+        SeparateTable => 'LightSource',
         PrintConv => \%lightSource,
     },
     0x9209 => {
         Name => 'Flash',
         Groups => { 2 => 'Camera' },
         Flags => 'PrintHex',
-        PrintConv => {
-            0x00 => 'No Flash',
-            0x01 => 'Fired',
-            0x05 => 'Fired, Return not detected',
-            0x07 => 'Fired, Return detected',
-            0x08 => 'On, Did not fire', # not charged up?
-            0x09 => 'On, Fired',
-            0x0d => 'On, Return not detected',
-            0x0f => 'On, Return detected',
-            0x10 => 'Off, Did not fire',
-            0x14 => 'Off, Did not fire, Return not detected',
-            0x18 => 'Auto, Did not fire',
-            0x19 => 'Auto, Fired',
-            0x1d => 'Auto, Fired, Return not detected',
-            0x1f => 'Auto, Fired, Return detected',
-            0x20 => 'No flash function',
-            0x30 => 'Off, No flash function',
-            0x41 => 'Fired, Red-eye reduction',
-            0x45 => 'Fired, Red-eye reduction, Return not detected',
-            0x47 => 'Fired, Red-eye reduction, Return detected',
-            0x49 => 'On, Red-eye reduction',
-            0x4d => 'On, Red-eye reduction, Return not detected',
-            0x4f => 'On, Red-eye reduction, Return detected',
-            0x50 => 'Off, Red-eye reduction',
-            0x58 => 'Auto, Did not fire, Red-eye reduction',
-            0x59 => 'Auto, Fired, Red-eye reduction',
-            0x5d => 'Auto, Fired, Red-eye reduction, Return not detected',
-            0x5f => 'Auto, Fired, Red-eye reduction, Return detected',
-        },
+        SeparateTable => 'Flash',
+        PrintConv => \%flash,
     },
     0x920a => {
         Name => 'FocalLength',
@@ -1367,39 +1394,49 @@ my %sampleFormat = (
         Groups => { 2 => 'Time' },
         ValueConv => '$val=~s/\s+$//; $val', # trim trailing blanks
     },
-    # from http://social.msdn.microsoft.com/Forums/en-US/os_standocs/thread/03086d55-294a-49d5-967a-5303d34c40f8/
-    # 0x932f Microsoft MDI document text?
-    # 0x9330 Microsoft MDI metadata dictionary?
-    # 0x9331 Microsoft MDI thumbnail?
-    0x935c => { #3
+    # The following 3 tags are found in MSOffice TIFF images
+    # References:
+    # http://social.msdn.microsoft.com/Forums/en-US/os_standocs/thread/03086d55-294a-49d5-967a-5303d34c40f8/
+    # http://blogs.msdn.com/openspecification/archive/2009/12/08/details-of-three-tiff-tag-extensions-that-microsoft-office-document-imaging-modi-software-may-write-into-the-tiff-files-it-generates.aspx
+    # http://www.microsoft.com/downloads/details.aspx?FamilyID=0dbc435d-3544-4f4b-9092-2f2643d64a39&displaylang=en#filelist
+    0x932f => 'MSDocumentText',
+    0x9330 => {
+        Name => 'MSPropertySetStorage',
+        Binary => 1,
+    },
+    0x9331 => {
+        Name => 'MSDocumentTextPosition',
+        Binary => 1, # (just in case -- don't know what format this is)
+    },
+    0x935c => { #3/19
         Name => 'ImageSourceData',
         Binary => 1,
     },
     0x9c9b => {
         Name => 'XPTitle',
         Format => 'undef',
-        ValueConv => '$self->Unicode2Charset($val,"II")',
+        ValueConv => '$self->Decode($val,"UCS2","II")',
     },
     0x9c9c => {
         Name => 'XPComment',
         Format => 'undef',
-        ValueConv => '$self->Unicode2Charset($val,"II")',
+        ValueConv => '$self->Decode($val,"UCS2","II")',
     },
     0x9c9d => {
         Name => 'XPAuthor',
         Groups => { 2 => 'Author' },
         Format => 'undef',
-        ValueConv => '$self->Unicode2Charset($val,"II")',
+        ValueConv => '$self->Decode($val,"UCS2","II")',
     },
     0x9c9e => {
         Name => 'XPKeywords',
         Format => 'undef',
-        ValueConv => '$self->Unicode2Charset($val,"II")',
+        ValueConv => '$self->Decode($val,"UCS2","II")',
     },
     0x9c9f => {
         Name => 'XPSubject',
         Format => 'undef',
-        ValueConv => '$self->Unicode2Charset($val,"II")',
+        ValueConv => '$self->Decode($val,"UCS2","II")',
     },
     0xa000 => {
         Name => 'FlashpixVersion',
@@ -1763,7 +1800,7 @@ my %sampleFormat = (
     0xc428 => 'OceApplicationSelector', #3
     0xc429 => 'OceIDNumber', #3
     0xc42a => 'OceImageLogic', #3
-    0xc44f => { Name => 'Annotations', Binary => 1 }, #7
+    0xc44f => { Name => 'Annotations', Binary => 1 }, #7/19
     0xc4a5 => {
         Name => 'PrintIM', # (writable directory!)
         # must set Writable here so this tag will be saved with MakerNotes option
@@ -1851,11 +1888,15 @@ my %sampleFormat = (
     0xc633 => 'ShadowScale',
     0xc634 => [
         {
-            Condition => '$$self{TIFF_TYPE} =~ /^(SR2|ARW)$/',
+            Condition => '$$self{TIFF_TYPE} =~ /^(ARW|SR2)$/',
             Name => 'SR2Private',
             Groups => { 1 => 'SR2' },
             Flags => 'SubIFD',
             Format => 'int32u',
+            # some utilites have problems unless this is int8u format:
+            # - Adobe Camera Raw 5.3 gives an error
+            # - Apple Preview 10.5.8 gets the wrong white balance
+            FixFormat => 'int8u', # (stupid Sony)
             SubDirectory => {
                 DirName => 'SR2Private',
                 TagTable => 'Image::ExifTool::Sony::SR2Private',
@@ -1909,10 +1950,12 @@ my %sampleFormat = (
     },
     0xc65a => {
         Name => 'CalibrationIlluminant1',
+        SeparateTable => 'LightSource',
         PrintConv => \%lightSource,
     },
     0xc65b => {
         Name => 'CalibrationIlluminant2',
+        SeparateTable => 'LightSource',
         PrintConv => \%lightSource,
     },
     0xc65c => 'BestQualityScale',
@@ -1969,7 +2012,7 @@ my %sampleFormat = (
         # panasonic always records this tag (64 zero bytes),
         # so ignore it unless it contains valid information
         RawConv => 'length($val) ? $val : undef',
-        ValueConv => '$self->UTF82Charset($val)',
+        ValueConv => '$self->Decode($val, "UTF8")',
     },
     0xc6d3 => { #PH (Panasonic DMC-FS7)
         Name => 'PanasonicTitle2',
@@ -1978,7 +2021,7 @@ my %sampleFormat = (
         # panasonic always records this tag (128 zero bytes),
         # so ignore it unless it contains valid information
         RawConv => 'length($val) ? $val : undef',
-        ValueConv => '$self->UTF82Charset($val)',
+        ValueConv => '$self->Decode($val, "UTF8")',
     },
     0xc6f3 => 'CameraCalibrationSig',
     0xc6f4 => 'ProfileCalibrationSig',
@@ -2318,9 +2361,9 @@ my %sampleFormat = (
             return $str;
         },
     },
-    # generate DateTimeOriginal from Date and Time Created if not set already
+    # generate DateTimeOriginal from Date and Time Created if not extracted already
     DateTimeOriginal => {
-        Condition => 'not defined($oldVal)',
+        Condition => 'not defined $$self{VALUE}{DateTimeOriginal}',
         Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
         Desire => {
@@ -2364,12 +2407,14 @@ my %sampleFormat = (
         },
         Desire => {
             2 => 'PreviewImageValid',
-            # (DNG may be have 2 preview images)
+            # (DNG and A100 ARW may be have 2 preview images)
             3 => 'PreviewImageStart (1)',
             4 => 'PreviewImageLength (1)',
         },
+        # note: extract 2nd preview, but ignore double-referenced preview
+        # (in A100 ARW images, the 2nd PreviewImageLength from IFD0 may be wrong anyway)
         RawConv => q{
-            if ($val[3] and $val[4]) {
+            if ($val[3] and $val[4] and $val[0] ne $val[3]) {
                 my %val = (
                     0 => 'PreviewImageStart (1)',
                     1 => 'PreviewImageLength (1)',
@@ -2658,25 +2703,25 @@ sub ConvertExifText($$)
     return $val if length($val) < 8;
     my $id = substr($val, 0, 8);
     my $str = substr($val, 8);
-    # by the EXIF spec, the string should be "UNICODE\0", but apparently Kodak
-    # sometimes uses "Unicode\0" in the APP3 "Meta" information.  However,
-    # unfortunately Ricoh uses "Unicode\0" in the RR30 EXIF UserComment when
-    # the text is actually ASCII, so only recognize uppercase "UNICODE\0" here.
-    if ($id eq "UNICODE\0") {
+    # Note: allow spaces instead of nulls in the ID codes because
+    # it is fairly common for camera manufacturers to get this wrong
+    if ($id =~ /^(ASCII)?[\0 ]+$/) {
+        # truncate at null terminator (shouldn't have a null based on the
+        # EXIF spec, but it seems that few people actually read the spec)
+        $str =~ s/\0.*//s;
+    # by the EXIF spec, the following string should be "UNICODE\0", but
+    # apparently Kodak sometimes uses "Unicode\0" in the APP3 "Meta" information.
+    # However, unfortunately Ricoh uses "Unicode\0" in the RR30 EXIF UserComment
+    # when the text is actually ASCII, so only recognize uppercase "UNICODE\0".
+    } elsif ($id =~ /^UNICODE[\0 ]$/) {
         # MicrosoftPhoto writes as little-endian even in big-endian EXIF,
         # so we must guess at the true byte ordering
-        my ($ii, $mm) = (0, 0);
-        foreach (unpack('n*', $str)) {
-            ++$mm unless $_ & 0xff00;
-            ++$ii unless $_ & 0x00ff;
-        }
-        my $order;
-        $order = ($ii > $mm) ? 'II' : 'MM' if $ii != $mm;
-        # convert from unicode
-        $str = $exifTool->Unicode2Charset($str, $order);
+        $str = $exifTool->Decode($str, 'UCS2', 'Unknown');
+    } elsif ($id =~ /^JIS[\0 ]{5}$/) {
+        $str = $exifTool->Decode($str, 'JIS', 'Unknown');
     } else {
-        # assume everything else is ASCII (Don't convert JIS... yet)
-        $str =~ s/\0.*//s;   # truncate at null terminator
+        $exifTool->Warn("Invalid EXIF text encoding");
+        $str = $id . $str;
     }
     return $str;
 }
@@ -2722,18 +2767,19 @@ sub PrintParameter($$$)
 
 #------------------------------------------------------------------------------
 # Convert parameter back to standard EXIF value
-#   0 or "Normal" => 0
+#   0,0.00,etc or "Normal" => 0
 #   -1,-2,etc or "Soft" or "Low" => 1
 #   +1,+2,1,2,etc or "Hard" or "High" => 2
 sub ConvertParameter($)
 {
     my $val = shift;
+    my $isFloat = Image::ExifTool::IsFloat($val);
     # normal is a value of zero
-    return 0 if $val =~ /\bn/i or not $val;
+    return 0 if $val =~ /\bn/i or ($isFloat and $val == 0);
     # "soft", "low" or any negative number is a value of 1
-    return 1 if $val =~ /\b(s|l|-)/i;
-    # "hard", "high" or any positive number is a vail of 2
-    return 2 if $val =~ /\b(h|\+|\d)/i;
+    return 1 if $val =~ /\b(s|l)/i or ($isFloat and $val < 0);
+    # "hard", "high" or any positive number is a value of 2
+    return 2 if $val =~ /\bh/i or $isFloat;
     return undef;
 }
 
@@ -2964,9 +3010,9 @@ sub ExtractImage($$$$)
         $image = $exifTool->ExtractBinary($offset, $len, $tag);
         return undef unless defined $image;
         # patch for incorrect ThumbnailOffset in some Sony DSLR-A100 ARW images
-        if ($image !~ /^(Binary data|\xff\xd8\xff)/ and $tag and
-            $tag eq 'ThumbnailImage' and $$exifTool{TIFF_TYPE} eq 'ARW' and
-            $$exifTool{Model} eq 'DSLR-A100' and $offset < 0x10000)
+        if ($tag and $tag eq 'ThumbnailImage' and $$exifTool{TIFF_TYPE} eq 'ARW' and
+            $$exifTool{Model} eq 'DSLR-A100' and $offset < 0x10000 and
+            $image !~ /^(Binary data|\xff\xd8\xff)/)
         {
             my $try = $exifTool->ExtractBinary($offset + 0x10000, $len, $tag);
             if (defined $try and $try =~ /^\xff\xd8\xff/) {
@@ -3003,6 +3049,17 @@ sub ProcessExif($$$)
     my ($tagKey, $dirSize, $makerAddr);
     my $inMakerNotes = $tagTablePtr->{GROUPS}{0} eq 'MakerNotes';
 
+    # ignore non-standard EXIF while in strict MWG compatibility mode
+    if ($Image::ExifTool::MWG::strict and $dirName eq 'IFD0' and
+        $tagTablePtr eq \%Image::ExifTool::Exif::Main and
+        $$exifTool{FILE_TYPE} =~ /^(JPEG|TIFF|PSD)$/)
+    {
+        my $path = join('-', @{$$exifTool{PATH}});
+        unless ($path =~ /^(JPEG-APP1-IFD0|TIFF-IFD0|PSD-EXIFInfo-IFD0)$/) {
+            $exifTool->Warn("Ignored non-standard EXIF at $path");
+            return 1;
+        }
+    }
     $verbose = -1 if $htmlDump; # mix htmlDump into verbose so we can test for both at once
     $dirName eq 'EXIF' and $dirName = $$dirInfo{DirName} = 'IFD0';
     $$dirInfo{Multi} = 1 if $dirName =~ /^(IFD0|SubIFD)$/ and not defined $$dirInfo{Multi};
@@ -3549,14 +3606,19 @@ sub ProcessExif($$$)
                 );
                 # (remember: some cameras incorrectly write maker notes in IFD0)
                 if ($$tagInfo{MakerNotes}) {
+                    # don't parse makernotes if FastScan > 1
+                    my $fast = $exifTool->Options('FastScan');
+                    last if $fast and $fast > 1;
                     $subdirInfo{MakerNoteAddr} = $valuePtr + $valueDataPos + $base;
                     $subdirInfo{NoFixBase} = 1 if $$subdir{Base};
                 }
-                # set directory IFD name from group name of family 1 in tag information if it exists
-                if ($$tagInfo{Groups}) {
+                # set directory IFD name from group name of family 1 if it exists,
+                # unless the tag is extracted as a block in which case group 1 may
+                # have been set automatically if the block was previously extracted
+                if ($$tagInfo{Groups} and not $$tagInfo{BlockExtract}) {
                     $subdirInfo{DirName} = $tagInfo->{Groups}{1};
                     # number multiple subdirectories
-                    $dirNum and $subdirInfo{DirName} .= $dirNum;
+                    $subdirInfo{DirName} =~ s/\d*$/$dirNum/ if $dirNum;
                 }
                 SetByteOrder($newByteOrder);    # set byte order for this subdir
                 # validate the subdirectory if necessary
@@ -3695,7 +3757,7 @@ EXIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

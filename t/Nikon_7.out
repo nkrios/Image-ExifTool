@@ -1,13 +1,13 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.05
 [File, System, Image] FileName - File Name: Nikon.nef
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 6.0 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:01:05 12:52:24-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:01:05 13:00:46-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: NEF
 [File, File, Image] MIMEType - MIME Type: image/x-raw
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
 [File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 4996c61239acf3d1d9fa08228a6f6825
-[File, File2, Image] CurrentIPTCDigest - Current IPTC Digest: f19115790adcedaaf800a0a41179efa2
 [EXIF, IFD0, Image] 254 - Subfile Type: Reduced-resolution image
 [EXIF, IFD0, Image] 256 - Image Width: 160
 [EXIF, IFD0, Image] 257 - Image Height: 106

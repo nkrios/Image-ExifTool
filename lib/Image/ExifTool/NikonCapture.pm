@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 # common print conversions
 my %offOn = ( 0 => 'Off', 1 => 'On' );
@@ -672,7 +672,6 @@ sub WriteNikonCapture($$$)
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart};
     my $dirLen = $$dirInfo{DirLen};
-    my $dirEnd = $dirStart + $dirLen;
     if ($dirLen < 22) {
         $exifTool->Warn('Short Nikon Capture Data',1);
         return undef;
@@ -681,13 +680,22 @@ sub WriteNikonCapture($$$)
     SetByteOrder('II');
     my $tagID = Get32u($dataPt, $dirStart);
     my $size = Get32u($dataPt, $dirStart + 18);
-    unless ($tagID == 0x7a86a940 and $size + 18 == $dirLen) {
+    my $pad = $dirLen - $size - 18; 
+    unless ($tagID == 0x7a86a940 and $pad >= 0) {
         $exifTool->Warn('Unrecognized Nikon Capture Data header');
         return undef;
+    }
+    # determine if there is any data after this block
+    if ($pad) {
+        $pad = substr($$dataPt, $dirStart + 18 + $size, $pad);
+        $dirLen = $size + 18;
+    } else {
+        $pad = '';
     }
     my $outBuff = '';
     my $pos;
     my $newTags = $exifTool->GetNewTagInfoHash($tagTablePtr);
+    my $dirEnd = $dirStart + $dirLen;
 
     # loop through all entries in the Nikon Capture data
     for ($pos=$dirStart+22; $pos+22<$dirEnd; $pos+=22+$size) {
@@ -741,13 +749,19 @@ sub WriteNikonCapture($$$)
         $outBuff .= substr($$dataPt, $pos, 22 + $size);
     }
     unless ($pos == $dirEnd) {
-        $exifTool->Warn('Nikon Capture Data improperly terminated',1);
-        return undef;
+        if ($pos == $dirEnd - 4) {
+            # it seems that sometimes (NX2) the main block size is wrong by 4 bytes
+            # (did they forget to include the size word?)
+            $outBuff .= substr($$dataPt, $pos, 4);
+        } else {
+            $exifTool->Warn('Nikon Capture Data improperly terminated',1);
+            return undef;
+        }
     }
     # add the header and return the new directory
     return substr($$dataPt, $dirStart, 18) .
            Set32u(length($outBuff) + 4) .
-           $outBuff;
+           $outBuff . $pad;
 }
 
 #------------------------------------------------------------------------------
@@ -813,7 +827,7 @@ the maker notes of NEF images.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

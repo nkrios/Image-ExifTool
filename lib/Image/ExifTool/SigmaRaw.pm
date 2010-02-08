@@ -3,7 +3,8 @@
 #
 # Description:  Read Sigma/Foveon RAW (X3F) meta information
 #
-# Revisions:    10/16/2005 - P. Harvey Created
+# Revisions:    2005/10/16 - P. Harvey Created
+#               2009/11/30 - P. Harvey Support X3F v2.3 written by Sigma DP2
 #
 # References:   1) http://www.x3f.info/technotes/FileDocs/X3F_Format.pdf
 #------------------------------------------------------------------------------
@@ -14,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.06';
+$VERSION = '1.08';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
@@ -38,10 +39,17 @@ sub ProcessX3FProperties($$$);
         Name => 'PreviewImage',
         Binary => 1,
     },
-    IMA2 => {
-        Name => 'PreviewImage',
-        Binary => 1,
-    },
+    IMA2 => [
+        {
+            Name => 'PreviewImage',
+            Condition => 'not $$self{IsJpgFromRaw}',
+            Binary => 1,
+        },
+        {
+            Name => 'JpgFromRaw',
+            Binary => 1,
+        },
+    ]
 );
 
 # common X3F header structure
@@ -52,11 +60,30 @@ sub ProcessX3FProperties($$$);
         Name => 'FileVersion',
         ValueConv => '($val >> 16) . "." . ($val & 0xffff)',
     },
-    7 => 'ImageWidth',
+    2 => {
+        Name => 'ImageUniqueID',
+        # the serial number (with an extra leading "0") makes up
+        # the first 8 digits of this UID,
+        Format => 'undef[16]',
+        ValueConv => 'unpack("H*", $val)',
+    },
+    6 => {
+        Name => 'MarkBits',
+        PrintConv => { BITMASK => { } },
+    },
+    7 => {
+        Name => 'ImageWidth',
+        # save this for testing preview image sizes later
+        RawConv => '$$self{ImageWidth} = $val',
+    },
     8 => 'ImageHeight',
     9 => 'Rotation',
     10 => {
         Name => 'WhiteBalance',
+        Format => 'string[32]',
+    },
+    18 => { #PH (DP2, FileVersion 2.3)
+        Name => 'SceneCaptureType',
         Format => 'string[32]',
     },
 );
@@ -105,6 +132,7 @@ sub ProcessX3FProperties($$$);
     CAMMODEL    => 'Model',
     CAMNAME     => 'CameraName',
     CAMSERIAL   => 'SerialNumber',
+    CM_DESC     => 'SceneCaptureType', #PH (DP2)
     COLORSPACE  => 'ColorSpace', # observed: sRGB
     DRIVE => {
         Name => 'DriveMode',
@@ -159,6 +187,7 @@ sub ProcessX3FProperties($$$);
     },
     IMAGERBOARDID => 'ImagerBoardID',
     IMAGERTEMP  => 'SensorTemperature',
+    IMAGEBOARDID=> 'ImageBoardID', #PH (DP2)
     ISO         => 'ISO',
     LENSARANGE  => 'LensApertureRange',
     LENSFRANGE  => 'LensFocalRange',
@@ -233,9 +262,8 @@ sub ExtractUnicodeString($$$)
     for ($i=$pos; $i<@$chars; ++$i) {
         last unless $$chars[$i];
     }
-    my $buff = pack('v*',@$chars[$pos..$i-1]);
-    my $val = $exifTool->Unicode2Charset($buff, 'II');
-    return $val;
+    my $buff = pack('v*', @$chars[$pos..$i-1]);
+    return $exifTool->Decode($buff, 'UCS2', 'II');
 }
 
 #------------------------------------------------------------------------------
@@ -245,17 +273,26 @@ sub ExtractUnicodeString($$$)
 sub ProcessX3FHeader($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $hdrLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
 
     # process the static header structure first
     $exifTool->ProcessBinaryData($dirInfo, $tagTablePtr);
 
     # process extended data if available
-    if ($$dirInfo{DirLen} >= 232) {
-        $verbose and $exifTool->VerboseDir('X3F HeaderExt', 32);
+    if (length $$dataPt >= 232) {
+        if ($verbose) {
+            $exifTool->VerboseDir('X3F HeaderExt', 32);
+            Image::ExifTool::HexDump($dataPt, undef,
+                MaxLen => $verbose > 3 ? 1024 : 96,
+                Out    => $exifTool->Options('TextOut'),
+                Prefix => $$exifTool{INDENT},
+                Start  => $$dirInfo{DirLen},
+            ) if $verbose > 2;
+        }
         $tagTablePtr = GetTagTable('Image::ExifTool::SigmaRaw::HeaderExt');
-        my $dataPt = $$dirInfo{DataPt};
-        my @vals = unpack('x72C32V32', $$dataPt);
+        my @vals = unpack("x${hdrLen}C32V32", $$dataPt);
         my $i;
         my $unused = 0;
         for ($i=0; $i<32; ++$i) {
@@ -273,10 +310,10 @@ sub ProcessX3FHeader($$$)
                 $val = $sign * 2 ** (($val - 0x3f800000) / 0x800000);
             }
             $exifTool->HandleTag($tagTablePtr, $vals[$i], $val,
-                Index => $i,
+                Index  => $i,
                 DataPt => $dataPt,
-                Start => 104 + $i * 4,
-                Size => 4,
+                Start  => $hdrLen + 32 + $i * 4,
+                Size   => 4,
             );
         }
         $exifTool->VPrint(0, "$exifTool->{INDENT}($unused entries unused)\n");
@@ -378,6 +415,17 @@ sub ProcessX3FDirectory($$$)
             $raf->Read($buff, 28) == 28 or return 'Error reading PreviewImage header';
             # igore all image data but JPEG compressed (type 18)
             next unless $buff =~ /^SECi.{4}\x02\0\0\0\x12/s;
+            # check preview image size and extract full-sized preview as JpgFromRaw
+            my $imageWidth = $$exifTool{ImageWidth};
+            if ($imageWidth) {
+                my ($w, $h) = unpack('x16V2', $buff);
+                # not sure if width/height values change for rotated images, so test both
+                if ($imageWidth == $w or $imageWidth == $h) {
+                    $$exifTool{IsJpgFromRaw} = 1;
+                    $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+                    delete $$exifTool{IsJpgFromRaw};
+                }
+            }
             $len -= 28;
         }
         $raf->Read($buff, $len) == $len or return "Error reading $$tagInfo{Name} data";
@@ -415,7 +463,10 @@ sub ProcessX3F($$)
     if ($ver >= 3) {
         $exifTool->Warn("Can't read version $ver X3F image");
         return 1;
+    } elsif ($ver > 2.3) {
+        $exifTool->Warn('Untested X3F version. Please submit sample for testing', 1);
     }
+    my $hdrLen = length $buff;
     # read version 2.1/2.2 extended header
     if ($ver > 2) {
         my $buf2;
@@ -424,17 +475,14 @@ sub ProcessX3F($$)
             return 1;
         }
         $buff .= $buf2;
+        $hdrLen += $ver > 2.2 ? 64 : 32;   # SceneCaptureType string added in 2.3
     }
     # process header information
     my $tagTablePtr = GetTagTable('Image::ExifTool::SigmaRaw::Main');
-    my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, 'Header');
-    my $subdir = GetTagTable('Image::ExifTool::SigmaRaw::Header');
-    my %dirInfo = (
+    $exifTool->HandleTag($tagTablePtr, 'Header', $buff,
         DataPt => \$buff,
-        DirStart => 0,
-        DirLen => length($buff),
+        Size   => $hdrLen,
     );
-    $exifTool->ProcessDirectory(\%dirInfo, $subdir);
     # read the directory pointer
     $raf->Seek(-4, 2);
     unless ($raf->Read($buff, 4) == 4) {
@@ -442,7 +490,7 @@ sub ProcessX3F($$)
         return 1;
     }
     my $offset = unpack('V', $buff);
-    %dirInfo = (
+    my %dirInfo = (
         RAF => $raf,
         DirStart => $offset,
     );
@@ -471,7 +519,7 @@ Sigma and Foveon X3F images.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

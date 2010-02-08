@@ -5,7 +5,7 @@
 #
 # URL:          http://owl.phy.queensu.ca/~phil/exiftool/
 #
-# Legal:        Copyright (c) 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+# Legal:        Copyright (c) 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 #               This library is free software; you can redistribute it and/or
 #               modify it under the same terms as Perl itself.
 #------------------------------------------------------------------------------
@@ -63,69 +63,89 @@ Sony.
 Below is a list of file types and meta information formats currently
 supported by ExifTool (r = read, w = write, c = create):
 
-                File Types                 |    Meta Information
-  ---------------------------------------  |  --------------------
-  3FR   r       GZ    r       PEF   r/w    |  EXIF           r/w/c
-  3G2   r       HDP   r/w     PGM   r/w    |  GPS            r/w/c
-  3GP   r       HTML  r       PICT  r      |  IPTC           r/w/c
-  ACR   r       ICC   r/w/c   PNG   r/w    |  XMP            r/w/c
-  AI    r/w     IIQ   r       PPM   r/w    |  MakerNotes     r/w/c
-  AIFF  r       IND   r/w     PPT   r      |  Photoshop IRB  r/w/c
-  APE   r       ITC   r       PPTX  r      |  ICC Profile    r/w/c
-  ARW   r       JNG   r/w     PS    r/w    |  MIE            r/w/c
-  ASF   r       JP2   r/w     PSD   r/w    |  JFIF           r/w/c
-  AVI   r       JPEG  r/w     QTIF  r      |  Ducky APP12    r/w/c
-  BMP   r       K25   r       RA    r      |  PDF            r/w/c
-  BTF   r       KDC   r       RAF   r/w    |  CIFF           r/w
-  COS   r       KEY   r       RAM   r      |  AFCP           r/w
-  CR2   r/w     LNK   r       RAW   r/w    |  JPEG 2000      r
-  CRW   r/w     M2TS  r       RIFF  r      |  DICOM          r
-  CS1   r/w     M4A/V r       RW2   r/w    |  Flash          r
-  DCM   r       MEF   r/w     RWL   r/w    |  FlashPix       r
-  DCP   r/w     MIE   r/w/c   RWZ   r      |  QuickTime      r
-  DCR   r       MIFF  r       RM    r      |  GeoTIFF        r
-  DIVX  r       MNG   r/w     SO    r      |  PrintIM        r
-  DJVU  r       MOS   r/w     SR2   r      |  ID3            r
-  DLL   r       MOV   r       SRF   r      |  Kodak Meta     r
-  DNG   r/w     MP3   r       SVG   r      |  Ricoh RMETA    r
-  DOC   r       MP4   r       SWF   r      |  Picture Info   r
-  DOCX  r       MPC   r       THM   r/w    |  Adobe APP14    r
-  DVB   r       MPG   r       TIFF  r/w    |  MPF            r
-  DYLIB r       MPO   r/w     VRD   r/w/c  |  Stim           r
-  EIP   r       MQV   r       WAV   r      |  APE            r
-  EPS   r/w     MRW   r/w     WDP   r/w    |  Vorbis         r
-  ERF   r/w     NEF   r/w     WMA   r      |  SPIFF          r
-  EXE   r       NRW   r/w     WMV   r      |  DjVu           r
-  EXIF  r/w/c   NUMBERS r     X3F   r      |  M2TS           r
-  F4A/V r       OGG   r       XLS   r      |  PE/COFF        r
-  FLAC  r       ORF   r/w     XLSX  r      |  AVCHD          r
-  FLV   r       PAGES r       XMP   r/w/c  |  ZIP            r
-  FPX   r       PBM   r/w     ZIP   r      |  (and more)
-  GIF   r/w     PDF   r/w  
+  File Types
+  ------------+-------------+-------------+-------------+------------
+  3FR   r     | DOC   r     | K25   r     | PAGES r     | RWZ   r
+  3G2   r     | DOCX  r     | KDC   r     | PBM   r/w   | RM    r
+  3GP   r     | DVB   r     | KEY   r     | PDF   r/w   | SO    r
+  ACR   r     | DYLIB r     | LNK   r     | PEF   r/w   | SR2   r/w
+  AFM   r     | EIP   r     | M2TS  r     | PFA   r     | SRF   r
+  AI    r/w   | EPS   r/w   | M4A/V r     | PFB   r     | SVG   r
+  AIFF  r     | ERF   r/w   | MEF   r/w   | PFM   r     | SWF   r
+  APE   r     | EXE   r     | MIE   r/w/c | PGM   r/w   | THM   r/w
+  ARW   r/w   | EXIF  r/w/c | MIFF  r     | PICT  r     | TIFF  r/w
+  ASF   r     | F4A/V r     | MNG   r/w   | PNG   r/w   | TTC   r
+  AVI   r     | FLA   r     | MOS   r/w   | PPM   r/w   | TTF   r
+  BMP   r     | FLAC  r     | MOV   r     | PPT   r     | VRD   r/w/c
+  BTF   r     | FLV   r     | MP3   r     | PPTX  r     | WAV   r
+  COS   r     | FPX   r     | MP4   r     | PS    r/w   | WDP   r/w
+  CR2   r/w   | GIF   r/w   | MPC   r     | PSB   r/w   | WMA   r
+  CRW   r/w   | GZ    r     | MPG   r     | PSD   r/w   | WMV   r
+  CS1   r/w   | HDP   r/w   | MPO   r/w   | PSP   r     | X3F   r
+  DCM   r     | HTML  r     | MQV   r     | QTIF  r     | XLS   r
+  DCP   r/w   | ICC   r/w/c | MRW   r/w   | RA    r     | XLSX  r
+  DCR   r     | IIQ   r     | NEF   r/w   | RAF   r/w   | XMP   r/w/c
+  DFONT r     | IND   r/w   | NRW   r/w   | RAM   r     | ZIP   r
+  DIVX  r     | ITC   r     | NUMBERS r   | RAW   r/w   |
+  DJVU  r     | JNG   r/w   | OGG   r     | RIFF  r     |
+  DLL   r     | JP2   r/w   | ORF   r/w   | RW2   r/w   |
+  DNG   r/w   | JPEG  r/w   | OTF   r     | RWL   r/w   |
+
+  Meta Information
+  ----------------------+----------------------+---------------------
+  EXIF           r/w/c  |  JPEG 2000      r    |  APE            r
+  GPS            r/w/c  |  DICOM          r    |  Vorbis         r
+  IPTC           r/w/c  |  Flash          r    |  SPIFF          r
+  XMP            r/w/c  |  FlashPix       r    |  DjVu           r
+  MakerNotes     r/w/c  |  QuickTime      r    |  M2TS           r
+  Photoshop IRB  r/w/c  |  GeoTIFF        r    |  PE/COFF        r
+  ICC Profile    r/w/c  |  PrintIM        r    |  AVCHD          r
+  MIE            r/w/c  |  ID3            r    |  ZIP            r
+  JFIF           r/w/c  |  Kodak Meta     r    |  (and more)
+  Ducky APP12    r/w/c  |  Ricoh RMETA    r    |
+  PDF            r/w/c  |  Picture Info   r    |
+  CIFF           r/w    |  Adobe APP14    r    |
+  AFCP           r/w    |  MPF            r    |
+  PhotoMechanic  r/w    |  Stim           r    |
 
 =head1 CONFIGURATION
 
 User-defined tags can be added via the ExifTool configuration file, or by
 defining the %Image::ExifTool::UserDefined hash before calling any ExifTool
-functions.  See "ExifTool_config" in the ExifTool distribution for more
-details.  If necessary, the configuration feature can be disabled by setting
-the ExifTool C<noConfig> flag before loading Image::ExifTool.  For example:
+methods.  See "ExifTool_config" in the ExifTool distribution for more
+details.
 
-    BEGIN { $Image::ExifTool::noConfig = 1 }
+By default ExifTool looks for a configuration file named ".ExifTool_config"
+in your home directory, but a different file may be specified by setting the
+ExifTool C<configFile> variable before using Image::ExifTool.  For example:
+
+    BEGIN { $Image::ExifTool::configFile = '/Users/phil/myconfig.cfg' }
     use Image::ExifTool;
 
-Or the ExifTool C<configFile> variable may be set before loading
-Image::ExifTool to use a specific configuration file:
+or the configuration feature may be disabled by setting C<configFile> to an
+empty string:
 
-    BEGIN { $Image::ExifTool::configFile = "/Users/phil/myconfig.cfg" }
+    BEGIN { $Image::ExifTool::configFile = '' }
     use Image::ExifTool;
 
 =head1 EXPORTS
 
-Exports nothing by default, but L</ImageInfo> and all static functions may
-be exported with the C<:Public> export list.
+Exports nothing by default, but L</ImageInfo> and all static methods may be
+exported with the C<:Public> export list.
 
 =head1 METHODS
+
+All ExifTool features are accessed through the methods of the public
+interface listed below.  Other Image::ExifTool methods and modules should
+not be accessed directly because their interface may change with future
+versions.
+
+None of these methods should ever die or issue warnings to STDERR if called
+with the proper arguments (with the exception of L</SetNewValue> which
+returns an error string when called in list context, or sends the error to
+STDERR otherwise).  Error and warning messages that occur during processing
+are stored in the values of the Error and Warning tags, and are accessible
+via the L</GetValue> method.
 
 =head2 new
 
@@ -406,13 +426,29 @@ values are listed below, case is not significant:
   Vietnam      cp1258           Windows Vietnamese
   Thai         cp874            Windows Thai
   MacRoman     cp10000, Roman   Macintosh Roman
-  MacLatin2    cp10029          Macintosh Latin 2 (Central Europe)
+  MacLatin2    cp10029          Macintosh Latin2 (Central Europe)
   MacCyrillic  cp10007          Macintosh Cyrillic
   MacGreek     cp10006          Macintosh Greek
   MacTurkish   cp10081          Macintosh Turkish
   MacRomanian  cp10010          Macintosh Romanian
   MacIceland   cp10079          Macintosh Icelandic
   MacCroatian  cp10082          Macintosh Croatian
+
+Note that this option affects some types of information when reading/writing
+the file and other types when getting/setting tag values, so it must be
+defined for both types of access.
+
+=item CharsetID3
+
+Character encoding to assume for ID3v1 strings.  By the specification ID3v1
+strings should be encoded in ISO 8859-1 (essentially Latin), but some
+applications may use local encoding instead.  Default is Latin.
+
+=item CharsetIPTC
+
+Fallback IPTC character set to assume if IPTC information contains no
+CodedCharacterSet tag.  Possible values are the same as the L</Charset>
+option.  Default is Latin.
 
 Note that this option affects some types of information when reading/writing
 the file and other types when getting/setting tag values, so it must be
@@ -486,12 +522,14 @@ MPO files.  Default is 0.
 =item FastScan
 
 Flag to increase speed of extracting information from JPEG images.  With
-this option set, ExifTool will not scan to the end of a JPEG image to check
-for an AFCP, CanonVRD, FotoStation, PhotoMechanic, MIE or PreviewImage
-trailer.  With RIFF-format files (AVI, WAV, etc), this option stops the
-parsing at the audio/video data, so any trailing metadata (ie. XMP written
-by Adobe Bridge) may be missed.  Also, when combined with the ScanForXMP
-option, prevents scanning for XMP in recognized file types.  Default is 0.
+this option set to 1, ExifTool will not scan to the end of a JPEG image to
+check for an AFCP, CanonVRD, FotoStation, PhotoMechanic, MIE or PreviewImage
+trailer.  This also stops the parsing after the first comment in GIF images,
+and at the audio/video data with RIFF-format files (AVI, WAV, etc), so any
+trailing metadata (ie. XMP written by some utilities) may be missed.  When
+combined with the ScanForXMP option, prevents scanning for XMP in recognized
+file types.  With a value of 2, ExifTool will also avoid extracting any EXIF
+MakerNote information.  Default is 0.
 
 =item FixBase
 
@@ -558,16 +596,6 @@ to allow writing of files when minor errors occur, but also allows thumbnail
 and preview images to be extracted even if they don't have a recognizable
 header.  Minor errors/warnings are denoted by '[minor]' at the start of the
 message.
-
-=item IPTCCharset
-
-Fallback IPTC character set to assume if IPTC information contains no
-CodedCharacterSet tag.  Possible values are the same as the L</Charset>
-option. Default is Latin.
-
-Note that this option affects some types of information when reading/writing
-the file and other types when getting/setting tag values, so it must be
-defined for both types of access.
 
 =item Lang
 
@@ -715,13 +743,14 @@ difference is that a list of tag keys is not returned if an ARRAY reference
 is given.  The following options are effective in the call to
 L</ExtractInfo>:
 
-Binary, Charset, Composite, ExtractEmbedded, FastScan, FixBase, HtmlDump,
-HtmlDumpBase, IgnoreMinorErrors, IPTCCharset, Lang, LargeFileSupport,
-MakerNotes, ScanForXMP, Struct, TextOut, Unknown and Verbose.
+Binary, Charset, CharsetID3, CharsetIPTC, Composite, ExtractEmbedded,
+FastScan, FixBase, HtmlDump, HtmlDumpBase, IgnoreMinorErrors, Lang,
+LargeFileSupport, MakerNotes, ScanForXMP, Struct, TextOut, Unknown and
+Verbose.
 
 =item Return Value:
 
-1 if image was valid, 0 otherwise (and 'Error' tag set).
+1 if this was a recognized file format, 0 otherwise (and 'Error' tag set).
 
 =back
 
@@ -826,8 +855,8 @@ The destination file type is only used if the source file is undefined.
 
 The following ExifTool options are effective in the call to L</WriteInfo>:
 
-ByteOrder, Charset, Compact, Compress, FixBase, IgnoreMinorErrors,
-IPTCCharset and Verbose.
+ByteOrder, Charset, CharsetID3, CharsetIPTC, Compact, Compress, FixBase,
+IgnoreMinorErrors and Verbose.
 
 =head2 CombineInfo
 
@@ -1278,12 +1307,13 @@ more than one value.
 
 0) ExifTool object reference
 
-1) Tag key or tag name
+1) Tag name (case sensitive, group names not allowed)
 
 =item Return Values:
 
-List of new Raw tag values.  The list may be empty if the tag is being
-deleted (ie. if SetNewValue was called without a value).
+List of new Raw tag values.  The list may be empty either if the tag isn't
+being written, or if it is being deleted (ie. if L</SetNewValue> was called
+without a value).
 
 =back
 
@@ -1749,20 +1779,20 @@ Here is a complete list of groups for each of these families:
 
 =item Family 0 (Information Type):
 
-AFCP, AIFF, APE, APP0, APP12, APP13, APP14, APP15, APP5, APP6, APP8, ASF,
-BMP, CanonVRD, Composite, DICOM, DNG, DjVu, Ducky, EXE, EXIF, ExifTool,
-FLAC, File, Flash, FlashPix, FotoStation, GeoTiff, HTML, ICC_Profile, ID3,
-IPTC, ITC, JFIF, JPEG, Jpeg2000, LNK, Leaf, M2TS, MIE, MIFF, MNG, MPC, MPEG,
-MPF, MakerNotes, Meta, PDF, PICT, PNG, PhotoMechanic, Photoshop, PostScript,
-PrintIM, QuickTime, RAF, RIFF, Rawzor, Real, SVG, SigmaRaw, Stim, Vorbis,
-XML, XMP, ZIP
+AFCP, AIFF, APE, APP0, APP12, APP13, APP14, APP15, APP4, APP5, APP6, APP8,
+ASF, BMP, CanonVRD, Composite, DICOM, DNG, DjVu, Ducky, EXE, EXIF, ExifTool,
+FLAC, File, Flash, FlashPix, Font, FotoStation, GIF, GeoTiff, H264, HTML,
+ICC_Profile, ID3, IPTC, ITC, JFIF, JPEG, Jpeg2000, LNK, Leaf, M2TS, MIE,
+MIFF, MNG, MPC, MPEG, MPF, MakerNotes, Meta, PDF, PICT, PNG, PSP,
+PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF, Rawzor,
+Real, SVG, SigmaRaw, SonyIDC, Stim, Vorbis, XML, XMP, ZIP
 
 =item Family 1 (Specific Location):
 
 AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, BMP, Canon, CanonCustom,
 CanonRaw, CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky,
-EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix,
-FotoStation, FujiFilm, GPS, GeoTiff, GlobParamIFD, GraphConv, H264, HP,
+EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, Font,
+FotoStation, FujiFilm, GIF, GPS, GeoTiff, GlobParamIFD, GraphConv, H264, HP,
 HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm,
 ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ICC_Profile#, ID3,
 ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC,
@@ -1772,15 +1802,16 @@ MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash,
 MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
 MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
 MIFF, MNG, MPC, MPEG, MPF0, MPImage, MakerNotes, MakerUnknown, MetaIFD,
-Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonPreview, NikonScan,
-Olympus, PDF, PICT, PNG, Panasonic, Pentax, PhotoMechanic, Photoshop,
-PictureInfo, PostScript, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF,
-RMETA, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4,
-Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG,
-Sanyo, Sigma, SigmaRaw, Sony, Stim, SubIFD, System, Track#, Vorbis, XML,
-XMP, XMP-DICOM, XMP-MP, XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux,
-XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-exif, XMP-iptcCore, XMP-iptcExt,
-XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-pdfx, XMP-photomech,
+Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom, NikonPreview,
+NikonScan, Olympus, PDF, PICT, PNG, Panasonic, Pentax, PSP, PhotoMechanic,
+Photoshop, PictureInfo, PostScript, PrintIM, ProfileIFD, QuickTime, RAF,
+RAF2, RIFF, RMETA, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3,
+Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
+SRF#, SVG, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD,
+System, Track#, Version#, Vorbis, XML, XMP, XMP-DICOM, XMP-MP,
+XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
+XMP-dex, XMP-digiKam, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr,
+XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-pdfx, XMP-photomech,
 XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-tiff,
 XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS,
 XMP-xmpRights, XMP-xmpTPg, ZIP
@@ -1847,17 +1878,20 @@ Get type of file given file name.
 
 =item Return Value:
 
-A string, based on the file extension, which represents the type of file.
-Returns undefined value if file type is not supported by ExifTool.  In array
-context, may return more than one file type if the file may be different
-formats.  Returns a list of extensions for all recognized file types if no
-input extension is specified.
+A string, based on the file extension, which indicates the basic format of
+the file.  Note that some files may be based on other formats (like many RAW
+image formats are based on TIFF).  In array context, may return more than
+one file type if the file may be based on different formats.  Returns undef
+if files with this extension are not yet supported by ExifTool.  Returns a
+list of extensions for all recognized file types if no input extension is
+specified.  Returns a more detailed description of the specific file format
+when the description flag is set.
 
 =back
 
 =head2 CanWrite [static]
 
-Can the specified file or file type be written?
+Can the specified file be written?
 
     my $writable = Image::ExifTool::CanWrite($filename);
 
@@ -1865,17 +1899,18 @@ Can the specified file or file type be written?
 
 =item Inputs:
 
-0) File name, file extension, or file type
+0) File name or extension
 
 =item Return Value:
 
-True if the specified file type can be written (edited).
+True if ExifTool supports writing files of this type (based on the file
+extension).
 
 =back
 
 =head2 CanCreate [static]
 
-Can the specified file or file type be created?
+Can the specified file be created?
 
     my $creatable = Image::ExifTool::CanCreate($filename);
 
@@ -1883,18 +1918,18 @@ Can the specified file or file type be created?
 
 =item Inputs:
 
-0) File name, file extension, or file type
+0) File name or extension
 
 =item Return Value:
 
-True if the specified file type can be created from scratch.  Currently,
-this can only be done with XMP, MIE, ICC, VRD and EXIF files.
+True if ExifTool can create files with this extension from scratch. 
+Currently, this can only be done with XMP, MIE, ICC, VRD and EXIF files.
 
 =back
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey
+Copyright 2003-2010, Phil Harvey
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

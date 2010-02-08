@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool, Main] ExifToolVersion - ExifTool Version Number: 7.93
+[ExifTool, ExifTool, ExifTool, Main] ExifToolVersion - ExifTool Version Number: 8.05
 [File, System, Image, Main] FileName - File Name: PostScript_3_failed.eps
 [File, System, Image, Main] Directory - Directory: t
 [File, System, Image, Main] FileSize - File Size: 14 kB
-[File, System, Time, Main] FileModifyDate - File Modification Date/Time: 2009:09:01 11:28:03-04:00
+[File, System, Time, Main] FileModifyDate - File Modification Date/Time: 2010:01:09 08:04:49-05:00
+[File, System, Image, Main] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image, Main] FileType - File Type: EPS
 [File, File, Image, Main] MIMEType - MIME Type: application/postscript
-[File, File, Image, Main] CurrentIPTCDigest - Current IPTC Digest: 32acda5aea9ad1d96e5b56b502e33ff2
 [File, File, Image, Main] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
 [PostScript, PostScript, Image, Main] Creator - Creator: phil made it
 [PostScript, PostScript, Image, Main] Title - Title: new title
@@ -95,7 +95,7 @@
 [EXIF, IFD1, Image, Main] 282 - X Resolution: 72
 [EXIF, IFD1, Image, Main] 283 - Y Resolution: 72
 [EXIF, IFD1, Image, Main] 296 - Resolution Unit: inches
-[XMP, XMP-x, Document, Main] xmptk - XMP Toolkit: Image::ExifTool 7.93
+[XMP, XMP-x, Document, Main] xmptk - XMP Toolkit: Image::ExifTool 8.05
 [XMP, XMP-rdf, Document, Main] about - About: uuid:b691db36-f92a-11d9-99a4-8c8e8269c120
 [XMP, XMP-dc, Author, Main] creator - Creator: phil made it
 [XMP, XMP-dc, Image, Main] description - Description: UTF-16 (big-endian) encoded XMP

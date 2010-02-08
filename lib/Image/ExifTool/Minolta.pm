@@ -28,6 +28,10 @@
 #              18) Olaf Ulrich private communication
 #              19) Lukasz Stelmach private communication
 #              20) Igal Milchtaich private communication (A100 firmware 1.04)
+#              21) Jean-Michel Dubois private communication
+#              22) http://www.mi-fo.de/forum/index.php?act=attach&type=post&id=6024
+#              23) Marcin Krol private communication
+#              24) http://cpanforum.com/threads/12291
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -38,7 +42,7 @@ use vars qw($VERSION %minoltaLensTypes %minoltaColorMode %sonyColorMode %minolta
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.60';
+$VERSION = '1.65';
 
 # lens ID numbers (ref 3)
 # ("New" and "II" appear in brackets if original version also has this LensType)
@@ -72,11 +76,14 @@ $VERSION = '1.60';
     24.1 => 'Sigma 18-50mm F2.8',
     24.2 => 'Sigma 17-70mm F2.8-4.5 (D)',
     24.3 => 'Sigma 20-40mm F2.8 EX DG Aspherical IF', #JD
-    24.4 => 'Tamron SP AF 28-75mm F2.8 XR Di (IF) Macro', #JD
+    24.4 => 'Sigma 18-200mm F3.5-6.3 DC', #22
+    24.5 => 'Sigma 20-40mm F2.8 EX DG Aspherical IF', #22
+    24.6 => 'Tamron SP AF 28-75mm F2.8 XR Di (IF) Macro', #JD
     25 => 'Minolta AF 100-300mm F4.5-5.6 APO (D) or Sigma Lens',
     25.1 => 'Sigma 100-300mm F4 EX (APO (D) or D IF)', #JD
     25.2 => 'Sigma 70mm F2.8 EX DG Macro', #JD
     25.3 => 'Sigma 20mm F1.8 EX DG Aspherical RF', #19
+    25.4 => 'Sigma 30mm F1.4 DG EX', #21
     27 => 'Minolta AF 85mm F1.4 G (D)', # added (D) (ref 13)
     28 => 'Minolta/Sony AF 100mm F2.8 Macro (D) or Tamron Lens',
     # 28 => 'Sony 100mm F2.8 Macro (SAL-100M28)' (ref 18)
@@ -117,6 +124,9 @@ $VERSION = '1.60';
     53 => 'Sony AF 70-400mm F4.5-5.6 G SSM (SAL-70400G)', #17
     54 => 'Carl Zeiss Vario-Sonnar T* 16-35mm F2.8 ZA SSM (SAL-1635Z)', #17
     55 => 'Sony DT 18-55mm F3.5-5.6 SAM (SAL-1855)', #PH
+    56 => 'Sony AF DT 55-200mm F4-5.6 SAM', #22
+    57 => 'Sony AF DT 50mm F1.8 SAM', #22
+    58 => 'Sony AF DT 30mm F2.8 SAM Macro', #22
     128 => 'Tamron or Sigma Lens (128)',
     128.1 => 'Tamron 18-200mm F3.5-6.3',
     128.2 => 'Tamron 28-300mm F3.5-6.3',
@@ -125,9 +135,11 @@ $VERSION = '1.60';
     128.5 => 'Tamron SP AF 17-35mm F2.8-4 Di LD Aspherical IF', #JD
     128.6 => 'Sigma AF 50-150mm F2.8 EX DC APO HSM II', #JD
     128.7 => 'Sigma 10-20mm F3.5 EX DC HSM', #11 (model 202-205)
+    128.8 => 'Sigma 70-200mm F2.8 II EX DG APO MACRO HSM', #24
     129 => 'Tamron Lens (129)',
-    129.1 => 'Tamron 200-400mm F5.6', #12
+    129.1 => 'Tamron 200-400mm F5.6 LD', #12 (LD ref 23)
     129.2 => 'Tamron 70-300mm F4-5.6 LD', #12
+    131 => 'Tamron 20-40mm F2.7-3.5 SP Aspherical IF', #23
     135 => 'Vivitar 28-210mm F3.5-5.6', #16
     136 => 'Tokina EMZ M100 AF 100mm F3.5', #JD
     137 => 'Cosina 70-210mm F2.8-4 AF', #11
@@ -140,6 +152,9 @@ $VERSION = '1.60';
     255.3 => 'Tamron AF 55-200mm F4-5.6 Di II',
     255.4 => 'Tamron AF 70-300mm F4-5.6 Di LD MACRO 1:2',
     255.5 => 'Tamron SP AF 200-500mm F5.0-6.3 Di LD IF',
+    255.6 => 'Tamron SP AF 10-24mm F3.5-4.5 Di II LD Aspherical IF', #22
+    255.7 => 'Tamron SP AF 70-200mm F2.8 Di LD IF Macro', #22
+    255.8 => 'Tamron SP AF 28-75mm F2.8 XR Di LD Aspherical IF', #24
     25501 => 'Minolta AF 50mm F1.7', #7
     25511 => 'Minolta AF 35-70mm F4 or Other Lens',
     25511.1 => 'Sigma UC AF 28-70mm F3.5-4.5', #12/16(HighSpeed-AF)
@@ -151,8 +166,9 @@ $VERSION = '1.60';
     25521.2 => 'Tokina 28-70mm F2.8 AT-X', #7
     25521.3 => 'Tokina 80-400mm F4.5-5.6 AT-X AF II 840', #JD
     25521.4 => 'Tokina AF PRO 28-80mm F2.8 AT-X 280', #JD
-    25521.5 => 'Tamron AF 19-35mm F3.5-4.5', #JD
-    25521.6 => 'Angenieux AF 28-70mm F2.6', #JD
+    25521.5 => 'Tokina AT-X PRO II AF 28-70mm F2.6-2.8 270', #24
+    25521.6 => 'Tamron AF 19-35mm F3.5-4.5', #JD
+    25521.7 => 'Angenieux AF 28-70mm F2.6', #JD
     25531 => 'Minolta AF 28-135mm F4-4.5 or Sigma Lens',
     25531.1 => 'Sigma ZOOM-alpha 35-135mm F3.5-4.5', #16
     25531.2 => 'Sigma 28-105mm F2.8-4 Aspherical', #JD
@@ -160,6 +176,7 @@ $VERSION = '1.60';
     25551 => 'Minolta AF 70-210mm F4 Macro or Sigma Lens',
     25551.1 => 'Sigma 70-210mm F4-5.6 APO', #7
     25551.2 => 'Sigma M-AF 70-200mm F2.8 EX APO', #6
+    25551.3 => 'Sigma 75-200mm F2.8-3.5', #22
     25561 => 'Minolta AF 135mm F2.8',
     25571 => 'Minolta/Sony AF 28mm F2.8', # Sony added (ref 18)
     # 25571 => 'Sony 28mm F2.8 (SAL-28F28)' (ref 18)
@@ -171,12 +188,14 @@ $VERSION = '1.60';
     25611.3 => 'Sigma AF 500mm F4.5 APO', #JD
     25611.4 => 'Sigma AF 170-500mm F5-6.3 APO Aspherical', #JD
     25611.5 => 'Tokina AT-X AF 300mm F4', #JD
-    25611.6 => 'Tokina AF 730 II 75-300mm F4.5-5.6', #JD
+    25611.6 => 'Tokina AT-X AF 400mm F5.6 SD', #22
+    25611.7 => 'Tokina AF 730 II 75-300mm F4.5-5.6', #JD
     25621 => 'Minolta AF 50mm F1.4 [New]', # original and New, not Sony (ref 13/18)
     25631 => 'Minolta AF 300mm F2.8 APO or Sigma Lens', # changed G to APO (ref 13)
     25631.1 => 'Sigma AF 50-500mm F4-6.3 EX DG APO', #JD
     25631.2 => 'Sigma AF 170-500mm F5-6.3 APO Aspherical', #JD
     25631.3 => 'Sigma AF 500mm F4.5 EX DG APO', #JD
+    25631.4 => 'Sigma 400mm F5.6 APO', #22
     25641 => 'Minolta AF 50mm F2.8 Macro or Sigma Lens',
     25641.1 => 'Sigma 50mm F2.8 EX Macro', #11
     25651 => 'Minolta AF 600mm F4',
@@ -234,6 +253,7 @@ $VERSION = '1.60';
     26671 => 'Minolta AF 35mm F2 New',
     26681 => 'Minolta AF 28mm F2 New',
     26721 => 'Minolta AF 24-105mm F3.5-4.5 (D)', #11
+    45671 => 'Tokina 70-210mm F4-5.6', #22
     45741 => '2x Teleconverter or Tamron or Tokina Lens', #18
     45741.1 => 'Tamron SP AF 90mm F2.5', #JD
     45741.2 => 'Tokina RF 500mm F8.0 x2', #JD
@@ -390,6 +410,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         DataTag => 'PreviewImage',
         Writable => 'int32u',
         Protected => 2,
+        # Note: Sony also uses this tag in A100 ARW images, but it points
+        #       to the same data as JpgFromRaw
     },
     0x0089 => {
         Name => 'PreviewImageLength',
@@ -492,6 +514,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x0109 => { #20
         Name => 'RawAndJpgRecording',
+        Writable => 'int32u',
         PrintConv => \%offOn,
     },
     0x010a => {
@@ -1921,7 +1944,6 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x57 => { #15
         Name => 'ImageStabilization',
-        Writable => 'int32u',
         PrintConv => \%offOn,
     },
     0x5e => { #15
@@ -2117,7 +2139,7 @@ and write Minolta RAW (MRW) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -2137,7 +2159,7 @@ under the same terms as Perl itself.
 Thanks to Jay Al-Saadi, Niels Kristian Bech Jensen, Shingo Noguchi, Pedro
 Corte-Real, Jeffery Small, Jens Duttke,  Thomas Kassner, Mladen Sever, Olaf
 Ulrich, Lukasz Stelmach and Igal Milchtaich for the information they
-provided.
+provided, and for everyone who helped with the LensType list.
 
 =head1 SEE ALSO
 

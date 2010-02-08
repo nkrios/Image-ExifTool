@@ -31,7 +31,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.63';
+$VERSION = '1.65';
 
 sub PrintLensInfo($$$);
 
@@ -1438,9 +1438,22 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x304 => { #PH/4
         Name => 'AFAreas',
+        Notes => 'coordinates range from 0 to 255',
         Format => 'int32u',
         Count => 64,
         PrintConv => 'Image::ExifTool::Olympus::PrintAFAreas($val)',
+    },
+    0x0305 => { #PH
+        Name => 'AFPointSelected',
+        Notes => 'coordinates expressed as a percent',
+        Format => 'rational64s',
+        Count => 5,
+        ValueConv => '$val =~ s/\S* //; $val', # ignore first undefined value
+        ValueConvInv => '"undef $val"',
+        PrintConv => q{
+            return $val if $val =~ /undef/;
+            sprintf("(%d%%,%d%%) (%d%%,%d%%)", map {$_ * 100} split(" ",$val));
+        }
     },
     0x307 => { #15
         Name => 'AFFineTuneAdj',
@@ -1835,6 +1848,18 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             2 => 'HQ',
             3 => 'SHQ',
             4 => 'RAW',
+        },
+    },
+    0x604 => { #PH
+        Name => 'ImageStabilization',
+        Writable => 'int32u',
+        DataMember => 'ImageStabilization',
+        RawConv => '$$self{ImageStabilization} = $val',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On, Mode 1',
+            2 => 'On, Mode 2',
+            3 => 'On, Mode 3',
         },
     },
     0x900 => { #11
@@ -2546,8 +2571,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Name => 'AFPoint',
             Writable => 'int16u',
             Notes => 'other models',
+            RawConv => '($val or $$self{Model} ne "E-P1") ? $val : undef',
             PrintConv => {
-                0 => 'Left',
+                # (E-P1 always writes 0, maybe other models do too - PH)
+                0 => 'Left (or n/a)',
                 1 => 'Center (horizontal)', #6 (E-510)
                 2 => 'Right',
                 3 => 'Center (vertical)', #6 (E-510)
@@ -2616,6 +2643,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x1600 => { # ref http://fourthirdsphoto.com/vbb/showpost.php?p=107607&postcount=15
         Name => 'ImageStabilization',
+        # (the other value is more reliable, so ignore this totally if the other exists)
+        Condition => 'not defined $$self{ImageStabilization}',
         Writable => 'undef',
         # if the first 4 bytes are non-zero, then bit 0x01 of byte 44
         # gives the stabilization mode
@@ -2641,57 +2670,57 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x100 => {
         Name => 'WB_RBLevelsUsed',
-        Writable => 'int16',
+        Writable => 'int16u',
         Count => 2,
     },
     0x110 => {
         Name => 'WB_RBLevelsAuto',
-        Writable => 'int16',
+        Writable => 'int16u',
         Count => 2,
     },
     0x120 => {
         Name => 'WB_RBLevelsShade',
-        Writable => 'int16',
+        Writable => 'int16u',
         Count => 2,
     },
     0x121 => {
         Name => 'WB_RBLevelsCloudy',
-        Writable => 'int16',
+        Writable => 'int16u',
         Count => 2,
     },
     0x122 => {
         Name => 'WB_RBLevelsFineWeather',
-        Writable => 'int16',
+        Writable => 'int16u',
         Count => 2,
     },
     0x123 => {
         Name => 'WB_RBLevelsTungsten',
-        Writable => 'int16',
+        Writable => 'int16u',
         Count => 2,
     },
     0x124 => {
         Name => 'WB_RBLevelsEveningSunlight',
-        Writable => 'int16',
+        Writable => 'int16u',
         Count => 2,
     },
     0x130 => {
         Name => 'WB_RBLevelsDaylightFluor',
-        Writable => 'int16',
+        Writable => 'int16u',
         Count => 2,
     },
     0x131 => {
         Name => 'WB_RBLevelsDayWhiteFluor',
-        Writable => 'int16',
+        Writable => 'int16u',
         Count => 2,
     },
     0x132 => {
         Name => 'WB_RBLevelsCoolWhiteFluor',
-        Writable => 'int16',
+        Writable => 'int16u',
         Count => 2,
     },
     0x133 => {
         Name => 'WB_RBLevelsWhiteFluorescent',
-        Writable => 'int16',
+        Writable => 'int16u',
         Count => 2,
     },
     0x200 => {
@@ -2966,10 +2995,12 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x83 => {
         Name => 'DateTime1',
         Format => 'string[24]',
+        Groups => { 2 => 'Time' },
     },
     0x9d => {
         Name => 'DateTime2',
         Format => 'string[24]',
+        Groups => { 2 => 'Time' },
     },
     0x12d => {
         Name => 'ThumbnailLength',
@@ -3091,7 +3122,7 @@ Olympus or Epson maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

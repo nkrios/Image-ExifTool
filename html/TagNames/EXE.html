@@ -207,15 +207,15 @@ existing StringFileInfo tags even if not listed in this table.</p>
 <td>CharacterSet</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(extracted from the StringFileInfo value)</span>
-  <br>&#39;0000&#39; = 7-bit ASCII
+  <br>&#39;0000&#39; = ASCII
   <br>&#39;03A4&#39; = Windows, Japan (Shift - JIS X-0208)
   <br>&#39;03A8&#39; = Windows, Chinese (Simplified)
   <br>&#39;03B5&#39; = Windows, Korea (Shift - KSC 5601)
-  <br>&#39;03B6&#39; = Windows, Taiwan (GB5)
+  <br>&#39;03B6&#39; = Windows, Taiwan (Big5)
   <br>&#39;04B0&#39; = Unicode
-  <br>&#39;04E2&#39; = Windows, Latin-2 (Eastern European)
+  <br>&#39;04E2&#39; = Windows, Latin2 (Eastern European)
   <br>&#39;04E3&#39; = Windows, Cyrillic
-  <br>&#39;04E4&#39; = Windows, Multilingual
+  <br>&#39;04E4&#39; = Windows, Latin1
   <br>&#39;04E5&#39; = Windows, Greek
   <br>&#39;04E6&#39; = Windows, Turkish
   <br>&#39;04E7&#39; = Windows, Hebrew
@@ -430,7 +430,7 @@ libraries.</p>
 <tr class=b>
 <td class=r title='3 = 0x3'>3</td>
 <td>CPUType</td>
-<td class=c>N+</td>
+<td class=c title='+ = List'>N+</td>
 <td><span class=s>-1 = Any
   <br>1 = VAX
   <br>2 = ROMP
@@ -454,7 +454,7 @@ libraries.</p>
 <tr>
 <td class=r title='4 = 0x4'>4</td>
 <td>CPUSubtype</td>
-<td class=c>N+</td>
+<td class=c title='+ = List'>N+</td>
 <td><span class=s>&#39;1 0&#39; = VAX (all)
   <br>&#39;1 1&#39; = VAX780
   <br>&#39;1 2&#39; = VAX785
@@ -651,7 +651,7 @@ libraries.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 20, 2009</i>
+<br><i>Last revised Jan 22, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

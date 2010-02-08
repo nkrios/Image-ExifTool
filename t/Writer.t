@@ -1,11 +1,7 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl t/Writer.t'
+# Before "make install", this script should be runnable with "make test".
+# After "make install" it should work as "perl t/Writer.t".
 
-######################### We start with some black magic to print on failure.
-
-# Change "1..N" below to so that N matches last test number
-
-BEGIN { $| = 1; print "1..38\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..40\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -696,6 +692,28 @@ my $testOK;
         }
         print "ok $testnum\n";
     }
+}
+
+# tests 39-40: Test writing only if the tag didn't already exist
+{
+    ++$testnum;
+    my @writeInfo = (
+        [DateTimeOriginal => '', DelValue => 1],
+        [DateTimeOriginal => '1999:99:99 99:99:99'],
+        [XResolution => '', DelValue => 1],
+        [XResolution => '123'],
+        [ResolutionUnit => '', DelValue => 1],
+        [ResolutionUnit => 'cm'],
+    );
+    my @check = qw(FileName DateTimeOriginal XResolution ResolutionUnit);
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
+                                   't/images/Writer.jpg', \@check);
+    print "ok $testnum\n";
+
+    ++$testnum;
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
+                                   't/images/Canon.jpg', \@check);
+    print "ok $testnum\n";
 }
 
 # end

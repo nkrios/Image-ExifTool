@@ -28,17 +28,17 @@ These tags are used in Pentax/Asahi cameras.
 <tr>
 <td title='0x0002 = 2'>0x0002</td>
 <td>PreviewImageSize</td>
-<td class=c>int16u[2]~</td>
+<td class=c title='~ = Writable only with -n'>int16u[2]~</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0003 = 3'>0x0003</td>
 <td>PreviewImageLength</td>
-<td class=c>int32u*</td>
+<td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x0004 = 4'>0x0004</td>
 <td>PreviewImageStart</td>
-<td class=c>int32u*</td>
+<td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0005 = 5'>0x0005</td>
@@ -551,7 +551,7 @@ step size)</span></span></td></tr>
 <tr>
 <td title='0x0039 = 57'>0x0039</td>
 <td>RawImageSize</td>
-<td class=c>int16u[2]~</td>
+<td class=c title='~ = Writable only with -n'>int16u[2]~</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x003c = 60'>0x003c</td>
@@ -809,12 +809,12 @@ step size)</span></span></td></tr>
 <tr class=b>
 <td title='0x0402 = 1026'>0x0402</td>
 <td>ToneCurve</td>
-<td class=c>Y~</td>
+<td class=c title='~ = Writable only with -n'>Y~</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x0403 = 1027'>0x0403</td>
 <td>ToneCurves</td>
-<td class=c>Y~</td>
+<td class=c title='~ = Writable only with -n'>Y~</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0e00 = 3584'>0x0e00</td>
@@ -1262,7 +1262,7 @@ released, including time for focusing)</span></span></td></tr>
 <td class=r title='1 = 0x1'>1.1</td>
 <td>ProgramLine</td>
 <td class=c>int8u</td>
-<td><span class=s>[Mask 0x3]
+<td><span class=s>[Mask 0x03]
   <br>0x0 = Normal
   <br>0x1 = Hi Speed
   <br>0x2 = Depth
@@ -1308,7 +1308,7 @@ released, including time for focusing)</span></span></td></tr>
 <td>MeteringMode2</td>
 <td class=c>int8u</td>
 <td><span class=s><span class=n>(may not be valid for some models, ie. *ist D)</span>
-  <br>[Mask 0xf]
+  <br>[Mask 0x0f]
   <br>0x0 = Multi-segment
   <br>Bit 0 = Center-weighted average
   <br>Bit 1 = Spot</span></td></tr>
@@ -1324,7 +1324,7 @@ released, including time for focusing)</span></span></td></tr>
 <td class=r title='3 = 0x3'>3.1</td>
 <td>FocusMode2</td>
 <td class=c>int8u</td>
-<td><span class=s>[Mask 0xf]
+<td><span class=s>[Mask 0x0f]
   <br>0x0 = Manual
   <br>0x1 = AF-S
   <br>0x2 = AF-C
@@ -1409,7 +1409,7 @@ released, including time for focusing)</span></span></td></tr>
 <td class=r title='10 = 0xa'>10.1</td>
 <td>MultipleExposureSet</td>
 <td class=c>int8u</td>
-<td><span class=s>[Mask 0xf]
+<td><span class=s>[Mask 0x0f]
   <br>0x0 = Off
   <br>0x1 = On</span></td></tr>
 <tr>
@@ -1460,7 +1460,7 @@ released, including time for focusing)</span></span></td></tr>
 <td>MeteringMode3</td>
 <td class=c>int8u</td>
 <td><span class=s><span class=n>(K10D only)</span>
-  <br>[Mask 0xf]
+  <br>[Mask 0x0f]
   <br>0x0 = Multi-segment
   <br>Bit 0 = Center-weighted average
   <br>Bit 1 = Spot</span></td></tr>
@@ -1488,7 +1488,7 @@ Remote or Self-timer, and Internal/ExternalFlashMode is not &quot;On, Wireless&q
 <td>ISOSetting</td>
 <td class=c>int8u</td>
 <td><span class=s><span class=n>(K10D only)</span>
-  <br>[Mask 0x4]
+  <br>[Mask 0x04]
   <br>0x0 = Manual
   <br>0x4 = Auto</span></td></tr>
 <tr class=b>
@@ -1496,7 +1496,7 @@ Remote or Self-timer, and Internal/ExternalFlashMode is not &quot;On, Wireless&q
 <td>SensitivitySteps</td>
 <td class=c>int8u</td>
 <td><span class=s><span class=n>(K10D only)</span>
-  <br>[Mask 0x2]
+  <br>[Mask 0x02]
   <br>0x0 = 1 EV Steps
   <br>0x2 = As EV Steps</span></td></tr>
 <tr>
@@ -1672,14 +1672,14 @@ gymnastics to decode them into useful values.</p>
 <td class=r title='0 = 0x0'>0.1</td>
 <td>AutoAperture</td>
 <td class=c>int8u</td>
-<td><span class=s>[Mask 0x1]
+<td><span class=s>[Mask 0x01]
   <br>0x0 = On
   <br>0x1 = Off</span></td></tr>
 <tr class=b>
 <td class=r title='0 = 0x0'>0.2</td>
 <td>MinAperture</td>
 <td class=c>int8u</td>
-<td><span class=s>[Mask 0x6]
+<td><span class=s>[Mask 0x06]
   <br>0x0 = 22
   <br>0x2 = 32
   <br>0x4 = 45
@@ -1743,7 +1743,7 @@ gymnastics to decode them into useful values.</p>
 <td class=r title='10 = 0xa'>10.1</td>
 <td>NominalMinAperture</td>
 <td class=c>int8u</td>
-<td><span class=s>[Mask 0xf]</span></td></tr>
+<td><span class=s>[Mask 0x0f]</span></td></tr>
 <tr>
 <td class=r title='11 = 0xb'>11</td>
 <td>LC10?</td>

@@ -246,7 +246,7 @@ sub WriteCR2($$$)
 # designed well!  So it isn't necessary to buffer the data in memory before
 # writing it out.  Therefore this routine doesn't return the directory data as
 # the rest of the Write routines do.  Instead, it writes to the dirInfo
-# Outfile on the fly --> much faster, efficient, and less demanding on memory!
+# OutFile on the fly --> much faster, efficient, and less demanding on memory!
 sub WriteCanonRaw($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
@@ -603,7 +603,7 @@ files, and would lead to far fewer problems with corrupted metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

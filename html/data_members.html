@@ -14,17 +14,18 @@ but this is Perl, so I couldn't do that...)</p>
 
 <p>Aside from the variables defined below, there may be other temporary
 variables added by individual modules. Temporary variables are identified by at
-least one lower case letter in their name, and are deleted before reading or
-writing each new image. Make, Model and CameraType are temporary variables like
-this, but these three are special because they are initialized to an empty
-string instead of being deleted at the start of processing for each image, which
-allows them to be tested without having to check for an undefined value.</p>
+least one lower case letter in their name, and are deleted automatically before
+reading or writing each new image.  Make, Model and CameraType are temporary
+variables like this, but these three are special because they are initialized to
+an empty string instead of being deleted at the start of processing for each
+image, which allows them to be tested without having to check for an undefined
+value.</p>
 
 <blockquote><table class='norm'><tr><th>Name</th><th>Description</th></tr>
 
 <tr><td>ADD_DIRS</td><td>Hash of parent directories for each directory added during
-	writing (Note: entry may exist but be undefined for top-level
-	directory!)</td></tr>
+    writing (Note: entry may exist but be undefined for top-level
+    directory!)</td></tr>
 
 <tr><td>BASE</td><td>Absolute position of current image in containing file
     (for example, when processing JPEG image in FujiFilm RAF file)</td></tr>
@@ -49,7 +50,8 @@ allows them to be tested without having to check for an undefined value.</p>
 
 <tr><td>DIR_NAME</td><td>Name of directory currently being processed</td></tr>
 
-<tr><td>DOC_COUNT</td><td>Number of embedded documents processed while extracting</td></tr>
+<tr><td>DOC_COUNT</td><td>Number of top-level embedded sub-documents processed while
+    extracting, or 0 if none were processed</td></tr>
 
 <tr><td>DOC_NUM</td><td>Current document number while extracting (0, '' or undef for the
     main document)</td></tr>
@@ -62,8 +64,8 @@ allows them to be tested without having to check for an undefined value.</p>
 <tr><td>DUPL_TAG</td><td>Hash of last used tag key index numbers for each duplicate tag.</td></tr>
 
 <tr><td>EDIT_DIRS</td><td>Hash of parent directories for each directory edited during
-	writing (Note: entry may exist but be undefined for top-level
-	directory!)</td></tr>
+    writing (Note: entry may exist but be undefined for top-level
+    directory!)</td></tr>
 
 <tr><td>ESCAPE_PROC</td><td>Routine for XML or HTML escaping if Escape option is set</td></tr>
 
@@ -112,13 +114,13 @@ allows them to be tested without having to check for an undefined value.</p>
     in a call to FoundTag().</td></tr>
 
 <tr><td>NEW_VALUE</td><td>Hash of new value information keyed by tag info reference.
-	Elements of new value information hash are:
+    Elements of new value information hash are:
     <table class='clear'><tr><td>TagInfo</td><td>-</td><td>tag information reference</td></tr>
     <tr><td>DelValue</td><td>-</td><td>list of specific values to delete</td></tr>
     <tr><td>Value</td><td>-</td><td>list of values to add</td></tr>
     <tr valign='top'><td>IsCreating</td><td>-</td><td>must be set for the tag to be added, otherwise just
-    	changed if it already exists.  A value of 2 will create a new tag if its group already
-    	exists, but won't add a new group</td></tr>
+        changed if it already exists.  A value of 2 will create a new tag if its group already
+        exists, but won't add a new group</td></tr>
     <tr valign='top'><td>Next</td><td>-</td><td>reference to next new value hash in linked list
         if there is more than one new value hash (for writing to different groups) for this
         tagInfo</td></tr>
@@ -141,6 +143,9 @@ allows them to be tested without having to check for an undefined value.</p>
     Photoshop:IPTCDigest tag</td></tr>
 
 <tr><td>OPTIONS</td><td>ExifTool options</td></tr>
+
+<tr><td>PATH</td><td>List reference to SubDirectory path when reading.  ie)
+    [qw(JPEG APP13 Photoshop IPTC)]</td></tr>
 
 <tr><td>PDF_CAPTURE</td><td>Used by PDF module to store information when writing</td></tr>
 
@@ -203,12 +208,12 @@ information may include:
 <tr><td>WRITE_PRIORITY</td><td>Hash of write priority values keyed by group name</td></tr>
 
 <tr><td>XMP_CAPTURE</td><td>Hash of tag information (value, attribute hash) keyed by XMP
-	property path, used by XMP module during writing</td></tr>
+    property path, used by XMP module during writing</td></tr>
 
 <tr><td>XMP_ERROR</td><td>Error string used by XMP module during writing</td></tr>
 
 <tr><td>XMP_NS</td><td>Hash of URI's keyed by namespace prefix, used by XMP module
-	during writing to remember all used namespaces</td></tr>
+    during writing to remember all used namespaces</td></tr>
 
 </table></blockquote>
 <hr>

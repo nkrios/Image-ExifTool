@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.87
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: XMP.svg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1402 bytes
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:04:08 13:45:42-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2008:04:07 14:11:53-04:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: SVG
 [File, File, Image] MIMEType - MIME Type: image/svg+xml
 [SVG, SVG, Image] width - Image Width: 4in

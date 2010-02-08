@@ -372,8 +372,18 @@ added dynamically to this table after processing the Meta Keys information.</p>
 <td><span class=s>0 = iTunes
   <br>1 = AOL</span></td></tr>
 <tr class=b>
+<td>'albm'</td>
+<td>Album</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'apID'</td>
 <td>AppleStoreAccount</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'atID'</td>
+<td>AlbumTitleID</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -428,47 +438,58 @@ added dynamically to this table after processing the Meta Keys information.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'geID'</td>
+<td>GenreID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'gnre'</td>
 <td>Genre</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'grup'</td>
 <td>Grouping</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'hdvd'</td>
 <td>HDVideo</td>
 <td class=c>N</td>
 <td><span class=s>0 = No
   <br>1 = Yes</span></td></tr>
-<tr class=b>
+<tr>
 <td>'keyw'</td>
 <td>Keyword</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'ldes'</td>
 <td>LongDescription</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'pcst'</td>
 <td>Podcast</td>
 <td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
+<td><span class=s>0 = No
+  <br>1 = Yes</span></td></tr>
+<tr class=b>
 <td>'perf'</td>
 <td>Performer</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'pgap'</td>
 <td>PlayGap</td>
 <td class=c>N</td>
 <td><span class=s>0 = Insert Gap
   <br>1 = No Gap</span></td></tr>
+<tr class=b>
+<td>'plID'</td>
+<td>PlayListID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 <tr>
 <td>'purd'</td>
 <td>PurchaseDate</td>
@@ -596,71 +617,76 @@ added dynamically to this table after processing the Meta Keys information.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>"&copy;ART"</td>
-<td>Artist</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>"&copy;alb"</td>
-<td>Album</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>"&copy;cmt"</td>
-<td>Comment</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>"&copy;com"</td>
-<td>Composer</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>"&copy;day"</td>
+<td>'yrrc'</td>
 <td>Year</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>"&copy;ART"</td>
+<td>Artist</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>"&copy;alb"</td>
+<td>Album</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>"&copy;cmt"</td>
+<td>Comment</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>"&copy;com"</td>
+<td>Composer</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>"&copy;day"</td>
+<td>Year</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>"&copy;des"</td>
 <td>Description</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;enc"</td>
 <td>EncodedBy</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;gen"</td>
 <td>Genre</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;grp"</td>
 <td>Grouping</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;lyr"</td>
 <td>Lyrics</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;nam"</td>
 <td>Title</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;too"</td>
 <td>Encoder</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;trk"</td>
 <td>Track</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;wrt"</td>
 <td>Composer</td>
 <td class=c>N</td>
@@ -1611,96 +1637,101 @@ if they don&#39;t exist in this table.</p>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Video'>QuickTime Video Tags</a></td></tr>
 <tr>
+<td>'vndr'</td>
+<td>Vendor</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>"&copy;cpy"</td>
 <td>Copyright</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;day"</td>
 <td>CreateDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;dir"</td>
 <td>Director</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;ed1"</td>
 <td>Edit1</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;ed2"</td>
 <td>Edit2</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;ed3"</td>
 <td>Edit3</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;ed4"</td>
 <td>Edit4</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;ed5"</td>
 <td>Edit5</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;ed6"</td>
 <td>Edit6</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;ed7"</td>
 <td>Edit7</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;ed8"</td>
 <td>Edit8</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;ed9"</td>
 <td>Edit9</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;fmt"</td>
 <td>Format</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;inf"</td>
 <td>Information</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;prd"</td>
 <td>Producer</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;prf"</td>
 <td>Performers</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;req"</td>
 <td>Requirements</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;src"</td>
 <td>Source</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;wrt"</td>
 <td>Writer</td>
 <td class=c>N</td>
@@ -2149,7 +2180,7 @@ if they don&#39;t exist in this table.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 12, 2009</i>
+<br><i>Last revised Dec 15, 2009</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

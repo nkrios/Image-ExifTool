@@ -74,7 +74,7 @@ Make sure you are looking at the right information.  Information may be
 duplicated in different locations within an image.  When in doubt, use
 "<code>exiftool -a -G1 FILENAME</code>" to show all information and the
 locations in the file.  In this command, <code>-a</code> allows
-duplicate tags to be displayed, <code>-G1</code> shows the family 1
+duplicate tags to be extracted, <code>-G1</code> shows the family 1
 group name (ie. the location) of each tag, and "<code>FILENAME</code>" is
 the name of your image file.  Also, it may be helpful to add
 <code>-s</code> to show the actual tag names instead of the
@@ -134,6 +134,15 @@ sub-seconds and a timezone to be specified.  The timezone format is
 example:
 
 <pre>exiftool -xmp:dateTimeOriginal="2005:10:23 20:06:34.33-05:00" a.jpg
+</pre>
+
+When writing XMP or other information types which allow incomplete date/time
+values, the following input formats are also accepted:
+
+<pre>YYYY
+YYYY:MM
+YYYY:MM:DD
+YYYY:MM:DD hh:mm
 </pre>
 
 ExifTool will attempt to reformat input date/time values into the standard
@@ -219,8 +228,8 @@ recognized. So it is a good idea not to edit the Make and Model tags in the
 first place.</blockquote>
 
 <blockquote>If you really want to delete the Make and Model information, you
-might as well delete the maker notes too.  You can do this with the either of
-the following commands:
+might as well delete the maker notes too.  You can do this with either of the
+following commands:
 <pre>exiftool -make= -model= -makernotes:all= image.jpg
 exiftool -make= -model= -makernotes= image.jpg
 </pre>
@@ -333,14 +342,22 @@ character entities when reading/writing with the <code>-E</code> option.
 </blockquote>
 
 <blockquote>Valid <code>-charset</code> values are (with aliases given in
-brackets): UTF8 (UTF-8, cp65001), Latin (Latin1, cp1252), Latin2 (cp1250),
-Cyrillic (Russian, cp1251), Greek (cp1253), Turkish (cp1254), Hebrew (cp1255),
-Arabic (cp1256), Baltic (cp1257), Vietnam (cp1258), Thai (cp874), MacRoman (Mac,
-Roman, cp10000), MacLatin2 (cp10029), MacCyrillic (cp10007), MacGreek (cp10006),
-MacTurkish (cp10081), MacRomanian (cp10010), MacIceland (cp10079) and
-MacCroatian (cp10082).</blockquote>
+brackets):
 
-<blockquote>More specific details are given below about how character coding is
+<blockquote><table class=clear>
+<tr><td>UTF8</td><td>(cp65001, UTF-8)</td><td>Thai</td><td>(cp874)</td></tr>
+<tr><td>Latin</td><td>(cp1252, Latin1)</td><td>MacRoman</td><td>(cp10000, Mac, Roman)</td></tr>
+<tr><td>Latin2</td><td>(cp1250)</td><td>MacLatin2</td><td>(cp10029)</td></tr>
+<tr><td>Cyrillic</td><td>(cp1251,&nbsp;Russian)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>MacCyrillic</td><td>(cp10007)</td></tr>
+<tr><td>Greek</td><td>(cp1253)</td><td>MacGreek</td><td>(cp10006)</td></tr>
+<tr><td>Turkish</td><td>(cp1254)</td><td>MacTurkish</td><td>(cp10081)</td></tr>
+<tr><td>Hebrew</td><td>(cp1255)</td><td>MacRomanian</td><td>(cp10010)</td></tr>
+<tr><td>Arabic</td><td>(cp1256)</td><td>MacIceland</td><td>(cp10079)</td></tr>
+<tr><td>Baltic</td><td>(cp1257)</td><td>MacCroatian</td><td>(cp10082)</td></tr>
+<tr><td>Vietnam</td><td>(cp1258)</td></tr>
+</table></blockquote>
+
+More specific details are given below about how character coding is
 handled for EXIF, IPTC, XMP, ID3, PDF and MIE information:</blockquote>
 
 <blockquote><b>EXIF</b>: Most textual information in EXIF is stored in ASCII
@@ -348,14 +365,17 @@ format, and ExifTool does not translate these tags.  However it is not uncommon
 for applications to write UTF-8 or other encodings where ASCII is expected, and
 ExifTool will quite happily read/write any encoding without translation.  For a
 few EXIF tags (UserComment, GPSProcessingMethod and GPSAreaInformation) the
-stored text may be encoded either in ASCII, Unicode (UCS-2) or JIS.  When
-reading these tags, Unicode text is translated to the character set specified by
+stored text may be encoded either in ASCII, Unicode (UCS-2) or JIS.  When reading
+these tags, Unicode and JIS are translated to the character set specified by
 the <code>-charset</code> or <code>-L</code> option, or to UTF&#8209;8 by
-default. Other encodings are not translated.  When writing, text is stored as
+default.  Other encodings are not translated.  When writing, text is stored as
 ASCII unless the string contains special characters, in which case it is
-translated from the specified character set and stored as Unicode.  The EXIF
-"XP" tags (XPTitle, XPComment, etc) are always stored as Unicode, and are read
-and written using the specified character set.</blockquote>
+translated from the specified character set and stored as Unicode.  ExifTool
+writes Unicode in native EXIF byte ordering by default, but this may be changed
+by setting the ExifUnicodeByteOrder tag (see the <a href="TagNames/Extra.html">Extra
+Tags</a> documentation).  The EXIF "XP" tags (XPTitle, XPComment, etc) are
+always stored as little-endian Unicode, and are read and written using the
+specified character set.</blockquote>
 
 <blockquote><b>IPTC</b>: The value of the IPTC:CodedCharacterSet tag determines
 how the internal IPTC string values are interpreted.  If CodedCharacterSet
@@ -374,7 +394,7 @@ about IPTC character coding.</blockquote>
 
 <blockquote>ExifTool may be used to convert IPTC values to a different internal
 encoding.  To do this, all IPTC tags must be rewritten along with the desired
-value of CodedCharacterSet. For example, the following command changes the
+value of CodedCharacterSet.  For example, the following command changes the
 internal IPTC encoding to UTF&#8209;8:
 <pre>exiftool -tagsfromfile @ -iptc:all -codedcharacterset=utf8 a.jpg
 </pre>and this command changes it back from UTF&#8209;8 to Windows Latin1 (cp1252):
@@ -394,14 +414,15 @@ following 5 characters to XML character references: <code>&amp; &lt; &gt; &#39;
 text to/from a specified character set when reading/writing.</blockquote>
 
 <blockquote><b>ID3</b>: The ID3v1 specification officially supports only ISO
-8859&#8209;1 encoding although some applications may incorrectly use other
-character sets.  ExifTool assumes proper ISO 8859&#8209;1 encoding and
-translates to UTF&#8209;8 by default, or disables translation with the
-"<code>-charset Latin</code>" or <code>-L</code> (since ISO 8859&#8209;1 is a
-subset of Windows Latin1). ID3v2 text may be stored with a number of different
-encodings, and ExifTool translates them to the character set specified by
-<code>-charset</code> or <code>-L</code>, or to UTF&#8209;8 by default. 
-ExifTool does not currently write ID3 information.</blockquote>
+8859&#8209;1 encoding (a subset of Windows Latin1), although some applications
+may incorrectly use other character sets.  By default ExifTool translates ID3v1
+text from Latin to the character set specified by the <code>-charset</code> or
+<code>-L</code> option, or to UTF&#8209;8 by default.  However, the internal
+ID3v1 charset may be specified with "<code>-charset id3=CHARSET</code>".  The
+encoding for ID3v2 information is stored in the file, so ExifTool translates
+ID3v2 text from this encoding to the character set specified by
+<code>-charset</code> or <code>-L</code>, or to UTF&#8209;8 by default. ExifTool
+does not currently write ID3 information.</blockquote>
 
 <blockquote><b>PDF</b>: PDF text strings are stored in either PDFDocEncoding
 (similar to Windows Latin1) or Unicode (UCS&#8209;2).  When reading, ExifTool
@@ -435,14 +456,22 @@ own tags.</blockquote>
 
 <blockquote>If this doesn't work, the most common problem is that the
 "<code>.ExifTool_config</code>" configuration file isn't getting loaded
-properly, and there are two things you
-can try:  1) Set either the <b>HOME</b> or the <b>EXIFTOOL_HOME</b> environment
+properly, and there are a few things you can try which may help with this:
+<ol><li>Set either the <b>HOME</b> or the <b>EXIFTOOL_HOME</b> environment
 variable to the name of the directory where you put your
-"<code>.ExifTool_config</code>" file, or 2) put the config file in the same
+"<code>.ExifTool_config</code>" file</li>
+<li>Put the config file in the same
 directory as the exiftool script.  (Also, be sure the config filename starts
 with a dot!  In the Windows GUI you may be not be able to generate a file name
 that starts with a '<code>.</code>', but it can be done from the command line
-using the '<code>rename</code>' command.)</blockquote>
+using the '<code>rename</code>' command.)</li>
+<li>If running on a system with case-sensitive filenames (ie. Linux), check the
+case of your config file.  It must be "<code>.ExifTool_config</code>" (note
+the capital "<code>T</code>").</li>
+<li>Use the <code>-config <i>CFGFILE</i></code> option to load the config file
+by name.  (If used, this must be the first option on the command line.)</li>
+</ol>
+</blockquote>
 
 <blockquote>If necessary, you can verify that ExifTool is loading your config
 file by adding the following line to your file:
@@ -456,7 +485,7 @@ file you are writing can support these names.  Try copying the
 "<code>t/images/Writer.jpg</code>" file from the distribution and running
 exiftool with the following command:
 
-<pre>exiftool -v3 -NewXMPxxxTag1=test Writer.jpg
+<pre>exiftool -v2 -NewXMPxxxTag1=test Writer.jpg
 </pre>
 
 If ExifTool recognizes the new tag, the first line of output from this command
@@ -674,7 +703,7 @@ split values of list-type tags into separate items.  For example,
 </pre>
 
 will store three separate keywords, the same as the first example above. This
-feature may be used to split a tag value into separate items if it was
+feature may also be used to split a tag value into separate items if it was
 originally stored incorrectly as a single string:
 
 <pre>exiftool -sep ", " -tagsfromfile @ -keywords test.jpg
@@ -711,10 +740,10 @@ assignment.  (ie. existing values will be preserved unless specifically deleted
 with "<code>-=</code>".)
 </blockquote>
 
-<blockquote>To prevent duplication when adding new values, the values can be
-deleted then added back again in the same command.  For example, the following
-command adds the keywords "one" and "two", ensuring that they are not duplicated
-if they already existed in the keywords of an image:
+<blockquote>To prevent duplication when adding new values, specific values can
+be deleted then added back again in the same command.  For example, the
+following command adds the keywords "one" and "two", ensuring that they are not
+duplicated if they already existed in the keywords of an image:
 
 <pre>exiftool -keywords-=one -keywords+=one -keywords-=two -keywords+=two DIR
 </pre>
@@ -739,9 +768,9 @@ the <code>-addTagsFromFile</code> option instead:
 </pre>
 
 Note that as with "<code>=</code>" in the first three examples above, the
-"<code>&lt;</code>" operation of the previous command overwrites any Keywords
-that existed previously in the original file.  To add to or remove from the
-existing keywords, use "<code>+&lt;</code>" or "<code>-&lt;</code>".
+"<code>&lt;</code>" operation of this command overwrites any Keywords that
+existed previously in the original file.  To add to or remove from the existing
+keywords, use "<code>+&lt;</code>" or "<code>-&lt;</code>".
 </blockquote>
 
 <a name="Q18"></a>
@@ -807,10 +836,12 @@ example to illustrate the idea:
 1; # end
 </pre>
 
-The above config file defines a new tag called "MyArtist" which takes its
-value from the "Artist" tag after translating spaces to underlines. So, for
-example, an Artist value of "Phil Harvey" yields a corresponding MyArtist value
-of "Phil_Harvey".</blockquote>
+The above config file defines a new tag called "MyArtist" which takes its value
+from the "Artist" tag after translating spaces to underlines. So, for example, an
+Artist value of "Phil Harvey" yields a corresponding MyArtist value of
+"Phil_Harvey".  The ValueConv expression may be any valid Perl expression -- it
+returns the converted value given the original value ($val) of the Require'd tag.
+</blockquote>
 
 <blockquote>To activate the config file, it must be named
 "<code>.ExifTool_config</code>" and placed either in your home directory or in
@@ -849,7 +880,7 @@ without errors, but note that some metadata from the original image may have
 been lost in the process.</blockquote>
 
 <hr>
-<i>Last revised Oct. 5, 2009</i>
+<i>Last revised Jan. 6, 2010</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

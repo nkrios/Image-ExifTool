@@ -1,11 +1,7 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl t/Geotag.t'
+# Before "make install", this script should be runnable with "make test".
+# After "make install" it should work as "perl t/Geotag.t".
 
-######################### We start with some black magic to print on failure.
-
-# Change "1..N" below to so that N matches last test number
-
-BEGIN { $| = 1; print "1..6\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..7\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -13,8 +9,6 @@ use Image::ExifTool 'ImageInfo';
 use Image::ExifTool::Geotag;
 $loaded = 1;
 print "ok 1\n";
-
-######################### End of black magic.
 
 use t::TestLib;
 
@@ -101,6 +95,33 @@ my $testfile2;
     my $info = $exifTool->ImageInfo($testfile, @testTags);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# test 7: Geotag from IGC log with time drift correction
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    my $txtfile = "t/${testname}_${testnum}.failed";
+    unlink $testfile;
+    open GEOTAG_TEST_7, ">$txtfile" or warn "Error opening $txtfile\n";
+    $exifTool->Options(Verbose => 2);
+    $exifTool->Options(TextOut => \*GEOTAG_TEST_7);
+    $exifTool->SetNewValue(Geosync => '2010:01:05 07:00:00Z@2001:08:01 12:00:00-02:00');
+    $exifTool->SetNewValue(Geosync => '2010:01:05 09:01:00Z@2001:08:01 14:00:00-02:00');
+    $exifTool->SetNewValue(Geotag => 't/images/Geotag.igc');
+    $exifTool->SetNewValuesFromFile('t/images/Nikon.jpg',
+        'Geotime<${DateTimeOriginal}-02:00'
+    );
+    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
+    close GEOTAG_TEST_7;
+    if (testCompare('t/Geotag_7.out', $txtfile, $testnum)) {
+        unlink $testfile;
+        unlink $txtfile;
     } else {
         print 'not ';
     }

@@ -1,13 +1,13 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.98
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.05
 [File, System, Image] FileName - File Name: Jpeg2000_3_failed.jp2
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 3.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:10:24 20:38:33-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:01:09 08:04:43-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JP2
 [File, File, Image] MIMEType - MIME Type: image/jp2
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
-[File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 70a74478872c74e33c70dcf49167edf0
 [Jpeg2000, Jpeg2000, Video] 0 - Major Brand: JPEG 2000 Image (.JP2)
 [Jpeg2000, Jpeg2000, Video] 1 - Minor Version: 0.0.0
 [Jpeg2000, Jpeg2000, Video] 2 - Compatible Brands: jp2 
@@ -40,6 +40,6 @@
 [GeoTiff, GeoTiff, Location] 3076 - Proj Linear Units: Linear Meter
 [IPTC, IPTC, Other] 25 - Keywords: test keyword
 [IPTC, IPTC, Other] 0 - Application Record Version: 4
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 7.98
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.05
 [XMP, XMP-photoshop, Location] City - City: a city
 [Composite, Composite, Image] ImageSize - Image Size: 16x16

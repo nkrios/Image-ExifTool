@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::XMP;
 use Image::ExifTool::ZIP;
 
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 # test for recognized iWork document extensions and outter XML elements
 my %iWorkType = (
@@ -22,17 +22,26 @@ my %iWorkType = (
     NUMBERS => 'Apple Numbers',
     PAGES   => 'Apple Pages',
     KEY     => 'Apple Keynote',
+    KTH     => 'Apple Keynote Theme',
+    NMBTEMPLATE => 'Apple Numbers Template',
+    # we don't support double extensions --
+    # "PAGES.TEMPLATE" => 'Apple Pages Template',
     # outter XML elements
     'ls:document' => 'Apple Numbers',
     'sl:document' => 'Apple Pages',
     'key:presentation' => 'Apple Keynote',
 );
 
-# MIME types for iWork files (apparently Apple has not registered these yet)
+# MIME types for iWork files (Apple has not registered these yet, but these
+# are my best guess after doing some googling.  I'm not 100% sure what "sff"
+# indicates, but I think it refers to the new "flattened" package format)
 my %mimeType = (
-    'Apple Numbers' => 'application/unknown',
-    'Apple Pages'   => 'application/unknown',
-    'Apple Keynote' => 'application/unknown',
+    'Apple Numbers' => 'application/x-iwork-numbers-sffnumbers',
+    'Apple Pages'   => 'application/x-iwork-pages-sffpages',
+    'Apple Keynote' => 'application/x-iWork-keynote-sffkey',
+    'Apple Numbers Template' => 'application/x-iwork-numbers-sfftemplate',
+    'Apple Pages Template'   => 'application/x-iwork-pages-sfftemplate',
+    'Apple Keynote Theme'    => 'application/x-iWork-keynote-sffkth',
 );
 
 # iWork tags
@@ -80,10 +89,8 @@ sub FoundTag($$$$;$)
 
     # un-escape XML character entities
     $val = Image::ExifTool::XMP::UnescapeXML($val);
-    # convert to specified character set if necessary
-    if ($exifTool->{OPTIONS}{Charset} ne 'UTF8' and $val =~ /[\x80-\xff]/) {
-        $val = $exifTool->UTF82Charset($val);
-    }
+    # convert from UTF8 to ExifTool Charset
+    $val = $exifTool->Decode($val, 'UTF8');
     my $tag = GetTagID($props) or return 0;
 
     # add any unknown tags to table
@@ -201,7 +208,7 @@ information from Apple iWork '09 XML+ZIP files.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

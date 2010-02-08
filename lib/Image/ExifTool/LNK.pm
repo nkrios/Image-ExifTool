@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.03';
 
 sub ProcessItemID($$$);
 sub ProcessLinkInfo($$$);
@@ -82,6 +82,7 @@ sub ProcessLinkInfo($$$);
     0x1c => {
         Name => 'CreateDate',
         Format => 'int64u',
+        Groups => { 2 => 'Time' },
         # convert time from 100-ns intervals since Jan 1, 1601
         RawConv => '$val ? $val : undef',
         ValueConv => '$val=$val/1e7-11644473600; ConvertUnixTime($val,1)',
@@ -90,6 +91,7 @@ sub ProcessLinkInfo($$$);
     0x24 => {
         Name => 'AccessDate',
         Format => 'int64u',
+        Groups => { 2 => 'Time' },
         RawConv => '$val ? $val : undef',
         ValueConv => '$val=$val/1e7-11644473600; ConvertUnixTime($val,1)',
         PrintConv => '$self->ConvertDateTime($val)',
@@ -97,6 +99,7 @@ sub ProcessLinkInfo($$$);
     0x2c => {
         Name => 'ModifyDate',
         Format => 'int64u',
+        Groups => { 2 => 'Time' },
         RawConv => '$val ? $val : undef',
         ValueConv => '$val=$val/1e7-11644473600; ConvertUnixTime($val,1)',
         PrintConv => '$self->ConvertDateTime($val)',
@@ -375,7 +378,7 @@ sub ProcessLinkInfo($$$);
         Name => 'FontName',
         Format => 'undef[64]',
         RawConv => q{
-            $val = $self->Unicode2Charset($val);
+            $val = $self->Decode($val, 'UCS2');
             $val =~ s/\0.*//;
             return length($val) ? $val : undef;
         },
@@ -514,7 +517,7 @@ sub ProcessLinkInfo($$$)
             $val = GetString($dataPt, $pos, $unicode);
             if (defined $val) {
                 $size = length $val;
-                $val = $exifTool->Unicode2Charset($val) if $unicode;
+                $val = $exifTool->Decode($val, 'UCS2') if $unicode;
                 $exifTool->HandleTag($tagTablePtr, 'VolumeLabel', $val, %opts, Start=>$pos, Size=>$size);
             }
         }
@@ -529,7 +532,7 @@ sub ProcessLinkInfo($$$)
         $val = GetString($dataPt, $pos, $unicode);
         if (defined $val) {
             $size = length $val;
-            $val = $exifTool->Unicode2Charset($val) if $unicode;
+            $val = $exifTool->Decode($val, 'UCS2') if $unicode;
             $exifTool->HandleTag($tagTablePtr, 'LocalBasePath', $val, %opts, Start=>$pos, Size=>$size);
         }
     }
@@ -548,7 +551,7 @@ sub ProcessLinkInfo($$$)
             $val = GetString($dataPt, $pos, $unicode);
             if (defined $val) {
                 $size = length $val;
-                $val = $exifTool->Unicode2Charset($val) if $unicode;
+                $val = $exifTool->Decode($val, 'UCS2') if $unicode;
                 $exifTool->HandleTag($tagTablePtr, 'NetName', $val, %opts, Start=>$pos, Size=>$size);
             }
             my $flg = Get32u($dataPt, $off + 0x04);
@@ -563,7 +566,7 @@ sub ProcessLinkInfo($$$)
                 $val = GetString($dataPt, $pos, $unicode);
                 if (defined $val) {
                     $size = length $val;
-                    $val = $exifTool->Unicode2Charset($val) if $unicode;
+                    $val = $exifTool->Decode($val, 'UCS2') if $unicode;
                     $exifTool->HandleTag($tagTablePtr, 'DeviceName', $val, %opts, Start=>$pos, Size=>$size);
                 }
             }
@@ -646,7 +649,7 @@ sub ProcessLNK($$)
         $len *= 2 if $flags & 0x80;  # characters are 2 bytes if Unicode flag is set   
         $raf->Read($buff, $len) or return 1;
         my $val;
-        $val = $exifTool->Unicode2Charset($buff) if $flags & 0x80;
+        $val = $exifTool->Decode($buff, 'UCS2') if $flags & 0x80;
         $exifTool->HandleTag($tagTablePtr, 0x30000 | $mask, $val,
             DataPt  => \$buff,
             DataPos => $raf->Tell() - $len,
@@ -695,7 +698,7 @@ information MS Shell Link (Windows shortcut) files.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

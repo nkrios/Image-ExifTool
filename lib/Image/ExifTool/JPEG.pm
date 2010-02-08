@@ -9,8 +9,9 @@
 package Image::ExifTool::JPEG;
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 # (this main JPEG table is for documentation purposes only)
 %Image::ExifTool::JPEG::Main = (
@@ -71,6 +72,11 @@ $VERSION = '1.10';
         Condition => '$$valPt =~ /^Stim\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::Stim::Main' },
     }],
+    APP4 => {
+        Name => 'Scalado',
+        Condition => '$$valPt =~ /^SCALADO\0/',
+        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::Scalado' },
+    },
     APP5 => {
         Name => 'RMETA',
         Condition => '$$valPt =~ /^RMETA\0/',
@@ -127,7 +133,7 @@ $VERSION = '1.10';
         Name => 'Comment',
         # note: flag as writable for documentation, but it won't show up
         # in the TagLookup as writable because there is no WRITE_PROC
-        Writable => '1',
+        Writable => 1,
     },
     SOF => {
         Name => 'StartOfFrame',
@@ -398,6 +404,75 @@ $VERSION = '1.10';
     },
 );
 
+# information written by Scalado software (PhotoFusion maybe?)
+%Image::ExifTool::JPEG::Scalado = (
+    GROUPS => { 0 => 'APP4', 1 => 'Scalado', 2 => 'Image' },
+    PROCESS_PROC => \&Image::ExifTool::JPEG::ProcessScalado,
+    TAG_PREFIX => 'Scalado',
+    FORMAT => 'int32s',
+    # I presume this was written by 
+    NOTES => q{
+        Tags extracted from the JPEG APP4 "SCALADO" segment (presumably written by
+        Scalado mobile software, L<http://www.scalado.com/>).
+    },
+    SPMO => {
+        Name => 'DataLength',
+        Unkown => 1,
+    },
+    WDTH => {
+        Name => 'PreviewImageWidth',
+        ValueConv => '$val ? abs($val) : undef',
+    },
+    HGHT => {
+        Name => 'PreviewImageHeight',
+        ValueConv => '$val ? abs($val) : undef',
+    },
+    QUAL => {
+        Name => 'PreviewQuality',
+        ValueConv => '$val ? abs($val) : undef',
+    },
+    # tags not yet decoded with observed values:
+    # CHKH: 0, -9010
+    # CHKL: -2664, -12852
+    # CLEN: -1024
+    # CSPC: -2232593
+    # DATA: (+ve data length)
+    # HDEC: 0
+    # MAIN: 0
+    # SCI0: (+ve data length)
+    # SCX1: (+ve data length)
+    # WDEC: 0
+);
+
+#------------------------------------------------------------------------------
+# Extract information from the JPEG APP4 SCALADO segment
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessScalado($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $pos = 0;
+    my $end = length $$dataPt;
+    SetByteOrder('MM');
+    $exifTool->VerboseDir('APP4 SCALADO', undef, $end);
+    for (;;) {
+        last if $pos + 12 > $end;
+        my $tag = substr($$dataPt, $pos, 4);
+        my $unk = Get32u($dataPt, $pos + 4); # (what is this?)
+        $exifTool->HandleTag($tagTablePtr, $tag, undef,
+            DataPt  => $dataPt,
+            Start   => $pos + 8,
+            Size    => 4,
+            Extra   => ", unk $unk",
+        );
+        # shorten directory size by length of SPMO
+        $end -= Get32u($dataPt, $pos + 8) if $tag eq 'SPMO';
+        $pos += 12;
+    }
+    return 1;
+}
+
 1;  # end
 
 __END__
@@ -418,7 +493,7 @@ segments are included in the Image::ExifTool module itself.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

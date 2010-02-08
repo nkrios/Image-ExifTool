@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.30';
+$VERSION = '1.32';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -891,7 +891,7 @@ sub CheckMIE($$$)
             $$valPtr =~ /[\x80-\xff]/)
         {
             # convert from Charset to UTF-8
-            $$valPtr = $exifTool->Charset2UTF8($$valPtr);
+            $$valPtr = $exifTool->Encode($$valPtr,'UTF8');
         }
         $err = Image::ExifTool::CheckValue($valPtr, $format, $$tagInfo{Count});
     }
@@ -1107,6 +1107,12 @@ sub WriteMIEGroup($$$)
                             DirStart=> 0,
                             DirLen  => $valLen,
                         );
+                        # write Compact subdirectories if we will compress the data
+                        if (($compress or $optCompress or $$dirInfo{IsCompressed}) and
+                            eval 'require Compress::Zlib')
+                        {
+                            $subdirInfo{Compact} = 1;
+                        }
                     }
                     $subdirInfo{Parent} = $dirName;
                     my $writeProc = $newInfo->{SubDirectory}->{WriteProc};
@@ -1235,10 +1241,8 @@ sub WriteMIEGroup($$$)
                     if ($isUTF8 > 0) {
                         $writable = 'utf8';
                         # write UTF-16 or UTF-32 if it is more compact
-                        my $pk = (GetByteOrder() eq 'MM') ? 'n' : 'v';
-                        $pk = uc($pk) if $isUTF8 > 1;
-                        # translate to utf16 or utf32
-                        my $tmp = Image::ExifTool::UTF82Unicode($newVal,$pk);
+                        my $to = $isUTF8 > 1 ? 'UCS4' : 'UCS2';
+                        my $tmp = Image::ExifTool::Decode(undef,$newVal,'UTF8',undef,$to);
                         if (length $tmp < length $newVal) {
                             $newVal = $tmp;
                             $writable = ($isUTF8 > 1) ? 'utf32' : 'utf16';
@@ -1619,8 +1623,8 @@ sub ProcessMIEGroup($$$)
                     $exifTool->{NO_LIST} = 1;
                 } else {
                     # convert to specified character set if necessary
-                    if ($notUTF8 and $formatStr =~ /^(utf|string)/ and $val =~ /[\x80-\xff]/) {
-                        $val = $exifTool->UTF82Charset($val);
+                    if ($notUTF8 and $formatStr =~ /^(utf|string)/) {
+                        $val = $exifTool->Decode($val, 'UTF8');
                     }
                     if ($formatStr =~ /_list$/) {
                         # split list value into separate strings
@@ -2520,7 +2524,7 @@ tag name.  For example:
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.  The MIE format itself is also

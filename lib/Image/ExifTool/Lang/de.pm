@@ -10,7 +10,7 @@ package Image::ExifTool::Lang::de;
 
 use vars qw($VERSION);
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 %Image::ExifTool::Lang::de::Translate = (
    'AEAperture' => 'AE-Blende',
@@ -47,7 +47,7 @@ $VERSION = '1.10';
    'AELockButton' => {
       Description => 'AE-L/AF-L-Taste',
       PrintConv => {
-        'AE Lock Hold' => 'Nur Belichtung (halten)',
+        'AE Lock (hold)' => 'Nur Belichtung (halten)',
         'AE Lock Only' => 'Nur Belichtung',
         'AE-L/AF Area' => 'Belichtung & Messfeld',
         'AE-L/AF-L/AF Area' => 'Bel. & Fokus & Messfeld',
@@ -156,8 +156,8 @@ $VERSION = '1.10';
       PrintConv => {
         'Auto-area' => 'Autom. Messfeldgr.',
         'Dynamic Area' => 'Dynamisch',
-        'Dynamic Area (wide)' => 'Dynamische Messfeldsteuerung (groß)',
         'Dynamic Area (closest subject)' => 'Dynamic Messfeldgruppensteuerung (priorität der kürzesten Aufnahmedistanz)',
+        'Dynamic Area (wide)' => 'Dynamische Messfeldsteuerung (groß)',
         'Group Dynamic' => 'Dynamische Messfeldgruppensteuerung',
         'Single Area' => 'Einzelfeld',
         'Single Area (wide)' => 'Einzelfeldmessung (groß)',
@@ -203,6 +203,7 @@ $VERSION = '1.10';
         'Quick mode' => 'QuickModus',
       },
     },
+   'AFFineTune' => 'AF-Feinabstimmung',
    'AFFineTuneAdj' => 'AF-Feinabstimmung',
    'AFImageHeight' => 'AF-Bildhöhe',
    'AFImageWidth' => 'AF-Bildbreite',
@@ -980,6 +981,7 @@ $VERSION = '1.10';
     },
    'ColorBalance' => 'Farbabgleich',
    'ColorBalance1' => 'Farbabgleich 1',
+   'ColorBalanceA' => 'Farbabgleich A',
    'ColorBalanceAdj' => {
       PrintConv => {
         'Off' => 'Aus',
@@ -1621,6 +1623,14 @@ $VERSION = '1.10';
    'Exposure' => 'Belichtung',
    'ExposureBracketStepSize' => 'Belichtungsreihen-Stufenabstand',
    'ExposureBracketValue' => 'Belichtungsreihenwert',
+   'ExposureCompStepSize' => {
+      Description => 'Belichtungskorrekturwert',
+      PrintConv => {
+        '1 EV' => '1 LW',
+        '1/2 EV' => '1/2 LW',
+        '1/3 EV' => '1/3 LW',
+      },
+    },
    'ExposureCompensation' => 'Belichtungskorrektur',
    'ExposureControlStepSize' => {
       Description => 'Belichtungswert',
@@ -1879,14 +1889,6 @@ $VERSION = '1.10';
    'FineTuneOptCenterWeighted' => 'Feinabst. der Bel.Messung Mittenbetonte Messung',
    'FineTuneOptMatrixMetering' => 'Feinabst. der Bel.Messung Matrixmessung',
    'FineTuneOptSpotMetering' => 'Feinabst. der Bel.Messung Spotmessung',
-   'FineTuneStepSize' => {
-      Description => 'Belichtungskorrekturwert',
-      PrintConv => {
-        '1 EV' => '1 LW',
-        '1/2 EV' => '1/2 LW',
-        '1/3 EV' => '1/3 LW',
-      },
-    },
    'FirmwareRevision' => 'Firmware-Revision',
    'FirmwareVersion' => 'Firmware-Version',
    'FixtureIdentifier' => 'Kennzeichnung',
@@ -2505,6 +2507,7 @@ $VERSION = '1.10';
    'IPTC-NAA' => 'IPTC-NAA Metadaten',
    'ISO' => 'ISO-Empfindlichkeit',
    'ISO2' => 'ISO-Empfindlichkeit (2)',
+   'ISODisplay' => 'ISO-Anzeige',
    'ISOExpansion' => {
       Description => 'ISO-Erweiterung',
       PrintConv => {
@@ -3391,6 +3394,13 @@ $VERSION = '1.10';
     },
    'PentaxModelID' => 'Pentax-Modell',
    'PentaxVersion' => 'Pentax-Version',
+   'PhaseDetectAF' => {
+      Description => 'Auto-Fokus',
+      PrintConv => {
+        'Off' => 'Aus',
+        'On (51-point)' => 'Ein',
+      },
+    },
    'PhotoEffect' => {
       Description => 'Foto-Effekt',
       PrintConv => {
@@ -5044,7 +5054,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

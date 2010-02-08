@@ -18,7 +18,7 @@ a.ref   { text-decoration: none; font-size: x-small;
 <br><a href="#EXIF">EXIF / TIFF</a>
 <br><a href="#Maker">EXIF Maker notes</a>
 <br><a href="#JPEG">JPEG</a>
-<br><a href="#IPTC">IPTC</a>
+<br><a href="#IPTC">IPTC IIM</a>
 <br><a href="#XMP">XMP</a>
 <br><a href="#PDF">PDF</a>
 <br><a href="#PNG">PNG</a>
@@ -115,8 +115,8 @@ typically want to use this image for quick review of pictures, and
 re-mapping the image into a contiguous memory space would be costly).</p>
 
 <a name='IPTC'></a>
-<h3>IPTC</h3>
-<p>IPTC earns a few points because it is the easiest to process of the
+<h3>IPTC IIM</h3>
+<p>IPTC IIM earns a few points because it is the easiest to process of the
 common meta information formats.  However, the format is overly restrictive
 and not very extensible.  Format information and human-readable tag names
 are not part of the specification, so it is not possible to meaningfully
@@ -145,8 +145,7 @@ information editing tools.  The best hope for small application developers
 is to link against an off-the-shelf XMP or XML library.  Apparently Adobe
 realizes this and is now providing an XMP development kit, but this solution
 is only useful for those platforms and computer languages that they choose
-to support, and even then the libraries are likely to be prohibitively
-unwieldy (too bulky and complex) for a small application.</p>
+to support.</p>
 
 <a name='PDF'></a>
 <h3>PDF</h3>
@@ -154,7 +153,9 @@ unwieldy (too bulky and complex) for a small application.</p>
 of this, it is unlikely that ExifTool will ever support this format for
 writing. <i>[Dec. 18, 2007 Update: I have just added PDF write support using
 the incremental update feature of PDF.  It was still a bit of work, but
-somewhat simpler (and MUCH faster!) than rewriting the entire PDF.]</i></p>
+somewhat simpler (and MUCH faster!) than rewriting the entire PDF.  But there
+are disadvantages: The resulting PDF is not "linearized", and there are
+privacy and security issues with leaving old metadata in the file.]</i></p>
 
 <a name='PNG'></a>
 <h3>PNG</h3>
@@ -205,16 +206,16 @@ tell I wrote this just after adding DICOM support to ExifTool?</p>
 
 <a name='AVCHD'></a>
 <h3>AVCHD (.M2TS) <span class='sm norm'><i>(added 2009-10-29)</i></h3>
-<p>This format is used .M2TS video files (and Blu-Ray HD DVD's).  It is
+<p>This format is used in .M2TS video files (and Blu-Ray HD DVD's).  It is
 painfully obvious that this was never designed as a storage format.  It uses
 MPEG-2 transport stream (M2TS) container, which is a communications protocol
 and never should have been used for storage.  The M2TS format is based on a
 188-byte packet size which makes no sense for modern filesystems.  And to
-make things worse, AVCHD uses insane and convoluted data structures such as
-the variable-bit-length exponential-Golomb which are painful and inefficient
-to parse in software.  And to top it off, as far as I can tell tell (the
-documentation of this format is very poor), there is no built-in metadata
-support.</p>
+make things worse, the H.264 video in AVCHD uses insane and convoluted data
+structures such as the variable-bit-length exponential-Golomb which are
+painful and inefficient to parse in software, and as far as I can tell the
+format for the metadata stored in these streams is proprietary and
+undocumented.</p>
 
 <a name='ISO'></a>
 <h3>ISO Considered Harmless</h3>

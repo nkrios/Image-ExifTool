@@ -5,6 +5,8 @@ a:visited { color: #508 }
 a:active  { color: red }
 .blk      { color: black }
 .red      { color: #c00 }
+.grn      { color: #080 }
+.blu      { color: blue }
 .com      { color: #a00 }
 .aside    { color: #864 }
 .lg       { font-size: larger }

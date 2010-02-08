@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: NikonD2Hs.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 3.4 kB
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2006:01:04 14:02:27-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
@@ -89,8 +90,10 @@
 [MakerNotes, NikonPreview, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Nikon, Camera] 19 - ISO Setting: 800
 [MakerNotes, Nikon, Camera] 22 - Image Boundary: 0 0 2464 1632
+[MakerNotes, Nikon, Camera] 23 - Flash Exposure Compensation: 0
 [MakerNotes, Nikon, Camera] 24 - Flash Exposure Bracket Value: 0.0
 [MakerNotes, Nikon, Camera] 25 - Exposure Bracket Value: 0
+[MakerNotes, Nikon, Camera] 28 - Exposure Tuning: 0
 [MakerNotes, Nikon, Camera] 29 - Serial Number: 3001006
 [MakerNotes, Nikon, Camera] 30 - Color Space: sRGB
 [MakerNotes, Nikon, Camera] 129 - Tone Comp: Auto
@@ -101,7 +104,6 @@
 [MakerNotes, Nikon, Camera] 1 - AF Point: Center
 [MakerNotes, Nikon, Camera] 2 - AF Points In Focus: Center
 [MakerNotes, Nikon, Camera] 137 - Shooting Mode: Delay
-[MakerNotes, Nikon, Camera] 138 - Auto Bracket Release: Manual Release
 [MakerNotes, Nikon, Camera] 139 - Lens F Stops: 7.33
 [MakerNotes, Nikon, Camera] 141 - Color Hue: Mode3
 [MakerNotes, Nikon, Camera] 144 - Light Source: Colored

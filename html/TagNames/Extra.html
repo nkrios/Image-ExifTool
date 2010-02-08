@@ -22,7 +22,7 @@ contained within the file data.  These &quot;pseudo&quot; tags belong to the fam
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td>CanonVRD</td>
-<td class=c>Y!</td>
+<td class=c title='! = Unsafe'>Y!</td>
 <td><span class=s><span class=n>(the full Canon DPP VRD trailer block)</span></span></td></tr>
 <tr class=b>
 <td>Comment</td>
@@ -32,14 +32,15 @@ contained within the file data.  These &quot;pseudo&quot; tags belong to the fam
 <td>CurrentIPTCDigest</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(MD5 digest of IPTC data.  All zeros if IPTC exists but Digest::MD5 is not
-installed)</span></span></td></tr>
+installed.  Only calculated for IPTC in the standard location as specified
+by the <a href="http://www.metadataworkinggroup.org/">MWG</a>)</span></span></td></tr>
 <tr class=b>
 <td>Directory</td>
-<td class=c>Y!</td>
+<td class=c title='! = Unsafe'>Y!</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>EXIF</td>
-<td class=c>Y!</td>
+<td class=c title='! = Unsafe'>Y!</td>
 <td><span class=s><span class=n>(the full EXIF data block from JPEG, PNG, JP2, MIE and MIFF images)</span></span></td></tr>
 <tr class=b>
 <td>Encryption</td>
@@ -70,23 +71,25 @@ tag may be used to force a specific byte order)</span>
   <br>&#39;MM&#39; = Big-endian (Motorola, MM)</span></td></tr>
 <tr>
 <td>FileModifyDate</td>
-<td class=c>Y!</td>
+<td class=c title='! = Unsafe'>Y!</td>
 <td><span class=s><span class=n>(the filesystem modification time)</span></span></td></tr>
 <tr class=b>
 <td>FileName</td>
-<td class=c>Y!</td>
+<td class=c title='! = Unsafe'>Y!</td>
 <td><span class=s><span class=n>(may be written with a full path name to set FileName and Directory in one
 operation)</span></span></td></tr>
 <tr>
+<td>FilePermissions</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(r=read, w=write and x=execute permissions for the file owner, group and
+others.  The ValueConv value is an octal number so bit test operations on
+this value should be done in octal, ie. &quot;oct($filePermissions) &amp; 0200&quot;)</span></span></td></tr>
+<tr class=b>
 <td>FileSize</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
-<td>FileType</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
 <tr>
-<td>GIFVersion</td>
+<td>FileType</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -95,7 +98,10 @@ operation)</span></span></td></tr>
 <td><span class=s><span class=n>(this write-only tag specifies a time difference to add to Geotime for
 synchronization with the GPS clock.  For example, set this to &quot;-12&quot; if the
 camera clock is 12 seconds faster than GPS time.  Input format is
-&quot;[+-][[[DD ]HH:]MM:]SS[.ss]&quot;.  Must be set before Geotime to be effective)</span></span></td></tr>
+&quot;[+-][[[DD ]HH:]MM:]SS[.ss]&quot;.  Must be set before Geotime to be effective.
+Additional features allow calculation of time differences and time drifts,
+and extraction of synchronization times from image files. See the
+<a href="../geotag.html">geotagging documentation</a> for details)</span></span></td></tr>
 <tr>
 <td>Geotag</td>
 <td class=c>Y</td>
@@ -115,7 +121,7 @@ A group name of &#39;EXIF&#39; or &#39;XMP&#39; may be specified to write or del
 EXIF or XMP GPS tags.  The value of Geotag must be assigned before this tag)</span></span></td></tr>
 <tr>
 <td>ICC_Profile</td>
-<td class=c>Y!</td>
+<td class=c title='! = Unsafe'>Y!</td>
 <td><span class=s><span class=n>(the full ICC_Profile data block)</span></span></td></tr>
 <tr class=b>
 <td>ID3Size</td>
@@ -136,7 +142,7 @@ EXIF or XMP GPS tags.  The value of Geotag must be assigned before this tag)</sp
 sub-sampling values to generate the value of this tag.  The result is
 compared to known values in an attempt to deduce the originating software
 based only on the JPEG image data.  For performance reasons, this tag is
-calculated only if specifically requested)</span></span></td></tr>
+generated only if specifically requested)</span></span></td></tr>
 <tr class=b>
 <td>MIMEType</td>
 <td class=c>N</td>
@@ -148,8 +154,8 @@ calculated only if specifically requested)</span></span></td></tr>
 <tr class=b>
 <td>Now</td>
 <td class=c>N</td>
-<td><span class=s><span class=n>(used to set the value of a tag to the current date/time. Not generated unless
-specified)</span></span></td></tr>
+<td><span class=s><span class=n>(the current date/time.  Useful when setting the tag values, ie.
+<code>&quot;-modifydate&lt;now&quot;</code>.  Not generated unless specifically requested)</span></span></td></tr>
 <tr>
 <td>PreviewImage</td>
 <td class=c>Y</td>
@@ -164,7 +170,7 @@ specified)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>XMP</td>
-<td class=c>Y!</td>
+<td class=c title='! = Unsafe'>Y!</td>
 <td><span class=s><span class=n>(the full XMP data block)</span></span></td></tr>
 <tr>
 <td>XResolution</td>
@@ -178,7 +184,7 @@ specified)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 28, 2009</i>
+<br><i>Last revised Jan 13, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

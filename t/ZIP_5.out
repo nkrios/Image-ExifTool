@@ -1,9 +1,10 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.99
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [ExifTool, ExifTool, ExifTool] Warning - Warning: [minor] Unrecognized MakerNotes
 [File, System, Image] FileName - File Name: CaptureOne.eip
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 5.3 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:04 08:26:59-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:04 08:41:15-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: EIP
 [File, File, Image] MIMEType - MIME Type: application/x-captureone
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)

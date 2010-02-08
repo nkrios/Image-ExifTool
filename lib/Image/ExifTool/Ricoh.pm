@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -226,7 +226,10 @@ my %ricohLensIDs = (
             0 => 'High',
             1 => 'Normal',
             2 => 'Low',
-            3 => 'None (B&W)',
+            3 => 'B&W',
+            6 => 'Toning Effect', #PH (GXR Sepia,Red,Green,Blue,Purple)
+            9 => 'Vivid', #PH (GXR)
+            10 => 'Natural', #PH (GXR)
         },
     },
 );
@@ -252,6 +255,7 @@ my %ricohLensIDs = (
         Writable => 'string',
         Count => 20,
     },
+    # 0x000c - int32u[2] 1st number is a counter (file number? shutter count?) - PH
     0x002c => { #PH (GXR)
         Name => 'SerialInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::SerialInfo' },
@@ -569,7 +573,7 @@ interpret Ricoh maker notes EXIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

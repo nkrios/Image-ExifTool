@@ -512,8 +512,7 @@ sub CheckXMP($$$)
         if ($exifTool->{OPTIONS}->{Charset} ne 'UTF8') {
             if ($$valPtr =~ /[\x80-\xff]/) {
                 # convert from Charset to UTF-8
-                my $val = $exifTool->Charset2Unicode($$valPtr, 'MM');
-                $$valPtr = Image::ExifTool::Unicode2UTF8($val,'n');
+                $$valPtr = $exifTool->Encode($$valPtr,'UTF8');
             }
         } else {
             # translate invalid XML characters to "."
@@ -998,6 +997,7 @@ sub RestoreStructure($)
 #          without tag table: 1 on success, 0 if not valid XMP file, -1 on write error
 # Notes: May set dirInfo InPlace flag to rewrite with specified DirLen
 #        May set dirInfo ReadOnly flag to write as read-only XMP ('r' mode and no padding)
+#        May set dirInfo Compact flag to force compact (drops 2kB of padding)
 #        May set dirInfo MaxDataLen to limit output data length -- this causes ExtendedXMP
 #          and ExtendedGUID to be returned in dirInfo if extended XMP was required
 sub WriteXMP($$;$)
@@ -1493,7 +1493,7 @@ sub WriteXMP($$;$)
         $newData .= (' ' x scalar(@curPropList)) . " </$prop>\n";
     }
     # limit XMP length and re-arrange if necessary to fit inside specified size
-    my $compact = $exifTool->Options('Compact');
+    my $compact = $$dirInfo{Compact} || $exifTool->Options('Compact');
     if ($maxDataLen) {
         # adjust maxDataLen to allow room for closing elements
         $maxDataLen -= length($rdfClose) + length($xmpClose) + length($pktCloseW);
@@ -1577,7 +1577,7 @@ This file contains routines to write XMP metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

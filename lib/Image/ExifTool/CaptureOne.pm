@@ -17,7 +17,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::XMP;
 use Image::ExifTool::ZIP;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 # CaptureOne COS XML tags
 # - tags are added dynamically when encountered
@@ -79,10 +79,8 @@ sub FoundCOS($$$$;$)
         }
         Image::ExifTool::AddTagToTable($tagTablePtr, $tag, \%tagInfo);
     }
-    # convert to specified character set
-    if ($exifTool->{OPTIONS}{Charset} ne 'UTF8' and $val =~ /[\x80-\xff]/) {
-        $val = $exifTool->UTF82Charset($val);
-    }
+    # convert from UTF8 to ExifTool Charset
+    $val = $exifTool->Decode($val, "UTF8");
     # un-escape XML character entities
     $val = Image::ExifTool::XMP::UnescapeXML($val);
     $exifTool->HandleTag($tagTablePtr, $tag, $val);
@@ -209,8 +207,8 @@ This module is used by Image::ExifTool
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to extract meta
-information Capture One EIP (Enhanced Image Package) and COS (Capture One
-Settings) files.
+information from Capture One EIP (Enhanced Image Package) and COS (Capture
+One Settings) files.
 
 =head1 NOTES
 
@@ -219,7 +217,7 @@ settings files (COS).
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

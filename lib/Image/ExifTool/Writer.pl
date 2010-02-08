@@ -418,6 +418,8 @@ sub SetNewValue($;$$%)
             $ifdName = "IFD$1";
         } elsif ($wantGroup =~ /^SubIFD(\d+)$/i) {
             $ifdName = "SubIFD$1";
+        } elsif ($wantGroup =~ /^Version(\d+)$/i) {
+            $ifdName = "Version$1"; # Sony IDC VersionIFD
         } elsif ($wantGroup =~ /^MIE(\d*-?)(\w+)$/i) {
             $mieGroup = "MIE$1" . ucfirst(lc($2));
         } else {
@@ -444,7 +446,7 @@ sub SetNewValue($;$$%)
             # only set tag in specified group
             $writeGroup = $self->GetGroup($tagInfo, 0);
             unless (lc($writeGroup) eq $lcWant) {
-                if ($writeGroup eq 'EXIF') {
+                if ($writeGroup eq 'EXIF' or $writeGroup eq 'SonyIDC') {
                     next unless $ifdName;
                     $writeGroup = $ifdName;  # write to the specified IFD
                 } elsif ($writeGroup eq 'MIE') {
@@ -590,9 +592,11 @@ sub SetNewValue($;$$%)
                     $shift = -1 if $options{DelValue};
                 }
                 if ($shift and (not defined $value or not length $value)) {
-                    $err = "No value for time shift of $wgrp1:$tag";
-                    $verbose > 2 and print $out "$err\n";
-                    next;
+                    # (now allow -= to be used for shiftable tag - v8.05)
+                    #$err = "No value for time shift of $wgrp1:$tag";
+                    #$verbose > 2 and print $out "$err\n";
+                    #next;
+                    undef $shift;
                 }
             } elsif ($shift) {
                 $err = "$wgrp1:$tag is not shiftable";
@@ -620,6 +624,8 @@ sub SetNewValue($;$$%)
                     next;
                 }
                 $noConv = 1;    # no conversions if shifting tag
+            } elsif (not length $val and $options{DelValue}) {
+                $noConv = 1;    # no conversions for deleting empty value
             }
         } elsif ($permanent) {
             # can't delete permanent tags, so set them to DelValue or empty string instead
@@ -762,13 +768,13 @@ Conv:   for (;;) {
                             foreach (keys %$conv) {
                                 my $val = $$conv{$_};
                                 defined $$lc{$val} or $newConv{$_} = $val, next;
-                                $newConv{$_} = $self->UTF82Charset($$lc{$val});
+                                $newConv{$_} = $self->Decode($$lc{$val}, 'UTF8');
                             }
                             if ($$conv{BITMASK}) {
                                 foreach (keys %{$$conv{BITMASK}}) {
                                     my $val = $$conv{BITMASK}{$_};
                                     defined $$lc{$val} or $newConv{BITMASK}{$_} = $val, next;
-                                    $newConv{BITMASK}{$_} = $self->UTF82Charset($$lc{$val});
+                                    $newConv{BITMASK}{$_} = $self->Decode($$lc{$val}, 'UTF8');
                                 }
                             }
                             $conv = \%newConv;
@@ -1042,7 +1048,7 @@ sub SetNewValuesFromFile($$;@)
         FastScan    => $$options{FastScan},
         FixBase     => $$options{FixBase},
         IgnoreMinorErrors => $$options{IgnoreMinorErrors},
-        IPTCCharset => $$options{IPTCCharset},
+        CharsetIPTC => $$options{CharsetIPTC},
         Lang        => $$options{Lang},
         LargeFileSupport => $$options{LargeFileSupport},
         List        => 1,
@@ -1279,7 +1285,7 @@ sub SetNewValuesFromFile($$;@)
 
 #------------------------------------------------------------------------------
 # Get new value(s) for tag
-# Inputs: 0) ExifTool object reference, 1) tag key, tag name, or tagInfo hash ref
+# Inputs: 0) ExifTool object reference, 1) tag name or tagInfo hash ref
 #         2) optional pointer to return new value hash reference (not part of public API)
 #    or   0) new value hash reference (not part of public API)
 # Returns: List of new Raw values (list may be empty if tag is being deleted)
@@ -1854,6 +1860,8 @@ sub WriteInfo($$;$$)
                     $err = 'Format error in file';
                 }
             } elsif ($fileType) {
+                # get specific type of file from extension
+                $fileType = GetFileExtension($infile) if $infile and GetFileType($infile);
                 $err = "Writing of $fileType files is not yet supported";
             } else {
                 $err = 'Writing of this type of file is not supported';
@@ -1927,7 +1935,7 @@ sub WriteInfo($$;$$)
     }
     # check for write error and set appropriate error message and return value
     if ($rtnVal < 0) {
-        $self->Error('Error writing output file');
+        $self->Error('Error writing output file') unless $$self{VALUE}{Error};
         $rtnVal = 0;    # return 0 on failure
     } elsif ($rtnVal > 0) {
         ++$rtnVal unless $self->{CHANGED};
@@ -2086,9 +2094,9 @@ sub GetDeleteGroups()
 # convert tag names to values in a string (ie. "${EXIF:ISO}x $$" --> "100x $")
 # Inputs: 0) ExifTool object ref, 1) reference to list of found tags
 #         2) string with embedded tag names, 3) Options:
-#               undef    - set missing tags to '',
-#              'Error'   - issue minor error on missing tag (and return undef),
-#              'Warn'    - issue minor warning on missing tag (and return undef),
+#               undef    - set missing tags to ''
+#              'Error'   - issue minor error on missing tag (and return undef)
+#              'Warn'    - issue minor warning on missing tag (and return undef)
 #               Hash ref - hash for return of tag/value pairs
 # Returns: string with embedded tag values (or '$info{TAGNAME}' entries with Hash ref option)
 # Notes:
@@ -2181,6 +2189,7 @@ sub InsertTagValues($$$;$)
             }
         }
         if (ref $opt eq 'HASH') {
+            $var .= '#' if $type;
             $rtnStr .= "$pre\$info{'$var'}";
             $$opt{$var} = $val;
         } else {
@@ -2790,6 +2799,8 @@ sub WriteDirectory($$$;$)
                     undef $grp1;
                 } elsif ($grp0 eq 'EXIF' and $$delGroup{$grp0}) {
                     undef $grp1 unless $$delGroup{$grp1} or $grp1 eq 'ExifIFD';
+                } elsif ($grp0 eq 'Photoshop' and $self->{FILE_TYPE} eq 'PSD') {
+                    undef $grp1; # don't delete Photoshop directories from PSD image
                 }
             }
             if ($grp1) {
@@ -3024,7 +3035,7 @@ sub VerboseInfo($$$%)
     my $index = $parms{Index};
     if (defined $index) {
         $line .= $index . ') ';
-        $line .= ' ' if $index < 10;
+        $line .= ' ' if length($index) < 2;
         $indent .= '    '; # indent everything else to align with tag name
     }
     $line .= $tag;
@@ -3317,171 +3328,6 @@ sub UnpackUTF8($)
         $pos += $n;         # position at end of UTF-8 character
     }
     return @out;
-}
-
-#------------------------------------------------------------------------------
-# Load necessary definitions for specified character set
-# Inputs: 0) Character set name
-my %unicode2byte = (
-  UTF8  => { }, # dummy entry so we don't try to load it from Charset.pm
-  Latin => { # cp1252 (Latin 1)
-    0x20ac => 0x80,  0x0160 => 0x8a,  0x2013 => 0x96,
-    0x201a => 0x82,  0x2039 => 0x8b,  0x2014 => 0x97,
-    0x0192 => 0x83,  0x0152 => 0x8c,  0x02dc => 0x98,
-    0x201e => 0x84,  0x017d => 0x8e,  0x2122 => 0x99,
-    0x2026 => 0x85,  0x2018 => 0x91,  0x0161 => 0x9a,
-    0x2020 => 0x86,  0x2019 => 0x92,  0x203a => 0x9b,
-    0x2021 => 0x87,  0x201c => 0x93,  0x0153 => 0x9c,
-    0x02c6 => 0x88,  0x201d => 0x94,  0x017e => 0x9e,
-    0x2030 => 0x89,  0x2022 => 0x95,  0x0178 => 0x9f,
-  },
-);
-sub LoadCharset($)
-{
-    my $charset = shift;
-    if ($charset ne 'UTF8' and not $unicode2byte{$charset}) {
-        require Image::ExifTool::Charset;
-        $unicode2byte{$charset} = $Image::ExifTool::Charset::Main{$charset};
-    }
-}
-
-#------------------------------------------------------------------------------
-# Convert Unicode characters to UTF-8
-# Inputs: 0) Unicode character string, 1) Unicode character format (n,v,N,V)
-# Returns: UTF-8 encoded string (truncates at null terminator)
-sub Unicode2UTF8($$)
-{
-    my ($val, $fmt) = @_;
-    my $outVal;
-    if ($] >= 5.006001) {
-        # let Perl do it
-        $outVal = pack('C0U*',unpack("$fmt*",$val));
-    } else {
-        # do it ourself
-        $outVal = PackUTF8(unpack("$fmt*",$val));
-    }
-    $outVal =~ s/\0.*//s;    # truncate at null terminator
-    return $outVal;
-}
-
-#------------------------------------------------------------------------------
-# Convert UTF-8 encoded string to Unicode string
-# Input: 0) UTF-8 string, 1) Unicode format, 2) optional ExifTool ref for warnings
-# Returns: Unicode character string in specified format
-sub UTF82Unicode($$;$)
-{
-    my ($str, $fmt, $exifTool) = @_;
-    undef $evalWarning;
-    if ($] < 5.006001) {
-        # do it ourself
-        $str = pack("$fmt*", UnpackUTF8($str));
-    } else {
-        # handle warnings from malformed UTF-8
-        local $SIG{'__WARN__'} = \&SetWarning;
-        # repack UTF-8 string in specified format
-        # (somehow the meaning of "U0" was reversed in Perl 5.10.0!)
-        $str = pack("$fmt*", unpack($] < 5.010000 ? 'U0U*' : 'C0U*', $str));
-    }
-    if ($evalWarning and $exifTool and not $$exifTool{WarnBadUTF8}) {
-        $exifTool->Warn('Malformed UTF-8 character(s)');
-        $$exifTool{WarnBadUTF8} = 1;
-    }
-    return $str;
-}
-
-#------------------------------------------------------------------------------
-# Convert UCS-2 character string to 8-bit
-# Inputs: 0) ExifTool ref, 1) 16-bit unicode string (in specified byte order)
-#         2) Optional byte order (current byte order used if not specified)
-#         3) Optional character set (defaults to current Charset setting)
-# Returns: 8-bit character string (truncates at null terminator)
-# Notes: ExifTool ref may be undef if character set is provided (in which
-#        case no encoding warnings are returned)
-my %unpackShort = ( 'II' => 'v', 'MM' => 'n' );
-sub Unicode2Charset($$;$$) {
-    my ($self, $val, $byteOrder, $charset) = @_;
-    # check for (and remove) byte order mark and set byte order accordingly if it exists
-    $val =~ s/^(\xff\xfe|\xfe\xff)// and $byteOrder = ($1 eq "\xff\xfe") ? 'MM' : 'II';
-    my $fmt = $unpackShort{$byteOrder || GetByteOrder()};
-    if (not $charset) {
-        $charset = $self->{OPTIONS}{Charset};
-    } elsif (not $unicode2byte{$charset} and not LoadCharset($charset)) {
-        warn("Invalid Charset $charset\n");  # (shouldn't happen)
-        return $val;
-    }
-    if ($charset eq 'UTF8') {
-        return Unicode2UTF8($val, $fmt);
-    } else {
-        my @uni = unpack("$fmt*",$val);
-        my $unicode2byte = $unicode2byte{$charset};
-        foreach (@uni) {
-            next if $_ < 0x80;
-            $$unicode2byte{$_} and $_ = $$unicode2byte{$_}, next;
-            next if $_ < 0x100;
-            $_ = ord('?');  # set to '?'
-            if ($self and not $$self{EncodingError}) {
-                $self->Warn("Some character(s) could not be encoded in $charset");
-                $$self{EncodingError} = 1;
-            }
-        }
-        # repack as an 8-bit string
-        my $outVal = pack('C*', @uni);
-        $outVal =~ s/\0.*//s;    # truncate at null terminator
-        return $outVal;
-    }
-}
-
-#------------------------------------------------------------------------------
-# Convert 8-bit character string to 16-bit unicode
-# Inputs: 0) ExifTool ref, 1) Latin or UTF-8 string, 2) optional byte order,
-#         3) optional Charset
-# Returns: UCS-2 character string (in specified byte order)
-# Notes: ExifTool ref may be undef if character set is provided
-my %byte2unicode;
-sub Charset2Unicode($$;$$)
-{
-    my ($self, $val, $byteOrder, $charset) = @_;
-    my $fmt = $unpackShort{$byteOrder || GetByteOrder()};
-    if (not $charset) {
-        $charset = $self->{OPTIONS}{Charset};
-    } elsif (not $unicode2byte{$charset} and not LoadCharset($charset)) {
-        warn("Invalid Charset $charset\n");  # (shouldn't happen)
-        return $val;
-    }
-    if ($charset eq 'UTF8') {
-        return UTF82Unicode($val, $fmt, $self);
-    } else {
-        # create reverse lookup table if necessary
-        my $byte2unicode = $byte2unicode{$charset};
-        unless ($byte2unicode) {
-            $byte2unicode = $byte2unicode{$charset} = { };
-            my $unicode2byte = $unicode2byte{$charset};
-            foreach (keys %$unicode2byte) {
-                $$byte2unicode{$$unicode2byte{$_}} = $_;
-            }
-        }
-        my @latin = unpack('C*', $val);
-        foreach (@latin) {
-            $_ = $$byte2unicode{$_} if $$byte2unicode{$_};
-        }
-        # repack as a 16-bit unicode string
-        my $outVal = pack("$fmt*", @latin);
-        return $outVal;
-    }
-}
-
-#------------------------------------------------------------------------------
-# Convert string to UTF-8
-# Inputs: 0) ExifTool ref, 1) Latin or UTF-8 string (depending on Charset option)
-# Return: UTF8 string
-sub Charset2UTF8($$)
-{
-    my ($self, $val) = @_;
-    if ($self->{OPTIONS}{Charset} ne 'UTF8' and $val =~ /[\x80-\xff]/) {
-        $val = $self->Charset2Unicode($val,'MM');
-        $val = Unicode2UTF8($val,'n');
-    }
-    return $val;
 }
 
 #------------------------------------------------------------------------------
@@ -3871,6 +3717,7 @@ sub ProcessTrailers($$)
     my $pos = $raf->Tell();
     my $byteOrder = GetByteOrder();
     my $success = 1;
+    my $path = $$self{PATH};
 
     for (;;) { # loop through all trailers
         require "Image/ExifTool/$dirName.pm";
@@ -3886,6 +3733,8 @@ sub ProcessTrailers($$)
         delete $$dirInfo{DirLen};       # reset trailer length
         $$dirInfo{Offset} = $offset;    # set offset from end of file
         $$dirInfo{Trailer} = 1;         # set Trailer flag in case proc cares
+        # add trailer and DirName to SubDirectory PATH
+        push @$path, 'Trailer', $dirName;
 
         # read or write this trailer
         # (proc takes Offset as offset from end of trailer to end of file,
@@ -3894,6 +3743,10 @@ sub ProcessTrailers($$)
         my $result = &$proc($self, $dirInfo);
         use strict 'refs';
 
+        # restore PATH
+        pop @$path;
+        pop @$path;
+        # check result
         if ($outfile) {
             if ($result > 0) {
                 if ($outBuff) {
@@ -3928,7 +3781,7 @@ sub ProcessTrailers($$)
     SetByteOrder($byteOrder);       # restore original byte order
     $raf->Seek($pos, 0);            # restore original file position
     $$dirInfo{OutFile} = $outfile;  # restore original outfile
-    $$dirInfo{Offset} = $offset;    # return offset to start of first trailer
+    $$dirInfo{Offset} = $offset;    # return offset from EOF to start of first trailer
     $$dirInfo{Fixup} = $fixup;      # return fixup information
     return $success;
 }
@@ -4792,7 +4645,12 @@ sub WriteJPEG($$)
                         $combinedSegData = $$segDataPt unless defined $combinedSegData;
                         next Marker;    # get the next segment to combine
                     }
-                    $doneDir{Photoshop} and $self->Warn('Multiple Photoshop records');
+                    if ($doneDir{Photoshop}) {
+                        $self->Warn('Multiple Photoshop records');
+                        # only rewrite the first Photoshop segment when deleting this group
+                        # (to remove multiples when deleting and adding back in one step)
+                        $$delGroup{Photoshop} and $del = 1, last;
+                    }
                     $doneDir{Photoshop} = 1;
                     # process APP13 Photoshop record
                     my $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Main');
@@ -5200,7 +5058,7 @@ used routines.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

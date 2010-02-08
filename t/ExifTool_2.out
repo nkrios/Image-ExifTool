@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.97
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.05
 [File, System, Image] FileName - File Name: ExifTool.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 24 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:08:24 09:36:51-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:08:24 20:32:31-04:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -15,9 +16,6 @@
 [File, File, Image] BitsPerSample - Bits Per Sample: 8
 [File, File, Image] ColorComponents - Color Components: 3
 [File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
-[File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 3966859223dfd48164eafc7ad95e2a38
-[File, File2, Image] CurrentIPTCDigest - Current IPTC Digest: 1eff71ad6d2e63aa7078d3ac943d2f1f
-[File, File3, Image] CurrentIPTCDigest - Current IPTC Digest: dc8f1ceb302ef80b84eed50780f43c99
 [File, File, Image] PreviewImage - Preview Image: (Binary data 1039273 bytes)
 [EXIF, IFD0, Image] 270 - Image Description: A witty caption
 [EXIF, IFD0, Camera] 271 - Make: FUJIFILM

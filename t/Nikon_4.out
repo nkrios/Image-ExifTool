@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: Nikon_4_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 6.4 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:20 09:31:20-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:49-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
@@ -82,6 +83,7 @@
 [MakerNotes, Nikon, Camera] 18 - Flash Exposure Compensation: -5/3
 [MakerNotes, Nikon, Camera] 19 - ISO Setting: 200
 [MakerNotes, Nikon, Camera] 22 - Image Boundary: 0 0 3008 2000
+[MakerNotes, Nikon, Camera] 23 - Flash Exposure Compensation: 0
 [MakerNotes, Nikon, Camera] 24 - Flash Exposure Bracket Value: 0.0
 [MakerNotes, Nikon, Camera] 25 - Exposure Bracket Value: 0
 [MakerNotes, Nikon, Camera] 129 - Tone Comp: CS
@@ -92,7 +94,6 @@
 [MakerNotes, Nikon, Camera] 1 - AF Point: Center
 [MakerNotes, Nikon, Camera] 2 - AF Points In Focus: Center
 [MakerNotes, Nikon, Camera] 137 - Shooting Mode: Continuous
-[MakerNotes, Nikon, Camera] 138 - Auto Bracket Release: None
 [MakerNotes, Nikon, Camera] 139 - Lens F Stops: 5.33
 [MakerNotes, Nikon, Camera] 141 - Color Hue: Mode2
 [MakerNotes, Nikon, Camera] 144 - Light Source: Speedlight
@@ -133,7 +134,7 @@
 [MakerNotes, Nikon, Camera] 169 - Image Optimization: Custom
 [MakerNotes, Nikon, Camera] 170 - Saturation: Enhanced
 [MakerNotes, Nikon, Camera] 171 - Vari Program: 
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.00
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.02
 [XMP, XMP-aux, Camera] Lens - Lens: 18-70mm f/3.5-4.5
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: No= 20025585
 [XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -

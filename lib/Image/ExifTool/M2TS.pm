@@ -31,7 +31,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.04';
 
 # program map table "stream_type" lookup (ref 6/1)
 my %streamType = (
@@ -130,20 +130,9 @@ my %noSyntax = (
         PrintConv => \%streamType,
         SeparateTable => 'StreamType',
     },
-);
-
-# information extracted from H.264 video streams
-%Image::ExifTool::M2TS::H264 = (
-    GROUPS => { 1 => 'H264', 2 => 'Video' },
-    VARS => { NO_ID => 1 },
-    NOTES => 'Tags extracted from H.264 video streams.',
-    DateTimeOriginal => {
-        Description => 'Date/Time Original',
-        Groups => { 2 => 'Time' },
-        PrintConv => '$self->ConvertDateTime($val)',
-    },
-    ImageWidth => { },
-    ImageHeight => { },
+    # the following tags are for documentation purposes only
+    _AC3  => { SubDirectory => { TagTable => 'Image::ExifTool::M2TS::AC3' } },
+    _H264 => { SubDirectory => { TagTable => 'Image::ExifTool::H264::Main' } },
 );
 
 # information extracted from AC-3 audio streams
@@ -229,264 +218,6 @@ my %noSyntax = (
     },
 );
 
-#==============================================================================
-# Bitstream functions (used for H264 video)
-#
-# Member variables:
-#   Mask    = mask for next bit to read (0 when all data has been read)
-#   Pos     = byte offset of next word to read
-#   Word    = current data word
-#   Len     = total data length in bytes
-#   DataPt  = data pointer
-#..............................................................................
-
-#------------------------------------------------------------------------------
-# Read next word from bitstream
-# Inputs: 0) BitStream ref
-# Returns: true if there is more data (and updates
-#          Mask, Pos and Word for first bit in next word)
-sub ReadNextWord($)
-{
-    my $bstr = shift;
-    my $pos = $$bstr{Pos};
-    if ($pos + 4 <= $$bstr{Len}) {
-        $$bstr{Word} = unpack("x$pos N", ${$$bstr{DataPt}});
-        $$bstr{Mask} = 0x80000000;
-        $$bstr{Pos} += 4;
-    } elsif ($pos < $$bstr{Len}) {
-        my @bytes = unpack("x$pos C*", ${$$bstr{DataPt}});
-        my ($word, $mask) = (shift(@bytes), 0x80);
-        while (@bytes) {
-            $word = ($word << 8) | shift(@bytes);
-            $mask <<= 8;
-        }
-        $$bstr{Word} = $word;
-        $$bstr{Mask} = $mask;
-        $$bstr{Pos} = $$bstr{Len};
-    } else {
-        return 0;
-    }
-    return 1;
-}
-
-#------------------------------------------------------------------------------
-# Create a new BitStream object
-# Inputs: 0) data ref
-# Returns: BitStream ref, or null if data is empty
-sub NewBitStream($)
-{
-    my $dataPt = shift;
-    my $bstr = {
-        DataPt => $dataPt,
-        Len    => length($$dataPt),
-        Pos    => 0,
-        Mask   => 0,
-    };
-    ReadNextWord($bstr) or undef $bstr;
-    return $bstr;
-}
-
-#------------------------------------------------------------------------------
-# Get integer from bitstream
-# Inputs: 0) BitStream ref, 1) number of bits
-# Returns: integer (and increments position in bitstream)
-sub GetIntN($$)
-{
-    my ($bstr, $bits) = @_;
-    my $val = 0;
-    while ($bits--) {
-        $val <<= 1;
-        ++$val if $$bstr{Mask} & $$bstr{Word};
-        $$bstr{Mask} >>= 1 and next;
-        ReadNextWord($bstr) or last;
-    }
-    return $val;
-}
-
-#------------------------------------------------------------------------------
-# Get Exp-Golomb integer from bitstream
-# Inputs: 0) BitStream ref
-# Returns: integer (and increments position in bitstream)
-sub GetGolomb($)
-{
-    my $bstr = shift;
-    # first, count the number of zero bits to get the integer bit width
-    my $count = 0;
-    until ($$bstr{Mask} & $$bstr{Word}) {
-        ++$count;
-        $$bstr{Mask} >>= 1 and next;
-        ReadNextWord($bstr) or last;
-    }
-    # then return the adjusted integer
-    return GetIntN($bstr, $count + 1) - 1;
-}
-
-#------------------------------------------------------------------------------
-# Get signed Exp-Golomb integer from bitstream
-# Inputs: 0) BitStream ref
-# Returns: integer (and increments position in bitstream)
-sub GetGolombS($)
-{
-    my $bstr = shift;
-    my $val = GetGolomb($bstr) + 1;
-    return ($val & 1) ? -($val >> 1) : ($val >> 1);
-}
-
-# end bitstream functions
-#==============================================================================
-
-#------------------------------------------------------------------------------
-# Decode H.264 scaling matrices
-# Inputs: 0) BitStream ref
-# Reference: http://ffmpeg.org/
-sub DecodeScalingMatrices($)
-{
-    my $bstr = shift;
-    if (GetIntN($bstr, 1)) {
-        my ($i, $j);
-        for ($i=0; $i<8; ++$i) {
-            my $size = $i<6 ? 16 : 64;
-            next unless GetIntN($bstr, 1);
-            my ($last, $next) = (8, 8);
-            for ($j=0; $j<$size; ++$j) {
-                $next = ($last + GetGolombS($bstr)) & 0xff if $next;
-                last unless $j or $next;
-            }
-        }
-    }
-}
-
-#------------------------------------------------------------------------------
-# Extract information from H.264 video stream
-# Inputs: 0) ExifTool ref, 1) data ref
-# References:
-#   a) http://www.itu.int/rec/T-REC-H.264/e (T-REC-H.264-200305-S!!PDF-E.pdf)
-#   b) http://miffteevee.co.uk/documentation/development/H264Parser_8cpp-source.html
-#   c) http://ffmpeg.org/
-# Glossary:
-#   RBSP = Raw Byte Sequence Payload
-sub ParseH264Video($$)
-{
-    my ($exifTool, $dataPt) = @_;
-    my $verbose = $exifTool->Options('Verbose');
-    my $out = $exifTool->Options('TextOut');
-    my $tagTablePtr = GetTagTable('Image::ExifTool::M2TS::H264');
-    my %parseNalUnit = ( 0x06 => 1, 0x07 => 1 );    # NAL unit types to parse
-    my $len = length $$dataPt;
-    my $pos = 0;
-    while ($pos < $len) {
-        my ($nextPos, $end);
-        # find start of next NAL unit
-        if ($$dataPt =~ /(\0{2,3}\x01)/g) {
-            $nextPos = pos $$dataPt;
-            $end = $nextPos - length $1;
-            $pos or $pos = $nextPos, next;
-        } else {
-            last unless $pos;
-            $nextPos = $end = $len;
-        }
-        last if $pos >= $len;
-        # parse NAL unit from $pos to $end
-        my $nal_unit_type = Get8u($dataPt, $pos);
-        ++$pos;
-        # check forbidden_zero_bit
-        $nal_unit_type & 0x80 and $exifTool->Warn('H264 forbidden bit error'), last;
-        $nal_unit_type &= 0x1f;
-        # ignore this NAL unit unless we will parse it
-        $parseNalUnit{$nal_unit_type} or $verbose or $pos = $nextPos, next;
-        # read NAL unit (and convert all 0x000003's to 0x0000 as per spec.)
-        my $buff = '';
-        pos($$dataPt) = $pos + 1;
-        while ($$dataPt =~ /\0\0\x03/g) {
-            last if pos $$dataPt > $end;
-            $buff .= substr($$dataPt, $pos, pos($$dataPt)-1-$pos);
-            $pos = pos $$dataPt;
-        }
-        $buff .= substr($$dataPt, $pos, $end - $pos);
-        if ($verbose > 1) {
-            printf $out "  NAL Unit Type: 0x%x (%d bytes)\n",$nal_unit_type, length $buff;
-            my %parms = ( Out => $out );
-            $parms{MaxLen} = 96 if $verbose < 4;
-            Image::ExifTool::HexDump(\$buff, undef, %parms) if $verbose > 2;
-        }
-        pos($$dataPt) = $pos = $nextPos;
-
-        if ($nal_unit_type == 0x06) {       # sei_rbsp (supplemental enhancement info)
-
-            # brute force scan for DateTimeOriginal (for now)
-            next unless $buff =~ /MDPM...(.{8})/s;
-            my $val = unpack('H*', $1);
-            if ($val =~ /^(\d{2})(\d{2})(\d{2})..(\d{2})(\d{2})(\d{2})(\d{2})$/s) {
-                $exifTool->HandleTag($tagTablePtr, DateTimeOriginal => "$1$2:$3:$4 $5:$6:$7");
-            }
-
-        } elsif ($nal_unit_type == 0x07) {  # sequence_parameter_set_rbsp
-
-            # initialize our bitstream object
-            my $bstr = NewBitStream(\$buff) or next;
-            my ($t, $i, $n);
-            # the messy nature of H.264 encoding makes it difficult to use
-            # data-driven structure parsing, so I code it explicitely (yuck!)
-            $t = GetIntN($bstr, 8);         # profile_idc
-            GetIntN($bstr, 16);             # constraints and level_idc
-            GetGolomb($bstr);               # seq_parameter_set_id
-            if ($t >= 100) { # (ref b)
-                $t = GetGolomb($bstr);      # chroma_format_idc
-                if ($t == 3) {
-                    GetIntN($bstr, 1);      # separate_colour_plane_flag
-                    $n = 12;
-                } else {
-                    $n = 8;
-                }
-                GetGolomb($bstr);           # bit_depth_luma_minus8
-                GetGolomb($bstr);           # bit_depth_chroma_minus8
-                GetIntN($bstr, 1);          # qpprime_y_zero_transform_bypass_flag
-                DecodeScalingMatrices($bstr);
-            }
-            GetGolomb($bstr);               # log2_max_frame_num_minus4
-            $t = GetGolomb($bstr);          # pic_order_cnt_type
-            if ($t == 0) {
-                GetGolomb($bstr);           # log2_max_pic_order_cnt_lsb_minus4
-            } elsif ($t == 1) {
-                GetIntN($bstr, 1);          # delta_pic_order_always_zero_flag
-                GetGolomb($bstr);           # offset_for_non_ref_pic
-                GetGolomb($bstr);           # offset_for_top_to_bottom_field
-                $n = GetGolomb($bstr);      # num_ref_frames_in_pic_order_cnt_cycle
-                for ($i=0; $i<$n; ++$i) {
-                    GetGolomb($bstr);       # offset_for_ref_frame[i]
-                }
-            }
-            GetGolomb($bstr);               # num_ref_frames
-            GetIntN($bstr, 1);              # gaps_in_frame_num_value_allowed_flag
-            my $w = GetGolomb($bstr);       # pic_width_in_mbs_minus1
-            my $h = GetGolomb($bstr);       # pic_height_in_map_units_minus1
-            my $f = GetIntN($bstr, 1);      # frame_mbs_only_flag
-            $f or GetIntN($bstr, 1);        # mb_adaptive_frame_field_flag
-            GetIntN($bstr, 1);              # direct_8x8_inference_flag
-            # convert image size to pixels
-            $w = ($w + 1) * 16;
-            $h = (2 - $f) * ($h + 1) * 16;
-            # account for cropping (if any)
-            $t = GetIntN($bstr, 1);         # frame_cropping_flag
-            if ($t) {
-                my $m = 4 - $f * 2;
-                $w -=  4 * GetGolomb($bstr);# frame_crop_left_offset
-                $w -=  4 * GetGolomb($bstr);# frame_crop_right_offset
-                $h -= $m * GetGolomb($bstr);# frame_crop_top_offset
-                $h -= $m * GetGolomb($bstr);# frame_crop_bottom_offset
-            }
-            # quick validity check (just in case)
-            if ($w>=160 and $w<=4096 and $h>=120 and $h<=3072) {
-                $exifTool->HandleTag($tagTablePtr, ImageWidth => $w);
-                $exifTool->HandleTag($tagTablePtr, ImageHeight => $h);
-            }
-            # (whew! -- so much work just to get ImageSize!!)
-        }
-        # we were successful, so don't parse this NAL unit type again
-        delete $parseNalUnit{$nal_unit_type};
-    }
-}
-
 #------------------------------------------------------------------------------
 # Extract information from AC-3 audio stream
 # Inputs: 0) ExifTool ref, 1) data ref
@@ -521,6 +252,47 @@ sub ParseAC3Descriptor($$)
 }
 
 #------------------------------------------------------------------------------
+# Parse PID stream data
+# Inputs: 0) Exiftool ref, 1) PID number, 2) PID type, 3) PID name, 4) data ref
+# Returns: 0=stream parsed OK,
+#          1=stream parsed but we want to parse more of these,
+#          -1=can't parse yet because we don't know the type
+sub ParsePID($$$$$)
+{
+    my ($exifTool, $pid, $type, $pidName, $dataPt) = @_;
+    # can't parse until we know the type (Program Map Table may be later in the stream)
+    return -1 unless defined $type;   
+    my $verbose = $exifTool->Options('Verbose');
+    if ($verbose > 1) {
+        my $out = $exifTool->Options('TextOut');
+        printf $out "Parsing stream 0x%.4x (%s)\n", $pid, $pidName;
+        my %parms = ( Out => $out );
+        $parms{MaxLen} = 96 if $verbose < 4;
+        Image::ExifTool::HexDump($dataPt, undef, %parms) if $verbose > 2;
+    }
+    my $more = 0;
+    if ($type == 0x01 or $type == 0x02) {
+        # MPEG-1/MPEG-2 Video
+        require Image::ExifTool::MPEG;
+        Image::ExifTool::MPEG::ParseMPEGAudioVideo($exifTool, $dataPt);
+    } elsif ($type == 0x03 or $type == 0x04) {
+        # MPEG-1/MPEG-2 Audio
+        require Image::ExifTool::MPEG;
+        Image::ExifTool::MPEG::ParseMPEGAudio($exifTool, $dataPt);
+    } elsif ($type == 0x1b) {
+        # H.264 Video
+        require Image::ExifTool::H264;
+        Image::ExifTool::H264::ParseH264Video($exifTool, $dataPt);
+        # process additional H264 frames with ExtractEmbedded option
+        $more = 1 if $exifTool->Options('ExtractEmbedded');
+    } elsif ($type == 0x81 or $type == 0x87 or $type == 0x91) {
+        # AC-3 audio
+        ParseAC3Audio($exifTool, $dataPt);
+    }
+    return $more;
+}
+
+#------------------------------------------------------------------------------
 # Extract information from a M2TS file
 # Inputs: 0) ExifTool object reference, 1) DirInfo reference
 # Returns: 1 on success, 0 if this wasn't a valid M2TS file
@@ -528,7 +300,7 @@ sub ProcessM2TS($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
-    my ($buff, $plen, $i, $j, $fileType);
+    my ($buff, $plen, $i, $j, $fileType, $eof);
     my (%pmt, %pidType, %didPID, %data, %sectLen);
     my $verbose = $exifTool->Options('Verbose');
     my $out = $exifTool->Options('TextOut');
@@ -549,7 +321,7 @@ sub ProcessM2TS($$)
     my $tagTablePtr = GetTagTable('Image::ExifTool::M2TS::Main');
 
     # PID lookup strings (will add to this with entries from program map table)
-    my %pidString = (
+    my %pidName = (
         0 => 'Program Association Table',
         1 => 'Conditional Access Table',
         2 => 'Transport Stream Description Table',
@@ -561,7 +333,7 @@ sub ProcessM2TS($$)
     for ($i=0; %needPID; ++$i) {
 
         # read the next packet
-        last unless $raf->Read($buff, $plen) == $plen;
+        $raf->Read($buff, $plen) == $plen or $eof = 1, last;
         # decode the packet prefix
         my $pos = length($buff) - 188;
         my $prefix = Get32u(\$buff, $pos);
@@ -583,7 +355,7 @@ sub ProcessM2TS($$)
         if ($verbose > 1) {
             print  $out "Transport packet $i:\n";
             Image::ExifTool::HexDump(\$buff, undef, Addr => $i * $plen, Out => $out) if $verbose > 2;
-            my $str = $pidString{$pid} ? " ($pidString{$pid})" : '';
+            my $str = $pidName{$pid} ? " ($pidName{$pid})" : '';
             printf $out "  Timecode:   0x%.4x\n", Get32u(\$buff, 0) if $plen == 192;
             printf $out "  Packet ID:  0x%.4x$str\n", $pid;
             printf $out "  Start Flag: %s\n", $payload_unit_start_indicator ? 'Yes' : 'No';
@@ -663,9 +435,9 @@ sub ProcessM2TS($$)
                     my $program_number = Get16u(\$buff, $pos);
                     my $program_map_PID = Get16u(\$buff, $pos + 2) & 0x1fff;
                     $pmt{$program_map_PID} = $program_number; # save our PMT PID's
-                    if (not $pidString{$program_map_PID} or $verbose > 1) {
+                    if (not $pidName{$program_map_PID} or $verbose > 1) {
                         my $str = "Program $program_number Map";
-                        $pidString{$program_map_PID} = $str;
+                        $pidName{$program_map_PID} = $str;
                         $needPID{$program_map_PID} = 1 unless $didPID{$program_map_PID};
                         $verbose and printf $out "  PID(0x%.4x) --> $str\n", $program_map_PID;
                     }
@@ -676,9 +448,9 @@ sub ProcessM2TS($$)
                 $pos + 4 > $slen and $exifTool->Warn('Truncated PMT'), last;
                 my $pcr_pid = Get16u(\$buff, $pos) & 0x1fff;
                 my $program_info_length = Get16u(\$buff, $pos + 2) & 0x0fff;
-                if (not $pidString{$pcr_pid} or $verbose > 1) {
+                if (not $pidName{$pcr_pid} or $verbose > 1) {
                     my $str = "Program $program_number Clock Reference";
-                    $pidString{$pcr_pid} = $str;
+                    $pidName{$pcr_pid} = $str;
                     $verbose and printf $out "  PID(0x%.4x) --> $str\n", $pcr_pid;
                 }
                 $pos += 4;
@@ -699,12 +471,13 @@ sub ProcessM2TS($$)
                     my $stream_type = Get8u(\$buff, $pos);
                     my $elementary_pid = Get16u(\$buff, $pos + 1) & 0x1fff;
                     my $es_info_length = Get16u(\$buff, $pos + 3) & 0x0fff;
-                    if (not $pidString{$elementary_pid} or $verbose > 1) {
+                    if (not $pidName{$elementary_pid} or $verbose > 1) {
                         my $str = $streamType{$stream_type};
                         $str or $str = ($stream_type < 0x7f ? 'Reserved' : 'Private');
                         $str = sprintf('%s (0x%.2x)', $str, $stream_type);
                         $str = "Program $program_number $str";
-                        $pidString{$elementary_pid} = $str;
+                        # save PID type and name string
+                        $pidName{$elementary_pid} = $str;
                         $pidType{$elementary_pid} = $stream_type;
                         $verbose and printf $out "  PID(0x%.4x) --> $str\n", $elementary_pid;
                         if ($str =~ /(Audio|Video)/) {
@@ -746,10 +519,17 @@ sub ProcessM2TS($$)
             # save data from the start of each elementary stream
             if ($payload_unit_start_indicator) {
                 if (defined $data{$pid}) {
-                    # we must have a whole section
-                    delete $needPID{$pid};
-                    $didPID{$pid} = 1;
-                    next;
+                    # we must have a whole section, so parse now
+                    my $more = ParsePID($exifTool, $pid, $pidType{$pid}, $pidName{$pid}, \$data{$pid});
+                    # start fresh even if we couldn't process this PID yet
+                    delete $data{$pid};
+                    unless ($more) {
+                        delete $needPID{$pid};
+                        $didPID{$pid} = 1;
+                        next;
+                    }
+                    # set flag indicating we found this PID but we still want more
+                    $needPID{$pid} = -1;
                 }
                 # check for a PES header
                 next if $pos + 6 > $plen;
@@ -774,13 +554,18 @@ sub ProcessM2TS($$)
                 }
                 $data{$pid} = substr($buff, $pos);
             } else {
-                # accumulate first 2kB of data for each elementary stream
-                $data{$pid} .= substr($buff, $pos) if defined $data{$pid};
+                next unless defined $data{$pid};
+                # accumulate data for each elementary stream
+                $data{$pid} .= substr($buff, $pos);
             }
-            # save the 256 bytes of most streams, except for unknown or H.264
-            # streams where we take the first 1 kB
+            # save only the first 256 bytes of most streams, except for
+            # unknown or H.264 streams where we save 1 kB
             my $saveLen = (not $pidType{$pid} or $pidType{$pid} == 0x1b) ? 1024 : 256;
             if (length($data{$pid}) >= $saveLen) {
+                my $more = ParsePID($exifTool, $pid, $pidType{$pid}, $pidName{$pid}, \$data{$pid});
+                next if $more < 0;  # wait for program map table (hopefully not too long)
+                delete $data{$pid};
+                $more and $needPID{$pid} = -1, next; # parse more of these
                 delete $needPID{$pid};
                 $didPID{$pid} = 1;
             }
@@ -795,40 +580,24 @@ sub ProcessM2TS($$)
     }
 
     if ($verbose) {
-        if (%needPID) {
-            my @list = sort map(sprintf("0x%.2x",$_), keys %needPID);
-            print $out "End of file.  Missing PID(s): @list\n";
+        my @need;
+        foreach (keys %needPID) {
+            push @need, sprintf('0x%.2x',$_) if $needPID{$_} > 0;
+        }
+        if (@need) {
+            @need = sort @need;
+            print $out "End of file.  Missing PID(s): @need\n";
         } else {
-            print $out "End scan.  All PID's parsed.\n";
+            my $what = $eof ? 'of file' : 'scan';
+            print $out "End $what.  All PID's parsed.\n";
         }
     }
 
-    # parse header from recognized audio/video streams
+    # parse any remaining partial PID streams
     my $pid;
     foreach $pid (sort keys %data) {
-        my $type = $pidType{$pid} or next;
-        my $dataPt = \$data{$pid};
-        if ($verbose > 1) {
-            printf $out "Parsing stream 0x%.4x (%s)\n", $pid, $pidString{$pid};
-            my %parms = ( Out => $out );
-            $parms{MaxLen} = 96 if $verbose < 4;
-            Image::ExifTool::HexDump(\$data{$pid}, undef, %parms) if $verbose > 2;
-        }
-        if ($type == 0x01 or $type == 0x02) {
-            # MPEG-1/MPEG-2 Video
-            require Image::ExifTool::MPEG;
-            Image::ExifTool::MPEG::ParseMPEGAudioVideo($exifTool, $dataPt);
-        } elsif ($type == 0x03 or $type == 0x04) {
-            # MPEG-1/MPEG-2 Audio
-            require Image::ExifTool::MPEG;
-            Image::ExifTool::MPEG::ParseMPEGAudio($exifTool, $dataPt);
-        } elsif ($type == 0x1b) {
-            # H.264 Video
-            ParseH264Video($exifTool, $dataPt);
-        } elsif ($type == 0x81 or $type == 0x87 or $type == 0x91) {
-            # AC-3 audio
-            ParseAC3Audio($exifTool, $dataPt);
-        }
+        ParsePID($exifTool, $pid, $pidType{$pid}, $pidName{$pid}, \$data{$pid});
+        delete $data{$pid};
     }
     return 1;
 }
@@ -853,7 +622,7 @@ video.
 
 =head1 AUTHOR
 
-Copyright 2003-2009, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.90
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: FujiFilm_3_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 1373 bytes
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:08:22 09:29:04-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:43-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)

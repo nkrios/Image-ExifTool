@@ -1,7 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 7.99
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
 [File, System, Image] FileName - File Name: FlashPix.ppt
 [File, System, Image] Directory - Directory: t/images
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:02:09 12:59:16-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:02:09 11:47:07-05:00
+[File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: PPT
 [File, File, Image] MIMEType - MIME Type: application/vnd.ms-powerpoint
 [FlashPix, FlashPix, Other] 1 - Code Page: Mac Roman (Western European)

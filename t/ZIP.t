@@ -1,9 +1,5 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl t/ZIP.t'
-
-######################### We start with some black magic to print on failure.
-
-# Change "1..N" below to so that N matches last test number
+# Before "make install", this script should be runnable with "make test".
+# After "make install" it should work as "perl t/ZIP.t".
 
 BEGIN { $| = 1; print "1..6\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
@@ -14,12 +10,11 @@ use Image::ExifTool::ZIP;
 $loaded = 1;
 print "ok 1\n";
 
-######################### End of black magic.
-
 use t::TestLib;
 
 my $testname = 'ZIP';
 my $testnum = 1;
+my $failed;
 
 # tests 2-3: Extract information from test ZIP and GZIP files
 {
@@ -28,7 +23,7 @@ my $testnum = 1;
     foreach $type (qw(zip gz)) {
         ++$testnum;
         my $info = $exifTool->ImageInfo("t/images/ZIP.$type");
-        print 'not ' unless check($exifTool, $info, $testname, $testnum);
+        print 'not ' and $failed = 1 unless check($exifTool, $info, $testname, $testnum);
         print "ok $testnum\n";
     }
 }
@@ -42,11 +37,31 @@ my $testnum = 1;
         my $skip = '';
         if (eval 'require Archive::Zip') {
             my $info = $exifTool->ImageInfo("t/images/$file");
-            print 'not ' unless check($exifTool, $info, $testname, $testnum);
+            print 'not ' and $failed = 1 unless check($exifTool, $info, $testname, $testnum);
         } else {
             $skip = ' # skip Requires Archive::Zip';
         }
         print "ok $testnum$skip\n";
+    }
+}
+
+# pass on any Archive::Zip warning
+if ($Image::ExifTool::ZIP::warnString) {
+    warn $Image::ExifTool::ZIP::warnString;
+}
+
+# print module versions if anything failed
+if ($failed) {
+    my $mod;
+    foreach $mod ('Archive::Zip', 'Compress::Raw::Zlib') {
+        my $v;
+        if (eval "require $mod") {
+            my $var = $mod . '::VERSION';
+            no strict 'refs';
+            $v = $$var;
+        }
+        my $w = $v ? "version is $v" : 'is not installed';
+        warn "    ($mod $w)\n";
     }
 }
 
