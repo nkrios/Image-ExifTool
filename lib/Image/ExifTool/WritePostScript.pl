@@ -467,7 +467,7 @@ sub WritePS($$)
 
     # set XMP hint flag (1 for adding, 0 for deleting, undef for no change)
     $xmpHint = 1 if $$addDirs{XMP};
-    $xmpHint = 0 if $exifTool->{DEL_GROUP}->{XMP};
+    $xmpHint = 0 if $$exifTool{DEL_GROUP}{XMP};
     $$newTags{XMP_HINT} = $xmpHint if $xmpHint;  # add special tag to newTags list
 
     my @lines;
@@ -660,7 +660,8 @@ sub WritePS($$)
         delete $$newTags{XMP_HINT};
         push @notDone, 'PostScript' if %$newTags;
         foreach $dir (qw{Photoshop ICC_Profile XMP}) {
-            push @notDone, $dir if $$editDirs{$dir} and not $doneDir{$dir};
+            push @notDone, $dir if $$editDirs{$dir} and not $doneDir{$dir} and
+                                   not $$exifTool{DEL_GROUP}{$dir};
         }
         @notDone and $exifTool->Warn("Couldn't write ".join('/',@notDone).' information');
     }

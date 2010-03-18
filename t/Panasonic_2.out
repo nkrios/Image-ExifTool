@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.14
 [File, System, Image] FileName - File Name: Panasonic.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 6.9 kB
@@ -67,7 +67,7 @@
 [MakerNotes, Panasonic, Camera] 2 - Firmware Version: 0.1.0.8
 [MakerNotes, Panasonic, Camera] 3 - White Balance: Auto
 [MakerNotes, Panasonic, Camera] 7 - Focus Mode: Auto
-[MakerNotes, Panasonic, Camera] 15 - AF Mode: 9-area
+[MakerNotes, Panasonic, Camera] 15 - AF Area Mode: 9-area
 [MakerNotes, Panasonic, Camera] 26 - Image Stabilization: On, Mode 2
 [MakerNotes, Panasonic, Camera] 28 - Macro Mode: Off
 [MakerNotes, Panasonic, Camera] 31 - Shooting Mode: Program

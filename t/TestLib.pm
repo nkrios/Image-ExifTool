@@ -22,7 +22,7 @@ require Exporter;
 use Image::ExifTool qw(ImageInfo);
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.14';
+$VERSION = '1.15';
 @ISA = qw(Exporter);
 @EXPORT = qw(check writeCheck testCompare binaryCompare testVerbose);
 
@@ -181,6 +181,7 @@ sub closeEnough($$)
         } else {
             # check to see if both tokens are floating point numbers (with decimal points!)
             $tok1 =~ s/[^\d.]+$//; $tok2 =~ s/[^\d.]+$//;   # remove trailing units
+            $tok1 =~ s/^\d+:\d+://; $tok2 =~ s/^\d+:\d+://; # remove HH:MM:
             last unless Image::ExifTool::IsFloat($tok1) and
                         Image::ExifTool::IsFloat($tok2) and
                         $tok1 =~ /\./ and $tok2 =~ /\./;

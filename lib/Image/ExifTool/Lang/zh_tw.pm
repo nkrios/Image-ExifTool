@@ -8,6 +8,7 @@
 
 package Image::ExifTool::Lang::zh_tw;
 
+use strict;
 use vars qw($VERSION);
 
 $VERSION = '1.01';

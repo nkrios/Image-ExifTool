@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ProcessMPImageList($$$);
 
@@ -208,7 +208,12 @@ sub ExtractMPImages($)
                     Groups => { 0 => 'Composite', 1 => 'Composite', 2 => 'Image'},
                 });
             }
-            $exifTool->FoundTag($tag, $val);
+            my $key = $exifTool->FoundTag($tag, $val);
+            # set groups for PreviewImage
+            if ($tag eq 'PreviewImage') {
+                $exifTool->SetGroup($key, 'Composite', 0);
+                $exifTool->SetGroup($key, 'Composite');
+            }
             # extract information from MP images if ExtractEmbedded option used
             if ($ee) {
                 $$exifTool{DOC_NUM} = $i;

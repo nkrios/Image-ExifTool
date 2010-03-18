@@ -8,9 +8,10 @@
 
 package Image::ExifTool::Lang::de;
 
+use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.11';
+$VERSION = '1.15';
 
 %Image::ExifTool::Lang::de::Translate = (
    'AEAperture' => 'AE-Blende',
@@ -65,6 +66,7 @@ $VERSION = '1.11';
    'AEMeteringMode' => {
       Description => 'AE Belichtungs-Messmethode',
       PrintConv => {
+        'Center-weighted average' => 'Mittenbetont',
         'Multi-segment' => 'Multi-Segment',
       },
     },
@@ -138,7 +140,7 @@ $VERSION = '1.11';
         'Shutter/AF-On' => 'AF-On-Taste & Auslöser',
       },
     },
-   'AFAdjustment' => 'AF-Verstellung',
+   'AFAdjustment' => 'AF-Korrektur',
    'AFAperture' => 'AF-Blende',
    'AFArea' => 'AF-Feld',
    'AFAreaHeight' => 'AF-Bereichshöhe',
@@ -155,12 +157,16 @@ $VERSION = '1.11';
       Description => 'Messfeldsteuerung',
       PrintConv => {
         'Auto-area' => 'Autom. Messfeldgr.',
-        'Dynamic Area' => 'Dynamisch',
         'Dynamic Area (closest subject)' => 'Dynamic Messfeldgruppensteuerung (priorität der kürzesten Aufnahmedistanz)',
         'Dynamic Area (wide)' => 'Dynamische Messfeldsteuerung (groß)',
+        'Dynamic Area' => 'Dynamisch',
+        'Face Detect AF' => 'Gesichtserkennung AF',
         'Group Dynamic' => 'Dynamische Messfeldgruppensteuerung',
-        'Single Area' => 'Einzelfeld',
+        'Multi-point AF or AI AF' => 'Mehrpunkt AF oder AI AF',
+        'Off (Manual Focus)' => 'Aus (Manueller Fokus)',
         'Single Area (wide)' => 'Einzelfeldmessung (groß)',
+        'Single Area' => 'Einzelfeld',
+        'Single-point AF' => 'Einpunkt AF',
       },
     },
    'AFAreaModeSetting' => {
@@ -173,6 +179,8 @@ $VERSION = '1.11';
     },
    'AFAreaWidth' => 'AF-Bereichsbreite',
    'AFAreaWidths' => 'AF-Bereichsbreite',
+   'AFAreaXPositions' => 'AF Bereich X Positionen',
+   'AFAreaYPositions' => 'AF Bereich Y Positionen',
    'AFAreas' => 'AF-Bereiche',
    'AFAssist' => {
       Description => 'AF-Hilfslicht',
@@ -225,12 +233,7 @@ $VERSION = '1.11';
         'Disable' => 'Deaktivieren',
       },
     },
-   'AFMode' => {
-      Description => 'AF-Modus',
-      PrintConv => {
-        'Face Detect AF' => 'Gesichtserk',
-      },
-    },
+   'AFMode' => 'AF-Modus',
    'AFOnAELockButtonSwitch' => {
       Description => 'AF-ON/AELocktaste- Schalter',
       PrintConv => {
@@ -241,16 +244,22 @@ $VERSION = '1.11';
    'AFPoint' => {
       Description => 'Gewählter AF-Punkt',
       PrintConv => {
+        'Auto AF point selection' => 'Automatische Wahl des AF-Punktes',
         'Bottom' => 'Unten',
         'Center' => 'Mitte',
+        'Center (horizontal)' => 'Mitte (horizontal)',
+        'Center (vertical)' => 'Mitte (vertical)',
+        'Face Detect' => 'Gesichtserkennung',
         'Far Left' => 'Ganz links',
         'Far Right' => 'Ganz rechts',
         'Left' => 'Links',
         'Lower-left' => 'Unten-Links',
         'Lower-right' => 'Unten-Rechts',
+        'Manual AF point selection' => 'Manuell gewählter AF-Punkt',
         'Mid-left' => 'Links-Mitte',
         'Mid-right' => 'Rechts-Mitte',
-        'None' => 'Keine',
+        'None' => 'Kein',
+        'None (MF)' => 'Kein (MF)',
         'Right' => 'Rechts',
         'Top' => 'Oben',
         'Upper-left' => 'Oben-Links',
@@ -263,8 +272,8 @@ $VERSION = '1.11';
       PrintConv => {
         'Disable' => 'Aus',
         'Enable' => 'An',
-        'Enable (left/right assist points)' => 'Möglich (linkes/rechtes zusätzliches AF-Messfeld)',
-        'Enable (surrounding assist points)' => 'Möglich (entsprechendes zusätzliches AF-Messfeld)',
+        'Left/right AF points' => 'Möglich (linkes/rechtes zusätzliches AF-Messfeld)',
+        'Surrounding AF points' => 'Möglich (entsprechendes zusätzliches AF-Messfeld)',
       },
     },
    'AFPointAutoSelection' => {
@@ -431,6 +440,13 @@ $VERSION = '1.11';
     },
    'AFPredictor' => 'AF-Prädiktor',
    'AFResponse' => 'Verwendeter AF',
+   'AFSearch' => {
+      Description => 'AF Fokussierung',
+      PrintConv => {
+        'Not Ready' => 'Nicht bereit',
+        'Ready' => 'Bereit',
+      },
+    },
    'AIServoContinuousShooting' => 'Auslösepriorität',
    'AIServoImagePriority' => {
       Description => 'AI Servo Priorität 1./2. Bild',
@@ -456,6 +472,7 @@ $VERSION = '1.11';
     },
    'APEVersion' => 'APE-Version',
    'ARMVersion' => 'ARM-Version',
+   'AccessDate' => 'Zugriffsdatum',
    'ActionAdvised' => 'Aktion empfohlen',
    'ActiveArea' => 'Aktiver Bereich',
    'ActiveD-Lighting' => {
@@ -487,6 +504,7 @@ $VERSION = '1.11';
         'On' => 'Ein',
       },
     },
+   'Address' => 'Adresse',
    'AdultContentWarning' => {
       PrintConv => {
         'Unknown' => 'Unbekannt',
@@ -511,6 +529,7 @@ $VERSION = '1.11';
     },
    'AlphaOffset' => 'Alpha-Kanal-Datenposition',
    'AnalogBalance' => 'Analog-Balance',
+   'Annotation' => 'Anmerkung',
    'Anti-Blur' => {
       Description => 'Verwacklungsschutz-Modus',
       PrintConv => {
@@ -544,7 +563,8 @@ $VERSION = '1.11';
         'Enable' => 'Möglich',
       },
     },
-   'Artist' => 'Ersteller des Bildes',
+   'Artist' => 'Künstler',
+   'AspectRatio' => 'Bildformat',
    'AssignFuncButton' => {
       Description => 'FUNC.-Taste zuordnen',
       PrintConv => {
@@ -583,6 +603,7 @@ $VERSION = '1.11';
         'On' => 'Ein',
       },
     },
+   'AutoBracket' => 'Automatische Belichtungsreihe',
    'AutoBracketModeM' => {
       Description => 'Belichtungsreihen bei M',
       PrintConv => {
@@ -607,7 +628,7 @@ $VERSION = '1.11';
         'AE & Flash' => 'Belichtung & Blitz',
         'AE Only' => 'Nur Belichtung',
         'Flash Only' => 'Nur Blitz',
-        'WB Bracketing' => 'Weißabgleichsreihe',
+        'WB Bracketing' => 'Weißabgleichs-Belichtungsreihe',
       },
     },
    'AutoBracketing' => {
@@ -692,6 +713,7 @@ $VERSION = '1.11';
     },
    'BWFilter' => 'S/W-Filter',
    'BWMode' => {
+      Description => 'Schwarz-Weiß Modus',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'An',
@@ -710,6 +732,7 @@ $VERSION = '1.11';
     },
    'BaseExposureCompensation' => 'Basis-Belichtungskorrektur',
    'BaseISO' => 'Basis-ISO',
+   'BaseURL' => 'Basis URL',
    'BatteryADBodyLoad' => 'Kamerabatterie A/D unter Last',
    'BatteryADBodyNoLoad' => 'Kamerabatterie A/D im Leerlauf',
    'BatteryADGripLoad' => 'Griffbatterie A/D unter Last',
@@ -811,10 +834,15 @@ $VERSION = '1.11';
    'CFARepeatPatternDim' => 'Farbfiltermatrix-Größe',
    'CLModeShootingSpeed' => 'Lowspeed-Bildrate',
    'CMMFlags' => 'CMM-Flags',
+   'CPUArchitecture' => 'CPU Architektur',
+   'CPUCount' => 'Anzahl CPU',
    'CPUFirmwareVersion' => 'CPU-Firmware-Version',
+   'CPUSubtype' => 'CPU Subtyp',
    'CPUType' => {
+      Description => 'CPU Typ',
       PrintConv => {
-        'None' => 'Keine',
+        'Any' => 'Unbestimmt',
+        'None' => 'Unbestimmt',
       },
     },
    'CalibrationIlluminant1' => {
@@ -898,9 +926,12 @@ $VERSION = '1.11';
       Description => 'Blitz-Modus',
       PrintConv => {
         'Auto' => 'Automatisch',
+        'External flash' => 'Externer Blitz',
         'Off' => 'Aus',
         'On' => 'Ein',
         'Red-eye reduction' => 'Rote-Augen-Reduzierung',
+        'Red-eye reduction (Auto)' => 'Rote-Augen-Reduzierung (Automatisch)',
+        'Red-eye reduction (On)' => 'Rote-Augen-Reduzierung (Ein)',
       },
     },
    'CanonFocalLength' => 'Objektivart',
@@ -949,6 +980,9 @@ $VERSION = '1.11';
         'Average' => 'Durchschnitt',
       },
     },
+   'Certificate' => 'Zertifikat',
+   'Channels' => 'Kanäle',
+   'Chapter' => 'Kapitel',
    'CharacterSet' => 'Zeichensatz',
    'Chromaticity' => 'Chromatizität',
    'ChrominanceNR_TIFF_JPEG' => {
@@ -965,6 +999,7 @@ $VERSION = '1.11';
         'Off' => 'Aus',
       },
     },
+   'CircleOfConfusion' => 'Unschärfekreis',
    'City' => 'Stadt/Ort',
    'ClassifyState' => 'Klassifizierungs-Status',
    'ColorAberrationControl' => {
@@ -974,6 +1009,7 @@ $VERSION = '1.11';
       },
     },
    'ColorAdjustmentMode' => {
+      Description => 'Farbtonkorrektur Modus',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
@@ -1018,6 +1054,7 @@ $VERSION = '1.11';
     },
    'ColorHue' => 'Farbwiedergabe',
    'ColorInfo' => 'Farb-Informationen',
+   'ColorMap' => 'Farbtafel',
    'ColorMatrix' => 'Farb-Matrix',
    'ColorMatrix1' => 'Farbmatrix 1',
    'ColorMatrix2' => 'Farbmatrix 2',
@@ -1080,7 +1117,7 @@ $VERSION = '1.11';
         'Uncalibrated' => 'Nicht festgelegt',
       },
     },
-   'ColorSpaceData' => 'Daten-Farbraum',
+   'ColorSpaceData' => 'Farbraum Daten',
    'ColorTemperature' => 'Farbtemperatur',
    'ColorTone' => {
       Description => 'Farbton',
@@ -1183,6 +1220,8 @@ $VERSION = '1.11';
         'Uncompressed' => 'Nicht komprimiert',
       },
     },
+   'CompressionFactor' => 'Kompressionsfaktor',
+   'CompressionRatio' => 'Kompressionsrate',
    'CompressionType' => {
       PrintConv => {
         'None' => 'Keine',
@@ -1198,6 +1237,7 @@ $VERSION = '1.11';
       PrintConv => {
         'Continuous' => 'Serienaufnahme',
         'Movie' => 'Filmen',
+        'Single' => 'Einzelbild',
       },
     },
    'ContinuousShootingSpeed' => {
@@ -1230,6 +1270,9 @@ $VERSION = '1.11';
       },
     },
    'ContrastCurve' => 'Kontrast-Kurve',
+   'ContrastSetting' => 'Kontrasteinstellung',
+   'Contributor' => 'Mitwirkender',
+   'Contributors' => 'Mitwirkende',
    'ControlMode' => {
       Description => 'Steuerungsmethode',
       PrintConv => {
@@ -1243,16 +1286,18 @@ $VERSION = '1.11';
       },
     },
    'Converter' => 'Konverter',
-   'Copyright' => 'Urheberrechtsinhaber',
+   'Copyright' => 'Urheberrechtsvermerk',
    'CopyrightNotice' => 'Urheberrechtsvermerk',
    'CopyrightStatus' => {
       PrintConv => {
         'Unknown' => 'Unbekannt',
       },
     },
+   'Country' => 'Staat',
    'Country-PrimaryLocationCode' => 'ISO-Landescode',
-   'Country-PrimaryLocationName' => 'Land',
-   'CreateDate' => 'Datum der Digitaldatengenerierung',
+   'Country-PrimaryLocationName' => 'Staat',
+   'CountryCode' => 'Länderkennzeichen',
+   'CreateDate' => 'Digitalisierungsdatum/-uhrzeit',
    'CreationDate' => 'Aufnahmedatum',
    'CreativeStyle' => 'Kreativmodus',
    'Creator' => 'Ersteller',
@@ -1314,7 +1359,7 @@ $VERSION = '1.11';
       },
     },
    'DNGBackwardVersion' => 'DNG Versionskompatibilität',
-   'DNGLensInfo' => 'Geringste Brennweite',
+   'DNGLensInfo' => 'Kleinste Brennweite',
    'DNGVersion' => 'DNG-Version',
    'DSPFirmwareVersion' => 'DSP-Firmware-Version',
    'DataDump' => 'Daten-Dump',
@@ -1326,6 +1371,7 @@ $VERSION = '1.11';
         'YYYY/MM/DD' => 'JJJJ/MM/TT',
       },
     },
+   'DataLength' => 'Datenlänge',
    'Date' => 'Datum',
    'DateCreated' => 'Erstellungsdatum',
    'DateDisplayFormat' => {
@@ -1344,8 +1390,10 @@ $VERSION = '1.11';
         'Off' => 'Aus',
       },
     },
-   'DateTime' => 'Dateiänderungsdatum',
-   'DateTimeOriginal' => 'Datum der Originaldatengenerierung',
+   'DateTime' => 'Änderungsdatum',
+   'DateTimeCreated' => 'Erstellungsdatum/-uhrzeit',
+   'DateTimeDigitized' => 'Datum/Uhrzeit der Digitalisierung',
+   'DateTimeOriginal' => 'Erstellungsdatum/-uhrzeit',
    'DaylightSavings' => {
       Description => 'Sommerzeit',
       PrintConv => {
@@ -1353,6 +1401,7 @@ $VERSION = '1.11';
         'Yes' => 'Ein',
       },
     },
+   'Declination' => 'Deklination',
    'DeletedImageCount' => 'Anzahl gelöschter Bilder',
    'Description' => 'Beschreibung',
    'Destination' => 'Ziel',
@@ -1379,12 +1428,13 @@ $VERSION = '1.11';
       },
     },
    'DigitalCreationDate' => 'Digitalisierungsdatum',
+   'DigitalCreationDateTime' => 'Digitalisierungsdatum/-uhrzeit',
    'DigitalCreationTime' => 'Digitalisierungszeit',
    'DigitalZoom' => {
       Description => 'Digital-Zoom',
       PrintConv => {
         'Electronic magnification' => 'Elektronische Vergrößerung',
-        'None' => 'Keiner',
+        'None' => 'Kein',
         'Off' => 'Aus',
         'Other' => 'Unbekannt',
       },
@@ -1395,7 +1445,8 @@ $VERSION = '1.11';
         'On' => 'Ein',
       },
     },
-   'DigitalZoomRatio' => 'Digital-Zoom-Fakor',
+   'DigitalZoomRatio' => 'Digitaler Zoom-Faktor',
+   'Directory' => 'Verzeichnis',
    'DirectoryIndex' => 'Verzeichnis-Index',
    'DirectoryNumber' => 'Ordner-Nummer',
    'DisplayAperture' => 'Angezeigte Blende',
@@ -1409,22 +1460,36 @@ $VERSION = '1.11';
         'um' => 'µm (Mikrometer)',
       },
     },
-   'DisplayedUnitsX' => 'Einheit der horiz. Auflösung',
-   'DisplayedUnitsY' => 'Einheit der vert. Auflösung',
+   'DisplayedUnitsX' => {
+      Description => 'Einheit der horiz. Auflösung',
+      PrintConv => {
+        'inches' => 'inch',
+      },
+    },
+   'DisplayedUnitsY' => {
+      Description => 'Einheit der vert. Auflösung',
+      PrintConv => {
+        'inches' => 'inch',
+      },
+    },
    'DistortionCorrection' => {
+      Description => 'Verzeichnungsausgleich',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
       },
     },
    'DistortionCorrection2' => {
+      Description => 'Verzeichnungsausgleich 2',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
       },
     },
    'DjVuVersion' => 'DjVu-Version',
+   'Document' => 'Dokument',
    'DocumentHistory' => 'Historie des Dokuments',
+   'DocumentName' => 'Dokumentenname',
    'DocumentNotes' => 'Notizen zum Dokument',
    'DriveMode' => {
       Description => 'Aufnahmeart',
@@ -1462,6 +1527,7 @@ $VERSION = '1.11';
         'Single-frame' => 'Einzelbildaufnahme',
       },
     },
+   'Duration' => 'Dauer',
    'DynamicAFArea' => {
       Description => 'Dynamisches AF-Messfeld',
       PrintConv => {
@@ -1509,9 +1575,10 @@ $VERSION = '1.11';
         'Tv or Av' => 'Tv oder Av',
       },
     },
+   'EMail' => 'E-Mail',
    'ETTLII' => {
       PrintConv => {
-        'Average' => 'Durchschnitt',
+        'Average' => 'Integralmessung',
         'Evaluative' => 'Mehrfeldmessung',
       },
     },
@@ -1556,6 +1623,7 @@ $VERSION = '1.11';
         'Manual' => 'Manuell',
         'Night' => 'Nachtszene',
         'Night Snapshot' => 'Nacht Schnappschuss',
+        'Pan focus' => 'Pan Fokus',
         'Portrait' => 'Porträt',
         'Snow' => 'Schnee',
         'Sports' => 'Sport',
@@ -1570,6 +1638,7 @@ $VERSION = '1.11';
       },
     },
    'EditStatus' => 'Bearbeitungsstatus',
+   'Edition' => 'Ausgabe',
    'EditorialUpdate' => 'Redaktionelle Überarbeitung',
    'EffectiveLV' => 'Effektiver LW',
    'EffectiveMaxAperture' => 'Effektiv größte Blende',
@@ -1579,6 +1648,7 @@ $VERSION = '1.11';
       },
     },
    'EncodingProcess' => 'JPEG-Kodierung Prozess',
+   'Encryption' => 'Verschlüsselung',
    'EnhanceDarkTones' => {
       PrintConv => {
         'Off' => 'Aus',
@@ -1606,10 +1676,12 @@ $VERSION = '1.11';
    'EnvelopeRecordVersion' => 'IPTC-Modell-1-Version',
    'EquipmentVersion' => 'Equipment-Version',
    'Error' => 'Fehler',
+   'ExifByteOrder' => 'Exif Byte-Reihenfolge',
    'ExifCameraInfo' => 'Exif Kamerainformationen',
    'ExifImageHeight' => 'Exif-Bildhöhe',
    'ExifImageWidth' => 'Exif-Bildbreite',
    'ExifToolVersion' => 'ExifTool-Version',
+   'ExifUnicodeByteOrder' => 'Exif Unicode Byte-Reihenfolge',
    'ExifVersion' => 'Exif-Version',
    'ExitPupilPosition' => 'Austrittspupillenposition',
    'ExpandFilm' => 'Erweitert Film',
@@ -1671,6 +1743,7 @@ $VERSION = '1.11';
         'Landscape' => 'Landschaft',
         'Manual' => 'Manuelle Belichtung',
         'Night Scene' => 'Nachtszene',
+        'Night Scene / Twilight' => 'Nachtszene',
         'Portrait' => 'Porträt',
         'Program' => 'Programm',
         'Program-shift' => 'Programm-Shift',
@@ -1693,14 +1766,14 @@ $VERSION = '1.11';
    'ExposureProgram' => {
       Description => 'Belichtungsprogramm',
       PrintConv => {
-        'Action (High speed)' => 'Action-Programm (ausgerichtet auf schnelle Verschlussgeschwindigkeit)',
+        'Action (High speed)' => 'Kreativ-Programm (ausgerichtet auf schnelle Verschlussgeschwindigkeit)',
         'Aperture Priority' => 'Blendenpriorität',
         'Aperture-priority AE' => 'Blendenpriorität',
         'Creative (Slow speed)' => 'Kreativ-Programm (ausgerichtet auf Schärfentiefe)',
         'Landscape' => 'Landschaftsmodus',
         'Manual' => 'Manuell',
         'Not Defined' => 'Nicht definiert',
-        'Portrait' => 'Portrait-Modus',
+        'Portrait' => 'Porträt-Modus',
         'Program' => 'Programm',
         'Program AE' => 'Normal-Programm',
         'Shutter Priority' => 'Verschlusspriorität',
@@ -1722,11 +1795,18 @@ $VERSION = '1.11';
         'On' => 'Ein',
       },
     },
-   'Extender' => 'Konverter',
+   'Extender' => {
+      Description => 'Konverter',
+      PrintConv => {
+        'None' => 'Kein',
+      },
+    },
    'ExtenderFirmwareVersion' => 'Konverter-Firmware-Version',
+   'ExtenderMake' => 'Konverter Hersteller',
    'ExtenderModel' => 'Konverter-Modell',
    'ExtenderSerialNumber' => 'Konverter-Seriennummer',
    'ExternalFlash' => {
+      Description => 'Externer Blitz',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
@@ -1775,8 +1855,10 @@ $VERSION = '1.11';
         'n/a - Off-Auto-Aperture' => 'K/A - Blendenring nicht auf A',
       },
     },
+   'ExternalFlashZoom' => 'Externer Blitz-Zoom',
    'ExtraSamples' => 'Zusätzliche Komponenten',
    'FNumber' => 'F-Wert',
+   'FOV' => 'Sichtfeld',
    'Face0Position' => 'Position, 0. Gesicht',
    'Face1Position' => 'Position, 1. Gesicht',
    'Face2Position' => 'Position, 2. Gesicht',
@@ -1786,8 +1868,16 @@ $VERSION = '1.11';
    'Face6Position' => 'Position, 6. Gesicht',
    'Face7Position' => 'Position, 7. Gesicht',
    'Face8Position' => 'Position, 8. Gesicht',
+   'FaceDetect' => {
+      Description => 'Gesichtserkennung',
+      PrintConv => {
+        'Off' => 'Aus',
+        'On' => 'Ein',
+      },
+    },
    'FaceDetect1' => 'Gesichter erkannt',
    'FaceDetect2' => 'Gesichter erkannt',
+   'FaceDetectArea' => 'Gesichtserkennung Bereich',
    'FaceDetectFrameHeight' => 'Bereichshöhe',
    'FaceDetectFrameWidth' => 'Bereichsbreite',
    'FacesDetected' => 'Gesichter erkannt',
@@ -1805,11 +1895,12 @@ $VERSION = '1.11';
    'FaxRecvParams' => 'Fax-Empfangsparameter',
    'FaxRecvTime' => 'Fax-Empfangszeit',
    'FaxSubAddress' => 'Fax-Sub-Adresse',
+   'FileDescription' => 'Dateibeschreibung',
    'FileFormat' => 'Dateiformat',
    'FileIndex' => 'Datei-Index',
    'FileInfo' => 'Datei-Informationen',
    'FileInfoVersion' => 'Datei-Informationen-Version',
-   'FileModifyDate' => 'Datei Änderung Datum / Uhrzeit',
+   'FileModifyDate' => 'Datum/Uhrzeit der Dateiänderung',
    'FileName' => 'Dateiname',
    'FileNumber' => 'Dateinummer',
    'FileNumberMemory' => {
@@ -1826,6 +1917,7 @@ $VERSION = '1.11';
         'On' => 'Ein',
       },
     },
+   'FilePermissions' => 'Dateiberechtigungen',
    'FileSize' => 'Dateigröße',
    'FileSource' => {
       Description => 'Dateiquelle',
@@ -1947,6 +2039,7 @@ $VERSION = '1.11';
       },
     },
    'FlashDevice' => {
+      Description => 'Blitzgerät',
       PrintConv => {
         'External' => 'Extern',
         'Internal' => 'Intern',
@@ -1980,6 +2073,7 @@ $VERSION = '1.11';
     },
    'FlashFirmwareVersion' => 'Blitz-Firmware-Version',
    'FlashFocalLength' => 'Blitz-Brennweite',
+   'FlashGNDistance' => 'Blitzleitzahl Entfernung',
    'FlashGroupAControlMode' => {
       Description => 'Gruppe A, Blitzlichtsteuerungsmodus',
       PrintConv => {
@@ -1995,6 +2089,7 @@ $VERSION = '1.11';
       Description => 'Gruppe B, Blitzlichtsteuerungsmodus',
       PrintConv => {
         'Auto Aperture' => 'Blendenautomatik (AA)',
+        'Automatic' => 'Automatik',
         'Manual' => 'Manuell',
         'Off' => 'Aus',
         'Repeating Flash' => 'Stroboskopblitz',
@@ -2023,6 +2118,7 @@ $VERSION = '1.11';
       },
     },
    'FlashLevel' => 'Blitzbelichtungskorr.',
+   'FlashMake' => 'Blitzgerät-Hersteller',
    'FlashMetering' => {
       Description => 'Blitz-Messung',
       PrintConv => {
@@ -2068,6 +2164,7 @@ $VERSION = '1.11';
         'On, Wireless (Control)' => 'Ein, Drahtlos (Steuerblitz)',
         'On, Wireless (Master)' => 'Ein, Drahtlos (Hauptblitz)',
         'Rear flash sync' => 'Synchronisation auf den zweiten Verschlussvorhang',
+        'Red-eye' => 'Rote Augen',
         'Red-eye Reduction' => 'Rote-Augen-Reduzierung',
         'Red-eye reduction' => 'Rote-Augen-Reduzierung',
         'Unknown' => 'Unbekannt',
@@ -2136,6 +2233,8 @@ $VERSION = '1.11';
    'FlashType' => {
       Description => 'Blitztyp',
       PrintConv => {
+        'Built-In Flash' => 'Intern',
+        'External' => 'Extern',
         'None' => 'Keiner',
       },
     },
@@ -2167,6 +2266,7 @@ $VERSION = '1.11';
       Description => 'Einheit der Sensorauflösung',
       PrintConv => {
         'None' => 'Keine',
+        'inches' => 'inch',
         'um' => 'µm (Mikrometer)',
       },
     },
@@ -2219,15 +2319,23 @@ $VERSION = '1.11';
       PrintConv => {
         'AF-C' => 'AF-C (Kontinuierlicher Autofokus)',
         'AF-S' => 'AF-S (Einzelautofokus)',
+        'AI Focus AF' => 'AI Fokus AF',
         'Auto' => 'Automatisch',
         'Continuous' => 'Serienaufnahme',
         'Custom' => 'Benutzerdefiniert',
+        'Face detect' => 'Gesichtserkennung AF',
         'Infinity' => 'Unendlich',
         'Macro' => 'Makro',
         'Macro (1)' => 'Makro (1)',
         'Macro (2)' => 'Makro (2)',
         'Manual' => 'Manuell',
+        'Manual Focus (3)' => 'Manueller Fokus (3)',
+        'Manual Focus (6)' => 'Manueller Fokus (6)',
+        'Multi AF' => 'Mehrpunkt AF',
+        'One-shot AF' => 'One-Shot AF',
         'Pan Focus' => 'Pan-Fokus',
+        'Single' => 'Einzelbild',
+        'Single AF' => 'Einpunkt AF',
         'Super Macro' => 'Super-Makro',
       },
     },
@@ -2257,6 +2365,13 @@ $VERSION = '1.11';
       },
     },
    'FocusPosition' => 'Fokus-Distanz',
+   'FocusProcess' => {
+      Description => 'Fokussierung',
+      PrintConv => {
+        'AF Not Used' => 'Ohne AF',
+        'AF Used' => 'Mit AF',
+      },
+    },
    'FocusRange' => {
       Description => 'Fokus-Bereich',
       PrintConv => {
@@ -2324,7 +2439,7 @@ $VERSION = '1.11';
       Description => 'Bezugshöhe',
       PrintConv => {
         'Above Sea Level' => 'Höhe über Normal-Null (Meeresspiegel)',
-        'Below Sea Level' => 'Meereshöhe-Referenz (negative Werte)',
+        'Below Sea Level' => 'Höhe unter Normal-Null (Meeresspiegel)',
       },
     },
    'GPSAreaInformation' => 'Name des GPS-Gebietes',
@@ -2407,6 +2522,7 @@ $VERSION = '1.11';
         '3-Dimensional Measurement' => '3-Dimensionale Messung',
       },
     },
+   'GPSPosition' => 'GPS Position',
    'GPSProcessingMethod' => 'Name der GPS-Verarbeitungsmethode',
    'GPSSatellites' => 'Für die Messung verwendete Satelliten',
    'GPSSpeed' => 'Geschwindigkeit des GPS-Empfängers',
@@ -2504,6 +2620,8 @@ $VERSION = '1.11';
       },
     },
    'HueAdjustment' => 'Farbtonkorrektur',
+   'HyperfocalDistance' => 'Hyperfokale Entfernung',
+   'ICCProfileName' => 'Name des ICC Profils',
    'IPTC-NAA' => 'IPTC-NAA Metadaten',
    'ISO' => 'ISO-Empfindlichkeit',
    'ISO2' => 'ISO-Empfindlichkeit (2)',
@@ -2590,7 +2708,7 @@ $VERSION = '1.11';
       },
     },
    'ImageDataSize' => 'Bilddatengröße',
-   'ImageDescription' => 'Bildtitel',
+   'ImageDescription' => 'Bildbeschreibung',
    'ImageDustOff' => {
       PrintConv => {
         'Off' => 'Aus',
@@ -2622,6 +2740,7 @@ $VERSION = '1.11';
       },
     },
    'ImageProcessingCount' => 'Bildverarbeitungszähler',
+   'ImageProcessingVersion' => 'Bildverarbeitung Version',
    'ImageQuality' => {
       Description => 'Bildqualität',
       PrintConv => {
@@ -2724,6 +2843,7 @@ $VERSION = '1.11';
       },
     },
    'InternalFlashStrength' => 'Slave-Blitz-Messfeld 4',
+   'InternalName' => 'Interner Name',
    'InternalSerialNumber' => 'Interne Seriennummer',
    'InteropIndex' => {
       Description => 'Interoperabilitäts-Identifikation',
@@ -2747,6 +2867,7 @@ $VERSION = '1.11';
    'JPEGQuality' => 'JPEG-Qualität',
    'JobID' => 'Job-ID',
    'JpgRecordedPixels' => 'JPEG-Auflösung',
+   'Key' => 'Schlüssel',
    'Keyword' => 'Stichwörter',
    'Keywords' => 'Schlüsselwort',
    'LC1' => 'Objektiv-Wert',
@@ -2795,6 +2916,14 @@ $VERSION = '1.11';
         'On' => 'Ein',
       },
     },
+   'Label' => 'Bezeichnung',
+   'Language' => 'Sprache',
+   'LanguageCode' => {
+      Description => 'Sprache',
+      PrintConv => {
+        'Process default' => 'Systemeinstellung',
+      },
+    },
    'LanguageIdentifier' => 'Sprachkennung',
    'LastFileNumber' => 'Letzte Dateinummer',
    'LeafData' => 'Leaf Daten',
@@ -2828,6 +2957,7 @@ $VERSION = '1.11';
    'LensIDNumber' => 'Objektivkennnummer',
    'LensInfo' => 'Objektiv-Informationen',
    'LensKind' => 'Objektivtyp / Version (LC0)',
+   'LensMake' => 'Objektivhersteller',
    'LensModel' => 'Objektiv-Typ',
    'LensProperties' => 'Objektivfunktionen?',
    'LensSerialNumber' => 'Objektiv-Seriennummer',
@@ -2867,6 +2997,7 @@ $VERSION = '1.11';
         'On' => 'Ein',
       },
     },
+   'LightValue' => 'Lichtwert(ISO)',
    'LinearizationTable' => 'Linearisierungstabelle',
    'Lit' => {
       PrintConv => {
@@ -2892,8 +3023,8 @@ $VERSION = '1.11';
    'LockMicrophoneButton' => {
       Description => 'Mikrofone-Tastenfunktion',
       PrintConv => {
-        'Protect (holding:sound rec.)' => 'Geschützt (drücken:Tonaufnahme)',
-        'Sound rec. (protect:disable)' => 'Tonaufnahme (ungeschützt)',
+        'Protect (hold:record memo)' => 'Geschützt (drücken:Tonaufnahme)',
+        'Record memo (protect:disable)' => 'Tonaufnahme (ungeschützt)',
       },
     },
    'LongExposureNoiseReduction' => {
@@ -2986,6 +3117,7 @@ $VERSION = '1.11';
    'MakerNoteVersion' => 'MakerNote-Version',
    'ManometerPressure' => 'Gemessener Luft- bzw. Wasserdruck',
    'ManometerReading' => 'Berechnete Höhe oder Tauchtiefe',
+   'ManualFlash' => 'Manueller Blitz',
    'ManualFlashOutput' => {
       Description => 'Manuelle Blitzstärke',
       PrintConv => {
@@ -3003,7 +3135,8 @@ $VERSION = '1.11';
         'Tv=Main/Av=Control' => 'Tv=Haupt-Wahlrad/Av=Schnelleinstellrad',
       },
     },
-   'ManufactureDate' => 'Herstellungsdatum?',
+   'ManufactureDate' => 'Herstellungsdatum',
+   'Marked' => 'Markiert',
    'MasterDocumentID' => 'ID des Originaldokuments',
    'MaxAperture' => 'Größte Blende',
    'MaxApertureAtCurrentFocal' => 'Größte Blende bei aktueller Brennweite',
@@ -3036,6 +3169,7 @@ $VERSION = '1.11';
         'Top' => 'Oben',
       },
     },
+   'MetadataDate' => 'Datum der Metadaten',
    'Metering' => {
       Description => 'Belichtungsmessung',
       PrintConv => {
@@ -3047,19 +3181,23 @@ $VERSION = '1.11';
    'MeteringMode' => {
       Description => 'Belichtungsmessmethode',
       PrintConv => {
-        'Average' => 'Durchschnitt',
+        'Average' => 'Integralmessung',
+        'Center-weighted Average' => 'Mittenbetont',
         'Center-weighted average' => 'Mittenbetont',
         'Evaluative' => 'Mehrfeldmessung',
         'Multi-segment' => 'Multi-Segment',
         'Other' => 'Andere',
         'Partial' => 'Teilbild',
         'Spot' => 'Spotmessung',
+        'Spot+Highlight control' => 'Spot+Helligkeitsbetont',
+        'Spot+Shadow control' => 'Spot+Schattenbetont',
         'Unknown' => 'Unbekannt',
       },
     },
    'MeteringMode2' => {
       Description => 'Belichtungs-Messmethode 2',
       PrintConv => {
+        'Center-weighted average' => 'Mittenbetont',
         'Multi-segment' => 'Multi-Segment',
       },
     },
@@ -3076,7 +3214,7 @@ $VERSION = '1.11';
       },
     },
    'MinAperture' => 'Kleinste Blende',
-   'MinFocalLength' => 'Geringste Brennweite',
+   'MinFocalLength' => 'Kleinste Brennweite',
    'MinoltaCameraSettings2' => 'Kameraeinstellungen 2',
    'MinoltaCameraSettings5D' => 'Kameraeinstellungen (A100)',
    'MinoltaCameraSettings7D' => 'Kameraeinstellungen (7D)',
@@ -3166,7 +3304,7 @@ $VERSION = '1.11';
         'Underwater' => 'Tauchen',
       },
     },
-   'ModifyDate' => 'Dateiänderungsdatum',
+   'ModifyDate' => 'Änderungsdatum',
    'MoireFilter' => {
       PrintConv => {
         'Off' => 'Aus',
@@ -3196,6 +3334,7 @@ $VERSION = '1.11';
         'Purple' => 'Lila',
       },
     },
+   'Month' => 'Monat',
    'MultiExposure' => 'Mehrfachbelichtungsdaten',
    'MultiExposureAutoGain' => {
       Description => 'Mehrfachbel.: Autom. Belichtung',
@@ -3288,7 +3427,6 @@ $VERSION = '1.11';
         'Small (2.5 M)' => 'Klein (2.5M)',
       },
     },
-   'NikonPreview' => 'Preview-IFD-Zeiger',
    'NoMemoryCard' => {
       Description => 'Auslösesperre',
       PrintConv => {
@@ -3298,6 +3436,7 @@ $VERSION = '1.11';
     },
    'Noise' => 'Bildrauschen',
    'NoiseFilter' => {
+      Description => 'Rauschfilter',
       PrintConv => {
         'High' => 'Hoch',
         'Low' => 'Leicht',
@@ -3329,6 +3468,7 @@ $VERSION = '1.11';
     },
    'ObjectFileType' => {
       PrintConv => {
+        'Executable file' => 'Ausführbare Datei',
         'None' => 'Keine',
         'Unknown' => 'Unbekannt',
       },
@@ -3341,12 +3481,14 @@ $VERSION = '1.11';
    'OffsetSchema' => 'Offset-Schema',
    'OldSubfileType' => 'Unterdatei-Typ',
    'OneTouchWB' => {
+      Description => 'Sofort-Weißabgleich',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'An',
         'On (Preset)' => 'An (Preset)',
       },
     },
+   'OpticalZoom' => 'Optischer Zoom',
    'OpticalZoomCode' => 'Optischer Zoom-Code',
    'OpticalZoomOn' => {
       PrintConv => {
@@ -3373,15 +3515,18 @@ $VERSION = '1.11';
    'OriginalRawFileName' => 'Original Raw Dateiname',
    'OriginalTransmissionReference' => 'Jobkennung',
    'OriginatingProgram' => 'Erstellungsprogramm',
+   'Owner' => 'Besitzer',
    'OwnerID' => 'Besitzer-ID',
    'OwnerName' => 'Name des Besitzers',
    'PEFVersion' => 'PEF-Version',
    'Padding' => 'Platzhalter',
    'PageName' => 'Seitenname',
    'PageNumber' => 'Seitenummer',
+   'Pages' => 'Seiten',
    'PanasonicTitle' => 'Titel',
    'PanoramaDirection' => 'Panorama-Richtung',
    'PanoramaFrameNumber' => 'Panorama-Bild',
+   'PanoramaMode' => 'Panorama Modus',
    'PentaxImageSize' => {
       Description => 'Pentax-Bildgröße',
       PrintConv => {
@@ -3398,9 +3543,11 @@ $VERSION = '1.11';
       Description => 'Auto-Fokus',
       PrintConv => {
         'Off' => 'Aus',
-        'On (51-point)' => 'Ein',
+        'On (11-point)' => 'Ein (11-Punkt)',
+        'On (51-point)' => 'Ein (51-Punkt)',
       },
     },
+   'PhoneNumber' => 'Telefonnummer',
    'PhotoEffect' => {
       Description => 'Foto-Effekt',
       PrintConv => {
@@ -3499,6 +3646,8 @@ $VERSION = '1.11';
         'Autumn' => 'Herbst',
         'Beach' => 'Strand',
         'Beach & Snow' => 'Strand & Schnee',
+        'Black & White' => 'Schwarz/Weiß',
+        'Blue' => 'Blau',
         'Blur Reduction' => 'Digital SR (Unschärfereduktion)',
         'Bulb' => 'Bulb-Modus',
         'Bulb, Off-Auto-Aperture' => 'Bulb (Blendenring nicht auf A)',
@@ -3512,6 +3661,7 @@ $VERSION = '1.11';
         'Flower' => 'Blumen',
         'Food' => 'Lebensmittel',
         'Frame Composite' => 'Rahmen',
+        'Green' => 'Grün',
         'Green Mode' => 'Grüner Modus',
         'Half-length Portrait' => 'Brustbild',
         'Hi-speed Program' => 'HS-Priorität',
@@ -3526,6 +3676,7 @@ $VERSION = '1.11';
         'Manual' => 'Manuell',
         'Manual, Off-Auto-Aperture' => 'Manuell (Blendenring nicht auf A)',
         'Medium Pet' => 'Haustier (Neutrale Helligkeit)',
+        'Natural' => 'Natur',
         'Natural Light' => 'Umgebungslicht',
         'Natural Light & Flash' => 'Umgebungslicht & Blitz',
         'Natural Skin Tone' => 'Nat. Hautton',
@@ -3533,12 +3684,15 @@ $VERSION = '1.11';
         'Night Scene Portrait' => 'Nacht-Porträt',
         'No Flash' => 'Kein Blitz',
         'Pet' => 'Haustier',
+        'Pink' => 'Rosa',
         'Portrait' => 'Porträt',
         'Program' => 'Programm',
         'Program (HyP)' => 'Programmautomatik (Hyper-Programm)',
         'Program AE' => 'Programmautomatik',
         'Program Av Shift' => 'Av Shift-Belichtungsprogramm',
         'Program Tv Shift' => 'Tv Shift-Belichtungsprogramm',
+        'Purple' => 'Violett',
+        'Red' => 'Rot',
         'Self Portrait' => 'Selbstporträt',
         'Sensitivity Priority AE' => 'Blenden- & Zeitautomatik (Sv, ISO-Vorgabe)',
         'Shutter & Aperture Priority AE' => 'Empfindlichkeitsautomatik (TAv, Zeit-/Blendenvorgabe)',
@@ -3551,6 +3705,7 @@ $VERSION = '1.11';
         'Surf & Snow' => 'Surf + Schnee',
         'Synchro Sound Record' => 'Synchr. Sprachnotiz',
         'Underwater' => 'Tauchen',
+        'Yellow', 'Gelb',
       },
     },
    'PictureMode2' => {
@@ -3612,6 +3767,7 @@ $VERSION = '1.11';
       },
     },
    'PlanarConfiguration' => 'Bilddatenausrichtung',
+   'PostalCode' => 'Postleitzahl',
    'PowerSource' => {
       Description => 'Stromquelle',
       PrintConv => {
@@ -3627,6 +3783,17 @@ $VERSION = '1.11';
         'None' => 'Kein Prädiktor-Schema in Benutzung',
       },
     },
+   'PresetWhiteBalance' => {
+      Description => 'Weißabgleich Voreinstellung',
+      PrintConv => {
+        'Cloudy' => 'Bewölkt',
+        'Daylight' => 'Tageslicht',
+        'Flash' => 'Blitz',
+        'Fluorescent' => 'Fluoreszierend',
+        'Shade' => 'Schatten',
+        'Tungsten' => 'Kunstlicht (Glühbirne)',
+      },
+    },
    'Preview0' => 'Vorschau 0',
    'Preview1' => 'Vorschau 1',
    'Preview2' => 'Vorschau 2',
@@ -3636,13 +3803,16 @@ $VERSION = '1.11';
       },
     },
    'PreviewHeight' => 'Vorschaubild-Höhe',
+   'PreviewIFD' => 'Preview-IFD-Zeiger',
    'PreviewImage' => 'Vorschaubild',
    'PreviewImageBorders' => 'Vorschaubild-Ränder',
    'PreviewImageData' => 'Vorschaubild-Daten',
    'PreviewImageHeight' => 'Vorschaubild-Höhe',
    'PreviewImageLength' => 'Vorschaubild-Datenlänge',
+   'PreviewImageName' => 'Vorschaubild-Name',
    'PreviewImageSize' => 'Vorschaubild-Größe',
    'PreviewImageStart' => 'Vorschaubild-Datenposition',
+   'PreviewImageType' => 'Vorschaubild-Typ',
    'PreviewImageValid' => {
       Description => 'Vorschaubild gültig',
       PrintConv => {
@@ -3662,6 +3832,7 @@ $VERSION = '1.11';
    'PrimaryAFPoint' => {
       Description => 'Primärer AF-Punkt',
       PrintConv => {
+        '(none)' => '(keiner)',
         'Bottom' => 'Unten',
         'C6 (Center)' => 'C6 (Mitte)',
         'Center' => 'Mitte',
@@ -3681,7 +3852,7 @@ $VERSION = '1.11';
    'ProcessingInfo' => 'Verarbeitungsinformationen',
    'ProcessingSoftware' => 'Verarbeitungssoftware',
    'ProductID' => 'Produkt-ID',
-   'ProductionCode' => 'Kamera war beim Kundendienst?',
+   'ProductionCode' => 'Herstellungskennzeichen',
    'ProfileCMMType' => 'Profil CMM-Typ',
    'ProfileClass' => {
       Description => 'Profil-Klasse',
@@ -3727,6 +3898,7 @@ $VERSION = '1.11';
    'ProgramVersion' => 'Programmversion',
    'Protect' => 'Schutz',
    'Province-State' => 'Bundesland/Kanton',
+   'Publisher' => 'Herausgeber',
    'Quality' => {
       Description => 'Bildqualität',
       PrintConv => {
@@ -3797,6 +3969,7 @@ $VERSION = '1.11';
         'Custom' => 'Benutzerdefiniert',
       },
     },
+   'RawDataLength' => 'RAW Datenlänge',
    'RawDataOffset' => 'RAW-Daten-Offset',
    'RawDevAutoGradation' => {
       PrintConv => {
@@ -3859,7 +4032,7 @@ $VERSION = '1.11';
       },
     },
    'RecordMode' => {
-      Description => 'Dateityp',
+      Description => 'Aufzeichnungsmodus',
       PrintConv => {
         'Aperture Priority' => 'Blendenpriorität',
         'Manual' => 'Manuell',
@@ -3883,6 +4056,7 @@ $VERSION = '1.11';
       },
     },
    'RedEyeReduction' => {
+      Description => 'Rote Augen Reduzierung',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
@@ -3896,6 +4070,7 @@ $VERSION = '1.11';
    'ReferenceDate' => 'Referenzdatum',
    'ReferenceNumber' => 'Referenznummer',
    'ReferenceService' => 'Referenzdienst',
+   'References' => 'Verweise',
    'RelatedImageFileFormat' => 'Dateiformat der Bilddaten',
    'RelatedImageHeight' => 'Bildhöhe',
    'RelatedImageWidth' => 'Bildbreite',
@@ -3908,6 +4083,7 @@ $VERSION = '1.11';
       },
     },
    'ReleaseDate' => 'Veröffentlichungsdatum',
+   'ReleaseMode' => 'Auslösemodus',
    'ReleaseTime' => 'Veröffentlichungszeit',
    'RemoteOnDuration' => 'Fernauslöser',
    'RenderingIntent' => {
@@ -3939,6 +4115,7 @@ $VERSION = '1.11';
       Description => 'Einheit der X- und Y-Auflösung',
       PrintConv => {
         'None' => 'Keine',
+        'inches' => 'inch',
       },
     },
    'RetouchHistory' => {
@@ -3957,6 +4134,7 @@ $VERSION = '1.11';
       },
     },
    'ReverseIndicators' => 'Skalen spiegeln',
+   'Rights' => 'Rechte',
    'Rotation' => {
       Description => 'Ausrichtung',
       PrintConv => {
@@ -4035,6 +4213,7 @@ $VERSION = '1.11';
         'Very Low' => 'Sehr gering',
       },
     },
+   'ScaleFactor35efl' => 'Formatfaktor zu 35 mm',
    'ScanImageEnhancer' => {
       PrintConv => {
         'Off' => 'Aus',
@@ -4056,18 +4235,30 @@ $VERSION = '1.11';
       PrintConv => {
         'Aperture Priority' => 'Blendenpriorität',
         'Auto' => 'Automatisch',
+        'Available Light' => 'Verfügbares Licht',
         'Beach' => 'Strand',
+        'Beach & Snow' => 'Strand & Schnee',
+        'Behind Glass' => 'Hinterglas',
+        'Candle' => 'Kerzenlicht',
         'Candlelight' => 'Kerzenlicht',
+        'Children' => 'Kinder',
+        'Documents' => 'Dokumente',
         'Fireworks' => 'Feuerwerk',
+        'Indoor' => 'Innenaufnahme',
         'Landscape' => 'Landschaft',
+        'Landscape+Portrait' => 'Landschaft+Porträt',
         'Macro' => 'Makro',
         'Manual' => 'Manuell',
+        'My Mode' => 'Benutzerdefiniert',
         'Night Portrait' => 'Nachtporträt',
         'Night Scene' => 'Nachtszene',
         'Night View/Portrait' => 'Abendszene/Nachtporträt',
+        'Night+Portrait' => 'Nacht+Porträt',
         'Off' => 'Aus',
         'Portrait' => 'Porträt',
         'Program' => 'Programm',
+        'Self Portrait' => 'Selbstporträt',
+        'Self Portrait+Self Timer' => 'Selbstporträt+Selbstauslöser',
         'Shutter Priority' => 'Verschlusspriorität',
         'Snow' => 'Schnee',
         'Sports' => 'Sport',
@@ -4128,7 +4319,7 @@ $VERSION = '1.11';
       },
     },
    'SelfTimer' => {
-      Description => 'Selbstauslöserzeit',
+      Description => 'Selbstauslöser',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
@@ -4168,6 +4359,8 @@ $VERSION = '1.11';
     },
    'SensorPixelSize' => 'Sensor-Pixelgröße',
    'SensorRedLevel' => 'Sensor Rot-Level',
+   'SensorSize' => 'Sensorgröße',
+   'SensorTemperature' => 'Sensor Temperatur',
    'SequenceNumber' => 'Bildsequenznummer',
    'SequentialShot' => {
       PrintConv => {
@@ -4222,12 +4415,14 @@ $VERSION = '1.11';
       },
     },
    'ShadingCompensation' => {
+      Description => 'Schattenaufhellung',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
       },
     },
    'ShadingCompensation2' => {
+      Description => 'Schattenaufhellung 2',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
@@ -4268,6 +4463,7 @@ $VERSION = '1.11';
         'n/a' => 'Nicht gesetzt',
       },
     },
+   'SharpnessSetting' => 'Schärfeeinstellung',
    'ShootingInfoDisplay' => {
       Description => 'Aufnahmeinfo-Ansicht',
       PrintConv => {
@@ -4332,8 +4528,8 @@ $VERSION = '1.11';
       PrintConv => {
         'AE lock/Metering + AF start' => 'AESpeicherung/Messung+AFStart',
         'Metering + AF start' => 'Messung+AFStart',
-        'Metering + AF start / disable' => 'Messung+AFStart/Deaktiviert',
         'Metering + AF start/AF stop' => 'Messung+AFStart / AFStopp',
+        'Metering + AF start/disable' => 'Messung+AFStart/Deaktiviert',
         'Metering start/Meter + AF start' => 'Messung Start/Mess.+AFStart',
       },
     },
@@ -4398,6 +4594,7 @@ $VERSION = '1.11';
         'On' => 'An',
       },
     },
+   'Software' => 'Software',
    'Source' => 'Quelle',
    'SpecialEffectsOpticalFilter' => {
       PrintConv => {
@@ -4418,15 +4615,17 @@ $VERSION = '1.11';
    'SpotMeteringMode' => {
       Description => 'Spot-Messmethode',
       PrintConv => {
+        'AF Point' => 'AF-Punkt',
         'Center' => 'Mitte',
       },
     },
+   'State' => 'Bundesland/Kanton',
    'StripByteCounts' => 'Anzahl Bytes pro komprimierter Bildabschnitt',
    'StripOffsets' => 'Bilddatenposition',
    'Sub-location' => 'Ort des Motivs',
-   'SubSecCreateDate' => 'Datum der Digitaldatengenerierung',
-   'SubSecDateTimeOriginal' => 'Datum der Originaldatengenerierung',
-   'SubSecModifyDate' => 'Dateiänderungsdatum',
+   'SubSecCreateDate' => 'Digitalisierungsdatum/-uhrzeit',
+   'SubSecDateTimeOriginal' => 'Erstellungsdatum/-uhrzeit',
+   'SubSecModifyDate' => 'Änderungsdatum',
    'SubSecTime' => 'DateTime 1/100 Sekunden',
    'SubSecTimeDigitized' => 'DateTimeDigitized 1/100 Sekunden',
    'SubSecTimeOriginal' => 'DateTimeOriginal 1/100 Sekunden',
@@ -4483,7 +4682,7 @@ $VERSION = '1.11';
         'On' => 'Ein',
       },
     },
-   'SupplementalCategories' => 'Zus. Kategorien',
+   'SupplementalCategories' => 'Zusätzliche Kategorien',
    'SvISOSetting' => 'Sv ISO-Einstellung',
    'SwitchToRegisteredAFPoint' => {
       Description => 'Auf gesp. AF-Messf. schalten',
@@ -4547,6 +4746,7 @@ $VERSION = '1.11';
    'ThumbnailFormat' => 'Miniaturbild-Format',
    'ThumbnailHeight' => 'Miniaturbild-Höhe',
    'ThumbnailImage' => 'Miniaturbild',
+   'ThumbnailImageName' => 'Miniaturbild-Name',
    'ThumbnailImageSize' => 'Miniaturbild-Größe',
    'ThumbnailImageType' => 'Miniaturbild-Typ',
    'ThumbnailImageValidArea' => 'Gültiger Bereich des Miniaturbildes',
@@ -4648,6 +4848,7 @@ $VERSION = '1.11';
       },
     },
    'TvExposureTimeSetting' => 'Tv Belichtungszeit-Einstellung',
+   'URL' => 'URL',
    'USMLensElectronicMF' => {
       Description => 'USM-Objektiv, elektr. MF',
       PrintConv => {
@@ -4699,6 +4900,7 @@ $VERSION = '1.11';
       },
     },
    'UnsharpMask' => {
+      Description => 'Unschärfemaske',
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
@@ -4728,6 +4930,7 @@ $VERSION = '1.11';
         'Enable' => 'Möglich',
       },
     },
+   'UsageTerms' => 'Verwendungsvorschriften',
    'UserComment' => 'Benutzerkommentar',
    'UserDef1PictureStyle' => {
       PrintConv => {
@@ -4760,7 +4963,7 @@ $VERSION = '1.11';
         'On (normal)' => 'Ein (Normal)',
       },
     },
-   'ValidAFPoints' => 'Gültige AF-Punke',
+   'ValidAFPoints' => 'Gültige AF-Punkte',
    'VariProgram' => 'Aufnahmeprogramm',
    'Version' => 'PrintIM Version',
    'VibrationReduction' => {
@@ -4805,6 +5008,7 @@ $VERSION = '1.11';
         'On' => 'Ein',
       },
     },
+   'Volume' => 'Band',
    'WBAdjLighting' => {
       PrintConv => {
         'Daylight' => 'Tageslicht',
@@ -4922,6 +5126,7 @@ $VERSION = '1.11';
       },
     },
    'WhiteBalance2' => {
+      Description => 'Weißabgleich 2',
       PrintConv => {
         'Auto' => 'Automatisch',
       },
@@ -4939,7 +5144,10 @@ $VERSION = '1.11';
         'Tungsten' => 'Kunstlicht (Glühbirne)',
       },
     },
+   'WhiteBalanceBias' => 'Weißabgleich Bias',
    'WhiteBalanceBlue' => 'Weißabgleich Blau',
+   'WhiteBalanceBracket' => 'Weißabgleichs-Belichtungsreihe',
+   'WhiteBalanceBracketing' => 'Weißabgleichs-Belichtungsreihe',
    'WhiteBalanceFineTune' => 'Weißabgleichsfeineinstellung',
    'WhiteBalanceMode' => {
       Description => 'Weißabgleich-Modus',
@@ -4975,6 +5183,9 @@ $VERSION = '1.11';
         'WhiteFluorescent' => 'Warme weiße Leuchtstofflampe',
       },
     },
+   'WhiteBalanceSetting' => 'Weißabgleichs-Einstellung',
+   'WhiteBalanceTemperature' => 'Weißabgleich Farbtemperatur',
+   'WhiteBoard' => 'Whiteboard Funktion',
    'WhitePoint' => 'Weißpunkt-Chromatizität',
    'Wide' => 'Breit',
    'WideFocusZone' => {
@@ -5034,6 +5245,7 @@ $VERSION = '1.11';
         'On' => 'Ein',
       },
     },
+   'ZoomPos' => 'Zoom Position',
    'ZoomSourceWidth' => 'Vergrößerungs-Ursprungsgröße',
    'ZoomTargetWidth' => 'Vergrößerungs-Endgröße',
 );

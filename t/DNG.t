@@ -29,7 +29,7 @@ my $testnum = 1;
     ++$testnum;
     my @writeInfo = (
         [ OwnerName => 'Just Me' ],
-        [ OriginalDecisionData => "\xff\xff\xff\xff\x01\0\0\0\x08\0\0\0Test", Protected => 1 ],
+        [ OriginalDecisionData => "\xff\xff\xff\xff\x03\0\0\0\0\0\0\0\0\0\0\0\x08\0\0\0Test", Protected => 1 ],
     );
     my @tags = qw(OwnerName OriginalDecisionData Warning Error);
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/DNG.dng', \@tags);

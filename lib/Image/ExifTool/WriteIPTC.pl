@@ -606,7 +606,7 @@ sub WriteIPTC($$$)
         if ($old) {
             if ($new and not defined $newData) {
                 $$exifTool{OldIPTCDigest} = $$exifTool{NewIPTCDigest};
-            } else {
+            } elsif ($$dirInfo{DataPt}) { #(may be undef if creating new IPTC)
                 $dataPt = $$dirInfo{DataPt};
                 if ($$dirInfo{DirStart} or length($$dataPt) != $$dirInfo{DirLen}) {
                     my $buff = substr($$dataPt, $$dirInfo{DirStart}, $$dirInfo{DirLen});

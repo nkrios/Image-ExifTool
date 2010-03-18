@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.13
 [File, System, Image] FileName - File Name: NikonD2Hs.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 3.4 kB
@@ -81,13 +81,13 @@
 [MakerNotes, Nikon, Camera] 11 - White Balance Fine Tune: 0
 [MakerNotes, Nikon, Camera] 13 - Program Shift: 0
 [MakerNotes, Nikon, Camera] 14 - Exposure Difference: 0
-[MakerNotes, NikonPreview, Image] 259 - Compression: JPEG (old-style)
-[MakerNotes, NikonPreview, Image] 282 - X Resolution: 300
-[MakerNotes, NikonPreview, Image] 283 - Y Resolution: 300
-[MakerNotes, NikonPreview, Image] 296 - Resolution Unit: inches
-[MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 3230
-[MakerNotes, NikonPreview, Image] 514 - Preview Image Length: 26
-[MakerNotes, NikonPreview, Image] 531 - Y Cb Cr Positioning: Co-sited
+[MakerNotes, PreviewIFD, Image] 259 - Compression: JPEG (old-style)
+[MakerNotes, PreviewIFD, Image] 282 - X Resolution: 300
+[MakerNotes, PreviewIFD, Image] 283 - Y Resolution: 300
+[MakerNotes, PreviewIFD, Image] 296 - Resolution Unit: inches
+[MakerNotes, PreviewIFD, Image] 513 - Preview Image Start: 3230
+[MakerNotes, PreviewIFD, Image] 514 - Preview Image Length: 26
+[MakerNotes, PreviewIFD, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Nikon, Camera] 19 - ISO Setting: 800
 [MakerNotes, Nikon, Camera] 22 - Image Boundary: 0 0 2464 1632
 [MakerNotes, Nikon, Camera] 23 - Flash Exposure Compensation: 0

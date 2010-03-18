@@ -13,6 +13,7 @@
 #               6) Andrey Tverdokhleb private communication
 #               7) Rudiger Lange private communication (A700)
 #               8) Igal Milchtaich private communication
+#               9) Michael Reit private communication (DSC-TX7)
 #               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -24,13 +25,31 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.37';
+$VERSION = '1.40';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
 sub WriteSR2($$$);
 
 my %sonyLensTypes;  # filled in based on Minolta LensType's
+
+# ExposureProgram values (ref PH, mainly decoded from A200)
+my %sonyExposureProgram = (
+    0 => 'Auto', # (same as 'Program AE'?)
+    1 => 'Manual',
+    2 => 'Program AE',
+    3 => 'Aperture-priority AE',
+    4 => 'Shutter speed priority AE',
+    8 => 'Program Shift A', #7
+    9 => 'Program Shift S', #7
+    19 => 'Night Portrait', # (A330)
+    18 => 'Sunset', # (A330)
+    17 => 'Sports', # (A330)
+    21 => 'Macro', # (A330)
+    20 => 'Landscape', # (A330)
+    16 => 'Portrait', # (A330)
+    35 => 'Auto No Flash', # (A330)
+);
 
 %Image::ExifTool::Sony::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -308,15 +327,26 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
         PrintConv => {
             0 => 'Auto',
             1 => 'Portrait', #PH (HX1)
+            2 => 'Beach', #9
+            4 => 'Snow', #9
             5 => 'Landscape',
             6 => 'Program',
             7 => 'Aperture Priority',
             8 => 'Shutter Priority',
-            9 => 'Night Scene',
+            9 => 'Night Scene / Twilight',#2/9
+            10 => 'Hi-Speed Shutter', #9
+            11 => 'Twilight Portrait', #9
+            12 => 'Soft Snap', #9
+            13 => 'Fireworks', #9
+            18 => 'High Sensitivity', #9
             15 => 'Manual',
+            29 => 'Underwater', #9
+            33 => 'Gourmet', #9
             34 => 'Panorama', #PH (HX1)
             35 => 'Handheld Twilight', #PH (HX1/TX1)
             36 => 'Anti Motion Blur', #PH (TX1)
+            37 => 'Pet', #9
+            38 => 'Backlight Correction HDR', #9
         },
     },
     # 0xb043 - some sort of mode: values - 0,1,2,3,4,15(face detect?),65535
@@ -355,7 +385,11 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     0xb052 => { #PH (TX1)
         Name => 'IntelligentAuto',
         Writable => 'int16u',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+            2 => 'Advanced', #9
+        },
     },
     0xb054 => { #PH (TX1)
         Name => 'WhiteBalance',
@@ -437,7 +471,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
             9 => 'Top-Left',
             10 => 'Far Right',
             11 => 'Far Left',
-            # see value of 128 for A230
+            # have seen value of 128 for A230, A330, A380 - PH
         },
     },
     0x15 => { #7
@@ -594,16 +628,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     0x3c => {
         Name => 'ExposureProgram',
         Priority => 0,
-        PrintConv => {
-            0 => 'Auto', # (same as 'Program AE'?)
-            1 => 'Manual',
-            2 => 'Program AE',
-            3 => 'Aperture-priority AE',
-            4 => 'Shutter speed priority AE',
-            8 => 'Program Shift A', #7
-            9 => 'Program Shift S', #7
-            16 => 'Portrait',
-        },
+        PrintConv => \%sonyExposureProgram,
     },
     0x3d => {
         Name => 'ImageStabilization',
@@ -773,14 +798,7 @@ my %sonyLensTypes;  # filled in based on Minolta LensType's
     0x3c => {
         Name => 'ExposureProgram',
         Priority => 0,
-        PrintConv => {
-            0 => 'Auto', # (same as 'Program AE'?)
-            1 => 'Manual',
-            2 => 'Program AE',
-            3 => 'Aperture-priority AE',
-            4 => 'Shutter speed priority AE',
-            16 => 'Portrait',
-        },
+        PrintConv => \%sonyExposureProgram,
     },
     0x3f => { # (verified for A330/A380)
         Name => 'Rotation',
@@ -1071,7 +1089,7 @@ sub SetARW($$)
 # Inputs: 0) ExifTool ref, 1) dirInfo ref, 2) EXIF data ref, 3) image data reference
 # Returns: undef on success, error string otherwise
 # Notes: (it turns that all of this is for the A100 only)
-sub FinishARW($$$)
+sub FinishARW($$$$)
 {
     my ($exifTool, $dirInfo, $dataPt, $imageData) = @_;
 
@@ -1279,7 +1297,7 @@ sub ProcessSR2($$$)
             return $$exifTool{MRWDirData} ? "\0\0\0\0\0\0" : undef;
         } else {
             if (not $outfile and $$exifTool{HTML_DUMP}) {
-                $exifTool->HtmlDump($srfPos, $srfLen, '[A100 SRF Data]');
+                $exifTool->HDump($srfPos, $srfLen, '[A100 SRF Data]');
             }
             return Image::ExifTool::MinoltaRaw::ProcessMRW($exifTool, \%dirInfo);
         }

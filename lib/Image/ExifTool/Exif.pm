@@ -29,6 +29,11 @@
 #              17) http://www.digitalpreservation.gov/formats/content/tiff_tags.shtml
 #              18) http://www.asmail.be/msg0055568584.html
 #              19) http://libpsd.graphest.com/files/Photoshop%20File%20Formats.pdf
+#              20) http://tiki-lounge.com/~raf/tiff/fields.html
+#              21) http://community.roxen.com/developers/idocs/rfc/rfc3949.html
+#              22) http://tools.ietf.org/html/draft-ietf-fax-tiff-fx-extension1-01
+#              23) MetaMorph Stack (STK) Image File Format:
+#                  --> ftp://ftp.meta.moleculardevices.com/support/stack/STK.doc
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -36,11 +41,12 @@ package Image::ExifTool::Exif;
 
 use strict;
 use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
-            %lightSource %flash %compression %photometricInterpretation %orientation);
+            %lightSource %flash %compression %photometricInterpretation %orientation
+            %subfileType);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.02';
+$VERSION = '3.07';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -158,6 +164,8 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
     0x5f => 'Auto, Fired, Red-eye reduction, Return detected',
 );
 
+# TIFF Compression values
+# (values with format "Xxxxx XXX Compressed" are used to identify RAW file types)
 %compression = (
     1 => 'Uncompressed',
     2 => 'CCITT 1D',
@@ -174,6 +182,7 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
     32766 => 'Next', #3
     32767 => 'Sony ARW Compressed', #16
     32769 => 'Epson ERF Compressed', #PH (also used by Nikon? ref 16)
+    32770 => 'Samsung SRW Compressed', #PH
     32771 => 'CCIRLEW', #3
     32773 => 'PackBits',
     32809 => 'Thunderscan', #3
@@ -191,6 +200,7 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
     34677 => 'SGILog24', #3
     34712 => 'JPEG 2000', #3
     34713 => 'Nikon NEF Compressed', #PH
+    34715 => 'JBIG2 TIFF FX', #20
     34718 => 'Microsoft Document Imaging (MDI) Binary Level Codec', #18
     34719 => 'Microsoft Document Imaging (MDI) Progressive Transform Codec', #18
     34720 => 'Microsoft Document Imaging (MDI) Vector', #18
@@ -224,6 +234,25 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
     6 => 'Rotate 90 CW',
     7 => 'Mirror horizontal and rotate 90 CW',
     8 => 'Rotate 270 CW',
+);
+
+%subfileType = (
+    0 => 'Full-resolution Image',
+    1 => 'Reduced-resolution image',
+    2 => 'Single page of multi-page image',
+    3 => 'Single page of multi-page reduced-resolution image',
+    4 => 'Transparency mask',
+    5 => 'Transparency mask of reduced-resolution image',
+    6 => 'Transparency mask of multi-page image',
+    7 => 'Transparency mask of reduced-resolution multi-page image',
+    0xffffffff => 'invalid', #(found in E5700 NEF's)
+    BITMASK => {
+        0 => 'Reduced resolution',
+        1 => 'Single page',
+        2 => 'Transparency mask',
+        3 => 'TIFF/IT final page', #20
+        4 => 'TIFF-FX mixed raster content', #20
+    },
 );
 
 # PrintConv for parameter tags
@@ -279,18 +308,7 @@ my %sampleFormat = (
         # set priority directory if this is the full resolution image
         DataMember => 'SubfileType',
         RawConv => '$self->SetPriorityDir() if $val eq "0"; $$self{SubfileType} = $val',
-        PrintConv => {
-            0 => 'Full-resolution Image',
-            1 => 'Reduced-resolution image',
-            2 => 'Single page of multi-page image',
-            3 => 'Single page of multi-page reduced-resolution image',
-            4 => 'Transparency mask',
-            5 => 'Transparency mask of reduced-resolution image',
-            6 => 'Transparency mask of multi-page image',
-            7 => 'Transparency mask of reduced-resolution multi-page image',
-            # 0x08 => TIFF/IT Final Page ? (PhotoME)
-            # 0x10 => TIFF-FX Mixed Raster Content ? (PhotoME)
-        },
+        PrintConv => \%subfileType,
     },
     0xff => {
         Name => 'OldSubfileType',
@@ -324,7 +342,10 @@ my %sampleFormat = (
         Name => 'Compression',
         DataMember => 'Compression',
         SeparateTable => 'Compression',
-        RawConv => '$$self{Compression} = $val',
+        RawConv => q{
+            Image::ExifTool::Exif::IdentifyRawFile($self, $val);
+            return $$self{Compression} = $val;
+        },
         PrintConv => \%compression,
         Priority => 0,
     },
@@ -585,6 +606,7 @@ my %sampleFormat = (
     0x13b => {
         Name => 'Artist',
         Groups => { 2 => 'Author' },
+        Notes => 'becomes a list-type tag when the MWG module is loaded',
     },
     0x13c => 'HostComputer',
     0x13d => {
@@ -672,7 +694,14 @@ my %sampleFormat = (
     0x14e => 'NumberofInks', #3
     0x150 => 'DotRange',
     0x151 => 'TargetPrinter',
-    0x152 => 'ExtraSamples',
+    0x152 => {
+        Name => 'ExtraSamples',
+        PrintConv => { #20
+            0 => 'Unspecified',
+            1 => 'Associated Alpha',
+            2 => 'Unassociated Alpha',
+        },
+    },
     0x153 => {
         Name => 'SampleFormat',
         Notes => 'SamplesPerPixel values',
@@ -700,6 +729,8 @@ my %sampleFormat = (
             1 => 'Higher resolution image exists',
         },
     },
+    # 0x181 => 'Decode', #20 (typo! - should be 0x1b1, ref 21)
+    # 0x182 => 'DefaultImageColor', #20 (typo! - should be 0x1b2, ref 21)
     0x190 => { #3
         Name => 'GlobalParametersIFD',
         Groups => { 1 => 'GlobParamIFD' },
@@ -723,6 +754,8 @@ my %sampleFormat = (
             4 => 'Lossy color and grayscale, C',
             5 => 'Lossless color and grayscale, L',
             6 => 'Mixed raster content, M',
+            7 => 'Profile T', #20
+            255 => 'Multi Profiles', #20
         },
     },
     0x193 => { #3
@@ -740,7 +773,8 @@ my %sampleFormat = (
     0x194 => 'VersionYear', #3
     0x195 => 'ModeNumber', #3
     0x1b1 => 'Decode', #3
-    0x1b2 => 'DefaultImageColor', #3
+    0x1b2 => 'DefaultImageColor', #3 (changed to ImageBaseColor, ref 21)
+    0x1b3 => 'T82Options', #20
     0x1b5 => { #19
         Name => 'JPEGTables',
         Binary => 1,
@@ -756,10 +790,11 @@ my %sampleFormat = (
         {
             Name => 'ThumbnailOffset',
             Notes => q{
-                ThumbnailOffset in IFD1 of JPEG and some TIFF-based images, and IFD0 of MRW
-                images and AVI videos; PreviewImageStart in MakerNotes and IFD0 of ARW and
-                SR2 images; JpgFromRawStart in SubIFD of NEF images and IFD2 of PEF images;
-                and OtherImageStart in everything else
+                ThumbnailOffset in IFD1 of JPEG and some TIFF-based images, IFD0 of MRW
+                images and AVI videos, and the SubIFD in IFD1 of SRW images;
+                PreviewImageStart in MakerNotes and IFD0 of ARW and SR2 images;
+                JpgFromRawStart in SubIFD of NEF images and IFD2 of PEF images; and
+                OtherImageStart in everything else
             },
             # thumbnail is found in IFD1 of JPEG and TIFF images, and
             # IFD0 of EXIF information in FujiFilm AVI (RIFF) videos
@@ -772,7 +807,15 @@ my %sampleFormat = (
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
             WriteGroup => 'IFD1',
-            WriteCondition => '$$self{FILE_TYPE} ne "TIFF" or $$self{TIFF_TYPE} eq "CR2"',
+            # according to the EXIF spec. a JPEG-compressed thumbnail image may not
+            # be stored in a TIFF file, but these TIFF-based RAW image formats
+            # use IFD1 for a JPEG-compressed thumbnail:  CR2, ARW, SR2 and PEF.
+            # (SRF also stores a JPEG image in IFD1, but it is actually a preview
+            # and we don't yet write SRF anyway) 
+            WriteCondition => q{
+                $$self{FILE_TYPE} ne "TIFF" or
+                $$self{TIFF_TYPE} =~ /^(CR2|ARW|SR2|PEF)$/
+            },
             Protected => 2,
         },
         {
@@ -787,6 +830,21 @@ my %sampleFormat = (
             Writable => 'int32u',
             WriteGroup => 'IFD0',
             WriteCondition => '$$self{FILE_TYPE} eq "MRW"',
+            Protected => 2,
+        },
+        {
+            Name => 'ThumbnailOffset',
+            # in SubIFD of IFD1 in Samsung SRW images
+            Condition => q{
+                $$self{TIFF_TYPE} eq 'SRW' and $$self{DIR_NAME} eq 'SubIFD' and
+                $$self{PATH}[-2] eq 'IFD1'
+            },
+            IsOffset => 1,
+            OffsetPair => 0x202,
+            DataTag => 'ThumbnailImage',
+            Writable => 'int32u',
+            WriteGroup => 'SubIFD',
+            WriteCondition => '$$self{TIFF_TYPE} eq "SRW"',
             Protected => 2,
         },
         {
@@ -820,8 +878,8 @@ my %sampleFormat = (
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
             WriteGroup => 'SubIFD',
-            # JpgFromRaw is in SubIFD of NEF files
-            WriteCondition => '$$self{TIFF_TYPE} =~ /^(NEF|NRW)$/',
+            # JpgFromRaw is in SubIFD of NEF, NRW and SRW files
+            WriteCondition => '$$self{TIFF_TYPE} =~ /^(NEF|NRW|SRW)$/',
             Protected => 2,
         },
         {
@@ -846,10 +904,11 @@ my %sampleFormat = (
         {
             Name => 'ThumbnailLength',
             Notes => q{
-                ThumbnailLength in IFD1 of JPEG and some TIFF-based images and IFD0 of MRW
-                images and AVI videos; PreviewImageLength in MakerNotes and IFD0 of ARW and
-                SR2 images; JpgFromRawLength in SubIFD of NEF images, and IFD2 of PEF
-                images; and OtherImageLength in everything else
+                ThumbnailLength in IFD1 of JPEG and some TIFF-based images, IFD0 of MRW
+                images and AVI videos, and the SubIFD in IFD1 of SRW images;
+                PreviewImageLength in MakerNotes and IFD0 of ARW and SR2 images;
+                JpgFromRawLength in SubIFD of NEF images, and IFD2 of PEF images; and
+                OtherImageLength in everything else
             },
             Condition => q{
                 $$self{DIR_NAME} eq 'IFD1' or
@@ -859,7 +918,10 @@ my %sampleFormat = (
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
             WriteGroup => 'IFD1',
-            WriteCondition => '$$self{FILE_TYPE} ne "TIFF" or $$self{TIFF_TYPE} eq "CR2"',
+            WriteCondition => q{
+                $$self{FILE_TYPE} ne "TIFF" or
+                $$self{TIFF_TYPE} =~ /^(CR2|ARW|SR2|PEF)$/
+            },
             Protected => 2,
         },
         {
@@ -871,6 +933,20 @@ my %sampleFormat = (
             Writable => 'int32u',
             WriteGroup => 'IFD0',
             WriteCondition => '$$self{FILE_TYPE} eq "MRW"',
+            Protected => 2,
+        },
+        {
+            Name => 'ThumbnailLength',
+            # in SubIFD of IFD1 in Samsung SRW images
+            Condition => q{
+                $$self{TIFF_TYPE} eq 'SRW' and $$self{DIR_NAME} eq 'SubIFD' and
+                $$self{PATH}[-2] eq 'IFD1'
+            },
+            OffsetPair => 0x201,
+            DataTag => 'ThumbnailImage',
+            Writable => 'int32u',
+            WriteGroup => 'SubIFD',
+            WriteCondition => '$$self{TIFF_TYPE} eq "SRW"',
             Protected => 2,
         },
         {
@@ -901,7 +977,7 @@ my %sampleFormat = (
             DataTag => 'JpgFromRaw',
             Writable => 'int32u',
             WriteGroup => 'SubIFD',
-            WriteCondition => '$$self{TIFF_TYPE} =~ /^(NEF|NRW)$/',
+            WriteCondition => '$$self{TIFF_TYPE} =~ /^(NEF|NRW|SRW)$/',
             Protected => 2,
         },
         {
@@ -974,6 +1050,7 @@ my %sampleFormat = (
             TagTable => 'Image::ExifTool::XMP::Main',
         },
     },
+    0x3e7 => 'USPTOMiscellaneous', #20
     0x1000 => 'RelatedImageFileFormat', #5
     0x1001 => 'RelatedImageWidth', #5
     0x1002 => { #5
@@ -984,7 +1061,13 @@ my %sampleFormat = (
     0x4746 => 'Rating', #PH
     0x4749 => 'RatingPercent', #PH
     0x800d => 'ImageID', #10
-    0x80a4 => 'WangAnnotation',
+    0x80a3 => { Name => 'WangTag1', Binary => 1 }, #20
+    0x80a4 => { Name => 'WangAnnotation', Binary => 1 },
+    0x80a5 => { Name => 'WangTag3', Binary => 1 }, #20
+    0x80a6 => { #20
+        Name => 'WangTag4',
+        PrintConv => 'length($val) <= 64 ? $val : \$val',
+    },
     0x80e3 => 'Matteing', #9
     0x80e4 => 'DataType', #9
     0x80e5 => 'ImageDepth', #9
@@ -1047,6 +1130,12 @@ my %sampleFormat = (
     0x82ab => 'MDPrepTime', #3
     0x82ac => 'MDFileUnits', #3
     0x830e => 'PixelScale',
+    0x8335 => 'AdventScale', #20
+    0x8336 => 'AdventRevision', #20
+    0x835c => 'UIC1Tag', #23
+    0x835d => 'UIC2Tag', #23
+    0x835e => 'UIC3Tag', #23
+    0x835f => 'UIC4Tag', #23
     0x83bb => { #12
         Name => 'IPTC-NAA', # (writable directory!)
         # this should actually be written as 'undef' (see
@@ -1065,6 +1154,7 @@ my %sampleFormat = (
     0x847e => 'IntergraphPacketData', #3
     0x847f => 'IntergraphFlagRegisters', #3
     0x8480 => 'IntergraphMatrix',
+    0x8481 => 'INGRReserved', #20
     0x8482 => {
         Name => 'ModelTiePoint',
         Groups => { 2 => 'Location' },
@@ -1072,18 +1162,46 @@ my %sampleFormat = (
     0x84e0 => 'Site', #9
     0x84e1 => 'ColorSequence', #9
     0x84e2 => 'IT8Header', #9
-    0x84e3 => 'RasterPadding', #9
+    0x84e3 => { #9
+        Name => 'RasterPadding',
+        PrintConv => { #20
+            0 => 'Byte',
+            1 => 'Word',
+            2 => 'Long Word',
+            9 => 'Sector',
+            10 => 'Long Sector',
+        },
+    },
     0x84e4 => 'BitsPerRunLength', #9
     0x84e5 => 'BitsPerExtendedRunLength', #9
     0x84e6 => 'ColorTable', #9
-    0x84e7 => 'ImageColorIndicator', #9
-    0x84e8 => 'BackgroundColorIndicator', #9
+    0x84e7 => { #9
+        Name => 'ImageColorIndicator',
+        PrintConv => { #20
+            0 => 'Unspecified Image Color',
+            1 => 'Specified Image Color',
+        },
+    },
+    0x84e8 => { #9
+        Name => 'BackgroundColorIndicator',
+        PrintConv => { #20
+            0 => 'Unspecified Background Color',
+            1 => 'Specified Background Color',
+        },
+    },
     0x84e9 => 'ImageColorValue', #9
     0x84ea => 'BackgroundColorValue', #9
     0x84eb => 'PixelIntensityRange', #9
     0x84ec => 'TransparencyIndicator', #9
     0x84ed => 'ColorCharacterization', #9
-    0x84ee => 'HCUsage', #9
+    0x84ee => { #9
+        Name => 'HCUsage',
+        PrintConv => { #20
+            0 => 'CT',
+            1 => 'Line Art',
+            2 => 'Trap',
+        },
+    },
     0x84ef => 'TrapIndicator', #17
     0x84f0 => 'CMYKEquivalent', #17
     0x8546 => { #11
@@ -1097,6 +1215,7 @@ my %sampleFormat = (
             TagTable => 'Image::ExifTool::IPTC::Main',
         },
     },
+    0x85b8 => 'PixelMagicJBIGOptions', #20
     0x85d8 => {
         Name => 'ModelTransform',
         Groups => { 2 => 'Location' },
@@ -1137,6 +1256,41 @@ my %sampleFormat = (
             TagTable => 'Image::ExifTool::ICC_Profile::Main',
         },
     },
+    0x877f => { #20
+        Name => 'TIFF_FXExtensions',
+        PrintConv => { BITMASK => {
+            0 => 'Resolution/Image Width',
+            1 => 'N Layer Profile M',
+            2 => 'Shared Data',
+            3 => 'B&W JBIG2',
+            4 => 'JBIG2 Profile M',
+        }},
+    },
+    0x8780 => { #20
+        Name => 'MultiProfiles',
+        PrintConv => { BITMASK => {
+            0 => 'Profile S',
+            1 => 'Profile F',
+            2 => 'Profile J',
+            3 => 'Profile C',
+            4 => 'Profile L',
+            5 => 'Profile M',
+            6 => 'Profile T',
+            7 => 'Resolution/Image Width',
+            8 => 'N Layer Profile M',
+            9 => 'Shared Data',
+            10 => 'JBIG2 Profile M',
+        }},
+    },
+    0x8781 => { #22
+        Name => 'SharedData',
+        IsOffset => 1,
+        # this tag is not supported for writing, so define an
+        # invalid offset pair to cause a "No size tag" error to be
+        # generated if we try to write a file containing this tag
+        OffsetPair => -1,
+    },
+    0x8782 => 'T88Options', #20
     0x87ac => 'ImageLayer',
     0x87af => {
         Name => 'GeoTiffDirectory',
@@ -1372,6 +1526,9 @@ my %sampleFormat = (
         },
     },
     0x9213 => 'ImageHistory',
+    0x923a => 'CIP3DataFile', #20
+    0x923b => 'CIP3Sheet', #20
+    0x923c => 'CIP3Side', #20
     0x923f => 'StoNits', #9
     # handle maker notes as a conditional list
     0x927c => \@Image::ExifTool::MakerNotes::Main,
@@ -1809,6 +1966,14 @@ my %sampleFormat = (
         Description => 'Print Image Matching',
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
+        },
+    },
+    0xc580 => { #20
+        Name => 'USPTOOriginalContentType',
+        PrintConv => {
+            0 => 'Text or Drawing',
+            1 => 'Grayscale',
+            2 => 'Color',
         },
     },
 #
@@ -2593,6 +2758,21 @@ sub AUTOLOAD
 }
 
 #------------------------------------------------------------------------------
+# Identify RAW file type for some TIFF-based formats using Compression value
+# Inputs: 0) ExifTool object reference, 1) Compression value
+# - sets TIFF_TYPE and FileType if identified
+sub IdentifyRawFile($$)
+{
+    my ($exifTool, $comp) = @_;
+    if ($$exifTool{FILE_TYPE} eq 'TIFF' and not $$exifTool{IdentifiedRawFile}) {
+        if ($compression{$comp} and $compression{$comp} =~ /^\w+ ([A-Z]{3}) Compressed$/) {
+            $exifTool->OverrideFileType($$exifTool{TIFF_TYPE} = $1);
+            $$exifTool{IdentifiedRawFile} = 1;
+        }
+    }
+}
+
+#------------------------------------------------------------------------------
 # Calculate LV (Light Value)
 # Inputs: 0) Aperture, 1) ShutterSpeed, 2) ISO
 # Returns: LV value (and converts input values to floating point if necessary)
@@ -3135,16 +3315,16 @@ sub ProcessExif($$$)
         my $longName = $name eq 'MakerNotes' ? ($$dirInfo{Name} || $name) : $name;
         if (defined $makerAddr) {
             my $hdrLen = $dirStart + $dataPos + $base - $makerAddr;
-            $exifTool->HtmlDump($makerAddr, $hdrLen, "MakerNotes header", $longName) if $hdrLen > 0;
+            $exifTool->HDump($makerAddr, $hdrLen, "MakerNotes header", $longName) if $hdrLen > 0;
         }
-        $exifTool->HtmlDump($dirStart + $dataPos + $base, 2, "$longName entries",
+        $exifTool->HDump($dirStart + $dataPos + $base, 2, "$longName entries",
                  "Entry count: $numEntries");
         my $tip;
         if ($bytesFromEnd >= 4) {
             my $nxt = ($name =~ /^(.*?)(\d+)$/) ? $1 . ($2 + 1) : 'Next IFD';
             $tip = sprintf("$nxt offset: 0x%.4x", Get32u($dataPt, $dirEnd));
         }
-        $exifTool->HtmlDump($dirEnd + $dataPos + $base, 4, "Next IFD", $tip, 0);
+        $exifTool->HDump($dirEnd + $dataPos + $base, 4, "Next IFD", $tip, 0);
     }
 
     # patch for Canon EOS 40D firmware 1.0.4 bug (incorrect directory counts)
@@ -3153,7 +3333,7 @@ sub ProcessExif($$$)
         my $entry = $dirStart + 2 + 12 * ($numEntries - 1);
         my $fmt = Get16u($dataPt, $entry + 2);
         if ($fmt < 1 or $fmt > 13) {
-            $exifTool->HtmlDump($entry+$dataPos+$base,12,"[invalid IFD entry]",
+            $exifTool->HDump($entry+$dataPos+$base,12,"[invalid IFD entry]",
                      "Bad format type: $fmt", 1);
             # adjust the number of directory entries
             --$numEntries;
@@ -3173,7 +3353,7 @@ sub ProcessExif($$$)
         my $format = Get16u($dataPt, $entry+2);
         my $count = Get32u($dataPt, $entry+4);
         if ($format < 1 or $format > 13) {
-            $exifTool->HtmlDump($entry+$dataPos+$base,12,"[invalid IFD entry]",
+            $exifTool->HDump($entry+$dataPos+$base,12,"[invalid IFD entry]",
                      "Bad format type: $format", 1);
             # warn unless the IFD was just padded with zeros
             if ($format) {
@@ -3276,12 +3456,18 @@ sub ProcessExif($$$)
                     $valueDataLen = length $buff;
                     $valuePtr = 0;
                 } else {
-                    my $tagStr;
+                    my ($tagStr, $tmpInfo);
                     if ($tagInfo) {
                         $tagStr = $$tagInfo{Name};
                     } elsif (defined $tagInfo) {
-                        my $tmpInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \ '', $formatStr, $count);
+                        $tmpInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \ '', $formatStr, $count);
                         $tagStr = $$tmpInfo{Name} if $tmpInfo;
+                    }
+                    if ($tagInfo and $$tagInfo{ChangeBase}) {
+                        # adjust base offset for this tag only
+                        #### eval ChangeBase ($dirStart,$dataPos)
+                        my $newBase = eval $$tagInfo{ChangeBase};
+                        $valuePtr += $newBase;
                     }
                     $tagStr or $tagStr = sprintf("tag 0x%x",$tagID);
                     # allow PreviewImage to run outside EXIF data
@@ -3293,6 +3479,19 @@ sub ProcessExif($$$)
                         $valueDataPos = $valuePtr + $dataPos;
                         $valueDataLen = $size;
                         $valuePtr = 0;
+                    } elsif ($tagStr eq 'MakerNoteLeica6' and $exifTool->{RAF}) {
+                        if ($verbose > 0) {
+                            $exifTool->VPrint(0, "$$exifTool{INDENT}$index) $tagStr --> (outside APP1 segment)\n");
+                        }
+                        if ($exifTool->Options('FastScan')) {
+                            $exifTool->Warn('Ignored Leica MakerNote trailer');
+                        } else {
+                            $$exifTool{LeicaTrailer} = {
+                                TagInfo => $tagInfo || $tmpInfo,
+                                Offset  => $base + $valuePtr + $dataPos,
+                                Size    => $size,
+                            };
+                        }
                     } else {
                         $exifTool->Warn("Bad $name offset for $tagStr");
                         ++$warnCount;
@@ -3407,10 +3606,11 @@ sub ProcessExif($$$)
                     my $actPt = $valuePtr + $valueDataPos + $base - ($$exifTool{EXIF_POS} || 0);
                     $tip .= sprintf("Value offset: 0x%.4x\n", $offPt);
                     # highlight tag name (red for bad size)
-                    my $style = ($valueDataLen < 0) ? 'V' : 'H';
+                    my $style = ($valueDataLen < 0 or not defined $tval) ? 'V' : 'H';
                     if ($actPt != $offPt) {
                         $tip .= sprintf("Actual offset: 0x%.4x\n", $actPt);
-                        $tip .= sprintf("Offset base: 0x%.4x\n", $actPt-$offPt);
+                        my $sign = $actPt > $offPt ? '' : '-';
+                        $tip .= sprintf("Offset base: ${sign}0x%.4x\n", abs($actPt - $offPt));
                         $style = 'F' if $style eq 'H';  # purple for different offsets
                     }
                     $colName = "<span class=$style>$tagName</span>";
@@ -3435,13 +3635,20 @@ sub ProcessExif($$$)
                     }
                 }
                 $tip .= "Value: $tval";
-                $exifTool->HtmlDump($entry+$dataPos+$base, 12, "$dname $colName", $tip, 1);
+                $exifTool->HDump($entry+$dataPos+$base, 12, "$dname $colName", $tip, 1);
                 next if $valueDataLen < 0;  # don't process bad pointer entry
                 if ($size > 4) {
                     my $exifDumpPos = $valuePtr + $valueDataPos + $base;
+                    my $flag = 0;
+                    if ($subdir) {
+                        if ($$tagInfo{MakerNotes}) {
+                            $flag = 0x04;
+                        } elsif ($$tagInfo{NestedHtmlDump}) {
+                            $flag = $$tagInfo{NestedHtmlDump} == 2 ? 0x10 : 0x04;
+                        }
+                    }
                     # add value data block (underlining maker notes data)
-                    $exifTool->HtmlDump($exifDumpPos,$size,"$tagName value",'SAME',
-                        ($subdir and ($$tagInfo{MakerNotes} or $$tagInfo{NestedHtmlDump})) ? 4 : 0);
+                    $exifTool->HDump($exifDumpPos,$size,"$tagName value",'SAME', $flag);
                 }
             } else {
                 my $fstr = $formatName[$format];
@@ -3545,7 +3752,7 @@ sub ProcessExif($$$)
                 if ($$subdir{Base}) {
                     # calculate subdirectory start relative to $base for eval
                     my $start = $subdirStart + $subdirDataPos;
-                    #### eval Base ($start)
+                    #### eval Base ($start,$base)
                     $subdirBase = eval($$subdir{Base}) + $base;
                 }
                 # add offset to the start of the directory if necessary
@@ -3610,7 +3817,7 @@ sub ProcessExif($$$)
                     my $fast = $exifTool->Options('FastScan');
                     last if $fast and $fast > 1;
                     $subdirInfo{MakerNoteAddr} = $valuePtr + $valueDataPos + $base;
-                    $subdirInfo{NoFixBase} = 1 if $$subdir{Base};
+                    $subdirInfo{NoFixBase} = 1 if defined $$subdir{Base};
                 }
                 # set directory IFD name from group name of family 1 if it exists,
                 # unless the tag is extracted as a block in which case group 1 may
@@ -3709,7 +3916,7 @@ sub ProcessExif($$$)
         $tagKey = $exifTool->FoundTag($tagInfo, $val);
         # set the group 1 name for tags in specified tables
         if (defined $tagKey and $$tagTablePtr{SET_GROUP1}) {
-            $exifTool->SetGroup1($tagKey, $dirName);
+            $exifTool->SetGroup($tagKey, $dirName);
         }
     }
 
@@ -3797,6 +4004,10 @@ under the same terms as Perl itself.
 =item L<http://www.cybercom.net/~dcoffin/dcraw/>
 
 =item L<http://www.digitalpreservation.gov/formats/content/tiff_tags.shtml>
+
+=item L<http://community.roxen.com/developers/idocs/rfc/rfc3949.html>
+
+=item L<http://tools.ietf.org/html/draft-ietf-fax-tiff-fx-extension1-01>
 
 =back
 

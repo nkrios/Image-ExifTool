@@ -1,6 +1,6 @@
 body { color: black; background: white; margin-top: 0;
        font-family: helvetica; font-size: .9em }
-code { color: #840; font-family: monospace }
+code { color: #840; font-family: monospace; white-space: nowrap }
 
 table.frame { background: #fb7 }    /* frame color */
 table.frame td { padding: 0 }       /* frame padding */

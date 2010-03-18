@@ -8,6 +8,7 @@ exif2xmp.args
 exiftool
 gps2xmp.args
 gpx.fmt
+gpx_wpt.fmt
 html/ExifTool.html
 html/MIE1.1-20070121.pdf
 html/TagNames/AFCP.html
@@ -80,9 +81,11 @@ html/TagNames/PostScript.html
 html/TagNames/PrintIM.html
 html/TagNames/QuickTime.html
 html/TagNames/RIFF.html
+html/TagNames/RSRC.html
 html/TagNames/Rawzor.html
 html/TagNames/Real.html
 html/TagNames/Ricoh.html
+html/TagNames/Samsung.html
 html/TagNames/Sanyo.html
 html/TagNames/Shortcuts.html
 html/TagNames/Sigma.html
@@ -251,9 +254,11 @@ lib/Image/ExifTool/PrintIM.pm
 lib/Image/ExifTool/QuickTime.pm
 lib/Image/ExifTool/README
 lib/Image/ExifTool/RIFF.pm
+lib/Image/ExifTool/RSRC.pm
 lib/Image/ExifTool/Rawzor.pm
 lib/Image/ExifTool/Real.pm
 lib/Image/ExifTool/Ricoh.pm
+lib/Image/ExifTool/Samsung.pm
 lib/Image/ExifTool/Sanyo.pm
 lib/Image/ExifTool/Shift.pl
 lib/Image/ExifTool/Shortcuts.pm
@@ -293,6 +298,8 @@ t/ASF.t
 t/ASF_2.out
 t/BMP.t
 t/BMP_2.out
+t/BigTIFF.t
+t/BigTIFF_2.out
 t/Canon.t
 t/CanonRaw.t
 t/CanonRaw_2.out
@@ -609,6 +616,7 @@ t/images/APE.ape
 t/images/APE.mpc
 t/images/ASF.wmv
 t/images/BMP.bmp
+t/images/BigTIFF.btf
 t/images/Canon.jpg
 t/images/Canon1DmkIII.jpg
 t/images/CanonRaw.cr2

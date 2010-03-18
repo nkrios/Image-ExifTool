@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.13
 [File, System, Image] FileName - File Name: Nikon_4_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 6.4 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:49-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:03:04 13:22:15-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -73,13 +73,13 @@
 [MakerNotes, Nikon, Camera] 11 - White Balance Fine Tune: 0
 [MakerNotes, Nikon, Camera] 13 - Program Shift: 0
 [MakerNotes, Nikon, Camera] 14 - Exposure Difference: -4.9
-[MakerNotes, NikonPreview, Image] 259 - Compression: JPEG (old-style)
-[MakerNotes, NikonPreview, Image] 282 - X Resolution: 300
-[MakerNotes, NikonPreview, Image] 283 - Y Resolution: 300
-[MakerNotes, NikonPreview, Image] 296 - Resolution Unit: inches
-[MakerNotes, NikonPreview, Image] 513 - Preview Image Start: 2392
-[MakerNotes, NikonPreview, Image] 514 - Preview Image Length: 0
-[MakerNotes, NikonPreview, Image] 531 - Y Cb Cr Positioning: Co-sited
+[MakerNotes, PreviewIFD, Image] 259 - Compression: JPEG (old-style)
+[MakerNotes, PreviewIFD, Image] 282 - X Resolution: 300
+[MakerNotes, PreviewIFD, Image] 283 - Y Resolution: 300
+[MakerNotes, PreviewIFD, Image] 296 - Resolution Unit: inches
+[MakerNotes, PreviewIFD, Image] 513 - Preview Image Start: 2392
+[MakerNotes, PreviewIFD, Image] 514 - Preview Image Length: 0
+[MakerNotes, PreviewIFD, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Nikon, Camera] 18 - Flash Exposure Compensation: -5/3
 [MakerNotes, Nikon, Camera] 19 - ISO Setting: 200
 [MakerNotes, Nikon, Camera] 22 - Image Boundary: 0 0 3008 2000
@@ -134,7 +134,7 @@
 [MakerNotes, Nikon, Camera] 169 - Image Optimization: Custom
 [MakerNotes, Nikon, Camera] 170 - Saturation: Enhanced
 [MakerNotes, Nikon, Camera] 171 - Vari Program: 
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.02
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.13
 [XMP, XMP-aux, Camera] Lens - Lens: 18-70mm f/3.5-4.5
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: No= 20025585
 [XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -

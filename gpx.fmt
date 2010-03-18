@@ -1,9 +1,11 @@
 #------------------------------------------------------------------------------
 # File:         gpx.fmt
 #
-# Description:  Example ExifTool print format file for generating GPX track log
+# Description:  Example ExifTool print format file to generate a GPX track log
 #
-# Usage:        exiftool -p gpx.fmt -d %Y:%m:%dT%H:%M:%SZ FILE [...] > out.gpx
+# Usage:        exiftool -p gpx.fmt -d %Y-%m-%dT%H:%M:%SZ FILE [...] > out.gpx
+#
+# Revisions:    2010/02/05 - P. Harvey created
 #
 # Notes:     1) All input files must contain GPSLatitude and GPSLongitude.
 #            2) The -fileOrder option may be used to control the order of the

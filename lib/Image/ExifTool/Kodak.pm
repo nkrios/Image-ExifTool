@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -1654,7 +1654,7 @@ sub ProcessKodakIFD($$$)
     $$dirInfo{DirLen} -= 2;
     if ($exifTool->{HTML_DUMP}) {
         my $base = $$dirInfo{Base} + $$dirInfo{DataPos};
-        $exifTool->HtmlDump($dirStart+$base, 2, "Byte Order Mark");
+        $exifTool->HDump($dirStart+$base, 2, "Byte Order Mark");
     }
     return Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
 }

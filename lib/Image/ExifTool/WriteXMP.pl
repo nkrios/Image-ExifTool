@@ -23,9 +23,9 @@ my $numPadLines = 24;       # number of blank padding lines
 
 # when writing extended XMP, resources bigger than this get placed in their own
 # rdf:Description so they can be moved to the extended segments if necessary
-my $newDescThresh = 10000;  # 10 kB
+my $newDescThresh = 10240;  # 10 kB
 
-# individual resources and namespaces to place last inseparate rdf:Description's
+# individual resources and namespaces to place last in separate rdf:Description's
 # so they can be moved to extended XMP segments if required (see Oct. 2008 XMP spec)
 my %extendedRes = (
     'photoshop:History' => 1,

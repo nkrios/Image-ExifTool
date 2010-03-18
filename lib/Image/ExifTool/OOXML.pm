@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::XMP;
 use Image::ExifTool::ZIP;
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 # test for recognized OOXML document extensions
 my %isOOXML = (
@@ -262,7 +262,7 @@ sub FoundTag($$$$;$)
         # use standard XMP table if it exists
         my $table = $Image::ExifTool::XMP::Main{$ns}{SubDirectory}{TagTable};
         no strict 'refs';
-        if ($table and defined %$table) {
+        if ($table and %$table) {
             $tagTablePtr = Image::ExifTool::GetTagTable($table);
         }
     } elsif (@$props > 2 and grep /^vt:vector$/, @$props) {

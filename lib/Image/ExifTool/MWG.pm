@@ -15,13 +15,16 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 # enable MWG strict mode by default
 # (causes non-standard EXIF, IPTC and XMP to be ignored)
 $Image::ExifTool::MWG::strict = 1 unless defined $Image::ExifTool::MWG::strict;
 
 sub RecoverTruncatedIPTC($$$);
+sub ListToString($);
+sub StringToList($$);
+sub OverwriteStringList($$$$);
 
 # MWG Composite tags
 %Image::ExifTool::MWG::Composite = (
@@ -50,20 +53,13 @@ sub RecoverTruncatedIPTC($$$);
         records only in the standard location, but writes new tags to any
         EXIF/IPTC/XMP records that exist.
 
-        A problem with the MWG specification is that although XMP:Creator and
-        IPTC:By-line are list-type tags, the corresponding EXIF tag, EXIF:Artist, is
-        not.  So, short of changing the EXIF specification to allow EXIF:Artist to
-        store a list of strings, the only reasonable alternative is to NOT allow
-        MWG:Creator to be written as a list.  (It is insufficient to say that
-        EXIF:Artist may store multiple strings separated with semicolons because
-        there is nothing in any of the MWG, EXIF, XMP or IPTC specifications that
-        states an individual Creator string may not contain a semicolon, and for
-        this to be feasible all of these specifications would require this
-        restriction.)  For this reason, the MWG:Creator tag is written as a single
-        string.  Multiple names may of course be written within the string (and it
-        would be reasonable to separate them with semicolons as suggested by the MWG
-        and EXIF specifications), but this tag is not treated as a list by ExifTool
-        when writing.
+        A complication of the specification is that although the MWG:Creator
+        property may consist of multiple values, the associated EXIF tag
+        (EXIF:Artist) is only a simple string.  To resolve this discrepancy the MWG
+        recommends a technique which allows a list of values to be stored in a
+        string by using a semicolon-space separator (with quotes around values if
+        necessary).  When the MWG module is loaded, ExifTool automatically
+        implements this policy and changes EXIF:Artist to a list-type tag.
     },
     Keywords => {
         Flags  => ['Writable','List'],
@@ -251,7 +247,7 @@ sub RecoverTruncatedIPTC($$$);
     },
     Creator => {
         Groups => { 2 => 'Author' },
-        Writable => 1,
+        Flags  => ['Writable','List'],
         Desire => {
             0 => 'EXIF:Artist',
             1 => 'IPTC:By-line', # (32-character limit)
@@ -259,7 +255,6 @@ sub RecoverTruncatedIPTC($$$);
             3 => 'CurrentIPTCDigest',
             4 => 'IPTCDigest',
         },
-        Notes => 'NOT a list-type tag.  See "A problem with the MWG specification" above',
         ValueConv => q{
             return $val[0] if defined $val[0];
             return $val[2] if not defined $val[3] or (defined $val[2] and
@@ -270,8 +265,8 @@ sub RecoverTruncatedIPTC($$$);
         WriteCheck => 'Image::ExifTool::MWG::ReconcileIPTCDigest($self)',
         WriteAlso  => {
             'EXIF:Artist'    => '$val',
-            'IPTC:By-line'   => '$opts{Replace} = 1; $opts{EditGroup} = 1; $val',
-            'XMP-dc:Creator' => '$opts{Replace} = 1; $val',
+            'IPTC:By-line'   => '$opts{EditGroup} = 1; $val',
+            'XMP-dc:Creator' => '$val',
         },
     },
     Country => {
@@ -369,6 +364,94 @@ unless ($Image::ExifTool::documentOnly) {
                                      'Image::ExifTool::Composite');
 }
 
+# modify EXIF:Artist to behave as a List-type tag
+{
+    my $artist = $Image::ExifTool::Exif::Main{0x13b};
+    $$artist{List} = 1;
+    $$artist{IsOverwriting} = \&OverwriteStringList;
+    $$artist{RawConv} = \&StringToList;
+}
+
+#------------------------------------------------------------------------------
+# Change a list of values to a string using MWG rules
+# Inputs: 0)reference to list of values
+# Returns: string of values (and may reformat list entries)
+sub ListToString($)
+{
+    my $vals = shift;
+    foreach (@$vals) {
+        # double all quotes in value and quote the value if it begins
+        # with a quote or contains a semicolon-space separator
+        if (/^"/ or /; /) {
+            s/"/""/g;       # double all quotes
+            $_ = qq{"$_"};  # quote the value
+        }
+    }
+    return join('; ', @$vals);
+}
+
+#------------------------------------------------------------------------------
+# Change a string value to a list of values using MWG rules
+# Inputs: 0) string of values, 1) ExifTool ref
+# Returns: value or list reference if more than one value
+# Notes: Sets Warning tag on error
+sub StringToList($$)
+{
+    my ($str, $exifTool) = @_;
+    my (@vals, $inQuotes);
+    my @t = split '; ', $str, -1;
+    foreach (@t) {
+        my $wasQuotes = $inQuotes;
+        $inQuotes = 1 if not $inQuotes and s/^"//;
+        if ($inQuotes) {
+            # remove the last quote and reset the inQuotes flag if
+            # the value ended in an odd number of quotes
+            $inQuotes = 0 if s/((^|[^"])("")*)"$/$1/;
+            s/""/"/g;   # un-double the contained quotes
+        }
+        if ($wasQuotes) {
+            # previous separator was quoted, so concatinate with previous value
+            $vals[-1] .= '; ' . $_;
+        } else {
+            push @vals, $_;
+        }
+    }
+    $exifTool->Warn('Incorrectly quoted MWG string-list value') if $inQuotes;
+    return @vals > 1 ? \@vals : $vals[0];
+}
+
+#------------------------------------------------------------------------------
+# Handle logic for overwriting EXIF string-type list tag
+# Inputs: 0) new value hash ref, 1) old string value (or undef if it didn't exist),
+#         2) reference to new value
+# Returns: 1 and sets the new value for the tag
+sub OverwriteStringList($$$$)
+{
+    local $_;
+    my ($exifTool, $nvHash, $val, $newValuePt) = @_;
+    my @new;
+    if ($$nvHash{DelValue} and defined $val) {
+        # preserve specified old values
+        my $old = StringToList($val, $exifTool);
+        my @old = ref $old eq 'ARRAY' ? @$old : $old;
+        if (@{$$nvHash{DelValue}}) {
+            my %del;
+            $del{$_} = 1 foreach @{$$nvHash{DelValue}};
+            $del{$_} or push(@new, $_) foreach @old;
+        } else {
+            push @new, @old;
+        }
+    }
+    # add new values
+    push @new, @{$$nvHash{Value}} if $$nvHash{Value};
+    if (@new) {
+        # convert back to string format
+        $$newValuePt = ListToString(\@new);
+    } else {
+        $$newValuePt = undef;   # delete the tag
+    }
+    return 1;
+}
 
 #------------------------------------------------------------------------------
 # Reconcile IPTC digest after writing an MWG tag

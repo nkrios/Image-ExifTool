@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 %Image::ExifTool::Sigma::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -50,7 +50,8 @@ $VERSION = '1.05';
     0x000c => [
         {
             Name => 'ExposureCompensation',
-            Condition => '$$self{Model} !~ /SD14$/',
+            Condition => '$$self{Model} =~ /SD(9|10)$/',
+            Notes => 'SD9 and SD10 only',
             ValueConv => '$val =~ s/Expo:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Expo:%+.1f",$val) : undef',
         },
@@ -176,22 +177,25 @@ $VERSION = '1.05';
     },
     0x001d => { #PH
         Name => 'MakerNoteVersion',
-        Format => 'undef',
+        Writable => 'undef',
     },
-    # 0x001e - int16u: 0 or 4
-    # 0x001f - string: "" or "Center"
+    # 0x001e - int16u: 0, 4, 13 - flash mode?
+    0x001f => { #PH (NC)
+        Name => 'AFPoint',
+        # values: "", "Center", "Center,Center", "Right,Right"
+    },
     # 0x0020-21 - string: " "
-    0x0022 => { #PH
-        Name => 'AdjustmentMode',
-        Priority => 0,
-        Unknown => 1,
+    0x0022 => { #PH (NC)
+        Name => 'FileFormat',
+        # values: "JPG", "JPG-S" or "X3F"
     },
-    # 0x0023 - string: "", 10, 131, 150, 152, 169
-    # 0x0024 - string: "" or "Starting calibration file..."
-    # 0x0025 - string: "" or "0.70"
-    # 0x0026-2e - int32u: 0
+    # 0x0023 - string: "", 10, 83, 131, 145, 150, 152, 169
+    0x0024 => 'Calibration',
+    # 0x0025 - string: "", "0.70", "0.90"
+    # 0x0026-2d - int32u: 0
+    # 0x002e - rational64s: (the negative of FlashExposureComp, but why?)
     # 0x002f - int32u: 0, 1
-    0x0030 => 'LensApertureRange', #PH
+    0x0030 => 'LensApertureRange', #PH (MaxAperture for some models)
     0x0031 => { #PH
         Name => 'FNumber',
         Writable => 'rational64u',
@@ -212,15 +216,18 @@ $VERSION = '1.05';
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         PrintConvInv => 'eval $val',
     },
-    # 0x0034 - int32u: 0,1,2,3 or 4 (possibly AFPoint?)
+    # 0x0034 - int32u: 0,1,2,3 or 4
     0x0035 => { #PH
         Name => 'ExposureCompensation',
         Writable => 'rational64s',
+        # add a '+' sign to positive values
+        PrintConv => '$val and $val =~ s/^(\d)/\+$1/; $val',
+        PrintConvInv => '$val',
     },
     # 0x0036 - string: "                    "
     # 0x0037-38 - string: ""
-    # 0x0039 - string: "", 24, 28, 31, 33, 34
-    0x003a => { #PH (guess!)
+    # 0x0039 - string: "", 24, 26, 28, 31, 33, 34, 36, 28, 40, 41, 42
+    0x003a => { #PH
         Name => 'FlashExposureComp',
         Writable => 'rational64s',
     },

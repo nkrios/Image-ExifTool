@@ -133,12 +133,14 @@ my %exifDirs = (
     globparamifd => 'GlobParamIFD',
     interopifd   => 'InteropIFD',
     makernotes   => 'MakerNotes',
+    previewifd   => 'PreviewIFD', # (in MakerNotes)
 );
 # min/max values for integer formats
 my %intRange = (
     'int8u'  => [0, 0xff],
     'int8s'  => [-0x80, 0x7f],
     'int16u' => [0, 0xffff],
+    'int16uRev' => [0, 0xffff],
     'int16s' => [-0x8000, 0x7fff],
     'int32u' => [0, 0xffffffff],
     'int32s' => [-0x80000000, 0x7fffffff],
@@ -411,7 +413,7 @@ sub SetNewValue($;$$%)
     }
     # get group name that we're looking for
     my $foundMatch = 0;
-    my ($ifdName, $mieGroup);
+    my ($ifdName, $mieGroup, $notWritable);
     if ($wantGroup) {
         # set $ifdName if this group is a valid IFD or SubIFD name
         if ($wantGroup =~ /^IFD(\d+)$/i) {
@@ -424,7 +426,7 @@ sub SetNewValue($;$$%)
             $mieGroup = "MIE$1" . ucfirst(lc($2));
         } else {
             $ifdName = $exifDirs{lc($wantGroup)};
-            if ($wantGroup =~ /^XMP\b/i) {
+            if (not $ifdName and $wantGroup =~ /^XMP\b/i) {
                 # must load XMP table to set group1 names
                 my $table = GetTagTable('Image::ExifTool::XMP::Main');
                 my $writeProc = $table->{WRITE_PROC};
@@ -448,6 +450,8 @@ sub SetNewValue($;$$%)
             unless (lc($writeGroup) eq $lcWant) {
                 if ($writeGroup eq 'EXIF' or $writeGroup eq 'SonyIDC') {
                     next unless $ifdName;
+                    # can't yet write PreviewIFD tags
+                    $ifdName eq 'PreviewIFD' and ++$foundMatch, next;
                     $writeGroup = $ifdName;  # write to the specified IFD
                 } elsif ($writeGroup eq 'MIE') {
                     next unless $mieGroup;
@@ -474,10 +478,10 @@ sub SetNewValue($;$$%)
         # before checking Writable flag
         my $table = $tagInfo->{Table};
         my $writeProc = $table->{WRITE_PROC};
-        # load parent table if this was a user-defined table
-        if ($table->{PARENT}) {
-            my $parent = GetTagTable($table->{PARENT});
-            $writeProc = $parent->{WRITE_PROC} unless $writeProc;
+        # load source table if this was a user-defined table
+        if ($$table{SRC_TABLE}) {
+            my $src = GetTagTable($$table{SRC_TABLE});
+            $writeProc = $$src{WRITE_PROC} unless $writeProc;
         }
         next unless $writeProc and &$writeProc();
         # must still check writable flags in case of UserDefined tags
@@ -981,7 +985,7 @@ WriteAlso:
     if (defined $err and not $prioritySet) {
         warn "$err\n" if $err and not wantarray;
     } elsif (not $numSet) {
-        my $pre = $wantGroup ? "$wantGroup:" : '';
+        my $pre = $wantGroup ? ($ifdName || $wantGroup) . ':' : '';
         if ($wasProtected) {
             $err = "Tag '$pre$tag' is $wasProtected for writing";
         } elsif ($foundMatch) {
@@ -2339,7 +2343,7 @@ PAT:    foreach $pattern (@patterns) {
 # Return true if we are deleting or overwriting the specified tag
 # Inputs: 0) new value hash reference
 #         2) optional tag value if deleting specific values
-# Returns: >0 - tag should be deleted
+# Returns: >0 - tag should be overwritten
 #          =0 - the tag should be preserved
 #          <0 - not sure, we need the value to know
 sub IsOverwriting($;$)
@@ -2790,17 +2794,20 @@ sub WriteDirectory($$$;$)
         my $grp1 = $dirName;
         my $delFlag = ($$delGroup{$grp0} or $$delGroup{$grp1});
         if ($delFlag) {
-            unless ($blockExifTypes{$self->{FILE_TYPE}}) {
+            unless ($blockExifTypes{$$self{FILE_TYPE}}) {
                 # restrict delete logic to prevent entire tiff image from being killed
                 # (don't allow IFD0 to be deleted, and delete only ExifIFD if EXIF specified)
-                if ($grp1 eq 'IFD0') {
+                if ($$self{FILE_TYPE} eq 'PSD') {
+                    # don't delete Photoshop directories from PSD image
+                    undef $grp1 if $grp0 eq 'Photoshop';
+                } elsif ($$self{FILE_TYPE} =~ /^(EPS|PS)$/) {
+                    # allow anything to be deleted from PostScript files
+                } elsif ($grp1 eq 'IFD0') {
                     my $type = $self->{TIFF_TYPE} || $self->{FILE_TYPE};
-                    $$delGroup{IFD0} and $self->Warn("Can't delete IFD0 from $type image",1);
+                    $$delGroup{IFD0} and $self->Warn("Can't delete IFD0 from $type",1);
                     undef $grp1;
                 } elsif ($grp0 eq 'EXIF' and $$delGroup{$grp0}) {
                     undef $grp1 unless $$delGroup{$grp1} or $grp1 eq 'ExifIFD';
-                } elsif ($grp0 eq 'Photoshop' and $self->{FILE_TYPE} eq 'PSD') {
-                    undef $grp1; # don't delete Photoshop directories from PSD image
                 }
             }
             if ($grp1) {
@@ -2810,18 +2817,33 @@ sub WriteDirectory($$$;$)
                     # can no longer validate TIFF_END if deleting an entire IFD
                     delete $self->{TIFF_END} if $dirName =~ /IFD/;
                 }
-                if ($delFlag == 2 and $self->{ADD_DIRS}{$grp1}) {
-                    # create new empty directory
-                    my $data = '';
-                    my %dirInfo = (
-                        DirName => $$dirInfo{DirName},
-                        DirStart => 0,
-                        DirLen => 0,
-                        DataPt => \$data,
-                        NewDataPos => $$dirInfo{NewDataPos},
-                        Fixup => $$dirInfo{Fixup},
-                    );
-                    $dirInfo = \%dirInfo;
+                # don't add back into the wrong location
+                my $right = $$self{ADD_DIRS}{$grp1};
+                # (take care because EXIF directory name may be either EXIF or IFD0,
+                #  but IFD0 will be the one that appears in the directory map)
+                $right = $$self{ADD_DIRS}{IFD0} if not $right and $grp1 eq 'EXIF';
+                if ($delFlag == 2 and $right) {
+                    # also check grandparent because some routines create 2 levels in 1
+                    my $right2 = $$self{ADD_DIRS}{$right} || '';
+                    if (not $$dirInfo{Parent} or $$dirInfo{Parent} eq $right or
+                        $$dirInfo{Parent} eq $right2)
+                    {
+                        # create new empty directory
+                        my $data = '';
+                        my %dirInfo = (
+                            DirName    => $$dirInfo{DirName},
+                            Parent     => $$dirInfo{Parent},
+                            DirStart   => 0,
+                            DirLen     => 0,
+                            DataPt     => \$data,
+                            NewDataPos => $$dirInfo{NewDataPos},
+                            Fixup      => $$dirInfo{Fixup},
+                        );
+                        $dirInfo = \%dirInfo;
+                    } else {
+                        $self->Warn("Not recreating $grp1 in $$dirInfo{Parent} (should be in $right)",1);
+                        return '';
+                    }
                 } else {
                     return '' unless $$dirInfo{NoDelete};
                 }
@@ -2856,6 +2878,7 @@ sub WriteDirectory($$$;$)
             $verb = 'Deleting';
             $newVal = '';
         }
+        $$dirInfo{BlockWrite} = 1;  # set flag indicating we did a block write
         $out and print $out "  $verb $blockName as a block\n";
         ++$self->{CHANGED};
         return $newVal;
@@ -2888,8 +2911,10 @@ sub WriteDirectory($$$;$)
     my $saveOrder = GetByteOrder();
     my $oldChanged = $self->{CHANGED};
     $self->{DIR_NAME} = $dirName;
+    push @{$self->{PATH}}, $$dirInfo{DirName};
     $$dirInfo{IsWriting} = 1;
     my $newData = &$writeProc($self, $dirInfo, $tagTablePtr);
+    pop @{$self->{PATH}};
     # nothing changed if error occurred or nothing was created
     $self->{CHANGED} = $oldChanged unless defined $newData and (length($newData) or $isRewriting);
     $self->{DIR_NAME} = $oldDir;
@@ -3112,7 +3137,7 @@ sub DumpTrailer($$)
             my $num = $raf->Read($buff, $size) or return;
             my $desc = "$trailer trailer";
             $desc = "[$desc]" if $trailer eq 'Unknown';
-            $self->HtmlDump($pos, $num, $desc, undef, 0x08);
+            $self->HDump($pos, $num, $desc, undef, 0x08);
             last;
         }
         my $out = $self->{OPTIONS}{TextOut};
@@ -3530,6 +3555,7 @@ my %writeValueProc = (
     int8u => \&Set8u,
     int16s => \&Set16s,
     int16u => \&Set16u,
+    int16uRev => \&Set16uRev,
     int32s => \&Set32s,
     int32u => \&Set32u,
     rational32s => \&SetRational32s,
@@ -4094,19 +4120,20 @@ sub WriteJPEG($$)
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Exif::Main');
                 my %dirInfo = (
                     DirName => 'IFD0',
-                    Parent  => $markerName,
+                    Parent  => 'APP1',
                 );
                 my $buff = $self->WriteDirectory(\%dirInfo, $tagTablePtr, \&WriteTIFF);
                 if (defined $buff and length $buff) {
                     my $size = length($buff) + length($exifAPP1hdr);
                     if ($size <= $maxSegmentLen) {
                         # switch to buffered output if required
-                        if ($self->{PREVIEW_INFO} and not $oldOutfile) {
+                        if (($$self{PREVIEW_INFO} or $$self{LeicaTrailer}) and not $oldOutfile) {
                             $writeBuffer = '';
                             $oldOutfile = $outfile;
                             $outfile = \$writeBuffer;
-                            # account for segment,EXIF and TIFF headers
-                            $self->{PREVIEW_INFO}{Fixup}{Start} += 18;
+                            # account for segment, EXIF and TIFF headers
+                            $$self{PREVIEW_INFO}{Fixup}{Start} += 18 if $$self{PREVIEW_INFO};
+                            $$self{LeicaTrailer}{Fixup}{Start} += 18 if $$self{LeicaTrailer};
                         }
                         # write the new segment with appropriate header
                         my $app1hdr = "\xff\xe1" . pack('n', $size + 2);
@@ -4125,7 +4152,7 @@ sub WriteJPEG($$)
                 # write new APP13 Photoshop record to memory
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Photoshop::Main');
                 my %dirInfo = (
-                    Parent => $markerName,
+                    Parent => 'APP13',
                 );
                 my $buff = $self->WriteDirectory(\%dirInfo, $tagTablePtr);
                 if (defined $buff and length $buff) {
@@ -4141,7 +4168,7 @@ sub WriteJPEG($$)
                 # write new XMP data
                 my $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
                 my %dirInfo = (
-                    Parent      => $markerName,
+                    Parent      => 'APP1',
                     # specify MaxDataLen so XMP is split if required
                     MaxDataLen  => $maxXMPLen - length($xmpAPP1hdr),
                 );
@@ -4160,7 +4187,7 @@ sub WriteJPEG($$)
                 # write new ICC_Profile data
                 my $tagTablePtr = GetTagTable('Image::ExifTool::ICC_Profile::Main');
                 my %dirInfo = (
-                    Parent   => $markerName,
+                    Parent   => 'APP2',
                 );
                 my $buff = $self->WriteDirectory(\%dirInfo, $tagTablePtr);
                 if (defined $buff and length $buff) {
@@ -4176,7 +4203,7 @@ sub WriteJPEG($$)
                 # write new Ducky segment data
                 my $tagTablePtr = GetTagTable('Image::ExifTool::APP12::Ducky');
                 my %dirInfo = (
-                    Parent   => $markerName,
+                    Parent   => 'APP12',
                 );
                 my $buff = $self->WriteDirectory(\%dirInfo, $tagTablePtr);
                 if (defined $buff and length $buff) {
@@ -4264,15 +4291,50 @@ sub WriteJPEG($$)
                 $$trailInfo{ScanForAFCP} = 1;   # scan if necessary
                 $self->ProcessTrailers($trailInfo) or undef $trailInfo;
             }
-            if ($oldOutfile) {
+            if (not $oldOutfile) {
+                # do nothing special
+            } elsif ($$self{LeicaTrailer}) {
+                my $trailLen;
+                if ($trailInfo) {
+                    $trailLen = $$trailInfo{DataPos} - $endPos;
+                } else {
+                    $raf->Seek(0, 2) or $err = 1;
+                    $trailLen = $raf->Tell() - $endPos;
+                }
+                my $fixup = $$self{LeicaTrailer}{Fixup};
+                $$self{LeicaTrailer}{TrailPos} = $endPos;
+                $$self{LeicaTrailer}{TrailLen} = $trailLen;
+                # get _absolute_ position of new Leica trailer
+                my $absPos = Tell($oldOutfile) + length($$outfile);
+                require Image::ExifTool::Panasonic;
+                my $dat = Image::ExifTool::Panasonic::ProcessLeicaTrailer($self, $absPos);
+                # allow some junk before Leica trailer (just in case)
+                my $junk = $$self{LeicaTrailerPos} - $endPos;
+                # set MakerNote pointer and size (subtract 10 for segment and EXIF headers)
+                $fixup->SetMarkerPointers($outfile, 'LeicaTrailer', length($$outfile) - 10 + $junk);
+                # use this fixup to set the size too (sneaky)
+                my $trailSize = defined($dat) ? length($dat) - $junk : $$self{LeicaTrailer}{Size};
+                $fixup->{Start} -= 4;  $fixup->{Shift} += 4;
+                $fixup->SetMarkerPointers($outfile, 'LeicaTrailer', $trailSize);
+                $fixup->{Start} += 4;  $fixup->{Shift} -= 4;
+                # clean up and write the buffered data
+                $outfile = $oldOutfile;
+                undef $oldOutfile;
+                Write($outfile, $writeBuffer) or $err = 1;
+                undef $writeBuffer;
+                if (defined $dat) {
+                    Write($outfile, $dat) or $err = 1;  # write new Leica trailer
+                    $delPreview = 1;                    # delete existing Leica trailer
+                }
+            } else {
                 # locate preview image and fix up preview offsets
                 my $scanLen = $$self{Make} =~ /Sony/i ? 65536 : 1024;
                 if (length($buff) < $scanLen) { # make sure we have enough trailer to scan
                     my $buf2;
                     $buff .= $buf2 if $raf->Read($buf2, $scanLen - length($buff));
                 }
-                # get new preview image position (subtract 10 for segment and EXIF headers)
-                my $newPos = length($$outfile) - 10;
+                # get new preview image position, relative to EXIF base
+                my $newPos = length($$outfile) - 10; # (subtract 10 for segment and EXIF headers)
                 my $junkLen;
                 # adjust position if image isn't at the start (ie. Olympus E-1/E-300)
                 if ($buff =~ m/(\xff\xd8\xff.|.\xd8\xff\xdb)/sg) {
@@ -4289,6 +4351,10 @@ sub WriteJPEG($$)
                 if ($previewInfo->{Relative}) {
                     # adjust for our base by looking at how far the pointer got shifted
                     $newPos -= $fixup->GetMarkerPointers($outfile, 'PreviewImage');
+                } elsif ($previewInfo->{ChangeBase}) {
+                    # Leica S2 uses relative offsets for the preview only (leica sucks)
+                    my $makerOffset = $fixup->GetMarkerPointers($outfile, 'LeicaTrailer');
+                    $newPos -= $makerOffset if $makerOffset;
                 }
                 $fixup->SetMarkerPointers($outfile, 'PreviewImage', $newPos);
                 # clean up and write the buffered data
@@ -4434,12 +4500,13 @@ sub WriteJPEG($$)
                         $self->{CHANGED} = $oldChanged; # nothing changed
                     }
                     # switch to buffered output if required
-                    if ($self->{PREVIEW_INFO} and not $oldOutfile) {
+                    if (($$self{PREVIEW_INFO} or $$self{LeicaTrailer}) and not $oldOutfile) {
                         $writeBuffer = '';
                         $oldOutfile = $outfile;
                         $outfile = \$writeBuffer;
                         # must account for segment, EXIF and TIFF headers
-                        $self->{PREVIEW_INFO}{Fixup}{Start} += 18;
+                        $$self{PREVIEW_INFO}{Fixup}{Start} += 18 if $$self{PREVIEW_INFO};
+                        $$self{LeicaTrailer}{Fixup}{Start} += 18 if $$self{LeicaTrailer};
                     }
                     # delete segment if IFD contains no entries
                     $del = 1 unless length($$segDataPt) > length($exifAPP1hdr);

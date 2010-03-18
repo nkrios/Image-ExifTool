@@ -205,17 +205,17 @@ it easier to read and allow CRC validation of the datastream. -- Can you
 tell I wrote this just after adding DICOM support to ExifTool?</p>
 
 <a name='AVCHD'></a>
-<h3>AVCHD (.M2TS) <span class='sm norm'><i>(added 2009-10-29)</i></h3>
-<p>This format is used in .M2TS video files (and Blu-Ray HD DVD's).  It is
-painfully obvious that this was never designed as a storage format.  It uses
-MPEG-2 transport stream (M2TS) container, which is a communications protocol
-and never should have been used for storage.  The M2TS format is based on a
-188-byte packet size which makes no sense for modern filesystems.  And to
-make things worse, the H.264 video in AVCHD uses insane and convoluted data
-structures such as the variable-bit-length exponential-Golomb which are
-painful and inefficient to parse in software, and as far as I can tell the
-format for the metadata stored in these streams is proprietary and
-undocumented.</p>
+<h3>AVCHD (.M2TS) <span class='sm norm'><i>(added 2009-10-29)</i></h3> <p>This
+format is used in .M2TS video files (and Blu-Ray HD DVD's).  It is painfully
+obvious that this was never designed as a storage format.  It uses MPEG-2
+transport stream (M2TS) container, which is a communications protocol and never
+should have been used for storage.  The M2TS format is based on a 188-byte
+packet size which makes no sense for modern filesystems.  And to make things
+worse, metadata in AVCHD files is stored in the H.264 video stream (!!) which
+uses insane and convoluted data structures such as the variable-bit-length
+exponential-Golomb which are painful and inefficient to parse in software, and
+as far as I can tell the format for the metadata stored in these streams is
+proprietary and undocumented.</p>
 
 <a name='ISO'></a>
 <h3>ISO Considered Harmless</h3>
@@ -296,8 +296,7 @@ offers a number of other features:</p>
 
 <hr>
 <i>Created Nov. 15, 2005</i>
-<br><i>Edited Dec. 28, 2007</i>
-<br><i>Added AVCHD Oct. 29, 2009</i>
+<br><i>Last revised Feb. 13, 2010</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

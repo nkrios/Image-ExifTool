@@ -89,9 +89,9 @@
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0011 = 17'>0x0011</td>
-<td>NikonPreview</td>
+<td>PreviewIFD</td>
 <td class=c>-</td>
-<td>--&gt; <a href='Nikon.html#PreviewImage'>Nikon PreviewImage Tags</a></td></tr>
+<td>--&gt; <a href='Nikon.html#PreviewIFD'>Nikon PreviewIFD Tags</a></td></tr>
 <tr>
 <td title='0x0012 = 18'>0x0012</td>
 <td>FlashExposureComp</td>
@@ -577,45 +577,63 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>&#39;14 0 0 0&#39; = 14</span></td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='PreviewImage'>Nikon PreviewImage Tags</a></h2>
+<h2><a name='PreviewIFD'>Nikon PreviewIFD Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td title='0x00fe = 254'>0x00fe</td>
+<td>SubfileType</td>
+<td class=c>N</td>
+<td><span class=s>0x0 = Full-resolution Image
+  <br>0x1 = Reduced-resolution image
+  <br>0x2 = Single page of multi-page image
+  <br>0x3 = Single page of multi-page reduced-resolution image
+  <br>0x4 = Transparency mask
+  <br>0x5 = Transparency mask of reduced-resolution image
+  <br>0x6 = Transparency mask of multi-page image
+  <br>0x7 = Transparency mask of reduced-resolution multi-page image
+  <br>0xffffffff = invalid
+  <br>Bit 0 = Reduced resolution
+  <br>Bit 1 = Single page
+  <br>Bit 2 = Transparency mask
+  <br>Bit 3 = TIFF/IT final page
+  <br>Bit 4 = TIFF-FX mixed raster content</span></td></tr>
+<tr class=b>
 <td title='0x0103 = 259'>0x0103</td>
 <td>Compression</td>
 <td class=c>N</td>
 <td>--&gt; <a href='EXIF.html#Compression'>EXIF Compression Values</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x011a = 282'>0x011a</td>
 <td>XResolution</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x011b = 283'>0x011b</td>
 <td>YResolution</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0128 = 296'>0x0128</td>
 <td>ResolutionUnit</td>
 <td class=c>N</td>
 <td><span class=s>1 = None
   <br>2 = inches
   <br>3 = cm</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0201 = 513'>0x0201</td>
 <td>PreviewImageStart</td>
 <td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0202 = 514'>0x0202</td>
 <td>PreviewImageLength</td>
 <td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0213 = 531'>0x0213</td>
 <td>YCbCrPositioning</td>
 <td class=c>N</td>
@@ -2689,8 +2707,103 @@ point is C6)</span>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='NCDT'>Nikon NCDT Tags</a></h2>
+<p>Nikon-specific QuickTime tags found in the NCDT atom of MOV videos from some
+Nikon cameras such as the Coolpix S8000.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'NCHD'</td>
+<td>MakerNoteVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'NCTG'</td>
+<td>NikonTags</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Nikon.html#NCTG'>Nikon NCTG Tags</a></td></tr>
+<tr>
+<td>'NCTH'</td>
+<td>ThumbnailImage</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'NCVW'</td>
+<td>PreviewImage</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='NCTG'>Nikon NCTG Tags</a></h2>
+<p>These tags are found in proprietary-format records of the NCTG atom in MOV
+videos from some Nikon cameras.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td title='0x0001 = 1'>0x0001</td>
+<td>Make</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0002 = 2'>0x0002</td>
+<td>Model</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0003 = 3'>0x0003</td>
+<td>Software</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0011 = 17'>0x0011</td>
+<td>CreateDate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0012 = 18'>0x0012</td>
+<td>DateTimeOriginal</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0016 = 22'>0x0016</td>
+<td>FrameRate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0022 = 34'>0x0022</td>
+<td>FrameWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0023 = 35'>0x0023</td>
+<td>FrameHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0032 = 50'>0x0032</td>
+<td>AudioChannels</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0033 = 51'>0x0033</td>
+<td>AudioBitsPerSample</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0034 = 52'>0x0034</td>
+<td>AudioSampleRate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='MOV'>Nikon MOV Tags</a></h2>
-<p>This information is found in Nikon MOV and QT videos.</p>
+<p>This information is found in MOV and QT videos from some Nikon cameras.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -2770,6 +2883,11 @@ point is C6)</span>
 <td>NikonVers</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#AVIVers'>Nikon AVIVers Tags</a></td></tr>
+<tr class=b>
+<td>'ncvw'</td>
+<td>PreviewImage</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='AVITags'>Nikon AVITags Tags</a></h2>
@@ -3301,7 +3419,9 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'A1 40 18 37 2C 34 A3 06'</td><td>= AF-S DX Nikkor 10-24mm f/3.5-4.5G ED</td>
 </tr><tr><td>'A1 41 19 31 2C 2C 4B 06'</td><td>= Sigma 10-20mm F3.5 EX DC HSM</td>
 </tr><tr><td>'A2 48 5C 80 24 24 A4 0E'</td><td>= AF-S Nikkor 70-200mm f/2.8G ED VR II</td>
+</tr><tr><td>'A3 3C 29 44 30 30 A5 0E'</td><td>= AF-S Nikkor 16-35mm f/4G ED VR</td>
 </tr><tr><td>'A3 3C 5C 8E 30 3C 4B 0E'</td><td>= Sigma 70-300mm F4-5.6 DG OS</td>
+</tr><tr><td>'A4 54 37 37 0C 0C A6 06'</td><td>= AF-S Nikkor 24mm f/1.4G ED</td>
 </tr><tr><td>'A5 40 2D 88 2C 40 4B 0E'</td><td>= Sigma 18-250mm F3.5-6.3 DC OS HSM</td>
 </tr><tr><td>'A6 48 37 5C 24 24 4B 06'</td><td>= Sigma 24-70mm F2.8 IF EX DG HSM</td>
 </tr><tr><td>'A6 48 8E 8E 24 24 A8 0E'</td><td>= AF-S VR Nikkor 300mm f/2.8G IF-ED II</td>
@@ -3340,7 +3460,7 @@ ExifTool to choose in these cases (see the
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 8, 2010</i>
+<br><i>Last revised Mar 4, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

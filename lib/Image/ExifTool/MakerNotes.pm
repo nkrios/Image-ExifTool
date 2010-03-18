@@ -14,9 +14,11 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
+sub ProcessUnknownOrPreview($$$);
+sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.53';
+$VERSION = '1.56';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -360,9 +362,9 @@ my $debug;          # set to 1 to enabled debugging code
         # /^\xd7/ - DiMAGE RD3000
         Name => 'MakerNoteMinolta3',
         Condition => '$$self{Make} =~ /^(Konica Minolta|Minolta)/i',
-        Notes => 'not EXIF-based',
         Binary => 1,
         NotIFD => 1,
+        Notes => 'not EXIF-based',
     },
     {
         # this maker notes starts with a standard TIFF header at offset 0x0a
@@ -431,7 +433,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteLeica2', # used by the M8
         # (starts with "LEICA\0\0\0")
-        Condition => '$$self{Make} =~ /^Leica Camera AG/ and $$valPt =~ /^LEICA\0/',
+        Condition => '$$self{Make} =~ /^Leica Camera AG/ and $$valPt =~ /^LEICA\0\0\0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Leica2',
             # (the offset base is different in JPEG and DNG images, but we
@@ -446,7 +448,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteLeica3', # used by the R8 and R9
         # (starts with IFD)
-        Condition => '$$self{Make} =~ /^Leica Camera AG/ and $$valPt !~ /^LEICA/',
+        Condition => '$$self{Make} =~ /^Leica Camera AG/ and $$valPt !~ /^LEICA/ and $$self{Model} ne "S2"',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Leica3',
             Start => '$valuePtr',
@@ -473,6 +475,24 @@ my $debug;          # set to 1 to enabled debugging code
             Start => '$valuePtr + 8',
             Base => '$start - 8',
             ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteLeica6', # used by the S2 (CAUTION: this tag name is special cased in the code)
+        # (S2 starts with "LEICA\0\x02\xff", Make is "LEICA CAMERA AG",
+        #  but maker notes aren't loaded at the time this is tested)
+        Condition => '$$self{Model} eq "S2"',
+        DataTag => 'LeicaTrailer',  # (generates fixup name for this tag)
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Panasonic::Leica6',
+            Start => '$valuePtr + 8',
+            ByteOrder => 'Unknown',
+            # NOTE: Leica uses absolute file offsets when this maker note is stored
+            # as a JPEG trailer -- this case is handled by ProcessLeicaTrailer in
+            # Panasonic.pm, and any "Base" defined here is ignored for this case.
+            # ExifTool may also create S2 maker notes inside the APP1 segment when
+            # copying from other files, and for this the normal EXIF offsets are used,
+            # Base should not be defined!
         },
     },
     {
@@ -569,16 +589,25 @@ my $debug;          # set to 1 to enabled debugging code
         },
     },
     {
-        # PreviewImage (Samsung Digimax plus some other types of cameras)
-        %Image::ExifTool::previewImageTagInfo,
-        Condition => '$$valPt =~ /^\xff\xd8\xff\xdb/ and $$self{Make}!~/(SONY|SANYO|SIGMA)/i',
-        Notes => 'Samsung preview image',
-    },
-    {
         Name => 'MakerNoteSamsung',
         Condition => '$$valPt =~ /^STMN\d{3}/',
         Binary => 1,
         Notes => 'Samsung unknown maker notes',
+    },
+    {
+        Name => 'MakerNoteSamsung2',
+        Condition => q{
+            $$self{Make} eq 'SAMSUNG' and ($$self{TIFF_TYPE} eq 'SRW' or
+            $$valPt=~/^(\0.\0\x01\0\x07\0{3}\x04|.\0\x01\0\x07\0\x04\0{3})0100/s)
+        },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Samsung::Main',
+            # Samsung is very inconsistent here, and uses absolute offsets for some
+            # models and relative offsets for others, so process as Unknown
+            ProcessProc => \&ProcessUnknown,
+            FixBase => 1,
+            ByteOrder => 'Unknown',
+        },
     },
     {
         Name => 'MakerNoteSanyo',
@@ -676,9 +705,11 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteUnknown',
+        PossiblePreview => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Unknown::Main',
-            ProcessProc => \&ProcessUnknown,
+            ProcessProc => \&ProcessUnknownOrPreview,
+            WriteProc => \&WriteUnknownOrPreview,
             ByteOrder => 'Unknown',
             FixBase => 2,
        },
@@ -712,7 +743,9 @@ sub GetMakerNoteOffset($)
     my $model = $exifTool->{Model};
     my ($relative, @offsets);
 
-    # normally value data starts 4 bytes after end of directory, so this is the default
+    # normally value data starts 4 bytes after end of directory, so this is the default.
+    # offsets of 0 and 4 are always allowed even if not specified,
+    # but the first offset specified is the one used when writing
     if ($make =~ /^Canon/) {
         push @offsets, ($model =~ /\b(20D|350D|REBEL XT|Kiss Digital N)\b/) ? 6 : 4;
         # some Canon models (FV-M30, Optura50, Optura60) leave 24 unused bytes
@@ -727,7 +760,14 @@ sub GetMakerNoteOffset($)
     } elsif ($make =~ /^KYOCERA/) {
         push @offsets, 12;
     } elsif ($make =~ /^Leica Camera AG/) {
-        push @offsets, 6; # R8, R9 and M8
+        if ($model eq 'S2') {
+            # lots of empty space before first value in S2 images
+            push @offsets, 4, ($$exifTool{FILE_TYPE} eq 'JPEG' ? 286 : 274);
+        } elsif ($model =~ /^(R8|R9|M8)\b/) {
+            push @offsets, 6;
+        } else {
+            push @offsets, 4;
+        }
     } elsif ($make =~ /^OLYMPUS/ and $model =~ /^E-(1|300|330)\b/) {
         push @offsets, 16;
     } elsif ($make =~ /^OLYMPUS/ and
@@ -771,7 +811,7 @@ sub GetMakerNoteOffset($)
 #------------------------------------------------------------------------------
 # Get hash of value offsets / block sizes
 # Inputs: 0) Data pointer, 1) offset to start of directory,
-#         2) hash ref to return value pointers based in tag ID
+#         2) hash ref to return value pointers based on tag ID
 # Returns: 0) hash reference: keys are offsets, values are block sizes
 #          1) same thing, but with keys adjusted for value-based offsets
 # Notes: Directory size should be validated before calling this routine
@@ -855,7 +895,7 @@ sub FixBase($$)
                 if ($oldOffset != $newOffset) {
                     $str .= sprintf("\nCurrent maker note offset: 0x%.4x", $newOffset);
                 }
-                $exifTool->HtmlDump($filePos, 8, '[Canon MakerNotes footer]', $str);
+                $exifTool->HDump($filePos, 8, '[Canon MakerNotes footer]', $str);
             }
             if ($setBase) {
                 $fix = $fixBase;
@@ -1058,7 +1098,10 @@ sub LocateIFD($$)
 #
     if ($tagInfo and $$tagInfo{SubDirectory}) {
         my $subdir = $$tagInfo{SubDirectory};
-        unless ($$subdir{ProcessProc} and $$subdir{ProcessProc} eq \&ProcessUnknown) {
+        unless ($$subdir{ProcessProc} and 
+               ($$subdir{ProcessProc} eq \&ProcessUnknown or
+                $$subdir{ProcessProc} eq \&ProcessUnknownOrPreview))
+        {
             # look for the IFD at the "Start" specified in our SubDirectory information
             my $valuePtr = $dirStart;
             my $newStart = $dirStart;
@@ -1069,7 +1112,8 @@ sub LocateIFD($$)
             if ($$subdir{Base}) {
                 # calculate subdirectory start relative to $base for eval
                 my $start = $newStart + $$dirInfo{DataPos};
-                #### eval Base ($start)
+                my $base = $$dirInfo{Base} || 0;
+                #### eval Base ($start,$base)
                 my $baseShift = eval($$subdir{Base});
                 # shift directory base (note: we may do this again below
                 # if an OffsetPt is defined, but that doesn't matter since
@@ -1209,6 +1253,60 @@ sub FixLeicaBase($$;$)
         $success = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
     }
     return $success;
+}
+
+#------------------------------------------------------------------------------
+# Process unknown maker notes or PreviewImage
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success, and updates $dirInfo if necessary for new directory
+sub ProcessUnknownOrPreview($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart};
+    my $dirLen = $$dirInfo{DirLen};
+    # check to see if this is a preview image
+    if ($dirLen > 6 and substr($$dataPt, $dirStart, 3) eq "\xff\xd8\xff") {
+        $exifTool->VerboseDir('PreviewImage');
+        if ($$exifTool{HTML_DUMP}) {
+            my $pos = $$dirInfo{DataPos} + $$dirInfo{Base} + $dirStart;
+            $exifTool->HDump($pos, $dirLen, '(MakerNotes:PreviewImage data)', "Size: $dirLen bytes")
+        }
+        $exifTool->FoundTag('PreviewImage', substr($$dataPt, $dirStart, $dirLen));
+        return 1;
+    }
+    return ProcessUnknown($exifTool, $dirInfo, $tagTablePtr);
+}
+
+#------------------------------------------------------------------------------
+# Write unknown maker notes or PreviewImage
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: directory data, '' to delete, or undef on error
+sub WriteUnknownOrPreview($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart};
+    my $dirLen = $$dirInfo{DirLen};
+    my $newVal;
+    # check to see if this is a preview image
+    if ($dirLen > 6 and substr($$dataPt, $dirStart, 3) eq "\xff\xd8\xff") {
+        if ($$exifTool{NEW_VALUE}{$Image::ExifTool::Extra{PreviewImage}}) {
+            # write or delete new preview (if deleted, it can't currently be added back again)
+            $newVal = $exifTool->GetNewValues('PreviewImage') || '';
+            if ($exifTool->Options('Verbose') > 1) {
+                $exifTool->VerboseValue("- MakerNotes:PreviewImage", substr($$dataPt, $dirStart, $dirLen));
+                $exifTool->VerboseValue("+ MakerNotes:PreviewImage", $newVal) if $newVal;
+            }
+            ++$$exifTool{CHANGED};
+        } else {
+            $newVal = substr($$dataPt, $dirStart, $dirLen);
+        }
+    } else {
+        # rewrite MakerNote IFD
+        $newVal = Image::ExifTool::Exif::WriteExif($exifTool, $dirInfo, $tagTablePtr);
+    }
+    return $newVal;
 }
 
 #------------------------------------------------------------------------------

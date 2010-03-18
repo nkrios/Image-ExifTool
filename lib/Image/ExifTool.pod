@@ -54,9 +54,9 @@ Image::ExifTool - Read and write meta information
 =head1 DESCRIPTION
 
 ExifTool provides an extensible set of perl modules to read and write meta
-information in image, audio and video files, including the maker note
-information of many digital cameras by various manufacturers such as Canon,
-Casio, FujiFilm, HP, JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon,
+information in a wide variety of files, including the maker note information
+of many digital cameras by various manufacturers such as Canon, Casio,
+FujiFilm, HP, JVC/Victor, Kodak, Leaf, Minolta/Konica-Minolta, Nikon,
 Olympus/Epson, Panasonic/Leica, Pentax/Asahi, Ricoh, Sanyo, Sigma/Foveon and
 Sony.
 
@@ -70,23 +70,23 @@ supported by ExifTool (r = read, w = write, c = create):
   3GP   r     | DVB   r     | KEY   r     | PDF   r/w   | SO    r
   ACR   r     | DYLIB r     | LNK   r     | PEF   r/w   | SR2   r/w
   AFM   r     | EIP   r     | M2TS  r     | PFA   r     | SRF   r
-  AI    r/w   | EPS   r/w   | M4A/V r     | PFB   r     | SVG   r
-  AIFF  r     | ERF   r/w   | MEF   r/w   | PFM   r     | SWF   r
-  APE   r     | EXE   r     | MIE   r/w/c | PGM   r/w   | THM   r/w
-  ARW   r/w   | EXIF  r/w/c | MIFF  r     | PICT  r     | TIFF  r/w
-  ASF   r     | F4A/V r     | MNG   r/w   | PNG   r/w   | TTC   r
-  AVI   r     | FLA   r     | MOS   r/w   | PPM   r/w   | TTF   r
-  BMP   r     | FLAC  r     | MOV   r     | PPT   r     | VRD   r/w/c
-  BTF   r     | FLV   r     | MP3   r     | PPTX  r     | WAV   r
-  COS   r     | FPX   r     | MP4   r     | PS    r/w   | WDP   r/w
-  CR2   r/w   | GIF   r/w   | MPC   r     | PSB   r/w   | WMA   r
-  CRW   r/w   | GZ    r     | MPG   r     | PSD   r/w   | WMV   r
-  CS1   r/w   | HDP   r/w   | MPO   r/w   | PSP   r     | X3F   r
-  DCM   r     | HTML  r     | MQV   r     | QTIF  r     | XLS   r
-  DCP   r/w   | ICC   r/w/c | MRW   r/w   | RA    r     | XLSX  r
-  DCR   r     | IIQ   r     | NEF   r/w   | RAF   r/w   | XMP   r/w/c
-  DFONT r     | IND   r/w   | NRW   r/w   | RAM   r     | ZIP   r
-  DIVX  r     | ITC   r     | NUMBERS r   | RAW   r/w   |
+  AI    r/w   | EPS   r/w   | M4A/V r     | PFB   r     | SRW   r/w
+  AIFF  r     | ERF   r/w   | MEF   r/w   | PFM   r     | SVG   r
+  APE   r     | EXE   r     | MIE   r/w/c | PGM   r/w   | SWF   r
+  ARW   r/w   | EXIF  r/w/c | MIFF  r     | PICT  r     | THM   r/w
+  ASF   r     | F4A/V r     | MNG   r/w   | PNG   r/w   | TIFF  r/w
+  AVI   r     | FLA   r     | MOS   r/w   | PPM   r/w   | TTC   r
+  BMP   r     | FLAC  r     | MOV   r     | PPT   r     | TTF   r
+  BTF   r     | FLV   r     | MP3   r     | PPTX  r     | VRD   r/w/c
+  COS   r     | FPX   r     | MP4   r     | PS    r/w   | WAV   r
+  CR2   r/w   | GIF   r/w   | MPC   r     | PSB   r/w   | WDP   r/w
+  CRW   r/w   | GZ    r     | MPG   r     | PSD   r/w   | WMA   r
+  CS1   r/w   | HDP   r/w   | MPO   r/w   | PSP   r     | WMV   r
+  DCM   r     | HTML  r     | MQV   r     | QTIF  r     | X3F   r
+  DCP   r/w   | ICC   r/w/c | MRW   r/w   | RA    r     | XLS   r
+  DCR   r     | IIQ   r     | NEF   r/w   | RAF   r/w   | XLSX  r
+  DFONT r     | IND   r/w   | NRW   r/w   | RAM   r     | XMP   r/w/c
+  DIVX  r     | ITC   r     | NUMBERS r   | RAW   r/w   | ZIP   r
   DJVU  r     | JNG   r/w   | OGG   r     | RIFF  r     |
   DLL   r     | JP2   r/w   | ORF   r/w   | RW2   r/w   |
   DNG   r/w   | JPEG  r/w   | OTF   r     | RWL   r/w   |
@@ -116,8 +116,9 @@ methods.  See "ExifTool_config" in the ExifTool distribution for more
 details.
 
 By default ExifTool looks for a configuration file named ".ExifTool_config"
-in your home directory, but a different file may be specified by setting the
-ExifTool C<configFile> variable before using Image::ExifTool.  For example:
+first in your home directory, then in the directory of the application
+script, but a different file may be specified by setting the ExifTool
+C<configFile> variable before using Image::ExifTool.  For example:
 
     BEGIN { $Image::ExifTool::configFile = '/Users/phil/myconfig.cfg' }
     use Image::ExifTool;
@@ -241,12 +242,13 @@ list of ExifTool tag names.
 
 A reference to an open image file.  If you use this method (or a SCALAR
 reference) to access information in an image, the FileName and Directory
-tags will not be returned.  (Also, the FileSize and FileModifyDate tags will
-not be returned unless it is a plain file.)  Image processing begins at the
-current file position, and on return the file position is unspecified.  May
-be either a standard filehandle, or a reference to a
-L<File::RandomAccess|File::RandomAccess> object.  Note that the file remains
-open and must be closed by the caller after L</ImageInfo> returns.
+tags will not be returned.  (Also, the FileSize, FileModifyDate and
+FilePermissions tags will not be returned unless it is a plain file.)  Image
+processing begins at the current file position, and on return the file
+position is unspecified.  May be either a standard filehandle, or a
+reference to a L<File::RandomAccess|File::RandomAccess> object.  Note that
+the file remains open and must be closed by the caller after L</ImageInfo>
+returns.
 
 [Advanced:  To allow a non-rewindable stream (ie. a network socket) to be
 re-read after processing with ExifTool, first wrap the file reference in a
@@ -971,6 +973,10 @@ PrintConv value for these tags is either a string of values or a list
 reference (depending on the List option setting), and the ValueConv value is
 always a list reference.  But in list context, L</GetValue> always returns
 the list itself.
+
+Note that L</GetValue> requires a case-sensitive tag key as an argument.  To
+retrieve tag information based on a case-insensitive tag name (with an
+optional group specifier), use L</GetInfo> instead.
 
     # PrintConv example
     my $val = $exifTool->GetValue($tag);
@@ -1802,9 +1808,9 @@ MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash,
 MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
 MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
 MIFF, MNG, MPC, MPEG, MPF0, MPImage, MakerNotes, MakerUnknown, MetaIFD,
-Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom, NikonPreview,
-NikonScan, Olympus, PDF, PICT, PNG, Panasonic, Pentax, PSP, PhotoMechanic,
-Photoshop, PictureInfo, PostScript, PrintIM, ProfileIFD, QuickTime, RAF,
+Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom, NikonScan,
+Olympus, PDF, PICT, PNG, Panasonic, Pentax, PSP, PhotoMechanic, Photoshop,
+PictureInfo, PostScript, PreviewIFD, PrintIM, ProfileIFD, QuickTime, RAF,
 RAF2, RIFF, RMETA, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3,
 Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
 SRF#, SVG, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD,
@@ -1934,11 +1940,12 @@ Copyright 2003-2010, Phil Harvey
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
-=head1 CREDITS
+=head1 ACKNOWLEDGEMENTS
 
 Many people have helped in the development of ExifTool through their bug
-reports, comments and suggestions, and/or additions to the code.  See
-html/index.html in the Image::ExifTool distribution package for a list of
+reports, comments and suggestions, and/or additions to the code.  See the
+ACKNOWLEDGEMENTS in the individual Image::ExifTool modules and in
+html/index.html of the Image::ExifTool distribution package for a list of
 people who have contributed to this project.
 
 =head1 SEE ALSO

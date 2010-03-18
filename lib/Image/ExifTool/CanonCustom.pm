@@ -20,7 +20,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.37';
+$VERSION = '1.38';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -1438,8 +1438,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         },
         {
             Name => 'FlashSyncSpeedAv',
-            Condition => '$$self{Model} =~ /\b(5D Mark II|500D|T1i|Kiss X3)\b/',
-            Notes => '5D Mark II and 500D',
+            Condition => '$$self{Model} =~ /\b(5D Mark II|500D|T1i|Kiss X3|550D|T2i|Kiss X4)\b/',
+            Notes => '5D Mark II, 500D and 550D',
             PrintConv => {
                 0 => 'Auto',
                 1 => '1/200-1/60 Auto',
@@ -1487,8 +1487,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0202 => [
         {
             Name => 'HighISONoiseReduction',
-            Condition => '$$self{Model} =~ /\b(50D|5D Mark II|7D|500D|T1i|Kiss X3)\b/',
-            Notes => '50D, 500D, 5DmkII and 7D',
+            Condition => '$$self{Model} =~ /\b(50D|5D Mark II|7D|500D|T1i|Kiss X3|550D|T2i|Kiss X4)\b/',
+            Notes => '50D, 500D, 550D, 5DmkII and 7D',
             PrintConv => {
                 0 => 'Standard',
                 1 => 'Low',
@@ -1837,7 +1837,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     #### 3b) Drive
     0x060f => {
         Name => 'MirrorLockup',
-        Notes => 'value of 2 not used by 40D, 50D, 450D, 1000D or 5DmkII',
+        Notes => 'value of 2 not used by some models',
         PrintConv => {
             0 => 'Disable',
             1 => 'Enable',
@@ -1874,8 +1874,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0701 => [
         {
             Name => 'Shutter-AELock',
-            Condition => '$$self{Model} =~ /\b(1000D|XS|Kiss F|500D|T1i|Kiss X3)\b/',
-            Notes => '500D and 1000D',
+            Condition => '$$self{Model} =~ /\b(1000D|XS|Kiss F|500D|T1i|Kiss X3|550D|T2i|Kiss X4)\b/',
+            Notes => '500D, 550D and 1000D',
             PrintConv => {
                 0 => 'AF/AE lock',
                 1 => 'AE lock/AF',
@@ -1926,14 +1926,15 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         },
         {
             Name => 'SetButtonWhenShooting',
-            Condition => '$$self{Model} =~ /\b(450D|XSi|Kiss X2)\b/',
-            Notes => '450D',
+            Condition => '$$self{Model} =~ /\b(450D|XSi|Kiss X2|550D|T2i|Kiss X4)\b/',
+            Notes => '450D and 550D; value of 5 is new for 550D',
             PrintConv => {
                 0 => 'Normal (disabled)',
                 1 => 'Image quality',
                 2 => 'Flash exposure compensation',
                 3 => 'LCD monitor On/Off',
                 4 => 'Menu display',
+                5 => 'ISO speed',
             },
         },
         {

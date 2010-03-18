@@ -13,7 +13,7 @@ use strict;
 use vars qw($VERSION %csType);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 my %charsetTable;   # character set tables we've loaded
 
@@ -44,7 +44,7 @@ my %unicode2byte = (
 #           fixed-width characters that map into multiple codepoints
 # Note: In its public interface, ExifTool can currently only support type 0x101
 #       and lower character sets because strings are only converted if they
-#       contain characters above 0x7f, and there is no provision for specifying
+#       contain characters above 0x7f and there is no provision for specifying
 #       the byte order for input/output values
 %csType = (
     UTF8         => 0x100,
@@ -105,7 +105,7 @@ sub Decompose($$$;$)
             # load translation module
             my $module = "Image::ExifTool::Charset::$charset";
             no strict 'refs';
-            unless (defined %$module or eval "require $module") {
+            unless (%$module or eval "require $module") {
                 # (shouldn't happen)
                 $exifTool->Warn("Invalid character set $charset") if $exifTool;
                 return \@uni;   # error!

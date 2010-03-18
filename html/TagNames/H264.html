@@ -7,7 +7,8 @@
 </head>
 <body>
 <h2 class=top>H264 Tags</h2>
-<p>Tags extracted from H.264 video streams.</p>
+<p>Tags extracted from H.264 video streams.  The metadata for AVCHD videos is
+stored in this stream.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -31,8 +32,8 @@
 <p>The following tags are decoded from the Modified Digital Video Pack Metadata
 (MDPM) of the unregistered user data with UUID
 17ee8c60f84d11d98cd60800200c9a66 in the H.264 Supplemental Enhancement
-Information (SEI).  [Yes, this description is confusing, but nothing
-compared to the challenge of actually decoding the data!]  This information
+Information (SEI).  <i>[Yes, this description is confusing, but nothing
+compared to the challenge of actually decoding the data!]</i>  This information
 may exist at regular intervals through the entire video, but only the first
 occurrence is extracted unless the ExtractEmbedded option is used (in which
 case subsequent occurrences are extracted as sub-documents).</p>
@@ -245,8 +246,8 @@ case subsequent occurrences are extracted as sub-documents).</p>
 <td class=r title='0 = 0x0'>0</td>
 <td>ApertureSetting</td>
 <td class=c>N</td>
-<td><span class=s>254 = Closed
-  <br>255 = Auto</span></td></tr>
+<td><span class=s>0xfe = Closed
+  <br>0xff = Auto</span></td></tr>
 <tr class=b>
 <td class=r title='1 = 0x1'>1.1</td>
 <td>Gain</td>
@@ -288,8 +289,8 @@ case subsequent occurrences are extracted as sub-documents).</p>
 <td class=r title='1 = 0x1'>1</td>
 <td>ImageStabilization</td>
 <td class=c>N</td>
-<td><span class=s>0 = Off
-  <br>16 = On</span></td></tr>
+<td><span class=s>0x0 = Off
+  <br>0x10 = On</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Shutter'>H264 Shutter Tags</a></h2>
@@ -311,13 +312,14 @@ case subsequent occurrences are extracted as sub-documents).</p>
 <td class=r title='0 = 0x0'>0</td>
 <td>Make</td>
 <td class=c>N</td>
-<td><span class=s>0x108 = Sony
+<td><span class=s>0x103 = Panasonic
+  <br>0x108 = Sony
   <br>0x1011 = Canon</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 8, 2010</i>
+<br><i>Last revised Feb 18, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -29,20 +29,13 @@ that the behaviour when writing is not changed:  ExifTool always creates new
 records only in the standard location, but writes new tags to any
 EXIF/IPTC/XMP records that exist.</p>
 
-<p>A problem with the MWG specification is that although XMP:Creator and
-IPTC:By-line are list-type tags, the corresponding EXIF tag, EXIF:Artist, is
-not.  So, short of changing the EXIF specification to allow EXIF:Artist to
-store a list of strings, the only reasonable alternative is to NOT allow
-MWG:Creator to be written as a list.  (It is insufficient to say that
-EXIF:Artist may store multiple strings separated with semicolons because
-there is nothing in any of the MWG, EXIF, XMP or IPTC specifications that
-states an individual Creator string may not contain a semicolon, and for
-this to be feasible all of these specifications would require this
-restriction.)  For this reason, the MWG:Creator tag is written as a single
-string.  Multiple names may of course be written within the string (and it
-would be reasonable to separate them with semicolons as suggested by the MWG
-and EXIF specifications), but this tag is not treated as a list by ExifTool
-when writing.</p>
+<p>A complication of the specification is that although the MWG:Creator
+property may consist of multiple values, the associated EXIF tag
+(EXIF:Artist) is only a simple string.  To resolve this discrepancy the MWG
+recommends a technique which allows a list of values to be stored in a
+string by using a semicolon-space separator (with quotes around values if
+necessary).  When the MWG module is loaded, ExifTool automatically
+implements this policy and changes EXIF:Artist to a list-type tag.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -86,13 +79,13 @@ when writing.</p>
 <td><span class=s><span class=n>(&quot;creation date of the digital representation&quot; - MWG)</span></span></td></tr>
 <tr>
 <td>Creator</td>
-<td class=c>Y</td>
+<td class=c title='+ = List'>Y+</td>
 <td class=n>EXIF:Artist
   <br>IPTC:By-line
   <br>XMP-dc:Creator
   <br>CurrentIPTCDigest
   <br>IPTCDigest</td>
-<td><span class=s><span class=n>(NOT a list-type tag.  See &quot;A problem with the MWG specification&quot; above)</span></span></td></tr>
+<td>&nbsp;</td></tr>
 <tr class=b>
 <td>DateTimeOriginal</td>
 <td class=c>Y</td>
@@ -167,7 +160,7 @@ when writing.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 13, 2010</i>
+<br><i>Last revised Mar 4, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

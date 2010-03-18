@@ -51,10 +51,11 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.24';
+$VERSION = '2.26';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
+sub ProcessNikonMOV($$$);
 sub FormatString($);
 
 # nikon lens ID numbers (ref 8/11)
@@ -242,6 +243,8 @@ my %nikonLensIDs = (
     'A0 54 50 50 0C 0C A2 06' => 'AF-S Nikkor 50mm f/1.4G',
     'A1 40 18 37 2C 34 A3 06' => 'AF-S DX Nikkor 10-24mm f/3.5-4.5G ED',
     'A2 48 5C 80 24 24 A4 0E' => 'AF-S Nikkor 70-200mm f/2.8G ED VR II',
+    'A3 3C 29 44 30 30 A5 0E' => 'AF-S Nikkor 16-35mm f/4G ED VR',
+    'A4 54 37 37 0C 0C A6 06' => 'AF-S Nikkor 24mm f/1.4G ED',
     'A6 48 8E 8E 24 24 A8 0E' => 'AF-S VR Nikkor 300mm f/2.8G IF-ED II',
     'A7 4B 62 62 2C 2C A9 0E' => 'AF-S DX Micro Nikkor 85mm f/3.5G ED VR',
     '01 00 00 00 00 00 02 00' => 'TC-16A',
@@ -656,11 +659,11 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Binary => 1,
     },
     0x0011 => {
-        Name => 'NikonPreview',
-        Groups => { 1 => 'NikonPreview', 2 => 'Image' },
+        Name => 'PreviewIFD',
+        Groups => { 1 => 'PreviewIFD', 2 => 'Image' },
         Flags => 'SubIFD',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Nikon::PreviewImage',
+            TagTable => 'Image::ExifTool::Nikon::PreviewIFD',
             Start => '$val',
         },
     },
@@ -2260,7 +2263,6 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'This information is encrypted for most camera models.',
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'WB_RGGBLevels',
         Format => 'int16u[4]',
@@ -2315,27 +2317,27 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x000B => 'Converter',
 );
 
-# these are standard EXIF tags, but they are duplicated here so we
-# can change some names to extract the Nikon preview separately
-%Image::ExifTool::Nikon::PreviewImage = (
+# these are standard EXIF tags, but they are duplicated here so we can
+# set the family 0 group to 'MakerNotes' and set the MINOR_ERRORS flag
+%Image::ExifTool::Nikon::PreviewIFD = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    GROUPS => { 0 => 'MakerNotes', 1 => 'NikonPreview', 2 => 'Image'},
+    GROUPS => { 0 => 'MakerNotes', 1 => 'PreviewIFD', 2 => 'Image'},
     VARS => { MINOR_ERRORS => 1 }, # this IFD is non-essential and often corrupted
+    # (these tags are priority 0 by default because PreviewIFD is flagged in LOW_PRIORITY_DIR)
+    0xfe => { # (not used by Nikon, but SRW images also use this table)
+        Name => 'SubfileType',
+        DataMember => 'SubfileType',
+        RawConv => '$$self{SubfileType} = $val',
+        PrintConv => \%Image::ExifTool::Exif::subfileType,
+    },
     0x103 => {
         Name => 'Compression',
         SeparateTable => 'EXIF Compression',
         PrintConv => \%Image::ExifTool::Exif::compression,
-        Priority => 0,
     },
-    0x11a => {
-        Name => 'XResolution',
-        Priority => 0,
-    },
-    0x11b => {
-        Name => 'YResolution',
-        Priority => 0,
-    },
+    0x11a => 'XResolution',
+    0x11b => 'YResolution',
     0x128 => {
         Name => 'ResolutionUnit',
         PrintConv => {
@@ -2343,12 +2345,11 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             2 => 'inches',
             3 => 'cm',
         },
-        Priority => 0,
     },
     0x201 => {
         Name => 'PreviewImageStart',
         Flags => [ 'IsOffset', 'Permanent' ],
-        OffsetPair => 0x202, # point to associated byte count
+        OffsetPair => 0x202,
         DataTag => 'PreviewImage',
         Writable => 'int32u',
         Protected => 2,
@@ -2356,7 +2357,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x202 => {
         Name => 'PreviewImageLength',
         Flags => 'Permanent' ,
-        OffsetPair => 0x201, # point to associated offset
+        OffsetPair => 0x201,
         DataTag => 'PreviewImage',
         Writable => 'int32u',
         Protected => 2,
@@ -2367,7 +2368,6 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             1 => 'Centered',
             2 => 'Co-sited',
         },
-        Priority => 0,
     },
 );
 
@@ -4000,7 +4000,7 @@ my %nikonFocalConversions = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     FIRST_ENTRY => 0,
     NOTES => q{
-        This information is found in Nikon MOV and QT videos.
+        This information is found in MOV and QT videos from some Nikon cameras.
     },
     0x00 => {
         Name => 'Make',
@@ -4071,6 +4071,11 @@ my %nikonFocalConversions = (
     ncvr => {
         Name => 'NikonVers',
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::AVIVers' },
+    },
+    ncvw => {
+        Name => 'PreviewImage',
+        RawConv => 'length($val) ? $val : undef',
+        Binary => 1,
     },
 );
 
@@ -4239,6 +4244,85 @@ my %nikonFocalConversions = (
         Format => 'int32s',
         Flags => [ 'Hidden', 'Unknown' ],
     }
+);
+
+# Nikon NCDT atoms (ref PH)
+%Image::ExifTool::Nikon::NCDT = (
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Nikon', 2 => 'Video' },
+    NOTES => q{
+        Nikon-specific QuickTime tags found in the NCDT atom of MOV videos from some
+        Nikon cameras such as the Coolpix S8000.
+    },
+    NCHD => {
+        Name => 'MakerNoteVersion',
+        Format => 'undef',
+        ValueConv => q{
+            $val =~ s/\0$//;    # remove trailing null
+            $val =~ s/([\0-\x1f])/'.'.ord($1)/ge;
+            $val =~ s/\./ /; return $val;
+        },
+    },
+    NCTG => {
+        Name => 'NikonTags',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::NCTG' },
+    },
+    NCTH => { Name => 'ThumbnailImage', Format => 'undef', Binary => 1 },
+    NCVW => { Name => 'PreviewImage',   Format => 'undef', Binary => 1 },
+    # NCDB - 0 bytes long
+);
+
+# Nikon NCTG tags from MOV videos (ref PH)
+%Image::ExifTool::Nikon::NCTG = (
+    PROCESS_PROC => \&ProcessNikonMOV,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        These tags are found in proprietary-format records of the NCTG atom in MOV
+        videos from some Nikon cameras.
+    },
+    0x01 => 'Make',
+    0x02 => 'Model',
+    0x03 => 'Software',
+    0x11 => {
+        Name => 'CreateDate', #(guess, but matches QuickTime CreateDate)
+        Groups => { 2 => 'Time' },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    0x12 => {
+        Name => 'DateTimeOriginal', #(guess, but time is 1 sec before tag 0x11)
+        Description => 'Date/Time Original',
+        Groups => { 2 => 'Time' },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    # 0x13 - int32u[2], val: "467 0"
+    # 0x14 - int32u[2], val: "0 0"
+    # 0x15 - int32u[2], val: "0 0"
+    0x16 => {
+        Name => 'FrameRate',
+        Groups => { 2 => 'Video' },
+        PrintConv => 'int($val * 100) / 100',
+    },
+    # 0x21 - int16u, val: 2
+    0x22 => {
+        Name => 'FrameWidth',
+        Groups => { 2 => 'Video' },
+    },
+    0x23 => {
+        Name => 'FrameHeight',
+        Groups => { 2 => 'Video' },
+    },
+    # 0x31 - int16u, val: 2
+    0x32 => { #(guess)
+        Name => 'AudioChannels',
+        Groups => { 2 => 'Audio' },
+    },
+    0x33 => {
+        Name => 'AudioBitsPerSample',
+        Groups => { 2 => 'Audio' },
+    },
+    0x34 => {
+        Name => 'AudioSampleRate',
+        Groups => { 2 => 'Audio' },
+    },
 );
 
 # Nikon composite tags
@@ -4518,6 +4602,46 @@ sub SerialKey($$)
     return $serial if not defined $serial or $serial =~ /^\d+$/;
     return 0x22 if $$exifTool{Model} =~ /\bD50$/; # D50 (ref 8)
     return 0x60; # D200 (ref 10), D40X (ref PH), etc
+}
+
+#------------------------------------------------------------------------------
+# Read Nikon NCTG tags in MOV videos
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessNikonMOV($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dataPos = $$dirInfo{DataPos};
+    my $pos = $$dirInfo{DirStart};
+    my $end = $pos + $$dirInfo{DirLen};
+    $exifTool->VerboseDir($$dirInfo{DirName}, 0, $$dirInfo{DirLen});
+    while ($pos + 8 < $end) {
+        my $tag = Get32u($dataPt, $pos);
+        my $fmt = Get16u($dataPt, $pos + 4); # (same format code as EXIF)
+        my $count = Get16u($dataPt, $pos + 6);
+        $pos += 8;
+        my $fmtStr = $Image::ExifTool::Exif::formatName[$fmt];
+        unless ($fmtStr) {
+            $exifTool->Warn(sprintf("Unknown format ($fmt) for $$dirInfo{DirName} tag 0x%x",$tag));
+            last;
+        }
+        my $size = $count * $Image::ExifTool::Exif::formatSize[$fmt];
+        if ($pos + $size > $end) {
+            $exifTool->Warn(sprintf("Truncated data for $$dirInfo{DirName} tag 0x%x",$tag));
+            last;
+        }
+        my $val = ReadValue($dataPt, $pos, $fmtStr, $count, $size);
+        $exifTool->HandleTag($tagTablePtr, $tag, $val,
+            DataPt => $dataPt,
+            DataPos => $dataPos,
+            Format  => $fmtStr,
+            Start   => $pos,
+            Size    => $size,
+        );
+        $pos += $size;  # is this padded to an even offset????
+    }
+    return 1;
 }
 
 #------------------------------------------------------------------------------

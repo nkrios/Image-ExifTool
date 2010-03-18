@@ -59,6 +59,7 @@
 #              43) Karsten Sote private communication
 #              44) Hugh Griffiths private communication (5DmkII)
 #              45) Mark Berger private communication (5DmkII)
+#              46) Dieter Steiner private communication (7D)
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -73,7 +74,7 @@ sub WriteCanon($$$);
 sub ProcessSerialData($$$);
 sub SwapWords($);
 
-$VERSION = '2.36';
+$VERSION = '2.39';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -298,6 +299,7 @@ my %canonLensTypes = ( #4
     248 => 'Canon EF 200mm f/2L IS', #42
     249 => 'Canon EF 800mm f/5.6L IS', #35
     250 => 'Canon EF 24 f/1.4L II', #41
+    251 => 'Canon EF 70-200mm f/2.8L IS II USM', #25
     254 => 'Canon EF 100mm f/2.8L Macro IS USM', #42
     # Note: LensType 488 (0x1e8) is reported as 232 (0xe8) in 7D CameraSettings
     488 => 'Canon EF-S 15-85mm f/3.5-5.6 IS USM', #PH
@@ -425,8 +427,13 @@ my %canonLensTypes = ( #4
     0x2760000 => 'PowerShot SD980 IS / Digital IXUS 200 IS / IXY Digital 930 IS',
     0x2770000 => 'PowerShot SD940 IS / Digital IXUS 120 IS / IXY Digital 220 IS',
     0x2800000 => 'PowerShot A495',
+    0x2810000 => 'PowerShot A490',
     0x2820000 => 'PowerShot A3100 IS',
     0x2830000 => 'PowerShot A3000 IS',
+    0x2840000 => 'PowerShot SD1400 IS / Digital IXUS 130 / IXY Digital 400F', # IS on IXUS/IXY?
+    0x2850000 => 'PowerShot SD1300 IS / Digital IXUS 105 / IXY Digital 200F', # IS on IXUS/IXY?
+    0x2860000 => 'PowerShot SD3500 IS / Digital IXUS 210 / IXY Digital 10S', # IS on IXUS/IXY?
+    0x2870000 => 'PowerShot SX210 IS',
     0x3010000 => 'PowerShot Pro90 IS',
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
@@ -458,6 +465,7 @@ my %canonLensTypes = ( #4
     0x80000252 => 'EOS Rebel T1i / 500D / Kiss X3', #25
     0x80000254 => 'EOS Rebel XS / 1000D / Kiss F',
     0x80000261 => 'EOS 50D',
+    0x80000270 => 'EOS Rebel T2i / 550D / Kiss X4', #25
     0x80000281 => 'EOS-1D Mark IV', #25
 );
 
@@ -570,11 +578,11 @@ my %cameraColorCalibration2 = (
 );
 # conversions, etc for byte-swapped FocusDistance tags
 my %focusDistanceByteSwap = (
-    Format => 'int16u',
     # this is very odd (little-endian number on odd boundary),
     # but it does seem to work better with my sample images - PH
-    ValueConv => 'unpack("n",pack("v",$val)) * 0.01',
-    ValueConvInv => 'unpack("v",pack("n",$val / 0.01))',
+    Format => 'int16uRev',
+    ValueConv => '$val / 100',
+    ValueConvInv => '$val * 100',
     PrintConv => '$val > 655.345 ? "inf" : $val',
     PrintConvInv => 'IsFloat($val) ? $val : 655.35',
 );
@@ -705,6 +713,13 @@ my %focusDistanceByteSwap = (
             },
         },
         {
+            Name => 'CanonCameraInfo1DmkIV',
+            Condition => '$$self{Model} =~ /\b1D Mark IV$/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Canon::CameraInfo1DmkIV',
+            },
+        },
+        {
             Name => 'CanonCameraInfo5D',
             Condition => '$$self{Model} =~ /EOS 5D$/',
             SubDirectory => {
@@ -751,6 +766,13 @@ my %focusDistanceByteSwap = (
             Condition => '$$self{Model} =~ /\b(500D|REBEL T1i|Kiss X3)\b/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Canon::CameraInfo500D',
+            },
+        },
+        {
+            Name => 'CanonCameraInfo550D',
+            Condition => '$$self{Model} =~ /\b(550D|REBEL T2i|Kiss X4)\b/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Canon::CameraInfo550D',
             },
         },
         {
@@ -1210,11 +1232,12 @@ my %focusDistanceByteSwap = (
         },
         {   # (int16u[692|674|702|1227|1250|1251|1337])
             # 40D (692), 1DmkIII (674), 1DSmkIII (702), 450D/1000D (1227)
-            # 50D/5DmkII (1250), 500D/7D_pre-prod/1DmkIV_pre-prod (1251), 7D (1337)
+            # 50D/5DmkII (1250), 500D/7D_pre-prod/1DmkIV_pre-prod (1251),
+            # 1DmkIV/7D/550D_pre-prod (1337), 550D (1338)
             Condition => q{
                 $count == 692  or $count == 674  or $count == 702 or
                 $count == 1227 or $count == 1250 or $count == 1251 or
-                $count == 1337
+                $count == 1337 or $count == 1338
             },
             Name => 'ColorData4',
             SubDirectory => {
@@ -1913,8 +1936,8 @@ my %focusDistanceByteSwap = (
             since they are not used by some newer models such as 450D and 1000D
         },
         RawConv => '($$self{FocusDistanceUpper} = $val) || undef',
-        ValueConv => '$val * 0.01',
-        ValueConvInv => '$val / 0.01',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
         PrintConv => '$val > 655.345 ? "inf" : $val',
         PrintConvInv => 'IsFloat($val) ? $val : 655.35',
     },
@@ -1922,8 +1945,8 @@ my %focusDistanceByteSwap = (
         Name => 'FocusDistanceLower',
         Condition => '$$self{FocusDistanceUpper}',
         Format => 'int16u',
-        ValueConv => '$val * 0.01',
-        ValueConvInv => '$val / 0.01',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
         PrintConv => '$val > 655.345 ? "inf" : $val',
         PrintConvInv => 'IsFloat($val) ? $val : 655.35',
     },
@@ -2029,7 +2052,6 @@ my %ciFNumber = (
     Name => 'FNumber',
     Format => 'int8u',
     Groups => { 2 => 'Image' },
-    Priority => 0,
     RawConv => '$val ? $val : undef',
     ValueConv => 'exp(($val-8)/16*log(2))',
     ValueConvInv => 'log($val)*16/log(2)+8',
@@ -2040,7 +2062,6 @@ my %ciExposureTime = (
     Name => 'ExposureTime',
     Format => 'int8u',
     Groups => { 2 => 'Image' },
-    Priority => 0,
     RawConv => '$val ? $val : undef',
     ValueConv => 'exp(4*log(2)*(1-Image::ExifTool::Canon::CanonEv($val-24)))',
     ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(1-log($val)/(4*log(2)))+24',
@@ -2051,7 +2072,6 @@ my %ciISO = (
     Name => 'ISO',
     Format => 'int8u',
     Groups => { 2 => 'Image' },
-    Priority => 0,
     ValueConv => '100*exp(($val/8-9)*log(2))',
     ValueConvInv => '(log($val/100)/log(2)+9)*8',
     PrintConv => 'sprintf("%.0f",$val)',
@@ -2065,38 +2085,33 @@ my %ciCameraTemperature = (
     PrintConv => '"$val C"',
     PrintConvInv => '$val=~s/ ?C//; $val',
 );
+my %ciMacroMagnification = (
+    Name => 'MacroMagnification',
+    Notes => 'currently decoded only for the MP-E 65mm f/2.8 1-5x Macro Photo',
+    Condition => '$$self{LensType} and $$self{LensType} == 124',
+    # 75=1x, 44=5x, log relationship
+    ValueConv => 'exp((75-$val) * log(2) * 3 / 40)',
+    ValueConvInv => '$val > 0 ? 75 - log($val) / log(2) * 40 / 3 : undef',
+    PrintConv => 'sprintf("%.1fx",$val)',
+    PrintConvInv => '$val=~s/\s*x//; $val',
+);
 my %ciFocalLength = (
     Name => 'FocalLength',
-    Format => 'int16u',
-    # the EXIF FocalLength is more reliable, so set this priority to zero
-    Priority => 0,
+    Format => 'int16uRev', # (just to make things confusing, the focal lengths are big-endian)
     # ignore if zero
     RawConv => '$val ? $val : undef',
-    # (just to make things confusing, the focal lengths are big-endian)
-    ValueConv => 'unpack("n",pack("v",$val))',
-    ValueConvInv => 'unpack("v",pack("n",$val))',
     PrintConv => '"$val mm"',
     PrintConvInv => '$val=~s/\s*mm//;$val',
 );
 my %ciShortFocal = (
     Name => 'ShortFocal',
-    Format => 'int16u',
-    # the other ShortFocal is more reliable, so set this priority to zero
-    Priority => 0,
-    # byte order is big-endian
-    ValueConv => 'unpack("n",pack("v",$val))',
-    ValueConvInv => 'unpack("v",pack("n",$val))',
+    Format => 'int16uRev', # byte order is big-endian
     PrintConv => '"$val mm"',
     PrintConvInv => '$val=~s/\s*mm//;$val',
 );
 my %ciLongFocal = (
     Name => 'LongFocal',
-    Format => 'int16u',
-    # the other LongFocal is more reliable, so set this priority to zero
-    Priority => 0,
-    # byte order is big-endian
-    ValueConv => 'unpack("n",pack("v",$val))',
-    ValueConvInv => 'unpack("v",pack("n",$val))',
+    Format => 'int16uRev', # byte order is big-endian
     PrintConv => '"$val mm"',
     PrintConvInv => '$val=~s/\s*mm//;$val',
 );
@@ -2111,6 +2126,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,  # these tags are not reliable since they change with firmware version
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
         Information in the "CameraInfo" records is tricky to decode because the
@@ -2123,8 +2139,6 @@ my %ciLongFocal = (
     0x0a => {
         Name => 'FocalLength',
         Format => 'int16u',
-        # the EXIF FocalLength is more reliable, so set this priority to zero
-        Priority => 0,
         # ignore if zero
         RawConv => '$val ? $val : undef',
         PrintConv => '"$val mm"',
@@ -2132,6 +2146,7 @@ my %ciLongFocal = (
     },
     0x0d => { #9
         Name => 'LensType',
+        Format => 'int16uRev', # value is little-endian
         SeparateTable => 1,
         RawConv => '$val ? $val : undef', # don't use if value is zero
         PrintConv => \%canonLensTypes,
@@ -2139,16 +2154,12 @@ my %ciLongFocal = (
     0x0e => {
         Name => 'ShortFocal',
         Format => 'int16u',
-        # the other ShortFocal is more reliable, so set this priority to zero
-        Priority => 0,
         PrintConv => '"$val mm"',
         PrintConvInv => '$val=~s/\s*mm//;$val',
     },
     0x10 => {
         Name => 'LongFocal',
         Format => 'int16u',
-        # the other LongFocal is more reliable, so set this priority to zero
-        Priority => 0,
         PrintConv => '"$val mm"',
         PrintConvInv => '$val=~s/\s*mm//;$val',
     },
@@ -2243,12 +2254,14 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'CameraInfo tags for the 1DmkII and 1DSmkII.',
     0x04 => { %ciExposureTime }, #9
     0x09 => { %ciFocalLength }, #9
-    0x0d => { #9
+    0x0c => { #9
         Name => 'LensType',
+        Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
         RawConv => '$val ? $val : undef', # don't use if value is zero
         PrintConv => \%canonLensTypes,
@@ -2257,7 +2270,6 @@ my %ciLongFocal = (
     0x13 => { %ciLongFocal }, #9
     0x2d => { #9
         Name => 'FocalType',
-        Priority => 0,
         PrintConv => {
            0 => 'Fixed',
            2 => 'Zoom',
@@ -2270,9 +2282,7 @@ my %ciLongFocal = (
     },
     0x37 => {
         Name => 'ColorTemperature',
-        Format => 'int16u',
-        ValueConv => 'unpack("n",pack("v",$val))',
-        ValueConvInv => 'unpack("v",pack("n",$val))',
+        Format => 'int16uRev',
     },
     0x39 => {
         Name => 'CanonImageSize',
@@ -2322,12 +2332,14 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'CameraInfo tags for the 1DmkIIN.',
     0x04 => { %ciExposureTime },
     0x09 => { %ciFocalLength },
-    0x0d => {
+    0x0c => {
         Name => 'LensType',
+        Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
         RawConv => '$val ? $val : undef', # don't use if value is zero
         PrintConv => \%canonLensTypes,
@@ -2341,9 +2353,7 @@ my %ciLongFocal = (
     },
     0x37 => { #15
         Name => 'ColorTemperature',
-        Format => 'int16u',
-        ValueConv => 'unpack("n",pack("v",$val))',
-        ValueConvInv => 'unpack("v",pack("n",$val))',
+        Format => 'int16uRev',
     },
     0x73 => { #15
         Name => 'PictureStyle',
@@ -2384,13 +2394,23 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'CameraInfo tags for the 1DmkIII and 1DSmkIII.',
     0x03 => { %ciFNumber },
     0x04 => { %ciExposureTime }, #9
     0x06 => { %ciISO },
     0x18 => { %ciCameraTemperature }, #36
+    0x1b => { %ciMacroMagnification }, #(NC)
     0x1d => { %ciFocalLength },
+    0x30 => {
+        Name => 'CameraOrientation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+        },
+    },
     0x43 => { #21/24
         Name => 'FocusDistanceUpper',
         # (it looks like the focus distances are also odd-byte big-endian)
@@ -2415,8 +2435,9 @@ my %ciLongFocal = (
         Flags => ['PrintHex','SeparateTable'],
         PrintConv => \%pictureStyles,
     },
-    0x112 => { #15
+    0x111 => { #15
         Name => 'LensType',
+        Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
         PrintConv => \%canonLensTypes,
     },
@@ -2477,6 +2498,83 @@ my %ciLongFocal = (
     },
 );
 
+# Canon camera information for 1DmkIV (MakerNotes tag 0x0d) (ref PH)
+%Image::ExifTool::Canon::CameraInfo1DmkIV = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    PRIORITY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'CameraInfo tags for the 1DmkIV.',
+    0x03 => { %ciFNumber },
+    0x04 => { %ciExposureTime },
+    0x06 => { %ciISO },
+    0x07 => {
+        Name => 'HighlightTonePriority',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x15 => {
+        Name => 'FlashMeteringMode',
+        PrintConv => {
+            0 => 'E-TTL',
+            3 => 'TTL',
+            4 => 'External Auto',
+            5 => 'External Manual',
+            6 => 'Off',
+        },
+    },
+    0x19 => { %ciCameraTemperature },
+    0x1e => { %ciFocalLength },
+    0x35 => {
+        Name => 'CameraOrientation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+        },
+    },
+    0x54 => {
+        Name => 'FocusDistanceUpper',
+        %focusDistanceByteSwap,
+    },
+    0x56 => {
+        Name => 'FocusDistanceLower',
+        %focusDistanceByteSwap,
+    },
+#    0x78 => { #(0x77 for firmware 4.2.1)
+#        Name => 'WhiteBalance',
+#        Format => 'int16u',
+#        SeparateTable => 1,
+#        PrintConv => \%canonWhiteBalance,
+#    },
+#    0x7c => { #(0x7b for firmware 4.2.1)
+#        Name => 'ColorTemperature',
+#        Format => 'int16u',
+#    },
+#    0x14f => { #(0x14e for firmware 4.2.1)
+#        Name => 'LensType',
+#        Format => 'int16uRev', # value is big-endian
+#        SeparateTable => 1,
+#        PrintConv => \%canonLensTypes,
+#    },
+#    0x151 => { %ciShortFocal }, #(0x150 for firmware 4.2.1)
+#    0x153 => { %ciLongFocal }, #(0x152 for firmware 4.2.1)
+    0x1e8 => { # firmware 4.2.1 (pre-production)
+        Name => 'FirmwareVersion',
+        Format => 'string[6]',
+        Writable => 0,
+        RawConv => '$val=~/^\d+\.\d+\.\d+\s*$/ ? $val : undef',
+    },
+    0x1ed => { # firmware 1.0.4
+        Name => 'FirmwareVersion',
+        Format => 'string[6]',
+        Writable => 0,
+        RawConv => '$val=~/^\d+\.\d+\.\d+\s*$/ ? $val : undef',
+    },
+);
+
 # Camera information for 5D (MakerNotes tag 0x0d)
 # (ref 12 unless otherwise noted)
 %Image::ExifTool::Canon::CameraInfo5D = (
@@ -2486,19 +2584,21 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8s',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'CameraInfo tags for the EOS 5D.',
     0x03 => { %ciFNumber }, #PH
     0x04 => { %ciExposureTime }, #9
     0x06 => { %ciISO }, #PH
-    0x0d => { #9
+    0x0c => { #9
         Name => 'LensType',
-        Format => 'int8u',
+        Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
         RawConv => '$val ? $val : undef', # don't use if value is zero
         PrintConv => \%canonLensTypes,
     },
     0x17 => { %ciCameraTemperature }, #PH
+    0x1b => { %ciMacroMagnification }, #PH
     0x27 => { #PH
         Name => 'CameraOrientation',
         PrintConv => {
@@ -2510,9 +2610,7 @@ my %ciLongFocal = (
     0x28 => { %ciFocalLength }, #15
     0x38 => {
         Name => 'AFPointsInFocus5D',
-        Format => 'int16u',
-        ValueConv => 'unpack("n",pack("v",$val))',
-        ValueConvInv => 'unpack("v",pack("n",$val))',
+        Format => 'int16uRev',
         PrintConvColumns => 2,
         PrintConv => { BITMASK => {
             0 => 'Center',
@@ -2550,9 +2648,9 @@ my %ciLongFocal = (
     },
     0x93 => { %ciShortFocal }, #15
     0x95 => { %ciLongFocal }, #15
-    0x98 => { #15
+    0x97 => { #15
         Name => 'LensType',
-        Format => 'int8u',
+        Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
         PrintConv => \%canonLensTypes,
     },
@@ -2666,6 +2764,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     DATAMEMBER => [ 0x15a, 0x17e ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'CameraInfo tags for the EOS 5D Mark II.',
@@ -2676,15 +2775,7 @@ my %ciLongFocal = (
         Name => 'HighlightTonePriority',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
-    0x1b => { #PH
-        Name => 'MacroMagnification',
-        Notes => 'currently decoded only for the MP-E 65mm f/2.8 1-5x Macro Photo',
-        Condition => '$$self{LensType} and $$self{LensType} == 124',
-        ValueConv => 'exp((75-$val) * log(2) * 3 / 40)',
-        ValueConvInv => '$val > 0 ? 75 - log($val) / log(2) * 40 / 3 : undef',
-        PrintConv => 'sprintf("%.1fx",$val)',
-        PrintConvInv => '$val=~s/\s*x//; $val',
-    },
+    0x1b => { %ciMacroMagnification }, #PH
     0x15 => { #PH (580 EX II)
         Name => 'FlashMeteringMode',
         PrintConv => {
@@ -2748,9 +2839,9 @@ my %ciLongFocal = (
             3 => 'Off',
         },
     },
-    0xe7 => {
+    0xe6 => {
         Name => 'LensType',
-        Priority => 0, # (in case offset changes with firmware version)
+        Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
         PrintConv => \%canonLensTypes,
     },
@@ -2775,7 +2866,6 @@ my %ciLongFocal = (
 #    0x2f7 => {
 #        Name => 'Contrast',
 #        Format => 'int32s',
-#        Priority => 0,
 #    }
     0x197 => {
         Name => 'FileIndex',
@@ -2819,6 +2909,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     DATAMEMBER => [ 0x1f ],
     VARS => { HAS_SUBDIR => 1 },
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -2881,6 +2972,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'More CameraInfo tags for the EOS 7D.',
     0x11 => {
@@ -2918,9 +3010,9 @@ my %ciLongFocal = (
             3 => 'Off',
         },
     },
-    0xef => {
+    0xee => {
         Name => 'LensType',
-        Priority => 0, # (in case offset changes with firmware version)
+        Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
         PrintConv => \%canonLensTypes,
     },
@@ -2949,7 +3041,7 @@ my %ciLongFocal = (
     },
 );
 
-# Canon camera information for 40D (MakerNotes tag 0x0d)
+# Canon camera information for 40D (MakerNotes tag 0x0d) (ref PH)
 %Image::ExifTool::Canon::CameraInfo40D = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
@@ -2957,6 +3049,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'CameraInfo tags for the EOS 40D.',
     0x03 => { %ciFNumber }, #PH
@@ -2973,15 +3066,7 @@ my %ciLongFocal = (
         },
     },
     0x18 => { %ciCameraTemperature }, #36
-    0x1b => { #PH
-        Name => 'MacroMagnification',
-        Notes => 'currently decoded only for the MP-E 65mm f/2.8 1-5x Macro Photo',
-        Condition => '$$self{LensType} and $$self{LensType} == 124',
-        ValueConv => 'exp((75-$val) * log(2) * 3 / 40)',
-        ValueConvInv => '$val > 0 ? 75 - log($val) / log(2) * 40 / 3 : undef',
-        PrintConv => 'sprintf("%.1fx",$val)',
-        PrintConvInv => '$val=~s/\s*x//; $val',
-    },
+    0x1b => { %ciMacroMagnification }, #PH
     0x1d => { %ciFocalLength }, #PH
     0x30 => { #20
         Name => 'CameraOrientation',
@@ -3011,8 +3096,9 @@ my %ciLongFocal = (
         Name => 'ColorTemperature',
         Format => 'int16u',
     },
-    0xd7 => { #15
+    0xd6 => { #15
         Name => 'LensType',
+        Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
         PrintConv => \%canonLensTypes,
     },
@@ -3052,6 +3138,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     DATAMEMBER => [ 0x15a, 0x15e ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'CameraInfo tags for the EOS 50D.',
@@ -3124,10 +3211,10 @@ my %ciLongFocal = (
             3 => 'Off',
         },
     },
-    0xeb => { #33
+    0xea => { #33
         Name => 'LensType',
+        Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
-        Priority => 0,
         PrintConv => \%canonLensTypes,
     },
     0xec => { %ciShortFocal },
@@ -3162,7 +3249,7 @@ my %ciLongFocal = (
         ValueConv => '$val + 1',
         ValueConvInv => '$val - 1',
     },
-    0x1a3 => { # (NC)
+    0x1a3 => { #(NC)
         Name => 'DirectoryIndex',
         Condition => '$$self{CanonFirmA}',
         Groups => { 2 => 'Image' },
@@ -3170,7 +3257,7 @@ my %ciLongFocal = (
         ValueConv => '$val - 1',
         ValueConvInv => '$val + 1',
     },
-    0x1a7 => { # (NC)
+    0x1a7 => { #(NC)
         Name => 'DirectoryIndex',
         Condition => '$$self{CanonFirmB}',
         Groups => { 2 => 'Image' },
@@ -3186,7 +3273,7 @@ my %ciLongFocal = (
     # },
 );
 
-# Canon camera information for 450D (MakerNotes tag 0x0d)
+# Canon camera information for 450D (MakerNotes tag 0x0d) (ref PH)
 %Image::ExifTool::Canon::CameraInfo450D = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
@@ -3194,6 +3281,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'CameraInfo tags for the EOS 450D.',
     0x03 => { %ciFNumber }, #PH
@@ -3209,18 +3297,9 @@ my %ciLongFocal = (
             6 => 'Off',
         },
     },
-    0x1d => { %ciFocalLength }, #PH
-    0x15 => { #PH (580 EX II)
-        Name => 'FlashMeteringMode',
-        PrintConv => {
-            0 => 'E-TTL',
-            3 => 'TTL',
-            4 => 'External Auto',
-            5 => 'External Manual',
-            6 => 'Off',
-        },
-    },
     0x18 => { %ciCameraTemperature }, #36
+    0x1b => { %ciMacroMagnification }, #PH
+    0x1d => { %ciFocalLength }, #PH
     0x30 => { #20
         Name => 'CameraOrientation',
         PrintConv => {
@@ -3249,10 +3328,10 @@ my %ciLongFocal = (
         Name => 'ColorTemperature',
         Format => 'int16u',
     },
-    0xdf => { #33
+    0xde => { #33
         Name => 'LensType',
+        Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
-        Priority => 0,
         PrintConv => \%canonLensTypes,
     },
     0x107 => { #PH
@@ -3277,7 +3356,7 @@ my %ciLongFocal = (
     },
 );
 
-# Canon camera information for 500D (MakerNotes tag 0x0d)
+# Canon camera information for 500D (MakerNotes tag 0x0d) (ref PH)
 %Image::ExifTool::Canon::CameraInfo500D = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
@@ -3285,8 +3364,9 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    NOTES => 'CameraInfo tags for the EOS 50D.',
+    NOTES => 'CameraInfo tags for the EOS 500D.',
     0x03 => { %ciFNumber },
     0x04 => { %ciExposureTime },
     0x06 => { %ciISO },
@@ -3356,10 +3436,10 @@ my %ciLongFocal = (
             3 => 'Off',
         },
     },
-    0xf7 => {
+    0xf6 => {
         Name => 'LensType',
+        Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
-        Priority => 0,
         PrintConv => \%canonLensTypes,
     },
     0xf8 => { %ciShortFocal },
@@ -3377,7 +3457,7 @@ my %ciLongFocal = (
         ValueConv => '$val + 1',
         ValueConvInv => '$val - 1',
     },
-    0x1df => { # (NC)
+    0x1df => { #(NC)
         Name => 'DirectoryIndex',
         Groups => { 2 => 'Image' },
         Format => 'int32u',
@@ -3386,7 +3466,99 @@ my %ciLongFocal = (
     },
 );
 
-# Canon camera information for 1000D (MakerNotes tag 0x0d)
+# Canon camera information for 550D (MakerNotes tag 0x0d) (ref PH)
+%Image::ExifTool::Canon::CameraInfo550D = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int8u',
+    FIRST_ENTRY => 0,
+    PRIORITY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'CameraInfo tags for the EOS 550D.',
+    0x03 => { %ciFNumber },
+    0x04 => { %ciExposureTime },
+    0x06 => { %ciISO },
+    0x07 => { #(NC)
+        Name => 'HighlightTonePriority',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x15 => { #(NC)
+        Name => 'FlashMeteringMode',
+        PrintConv => {
+            0 => 'E-TTL',
+            3 => 'TTL',
+            4 => 'External Auto',
+            5 => 'External Manual',
+            6 => 'Off',
+        },
+    },
+    0x19 => { %ciCameraTemperature }, # (500D + 0)
+    0x1e => { %ciFocalLength }, # (500D + 0)
+    0x35 => { # (500D + 4)
+        Name => 'CameraOrientation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+        },
+    },
+    0x54 => { # (500D + 4)
+        Name => 'FocusDistanceUpper',
+        %focusDistanceByteSwap,
+    },
+    0x56 => { # (500D + 4)
+        Name => 'FocusDistanceLower',
+        %focusDistanceByteSwap,
+    },
+    0x78 => { # (500D + 5) (NC)
+        Name => 'WhiteBalance',
+        Format => 'int16u',
+        SeparateTable => 1,
+        PrintConv => \%canonWhiteBalance,
+    },
+    0x7c => { # (500D + 5)
+        Name => 'ColorTemperature',
+        Format => 'int16u',
+    },
+    0xb0 => { # (500D + 5)
+        Name => 'PictureStyle',
+        Format => 'int8u',
+        Flags => ['PrintHex','SeparateTable'],
+        PrintConv => \%pictureStyles,
+    },
+    0xff => { # (500D + 9)
+        Name => 'LensType',
+        Format => 'int16uRev', # value is big-endian
+        SeparateTable => 1,
+        PrintConv => \%canonLensTypes,
+    },
+    0x101 => { %ciShortFocal }, # (500D + 9)
+    0x103 => { %ciLongFocal }, # (500D + 9)
+    0x1a4 => { # (500D + 0x11)
+        Name => 'FirmwareVersion',
+        Format => 'string[6]',
+        Writable => 0,
+        RawConv => '$val=~/^\d+\.\d+\.\d+\s*$/ ? $val : undef',
+    },
+    0x1e4 => { # (500D + 0x11)
+        Name => 'FileIndex',
+        Groups => { 2 => 'Image' },
+        Format => 'int32u',
+        ValueConv => '$val + 1',
+        ValueConvInv => '$val - 1',
+    },
+    0x1f0 => { # (500D + 0x11) (NC)
+        Name => 'DirectoryIndex',
+        Groups => { 2 => 'Image' },
+        Format => 'int32u',
+        ValueConv => '$val - 1',
+        ValueConvInv => '$val + 1',
+    },
+);
+
+# Canon camera information for 1000D (MakerNotes tag 0x0d) (ref PH)
 %Image::ExifTool::Canon::CameraInfo1000D = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
@@ -3394,6 +3566,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'CameraInfo tags for the EOS 1000D.',
     0x03 => { %ciFNumber }, #PH
@@ -3410,6 +3583,7 @@ my %ciLongFocal = (
         },
     },
     0x18 => { %ciCameraTemperature }, #36
+    0x1b => { %ciMacroMagnification }, #PH (NC)
     0x1d => { %ciFocalLength }, #PH
     0x30 => { #20
         Name => 'CameraOrientation',
@@ -3437,10 +3611,10 @@ my %ciLongFocal = (
         Name => 'ColorTemperature',
         Format => 'int16u',
     },
-    0xe3 => { #PH
+    0xe2 => { #PH
         Name => 'LensType',
+        Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
-        Priority => 0,
         PrintConv => \%canonLensTypes,
     },
     0x10b => { #PH
@@ -3473,6 +3647,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int32s',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
         CameraInfo tags for PowerShot models such as the A450, A460, A550, A560,
@@ -3482,7 +3657,6 @@ my %ciLongFocal = (
     0x00 => {
         Name => 'ISO',
         Groups => { 2 => 'Image' },
-        Priority => 0,
         ValueConv => '100*exp((($val-411)/96)*log(2))',
         ValueConvInv => 'log($val/100)/log(2)*96+411',
         PrintConv => 'sprintf("%.0f",$val)',
@@ -3491,7 +3665,6 @@ my %ciLongFocal = (
     0x05 => {
         Name => 'FNumber',
         Groups => { 2 => 'Image' },
-        Priority => 0,
         ValueConv => 'exp($val/192*log(2))',
         ValueConvInv => 'log($val)*192/log(2)',
         PrintConv => 'sprintf("%.2g",$val)',
@@ -3500,7 +3673,6 @@ my %ciLongFocal = (
     0x06 => {
         Name => 'ExposureTime',
         Groups => { 2 => 'Image' },
-        Priority => 0,
         ValueConv => 'exp(-$val/96*log(2))',
         ValueConvInv => '-log($val)*96/log(2)',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
@@ -3538,6 +3710,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int32s',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
         CameraInfo tags for PowerShot models such as the A470, A480, A580, A590,
@@ -3548,7 +3721,6 @@ my %ciLongFocal = (
     0x01 => {
         Name => 'ISO',
         Groups => { 2 => 'Image' },
-        Priority => 0,
         ValueConv => '100*exp((($val-411)/96)*log(2))',
         ValueConvInv => 'log($val/100)/log(2)*96+411',
         PrintConv => 'sprintf("%.0f",$val)',
@@ -3557,7 +3729,6 @@ my %ciLongFocal = (
     0x06 => {
         Name => 'FNumber',
         Groups => { 2 => 'Image' },
-        Priority => 0,
         ValueConv => 'exp($val/192*log(2))',
         ValueConvInv => 'log($val)*192/log(2)',
         PrintConv => 'sprintf("%.2g",$val)',
@@ -3566,7 +3737,6 @@ my %ciLongFocal = (
     0x07 => {
         Name => 'ExposureTime',
         Groups => { 2 => 'Image' },
-        Priority => 0,
         ValueConv => 'exp(-$val/96*log(2))',
         ValueConvInv => '-log($val)*96/log(2)',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
@@ -3611,6 +3781,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int32s',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'Unknown CameraInfo tags are divided into 3 tables based on format size.',
     0x47 => {
@@ -3658,6 +3829,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int16s',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
 );
 
@@ -3669,6 +3841,7 @@ my %ciLongFocal = (
     WRITABLE => 1,
     FORMAT => 'int8s',
     FIRST_ENTRY => 0,
+    PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
 );
 
@@ -3785,13 +3958,15 @@ my %ciLongFocal = (
         Unknown => 1, # normally don't print this out
     },
     1 => {
-        Name => 'AFMode',
+        Name => 'AFAreaMode',
         PrintConv => {
             0 => 'Off (Manual Focus)',
             2 => 'Single-point AF',
             4 => 'Multi-point AF or AI AF', # AiAF on A570IS
             5 => 'Face Detect AF',
-            # 9 => 'AI Servo', (ref 25)
+            7 => 'Zone AF', #46
+            8 => 'AF Point Expansion', #46
+            9 => 'Spot AF', #46
         },
     },
     2 => {
@@ -4186,21 +4361,18 @@ my %ciLongFocal = (
             4 => 'Green',
         },
     },
-    # 16 - values: 86, 99, 104, 113, 120, 136, 163 (lens dependent?)
-    # MP-E 65mm on 5DmkII: 44=5x,52~=3.9x,56~=3.3x,62~=2.6x,75=1x
-    # ME-E 65mm on 40D: 72=1x(?) for all samples -- decoded here as 1.4x (35efl=1.6)?
     16 => { #PH
-        Name => 'MacroMagnification',
-        Condition => '$$self{LensType} and $$self{LensType} == 124',
-        Priority => 0,
+        %ciMacroMagnification,
+        # MP-E 65mm on 5DmkII: 44=5x,52~=3.9x,56~=3.3x,62~=2.6x,75=1x
+        # ME-E 65mm on 40D/450D: 72 for all samples (not valid)
+        Condition => q{
+            $$self{LensType} and $$self{LensType} == 124 and
+            $$self{Model} !~ /\b(40D|450D|REBEL XSi|Kiss X2)\b/
+        },
         Notes => q{
             currently decoded only for the MP-E 65mm f/2.8 1-5x Macro Photo, and not
             valid for all camera models
         },
-        ValueConv => 'exp((75-$val) * log(2) * 3 / 40)',
-        ValueConvInv => '$val > 0 ? 75 - log($val) / log(2) * 40 / 3 : undef',
-        PrintConv => 'sprintf("%.1fx",$val)',
-        PrintConvInv => '$val=~s/\s*x//; $val',
     },
     # 17 - values: 0, 3, 4
     # 18 - same as LiveViewShooting for all my samples (5DmkII, 50D) - PH
@@ -4614,7 +4786,7 @@ my %ciLongFocal = (
             4 => '4 (1DSmkIII)',
             5 => '5 (450D/1000D)',
             6 => '6 (50D/5DmkII)',
-            7 => '7 (500D/7D/1DmkIV)',
+            7 => '7 (500D/550D/7D/1DmkIV)',
         },
     },
     # 0x01-0x18: unknown RGGB coefficients (int16s[4]) (50D)
@@ -4833,8 +5005,8 @@ my %ciLongFocal = (
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
-        This information is found in images from the 1DmkIV, 5DmkII, 7D, 50D and
-        500D.
+        This information is found in images from the 1DmkIV, 5DmkII, 7D, 50D, 500D
+        and 550D.
     },
     # 0 => 'PeripheralLightingVersion', value = 0x1000
     2 => {
@@ -5279,61 +5451,100 @@ sub ValidateAFInfo($$$)
 }
 
 #------------------------------------------------------------------------------
-# Read original decision data from file (variable length)
+# Read original decision data from file (variable length) (ref 25)
 # Inputs: 0) ExifTool object ref, 1) offset in file
 # Returns: reference to original decision data (or undef if no data)
 sub ReadODD($$)
 {
     my ($exifTool, $offset) = @_;
     return undef unless $offset;
-    my ($raf, $buff, $buf2, $i);
+    my ($raf, $buff, $buf2, $i, $warn);
     return undef unless defined($raf = $$exifTool{RAF});
-    # the data block is a variable length and starts with ff ff ff ff followed
-    # an int32u count of the number of records.  Then an int32u size of the first
-    # record, then the first record data, int32u size of the 2nd record, etc,
-    # for the specified number of records (for some reason the size of the last
-    # record includes the size word, but the others don't)
+    # the data block is a variable length and starts with 0xffffffff
+    # followed a 4-byte (int32u) version number
     my $pos = $raf->Tell();
     if ($raf->Seek($offset, 0) and $raf->Read($buff, 8)==8 and $buff=~/^\xff{4}.\0\0/s) {
         my $err = 1;
         # must set byte order in case it is different than current byte order
         # (we could be reading this after byte order was changed)
         my $oldOrder = GetByteOrder();
-        my $count = Get32u(\$buff, 4);
-        if ($count > 20) {
+        my $version = Get32u(\$buff, 4);
+        if ($version > 20) {
             ToggleByteOrder();
-            $count = unpack('N',pack('V',$count));
+            $version = unpack('N',pack('V',$version));
         }
-        if ($count and $count <= 20) {
+        if ($version == 1 or   # 1Ds (big endian)
+            $version == 2)     # 5D/20D (little endian)
+        {
+            # this data is structured as follows:
+            #  4 bytes: all 0xff
+            #  4 bytes: version number (=1 or 2)
+            # 20 bytes: sha1
+            #  4 bytes: record count
+            # for each record:
+            # |  4 bytes: record number (beginning at 0)
+            # |  4 bytes: block offset
+            # |  4 bytes: block length
+            # | 20 bytes: block sha1
+            if ($raf->Read($buf2, 24) == 24) {
+                $buff .= $buf2;
+                my $count = Get32u(\$buf2, 20);
+                # read all records if the count is reasonable
+                if ($count and $count < 20 and
+                    $raf->Read($buf2, $count * 32) == $count * 32)
+                {
+                    $buff .= $buf2;
+                    undef $err;
+                }
+            }
+        } elsif ($version == 3) { # newer models (little endian)
+            # this data is structured as follows:
+            #  4 bytes: all 0xff
+            #  4 bytes: version number (=3)
+            # 24 bytes: sha1 A length (=20) + sha1 A
+            # 24 bytes: sha1 B length (=20) + sha1 B
+            #  4 bytes: length of remaining data (including this length word!)
+            #  8 bytes: salt length (=4) + salt ?
+            #  4 bytes: unknown (=3)
+            #  4 bytes: size of file
+            #  4 bytes: unknown (=1 for most models, 2 for 5DmkII)
+            #  4 bytes: unknown (=1)
+            #  4 bytes: unknown (always the same for a given firmware version)
+            #  4 bytes: unknown (random)
+            #  4 bytes: record count
+            # for each record:
+            # |  4 bytes: record number (beginning at 1)
+            # |  8 bytes: salt length (=4) + salt ?
+            # | 24 bytes: sha1 length (=20) + sha1
+            # |  4 bytes: block count
+            # | for each block:
+            # | |  4 bytes: block offset
+            # | |  4 bytes: block length
+            # followed by zero padding to end of ODD data (~72 bytes)
             for ($i=0; ; ++$i) {
-                $i >= $count and undef $err, last;
+                $i == 3 and undef $err, last; # success!
                 $raf->Read($buf2, 4) == 4 or last;
                 $buff .= $buf2;
                 my $len = Get32u(\$buf2, 0);
-                # (apparently the last record includes the size word itself
-                # in the data size, but the others don't. doh!)
-                $len -= 4 if $i == $count - 1 and $len >= 4;
-                # make sure records are a reasonable size (< 1MB)
-                $len <= 0x100000 and $raf->Read($buf2, $len) == $len or last;
+                # (the data length includes the length word itself - doh!)
+                $len -= 4 if $i == 2 and $len >= 4;
+                # make sure records are a reasonable size (<= 64kB)
+                $len <= 0x10000 and $raf->Read($buf2, $len) == $len or last;
                 $buff .= $buf2;
             }
+        } else {
+            $warn = "Unsupported original decision data version $version";
         }
         SetByteOrder($oldOrder);
-        if ($err) {
-            # the Canon 5D doesn't seem to use the same record format as the 40D,
-            # and the above parsing fails.  For the 40D, the data size is 512 bytes
-            # for JPEG images and 608 bytes for CR2 images.  For my only 5D sample
-            # with this information, it is 160 bytes for the CR2 image.  So just to
-            # be safe, let's copy up to 800 bytes:
-            $raf->Seek($offset, 0);
-            $raf->Read($buff, 800);
-        } elsif ($exifTool->Options('HtmlDump')) {
-            $exifTool->HtmlDump($offset, length $buff, '[OriginalDecisionData]', undef);
+        unless ($err) {
+            if ($exifTool->Options('HtmlDump')) {
+                $exifTool->HDump($offset, length $buff, '[OriginalDecisionData]', undef);
+            }
+            $raf->Seek($pos, 0);    # restore original file position
+            return \$buff;
         }
-        $raf->Seek($pos, 0);    # restore original file position
-        return \$buff;
     }
-    $exifTool->Warn('Invalid original decision data');
+    $exifTool->Warn($warn || 'Invalid original decision data');
     $raf->Seek($pos, 0);    # restore original file position
     return undef;
 }

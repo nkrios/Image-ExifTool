@@ -12,7 +12,7 @@
 use strict;
 require 5.004;
 
-my $version = '8.10';
+my $version = '8.15';
 
 # add our 'lib' directory to the include list BEFORE 'use Image::ExifTool'
 my $exeDir;
@@ -976,24 +976,35 @@ if (@fileOrder) {
     my @allFiles;
     ProcessFiles(undef, \@allFiles);
     my $sortTool = new Image::ExifTool;
-    my (%sortBy, @rev, $file);
+    $sortTool->Options(PrintConv => $mainTool->Options('PrintConv'));
+    $sortTool->Options(Duplicates => 0);
+    my (%sortBy, %isFloat, @rev, $file);
     # save reverse sort flags
     push @rev, (s/^-// ? 1 : 0) foreach @fileOrder;
-    foreach $file (@files) {
+    foreach $file (@allFiles) {
         my @tags;
         my $info = $sortTool->ImageInfo($file, @fileOrder, \@tags);
-        # get values of all tags (or '' if not defined)
+        # get values of all tags (or '~' to sort last if not defined)
         foreach (@tags) {
             $_ = $$info{$_};
-            $_ = '~' unless defined $_;
+            defined $_ or $_ = '~', next;
+            $isFloat{$_} = 1 if /^[+-]?(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/;
         }
         $sortBy{$file} = \@tags;    # save tag values for each file
     }
     # sort in specified order
     @files = sort {
-        my $i;
+        my ($i, $cmp);
         for ($i=0; $i<@rev; ++$i) {
-            my $cmp = $sortBy{$a}[$i] cmp $sortBy{$b}[$i];
+            my $u = $sortBy{$a}[$i];
+            my $v = $sortBy{$b}[$i];
+            if (not $isFloat{$u} and not $isFloat{$v}) {
+                $cmp = $u cmp $v;               # alphabetically
+            } elsif ($isFloat{$u} and $isFloat{$v}) {
+                $cmp = $u <=> $v;               # numerically
+            } else {
+                $cmp = $isFloat{$u} ? -1 : 1;   # numbers first
+            }
             return $rev[$i] ? -$cmp : $cmp if $cmp;
         }
         return $a cmp $b;   # default to sort by name
@@ -1271,6 +1282,8 @@ sub GetImageInfo($$)
             $comma = 1;
             $ind = (defined $showGroup and not $allGroup) ? '    ' : '  ';
         }
+        # suppress duplicates manually in JSON and short XML output
+        my $noDups = ($json or ($xml and $outFormat > 0));
         my $printConv = $mainTool->Options('PrintConv');
         my $lastGroup = '';
         foreach $tag (@foundTags) {
@@ -1286,6 +1299,10 @@ sub GetImageInfo($$)
             }
             if (defined $showGroup) {
                 $group = $exifTool->GetGroup($tag, $showGroup);
+                # look ahead to see if this tag may suppress a priority tag in
+                # the same group, and if so suppress this tag instead
+                next if $noDups and $tag =~ /(\S+) / and defined $$info{$1} and
+                        $group eq $exifTool->GetGroup($1, $showGroup);
                 $group = 'Unknown' if not $group and ($xml or $json);
                 unless ($allGroup) {
                     if ($lastGroup ne $group) {
@@ -2425,23 +2442,23 @@ supported by ExifTool (r = read, w = write, c = create):
   3GP   r     | DVB   r     | KEY   r     | PDF   r/w   | SO    r
   ACR   r     | DYLIB r     | LNK   r     | PEF   r/w   | SR2   r/w
   AFM   r     | EIP   r     | M2TS  r     | PFA   r     | SRF   r
-  AI    r/w   | EPS   r/w   | M4A/V r     | PFB   r     | SVG   r
-  AIFF  r     | ERF   r/w   | MEF   r/w   | PFM   r     | SWF   r
-  APE   r     | EXE   r     | MIE   r/w/c | PGM   r/w   | THM   r/w
-  ARW   r/w   | EXIF  r/w/c | MIFF  r     | PICT  r     | TIFF  r/w
-  ASF   r     | F4A/V r     | MNG   r/w   | PNG   r/w   | TTC   r
-  AVI   r     | FLA   r     | MOS   r/w   | PPM   r/w   | TTF   r
-  BMP   r     | FLAC  r     | MOV   r     | PPT   r     | VRD   r/w/c
-  BTF   r     | FLV   r     | MP3   r     | PPTX  r     | WAV   r
-  COS   r     | FPX   r     | MP4   r     | PS    r/w   | WDP   r/w
-  CR2   r/w   | GIF   r/w   | MPC   r     | PSB   r/w   | WMA   r
-  CRW   r/w   | GZ    r     | MPG   r     | PSD   r/w   | WMV   r
-  CS1   r/w   | HDP   r/w   | MPO   r/w   | PSP   r     | X3F   r
-  DCM   r     | HTML  r     | MQV   r     | QTIF  r     | XLS   r
-  DCP   r/w   | ICC   r/w/c | MRW   r/w   | RA    r     | XLSX  r
-  DCR   r     | IIQ   r     | NEF   r/w   | RAF   r/w   | XMP   r/w/c
-  DFONT r     | IND   r/w   | NRW   r/w   | RAM   r     | ZIP   r
-  DIVX  r     | ITC   r     | NUMBERS r   | RAW   r/w   |
+  AI    r/w   | EPS   r/w   | M4A/V r     | PFB   r     | SRW   r/w
+  AIFF  r     | ERF   r/w   | MEF   r/w   | PFM   r     | SVG   r
+  APE   r     | EXE   r     | MIE   r/w/c | PGM   r/w   | SWF   r
+  ARW   r/w   | EXIF  r/w/c | MIFF  r     | PICT  r     | THM   r/w
+  ASF   r     | F4A/V r     | MNG   r/w   | PNG   r/w   | TIFF  r/w
+  AVI   r     | FLA   r     | MOS   r/w   | PPM   r/w   | TTC   r
+  BMP   r     | FLAC  r     | MOV   r     | PPT   r     | TTF   r
+  BTF   r     | FLV   r     | MP3   r     | PPTX  r     | VRD   r/w/c
+  COS   r     | FPX   r     | MP4   r     | PS    r/w   | WAV   r
+  CR2   r/w   | GIF   r/w   | MPC   r     | PSB   r/w   | WDP   r/w
+  CRW   r/w   | GZ    r     | MPG   r     | PSD   r/w   | WMA   r
+  CS1   r/w   | HDP   r/w   | MPO   r/w   | PSP   r     | WMV   r
+  DCM   r     | HTML  r     | MQV   r     | QTIF  r     | X3F   r
+  DCP   r/w   | ICC   r/w/c | MRW   r/w   | RA    r     | XLS   r
+  DCR   r     | IIQ   r     | NEF   r/w   | RAF   r/w   | XLSX  r
+  DFONT r     | IND   r/w   | NRW   r/w   | RAM   r     | XMP   r/w/c
+  DIVX  r     | ITC   r     | NUMBERS r   | RAW   r/w   | ZIP   r
   DJVU  r     | JNG   r/w   | OGG   r     | RIFF  r     |
   DLL   r     | JP2   r/w   | ORF   r/w   | RW2   r/w   |
   DNG   r/w   | JPEG  r/w   | OTF   r     | RWL   r/w   |
@@ -2591,8 +2608,8 @@ L</WRITING EXAMPLES> for examples).
 
 I<TAG> may contain a leading family 0 or 1 group name separated by a colon.
 If no group name is specified, the tag is created in the preferred group,
-and updated in any other location where the tag already exists.  The
-preferred group is the first group in the following list where I<TAG> is
+and updated in any other location where a same-named tag already exists. 
+The preferred group is the first group in the following list where I<TAG> is
 valid: 1) EXIF, 2) IPTC, 3) XMP.
 
 The special C<All> tag may be used in this syntax only if a I<VALUE> is NOT
@@ -2721,7 +2738,7 @@ currently not applied when writing a date/time tag.
 
 =item B<-D> (B<-decimal>)
 
-Show tag ID number in decimal.
+Show tag ID number in decimal when extracting information.
 
 =item B<-e> (B<--composite>)
 
@@ -2739,11 +2756,12 @@ B<-X>.  The inverse conversion is applied when writing tags.
 =item B<-ee> (B<-extractEmbedded>)
 
 Extract information from embedded documents in EPS and PDF files, embedded
-MPF images in JPEG and MPO files, and streaming metadata from AVCHD videos. 
-Implies the B<-a> option.  Use B<-g3> or B<-G3> to identify the originating
-document for extracted information. Embedded documents containing
-sub-documents are indicated with dashes in the family 3 group name.  (ie.
-C<Doc2-3> is the 3rd sub-document of the 2nd embedded document.)
+MPF images in JPEG and MPO files, streaming metadata from AVCHD videos, and
+the resource fork of Macintosh files.  Implies the B<-a> option.  Use B<-g3>
+or B<-G3> to identify the originating document for extracted information.
+Embedded documents containing sub-documents are indicated with dashes in the
+family 3 group name.  (ie. C<Doc2-3> is the 3rd sub-document of the 2nd
+embedded document.)
 
 =item B<-ext> I<EXT>, B<--ext> I<EXT> (B<-extension>)
 
@@ -2793,10 +2811,12 @@ I<TAG>.  For example, to process files in order of date:
 
     exiftool -fileOrder DateTimeOriginal DIR
 
-Additional B<-fileOrder> options may be added as secondary sort keys.  The
-sort order may be reversed by prefixing the tag name with a C<->, ie.
-C<-fileOrder -createdate>.  Note that this option has a large performance
-impact since it adds an additional processing pass for each file.
+Additional B<-fileOrder> options may be added as secondary sort keys. 
+Floating point values are sorted numerically, and all other values are
+sorted alphabetically.  The sort order may be reversed by prefixing the tag
+name with a C<-> (ie. C<-fileOrder -createdate>).  Note that this option has
+a large performance impact since it involves an additional processing pass
+of each file.
 
 =item B<-g>[I<NUM>][:I<NUM>...] (B<-groupHeadings>)
 
@@ -2863,7 +2883,7 @@ in combination with B<-h> to influence the HTML format.
 
 =item B<-H> (B<-hex>)
 
-Show tag ID number in hexadecimal.
+Show tag ID number in hexadecimal when extracting information.
 
 =item B<-htmlDump>[I<OFFSET>]
 
@@ -3044,32 +3064,35 @@ Overwrite the original I<FILE> (instead of preserving it by adding
 C<_original> to the file name) when writing information to an image.
 Caution: This option should only be used if you already have separate backup
 copies of your image files.  The overwrite is implemented by renaming a
-temporary file.  When combined with the B<-o> option, causes the original
-file to be deleted if the output file was successfully written.
+temporary file to replace the original.  This deletes the original file and
+replaces it with the edited version in a single operation.  When combined
+with B<-o>, this option causes the original file to be deleted if the output
+file was successfully written.
 
 =item B<-overwrite_original_in_place>
 
 Similar to B<-overwrite_original> except that an extra step is added to
 allow the original file attributes to be preserved.  For example, on a Mac
 this causes the original file creation date, ownership, permissions, type,
-creator and icon to be preserved.  This is implemented by copying the
-contents of a temporary file over the original, then deleting the temporary
-file.  The extra step results in slower performance, so the
-B<-overwrite_original> option should be used instead unless necessary.
+creator, icon and resource fork to be preserved.  This is implemented by
+opening the original file in update mode and replacing its data with a copy
+of a temporary file before deleting the temporary.  The extra step results
+in slower performance, so the B<-overwrite_original> option should be used
+instead unless necessary.
 
 =item B<-p> I<FMTFILE> or I<STR> (B<-printFormat>)
 
 Print output in the format specified by the given file or string (and ignore
 other format options).  Tag names in the format file or string begin with a
-C<$> symbol and may contain an optional group name.  Case is not
-significant.  Braces C<{}> may be used around the tag name to separate it
-from subsequent text.  Use C<$$> to represent a C<$> symbol.  C<$/> may be
-used for a newline.  Multiple B<-p> options may be used, each contributing a
-line of text to the output.  Lines beginning with C<#[HEAD]> and C<#[TAIL]>
-are output only for the first and last processed files respectively.  Lines
-beginning with C<#[BODY]> and lines not beginning with C<#> are output for
-each processed file.  Other lines beginning with C<#> are ignored.  For
-example, this format file:
+C<$> symbol and may contain a leading group name and/or a trailing C<#>. 
+Case is not significant.  Braces C<{}> may be used around the tag name to
+separate it from subsequent text.  Use C<$$> to represent a C<$> symbol, and
+C<$/> for a newline.  Multiple B<-p> options may be used, each contributing
+a line of text to the output.  Lines beginning with C<#[HEAD]> and
+C<#[TAIL]> are output only for the first and last processed files
+respectively.  Lines beginning with C<#[BODY]> and lines not beginning with
+C<#> are output for each processed file.  Other lines beginning with C<#>
+are ignored.  For example, this format file:
 
     # this is a comment line
     #[HEAD]# Generated by ExifTool $exifToolVersion
@@ -3093,10 +3116,10 @@ produces output like this:
 When B<-ee> (B<-extractEmbedded>) is combined with B<-p>, embedded documents
 are effectively processed as separate input files.
 
-If a specified tag does not exist, the output value is set to '-' if the
-B<-f> option is used.  Otherwise a minor warning is issued and the line with
-the missing tag is not printed.  However, if the B<-m> option is used, minor
-warnings are ignored and the line is printed with an empty tag value.
+If a specified tag does not exist, a minor warning is issued and the line
+with the missing tag is not printed.  However, the B<-f> option may be used
+to set the value of missing tags to '-', or the B<-m> option may be used to
+ignore minor warnings and leave the missing values empty.
 
 =item B<-P> (B<-preserve>)
 
@@ -3176,12 +3199,12 @@ files.
 
 By default, this option will commute information between same-named tags in
 different groups and write each tag to the preferred group.  This allows
-information to be automatically translated when copying between images of
-different formats.  However, if a group name is specified for a tag then the
-information is written to the original group (unless redirected to another
-group, see below).  This works even if C<All> is used as a group name, so
-C<-All:All> is used to specify that all information be copied to the same
-group in the destination file.
+some information to be automatically translated when copying between images
+of different formats.  However, if a group name is specified for a tag then
+the information is written to the original group (unless redirected to
+another group, see below).  This works even if C<All> is used as a group
+name, so C<-All:All> is used to specify that all information be copied to
+the same group in the destination file.
 
 I<SRCFILE> may be the same as I<FILE> to move information around within a
 file.  In this case, C<@> may be used to represent the source file (ie.
@@ -3820,7 +3843,7 @@ an extra '%' must be added to pass these codes through the date/time parser.
 (And further note that in a Windows batch file, all '%' characters must also
 be escaped, so in this extreme case '%%%%f' is necessary to pass a simple
 '%f' through the two levels of parsing.)  See
-L<http://owl.phy.queensu.ca/~phil/exiftool/renaming.html> for additional
+L<http://owl.phy.queensu.ca/~phil/exiftool/filename.html> for additional
 documentation and examples.
 
 =over 5
@@ -3921,7 +3944,8 @@ command line is ignored.
 
 =item exiftool -geotag= a.jpg
 
-Delete GPS tags which may have been added by the geotag feature.
+Delete GPS tags which may have been added by the geotag feature.  Note that
+this does not remove all GPS tags -- to do this instead use C<-gps:all=>.
 
 =item exiftool -xmp:geotag= a.jpg
 
@@ -3939,7 +3963,7 @@ Combine multiple track logs and geotag an entire directory tree of images.
 
 Read all track logs from the C<tracks> directory.
 
-=item exiftool -p gpx.fmt -d %Y:%m:%dT%H:%M:%SZ dir > out.gpx
+=item exiftool -p gpx.fmt -d %Y-%m-%dT%H:%M:%SZ dir > out.gpx
 
 Generate a GPX track log from all images in directory C<dir>.  This example
 uses the C<gpx.fmt> file included in the full ExifTool distribution package

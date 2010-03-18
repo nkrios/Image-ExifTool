@@ -69,7 +69,8 @@ These tags are used in Pentax/Asahi cameras.
 <td title='0x0009 = 9'>0x0009</td>
 <td>PentaxImageSize</td>
 <td class=c>int16u</td>
-<td><span class=s>0 = 640x480
+<td><table class=cols><tr>
+  <td>0 = 640x480
   <br>1 = Full
   <br>2 = 1024x768
   <br>3 = 1280x960
@@ -82,8 +83,8 @@ These tags are used in Pentax/Asahi cameras.
   <br>20 = 2288x1712
   <br>21 = 2592x1944
   <br>22 = 2304x1728 or 2592x1944
-  <br>23 = 3056x2296
-  <br>25 = 2816x2212 or 2816x2112
+  <br>23 = 3056x2296</td><td>&nbsp;&nbsp;</td>
+  <td>25 = 2816x2212 or 2816x2112
   <br>27 = 3648x2736
   <br>29 = 4000x3000
   <br>&#39;0 0&#39; = 2304x1728
@@ -95,17 +96,22 @@ These tags are used in Pentax/Asahi cameras.
   <br>&#39;34 2&#39; = 1536x1024
   <br>&#39;35 1&#39; = 2400x1600
   <br>&#39;36 0&#39; = 3008x2008 or 3040x2024
-  <br>&#39;37 0&#39; = 3008x2000</span></td></tr>
+  <br>&#39;37 0&#39; = 3008x2000</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr>
 <td title='0x000b = 11'>0x000b</td>
 <td>PictureMode</td>
 <td class=c>int16u[n]</td>
-<td><span class=s><span class=n>(1 or 2 values)</span>
-  <br>[Value 0]
-  <br>0 = Program
+<td><span class=s><span class=n>(1 or 2 values.  Decimals used to differentiate values for the Optio 555)</span>
+  <br>[Value 0]</span><table class=cols><tr>
+  <td>0 = Program
+  <br>0.1 = Av
   <br>1 = Shutter Speed Priority
+  <br>1.1 = M
   <br>2 = Program AE
+  <br>2.1 = Tv
   <br>3 = Manual
+  <br>3.1 = USER
   <br>5 = Portrait
   <br>6 = Landscape
   <br>8 = Sport
@@ -118,6 +124,15 @@ These tags are used in Pentax/Asahi cameras.
   <br>17 = Fireworks
   <br>18 = Text
   <br>19 = Panorama
+  <br>20 = 3-D
+  <br>21 = Black &amp; White
+  <br>22 = Sepia
+  <br>23 = Red
+  <br>24 = Pink
+  <br>25 = Purple</td><td>&nbsp;&nbsp;</td>
+  <td>26 = Blue
+  <br>27 = Green
+  <br>28 = Yellow
   <br>30 = Self Portrait
   <br>31 = Illustrations
   <br>33 = Digital Filter
@@ -138,7 +153,9 @@ These tags are used in Pentax/Asahi cameras.
   <br>60 = Kids
   <br>61 = Blur Reduction
   <br>65 = Half-length Portrait
-  <br>255 = Digital Filter?</span></td></tr>
+  <br>221 = P
+  <br>255 = PICT</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr class=b>
 <td title='0x000c = 12'>0x000c</td>
 <td>FlashMode</td>
@@ -173,17 +190,17 @@ These tags are used in Pentax/Asahi cameras.
 <td title='0x000d = 13'>0x000d</td>
 <td>FocusMode</td>
 <td class=c>int16u</td>
-<td><span class=s><span class=n>(Pentax models)</span>
-  <br>0 = Normal
+<td><span class=s><span class=n>(Pentax models)</span></span><table class=cols><tr>
+  <td>0 = Normal
   <br>1 = Macro
   <br>2 = Infinity
   <br>3 = Manual
-  <br>4 = Super Macro
-  <br>5 = Pan Focus
+  <br>4 = Super Macro</td><td>&nbsp;&nbsp;</td>
+  <td>5 = Pan Focus
   <br>16 = AF-S
   <br>17 = AF-C
-  <br>18 = AF-A
-  <br><span class=n>(Asahi models)</span>
+  <br>18 = AF-A</td><td>&nbsp;&nbsp;</td></tr></table>
+<span class=s><span class=n>(Asahi models)</span>
   <br>0 = Normal
   <br>1 = Macro (1)
   <br>2 = Macro (2)
@@ -192,21 +209,23 @@ These tags are used in Pentax/Asahi cameras.
 <td title='0x000e = 14'>0x000e</td>
 <td>AFPointSelected</td>
 <td class=c>int16u</td>
-<td><span class=s>1 = Upper-left
+<td><table class=cols><tr>
+  <td>1 = Upper-left
   <br>2 = Top
   <br>3 = Upper-right
   <br>4 = Left
   <br>5 = Mid-left
   <br>6 = Center
   <br>7 = Mid-right
-  <br>8 = Right
-  <br>9 = Lower-left
+  <br>8 = Right</td><td>&nbsp;&nbsp;</td>
+  <td>9 = Lower-left
   <br>10 = Bottom
   <br>11 = Lower-right
   <br>65532 = Face Recognition AF
   <br>65533 = Automatic Tracking AF
   <br>65534 = Fixed Center
-  <br>65535 = Auto</span></td></tr>
+  <br>65535 = Auto</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr>
 <td title='0x000f = 15'>0x000f</td>
 <td>AFPointsInFocus</td>
@@ -241,8 +260,8 @@ These tags are used in Pentax/Asahi cameras.
 <td title='0x0014 = 20'>0x0014</td>
 <td>ISO</td>
 <td class=c>int16u</td>
-<td><span class=s><span class=n>(may be different than EXIF:ISO, which can round to the nearest full stop)</span>
-  <br>3 = 50
+<td><span class=s><span class=n>(may be different than EXIF:ISO, which can round to the nearest full stop)</span></span><table class=cols><tr>
+  <td>3 = 50
   <br>4 = 64
   <br>5 = 80
   <br>6 = 100
@@ -252,8 +271,8 @@ These tags are used in Pentax/Asahi cameras.
   <br>10 = 250
   <br>11 = 320
   <br>12 = 400
-  <br>13 = 500
-  <br>14 = 640
+  <br>13 = 500</td><td>&nbsp;&nbsp;</td>
+  <td>14 = 640
   <br>15 = 800
   <br>16 = 1000
   <br>17 = 1250
@@ -263,8 +282,8 @@ These tags are used in Pentax/Asahi cameras.
   <br>21 = 3200
   <br>22 = 4000
   <br>23 = 5000
-  <br>24 = 6400
-  <br>50 = 50
+  <br>24 = 6400</td><td>&nbsp;&nbsp;</td>
+  <td>50 = 50
   <br>100 = 100
   <br>200 = 200
   <br>258 = 50
@@ -274,8 +293,8 @@ These tags are used in Pentax/Asahi cameras.
   <br>262 = 200
   <br>263 = 280
   <br>264 = 400
-  <br>265 = 560
-  <br>266 = 800
+  <br>265 = 560</td><td>&nbsp;&nbsp;</td>
+  <td>266 = 800
   <br>267 = 1100
   <br>268 = 1600
   <br>269 = 2200
@@ -283,7 +302,8 @@ These tags are used in Pentax/Asahi cameras.
   <br>400 = 400
   <br>800 = 800
   <br>1600 = 1600
-  <br>3200 = 3200</span></td></tr>
+  <br>3200 = 3200</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr class=b>
 <td title='0x0015 = 21'>0x0015</td>
 <td>LightReading</td>
@@ -314,20 +334,22 @@ step size)</span></span></td></tr>
 <td title='0x0019 = 25'>0x0019</td>
 <td>WhiteBalance</td>
 <td class=c>int16u</td>
-<td><span class=s>0 = Auto
+<td><table class=cols><tr>
+  <td>0 = Auto
   <br>1 = Daylight
   <br>2 = Shade
   <br>3 = Fluorescent
   <br>4 = Tungsten
   <br>5 = Manual
-  <br>6 = DaylightFluorescent
-  <br>7 = DaywhiteFluorescent
+  <br>6 = DaylightFluorescent</td><td>&nbsp;&nbsp;</td>
+  <td>7 = DaywhiteFluorescent
   <br>8 = WhiteFluorescent
   <br>9 = Flash
   <br>10 = Cloudy
   <br>17 = Kelvin
   <br>65534 = Unknown
-  <br>65535 = User-Selected</span></td></tr>
+  <br>65535 = User-Selected</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr>
 <td title='0x001a = 26'>0x001a</td>
 <td>WhiteBalanceMode</td>
@@ -367,41 +389,44 @@ step size)</span></span></td></tr>
 <td>Saturation</td>
 <td class=c>int16u[n]</td>
 <td><span class=s><span class=n>(1 or 2 values)</span>
-  <br>[Value 0]
-  <br>0 = Low
+  <br>[Value 0]</span><table class=cols><tr>
+  <td>0 = Low
   <br>1 = Normal
   <br>2 = High
-  <br>3 = Med Low
-  <br>4 = Med High
+  <br>3 = Med Low</td><td>&nbsp;&nbsp;</td>
+  <td>4 = Med High
   <br>5 = Very Low
   <br>6 = Very High
-  <br>65535 = None</span></td></tr>
+  <br>65535 = None</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr>
 <td title='0x0020 = 32'>0x0020</td>
 <td>Contrast</td>
 <td class=c>int16u[n]</td>
 <td><span class=s><span class=n>(1 or 2 values)</span>
-  <br>[Value 0]
-  <br>0 = Low
+  <br>[Value 0]</span><table class=cols><tr>
+  <td>0 = Low
   <br>1 = Normal
   <br>2 = High
-  <br>3 = Med Low
-  <br>4 = Med High
+  <br>3 = Med Low</td><td>&nbsp;&nbsp;</td>
+  <td>4 = Med High
   <br>5 = Very Low
-  <br>6 = Very High</span></td></tr>
+  <br>6 = Very High</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr class=b>
 <td title='0x0021 = 33'>0x0021</td>
 <td>Sharpness</td>
 <td class=c>int16u[n]</td>
 <td><span class=s><span class=n>(1 or 2 values)</span>
-  <br>[Value 0]
-  <br>0 = Soft
+  <br>[Value 0]</span><table class=cols><tr>
+  <td>0 = Soft
   <br>1 = Normal
   <br>2 = Hard
-  <br>3 = Med Soft
-  <br>4 = Med Hard
+  <br>3 = Med Soft</td><td>&nbsp;&nbsp;</td>
+  <td>4 = Med Hard
   <br>5 = Very Soft
-  <br>6 = Very Hard</span></td></tr>
+  <br>6 = Very Hard</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr>
 <td title='0x0022 = 34'>0x0022</td>
 <td>WorldTimeLocation</td>
@@ -464,8 +489,8 @@ step size)</span></span></td></tr>
 <td title='0x0033 = 51'>0x0033</td>
 <td>PictureMode</td>
 <td class=c>int8u[3]</td>
-<td><span class=s>[Values 0-1]
-  <br>&#39;0 0&#39; = Program
+<td><span class=s>[Values 0-1]</span><table class=cols><tr>
+  <td>&#39;0 0&#39; = Program
   <br>&#39;0 1&#39; = Hi-speed Program
   <br>&#39;0 2&#39; = DOF Program
   <br>&#39;0 3&#39; = MTF Program
@@ -487,8 +512,8 @@ step size)</span></span></td></tr>
   <br>&#39;0 19&#39; = Food
   <br>&#39;0 20&#39; = Stage Lighting
   <br>&#39;0 21&#39; = Night Snap
-  <br>&#39;1 4&#39; = Auto PICT (Standard)
-  <br>&#39;1 5&#39; = Auto PICT (Portrait)
+  <br>&#39;1 4&#39; = Auto PICT (Standard)</td><td>&nbsp;&nbsp;</td>
+  <td>&#39;1 5&#39; = Auto PICT (Portrait)
   <br>&#39;1 6&#39; = Auto PICT (Landscape)
   <br>&#39;1 7&#39; = Auto PICT (Macro)
   <br>&#39;1 8&#39; = Auto PICT (Sport)
@@ -510,10 +535,11 @@ step size)</span></span></td></tr>
   <br>&#39;15 0&#39; = Sensitivity Priority AE
   <br>&#39;16 0&#39; = Flash X-Sync Speed AE
   <br>&#39;254 0&#39; = Video (30 fps)
-  <br>&#39;255 4&#39; = Video (24 fps)
-  <br>[Value 2]
-  <br>0 = 1/2 EV steps
-  <br>1 = 1/3 EV steps</span></td></tr>
+  <br>&#39;255 4&#39; = Video (24 fps)</td><td>&nbsp;&nbsp;</td></tr></table>
+<span class=s>[Value 2]</span><table class=cols><tr>
+  <td>0 = 1/2 EV steps</td><td>&nbsp;&nbsp;</td>
+  <td>1 = 1/3 EV steps</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr class=b>
 <td title='0x0034 = 52'>0x0034</td>
 <td>DriveMode</td>
@@ -557,18 +583,19 @@ step size)</span></span></td></tr>
 <td title='0x003c = 60'>0x003c</td>
 <td>AFPointsInFocus</td>
 <td class=c>N</td>
-<td><span class=s><span class=n>(*istD only)</span>
-  <br>Bit 0 = Upper-left
+<td><span class=s><span class=n>(*istD only)</span></span><table class=cols><tr>
+  <td>Bit 0 = Upper-left
   <br>Bit 1 = Top
   <br>Bit 2 = Upper-right
   <br>Bit 3 = Left
   <br>Bit 4 = Mid-left
-  <br>Bit 5 = Center
-  <br>Bit 6 = Mid-right
+  <br>Bit 5 = Center</td><td>&nbsp;&nbsp;</td>
+  <td>Bit 6 = Mid-right
   <br>Bit 7 = Right
   <br>Bit 8 = Lower-left
   <br>Bit 9 = Bottom
-  <br>Bit 10 = Lower-right</span></td></tr>
+  <br>Bit 10 = Lower-right</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr>
 <td title='0x003e = 62'>0x003e</td>
 <td>PreviewImageBorders</td>
@@ -911,7 +938,7 @@ step size)</span></span></td></tr>
 </tr><tr><td class=r>0x12ba2</td><td>= K100D Super</td>
 <td class='r b'>0x12dfe</td><td class=b>= K-x</td>
 </tr><tr><td class=r>0x12bb0</td><td>= Optio T10/T20</td>
-<td class='r b'>&nbsp;</td><td class=b>&nbsp;</td>
+<td class='r b'>0x12e3a</td><td class=b>= Optio I-10</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='City'>Pentax City Values</a></h2>
@@ -1561,7 +1588,8 @@ Remote or Self-timer, and Internal/ExternalFlashMode is not &quot;On, Wireless&q
 <td class=r title='6 = 0x6'>6</td>
 <td>AEProgramMode</td>
 <td class=c>int8u</td>
-<td><span class=s>0 = M, P or TAv
+<td><table class=cols><tr>
+  <td>0 = M, P or TAv
   <br>1 = Av, B or X
   <br>2 = Tv
   <br>3 = Sv or Green Mode
@@ -1573,8 +1601,8 @@ Remote or Self-timer, and Internal/ExternalFlashMode is not &quot;On, Wireless&q
   <br>27 = MTF Program (P-Shift)
   <br>35 = Standard
   <br>43 = Portrait
-  <br>51 = Landscape
-  <br>59 = Macro
+  <br>51 = Landscape</td><td>&nbsp;&nbsp;</td>
+  <td>59 = Macro
   <br>67 = Sport
   <br>75 = Night Scene Portrait
   <br>83 = No Flash
@@ -1585,7 +1613,8 @@ Remote or Self-timer, and Internal/ExternalFlashMode is not &quot;On, Wireless&q
   <br>123 = Kids
   <br>131 = Pet
   <br>139 = Candlelight
-  <br>147 = Museum</span></td></tr>
+  <br>147 = Museum</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr class=b>
 <td class=r title='7 = 0x7'>7</td>
 <td>AEExtra?</td>
@@ -1975,35 +2004,39 @@ serviced)</span></span></td></tr>
 <td class=r title='0 = 0x0'>0</td>
 <td>AFPointsUnknown1?</td>
 <td class=c>int16u</td>
-<td><span class=s>0x777 = Central 9 points
+<td><table class=cols><tr>
+  <td>0x777 = Central 9 points
   <br>0x7ff = All
   <br>Bit 0 = Upper-left
   <br>Bit 1 = Top
   <br>Bit 2 = Upper-right
   <br>Bit 3 = Left
-  <br>Bit 4 = Mid-left
-  <br>Bit 5 = Center
+  <br>Bit 4 = Mid-left</td><td>&nbsp;&nbsp;</td>
+  <td>Bit 5 = Center
   <br>Bit 6 = Mid-right
   <br>Bit 7 = Right
   <br>Bit 8 = Lower-left
   <br>Bit 9 = Bottom
-  <br>Bit 10 = Lower-right</span></td></tr>
+  <br>Bit 10 = Lower-right</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr class=b>
 <td class=r title='2 = 0x2'>2</td>
 <td>AFPointsUnknown2?</td>
 <td class=c>int16u</td>
-<td><span class=s>0x0 = Auto
+<td><table class=cols><tr>
+  <td>0x0 = Auto
   <br>Bit 0 = Upper-left
   <br>Bit 1 = Top
   <br>Bit 2 = Upper-right
   <br>Bit 3 = Left
-  <br>Bit 4 = Mid-left
-  <br>Bit 5 = Center
+  <br>Bit 4 = Mid-left</td><td>&nbsp;&nbsp;</td>
+  <td>Bit 5 = Center
   <br>Bit 6 = Mid-right
   <br>Bit 7 = Right
   <br>Bit 8 = Lower-left
   <br>Bit 9 = Bottom
-  <br>Bit 10 = Lower-right</span></td></tr>
+  <br>Bit 10 = Lower-right</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr>
 <td class=r title='4 = 0x4'>4</td>
 <td>AFPredictor</td>
@@ -2024,8 +2057,8 @@ serviced)</span></span></td></tr>
 <td>AFPointsInFocus</td>
 <td class=c>int8u</td>
 <td><span class=s><span class=n>(may report two points in focus even though a single AFPoint has been
-selected, in which case the selected AFPoint is the first reported)</span>
-  <br>0 = None
+selected, in which case the selected AFPoint is the first reported)</span></span><table class=cols><tr>
+  <td>0 = None
   <br>1 = Lower-left, Bottom
   <br>2 = Bottom
   <br>3 = Lower-right, Bottom
@@ -2035,8 +2068,8 @@ selected, in which case the selected AFPoint is the first reported)</span>
   <br>7 = Upper-left, Top
   <br>8 = Top
   <br>9 = Upper-right, Top
-  <br>10 = Right
-  <br>11 = Lower-left, Mid-left
+  <br>10 = Right</td><td>&nbsp;&nbsp;</td>
+  <td>11 = Lower-left, Mid-left
   <br>12 = Upper-left, Mid-left
   <br>13 = Bottom, Center
   <br>14 = Top, Center
@@ -2045,7 +2078,8 @@ selected, in which case the selected AFPoint is the first reported)</span>
   <br>17 = Left
   <br>18 = Mid-left
   <br>19 = Center (vertical)
-  <br>20 = Mid-right</span></td></tr>
+  <br>20 = Mid-right</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ColorInfo'>Pentax ColorInfo Tags</a></h2>
@@ -2285,7 +2319,7 @@ stored as ASCII text in a format very similar to some HP models.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 2, 2009</i>
+<br><i>Last revised Mar 18, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

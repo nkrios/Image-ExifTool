@@ -15,7 +15,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.31';
+$VERSION = '1.34';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -179,6 +179,7 @@ $VERSION = '1.31';
         'MakerNoteLeica3',
         'MakerNoteLeica4',
         'MakerNoteLeica5',
+        'MakerNoteLeica6',
         'MakerNotePanasonic',
         'MakerNotePanasonic2',
         'MakerNotePentax',
@@ -188,6 +189,7 @@ $VERSION = '1.31';
         'MakerNoteRicoh',
         'MakerNoteRicohText',
         'MakerNoteSamsung',
+        'MakerNoteSamsung2',
         'MakerNoteSanyo',
         'MakerNoteSanyoC4',
         'MakerNoteSanyoPatch',
@@ -230,10 +232,10 @@ sub LoadShortcuts($)
     }
 }
 # (for backward compatibility, renamed in ExifTool 7.75)
-if (defined %Image::ExifTool::Shortcuts::UserDefined) {
+if (%Image::ExifTool::Shortcuts::UserDefined) {
     LoadShortcuts(\%Image::ExifTool::Shortcuts::UserDefined);
 }
-if (defined %Image::ExifTool::UserDefined::Shortcuts) {
+if (%Image::ExifTool::UserDefined::Shortcuts) {
     LoadShortcuts(\%Image::ExifTool::UserDefined::Shortcuts);
 }
 

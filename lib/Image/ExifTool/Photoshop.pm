@@ -27,7 +27,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD $iptcDigestInfo);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.39';
+$VERSION = '1.40';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -457,7 +457,7 @@ sub ProcessPSD($$)
     my %dirInfo = (
         DataPt => \$data,
         DirStart => 0,
-        DirName => 'PSD',
+        DirName => 'Photoshop',
     );
     my $len = Get32u(\$data, 26);
     if ($outfile) {

@@ -30,7 +30,7 @@ use Image::ExifTool::IPTC;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.06';
+$VERSION = '2.07';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -65,6 +65,7 @@ my %formatOK = (
     extended => 1,
     resize   => 1,
     digits   => 1,
+    int16uRev => 1,
     rational32u => 1,
     rational32s => 1,
     var_string  => 1,
@@ -181,6 +182,11 @@ automatically by ExifTool.  Remember that the descriptive values are used
 when writing (ie. 'Above Sea Level', not '0') unless the print conversion is
 disabled (with '-n' on the command line or the PrintConv option in the API,
 or by suffixing the tag name with a C<#> character).
+
+When adding GPS information to an image, it is important to set all of the
+following tags: GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef,
+GPSAltitude and GPSAltitudeRef.  ExifTool will write the required
+GPSVersionID tag automatically if new a GPS IFD is added to an image.
 },
     XMP => q{
 XMP stands for "Extensible Metadata Platform", an XML/RDF-based metadata
@@ -228,10 +234,11 @@ but this information is extracted by ExifTool.
 See L<http://www.adobe.com/devnet/xmp/> for the offical XMP specification.
 },
     IPTC => q{
-IPTC stands for "International Press Telecommunications Council".  This is
-an older meta information format that is slowly being phased out in favor of
-XMP.  IPTC information may be embedded in JPG, TIFF, PNG, MIFF, PS, PDF, PSD
-and DNG images.
+The tags listed below are part of the International Press Telecommunications
+Council (IPTC) and the Newspaper Association of America (NAA) Information
+Interchange Model (IIM).  This is an older meta information format, slowly
+being phased out in favor of XMP.  IPTC information may be embedded in JPG,
+TIFF, PNG, MIFF, PS, PDF, PSD and DNG images.
 
 The IPTC specification dictates a length for ASCII (C<string> or C<digits>)
 values.  These lengths are given in square brackets after the B<Writable>
@@ -248,17 +255,18 @@ IPTC information is separated into different records, each of which has its
 own set of tags.
 
 See L<http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf> for the
-official IPTC specification.
+official specification.
 },
     Photoshop => q{
-Photoshop tags are found in PSD files, as well as inside embedded Photoshop
-information in many other file types (JPEG, TIFF, PDF, PNG to name a few).
+Photoshop tags are found in PSD and PSB files, as well as inside embedded
+Photoshop information in many other file types (JPEG, TIFF, PDF, PNG to name
+a few).
 
 Many Photoshop tags are marked as Unknown (indicated by a question mark
 after the tag name) because the information they provide is not very useful
-under normal circumstances (and because Adobe denied my application for
+under normal circumstances I<[and because Adobe denied my application for
 their file format documentation -- apparently open source software is too
-big a concept for them).  These unknown tags are not extracted unless the
+big a concept for them]>.  These unknown tags are not extracted unless the
 Unknown (-u) option is used.
 },
     PrintIM => q{
@@ -1175,6 +1183,7 @@ sub Doc2Html($)
     $doc =~ s/\n\n/<\/p>\n\n<p>/g;
     $doc =~ s/B&lt;(.*?)&gt;/<b>$1<\/b>/sg;
     $doc =~ s/C&lt;(.*?)&gt;/<code>$1<\/code>/sg;
+    $doc =~ s/I&lt;(.*?)&gt;/<i>$1<\/i>/sg;
     # Note: the following illegal L<> syntax should only be used in Notes
     #       which are using in the HTML documentation only (not in POD)
     $doc =~ s/L&lt;([^&]+?)\|(.+?)&gt;/<a href="$2">$1<\/a>/sg;

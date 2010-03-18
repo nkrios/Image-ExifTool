@@ -89,23 +89,23 @@ supported by ExifTool (r = read, w = write, c = create):</p>
   3GP   r     | DVB   r     | KEY   r     | PDF   r/w   | SO    r
   ACR   r     | DYLIB r     | LNK   r     | PEF   r/w   | SR2   r/w
   AFM   r     | EIP   r     | M2TS  r     | PFA   r     | SRF   r
-  AI    r/w   | EPS   r/w   | M4A/V r     | PFB   r     | SVG   r
-  AIFF  r     | ERF   r/w   | MEF   r/w   | PFM   r     | SWF   r
-  APE   r     | EXE   r     | MIE   r/w/c | PGM   r/w   | THM   r/w
-  ARW   r/w   | EXIF  r/w/c | MIFF  r     | PICT  r     | TIFF  r/w
-  ASF   r     | F4A/V r     | MNG   r/w   | PNG   r/w   | TTC   r
-  AVI   r     | FLA   r     | MOS   r/w   | PPM   r/w   | TTF   r
-  BMP   r     | FLAC  r     | MOV   r     | PPT   r     | VRD   r/w/c
-  BTF   r     | FLV   r     | MP3   r     | PPTX  r     | WAV   r
-  COS   r     | FPX   r     | MP4   r     | PS    r/w   | WDP   r/w
-  CR2   r/w   | GIF   r/w   | MPC   r     | PSB   r/w   | WMA   r
-  CRW   r/w   | GZ    r     | MPG   r     | PSD   r/w   | WMV   r
-  CS1   r/w   | HDP   r/w   | MPO   r/w   | PSP   r     | X3F   r
-  DCM   r     | HTML  r     | MQV   r     | QTIF  r     | XLS   r
-  DCP   r/w   | ICC   r/w/c | MRW   r/w   | RA    r     | XLSX  r
-  DCR   r     | IIQ   r     | NEF   r/w   | RAF   r/w   | XMP   r/w/c
-  DFONT r     | IND   r/w   | NRW   r/w   | RAM   r     | ZIP   r
-  DIVX  r     | ITC   r     | NUMBERS r   | RAW   r/w   |
+  AI    r/w   | EPS   r/w   | M4A/V r     | PFB   r     | SRW   r/w
+  AIFF  r     | ERF   r/w   | MEF   r/w   | PFM   r     | SVG   r
+  APE   r     | EXE   r     | MIE   r/w/c | PGM   r/w   | SWF   r
+  ARW   r/w   | EXIF  r/w/c | MIFF  r     | PICT  r     | THM   r/w
+  ASF   r     | F4A/V r     | MNG   r/w   | PNG   r/w   | TIFF  r/w
+  AVI   r     | FLA   r     | MOS   r/w   | PPM   r/w   | TTC   r
+  BMP   r     | FLAC  r     | MOV   r     | PPT   r     | TTF   r
+  BTF   r     | FLV   r     | MP3   r     | PPTX  r     | VRD   r/w/c
+  COS   r     | FPX   r     | MP4   r     | PS    r/w   | WAV   r
+  CR2   r/w   | GIF   r/w   | MPC   r     | PSB   r/w   | WDP   r/w
+  CRW   r/w   | GZ    r     | MPG   r     | PSD   r/w   | WMA   r
+  CS1   r/w   | HDP   r/w   | MPO   r/w   | PSP   r     | WMV   r
+  DCM   r     | HTML  r     | MQV   r     | QTIF  r     | X3F   r
+  DCP   r/w   | ICC   r/w/c | MRW   r/w   | RA    r     | XLS   r
+  DCR   r     | IIQ   r     | NEF   r/w   | RAF   r/w   | XLSX  r
+  DFONT r     | IND   r/w   | NRW   r/w   | RAM   r     | XMP   r/w/c
+  DIVX  r     | ITC   r     | NUMBERS r   | RAW   r/w   | ZIP   r
   DJVU  r     | JNG   r/w   | OGG   r     | RIFF  r     |
   DLL   r     | JP2   r/w   | ORF   r/w   | RW2   r/w   |
   DNG   r/w   | JPEG  r/w   | OTF   r     | RWL   r/w   |</pre>
@@ -266,8 +266,8 @@ and <code>-=</code> may be used to conditionally remove or replace a tag (see
 <dd>
 <p><em>TAG</em> may contain a leading family 0 or 1 group name separated by a colon.
 If no group name is specified, the tag is created in the preferred group,
-and updated in any other location where the tag already exists.  The
-preferred group is the first group in the following list where <em>TAG</em> is
+and updated in any other location where a same-named tag already exists. 
+The preferred group is the first group in the following list where <em>TAG</em> is
 valid: 1) EXIF, 2) IPTC, 3) XMP.</p>
 </dd>
 <dd>
@@ -426,7 +426,7 @@ currently not applied when writing a date/time tag.
 <dt><strong><a name="item_d"><strong>-D</strong> (<strong>-decimal</strong>)</a></strong><br />
 </dt>
 <dd>
-Show tag ID number in decimal.
+Show tag ID number in decimal when extracting information.
 </dd>
 <p></p>
 <dt><strong><a name="item_e"><strong>-e</strong> (<strong>--composite</strong>)</a></strong><br />
@@ -450,11 +450,12 @@ escaped.  The <strong>-E</strong> option is implied with <strong>-h</strong>, an
 </dt>
 <dd>
 Extract information from embedded documents in EPS and PDF files, embedded
-MPF images in JPEG and MPO files, and streaming metadata from AVCHD videos. 
-Implies the <strong>-a</strong> option.  Use <strong>-g3</strong> or <strong>-G3</strong> to identify the originating
-document for extracted information. Embedded documents containing
-sub-documents are indicated with dashes in the family 3 group name.  (ie.
-<code>Doc2-3</code> is the 3rd sub-document of the 2nd embedded document.)
+MPF images in JPEG and MPO files, streaming metadata from AVCHD videos, and
+the resource fork of Macintosh files.  Implies the <strong>-a</strong> option.  Use <strong>-g3</strong>
+or <strong>-G3</strong> to identify the originating document for extracted information.
+Embedded documents containing sub-documents are indicated with dashes in the
+family 3 group name.  (ie. <code>Doc2-3</code> is the 3rd sub-document of the 2nd
+embedded document.)
 </dd>
 <p></p>
 <dt><strong><a name="item_ext"><strong>-ext</strong> <em>EXT</em>, <strong>--ext</strong> <em>EXT</em> (<strong>-extension</strong>)</a></strong><br />
@@ -521,10 +522,12 @@ Set file processing order according to the sorted value of the specified
     exiftool -fileOrder DateTimeOriginal DIR</pre>
 </dd>
 <dd>
-<p>Additional <strong>-fileOrder</strong> options may be added as secondary sort keys.  The
-sort order may be reversed by prefixing the tag name with a <code>-</code>, ie.
-<code>-fileOrder -createdate</code>.  Note that this option has a large performance
-impact since it adds an additional processing pass for each file.</p>
+<p>Additional <strong>-fileOrder</strong> options may be added as secondary sort keys. 
+Floating point values are sorted numerically, and all other values are
+sorted alphabetically.  The sort order may be reversed by prefixing the tag
+name with a <code>-</code> (ie. <code>-fileOrder -createdate</code>).  Note that this option has
+a large performance impact since it involves an additional processing pass
+of each file.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item__2dg_5bnum_5d_5b_3anum_2e_2e_2e_5d__28_2dgrouphead"><strong>-g</strong>[<em>NUM</em>][:<em>NUM</em>...] (<strong>-groupHeadings</strong>)</a></strong><br />
@@ -611,7 +614,7 @@ in combination with <strong>-h</strong> to influence the HTML format.
 <dt><strong><a name="item_h"><strong>-H</strong> (<strong>-hex</strong>)</a></strong><br />
 </dt>
 <dd>
-Show tag ID number in hexadecimal.
+Show tag ID number in hexadecimal when extracting information.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dhtmldump_5boffset_5d"><strong>-htmlDump</strong>[<em>OFFSET</em>]</a></strong><br />
@@ -841,8 +844,10 @@ Overwrite the original <em>FILE</em> (instead of preserving it by adding
 <code>_original</code> to the file name) when writing information to an image.
 Caution: This option should only be used if you already have separate backup
 copies of your image files.  The overwrite is implemented by renaming a
-temporary file.  When combined with the <strong>-o</strong> option, causes the original
-file to be deleted if the output file was successfully written.
+temporary file to replace the original.  This deletes the original file and
+replaces it with the edited version in a single operation.  When combined
+with <strong>-o</strong>, this option causes the original file to be deleted if the output
+file was successfully written.
 </dd>
 <p></p>
 <dt><strong><a name="item__2doverwrite_original_in_place"><strong>-overwrite_original_in_place</strong></a></strong><br />
@@ -851,10 +856,11 @@ file to be deleted if the output file was successfully written.
 Similar to <strong>-overwrite_original</strong> except that an extra step is added to
 allow the original file attributes to be preserved.  For example, on a Mac
 this causes the original file creation date, ownership, permissions, type,
-creator and icon to be preserved.  This is implemented by copying the
-contents of a temporary file over the original, then deleting the temporary
-file.  The extra step results in slower performance, so the
-<strong>-overwrite_original</strong> option should be used instead unless necessary.
+creator, icon and resource fork to be preserved.  This is implemented by
+opening the original file in update mode and replacing its data with a copy
+of a temporary file before deleting the temporary.  The extra step results
+in slower performance, so the <strong>-overwrite_original</strong> option should be used
+instead unless necessary.
 </dd>
 <p></p>
 <dt><strong><a name="item_str"><strong>-p</strong> <em>FMTFILE</em> or <em>STR</em> (<strong>-printFormat</strong>)</a></strong><br />
@@ -862,15 +868,15 @@ file.  The extra step results in slower performance, so the
 <dd>
 Print output in the format specified by the given file or string (and ignore
 other format options).  Tag names in the format file or string begin with a
-<code>$</code> symbol and may contain an optional group name.  Case is not
-significant.  Braces <code>{}</code> may be used around the tag name to separate it
-from subsequent text.  Use <code>$$</code> to represent a <code>$</code> symbol.  <code>$/</code> may be
-used for a newline.  Multiple <strong>-p</strong> options may be used, each contributing a
-line of text to the output.  Lines beginning with <code>#[HEAD]</code> and <code>#[TAIL]</code>
-are output only for the first and last processed files respectively.  Lines
-beginning with <code>#[BODY]</code> and lines not beginning with <code>#</code> are output for
-each processed file.  Other lines beginning with <code>#</code> are ignored.  For
-example, this format file:
+<code>$</code> symbol and may contain a leading group name and/or a trailing <code>#</code>. 
+Case is not significant.  Braces <code>{}</code> may be used around the tag name to
+separate it from subsequent text.  Use <code>$$</code> to represent a <code>$</code> symbol, and
+<code>$/</code> for a newline.  Multiple <strong>-p</strong> options may be used, each contributing
+a line of text to the output.  Lines beginning with <code>#[HEAD]</code> and
+<code>#[TAIL]</code> are output only for the first and last processed files
+respectively.  Lines beginning with <code>#[BODY]</code> and lines not beginning with
+<code>#</code> are output for each processed file.  Other lines beginning with <code>#</code>
+are ignored.  For example, this format file:
 </dd>
 <dd>
 <pre>
@@ -904,10 +910,10 @@ example, this format file:
 are effectively processed as separate input files.</p>
 </dd>
 <dd>
-<p>If a specified tag does not exist, the output value is set to '-' if the
-<strong>-f</strong> option is used.  Otherwise a minor warning is issued and the line with
-the missing tag is not printed.  However, if the <strong>-m</strong> option is used, minor
-warnings are ignored and the line is printed with an empty tag value.</p>
+<p>If a specified tag does not exist, a minor warning is issued and the line
+with the missing tag is not printed.  However, the <strong>-f</strong> option may be used
+to set the value of missing tags to '-', or the <strong>-m</strong> option may be used to
+ignore minor warnings and leave the missing values empty.</p>
 </dd>
 <p></p>
 <dt><strong><a name="item_p"><strong>-P</strong> (<strong>-preserve</strong>)</a></strong><br />
@@ -1013,12 +1019,12 @@ files.
 <dd>
 <p>By default, this option will commute information between same-named tags in
 different groups and write each tag to the preferred group.  This allows
-information to be automatically translated when copying between images of
-different formats.  However, if a group name is specified for a tag then the
-information is written to the original group (unless redirected to another
-group, see below).  This works even if <code>All</code> is used as a group name, so
-<code>-All:All</code> is used to specify that all information be copied to the same
-group in the destination file.</p>
+some information to be automatically translated when copying between images
+of different formats.  However, if a group name is specified for a tag then
+the information is written to the original group (unless redirected to
+another group, see below).  This works even if <code>All</code> is used as a group
+name, so <code>-All:All</code> is used to specify that all information be copied to
+the same group in the destination file.</p>
 </dd>
 <dd>
 <p><em>SRCFILE</em> may be the same as <em>FILE</em> to move information around within a
@@ -1830,7 +1836,7 @@ an extra '%' must be added to pass these codes through the date/time parser.
 (And further note that in a Windows batch file, all '%' characters must also
 be escaped, so in this extreme case '%%%%f' is necessary to pass a simple
 '%f' through the two levels of parsing.)  See
-<a href="http://owl.phy.queensu.ca/~phil/exiftool/renaming.html">http://owl.phy.queensu.ca/~phil/exiftool/renaming.html</a> for additional
+<a href="http://owl.phy.queensu.ca/~phil/exiftool/filename.html">http://owl.phy.queensu.ca/~phil/exiftool/filename.html</a> for additional
 documentation and examples.</p>
 <dl>
 <dt><strong><a name="item_exiftool__2dfilename_3dnew_2ejpg_dir_2fold_2ejpg">exiftool -filename=new.jpg dir/old.jpg</a></strong><br />
@@ -1956,7 +1962,8 @@ command line is ignored.
 <dt><strong><a name="item_exiftool__2dgeotag_3d_a_2ejpg">exiftool -geotag= a.jpg</a></strong><br />
 </dt>
 <dd>
-Delete GPS tags which may have been added by the geotag feature.
+Delete GPS tags which may have been added by the geotag feature.  Note that
+this does not remove all GPS tags -- to do this instead use <code>-gps:all=</code>.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dxmp_3ageotag_3d_a_2ejpg">exiftool -xmp:geotag= a.jpg</a></strong><br />
@@ -1983,7 +1990,7 @@ Combine multiple track logs and geotag an entire directory tree of images.
 Read all track logs from the <code>tracks</code> directory.
 </dd>
 <p></p>
-<dt><strong><a name="item_exiftool__2dp_gpx_2efmt__2dd__25y_3a_25m_3a_25dt_2">exiftool -p gpx.fmt -d %Y:%m:%dT%H:%M:%SZ dir &gt; out.gpx</a></strong><br />
+<dt><strong><a name="item_exiftool__2dp_gpx_2efmt__2dd__25y_2d_25m_2d_25dt_2">exiftool -p gpx.fmt -d %Y-%m-%dT%H:%M:%SZ dir &gt; out.gpx</a></strong><br />
 </dt>
 <dd>
 Generate a GPX track log from all images in directory <code>dir</code>.  This example

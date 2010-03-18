@@ -330,10 +330,12 @@ official EXIF specification.
   0x0195   ModeNumber                -          N
   0x01b1   Decode                    -          N
   0x01b2   DefaultImageColor         -          N
+  0x01b3   T82Options                -          N
   0x01b5   JPEGTables                -          N
   0x0200   JPEGProc                  -          N
   0x0201   ThumbnailOffset           IFD1       int32u*
            ThumbnailOffset           IFD0       int32u*
+           ThumbnailOffset           SubIFD     int32u*
            PreviewImageStart         MakerNotes int32u*
            PreviewImageStart         IFD0       int32u*
            JpgFromRawStart           SubIFD     int32u*
@@ -341,6 +343,7 @@ official EXIF specification.
            OtherImageStart           -          N
   0x0202   ThumbnailLength           IFD1       int32u*
            ThumbnailLength           IFD0       int32u*
+           ThumbnailLength           SubIFD     int32u*
            PreviewImageLength        MakerNotes int32u*
            PreviewImageLength        IFD0       int32u*
            JpgFromRawLength          SubIFD     int32u*
@@ -358,13 +361,17 @@ official EXIF specification.
   0x0214   ReferenceBlackWhite       IFD0       rational64u[6]
   0x022f   StripRowCounts            -          N
   0x02bc   ApplicationNotes          ExifIFD    XMP
+  0x03e7   USPTOMiscellaneous        -          N
   0x1000   RelatedImageFileFormat    InteropIFD string!
   0x1001   RelatedImageWidth         InteropIFD int16u!
   0x1002   RelatedImageHeight        InteropIFD int16u!
   0x4746   Rating                    IFD0       int16u/
   0x4749   RatingPercent             IFD0       int16u/
   0x800d   ImageID                   -          N
+  0x80a3   WangTag1                  -          N
   0x80a4   WangAnnotation            -          N
+  0x80a5   WangTag3                  -          N
+  0x80a6   WangTag4                  -          N
   0x80e3   Matteing                  -          N
   0x80e4   DataType                  -          N
   0x80e5   ImageDepth                -          N
@@ -386,10 +393,17 @@ official EXIF specification.
   0x82ab   MDPrepTime                -          N
   0x82ac   MDFileUnits               -          N
   0x830e   PixelScale                -          N
+  0x8335   AdventScale               -          N
+  0x8336   AdventRevision            -          N
+  0x835c   UIC1Tag                   -          N
+  0x835d   UIC2Tag                   -          N
+  0x835e   UIC3Tag                   -          N
+  0x835f   UIC4Tag                   -          N
   0x83bb   IPTC-NAA                  IFD0       IPTC
   0x847e   IntergraphPacketData      -          N
   0x847f   IntergraphFlagRegisters   -          N
   0x8480   IntergraphMatrix          -          N
+  0x8481   INGRReserved              -          N
   0x8482   ModelTiePoint             -          N
   0x84e0   Site                      -          N
   0x84e1   ColorSequence             -          N
@@ -410,12 +424,17 @@ official EXIF specification.
   0x84f0   CMYKEquivalent            -          N
   0x8546   SEMInfo                   IFD0       string
   0x8568   AFCP_IPTC                 -          IPTC
+  0x85b8   PixelMagicJBIGOptions     -          N
   0x85d8   ModelTransform            -          N
   0x8602   WB_GRGBLevels             -          N
   0x8606   LeafData                  -          Leaf
   0x8649   PhotoshopSettings         -          Photoshop
   0x8769   ExifOffset                -          EXIF
   0x8773   ICC_Profile               -          ICC_Profile
+  0x877f   TIFF_FXExtensions         -          N
+  0x8780   MultiProfiles             -          N
+  0x8781   SharedData                -          N
+  0x8782   T88Options                -          N
   0x87ac   ImageLayer                -          N
   0x87af   GeoTiffDirectory          -          N
   0x87b0   GeoTiffDoubleParams       -          N
@@ -460,6 +479,9 @@ official EXIF specification.
   0x9215   ExposureIndex             -          N
   0x9216   TIFF-EPStandardID         -          N
   0x9217   SensingMethod             -          N
+  0x923a   CIP3DataFile              -          N
+  0x923b   CIP3Sheet                 -          N
+  0x923c   CIP3Side                  -          N
   0x923f   StoNits                   -          N
   0x927c   MakerNoteCanon            ExifIFD    Canon
            MakerNoteCasio            ExifIFD    Casio
@@ -500,6 +522,7 @@ official EXIF specification.
            MakerNoteLeica3           ExifIFD    Panasonic Leica3
            MakerNoteLeica4           ExifIFD    Panasonic Leica4
            MakerNoteLeica5           ExifIFD    Panasonic Leica5
+           MakerNoteLeica6           ExifIFD    Panasonic Leica6
            MakerNotePanasonic        ExifIFD    Panasonic
            MakerNotePanasonic2       ExifIFD    Panasonic Type2
            MakerNotePentax           ExifIFD    Pentax
@@ -508,8 +531,8 @@ official EXIF specification.
            MakerNotePentax4          ExifIFD    Pentax Type4
            MakerNoteRicoh            ExifIFD    Ricoh
            MakerNoteRicohText        ExifIFD    Ricoh Text
-           PreviewImage              ExifIFD    undef
            MakerNoteSamsung          ExifIFD    undef
+           MakerNoteSamsung2         ExifIFD    Samsung
            MakerNoteSanyo            ExifIFD    Sanyo
            MakerNoteSanyoC4          ExifIFD    Sanyo
            MakerNoteSanyoPatch       ExifIFD    Sanyo
@@ -597,6 +620,7 @@ official EXIF specification.
   0xc42a   OceImageLogic             -          N
   0xc44f   Annotations               -          N
   0xc4a5   PrintIM                   IFD0       PrintIM
+  0xc580   USPTOOriginalContentType  -          N
   0xc612   DNGVersion                IFD0       int8u[4]!
   0xc613   DNGBackwardVersion        IFD0       int8u[4]!
   0xc614   UniqueCameraModel         IFD0       string
@@ -703,10 +727,11 @@ official EXIF specification.
 
 =head2 IPTC Tags
 
-IPTC stands for "International Press Telecommunications Council".  This is
-an older meta information format that is slowly being phased out in favor of
-XMP.  IPTC information may be embedded in JPG, TIFF, PNG, MIFF, PS, PDF, PSD
-and DNG images.
+The tags listed below are part of the International Press Telecommunications
+Council (IPTC) and the Newspaper Association of America (NAA) Information
+Interchange Model (IIM).  This is an older meta information format, slowly
+being phased out in favor of XMP.  IPTC information may be embedded in JPG,
+TIFF, PNG, MIFF, PS, PDF, PSD and DNG images.
 
 The IPTC specification dictates a length for ASCII (C<string> or C<digits>)
 values.  These lengths are given in square brackets after the B<Writable>
@@ -723,7 +748,7 @@ IPTC information is separated into different records, each of which has its
 own set of tags.
 
 See L<http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf> for the
-official IPTC specification.
+official specification.
 
   Record   Tag Name                             Writable
   ------   --------                             --------
@@ -1389,6 +1414,7 @@ but ExifTool shortens this for the "XMP-iptcExt" family 1 group name.
   ControlledVocabularyTerm                      string+
   DigitalImageGUID                              string
   DigitalSourceFileType                         string
+  DigitalSourceType                             string
   Event                                         lang-alt
   IptcLastEdited                                date
   LocationCreatedCity                           string+
@@ -1780,7 +1806,9 @@ EXIF schema for TIFF tags.
 =head3 XMP x Tags
 
 The "x" namespace is used for the "xmpmeta" wrapper, and may contain an
-"xmptk" attribute that is extracted as the XMPToolkit tag.
+"xmptk" attribute that is extracted as the XMPToolkit tag.  When writing,
+the XMPToolkit tag is automatically generated by ExifTool unless
+specifically set to another value.
 
   Tag Name                                      Writable
   --------                                      --------
@@ -2148,8 +2176,7 @@ or by suffixing the tag name with a C<#> character).
 When adding GPS information to an image, it is important to set all of the
 following tags: GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef,
 GPSAltitude and GPSAltitudeRef.  ExifTool will write the required
-GPSVersionID tag automatically if new a GPS IFD is added to an image.  All
-GPS tags listed below are part of the EXIF specification.
+GPSVersionID tag automatically if new a GPS IFD is added to an image.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -2377,14 +2404,15 @@ been decoded.  Use the Unknown (-u) option to extract PrintIM information.
 
 =head2 Photoshop Tags
 
-Photoshop tags are found in PSD files, as well as inside embedded Photoshop
-information in many other file types (JPEG, TIFF, PDF, PNG to name a few).
+Photoshop tags are found in PSD and PSB files, as well as inside embedded
+Photoshop information in many other file types (JPEG, TIFF, PDF, PNG to name
+a few).
 
 Many Photoshop tags are marked as Unknown (indicated by a question mark
 after the tag name) because the information they provide is not very useful
-under normal circumstances (and because Adobe denied my application for
+under normal circumstances I<[and because Adobe denied my application for
 their file format documentation -- apparently open source software is too
-big a concept for them).  These unknown tags are not extracted unless the
+big a concept for them]>.  These unknown tags are not extracted unless the
 Unknown (-u) option is used.
 
   Tag ID   Tag Name                             Writable
@@ -2502,6 +2530,7 @@ This information is found in the PSD file header.
            CanonCameraInfo1DmkII                Canon CameraInfo1DmkII
            CanonCameraInfo1DmkIIN               Canon CameraInfo1DmkIIN
            CanonCameraInfo1DmkIII               Canon CameraInfo1DmkIII
+           CanonCameraInfo1DmkIV                Canon CameraInfo1DmkIV
            CanonCameraInfo5D                    Canon CameraInfo5D
            CanonCameraInfo5DmkII                Canon CameraInfo5DmkII
            CanonCameraInfo7D                    Canon CameraInfo7D
@@ -2509,6 +2538,7 @@ This information is found in the PSD file header.
            CanonCameraInfo50D                   Canon CameraInfo50D
            CanonCameraInfo450D                  Canon CameraInfo450D
            CanonCameraInfo500D                  Canon CameraInfo500D
+           CanonCameraInfo550D                  Canon CameraInfo550D
            CanonCameraInfo1000D                 Canon CameraInfo1000D
            CanonCameraInfoPowerShot             Canon CameraInfoPowerShot
            CanonCameraInfoPowerShot2            Canon CameraInfoPowerShot2
@@ -2692,7 +2722,7 @@ lists CameraInfo tags for the 1D and 1DS.
    -----   --------                             --------
       4    ExposureTime                         int8u
      10    FocalLength                          int16u
-     13    LensType                             int8u
+     13    LensType                             int16uRev
      14    ShortFocal                           int16u
      16    LongFocal                            int16u
      65    SharpnessFrequency                   int8u
@@ -2713,13 +2743,13 @@ CameraInfo tags for the 1DmkII and 1DSmkII.
    Index   Tag Name                             Writable
    -----   --------                             --------
       4    ExposureTime                         int8u
-      9    FocalLength                          int16u
-     13    LensType                             int8u
-     17    ShortFocal                           int16u
-     19    LongFocal                            int16u
+      9    FocalLength                          int16uRev
+     12    LensType                             int16uRev
+     17    ShortFocal                           int16uRev
+     19    LongFocal                            int16uRev
      45    FocalType                            int8u
      54    WhiteBalance                         int8u
-     55    ColorTemperature                     int16u
+     55    ColorTemperature                     int16uRev
      57    CanonImageSize                       int16u
     102    JPEGQuality                          int8u
     108    PictureStyle                         int8u
@@ -2736,12 +2766,12 @@ CameraInfo tags for the 1DmkIIN.
    Index   Tag Name                             Writable
    -----   --------                             --------
       4    ExposureTime                         int8u
-      9    FocalLength                          int16u
-     13    LensType                             int8u
-     17    ShortFocal                           int16u
-     19    LongFocal                            int16u
+      9    FocalLength                          int16uRev
+     12    LensType                             int16uRev
+     17    ShortFocal                           int16uRev
+     19    LongFocal                            int16uRev
      54    WhiteBalance                         int8u
-     55    ColorTemperature                     int16u
+     55    ColorTemperature                     int16uRev
     115    PictureStyle                         int8u
     116    Sharpness                            int8s
     117    Contrast                             int8s
@@ -2759,21 +2789,42 @@ CameraInfo tags for the 1DmkIII and 1DSmkIII.
       4    ExposureTime                         int8u
       6    ISO                                  int8u
      24    CameraTemperature                    int8u
-     29    FocalLength                          int16u
-     67    FocusDistanceUpper                   int16u
-     69    FocusDistanceLower                   int16u
+     27    MacroMagnification                   int8u
+     29    FocalLength                          int16uRev
+     48    CameraOrientation                    int8u
+     67    FocusDistanceUpper                   int16uRev
+     69    FocusDistanceLower                   int16uRev
      94    WhiteBalance                         int16u
      98    ColorTemperature                     int16u
     134    PictureStyle                         int8u
-    274    LensType                             int8u
-    275    ShortFocal                           int16u
-    277    LongFocal                            int16u
+    273    LensType                             int16uRev
+    275    ShortFocal                           int16uRev
+    277    LongFocal                            int16uRev
     310    FirmwareVersion                      string[6]
     370    FileIndex                            int32u
     374    ShutterCount                         int32u
     382    DirectoryIndex                       int32u
    1114    TimeStamp1                           int32u
    1118    TimeStamp                            int32u
+
+=head3 Canon CameraInfo1DmkIV Tags
+
+CameraInfo tags for the 1DmkIV.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      3    FNumber                              int8u
+      4    ExposureTime                         int8u
+      6    ISO                                  int8u
+      7    HighlightTonePriority                int8u
+     21    FlashMeteringMode                    int8u
+     25    CameraTemperature                    int8u
+     30    FocalLength                          int16uRev
+     53    CameraOrientation                    int8u
+     84    FocusDistanceUpper                   int16uRev
+     86    FocusDistanceLower                   int16uRev
+    488    FirmwareVersion                      N
+    493    FirmwareVersion                      N
 
 =head3 Canon CameraInfo5D Tags
 
@@ -2784,17 +2835,18 @@ CameraInfo tags for the EOS 5D.
       3    FNumber                              int8u
       4    ExposureTime                         int8u
       6    ISO                                  int8u
-     13    LensType                             int8u
+     12    LensType                             int16uRev
      23    CameraTemperature                    int8u
+     27    MacroMagnification                   int8s
      39    CameraOrientation                    int8s
-     40    FocalLength                          int16u
-     56    AFPointsInFocus5D                    int16u
+     40    FocalLength                          int16uRev
+     56    AFPointsInFocus5D                    int16uRev
      84    WhiteBalance                         int16u
      88    ColorTemperature                     int16u
     108    PictureStyle                         int8u
-    147    ShortFocal                           int16u
-    149    LongFocal                            int16u
-    152    LensType                             int8u
+    147    ShortFocal                           int16uRev
+    149    LongFocal                            int16uRev
+    151    LensType                             int16uRev
     164    FirmwareRevision                     string[8]
     172    ShortOwnerName                       string[16]
     208    ImageNumber                          int16u
@@ -2852,18 +2904,18 @@ CameraInfo tags for the EOS 5D Mark II.
      21    FlashMeteringMode                    int8u
      25    CameraTemperature                    int8u
      27    MacroMagnification                   int8u
-     30    FocalLength                          int16u
+     30    FocalLength                          int16uRev
      49    CameraOrientation                    int8u
-     80    FocusDistanceUpper                   int16u
-     82    FocusDistanceLower                   int16u
+     80    FocusDistanceUpper                   int16uRev
+     82    FocusDistanceLower                   int16uRev
     111    WhiteBalance                         int16u
     115    ColorTemperature                     int16u
     167    PictureStyle                         int8u
     189    HighISONoiseReduction                int8u
     191    AutoLightingOptimizer                int8u
-    231    LensType                             int8u
-    232    ShortFocal                           int16u
-    234    LongFocal                            int16u
+    230    LensType                             int16uRev
+    232    ShortFocal                           int16uRev
+    234    LongFocal                            int16uRev
     346    FirmwareVersion                      N
     382    FirmwareVersion                      N
     407    FileIndex                            int32u
@@ -2883,7 +2935,7 @@ CameraInfo tags for the EOS 7D.
       7    HighlightTonePriority                int8u
      21    FlashMeteringMode                    int8u
      25    CameraTemperature                    int8u
-     30    FocalLength                          int16u
+     30    FocalLength                          int16uRev
      32    CameraInfo7D_2a                      Canon CameraInfo7D_2
      36    CameraInfo7D_2b                      Canon CameraInfo7D_2
 
@@ -2894,14 +2946,14 @@ More CameraInfo tags for the EOS 7D.
    Index   Tag Name                             Writable
    -----   --------                             --------
      17    CameraOrientation                    int8u
-     48    FocusDistanceUpper                   int16u
-     50    FocusDistanceLower                   int16u
+     48    FocusDistanceUpper                   int16uRev
+     50    FocusDistanceLower                   int16uRev
      83    WhiteBalance                         int16u
      87    ColorTemperature                     int16u
     165    HighISONoiseReduction                int8u
-    239    LensType                             int8u
-    240    ShortFocal                           int16u
-    242    LongFocal                            int16u
+    238    LensType                             int16uRev
+    240    ShortFocal                           int16uRev
+    242    LongFocal                            int16uRev
     392    FirmwareVersion                      N
     455    FileIndex                            int32u
     467    DirectoryIndex                       int32u
@@ -2918,15 +2970,15 @@ CameraInfo tags for the EOS 40D.
      21    FlashMeteringMode                    int8u
      24    CameraTemperature                    int8u
      27    MacroMagnification                   int8u
-     29    FocalLength                          int16u
+     29    FocalLength                          int16uRev
      48    CameraOrientation                    int8u
-     67    FocusDistanceUpper                   int16u
-     69    FocusDistanceLower                   int16u
+     67    FocusDistanceUpper                   int16uRev
+     69    FocusDistanceLower                   int16uRev
     111    WhiteBalance                         int16u
     115    ColorTemperature                     int16u
-    215    LensType                             int8u
-    216    ShortFocal                           int16u
-    218    LongFocal                            int16u
+    214    LensType                             int16uRev
+    216    ShortFocal                           int16uRev
+    218    LongFocal                            int16uRev
     255    FirmwareVersion                      string[6]
     307    FileIndex                            int32u
     319    DirectoryIndex                       int32u
@@ -2944,18 +2996,18 @@ CameraInfo tags for the EOS 50D.
       7    HighlightTonePriority                int8u
      21    FlashMeteringMode                    int8u
      25    CameraTemperature                    int8u
-     30    FocalLength                          int16u
+     30    FocalLength                          int16uRev
      49    CameraOrientation                    int8u
-     80    FocusDistanceUpper                   int16u
-     82    FocusDistanceLower                   int16u
+     80    FocusDistanceUpper                   int16uRev
+     82    FocusDistanceLower                   int16uRev
     111    WhiteBalance                         int16u
     115    ColorTemperature                     int16u
     167    PictureStyle                         int8u
     189    HighISONoiseReduction                int8u
     191    AutoLightingOptimizer                int8u
-    235    LensType                             int8u
-    236    ShortFocal                           int16u
-    238    LongFocal                            int16u
+    234    LensType                             int16uRev
+    236    ShortFocal                           int16uRev
+    238    LongFocal                            int16uRev
     346    FirmwareVersion                      N
     350    FirmwareVersion                      N
     407    FileIndex                            int32u
@@ -2974,13 +3026,14 @@ CameraInfo tags for the EOS 450D.
       6    ISO                                  int8u
      21    FlashMeteringMode                    int8u
      24    CameraTemperature                    int8u
-     29    FocalLength                          int16u
+     27    MacroMagnification                   int8u
+     29    FocalLength                          int16uRev
      48    CameraOrientation                    int8u
-     67    FocusDistanceUpper                   int16u
-     69    FocusDistanceLower                   int16u
+     67    FocusDistanceUpper                   int16uRev
+     69    FocusDistanceLower                   int16uRev
     111    WhiteBalance                         int16u
     115    ColorTemperature                     int16u
-    223    LensType                             int8u
+    222    LensType                             int16uRev
     263    FirmwareVersion                      string[6]
     307    DirectoryIndex                       int32u
     319    FileIndex                            int32u
@@ -2988,7 +3041,7 @@ CameraInfo tags for the EOS 450D.
 
 =head3 Canon CameraInfo500D Tags
 
-CameraInfo tags for the EOS 50D.
+CameraInfo tags for the EOS 500D.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -2998,21 +3051,47 @@ CameraInfo tags for the EOS 50D.
       7    HighlightTonePriority                int8u
      21    FlashMeteringMode                    int8u
      25    CameraTemperature                    int8u
-     30    FocalLength                          int16u
+     30    FocalLength                          int16uRev
      49    CameraOrientation                    int8u
-     80    FocusDistanceUpper                   int16u
-     82    FocusDistanceLower                   int16u
+     80    FocusDistanceUpper                   int16uRev
+     82    FocusDistanceLower                   int16uRev
     115    WhiteBalance                         int16u
     119    ColorTemperature                     int16u
     171    PictureStyle                         int8u
     188    HighISONoiseReduction                int8u
     190    AutoLightingOptimizer                int8u
-    247    LensType                             int8u
-    248    ShortFocal                           int16u
-    250    LongFocal                            int16u
+    246    LensType                             int16uRev
+    248    ShortFocal                           int16uRev
+    250    LongFocal                            int16uRev
     400    FirmwareVersion                      N
     467    FileIndex                            int32u
     479    DirectoryIndex                       int32u
+
+=head3 Canon CameraInfo550D Tags
+
+CameraInfo tags for the EOS 550D.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      3    FNumber                              int8u
+      4    ExposureTime                         int8u
+      6    ISO                                  int8u
+      7    HighlightTonePriority                int8u
+     21    FlashMeteringMode                    int8u
+     25    CameraTemperature                    int8u
+     30    FocalLength                          int16uRev
+     53    CameraOrientation                    int8u
+     84    FocusDistanceUpper                   int16uRev
+     86    FocusDistanceLower                   int16uRev
+    120    WhiteBalance                         int16u
+    124    ColorTemperature                     int16u
+    176    PictureStyle                         int8u
+    255    LensType                             int16uRev
+    257    ShortFocal                           int16uRev
+    259    LongFocal                            int16uRev
+    420    FirmwareVersion                      N
+    484    FileIndex                            int32u
+    496    DirectoryIndex                       int32u
 
 =head3 Canon CameraInfo1000D Tags
 
@@ -3025,13 +3104,14 @@ CameraInfo tags for the EOS 1000D.
       6    ISO                                  int8u
      21    FlashMeteringMode                    int8u
      24    CameraTemperature                    int8u
-     29    FocalLength                          int16u
+     27    MacroMagnification                   int8u
+     29    FocalLength                          int16uRev
      48    CameraOrientation                    int8u
-     67    FocusDistanceUpper                   int16u
-     69    FocusDistanceLower                   int16u
+     67    FocusDistanceUpper                   int16uRev
+     69    FocusDistanceLower                   int16uRev
     111    WhiteBalance                         int16u
     115    ColorTemperature                     int16u
-    227    LensType                             int8u
+    226    LensType                             int16uRev
     267    FirmwareVersion                      string[6]
     311    DirectoryIndex                       int32u
     323    FileIndex                            int32u
@@ -3159,7 +3239,7 @@ Newer version of the AFInfo record containing much of the same information
   Sequence Tag Name                             Writable
   -------- --------                             --------
       0    AFInfoSize?                          N
-      1    AFMode                               N
+      1    AFAreaMode                           N
       2    NumAFPoints                          N
       3    ValidAFPoints                        N
       4    CanonImageWidth                      N
@@ -3623,8 +3703,8 @@ These tags are used by the PowerShot G10.
 
 =head3 Canon VignettingCorr Tags
 
-This information is found in images from the 1DmkIV, 5DmkII, 7D, 50D and
-500D.
+This information is found in images from the 1DmkIV, 5DmkII, 7D, 50D, 500D
+and 550D.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -5304,7 +5384,7 @@ DiMAGE X and Xt.
   0x000e   ExposureDifference                   undef[4]
   0x000f   ISOSelection                         string
   0x0010   DataDump                             N
-  0x0011   NikonPreview                         Nikon PreviewImage
+  0x0011   PreviewIFD                           Nikon PreviewIFD
   0x0012   FlashExposureComp                    undef[4]
   0x0013   ISOSetting                           int16u[2]
   0x0014   ColorBalanceA                        Nikon ColorBalanceA
@@ -5406,10 +5486,11 @@ DiMAGE X and Xt.
   0x0e1e   NikonCaptureOutput                   Nikon CaptureOutput
   0x0e22   NEFBitDepth                          int16u[4]!
 
-=head3 Nikon PreviewImage Tags
+=head3 Nikon PreviewIFD Tags
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
+  0x00fe   SubfileType                          N
   0x0103   Compression                          N
   0x011a   XResolution                          N
   0x011b   YResolution                          N
@@ -5941,9 +6022,40 @@ This information is written by the Nikon Scan software.
   0x000a   DigitalZoom                          Y
   0x000b   Converter                            Y
 
+=head3 Nikon NCDT Tags
+
+Nikon-specific QuickTime tags found in the NCDT atom of MOV videos from some
+Nikon cameras such as the Coolpix S8000.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'NCHD'   MakerNoteVersion                     N
+  'NCTG'   NikonTags                            Nikon NCTG
+  'NCTH'   ThumbnailImage                       N
+  'NCVW'   PreviewImage                         N
+
+=head3 Nikon NCTG Tags
+
+These tags are found in proprietary-format records of the NCTG atom in MOV
+videos from some Nikon cameras.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0001   Make                                 N
+  0x0002   Model                                N
+  0x0003   Software                             N
+  0x0011   CreateDate                           N
+  0x0012   DateTimeOriginal                     N
+  0x0016   FrameRate                            N
+  0x0022   FrameWidth                           N
+  0x0023   FrameHeight                          N
+  0x0032   AudioChannels                        N
+  0x0033   AudioBitsPerSample                   N
+  0x0034   AudioSampleRate                      N
+
 =head3 Nikon MOV Tags
 
-This information is found in Nikon MOV and QT videos.
+This information is found in MOV and QT videos from some Nikon cameras.
 
    Index   Tag Name                             Writable
    -----   --------                             --------
@@ -5966,6 +6078,7 @@ Nikon-specific RIFF tags found in AVI videos.
   'nctg'   NikonTags                            Nikon AVITags
   'ncth'   ThumbnailImage                       N
   'ncvr'   NikonVers                            Nikon AVIVers
+  'ncvw'   PreviewImage                         N
 
 =head3 Nikon AVITags Tags
 
@@ -6902,6 +7015,18 @@ FE120, FE140 and FE190.
      88    FocalLength                          N
     193    ISO                                  N
 
+=head3 Olympus MP4 Tags
+
+This information is found in MP4 videos from Olympus models such as the
+u7040 and u9010.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    Make                                 N
+     24    Model                                N
+     40    FNumber                              N
+     48    ExposureCompensation                 N
+
 =head3 Olympus AVI Tags
 
 This information is found in Olympus AVI videos.
@@ -6926,7 +7051,7 @@ These tags are used in Panasonic/Leica cameras.
   0x0002   FirmwareVersion                      undef
   0x0003   WhiteBalance                         int16u
   0x0007   FocusMode                            int16u
-  0x000f   AFMode                               int8u[2]
+  0x000f   AFAreaMode                           int8u[2]
   0x001a   ImageStabilization                   int16u
   0x001c   MacroMode                            int16u
   0x001f   ShootingMode                         int16u
@@ -6972,6 +7097,11 @@ These tags are used in Panasonic/Leica cameras.
   0x0061   FaceRecInfo                          Panasonic FaceRecInfo
   0x0062   FlashWarning                         int16u
   0x0063   RecognizedFaceFlags?                 undef[4]
+  0x0069   Country                              undef
+  0x006b   State                                undef
+  0x006d   City                                 undef
+  0x006f   Landmark                             undef
+  0x0070   IntelligentResolution                int8u
   0x0e00   PrintIM                              PrintIM
   0x8000   MakerNoteVersion                     undef
   0x8001   SceneMode                            int16u
@@ -7083,6 +7213,16 @@ This information is written by the X1.
   0x040d   ExposureMode                         int8u[4]
   0x0412   FilmMode                             string
   0x0413   WB_RGBLevels                         rational64u[3]
+
+=head3 Panasonic Leica6 Tags
+
+This information is written by the S2 (as a trailer in JPEG images).
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0300   PreviewImage                         undef
+  0x0301   UnknownBlock?                        N
+  0x0303   LensType                             string
 
 =head3 Panasonic Type2 Tags
 
@@ -7579,6 +7719,27 @@ This information is found in Sanyo MP4 videos.
     257    ThumbnailOffset                      N
     258    ThumbnailOffset                      N
 
+=head2 Samsung Tags
+
+These tags used in the maker notes of cameras such as the NX10, ST500, ST550,
+ST1000 and WB5000.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0001   MakerNoteVersion                     undef[4]
+  0x0021   PictureWizard                        int16u[5]
+  0x0035   PreviewIFD                           Nikon PreviewIFD
+  0x0043   CameraTemperature                    rational64s
+  0xa001   FirmwareName                         string
+  0xa003   LensType                             int16u
+  0xa010   SensorAreas                          int32u[8]
+  0xa013   ExposureCompensation                 rational64s
+  0xa014   ISO                                  int32u
+  0xa018   ExposureTime                         rational64u
+  0xa019   FNumber                              rational64u
+  0xa01a   FocalLengthIn35mmFormat              int32u
+  0xa021   WB_RGGBLevels                        int32u[4]
+
 =head2 Sigma Tags
 
 These tags are used in Sigma/Foveon cameras.
@@ -7619,8 +7780,10 @@ These tags are used in Sigma/Foveon cameras.
   0x001a   PreviewImageStart                    int32u*
   0x001b   PreviewImageLength                   int32u*
   0x001c   PreviewImageSize                     int16u[2]
-  0x001d   MakerNoteVersion                     string
-  0x0022   AdjustmentMode?                      string
+  0x001d   MakerNoteVersion                     undef
+  0x001f   AFPoint                              string
+  0x0022   FileFormat                           string
+  0x0024   Calibration                          string
   0x0030   LensApertureRange                    string
   0x0031   FNumber                              rational64u
   0x0032   ExposureTime                         rational64u
@@ -7934,6 +8097,7 @@ still proprietary) Adobe format.
            MakerNoteLeica3                      Panasonic Leica3
            MakerNoteLeica4                      Panasonic Leica4
            MakerNoteLeica5                      Panasonic Leica5
+           MakerNoteLeica6                      Panasonic Leica6
            MakerNotePanasonic                   Panasonic
            MakerNotePanasonic2                  Panasonic Type2
            MakerNotePentax                      Pentax
@@ -7942,8 +8106,8 @@ still proprietary) Adobe format.
            MakerNotePentax4                     Pentax Type4
            MakerNoteRicoh                       Ricoh
            MakerNoteRicohText                   Ricoh Text
-           PreviewImage                         undef
            MakerNoteSamsung                     undef
+           MakerNoteSamsung2                    Samsung
            MakerNoteSanyo                       Sanyo
            MakerNoteSanyoC4                     Sanyo
            MakerNoteSanyoPatch                  Sanyo
@@ -9543,8 +9707,8 @@ Data for the TextualData tags may be stored as tEXt, zTXt or iTXt chunks in
 the PNG image.  ExifTool will read and edit tags in their original form, but
 new string tags are created as uncompressed tEXt by default, or as
 compressed zTXt if the -z (Compress) option is used and Compress::Zlib is
-available. Raw profile information is always created as compressed zTXt if
-Compress::Zlib is available.
+available.  Raw profile information is always created as compressed zTXt if
+Compress::Zlib is available, and standard XMP is written as iTXt.
 
 Some of the tags below are not registered as part of the PNG specification,
 but are included here because they are generated by other software such as
@@ -9875,7 +10039,8 @@ image.
 
 =head2 PSP Tags
 
-Tags extracted from Paint Shop Pro images.
+Tags extracted from Paint Shop Pro images (PSP, PSPIMAGE, PSPFRAME,
+PSPSHAPE, PSPTUBE and TUB extensions).
 
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
@@ -10568,8 +10733,8 @@ These tags are extracted for variable bitrate audio.
 =head2 M2TS Tags
 
 The MPEG-2 transport stream is used as a container for many different
-audio/video formats (including AVCHD).  This table represents information
-extracted from the MPEG-2 transport headers.
+audio/video formats (including AVCHD).  This table lists information
+extracted from M2TS files.
 
   Tag Name                                      Writable
   --------                                      --------
@@ -10591,7 +10756,8 @@ Tags extracted from AC-3 audio streams.
 
 =head2 H264 Tags
 
-Tags extracted from H.264 video streams.
+Tags extracted from H.264 video streams.  The metadata for AVCHD videos is
+stored in this stream.
 
   Tag Name                                      Writable
   --------                                      --------
@@ -10604,8 +10770,8 @@ Tags extracted from H.264 video streams.
 The following tags are decoded from the Modified Digital Video Pack Metadata
 (MDPM) of the unregistered user data with UUID
 17ee8c60f84d11d98cd60800200c9a66 in the H.264 Supplemental Enhancement
-Information (SEI).  [Yes, this description is confusing, but nothing
-compared to the challenge of actually decoding the data!]  This information
+Information (SEI).  I<[Yes, this description is confusing, but nothing
+compared to the challenge of actually decoding the data!]>  This information
 may exist at regular intervals through the entire video, but only the first
 occurrence is extracted unless the ExtractEmbedded option is used (in which
 case subsequent occurrences are extracted as sub-documents).
@@ -11087,10 +11253,13 @@ if they don't exist in this table.
   ------       --------                         --------
   'AllF'       PlayAllFrames                    N
   'CNCV'       CompressorVersion                N
+  'CNFV'       FirmwareVersion                  N
+  'CNMN'       Model                            N
   'DcMD'       DcMD                             QuickTime DcMD
   'LOOP'       LoopStyle                        N
   'MMA0'       MinoltaMMA0                      Minolta MMA
   'MMA1'       MinoltaMMA1                      Minolta MMA
+  'NCDT'       NikonNCDT                        Nikon NCDT
   'QVMI'       CasioQVMI                        EXIF
   'SelO'       PlaySelection                    N
   'TAGS'       KodakTags                        Kodak MOV
@@ -11099,6 +11268,7 @@ if they don't exist in this table.
                NikonTags                        Nikon MOV
                OlympusTags1                     Olympus MOV1
                OlympusTags2                     Olympus MOV2
+               OlympusTags3                     Olympus MP4
                PentaxTags                       Pentax MOV
                SanyoMOV                         Sanyo MOV
                SanyoMP4                         Sanyo MP4
@@ -15493,7 +15663,7 @@ Information extracted from MS Shell Link (Windows shortcut) files.
 =head2 Font Tags
 
 This table contains a collection of tags found in font files of various
-formats. ExifTool current recognizes OTF, TTF, TTC, DFONT, PFA, PFB, PFM,
+formats.  ExifTool current recognizes OTF, TTF, TTC, DFONT, PFA, PFB, PFM,
 AFM, ACFM and AMFM font files.
 
   Tag ID       Tag Name                         Writable
@@ -15505,7 +15675,6 @@ AFM, ACFM and AMFM font files.
   'name'       Name                             Font Name
   'numfonts'   NumFonts                         N
   'postfont'   PostScriptFontName               N
-  'vers'       ResourceVersion                  N
 
 =head3 Font AFM Tags
 
@@ -15615,6 +15784,20 @@ default language of "en".
   0x0014   PostScriptFontName                   N
   0x0015   WWSFamilyName                        N
   0x0016   WWSSubfamilyName                     N
+
+=head2 RSRC Tags
+
+Tags extracted from Mac OS resource files and DFONT files.  These tags may
+also be extracted from the resource fork of any file on a Mac OS system,
+either by adding "/rsrc" to the filename to process the resource fork alone,
+or by using the -ee (ExtractEmbedded) option to process the resource fork as
+a sub-document of the main file.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  '8BIM'   PhotoshopInfo                        Photoshop
+  'fnt '   Font                                 Font Name
+  'vers'   ResourceVersion                      N
 
 =head2 Rawzor Tags
 
@@ -15797,6 +15980,7 @@ contained within the file data.  These "pseudo" tags belong to the family 1
   Now                                           N
   PreviewImage                                  Y
   RAFVersion                                    N
+  ResourceForkSize                              N
   Warning                                       N
   XMP                                           Y!
   XResolution                                   N
@@ -15883,16 +16067,13 @@ information is extracted.
   GPSAltitude          GPSAltitudeRef           N
                        GPS:GPSAltitude
                        XMP:GPSAltitude
-                       H264:GPSAltitude
   GPSDateTime          GPS:GPSDateStamp         N
                        GPS:GPSTimeStamp
-  GPSLatitude          GPSLatitudeRef           N
-                       GPS:GPSLatitude
-                       H264:GPSLatitude
+  GPSLatitude          GPS:GPSLatitude          N
+                       GPS:GPSLatitudeRef
   GPSLatitudeRef       XMP:GPSLatitude          N
-  GPSLongitude         GPSLongitudeRef          N
-                       GPS:GPSLongitude
-                       H264:GPSLongitude
+  GPSLongitude         GPS:GPSLongitude         N
+                       GPS:GPSLongitudeRef
   GPSLongitudeRef      XMP:GPSLongitude         N
   GPSPosition          GPSLatitude              N
                        GPSLongitude
@@ -16160,6 +16341,7 @@ for more details.
                        MakerNoteLeica3
                        MakerNoteLeica4
                        MakerNoteLeica5
+                       MakerNoteLeica6
                        MakerNotePanasonic
                        MakerNotePanasonic2
                        MakerNotePentax
@@ -16169,6 +16351,7 @@ for more details.
                        MakerNoteRicoh
                        MakerNoteRicohText
                        MakerNoteSamsung
+                       MakerNoteSamsung2
                        MakerNoteSanyo
                        MakerNoteSanyoC4
                        MakerNoteSanyoPatch
@@ -16243,20 +16426,13 @@ that the behaviour when writing is not changed:  ExifTool always creates new
 records only in the standard location, but writes new tags to any
 EXIF/IPTC/XMP records that exist.
 
-A problem with the MWG specification is that although XMP:Creator and
-IPTC:By-line are list-type tags, the corresponding EXIF tag, EXIF:Artist, is
-not.  So, short of changing the EXIF specification to allow EXIF:Artist to
-store a list of strings, the only reasonable alternative is to NOT allow
-MWG:Creator to be written as a list.  (It is insufficient to say that
-EXIF:Artist may store multiple strings separated with semicolons because
-there is nothing in any of the MWG, EXIF, XMP or IPTC specifications that
-states an individual Creator string may not contain a semicolon, and for
-this to be feasible all of these specifications would require this
-restriction.)  For this reason, the MWG:Creator tag is written as a single
-string.  Multiple names may of course be written within the string (and it
-would be reasonable to separate them with semicolons as suggested by the MWG
-and EXIF specifications), but this tag is not treated as a list by ExifTool
-when writing.
+A complication of the specification is that although the MWG:Creator
+property may consist of multiple values, the associated EXIF tag
+(EXIF:Artist) is only a simple string.  To resolve this discrepancy the MWG
+recommends a technique which allows a list of values to be stored in a
+string by using a semicolon-space separator (with quotes around values if
+necessary).  When the MWG module is loaded, ExifTool automatically
+implements this policy and changes EXIF:Artist to a list-type tag.
 
   Tag Name             Derived From             Writable
   --------             ------------             --------
@@ -16280,7 +16456,7 @@ when writing.
                        XMP-xmp:CreateDate
                        CurrentIPTCDigest
                        IPTCDigest
-  Creator              EXIF:Artist              Y
+  Creator              EXIF:Artist              Y+
                        IPTC:By-line
                        XMP-dc:Creator
                        CurrentIPTCDigest

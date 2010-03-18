@@ -87,13 +87,22 @@ value.</p>
 
 <tr><td>FOUND_TAGS</td><td>Found tags with proper case and order</td></tr>
 
+<tr><td>HTML_DUMP</td><td>Reference to HtmlDump object when using HtmlDump feature</td></tr>
+
 <tr><td>INDENT</td><td>Indent string for verbose output</td></tr>
+
+<tr><td>IN_RESOURCE</td><td>Flag indicates we are processing the resource fork of a Mac OS file</td></tr>
 
 <tr><td>IO_TAG_LIST</td><td>List for output of requested tags in proper case and order</td></tr>
 
 <tr><td>LIST_TAGS</td><td>Hash of tag keys by tagInfo reference for active List-type
     tags.  This hash is cleared at the start of processing for each directory.
     Not used during when writing.</td></tr>
+
+<tr><td>LOW_PRIORITY_DIR</td><td>Lookup based on directory name for directories where
+    undefined Priority tags get set to Priority 0 (ie. PreviewIFD in all images,
+    and IFD1 in JPEG images).  This is equivalent to setting PRIORITY to 0 for
+    the tag table only for a specific directory name.</td></tr>
 
 <tr><td>Make</td><td>Camera make set during reading and writing</td></tr>
 
@@ -144,7 +153,7 @@ value.</p>
 
 <tr><td>OPTIONS</td><td>ExifTool options</td></tr>
 
-<tr><td>PATH</td><td>List reference to SubDirectory path when reading.  ie)
+<tr><td>PATH</td><td>List reference to SubDirectory path.  ie)
     [qw(JPEG APP13 Photoshop IPTC)]</td></tr>
 
 <tr><td>PDF_CAPTURE</td><td>Used by PDF module to store information when writing</td></tr>
@@ -163,9 +172,6 @@ value.</p>
 <tr><td>PRIORITY</td><td>Hash of tag Priority values for current tag, keyed by tag name (not tag key!)</td></tr>
 
 <tr><td>PRIORITY_DIR</td><td>Name of priority directory (ie. the IFD for the full resolution image)</td></tr>
-
-<tr><td>PRIORITY0_DIR</td><td>Name of directory where undefined Priority tags get set to Priority 0
-    (used for IFD1 in JPEG images)</td></tr>
 
 <tr><td>PROCESSED</td><td>Reference to hash of address/directory names which were processed
     during reading and/or writing</td></tr>
@@ -187,6 +193,7 @@ value.</p>
 <tr><td>TAG_EXTRA</td><td>Hash of extra tag information keyed by tag key.  Current extra
 information may include:
     <table class='clear'>
+    <tr valign='top'><td>G0</td><td>-</td><td>override for family 0 group name</td></tr>
     <tr valign='top'><td>G1</td><td>-</td><td>dynamic family 1 group name (ie. IFD name or XMP
         namespace), with a leading '+' to add value to the existing group 1 name</td></tr>
     <tr valign='top'><td>G3</td><td>-</td><td>number for embedded documents (ie. 1, 2, etc)</td></tr>

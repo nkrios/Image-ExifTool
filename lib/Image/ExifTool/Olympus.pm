@@ -31,7 +31,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.65';
+$VERSION = '1.67';
 
 sub PrintLensInfo($$$);
 
@@ -687,6 +687,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         {
             Name => 'Equipment',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2, # (so HtmlDump doesn't show these as double-referenced)
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::Equipment',
                 ByteOrder => 'Unknown',
@@ -707,6 +708,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         {
             Name => 'CameraSettings',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::CameraSettings',
                 ByteOrder => 'Unknown',
@@ -727,6 +729,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         {
             Name => 'RawDevelopment',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::RawDevelopment',
                 ByteOrder => 'Unknown',
@@ -747,6 +750,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         {
             Name => 'RawDev2',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::RawDevelopment2',
                 ByteOrder => 'Unknown',
@@ -767,6 +771,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         {
             Name => 'ImageProcessing',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::ImageProcessing',
                 ByteOrder => 'Unknown',
@@ -787,6 +792,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         {
             Name => 'FocusInfo',
             Condition => '$format ne "ifd" and $format ne "int32u" and not $$self{OlympusCAMER}',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::FocusInfo',
                 ByteOrder => 'Unknown',
@@ -815,6 +821,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         { #11
             Name => 'Olympus2100',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::FETags',
                 ByteOrder => 'Unknown',
@@ -836,6 +843,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         { #11
             Name => 'Olympus2200',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::FETags',
                 ByteOrder => 'Unknown',
@@ -857,6 +865,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         { #11
             Name => 'Olympus2300',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::FETags',
                 ByteOrder => 'Unknown',
@@ -878,6 +887,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         { #11
             Name => 'Olympus2400',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::FETags',
                 ByteOrder => 'Unknown',
@@ -899,6 +909,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         { #11
             Name => 'Olympus2500',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::FETags',
                 ByteOrder => 'Unknown',
@@ -920,6 +931,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         { #11
             Name => 'Olympus2600',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::FETags',
                 ByteOrder => 'Unknown',
@@ -941,6 +953,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         { #11
             Name => 'Olympus2700',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::FETags',
                 ByteOrder => 'Unknown',
@@ -962,6 +975,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         { #11
             Name => 'Olympus2800',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::FETags',
                 ByteOrder => 'Unknown',
@@ -983,6 +997,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         { #11
             Name => 'Olympus2900',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::FETags',
                 ByteOrder => 'Unknown',
@@ -1004,6 +1019,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         { #6
             Name => 'RawInfo',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::RawInfo',
                 ByteOrder => 'Unknown',
@@ -1024,6 +1040,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         {
             Name => 'MainInfo',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::Main',
                 ByteOrder => 'Unknown',
@@ -1044,6 +1061,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         {
             Name => 'UnknownInfo',
             Condition => '$format ne "ifd" and $format ne "int32u"',
+            NestedHtmlDump => 2,
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::UnknownInfo',
                 ByteOrder => 'Unknown',
@@ -2971,6 +2989,36 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ISO',
         Format => 'int16u',
     },
+);
+
+# tags in Olympus MP4 videos (ref PH)
+%Image::ExifTool::Olympus::MP4 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    NOTES => q{
+        This information is found in MP4 videos from Olympus models such as the
+        u7040 and u9010.
+    },
+    0x00 => {
+        Name => 'Make',
+        Format => 'string[24]',
+    },
+    0x18 => {
+        Name => 'Model',
+        Format => 'string[24]',
+    },
+    0x28 => {
+        Name => 'FNumber',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x30 => { #(NC)
+        Name => 'ExposureCompensation',
+        Format => 'rational64s',
+        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    # NEED MORE SAMPLES TO DECODE THIS
 );
 
 # tags in Olympus AVI videos (ref PH)

@@ -8,10 +8,9 @@
 # References:   1) http://developer.apple.com/textfonts/TTRefMan/RM06/Chap6.html
 #               2) http://www.microsoft.com/typography/otspec/otff.htm
 #               3) http://partners.adobe.com/public/developer/opentype/index_font_file.html
-#               4) http://developer.apple.com/legacy/mac/library/documentation/mac/MoreToolbox/MoreToolbox-99.html
-#               5) http://partners.adobe.com/public/developer/en/font/5178.PFM.pdf
-#               6) http://opensource.adobe.com/svn/opensource/flex/sdk/trunk/modules/compiler/src/java/flex2/compiler/util/MimeMappings.java
-#               7) http://www.adobe.com/devnet/font/pdfs/5004.AFM_Spec.pdf
+#               4) http://partners.adobe.com/public/developer/en/font/5178.PFM.pdf
+#               5) http://opensource.adobe.com/svn/opensource/flex/sdk/trunk/modules/compiler/src/java/flex2/compiler/util/MimeMappings.java
+#               6) http://www.adobe.com/devnet/font/pdfs/5004.AFM_Spec.pdf
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Font;
@@ -20,7 +19,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessOTF($$);
 
@@ -184,7 +183,7 @@ my %ttLang = (
     GROUPS => { 2 => 'Document' },
     NOTES => q{
         This table contains a collection of tags found in font files of various
-        formats. ExifTool current recognizes OTF, TTF, TTC, DFONT, PFA, PFB, PFM,
+        formats.  ExifTool current recognizes OTF, TTF, TTC, DFONT, PFA, PFB, PFM,
         AFM, ACFM and AMFM font files.
     },
     name => {
@@ -202,7 +201,6 @@ my %ttLang = (
         Name => 'AFM',
         SubDirectory => { TagTable => 'Image::ExifTool::Font::AFM' },
     },
-    vers => 'ResourceVersion',
     numfonts => 'NumFonts',
     fontname => 'FontName',
     postfont => {
@@ -248,7 +246,7 @@ my %ttLang = (
     22 => 'WWSSubfamilyName',
 );
 
-# PostScript Font Metric file header (ref 5)
+# PostScript Font Metric file header (ref 4)
 %Image::ExifTool::Font::PFM = (
     GROUPS => { 2 => 'Document' },
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -306,7 +304,7 @@ my %ttLang = (
     FSType      => { },
 );
 
-# Adobe Font Metrics tags (AFM) (ref 7)
+# Adobe Font Metrics tags (AFM) (ref 6)
 %Image::ExifTool::Font::AFM = (
     GROUPS => { 2 => 'Document' },
     NOTES => 'Tags extracted from Adobe Font Metrics files (AFM, ACFM and AMFM).',
@@ -330,80 +328,6 @@ my %ttLang = (
     Ascender    => { },
     Descender   => { },
 );
-
-#------------------------------------------------------------------------------
-# Read information from a Mac resource file (DFONT files) (ref 4)
-# Inputs: 0) ExifTool ref, 1) dirInfo ref
-# Returns: 1 on success, 0 if this wasn't a valid resource file
-sub ProcessRSRC($$)
-{
-    my ($exifTool, $dirInfo) = @_;
-    my $raf = $$dirInfo{RAF};
-    my ($hdr, $map, $buff, $i, $j);
-
-    # attempt to validate the format as thoroughly as practical
-    return 0 unless $raf->Read($hdr, 16) == 16;
-    my ($datOff, $mapOff, $datLen, $mapLen) = unpack('N*', $hdr);
-    return 0 unless $raf->Seek(0, 2);
-    my $fLen = $raf->Tell();
-    return 0 if $datOff < 0x10 or $datOff + $datLen > $fLen;
-    return 0 if $mapOff < 0x10 or $mapOff + $mapLen > $fLen or $mapLen < 30;
-    return 0 if $datOff < $mapOff and $datOff + $datLen > $mapOff;
-    return 0 if $mapOff < $datOff and $mapOff + $mapLen > $datOff;
-    # make sure the file isn't mostly empty
-    return 0 if $mapLen + $datLen < $fLen / 2;
-
-    my $verbose = $exifTool->Options('Verbose');
-
-    # read the resource map
-    $raf->Seek($mapOff, 0) and $raf->Read($map, $mapLen) == $mapLen or return 0;
-    $exifTool->SetFileType('RSRC');
-    SetByteOrder('MM');
-    my $typeOff = Get16u(\$map, 24);
-    my $numTypes = Get16u(\$map, 28);
-    # parse resource type list
-    for ($i=0; $i<=$numTypes; ++$i) {
-        my $off = $typeOff + 2 + 8 * $i;    # offset of entry in type list
-        last if $off + 8 > $mapLen;
-        my $resType = substr($map,$off,4);  # resource type
-        my $resNum = Get16u(\$map,$off+4);  # number of resources - 1
-        my $refOff = Get16u(\$map,$off+6) + $typeOff; # offset to first resource reference
-        my $tmp = $resNum + 1;
-        # loop through all resources
-        for ($j=0; $j<=$resNum; ++$j) {
-            my $roff = $refOff + 12 * $j;
-            last if $roff + 12 > $mapLen;
-            # read only the 24-bit resource data offset
-            my $resOff = (Get32u(\$map,$roff+4) & 0x00ffffff) + $datOff;
-            if ($verbose) {
-                $exifTool->VPrint(0,sprintf("$resType resource (offset 0x%.4x):\n", $resOff));
-            }
-            if ($resType eq 'vers') {
-                # parse the 'vers' resource to get the long version string
-                $raf->Seek($resOff, 0) and $raf->Read($buff, 4) == 4 or next;
-                my $n = unpack('N', $buff);
-                $n > 8 and $raf->Read($buff, $n) == $n or next;
-                # long version string is after short version
-                my $p = 7 + Get8u(\$buff, 6);
-                next if $p >= $n;
-                my $vlen = Get8u(\$buff, $p++);
-                next if $p + $vlen > $n;
-                my $tagTablePtr = GetTagTable('Image::ExifTool::Font::Main');
-                my $val = $exifTool->Decode(substr($buff, $p, $vlen), 'MacRoman');
-                $exifTool->HandleTag($tagTablePtr, 'vers', $val);
-            } elsif ($resType eq 'sfnt') {
-                # parse the OFT font block
-                $raf->Seek($resOff + 4, 0) or next;
-                $$dirInfo{Base} = $resOff + 4;
-                unless (ProcessOTF($exifTool, $dirInfo)) {
-                    $exifTool->Warn('Unrecognized sfnt resource format');
-                }
-                $exifTool->OverrideFileType('DFONT');
-            }
-        }
-    }
-    return 1;
-}
 
 #------------------------------------------------------------------------------
 # Read information from a TrueType font collection (TTC) (refs 2,3)
@@ -574,7 +498,7 @@ sub ProcessOTF($$)
 }
 
 #------------------------------------------------------------------------------
-# Read information from an Adobe Font Metrics file (AFM, ACFM, AMFM) (ref 7)
+# Read information from an Adobe Font Metrics file (AFM, ACFM, AMFM) (ref 6)
 # Inputs: 0) ExifTool ref, 1) dirInfo ref
 # Returns: 1 on success, 0 if this wasn't a recognized AFM-type file
 sub ProcessAFM($$)
@@ -630,8 +554,6 @@ sub ProcessFont($$)
         $rtnVal = ProcessOTF($exifTool, $dirInfo);
     } elsif ($buff =~ /^ttcf\0[\x01\x02]\0\0/) {                  # TTC
         $rtnVal = ProcessTTC($exifTool, $dirInfo);
-    } elsif ($buff =~ /^(....)?\0\0\x01\0/s) {                    # DFONT (RSRC)
-        $rtnVal = ProcessRSRC($exifTool, $dirInfo);
     } elsif ($buff =~ /^Start(Comp|Master)?FontMetrics\s+\d+/s) { # AFM
         $rtnVal = ProcessAFM($exifTool, $dirInfo);
     } elsif ($buff =~ /^(.{6})?%!(PS-AdobeFont-|FontType1-)\d/s) {# PFA, PFB
@@ -703,8 +625,6 @@ under the same terms as Perl itself.
 =item L<http://www.microsoft.com/typography/otspec/otff.htm>
 
 =item L<http://partners.adobe.com/public/developer/opentype/index_font_file.html>
-
-=item L<http://developer.apple.com/legacy/mac/library/documentation/mac/MoreToolbox/MoreToolbox-99.html>
 
 =item L<http://partners.adobe.com/public/developer/en/font/5178.PFM.pdf>
 

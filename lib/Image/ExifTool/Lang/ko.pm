@@ -8,6 +8,7 @@
 
 package Image::ExifTool::Lang::ko;
 
+use strict;
 use vars qw($VERSION);
 
 $VERSION = '1.01';
@@ -1423,7 +1424,6 @@ $VERSION = '1.01';
         'Small (2.5 M)' => '작은 (2.5M)',
       },
     },
-   'NikonPreview' => 'IFD 포인터 미리보기',
    'NoMemoryCard' => {
       Description => '메모리카드 없을 경우',
       PrintConv => {
@@ -1546,6 +1546,7 @@ $VERSION = '1.01';
         'Green' => '녹색',
       },
     },
+   'PreviewIFD' => 'IFD 포인터 미리보기',
    'PrimaryAFPoint' => {
       PrintConv => {
         'Bottom' => '하단',

@@ -24,7 +24,6 @@ a.top       { text-decoration: none; font-size: smaller;
               border: 1px solid blue; padding: 0 .2em }
 pre         { color: #800; padding: 0; margin: 0 }
 blockquote  { margin-top: 1em; margin-bottom: 1em }
-code        { white-space: nowrap }
 div.wide        { margin: 0 -.5em }
 table.tight td  { padding: 0px 4px }
 table.links     { border-collapse: collapse; width: 100%; margin: 0 }
@@ -73,14 +72,15 @@ table.dl td     { padding: .4em .8em }
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-8.10.tar.gz">
-Download        Version 8.10</a> (2.6 MB) -
-<a href="history.html">Feb. 8, 2010</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-8.15.tar.gz">
+Download        Version 8.15</a> (2.7 MB) -
+<a href="history.html">Mar. 18, 2010</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
-reading, writing and editing meta information in image, audio and video
-files.</b> ExifTool supports many different types of metadata including
+reading, writing and editing meta information in a
+<a href="#supported">wide variety of files</a>.</b>
+ExifTool supports many different metadata formats including
 <a href="TagNames/EXIF.html">EXIF</a>,
 <a href="TagNames/GPS.html">GPS</a>,
 <a href="TagNames/IPTC.html">IPTC</a>,
@@ -117,8 +117,8 @@ distribution above.</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-8.10.zip">
-         exiftool-8.10.zip</a> (2.9 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-8.15.zip">
+         exiftool-8.15.zip</a> (2.9 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -129,8 +129,8 @@ of Windows (including Windows 7).</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 Mac OS X Package:
-<a href="ExifTool-8.10.dmg">
-         ExifTool-8.10.dmg</a> (1.7 MB)</b></td></tr></table></blockquote>
+<a href="ExifTool-8.15.dmg">
+         ExifTool-8.15.dmg</a> (1.8 MB)</b></td></tr></table></blockquote>
 
 <p><b>The OS X package</b> installs the ExifTool command-line application and
 libraries in /usr/bin. After installing, type "<code>exiftool</code>" in a
@@ -330,6 +330,7 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td><a href="TagNames/EXE.html#ELF">SO</a></td><td>R</td><td>Unix ELF executable and Shared Object files</td></tr>
 <tr><td>SR2</td><td>R/W</td><td>Sony RAW 2 (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td>SRF</td><td>R</td><td>Sony RAW Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
+<tr><td>SRW</td><td>R/W</td><td>Samsung RAW format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/XMP.html#SVG">SVG</a></td><td>R</td><td>Scalable Vector Graphics (XML-based)</td></tr>
 <tr><td><a href="TagNames/Flash.html">SWF</a></td><td>R</td><td>Shockwave Flash</td></tr>
 <tr><td>THM</td><td>R/W</td><td>Canon Thumbnail (<a href="TagNames/JPEG.html">JPEG</a>)</td></tr>
@@ -654,9 +655,9 @@ MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash,
 MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
 MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
 MIFF, MNG, MPC, MPEG, MPF0, MPImage, MakerNotes, MakerUnknown, MetaIFD,
-Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom, NikonPreview,
-NikonScan, Olympus, PDF, PICT, PNG, Panasonic, Pentax, PSP, PhotoMechanic,
-Photoshop, PictureInfo, PostScript, PrintIM, ProfileIFD, QuickTime, RAF,
+Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom, NikonScan,
+Olympus, PDF, PICT, PNG, Panasonic, Pentax, PSP, PhotoMechanic, Photoshop,
+PictureInfo, PostScript, PreviewIFD, PrintIM, ProfileIFD, QuickTime, RAF,
 RAF2, RIFF, RMETA, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3,
 Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
 SRF#, SVG, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD,
@@ -793,10 +794,10 @@ prevents some edited <b>Pentax PEF</b> images from being displayed properly.
 Other software such as the Pentax Silkypix software and dcraw have no problems
 with these images. <i>[This bug is fixed in OS X 10.5.4]</i></li>
 <li>Some <b>Apple</b> applications may store information in the <b>resource
-fork</b> of a file.  ExifTool does not process the resource fork, so this
-information is lost if the file is rewritten.  (The resource fork is also
-typically dropped if the file is simply transferred to a non-Macintosh
-system.)</li>
+fork</b> of a file.  This information is lost when the file is rewritten unless
+the <code>-overwrite_original_in_place</code> option is used.  Note that the
+resource fork is also typically dropped if the file is simply transferred to a
+non-Macintosh system.</li>
 <li>In <b>Windows</b>, ExifTool will not process files with <b>Unicode
 characters in the file name</b>.  This is due to an underlying lack of support
 for Unicode filenames in the Windows standard C I/O libraries.</li>
@@ -933,12 +934,11 @@ binary data.  The simple script above does not handle this case.</p>
 
 <h3>Related Utilities</h3>
 
-<p>Below are some utilities which take advantage of the ExifTool engine:</p>
+<p>Below are some free utilities which take advantage of the ExifTool engine:</p>
 
 <p><b>Windows</b></p>
 <ul>
 <li><a href="http://www.thezeal.com/blog/?p=145">Exif Stats Utility</a>: Analyzes images to tabulate apertures, exposure times, etc</li>
-<li><a href="http://owl.phy.queensu.ca/~phil/exiftool/modExiftool_101.zip">Download</a> Visual Basic 6.0 example script v1.01 for reading tags with exiftool (thanks Michael Wandel)</li>
 <li><a href="http://aeropic.free.fr/H&amp;B/AUTO_ISO_patcher/">Auto ISO Tool</a>: GUI front-end for ExifTool to patch Canon ISO information</li>
 <li><a href="http://home.roadrunner.com/~dick/ExifAuto.htm">ExifAuto</a>: GUI front-end for ExifTool to perform simple operations</li>
 <li><a href="http://freeweb.siol.net/hrastni3/foto/exif/exiftoolgui.htm">ExifTool GUI for Windows</a>: GUI for viewing meta information with some editing features</li>
@@ -995,8 +995,10 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <ul>
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/get_tags.sit">Download</a> sample AppleScript to extract tags into AppleScript record (thanks to Rob Lewis)</li>
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/ExifToolWrapper.zip">Download</a> example of a simple Visual C++ wrapper for exiftool (thanks Mark Borg and &#40643;&#29790;&#26124;)</li>
+<li><a href="http://owl.phy.queensu.ca/~phil/exiftool/modExiftool_101.zip">Download</a> Visual Basic 6.0 example script v1.01 for reading tags with exiftool (thanks Michael Wandel)</li>
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/vb_sample.html">Sample VB.NET subroutine</a> to extract a preview image (thanks Claus Beckmann)</li>
 <li><a href="http://sourceforge.net/projects/moss">Moss</a>: Collection of Java utilities which includes an exiftool interface</li>
+<li><a href="http://gitorious.org/mini_exiftool">MiniExiftool</a>: Ruby library wrapper for ExifTool</li>
 </ul>
 
 <p>Also notable, but not directly based on ExifTool:</p>

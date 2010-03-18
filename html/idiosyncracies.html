@@ -82,12 +82,34 @@ start of the individual IFD entry.</p>
 to the start of the individual IFD entry.</p>
 
 <p><b>Leica:</b> The M8 and M9 write the EXIF ComponentsConfiguration value in
-ASCII instead of binary.  Also, the M8 writes EXIF ExposureCompensation and
+ASCII instead of binary.  The M8 writes EXIF ExposureCompensation and
 ShutterSpeedValue incorrectly as a unsigned rationals when they should be
 signed.  This leads to crazy values like "+65536" for small negative exposure
-compensations, and "0 s" for long exposure times.  NOTE: These are all EXIF
+compensations, and "0 s" for long exposure times.  (NOTE: These are all EXIF
 idiosyncracies since the values are in the standard EXIF, not the maker
-notes.</p>
+notes.)  In DNG images, the M8 uses maker note offsets relative to the
+start of the maker notes in JPEG images (very reasonable), but relative to
+the end of the maker note header in DNG images.  I think this was a mistake
+because this is changed in M9 DNG images to be the same as JPEG images.</p>
+
+<p>The Leica S2 maker note format is the MOST idiotic I have seen, and has the
+following peculiarities:</p>
+
+<ul>
+<li>It is stored as a trailer after the JPEG EOI (but referenced from a pointer
+inside the APP1 EXIF segment).</li>
+<li>Most of the offsets in this MakerNote IFD are relative to the start of the
+file instead of the EXIF TIFF header (which is particularly cruel because they
+are broken if other software simply adds a leading JFIF segment, but there is no
+simple way to detect that this has happened.  Normally this could be detected by
+analyzing the pointers, but this doesn't work here because all of the unused
+data in the Leica maker notes make normal pointer assumptions impossible).</li>
+<li>The PreviewImage offset is relative to the start of the MakerNote data
+(which is MUCH more reasonable, but using two different offset bases in the same
+directory is yet another level of idiocy).</li>
+<li>In DNG images the maker notes use an absolute base offset.  Yet again
+different from the M8 and M9.  Consistency isn't Leica's strong suit.
+</ul>
 
 <p><b>Minolta:</b> An obvious bug in the firmware of the Z2 writes an incorrect
 offset for the 'MinoltaCameraSettings2' information -- it writes the offset of
@@ -192,9 +214,20 @@ use the same NEF writing routines.)  But luckly  the lost information isn't very
 important.  (Only a few tags from the embedded full-sized preview image are lost:
 XResolution, YResolution and YCbCrPositioning.)</p>
 
+<p><b>Nikon NRW:</b> Nikon should have just called this NEF with a different
+version number -- there should be no need to pollute the universe with zillions
+of unnecessary file extensions.  Oh right, they weren't smart enough to include
+a file identifier containing a version number in their NEF images -- Doh! In
+these images, CFAPattern2 is written incorrectly with UNDEFINED instead of BYTE
+format.</p>
+
+<p><b>Samsung SRW:</b> Yet another TIFF-based RAW image with no proper file
+identifier.  In these images the thumbnail is stored inside a SubIFD of IFD1
+instead of directly in IFD1 (dumb, dumb...).</p>
+
 <hr>
 <i>Created Mar. 25, 2005</i>
-<br><i>Last revised Jan. 10, 2010</i>
+<br><i>Last revised Mar. 1, 2010</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

@@ -21,7 +21,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.00';
+$VERSION = '1.03';
 
 sub ProcessSEI($$);
 
@@ -31,7 +31,10 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
 %Image::ExifTool::H264::Main = (
     GROUPS => { 2 => 'Video' },
     VARS => { NO_ID => 1 },
-    NOTES => 'Tags extracted from H.264 video streams.',
+    NOTES => q{
+        Tags extracted from H.264 video streams.  The metadata for AVCHD videos is
+        stored in this stream.
+    },
     ImageWidth => { },
     ImageHeight => { },
     MDPM => { SubDirectory => { TagTable => 'Image::ExifTool::H264::MDPM' } },
@@ -39,14 +42,14 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
 
 # H.264 Supplemental Enhancement Information User Data (ref PH/4)
 %Image::ExifTool::H264::MDPM = (
-    GROUPS => { 2 => 'Location' },
+    GROUPS => { 2 => 'Camera' },
     PROCESS_PROC => \&ProcessSEI,
     NOTES => q{
         The following tags are decoded from the Modified Digital Video Pack Metadata
         (MDPM) of the unregistered user data with UUID
         17ee8c60f84d11d98cd60800200c9a66 in the H.264 Supplemental Enhancement
-        Information (SEI).  [Yes, this description is confusing, but nothing
-        compared to the challenge of actually decoding the data!]  This information
+        Information (SEI).  I<[Yes, this description is confusing, but nothing
+        compared to the challenge of actually decoding the data!]>  This information
         may exist at regular intervals through the entire video, but only the first
         occurrence is extracted unless the ExtractEmbedded option is used (in which
         case subsequent occurrences are extracted as sub-documents).
@@ -97,18 +100,15 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     0xa0 => {
         Name => 'ExposureTime',
         Format => 'rational32u',
-        Groups => { 2 => 'Camera' },
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },
     0xa1 => {
         Name => 'FNumber',
         Format => 'rational32u',
-        Groups => { 2 => 'Camera' },
     },
     0xa2 => {
         Name => 'ExposureProgram',
         Format => 'int32u', # (guess)
-        Groups => { 2 => 'Camera' },
         PrintConv => {
             0 => 'Not Defined',
             1 => 'Manual',
@@ -135,14 +135,12 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     0xa5 => {
         Name => 'MaxApertureValue',
         Format => 'rational32u',
-        Groups => { 2 => 'Camera' },
         ValueConv => '2 ** ($val / 2)',
         PrintConv => 'sprintf("%.1f",$val)',
     },
     0xa6 => {
         Name => 'Flash',
         Format => 'int32u', # (guess)
-        Groups => { 2 => 'Camera' },
         Flags => 'PrintHex',
         SeparateTable => 'EXIF Flash',
         PrintConv =>  \%Image::ExifTool::Exif::flash,
@@ -159,7 +157,6 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     0xa8 => {
         Name => 'WhiteBalance',
         Format => 'int32u', # (guess)
-        Groups => { 2 => 'Camera' },
         Priority => 0,
         PrintConv => {
             0 => 'Auto',
@@ -169,13 +166,11 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     0xa9 => {
         Name => 'FocalLengthIn35mmFormat',
         Format => 'rational32u',
-        Groups => { 2 => 'Camera' },
         PrintConv => '"$val mm"',
     },
     0xaa => {
         Name => 'SceneCaptureType',
         Format => 'int32u', # (guess)
-        Groups => { 2 => 'Camera' },
         PrintConv => {
             0 => 'Standard',
             1 => 'Landscape',
@@ -188,11 +183,13 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
         Name => 'GPSVersionID',
         Format => 'int8u',
         Count => 4,
+        Groups => { 1 => 'GPS', 2 => 'Location' },
         PrintConv => '$val =~ tr/ /./; $val',
     },
     0xb1 => {
         Name => 'GPSLatitudeRef',
         Format => 'string',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
         PrintConv => {
             N => 'North',
             S => 'South',
@@ -201,6 +198,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     0xb2 => {
         Name => 'GPSLatitude',
         Format => 'rational32u',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
         Notes => 'combined with tags 0xb3 and 0xb4',
         Combine => 2,   # combine the next 2 tags (0xb2=deg, 0xb3=min, 0xb4=sec)
         ValueConv => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -209,6 +207,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     0xb5 => {
         Name => 'GPSLongitudeRef',
         Format => 'string',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
         PrintConv => {
             E => 'East',
             W => 'West',
@@ -217,6 +216,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     0xb6 => {
         Name => 'GPSLongitude',
         Format => 'rational32u',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
         Combine => 2,   # combine the next 2 tags (0xb6=deg, 0xb7=min, 0xb8=sec)
         Notes => 'combined with tags 0xb7 and 0xb8',
         ValueConv => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -225,16 +225,22 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     0xb9 => {
         Name => 'GPSAltitudeRef',
         Format => 'int32u', # (guess)
+        Groups => { 1 => 'GPS', 2 => 'Location' },
         ValueConv => '$val ? 1 : 0', # because I'm not sure about the Format
         PrintConv => {
             0 => 'Above Sea Level',
             1 => 'Below Sea Level',
         },
     },
-    0xba => { Name => 'GPSAltitude', Format => 'rational32u' },
+    0xba => {
+        Name => 'GPSAltitude',
+        Format => 'rational32u',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+    },
     0xbb => {
         Name => 'GPSTimeStamp',
         Format => 'rational32u',
+        Groups => { 1 => 'GPS', 2 => 'Time' },
         Combine => 2,    # the next tags (0xbc/0xbd) contain the minutes/seconds
         Notes => 'combined with tags 0xbc and 0xbd',
         ValueConv => 'Image::ExifTool::GPS::ConvertTimeStamp($val)',
@@ -242,6 +248,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     0xbe => {
         Name => 'GPSStatus',
         Format => 'string',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
         PrintConv => {
             A => 'Measurement Active',
             V => 'Measurement Void',
@@ -250,6 +257,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     0xbf => {
         Name => 'GPSMeasureMode',
         Format => 'string',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
         PrintConv => {
             2 => '2-Dimensional Measurement',
             3 => '3-Dimensional Measurement',
@@ -259,38 +267,55 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
         Name => 'GPSDOP',
         Description => 'GPS Dilution Of Precision',
         Format => 'rational32u',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
     },
     0xc1 => {
         Name => 'GPSSpeedRef',
         Format => 'string',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
         PrintConv => {
             K => 'km/h',
             M => 'mph',
             N => 'knots',
         },
     },
-    0xc2 => { Name => 'GPSSpeed', Format => 'rational32u' },
+    0xc2 => {
+        Name => 'GPSSpeed',
+        Format => 'rational32u',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+    },
     0xc3 => {
         Name => 'GPSTrackRef',
         Format => 'string',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
         PrintConv => {
             M => 'Magnetic North',
             T => 'True North',
         },
     },
-    0xc4 => { Name => 'GPSTrack', Format => 'rational32u' },
+    0xc4 => {
+        Name => 'GPSTrack',
+        Format => 'rational32u',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+    },
     0xc5 => {
         Name => 'GPSImgDirectionRef',
         Format => 'string',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
         PrintConv => {
             M => 'Magnetic North',
             T => 'True North',
         },
     },
-    0xc6 => { Name => 'GPSImgDirection', Format => 'rational32u' },
+    0xc6 => {
+        Name => 'GPSImgDirection',
+        Format => 'rational32u',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+    },
     0xc7 => {
         Name => 'GPSMapDatum',
         Format => 'string',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
         Combine => 1,    # the next tag (0xc8) contains the rest of the string
         Notes => 'combined with tag 0xc8',
     },
@@ -313,6 +338,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     FIRST_ENTRY => 0,
     0 => {
         Name => 'ApertureSetting',
+        PrintHex => 1,
         PrintConv => {
             0xff => 'Auto',
             0xfe => 'Closed',
@@ -369,6 +395,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
         Name => 'ImageStabilization',
         # no stabilization feature if whole byte is 0xff
         ValueConv => '$val == 0xff ? 0 : $val & 0x10',
+        PrintHex => 1,
         PrintConv => {
             0x00 => 'Off',
             0x10 => 'On',
@@ -403,6 +430,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
         Name => 'Make',
         PrintHex => 1,
         PrintConv => {
+            0x0103 => 'Panasonic',
             0x0108 => 'Sony',
             0x1011 => 'Canon',
         },
@@ -843,6 +871,7 @@ sub ProcessSEI($$)
 #------------------------------------------------------------------------------
 # Extract information from H.264 video stream
 # Inputs: 0) ExifTool ref, 1) data ref
+# Returns: 0 = done parsing, 1 = we want to parse more of these
 sub ParseH264Video($$)
 {
     my ($exifTool, $dataPt) = @_;
@@ -850,6 +879,7 @@ sub ParseH264Video($$)
     my $out = $exifTool->Options('TextOut');
     my $tagTablePtr = GetTagTable('Image::ExifTool::H264::Main');
     my %parseNalUnit = ( 0x06 => 1, 0x07 => 1 );    # NAL unit types to parse
+    my $foundUserData;
     my $len = length $$dataPt;
     my $pos = 0;
     while ($pos < $len) {
@@ -896,9 +926,10 @@ sub ParseH264Video($$)
                 next unless $exifTool->Options('ExtractEmbedded');
                 $$exifTool{DOC_NUM} = $$exifTool{GotNAL06};
             }
-            my $result = ProcessSEI($exifTool, { DataPt => \$buff } );
+            $foundUserData = ProcessSEI($exifTool, { DataPt => \$buff } );
             delete $$exifTool{DOC_NUM};
-            next unless $result;
+            # keep parsing SEI's until we find the user data
+            next unless $foundUserData;
             $$exifTool{GotNAL06} = ($$exifTool{GotNAL06} || 0) + 1;
 
         } elsif ($nal_unit_type == 0x07) {  # sequence_parameter_set_rbsp
@@ -911,6 +942,11 @@ sub ParseH264Video($$)
         # we were successful, so don't parse this NAL unit type again
         delete $parseNalUnit{$nal_unit_type};
     }
+    # parse one extra H264 frame if we didn't find the user data in this one
+    # (Panasonic cameras don't put the SEI in the first frame)
+    return 0 if $foundUserData or $$exifTool{ParsedH264};
+    $$exifTool{ParsedH264} = 1;
+    return 1;
 }
 
 1;  # end

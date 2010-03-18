@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 sub ProcessMRW($$;$);
 sub WriteMRW($$;$);
@@ -164,6 +164,8 @@ sub WriteMRW($$;$);
             3 => 'Night Portrait',
             4 => 'Sunset',
             5 => 'Sports',
+            # have seen these values in Sony ARW images: - PH
+            # 7, 128, 129, 160
         },
     },
     6 => {
@@ -189,9 +191,11 @@ sub WriteMRW($$;$);
             0x84 => 'Embed Adobe RGB',
             # have seen these values in Sony ARW images: - PH
             # 0x00 = Standard
-            # 0x30 = Vivid
-            # 0x38 = AdobeRGB (??)
+            # 0x07 = AdobeRGB
+            # 0x30 = Vivid, Standard (??)
+            # 0x38 = AdobeRGB, Vivid (??)
             # 0x40 = Standard, AdobeRGB (??)
+            # 0x58 = Standard (??)
         },
     },
     56 => {
@@ -201,10 +205,12 @@ sub WriteMRW($$;$);
     57 => 'BWFilter',
     58 => {
         Name => 'ZoneMatching',
+        Priority => 0, # # (so Sony ZoneMatching takes priority in ARW images)
         PrintConv => {
             0 => 'ISO Setting Used',
             1 => 'High Key',
             2 => 'Low Key',
+            # have seen values of 214 (Sony A100) and 212 (all other Sony DSLR's) - PH
         },
     },
     59 => {

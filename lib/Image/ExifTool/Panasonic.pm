@@ -25,7 +25,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.45';
+$VERSION = '1.49';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -180,7 +180,7 @@ my %shootingMode = (
     },
     0x0f => [
         {
-            Name => 'AFMode',
+            Name => 'AFAreaMode',
             Condition => '$$self{Model} =~ /DMC-FZ10\b/', #JD
             Writable => 'int8u',
             Count => 2,
@@ -190,7 +190,7 @@ my %shootingMode = (
                 '0 16'  => 'Spot Mode Off',
             },
         },{
-            Name => 'AFMode',
+            Name => 'AFAreaMode',
             Writable => 'int8u',
             Count => 2,
             Notes => 'other models',
@@ -199,7 +199,7 @@ my %shootingMode = (
                 '0 16'  => '3-area (high speed)', # (FZ8)
                 '1 0'   => 'Spot Focusing', # (FZ8)
                 '1 1'   => '5-area', # (FZ8)
-                '16'    => 'Normal?', # (only AFMode for DMC-LC20)
+                '16'    => 'Normal?', # (only mode for DMC-LC20)
                 '16 0'  => '1-area', # (FZ8)
                 '16 16' => '1-area (high speed)', # (FZ8)
                 '32 0'  => 'Auto or Face Detect', # (Face Detect for FS7, Auto is DMC-L1 guess)
@@ -634,8 +634,9 @@ my %shootingMode = (
             '3 2' => 'Stretch High',
         },
     },
-    0x5d => { #PH (GF1)
+    0x5d => { #PH (GF1, FZ35)
         Name => 'IntelligentExposure',
+        Notes => 'not valid for some models', # (doesn't change in ZS7 and GH1 images)
         Writable => 'int16u',
         PrintConv => {
             0 => 'Off',
@@ -663,6 +664,38 @@ my %shootingMode = (
         Count => 4,
         Writable => 'undef',
         Unknown => 1,
+    },
+    0x69 => { #PH (ZS7)
+        Name => 'Country', # (Country/Region)
+        Groups => { 2 => 'Location' },
+        Format => 'string',
+        Writable => 'undef',
+    },
+    0x6b => { #PH (ZS7)
+        Name => 'State', # (State/Province/Count -- what is Count?)
+        Groups => { 2 => 'Location' },
+        Format => 'string',
+        Writable => 'undef',
+    },
+    0x6d => { #PH (ZS7)
+        Name => 'City', # (City/Town)
+        Groups => { 2 => 'Location' },
+        Format => 'string',
+        Writable => 'undef',
+    },
+    0x6f => { #PH (ZS7)
+        Name => 'Landmark', # (Landmark)
+        Groups => { 2 => 'Location' },
+        Format => 'string',
+        Writable => 'undef',
+    },
+    0x70 => { #PH (ZS7)
+        Name => 'IntelligentResolution',
+        Writable => 'int8u',
+        PrintConv => {
+            0 => 'Off',
+            3 => 'On',
+        },
     },
     0x0e00 => {
         Name => 'PrintIM',
@@ -974,6 +1007,40 @@ my %shootingMode = (
     0x0413 => { Name => 'WB_RGBLevels',     Writable => 'rational64u', Count => 3 },
 );
 
+# Leica type6 maker notes (ref PH) (S2)
+%Image::ExifTool::Panasonic::Leica6 = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
+    NOTES => 'This information is written by the S2 (as a trailer in JPEG images).',
+    0x300 => {
+        Name => 'PreviewImage',
+        Writable => 'undef',
+        Notes => 'S2',
+        DataTag => 'PreviewImage',
+        RawConv => q{
+            return \$val if $val =~ /^Binary/;
+            return \$val if $val =~ /^\xff\xd8\xff/;
+            $$self{PreviewError} = 1 unless $val eq 'none';
+            return undef;
+        },
+        ValueConvInv => '$val || "none"',
+        WriteCheck => 'return $val=~/^(none|\xff\xd8\xff)/s ? undef : "Not a valid image"',
+        ChangeBase => '$dirStart + $dataPos - 8',
+    },
+    0x301 => {
+        Name => 'UnknownBlock',
+        Notes => 'unknown 320kB block, not copied to JPEG images',
+        Flags => [ 'Unknown', 'Binary', 'Drop' ],
+    },
+    # 0x302 - same value as 4 unknown bytes at the end of JPEG or after the DNG TIFF header
+    0x303 => {
+        Name => 'LensType',
+        Writable => 'string',
+    },
+    # 0x340 - same as 0x302
+);
+
 # Type 2 tags (ref PH)
 %Image::ExifTool::Panasonic::Type2 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -1128,6 +1195,164 @@ sub WhiteBalanceConv($;$$)
         return ($val - 0x8000) . ' Kelvin' if $val > 0x8000;
     }
     return undef;
+}
+
+#------------------------------------------------------------------------------
+# Process MakerNote trailer written by Leica S2
+# Inputs: 0) ExifTool object ref, 1) new absolute position of Leica trailer when writing
+# Returns: On success: 1 when reading, directory data when writing; othewise undef
+# Notes:
+# - may be called twice for a file if the first call doesn't succeed
+# - must leave RAF position unchanged
+# - uses information from LeicaTrailer member:
+#      TagInfo = tag info ref for MakerNote SubDirectory
+#      Offset/Size = value offset/size from MakerNote IFD
+#      TrailStart/TrailLen = actual JPEG trailer position/size (2nd call only)
+# - deletes LeicaTrailer member and sets LeicaTrailerPos when successful
+sub ProcessLeicaTrailer($;$)
+{
+    my ($exifTool, $newPos) = @_;
+    my $trail = $$exifTool{LeicaTrailer};
+    my $raf = $$exifTool{RAF};
+    my $trailPos = $$trail{TrailPos};
+    my $pos = $trailPos || $$trail{Offset};
+    my $len = $$trail{TrailLen} || $$trail{Size};
+    my ($buff, $result, %tagPtr);
+
+    delete $$exifTool{LeicaTrailer} if $trailPos;   # done after this
+    unless ($len > 0) {
+        $exifTool->Warn('Missing Leica MakerNote trailer', 1) if $trailPos;
+        undef $$exifTool{LeicaTrailer};
+        return undef;
+    }
+    my $oldPos = $raf->Tell();
+    my $ok = ($raf->Seek($pos, 0) and $raf->Read($buff, $len) == $len);
+    $raf->Seek($oldPos, 0);
+    unless ($ok) {
+        $exifTool->Warn('Error reading Leica MakerNote trailer', 1) if $trailPos;
+        return undef;
+    }
+    # look for Leica MakerNote header (should be at start of
+    # trailer, but allow up to 256 bytes of garbage just in case)
+    if ($buff !~ /^(.{0,256})LEICA\0..../sg) {
+        my $what = $trailPos ? 'trailer' : 'offset';
+        $exifTool->Warn("Invalid Leica MakerNote $what", 1);
+        return undef;
+    }
+    my $junk = $1;
+    my $start = pos($buff) - 10;
+    if ($start and not $trailPos) {
+        $exifTool->Warn('Invalid Leica MakerNote offset', 1);
+        return undef;
+    }
+#
+# all checks passed -- go ahead and process the trailer now
+#
+    my $hdrLen = 8;
+    my $dirStart = $start + $hdrLen;
+    my $tagInfo = $$trail{TagInfo};
+    if ($$exifTool{HTML_DUMP}) {
+        my $name = $$tagInfo{Name};
+        $exifTool->HDump($pos+$start, $len-$start, "$name value", 'Leica MakerNote trailer', 4);
+        $exifTool->HDump($pos+$start, $hdrLen, "MakerNotes header", $name);
+    } elsif ($exifTool->Options('Verbose')) {
+        my $where = sprintf('at offset 0x%x', $pos);
+        $exifTool->VPrint(0, "Leica MakerNote trailer ($len bytes $where):\n");
+    }
+    # delete LeicaTrailer member so we don't try to process it again
+    delete $$exifTool{LeicaTrailer};
+    $$exifTool{LeicaTrailerPos} = $pos + $start;    # return actual start position of Leica trailer
+
+    my $oldOrder = GetByteOrder();
+    my $num = Get16u(\$buff, $dirStart);            # get entry count
+    ToggleByteOrder() if ($num>>8) > ($num&0xff);   # set byte order
+
+    # use specialized algorithm to automatically fix offsets
+    my $valStart = $dirStart + 2 + 12 * $num + 4;
+    my $fix = 0;
+    if ($valStart < $len) {
+        my $valBlock = Image::ExifTool::MakerNotes::GetValueBlocks(\$buff, $dirStart, \%tagPtr);
+        # find the minimum offset (excluding the PreviewImage tag 0x300)
+        my $minPtr;
+        foreach (keys %tagPtr) {
+            my $ptr = $tagPtr{$_};
+            next if $_ == 0x300 or not $ptr;
+            $minPtr = $ptr if not defined $minPtr or $minPtr > $ptr;
+        }
+        if ($minPtr) {
+            my $diff = $minPtr - ($valStart + $pos);
+            # scan value data for the first non-zero byte
+            pos($buff) = $valStart;
+            if ($buff =~ /[^\0]/g) {
+                my $n = pos($buff) - 1 - $valStart; # number of zero bytes
+                # S2 writes 282 bytes of zeros, exiftool writes none
+                my $expect = $n >= 282 ? 282 : 0;
+                my $fixBase = $exifTool->Options('FixBase');
+                if ($diff != $expect or defined $fixBase) {
+                    $fix = $expect - $diff;
+                    if (defined $fixBase) {
+                        $fix = $fixBase if $fixBase ne '';
+                        $exifTool->Warn("Adjusted MakerNotes base by $fix",1);
+                    } else {
+                        $exifTool->Warn("Possibly incorrect maker notes offsets (fixed by $fix)",1);
+                    }
+                }
+            }
+        }
+    }
+    # generate dirInfo for Leica MakerNote directory
+    my %dirInfo = (
+        Name       => $$tagInfo{Name},
+        Base       => $fix,
+        DataPt     => \$buff,
+        DataPos    => $pos - $fix,
+        DataLen    => $len,
+        DirStart   => $dirStart,
+        DirLen     => $len - $dirStart,
+        DirName    => 'MakerNotes',
+        Parent     => 'ExifIFD',
+        TagInfo    => $tagInfo,
+    );
+    my $tagTablePtr = GetTagTable($$tagInfo{SubDirectory}{TagTable});
+    if ($newPos) { # are we writing?
+        # set position of new MakerNote IFD (+ 8 for Leica MakerNote header)
+        $dirInfo{NewDataPos} = $newPos + $start + 8;
+        $result = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
+        # write preview image last if necessary and fix up the preview offsets
+        my $previewInfo = $$exifTool{PREVIEW_INFO};
+        delete $$exifTool{PREVIEW_INFO};
+        if ($result) {
+            if ($previewInfo) {
+                my $fixup = $previewInfo->{Fixup};
+                # set preview offset (relative to start of makernotes, + 8 for makernote header)
+                $fixup->SetMarkerPointers(\$result, 'PreviewImage', length($result) + 8);
+                $result .= $$previewInfo{Data};
+            }
+            return $junk . substr($buff, $start, $hdrLen) . $result;
+        }
+    } else {
+        # extract information
+        $result = $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
+        # also extract as a block if necessary
+        if ($exifTool->Options('MakerNotes') or
+            $exifTool->{REQ_TAG_LOOKUP}{lc($$tagInfo{Name})})
+        {
+            # makernote header must be included in RebuildMakerNotes call
+            $dirInfo{DirStart} -= 8;
+            $dirInfo{DirLen} += 8;
+            $exifTool->{MAKER_NOTE_BYTE_ORDER} = GetByteOrder();
+            # rebuild maker notes (creates $exifTool->{MAKER_NOTE_FIXUP})
+            my $val = Image::ExifTool::Exif::RebuildMakerNotes($exifTool, $tagTablePtr, \%dirInfo);
+            unless (defined $val) {
+                $exifTool->Warn('Error rebuilding maker notes (may be corrupt)');
+                $val = $buff,
+            }
+            my $key = $exifTool->FoundTag($tagInfo, $val);
+            $exifTool->SetGroup($key, 'ExifIFD');
+        }
+    }
+    SetByteOrder($oldOrder);
+    return $result;
 }
 
 1;  # end

@@ -15,14 +15,17 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ProcessExtData($$$);
 
 # PSP info
 %Image::ExifTool::PSP::Main = (
     GROUPS => { 2 => 'Image' },
-    NOTES => 'Tags extracted from Paint Shop Pro images.',
+    NOTES => q{
+        Tags extracted from Paint Shop Pro images (PSP, PSPIMAGE, PSPFRAME,
+        PSPSHAPE, PSPTUBE and TUB extensions).
+    },
     # FileVersions:
     #  3.0 => PSP 5
     #  4.0 => PSP 6

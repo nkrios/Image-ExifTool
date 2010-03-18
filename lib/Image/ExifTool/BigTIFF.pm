@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.03';
+$VERSION = '1.05';
 
 my $maxOffset = 0x7fffffff; # currently supported maximum data offset/size
 
@@ -64,10 +64,10 @@ sub ProcessBigIFD($$$)
         my $nextIFD;
         $raf->Read($nextIFD, 8) == 8 or undef $nextIFD; # try to read next IFD pointer
         if ($htmlDump) {
-            $exifTool->HtmlDump($bufPos-8, 8, "$dirName entries", "Entry count: $numEntries");
+            $exifTool->HDump($bufPos-8, 8, "$dirName entries", "Entry count: $numEntries");
             if (defined $nextIFD) {
                 my $tip = sprintf("Offset: 0x%.8x", Image::ExifTool::Get64u(\$nextIFD, 0));
-                $exifTool->HtmlDump($bufPos + 20 * $numEntries, 8, "Next IFD", $tip, 0);
+                $exifTool->HDump($bufPos + 20 * $numEntries, 8, "Next IFD", $tip, 0);
             }
         }
         # loop through all entries in this BigTIFF IFD
@@ -78,7 +78,7 @@ sub ProcessBigIFD($$$)
             my $count = Image::ExifTool::Get64u(\$dirBuff, $entry+4);
             my $formatSize = $Image::ExifTool::Exif::formatSize[$format];
             unless (defined $formatSize) {
-                $exifTool->HtmlDump($bufPos+$entry,20,"[invalid IFD entry]",
+                $exifTool->HDump($bufPos+$entry,20,"[invalid IFD entry]",
                          "Bad format value: $format", 1);
                 # warn unless the IFD was just padded with zeros
                 $exifTool->Warn(sprintf("Unknown format ($format) for $dirName tag 0x%x",$tagID));
@@ -152,11 +152,11 @@ sub ProcessBigIFD($$$)
                     }
                 }
                 $tip .= "Value: $tval";
-                $exifTool->HtmlDump($entry+$bufPos, 20, "$dname $colName", $tip, 1);
+                $exifTool->HDump($entry+$bufPos, 20, "$dname $colName", $tip, 1);
                 if ($size > 8) {
                     # add value data block
                     my $flg = ($tagInfo and $$tagInfo{SubDirectory} and $$tagInfo{MakerNotes}) ? 4 : 0;
-                    $exifTool->HtmlDump($valuePtr,$size,"$tagName value",'SAME', $flg);
+                    $exifTool->HDump($valuePtr,$size,"$tagName value",'SAME', $flg);
                 }
             }
             if ($tagInfo and $$tagInfo{SubIFD}) {
@@ -197,7 +197,7 @@ sub ProcessBigIFD($$$)
                     TagInfo => $tagInfo,
                     RAF     => $raf,
                 );
-                $tagKey and $exifTool->SetGroup1($tagKey, $dirName);
+                $tagKey and $exifTool->SetGroup($tagKey, $dirName);
             }
         }
         last unless $dirName =~ /^(IFD|SubIFD)(\d*)$/;
@@ -230,8 +230,8 @@ sub ProcessBTF($$)
     my $offset = Image::ExifTool::Get64u(\$buff, 8);
     if ($exifTool->{HTML_DUMP}) {
         my $o = (GetByteOrder() eq 'II') ? 'Little' : 'Big';
-        $exifTool->HtmlDump(0, 8, "BigTIFF header", "Byte order: $o endian", 0);
-        $exifTool->HtmlDump(8, 8, "IFD0 pointer", sprintf("Offset: 0x%.8x",$offset), 0);
+        $exifTool->HDump(0, 8, "BigTIFF header", "Byte order: $o endian", 0);
+        $exifTool->HDump(8, 8, "IFD0 pointer", sprintf("Offset: 0x%.8x",$offset), 0);
     }
     my %dirInfo = (
         RAF      => $raf,

@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -669,7 +669,7 @@ sub ProcessPrivate($$$)
         DataPt => $dataPt,
     );
     # set group1 name
-    $exifTool->SetGroup1($key, $$exifTool{ID3_Ver}) if $key;
+    $exifTool->SetGroup($key, $$exifTool{ID3_Ver}) if $key;
 }
 
 #------------------------------------------------------------------------------

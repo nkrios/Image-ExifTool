@@ -8,6 +8,7 @@
 
 package Image::ExifTool::Lang::nl;
 
+use strict;
 use vars qw($VERSION);
 
 $VERSION = '1.04';
@@ -754,11 +755,6 @@ $VERSION = '1.04';
    'ConnectionSpaceIlluminant' => 'Witpunt van connectiekleurruimte',
    'ContentLocationCode' => 'Locatiecode van inhoud',
    'ContentLocationName' => 'Locatienaam van inhoud',
-   'ContentType' => {
-      PrintConv => {
-        'Normal' => 'Normaal',
-      },
-    },
    'ContinuousDrive' => {
       PrintConv => {
         'Continuous' => 'Continu',
@@ -1937,6 +1933,11 @@ $VERSION = '1.04';
    'MaxContinuousRelease' => 'Max. aant. continuopnamen',
    'MaxSampleValue' => 'Max sample waarde',
    'MediaBlackPoint' => 'Media zwartpunt',
+   'MediaType' => {
+      PrintConv => {
+        'Normal' => 'Normaal',
+      },
+    },
    'MediaWhitePoint' => 'Media Witpunt',
    'Metering' => {
       Description => 'Lichtmeting',

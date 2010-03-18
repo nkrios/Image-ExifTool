@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.30';
+$VERSION = '1.32';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -27,13 +27,6 @@ my %coordConv = (
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
     WRITE_GROUP => 'GPS',
-    NOTES => q{
-        When adding GPS information to an image, it is important to set all of the
-        following tags: GPSLatitude, GPSLatitudeRef, GPSLongitude, GPSLongitudeRef,
-        GPSAltitude and GPSAltitudeRef.  ExifTool will write the required
-        GPSVersionID tag automatically if new a GPS IFD is added to an image.  All
-        GPS tags listed below are part of the EXIF specification.
-    },
     0x0000 => {
         Name => 'GPSVersionID',
         Writable => 'int8u',
@@ -316,33 +309,19 @@ my %coordConv = (
     GPSLatitude => {
         SubDoc => 1,    # generate for all sub-documents
         Require => {
-            0 => 'GPSLatitudeRef',
+            0 => 'GPS:GPSLatitude',
+            1 => 'GPS:GPSLatitudeRef',
         },
-        Desire => {
-            1 => 'GPS:GPSLatitude',
-            2 => 'H264:GPSLatitude',
-        },
-        ValueConv => q{
-            return undef unless defined $val[1] or defined $val[2];
-            my $lat = defined $val[1] ? $val[1] : $val[2];
-            return $val[0] =~ /^S/i ? -$lat : $lat;
-        },
+        ValueConv => '$val[1] =~ /^S/i ? -$val[0] : $val[0]',
         PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "N")',
     },
     GPSLongitude => {
         SubDoc => 1,    # generate for all sub-documents
         Require => {
-            0 => 'GPSLongitudeRef',
+            0 => 'GPS:GPSLongitude',
+            1 => 'GPS:GPSLongitudeRef',
         },
-        Desire => {
-            1 => 'GPS:GPSLongitude',
-            2 => 'H264:GPSLongitude',
-        },
-        ValueConv => q{
-            return undef unless defined $val[1] or defined $val[2];
-            my $lon = defined $val[1] ? $val[1] : $val[2];
-            return $val[0] =~ /^W/i ? -$lon : $lon;
-        },
+        ValueConv => '$val[1] =~ /^W/i ? -$val[0] : $val[0]',
         PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1, "E")',
     },
     GPSAltitude => {
@@ -353,14 +332,11 @@ my %coordConv = (
         Desire => {
             1 => 'GPS:GPSAltitude',
             2 => 'XMP:GPSAltitude',
-            3 => 'H264:GPSAltitude',
         },
         ValueConv => q{
             my $alt = $val[1];
-            unless (defined $alt) {
-                $alt = defined $val[2] ? $val[2] : $val[3];
-                return undef unless defined $alt;
-            }
+            $alt = $val[2] unless defined $alt;
+            return undef unless defined $alt;
             return $val[0] ? -$alt : $alt;
         },
         PrintConv => q{

@@ -6,6 +6,8 @@
 #
 # Usage:        exiftool -p kml.fmt FILE [...] > out.kml
 #
+# Revisions:    2010/02/05 - P. Harvey created
+#
 # Notes:     1) All input files must contain GPSLatitude and GPSLongitude.
 #            2) The -fileOrder option may be used to control the order of the
 #               generated placemarks.

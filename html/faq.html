@@ -6,9 +6,8 @@
 <link rel=stylesheet type='text/css' href='style.css' title='Style'>
 <style type="text/css">
 <!--
-pre         { color: #800; margin-left: 2em }
-code        { white-space: nowrap }
-ol.index    { margin: 0; padding: 0 0 0 2em }
+pre      { color: #800; margin-left: 2em }
+ol.index { margin: 0; padding: 0 0 0 2em }
 -->
 </style>
 </head>
@@ -35,6 +34,8 @@ ol.index    { margin: 0; padding: 0 0 0 2em }
 <li><a href="#Q18">Windows character encoding</a></li>
 <li><a href="#Q19">Formatting tag values</a></li>
 <li><a href="#Q20">Write errors (repair corrupted EXIF)</a></li>
+<li><a href="#Q21">Newlines in values</a></li>
+<li><a href="#Q22">File names beginning with dash (-)</a></li>
 </ol>
 </div>
 
@@ -879,8 +880,73 @@ for unsafe EXIF tags in JPEG images which are not normally copied.</blockquote>
 without errors, but note that some metadata from the original image may have
 been lost in the process.</blockquote>
 
+<a name="Q21"></a>
+<p>21. <b>"How do I read/write values containing newline characters?"</b></p>
+
+<blockquote>By default, exiftool translates all control characters to "." when
+extracting information (to avoid messing up the output formatting), so newlines
+will usually appear as a "." in the output.  The <code>-b</code> option may be
+used to bypass all output formatting, but this may not be appropriate when the
+values of many tags must be extracted.  In this case, the JSON (<code>-j</code>)
+and XML (<code>-X</code>) options provide alternative output formats which
+preserve newlines in values.</blockquote>
+
+<blockquote>When writing, there are a number of options:
+
+<ol type='a'>
+<li>In many shells, a newline may be inserted directly in the command
+line:
+<p>Bourne shells (press <i>RETURN</i> inside a quoted string)</p>
+<pre>exiftool -comment="line 1
+line 2" image.jpg
+</pre>
+<p>C shells (press "<code>\</code>" then <i>RETURN</i> inside a quoted string)</p>
+<pre>exiftool -comment="line 1\
+line 2" image.jpg
+</pre>
+<i class=lt>[Unfortunately the Windows cmd shell provides no method to get a
+newline (CR/LF in Windows) into the command line.  A linefeed (LF) may be
+inserted with CTRL-T, but I have found no way to insert a carriage return
+(CR).]</i><br><br>
+</li>
+<li>Write the tag from the contents of a separate text file:
+<pre>exiftool "-comment&lt;=file.txt" image.jpg
+</pre></li>
+<li>Use <code>$/</code> in a redirection expression (Note: Single quotes
+must be used in Mac/Linux shells around arguments containing a dollar sign,
+but double quotes are used instead in Windows):
+<pre>exiftool '-comment&lt;line 1$/line 2' image.jpg
+</pre></li>
+<li>Use the <code>-E</code> option to allow HTML character entities (Note:
+In Windows a newline is "<code>&amp;#xd;&amp;#xa;</code>" instead of just
+"<code>&amp;#xa;</code>"):
+<pre>exiftool -E "-comment=line 1&amp;#xa;line 2" image.jpg
+</pre></li>
+</ol>
+</blockquote>
+
+<a name="Q22"></a>
+<p>22. <b>"How do I run exiftool on a file with a name beginning with a dash (-)?"</b></p>
+
+<blockquote>This is a problem because command-line arguments starting with a
+dash are interpreted as exiftool options.  A work-around is to add the directory
+name so the argument no longer begins with a dash.  For example, to process a
+file named "<code>-file.jpg</code>" in the current directory, you could do this:
+
+<pre>exiftool ./-file.jpg
+</pre>
+
+In Mac/Unix shells, the same problem exists when specifying files using
+wildcards since these shells automatically expand wildcards into separate
+command-line arguments.  This problem may also be avoided by specifying the
+directory name as above, but a better solution is to use the <code>-ext</code>
+option instead of wildcards.  For example, use
+"<code>exiftool -ext jpg .</code>" instead of "<code>exiftool *.jpg</code>" to
+process all JPEG files in the current directory.
+</blockquote>
+
 <hr>
-<i>Last revised Jan. 6, 2010</i>
+<i>Last revised Feb. 26, 2010</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

@@ -5,8 +5,82 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 8.10. (Other versions are
+Note: The most recent production release is Version 8.15. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+Mar. 18, 2010 - Version 8.15 (production release)
+
+  - Added read support for Macintosh resource files:
+      - Generate ResourceForkSize tag if data exists in a file's resource fork
+      - Enhanced -ee option to process resource fork as a sub-document
+  - Added a new PentaxModelID (Optio I-10)
+  - Decode Panasonic DMC-ZS7 landmark tags
+  - Fixed decoding of Pentax Optio 555 PictureMode and added a number of new
+    values (thanks Ralf Medow)
+
+Mar. 16, 2010 - Version 8.14
+
+  - Added some new Canon AFMode values for the EOS 7D (thanks Dieter Steiner)
+    and renamed tag to AFAreaMode
+  - Decode ColorData and some new MOV tags for the production Canon EOS 550D
+  - Decode Panasonic IntelligentResolution tag
+  - Allow times with timezones in GPX track logs
+  - Improved handling of maker notes in Olympus MP4 videos
+  - Changed H264 GPS tags to the GPS group
+  - Fixed date/time format error in reverse geotagging GPX example
+  - Fixed problem introduced in version 8.09 where XMP:GPSLatitude/GPSLongitude
+    require the -a option to be extracted
+  - API Changes:
+      - Fixed bug where some options (Charset, Escape, Exclude and Lang) weren't
+        activated properly when set via options hash in calls to some functions
+      - Fixed some potential problems when used with mod_perl
+
+Mar. 5, 2010 - Version 8.13
+
+  - Added read/write support for Samsung SRW images and decode some NX10 maker
+    note tags (thanks Tae-Sun Park)
+  - Added new values for some Sony tags (thanks Michael Reit)
+  - Added a new Canon LensType (thanks Laurent Clevy)
+  - Decode maker notes in Nikon Coolpix S8000 MOV videos
+  - Decode a number of obscure TIFF FX tags
+  - Implemented list-type behaviour for MWG:Creator tag
+  - More improvements to German translations (thanks Herbert Kauer)
+  - Changed name of NikonPreview group to PreviewIFD
+  - Fixed problem which prevented ThumbnailImage from being written to ARW, SR2
+    and PEF images
+
+Feb. 26, 2010 - Version 8.12
+
+  - Added a number of missing ProgramMode values for the Sony DSLR-A330
+  - Added XMP-iptcCore:DigitalSourceType (IPTC Extension version 1.1)
+  - Added a couple more Nikon LensID's (thanks Jens Kriese and Robert
+    Rottmerhusen)
+  - Improved German language tag descriptions (thanks Herbert Kauer)
+  - Improved identification of some RAW file types
+  - Moved MPF PreviewImage into the Composite group
+  - Fixed some problems in HtmlDump output
+  - Fixed problem copying makernotes as a block into DNGAdobeData
+
+Feb. 20, 2010 - Version 8.11
+
+  - Added support for Leica S2 maker notes
+  - Added a bunch of new CanonModelID's (thanks Laurent Clevy for the 550D)
+  - Decode MacroMagnification for more Canon models (MP-E 65mm only)
+  - Decode a number of Canon CameraInfo tags for the 1DmkIV and 550D
+  - Updated CanonCustom tags for the 550D
+  - Improved parsing of Canon OriginalDecisionData
+  - Improved decoding of Canon CameraInfo LensType
+  - Improved decoding of some Sigma tags
+  - Recognize a number of new Paint Shop Pro file extensions
+  - Prevent a directory from being recreated in the wrong location when deleting
+    a group and adding back information in the same step
+  - Changed -fileOrder option to sort numbers numerically
+  - Fixed bug in -fileOrder option when directory names are specified
+  - Fixed problem extracting information from some Panasonic AVCHD videos
+  - Fixed some minor compatibility problems with Perl 5.11
+  - Fixed problem which could result in runtime error when using MWG feature
+  - Fixed an inconsistency in the way duplicate tags were handled in the grouped
+    JSON (-j -g) and short XML (-X -s) output formats
 
 Feb. 8, 2010 - Version 8.10 (production release)
 
@@ -15,7 +89,7 @@ Feb. 8, 2010 - Version 8.10 (production release)
   - Added a few new Sony/Minolta LensTypes (thanks Marcin Krol)
   - Added more Nikon LensID's (thanks Robert Rottmerhusen)
   - Decode metadata from all frames in AVCHD H.264 video with -ee option
-  - Improved decoding of many H.264 tags
+  - Decode more H.264 tags and improved decoding of others
   - Improved decoding of some Olympus E-P1 tags
   - Improved handling of some types of unknown maker notes
   - Enhanced -p option to support output file headers and footers, and to parse

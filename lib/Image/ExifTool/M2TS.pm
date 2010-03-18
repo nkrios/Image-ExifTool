@@ -31,7 +31,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 # program map table "stream_type" lookup (ref 6/1)
 my %streamType = (
@@ -117,8 +117,8 @@ my %noSyntax = (
     VARS => { NO_ID => 1 },
     NOTES => q{
         The MPEG-2 transport stream is used as a container for many different
-        audio/video formats (including AVCHD).  This table represents information
-        extracted from the MPEG-2 transport headers.
+        audio/video formats (including AVCHD).  This table lists information
+        extracted from M2TS files.
     },
     VideoStreamType => {
         PrintHex => 1,
@@ -282,8 +282,8 @@ sub ParsePID($$$$$)
     } elsif ($type == 0x1b) {
         # H.264 Video
         require Image::ExifTool::H264;
-        Image::ExifTool::H264::ParseH264Video($exifTool, $dataPt);
-        # process additional H264 frames with ExtractEmbedded option
+        $more = Image::ExifTool::H264::ParseH264Video($exifTool, $dataPt);
+        # force parsing additional H264 frames with ExtractEmbedded option
         $more = 1 if $exifTool->Options('ExtractEmbedded');
     } elsif ($type == 0x81 or $type == 0x87 or $type == 0x91) {
         # AC-3 audio

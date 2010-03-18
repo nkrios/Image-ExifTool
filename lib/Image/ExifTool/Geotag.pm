@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 sub SetGeoValues($$;$);
 
@@ -195,10 +195,17 @@ sub LoadTrackLog($$;$)
                     if ($$fix{lat} and $$fix{lon} and $$fix{'time'} and
                         $$fix{lat} =~ /^[+-]?\d+\.?\d*/ and
                         $$fix{lon} =~ /^[+-]?\d+\.?\d*/ and
-                        $$fix{'time'} =~ /^(\d{4})-(\d+)-(\d+)T(\d+):(\d+):(\d+)(\.\d+)?/)
+                        $$fix{'time'} =~ /^(\d{4})-(\d+)-(\d+)T(\d+):(\d+):(\d+)(\.\d+)?(.*)/)
                     {
                         $time = Time::Local::timegm($6,$5,$4,$3,$2-1,$1-1900);
                         $time += $7 if $7;  # add fractional seconds
+                        my $tz = $8;
+                        # adjust for time zone (otherwise assume UTC)
+                        if ($tz =~ /^([-+])(\d+):(\d{2})\b/) {
+                            $tz = ($2 * 60 + $3) * 60;
+                            $tz *= -1 if $1 eq '+'; # opposite sign to change back to UTC
+                            $time += $tz;
+                        }
                         # validate altitude
                         undef $$fix{alt} if $$fix{alt} and $$fix{alt} !~ /^[+-]?\d+\.?\d*/;
                         $isDate = 1;

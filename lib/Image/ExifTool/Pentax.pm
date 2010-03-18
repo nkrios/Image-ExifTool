@@ -50,7 +50,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.10';
+$VERSION = '2.11';
 
 sub CryptShutterCount($$);
 
@@ -340,6 +340,7 @@ my %pentaxModelID = (
     0x12dea => 'Optio P80',
     0x12df4 => 'Optio WS80',
     0x12dfe => 'K-x',
+    0x12e3a => 'Optio I-10',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -554,6 +555,7 @@ my %lensCode = (
         Name => 'PentaxImageSize',
         Groups => { 2 => 'Image' },
         Writable => 'int16u',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => '640x480',
             1 => 'Full', #PH - this can mean 2048x1536 or 2240x1680 or ... ?
@@ -588,12 +590,19 @@ my %lensCode = (
         Name => 'PictureMode',
         Writable => 'int16u',
         Count => -1,
-        Notes => '1 or 2 values',
+        Notes => '1 or 2 values.  Decimals used to differentiate values for the Optio 555',
+        ValueConv => '($val < 4 and $$self{Model} =~ /Optio 555\b/) ? $val + 0.1 : $val',
+        ValueConvInv => 'int $val',
+        PrintConvColumns => 2,
         PrintConv => [{
             0 => 'Program', #PH
+            0.1 => 'Av', #PH (Optio 555)
             1 => 'Shutter Speed Priority', #JD
+            1.1 => 'M', #PH (Optio 555)
             2 => 'Program AE', #13
+            2.1 => 'Tv', #PH (Optio 555)
             3 => 'Manual', #13
+            3.1 => 'USER', #PH (Optio 555)
             5 => 'Portrait',
             6 => 'Landscape',
             8 => 'Sport', #PH
@@ -607,6 +616,15 @@ my %lensCode = (
             17 => 'Fireworks',
             18 => 'Text',
             19 => 'Panorama', #PH
+            20 => '3-D', #PH (Optio 555)
+            21 => 'Black & White', #PH (Optio 555)
+            22 => 'Sepia', #PH (Optio 555)
+            23 => 'Red', #PH (Optio 555)
+            24 => 'Pink', #PH (Optio 555)
+            25 => 'Purple', #PH (Optio 555)
+            26 => 'Blue', #PH (Optio 555)
+            27 => 'Green', #PH (Optio 555)
+            28 => 'Yellow', #PH (Optio 555)
             30 => 'Self Portrait', #PH
             31 => 'Illustrations', #13
             33 => 'Digital Filter', #13
@@ -627,7 +645,8 @@ my %lensCode = (
             60 => 'Kids', #13
             61 => 'Blur Reduction', #13
             65 => 'Half-length Portrait', #JD
-            255=> 'Digital Filter?', #13
+            221 => 'P', #PH (Optio 555)
+            255=> 'PICT', #PH (Optio 555)
         }],
     },
     0x000c => { #PH
@@ -669,6 +688,7 @@ my %lensCode = (
             Condition => '$self->{Make} =~ /^PENTAX/',
             Notes => 'Pentax models',
             Writable => 'int16u',
+            PrintConvColumns => 2,
             PrintConv => { #PH
                 0 => 'Normal',
                 1 => 'Macro',
@@ -696,6 +716,7 @@ my %lensCode = (
     0x000e => { #7
         Name => 'AFPointSelected',
         Writable => 'int16u',
+        PrintConvColumns => 2,
         PrintConv => {
             0xffff => 'Auto',
             0xfffe => 'Fixed Center',
@@ -761,6 +782,7 @@ my %lensCode = (
         Name => 'ISO',
         Writable => 'int16u',
         Notes => 'may be different than EXIF:ISO, which can round to the nearest full stop',
+        PrintConvColumns => 4,
         PrintConv => {
             3 => 50, #(NC=Not Confirmed)
             4 => 64,
@@ -880,6 +902,7 @@ my %lensCode = (
     0x0019 => { #3
         Name => 'WhiteBalance',
         Writable => 'int16u',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 'Auto',
             1 => 'Daylight',
@@ -964,6 +987,7 @@ my %lensCode = (
         Writable => 'int16u',
         Count => -1,
         Notes => '1 or 2 values',
+        PrintConvColumns => 2,
         PrintConv => [{ # the *istD has pairs of values - PH
             0 => 'Low', #PH
             1 => 'Normal', #PH
@@ -981,6 +1005,7 @@ my %lensCode = (
         Writable => 'int16u',
         Count => -1,
         Notes => '1 or 2 values',
+        PrintConvColumns => 2,
         PrintConv => [{ # the *istD has pairs of values - PH
             0 => 'Low', #PH
             1 => 'Normal', #PH
@@ -996,6 +1021,7 @@ my %lensCode = (
         Writable => 'int16u',
         Count => -1,
         Notes => '1 or 2 values',
+        PrintConvColumns => 2,
         PrintConv => [{ # the *istD has pairs of values - PH
             0 => 'Soft', #PH
             1 => 'Normal', #PH
@@ -1091,6 +1117,7 @@ my %lensCode = (
         Writable => 'int8u',
         Count => 3,
         Relist => [ [0, 1], 2 ], # join values 0 and 1 for PrintConv
+        PrintConvColumns => 2,
         PrintConv => [{
             # Program dial modes (from K110D)
             '0 0'  => 'Program',    # (also on K10D, custom settings: Program Line 1, e-dial in Program 3, 4 or 5)
@@ -1206,6 +1233,7 @@ my %lensCode = (
         Format => 'int32u',
         Notes => '*istD only',
         ValueConv => '$val & 0x7ff', # ignore other bits for now
+        PrintConvColumns => 2,
         PrintConv => { BITMASK => {
             0 => 'Upper-left',
             1 => 'Top',
@@ -2094,6 +2122,7 @@ my %lensCode = (
     },
     6 => {
         Name => 'AEProgramMode',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 'M, P or TAv',
             1 => 'Av, B or X',
@@ -2646,6 +2675,7 @@ my %lensCode = (
         Format => 'int16u',
         ValueConv => '$self->Options("Unknown") ? $val : $val & 0x7ff',
         ValueConvInv => '$val',
+        PrintConvColumns => 2,
         PrintConv => {
             0x07ff => 'All',
             0x0777 => 'Central 9 points',
@@ -2671,6 +2701,7 @@ my %lensCode = (
         Format => 'int16u',
         ValueConv => '$self->Options("Unknown") ? $val : $val & 0x7ff',
         ValueConvInv => '$val',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 'Auto',
             BITMASK => {
@@ -2711,6 +2742,7 @@ my %lensCode = (
             may report two points in focus even though a single AFPoint has been
             selected, in which case the selected AFPoint is the first reported
         },
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 'None',
             1 => 'Lower-left, Bottom',

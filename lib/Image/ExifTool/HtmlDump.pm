@@ -13,13 +13,13 @@ use vars qw($VERSION);
 use Image::ExifTool;    # only for FinishTiffDump()
 use Image::ExifTool::HTML qw(EscapeHTML);
 
-$VERSION = '1.29';
+$VERSION = '1.30';
 
 sub DumpTable($$$;$$$$$);
 sub Open($$$;@);
 sub Write($@);
 
-my ($bkgStart, $bkgEnd, $bkgSpan);
+my ($bkgStart, $bkgEnd, @bkgSpan);
 
 my $htmlHeader1 = <<_END_PART_1_;
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
@@ -239,6 +239,8 @@ sub new
 #       0x02 - print red address
 #       0x04 - maker notes data ('M'-class span)
 #       0x08 - limit block length
+#       0x10 - allow double references
+#       0x100 - (reserved)
 # Notes: Block will be shown in 'unused' color if comment string begins with '['
 sub Add($$$$;$$)
 {
@@ -305,7 +307,7 @@ sub Print($$;$$$$$)
         $self->{Closed}->[$i] = { ID => [ ], Element => { } };
     }
     $bkgStart = $bkgEnd = 0;
-    $bkgSpan = '';
+    undef @bkgSpan;
     my $index = 0;  # initialize tooltip index
     my (@names, $wasUnused, @starts);
     # only do dump if we didn't have a serious error
@@ -317,12 +319,17 @@ sub Print($$;$$$$$)
         if ($len > 0 and not $wasUnused) {
             # we have an unused bytes before this data block
             --$i;           # dump the data block next time around
-            # split unused data into 2 blocks if it spans end of makernotes
-            if (not defined $wasUnused and $bkgEnd and
-                $pos < $bkgEnd + $dataPos and $pos + $len > $bkgEnd + $dataPos)
-            {
+            # split unused data into 2 blocks if it spans end of a bkg block
+            my ($nextBkgEnd, $bkg);
+            if (not defined $wasUnused and $bkgEnd) {
+                foreach $bkg (@bkgSpan) {
+                    next if $pos >= $$bkg{End} + $dataPos or $pos + $len <= $$bkg{End} + $dataPos;
+                    $nextBkgEnd = $$bkg{End} unless $nextBkgEnd and $nextBkgEnd < $$bkg{End};
+                }
+            }
+            if ($nextBkgEnd) {
                 $start = $pos;
-                $len = $bkgEnd + $dataPos - $pos;
+                $len = $nextBkgEnd + $dataPos - $pos;
                 $wasUnused = 0;
             } else {
                 $start = $pos;  # dump the unused bytes now
@@ -350,11 +357,15 @@ sub Print($$;$$$$$)
                 $names[$tipNum] = $name if defined $tipNum;
                 ++$index;
             }
-            if ($flag == 4) {
-                $bkgStart = $start - $dataPos;
-                # (allow for nested makernotes data)
-                $bkgEnd = $bkgStart + $len unless $bkgEnd and $bkgEnd > $bkgStart + $len;
-                $bkgSpan = "<span class='$name M'>";
+            if ($flag & 0x14) {
+                my %bkg = (
+                    Class => $flag & 0x04 ? "$name M" : $name,
+                    Start => $start - $dataPos,
+                    End   => $start - $dataPos + $len,
+                );
+                push @bkgSpan, \%bkg;
+                $bkgStart = $bkg{Start} unless $bkgStart and $bkgStart < $bkg{Start};
+                $bkgEnd = $bkg{End} unless $bkgEnd and $bkgEnd > $bkg{End};
                 push @{$self->{MSpanList}}, $name;
                 next;
             }
@@ -595,7 +606,21 @@ sub DumpTable($$$;$$$$$)
     }
     # loop through each column of hex numbers
     for (;;) {
-        $self->Open('bkg', ($p>=$bkgStart and $p<$bkgEnd) ? $bkgSpan : '', 1, 2);
+        my (@spanClass, @spanCont, $spanClose, $bkg);
+        if ($p >= $bkgStart and $p < $bkgEnd) {
+            foreach $bkg (@bkgSpan) {
+                next unless $p >= $$bkg{Start} and $p < $$bkg{End};
+                push @spanClass, $$bkg{Class};
+                if ($p + 1 == $$bkg{End}) {
+                    $spanClose = 1;
+                } else {
+                    push @spanCont, $$bkg{Class};   # this span continues
+                }
+            }
+            $self->Open('bkg', @spanClass ? "<span class='@spanClass'>" : '', 1, 2);
+        } else {
+            $self->Open('bkg', '', 1, 2);
+        }
         $self->Open('a', $name, 1, 2);
         my $ch = substr($$blockPt,$p-$pos-$skipped,1);
         $c[1] .= sprintf("%.2x", ord($ch));
@@ -608,9 +633,10 @@ sub DumpTable($$$;$$$$$)
         ++$p;
         ++$cols;
         # close necessary elements
-        if ($p >= $bkgEnd) {
+        if ($spanClose) {
+            my $spanCont = @spanCont ? "<span class='@spanCont'>" : '';
             # close without reopening if closing anchor later
-            my $arg = ($p - $pos >= $len) ? 0 : '';
+            my $arg = ($p - $pos >= $len) ? 0 : $spanCont;
             $self->Open('bkg', $arg, 1, 2);
         }
         if ($dblRef and $p >= $endPos) {

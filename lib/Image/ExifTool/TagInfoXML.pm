@@ -15,8 +15,14 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP;
 
-$VERSION = '1.10';
+$VERSION = '1.14';
 @ISA = qw(Exporter);
+
+# set this to a language code to generate Lang module with 'MISSING' entries
+my $makeMissing = '';
+
+# set this to true to override existing different descriptions/values
+my $overrideDifferent;
 
 sub LoadLangModules($);
 sub WriteLangModule($$;$);
@@ -51,10 +57,7 @@ my %translateLang = (
     se    => 'sv',
 );
 
-my $caseInsensitive;
-
-# set this to a language code to generate Lang module with 'MISSING' entries
-my $makeMissing = '';
+my $caseInsensitive;    # used internally by sort routine
 
 #------------------------------------------------------------------------------
 # Utility to print tag information database as an XML list
@@ -316,7 +319,7 @@ sub BuildLangModules($;$)
     local ($_, *XFILE);
     my ($file, $forceUpdate) = @_;
     my ($table, $tableName, $id, $index, $valIndex, $name, $key, $lang);
-    my (%langInfo, %changed);
+    my (%langInfo, %different, %changed);
 
     Image::ExifTool::LoadAllTables();   # first load all our tables
     LoadLangModules(\%langInfo);        # load all existing Lang modules
@@ -375,7 +378,9 @@ sub BuildLangModules($;$)
                 $lang =~ tr/-A-Z/_a-z/;
                 # use standard ISO 639-1 language codes
                 $lang = $translateLang{$lang} if $translateLang{$lang};
-                my $val = ucfirst Image::ExifTool::XMP::UnescapeXML($3);
+                my $tval = Image::ExifTool::XMP::UnescapeXML($3);
+                my $val = ucfirst $tval;
+                my $cap = ($tval ne $val);
                 if ($makeMissing and $lang eq 'en') {
                     $lang = $makeMissing;
                     $val = 'MISSING';
@@ -385,6 +390,7 @@ sub BuildLangModules($;$)
                     print "Creating new language $lang\n";
                     $langInfo{$lang} = { };
                 }
+                defined $name or $name = '<unknown>';
                 unless (defined $id) {
                     next if $isDefault;
                     # this is a table description
@@ -392,9 +398,9 @@ sub BuildLangModules($;$)
                             $langInfo{$lang}{$tableName} eq $val;
                     $langInfo{$lang}{$tableName} = $val;
                     $changed{$lang} = 1;
+                    warn("Capitalized '$lang' val for $name: $val\n") if $cap;
                     next;
                 }
-                defined $name or $name = '<unknown>';
                 my @infoArray = GetTagInfoList($table, $id);
     
                 # this will fail for UserDefined tags and tags without ID's
@@ -428,8 +434,14 @@ sub BuildLangModules($;$)
                     if ($makeMissing) {
                         next if defined $oldVal and $val eq 'MISSING';
                     } elsif (defined $oldVal) {
-                        warn "Different '$lang' desc for $tagName: $val (was $$langInfo{Description})\n";
-                        next;
+                        my $t = "$lang $tagName";
+                        unless (defined $different{$t} and $different{$t} eq $val) {
+                            my $a = defined $different{$t} ? 'ANOTHER ' : '';
+                            warn "${a}Different '$lang' desc for $tagName: $val (was $$langInfo{Description})\n";
+                            next if defined $different{$t}; # don't change back again
+                            $different{$t} = $val;
+                        }
+                        next unless $overrideDifferent;
                     }
                     next if $isDefault;
                     $$langInfo{Description} = $val;
@@ -450,7 +462,7 @@ sub BuildLangModules($;$)
                                 $convVal = $$printConv{BITMASK}{$i};
                             }
                         }
-                        warn('Missing PrintConv entry') and next unless defined $convVal;
+                        warn("Missing PrintConv entry for $key") and next unless defined $convVal;
                     }
                     my $lc = $$langInfo{PrintConv};
                     $lc or $lc = $$langInfo{PrintConv} = { };
@@ -460,10 +472,17 @@ sub BuildLangModules($;$)
                     if ($makeMissing) {
                         next if defined $oldVal and $val eq 'MISSING';
                     } elsif (defined $oldVal and (not $isDefault or not $val=~/^\d+$/)) {
-                        warn "Different '$lang' val for $tagName $convVal: $val (was $oldVal)\n";
-                        next;
+                        my $t = "$lang $tagName $convVal";
+                        unless (defined $different{$t} and $different{$t} eq $val) {
+                            my $a = defined $different{$t} ? 'ANOTHER ' : '';
+                            warn "${a}Different '$lang' val for $tagName '$convVal': $val (was $oldVal)\n";
+                            next if defined $different{$t}; # don't change back again
+                            $different{$t} = $val;
+                        }
+                        next unless $overrideDifferent;
                     }
                     next if $isDefault;
+                    warn("Capitalized '$lang' val for $tagName: $tval\n") if $cap;
                     $$lc{$convVal} = $val;
                 }
                 $changed{$lang} = 1;
@@ -518,6 +537,7 @@ sub WriteLangModule($$;$)
 
 package Image::ExifTool::Lang::$lang;
 
+use strict;
 use vars qw(\$VERSION);
 
 \$VERSION = '$ver';
@@ -532,6 +552,17 @@ HEADER
         if (ref $desc) {
             $conv = $$desc{PrintConv};
             $desc = $$desc{Description};
+            # remove description if not necessary
+            # (not strictly correct -- should test against tag description, not name)
+            undef $desc if $desc and $desc eq $tag;
+            # remove unnecessary value translations
+            if ($conv) {
+                my @keys = keys %$conv;
+                foreach (@keys) {
+                    delete $$conv{$_} if $_ eq $$conv{$_};
+                }
+                undef $conv unless %$conv;
+            }
         }
         if (defined $desc) {
             $desc = EscapePerl($desc);
@@ -620,7 +651,7 @@ sub LoadLangModules($)
         eval "require Image::ExifTool::Lang::$lang" or warn("Can't load Lang::$lang\n"), next;
         my $xlat = "Image::ExifTool::Lang::${lang}::Translate";
         no strict 'refs';
-        defined %$xlat or warn("Missing Info for $lang\n"), next;
+        %$xlat or warn("Missing Info for $lang\n"), next;
         $$langHash{$lang} = \%$xlat;
         use strict 'refs';
     }

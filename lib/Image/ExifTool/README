@@ -16,7 +16,7 @@ hash value provides information about the tag (explained later).
 
 Twenty-four special keys (TABLE_NAME, SHORT_NAME, PROCESS_PROC, WRITE_PROC,
 CHECK_PROC, GROUPS, FORMAT, FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, WRITABLE,
-TABLE_DESC, NOTES, IS_OFFSET, EXTRACT_UNKNOWN, NAMESPACE, PREFERRED, PARENT,
+TABLE_DESC, NOTES, IS_OFFSET, EXTRACT_UNKNOWN, NAMESPACE, PREFERRED, SRC_TABLE,
 PRIORITY, WRITE_GROUP, LANG_INFO, VARS, DATAMEMBER and SET_GROUP1) are used to
 provide additional information about a table. The special keys have names that
 are all capitalized to avoid possible conflicts with tag keys.  Below is an
@@ -77,6 +77,7 @@ explanation of the meaning of each special key:
     int8u       - Unsigned 8-bit integer                  (EXIF 'BYTE')
     int16s      - Signed 16-bit integer                   (EXIF 'SSHORT')
     int16u      - Unsigned 16-bit integer                 (EXIF 'SHORT')
+    int16uRev   - Unsigned 16-bit integer, reversed byte order
     int32s      - Signed 32-bit integer                   (EXIF 'SLONG')
     int32u      - Unsigned 32-bit integer                 (EXIF 'LONG')
     int64s      - Signed 64-bit integer                   (BigTIFF 'SLONG8')
@@ -141,8 +142,8 @@ explanation of the meaning of each special key:
   when calling InitWriteDirs() to write these tags; this avoids creating other
   directories for tags which are already being creating in the preferred group.
 
-  PARENT : Used internally to store the parent table name of a user-defined tag
-  table so the appropriate module can be loaded as required.
+  SRC_TABLE : Used internally to store the source table name of a user-defined
+  tag table so the appropriate module can be loaded as required.
 
   PRIORITY : Default Priority for all tags in this table.
 
@@ -272,7 +273,9 @@ numerical.
                   this tag if it should be stored as a special data member when
                   writing information.  Necessary only if the value of the tag
                   affects other written information.  Currently only used for
-                  tags in EXIF tables.
+                  tags in EXIF tables where it triggers the execution of the
+                  RawConv to convert and store the value as an ExifTool data
+                  member when writing.
 
                   'DataTag' - associated tag name containing data for offset or
                   byte count tags.
@@ -315,7 +318,8 @@ numerical.
 
                   'NestedHtmlDump' - flag set if value for this tag is also
                   dumped when processing the SubDirectory.  This flag is implied
-                  if the MakerNotes flag is set.
+                  if the MakerNotes flag is set.  Set to 2 if the dump should
+                  only be underlined if nested inside other maker notes.
 
                   'NotIFD' - set for 'MakerNotes' tags only if the data is not
                   in standard EXIF IFD format.
@@ -618,12 +622,17 @@ numerical.
                   The condition may use $self to reference the ExifTool object,
                   and returns true if it is OK for writing.  Unlike WriteCheck
                   which is done only once when the new value is set, this
-                  condition is evaluated before the information is written in
-                  each file.
+                  condition is evaluated just before the tags of the specific
+                  SubDirectory are written.
 
   WriteGroup    : [Writable EXIF tags only] Specifies the IFD where the
                   information gets written by default.  Must be defined for
                   writable EXIF tags if WRITE_GROUP is not specified in table.
+
+  IsOverwriting : [Writable EXIF tags only] Specifies reference to subroutine
+                  which determines if tag should be overwritten.  Arguments are:
+                  0) ExifTool object ref, 1) new value hash ref, 2) old value,
+                  3) new value reference.
 
   AllowGroup    : [Writable tags only] Regular expression string (case
                   insensitive) to match group names which are allowed when
@@ -638,6 +647,12 @@ numerical.
 
   FixFormat     : [Writable EXIF SubIFD SubDirectory's only] Used to specify a
                   format for writing an IFD pointer other than 'int32u'.
+
+  ChangeBase    : [EXIF tags in JPEG images only] Eval used to return new base
+                  for the offset for this tag only.  Eval may use $dirStart and
+                  $dataPos.  Note this is geared to the quirky Leica preview
+                  image offset, and is only used if the preview is outside the
+                  APP1 EXIF segment.
 
   Struct        : [XMP tags only] Used by XMP writer code to specify name of XMP
                   structure so the PropertyPath can be determined.  Tags with
@@ -696,9 +711,9 @@ numerical.
                   subdirectory.  This need not be specified if the offset is the
                   same as the current directory, which is normally the case.
                   May use $start to represent the subdirectory start location
-                  relative to the current base.  If this is defined, the
-                  automatic validation of base offsets is disabled for maker
-                  notes directories.
+                  relative to the current base, and $base for the value of the
+                  current base.  If this is defined, the automatic validation of
+                  base offsets is disabled for maker notes directories.
 
      EntryBased : Flag indicating that the offsets are based on the individual
                   directory entry position, so offsets are incremented by 12

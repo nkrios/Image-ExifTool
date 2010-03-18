@@ -132,8 +132,9 @@ functions.  See "<a href="config.html">ExifTool_config</a>" in the ExifTool
 distribution for more details.</p>
 
 <p>By default ExifTool looks for a configuration file named ".ExifTool_config"
-in your home directory, but a different file may be specified by setting the
-ExifTool "<code>configFile</code>" variable before using Image::ExifTool.  For
+first in your home directory, then in the directory of the application script,
+but a different file may be specified by setting the ExifTool
+"<code>configFile</code>" variable before using Image::ExifTool.  For
 example:</p>
 
 <blockquote><table class='box'><tr><td><pre>
@@ -258,10 +259,11 @@ complete list of ExifTool tag names.
 </td></tr><tr><td valign='top'><b>File&nbsp;ref</b></td><td>
 A reference to an open image file.  If you use this method (or a SCALAR
 reference) to access information in an image, the FileName and Directory tags
-will not be returned.  (Also, the FileSize and FileModifyDate tags will not be
-returned unless it is a plain file.)  Image processing begins at the current
-file position, and on return the file position is unspecified. May be either a
-standard filehandle or a reference to a File::RandomAccess object.
+will not be returned.  (Also, the FileSize, FileModifyDate and FilePermissions
+tags will not be returned unless it is a plain file.)  Image processing begins
+at the current file position, and on return the file position is unspecified.
+May be either a standard filehandle or a reference to a File::RandomAccess
+object.
 <br>&nbsp;<br>
 [Advanced:  To allow a non-rewindable stream (ie. a network socket) to be
 re-read after processing with ExifTool, first wrap the file reference in a
@@ -886,6 +888,10 @@ the returned PrintConv value for these tags is either a string of values or
 a list reference (depending on the List option setting), and the ValueConv
 value is always a list reference.  But in list context,
 <a href="#GetValue">GetValue</a> always returns the list itself.</p>
+<p>Note that <a href="#GetInfo">GetValue</a> requires a case-sensitive tag key
+as an argument. To retrieve tag information based on a case-insensitive tag name
+(with an optional group specifier), use <a href="#GetInfo">GetInfo</a>
+instead.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetValue($$;$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
@@ -1643,9 +1649,9 @@ MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash,
 MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
 MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
 MIFF, MNG, MPC, MPEG, MPF0, MPImage, MakerNotes, MakerUnknown, MetaIFD,
-Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom, NikonPreview,
-NikonScan, Olympus, PDF, PICT, PNG, PSP, Panasonic, Pentax, PhotoMechanic,
-Photoshop, PictureInfo, PostScript, PrintIM, ProfileIFD, QuickTime, RAF,
+Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom, NikonScan,
+Olympus, PDF, PICT, PNG, Panasonic, Pentax, PSP, PhotoMechanic, Photoshop,
+PictureInfo, PostScript, PreviewIFD, PrintIM, ProfileIFD, QuickTime, RAF,
 RAF2, RIFF, RMETA, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3,
 Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
 SRF#, SVG, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD,

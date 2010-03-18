@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
@@ -93,16 +93,16 @@ sub ProcessX3FProperties($$$);
     GROUPS => { 2 => 'Camera' },
     NOTES => 'Extended header data found in version 2.1 and 2.2 files',
     0 => 'Unused',
-    1 => { Name => 'ExposureAdjust',PrintConv => 'sprintf("%.2f",$val)' },
-    2 => { Name => 'Contrast',      PrintConv => 'sprintf("%.2f",$val)' },
-    3 => { Name => 'Shadow',        PrintConv => 'sprintf("%.2f",$val)' },
-    4 => { Name => 'Highlight',     PrintConv => 'sprintf("%.2f",$val)' },
-    5 => { Name => 'Saturation',    PrintConv => 'sprintf("%.2f",$val)' },
-    6 => { Name => 'Sharpness',     PrintConv => 'sprintf("%.2f",$val)' },
-    7 => { Name => 'RedAdjust',     PrintConv => 'sprintf("%.2f",$val)' },
-    8 => { Name => 'GreenAdjust',   PrintConv => 'sprintf("%.2f",$val)' },
-    9 => { Name => 'BlueAdjust',    PrintConv => 'sprintf("%.2f",$val)' },
-   10 => { Name => 'X3FillLight',   PrintConv => 'sprintf("%.2f",$val)' },
+    1 => { Name => 'ExposureAdjust',PrintConv => 'sprintf("%.1f",$val)' },
+    2 => { Name => 'Contrast',      PrintConv => 'sprintf("%.1f",$val)' },
+    3 => { Name => 'Shadow',        PrintConv => 'sprintf("%.1f",$val)' },
+    4 => { Name => 'Highlight',     PrintConv => 'sprintf("%.1f",$val)' },
+    5 => { Name => 'Saturation',    PrintConv => 'sprintf("%.1f",$val)' },
+    6 => { Name => 'Sharpness',     PrintConv => 'sprintf("%.1f",$val)' },
+    7 => { Name => 'RedAdjust',     PrintConv => 'sprintf("%.1f",$val)' },
+    8 => { Name => 'GreenAdjust',   PrintConv => 'sprintf("%.1f",$val)' },
+    9 => { Name => 'BlueAdjust',    PrintConv => 'sprintf("%.1f",$val)' },
+   10 => { Name => 'X3FillLight',   PrintConv => 'sprintf("%.1f",$val)' },
 );
 
 # PROP tags

@@ -17,7 +17,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::MakerNotes;
 use Image::ExifTool::CanonRaw;
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 sub ProcessOriginalRaw($$$);
 sub ProcessAdobeData($$$);
@@ -235,7 +235,7 @@ sub ProcessAdobeData($$$)
         my $fast = $exifTool->Options('FastScan');
         return 1 if $fast and $fast > 1;
     }
-    $htmlDump and $exifTool->HtmlDump($dataPos, 6, 'Adobe DNGPrivateData header');
+    $htmlDump and $exifTool->HDump($dataPos, 6, 'Adobe DNGPrivateData header');
     SetByteOrder('MM'); # always big endian
     $pos += 6;
     while ($pos + 8 <= $end) {
@@ -246,10 +246,10 @@ sub ProcessAdobeData($$$)
         if ($htmlDump) {
             my $name = "Adobe$tag";
             $name =~ tr/ //d;
-            $exifTool->HtmlDump($dataPos + $pos - 8, 8, "$name header", "Data Size: $size bytes");
+            $exifTool->HDump($dataPos + $pos - 8, 8, "$name header", "Data Size: $size bytes");
             # dump non-EXIF format data
             unless ($tag =~ /^(MakN|SR2 )$/) {
-                $exifTool->HtmlDump($dataPos + $pos, $size, "$name data");
+                $exifTool->HDump($dataPos + $pos, $size, "$name data");
             }
         }
         if ($verbose and not $outfile) {
@@ -589,7 +589,7 @@ sub ProcessAdobeSR2($$$)
         Parent    => $$dirInfo{DirName},
     );
     if ($exifTool->Options('HtmlDump')) {
-        $exifTool->HtmlDump($dataPos + $start, 6, 'Adobe SR2 data');
+        $exifTool->HDump($dataPos + $start, 6, 'Adobe SR2 data');
     }
     # parse the SR2 directory
     $exifTool->ProcessDirectory(\%subdirInfo, $tagTablePtr);
@@ -707,8 +707,8 @@ sub ProcessAdobeMakN($$$)
         return 0;
     }
     if ($exifTool->Options('HtmlDump')) {
-        $exifTool->HtmlDump($dataPos + $start, 6, 'Adobe MakN data');
-        $exifTool->HtmlDump($dataPos + $dirStart, $loc, "$$tagInfo{Name} header") if $loc;
+        $exifTool->HDump($dataPos + $start, 6, 'Adobe MakN data');
+        $exifTool->HDump($dataPos + $dirStart, $loc, "$$tagInfo{Name} header") if $loc;
     }
 
     my $fix = 0;
@@ -742,6 +742,8 @@ sub ProcessAdobeMakN($$$)
             # shift offsets to position of original maker notes
             $fixup->{Shift} += $originalPos;
         }
+        # if we wrote the directory as a block the header is already included
+        $loc = 0 if $subdirInfo{BlockWrite};
         $fixup->{Shift} += $loc;    # adjust for makernotes header
         $fixup->ApplyFixup(\$buff); # fix up pointer offsets
         # get copy of original Adobe header (6) and makernotes header ($loc)

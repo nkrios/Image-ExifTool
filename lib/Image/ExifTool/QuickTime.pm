@@ -27,7 +27,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.30';
+$VERSION = '1.33';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -213,7 +213,7 @@ my %ftypLookup = (
 
 # QuickTime atoms
 %Image::ExifTool::QuickTime::Main = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     NOTES => q{
         The QuickTime format is used for many different types of audio, video and
@@ -298,7 +298,7 @@ my %ftypLookup = (
 
 # atoms used in QTIF files
 %Image::ExifTool::QuickTime::ImageFile = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Image' },
     NOTES => 'Tags used in QTIF QuickTime Image Files.',
     idsc => {
@@ -399,7 +399,7 @@ my %ftypLookup = (
 
 # movie atoms
 %Image::ExifTool::QuickTime::Movie = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     mvhd => {
         Name => 'MovieHeader',
@@ -490,7 +490,7 @@ my %ftypLookup = (
 
 # track atoms
 %Image::ExifTool::QuickTime::Track = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     tkhd => {
         Name => 'TrackHeader',
@@ -603,7 +603,7 @@ my %ftypLookup = (
 
 # user data atoms
 %Image::ExifTool::QuickTime::UserData = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     NOTES => q{
         Tag ID's beginning with the copyright symbol (hex 0xa9) are multi-language
@@ -721,9 +721,17 @@ my %ftypLookup = (
         },
         {
             Name => 'OlympusTags2',
-            Condition => '$$valPt =~ /^OLYMPUS DIGITAL CAMERA\0/',
+            Condition => '$$valPt =~ /^OLYMPUS DIGITAL CAMERA(?!\0.{21}\x0a\0{3})/s',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Olympus::MOV2',
+                ByteOrder => 'LittleEndian',
+            },
+        },
+        {
+            Name => 'OlympusTags3',
+            Condition => '$$valPt =~ /^OLYMPUS DIGITAL CAMERA\0/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Olympus::MP4',
                 ByteOrder => 'LittleEndian',
             },
         },
@@ -763,6 +771,13 @@ my %ftypLookup = (
             Binary => 1
         },
     ],
+    NCDT => { #PH
+        Name => 'NikonNCDT',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::NCDT',
+            ProcessProc => \&ProcessMOV,
+        },
+    },
     QVMI => { #PH
         Name => 'CasioQVMI',
         # Casio stores standard EXIF-format information in MOV videos (ie. EX-S880)
@@ -785,13 +800,17 @@ my %ftypLookup = (
         Name => 'XMP',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
     },
-    CNCV => 'CompressorVersion', #PH (Canon 5D Mark II)
     vndr => 'Vendor', #PH (Samsung PL70)
+    # Canon tags
+    CNCV => 'CompressorVersion', #PH (5D Mark II)
+    CNMN => 'Model', #PH (EOS 550D)
+    CNFV => 'FirmwareVersion', #PH (EOS 550D)
+    # CNDB - ? (550D)
 );
 
 # User-specific media data atoms (ref 11)
 %Image::ExifTool::QuickTime::UserMedia = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     MTDT => {
         Name => 'MetaData',
@@ -818,7 +837,7 @@ my %ftypLookup = (
         RawConv => 'my @a=unpack("Nnn",$val); "@a"',
         PrintConv => [
             { 0 => 'No presentation', BITMASK => { 0 => 'Main track' } },
-            { 0 => 'No attributes',   BITMASK => { 0x8000 => 'Read only' } },
+            { 0 => 'No attributes',   BITMASK => { 15 => 'Read only' } },
             '"Priority $val"',
         ],
     },
@@ -839,7 +858,7 @@ my %ftypLookup = (
 
 # Profile atoms (ref 11)
 %Image::ExifTool::QuickTime::Profile = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     FPRF => {
         Name => 'FileGlobalProfile',
@@ -965,7 +984,7 @@ my %ftypLookup = (
 
 # meta atoms
 %Image::ExifTool::QuickTime::Meta = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     ilst => {
         Name => 'InfoList',
@@ -1019,7 +1038,7 @@ my %ftypLookup = (
 
 # track reference atoms
 %Image::ExifTool::QuickTime::TrackRef = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     chap => { Name => 'ChapterList', Format => 'int32u' },
     # also: tmcd, sync, scpt, ssrc, iTunesInfo
@@ -1028,7 +1047,7 @@ my %ftypLookup = (
 # info list atoms
 # -> these atoms are unique, and contain one or more 'data' atoms
 %Image::ExifTool::QuickTime::InfoList = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Audio' },
     NOTES => q{
         As well as these tags, the 'mdta' handler uses numerical tag ID's which are
@@ -1238,7 +1257,7 @@ my %ftypLookup = (
 
 # info list atoms
 %Image::ExifTool::QuickTime::iTunesInfo = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Audio' },
     # 'mean'/'name'/'data' atoms form a triplet, but unfortunately
     # I can't find any source for decoding 'data'.
@@ -1284,7 +1303,7 @@ my %ftypLookup = (
 
 # 'hnti' atoms
 %Image::ExifTool::QuickTime::HintInfo = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     'rtp ' => {
         Name => 'RealtimeStreamingProtocol',
@@ -1295,7 +1314,7 @@ my %ftypLookup = (
 
 # 'hinf' atoms
 %Image::ExifTool::QuickTime::HintTrackInfo = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     trpY => { Name => 'TotalBytes', Format => 'int64u' }, #(documented)
     trpy => { Name => 'TotalBytes', Format => 'int64u' }, #(observed)
@@ -1337,9 +1356,9 @@ my %ftypLookup = (
     },
 );
 
-# DcMD atoms
+# Kodak DcMD atoms (ref PH)
 %Image::ExifTool::QuickTime::DcMD = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     NOTES => 'Metadata directory found in MOV videos from some Kodak cameras.',
     Cmbo => {
@@ -1357,9 +1376,9 @@ my %ftypLookup = (
     },
 );
 
-# DcME atoms
+# Kodak DcME atoms (ref PH)
 %Image::ExifTool::QuickTime::DcME = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     # Mtmd = binary data
     # Keyw = keywords?
@@ -1368,7 +1387,7 @@ my %ftypLookup = (
 
 # MP4 media box (ref 5)
 %Image::ExifTool::QuickTime::Media = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     NOTES => 'MP4 media box.',
     mdhd => [{
@@ -1468,7 +1487,7 @@ my %ftypLookup = (
 
 # MP4 media information box (ref 5)
 %Image::ExifTool::QuickTime::MediaInfo = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     NOTES => 'MP4 media info box.',
     vmhd => {
@@ -1542,7 +1561,7 @@ my %ftypLookup = (
 
 # MP4 sample table box (ref 5)
 %Image::ExifTool::QuickTime::SampleTable = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     NOTES => 'MP4 sample table box.',
     stsd => [
@@ -1694,7 +1713,7 @@ my %ftypLookup = (
 
 # MP4 data information box (ref 5)
 %Image::ExifTool::QuickTime::DataInfo = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     NOTES => 'MP4 data information box.',
     dref => {
         Name => 'DataRef',
@@ -1707,7 +1726,7 @@ my %ftypLookup = (
 
 # Generic media header
 %Image::ExifTool::QuickTime::GenMediaHeader = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     gmin => {
         Name => 'GenMediaInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::GenMediaInfo' },
@@ -1736,7 +1755,7 @@ my %ftypLookup = (
 
 # MP4 data reference box (ref 5)
 %Image::ExifTool::QuickTime::DataRef = (
-    PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessMOV,
+    PROCESS_PROC => \&ProcessMOV,
     NOTES => 'MP4 data reference box.',
     'url ' => {
         Name => 'URL',
@@ -2143,7 +2162,8 @@ sub ProcessMOV($$;$)
                         $exifTool->{SET_GROUP1} = 'Track' . (++$track);
                     }
                     my $subTable = GetTagTable($$subdir{TagTable});
-                    $exifTool->ProcessDirectory(\%dirInfo, $subTable) if $size > $start;
+                    my $proc = $$subdir{ProcessProc};
+                    $exifTool->ProcessDirectory(\%dirInfo, $subTable, $proc) if $size > $start;
                     $exifTool->{SET_GROUP1} = $oldGroup1;
                     SetByteOrder('MM');
                 } elsif ($hasData) {

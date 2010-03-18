@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -218,6 +218,7 @@ my %ricohLensIDs = (
             6 => 400,
             7 => 800,
             8 => 1600,
+            9 => 'Auto', #PH (? CX3)
         },
     },
     40 => {

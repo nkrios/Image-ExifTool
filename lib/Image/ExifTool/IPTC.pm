@@ -193,7 +193,7 @@ my %fileFormat = (
             affects the decoding of string values in the Application and NewsPhoto
             records.  This tag is marked as "unsafe" to prevent it from being copied by
             default in a group operation because existing tags in the destination image
-            may use a different encoding. When creating a new IPTC record from scratch,
+            may use a different encoding.  When creating a new IPTC record from scratch,
             it is suggested that this be set to "UTF8" if special characters are a
             possibility
         },
@@ -495,7 +495,7 @@ my %fileFormat = (
             I haven't found a reference for the format of tags 121, 184-188 and
             225-232, so I have just make them writable as strings with
             reasonable length.  Beware that if this is wrong, other utilities
-            won't be able to read these tags as written by ExifTool.
+            won't be able to read these tags as written by ExifTool
         },
     },
     122 => {

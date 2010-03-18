@@ -8,9 +8,10 @@
 
 package Image::ExifTool::Lang::ja;
 
+use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 %Image::ExifTool::Lang::ja::Translate = (
    'AEAperture' => 'AE絞り',
@@ -152,13 +153,23 @@ $VERSION = '1.11';
    'AFAreaMode' => {
       Description => 'AFエリアモード',
       PrintConv => {
+        '1-area (high speed)' => '高速１点',
+        '1-area' => '１点',
+        '3-area (center)?' => '３点中央？',
+        '3-area (left)?' => '３点左？',
+        '3-area (right)?' => '３点右？',
+        '5-area' => '５点',
         'Auto-area' => '自動エリアAF',
-        'Dynamic Area' => 'ダイナミックエリア',
         'Dynamic Area (closest subject)' => 'ダイナミック（重点主題）',
         'Dynamic Area (wide)' => 'ダイナミック（ワイド）',
+        'Dynamic Area' => 'ダイナミックエリア',
+        'Face Detect AF' => '顔優先',
         'Group Dynamic' => 'グループダイナミック',
-        'Single Area' => 'シングルポイント',
+        'Normal?' => 'ノーマル？',
         'Single Area (wide)' => 'シングルポイント（ワイド）',
+        'Single Area' => 'シングルポイント',
+        'Spot Focusing' => 'スポットフォーカス',
+        'Spot Mode On' => 'スポットモードオン',
       },
     },
    'AFAreaModeSetting' => {
@@ -223,21 +234,7 @@ $VERSION = '1.11';
         'Disable' => 'しない',
       },
     },
-   'AFMode' => {
-      Description => 'AFモード',
-      PrintConv => {
-        '1-area' => '１点',
-        '1-area (high speed)' => '高速１点',
-        '3-area (center)?' => '３点中央？',
-        '3-area (left)?' => '３点左？',
-        '3-area (right)?' => '３点右？',
-        '5-area' => '５点',
-        'Face Detect AF' => '顔優先',
-        'Normal?' => 'ノーマル？',
-        'Spot Focusing' => 'スポットフォーカス',
-        'Spot Mode On' => 'スポットモードオン',
-      },
-    },
+   'AFMode' => 'AFモード',
    'AFOnAELockButtonSwitch' => {
       Description => 'AF-ON/AEロックボタン入替',
       PrintConv => {
@@ -273,8 +270,8 @@ $VERSION = '1.11';
       PrintConv => {
         'Disable' => 'しない',
         'Enable' => 'する',
-        'Enable (left/right assist points)' => 'する(左右1領域アシスト有効)',
-        'Enable (surrounding assist points)' => 'する(周囲1領域アシスト有効)',
+        'Left/right AF points' => 'する(左右1領域アシスト有効)',
+        'Surrounding AF points' => 'する(周囲1領域アシスト有効)',
       },
     },
    'AFPointAutoSelection' => {
@@ -1298,12 +1295,6 @@ $VERSION = '1.11';
    'Contact' => '連絡',
    'ContentLocationCode' => '内容位置コード',
    'ContentLocationName' => '内容位置名',
-   'ContentType' => {
-      PrintConv => {
-        'Movie' => '動画',
-        'Normal' => '標準',
-      },
-    },
    'ContinuousDrive' => {
       Description => 'ドライブモード',
       PrintConv => {
@@ -1847,6 +1838,7 @@ $VERSION = '1.11';
         'Landscape' => '風景',
         'Manual' => 'マニュアル露出',
         'Night Scene' => '夜景',
+        'Night Scene / Twilight' => '夜景',
         'Portrait' => 'ポートレート',
         'Program' => 'プログラム',
         'Program AE' => 'プログラムAE',
@@ -3173,8 +3165,8 @@ $VERSION = '1.11';
    'LockMicrophoneButton' => {
       Description => 'プロテクト/録音ボタン タンの機能',
       PrintConv => {
-        'Protect (holding:sound rec.)' => 'プロテクト(長押しで録音)',
-        'Sound rec. (protect:disable)' => '録音(プロテクト不可)',
+        'Protect (hold:record memo)' => 'プロテクト(長押しで録音)',
+        'Record memo (protect:disable)' => '録音(プロテクト不可)',
       },
     },
    'LongExposureNoiseReduction' => {
@@ -3299,6 +3291,12 @@ $VERSION = '1.11';
    'MeasurementIlluminant' => '光源測定',
    'MeasurementObserver' => '測定オブザーバー',
    'MediaBlackPoint' => 'メディア黒点',
+   'MediaType' => {
+      PrintConv => {
+        'Movie' => '動画',
+        'Normal' => '標準',
+      },
+    },
    'MediaWhitePoint' => 'メディア白点',
    'Medium' => 'ミドル',
    'MenuButtonDisplayPosition' => {
@@ -3603,7 +3601,6 @@ $VERSION = '1.11';
    'NikonCaptureData' => 'ニコンキャプチャーデータ',
    'NikonCaptureOffsets' => 'ニコンキャプチャーオフセット',
    'NikonCaptureVersion' => 'ニコンキャプチャーバージョン',
-   'NikonPreview' => 'プレビューIFDポインター',
    'NoMemoryCard' => {
       Description => 'メモリーカード無し',
       PrintConv => {
@@ -4008,6 +4005,7 @@ $VERSION = '1.11';
       },
     },
    'PreviewDateTime' => 'プレビュー日時',
+   'PreviewIFD' => 'プレビューIFDポインター',
    'PreviewImage' => 'プレビューイメージ',
    'PreviewImageBorders' => 'プレビュー画像境界',
    'PreviewImageData' => 'プレビュー画像データ',
@@ -4873,8 +4871,8 @@ $VERSION = '1.11';
       PrintConv => {
         'AE lock/Metering + AF start' => 'AEロック/測光・AF開始',
         'Metering + AF start' => '測光・AF開始',
-        'Metering + AF start / disable' => '測光・AF開始/無効',
         'Metering + AF start/AF stop' => '測光・AF開始/AFストップ',
+        'Metering + AF start/disable' => '測光・AF開始/無効',
         'Metering start/Meter + AF start' => '測光開始/測光・AF開始',
       },
     },

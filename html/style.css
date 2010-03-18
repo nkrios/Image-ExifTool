@@ -9,13 +9,15 @@ a:active  { color: red }
 .blu      { color: blue }
 .com      { color: #a00 }
 .aside    { color: #864 }
+.lt       { color: #666 }
 .lg       { font-size: larger }
 .sm       { font-size: smaller }
 .up       { margin: 0 0 .5em 0 }
 p         { margin: 1em 1em }
 p.lf      { margin: 1em 0 }
 .code     { color: #800; }
-code      { color: #800; font-family: monaco, monospace; font-size: 1em }
+code      { color: #800; font-family: monaco, monospace;
+            font-size: 1em; white-space: nowrap }
 pre       { font-family: monaco, monospace; font-size: 1em }
 div.index { float: right; clear: both;
             border-left: 1px solid gray;

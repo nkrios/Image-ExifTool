@@ -18,7 +18,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub ProcessJpgFromRaw($$$);
 sub WriteJpgFromRaw($$$);
@@ -315,7 +315,7 @@ sub ProcessJpgFromRaw($$$)
         my $buff = substr($$dataPt, $dirStart, $dirLen);
         $dataPt = \$buff;
     }
-    $$exifTool{BASE} = $$dirInfo{DataPos};
+    $$exifTool{BASE} = $$dirInfo{DataPos} + ($dirStart || 0);
     $$exifTool{FILE_TYPE} = $$exifTool{TIFF_TYPE} = 'JPEG';
     $$exifTool{DOC_NUM} = 1;
     # extract information from embedded JPEG

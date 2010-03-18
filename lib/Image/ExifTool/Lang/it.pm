@@ -8,6 +8,7 @@
 
 package Image::ExifTool::Lang::it;
 
+use strict;
 use vars qw($VERSION);
 
 $VERSION = '1.04';
@@ -403,11 +404,6 @@ $VERSION = '1.04';
    'Contact' => 'Contatto',
    'ContentLocationCode' => 'Codice ubicazione contenuto',
    'ContentLocationName' => 'Nome Ubicazione Contenuto',
-   'ContentType' => {
-      PrintConv => {
-        'Normal' => 'Normale',
-      },
-    },
    'Contrast' => {
       Description => 'Contrasto',
       PrintConv => {
@@ -1111,6 +1107,11 @@ $VERSION = '1.04';
    'MaxApertureValue' => 'Diaframma massimo obiettivo',
    'MaxFocalLength' => 'Lunghezza Focale Massima',
    'MediaBlackPoint' => 'Media Punto Nero',
+   'MediaType' => {
+      PrintConv => {
+        'Normal' => 'Normale',
+      },
+    },
    'MediaWhitePoint' => 'Media Punto Bianco',
    'MenuButtonDisplayPosition' => {
       PrintConv => {
@@ -1215,7 +1216,6 @@ $VERSION = '1.04';
    'NativeDisplayInfo' => 'Info Display Nativo',
    'NikonCaptureData' => 'Dati Nikon Capture',
    'NikonCaptureVersion' => 'Versione Nikon Capture',
-   'NikonPreview' => 'Anteprima Puntatore IFD',
    'Noise' => 'Rumore',
    'NoiseFilter' => {
       PrintConv => {
@@ -1346,6 +1346,7 @@ $VERSION = '1.04';
       },
     },
    'PreviewDateTime' => 'Anteprima Data Ora',
+   'PreviewIFD' => 'Anteprima Puntatore IFD',
    'PreviewImage' => 'Anteprima',
    'PreviewImageValid' => {
       PrintConv => {

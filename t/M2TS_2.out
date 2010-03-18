@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.10
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.14
 [File, System, Image] FileName - File Name: M2TS.mts
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1344 bytes
@@ -19,5 +19,5 @@
 [H264, H264, Camera] 1.1 - Gain: 9 dB
 [H264, H264, Camera] 1 - Image Stabilization: Off
 [H264, H264, Camera] 0 - Make: Canon
-[H264, H264, Location] 225 - MDPM 0xe1: 0x06ffffff
+[H264, H264, Camera] 225 - MDPM 0xe1: 0x06ffffff
 [Composite, Composite, Image] ImageSize - Image Size: 1920x1080

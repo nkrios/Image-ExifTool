@@ -8,6 +8,7 @@
 
 package Image::ExifTool::Lang::cs;
 
+use strict;
 use vars qw($VERSION);
 
 $VERSION = '1.02';
@@ -266,11 +267,6 @@ $VERSION = '1.02';
       },
     },
    'ConsecutiveBadFaxLines' => 'Sekvence vadných faxových řádků',
-   'ContentType' => {
-      PrintConv => {
-        'Normal' => 'Normální',
-      },
-    },
    'Contrast' => {
       Description => 'Kontrast',
       PrintConv => {
@@ -874,6 +870,11 @@ $VERSION = '1.02';
     },
    'MaxApertureValue' => 'Max clona objektivu',
    'MaxSampleValue' => 'Max. hodnota vzorku',
+   'MediaType' => {
+      PrintConv => {
+        'Normal' => 'Normální',
+      },
+    },
    'Metering' => {
       PrintConv => {
         'Spot' => 'Středový bod',

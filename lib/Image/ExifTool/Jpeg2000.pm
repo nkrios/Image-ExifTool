@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 sub ProcessJpeg2000Box($$$);
 
@@ -38,6 +38,9 @@ my %jp2Map = (
     IPTC         => 'UUID-IPTC',
     IFD0         => 'UUID-EXIF',
     XMP          => 'UUID-XMP',
+   'UUID-IPTC'   => 'JP2',
+   'UUID-EXIF'   => 'JP2',
+   'UUID-XMP'    => 'JP2',
   # jp2h         => 'JP2',  (not yet functional)
   # ICC_Profile  => 'jp2h', (not yet functional)
     IFD1         => 'IFD0',

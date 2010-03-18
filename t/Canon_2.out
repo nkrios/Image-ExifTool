@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.14
 [File, System, Image] FileName - File Name: Canon1DmkIII.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 8.1 kB
@@ -116,12 +116,13 @@
 [MakerNotes, Canon, Image] 6 - ISO: 3200
 [MakerNotes, Canon, Camera] 24 - Camera Temperature: 26 C
 [MakerNotes, Canon, Camera] 29 - Focal Length: 35 mm
+[MakerNotes, Canon, Camera] 48 - Camera Orientation: Horizontal (normal)
 [MakerNotes, Canon, Camera] 67 - Focus Distance Upper: 2.19
 [MakerNotes, Canon, Camera] 69 - Focus Distance Lower: 1.13
 [MakerNotes, Canon, Camera] 94 - White Balance: Auto
 [MakerNotes, Canon, Camera] 98 - Color Temperature: 5200
 [MakerNotes, Canon, Camera] 134 - Picture Style: Neutral
-[MakerNotes, Canon, Camera] 274 - Lens Type: Canon EF 16-35mm f/2.8L II
+[MakerNotes, Canon, Camera] 273 - Lens Type: Canon EF 16-35mm f/2.8L II
 [MakerNotes, Canon, Camera] 275 - Short Focal: 16 mm
 [MakerNotes, Canon, Camera] 277 - Long Focal: 35 mm
 [MakerNotes, Canon, Camera] 310 - Firmware Version: 5.3.1
@@ -133,7 +134,7 @@
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS-1D Mark III
 [MakerNotes, Canon, Camera] 19 - Thumbnail Image Valid Area: 0 159 7 112
 [MakerNotes, Canon, Camera] 21 - Serial Number Format: Format 2
-[MakerNotes, Canon, Camera] 1 - AF Mode: Single-point AF
+[MakerNotes, Canon, Camera] 1 - AF Area Mode: Single-point AF
 [MakerNotes, Canon, Camera] 2 - Num AF Points: 45
 [MakerNotes, Canon, Camera] 3 - Valid AF Points: 45
 [MakerNotes, Canon, Image] 4 - Canon Image Width: 3888

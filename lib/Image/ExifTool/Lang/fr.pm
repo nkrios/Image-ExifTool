@@ -8,9 +8,10 @@
 
 package Image::ExifTool::Lang::fr;
 
+use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 %Image::ExifTool::Lang::fr::Translate = (
    'AEAperture' => 'Ouverture AE',
@@ -89,7 +90,23 @@ $VERSION = '1.13';
         'On' => 'Activé',
       },
     },
-   'AFAreaMode' => 'Mode de zone AF',
+   'AFAreaMode' => {
+      Description => 'Mode de zone AF',
+      PrintConv => {
+        '1-area' => 'Mise au point 1 zone',
+        '1-area (high speed)' => 'Mise au point 1 zone (haute vitesse)',
+        '3-area (center)?' => 'Mise au point 3 zones (au centre) ?',
+        '3-area (high speed)' => 'Mise au point 3 zones (haute vitesse)',
+        '3-area (left)?' => 'Mise au point 3 zones (à gauche) ?',
+        '3-area (right)?' => 'Mise au point 3 zones (à droite) ?',
+        '5-area' => 'Mise au point 5 zones',
+        '9-area' => 'Mise au point 9 zones',
+        'Face Detect AF' => 'Dét. visage',
+        'Spot Focusing' => 'Mise au point Spot',
+        'Spot Mode Off' => 'Mode Spot désactivé',
+        'Spot Mode On' => 'Mode Spot enclenché',
+      },
+    },
    'AFAssist' => {
       Description => 'Faisceau d\'assistance AF',
       PrintConv => {
@@ -137,23 +154,7 @@ $VERSION = '1.13';
         'Disable' => 'Désactivé',
       },
     },
-   'AFMode' => {
-      Description => 'Mode AF',
-      PrintConv => {
-        '1-area' => 'Mise au point 1 zone',
-        '1-area (high speed)' => 'Mise au point 1 zone (haute vitesse)',
-        '3-area (center)?' => 'Mise au point 3 zones (au centre) ?',
-        '3-area (high speed)' => 'Mise au point 3 zones (haute vitesse)',
-        '3-area (left)?' => 'Mise au point 3 zones (à gauche) ?',
-        '3-area (right)?' => 'Mise au point 3 zones (à droite) ?',
-        '5-area' => 'Mise au point 5 zones',
-        '9-area' => 'Mise au point 9 zones',
-        'Face Detect AF' => 'Dét. visage',
-        'Spot Focusing' => 'Mise au point Spot',
-        'Spot Mode Off' => 'Mode Spot désactivé',
-        'Spot Mode On' => 'Mode Spot enclenché',
-      },
-    },
+   'AFMode' => 'Mode AF',
    'AFOnAELockButtonSwitch' => {
       Description => 'Permutation touche AF/Mémo',
       PrintConv => {
@@ -193,8 +194,8 @@ $VERSION = '1.13';
       PrintConv => {
         'Disable' => 'Désactivé',
         'Enable' => 'Activé',
-        'Enable (left/right assist points)' => 'Activé (gauche/droite collimateurs autofocus d\'assistance)',
-        'Enable (surrounding assist points)' => 'Activée (Collimateurs autofocus d\'assistance environnants)',
+        'Left/right AF points' => 'Activé (gauche/droite collimateurs autofocus d\'assistance)',
+        'Surrounding AF points' => 'Activée (Collimateurs autofocus d\'assistance environnants)',
       },
     },
    'AFPointAutoSelection' => {
@@ -1076,11 +1077,6 @@ $VERSION = '1.13';
    'ConsecutiveBadFaxLines' => 'Mauvaises lignes de Fax consécutives',
    'ContentLocationCode' => 'Code du lieu du contenu',
    'ContentLocationName' => 'Nom du lieu du contenu',
-   'ContentType' => {
-      PrintConv => {
-        'Normal' => 'Normale',
-      },
-    },
    'ContinuousDrive' => {
       PrintConv => {
         'Movie' => 'Vidéo',
@@ -1548,6 +1544,7 @@ $VERSION = '1.13';
         'Landscape' => 'Paysage',
         'Manual' => 'Exposition manuelle',
         'Night Scene' => 'Nocturne',
+        'Night Scene / Twilight' => 'Nocturne',
         'Shutter Priority' => 'Priorité vitesse',
         'Shutter speed priority AE' => 'Priorité vitesse',
       },
@@ -2653,8 +2650,8 @@ $VERSION = '1.13';
    'LockMicrophoneButton' => {
       Description => 'Fonction de touche microphone',
       PrintConv => {
-        'Protect (holding:sound rec.)' => 'Protéger (maintien: enregistrement sonore)',
-        'Sound rec. (protect:disable)' => 'Enregistrement sonore (protéger: désactivée)',
+        'Protect (hold:record memo)' => 'Protéger (maintien: enregistrement sonore)',
+        'Record memo (protect:disable)' => 'Enregistrement sonore (protéger: désactivée)',
       },
     },
    'LongExposureNoiseReduction' => {
@@ -2772,6 +2769,11 @@ $VERSION = '1.13';
    'MeasurementIlluminant' => 'Illuminant de mesure',
    'MeasurementObserver' => 'Observateur de mesure',
    'MediaBlackPoint' => 'Point noir moyen',
+   'MediaType' => {
+      PrintConv => {
+        'Normal' => 'Normale',
+      },
+    },
    'MediaWhitePoint' => 'Point blanc moyen',
    'MenuButtonDisplayPosition' => {
       Description => 'Position début touche menu',
@@ -3961,8 +3963,8 @@ $VERSION = '1.13';
       PrintConv => {
         'AE lock/Metering + AF start' => 'Mémo expo/lct. mesure+AF',
         'Metering + AF start' => 'Mesure + lancement AF',
-        'Metering + AF start / disable' => 'Lct. mesure+AF/désactivée',
         'Metering + AF start/AF stop' => 'Mesure + lancement/arrêt AF',
+        'Metering + AF start/disable' => 'Lct. mesure+AF/désactivée',
         'Metering start/Meter + AF start' => 'Lct. mesure/lct. mesure+AF',
       },
     },
