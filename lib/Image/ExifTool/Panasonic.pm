@@ -15,6 +15,8 @@
 #              10) http://bretteville.com/pdfs/M8Metadata_v2.pdf
 #              11) http://www.digital-leica.com/lens_codes/index.html
 #              12) Joerg - http://www.cpanforum.com/threads/11602 (LX3 firmware 2.0)
+#              13) Michael Byczkowski private communication (Leica M9)
+#              14) Carl Bretteville private communication (M9)
 #              JD) Jens Duttke private communication (TZ3,FZ30,FZ50)
 #------------------------------------------------------------------------------
 
@@ -25,49 +27,127 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.49';
+$VERSION = '1.55';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
 
 # Leica lens types (ref 10)
 my %leicaLensType = (
-    1 => 'Elmarit-M 21mm f/2.8',
-    3 => 'Elmarit-M 28mm f/2.8 (III)',
-    4 => 'Tele-Elmarit-M 90mm f/2.8 (II)',
-    5 => 'Summilux-M 50mm f/1.4 (II)',
-    6 => 'Summicron-M 35mm f/2 (IV)',
-    7 => 'Summicron-M 90mm f/2 (II)',
-    9 => 'Elmarit-M 135mm f/2.8 (I/II)',
-    16 => 'Tri-Elmar-M 16-18-21mm f/4 ASPH.',
-    23 => 'Summicron-M 50mm f/2 (III)',
-    24 => 'Elmarit-M 21mm f/2.8 ASPH.',
-    25 => 'Elmarit-M 24mm f/2.8 ASPH.',
-    26 => 'Summicron-M 28mm f/2 ASPH.',
-    27 => 'Elmarit-M 28mm f/2.8 (IV)',
-    28 => 'Elmarit-M 28mm f/2.8 ASPH.',
-    29 => 'Summilux-M 35mm f/1.4 ASPH.',
-    30 => 'Summicron-M 35mm f/2 ASPH.',
-    31 => 'Noctilux-M 50mm f/1',
-    32 => 'Summilux-M 50mm f/1.4 ASPH.',
-    33 => 'Summicron-M 50mm f/2 (IV, V)',
-    34 => 'Elmar-M 50mm f/2.8',
-    35 => 'Summilux-M 75mm f/1.4',
-    36 => 'Apo-Summicron-M 75mm f/2 ASPH.',
-    37 => 'Apo-Summicron-M 90mm f/2 ASPH.',
-    38 => 'Elmarit-M 90mm f/2.8',
-    39 => 'Macro-Elmar-M 90mm f/4',
-    40 => 'Macro-Adapter M',
-    42 => 'Tri-Elmar-M 28-35-50mm f/4 ASPH.',
-    43 => 'Summarit-M 35mm f/2.5',
-    44 => 'Summarit-M 50mm f/2.5',
-    45 => 'Summarit-M 75mm f/2.5',
-    46 => 'Summarit-M 90mm f/2.5',
-    47 => 'Summilux-M 21mm f/1.4 ASPH.', #11
-    48 => 'Summilux-M 24mm f/1.4 ASPH.', #11
-    49 => 'Noctilux-M 50mm f/0.95 ASPH.', #11
-    50 => 'Elmar-M 24mm f/3.8 ASPH.', #11
-    52 => 'Super-Elmar-M 18mm f/3.8 ASPH.', #PH/11
+    OTHER => sub {
+        my ($val, $inv, $conv) = @_;
+        return undef if $inv or not $val =~ s/ .*//;
+        return $$conv{$val};
+    },
+    Notes => q{
+        Entries with 2 numbers give the lower 2 bits of the LensType value which are
+        used to identify certain manually coded lenses on the M9, or the focal
+        length of some multi-focal lenses.
+    },
+    # All M9 codes (two numbers: first the LensID then the lower 2 bits)
+    # are ref PH with samples from ref 13.  From ref 10, the lower 2 bits of
+    # the LensType value give the frame selector position for most lenses,
+    # although for the 28-35-50mm (at least) it gives the focal length selection.
+    # The M9 also gives the focal length selection but for other lenses the
+    # lower 3 bits don't change with frame selector position except for the lens
+    # shows as uncoded for certain lenses and some incorrect positions of the
+    # frame selector.  The bits are zero for uncoded lenses when manually coding
+    # from the menu on the M9. - PH
+    '0 0' => 'Uncoded lens',
+#
+# NOTE: MUST ADD ENTRY TO %frameSelectorBits below when a new lens is added!!!!
+#
+                                            # model number(s):
+    1 => 'Elmarit-M 21mm f/2.8',            # 11134
+    3 => 'Elmarit-M 28mm f/2.8 (III)',      # 11804
+    4 => 'Tele-Elmarit-M 90mm f/2.8 (II)',  # 11800
+    5 => 'Summilux-M 50mm f/1.4 (II)',      # 11868/11856/11114
+    6 => 'Summicron-M 35mm f/2 (IV)',       # 11310/11311
+    '6 0' => 'Summilux-M 35mm f/1.4',       # 11869/11870/11860
+    7 => 'Summicron-M 90mm f/2 (II)',       # 11136/11137
+    9 => 'Elmarit-M 135mm f/2.8 (I/II)',    # 11829
+    '9 0' => 'Apo-Telyt-M 135mm f/3.4',     # 11889
+    16 => 'Tri-Elmar-M 16-18-21mm f/4 ASPH.',# 11626
+    '16 1' => 'Tri-Elmar-M 16-18-21mm f/4 ASPH. (at 16mm)',
+    '16 2' => 'Tri-Elmar-M 16-18-21mm f/4 ASPH. (at 18mm)',
+    '16 3' => 'Tri-Elmar-M 16-18-21mm f/4 ASPH. (at 21mm)',
+    23 => 'Summicron-M 50mm f/2 (III)',     # 11817, version (I) in camera menu
+    24 => 'Elmarit-M 21mm f/2.8 ASPH.',     # 11135/11897
+    25 => 'Elmarit-M 24mm f/2.8 ASPH.',     # 11878/11898
+    26 => 'Summicron-M 28mm f/2 ASPH.',     # 11604
+    27 => 'Elmarit-M 28mm f/2.8 (IV)',      # 11809
+    28 => 'Elmarit-M 28mm f/2.8 ASPH.',     # 11606
+    29 => 'Summilux-M 35mm f/1.4 ASPH.',    # 11874/11883
+    '29 0' => 'Summilux-M 35mm f/1.4 ASPHERICAL', # 11873 (different from "ASPH." model!)
+    30 => 'Summicron-M 35mm f/2 ASPH.',     # 11879/11882
+    31 => 'Noctilux-M 50mm f/1',            # 11821/11822
+    '31 0' => 'Noctilux-M 50mm f/1.2',      # 11820
+    32 => 'Summilux-M 50mm f/1.4 ASPH.',    # 11891/11892
+    33 => 'Summicron-M 50mm f/2 (IV, V)',   # 11819/11825/11826/11816, version (II,III) in camera menu
+    34 => 'Elmar-M 50mm f/2.8',             # 11831/11823/11825
+    35 => 'Summilux-M 75mm f/1.4',          # 11814/11815/11810
+    36 => 'Apo-Summicron-M 75mm f/2 ASPH.', # 11637
+    37 => 'Apo-Summicron-M 90mm f/2 ASPH.', # 11884/11885
+    38 => 'Elmarit-M 90mm f/2.8',           # 11807/11808, version (II) in camera menu
+    39 => 'Macro-Elmar-M 90mm f/4',         # 11633/11634
+    '39 0' => 'Tele-Elmar-M 135mm f/4 (II)',# 11861
+    40 => 'Macro-Adapter M',                # 14409
+    42 => 'Tri-Elmar-M 28-35-50mm f/4 ASPH.',# 11625
+    '42 1' => 'Tri-Elmar-M 28-35-50mm f/4 ASPH. (at 28mm)',
+    '42 2' => 'Tri-Elmar-M 28-35-50mm f/4 ASPH. (at 35mm)',
+    '42 3' => 'Tri-Elmar-M 28-35-50mm f/4 ASPH. (at 50mm)',
+    43 => 'Summarit-M 35mm f/2.5',          # ? (ref PH)
+    44 => 'Summarit-M 50mm f/2.5',          # ? (ref PH)
+    45 => 'Summarit-M 75mm f/2.5',          # ? (ref PH)
+    46 => 'Summarit-M 90mm f/2.5',          # ?
+    47 => 'Summilux-M 21mm f/1.4 ASPH.',    # ? (ref 11)
+    48 => 'Summilux-M 24mm f/1.4 ASPH.',    # ? (ref 11)
+    49 => 'Noctilux-M 50mm f/0.95 ASPH.',   # ? (ref 11)
+    50 => 'Elmar-M 24mm f/3.8 ASPH.',       # ? (ref 11)
+    52 => 'Super-Elmar-M 18mm f/3.8 ASPH.', # ? (ref PH/11)
+);
+
+# M9 frame selector bits for each lens
+#  1 = towards lens    = 28/90mm or 21mm or Adapter (or Elmarit-M 135mm f/2.8)
+#  2 = away from lens  = 24/35mm (or 35/135mm on the M9)
+#  3 = middle position = 50/75mm or 18mm
+my %frameSelectorBits = (
+    1 => 1,
+    3 => 1,
+    4 => 1,
+    5 => 3,
+    6 => 2,
+    7 => 1,
+    9 => 1, # (because lens has special magnifier for the rangefinder)
+    16 => 1, # or 2 or 3
+    23 => 3,
+    24 => 1,
+    25 => 2,
+    26 => 1,
+    27 => 1,
+    28 => 1,
+    29 => 2,
+    30 => 2,
+    31 => 3,
+    32 => 3,
+    33 => 3,
+    34 => 3,
+    35 => 3,
+    36 => 3,
+    37 => 1,
+    38 => 1,
+    39 => 1,
+    40 => 1,
+    42 => 1, # or 2 or 3
+    43 => 2, # (NC)
+    44 => 3, # (NC)
+    45 => 3,
+    46 => 1, # (NC)
+    47 => 1, # (NC)
+    48 => 2, # (NC)
+    49 => 3, # (NC)
+    50 => 2, # (NC)
+    52 => 3,
 );
 
 # conversions for ShootingMode and SceneMode
@@ -159,7 +239,7 @@ my %shootingMode = (
             1 => 'Auto',
             2 => 'Daylight',
             3 => 'Cloudy',
-            4 => 'Tungsten', #PH (FS7 manual calls this Incandescent)
+            4 => 'Incandescent', #PH
             5 => 'Manual',
             8 => 'Flash',
             10 => 'Black & White', #3 (Leica)
@@ -252,9 +332,9 @@ my %shootingMode = (
         Format => 'int16s',
         Writable => 'int16s',
         ValueConv => '$val / 3',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         ValueConvInv => '$val * 3',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x24 => {
         Name => 'FlashBias',
@@ -291,6 +371,7 @@ my %shootingMode = (
             3 => 'Cool',
             4 => 'Black & White',
             5 => 'Sepia',
+            6 => 'Happy', #PH (FX70) (yes, really. you wouldn't want sad colors now would you?)
         },
     },
     0x29 => { #JD
@@ -694,6 +775,7 @@ my %shootingMode = (
         Writable => 'int8u',
         PrintConv => {
             0 => 'Off',
+            2 => 'Auto', # (NC) (TS2 in intelligent auto mode)
             3 => 'On',
         },
     },
@@ -820,18 +902,8 @@ my %shootingMode = (
         },
     },
     0x310 => {
-        Name => 'LensType',
-        Writable => 'int32u',
-        Notes => 'lower 3 bits split into a separate value for the frame selector position',
-        ValueConv => '($val >> 2) . " " . ($val & 0x03)',
-        ValueConvInv => 'my @a=split " ",$val; ($a[0] << 2) + ($a[1] & 0x03)',
-        PrintConv => [
-            \%leicaLensType,
-        {
-            1 => '28/90mm frame lines engaged',
-            2 => '24/35mm frame lines engaged',
-            3 => '50/75mm frame lines engaged',
-        }],
+        Name => 'LensInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::Panasonic::LensInfo' },
     },
     0x311 => {
         Name => 'ExternalSensorBrightnessValue',
@@ -855,7 +927,12 @@ my %shootingMode = (
         PrintConv => 'sprintf("%.1f", $val)',
         PrintConvInv => '$val',
     },
-    0x320 => { Name => 'CameraTemperature', Writable => 'int32s' },
+    0x320 => {
+        Name => 'CameraTemperature',
+        Writable => 'int32s',
+        PrintConv => '"$val C"',
+        PrintConvInv => '$val=~s/ ?C//; $val',
+    },
     0x321 => { Name => 'ColorTemperature',  Writable => 'int32u' },
     0x322 => { Name => 'WBRedLevel',        Writable => 'rational64u' },
     0x323 => { Name => 'WBGreenLevel',      Writable => 'rational64u' },
@@ -934,25 +1011,104 @@ my %shootingMode = (
     GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
     TAG_PREFIX => 'Leica_Subdir',
     WRITABLE => 1,
-    0x3038 => {
-        Name => 'UserProfile', # (guess)
-        Writable => 'string',
+    # 0x3001 - normally 0 but value of 2 when manual coding is used
+    #          with a coded lens (but only tested with Elmar-M 50mm f/2.8) - PH
+    0x300a => {
+        Name => 'Contrast',
+        Writable => 'int32u',
+        PrintConv => {
+            0 => 'Low',
+            1 => 'Medium Low',
+            2 => 'Normal',
+            3 => 'Medium High',
+            4 => 'High',
+        },
     },
-    # 0x3104 body-dependent string ("00012905000000") (not serial number)
-    # 0x3105 body-dependent string ("00012905000000")
-    0x3109 => {
-        Name => 'FirmwareVersion',
-        Writable => 'string',
+    0x300b => {
+        Name => 'Sharpening',
+        Writable => 'int32u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Low',
+            2 => 'Normal',
+            3 => 'Medium High',
+            4 => 'High',
+        },
     },
-    # 0x3032 - some sort of RGB coefficients?  (zeros when manual WB)
-    # 0x3033 - WhiteBalance (0=Auto, 4=Manual)
+    0x300d => {
+        Name => 'Saturation',
+        Writable => 'int32u',
+        PrintConv => {
+            0 => 'Low',
+            1 => 'Medium Low',
+            2 => 'Normal',
+            3 => 'Medium High',
+            4 => 'High',
+            5 => 'Black & White',
+            6 => 'Vintage B&W',
+        },
+    },
+    # 0x3032 - some sort of RGB coefficients? (zeros unless Kelvin WB, but same for all Color Temps)
+    0x3033 => {
+        Name => 'WhiteBalance',
+        Writable => 'int32u',
+        PrintConv => { #13
+            0 => 'Auto',
+            1 => 'Tungsten',
+            2 => 'Fluorescent',
+            3 => 'Daylight Fluorescent',
+            4 => 'Daylight',
+            5 => 'Flash',
+            6 => 'Cloudy',
+            7 => 'Shade',
+            8 => 'Manual',
+            9 => 'Kelvin',
+        },
+    },
+    0x3034 => {
+        Name => 'JPEGQuality',
+        Writable => 'int32u',
+        PrintConv => {
+            94 => 'Basic',
+            97 => 'Fine',
+        },
+    },
+    # 0x3035 (int32u): -1 unless Manual WB (2 in my Manual sample)
     0x3036 => {
         Name => 'WB_RGBLevels',
         Writable => 'rational64u',
         Count => 3,
     },
-    # 0x3103 - string ("*******")
+    0x3038 => {
+        Name => 'UserProfile', # (CameraProfile according to ref 14)
+        Writable => 'string',
+    },
+    0x303a => {
+        Name => 'JPEGSize',
+        Writable => 'int32u',
+        PrintConv => {
+            0 => '5216x3472',
+            1 => '3840x2592',
+            2 => '2592x1728',
+            3 => '1728x1152',
+            4 => '1280x864',
+        },
+    },
+    0x3103 => { #13 (valid for FW 1.116 and later)
+        Name => 'SerialNumber',
+        Writable => 'string',
+    },
+    # 0x3104 body-dependent string ("00012905000000") (not serial number)
+    # 0x3105 body-dependent string ("00012905000000")
     # 0x3107 - body-dependent string ("4H205800116800") (not serial number)
+    0x3109 => {
+        Name => 'FirmwareVersion',
+        Writable => 'string',
+    },
+    0x312a => { #14 (NC)
+        Name => 'BaseISO',
+        Writable => 'int32u',
+    },
     0x312b => {
         Name => 'SensorWidth',
         Writable => 'int32u',
@@ -961,23 +1117,83 @@ my %shootingMode = (
         Name => 'SensorHeight',
         Writable => 'int32u',
     },
-    # 0x3402 - int32s (camera temperature?)
+    0x312d => { #14 (NC)
+        Name => 'SensorBitDepth',
+        Writable => 'int32u',
+    },
+    0x3402 => { #PH/13
+        Name => 'CameraTemperature',
+        Writable => 'int32s',
+        PrintConv => '"$val C"',
+        PrintConvInv => '$val=~s/ ?C//; $val',
+    },
     0x3405 => {
         Name => 'LensType',
         Writable => 'int32u',
-        # (assuming the frame selector is the same as the M8)
-        Notes => 'lower 3 bits split into a separate value for the frame selector position',
-        ValueConv => '($val >> 2) . " " . ($val & 0x03)',
-        ValueConvInv => 'my @a=split " ",$val; ($a[0] << 2) + ($a[1] & 0x03)',
-        PrintConv => [
-            \%leicaLensType,
-        {
-            1 => '28/90mm frame lines engaged',
-            2 => '24/35mm frame lines engaged',
-            3 => '50/75mm frame lines engaged',
-        }],
+        SeparateTable => 1,
+        ValueConv => '($val >> 2) . " " . ($val & 0x3)',
+        ValueConvInv => \&LensTypeConvInv,
+        PrintConv => \%leicaLensType,
     },
-    # 0x3406 - rational64u (approximate FNumber?)
+    0x3406 => { #PH/13
+        Name => 'ApproximateFNumber',
+        Writable => 'rational64u',
+        PrintConv => 'sprintf("%.1f", $val)',
+        PrintConvInv => '$val',
+    },
+    0x3407 => { #14
+        Name => 'MeasuredLV',
+        Writable => 'int32s',
+        Notes => 'imaging sensor or TTL exposure meter measurement',
+        ValueConv => '$val / 1e5', #PH (NC)
+        ValueConvInv => '$val * 1e5', #PH (NC)
+        PrintConv => 'sprintf("%.2f", $val)',
+        PrintConvInv => '$val',
+    },
+    0x3408 => { #14
+        Name => 'ExternalSensorBrightnessValue',
+        Writable => 'int32s',
+        Notes => '"blue dot" measurement',
+        ValueConv => '$val / 1e5', #PH (NC)
+        ValueConvInv => '$val * 1e5', #PH (NC)
+        PrintConv => 'sprintf("%.2f", $val)',
+        PrintConvInv => '$val',
+    },
+    0x3901 => {
+        Name => 'Data1',
+        SubDirectory => { TagTable => 'Image::ExifTool::Panasonic::Data1' },
+    },
+    0x3902 => {
+        Name => 'Data2',
+        SubDirectory => { TagTable => 'Image::ExifTool::Panasonic::Data2' },
+    },
+    # 0x3903 - larger binary data block
+);
+
+%Image::ExifTool::Panasonic::Data1 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
+    WRITABLE => 1,
+    TAG_PREFIX => 'Leica_Data1',
+    FIRST_ENTRY => 0,
+    0x0016 => {
+        Name => 'LensType',
+        Writable => 'int32u',
+        Priority => 0,
+        SeparateTable => 1,
+        ValueConv => '($val >> 2) . " " . ($val & 0x3)',
+        ValueConvInv => \&LensTypeConvInv,
+        PrintConv => \%leicaLensType,
+    },
+);
+
+%Image::ExifTool::Panasonic::Data2 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
+    TAG_PREFIX => 'Leica_Data2',
+    FIRST_ENTRY => 0,
 );
 
 # Leica type5 maker notes (ref PH) (X1)
@@ -1059,6 +1275,35 @@ my %shootingMode = (
     # seems to vary inversely with amount of light, so I'll call it 'Gain' - PH
     # (minimum is 16, maximum is 136.  Value is 0 for pictures captured from video)
     3 => 'Gain',
+);
+
+# lens information (ref 10)
+%Image::ExifTool::Panasonic::LensInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
+    WRITABLE => 1,
+    FORMAT => 'int32u',
+    FIRST_ENTRY => 0,
+    0 => {
+        Name => 'LensType',
+        Mask => 0xfffffffc,
+        PrintHex => 0,
+        SeparateTable => 1,
+        ValueConv => '$val >> 2',
+        ValueConvInv => '$val << 2',
+        PrintConv => \%leicaLensType,
+    },
+    0.1 => { # lower 2 bits give frame selector position
+        Name => 'FrameSelector',
+        Mask => 0x03,
+        PrintConv => {
+            1 => '28/90mm frame lines engaged',
+            2 => '24/35mm frame lines engaged',
+            3 => '50/75mm frame lines engaged',
+        },
+    },
 );
 
 # Face detection position information (ref PH)
@@ -1181,6 +1426,24 @@ my %shootingMode = (
         RawConv => '$$self{FacesRecognized} < 3 ? undef : $val',
     },
 );
+
+#------------------------------------------------------------------------------
+# Inverse conversion for Leica M9 lens codes
+# Inputs: 0) value
+# Returns: Converted value, or undef on error
+sub LensTypeConvInv($)
+{
+    my $val = shift;
+    if ($val =~ /^(\d+) (\d+)$/) {
+        return ($1 << 2) + ($2 & 0x03);
+    } elsif ($val =~ /^\d+$/) {
+        my $bits = $frameSelectorBits{$val};
+        return undef unless defined $bits;
+        return ($val << 2) | $bits;
+    } else {
+        return undef;
+    }
+}
 
 #------------------------------------------------------------------------------
 # Convert Leica Kelvin white balance
@@ -1400,7 +1663,7 @@ under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Tels for the information he provided on decoding some tags, and to
-Marcel Coenen and Jens Duttke for their contributions.
+Marcel Coenen, Jens Duttke and Michael Byczkowski for their contributions.
 
 =head1 SEE ALSO
 

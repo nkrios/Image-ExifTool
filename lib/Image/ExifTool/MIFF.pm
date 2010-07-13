@@ -21,9 +21,9 @@ $VERSION = '1.05';
 %Image::ExifTool::MIFF::Main = (
     GROUPS => { 2 => 'Image' },
     NOTES => q{
-        The MIFF format allows aribrary tag names to be used.  Only the standard tag
-        names are listed below, however ExifTool will decode any tags found in the
-        image.
+        The MIFF (Magick Image File Format) format allows aribrary tag names to be
+        used.  Only the standard tag names are listed below, however ExifTool will
+        decode any tags found in the image.
     },
    'background-color' => 'BackgroundColor',
    'blue-primary' => 'BluePrimary',

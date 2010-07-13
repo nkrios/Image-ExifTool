@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.29';
+$VERSION = '1.31';
 
 sub WritePS($$);
 sub ProcessPS($$;$);
@@ -126,6 +126,15 @@ Image::ExifTool::AddCompositeTags('Image::ExifTool::PostScript');
 sub AUTOLOAD
 {
     return Image::ExifTool::DoAutoLoad($AUTOLOAD, @_);
+}
+
+#------------------------------------------------------------------------------
+# Is this a PC system
+# Returns: true for PC systems
+my %isPC = (MSWin32 => 1, os2 => 1, dos => 1, NetWare => 1, symbian => 1, cygwin => 1);
+sub IsPC()
+{
+    return $isPC{$^O};
 }
 
 #------------------------------------------------------------------------------
@@ -336,11 +345,11 @@ sub ProcessPS($$;$)
         # check for PostScript font file (PFA or PFB)
         my $d2;
         $data .= $d2 if $raf->Read($d2,12);
-        if ($data =~ /^(%!PS-AdobeFont-|%!FontType1-)/) {
+        if ($data =~ /^%!(PS-(AdobeFont-|Bitstream )|FontType1-)/) {
             $exifTool->SetFileType('PFA');  # PostScript ASCII font file
             $fontTable = GetTagTable('Image::ExifTool::Font::PSInfo');
             # PostScript font files may contain an unformatted comments which may
-            # contain useful information, so accumulate thes for the Comment tag
+            # contain useful information, so accumulate these for the Comment tag
             $comment = 1;
         }
         $raf->Seek(-length($data), 1);
@@ -385,7 +394,7 @@ sub ProcessPS($$;$)
 #
 # parse the postscript
 #
-    my ($buff, $mode, $beginToken, $endToken, $docNum, $subDocNum);
+    my ($buff, $mode, $beginToken, $endToken, $docNum, $subDocNum, $changedNL);
     my (@lines, $altnl);
     if ($/ eq "\x0d") {
         $altnl = "\x0a";
@@ -400,16 +409,31 @@ sub ProcessPS($$;$)
             $raf->ReadLine($data) or last;
             # check for alternate newlines as efficiently as possible
             if ($data =~ /$altnl/) {
-                # split into separate lines
-                @lines = split /$altnl/, $data, -1;
-                $data = shift @lines;
-                if (@lines == 1 and $lines[0] eq $/) {
-                    # handle case of DOS newline data inside file using Unix newlines
-                    $data .= $lines[0];
-                    undef @lines;
+                if (length($data) > 500000 and IsPC()) {
+                    # Windows can't split very long lines due to poor memory handling,
+                    # so re-read the file with the other newline character instead
+                    # (slower but uses less memory)
+                    unless ($changedNL) {
+                        $changedNL = 1;
+                        my $t = $/;
+                        $/ = $altnl;
+                        $altnl = $t;
+                        $raf->Seek(-length($data), 1);
+                        next;
+                    }
+                } else {
+                    # split into separate lines
+                    @lines = split /$altnl/, $data, -1;
+                    $data = shift @lines;
+                    if (@lines == 1 and $lines[0] eq $/) {
+                        # handle case of DOS newline data inside file using Unix newlines
+                        $data .= $lines[0];
+                        undef @lines;
+                    }
                 }
             }
         }
+        undef $changedNL;
         if ($mode) {
             if (not $endToken) {
                 $buff .= $data;

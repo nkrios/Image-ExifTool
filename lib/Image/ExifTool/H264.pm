@@ -21,7 +21,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub ProcessSEI($$);
 
@@ -51,10 +51,10 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
         Information (SEI).  I<[Yes, this description is confusing, but nothing
         compared to the challenge of actually decoding the data!]>  This information
         may exist at regular intervals through the entire video, but only the first
-        occurrence is extracted unless the ExtractEmbedded option is used (in which
-        case subsequent occurrences are extracted as sub-documents).
+        occurrence is extracted unless the ExtractEmbedded (-ee) option is used (in
+        which case subsequent occurrences are extracted as sub-documents).
     },
-    # 0x13 - TimeCode
+    # 0x13 - Timecode
     # 0x14 - BinaryGrup
     0x18 => {
         Name => 'DateTimeOriginal',
@@ -130,7 +130,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
         Name => 'ExposureCompensation',
         Format => 'rational32s',
         Groups => { 2 => 'Image' },
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
     0xa5 => {
         Name => 'MaxApertureValue',

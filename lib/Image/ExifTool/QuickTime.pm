@@ -7,7 +7,7 @@
 #               12/19/2005 - P. Harvey Added MP4 support
 #               09/22/2006 - P. Harvey Added M4A support
 #
-# References:   1) http://developer.apple.com/documentation/QuickTime/
+# References:   1) http://developer.apple.com/mac/library/documentation/QuickTime/QTFF/QTFFChap1/qtff1.html
 #               2) http://search.cpan.org/dist/MP4-Info-1.04/
 #               3) http://www.geocities.com/xhelmboyx/quicktime/formats/mp4-layout.txt
 #               4) http://wiki.multimedia.cx/index.php?title=Apple_QuickTime
@@ -27,7 +27,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.33';
+$VERSION = '1.35';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -612,7 +612,18 @@ my %ftypLookup = (
         if they don't exist in this table.
     },
     "\xa9cpy" => { Name => 'Copyright',  Groups => { 2 => 'Author' } },
-    "\xa9day" => { Name => 'CreateDate', Groups => { 2 => 'Time' } },
+    "\xa9day" => {
+        Name => 'CreateDate',
+        Groups => { 2 => 'Time' },
+        # handle values in the form "2010-02-12T13:27:14-0800" (written by Apple iPhone)
+        ValueConv => q{
+            require Image::ExifTool::XMP;
+            $val =  Image::ExifTool::XMP::ConvertXMPDate($val);
+            $val =~ s/([-+]\d{2})(\d{2})$/$1:$2/; # add colon to timezone if necessary
+            return $val;
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
     "\xa9dir" => 'Director',
     "\xa9ed1" => 'Edit1',
     "\xa9ed2" => 'Edit2',
@@ -806,6 +817,10 @@ my %ftypLookup = (
     CNMN => 'Model', #PH (EOS 550D)
     CNFV => 'FirmwareVersion', #PH (EOS 550D)
     # CNDB - ? (550D)
+    INFO => {
+        Name => 'SamsungINFO',
+        SubDirectory => { TagTable => 'Image::ExifTool::Samsung::INFO' },
+    },
 );
 
 # User-specific media data atoms (ref 11)
@@ -963,12 +978,12 @@ my %ftypLookup = (
     7 => {
         Name => 'VideoAvgFrameRate',
         Format => 'fixed32u',
-        PrintConv => 'sprintf("%.2f", $val)',
+        PrintConv => 'int($val * 1000 + 0.5) / 1000',
     },
     8 => {
         Name => 'VideoMaxFrameRate',
         Format => 'fixed32u',
-        PrintConv => 'sprintf("%.2f", $val)',
+        PrintConv => 'int($val * 1000 + 0.5) / 1000',
     },
     9 => {
         Name => 'VideoSize',
@@ -1602,7 +1617,7 @@ my %ftypLookup = (
             Condition => '$$self{HandlerType} and $$self{HandlerType} eq "vide"',
             # (must be RawConv so appropriate MediaTS is used in calculation)
             RawConv => 'Image::ExifTool::QuickTime::CalcSampleRate($self, \$val)',
-            PrintConv => 'sprintf("%.2f", $val)',
+            PrintConv => 'int($val * 1000 + 0.5) / 1000',
         },
         {
             Name => 'TimeToSampleTable',
@@ -1663,6 +1678,10 @@ my %ftypLookup = (
     },
     subs => {
         Name => 'Sub-sampleInformation',
+        Flags => ['Binary','Unknown'],
+    },
+    cslg => {
+        Name => 'CompositionToDecodeTimelineMapping',
         Flags => ['Binary','Unknown'],
     },
 );
@@ -2281,7 +2300,7 @@ under the same terms as Perl itself.
 
 =over 4
 
-=item L<http://developer.apple.com/documentation/QuickTime/>
+=item L<http://developer.apple.com/mac/library/documentation/QuickTime/QTFF/QTFFChap1/qtff1.html>
 
 =item L<http://search.cpan.org/dist/MP4-Info-1.04/>
 

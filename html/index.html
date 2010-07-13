@@ -44,7 +44,7 @@ table.dl td     { padding: .4em .8em }
 <th><a href="TagNames/index.html" class='wt'>&nbsp;Tag&nbsp;Names&nbsp;</a></th>
 <th><a href="#links" class='wt'>&nbsp;Resources&nbsp;</a></th>
 <th><a href="history.html" class='wt'>&nbsp;History&nbsp;</a></th>
-<th><a href="http://www.cpanforum.com/dist/Image-ExifTool" class='wt'>&nbsp;Forum&nbsp;</a></th>
+<th><a href="http://owl.phy.queensu.ca/~phil/exiftool/forum/" class='wt'>&nbsp;Forum&nbsp;</a></th>
 <th class='rt'><a href="faq.html" class='wt'>&nbsp;FAQ&nbsp;</a></th>
 </tr></table></div>
 <div class='index'>
@@ -72,9 +72,9 @@ table.dl td     { padding: .4em .8em }
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-8.15.tar.gz">
-Download        Version 8.15</a> (2.7 MB) -
-<a href="history.html">Mar. 18, 2010</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-8.25.tar.gz">
+Download        Version 8.25</a> (2.8 MB) -
+<a href="history.html">July 13, 2010</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -106,6 +106,7 @@ as well as the maker notes of many digital cameras by
 <a href="TagNames/Panasonic.html">Panasonic/Leica</a>,
 <a href="TagNames/Pentax.html">Pentax/Asahi</a>,
 <a href="TagNames/Ricoh.html">Ricoh</a>,
+<a href="TagNames/Samsung.html">Samsung</a>,
 <a href="TagNames/Sanyo.html">Sanyo</a>,
 <a href="TagNames/Sigma.html">Sigma/Foveon</a> and
 <a href="TagNames/Sony.html">Sony</a>.</p>
@@ -117,8 +118,8 @@ distribution above.</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-8.15.zip">
-         exiftool-8.15.zip</a> (2.9 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-8.25.zip">
+         exiftool-8.25.zip</a> (2.9 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -129,8 +130,8 @@ of Windows (including Windows 7).</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 Mac OS X Package:
-<a href="ExifTool-8.15.dmg">
-         ExifTool-8.15.dmg</a> (1.8 MB)</b></td></tr></table></blockquote>
+<a href="ExifTool-8.25.dmg">
+         ExifTool-8.25.dmg</a> (1.8 MB)</b></td></tr></table></blockquote>
 
 <p><b>The OS X package</b> installs the ExifTool command-line application and
 libraries in /usr/bin. After installing, type "<code>exiftool</code>" in a
@@ -177,8 +178,8 @@ installing ExifTool on Windows, Mac OS X and Unix systems.</p>
 <li>Deletes meta information individually, in groups, or altogether</li>
 <li>Sets the file modification date from EXIF information</li>
 <li>Supports alternate language tags in <a href="TagNames/XMP.html">XMP</a>,
-    <a href="TagNames/ID3.html">ID3</a>, <a href="TagNames/Font.html#Name">Font</a> and
-    <a href="TagNames/MIE.html">MIE</a> information</li>
+    <a href="Tagnames/PNG.html#TextualData">PNG</a>, <a href="TagNames/ID3.html">ID3</a>,
+    <a href="TagNames/Font.html#Name">Font</a> and <a href="TagNames/MIE.html">MIE</a> information</li>
 <li>Processes entire directory trees</li>
 <li>Creates text output file for each image file</li>
 <li>Creates binary-format metadata-only (MIE) files for metadata backup</li>
@@ -285,6 +286,7 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td>MEF</td><td>R/W</td><td>Mamiya (RAW) Electronic Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/MIE.html">MIE</a></td><td>R/W/C</td><td>Meta Information Encapsulation (<a href="MIE1.1-20070121.pdf">MIE specification</a>)</td></tr>
 <tr><td><a href="TagNames/MIFF.html">MIFF, MIF</a></td><td>R</td><td>Magick Image File Format</td></tr>
+<tr><td><a href="TagNames/Matroska.html">MKA, MKV, MKS</a></td><td>R</td><td>Matroska Audio/Video/Subtitle</td></tr>
 <tr><td><a href="TagNames/Leaf.html">MOS</a></td><td>R/W</td><td>Creo Leaf Mosaic (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/QuickTime.html">MOV, QT</a></td><td>R</td><td>Apple QuickTime Movie</td></tr>
 <tr><td><a href="TagNames/MPEG.html#Audio">MP3</a></td><td>R</td><td>MPEG-1 layer 3 audio (uses <a href="TagNames/ID3.html">ID3</a> information)</td></tr>
@@ -298,6 +300,7 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td><a href="TagNames/iWork.html">NMBTEMPLATE</a></td><td>R</td><td>Apple iWork '09 Numbers Template</td></tr>
 <tr><td>NRW</td><td>R/W</td><td>Nikon RAW (2) (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/iWork.html">NUMBERS</a></td><td>R</td><td>Apple iWork '09 Numbers spreadsheet</td></tr>
+<tr><td>ODP, ODS, ODT</td><td>R</td><td>Open Document Presentation/Spreadsheet/Text (ZIP/XML-based)</td></tr>
 <tr><td>OGG</td><td>R</td><td>Ogg <a href="TagNames/Vorbis.html">Vorbis</a> and Ogg <a href="TagNames/FLAC.html">FLAC</a> audio</td></tr>
 <tr><td>ORF</td><td>R/W</td><td>Olympus RAW Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/Font.html">OTF</a></td><td>R</td><td>Open Type Font</td></tr>
@@ -307,6 +310,7 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td><a href="TagNames/Font.html">PFA, PFB</a></td><td>R</td><td>PostScript Font ASCII/Binary</td></tr>
 <tr><td><a href="TagNames/Font.html">PFM</a></td><td>R</td><td>Printer Font Metrics</td></tr>
 <tr><td><a href="TagNames/PICT.html">PICT, PCT</a></td><td>R</td><td>Apple Picture file</td></tr>
+<tr><td><a href="TagNames/Sony.html#PMP">PMP</a></td><td>R</td><td>Sony DSC-F1 Cyber-Shot image</td></tr>
 <tr><td><a href="TagNames/PNG.html">PNG</a>, <a href="TagNames/MNG.html">JNG, MNG</a></td><td>R/W</td><td>Portable/JPEG/Multiple-image Network Graphics</td></tr>
 <tr><td>PPM, PBM, PGM</td><td>R/W</td><td>Portable Pixel/Bit/Gray Map</td></tr>
 <tr><td>PPT, PPS, POT</td><td>R</td><td>Microsoft PowerPoint Presentation/Slideshow/Template (<a href="TagNames/FlashPix.html">FPX</a>-like)</td></tr>
@@ -321,11 +325,13 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td><a href="TagNames/FujiFilm.html#RAF">RAF</a></td><td>R/W</td><td>FujiFilm RAW Format</td></tr>
 <tr><td><a href="TagNames/Real.html#Metafile">RAM, RPM</a></td><td>R</td><td>Real Audio/Plug-in Metafile</td></tr>
 <tr><td><a href="TagNames/KyoceraRaw.html">RAW</a></td><td>R</td><td>Kyocera Contax N Digital RAW</td></tr>
-<tr><td><a href="TagNames/Panasonic.html#Raw">RAW</a></td><td>R/W</td><td>Panasonic RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
+<tr><td><a href="TagNames/PanasonicRaw.html">RAW</a></td><td>R/W</td><td>Panasonic RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/RIFF.html">RIFF, RIF</a></td><td>R</td><td>Resource Interchange File Format</td></tr>
 <tr><td><a href="TagNames/Real.html">RM, RV, RMVB</a></td><td>R</td><td>Real Media/Video [Variable Bitrate]</td></tr>
-<tr><td><a href="TagNames/Panasonic.html#Raw">RW2</a></td><td>R/W</td><td>Panasonic RAW 2 (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
-<tr><td><a href="TagNames/Panasonic.html#Raw">RWL</a></td><td>R/W</td><td>Leica RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
+<tr><td><a href="TagNames/RSRC.html">RSRC</a></td><td>R</td><td>Mac OS Resource</td></tr>
+<tr><td><a href="TagNames/RTF.html">RTF</a></td><td>R</td><td>Rich Text Format</td></tr>
+<tr><td><a href="TagNames/PanasonicRaw.html">RW2</a></td><td>R/W</td><td>Panasonic RAW 2 (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
+<tr><td><a href="TagNames/PanasonicRaw.html">RWL</a></td><td>R/W</td><td>Leica RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/Rawzor.html">RWZ</a></td><td>R</td><td>Rawzor compressed image</td></tr>
 <tr><td><a href="TagNames/EXE.html#ELF">SO</a></td><td>R</td><td>Unix ELF executable and Shared Object files</td></tr>
 <tr><td>SR2</td><td>R/W</td><td>Sony RAW 2 (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
@@ -359,16 +365,21 @@ of meta information in JPEG images:</p>
 <tr><td>APP0 - <a href="TagNames/JPEG.html#AVI1">AVI1</a></td><td>R</td><td>JPEG AVI information</td></tr>
 <tr><td>APP1 - <a href="TagNames/EXIF.html">EXIF</a></td><td>R/W/C</td><td>Exchangeable Image File Format (including maker notes)</td></tr>
 <tr><td>APP1 - <a href="TagNames/XMP.html">XMP</a></td><td>R/W/C</td><td>Extensible Metadata Platform (multi-segment)</td></tr>
+<tr><td>APP1 - <a href="TagNames/Casio.html#QVCI">QVCI</a></td><td>R</td><td>Casio QV-7000SX QVCI information</td></tr>
 <tr><td>APP2 - <a href="TagNames/ICC_Profile.html">ICC</a></td><td>R/W/C</td><td>International Color Consortium (multi-segment)</td></tr>
 <tr><td>APP2 - <a href="TagNames/FlashPix.html">FPXR</a></td><td>R</td><td>FlashPix Ready (multi-segment)</td></tr>
 <tr><td>APP2 - <a href="TagNames/MPF.html">MPF</a></td><td>R</td><td>Multi-Picture Format</td></tr>
 <tr><td>APP2 - PreviewImage</td><td>R</td><td>Samsung large preview (multi-segment)</td></tr>
-<tr><td>APP3 - <a href="TagNames/Kodak.html#Meta">Kodak Meta</a></td><td>R</td><td>EXIF-like Kodak information</td></tr>
+<tr><td>APP3 - <a href="TagNames/Kodak.html#Meta">Kodak Meta</a></td><td>R/W</td><td>Kodak Meta information (EXIF-like)</td></tr>
 <tr><td>APP3 - <a href="TagNames/Stim.html">Stim</a></td><td>R</td><td>Stereo Still Image format</td></tr>
+<tr><td>APP3 - PreviewImage</td><td>R</td><td>Hewlett-Packard or Samsung (multi-segment) preview</td></tr>
 <tr><td>APP4 - <a href="TagNames/JPEG.html#Scalado">Scalado</a></td><td>R</td><td>(presumably written by <a href="http://www.scalado.com/">Scalado</a> mobile software)</td></tr>
+<tr><td>APP4 - <a href="TagNames/FlashPix.html">FPXR</a></td><td>R</td><td>FlashPix Ready in non-standard location (multi-segment)</td></tr>
+<tr><td>APP4 - PreviewImage</td><td>R</td><td>Continued Samsung preview from APP3</td></tr>
 <tr><td>APP5 - <a href="TagNames/Ricoh.html#RMETA">Ricoh RMETA</a></td><td>R</td><td>Ricoh custom fields</td></tr>
 <tr><td>APP6 - <a href="TagNames/JPEG.html#EPPIM">EPPIM</a></td><td>R</td><td>Toshiba PrintIM</td></tr>
 <tr><td>APP6 - <a href="TagNames/JPEG.html#NITF">NITF</a></td><td>R</td><td>National Imagery Transmission Format</td></tr>
+<tr><td>APP6 - <a href="TagNames/HP.html#TDHD">HP TDHD</a></td><td>R</td><td>Hewlett-Packard Photosmart R837 TDHD information</td></tr>
 <tr><td>APP8 - <a href="TagNames/JPEG.html#SPIFF">SPIFF</a></td><td>R</td><td>Still Picture Interchange File Format</td></tr>
 <tr><td>APP10 - Comment</td><td>R</td><td>PhotoStudio Unicode Comment</td></tr>
 <tr><td>APP12 - <a href="TagNames/APP12.html#PictureInfo">Picture Info</a></td><td>R</td><td>ASCII-based Picture Information</td></tr>
@@ -637,37 +648,38 @@ These groups are:</p>
 ASF, BMP, CanonVRD, Composite, DICOM, DNG, DjVu, Ducky, EXE, EXIF, ExifTool,
 FLAC, File, Flash, FlashPix, Font, FotoStation, GIF, GeoTiff, H264, HTML,
 ICC_Profile, ID3, IPTC, ITC, JFIF, JPEG, Jpeg2000, LNK, Leaf, M2TS, MIE,
-MIFF, MNG, MPC, MPEG, MPF, MakerNotes, Meta, PDF, PICT, PNG, PSP,
-PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF, Rawzor,
-Real, SVG, SigmaRaw, SonyIDC, Stim, Vorbis, XML, XMP, ZIP
+MIFF, MNG, MPC, MPEG, MPF, MakerNotes, Matroska, Meta, PDF, PICT, PNG, PSP,
+PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF, RSRC,
+RTF, Rawzor, Real, SVG, SigmaRaw, SonyIDC, Stim, Vorbis, XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, BMP, Canon, CanonCustom,
-CanonRaw, CanonVRD, Casio, Composite, DICOM, DNG, DjVu, DjVu-Meta, Ducky,
-EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix, Font,
-FotoStation, FujiFilm, GIF, GPS, GeoTiff, GlobParamIFD, GraphConv, H264, HP,
-HTML, HTML-dc, HTML-ncc, HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm,
-ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile, ICC_Profile#, ID3,
-ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC,
-InteropIFD, JFIF, JPEG, JVC, Jpeg2000, KDC_IFD, Kodak, KodakBordersIFD,
-KodakEffectsIFD, KodakIFD, KyoceraRaw, LNK, Leaf, LeafSubIFD, Leica, M2TS,
-MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash,
-MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
-MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
-MIFF, MNG, MPC, MPEG, MPF0, MPImage, MakerNotes, MakerUnknown, MetaIFD,
-Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom, NikonScan,
-Olympus, PDF, PICT, PNG, Panasonic, Pentax, PSP, PhotoMechanic, Photoshop,
-PictureInfo, PostScript, PreviewIFD, PrintIM, ProfileIFD, QuickTime, RAF,
-RAF2, RIFF, RMETA, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3,
-Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
-SRF#, SVG, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD,
-System, Track#, Version#, Vorbis, XML, XMP, XMP-DICOM, XMP-MP,
+CanonRaw, CanonVRD, Casio, Chapter#, Composite, DICOM, DNG, DjVu, DjVu-Meta,
+Ducky, EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix,
+Font, FotoStation, FujiFilm, GIF, GPS, GeoTiff, GlobParamIFD, GraphConv,
+H264, HP, HTML, HTML-dc, HTML-ncc, HTML-office, HTML-prod, HTML-vw96,
+HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
+ICC_Profile#, ID3, ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
+IPTC, IPTC#, ITC, InteropIFD, JFIF, JPEG, JVC, Jpeg2000, KDC_IFD, Kodak,
+KodakBordersIFD, KodakEffectsIFD, KodakIFD, KyoceraRaw, LNK, Leaf,
+LeafSubIFD, Leica, M2TS, MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc,
+MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
+MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM,
+MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MPF0, MPImage, MakerNotes,
+MakerUnknown, Matroska, MetaIFD, Minolta, MinoltaRaw, NITF, Nikon,
+NikonCapture, NikonCustom, NikonScan, Olympus, PDF, PICT, PNG, PSP,
+Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo, PostScript,
+PreviewIFD, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, RSRC,
+RTF, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4,
+Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG,
+Samsung, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD,
+System, Track#, Version0, Vorbis, XML, XMP, XMP-DICOM, XMP-MP,
 XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
 XMP-dex, XMP-digiKam, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr,
 XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-pdfx, XMP-photomech,
-XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-tiff,
-XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS,
-XMP-xmpRights, XMP-xmpTPg, ZIP
+XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-swf,
+XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote,
+XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
@@ -793,11 +805,6 @@ submit a bug report to Adobe.</li>
 prevents some edited <b>Pentax PEF</b> images from being displayed properly. 
 Other software such as the Pentax Silkypix software and dcraw have no problems
 with these images. <i>[This bug is fixed in OS X 10.5.4]</i></li>
-<li>Some <b>Apple</b> applications may store information in the <b>resource
-fork</b> of a file.  This information is lost when the file is rewritten unless
-the <code>-overwrite_original_in_place</code> option is used.  Note that the
-resource fork is also typically dropped if the file is simply transferred to a
-non-Macintosh system.</li>
 <li>In <b>Windows</b>, ExifTool will not process files with <b>Unicode
 characters in the file name</b>.  This is due to an underlying lack of support
 for Unicode filenames in the Windows standard C I/O libraries.</li>
@@ -871,18 +878,29 @@ extracted tags by specifying them individually (<code>-TAG</code>) or by group
 the print conversions (<code>-n</code>) if these features aren't required.  Note
 that the exclude options (<code>-x</code> or <code>--TAG</code>) are not very
 efficient, and may have a negative impact on performance if a large number of
-tags are excluded.</p>
+tags are excluded individually.</p>
 
-<p>There is overhead in loading ExifTool, so performance may be improved by
-taking advantage of ExifTool's batch processing capabilities to reduce the
-number of executed commands when performing complex operations or processing
-multiple files.</p>
+<p>There is a large overhead in loading ExifTool, so performance may be greatly
+improved by taking advantage of ExifTool's batch processing capabilities (the
+ability to process multiple files or entire directories with a single command)
+to reduce the number of executed commands when performing complex operations or
+processing multiple files. <i>[One exiftool user
+<a href="http://www.christian-etter.de/?p=458">documented a 60x speed increase</a>
+by processing a large number of files with a single command instead of running
+exiftool separately on each file.]</i> Also, the <code>-execute</code> option
+may be used to perform multiple independent operations with a single invocation
+of exiftool.</p>
 
 <p>The <code>-fast</code> option can significantly increase speed when
 extracting information from JPEG images which are piped across a slow network
 connection.  However, with this option any information in a JPEG trailer is not
 extracted.  For more substantial speed benefits, <code>-fast2</code> may be
 used to also avoid extracting MakerNote information if this is not required.</p>
+
+<p>When writing, avoid copying tags (with <code>-tagsFromFile</code>) or using
+the <code>-if</code> or <code>-fileOrder</code> option because these will add
+the extra step of extracting tags from the file.  Without these the write
+operation is accomplished with a single pass of each file.</p>
 
 <h2><a name="library">The Image::ExifTool Perl Library Module</a>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
@@ -926,30 +944,31 @@ binary data.  The simple script above does not handle this case.</p>
 <li><a href="MIE1.1-20070121.pdf">MIE 1.1 File Format Specification (pdf)</a></li>
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/sample_images.html">JPEG Image Samples</a> (and
     <a href="http://owl.phy.queensu.ca/~phil/exiftool/makernote_types.html">Table of Makernote Types</a>)</li>
-<li><a href="http://www.cpanforum.com/dist/Image-ExifTool">ExifTool Forum</a> (CPAN Forum)</li>
+<li><a href="http://owl.phy.queensu.ca/~phil/exiftool/forum/">ExifTool Forum</a></li>
 <li><a href="http://search.cpan.org/dist/Image-ExifTool/">Image::ExifTool at CPAN</a> (CPAN Search)</li>
 <li><a href="http://rt.cpan.org/Public/Dist/Display.html?Name=Image-ExifTool">ExifTool Bug Reports</a> (CPAN Request Tracker)</li>
 <li><a href="http://cpantesters.perl.org/show/Image-ExifTool.html">ExifTool Test Reports</a> (CPAN Testers)</li>
 </ul>
 
-<h3>Related Utilities</h3>
+<h3><a name="related">Related Utilities</a></h3>
 
 <p>Below are some free utilities which take advantage of the ExifTool engine:</p>
 
-<p><b>Windows</b></p>
+<p><b><a name="related_win">Windows</a></b></p>
 <ul>
+<li><a href="http://freeweb.siol.net/hrastni3/foto/exif/exiftoolgui.htm">ExifTool GUI for Windows</a>: GUI for viewing meta information with some editing features</li>
 <li><a href="http://www.thezeal.com/blog/?p=145">Exif Stats Utility</a>: Analyzes images to tabulate apertures, exposure times, etc</li>
 <li><a href="http://aeropic.free.fr/H&amp;B/AUTO_ISO_patcher/">Auto ISO Tool</a>: GUI front-end for ExifTool to patch Canon ISO information</li>
 <li><a href="http://home.roadrunner.com/~dick/ExifAuto.htm">ExifAuto</a>: GUI front-end for ExifTool to perform simple operations</li>
-<li><a href="http://freeweb.siol.net/hrastni3/foto/exif/exiftoolgui.htm">ExifTool GUI for Windows</a>: GUI for viewing meta information with some editing features</li>
 <li><a href="http://www.geosetter.de/en/">GeoSetter</a>: Utility for showing and changing geo data of image files</li>
 <li><a href="http://www.moonsoftware.com/exifmixer.asp">ExifMixer</a>: GUI extension for the exiftool command-line interface</li>
 <li><a href="http://fliggs.wordpress.com/2009/02/01/exifdropper-v090902-released/">ExifDropper</a>: Graphical front-end for ExifTool with drag-and-drop</li>
 <li><a href="http://gpstamper.wordpress.com/geotagger/">GPStamper Geotagger</a>: A simple Windows GUI front end for geotagging images</li>
 <li><a href="http://www.anvo-it.de/wiki/doku.php?id=avpicfacexmptagger:main">AvPicFaceXmpTagger</a>: Write Picasa 3.5 face recognition information as XMP to your images</li>
+<li><a href="http://www.ulfwood.net/Mp3TagFileData/Id3TagExifViewer.aspx">FileTagSleuth</a>: MP3, ID3 and EXIF viewer</li>
 </ul>
 
-<p><b>Mac OS X</b></p>
+<p><b><a name="related_mac">Mac OS X</a></b></p>
 <ul>
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/Extract%20Preview.sit">Download</a>
 a stand-alone droplet to extract preview images from RAW files (thanks to Brett Gross)</li>
@@ -967,9 +986,10 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="http://www.raw-photo-processor.com/RPP/Overview.html">Raw Photo Processor</a>: Raw converter for Mac OS X</li>
 <li><a href="http://www.lemkesoft.com/content/188/graphicconverter.html">GraphicConverter</a>: Full-featured image editor</li>
 <li><a href="http://www.saltpepper.net/geotag/">GeoTag</a>: Geotagging application for iPhone and OS X</li>
+<li><a href="http://imagefuser.sourceforge.net/">ImageFuser</a>: Fuses multiple exposures of a scene into one image with improved detail/exposure</li>
 </ul>
 
-<p><b>Multi-Platform</b></p>
+<p><b><a name="related_multi">Multi-Platform</a></b></p>
 <ul>
 <li><a href="http://basepath.com/ImageIngester/">ImageIngester</a>: Windows and Mac OS X image workflow automator</li>
 <li><a href="http://www.carto.net/projects/photoTools/gpsPhoto/">gpsPhoto</a>: Geotag your images from a GPS (GPX) track log</li>
@@ -982,16 +1002,19 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="http://muellerware.org/hg/gpx2exif/">gpx2exif</a>: Python script to geocode photos and produce KML files from a GPS track log</li>
 <li><a href="http://geotag.sourceforge.net/?q=node/1">Geotag</a>: Open source Java-based geotagging application</li>
 <li><a href="http://www.haplessgenius.com/photogrok/">PhotoGrok</a>: Java-based GUI front-end for ExifTool to display images organized by any EXIF tag</li>
+<li><a href="http://www.xnview.com/en/xnview.html">XnView</a>: View and convert graphic files</li>
 </ul>
 
-<p><b>Linux</b></p>
+<p><b><a name="related_linux">Linux</a></b></p>
 <ul>
 <li><a href="http://kde-apps.org/content/show.php?content=30971">rawimage:</a> A kfile plugin and thumbnail image handler for RAW formats</li>
 <li><a href="http://sagittarius.berlios.de/">Sagittarius</a>: Linux XMP metadata editor</li>
 <li><a href="http://beam.at/aenima">Photo related scripts</a>: Includes EXIFInfo script to provide statistics from EXIF data</li>
+<li><a href="http://kornelix.squarespace.com/fotoxx/">Fotoxx</a>: Open source Linux program for photo editing and collection management</li>
+<li><a href="http://hugin.sourceforge.net/">Hugin</a>: Panorama photo stitcher</li>
 </ul>
 
-<p><b>Programming</b></p>
+<p><b><a name="related_prog">Programming</a></b></p>
 <ul>
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/get_tags.sit">Download</a> sample AppleScript to extract tags into AppleScript record (thanks to Rob Lewis)</li>
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/ExifToolWrapper.zip">Download</a> example of a simple Visual C++ wrapper for exiftool (thanks Mark Borg and &#40643;&#29790;&#26124;)</li>
@@ -999,6 +1022,7 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/vb_sample.html">Sample VB.NET subroutine</a> to extract a preview image (thanks Claus Beckmann)</li>
 <li><a href="http://sourceforge.net/projects/moss">Moss</a>: Collection of Java utilities which includes an exiftool interface</li>
 <li><a href="http://gitorious.org/mini_exiftool">MiniExiftool</a>: Ruby library wrapper for ExifTool</li>
+<li><a href="http://im4java.sourceforge.net">im4java</a>: Java interface to ImageMagick, ExifTool, and other image utilities</li>
 </ul>
 
 <p>Also notable, but not directly based on ExifTool:</p>
@@ -1006,7 +1030,7 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <ul><li><a href="http://www.photome.de/">PhotoME</a>: Windows utility to read/write meta information</li>
 </ul>
 
-<h3>References</h3>
+<h3><a name="references">References</a></h3>
 
 <p>The following sources were very useful in helping to decode various types of
 information:</p>
@@ -1031,7 +1055,7 @@ information:</p>
 <li><a href="http://www.gvsoft.homedns.org/exif/">http://www.gvsoft.homedns.org/exif/</a></li>
 </ul>
 
-<h3>Other Links</h3>
+<h3><a name="other_links">Other Links</a></h3>
 <ul>
 <li><a href="http://www.schnebeck.de/an-interview-with-phil-harvey">An interview with Phil Harvey</a></li>
 <li><a href="http://metadatamadness.blogspot.com/">Pepper's "Metadata Madness" blog</a> <i>(Pepper is my cat)</i></li>
@@ -1125,16 +1149,19 @@ $<input name="amount" value="0.00" size="6">
 <h2><a name="contact">Contact Me</a>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
 
-<p>Feel free to drop me a note if you find ExifTool useful, or if you have any
-comments, suggestions or questions.  My e-mail address is on the first line of
-the README file in the full distribution.  Thanks. &nbsp; - <i>Phil Harvey</i></p>
+<p>If you have any comments, suggestions or questions, please post to the
+<a href="http://owl.phy.queensu.ca/~phil/exiftool/forum/">ExifTool Forum</a> so
+other people may benefit from your experiences.  (I check the forum at least as
+often as my email.)  Otherwise, if you must contact me directly, my e-mail
+address is on the first line of the README file in the full distribution. 
+Thanks. &nbsp; - <i>Phil Harvey</i></p>
 
 <div class='wide'><table class='links'><tr>
 <th><a href="install.html" class='wt'>&nbsp;Installing&nbsp;</a></th>
 <th><a href="TagNames/index.html" class='wt'>&nbsp;Tag&nbsp;Names&nbsp;</a></th>
 <th><a href="#links" class='wt'>&nbsp;Resources&nbsp;</a></th>
 <th><a href="history.html" class='wt'>&nbsp;History&nbsp;</a></th>
-<th><a href="http://www.cpanforum.com/dist/Image-ExifTool" class='wt'>&nbsp;Forum&nbsp;</a></th>
+<th><a href="http://owl.phy.queensu.ca/~phil/exiftool/forum/" class='wt'>&nbsp;Forum&nbsp;</a></th>
 <th class='rt'><a href="faq.html" class='wt'>&nbsp;FAQ&nbsp;</a></th>
 </tr></table></div>
 </body>

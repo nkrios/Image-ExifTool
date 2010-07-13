@@ -28,8 +28,8 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='CanonCustom.html'>CanonCustom</a><br>
 <a href='CanonVRD.html'>CanonVRD</a><br>
 <a href='Casio.html'>Casio</a><br>
-<a href='FujiFilm.html'>FujiFilm</a><br>
-<a href='HP.html'>HP</a></td><td width='16%'>
+<a href='HP.html'>HP</a><br>
+<a href='FujiFilm.html'>FujiFilm</a></td><td width='16%'>
 <a href='JVC.html'>JVC</a><br>
 <a href='Kodak.html'>Kodak</a><br>
 <a href='Leaf.html'>Leaf</a><br>
@@ -82,20 +82,22 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='M2TS.html'>M2TS</a><br>
 <a href='H264.html'>H264</a><br>
 <a href='QuickTime.html'>QuickTime</a><br>
+<a href='Matroska.html'>Matroska</a><br>
 <a href='Flash.html'>Flash</a><br>
 <a href='Real.html'>Real</a><br>
 <a href='RIFF.html'>RIFF</a><br>
 <a href='AIFF.html'>AIFF</a><br>
 <a href='ASF.html'>ASF</a><br>
 <a href='DICOM.html'>DICOM</a><br>
-<a href='DjVu.html'>DjVu</a><br>
-<a href='HTML.html'>HTML</a></td><td width='16%'>
+<a href='DjVu.html'>DjVu</a></td><td width='16%'>
+<a href='HTML.html'>HTML</a><br>
 <a href='EXE.html'>EXE</a><br>
 <a href='LNK.html'>LNK</a><br>
 <a href='Font.html'>Font</a><br>
 <a href='RSRC.html'>RSRC</a><br>
 <a href='Rawzor.html'>Rawzor</a><br>
 <a href='ZIP.html'>ZIP</a><br>
+<a href='RTF.html'>RTF</a><br>
 <a href='OOXML.html'>OOXML</a><br>
 <a href='iWork.html'>iWork</a><br>
 <a href='Extra.html'>Extra</a><br>
@@ -137,15 +139,15 @@ created when writing if another same-named tag may be created instead.  To
 write these tags, the group should be specified.  A tilde (<code>~</code>) indicates a
 tag this is writable only when the print conversion is disabled (by setting
 PrintConv to 0, using the -n option, or suffixing the tag name with a <code>#</code>
-character). An exclamation point (<code>!</code>) indicates a tag that is considered
+character).  An exclamation point (<code>!</code>) indicates a tag that is considered
 unsafe to write under normal circumstances.  These &quot;unsafe&quot; tags are not set
-when calling SetNewValuesFromFile() or when using the exiftool -tagsFromFile
-option unless specified explicitly, and care should be taken when editing
-them manually since they may affect the way an image is rendered.  An
-asterisk (<code>*</code>) indicates a &quot;protected&quot; tag which is not writable directly,
-but is written automatically by exiftool (often when a corresponding
-Composite or Extra tag is written).  A colon (<code>:</code>) indicates a mandatory
-tag which may be added automatically when writing.</p>
+when calling SetNewValuesFromFile() or copied with the exiftool
+-tagsFromFile option unless specified explicitly, and care should be taken
+when editing them manually since they may affect the way an image is
+rendered.  An asterisk (<code>*</code>) indicates a &quot;protected&quot; tag which is not
+writable directly, but is written automatically by ExifTool (often when a
+corresponding Composite or Extra tag is written).  A colon (<code>:</code>) indicates
+a mandatory tag which may be added automatically when writing.</p>
 
 <p>The HTML version of these tables also lists possible <b>Values</b> for
 discrete-valued tags, as well as <b>Notes</b> for some tags.</p>
@@ -159,7 +161,7 @@ question.
 </p>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 17, 2010</i>
+<br><i>Last revised Jul 13, 2010</i>
 <p class=lf><a href='../index.html'>&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

@@ -46,13 +46,13 @@ CustomRendered: Normal
 DateTimeOriginal: 2003:12:04 06:46:52
 DigitalZoom: Unknown (-1)
 Directory: t
-DriveMode: Continuous shooting
+DriveMode: Continuous Shooting
 EasyMode: Manual
 EncodingProcess: Baseline DCT, Huffman coding
 ExifByteOrder: Little-endian (Intel, II)
 ExifImageHeight: 120
 ExifImageWidth: 160
-ExifToolVersion: 8.02
+ExifToolVersion: 8.24
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -62,7 +62,7 @@ ExposureTime (1): 128
 FNumber: 14.0
 FNumber (1): 14
 FOV: 37.7 deg
-FileModifyDate: 2009:12:13 20:39:55-05:00
+FileModifyDate: 2010:06:21 15:13:09-04:00
 FileName: Writer_2_failed.jpg
 FileNumber: 118-1861
 FilePermissions: rw-r--r--
@@ -84,7 +84,7 @@ FocalPlaneXSize: 23.22 mm
 FocalPlaneYResolution: 3442.016807
 FocalPlaneYSize: 15.49 mm
 FocalUnits: 1/mm
-FocusDistanceLower: 5.46
+FocusDistanceLower: 5.46 m
 FocusDistanceUpper: inf
 FocusMode: Manual Focus (3)
 FocusRange: Not Known

@@ -23,9 +23,10 @@
 #
 #               To activate this file, rename it to ".ExifTool_config" and
 #               place it in your home directory or the exiftool application
-#               directory.  This causes ExifTool to automatically load the file
-#               when run.  Your home directory is determined by the first
-#               defined of the following environment variables:
+#               directory (to do this in Windows, use the "rename" command at
+#               the command line).  This causes ExifTool to automatically
+#               load the file when run.  Your home directory is determined by
+#               the first defined of the following environment variables:
 #
 #                   1. EXIFTOOL_HOME
 #                   2. HOME
@@ -95,7 +96,7 @@
     },
     <span class='com'># new XMP namespaces (ie. xxx) must be added to the Main XMP table:</span>
     'Image::ExifTool::XMP::Main' =&gt; {
-        xxx =&gt; {
+        xxx =&gt; { <span class='com'># <-- must be the same as the NAMESPACE prefix</span>
             SubDirectory =&gt; {
                 TagTable =&gt; 'Image::ExifTool::UserDefined::xxx',
                 <span class='com'># (see the definition of this table below)</span>

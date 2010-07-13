@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
 [File, System, Image] FileName - File Name: Unknown.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 7.0 kB
@@ -69,6 +69,7 @@
 [MakerNotes, MakerUnknown, Camera] 6 - Unknown 0x0006: AFÿÿ...Û.ÿÿgò.rá.ıHî;ŸÍ.~4.". †.ˆ.Û.Û.Û.÷[...]
 [MakerNotes, MakerUnknown, Camera] 8 - Unknown 0x0008: WB.|ãÿÿÿ<.dCÿÿÿÄ.­..„.(.„.;n[...]
 [MakerNotes, MakerUnknown, Camera] 10 - Unknown 0x000a: ..;..SDSD512€...[...]
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0250
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00160016
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x00000001
 [PrintIM, PrintIM, Printing] 256 - Print IM 0x0100: 0x00000005

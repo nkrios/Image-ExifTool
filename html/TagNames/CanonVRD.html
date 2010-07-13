@@ -136,25 +136,47 @@ explicitly.</p>
 <td><span class=s>0 = No
   <br>1 = Yes</span></td></tr>
 <tr class=b>
+<td class=r title='275 = 0x113'>275</td>
+<td>ToneCurveMode</td>
+<td class=c>int8u</td>
+<td><span class=s>0 = RGB
+  <br>1 = Luminance</span></td></tr>
+<tr>
 <td class=r title='276 = 0x114'>276</td>
 <td>BrightnessAdj</td>
 <td class=c>int8s</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='277 = 0x115'>277</td>
 <td>ContrastAdj</td>
 <td class=c>int8s</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='278 = 0x116'>278</td>
 <td>SaturationAdj</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='286 = 0x11e'>286</td>
 <td>ColorToneAdj</td>
 <td class=c>int32s</td>
 <td><span class=s><span class=n>(in degrees, so -1 is the same as 359)</span></span></td></tr>
+<tr>
+<td class=r title='294 = 0x126'>294</td>
+<td>LuminanceCurvePoints</td>
+<td class=c>int16u[21]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='336 = 0x150'>336</td>
+<td>LuminanceCurveLimits</td>
+<td class=c>int16u[4]</td>
+<td><span class=s><span class=n>(4 numbers: input and output highlight and shadow points)</span></span></td></tr>
+<tr>
+<td class=r title='345 = 0x159'>345</td>
+<td>ToneCurveInterpolation</td>
+<td class=c>int8u</td>
+<td><span class=s>0 = Curve
+  <br>1 = Straight</span></td></tr>
 <tr class=b>
 <td class=r title='352 = 0x160'>352</td>
 <td>RedCurvePoints</td>
@@ -164,7 +186,7 @@ explicitly.</p>
 <td class=r title='394 = 0x18a'>394</td>
 <td>RedCurveLimits</td>
 <td class=c>int16u[4]</td>
-<td><span class=s><span class=n>(4 numbers: input and output highlight and shadow points)</span></span></td></tr>
+<td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='410 = 0x19a'>410</td>
 <td>GreenCurvePoints</td>
@@ -308,44 +330,246 @@ explicitly.</p>
   <br>2 = Landscape
   <br>3 = Neutral
   <br>4 = Faithful
-  <br>5 = Monochrome</span></td></tr>
+  <br>5 = Monochrome
+  <br>6 = Unknown?
+  <br>7 = Custom</span></td></tr>
 <tr class=b>
+<td class=r title='3 = 0x3'>3</td>
+<td>IsCustomPictureStyle</td>
+<td class=c>int16s</td>
+<td><span class=s>0 = No
+  <br>1 = Yes</span></td></tr>
+<tr>
 <td class=r title='13 = 0xd'>13</td>
-<td>RawColorToneAdj</td>
-<td class=c>int16s</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='14 = 0xe'>14</td>
-<td>RawSaturationAdj</td>
+<td>StandardRawColorTone</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='15 = 0xf'>15</td>
-<td>RawContrastAdj</td>
+<td class=r title='14 = 0xe'>14</td>
+<td>StandardRawSaturation</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r title='15 = 0xf'>15</td>
+<td>StandardRawContrast</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td class=r title='16 = 0x10'>16</td>
-<td>RawLinear</td>
+<td>StandardRawLinear</td>
+<td class=c>int16s</td>
+<td><span class=s>0 = No
+  <br>1 = Yes</span></td></tr>
+<tr>
+<td class=r title='17 = 0x11'>17</td>
+<td>StandardRawSharpness</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='18 = 0x12'>18</td>
+<td>StandardRawHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='19 = 0x13'>19</td>
+<td>StandardRawShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='20 = 0x14'>20</td>
+<td>StandardOutputHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='21 = 0x15'>21</td>
+<td>StandardOutputShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='22 = 0x16'>22</td>
+<td>PortraitRawColorTone</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='23 = 0x17'>23</td>
+<td>PortraitRawSaturation</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='24 = 0x18'>24</td>
+<td>PortraitRawContrast</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='25 = 0x19'>25</td>
+<td>PortraitRawLinear</td>
 <td class=c>int16s</td>
 <td><span class=s>0 = No
   <br>1 = Yes</span></td></tr>
 <tr class=b>
-<td class=r title='17 = 0x11'>17</td>
-<td>RawSharpnessAdj</td>
+<td class=r title='26 = 0x1a'>26</td>
+<td>PortraitRawSharpness</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='18 = 0x12'>18</td>
-<td>RawHighlightPoint</td>
+<td class=r title='27 = 0x1b'>27</td>
+<td>PortraitRawHighlightPoint</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='19 = 0x13'>19</td>
-<td>RawShadowPoint</td>
+<td class=r title='28 = 0x1c'>28</td>
+<td>PortraitRawShadowPoint</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r title='29 = 0x1d'>29</td>
+<td>PortraitOutputHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='30 = 0x1e'>30</td>
+<td>PortraitOutputShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='31 = 0x1f'>31</td>
+<td>LandscapeRawColorTone</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='32 = 0x20'>32</td>
+<td>LandscapeRawSaturation</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='33 = 0x21'>33</td>
+<td>LandscapeRawContrast</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='34 = 0x22'>34</td>
+<td>LandscapeRawLinear</td>
+<td class=c>int16s</td>
+<td><span class=s>0 = No
+  <br>1 = Yes</span></td></tr>
+<tr>
+<td class=r title='35 = 0x23'>35</td>
+<td>LandscapeRawSharpness</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='36 = 0x24'>36</td>
+<td>LandscapeRawHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='37 = 0x25'>37</td>
+<td>LandscapeRawShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='38 = 0x26'>38</td>
+<td>LandscapeOutputHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='39 = 0x27'>39</td>
+<td>LandscapeOutputShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='40 = 0x28'>40</td>
+<td>NeutralRawColorTone</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='41 = 0x29'>41</td>
+<td>NeutralRawSaturation</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='42 = 0x2a'>42</td>
+<td>NeutralRawContrast</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='43 = 0x2b'>43</td>
+<td>NeutralRawLinear</td>
+<td class=c>int16s</td>
+<td><span class=s>0 = No
+  <br>1 = Yes</span></td></tr>
+<tr class=b>
+<td class=r title='44 = 0x2c'>44</td>
+<td>NeutralRawSharpness</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='45 = 0x2d'>45</td>
+<td>NeutralRawHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='46 = 0x2e'>46</td>
+<td>NeutralRawShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='47 = 0x2f'>47</td>
+<td>NeutralOutputHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='48 = 0x30'>48</td>
+<td>NeutralOutputShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='49 = 0x31'>49</td>
+<td>FaithfulRawColorTone</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='50 = 0x32'>50</td>
+<td>FaithfulRawSaturation</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='51 = 0x33'>51</td>
+<td>FaithfulRawContrast</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='52 = 0x34'>52</td>
+<td>FaithfulRawLinear</td>
+<td class=c>int16s</td>
+<td><span class=s>0 = No
+  <br>1 = Yes</span></td></tr>
+<tr>
+<td class=r title='53 = 0x35'>53</td>
+<td>FaithfulRawSharpness</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='54 = 0x36'>54</td>
+<td>FaithfulRawHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='55 = 0x37'>55</td>
+<td>FaithfulRawShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='56 = 0x38'>56</td>
+<td>FaithfulOutputHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='57 = 0x39'>57</td>
+<td>FaithfulOutputShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td class=r title='58 = 0x3a'>58</td>
 <td>MonochromeFilterEffect</td>
 <td class=c>int16s</td>
@@ -354,7 +578,7 @@ explicitly.</p>
   <br>0 = Orange
   <br>1 = Red
   <br>2 = Green</span></td></tr>
-<tr class=b>
+<tr>
 <td class=r title='59 = 0x3b'>59</td>
 <td>MonochromeToningEffect</td>
 <td class=c>int16s</td>
@@ -363,22 +587,119 @@ explicitly.</p>
   <br>0 = Blue
   <br>1 = Purple
   <br>2 = Green</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='60 = 0x3c'>60</td>
 <td>MonochromeContrast</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='61 = 0x3d'>61</td>
 <td>MonochromeLinear</td>
 <td class=c>int16s</td>
 <td><span class=s>0 = No
   <br>1 = Yes</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='62 = 0x3e'>62</td>
 <td>MonochromeSharpness</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td class=r title='63 = 0x3f'>63</td>
+<td>MonochromeRawHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='64 = 0x40'>64</td>
+<td>MonochromeRawShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='65 = 0x41'>65</td>
+<td>MonochromeOutputHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='66 = 0x42'>66</td>
+<td>MonochromeOutputShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='69 = 0x45'>69</td>
+<td>UnknownContrast?</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='70 = 0x46'>70</td>
+<td>UnknownLinear?</td>
+<td class=c>int16s</td>
+<td><span class=s>0 = No
+  <br>1 = Yes</span></td></tr>
+<tr>
+<td class=r title='71 = 0x47'>71</td>
+<td>UnknownSharpness?</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='72 = 0x48'>72</td>
+<td>UnknownRawHighlightPoint?</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='73 = 0x49'>73</td>
+<td>UnknownRawShadowPoint?</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='74 = 0x4a'>74</td>
+<td>UnknownOutputHighlightPoint?</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='75 = 0x4b'>75</td>
+<td>UnknownOutputShadowPoint?</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='78 = 0x4e'>78</td>
+<td>CustomContrast</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='79 = 0x4f'>79</td>
+<td>CustomLinear</td>
+<td class=c>int16s</td>
+<td><span class=s>0 = No
+  <br>1 = Yes</span></td></tr>
+<tr class=b>
+<td class=r title='80 = 0x50'>80</td>
+<td>CustomSharpness</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='81 = 0x51'>81</td>
+<td>CustomRawHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='82 = 0x52'>82</td>
+<td>CustomRawShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='83 = 0x53'>83</td>
+<td>CustomOutputHighlightPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='84 = 0x54'>84</td>
+<td>CustomOutputShadowPoint</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='88 = 0x58'>88</td>
+<td>CustomPictureStyleData</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(variable-length data structure)</span></span></td></tr>
 <tr class=b>
 <td class=r title='94 = 0x5e'>94</td>
 <td>ChrominanceNoiseReduction</td>
@@ -387,28 +708,29 @@ explicitly.</p>
   <br>0 = Off
   <br>58 = Low
   <br>100 = High
-  <br><span class=n>(VRDVersion 3.30 or later)</span>
-  <br>0x0 = 0
+  <br><span class=n>(VRDVersion 3.30 or later)</span></span><table class=cols><tr>
+  <td>0x0 = 0
   <br>0x10 = 1
   <br>0x21 = 2
   <br>0x32 = 3
   <br>0x42 = 4
-  <br>0x53 = 5
-  <br>0x64 = 6
+  <br>0x53 = 5</td><td>&nbsp;&nbsp;</td>
+  <td>0x64 = 6
   <br>0x74 = 7
   <br>0x85 = 8
   <br>0x96 = 9
   <br>0xa6 = 10
-  <br>0xa7 = 11
-  <br>0xa8 = 12
+  <br>0xa7 = 11</td><td>&nbsp;&nbsp;</td>
+  <td>0xa8 = 12
   <br>0xa9 = 13
   <br>0xaa = 14
   <br>0xab = 15
   <br>0xac = 16
-  <br>0xad = 17
-  <br>0xae = 18
+  <br>0xad = 17</td><td>&nbsp;&nbsp;</td>
+  <td>0xae = 18
   <br>0xaf = 19
-  <br>0xb0 = 20</span></td></tr>
+  <br>0xb0 = 20</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr>
 <td class=r title='95 = 0x5f'>95</td>
 <td>LuminanceNoiseReduction</td>
@@ -417,28 +739,29 @@ explicitly.</p>
   <br>0 = Off
   <br>65 = Low
   <br>100 = High
-  <br><span class=n>(VRDVersion 3.30 or later)</span>
-  <br>0x0 = 0
+  <br><span class=n>(VRDVersion 3.30 or later)</span></span><table class=cols><tr>
+  <td>0x0 = 0
   <br>0x41 = 1
   <br>0x64 = 2
   <br>0x6e = 3
   <br>0x78 = 4
-  <br>0x82 = 5
-  <br>0x8c = 6
+  <br>0x82 = 5</td><td>&nbsp;&nbsp;</td>
+  <td>0x8c = 6
   <br>0x96 = 7
   <br>0xa0 = 8
   <br>0xaa = 9
   <br>0xb4 = 10
-  <br>0xb5 = 11
-  <br>0xb6 = 12
+  <br>0xb5 = 11</td><td>&nbsp;&nbsp;</td>
+  <td>0xb6 = 12
   <br>0xb7 = 13
   <br>0xb8 = 14
   <br>0xb9 = 15
   <br>0xba = 16
-  <br>0xbb = 17
-  <br>0xbc = 18
+  <br>0xbb = 17</td><td>&nbsp;&nbsp;</td>
+  <td>0xbc = 18
   <br>0xbd = 19
-  <br>0xbe = 20</span></td></tr>
+  <br>0xbe = 20</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr class=b>
 <td class=r title='96 = 0x60'>96</td>
 <td>ChrominanceNR_TIFF_JPEG</td>
@@ -447,28 +770,29 @@ explicitly.</p>
   <br>0 = Off
   <br>33 = Low
   <br>100 = High
-  <br><span class=n>(VRDVersion 3.30 or later)</span>
-  <br>0x0 = 0
+  <br><span class=n>(VRDVersion 3.30 or later)</span></span><table class=cols><tr>
+  <td>0x0 = 0
   <br>0x10 = 1
   <br>0x21 = 2
   <br>0x32 = 3
   <br>0x42 = 4
-  <br>0x53 = 5
-  <br>0x64 = 6
+  <br>0x53 = 5</td><td>&nbsp;&nbsp;</td>
+  <td>0x64 = 6
   <br>0x74 = 7
   <br>0x85 = 8
   <br>0x96 = 9
   <br>0xa6 = 10
-  <br>0xa7 = 11
-  <br>0xa8 = 12
+  <br>0xa7 = 11</td><td>&nbsp;&nbsp;</td>
+  <td>0xa8 = 12
   <br>0xa9 = 13
   <br>0xaa = 14
   <br>0xab = 15
   <br>0xac = 16
-  <br>0xad = 17
-  <br>0xae = 18
+  <br>0xad = 17</td><td>&nbsp;&nbsp;</td>
+  <td>0xae = 18
   <br>0xaf = 19
-  <br>0xb0 = 20</span></td></tr>
+  <br>0xb0 = 20</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr>
 <td class=r title='98 = 0x62'>98</td>
 <td>ChromaticAberrationOn</td>
@@ -538,11 +862,96 @@ explicitly.</p>
   <br>200 = Standard
   <br>300 = Strong
   <br>32767 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='117 = 0x75'>117</td>
+<td>StandardRawHighlight</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='118 = 0x76'>118</td>
+<td>PortraitRawHighlight</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='119 = 0x77'>119</td>
+<td>LandscapeRawHighlight</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='120 = 0x78'>120</td>
+<td>NeutralRawHighlight</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='121 = 0x79'>121</td>
+<td>FaithfulRawHighlight</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='122 = 0x7a'>122</td>
+<td>MonochromeRawHighlight</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='123 = 0x7b'>123</td>
+<td>UnknownRawHighlight?</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='124 = 0x7c'>124</td>
+<td>CustomRawHighlight</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='126 = 0x7e'>126</td>
+<td>StandardRawShadow</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='127 = 0x7f'>127</td>
+<td>PortraitRawShadow</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='128 = 0x80'>128</td>
+<td>LandscapeRawShadow</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='129 = 0x81'>129</td>
+<td>NeutralRawShadow</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='130 = 0x82'>130</td>
+<td>FaithfulRawShadow</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='131 = 0x83'>131</td>
+<td>MonochromeRawShadow</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='132 = 0x84'>132</td>
+<td>UnknownRawShadow?</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='133 = 0x85'>133</td>
+<td>CustomRawShadow</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='139 = 0x8b'>139</td>
+<td>AngleAdj</td>
+<td class=c>int32s</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 1, 2008</i>
+<br><i>Last revised Jun 22, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

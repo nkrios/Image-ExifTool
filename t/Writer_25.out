@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.20
 [File, System, Image] FileName - File Name: Writer_25_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 621 bytes
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:57-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:05:25 13:10:42-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -24,7 +24,7 @@
 [EXIF, IFD0, Time] 306 - Modify Date: 2001:08:01 12:57:23
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
 [EXIF, ExifIFD, Image] 33437 - F Number: 25.0
-[EXIF, ExifIFD, Image] 36864 - Exif Version: 0220
+[EXIF, ExifIFD, Image] 36864 - Exif Version: 0230
 [EXIF, ExifIFD, Image] 37121 - Components Configuration: Y, Cb, Cr, -
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: Uncalibrated

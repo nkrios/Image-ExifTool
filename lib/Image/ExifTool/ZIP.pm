@@ -16,9 +16,16 @@ use strict;
 use vars qw($VERSION $warnString);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub WarnProc($) { $warnString = $_[0]; }
+
+# file types for recognized Open Document "mimetype" values
+my %openDocType = (
+    'application/vnd.oasis.opendocument.presentation' => 'ODP',
+    'application/vnd.oasis.opendocument.spreadsheet'  => 'ODS',
+    'application/vnd.oasis.opendocument.text'         => 'ODT',
+);
 
 # ZIP metadata blocks
 %Image::ExifTool::ZIP::Main = (
@@ -28,10 +35,10 @@ sub WarnProc($) { $warnString = $_[0]; }
     NOTES => q{
         The following tags are extracted from ZIP archives.  ExifTool also extracts
         additional meta information from compressed documents inside some ZIP-based
-        files such as DOCX, PPTX, XLSX (Office Open XML) and EIP (Capture One
-        Enhanced Image Package).  The ExifTool family 3 groups may be used to
-        organize the output by embedded document number (ie. the exiftool C<-g3>
-        option).
+        files such Office Open XML (DOCX, PPTX and XLSX), Open Document (ODP, ODS
+        and ODT), iWork (KEY, PAGES, NUMBERS), and Capture One Enhanced Image
+        Package (EIP).  The ExifTool family 3 groups may be used to organize the
+        output by embedded document number (ie. the exiftool C<-g3> option).
     },
     2 => 'ZipRequiredVersion',
     3 => {
@@ -314,8 +321,44 @@ sub ProcessZIP($$)
             last;
         }
 
+        # check for an Open Document file
+        my $mType = $zip->memberNamed('mimetype');
+        if ($mType) {
+            ($mime, $status) = $zip->contents($mType);
+            unless ($status) {
+                chomp $mime;
+                if ($openDocType{$mime}) {
+                    $exifTool->SetFileType($openDocType{$mime}, $mime);
+                    # extract Open Document metadata from "meta.xml"
+                    my $meta = $zip->memberNamed('meta.xml');
+                    if ($meta) {
+                        ($buff, $status) = $zip->contents($meta);
+                        unless ($status) {
+                            my %dirInfo = (
+                                DataPt => \$buff,
+                                DirLen => length $buff,
+                                DataLen => length $buff,
+                            );
+                            my $xmpTable = GetTagTable('Image::ExifTool::XMP::Main');
+                            $exifTool->ProcessDirectory(\%dirInfo, $xmpTable);
+                        }
+                    }
+                    # extract preview image(s) from "Thumbnails" directory
+                    my $type;
+                    my %tag = ( jpg => 'PreviewImage', png => 'PreviewPNG' );
+                    foreach $type ('jpg', 'png') {
+                        my $thumb = $zip->memberNamed("Thumbnails/thumbnail.$type");
+                        next unless $thumb;
+                        ($buff, $status) = $zip->contents($thumb);
+                        $exifTool->FoundTag($tag{$type}, $buff) unless $status;
+                    }
+                    last;
+                }
+            }
+        }
+
         # otherwise just extract general ZIP information
-        $exifTool->SetFileType;
+        $exifTool->SetFileType();
         @members = $zip->members();
         $docNum = 0;
         my $member;
@@ -399,7 +442,7 @@ This module is used by Image::ExifTool
 
 This module contains definitions required by Image::ExifTool to extract meta
 information from ZIP and GZIP archives.  This includes ZIP-based file types
-like DOCX, PPTX, XLSX and EIP.
+like DOCX, PPTX, XLSX, ODP, ODS, ODT and EIP.
 
 =head1 AUTHOR
 

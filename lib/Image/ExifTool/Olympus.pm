@@ -22,6 +22,7 @@
 #              14) Viktor Lushnikov private communication (E-400)
 #              15) Yrjo Rauste private communication (E-30)
 #              16) Godfrey DiGiorgi private communcation (E-P1) + http://forums.dpreview.com/forums/read.asp?message=33187567
+#              17) Martin Hibers private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -31,12 +32,93 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.67';
+$VERSION = '1.71';
 
 sub PrintLensInfo($$$);
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
 
+# lookup for Olympus LensType values
+my %olympusLensTypes = (
+    '0 0 0'  => 'None',
+    # Olympus lenses
+    '0 1 0'  => 'Olympus Zuiko Digital ED 50mm F2.0 Macro',
+    '0 1 1'  => 'Olympus Zuiko Digital 40-150mm F3.5-4.5', #8
+    '0 1 16' => 'Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6', #PH (E-P1 pre-production)
+    '0 2 0'  => 'Olympus Zuiko Digital ED 150mm F2.0',
+    '0 2 16' => 'Olympus M.Zuiko Digital 17mm F2.8 Pancake', #PH (E-P1 pre-production)
+    '0 3 0'  => 'Olympus Zuiko Digital ED 300mm F2.8',
+    '0 3 16' => 'Olympus M.Zuiko Digital ED 14-150mm F4.0-5.6', #11
+    '0 4 16' => 'Olympus M.Zuiko Digital ED 9-18mm F4.0-5.6', #11
+    '0 5 0'  => 'Olympus Zuiko Digital 14-54mm F2.8-3.5',
+    '0 5 1'  => 'Olympus Zuiko Digital Pro ED 90-250mm F2.8', #9
+    '0 5 16' => 'Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6', #11
+    '0 6 0'  => 'Olympus Zuiko Digital ED 50-200mm F2.8-3.5',
+    '0 6 1'  => 'Olympus Zuiko Digital ED 8mm F3.5 Fisheye', #9
+    '0 7 0'  => 'Olympus Zuiko Digital 11-22mm F2.8-3.5',
+    '0 7 1'  => 'Olympus Zuiko Digital 18-180mm F3.5-6.3', #6
+    '0 8 1'  => 'Olympus Zuiko Digital 70-300mm F4.0-5.6', #7 (seen as release 1 - PH)
+    '0 21 0' => 'Olympus Zuiko Digital ED 7-14mm F4.0',
+    '0 23 0' => 'Olympus Zuiko Digital Pro ED 35-100mm F2.0', #7
+    '0 24 0' => 'Olympus Zuiko Digital 14-45mm F3.5-5.6',
+    '0 32 0' => 'Olympus Zuiko Digital 35mm F3.5 Macro', #9
+    '0 34 0' => 'Olympus Zuiko Digital 17.5-45mm F3.5-5.6', #9
+    '0 35 0' => 'Olympus Zuiko Digital ED 14-42mm F3.5-5.6', #PH
+    '0 36 0' => 'Olympus Zuiko Digital ED 40-150mm F4.0-5.6', #PH
+    '0 48 0' => 'Olympus Zuiko Digital ED 50-200mm F2.8-3.5 SWD', #7
+    '0 49 0' => 'Olympus Zuiko Digital ED 12-60mm F2.8-4.0 SWD', #7
+    '0 50 0' => 'Olympus Zuiko Digital ED 14-35mm F2.0 SWD', #PH
+    '0 51 0' => 'Olympus Zuiko Digital 25mm F2.8', #PH
+    '0 52 0' => 'Olympus Zuiko Digital ED 9-18mm F4.0-5.6', #7
+    '0 53 0' => 'Olympus Zuiko Digital 14-54mm F2.8-3.5 II', #PH
+    # Sigma lenses
+    '1 1 0'  => 'Sigma 18-50mm F3.5-5.6', #8
+    '1 2 0'  => 'Sigma 55-200mm F4.0-5.6 DC',
+    '1 3 0'  => 'Sigma 18-125mm F3.5-5.6 DC',
+    '1 4 0'  => 'Sigma 18-125mm F3.5-5.6', #7
+    '1 5 0'  => 'Sigma 30mm F1.4', #10
+    '1 6 0'  => 'Sigma 50-500mm F4.0-6.3 EX DG APO HSM RF', #6
+    '1 7 0'  => 'Sigma 105mm F2.8 DG', #PH
+    '1 8 0'  => 'Sigma 150mm F2.8 DG HSM', #PH
+    '1 16 0' => 'Sigma 24mm F1.8 EX DG Aspherical Macro', #PH
+    '1 17 0' => 'Sigma 135-400mm F4.5-5.6 DG ASP APO RF', #11
+    '1 18 0' => 'Sigma 300-800mm F5.6 EX DG APO', #11
+    '1 20 0' => 'Sigma 50-500mm F4.0-6.3 EX DG APO HSM RF', #11
+    '1 21 0' => 'Sigma 10-20mm F4.0-5.6 EX DC HSM', #11
+    '1 22 0' => 'Sigma 70-200mm F2.8 EX DG Macro HSM II', #11
+    '1 23 0' => 'Sigma 50mm F1.4 EX DG HSM', #11
+    # Leica lenses (ref 11)
+    '2 1 0'  => 'Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
+    '2 1 16' => 'Lumix G Vario 14-45mm F3.5-5.6 Asph. Mega OIS', #16
+    '2 2 0'  => 'Leica D Summilux 25mm F1.4 Asph.',
+    '2 2 16' => 'Lumix G Vario 45-200mm F4-5.6 Mega OIS', #16
+    '2 3 1'  => 'Leica D Vario Elmar 14-50mm F3.8-5.6 Asph.', #14 (L10 kit)
+    '2 3 16' => 'Lumix G Vario HD 14-140mm F4-5.8 Asph. Mega OIS', #16
+    '2 4 0'  => 'Leica D Vario Elmar 14-150mm F3.5-5.6', #13
+    '2 4 16' => 'Lumix G Vario 7-14mm F4 Asph.', #PH (E-P1 pre-production)
+    '2 5 16' => 'Lumix G 20mm F1.7 Asph.', #16
+    '2 8 16' => 'Lumix G Fisheye 8mm F3.5', #PH
+    '3 1 0'  => 'Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
+    '3 2 0'  => 'Leica D Summilux 25mm F1.4 Asph.',
+);
+
+# ArtFilter and MagicFilter values (ref PH)
+my %filters = (
+    '0 0 0 0'    => 'Off', # ArtFilter
+    '0 1280 0 0' => 'Off', # MagicFilter
+    '1 1280 0 0' => 'Soft Focus',
+    '2 1280 0 0' => 'Pop Art',
+    '3 1280 0 0' => 'Pale & Light Color',
+    '4 1280 0 0' => 'Light Tone',
+    '5 1280 0 0' => 'Pin Hole',
+    '6 1280 0 0' => 'Grainy Film',
+    '9 1280 0 0' => 'Diorama',
+    '10 1280 0 0' => 'Cross Process',
+    '12 1280 0 0' => 'Fish Eye',
+    '13 1280 0 0' => 'Drawing',
+);
+
+# Olympus tags
 %Image::ExifTool::Olympus::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
@@ -255,6 +337,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             0 => 'Normal',
             1 => 'Standard',
             2 => 'Auto',
+            3 => 'Intelligent Auto', #PH (guess, u7040)
             4 => 'Portrait',
             5 => 'Landscape+Portrait',
             6 => 'Landscape',
@@ -286,6 +369,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             32 => 'Face Portrait',
             33 => 'Pet',
             34 => 'Smile Shot',
+            101 => 'Magic Filter', #PH
         },
     },
     0x0404 => { #PH (D595Z, C7070WZ)
@@ -318,10 +402,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ShutterSpeedValue',
         Writable => 'rational64s',
         Priority => 0,
-        ValueConv => 'abs($val)<100 ? 1/(2**$val) : 0',
+        ValueConv => 'abs($val)<100 ? 2**(-$val) : 0',
         ValueConvInv => '$val>0 ? -log($val)/log(2) : -100',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x1001 => { #6
         Name => 'ISOValue',
@@ -1155,62 +1239,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         ValueConv => 'my @a = split(" ",$val); "$a[0] $a[2] $a[3]"',
         # set unknown values to zero when writing
         ValueConvInv => 'my @a=split(" ",$val); "$a[0] 0 $a[1] $a[2] 0 0"',
-        PrintConv => {
-            '0 0 0'  => 'None',
-            # Olympus lenses
-            '0 1 0'  => 'Olympus Zuiko Digital ED 50mm F2.0 Macro',
-            '0 1 1'  => 'Olympus Zuiko Digital 40-150mm F3.5-4.5', #8
-            '0 1 16' => 'Olympus Zuiko Digital ED 14-42mm F3.5-5.6', #PH (E-P1 pre-production)
-            '0 2 0'  => 'Olympus Zuiko Digital ED 150mm F2.0',
-            '0 2 16' => 'Olympus Zuiko Digital 17mm F2.8 Pancake', #PH (E-P1 pre-production)
-            '0 3 0'  => 'Olympus Zuiko Digital ED 300mm F2.8',
-            '0 5 0'  => 'Olympus Zuiko Digital 14-54mm F2.8-3.5',
-            '0 5 1'  => 'Olympus Zuiko Digital Pro ED 90-250mm F2.8', #9
-            '0 6 0'  => 'Olympus Zuiko Digital ED 50-200mm F2.8-3.5',
-            '0 6 1'  => 'Olympus Zuiko Digital ED 8mm F3.5 Fisheye', #9
-            '0 7 0'  => 'Olympus Zuiko Digital 11-22mm F2.8-3.5',
-            '0 7 1'  => 'Olympus Zuiko Digital 18-180mm F3.5-6.3', #6
-            '0 8 1'  => 'Olympus Zuiko Digital 70-300mm F4.0-5.6', #7 (seen as release 1 - PH)
-            '0 21 0' => 'Olympus Zuiko Digital ED 7-14mm F4.0',
-            '0 23 0' => 'Olympus Zuiko Digital Pro ED 35-100mm F2.0', #7
-            '0 24 0' => 'Olympus Zuiko Digital 14-45mm F3.5-5.6',
-            '0 32 0' => 'Olympus Zuiko Digital 35mm F3.5 Macro', #9
-            '0 34 0' => 'Olympus Zuiko Digital 17.5-45mm F3.5-5.6', #9
-            '0 35 0' => 'Olympus Zuiko Digital ED 14-42mm F3.5-5.6', #PH
-            '0 36 0' => 'Olympus Zuiko Digital ED 40-150mm F4.0-5.6', #PH
-            '0 48 0' => 'Olympus Zuiko Digital ED 50-200mm F2.8-3.5 SWD', #7
-            '0 49 0' => 'Olympus Zuiko Digital ED 12-60mm F2.8-4.0 SWD', #7
-            '0 50 0' => 'Olympus Zuiko Digital ED 14-35mm F2.0 SWD', #PH
-            '0 51 0' => 'Olympus Zuiko Digital 25mm F2.8', #PH
-            '0 52 0' => 'Olympus Zuiko Digital ED 9-18mm F4.0-5.6', #7
-            '0 53 0' => 'Olympus Zuiko Digital 14-54mm F2.8-3.5 II', #PH
-            # Sigma lenses
-            '1 1 0'  => 'Sigma 18-50mm F3.5-5.6', #8
-            '1 2 0'  => 'Sigma 55-200mm F4.0-5.6 DC',
-            '1 3 0'  => 'Sigma 18-125mm F3.5-5.6 DC',
-            '1 4 0'  => 'Sigma 18-125mm F3.5-5.6', #7
-            '1 5 0'  => 'Sigma 30mm F1.4', #10
-            '1 6 0'  => 'Sigma 50-500mm F4.0-6.3 EX DG APO HSM RF', #6
-            '1 7 0'  => 'Sigma 105mm F2.8 DG', #PH
-            '1 8 0'  => 'Sigma 150mm F2.8 DG HSM', #PH
-            '1 16 0' => 'Sigma 24mm F1.8 EX DG Aspherical Macro', #PH
-            '1 17 0' => 'Sigma 135-400mm F4.5-5.6 DG ASP APO RF', #11
-            '1 18 0' => 'Sigma 300-800mm F5.6 EX DG APO', #11
-            '1 20 0' => 'Sigma 50-500mm F4.0-6.3 EX DG APO HSM RF', #11
-            '1 21 0' => 'Sigma 10-20mm F4.0-5.6 EX DC HSM', #11
-            # Leica lenses (ref 11)
-            '2 1 0'  => 'Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
-            '2 1 16' => 'Lumix G Vario 14-45mm F3.5-5.6 Asph. Mega OIS', #16
-            '2 2 0'  => 'Leica D Summilux 25mm F1.4 Asph.',
-            '2 2 16' => 'Lumix G Vario 45-200mm F4-5.6 Mega OIS', #16
-            '2 3 1'  => 'Leica D Vario Elmar 14-50mm F3.8-5.6 Asph.', #14 (L10 kit)
-            '2 3 16' => 'Lumix G Vario HD 14-140mm F4-5.8 Asph. Mega OIS', #16
-            '2 4 0'  => 'Leica D Vario Elmar 14-150mm F3.5-5.6', #13
-            '2 4 16' => 'Lumix G Vario 7-14mm F4 Asph.', #PH (E-P1 pre-production)
-            '2 5 16' => 'Lumix G 20mm F1.7 Asph.', #16
-            '3 1 0'  => 'Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
-            '3 2 0'  => 'Leica D Summilux 25mm F1.4 Asph.',
-        },
+        PrintConv => \%olympusLensTypes,
     },
     # apparently the first 3 digits of the lens s/n give the type (ref 4):
     # 010 = 50macro
@@ -1226,6 +1255,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Count => 32,
         PrintConv => '$val=~s/\s+$//;$val',
         PrintConvInv => 'pack("A31",$val)', # pad with spaces to 31 chars
+    },
+    0x203 => { #17
+        Name => 'LensModel',
+        Writable => 'string',
     },
     0x204 => { #6
         Name => 'LensFirmwareVersion',
@@ -1422,6 +1455,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             1 => 'Sequential shooting AF',
             2 => 'Continuous AF',
             3 => 'Multi AF',
+            5 => 'Face detect', #11
             10 => 'MF',
         }, { BITMASK => { #11
             0 => 'S-AF',
@@ -1729,6 +1763,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             2 => 'Natural',
             3 => 'Muted',
             4 => 'Portrait',
+            5 => 'i-Enhance', #11
             256 => 'Monotone',
             512 => 'Sepia',
         }],
@@ -1802,17 +1837,13 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ArtFilter',
         Writable => 'int16u',
         Count => 4,
-        PrintConv => {
-            '0 0 0 0'    => 'Off',
-            '1 1280 0 0' => 'Soft Focus',
-            '2 1280 0 0' => 'Pop Art',
-            '3 1280 0 0' => 'Pale & Light Color',
-            '4 1280 0 0' => 'Light Tone',
-            '5 1280 0 0' => 'Pin Hole',
-            '6 1280 0 0' => 'Grainy Film',
-            '9 1280 0 0' => 'Diorama',
-            '10 1280 0 0' => 'Cross Process',
-        },
+        PrintConv => \%filters,
+    },
+    0x52c => { #PH
+        Name => 'MagicFilter',
+        Writable => 'int16u',
+        Count => 4,
+        PrintConv => \%filters,
     },
     0x600 => { #PH/4
         Name => 'DriveMode',
@@ -1850,10 +1881,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             my ($a,$b) = split ' ',$val;
             return 'Off' unless $a;
             my %a = (
-                1 => 'Left to right',
-                2 => 'Right to left',
-                3 => 'Bottom to top',
-                4 => 'Top to bottom',
+                1 => 'Left to Right',
+                2 => 'Right to Left',
+                3 => 'Bottom to Top',
+                4 => 'Top to Bottom',
             );
             return ($a{$a} || "Unknown ($a)") . ', Shot ' . $b;
         },
@@ -2801,12 +2832,12 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             16 => 'Shade',
             17 => 'Cloudy',
             18 => 'Fine Weather',
-            20 => 'Tungsten (incandescent)',
+            20 => 'Tungsten (Incandescent)',
             22 => 'Evening Sunlight',
-            33 => 'Daylight Fluorescent (D 5700 - 7100K)',
-            34 => 'Day White Fluorescent (N 4600 - 5400K)',
-            35 => 'Cool White Fluorescent (W 3900 - 4500K)',
-            36 => 'White Fluorescent (WW 3200 - 3700K)',
+            33 => 'Daylight Fluorescent',
+            34 => 'Day White Fluorescent',
+            35 => 'Cool White Fluorescent',
+            36 => 'White Fluorescent',
             256 => 'One Touch White Balance',
             512 => 'Custom 1-4',
         },
@@ -2934,7 +2965,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x32 => { #(NC)
         Name => 'ExposureCompensation',
         Format => 'rational64s',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
   # 0x44 => WhiteBalance ?
     0x48 => {
@@ -2978,7 +3009,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x42 => { #(NC)
         Name => 'ExposureCompensation',
         Format => 'rational64s',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
     0x58 => {
         Name => 'FocalLength',
@@ -3016,7 +3047,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x30 => { #(NC)
         Name => 'ExposureCompensation',
         Format => 'rational64s',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
     # NEED MORE SAMPLES TO DECODE THIS
 );

@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.32';
+$VERSION = '1.33';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -248,6 +248,7 @@ my %coordConv = (
     0x001b => {
         Name => 'GPSProcessingMethod',
         Writable => 'undef',
+        Notes => 'values of "GPS", "CELLID", "WLAN" or "MANUAL" by the EXIF spec.',
         RawConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
         RawConvInv => 'Image::ExifTool::Exif::EncodeExifText($self,$val)',
     },
@@ -287,6 +288,13 @@ my %coordConv = (
             0 => 'No Correction',
             1 => 'Differential Corrected',
         },
+    },
+    0x001f => {
+        Name => 'GPSHPositioningError',
+        Description => 'GPS Horizontal Positioning Error',
+        PrintConv => '"$val m"',
+        PrintConvInv => '$val=~s/\s*m$//; $val',
+        Writable => 'rational64u',
     },
 );
 

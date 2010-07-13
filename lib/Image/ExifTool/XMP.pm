@@ -45,7 +45,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.21';
+$VERSION = '2.28';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -59,6 +59,7 @@ sub ValidateXMP($;$);
 sub UnescapeChar($$);
 sub FormatXMPDate($);
 sub RestoreStructure($);
+sub ConvertRational($);
 
 my %curNS;  # namespaces currently in effect while parsing the file
 
@@ -125,7 +126,7 @@ my %stdXlatNS = (
     plus      => 'http://ns.useplus.org/ldf/xmp/1.0/',
     prism     => 'http://prismstandard.org/namespaces/basic/2.1/',
     prl       => 'http://prismstandard.org/namespaces/prl/2.1/',
-    prismusagerights => 'http://prismstandard.org/namespaces/prismusagerights/2.1/',
+    pur       => 'http://prismstandard.org/namespaces/prismusagerights/2.1/',
     acdsee    => 'http://ns.acdsee.com/iptc/1.0/',
     digiKam   => 'http://www.digikam.org/ns/1.0/',
     swf       => 'http://ns.adobe.com/swf/1.0',
@@ -176,7 +177,7 @@ my %longConv = (
 
 # XMP namespaces which we don't want to contribute to generated EXIF tag names
 # (Note: namespaces with non-standard prefixes aren't currently ignored)
-my %ignoreNamespace = ( 'x'=>1, rdf=>1, xmlns=>1, xml=>1, svg=>1, et=>1 );
+my %ignoreNamespace = ( 'x'=>1, rdf=>1, xmlns=>1, xml=>1, svg=>1, et=>1, office=>1 );
 
 # these are the attributes that we handle for properties that contain
 # sub-properties.  Attributes for simple properties are easy, and we
@@ -519,6 +520,7 @@ my %recognizedAttrs = (
     DerivedFromMaskMarkers      => { PrintConv => { All => 'All', None => 'None' } },
     DerivedFromPartMapping      => { },
     DerivedFromToPart           => { },
+    DerivedFromOriginalDocumentID => { },
     #  DerivedFromOriginalDocumentID (undocumented property written by Adobe InDesign)
     DocumentID      => { },
     History         => {
@@ -554,6 +556,7 @@ my %recognizedAttrs = (
     IngredientsMaskMarkers      => { List => 1, PrintConv => { All => 'All', None => 'None' } },
     IngredientsPartMapping      => { List => 1 },
     IngredientsToPart           => { List => 1 },
+    IngredientsOriginalDocumentID => { },
     InstanceID      => { }, #PH (CS3)
     ManagedFrom     => {
         SubDirectory => { },
@@ -575,6 +578,7 @@ my %recognizedAttrs = (
     ManagedFromMaskMarkers      => { PrintConv => { All => 'All', None => 'None' } },
     ManagedFromPartMapping      => { },
     ManagedFromToPart           => { },
+    ManagedFromOriginalDocumentID => { },
     Manager         => { Groups => { 2 => 'Author' } },
     ManageTo        => { Groups => { 2 => 'Author' } },
     ManageUI        => { },
@@ -625,6 +629,7 @@ my %recognizedAttrs = (
     RenditionOfMaskMarkers      => { PrintConv => { All => 'All', None => 'None' } },
     RenditionOfPartMapping      => { },
     RenditionOfToPart           => { },
+    RenditionOfOriginalDocumentID => { },
     SaveID          => { Writable => 'integer' },
 );
 
@@ -706,9 +711,9 @@ my %recognizedAttrs = (
     TABLE_DESC => 'XMP PDF',
     NOTES => q{
         Adobe PDF schema tags.  The official XMP specification defines only
-        Keywords, PDFVersion and Producer.  The other tags are included because they
-        have been observed in PDF files, but some are avoided when writing due to
-        name conflicts with other XMP namespaces.
+        Keywords, PDFVersion, Producer and Trapped.  The other tags are included
+        because they have been observed in PDF files, but some are avoided when
+        writing due to name conflicts with other XMP namespaces.
     },
     Author      => { Groups => { 2 => 'Author' } }, #PH
     ModDate     => { Groups => { 2 => 'Time' }, %dateTimeInfo }, #PH
@@ -753,9 +758,27 @@ my %recognizedAttrs = (
     Category        => { },
     City            => { Groups => { 2 => 'Location' } },
     Country         => { Groups => { 2 => 'Location' } },
-    ColorMode       => { }, #PH
+    ColorMode       => {
+        # (this should probably be integer type, but is string in the April 2010 XMP spec)
+        PrintConv => {
+            0 => 'Bitmap',
+            1 => 'Grayscale',
+            2 => 'Indexed',
+            3 => 'RGB',
+            4 => 'CMYK',
+            7 => 'Multichannel',
+            8 => 'Duotone',
+            9 => 'Lab',
+        },
+    },
     Credit          => { Groups => { 2 => 'Author' } },
     DateCreated     => { Groups => { 2 => 'Time' }, %dateTimeInfo },
+    DocumentAncestors => {
+        SubDirectory => { },
+        Struct => 'Ancestor',
+        List => 'bag',
+    },
+    DocumentAncestorsAncestorID => { Name => 'DocumentAncestorID', List => 1 },
     History         => { }, #PH (CS3)
     Headline        => { },
     Instructions    => { },
@@ -769,6 +792,13 @@ my %recognizedAttrs = (
     # Also, it is incorrectly listed as "SupplementalCategory" in the
     # IPTC Standard Photo Metadata docs (2008rev2 and July 2009rev1) - PH
     SupplementalCategories  => { List => 'Bag' },
+    TextLayers => {
+        SubDirectory => { },
+        Struct => 'Layer',
+        List => 'seq',
+    },
+    TextLayersLayerName => { Name => 'TextLayerName', List => 1 },
+    TextLayersLayerText => { Name => 'TextLayerText', List => 1 },
     TransmissionReference   => { },
     Urgency         => {
         Writable => 'integer',
@@ -1257,11 +1287,13 @@ my %recognizedAttrs = (
     FlashpixVersion => { },
     ColorSpace => {
         Writable => 'integer',
+        # (some applications incorrectly write -1 as a long integer)
+        ValueConv => '$val == 0xffffffff ? 0xffff : $val',
+        ValueConvInv => '$val',
         PrintConv => {
             1 => 'sRGB',
             2 => 'Adobe RGB',
             0xffff => 'Uncalibrated',
-            0xffffffff => 'Uncalibrated',
         },
     },
     ComponentsConfiguration => {
@@ -1297,7 +1329,7 @@ my %recognizedAttrs = (
     ExposureTime => {
         Writable => 'rational',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     FNumber => {
         Writable => 'rational',
@@ -1344,8 +1376,7 @@ my %recognizedAttrs = (
         ValueConv => 'abs($val)<100 ? 1/(2**$val) : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
         ValueConvInv => '$val>0 ? -log($val)/log(2) : 0',
-        # do eval to convert things like '1/100'
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     ApertureValue => {
         Writable => 'rational',
@@ -1358,7 +1389,7 @@ my %recognizedAttrs = (
     ExposureBiasValue => {
         Name => 'ExposureCompensation',
         Writable => 'rational',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
         PrintConvInv => '$val',
     },
     MaxApertureValue => {
@@ -1705,11 +1736,40 @@ my %recognizedAttrs = (
     Firmware        => { }, #7
     FlashCompensation => { Writable => 'rational' }, #7
     ImageNumber     => { }, #7
-    LensInfo        => { Notes => '4 rational values giving focal and aperture ranges' }, #7
+    LensInfo        => { #7
+        Notes => '4 rational values giving focal and aperture ranges',
+        # convert to floating point values (or 'inf' or 'undef')
+        ValueConv => sub {
+            my $val = shift;
+            my @vals = split ' ', $val;
+            return $val unless @vals == 4;
+            foreach (@vals) {
+                ConvertRational($_) or return $val;
+            }
+            return join ' ', @vals;
+        },
+        ValueConvInv => sub {
+            my $val = shift;
+            my @vals = split ' ', $val;
+            return $val unless @vals == 4;
+            foreach (@vals) {
+                $_ eq 'inf' and $_ = '1/0', next;
+                $_ eq 'undef' and $_ = '0/0', next;
+                Image::ExifTool::IsFloat($_) or return $val;
+                my @a = Image::ExifTool::Rationalize($_);
+                $_ = join '/', @a;
+            }
+            return join ' ', @vals;
+        },
+        # convert to the form "12-20mm f/3.8-4.5" or "50mm f/1.4"
+        PrintConv => \&Image::ExifTool::Exif::PrintLensInfo,
+        PrintConvInv => \&Image::ExifTool::Exif::ConvertLensInfo,
+    },
     Lens            => { },
     OwnerName       => { }, #7
     SerialNumber    => { },
     LensID          => {
+        Priority => 0,
         # prevent this from getting set from a LensID that has been converted
         ValueConvInv => q{
             warn "Expected one or more integer values" if $val =~ /[^\d ]/;
@@ -2266,12 +2326,30 @@ sub ConvertXMPDate($;$)
 {
     my ($val, $unsure) = @_;
     if ($val =~ /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}:\d{2})(:\d{2})?\s*(\S*)$/) {
-        my $s = $5 || ':00';        # seconds may be missing
+        my $s = $5 || '';           # seconds may be missing
         $val = "$1:$2:$3 $4$s$6";   # convert back to EXIF time format
     } elsif (not $unsure and $val =~ /^(\d{4})(-\d{2}){0,2}/) {
         $val =~ tr/-/:/;
     }
     return $val;
+}
+
+#------------------------------------------------------------------------------
+# Convert rational string value
+# Inputs: 0) string (converted to number, 'inf' or 'undef' on return if rational)
+# Returns: true if value was converted
+sub ConvertRational($)
+{
+    my $val = $_[0];
+    $val =~ m{^(-?\d+)/(-?\d+)$} or return undef;
+    if ($2) {
+        $_[0] = $1 / $2; # calculate quotient
+    } elsif ($1) {
+        $_[0] = 'inf';
+    } else {
+        $_[0] = 'undef';
+    }
+    return 1;
 }
 
 #------------------------------------------------------------------------------
@@ -2368,17 +2446,9 @@ sub FoundXMP($$$$;$)
     # convert rational and date values to a more sensible format
     my $fmt = $$tagInfo{Writable};
     my $new = $$tagInfo{WasAdded};
-    if ($fmt or $new) {
-        if (($new or $fmt eq 'rational') and $val =~ m{^(-?\d+)/(-?\d+)$}) {
-            if ($2) {
-                $val = $1 / $2; # calculate quotient
-            } elsif ($1) {
-                $val = 'inf';
-            } else {
-                $val = 'undef';
-            }
-        } elsif ($new or $fmt eq 'date') {
-            $val = ConvertXMPDate($val, $new);
+    if (($fmt or $new)) {
+        unless (($new or $fmt eq 'rational') and ConvertRational($val)) {
+            $val = ConvertXMPDate($val, $new) if $new or $fmt eq 'date';
         }
     }
     # store the value for this tag
@@ -2706,9 +2776,9 @@ sub ProcessXMP($$;$)
         my ($buf2, $buf3, $double);
         ($buf2 = $buff) =~ tr/\0//d;    # cheap conversion to UTF-8
         # remove leading comments if they exist (ie. ImageIngester)
-        while ($buf2 =~ /^<!--/) {
+        while ($buf2 =~ /^\s*<!--/) {
             # remove the comment if it is complete
-            if ($buf2 =~ s/^<!--.*?-->\s+//s) {
+            if ($buf2 =~ s/^\s*<!--.*?-->\s+//s) {
                 # continue with parsing if we have more than 128 bytes remaining
                 next if length $buf2 > 128;
             } else {
@@ -2722,7 +2792,7 @@ sub ProcessXMP($$;$)
         }
         # check to see if this is XMP format
         # (CS2 writes .XMP files without the "xpacket begin")
-        if ($buf2 =~ /^(<\?xpacket begin=|<x(mp)?:x[ma]pmeta)/) {
+        if ($buf2 =~ /^\s*(<\?xpacket begin=|<x(mp)?:x[ma]pmeta)/) {
             $hasXMP = 1;
         } else {
             # also recognize XML files and .XMP files with BOM and without x:xmpmeta

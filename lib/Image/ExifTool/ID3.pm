@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.24';
+$VERSION = '1.26';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -32,9 +32,10 @@ my %audioModule = (
 );
 
 # picture types for 'PIC' and 'APIC' tags
+# (Note: Duplicated in ID3, ASF and FLAC modules!)
 my %pictureType = (
     0 => 'Other',
-    1 => 'Icon',
+    1 => '32x32 PNG Icon',
     2 => 'Other Icon',
     3 => 'Front Cover',
     4 => 'Back Cover',
@@ -46,10 +47,10 @@ my %pictureType = (
     10 => 'Band',
     11 => 'Composer',
     12 => 'Lyricist',
-    13 => 'Recording Location',
-    14 => 'During Recording',
-    15 => 'During Performance',
-    16 => 'Video',
+    13 => 'Recording Studio or Location',
+    14 => 'Recording Session',
+    15 => 'Performance',
+    16 => 'Capture from Movie or Video',
     17 => 'Bright(ly) Colored Fish',
     18 => 'Illustration',
     19 => 'Band Logo',
@@ -366,16 +367,18 @@ my %genre = (
     IPL => 'InvolvedPeople',
     PIC => {
         Name => 'Picture',
+        Groups => { 2 => 'Image' },
         Binary => 1,
         Notes => 'the 3 tags below are also extracted from this PIC frame',
     },
-    'PIC-1' => 'PictureFormat',
+    'PIC-1' => { Name => 'PictureFormat',      Groups => { 2 => 'Image' } },
     'PIC-2' => {
         Name => 'PictureType',
+        Groups => { 2 => 'Image' },
         PrintConv => \%pictureType,
         SeparateTable => 1,
     },
-    'PIC-3' => 'PictureDescription',
+    'PIC-3' => { Name => 'PictureDescription', Groups => { 2 => 'Image' } },
   # POP => 'Popularimeter',
     SLT => {
         Name => 'SynchronizedLyricText',
@@ -423,7 +426,7 @@ my %genre = (
     TXX => 'UserDefinedText',
     TYE => { Name => 'Year', Groups => { 2 => 'Time' } },
     ULT => 'Lyrics',
-    WAF => 'FileRUL',
+    WAF => 'FileURL',
     WAR => { Name => 'ArtistURL', Groups => { 2 => 'Author' } },
     WAS => 'SourceURL',
     WCM => 'CommercialURL',
@@ -437,16 +440,18 @@ my %id3v2_common = (
   # AENC => 'AudioEncryption', # Owner, preview start, preview length, encr data
     APIC => {
         Name => 'Picture',
+        Groups => { 2 => 'Image' },
         Binary => 1,
         Notes => 'the 3 tags below are also extracted from this PIC frame',
     },
-    'APIC-1' => 'PictureMimeType',
+    'APIC-1' => { Name => 'PictureMimeType',    Groups => { 2 => 'Image' } },
     'APIC-2' => {
         Name => 'PictureType',
+        Groups => { 2 => 'Image' },
         PrintConv => \%pictureType,
         SeparateTable => 1,
     },
-    'APIC-3' => 'PictureDescription',
+    'APIC-3' => { Name => 'PictureDescription', Groups => { 2 => 'Image' } },
     COMM => 'Comment',
   # COMR => 'Commercial',
   # ENCR => 'EncryptionMethod',
@@ -518,7 +523,7 @@ my %id3v2_common = (
     USLT => 'Lyrics',
     WCOM => 'CommercialURL',
     WCOP => 'CopyrightURL',
-    WOAF => 'FileRUL',
+    WOAF => 'FileURL',
     WOAR => { Name => 'ArtistURL', Groups => { 2 => 'Author' } },
     WOAS => 'SourceURL',
     WORS => 'InternetRadioStationURL',
@@ -754,6 +759,20 @@ sub WarnOnce($$)
 }
 
 #------------------------------------------------------------------------------
+# Convert sync-safe integer to a number we can use
+# Inputs: 0) int32u sync-safe value
+# Returns: actual number or undef on invalid value
+sub UnSyncSafe($)
+{
+    my $val = shift;
+    return undef if $val & 0x80808080;
+    return ($val & 0x0000007f) |
+          (($val & 0x00007f00) >> 1) |
+          (($val & 0x007f0000) >> 2) |
+          (($val & 0x7f000000) >> 3);
+}
+
+#------------------------------------------------------------------------------
 # Process ID3v2 information
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 sub ProcessID3v2($$$)
@@ -789,11 +808,11 @@ sub ProcessID3v2($$$)
             # (ref http://www.id3.org/iTunes)
             while ($vers >= 0x0400 and $len > 0x7f and not $len & 0x80808080) {
                 my $oldLen = $len;
-                $len =  ($len & 0x0000007f) |
-                       (($len & 0x00007f00) >> 1) |
-                       (($len & 0x007f0000) >> 2) |
-                       (($len & 0x7f000000) >> 3);
-                last if $offset + $len + 10 > $size;
+                $len =  UnSyncSafe($len);
+                if (not defined $len or $offset + $len + 10 > $size) {
+                    $exifTool->Warn('Invalid ID3 frame size');
+                    last;
+                }
                 # check next ID to see if it makes sense
                 my $nextID = substr($$dataPt, $offset + $len, 4);
                 last if $$tagTablePtr{$nextID};
@@ -839,21 +858,22 @@ sub ProcessID3v2($$$)
         # extract the value
         my $val = substr($$dataPt, $offset, $len);
 
-        # handle the flags
-        if ($flags{Unsync}) {
-            # reverse the unsynchronization
-            $val =~ s/\xff\x00/\xff/g;
-        }
+        # reverse the unsynchronization
+        $val =~ s/\xff\x00/\xff/g if $flags{Unsync};
+
+        # read grouping identity
         if ($flags{GroupID}) {
             length($val) >= 1 or $exifTool->Warn("Short $id frame"), next;
-            # ignore the grouping identity byte
-            $val = substr($val, 1);
+            $val = substr($val, 1); # (ignore it)
         }
+        # read data length
+        my $dataLen;
         if ($flags{DataLen} or $flags{Compress}) {
             length($val) >= 4 or $exifTool->Warn("Short $id frame"), next;
-            # ignore data length word
+            $dataLen = unpack('N', $val);   # save the data length word
             $val = substr($val, 4);
         }
+        # uncompress data
         if ($flags{Compress}) {
             if (eval 'require Compress::Zlib') {
                 my $inflate = Compress::Zlib::inflateInit();
@@ -869,6 +889,12 @@ sub ProcessID3v2($$$)
                 WarnOnce($exifTool,'Install Compress::Zlib to decode compressed frames');
                 next;
             }
+        }
+        # validate data length
+        if (defined $dataLen) {
+            $dataLen = UnSyncSafe($dataLen);
+            defined $dataLen or $exifTool->Warn("Invalid length for $id frame"), next;
+            $dataLen == length($val) or $exifTool->Warn("Wrong length for $id frame"), next;
         }
         $verbose and $exifTool->VerboseInfo($id, $tagInfo,
             Table   => $tagTablePtr,
@@ -993,21 +1019,19 @@ sub ProcessID3($$)
         $rtnVal = 1;
         $raf->Read($hBuff, 7) == 7 or $exifTool->Warn('Short ID3 header'), last;
         my ($vers, $flags, $size) = unpack('nCN', $hBuff);
-        $size & 0x80808080 and $exifTool->Warn('Invalid ID3 header'), last;
+        $size = UnSyncSafe($size);
+        defined $size or $exifTool->Warn('Invalid ID3 header'), last;
         my $verStr = sprintf("2.%d.%d", $vers >> 8, $vers & 0xff);
         if ($vers >= 0x0500) {
             $exifTool->Warn("Unsupported ID3 version: $verStr");
             last;
         }
-        $size =  ($size & 0x0000007f) |
-                (($size & 0x00007f00) >> 1) |
-                (($size & 0x007f0000) >> 2) |
-                (($size & 0x7f000000) >> 3);
         unless ($raf->Read($hBuff, $size) == $size) {
             $exifTool->Warn('Truncated ID3 data');
             last;
         }
-        if ($flags & 0x80) {
+        # this flag only indicates use of unsynchronized frames in ID3v2.4
+        if ($flags & 0x80 and $vers < 0x0400) {
             # reverse the unsynchronization
             $hBuff =~ s/\xff\x00/\xff/g;
         }

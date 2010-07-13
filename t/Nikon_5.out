@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.13
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.24
 [File, System, Image] FileName - File Name: NikonD2Hs.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 3.4 kB
@@ -19,7 +19,7 @@
 [EXIF, IFD0, Image] 282 - X Resolution: 300
 [EXIF, IFD0, Image] 283 - Y Resolution: 300
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
-[EXIF, IFD0, Image] 305 - Software: Ver.1.00 
+[EXIF, IFD0, Image] 305 - Software: Ver.1.00
 [EXIF, IFD0, Time] 306 - Modify Date: 2005:03:18 02:55:18
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
 [EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/125
@@ -90,7 +90,7 @@
 [MakerNotes, PreviewIFD, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Nikon, Camera] 19 - ISO Setting: 800
 [MakerNotes, Nikon, Camera] 22 - Image Boundary: 0 0 2464 1632
-[MakerNotes, Nikon, Camera] 23 - Flash Exposure Compensation: 0
+[MakerNotes, Nikon, Camera] 23 - External Flash Exposure Comp: 0
 [MakerNotes, Nikon, Camera] 24 - Flash Exposure Bracket Value: 0.0
 [MakerNotes, Nikon, Camera] 25 - Exposure Bracket Value: 0
 [MakerNotes, Nikon, Camera] 28 - Exposure Tuning: 0
@@ -136,12 +136,12 @@
 [MakerNotes, Nikon, Camera] 8 - External Flash Flags: (none)
 [MakerNotes, Nikon, Camera] 9.1 - Flash Commander Mode: Off
 [MakerNotes, Nikon, Camera] 9.2 - Flash Control Mode: Off
-[MakerNotes, Nikon, Camera] 10 - Flash Exposure Compensation: 0
+[MakerNotes, Nikon, Camera] 10 - Flash Compensation: 0
 [MakerNotes, Nikon, Camera] 14 - Flash GN Distance: 0
 [MakerNotes, Nikon, Camera] 15 - Flash Group A Control Mode: Off
 [MakerNotes, Nikon, Camera] 16 - Flash Group B Control Mode: Off
-[MakerNotes, Nikon, Camera] 17 - Flash Group A Exposure Comp: 0
-[MakerNotes, Nikon, Camera] 18 - Flash Group B Exposure Comp: 0
+[MakerNotes, Nikon, Camera] 17 - Flash Group A Compensation: 0
+[MakerNotes, Nikon, Camera] 18 - Flash Group B Compensation: 0
 [MakerNotes, Nikon, Camera] 170 - Saturation: Normal
 [MakerNotes, Nikon, Camera] 177 - High ISO Noise Reduction: Normal
 [Composite, Composite, Image] Aperture - Aperture: 4.0

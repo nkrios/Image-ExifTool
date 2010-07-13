@@ -88,8 +88,8 @@ my %dirMap = (
 my @delGroups = qw(
     AFCP CanonVRD CIFF Ducky EXIF ExifIFD File FlashPix FotoStation GlobParamIFD
     GPS ICC_Profile IFD0 IFD1 InteropIFD IPTC JFIF MakerNotes Meta MetaIFD MIE
-    PDF PDF-update PhotoMechanic Photoshop PNG PrintIM RMETA SubIFD Trailer XML
-    XML-* XMP XMP-*
+    PDF PDF-update PhotoMechanic Photoshop PNG PrintIM RMETA RSRC SubIFD Trailer
+    XML XML-* XMP XMP-*
 );
 # other group names of new tag values to remove when deleting an entire group
 my %removeGroups = (
@@ -122,10 +122,11 @@ my %excludeGroups = (
 # group names to translate for writing
 my %translateWriteGroup = (
     EXIF => 'ExifIFD',
+    Meta => 'MetaIFD',
     File => 'Comment',
     MIE  => 'MIE',
 );
-# names of valid EXIF directories:
+# names of valid EXIF and Meta directories:
 my %exifDirs = (
     gps          => 'GPS',
     exififd      => 'ExifIFD',
@@ -134,6 +135,7 @@ my %exifDirs = (
     interopifd   => 'InteropIFD',
     makernotes   => 'MakerNotes',
     previewifd   => 'PreviewIFD', # (in MakerNotes)
+    metaifd      => 'MetaIFD', # Kodak APP3 Meta
 );
 # min/max values for integer formats
 my %intRange = (
@@ -356,9 +358,10 @@ sub SetNewValue($;$$%)
             my $langCode;
             # allow language suffix of form "-en_CA" or "-<rfc3066>" on tag name
             if ($tag =~ /^(\w+)-([a-z]{2})(_[a-z]{2})$/i or # MIE
-                $tag =~ /^(\w+)-([a-z]{2,3}|[xi])(-[a-z\d]{2,8}(-[a-z\d]{1,8})*)?$/i) # XMP
+                $tag =~ /^(\w+)-([a-z]{2,3}|[xi])(-[a-z\d]{2,8}(-[a-z\d]{1,8})*)?$/i) # XMP/PNG
             {
                 $tag = $1;
+                # normalize case of language codes
                 $langCode = lc($2);
                 $langCode .= (length($3) == 3 ? uc($3) : lc($3)) if $3;
                 my @newMatches = FindTagInfo($tag);
@@ -968,6 +971,8 @@ WriteAlso:
                 unless ($evalWarning) {
                     ($n,$evalWarning) = $self->SetNewValue($wtag, $v, %opts);
                     $numSet += $n;
+                    # count this as being set if any related tag is set
+                    $prioritySet = 1 if $n and $preferred{$tagInfo};
                 }
                 if ($evalWarning and (not $err or $verbose > 2)) {
                     my $str = CleanWarning();
@@ -1142,7 +1147,10 @@ sub SetNewValuesFromFile($$;@)
                 }
             }
             # translate '+' and '-' to appropriate SetNewValue option
-            $$opts{{ '+' => 'AddValue', '-' => 'DelValue' }->{$opt}} = 1 if $opt;
+            if ($opt) {
+                $$opts{{ '+' => 'AddValue', '-' => 'DelValue' }->{$opt}} = 1;
+                $$opts{Shift} = 0;  # shift if this is a date/time tag
+            }
             $dstTag =~ s/\ball\b/\*/g;       # replace 'all' with '*'
             ($dstGrp, $dstTag) = ($1, $2) if $dstTag =~ /(.+):(.+)/;
             # ignore leading family number
@@ -1397,7 +1405,7 @@ sub CountNewValues($)
     return $num unless wantarray;
     my $pseudo = 0;
     if ($newVal) {
-        # (Note: all "pseudo" tags must be found in Extra table)
+        # (Note: all writable "pseudo" tags must be found in Extra table)
         foreach $tag (qw{FileName Directory FileModifyDate}) {
             ++$pseudo if defined $$newVal{$Image::ExifTool::Extra{$tag}};
         }
@@ -1600,14 +1608,13 @@ sub SetFileName($$;$)
 # Write information back to file
 # Inputs: 0) ExifTool object reference,
 #         1) input filename, file ref, or scalar ref (or '' or undef to create from scratch)
-#         2) output filename, file ref, or scalar ref (or undef to edit in place)
+#         2) output filename, file ref, or scalar ref (or undef to overwrite)
 #         3) optional output file type (required only if input file is not specified
 #            and output file is a reference)
 # Returns: 1=file written OK, 2=file written but no changes made, 0=file write error
 sub WriteInfo($$;$$)
 {
-    local $_;
-    local (*EXIFTOOL_FILE2, *EXIFTOOL_OUTFILE);
+    local ($_, *EXIFTOOL_FILE2, *EXIFTOOL_OUTFILE);
     my ($self, $infile, $outfile, $outType) = @_;
     my (@fileTypeList, $fileType, $tiffType, $hdr, $seekErr, $type, $tmpfile);
     my ($inRef, $outRef, $closeIn, $closeOut, $outPos, $outBuff, $eraseIn);
@@ -1629,9 +1636,9 @@ sub WriteInfo($$;$$)
 #
 # do quick in-place change of file dir/name or date if that is all we are doing
 #
+    my ($numNew, $numPseudo) = $self->CountNewValues();
     if (not defined $outfile and defined $infile) {
         my $newFileName =  $self->GetNewValues('FileName', \$nvHash);
-        my ($numNew, $numPseudo) = $self->CountNewValues();
         if ($numNew == $numPseudo) {
             $rtnVal = 2;
             if (defined $fileModifyDate and (not ref $infile or UNIVERSAL::isa($infile,'GLOB'))) {
@@ -1743,14 +1750,26 @@ sub WriteInfo($$;$$)
 #
 # write the file
 #
-    unless ($self->{VALUE}{Error}) {
-        # create random access file object
-        my $raf = new File::RandomAccess($inRef);
-        # patch for Windows command shell pipe
-        $raf->{TESTED} = -1 if not ref $infile and ($infile eq '-' or $infile =~ /\|$/);
+    until ($self->{VALUE}{Error}) {
+        # create random access file object (disable seek test in case of straight copy)
+        my $raf = new File::RandomAccess($inRef, 1);
+        $raf->BinMode();
+        if ($numNew == $numPseudo) {
+            $rtnVal = 1;
+            # just do a straight copy of the file (no "real" tags are being changed)
+            my $buff;
+            while ($raf->Read($buff, 65536)) {
+                Write($outRef, $buff) or $rtnVal = -1, last;
+            }
+            last;
+        } elsif (not ref $infile and ($infile eq '-' or $infile =~ /\|$/)) {
+            # patch for Windows command shell pipe
+            $raf->{TESTED} = -1;    # force buffering
+        } else {
+            $raf->SeekTest();
+        }
        # $raf->Debug() and warn "  RAF debugging enabled!\n";
         my $inPos = $raf->Tell();
-        $raf->BinMode();
         $self->{RAF} = $raf;
         my %dirInfo = (
             RAF => $raf,
@@ -1874,12 +1893,18 @@ sub WriteInfo($$;$$)
             $rtnVal = 0;    # (in case it was undef)
         }
        # $raf->Close();  # only used to force debug output
+        last;   # (didn't really want to loop)
     }
     # don't return success code if any error occurred
     if ($rtnVal > 0) {
-        # don't write a file with zero length
-        $self->Error(length $hdr ? "Can't delete all meta information from $type file" :
-                    'Nothing to write') unless Tell($outRef) or $self->{VALUE}{Error};
+        unless (Tell($outRef) or $self->{VALUE}{Error}) {
+            # don't write a file with zero length
+            if (defined $hdr and length $hdr) {
+                $self->Error("Can't delete all meta information from $type file");
+            } else {
+                $self->Error('Nothing to write');
+            }
+        }
         $rtnVal = 0 if $self->{VALUE}{Error};
     }
 
@@ -1906,9 +1931,37 @@ sub WriteInfo($$;$$)
     if ($closeIn) {
         # errors on input file are significant if we edited the file in place
         $rtnVal and $rtnVal = -1 unless close($inRef) or not defined $outBuff;
-        if ($eraseIn and $rtnVal > 0) {
+        if ($rtnVal > 0) {
+            # copy Mac OS resource fork if it exists
+            if ($^O eq 'darwin' and -s "$infile/rsrc") {
+                if ($$self{DEL_GROUP} and $$self{DEL_GROUP}{RSRC}) {
+                    $self->VPrint(0,"Deleting Mac OS resource fork\n");
+                    ++$$self{CHANGED};
+                } else {
+                    $self->VPrint(0,"Copying Mac OS resource fork\n");
+                    my ($buf, $err);
+                    local (*SRC, *DST);
+                    if (open SRC, "$infile/rsrc") {
+                        if (open DST, ">$outfile/rsrc") {
+                            binmode SRC; # (not necessary for Darwin, but let's be thorough)
+                            binmode DST;
+                            while (read SRC, $buf, 65536) {
+                                print DST $buf or $err = 'copying', last;
+                            }
+                            close DST or $err or $err = 'closing';
+                        } else {
+                            # (this is normal if the destination filesystem isn't Mac OS)
+                            $self->Warn('Error creating Mac OS resource fork');
+                        }
+                        close SRC;
+                    } else {
+                        $err = 'opening';
+                    }
+                    $rtnVal = 0 if $err and $self->Error("Error $err Mac OS resource fork", 1);
+                }
+            }
             # erase input file if renaming while editing information in place
-            unlink $infile or $self->Warn('Error erasing original file');
+            unlink $infile or $self->Warn('Error erasing original file') if $eraseIn;
         }
     }
     # close output file if we created it
@@ -1919,23 +1972,27 @@ sub WriteInfo($$;$$)
         if ($rtnVal <= 0) {
             unlink $outfile;
         # else rename temporary file if necessary
-        } elsif ($tmpfile and not rename($tmpfile, $infile)) {
-            # some filesystems won't overwrite with 'rename', so try erasing original
-            if (not unlink($infile)) {
-                unlink $tmpfile;
-                $self->Error('Error renaming temporary file');
-                $rtnVal = 0;
-            } elsif (not rename($tmpfile, $infile)) {
-                $self->Error('Error renaming temporary file after deleting original');
-                $rtnVal = 0;
+        } elsif ($tmpfile) {
+            CopyFileAttrs($infile, $tmpfile);   # copy attributes to new file
+            unless (rename($tmpfile, $infile)) {
+                # some filesystems won't overwrite with 'rename', so try erasing original
+                if (not unlink($infile)) {
+                    unlink $tmpfile;
+                    $self->Error('Error renaming temporary file');
+                    $rtnVal = 0;
+                } elsif (not rename($tmpfile, $infile)) {
+                    $self->Error('Error renaming temporary file after deleting original');
+                    $rtnVal = 0;
+                }
             }
         }
     }
     # set FileModifyDate if requested (and if possible!)
     if (defined $fileModifyDate and $rtnVal > 0 and
-        ($closeOut or ($closeIn and defined $outBuff)))
+        ($closeOut or ($closeIn and defined $outBuff)) and
+        $self->SetFileModifyDate($closeOut ? $outfile : $infile, $originalTime) > 0)
     {
-        $self->SetFileModifyDate($closeOut ? $outfile : $infile, $originalTime);
+        ++$self->{CHANGED}; # we changed something
     }
     # check for write error and set appropriate error message and return value
     if ($rtnVal < 0) {
@@ -2256,6 +2313,18 @@ sub CreateDirectory($)
 }
 
 #------------------------------------------------------------------------------
+# Copy file attributes from one file to another
+# Inputs: 0) source file name, 1) destination file name
+# Notes: eventually add support for extended attributes?
+sub CopyFileAttrs($$)
+{
+    my ($src, $dst) = @_;
+    my ($mode, $uid, $gid) = (stat($src))[2, 4, 5];
+    chmod($mode & 07777, $dst) if defined $mode;
+    chown($uid, $gid, $dst) if defined $uid and defined $gid;
+}
+
+#------------------------------------------------------------------------------
 # Get new file name
 # Inputs: 0) existing name, 1) new name
 # Returns: new file path name
@@ -2342,40 +2411,57 @@ PAT:    foreach $pattern (@patterns) {
 #------------------------------------------------------------------------------
 # Return true if we are deleting or overwriting the specified tag
 # Inputs: 0) new value hash reference
-#         2) optional tag value if deleting specific values
+#         1) optional tag value (before RawConv) if deleting specific values
 # Returns: >0 - tag should be overwritten
 #          =0 - the tag should be preserved
 #          <0 - not sure, we need the value to know
 sub IsOverwriting($;$)
 {
-    my ($nvHash, $value) = @_;
+    my ($nvHash, $val) = @_;
     return 0 unless $nvHash;
     # overwrite regardless if no DelValues specified
     return 1 unless $nvHash->{DelValue};
     # apply time shift if necessary
     if (defined $nvHash->{Shift}) {
-        return -1 unless defined $value;
+        return -1 unless defined $val;
         my $type = $nvHash->{TagInfo}{Shift};
         my $shift = $nvHash->{Shift};
         require 'Image/ExifTool/Shift.pl';
-        my $err = ApplyShift($type, $shift, $value, $nvHash);
+        my $err = ApplyShift($type, $shift, $val, $nvHash);
         if ($err) {
             my $tag = $nvHash->{TagInfo}{Name};
             $nvHash->{Self}->Warn("$err when shifting $tag");
             return 0;
         }
         # don't bother overwriting if value is the same
-        return 0 if $value eq $nvHash->{Value}[0];
+        return 0 if $val eq $nvHash->{Value}[0];
         return 1;
     }
     # never overwrite if DelValue list exists but is empty
     return 0 unless @{$nvHash->{DelValue}};
     # return "don't know" if we don't have a value to test
-    return -1 unless defined $value;
+    return -1 unless defined $val;
+    # apply raw conversion if necessary
+    my $tagInfo = $$nvHash{TagInfo};
+    my $conv = $$tagInfo{RawConv};
+    if ($conv) {
+        local $SIG{'__WARN__'} = \&SetWarning;
+        undef $evalWarning;
+        if (ref $conv eq 'CODE') {
+            $val = &$conv($val, $$nvHash{Self});
+        } else {
+            my $self = $$nvHash{Self};
+            my $tag = $$tagInfo{Name};
+            #### eval RawConv ($self, $val, $tag)
+            $val = eval $conv;
+            $@ and $evalWarning = $@;
+        }
+        return -1 unless defined $val;
+    }
     # return 1 if value matches a DelValue
-    my $val;
-    foreach $val (@{$nvHash->{DelValue}}) {
-        return 1 if $value eq $val;
+    my $delVal;
+    foreach $delVal (@{$nvHash->{DelValue}}) {
+        return 1 if $val eq $delVal;
     }
     return 0;
 }
@@ -2651,7 +2737,7 @@ sub GetAddDirHash($$;$)
 }
 
 #------------------------------------------------------------------------------
-# Get localized version of tagInfo hash (used by MIE, XMP and QuickTime)
+# Get localized version of tagInfo hash (used by MIE, XMP, PNG and QuickTime)
 # Inputs: 0) tagInfo hash ref, 1) locale code (ie. "en_CA" for MIE)
 # Returns: new tagInfo hash ref, or undef if invalid
 # - sets LangCode member in new tagInfo
@@ -3361,7 +3447,7 @@ sub UnpackUTF8($)
 #               0     - remove timezone and sub-seconds if they exist
 #               1     - add timezone if it doesn't exist
 #               undef - leave timezone alone
-#         3) flag to allow date-only (YYYY, YYYY:MM or YYYY:MM:DD)
+#         3) flag to allow date-only (YYYY, YYYY:MM or YYYY:MM:DD) or time without seconds
 # Returns: formatted date/time string (or undef and issues warning on error)
 # Notes: currently accepts different separators, but doesn't use DateFormat yet
 sub InverseDateTime($$;$$)
@@ -3377,11 +3463,12 @@ sub InverseDateTime($$;$$)
         $tz = '';
     }
     # strip of sub seconds
-    my $ss = $val =~ /(\.\d+)$/ ? $1 : '';
+    my $fs = $val =~ /(\.\d+)$/ ? $1 : '';
     if ($val =~ /(\d{4})/g) {           # get YYYY
         my $yr = $1;
-        my @a = ($val =~ /\d{2}/g);     # get MM, DD, and maybe hh, mm, ss
+        my @a = ($val =~ /\d{2}/g);     # get MM, DD, hh, and maybe mm, ss
         if (@a >= 3) {
+            my $ss = $a[4];             # get ss
             push @a, '00' while @a < 5; # add mm, ss if not given
             # add/remove timezone if necessary
             if ($tzFlag) {
@@ -3396,10 +3483,17 @@ sub InverseDateTime($$;$$)
                     }
                 }
             } elsif (defined $tzFlag) {
-                $tz = $ss = ''; # remove timezone and sub-seconds
+                $tz = $fs = ''; # remove timezone and sub-seconds
+            }
+            if (defined $ss) {
+                $ss = ":$ss";
+            } elsif ($dateOnly) {
+                $ss = '';
+            } else {
+                $ss = ':00';
             }
             # construct properly formatted date/time string
-            $rtnVal = "$yr:$a[0]:$a[1] $a[2]:$a[3]:$a[4]$ss$tz";
+            $rtnVal = "$yr:$a[0]:$a[1] $a[2]:$a[3]$ss$fs$tz";
         } elsif ($dateOnly) {
             $rtnVal = join ':', $yr, @a;
         }
@@ -4010,7 +4104,7 @@ sub WriteJPEG($$)
                 my $n = $len < 64 ? $len : 64;
                 $raf->Read($s, $n) == $n or last;
                 $len -= $n;
-                # (only necessary to recognize APP segments that we can create)
+                # (Note: only necessary to recognize APP segments that we can create)
                 if ($marker == 0xe0) {
                     $s =~ /^JFIF\0/         and $dirName = 'JFIF';
                     $s =~ /^JFXX\0\x10/     and $dirName = 'JFXX';
@@ -4346,12 +4440,14 @@ sub WriteJPEG($$)
                 # fix up the preview offsets to point to the start of the new image
                 my $previewInfo = $self->{PREVIEW_INFO};
                 delete $self->{PREVIEW_INFO};
-                my $fixup = $previewInfo->{Fixup};
-                $newPos += ($previewInfo->{BaseShift} || 0);
-                if ($previewInfo->{Relative}) {
+                my $fixup = $$previewInfo{Fixup};
+                $newPos += ($$previewInfo{BaseShift} || 0);
+                # adjust to absolute file offset if necessary (Samsung STMN)
+                $newPos += Tell($oldOutfile) + 10 if $$previewInfo{Absolute};
+                if ($$previewInfo{Relative}) {
                     # adjust for our base by looking at how far the pointer got shifted
                     $newPos -= $fixup->GetMarkerPointers($outfile, 'PreviewImage');
-                } elsif ($previewInfo->{ChangeBase}) {
+                } elsif ($$previewInfo{ChangeBase}) {
                     # Leica S2 uses relative offsets for the preview only (leica sucks)
                     my $makerOffset = $fixup->GetMarkerPointers($outfile, 'LeicaTrailer');
                     $newPos -= $makerOffset if $makerOffset;
@@ -4363,12 +4459,12 @@ sub WriteJPEG($$)
                 Write($outfile, $writeBuffer) or $err = 1;
                 undef $writeBuffer;
                 # write preview image
-                if ($previewInfo->{Data} ne 'LOAD_PREVIEW') {
+                if ($$previewInfo{Data} ne 'LOAD_PREVIEW') {
                     # write any junk that existed before the preview image
                     Write($outfile, substr($buff,0,$junkLen)) or $err = 1 if $junkLen;
                     # write the saved preview image
-                    Write($outfile, $previewInfo->{Data}) or $err = 1;
-                    delete $previewInfo->{Data};
+                    Write($outfile, $$previewInfo{Data}) or $err = 1;
+                    delete $$previewInfo{Data};
                     # (don't increment CHANGED because we could be rewriting existing preview)
                     $delPreview = 1;    # remove old preview
                 }
@@ -4482,12 +4578,12 @@ sub WriteJPEG($$)
                     }
                     # rewrite EXIF as if this were a TIFF file in memory
                     my %dirInfo = (
-                        DataPt => $segDataPt,
-                        DataPos => $segPos,
+                        DataPt   => $segDataPt,
+                        DataPos  => $segPos,
                         DirStart => 6,
-                        Base => $segPos + 6,
-                        Parent => $markerName,
-                        DirName => 'IFD0',
+                        Base     => $segPos + 6,
+                        Parent   => $markerName,
+                        DirName  => 'IFD0',
                     );
                     # write new EXIF data to memory
                     my $tagTablePtr = GetTagTable('Image::ExifTool::Exif::Main');
@@ -4663,7 +4759,31 @@ sub WriteJPEG($$)
             } elsif ($marker == 0xe3) {         # APP3 (Kodak Meta)
                 if ($$segDataPt =~ /^(Meta|META|Exif)\0\0/) {
                     $segType = 'Kodak Meta';
-                    $$delGroup{Meta} and $del = 1;
+                    $$delGroup{Meta} and $del = 1, last;
+                    $doneDir{Meta} and $self->Warn('Multiple APP3 Meta segments');
+                    $doneDir{Meta} = 1;
+                    last unless $$editDirs{Meta};
+                    # rewrite Meta IFD as if this were a TIFF file in memory
+                    my %dirInfo = (
+                        DataPt   => $segDataPt,
+                        DataPos  => $segPos,
+                        DirStart => 6,
+                        Base     => $segPos + 6,
+                        Parent   => $markerName,
+                        DirName  => 'Meta',
+                    );
+                    # write new data to memory
+                    my $tagTablePtr = GetTagTable('Image::ExifTool::Kodak::Meta');
+                    my $buff = $self->WriteDirectory(\%dirInfo, $tagTablePtr, \&WriteTIFF);
+                    if (defined $buff) {
+                        # update segment with new data
+                        $$segDataPt = substr($$segDataPt,0,6) . $buff;
+                    } else {
+                        last Marker unless $self->Options('IgnoreMinorErrors');
+                        $self->{CHANGED} = $oldChanged; # nothing changed
+                    }
+                    # delete segment if IFD contains no entries
+                    $del = 1 unless length($$segDataPt) > 6;
                 }
             } elsif ($marker == 0xe5) {         # APP5 (Ricoh RMETA)
                 if ($$segDataPt =~ /^RMETA\0/) {
@@ -4980,16 +5100,21 @@ sub WriteBinaryData($$$)
         return undef;
     }
     # extract data members first if necessary
+    my @varOffsets;
     if ($$tagTablePtr{DATAMEMBER}) {
         $$dirInfo{DataMember} = $$tagTablePtr{DATAMEMBER};
+        $$dirInfo{VarFormatData} = \@varOffsets;
         $self->ProcessBinaryData($dirInfo, $tagTablePtr);
         delete $$dirInfo{DataMember};
+        delete $$dirInfo{VarFormatData};
     }
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen} || length($$dataPt) - $dirStart;
     my $newData = substr($$dataPt, $dirStart, $dirLen) or return undef;
     my $dirName = $$dirInfo{DirName};
     my $verbose = $self->Options('Verbose');
+    my $varSize = 0;
+    my @varInfo = @varOffsets;
     my $tagInfo;
     $dataPt = \$newData;
     foreach $tagInfo ($self->GetNewTagInfoList($tagTablePtr)) {
@@ -4999,9 +5124,14 @@ sub WriteBinaryData($$$)
             my $writeInfo = $self->GetTagInfo($tagTablePtr, $tagID);
             next unless $writeInfo and $writeInfo eq $tagInfo;
         }
+        # add offsets for variable-sized tags if necessary
+        while (@varInfo and $varInfo[0] < $tagID) {
+            shift @varInfo;             # discard index
+            $varSize = shift @varInfo;  # get accumulated variable size
+        }
         my $count = 1;
         my $format = $$tagInfo{Format};
-        my $entry = int($tagID) * $increment;   # relative offset of this entry
+        my $entry = int($tagID) * $increment + $varSize; # relative offset of this entry
         if ($format) {
             if ($format =~ /(.*)\[(.*)\]/) {
                 $format = $1;
@@ -5046,11 +5176,17 @@ sub WriteBinaryData($$$)
     }
     # add necessary fixups for any offsets
     if ($$tagTablePtr{IS_OFFSET} and $$dirInfo{Fixup}) {
+        $varSize = 0;
+        @varInfo = @varOffsets;
         my $fixup = $$dirInfo{Fixup};
         my $tagID;
         foreach $tagID (@{$tagTablePtr->{IS_OFFSET}}) {
             $tagInfo = $self->GetTagInfo($tagTablePtr, $tagID) or next;
-            my $entry = $tagID * $increment;    # (no offset to dirStart for new dir data)
+            while (@varInfo and $varInfo[0] < $tagID) {
+                shift @varInfo;
+                $varSize = shift @varInfo;
+            }
+            my $entry = $tagID * $increment + $varSize; # (no offset to dirStart for new dir data)
             next unless $entry <= $dirLen - 4;
             # (Ricoh has 16-bit preview image offsets, so can't just assume int32u)
             my $format = $$tagInfo{Format} || $$tagTablePtr{FORMAT} || 'int32u';
@@ -5061,29 +5197,39 @@ sub WriteBinaryData($$$)
             # handle the preview image now if this is a JPEG file
             next unless $self->{FILE_TYPE} eq 'JPEG' and $$tagInfo{DataTag} and
                 $$tagInfo{DataTag} eq 'PreviewImage' and defined $$tagInfo{OffsetPair};
-            $entry = $$tagInfo{OffsetPair} * $increment;
+            # NOTE: here we assume there are no var-sized tags between the
+            # OffsetPair tags.  If this ever becomes possible we must recalculate
+            # $varSize for the OffsetPair tag here!
+            $entry = $$tagInfo{OffsetPair} * $increment + $varSize;
             my $size = ReadValue($dataPt, $entry, $format, 1, $dirLen-$entry);
             my $previewInfo = $self->{PREVIEW_INFO};
             $previewInfo or $previewInfo = $self->{PREVIEW_INFO} = { };
             # set flag indicating we are using short pointers
-            $previewInfo->{IsShort} = 1 unless $format eq 'int32u';
-            $previewInfo->{Data} = $self->GetNewValues('PreviewImage');
-            unless (defined $previewInfo->{Data}) {
+            $$previewInfo{IsShort} = 1 unless $format eq 'int32u';
+            $$previewInfo{Absolute} = 1 if $$tagInfo{IsOffset} and $$tagInfo{IsOffset} eq '3';
+            $$previewInfo{Data} = $self->GetNewValues('PreviewImage');
+            unless (defined $$previewInfo{Data}) {
                 if ($offset >= 0 and $offset + $size <= $$dirInfo{DataLen}) {
-                    $previewInfo->{Data} = substr(${$$dirInfo{DataPt}},$offset,$size);
+                    $$previewInfo{Data} = substr(${$$dirInfo{DataPt}},$offset,$size);
                 } else {
-                    $previewInfo->{Data} = 'LOAD_PREVIEW'; # flag to load preview later
+                    $$previewInfo{Data} = 'LOAD_PREVIEW'; # flag to load preview later
                 }
             }
         }
     }
     # write any necessary SubDirectories
     if ($$tagTablePtr{VARS} and $tagTablePtr->{VARS}{HAS_SUBDIR}) {
+        $varSize = 0;
+        @varInfo = @varOffsets;
         my $tagID;
         foreach $tagID (TagTableKeys($tagTablePtr)) {
             my $tagInfo = $self->GetTagInfo($tagTablePtr, $tagID);
             next unless $tagInfo and $$tagInfo{SubDirectory};
-            my $entry = int($tagID) * $increment;
+            while (@varInfo and $varInfo[0] < $tagID) {
+                shift @varInfo;
+                $varSize = shift @varInfo;
+            }
+            my $entry = int($tagID) * $increment + $varSize;
             my %subdirInfo = ( DataPt => \$newData, DirStart => $entry );
             my $subTablePtr = GetTagTable($tagInfo->{SubDirectory}{TagTable});
             my $dat = $self->WriteDirectory(\%subdirInfo, $subTablePtr);

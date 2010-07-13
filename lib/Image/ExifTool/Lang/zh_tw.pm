@@ -328,7 +328,7 @@ $VERSION = '1.01';
         'Standard Light A' => '標準燈光 A',
         'Standard Light B' => '標準燈光 B',
         'Standard Light C' => '標準燈光 C',
-        'Tungsten' => '鎢絲燈',
+        'Tungsten (Incandescent)' => '鎢絲燈',
         'Unknown' => '未知',
         'White Fluorescent' => '白色熒光燈 (WW 3200 - 3700K)',
       },

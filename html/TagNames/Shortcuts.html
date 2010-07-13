@@ -114,6 +114,28 @@ for more details.
   <br>Flash</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>CommonIFD0</td>
+<td class=c>Y</td>
+<td class=n>IFD0:ImageDescription
+  <br>IFD0:Make
+  <br>IFD0:Model
+  <br>IFD0:Software
+  <br>IFD0:ModifyDate
+  <br>IFD0:Artist
+  <br>IFD0:Copyright
+  <br>IFD0:Rating
+  <br>IFD0:RatingPercent
+  <br>IFD0:DNGLensInfo
+  <br>IFD0:PanasonicTitle
+  <br>IFD0:PanasonicTitle2
+  <br>IFD0:XPTitle
+  <br>IFD0:XPComment
+  <br>IFD0:XPAuthor
+  <br>IFD0:XPKeywords
+  <br>IFD0:XPSubject</td>
+<td><span class=s><span class=n>(common metadata tags found in IFD0 of TIFF-format images.  Used to simpify
+deletion of all metadata from these images.  See FAQ number 7 for details)</span></span></td></tr>
+<tr class=b>
 <td>MakerNotes</td>
 <td class=c>Y</td>
 <td class=n>MakerNotes
@@ -165,7 +187,8 @@ for more details.
   <br>MakerNotePentax4
   <br>MakerNoteRicoh
   <br>MakerNoteRicohText
-  <br>MakerNoteSamsung
+  <br>MakerNoteSamsung1a
+  <br>MakerNoteSamsung1b
   <br>MakerNoteSamsung2
   <br>MakerNoteSanyo
   <br>MakerNoteSanyoC4
@@ -179,7 +202,7 @@ for more details.
   <br>MakerNoteUnknown</td>
 <td><span class=s><span class=n>(useful when copying tags between files to either copy the maker notes as a
 block or prevent it from being copied)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>Nikon</td>
 <td class=c>Y</td>
 <td class=n>Model
@@ -211,7 +234,7 @@ block or prevent it from being copied)</span></span></td></tr>
   <br>FlashMode
   <br>FlashExposureComp</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Unsafe</td>
 <td class=c>Y</td>
 <td class=n>IFD0:YCbCrPositioning
@@ -223,13 +246,13 @@ block or prevent it from being copied)</span></span></td></tr>
   <br>InteropIFD:InteropVersion
   <br>InteropIFD:RelatedImageWidth
   <br>InteropIFD:RelatedImageHeight</td>
-<td><span class=s><span class=n>(&quot;unsafe&quot; tags in JPEG images which are normally not copied -- defined here
+<td><span class=s><span class=n>(&quot;unsafe&quot; tags in JPEG images which are normally not copied.  Defined here
 as a shortcut to use when rebuilding JPEG EXIF from scratch)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 1, 2010</i>
+<br><i>Last revised Jul 5, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

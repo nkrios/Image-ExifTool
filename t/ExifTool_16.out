@@ -81,7 +81,7 @@ FlashGuideNumber : 0
 FocalLength (1) : 34 mm
 FocalPlaneXSize : 23.22 mm
 FocalPlaneYSize : 15.49 mm
-FocusDistanceLower : 5.46
+FocusDistanceLower : 5.46 m
 FocusDistanceUpper : inf
 MeasuredEV : -1.25
 MeasuredEV2 : -1.25
@@ -94,7 +94,7 @@ WhiteBalance : Auto
 ---- Composite:Camera ----
 BlueBalance : 1.190619
 CircleOfConfusion : 0.019 mm
-DriveMode : Continuous shooting
+DriveMode : Continuous Shooting
 FocalLength35efl : 34.0 mm (35 mm equivalent: 52.7 mm)
 HyperfocalDistance : 4.26 m
 ISO (1) : 100
@@ -175,4 +175,4 @@ FileName : Canon.jpg
 FilePermissions : rw-r--r--
 FileSize : 2.6 kB
 ---- System:Time ----
-FileModifyDate : 2006:10:03 15:10:31-04:00
+FileModifyDate : 2007:05:01 07:34:38-04:00

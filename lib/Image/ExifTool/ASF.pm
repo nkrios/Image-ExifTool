@@ -17,11 +17,11 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
-sub ProcessPreview($$$);
+sub ProcessPicture($$$);
 sub ProcessCodecList($$$);
 
 # GUID definitions
@@ -277,7 +277,7 @@ my %advancedContentEncryption = (
     Period => {},
     Picture => {
         SubDirectory => {
-            TagTable => 'Image::ExifTool::ASF::Preview',
+            TagTable => 'Image::ExifTool::ASF::Picture',
         },
     },
     PlaylistDelay => {},
@@ -318,40 +318,40 @@ my %advancedContentEncryption = (
     Year => { Groups => { 2 => 'Time' } },
 );
 
-%Image::ExifTool::ASF::Preview = (
-    PROCESS_PROC => \&ProcessPreview,
-    GROUPS => { 2 => 'Video' },
+%Image::ExifTool::ASF::Picture = (
+    PROCESS_PROC => \&ProcessPicture,
+    GROUPS => { 2 => 'Image' },
     0 => {
-        Name => 'PreviewType',
-        PrintConv => {
-            0 => 'Other picture type',
-            1 => '32x32 PNG file icon',
-            2 => 'Other file icon',
-            3 => 'Front album cover',
-            4 => 'Back album cover',
-            5 => 'Leaflet page',
-            6 => 'Media label',
-            7 => 'Lead artist, performer, or soloist',
-            8 => 'Artists or performers',
+        Name => 'PictureType',
+        PrintConv => { # (Note: Duplicated in ID3, ASF and FLAC modules!)
+            0 => 'Other',
+            1 => '32x32 PNG Icon',
+            2 => 'Other Icon',
+            3 => 'Front Cover',
+            4 => 'Back Cover',
+            5 => 'Leaflet',
+            6 => 'Media',
+            7 => 'Lead Artist',
+            8 => 'Artist',
             9 => 'Conductor',
-            10 => 'Band or orchestra',
+            10 => 'Band',
             11 => 'Composer',
-            12 => 'Lyricist or writer',
-            13 => 'Recording studio or location',
-            14 => 'Recording session',
+            12 => 'Lyricist',
+            13 => 'Recording Studio or Location',
+            14 => 'Recording Session',
             15 => 'Performance',
-            16 => 'Capture from movie or video',
-            17 => 'A bright colored fish',
+            16 => 'Capture from Movie or Video',
+            17 => 'Bright(ly) Colored Fish',
             18 => 'Illustration',
-            19 => 'Band or artist logo',
-            20 => 'Publisher or studio logo',
+            19 => 'Band Logo',
+            20 => 'Publisher Logo',
         },
     },
-    1 => 'PreviewMimeType',
-    2 => 'PreviewDescription',
+    1 => 'PictureMimeType',
+    2 => 'PictureDescription',
     3 => {
-        Name => 'PreviewImage',
-        RawConv => '$self->ValidateImage(\$val,$tag)',
+        Name => 'Picture',
+        Binary => 1,
     },
 );
 
@@ -627,7 +627,7 @@ sub ProcessExtendedContentDescription($$$)
 # Process WM/Picture preview
 # Inputs: 0) ExifTool object reference, 1) dirInfo ref, 2) tag table reference
 # Returns: 1 on success
-sub ProcessPreview($$$)
+sub ProcessPicture($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};

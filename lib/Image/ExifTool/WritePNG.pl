@@ -126,6 +126,71 @@ sub Add_iCCP($$)
 }
 
 #------------------------------------------------------------------------------
+# Generate tEXt, zTXt or iTXt data for writing
+# Inputs: 0) ExifTool ref, 1) tagID, 2) tagInfo ref, 3) value string, 4) language code
+# Returns: chunk data (not including 8-byte chunk header)
+# Notes: Sets ExifTool TextChunkType member to the type of chunk written
+sub BuildTextChunk($$$$$)
+{
+    my ($exifTool, $tag, $tagInfo, $val, $lang) = @_;
+    my ($xtra, $compVal, $iTXt, $comp);
+    if ($$tagInfo{SubDirectory}) {
+        if ($$tagInfo{Name} eq 'XMP') {
+            $iTXt = 2;      # write as iTXt but flag to avoid encoding
+            # (never compress XMP)
+        } else {
+            $comp = 2;      # compress raw profile if possible
+        }
+    } else {
+        # compress if specified
+        $comp = 1 if $exifTool->Options('Compress');
+        if ($lang) {
+            $iTXt = 1;      # write as iTXt if it has a language code
+            $tag =~ s/-$lang$//;    # remove language code from tagID
+        } elsif ($$exifTool{OPTIONS}{Charset} ne 'Latin' and $val =~  /[\x80-\xff]/) {
+            $iTXt = 1;      # write as iTXt if it contains non-Latin special characters
+        }
+    }
+    if ($comp) {
+        my $warn;
+        if (eval 'require Compress::Zlib') {
+            my $deflate = Compress::Zlib::deflateInit();
+            $compVal = $deflate->deflate($val) if $deflate;
+            if (defined $compVal) {
+                $compVal .= $deflate->flush();
+                # only compress if it actually saves space
+                unless (length($compVal) < length($val)) {
+                    undef $compVal;
+                    $warn = 'uncompressed data is smaller';
+                }
+            } else {
+                $warn = 'deflate error';
+            }
+        } else {
+            $warn = 'Compress::Zlib not available';
+        }
+        # warn if any user-specified compression fails
+        if ($warn and $comp == 1) {
+            $exifTool->Warn("PNG:$$tagInfo{Name} not compressed ($warn)", 1);
+        }
+    }
+    # decide whether to write as iTXt, zTXt or tEXt
+    if ($iTXt) {
+        $$exifTool{TextChunkType} = 'iTXt';
+        $xtra = (defined $compVal ? "\x01\0" : "\0\0") . ($lang || '') . "\0\0";
+        # iTXt is encoded as UTF-8 (but note that XMP is already UTF-8)
+        $val = $exifTool->Encode($val, 'UTF8') if $iTXt == 1;
+    } elsif (defined $compVal) {
+        $$exifTool{TextChunkType} = 'zTXt';
+        $xtra = "\0";
+    } else {
+        $$exifTool{TextChunkType} = 'tEXt';
+        $xtra = '';
+    }
+    return $tag . "\0" . $xtra . (defined $compVal ? $compVal : $val);
+}
+
+#------------------------------------------------------------------------------
 # Add any outstanding new chunks to the PNG image
 # Inputs: 0) ExifTool object ref, 1) output file or scalar ref
 # Returns: true on success
@@ -146,32 +211,11 @@ sub AddChunks($$)
         if (defined $val) {
             my $data;
             if ($$tagInfo{Table} eq \%Image::ExifTool::PNG::TextualData) {
-                $data = "tEXt$tag\0$val";
+                $data = BuildTextChunk($exifTool, $tag, $tagInfo, $val, $$tagInfo{LangCode});
+                $data = $$exifTool{TextChunkType} . $data;
+                delete $$exifTool{TextChunkType};
             } else {
                 $data = "$tag$val";
-            }
-            # write as compressed zTXt if specified
-            if ($exifTool->Options('Compress')) {
-                my $warn;
-                if (eval 'require Compress::Zlib') {
-                    my $buff;
-                    my $deflate = Compress::Zlib::deflateInit();
-                    $buff = $deflate->deflate($val) if $deflate;
-                    if (defined $buff) {
-                        $buff .= $deflate->flush();
-                        # only write as zTXt if it actually saves space
-                        if (length($buff) < length($val) - 1) {
-                            $data = "zTXt$tag\0\0$buff";
-                        } else {
-                            $warn = 'uncompressed data is smaller';
-                        }
-                    } else {
-                        $warn = 'deflate error';
-                    }
-                } else {
-                    $warn = 'Compress::Zlib not available';
-                }
-                $warn and $exifTool->Warn("PNG:$$tagInfo{Name} not compressed ($warn)", 1);
             }
             my $hdr = pack('N', length($data) - 4);
             my $cbuf = pack('N', CalculateCRC(\$data, undef));
@@ -230,7 +274,7 @@ sub AddChunks($$)
             $buff = $exifTool->WriteDirectory(\%dirInfo, $tagTablePtr);
             if (defined $buff and length $buff) {
                 WriteProfile($outfile, 'icm', \$buff, 'ICC') or $err = 1;
-                $exifTool->Warn('Wrote ICC as generic profile (no Compress::Zlib)');
+                $exifTool->Warn('Wrote ICC as a raw profile (no Compress::Zlib)');
             }
         }
     }

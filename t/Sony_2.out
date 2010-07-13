@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
 [File, System, Image] FileName - File Name: Sony.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 2.7 kB
@@ -71,6 +71,7 @@
 [MakerNotes, Sony, Camera] 36870 - Sony 0x9006: .ğ™ârï‘.{.•ân‡öGeG‘š‘`zâ[...]
 [MakerNotes, Sony, Camera] 36871 - Sony 0x9007: .ç;.|.cçf.VØÌ£.üêbêØ.ßç¶^O[...]
 [MakerNotes, Sony, Camera] 36872 - Sony 0x9008: ..ªø..¼·’.³ôi.Ş.Ğ@÷.]:şïó•±ö;î;ä‚.ÕH[...]
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0250
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x00000001
 [PrintIM, PrintIM, Printing] 257 - Print IM 0x0101: 0x00000000
 [Composite, Composite, Image] Aperture - Aperture: 7.1

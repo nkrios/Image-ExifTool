@@ -24,9 +24,9 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
-sub ConvertTimeCode($);
+sub ConvertTimecode($);
 
 # type of current stream
 $Image::ExifTool::RIFF::streamType = '';
@@ -448,17 +448,17 @@ $Image::ExifTool::RIFF::streamType = '';
         Groups => { 2 => 'Video' },
     },
     TCOD => {
-        Name => 'StartTimeCode',
+        Name => 'StartTimecode',
         # this is the tape time code for the start of the video
         Groups => { 2 => 'Video' },
         ValueConv => '$val * 1e-7',
-        PrintConv => \&ConvertTimeCode,
+        PrintConv => \&ConvertTimecode,
     },
     TCDO => {
-        Name => 'EndTimeCode',
+        Name => 'EndTimecode',
         Groups => { 2 => 'Video' },
         ValueConv => '$val * 1e-7',
-        PrintConv => \&ConvertTimeCode,
+        PrintConv => \&ConvertTimecode,
     },
     VMAJ => {
         Name => 'VegasVersionMajor',
@@ -536,7 +536,7 @@ $Image::ExifTool::RIFF::streamType = '';
         ValueConv => 'Image::ExifTool::RIFF::ConvertRIFFDate($val)',
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    ISMP => 'TimeCode',
+    ISMP => 'Timecode',
     LIST_strl => {
         Name => 'Stream',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::Stream' },
@@ -666,13 +666,13 @@ $Image::ExifTool::RIFF::streamType = '';
             Format => 'rational64u',
             # (must use RawConv because raw value used in Composite tag)
             RawConv => '$val ? 1/$val : undef',
-            PrintConv => 'int($val * 100 + 0.5) / 100',
+            PrintConv => 'int($val * 1000 + 0.5) / 1000',
         },
         {
             Name => 'StreamSampleRate',
             Format => 'rational64u',
             ValueConv => '$val ? 1/$val : 0',
-            PrintConv => 'int($val * 100 + 0.5) / 100',
+            PrintConv => 'int($val * 1000 + 0.5) / 1000',
         },
     ],
   # 7 => 'Start',
@@ -798,7 +798,7 @@ sub ConvertRIFFDate($)
 # Print time
 # Inputs: 0) time in seconds
 # Returns: time string
-sub ConvertTimeCode($)
+sub ConvertTimecode($)
 {
     my $val = shift;
     my $hr = int($val / 3600);

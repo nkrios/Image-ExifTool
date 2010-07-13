@@ -46,26 +46,32 @@ located in 5 different places.)
 <td><span class=s><span class=n>(a block of binary data which exists in DiMAGE A2 (and A1/X1?) images only if
 image stabilization is enabled)</span></span></td></tr>
 <tr class=b>
+<td title='0x0020 = 32'>0x0020</td>
+<td>WBInfoA100</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Minolta.html#WBInfoA100'>Minolta WBInfoA100 Tags</a>
+  <br><span class='n s'>(currently decoded only for the Sony A100)</span></td></tr>
+<tr>
 <td title='0x0040 = 64'>0x0040</td>
 <td>CompressedImageSize</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0081 = 129'>0x0081</td>
 <td>PreviewImage</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0088 = 136'>0x0088</td>
 <td>PreviewImageStart</td>
 <td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0089 = 137'>0x0089</td>
 <td>PreviewImageLength</td>
 <td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0100 = 256'>0x0100</td>
 <td>SceneMode</td>
 <td class=c>int32u</td>
@@ -81,7 +87,7 @@ image stabilization is enabled)</span></span></td></tr>
   <br>9 = Super Macro
   <br>16 = Auto
   <br>17 = Night View/Portrait</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0101 = 257'>0x0101</td>
 <td>ColorMode</td>
 <td class=c>int32u</td>
@@ -99,6 +105,7 @@ image stabilization is enabled)</span></span></td></tr>
   <br>16 = Evening
   <br>17 = Night Scene
   <br>18 = Night Portrait
+  <br>132 = Embed Adobe RGB
   <br><span class=n>(Sony models)</span>
   <br>0 = Standard
   <br>1 = Vivid
@@ -115,7 +122,7 @@ image stabilization is enabled)</span></span></td></tr>
   <br>103 = Light
   <br>104 = Night View
   <br>105 = Autumn Leaves</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0102 = 258'>0x0102</td>
 <td>MinoltaQuality</td>
 <td class=c>int32u</td>
@@ -125,7 +132,7 @@ image stabilization is enabled)</span></span></td></tr>
   <br>3 = Standard
   <br>4 = Economy
   <br>5 = Extra fine</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0103 = 259'>0x0103</td>
 <td>MinoltaQuality
   <br>MinoltaImageSize</td>
@@ -144,12 +151,12 @@ image stabilization is enabled)</span></span></td></tr>
   <br>5 = 2560x1920
   <br>6 = 2272x1704
   <br>7 = 2048x1536</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0104 = 260'>0x0104</td>
 <td>FlashExposureComp</td>
 <td class=c>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0105 = 261'>0x0105</td>
 <td>Teleconverter</td>
 <td class=c>int32u</td>
@@ -158,31 +165,31 @@ image stabilization is enabled)</span></span></td></tr>
   <br>0x50 = Minolta AF 2x APO II
   <br>0x88 = Minolta AF 1.4x APO (D)
   <br>0x90 = Minolta AF 1.4x APO II</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0107 = 263'>0x0107</td>
 <td>ImageStabilization</td>
 <td class=c>int32u</td>
 <td><span class=s>1 = Off
   <br>5 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0109 = 265'>0x0109</td>
 <td>RawAndJpgRecording</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x010a = 266'>0x010a</td>
 <td>ZoneMatching</td>
 <td class=c>int32u</td>
 <td><span class=s>0 = ISO Setting Used
   <br>1 = High Key
   <br>2 = Low Key</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x010b = 267'>0x010b</td>
 <td>ColorTemperature</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x010c = 268'>0x010c</td>
 <td>LensType</td>
 <td class=c>int32u</td>
@@ -259,7 +266,7 @@ original version of the lens has the same LensType)</span>
   <br>51 = Sony AF DT 16-105mm F3.5-5.6 or 55-200mm F4-5.5
   <br>51.1 = Sony AF DT 55-200mm F4-5.5
   <br>52 = Sony 70-300mm F4.5-5.6 G SSM
-  <br>53 = Sony AF 70-400mm F4.5-5.6 G SSM (SAL-70400G)
+  <br>53 = Sony AF 70-400mm F4-5.6 G SSM (SAL-70400G)
   <br>54 = Carl Zeiss Vario-Sonnar T* 16-35mm F2.8 ZA SSM (SAL-1635Z)
   <br>55 = Sony DT 18-55mm F3.5-5.6 SAM (SAL-1855)
   <br>56 = Sony AF DT 55-200mm F4-5.6 SAM
@@ -404,31 +411,31 @@ original version of the lens has the same LensType)</span>
   <br>65535.5 = Pentacon Auto 135mm F2.8
   <br>65535.6 = Pentacon Auto 29mm F2.8
   <br>65535.7 = Helios 44-2 58mm F2.0</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0111 = 273'>0x0111</td>
 <td>ColorCompensationFilter</td>
 <td class=c>int32s</td>
 <td><span class=s><span class=n>(ranges from -2 for green to +2 for magenta)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0112 = 274'>0x0112</td>
 <td>WhiteBalanceFineTune</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0113 = 275'>0x0113</td>
 <td>ImageStabilization</td>
 <td class=c>int32u</td>
 <td><span class=s><span class=n>(valid for Sony A100 only)</span>
   <br>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0114 = 276'>0x0114</td>
 <td>MinoltaCameraSettings5D
   <br>CameraSettingsA100</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='Minolta.html#CameraSettings5D'>Minolta CameraSettings5D Tags</a>
   <br>--&gt; <a href='Minolta.html#CameraSettingsA100'>Minolta CameraSettingsA100 Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0115 = 277'>0x0115</td>
 <td>WhiteBalance</td>
 <td class=c>int32u</td>
@@ -441,12 +448,12 @@ original version of the lens has the same LensType)</span>
   <br>0x50 = Flash
   <br>0x60 = Fluorescent
   <br>0x70 = Custom</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0f00 = 3840'>0x0f00</td>
 <td>MinoltaCameraSettings2</td>
 <td class=c>N</td>
@@ -979,6 +986,82 @@ version)</span></span></td></tr>
   <br>1 = On</span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='WBInfoA100'>Minolta WBInfoA100 Tags</a></h2>
+<p>White balance information for the Sony DSLR-A100.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='150 = 0x96'>150</td>
+<td>WB_RGBLevels</td>
+<td class=c>int16u[3]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='174 = 0xae'>174</td>
+<td>WB_GBRGLevels</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='772 = 0x304'>772</td>
+<td>WB_RBPresetFlash</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='776 = 0x308'>776</td>
+<td>WB_RBPresetCoolWhiteF</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='1000 = 0x3e8'>1000</td>
+<td>WB_RBPresetTungsten</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1004 = 0x3ec'>1004</td>
+<td>WB_RBPresetDaylight</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='1008 = 0x3f0'>1008</td>
+<td>WB_RBPresetCloudy</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1012 = 0x3f4'>1012</td>
+<td>WB_RBPresetFlash</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='1020 = 0x3fc'>1020</td>
+<td>WB_RedPresetsFluorescent</td>
+<td class=c>int16u[7]</td>
+<td><span class=s><span class=n>(white balance red presets for fluorescent -2 through +4.  -2=Fluorescent,
+-1=WhiteFluorescent, 0=CoolWhiteFluorescent, +1=DayWhiteFluorescent and
++3=DaylightFluorescent)</span></span></td></tr>
+<tr class=b>
+<td class=r title='1034 = 0x40a'>1034</td>
+<td>WB_BluePresetsFluorescent</td>
+<td class=c>int16u[7]</td>
+<td><span class=s><span class=n>(white balance blue presets for fluorescent -2 through +4)</span></span></td></tr>
+<tr>
+<td class=r title='1048 = 0x418'>1048</td>
+<td>WB_RBPresetShade</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1060 = 0x424'>1060</td>
+<td>WB_RBPresetCustom</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='18908 = 0x49dc'>18908</td>
+<td>InternalSerialNumber</td>
+<td class=c>string[12]</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='CameraSettings5D'>Minolta CameraSettings5D Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -1313,7 +1396,7 @@ version)</span></span></td></tr>
   <br>184 = 200 (Zone Matching High)</span></td></tr>
 <tr>
 <td class=r title='20 = 0x14'>20</td>
-<td>ZoneMatching</td>
+<td>ZoneMatchingMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = Standard
@@ -1838,7 +1921,7 @@ DiMAGE X and Xt.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 4, 2010</i>
+<br><i>Last revised Jul 5, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

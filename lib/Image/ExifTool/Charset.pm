@@ -13,7 +13,7 @@ use strict;
 use vars qw($VERSION %csType);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 my %charsetTable;   # character set tables we've loaded
 
@@ -139,9 +139,11 @@ sub Decompose($$$;$)
     } elsif ($type & 0x600) {   # 2-byte or 4-byte fixed-width characters
         my $unknown;
         my $byteOrder = $_[3];
-        if (not $byteOrder or $byteOrder eq 'Unknown') {
-            $unknown = 1 if $byteOrder;
+        if (not $byteOrder) {
             $byteOrder = GetByteOrder();
+        } elsif ($byteOrder eq 'Unknown') {
+            $byteOrder = GetByteOrder();
+            $unknown = 1;
         }
         my $fmt = $byteOrder eq 'MM' ? 'n*' : 'v*';
         if ($type & 0x400) {    # 4-byte
@@ -240,11 +242,12 @@ sub Decompose($$$;$)
 # Inputs: 0) ExifTool ref, 1) unicode character array ref,
 #         2) character set (note: not all types are supported)
 #         3) byte order ('MM' or 'II', multi-byte sets only, defaults to current byte order)
-# Returns: converted string (truncated at null character if it exists)
+# Returns: converted string (truncated at null character if it exists), empty on error
 # Notes: converts elements of input character array to new code points
 # - ExifTool ref may be undef provided $charset is defined
 sub Recompose($$;$$)
 {
+    local $_;
     my ($exifTool, $uni, $charset) = @_; # ($byteOrder assigned later if required)
     my $outVal;
     $charset or $charset = $$exifTool{OPTIONS}{Charset};

@@ -19,7 +19,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub ProcessOTF($$);
 
@@ -556,7 +556,7 @@ sub ProcessFont($$)
         $rtnVal = ProcessTTC($exifTool, $dirInfo);
     } elsif ($buff =~ /^Start(Comp|Master)?FontMetrics\s+\d+/s) { # AFM
         $rtnVal = ProcessAFM($exifTool, $dirInfo);
-    } elsif ($buff =~ /^(.{6})?%!(PS-AdobeFont-|FontType1-)\d/s) {# PFA, PFB
+    } elsif ($buff =~ /^(.{6})?%!(PS-(AdobeFont-|Bitstream )|FontType1-)/s) {# PFA, PFB
         $raf->Seek(6,0) and $exifTool->SetFileType('PFB') if $1;
         require Image::ExifTool::PostScript;
         $rtnVal = Image::ExifTool::PostScript::ProcessPS($exifTool, $dirInfo);

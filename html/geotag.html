@@ -21,7 +21,8 @@ pre  { color: #800; margin-left: 4em }
 <br><a href="#Options">Options</a>
 <br><a href="#Troubleshooting">Troubleshooting</a>
 <br><a href="#Tips">Tips</a>
-<br><a href="#Reverse">Reverse Geotagging</a>
+<hr>
+<a href="#Reverse">Reverse Geotagging</a>
 <br>&nbsp; - <a href="#GPX">Creating GPX log</a>
 <br>&nbsp; - <a href="#KML">Creating KML file</a>
 </div>
@@ -96,10 +97,11 @@ file name.</i></blockquote>
 <h4>Geosync</h4>
 
 <p>The <code>Geosync</code> tag is needed only when the image timestamps are not
-properly synchronized with GPS time.  The value written to the <code>Geosync</code>
-tag may take a number of different forms, but the basic form is that of a simple
-time difference which is added to <code>Geotime</code> before interpolating the
-GPS position in the track log.  This time difference may be of the form "SS",
+properly synchronized with GPS time, and must be set before <code>Geotime</code>
+to be effective.  The value written to the <code>Geosync</code> tag may take a
+number of different forms, but the basic form is that of a simple time
+difference which is added to <code>Geotime</code> before interpolating the GPS
+position in the track log.  This time difference may be of the form "SS",
 "MM:SS", "HH:MM:SS" or "DD HH:MM:SS" (where SS=seconds, MM=minutes, HH=hours and
 DD=days), and a leading "+" or "-" may be added for positive or negative
 differences (negative if the camera clock was ahead of GPS time).  Fractional
@@ -268,8 +270,8 @@ operating systems to prevent filename expansion):</p>
 <pre>exiftool -Geotag a.log -Geosync=+13.42 "-Geotime&lt;SubSecDateTimeOriginal" dir
 </pre>
 
-<p>Geotag images with a linear time drift correction using the GPS time
-synchronization from three already-geotagged images:</p>
+<p>Geotag images with a piecewise linear time drift correction using the GPS
+time synchronization from three already-geotagged images:</p>
 
 <pre>exiftool -geotag a.log -geosync=1.jpg -geosync=2.jpg -geosync=3.jpg dir
 </pre>
@@ -436,12 +438,18 @@ is in the current directory, that the images were downloaded to the
 <code>C:\Images</code> directory, and that the computer and camera clocks are
 in the same timezone.</blockquote>
 
+<hr>
 <a name="Reverse"></a>
-<h3>Reverse Geotagging</h3>
+<h2>Reverse Geotagging</h2>
 
 <p>The <b>-p</b> option may be used to output files in any number of formats.
-This section gives examples for creating GPX and KML output files from
-a set of geotagged images.</p>
+This section gives examples for creating GPX and KML output files from a set of
+geotagged images, or from a geotagged video file <i>(see note below)</i>.</p>
+
+<blockquote class=lt><i>Note: The <code>-ee</code> option must be added to the
+example commands below to extract all GPS fixes from a video file (such as the
+M2TS videos from some Sony cameras), otherwise only the first GPS fix is
+extracted.</i></blockquote>
 
 <a name="GPX"></a>
 <h4>Creating a GPX track log</h4>
@@ -497,10 +505,10 @@ following command processes files in order of increasing <code>GPSDateTime</code
 <pre>exiftool -fileOrder gpsdatetime -p gpx.fmt -d %Y-%m-%dT%H:%M:%SZ /Users/Phil/Pictures > out.gpx
 </pre>
 
-<p>Note that since no directory was specified for <code>gpx.fmt</code>, this
-file must exist in the current directory when the above command is executed.
-(If the <code>gpx.fmt</code> file can't be found then the <code>-p</code>
-argument is interpreted as a string instead of a file name, and the text
+<p>Since no directory was specified for <code>gpx.fmt</code>, this file must
+exist in the current directory when the above command is executed. (If the
+<code>gpx.fmt</code> file can't be found then the <code>-p</code> argument is
+interpreted as a string instead of a file name, and the text
 "<code>gpx.fmt</code>" is sent to the output, which isn't what we want.)</p>
 
 <p>The <code>-if</code> option may be added to ensure that only files containing
@@ -594,7 +602,7 @@ in the full ExifTool distribution.]</i></p>
 
 <hr>
 <i>Created Apr. 2, 2009</i><br>
-<i>Last revised Mar. 13, 2010</i>
+<i>Last revised July 12, 2010</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

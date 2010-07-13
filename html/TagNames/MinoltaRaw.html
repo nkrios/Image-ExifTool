@@ -130,24 +130,104 @@
 <td class=r title='6 = 0x6'>6</td>
 <td>ISOSetting</td>
 <td class=c>int8u</td>
-<td>&nbsp;</td></tr>
+<td><span class=s>0 = Auto
+  <br>48 = 100
+  <br>56 = 200
+  <br>64 = 400
+  <br>72 = 800
+  <br>80 = 1600
+  <br>174 = 80 (Zone Matching Low)
+  <br>184 = 200 (Zone Matching High)</span></td></tr>
 <tr>
 <td class=r title='7 = 0x7'>7</td>
 <td>ColorMode</td>
-<td class=c>int8u</td>
-<td><span class=s>0x0 = Normal
-  <br>0x1 = Black &amp; White
-  <br>0x2 = Vivid color
-  <br>0x3 = Solarization
-  <br>0x4 = Adobe RGB
-  <br>0xd = Natural sRGB
-  <br>0xe = Natural+ sRGB
-  <br>0x84 = Embed Adobe RGB</span></td></tr>
+<td class=c>int32u[0.25]</td>
+<td><span class=s>0 = Natural color
+  <br>1 = Black &amp; White
+  <br>2 = Vivid color
+  <br>3 = Solarization
+  <br>4 = Adobe RGB
+  <br>5 = Sepia
+  <br>9 = Natural
+  <br>12 = Portrait
+  <br>13 = Natural sRGB
+  <br>14 = Natural+ sRGB
+  <br>15 = Landscape
+  <br>16 = Evening
+  <br>17 = Night Scene
+  <br>18 = Night Portrait
+  <br>132 = Embed Adobe RGB
+  <br><span class=n>(Sony A100)</span>
+  <br>0x0 = Standard
+  <br>0x1 = Vivid
+  <br>0x2 = Portrait
+  <br>0x3 = Landscape
+  <br>0x4 = Sunset
+  <br>0x5 = Night View/Portrait
+  <br>0x6 = B&amp;W
+  <br>0x7 = Adobe RGB
+  <br>0xc = Neutral
+  <br>0x64 = Neutral
+  <br>0x65 = Clear
+  <br>0x66 = Deep
+  <br>0x67 = Light
+  <br>0x68 = Night View
+  <br>0x69 = Autumn Leaves</span></td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>WB_RBLevelsTungsten</td>
+<td class=c>int16u[2]</td>
+<td><span class=s><span class=n>(these WB_RBLevels currently decoded only for the Sony A100)</span></span></td></tr>
+<tr>
+<td class=r title='12 = 0xc'>12</td>
+<td>WB_RBLevelsDaylight</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='16 = 0x10'>16</td>
+<td>WB_RBLevelsCloudy</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='20 = 0x14'>20</td>
+<td>WB_RBLevelsCoolWhiteF</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='24 = 0x18'>24</td>
+<td>WB_RBLevelsFlash</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='28 = 0x1c'>28</td>
+<td>WB_RBLevelsUnknown?</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='32 = 0x20'>32</td>
+<td>WB_RBLevelsShade</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='36 = 0x24'>36</td>
+<td>WB_RBLevelsDaylightF</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='40 = 0x28'>40</td>
+<td>WB_RBLevelsDayWhiteF</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='44 = 0x2c'>44</td>
+<td>WB_RBLevelsWhiteF</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='56 = 0x38'>56</td>
 <td>ColorFilter</td>
 <td class=c>int8s</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(Minolta models)</span></span></td></tr>
 <tr>
 <td class=r title='57 = 0x39'>57</td>
 <td>BWFilter</td>
@@ -157,7 +237,8 @@
 <td class=r title='58 = 0x3a'>58</td>
 <td>ZoneMatching</td>
 <td class=c>int8u</td>
-<td><span class=s>0 = ISO Setting Used
+<td><span class=s><span class=n>(Minolta models)</span>
+  <br>0 = ISO Setting Used
   <br>1 = High Key
   <br>2 = Low Key</span></td></tr>
 <tr>
@@ -169,7 +250,35 @@
 <td class=r title='60 = 0x3c'>60</td>
 <td>ColorTemperature</td>
 <td class=c>int8u</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(Minolta models)</span></span></td></tr>
+<tr>
+<td class=r title='74 = 0x4a'>74</td>
+<td>ZoneMatching</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(Sony models)</span>
+  <br>0 = ISO Setting Used
+  <br>1 = High Key
+  <br>2 = Low Key</span></td></tr>
+<tr class=b>
+<td class=r title='76 = 0x4c'>76</td>
+<td>ColorTemperature</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(A100)</span></span></td></tr>
+<tr>
+<td class=r title='77 = 0x4d'>77</td>
+<td>ColorFilter</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(A100)</span></span></td></tr>
+<tr class=b>
+<td class=r title='78 = 0x4e'>78</td>
+<td>ColorTemperature</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(A200 and A700)</span></span></td></tr>
+<tr>
+<td class=r title='79 = 0x4f'>79</td>
+<td>ColorFilter</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(A200 and A700)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='WBG'>MinoltaRaw WBG Tags</a></h2>
@@ -194,7 +303,7 @@
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 23, 2009</i>
+<br><i>Last revised May 18, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

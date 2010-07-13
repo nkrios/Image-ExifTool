@@ -61,6 +61,8 @@ my %xmpStruct = (
         maskMarkers     => { },
         partMapping     => { },
         toPart          => { },
+        # added May 2010
+        originalDocumentID => { },
     },
     ResourceEvent => {
         NAMESPACE => 'stEvt',
@@ -358,6 +360,16 @@ my %xmpStruct = (
         Rectangle => { },
         PersonDisplayName => { },
     },
+    # April 2010 XMP additions
+    Ancestor => {
+        NAMESPACE => 'photoshop',
+        AncestorID => { },
+    },
+    Layer => {
+        NAMESPACE => 'photoshop',
+        LayerName => { },
+        LayerText => { },
+    },
 );
 
 my $rdfDesc = 'rdf:Description';
@@ -425,7 +437,6 @@ my $pktCloseR =  "<?xpacket end='r'?>";
             # must set PropertyPath now for all tags that are Struct elements
             # (normal tags will get set later if they are actually written)
             SetPropertyPath($table, $tag) if $$tagInfo{Struct};
-            my $format = $$tagInfo{Writable};
         }
     }
 }
@@ -1172,7 +1183,7 @@ sub WriteXMP($$;$)
             # take attributes from old values if they exist
             %attrs = %{$capList->[1]};
             if ($overwrite) {
-                my ($delPath, @matchingPaths, $oldLang, $delLang);
+                my ($delPath, @matchingPaths, $oldLang, $delLang, $addLang);
                 # check to see if this is an indexed list item
                 if ($path =~ / /) {
                     my $pathPattern;
@@ -1183,17 +1194,24 @@ sub WriteXMP($$;$)
                 }
                 foreach $path (@matchingPaths) {
                     my ($val, $attrs) = @{$capture{$path}};
-                    if ($overwrite < 0) {
-                        # only overwrite specific values
-                        next unless Image::ExifTool::IsOverwriting($nvHash, UnescapeXML($val));
-                    }
                     if ($writable eq 'lang-alt') {
+                        unless (defined $addLang) {
+                            # add to lang-alt list by default if creating this tag from scratch
+                            $addLang = Image::ExifTool::IsCreating($nvHash) ? 1 : 0;
+                        }
                         # get original language code (lc for comparisons)
                         $oldLang = lc($$attrs{'xml:lang'} || 'x-default');
+                        if ($overwrite < 0) {
+                            my $newLang = lc($$tagInfo{LangCode} || 'x-default');
+                            next unless $oldLang eq $newLang;
+                            # only add new tag if we are overwriting this one
+                            $addLang = Image::ExifTool::IsOverwriting($nvHash, UnescapeXML($val));
+                            next unless $addLang;
+                        }
                         # delete all if deleting "x-default" or writing with no LangCode
                         # (XMP spec requires x-default language exist and be first in list)
-                        if ($oldLang eq 'x-default' and not ($nvHash->{Value} or
-                            ($$tagInfo{LangCode} and $$tagInfo{LangCode} ne 'x-default')))
+                        if ($oldLang eq 'x-default' and (not $$tagInfo{LangCode} or 
+                            ($$tagInfo{LangCode} eq 'x-default' and not $nvHash->{Value})))
                         {
                             $delLang = 1;   # delete all languages
                             $overwrite = 1; # force overwrite
@@ -1202,6 +1220,9 @@ sub WriteXMP($$;$)
                             # only overwrite specified language
                             next unless lc($$tagInfo{LangCode}) eq $oldLang;
                         }
+                    } elsif ($overwrite < 0) {
+                        # only overwrite specific values
+                        next unless Image::ExifTool::IsOverwriting($nvHash, UnescapeXML($val));
                     }
                     if ($verbose > 1) {
                         my $grp = $exifTool->GetGroup($tagInfo, 1);
@@ -1226,7 +1247,7 @@ sub WriteXMP($$;$)
                         delete $capture{"$pp/rdf:type"} if @a == 1;
                     }
                 }
-                next unless $delPath or $$tagInfo{List} or $oldLang;
+                next unless $delPath or $$tagInfo{List} or $addLang;
                 if ($delPath) {
                     $path = $delPath;
                     $deleted = 1;

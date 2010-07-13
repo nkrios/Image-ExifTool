@@ -1,4 +1,4 @@
-  ExifToolVersion = 8.02
+  ExifToolVersion = 8.21
   FileName = CanonRaw.crw
   Directory = t/images
   FileSize = 6255
@@ -76,6 +76,7 @@
   | | | | SlowShutter = 3
   | | | | SequenceNumber = 0
   | | | | OpticalZoomCode = 8
+  | | | | CameraTemperature = 0
   | | | | FlashGuideNumber = -1
   | | | | AFPointsInFocus = 0
   | | | | FlashExposureComp = 20
@@ -138,7 +139,7 @@
   | | | | PhotoEffect = -1
   | | | | ManualFlashOutput = 0
   | | | | ColorTone = 0
-  | | | 5)  CanonRaw_0x0036 = Binary data 3714 bytes
+  | | | 5)  CanonRaw_0x0036 = ...........................1..:..........1..:.........[snip]
   | | | 6)  CanonModelID = 2147484016
   | | | 7)  SensorInfo (SubDirectory) -->
   | | | + [BinaryData directory, 34 bytes]
@@ -172,7 +173,7 @@
   | | | | 10) AFPointsInFocus = 8
   | | | 10) CanonRaw_0x10c0 = 26 331 372 372 177 240 428 429 277 186 510 511 442
   | | | 11) CanonRaw_0x10c1 = 26 299 375 375 170 202 394 395 240 153 453 454 375
-  | | | 12) CanonRaw_0x10c2 = Binary data 884 bytes
+  | | | 12) CanonRaw_0x10c2 = t......a.................c...............c.X..........[snip]
   | | | 13) CanonRaw_0x10aa = 10 554 1022 1026 754
   | | | 14) CanonRaw_0x10a8 = 20 5528 5190 7000 5987 3214 3897 6457 5190 5200
   | | | 15) CanonRaw_0x10ad = 62 20127 8480 7000 6000 5600 5200 4724 4200 3266 1446 [snip]

@@ -62,7 +62,7 @@ These tags are used in Sigma/Foveon cameras.
   <br>&#39;C&#39; = Center-weighted average</span></td></tr>
 <tr>
 <td title='0x000a = 10'>0x000a</td>
-<td>Lens</td>
+<td>LensFocalRange</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -73,9 +73,9 @@ These tags are used in Sigma/Foveon cameras.
 <tr>
 <td title='0x000c = 12'>0x000c</td>
 <td>ExposureCompensation
-  <br>UnknownCompensation?</td>
+  <br>ExposureAdjust?</td>
 <td class=c>string<br>rational64s</td>
-<td><span class=s><span class=n>(SD9 and SD10 only)</span></span></td></tr>
+<td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x000d = 13'>0x000d</td>
 <td>Contrast
@@ -179,24 +179,41 @@ These tags are used in Sigma/Foveon cameras.
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td title='0x002c = 44'>0x002c</td>
+<td>ColorMode</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = n/a
+  <br>1 = Sepia
+  <br>2 = B&amp;W
+  <br>3 = Standard
+  <br>4 = Vivid
+  <br>5 = Neutral
+  <br>6 = Portrait
+  <br>7 = Landscape</span></td></tr>
+<tr class=b>
 <td title='0x0030 = 48'>0x0030</td>
 <td>LensApertureRange</td>
 <td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
+<td><span class=s><span class=n>(changes with focal length. MaxAperture for some models)</span></span></td></tr>
+<tr>
 <td title='0x0031 = 49'>0x0031</td>
 <td>FNumber</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0032 = 50'>0x0032</td>
 <td>ExposureTime</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0033 = 51'>0x0033</td>
 <td>ExposureTime2</td>
 <td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0034 = 52'>0x0034</td>
+<td>BurstShot</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x0035 = 53'>0x0035</td>
@@ -204,25 +221,35 @@ These tags are used in Sigma/Foveon cameras.
 <td class=c>rational64s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td title='0x0039 = 57'>0x0039</td>
+<td>SensorTemperature</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td title='0x003a = 58'>0x003a</td>
 <td>FlashExposureComp</td>
 <td class=c>rational64s</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x003b = 59'>0x003b</td>
 <td>Firmware</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x003c = 60'>0x003c</td>
 <td>WhiteBalance</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x003d = 61'>0x003d</td>
+<td>PictureMode</td>
+<td class=c>string</td>
+<td><span class=s><span class=n>(same as ColorMode, but &quot;Standard&quot; when ColorMode is Sepia or B&amp;W)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 19, 2010</i>
+<br><i>Last revised Jun 25, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

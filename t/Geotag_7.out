@@ -38,7 +38,7 @@ Creating APP1:
     + IFD0:ResolutionUnit = '2' (mandatory)
     + IFD0:YCbCrPositioning = '1' (mandatory)
   Creating GPS
-    + GPS:GPSVersionID = '2 2 0 0' (mandatory)
+    + GPS:GPSVersionID = '2 3 0 0' (mandatory)
     + GPS:GPSLatitudeRef = 'N'
     + GPS:GPSLatitude = '49 10 45.9657779460145'
     + GPS:GPSLongitudeRef = 'E'

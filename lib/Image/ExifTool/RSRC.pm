@@ -14,31 +14,42 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.02';
 
 # Information decoded from Mac OS resources
 %Image::ExifTool::RSRC::Main = (
     GROUPS => { 2 => 'Document' },
     NOTES => q{
         Tags extracted from Mac OS resource files and DFONT files.  These tags may
-        also be extracted from the resource fork of any file on a Mac OS system,
-        either by adding "/rsrc" to the filename to process the resource fork alone,
-        or by using the -ee (ExtractEmbedded) option to process the resource fork as
-        a sub-document of the main file.
+        also be extracted from the resource fork of any file in OS X, either by
+        adding "/rsrc" to the filename to process the resource fork alone, or by
+        using the ExtractEmbedded (-ee) option to process the resource fork as a
+        sub-document of the main file.
     },
-    '8BIM'=> {
+    '8BIM' => {
         Name => 'PhotoshopInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Photoshop::Main' },
     },
-    'vers' => 'ResourceVersion',
-    'fnt ' => {
+    'sfnt' => {
         Name => 'Font',
         SubDirectory => { TagTable => 'Image::ExifTool::Font::Name' },
     },
+    'usro_0x0000' => 'OpenWithApplication',
+    'vers_0x0001' => 'ApplicationVersion',
+    'STR _0xbff3' => 'ApplicationMissingMsg',
+    'STR _0xbff4' => 'CreatorApplication',
+    # the following written by Photoshop
+    # (ref http://www.adobe.ca/devnet/photoshop/psir/ps_image_resources.pdf)
+    'STR#_0x0080' => 'Keywords',
+    'TEXT_0x0080' => 'Description',
+    # don't extract PICT's because the clip region isn't set properly
+    # in the PICT resource for some reason.  Also, a dummy 512-byte
+    # header would have to be added to create a valid PICT file.
+    # 'PICT' => { Name => 'PreviewPICT', Binary => 1 },
 );
 
 #------------------------------------------------------------------------------
-# Read information from a Mac resource file (DFONT files) (ref 4)
+# Read information from a Mac resource file (ref 1)
 # Inputs: 0) ExifTool ref, 1) dirInfo ref
 # Returns: 1 on success, 0 if this wasn't a valid resource file
 sub ProcessRSRC($$)
@@ -69,6 +80,7 @@ sub ProcessRSRC($$)
 
     $exifTool->SetFileType('RSRC') unless $$exifTool{IN_RESOURCE};
     my $verbose = $exifTool->Options('Verbose');
+    my $tagTablePtr = GetTagTable('Image::ExifTool::RSRC::Main');
 
     # parse resource type list
     for ($i=0; $i<=$numTypes; ++$i) {
@@ -83,12 +95,19 @@ sub ProcessRSRC($$)
             my $roff = $refOff + 12 * $j;
             last if $roff + 12 > $mapLen;
             # read only the 24-bit resource data offset
-            my $tag = Get16u(\$map,$roff);
+            my $id = Get16u(\$map,$roff);
             my $resOff = (Get32u(\$map,$roff+4) & 0x00ffffff) + $datOff;
             my $resNameOff = Get16u(\$map,$roff+2) + $nameOff + $mapOff;
-            my ($val, $valLen);
+            my ($tag, $val, $valLen);
+            my $tagInfo = $$tagTablePtr{$resType};
+            if ($tagInfo) {
+                $tag = $resType;
+            } else {
+                $tag = sprintf('%s_0x%.4x', $resType, $id);
+                $tagInfo = $$tagTablePtr{$tag};
+            }
             # read the resource data if necessary
-            if ($resType eq 'vers' or $resType eq '8BIM' or $verbose) {
+            if ($tagInfo or $verbose) {
                 unless ($raf->Seek($resOff, 0) and $raf->Read($buff, 4) == 4 and
                         ($valLen = unpack('N', $buff)) < 1024000 and # arbitrary size limit
                         $raf->Read($val, $valLen) == $valLen)
@@ -101,8 +120,10 @@ sub ProcessRSRC($$)
                 my ($resName, $nameLen);
                 $resName = '' unless $raf->Seek($resNameOff, 0) and $raf->Read($buff, 1) and
                     ($nameLen = ord $buff) != 0 and $raf->Read($resName, $nameLen) == $nameLen;
-                $exifTool->VPrint(0,sprintf("$resType resource ID 0x%.4x (offset 0x%.4x, $valLen bytes, name='$resName'):\n", $tag, $resOff));
+                $exifTool->VPrint(0,sprintf("$resType resource ID 0x%.4x (offset 0x%.4x, $valLen bytes, name='$resName'):\n", $id, $resOff));
+                $exifTool->VerboseDump(\$val);
             }
+            next unless $tagInfo;
             if ($resType eq 'vers') {
                 # parse the 'vers' resource to get the long version string
                 next unless $valLen > 8;
@@ -112,8 +133,7 @@ sub ProcessRSRC($$)
                 my $vlen = Get8u(\$val, $p++);
                 next if $p + $vlen > $valLen;
                 my $tagTablePtr = GetTagTable('Image::ExifTool::RSRC::Main');
-                my $val = $exifTool->Decode(substr($val, $p, $vlen), 'MacRoman');
-                $exifTool->HandleTag($tagTablePtr, 'vers', $val);
+                $val = $exifTool->Decode(substr($val, $p, $vlen), 'MacRoman');
             } elsif ($resType eq 'sfnt') {
                 # parse the OTF font block
                 $raf->Seek($resOff + 4, 0) or next;
@@ -123,18 +143,44 @@ sub ProcessRSRC($$)
                     $exifTool->Warn('Unrecognized sfnt resource format');
                 }
                 $exifTool->OverrideFileType('DFONT');
+                next;
             } elsif ($resType eq '8BIM') {
                 my $ttPtr = GetTagTable('Image::ExifTool::Photoshop::Main');
-                $exifTool->HandleTag($ttPtr, $tag, $val,
+                $exifTool->HandleTag($ttPtr, $id, $val,
                     DataPt  => \$val,
                     DataPos => $resOff + 4,
                     Size    => $valLen,
                     Start   => 0,
                     Parent  => 'RSRC',
                 );
-            } else {
-                $exifTool->VerboseDump(\$val) if defined $val;
+                next;
+            } elsif ($resType eq 'STR ' and $valLen > 1) {
+                # extract Pascal string
+                my $len = ord $val;
+                next unless $valLen >= $len + 1;
+                $val = substr($val, 1, $len);
+            } elsif ($resType eq 'usro' and $valLen > 4) {
+                my $len = unpack('N', $val);
+                next unless $valLen >= $len + 4;
+                ($val = substr($val, 4, $len)) =~ s/\0.*//g; # truncate at null
+            } elsif ($resType eq 'STR#' and $valLen > 2) {
+                # extract list of strings (ref http://simtech.sourceforge.net/tech/strings.html)
+                my $num = unpack('n', $val);
+                next if $num & 0xf000; # (ignore special-format STR# resources)
+                my ($i, @vals);
+                my $pos = 2;
+                for ($i=0; $i<$num; ++$i) {
+                    last if $pos >= $valLen;
+                    my $len = ord substr($val, $pos++, 1);
+                    last if $pos + $len > $valLen;
+                    push @vals, substr($val, $pos, $len);
+                    $pos += $len;
+                }
+                $val = \@vals;
+            } elsif ($resType ne 'TEXT') {
+                next;
             }
+            $exifTool->HandleTag($tagTablePtr, $tag, $val);
         }
     }
     return 1;

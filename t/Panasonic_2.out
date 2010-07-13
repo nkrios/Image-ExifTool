@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.14
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
 [File, System, Image] FileName - File Name: Panasonic.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 6.9 kB
@@ -84,6 +84,7 @@
 [MakerNotes, Panasonic, Camera] 44 - Contrast Mode: Normal
 [MakerNotes, Panasonic, Camera] 45 - Noise Reduction: Standard
 [MakerNotes, Panasonic, Camera] 46 - Self Timer: Off
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0250
 [Composite, Composite, Image] Aperture - Aperture: 4.0
 [Composite, Composite, Image] ImageSize - Image Size: 8x8
 [Composite, Composite, Camera] ScaleFactor35efl - Scale Factor To 35 mm Equivalent: 7.6

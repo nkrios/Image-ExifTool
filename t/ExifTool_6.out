@@ -1,7 +1,7 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.17
 [File, System, Image] FileName - File Name: Canon.jpg
 [File, System, Image] Directory - Directory: t/images
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2006:10:03 15:10:31-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:05:01 07:34:38-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -51,7 +51,7 @@
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Auto
 [EXIF, ExifIFD, Camera] 41990 - Scene Capture Type: Standard
 [Composite, Composite, Image] Aperture - Aperture: 14.0
-[Composite, Composite, Camera] DriveMode - Drive Mode: Continuous shooting
+[Composite, Composite, Camera] DriveMode - Drive Mode: Continuous Shooting
 [Composite, Composite, Camera] ISO - ISO: 100
 [Composite, Composite, Image] ImageSize - Image Size: 8x8
 [Composite, Composite, Camera] Lens - Lens: 18.0 - 55.0 mm

@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessPEResources($$);
 sub ProcessPEVersion($$);
@@ -251,8 +251,10 @@ my %resourceType = (
 # (see http://msdn.microsoft.com/en-us/library/aa381049.aspx)
 %Image::ExifTool::EXE::PEString = (
     GROUPS => { 2 => 'Other' },
+    VARS => { NO_ID => 1 },
     NOTES => q{
-        Resource strings found in Windows PE files.  ExifTool will extract any
+        Resource strings found in Windows PE files.  The B<TagID>'s are not shown
+        because they are the same as the B<Tag Name>.  ExifTool will extract any
         existing StringFileInfo tags even if not listed in this table.
     },
     LanguageCode => {

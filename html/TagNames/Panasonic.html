@@ -37,7 +37,7 @@ reference number and not the actual firmware version)</span></span></td></tr>
 <td><span class=s>1 = Auto
   <br>2 = Daylight
   <br>3 = Cloudy
-  <br>4 = Tungsten
+  <br>4 = Incandescent
   <br>5 = Manual
   <br>8 = Flash
   <br>10 = Black &amp; White
@@ -177,7 +177,8 @@ same as the number printed on the camera body)</span></span></td></tr>
   <br>2 = Warm
   <br>3 = Cool
   <br>4 = Black &amp; White
-  <br>5 = Sepia</span></td></tr>
+  <br>5 = Sepia
+  <br>6 = Happy</span></td></tr>
 <tr class=b>
 <td title='0x0029 = 41'>0x0029</td>
 <td>TimeSincePowerOn</td>
@@ -460,6 +461,7 @@ L10 and LC80)</span>
 <td>IntelligentResolution</td>
 <td class=c>int8u</td>
 <td><span class=s>0 = Off
+  <br>2 = Auto
   <br>3 = On</span></td></tr>
 <tr class=b>
 <td title='0x0e00 = 3584'>0x0e00</td>
@@ -716,50 +718,9 @@ user-supplied set of known faces.</p>
   <br>11 = Shade</span></td></tr>
 <tr>
 <td title='0x0310 = 784'>0x0310</td>
-<td>LensType</td>
-<td class=c>int32u</td>
-<td><span class=s><span class=n>(lower 3 bits split into a separate value for the frame selector position)</span>
-  <br>[Value 0]
-  <br>1 = Elmarit-M 21mm f/2.8
-  <br>3 = Elmarit-M 28mm f/2.8 (III)
-  <br>4 = Tele-Elmarit-M 90mm f/2.8 (II)
-  <br>5 = Summilux-M 50mm f/1.4 (II)
-  <br>6 = Summicron-M 35mm f/2 (IV)
-  <br>7 = Summicron-M 90mm f/2 (II)
-  <br>9 = Elmarit-M 135mm f/2.8 (I/II)
-  <br>16 = Tri-Elmar-M 16-18-21mm f/4 ASPH.
-  <br>23 = Summicron-M 50mm f/2 (III)
-  <br>24 = Elmarit-M 21mm f/2.8 ASPH.
-  <br>25 = Elmarit-M 24mm f/2.8 ASPH.
-  <br>26 = Summicron-M 28mm f/2 ASPH.
-  <br>27 = Elmarit-M 28mm f/2.8 (IV)
-  <br>28 = Elmarit-M 28mm f/2.8 ASPH.
-  <br>29 = Summilux-M 35mm f/1.4 ASPH.
-  <br>30 = Summicron-M 35mm f/2 ASPH.
-  <br>31 = Noctilux-M 50mm f/1
-  <br>32 = Summilux-M 50mm f/1.4 ASPH.
-  <br>33 = Summicron-M 50mm f/2 (IV, V)
-  <br>34 = Elmar-M 50mm f/2.8
-  <br>35 = Summilux-M 75mm f/1.4
-  <br>36 = Apo-Summicron-M 75mm f/2 ASPH.
-  <br>37 = Apo-Summicron-M 90mm f/2 ASPH.
-  <br>38 = Elmarit-M 90mm f/2.8
-  <br>39 = Macro-Elmar-M 90mm f/4
-  <br>40 = Macro-Adapter M
-  <br>42 = Tri-Elmar-M 28-35-50mm f/4 ASPH.
-  <br>43 = Summarit-M 35mm f/2.5
-  <br>44 = Summarit-M 50mm f/2.5
-  <br>45 = Summarit-M 75mm f/2.5
-  <br>46 = Summarit-M 90mm f/2.5
-  <br>47 = Summilux-M 21mm f/1.4 ASPH.
-  <br>48 = Summilux-M 24mm f/1.4 ASPH.
-  <br>49 = Noctilux-M 50mm f/0.95 ASPH.
-  <br>50 = Elmar-M 24mm f/3.8 ASPH.
-  <br>52 = Super-Elmar-M 18mm f/3.8 ASPH.
-  <br>[Value 1]
-  <br>1 = 28/90mm frame lines engaged
-  <br>2 = 24/35mm frame lines engaged
-  <br>3 = 50/75mm frame lines engaged</span></td></tr>
+<td>LensInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Panasonic.html#LensInfo'>Panasonic LensInfo Tags</a></td></tr>
 <tr class=b>
 <td title='0x0311 = 785'>0x0311</td>
 <td>ExternalSensorBrightnessValue</td>
@@ -833,6 +794,86 @@ user-supplied set of known faces.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='LensInfo'>Panasonic LensInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>LensType</td>
+<td class=c>int32u</td>
+<td><span class=s>[Mask 0xfffffffc]</span>
+  <br>--&gt; <a href='Panasonic.html#LensType'>Panasonic LensType Values</a></td></tr>
+<tr class=b>
+<td class=r title='0 = 0x0'>0.1</td>
+<td>FrameSelector</td>
+<td class=c>int32u</td>
+<td><span class=s>[Mask 0x03]
+  <br>0x1 = 28/90mm frame lines engaged
+  <br>0x2 = 24/35mm frame lines engaged
+  <br>0x3 = 50/75mm frame lines engaged</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='LensType'>Panasonic LensType Values</a></h2>
+Entries with 2 numbers give the lower 2 bits of the LensType value which are
+used to identify certain manually coded lenses on the M9, or the focal
+length of some multi-focal lenses.
+<blockquote>
+<table class=frame><tr><td>
+<table class='inner sep' cellspacing=1>
+<tr class=h><th>Value</th><th>LensType</th></tr>
+<tr><td>1</td><td>= Elmarit-M 21mm f/2.8</td>
+</tr><tr><td>3</td><td>= Elmarit-M 28mm f/2.8 (III)</td>
+</tr><tr><td>4</td><td>= Tele-Elmarit-M 90mm f/2.8 (II)</td>
+</tr><tr><td>5</td><td>= Summilux-M 50mm f/1.4 (II)</td>
+</tr><tr><td>6</td><td>= Summicron-M 35mm f/2 (IV)</td>
+</tr><tr><td>7</td><td>= Summicron-M 90mm f/2 (II)</td>
+</tr><tr><td>9</td><td>= Elmarit-M 135mm f/2.8 (I/II)</td>
+</tr><tr><td>16</td><td>= Tri-Elmar-M 16-18-21mm f/4 ASPH.</td>
+</tr><tr><td>23</td><td>= Summicron-M 50mm f/2 (III)</td>
+</tr><tr><td>24</td><td>= Elmarit-M 21mm f/2.8 ASPH.</td>
+</tr><tr><td>25</td><td>= Elmarit-M 24mm f/2.8 ASPH.</td>
+</tr><tr><td>26</td><td>= Summicron-M 28mm f/2 ASPH.</td>
+</tr><tr><td>27</td><td>= Elmarit-M 28mm f/2.8 (IV)</td>
+</tr><tr><td>28</td><td>= Elmarit-M 28mm f/2.8 ASPH.</td>
+</tr><tr><td>29</td><td>= Summilux-M 35mm f/1.4 ASPH.</td>
+</tr><tr><td>30</td><td>= Summicron-M 35mm f/2 ASPH.</td>
+</tr><tr><td>31</td><td>= Noctilux-M 50mm f/1</td>
+</tr><tr><td>32</td><td>= Summilux-M 50mm f/1.4 ASPH.</td>
+</tr><tr><td>33</td><td>= Summicron-M 50mm f/2 (IV, V)</td>
+</tr><tr><td>34</td><td>= Elmar-M 50mm f/2.8</td>
+</tr><tr><td>35</td><td>= Summilux-M 75mm f/1.4</td>
+</tr><tr><td>36</td><td>= Apo-Summicron-M 75mm f/2 ASPH.</td>
+</tr><tr><td>37</td><td>= Apo-Summicron-M 90mm f/2 ASPH.</td>
+</tr><tr><td>38</td><td>= Elmarit-M 90mm f/2.8</td>
+</tr><tr><td>39</td><td>= Macro-Elmar-M 90mm f/4</td>
+</tr><tr><td>40</td><td>= Macro-Adapter M</td>
+</tr><tr><td>42</td><td>= Tri-Elmar-M 28-35-50mm f/4 ASPH.</td>
+</tr><tr><td>43</td><td>= Summarit-M 35mm f/2.5</td>
+</tr><tr><td>44</td><td>= Summarit-M 50mm f/2.5</td>
+</tr><tr><td>45</td><td>= Summarit-M 75mm f/2.5</td>
+</tr><tr><td>46</td><td>= Summarit-M 90mm f/2.5</td>
+</tr><tr><td>47</td><td>= Summilux-M 21mm f/1.4 ASPH.</td>
+</tr><tr><td>48</td><td>= Summilux-M 24mm f/1.4 ASPH.</td>
+</tr><tr><td>49</td><td>= Noctilux-M 50mm f/0.95 ASPH.</td>
+</tr><tr><td>50</td><td>= Elmar-M 24mm f/3.8 ASPH.</td>
+</tr><tr><td>52</td><td>= Super-Elmar-M 18mm f/3.8 ASPH.</td>
+</tr><tr><td>'0 0'</td><td>= Uncoded lens</td>
+</tr><tr><td>'6 0'</td><td>= Summilux-M 35mm f/1.4</td>
+</tr><tr><td>'9 0'</td><td>= Apo-Telyt-M 135mm f/3.4</td>
+</tr><tr><td>'16 1'</td><td>= Tri-Elmar-M 16-18-21mm f/4 ASPH. (at 16mm)</td>
+</tr><tr><td>'16 2'</td><td>= Tri-Elmar-M 16-18-21mm f/4 ASPH. (at 18mm)</td>
+</tr><tr><td>'16 3'</td><td>= Tri-Elmar-M 16-18-21mm f/4 ASPH. (at 21mm)</td>
+</tr><tr><td>'29 0'</td><td>= Summilux-M 35mm f/1.4 ASPHERICAL</td>
+</tr><tr><td>'31 0'</td><td>= Noctilux-M 50mm f/1.2</td>
+</tr><tr><td>'39 0'</td><td>= Tele-Elmar-M 135mm f/4 (II)</td>
+</tr><tr><td>'42 1'</td><td>= Tri-Elmar-M 28-35-50mm f/4 ASPH. (at 28mm)</td>
+</tr><tr><td>'42 2'</td><td>= Tri-Elmar-M 28-35-50mm f/4 ASPH. (at 35mm)</td>
+</tr><tr><td>'42 3'</td><td>= Tri-Elmar-M 28-35-50mm f/4 ASPH. (at 50mm)</td>
+</tr></table></td></tr></table></blockquote>
+
 <h2><a name='Leica3'>Panasonic Leica3 Tags</a></h2>
 <p>These tags are used by the Leica R8 and R9 digital backs.</p>
 <blockquote>
@@ -883,19 +924,87 @@ user-supplied set of known faces.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td title='0x300a = 12298'>0x300a</td>
+<td>Contrast</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = Low
+  <br>1 = Medium Low
+  <br>2 = Normal
+  <br>3 = Medium High
+  <br>4 = High</span></td></tr>
+<tr class=b>
+<td title='0x300b = 12299'>0x300b</td>
+<td>Sharpening</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = Off
+  <br>1 = Low
+  <br>2 = Normal
+  <br>3 = Medium High
+  <br>4 = High</span></td></tr>
+<tr>
+<td title='0x300d = 12301'>0x300d</td>
+<td>Saturation</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = Low
+  <br>1 = Medium Low
+  <br>2 = Normal
+  <br>3 = Medium High
+  <br>4 = High
+  <br>5 = Black &amp; White
+  <br>6 = Vintage B&amp;W</span></td></tr>
+<tr class=b>
+<td title='0x3033 = 12339'>0x3033</td>
+<td>WhiteBalance</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = Auto
+  <br>1 = Tungsten
+  <br>2 = Fluorescent
+  <br>3 = Daylight Fluorescent
+  <br>4 = Daylight
+  <br>5 = Flash
+  <br>6 = Cloudy
+  <br>7 = Shade
+  <br>8 = Manual
+  <br>9 = Kelvin</span></td></tr>
+<tr>
+<td title='0x3034 = 12340'>0x3034</td>
+<td>JPEGQuality</td>
+<td class=c>int32u</td>
+<td><span class=s>94 = Basic
+  <br>97 = Fine</span></td></tr>
+<tr class=b>
 <td title='0x3036 = 12342'>0x3036</td>
 <td>WB_RGBLevels</td>
 <td class=c>rational64u[3]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x3038 = 12344'>0x3038</td>
 <td>UserProfile</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x303a = 12346'>0x303a</td>
+<td>JPEGSize</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = 5216x3472
+  <br>1 = 3840x2592
+  <br>2 = 2592x1728
+  <br>3 = 1728x1152
+  <br>4 = 1280x864</span></td></tr>
 <tr>
+<td title='0x3103 = 12547'>0x3103</td>
+<td>SerialNumber</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td title='0x3109 = 12553'>0x3109</td>
 <td>FirmwareVersion</td>
 <td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x312a = 12586'>0x312a</td>
+<td>BaseISO</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x312b = 12587'>0x312b</td>
@@ -908,51 +1017,67 @@ user-supplied set of known faces.</p>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td title='0x312d = 12589'>0x312d</td>
+<td>SensorBitDepth</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x3402 = 13314'>0x3402</td>
+<td>CameraTemperature</td>
+<td class=c>int32s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td title='0x3405 = 13317'>0x3405</td>
 <td>LensType</td>
 <td class=c>int32u</td>
-<td><span class=s><span class=n>(lower 3 bits split into a separate value for the frame selector position)</span>
-  <br>[Value 0]
-  <br>1 = Elmarit-M 21mm f/2.8
-  <br>3 = Elmarit-M 28mm f/2.8 (III)
-  <br>4 = Tele-Elmarit-M 90mm f/2.8 (II)
-  <br>5 = Summilux-M 50mm f/1.4 (II)
-  <br>6 = Summicron-M 35mm f/2 (IV)
-  <br>7 = Summicron-M 90mm f/2 (II)
-  <br>9 = Elmarit-M 135mm f/2.8 (I/II)
-  <br>16 = Tri-Elmar-M 16-18-21mm f/4 ASPH.
-  <br>23 = Summicron-M 50mm f/2 (III)
-  <br>24 = Elmarit-M 21mm f/2.8 ASPH.
-  <br>25 = Elmarit-M 24mm f/2.8 ASPH.
-  <br>26 = Summicron-M 28mm f/2 ASPH.
-  <br>27 = Elmarit-M 28mm f/2.8 (IV)
-  <br>28 = Elmarit-M 28mm f/2.8 ASPH.
-  <br>29 = Summilux-M 35mm f/1.4 ASPH.
-  <br>30 = Summicron-M 35mm f/2 ASPH.
-  <br>31 = Noctilux-M 50mm f/1
-  <br>32 = Summilux-M 50mm f/1.4 ASPH.
-  <br>33 = Summicron-M 50mm f/2 (IV, V)
-  <br>34 = Elmar-M 50mm f/2.8
-  <br>35 = Summilux-M 75mm f/1.4
-  <br>36 = Apo-Summicron-M 75mm f/2 ASPH.
-  <br>37 = Apo-Summicron-M 90mm f/2 ASPH.
-  <br>38 = Elmarit-M 90mm f/2.8
-  <br>39 = Macro-Elmar-M 90mm f/4
-  <br>40 = Macro-Adapter M
-  <br>42 = Tri-Elmar-M 28-35-50mm f/4 ASPH.
-  <br>43 = Summarit-M 35mm f/2.5
-  <br>44 = Summarit-M 50mm f/2.5
-  <br>45 = Summarit-M 75mm f/2.5
-  <br>46 = Summarit-M 90mm f/2.5
-  <br>47 = Summilux-M 21mm f/1.4 ASPH.
-  <br>48 = Summilux-M 24mm f/1.4 ASPH.
-  <br>49 = Noctilux-M 50mm f/0.95 ASPH.
-  <br>50 = Elmar-M 24mm f/3.8 ASPH.
-  <br>52 = Super-Elmar-M 18mm f/3.8 ASPH.
-  <br>[Value 1]
-  <br>1 = 28/90mm frame lines engaged
-  <br>2 = 24/35mm frame lines engaged
-  <br>3 = 50/75mm frame lines engaged</span></td></tr>
+<td>--&gt; <a href='Panasonic.html#LensType'>Panasonic LensType Values</a></td></tr>
+<tr>
+<td title='0x3406 = 13318'>0x3406</td>
+<td>ApproximateFNumber</td>
+<td class=c>rational64u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x3407 = 13319'>0x3407</td>
+<td>MeasuredLV</td>
+<td class=c>int32s</td>
+<td><span class=s><span class=n>(imaging sensor or TTL exposure meter measurement)</span></span></td></tr>
+<tr>
+<td title='0x3408 = 13320'>0x3408</td>
+<td>ExternalSensorBrightnessValue</td>
+<td class=c>int32s</td>
+<td><span class=s><span class=n>(&quot;blue dot&quot; measurement)</span></span></td></tr>
+<tr class=b>
+<td title='0x3901 = 14593'>0x3901</td>
+<td>Data1</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Panasonic.html#Data1'>Panasonic Data1 Tags</a></td></tr>
+<tr>
+<td title='0x3902 = 14594'>0x3902</td>
+<td>Data2</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Panasonic.html#Data2'>Panasonic Data2 Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Data1'>Panasonic Data1 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='22 = 0x16'>22</td>
+<td>LensType</td>
+<td class=c>int32u[0.25]</td>
+<td>--&gt; <a href='Panasonic.html#LensType'>Panasonic LensType Values</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Data2'>Panasonic Data2 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr><td colspan=4 class=c><i>[no tags known]</i></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Leica5'>Panasonic Leica5 Tags</a></h2>
@@ -1039,7 +1164,7 @@ iPalm.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 16, 2010</i>
+<br><i>Last revised Jul 12, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

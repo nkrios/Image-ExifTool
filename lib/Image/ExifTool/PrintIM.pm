@@ -12,16 +12,27 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 sub ProcessPrintIM($$$);
 
-# PrintIM table (is this proprietary? I can't find any documentation on this)
+# PrintIM table (proprietary specification by Epson)
 %Image::ExifTool::PrintIM::Main = (
     PROCESS_PROC => \&ProcessPrintIM,
     GROUPS => { 0 => 'PrintIM', 1 => 'PrintIM', 2 => 'Printing' },
     PRINT_CONV => 'sprintf("0x%.8x", $val)',
     TAG_PREFIX => 'PrintIM',
+    PrintIMVersion => { # values: 0100, 0250, 0260, 0300
+        Description => 'PrintIM Version',
+        PrintConv => undef,
+    },
+    # the following names are from http://www.kanzaki.com/ns/exif
+    # but the decoding is unknown:
+    # 9  => { Name => 'PIMContrast',     Unknown => 1 }, #1
+    # 10 => { Name => 'PIMBrightness',   Unknown => 1 }, #1
+    # 11 => { Name => 'PIMColorbalance', Unknown => 1 }, #1
+    # 12 => { Name => 'PIMSaturation',   Unknown => 1 }, #1
+    # 13 => { Name => 'PIMSharpness',    Unknown => 1 }, #1
 );
 
 
@@ -61,6 +72,11 @@ sub ProcessPrintIM($$$)
         }
     }
     $verbose and $exifTool->VerboseDir('PrintIM', $num);
+    $exifTool->HandleTag($tagTablePtr, 'PrintIMVersion', substr($$dataPt, $offset + 8, 4),
+        DataPt => $dataPt,
+        Start  => $offset + 8,
+        Size   => 4,
+    );
     my $n;
     for ($n=0; $n<$num; ++$n) {
         my $pos = $offset + 16 + $n * 6;
@@ -69,8 +85,8 @@ sub ProcessPrintIM($$$)
         $exifTool->HandleTag($tagTablePtr, $tag, $val,
             Index  => $n,
             DataPt => $dataPt,
-            Size   => 4,
             Start  => $pos + 2,
+            Size   => 4,
         );
     }
     return 1;

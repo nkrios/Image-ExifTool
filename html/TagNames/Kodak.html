@@ -460,32 +460,49 @@ with much duplication), but relatively few tags have so far been decoded.</p>
 <td title='0xfc00 = 64512'>0xfc00</td>
 <td>SubIFD0</td>
 <td class=c>-</td>
-<td>--&gt; <a href='Kodak.html#SubIFD0'>Kodak SubIFD0 Tags</a></td></tr>
+<td>--&gt; <a href='Kodak.html#SubIFD0'>Kodak SubIFD0 Tags</a>
+  <br>--&gt; <a href='Kodak.html#SubIFD0'>Kodak SubIFD0 Tags</a></td></tr>
 <tr class=b>
 <td title='0xfc01 = 64513'>0xfc01</td>
 <td>SubIFD1</td>
 <td class=c>-</td>
-<td>--&gt; <a href='Kodak.html#SubIFD1'>Kodak SubIFD1 Tags</a></td></tr>
+<td>--&gt; <a href='Kodak.html#SubIFD1'>Kodak SubIFD1 Tags</a>
+  <br>--&gt; <a href='Kodak.html#SubIFD1'>Kodak SubIFD1 Tags</a></td></tr>
 <tr>
 <td title='0xfc02 = 64514'>0xfc02</td>
 <td>SubIFD2</td>
 <td class=c>-</td>
-<td>--&gt; <a href='Kodak.html#SubIFD2'>Kodak SubIFD2 Tags</a></td></tr>
+<td>--&gt; <a href='Kodak.html#SubIFD2'>Kodak SubIFD2 Tags</a>
+  <br>--&gt; <a href='Kodak.html#SubIFD2'>Kodak SubIFD2 Tags</a></td></tr>
 <tr class=b>
 <td title='0xfc03 = 64515'>0xfc03</td>
 <td>SubIFD3</td>
 <td class=c>-</td>
-<td>--&gt; <a href='Kodak.html#SubIFD3'>Kodak SubIFD3 Tags</a></td></tr>
+<td>--&gt; <a href='Kodak.html#SubIFD3'>Kodak SubIFD3 Tags</a>
+  <br>--&gt; <a href='Kodak.html#SubIFD3'>Kodak SubIFD3 Tags</a></td></tr>
 <tr>
 <td title='0xfc04 = 64516'>0xfc04</td>
 <td>SubIFD4</td>
 <td class=c>-</td>
-<td>--&gt; <a href='Kodak.html#SubIFD4'>Kodak SubIFD4 Tags</a></td></tr>
+<td>--&gt; <a href='Kodak.html#SubIFD4'>Kodak SubIFD4 Tags</a>
+  <br>--&gt; <a href='Kodak.html#SubIFD4'>Kodak SubIFD4 Tags</a></td></tr>
 <tr class=b>
 <td title='0xfc05 = 64517'>0xfc05</td>
 <td>SubIFD5</td>
 <td class=c>-</td>
-<td>--&gt; <a href='Kodak.html#SubIFD5'>Kodak SubIFD5 Tags</a></td></tr>
+<td>--&gt; <a href='Kodak.html#SubIFD5'>Kodak SubIFD5 Tags</a>
+  <br>--&gt; <a href='Kodak.html#SubIFD5'>Kodak SubIFD5 Tags</a></td></tr>
+<tr>
+<td title='0xfc06 = 64518'>0xfc06</td>
+<td>SubIFD6</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#SubIFD6'>Kodak SubIFD6 Tags</a>
+  <br>--&gt; <a href='Kodak.html#SubIFD6'>Kodak SubIFD6 Tags</a></td></tr>
+<tr class=b>
+<td title='0xfcff = 64767'>0xfcff</td>
+<td>SubIFD255</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Kodak.html#SubIFD0'>Kodak SubIFD0 Tags</a></td></tr>
 <tr>
 <td title='0xff00 = 65280'>0xff00</td>
 <td>CameraInfo</td>
@@ -494,7 +511,7 @@ with much duplication), but relatively few tags have so far been decoded.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SubIFD0'>Kodak SubIFD0 Tags</a></h2>
-<p>SubIFD0 through SubIFD5 tags are used by the Z612 and Z712.</p>
+<p>SubIFD0 through SubIFD5 tags are written a number of newer Kodak models.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -504,7 +521,8 @@ with much duplication), but relatively few tags have so far been decoded.</p>
 <td title='0xfa02 = 64002'>0xfa02</td>
 <td>SceneMode</td>
 <td class=c>int16u</td>
-<td><span class=s>1 = Sport
+<td><span class=s><span class=n>(may not be valid for some models)</span>
+  <br>1 = Sport
   <br>3 = Portrait
   <br>4 = Landscape
   <br>6 = Beach
@@ -748,6 +766,16 @@ with much duplication), but relatively few tags have so far been decoded.</p>
 <td>OpticalZoom</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SubIFD6'>Kodak SubIFD6 Tags</a></h2>
+<p>SubIFD6 is written by the M580.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr><td colspan=4 class=c><i>[no tags known]</i></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo'>Kodak CameraInfo Tags</a></h2>
@@ -1222,9 +1250,9 @@ data, however ExifTool will extract information from any tags found here.</p>
 
 <h2><a name='Meta'>Kodak Meta Tags</a></h2>
 <p>These tags are found in the APP3 &quot;Meta&quot; segment of JPEG images from Kodak
-cameras such as the DC280, DC3400, DC5000 and MC3.  The structure of this
-segment is similar to the APP1 &quot;Exif&quot; segment, but a different set of tags
-is used.</p>
+cameras such as the DC280, DC3400, DC5000, MC3, M580, Z950 and Z981.  The
+structure of this segment is similar to the APP1 &quot;Exif&quot; segment, but a
+different set of tags is used.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -1248,12 +1276,12 @@ is used.</p>
 <tr class=b>
 <td title='0xc353 = 50003'>0xc353</td>
 <td>CameraOwner</td>
-<td class=c>N</td>
+<td class=c>undef</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0xc354 = 50004'>0xc354</td>
 <td>SerialNumber</td>
-<td class=c>N</td>
+<td class=c>undef</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0xc355 = 50005'>0xc355</td>
@@ -1562,7 +1590,7 @@ models such as the P880 and Z1015IS.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 6, 2010</i>
+<br><i>Last revised Jun 28, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

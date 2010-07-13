@@ -23,24 +23,25 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.25';
+$VERSION = '1.26';
 
 sub ProcessFujiDir($$$);
 
 # the following RAF version numbers have been tested for writing:
 my %testedRAF = (
-    '0100' => 'E550 V1.00, E900 V1.00, S5600 V1.00, S6000fd V1.00, S6500fd V2.00',
-    '0104' => 'S5Pro V1.04',
-    '0106' => 'S5Pro V1.06',
-    '0111' => 'S5Pro V1.11',
-    '0114' => 'S9600 V1.00',
-    '0159' => 'S2Pro V1.00',
-    '0212' => 'S3Pro V2.12',
-    '0218' => 'S3Pro V2.18',
-    '0264' => 'F700  V2.00',
-    '0266' => 'S9500 V1.01',
-    '0269' => 'S9500 V1.02',
-    '0712' => 'S5000 V3.00',
+    '0100' => 'E550, E900, S5600, S6000fd, S6500fd, HS10/HS11, S200EXR (all Ver1.00)',
+    '0102' => 'S100FS Ver1.02',
+    '0104' => 'S5Pro Ver1.04',
+    '0106' => 'S5Pro Ver1.06',
+    '0111' => 'S5Pro Ver1.11',
+    '0114' => 'S9600 Ver1.00',
+    '0159' => 'S2Pro Ver1.00',
+    '0212' => 'S3Pro Ver2.12',
+    '0218' => 'S3Pro Ver2.18',
+    '0264' => 'F700  Ver2.00',
+    '0266' => 'S9500 Ver1.01',
+    '0269' => 'S9500 Ver1.02',
+    '0712' => 'S5000 Ver3.00',
 );
 
 # FujiFilm MakerNotes tags
@@ -375,6 +376,12 @@ my %testedRAF = (
     # 0x1408 - values: '0100', 'S100', 'VQ10'
     # 0x1409 - values: same as 0x1408
     # 0x140a - values: 0, 1, 3, 5, 7
+    0x140b => { #6
+        Name => 'AutoDynamicRange',
+        Writable => 'int16u',
+        PrintConv => '"$val%"',
+        PrintConvInv => '$val=~s/\s*\%$//; $val',
+    },
     # 0x140b - DR value for AutoDR???? (ref 6) - values: 100
     0x4100 => { #PH
         Name => 'FacesDetected',
@@ -578,9 +585,19 @@ sub WriteRAF($$)
     my $nextPtr = Get32u(\$hdr, 0x5c);
     # determine the length of padding at the end of the original JPEG
     my $oldPadLen = $nextPtr - ($jpos + $jlen);
-    if ($oldPadLen > 31 or $oldPadLen < 0) {
-        $exifTool->Error('Bad RAF pointer at 0x5c');
-        return 1;
+    if ($oldPadLen) {
+        if ($oldPadLen > 1000000 or $oldPadLen < 0 or
+            not $raf->Seek($jpos+$jlen, 0) or
+            $raf->Read($buff, $oldPadLen) != $oldPadLen)
+        {
+            $exifTool->Error('Bad RAF pointer at 0x5c');
+            return 1;
+        }
+        # make sure padding is only zero bytes (can be >100k for HS10)
+        if ($buff =~ /[^\0]/) {
+            $exifTool->Error('Non-null bytes found in padding');
+            return 1;
+        }
     }
     # calculate offset difference due to change in JPEG size
     my $ptrDiff = length($outJpeg) + length($pad) - ($jlen + $oldPadLen);

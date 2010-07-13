@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.20
 [File, System, Image] FileName - File Name: CanonRaw_7_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 12 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:39-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:05:25 13:10:08-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -50,6 +50,8 @@
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
 [EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Normal
+[EXIF, ExifIFD, Image] 42032 - Owner Name: unknown
+[EXIF, ExifIFD, Image] 42033 - Serial Number: 0123456789
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Normal
 [MakerNotes, Canon, Camera] 2 - Self Timer: Off
 [MakerNotes, Canon, Camera] 3 - Quality: RAW
@@ -207,10 +209,8 @@
 [MakerNotes, Canon, Camera] 131 - Camera Color Calibration 15:  949  307  397 (2413K)
 [MakerNotes, Canon, Camera] 16386 - Unknown Block 1: (Binary data 5352 bytes)
 [MakerNotes, Canon, Camera] 2 - Color Tone: Normal
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.02
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.20
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
-[XMP, XMP-aux, Camera] OwnerName - Owner Name: unknown
-[XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0123456789
 [XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: -, -, -, -
 [XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8, 8, 8
 [XMP, XMP-tiff, Image] Compression - Compression: JPEG (old-style)
@@ -221,7 +221,7 @@
 [XMP, XMP-tiff, Image] SamplesPerPixel - Samples Per Pixel: 3
 [XMP, XMP-crs, Image] ToneCurve - Tone Curve: Standard
 [Composite, Composite, Image] Aperture - Aperture: 8.0
-[Composite, Composite, Camera] DriveMode - Drive Mode: Single-frame shooting
+[Composite, Composite, Camera] DriveMode - Drive Mode: Single-frame Shooting
 [Composite, Composite, Camera] ISO - ISO: 400
 [Composite, Composite, Camera] Lens - Lens: 18.0 - 55.0 mm
 [Composite, Composite, Camera] LensID - Lens ID: Unknown 18-55mm

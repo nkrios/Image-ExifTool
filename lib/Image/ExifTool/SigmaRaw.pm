@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.09';
+$VERSION = '1.11';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
@@ -150,12 +150,12 @@ sub ProcessX3FProperties($$$);
     EXPCOMP => {
         Name => 'ExposureCompensation',
         Groups => { 2 => 'Image' },
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
     EXPNET => {
         Name => 'NetExposureCompensation',
         Groups => { 2 => 'Image' },
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
     EXPTIME => {
         Name => 'IntegrationTime',
@@ -186,7 +186,10 @@ sub ProcessX3FProperties($$$);
         },
     },
     IMAGERBOARDID => 'ImagerBoardID',
-    IMAGERTEMP  => 'SensorTemperature',
+    IMAGERTEMP  => {
+        Name => 'SensorTemperature',
+        PrintConv => '"$val C"',
+    },
     IMAGEBOARDID=> 'ImageBoardID', #PH (DP2)
     ISO         => 'ISO',
     LENSARANGE  => 'LensApertureRange',

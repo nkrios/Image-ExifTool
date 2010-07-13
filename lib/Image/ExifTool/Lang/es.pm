@@ -809,7 +809,7 @@ $VERSION = '1.02';
         'Standard Light A' => 'Luz estandar A',
         'Standard Light B' => 'Luz estandar B',
         'Standard Light C' => 'Luz estandar C',
-        'Tungsten' => 'Tungsteno (luz incandescente)',
+        'Tungsten (Incandescent)' => 'Tungsteno (luz incandescente)',
         'Unknown' => 'Desconocido',
         'White Fluorescent' => 'Fluorescente blanco (WW 3200 - 3700K)',
       },

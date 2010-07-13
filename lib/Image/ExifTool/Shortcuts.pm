@@ -15,7 +15,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.34';
+$VERSION = '1.35';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -188,7 +188,8 @@ $VERSION = '1.34';
         'MakerNotePentax4',
         'MakerNoteRicoh',
         'MakerNoteRicohText',
-        'MakerNoteSamsung',
+        'MakerNoteSamsung1a',
+        'MakerNoteSamsung1b',
         'MakerNoteSamsung2',
         'MakerNoteSanyo',
         'MakerNoteSanyoC4',
@@ -213,6 +214,28 @@ $VERSION = '1.34';
         'InteropIFD:InteropVersion',
         'InteropIFD:RelatedImageWidth',
         'InteropIFD:RelatedImageHeight',
+    ],
+    # common metadata tags found in IFD0 of TIFF images
+    CommonIFD0 => [
+        # standard EXIF
+        'IFD0:ImageDescription',
+        'IFD0:Make',
+        'IFD0:Model',
+        'IFD0:Software',
+        'IFD0:ModifyDate',
+        'IFD0:Artist',
+        'IFD0:Copyright',
+        # other TIFF tags
+        'IFD0:Rating', 
+        'IFD0:RatingPercent',
+        'IFD0:DNGLensInfo',
+        'IFD0:PanasonicTitle',
+        'IFD0:PanasonicTitle2',
+        'IFD0:XPTitle',
+        'IFD0:XPComment',
+        'IFD0:XPAuthor',
+        'IFD0:XPKeywords',
+        'IFD0:XPSubject',
     ],
 );
 

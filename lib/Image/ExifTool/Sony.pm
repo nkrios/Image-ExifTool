@@ -13,7 +13,8 @@
 #               6) Andrey Tverdokhleb private communication
 #               7) Rudiger Lange private communication (A700)
 #               8) Igal Milchtaich private communication
-#               9) Michael Reit private communication (DSC-TX7)
+#               9) Michael Reitinger private communication (DSC-TX7)
+#               10) http://www.klingebiel.com/tempest/hd/pmp.html
 #               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -25,7 +26,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.40';
+$VERSION = '1.45';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -140,6 +141,29 @@ my %sonyExposureProgram = (
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
     },
+    # the next 3 tags have a different meaning for some models (with format int32u)
+    0x1000 => { #9 (F88, multi burst mode only)
+        Name => 'MultiBurstMode',
+        Condition => '$format eq "undef"',
+        Notes => 'MultiBurst tags valid only for models with this feature, like the F88',
+        Writable => 'undef',
+        Format => 'int8u',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x1001 => { #9 (F88, multi burst mode only)
+        Name => 'MultiBurstImageWidth',
+        Condition => '$format eq "int16u"',
+        Writable => 'int16u',
+    },
+    0x1002 => { #9 (F88, multi burst mode only)
+        Name => 'MultiBurstImageHeight',
+        Condition => '$format eq "int16u"',
+        Writable => 'int16u',
+    },
+    0x1003 => { #9 (TX7, panorama mode only)
+        Name => 'Panorama',
+        SubDirectory => { TagTable => 'Image::ExifTool::Sony::Panorama' },
+    },
     0x2001 => { #PH (JPEG images from all DSLR's except the A100)
         Name => 'PreviewImage',
         Writable => 'undef',
@@ -163,13 +187,33 @@ my %sonyExposureProgram = (
             return Set32u(length $val) . $size . ("\0" x 8) . $size . ("\0" x 4) . $val;
         },
     },
+    # 0x2002 - probably Sharpness (PH guess)
+    0x2004 => { #PH (NEX-5)
+        Name => 'Contrast',
+        Writable => 'int32s',
+        PrintConv => '$val > 0 ? "+$val" : $val',
+        PrintConvInv => '$val',
+    },
+    0x2005 => { #PH (NEX-5)
+        Name => 'Saturation',
+        Writable => 'int32s',
+        PrintConv => '$val > 0 ? "+$val" : $val',
+        PrintConvInv => '$val',
+    },
+    # 0x2006 - possibly Brightness? (PH guess)
+    # 0x2009 - NoiseReduction? 1=Weak, 256=Normal (PH)
     0x200a => { #PH (A550)
-        Name => 'AutoHDR',
+        Name => 'HDR',
         Writable => 'int32u',
         PrintHex => 1,
         PrintConv => {
             0x0 => 'Off',
-            0x10001 => 'On',
+            0x10001 => 'Auto',
+            0x10010 => 1, # (NEX_5)
+            0x10012 => 2,
+            0x10014 => 3,
+            0x10016 => 4,
+            0x10018 => 5,
         },
     },
     0x3000 => {
@@ -194,6 +238,7 @@ my %sonyExposureProgram = (
             '2 0 0 0' => 'ARW 1.0',
             '3 0 0 0' => 'ARW 2.0',
             '3 1 0 0' => 'ARW 2.1',
+            '3 2 0 0' => 'ARW 2.2', # (NEX-5)
             # what about cRAW images?
         },
     },
@@ -216,6 +261,9 @@ my %sonyExposureProgram = (
             269 => 'DSLR-A850',
             273 => 'DSLR-A550',
             274 => 'DSLR-A500', #PH
+            275 => 'DSLR-A450', # (http://dev.exiv2.org/issues/show/0000611)
+            278 => 'NEX-5', #PH
+            279 => 'NEX-3', #PH
         },
     },
     0xb020 => { #2
@@ -232,7 +280,7 @@ my %sonyExposureProgram = (
     0xb022 => { #7
         Name => 'ColorCompensationFilter',
         Format => 'int32s',
-        Writable => 'int32u',
+        Writable => 'int32u', # (written incorrectly as unsigned by Sony)
         Notes => 'negative is green, positive is magenta',
     },
     0xb023 => { #PH (A100) - (set by mode dial)
@@ -256,12 +304,17 @@ my %sonyExposureProgram = (
             0 => 'Off',
             1 => 'Standard',
             2 => 'Advanced Auto',
-            3 => 'Auto', #PH (A550)
+            3 => 'Auto', # (A550)
             8 => 'Advanced Lv1', #JD
             9 => 'Advanced Lv2', #JD
             10 => 'Advanced Lv3', #JD
             11 => 'Advanced Lv4', #JD
             12 => 'Advanced Lv5', #JD
+            16 => 1, # (NEX_5)
+            17 => 2,
+            18 => 3,
+            19 => 4,
+            20 => 5,
         },
     },
     0xb026 => { #PH (A100)
@@ -319,11 +372,18 @@ my %sonyExposureProgram = (
     0xb040 => { #2
         Name => 'Macro',
         Writable => 'int16u',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        RawConv => '$val == 65535 ? undef : $val',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+            2 => 'Close Focus', #9
+            65535 => 'n/a', #PH (A100)
+        },
     },
     0xb041 => { #2
         Name => 'ExposureMode',
         Writable => 'int16u',
+        RawConv => '$val == 65535 ? undef : $val',
         PrintConv => {
             0 => 'Auto',
             1 => 'Portrait', #PH (HX1)
@@ -338,8 +398,10 @@ my %sonyExposureProgram = (
             11 => 'Twilight Portrait', #9
             12 => 'Soft Snap', #9
             13 => 'Fireworks', #9
-            18 => 'High Sensitivity', #9
+            14 => 'Smile Shutter', #9 (T200)
             15 => 'Manual',
+            18 => 'High Sensitivity', #9
+            20 => 'Advanced Sports Shooting', #9
             29 => 'Underwater', #9
             33 => 'Gourmet', #9
             34 => 'Panorama', #PH (HX1)
@@ -347,20 +409,94 @@ my %sonyExposureProgram = (
             36 => 'Anti Motion Blur', #PH (TX1)
             37 => 'Pet', #9
             38 => 'Backlight Correction HDR', #9
+            65535 => 'n/a', #PH (A100)
         },
     },
-    # 0xb043 - some sort of mode: values - 0,1,2,3,4,15(face detect?),65535
+    0xb042 => { #9
+        Name => 'FocusMode',
+        Writable => 'int16u',
+        RawConv => '$val == 65535 ? undef : $val',
+        PrintConv => {
+            1 => 'AF-S', # (called Single-AF by Sony)
+            2 => 'AF-C', # (called Monitor-AF by Sony)
+            4 => 'Permanent-AF', # (TX7)
+            65535 => 'n/a', #PH (A100)
+        },
+    },
+    0xb043 => { #9
+        Name => 'AFMode',
+        Writable => 'int16u',
+        RawConv => '$val == 65535 ? undef : $val',
+        PrintConv => {
+            0 => 'Default', # (takes this value after camera reset, but can't be set back once changed)
+            1 => 'Multi AF',
+            2 => 'Center AF',
+            3 => 'Spot AF',
+            4 => 'Flexible Spot AF', # (T200)
+            6 => 'Touch AF',
+            14 => 'Manual Focus', # (T200)
+            15 => 'Face Detected', # (not set when in face detect mode and no faces detected)
+            65535 => 'n/a', #PH (A100)
+        },
+    },
+    0xb044 => { #9
+        Name => 'AFIlluminator',
+        Writable => 'int16u',
+        RawConv => '$val == 65535 ? undef : $val',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Auto',
+            65535 => 'n/a', #PH (A100)
+        },
+    },
     0xb047 => { #2
         Name => 'Quality',
         Writable => 'int16u',
+        RawConv => '$val == 65535 ? undef : $val',
         PrintConv => {
             0 => 'Normal',
             1 => 'Fine',
+            65535 => 'n/a', #PH (A100)
+        },
+    },
+    0xb048 => { #9
+        Name => 'FlashLevel',
+        Writable => 'int16s',
+        RawConv => '$val == -1 ? undef : $val',
+        PrintConv => {
+            -32768 => 'Low',
+            -1 => 'n/a', #PH (A100)
+            0 => 'Normal',
+            32767 => 'High',
+        },
+    },
+    0xb049 => { #9
+        Name => 'ReleaseMode',
+        Writable => 'int16u',
+        RawConv => '$val == 65535 ? undef : $val',
+        PrintConv => {
+            0 => 'Normal',
+            2 => 'Burst',
+            5 => 'Exposure Bracketing',
+            6 => 'White Balance Bracketing', # (HX5)
+            65535 => 'n/a', #PH (A100)
+        },
+    },
+    0xb04a => { #9
+        Name => 'SequenceNumber',
+        Notes => 'shot number in continuous burst',
+        Writable => 'int16u',
+        RawConv => '$val == 65535 ? undef : $val',
+        PrintConv => {
+            0 => 'Single',
+            65535 => 'n/a', #PH (A100)
+            OTHER => sub { shift }, # pass all other numbers straight through
         },
     },
     0xb04b => { #2/PH
         Name => 'Anti-Blur',
         Writable => 'int16u',
+        RawConv => '$val == 65535 ? undef : $val',
         PrintConv => {
             0 => 'Off',
             1 => 'On (Continuous)', #PH (NC)
@@ -371,7 +507,12 @@ my %sonyExposureProgram = (
     0xb04e => { #2
         Name => 'LongExposureNoiseReduction',
         Writable => 'int16u',
-        PrintConv => { 0 => 'Off', 1 => 'On' },
+        RawConv => '$val == 65535 ? undef : $val',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+            65535 => 'n/a', #PH (A100)
+        },
     },
     0xb04f => { #PH (TX1)
         Name => 'DynamicRangeOptimizer',
@@ -399,7 +540,14 @@ my %sonyExposureProgram = (
             0 => 'Auto',
             4 => 'Manual',
             5 => 'Daylight',
+            6 => 'Cloudy', #9
+            7 => 'White Flourescent', #9      (Sony "Fluorescent 1 (White)")
+            8 => 'Cool White Flourescent', #9 (Sony "Fluorescent 2 (Natural White)")
+            9 => 'Day White Flourescent', #9  (Sony "Fluorescent 3 (Day White)")
             14 => 'Incandescent',
+            15 => 'Flash', #9
+            17 => 'Underwater 1 (Blue Water)', #9
+            18 => 'Underwater 2 (Green Water)', #9
         },
     },
 );
@@ -855,6 +1003,46 @@ my %sonyExposureProgram = (
     #},
 );
 
+# panorama info for cameras such as the HX1, HX5, TX7 (ref 9/PH)
+%Image::ExifTool::Sony::Panorama = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    FORMAT => 'int32u',
+    NOTES => q{
+        Tags found only in panorama images from Sony cameras such as the HX1, HX5
+        and TX7.  The width/height values of these tags are not affected by camera
+        rotation -- the width is always the longer dimension.
+    },
+    # 0: 257
+    1 => 'PanoramaFullWidth', # (including black/grey borders)
+    2 => 'PanoramaFullHeight',
+    3 => {
+        Name => 'PanoramaDirection',
+        PrintConv => {
+            0 => 'Right to Left',
+            1 => 'Left to Right',
+        },
+    },
+    # crop area to remove black/grey borders from full image
+    4 => 'PanoramaCropLeft',
+    5 => 'PanoramaCropTop', #PH guess (NC)
+    6 => 'PanoramaCropRight',
+    7 => 'PanoramaCropBottom',
+    # 8: 1728 (HX1), 1824 (HX5/TX7) (value8/value9 = 16/9)
+    8 => 'PanoramaFrameWidth', #PH guess (NC)
+    # 9: 972 (HX1), 1026 (HX5/TX7)
+    9 => 'PanoramaFrameHeight', #PH guess (NC)
+    # 10: 3200-3800 (HX1), 4000-4900 (HX5/TX7)
+    10 => 'PanoramaSourceWidth', #PH guess (NC)
+    # 11: 800-1800 (larger for taller panoramas)
+    11 => 'PanoramaSourceHeight', #PH guess (NC)
+    # 12-15: 0
+);
+
 # tag table for SRF0 IFD (ref 1)
 %Image::ExifTool::Sony::SRF = (
     PROCESS_PROC => \&ProcessSRF,
@@ -1002,6 +1190,103 @@ my %sonyExposureProgram = (
     },
 );
 
+# tags found in DSC-F1 PMP header (ref 10)
+%Image::ExifTool::Sony::PMP = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    FIRST_ENTRY => 0,
+    NOTES => q{
+        These tags are written in the proprietary-format header of PMP images from
+        the DSC-F1.
+    },
+    8 => { #PH
+        Name => 'JpgFromRawStart',
+        Format => 'int32u',
+        Notes => q{
+            OK, not really a RAW file, but this mechanism is used to allow extraction of
+            the JPEG image from a PMP file
+        },
+    },
+    12 => { Name => 'JpgFromRawLength',Format => 'int32u' },
+    22 => { Name => 'SonyImageWidth',  Format => 'int16u' },
+    24 => { Name => 'SonyImageHeight', Format => 'int16u' },
+    27 => {
+        Name => 'Orientation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            2 => 'Rotate 180',
+        },
+    },
+    29 => {
+        Name => 'ImageQuality',
+        PrintConv => {
+            8 => 'Snap Shot',
+            23 => 'Standard',
+            51 => 'Fine',
+        },
+    },
+    # 40 => ImageWidth again (int16u)
+    # 42 => ImageHeight again (int16u)
+    52 => { Name => 'Comment',         Format => 'string[19]' },
+    76 => {
+        Name => 'DateTimeOriginal',
+        Description => 'Date/Time Original',
+        Format => 'int8u[6]',
+        Groups => { 2 => 'Time' },
+        ValueConv => q{
+            my @a = split ' ', $val;
+            $a[0] += $a[0] < 70 ? 2000 : 1900;
+            sprintf('%.4d:%.2d:%.2d %.2d:%.2d:%.2d', @a);
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    84 => {
+        Name => 'ModifyDate',
+        Format => 'int8u[6]',
+        Groups => { 2 => 'Time' },
+        ValueConv => q{
+            my @a = split ' ', $val;
+            $a[0] += $a[0] < 70 ? 2000 : 1900;
+            sprintf('%.4d:%.2d:%.2d %.2d:%.2d:%.2d', @a);
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    102 => {
+        Name => 'ExposureTime',
+        Format => 'int16s',
+        RawConv => '$val <= 0 ? undef : $val',
+        ValueConv => '2 ** (-$val / 100)',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    106 => { # (NC -- not written by DSC-F1)
+        Name => 'FNumber',
+        Format => 'int16s',
+        RawConv => '$val <= 0 ? undef : $val',
+        ValueConv => '$val / 100', # (likely wrong)
+    },
+    108 => { # (NC -- not written by DSC-F1)
+        Name => 'ExposureCompensation',
+        Format => 'int16s',
+        RawConv => '($val == -1 or $val == -32768) ? undef : $val',
+        ValueConv => '$val / 100', # (probably wrong too)
+    },
+    112 => { # (NC -- not written by DSC-F1)
+        Name => 'FocalLength',
+        Format => 'int16s',
+        Groups => { 2 => 'Camera' },
+        RawConv => '$val <= 0 ? undef : $val',
+        ValueConv => '$val / 100',
+        PrintConv => 'sprintf("%.1f mm",$val)',
+    },
+    118 => {
+        Name => 'Flash',
+        Groups => { 2 => 'Camera' },
+        PrintConv => { 0 => 'No Flash', 1 => 'Fired' },
+    },
+);
+
 # fill in Sony LensType lookup based on Minolta values
 {
     %sonyLensTypes = %Image::ExifTool::Minolta::minoltaLensTypes;
@@ -1027,6 +1312,33 @@ my %sonyExposureProgram = (
         }
         $sonyLensTypes{$sid} = $lens;
     }
+}
+
+#------------------------------------------------------------------------------
+# Read Sony DSC-F1 PMP file
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref
+# Returns: 1 on success when reading, 0 if this isn't a valid PMP file
+sub ProcessPMP($$)
+{
+    my ($exifTool, $dirInfo) = @_;
+    my $raf = $$dirInfo{RAF};
+    my $buff;
+    $raf->Read($buff, 128) == 128 or return 0;
+    # validate header length (124 bytes)
+    $buff =~ /^.{8}\0{3}\x7c.{112}\xff\xd8\xff\xdb$/s or return 0;
+    $exifTool->SetFileType();
+    SetByteOrder('MM');
+    $exifTool->FoundTag(Make => 'Sony');
+    $exifTool->FoundTag(Model => 'DSC-F1');
+    # extract information from 124-byte header
+    my $tagTablePtr = GetTagTable('Image::ExifTool::Sony::PMP');
+    my %dirInfo = ( DataPt => \$buff, DirName => 'PMP' );
+    $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
+    # process JPEG image
+    $raf->Seek(124, 0);
+    $$dirInfo{Base} = 124;
+    $exifTool->ProcessJPEG($dirInfo);
+    return 1;
 }
 
 #------------------------------------------------------------------------------
@@ -1460,13 +1772,15 @@ under the same terms as Perl itself.
 
 =item L<http://homepage3.nifty.com/kamisaka/makernote/makernote_sony.htm>
 
+=item L<http://www.klingebiel.com/tempest/hd/pmp.html>
+
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Thomas Bodenmann, Philippe Devaux, Jens Duttke, Marcus
-Holland-Moritz, Andrey Tverdokhleb, Rudiger Lange and Igal Milchtaich for
-help decoding some tags.
+Holland-Moritz, Andrey Tverdokhleb, Rudiger Lange, Igal Milchtaich and
+Michael Reitinger for help decoding some tags.
 
 =head1 SEE ALSO
 

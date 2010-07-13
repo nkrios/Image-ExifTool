@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 # BMP chunks
 %Image::ExifTool::BMP::Main = (
@@ -38,7 +38,8 @@ $VERSION = '1.05';
     },
     8 => {
         Name => 'ImageHeight',
-        Format => 'int32u',
+        Format => 'int32s', # (negative when stored in top-to-bottom order)
+        ValueConv => 'abs($val)',
     },
     12 => {
         Name => 'Planes',

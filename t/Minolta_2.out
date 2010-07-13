@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
 [File, System, Image] FileName - File Name: Minolta.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 13 kB
@@ -115,6 +115,8 @@
 [MakerNotes, Minolta, Camera] 64 - Compressed Image Size: 2396300
 [MakerNotes, Minolta, Camera] 136 - Preview Image Start: 13042
 [MakerNotes, Minolta, Camera] 137 - Preview Image Length: 26
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0100
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0250
 [Composite, Composite, Image] Aperture - Aperture: 5.6
 [Composite, Composite, Image] ImageSize - Image Size: 8x8
 [Composite, Composite, Image] PreviewImage - Preview Image: (Binary data 26 bytes)

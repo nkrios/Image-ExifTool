@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.24
 [File, System, Image] FileName - File Name: Sigma.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1531 bytes
@@ -62,7 +62,7 @@
 [MakerNotes, Sigma, Camera] 7 - White Balance: Sunlight
 [MakerNotes, Sigma, Camera] 8 - Exposure Mode: Program AE
 [MakerNotes, Sigma, Camera] 9 - Metering Mode: Multi-segment
-[MakerNotes, Sigma, Camera] 10 - Lens: 24 to 70
+[MakerNotes, Sigma, Camera] 10 - Lens Focal Range: 24 to 70
 [MakerNotes, Sigma, Camera] 11 - Color Space: sRGB
 [MakerNotes, Sigma, Camera] 12 - Exposure Compensation: +0.8
 [MakerNotes, Sigma, Camera] 13 - Contrast: +0.0

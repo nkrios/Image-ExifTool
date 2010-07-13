@@ -10,9 +10,10 @@ blockquote  { margin-top: 1em; margin-bottom: 1em }
 pre         { color: #800; margin-left: 4em }
 pre.code    { color: #000; padding: 0; margin: 0 }
 .lt         { color: #666 }
-.l2         { color: #666; margin-left: 1.2em }
-.l2p        { color: #666; margin-left: 2.2em }
 .ind        { margin-left: 2.5em }
+p.a         { margin: 1em 2em 0 1em }
+p.b         { margin: 0 2em 1em 2.2em; color: #666 }
+p.c         { margin: 1em 2em 1em 2.2em; color: #666 }
 -->
 </style>
 </head>
@@ -42,37 +43,46 @@ exiftool, and the method you choose depends on your circumstances and
 preferences. Below are a number of example commands which write an output XMP
 file from information in a source file of any type.</p>
 
-<p>1. Copy same-named tags from all information types to preferred locations in XMP:<br>
-<span class=l2>(<code><i>SRC</i>.<i>EXT</i></code> is the source file name and
-extension, and <code><i>DST</i></code> is the destination file name)</span></p>
+<p class=a>1. Copy same-named tags from all information types to preferred locations in XMP:</p>
+<p class=b>(<code><i>SRC</i>.<i>EXT</i></code> is the source file name and
+extension, and <code><i>DST</i></code> is the destination file name)</p>
 <pre>exiftool -tagsfromfile <i>SRC</i>.<i>EXT</i> <i>DST</i>.xmp</pre>
 
-<p>2. Rewrite source file to destination XMP file:<br>
-<span class=l2>(same effect as above, but the command will exit with an error if the output XMP file already exists)</span></p>
+<p class=a>2. Rewrite source file to destination XMP file:</p>
+<p class=b>(same effect as above, but the command will exit with an error if the output XMP file already exists)</p>
 <pre>exiftool <i>SRC</i>.<i>EXT</i> -o <i>DST</i>.xmp</pre>
 
-<p>3. Copy XMP, preserving original locations:<br>
-<span class=l2>(ie. copies XMP tags only to the same namespaces in the destination file)</span></p>
+<p class=a>3. Copy XMP, preserving original locations:</p>
+<p class=b>(ie. copies XMP tags only to the same namespaces in the destination file)</p>
 <pre>exiftool -tagsfromfile <i>SRC</i>.<i>EXT</i> -all:all <i>DST</i>.xmp</pre>
+<p class=c>Advanced: Notice that <code>-all:all</code> is used above instead of
+<code>-xmp:all</code> even though only XMP tags will be copied (since the destination
+is an XMP file).  This is because <code>-all:all</code> preserves the family 1 group
+(ie. XMP namespace) while <code>-xmp:all</code> would copy tags to the preferred XMP
+namespace, which may be different for XMP tags that exist in multiple namespaces.
+Using <code>"-xmp:all>all:all"</code> would avoid the inefficiencies of assigning
+tags which aren't copied while still preserving the family 1 group, but this wasn't
+done above to keep the example as simple as possible.
+</p>
 
-<p>4. Rewrite source to XMP file, preserving locations:<br>
-<span class=l2>(same effect as above, but the command will fail if the XMP file already exists)</span></p>
+<p class=a>4. Rewrite source to XMP file, preserving locations:</p>
+<p class=b>(same effect as above, but the command will fail if the XMP file already exists)</p>
 <pre>exiftool <i>SRC</i>.<i>EXT</i> -o <i>DST</i>.xmp -all:all</pre>
 
-<p>5. Generate XMP from EXIF and IPTC using standard tag name mappings:<br>
-<span class=l2> (the <code>.args</code> files are available in the full ExifTool distribution)</span></p>
+<p class=a>5. Generate XMP from EXIF and IPTC using standard tag name mappings:</p>
+<p class=b> (the <code>.args</code> files are available in the full ExifTool distribution)</p>
 <pre>exiftool -tagsfromfile <i>SRC</i>.<i>EXT</i> -@ exif2xmp.args -@ iptc2xmp.args <i>DST</i>.xmp</pre>
 
-<p>6. Copy XMP as a block to an XMP file:<br>
-<span class=l2>(writing as a block is the only way to transfer unknown or non-writable XMP tags)</span></p>
+<p class=a>6. Copy XMP as a block to an XMP file:</p>
+<p class=b>(writing as a block is the only way to transfer unknown or non-writable XMP tags)</p>
 <pre>exiftool -tagsfromfile <i>SRC</i>.<i>EXT</i> -xmp <i>DST</i>.xmp</pre>
 
 <p>7. Extract XMP as a block and write to output XMP file: <span class=lt>(same effect as above)</span></p>
 <pre>exiftool -xmp -b <i>SRC</i>.<i>EXT</i> > <i>DST</i>.xmp</pre>
 
-<p>8. Extract XMP as a block to an output text file with .xmp extension:<br>
-<span class=l2>(same effect as above, but the command will fail if the XMP file exists
-and the destination file name is the same as the source)</span></p>
+<p class=a>8. Extract XMP as a block to an output text file with .xmp extension:</p>
+<p class=b>(same effect as above, but the command will fail if the XMP file exists
+and the destination file name is the same as the source)</p>
 <pre>exiftool -xmp -b -w xmp <i>SRC</i>.<i>EXT</i></pre>
 
 <h4>Batch Processing</h4>
@@ -227,7 +237,7 @@ which may be useful if disk space is at a premium.</p>
 
 <hr>
 <i>Created Nov 12, 2008</i><br>
-<i>Last revised Nov 30, 2009</i>
+<i>Last revised Apr 7, 2010</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

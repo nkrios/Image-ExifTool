@@ -52,9 +52,9 @@ information such as this.</p>
 the same format code as a long integer, so information in any non-recognized
 IFD is lost when the image is rewritten.  There is a seldom-used format
 code of 13 that has been proposed to indicate an IFD, but this is not part
-of the EXIF/TIFF specification and is not in common usage.  <i>[Hey! Olympus
-has just started using this code for the IFD's in the maker notes of their
-new Camera models! - 2007/03/08]</i></p>
+of the EXIF/TIFF specification and is not in common usage.  <i class=lt>[Hey!
+Olympus has just started using this code for the IFD's in the maker notes of
+their new Camera models! - 2007/03/08]</i></p>
 
 <p>Also, it was wrong to specify a count instead of a size for each
 directory entry because this makes it impossible to add new format types
@@ -105,7 +105,10 @@ container format because it limits the maximum contiguous block size to
 additional information in their JPEG images.  Usually, this is due to the
 medium-sized JPEG image that many cameras embed for preview purposes. It
 would have been nice if there was a standard way to embed this preview in
-JPEG images (without the 64kB limitation).</p>
+JPEG images (without the 64kB limitation).  <i class=lt>[Update: In February
+2009 CIPA released the MPF format specification which allows storage of
+preview images larger than 64kB, but unfortunately this specification
+<a href="standards.html#MPF">has problems of its own</a>.]</i></p>
 
 <p>Aside:  The EXIF specification could have easily allowed the information
 to span multiple JPEG segments, which would have been smart, but still
@@ -151,11 +154,11 @@ to support.</p>
 <h3>PDF</h3>
 <p>...and I thought XMP was too complicated.  PDF is just insane.  Because
 of this, it is unlikely that ExifTool will ever support this format for
-writing. <i>[Dec. 18, 2007 Update: I have just added PDF write support using
-the incremental update feature of PDF.  It was still a bit of work, but
+writing. <i class=lt>[Dec. 18, 2007 Update: I have just added PDF write support
+using the incremental update feature of PDF.  It was still a bit of work, but
 somewhat simpler (and MUCH faster!) than rewriting the entire PDF.  But there
-are disadvantages: The resulting PDF is not "linearized", and there are
-privacy and security issues with leaving old metadata in the file.]</i></p>
+are disadvantages: The resulting PDF is not "linearized", and there are privacy
+and security issues with leaving old metadata in the file.]</i></p>
 
 <a name='PNG'></a>
 <h3>PNG</h3>
@@ -205,17 +208,17 @@ it easier to read and allow CRC validation of the datastream. -- Can you
 tell I wrote this just after adding DICOM support to ExifTool?</p>
 
 <a name='AVCHD'></a>
-<h3>AVCHD (.M2TS) <span class='sm norm'><i>(added 2009-10-29)</i></h3> <p>This
-format is used in .M2TS video files (and Blu-Ray HD DVD's).  It is painfully
-obvious that this was never designed as a storage format.  It uses MPEG-2
-transport stream (M2TS) container, which is a communications protocol and never
-should have been used for storage.  The M2TS format is based on a 188-byte
-packet size which makes no sense for modern filesystems.  And to make things
-worse, metadata in AVCHD files is stored in the H.264 video stream (!!) which
-uses insane and convoluted data structures such as the variable-bit-length
-exponential-Golomb which are painful and inefficient to parse in software, and
-as far as I can tell the format for the metadata stored in these streams is
-proprietary and undocumented.</p>
+<h3>AVCHD (.M2TS) <span class='sm norm'><i class=lt>(added 2009-10-29)</i></span></h3>
+<p>This format is used in .M2TS video files (and Blu-Ray HD DVD's).  It is
+painfully obvious that this was never designed as a storage format.  It uses
+MPEG-2 transport stream (M2TS) container, which is a communications protocol
+and never should have been used for storage.  The M2TS format is based on a
+188-byte packet size which makes no sense for modern filesystems.  And to
+make things worse, metadata in AVCHD files is stored in the H.264 video
+stream (!!) which uses insane and convoluted data structures such as the
+variable-bit-length exponential-Golomb which are painful and inefficient to
+parse in software, and as far as I can tell the format for the metadata
+stored in these streams is proprietary and undocumented.</p>
 
 <a name='ISO'></a>
 <h3>ISO Considered Harmless</h3>
@@ -295,8 +298,8 @@ offers a number of other features:</p>
 </ol>
 
 <hr>
-<i>Created Nov. 15, 2005</i>
-<br><i>Last revised Feb. 13, 2010</i>
+<i>Created Nov. 15, 2005</i><br>
+<i>Last revised May 26, 2010</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

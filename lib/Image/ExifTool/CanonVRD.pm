@@ -9,6 +9,7 @@
 #               2008/12/02 - PH Added new VRD 3.5 tags
 #
 # References:   1) Bogdan private communication (Canon DPP v3.4.1.1)
+#               2) Gert Kello private communiation (DPP 3.8)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::CanonVRD;
@@ -17,14 +18,14 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.08';
+$VERSION = '1.10';
 
 sub ProcessCanonVRD($$;$);
 sub WriteCanonVRD($$;$);
 
 my %noYes = ( 0 => 'No', 1 => 'Yes' );
 
-# main tag table IPTC-format records in CanonVRD trailer
+# main tag table IPTC-format records in CanonVRD trailer (ref PH)
 %Image::ExifTool::CanonVRD::Main = (
     WRITE_PROC => \&WriteCanonVRD,
     PROCESS_PROC => \&ProcessCanonVRD,
@@ -55,7 +56,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
     },
 );
 
-# VRD version 1 tags
+# VRD version 1 tags (ref PH)
 %Image::ExifTool::CanonVRD::Ver1 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
@@ -171,6 +172,10 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         Format => 'int16u',
         PrintConv => \%noYes,
     },
+    0x113 => {
+        Name => 'ToneCurveMode',
+        PrintConv => { 0 => 'RGB', 1 => 'Luminance' },
+    },
     0x114 => {
         Name => 'BrightnessAdj',
         Format => 'int8s',
@@ -188,18 +193,35 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         Notes => 'in degrees, so -1 is the same as 359',
         Format => 'int32s',
     },
+    0x126 => {
+        Name => 'LuminanceCurvePoints',
+        Format => 'int16u[21]',
+        PrintConv => 'Image::ExifTool::CanonVRD::ToneCurvePrint($val)',
+        PrintConvInv => 'Image::ExifTool::CanonVRD::ToneCurvePrintInv($val)',
+    },
+    0x150 => {
+        Name => 'LuminanceCurveLimits',
+        Notes => '4 numbers: input and output highlight and shadow points',
+        Format => 'int16u[4]',
+    },
+    0x159 => {
+        Name => 'ToneCurveInterpolation',
+        PrintConv => { 0 => 'Curve', 1 => 'Straight' },
+    },
     0x160 => {
         Name => 'RedCurvePoints',
         Format => 'int16u[21]',
         PrintConv => 'Image::ExifTool::CanonVRD::ToneCurvePrint($val)',
         PrintConvInv => 'Image::ExifTool::CanonVRD::ToneCurvePrintInv($val)',
     },
+    # 0x193 same as 0x159
     0x19a => {
         Name => 'GreenCurvePoints',
         Format => 'int16u[21]',
         PrintConv => 'Image::ExifTool::CanonVRD::ToneCurvePrint($val)',
         PrintConvInv => 'Image::ExifTool::CanonVRD::ToneCurvePrintInv($val)',
     },
+    # 0x1cd same as 0x159
     0x1d4 => {
         Name => 'BlueCurvePoints',
         Format => 'int16u[21]',
@@ -208,7 +230,6 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
     },
     0x18a => {
         Name => 'RedCurveLimits',
-        Notes => '4 numbers: input and output highlight and shadow points',
         Format => 'int16u[4]',
     },
     0x1c4 => {
@@ -219,6 +240,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         Name => 'BlueCurveLimits',
         Format => 'int16u[4]',
     },
+    # 0x207 same as 0x159
     0x20e => {
         Name => 'RGBCurvePoints',
         Format => 'int16u[21]',
@@ -229,6 +251,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         Name => 'RGBCurveLimits',
         Format => 'int16u[4]',
     },
+    # 0x241 same as 0x159
     0x244 => {
         Name => 'CropActive',
         Format => 'int16u',
@@ -319,7 +342,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
     # (VRD 1.0 edit data ends here -- 0x272 bytes)
 );
 
-# VRD Stamp Tool tags
+# VRD Stamp Tool tags (ref PH)
 %Image::ExifTool::CanonVRD::StampTool = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Image' },
@@ -329,7 +352,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
     },
 );
 
-# VRD version 2 and 3 tags
+# VRD version 2 and 3 tags (ref PH)
 %Image::ExifTool::CanonVRD::Ver2 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
@@ -337,6 +360,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     FORMAT => 'int16s',
+    DATAMEMBER => [ 0x58 ], # (required for writable var-format tags)
     GROUPS => { 2 => 'Image' },
     NOTES => 'Tags added in DPP version 2.0 and later.',
     0x02 => {
@@ -348,18 +372,74 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
             3 => 'Neutral',
             4 => 'Faithful',
             5 => 'Monochrome',
+            6 => 'Unknown?', # PH (maybe in-camera custom picture style?)
+            7 => 'Custom',
         },
     },
-    0x0d => 'RawColorToneAdj',
-    0x0e => 'RawSaturationAdj',
-    0x0f => 'RawContrastAdj',
-    0x10 => {
-        Name => 'RawLinear',
+    0x03 => {
+        Name => 'IsCustomPictureStyle',
         PrintConv => \%noYes,
     },
-    0x11 => 'RawSharpnessAdj',
-    0x12 => 'RawHighlightPoint',
-    0x13 => 'RawShadowPoint',
+    0x0d => 'StandardRawColorTone',
+    0x0e => 'StandardRawSaturation',
+    0x0f => 'StandardRawContrast',
+    0x10 => {
+        Name => 'StandardRawLinear',
+        PrintConv => \%noYes,
+    },
+    0x11 => 'StandardRawSharpness',
+    0x12 => 'StandardRawHighlightPoint',
+    0x13 => 'StandardRawShadowPoint',
+    0x14 => 'StandardOutputHighlightPoint', #2
+    0x15 => 'StandardOutputShadowPoint', #2
+    0x16 => 'PortraitRawColorTone',
+    0x17 => 'PortraitRawSaturation',
+    0x18 => 'PortraitRawContrast',
+    0x19 => {
+        Name => 'PortraitRawLinear',
+        PrintConv => \%noYes,
+    },
+    0x1a => 'PortraitRawSharpness',
+    0x1b => 'PortraitRawHighlightPoint',
+    0x1c => 'PortraitRawShadowPoint',
+    0x1d => 'PortraitOutputHighlightPoint',
+    0x1e => 'PortraitOutputShadowPoint',
+    0x1f => 'LandscapeRawColorTone',
+    0x20 => 'LandscapeRawSaturation',
+    0x21 => 'LandscapeRawContrast',
+    0x22 => {
+        Name => 'LandscapeRawLinear',
+        PrintConv => \%noYes,
+    },
+    0x23 => 'LandscapeRawSharpness',
+    0x24 => 'LandscapeRawHighlightPoint',
+    0x25 => 'LandscapeRawShadowPoint',
+    0x26 => 'LandscapeOutputHighlightPoint',
+    0x27 => 'LandscapeOutputShadowPoint',
+    0x28 => 'NeutralRawColorTone',
+    0x29 => 'NeutralRawSaturation',
+    0x2a => 'NeutralRawContrast',
+    0x2b => {
+        Name => 'NeutralRawLinear',
+        PrintConv => \%noYes,
+    },
+    0x2c => 'NeutralRawSharpness',
+    0x2d => 'NeutralRawHighlightPoint',
+    0x2e => 'NeutralRawShadowPoint',
+    0x2f => 'NeutralOutputHighlightPoint',
+    0x30 => 'NeutralOutputShadowPoint',
+    0x31 => 'FaithfulRawColorTone',
+    0x32 => 'FaithfulRawSaturation',
+    0x33 => 'FaithfulRawContrast',
+    0x34 => {
+        Name => 'FaithfulRawLinear',
+        PrintConv => \%noYes,
+    },
+    0x35 => 'FaithfulRawSharpness',
+    0x36 => 'FaithfulRawHighlightPoint',
+    0x37 => 'FaithfulRawShadowPoint',
+    0x38 => 'FaithfulOutputHighlightPoint',
+    0x39 => 'FaithfulOutputShadowPoint',
     0x3a => {
         Name => 'MonochromeFilterEffect',
         PrintConv => {
@@ -386,6 +466,39 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         PrintConv => \%noYes,
     },
     0x3e => 'MonochromeSharpness',
+    0x3f => 'MonochromeRawHighlightPoint',
+    0x40 => 'MonochromeRawShadowPoint',
+    0x41 => 'MonochromeOutputHighlightPoint',
+    0x42 => 'MonochromeOutputShadowPoint',
+    0x45 => { Name => 'UnknownContrast',            Unknown => 1 },
+    0x46 => {
+        Name => 'UnknownLinear',
+        Unknown => 1,
+        PrintConv => \%noYes,
+    },
+    0x47 => { Name => 'UnknownSharpness',           Unknown => 1 },
+    0x48 => { Name => 'UnknownRawHighlightPoint',   Unknown => 1 },
+    0x49 => { Name => 'UnknownRawShadowPoint',      Unknown => 1 },
+    0x4a => { Name => 'UnknownOutputHighlightPoint',Unknown => 1 },
+    0x4b => { Name => 'UnknownOutputShadowPoint',   Unknown => 1 },
+    0x4e => 'CustomContrast',
+    0x4f => {
+        Name => 'CustomLinear',
+        PrintConv => \%noYes,
+    },
+    0x50 => 'CustomSharpness',
+    0x51 => 'CustomRawHighlightPoint',
+    0x52 => 'CustomRawShadowPoint',
+    0x53 => 'CustomOutputHighlightPoint',
+    0x54 => 'CustomOutputShadowPoint',
+    0x58 => {
+        Name => 'CustomPictureStyleData',
+        Format => 'var_int16u',
+        Binary => 1,
+        Notes => 'variable-length data structure',
+        Writable => 0,
+        RawConv => 'length($val) == 2 ? undef : $val', # ignore if no data
+    },
     # (VRD 2.0 edit data ends here: 178 bytes, index 0x59)
     0x5e => [{
         Name => 'ChrominanceNoiseReduction',
@@ -400,6 +513,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         Name => 'ChrominanceNoiseReduction',
         Notes => 'VRDVersion 3.30 or later',
         PrintHex => 1,
+        PrintConvColumns => 4,
         PrintConv => {
             0x00 => 0,
             0x10 => 1,
@@ -437,6 +551,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         Name => 'LuminanceNoiseReduction',
         Notes => 'VRDVersion 3.30 or later',
         PrintHex => 1,
+        PrintConvColumns => 4,
         PrintConv => {
             0x00 => 0,
             0x41 => 1,
@@ -474,6 +589,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         Name => 'ChrominanceNR_TIFF_JPEG',
         Notes => 'VRDVersion 3.30 or later',
         PrintHex => 1,
+        PrintConvColumns => 4,
         PrintConv => {
             0x00 => 0,
             0x10 => 1,
@@ -568,6 +684,95 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         },
     },
     # (VRD 3.5 edit data ends here: 232 bytes, index 0x74)
+    0x75 => {
+        Name => 'StandardRawHighlight',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x76 => {
+        Name => 'PortraitRawHighlight',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x77 => {
+        Name => 'LandscapeRawHighlight',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x78 => {
+        Name => 'NeutralRawHighlight',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x79 => {
+        Name => 'FaithfulRawHighlight',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x7a => {
+        Name => 'MonochromeRawHighlight',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x7b => {
+        Name => 'UnknownRawHighlight',
+        Unknown => 1,
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x7c => {
+        Name => 'CustomRawHighlight',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x7e => {
+        Name => 'StandardRawShadow',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x7f => {
+        Name => 'PortraitRawShadow',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x80 => {
+        Name => 'LandscapeRawShadow',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x81 => {
+        Name => 'NeutralRawShadow',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x82 => {
+        Name => 'FaithfulRawShadow',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x83 => {
+        Name => 'MonochromeRawShadow',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x84 => {
+        Name => 'UnknownRawShadow',
+        Unknown => 1,
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x85 => {
+        Name => 'CustomRawShadow',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+    },
+    0x8b => { #2
+        Name => 'AngleAdj',
+        Format => 'int32s',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+    },
+    # (VRD 3.8 edit data ends here: 286 bytes, index 0x8f)
 );
 
 #------------------------------------------------------------------------------
@@ -854,7 +1059,7 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Bogdan for decoding some new tags written by Canon DPP v3.4.1.
+Thanks to Bogdan and Gert Kello for decoding some tags.
 
 =head1 SEE ALSO
 

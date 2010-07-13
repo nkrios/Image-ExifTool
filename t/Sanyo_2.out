@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
 [File, System, Image] FileName - File Name: Sanyo.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 2.1 kB
@@ -86,6 +86,7 @@
 [MakerNotes, Sanyo, Camera] 548 - Sequence Shot Interval: 5 frames/s
 [MakerNotes, Sanyo, Camera] 549 - Flash Mode: Red eye
 [MakerNotes, Sanyo, Camera] 3840 - Data Dump: (Binary data 260 bytes)
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0100
 [Composite, Composite, Image] Aperture - Aperture: 6.9
 [Composite, Composite, Image] ImageSize - Image Size: 8x8
 [Composite, Composite, Camera] ScaleFactor35efl - Scale Factor To 35 mm Equivalent: 481.1

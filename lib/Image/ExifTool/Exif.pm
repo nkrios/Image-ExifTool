@@ -34,6 +34,8 @@
 #              22) http://tools.ietf.org/html/draft-ietf-fax-tiff-fx-extension1-01
 #              23) MetaMorph Stack (STK) Image File Format:
 #                  --> ftp://ftp.meta.moleculardevices.com/support/stack/STK.doc
+#              24) http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-008-2010_E.pdf (Exif 2.3)
+#              25) Vesa Kivisto private communication (7D)
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -46,7 +48,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.07';
+$VERSION = '3.13';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -57,6 +59,8 @@ sub ValidateIFD($;$);
 sub ProcessTiffIFD($$$);
 sub PrintParameter($$$);
 sub GetOffList($$$$$);
+sub PrintLensInfo($);
+sub ConvertLensInfo($);
 
 # size limit for loading binary data block into memory
 sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
@@ -113,15 +117,16 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
     0 => 'Unknown',
     1 => 'Daylight',
     2 => 'Fluorescent',
-    3 => 'Tungsten',
+    3 => 'Tungsten (Incandescent)',
     4 => 'Flash',
     9 => 'Fine Weather',
     10 => 'Cloudy',
     11 => 'Shade',
-    12 => 'Daylight Fluorescent',
-    13 => 'Day White Fluorescent',
-    14 => 'Cool White Fluorescent',
-    15 => 'White Fluorescent',
+    12 => 'Daylight Fluorescent',   # (D 5700 - 7100K)
+    13 => 'Day White Fluorescent',  # (N 4600 - 5500K)
+    14 => 'Cool White Fluorescent', # (W 3800 - 4500K)
+    15 => 'White Fluorescent',      # (WW 3250 - 3800K)
+    16 => 'Warm White Fluorescent', # (L 2600 - 3250K)
     17 => 'Standard Light A',
     18 => 'Standard Light B',
     19 => 'Standard Light C',
@@ -135,6 +140,12 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
 
 # EXIF Flash values
 %flash = (
+    OTHER => sub {
+        # translate "Off" and "On" when writing
+        my ($val, $inv) = @_;
+        return undef unless $inv and $val =~ /^(off|on)$/i;
+        return lc $val eq 'off' ? 0x00 : 0x01;
+    },
     0x00 => 'No Flash',
     0x01 => 'Fired',
     0x05 => 'Fired, Return not detected',
@@ -181,7 +192,7 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
     262 => 'Kodak 262', #16
     32766 => 'Next', #3
     32767 => 'Sony ARW Compressed', #16
-    32769 => 'Epson ERF Compressed', #PH (also used by Nikon? ref 16)
+    32769 => 'Packed RAW', #PH (used by Epson, Nikon, Samsung)
     32770 => 'Samsung SRW Compressed', #PH
     32771 => 'CCIRLEW', #3
     32773 => 'PackBits',
@@ -331,7 +342,7 @@ my %sampleFormat = (
     },
     0x101 => {
         Name => 'ImageHeight',
-        Notes => 'called ImageLength in the EXIF specification',
+        Notes => 'called ImageLength by the EXIF spec.',
         Priority => 0,
     },
     0x102 => {
@@ -380,15 +391,19 @@ my %sampleFormat = (
         Name => 'Make',
         Groups => { 2 => 'Camera' },
         DataMember => 'Make',
-        # remove trailing whitespace and save as an ExifTool member variable
+        # remove trailing blanks and save as an ExifTool member variable
         RawConv => '$val =~ s/\s+$//; $$self{Make} = $val',
+        # NOTE: trailing "blanks" (spaces) are removed from all EXIF tags which
+        # may be "unknown" (filled with spaces) according to the EXIF spec.
+        # This allows conditional replacement with "exiftool -TAG-= -TAG=VALUE".
+        # - also removed are any other trailing whitespace characters
     },
     0x110 => {
         Name => 'Model',
         Description => 'Camera Model Name',
         Groups => { 2 => 'Camera' },
         DataMember => 'Model',
-        # remove trailing whitespace and save as an ExifTool member variable
+        # remove trailing blanks and save as an ExifTool member variable
         RawConv => '$val =~ s/\s+$//; $$self{Model} = $val',
     },
     0x111 => [
@@ -596,17 +611,19 @@ my %sampleFormat = (
     },
     0x131 => {
         Name => 'Software',
+        RawConv => '$val =~ s/\s+$//; $val',
     },
     0x132 => {
         Name => 'ModifyDate',
         Groups => { 2 => 'Time' },
-        Notes => 'called DateTime by the EXIF spec',
+        Notes => 'called DateTime by the EXIF spec.',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     0x13b => {
         Name => 'Artist',
         Groups => { 2 => 'Author' },
         Notes => 'becomes a list-type tag when the MWG module is loaded',
+        RawConv => '$val =~ s/\s+$//; $val',
     },
     0x13c => 'HostComputer',
     0x13d => {
@@ -1055,7 +1072,7 @@ my %sampleFormat = (
     0x1001 => 'RelatedImageWidth', #5
     0x1002 => { #5
         Name => 'RelatedImageHeight',
-        Notes => 'called RelatedImageLength by the DCF specification',
+        Notes => 'called RelatedImageLength by the DCF spec.',
     },
     # (0x474x tags written by MicrosoftPhoto)
     0x4746 => 'Rating', #PH
@@ -1099,16 +1116,17 @@ my %sampleFormat = (
         Format => 'undef',
         Notes => q{
             may contain copyright notices for photographer and editor, separated by a
-            newline
+            newline in ExifTool
         },
         # internally the strings are separated by a null character in this format:
         # Photographer only: photographer + NULL
         # Both:              photographer + NULL + editor + NULL
         # Editor only:       SPACE + NULL + editor + NULL
-        # 1) translate first NULL (and surrounding whitespace) to a newline
-        # 2) truncate at second NULL
+        # 1) translate first NULL to a newline, removing trailing blanks
+        # 2) truncate at second NULL and remove trailing blanks
         # 3) remove trailing newline if it exists
-        ValueConv => '$val=~s/\s*\0\s*/\n/; $val=~s/\0.*//; $val=~s/\n+$//; $val',
+        # (this is done as a RawConv so conditional replaces will work properly)
+        RawConv => '$_=$val; s/ *\0/\n/; s/ *\0.*//s; s/\n$//; $_',
     },
     0x829a => {
         Name => 'ExposureTime',
@@ -1309,6 +1327,7 @@ my %sampleFormat = (
     0x8822 => {
         Name => 'ExposureProgram',
         Groups => { 2 => 'Camera' },
+        Notes => 'the value of 9 is not standard EXIF, but is used by the Canon EOS 7D',
         PrintConv => {
             0 => 'Not Defined',
             1 => 'Manual',
@@ -1319,6 +1338,7 @@ my %sampleFormat = (
             6 => 'Action (High speed)',
             7 => 'Portrait',
             8 => 'Landscape',
+            9 => 'Bulb', #25
         },
     },
     0x8824 => {
@@ -1337,17 +1357,45 @@ my %sampleFormat = (
     },
     0x8827 => {
         Name => 'ISO',
-        Notes => 'called ISOSpeedRatings by the EXIF spec',
+        Notes => q{
+            called ISOSpeedRatings by EXIF 2.2, then PhotographicSensitivity by the EXIF
+            2.3 spec.
+        },
         PrintConv => '$val=~s/\s+/, /g; $val',
     },
     0x8828 => {
         Name => 'Opto-ElectricConvFactor',
-        Notes => 'called OECF by the EXIF spec',
+        Notes => 'called OECF by the EXIF spec.',
         Binary => 1,
     },
     0x8829 => 'Interlace', #12
     0x882a => 'TimeZoneOffset', #12
     0x882b => 'SelfTimerMode', #12
+    0x8830 => { #24
+        Name => 'SensitivityType',
+        Notes => 'applies to EXIF:ISO tag',
+        PrintConv => {
+            0 => 'Unknown',
+            1 => 'Standard Output Sensitivity',
+            2 => 'Recommended Exposure Index',
+            3 => 'ISO Speed',
+            4 => 'Standard Output Sensitivity and Recommended Exposure Index',
+            5 => 'Standard Output Sensitivity and ISO Speed',
+            6 => 'Recommended Exposure Index and ISO Speed',
+            7 => 'Standard Output Sensitivity, Recommended Exposure Index and ISO Speed',
+        },
+    },
+    0x8831 => 'StandardOutputSensitivity', #24
+    0x8832 => 'RecommendedExposureIndex', #24
+    0x8833 => 'ISOSpeed', #24
+    0x8834 => { #24
+        Name => 'ISOSpeedLatitudeyyy',
+        Description => 'ISO Speed Latitude yyy',
+    },
+    0x8835 => { #24
+        Name => 'ISOSpeedLatitudezzz',
+        Description => 'ISO Speed Latitude zzz',
+    },
     0x885c => 'FaxRecvParams', #9
     0x885d => 'FaxSubAddress', #9
     0x885e => 'FaxRecvTime', #9
@@ -1369,12 +1417,13 @@ my %sampleFormat = (
         Name => 'DateTimeOriginal',
         Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
+        Notes => 'date/time when original image was taken',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     0x9004 => {
         Name => 'CreateDate',
         Groups => { 2 => 'Time' },
-        Notes => 'called DateTimeDigitized by the EXIF spec',
+        Notes => 'called DateTimeDigitized by the EXIF spec.',
         PrintConv => '$self->ConvertDateTime($val)',
     },
     0x9101 => {
@@ -1414,7 +1463,7 @@ my %sampleFormat = (
     0x9201 => {
         Name => 'ShutterSpeedValue',
         Format => 'rational64s', # Leica M8 patch (incorrectly written as rational64u)
-        ValueConv => 'abs($val)<100 ? 1/(2**$val) : 0',
+        ValueConv => 'abs($val)<100 ? 2**(-$val) : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },
     0x9202 => {
@@ -1426,8 +1475,8 @@ my %sampleFormat = (
     0x9204 => {
         Name => 'ExposureCompensation',
         Format => 'rational64s', # Leica M8 patch (incorrectly written as rational64u)
-        Notes => 'called ExposureBiasValue by the EXIF spec',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        Notes => 'called ExposureBiasValue by the EXIF spec.',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
     0x9205 => {
         Name => 'MaxApertureValue',
@@ -1539,17 +1588,17 @@ my %sampleFormat = (
     0x9290 => {
         Name => 'SubSecTime',
         Groups => { 2 => 'Time' },
-        ValueConv => '$val=~s/\s+$//; $val', # trim trailing blanks
+        ValueConv => '$val=~s/ +$//; $val', # trim trailing blanks
     },
     0x9291 => {
         Name => 'SubSecTimeOriginal',
         Groups => { 2 => 'Time' },
-        ValueConv => '$val=~s/\s+$//; $val', # trim trailing blanks
+        ValueConv => '$val=~s/ +$//; $val', # trim trailing blanks
     },
     0x9292 => {
         Name => 'SubSecTimeDigitized',
         Groups => { 2 => 'Time' },
-        ValueConv => '$val=~s/\s+$//; $val', # trim trailing blanks
+        ValueConv => '$val=~s/ +$//; $val', # trim trailing blanks
     },
     # The following 3 tags are found in MSOffice TIFF images
     # References:
@@ -1617,11 +1666,11 @@ my %sampleFormat = (
     },
     0xa002 => {
         Name => 'ExifImageWidth',
-        Notes => 'called PixelXDimension by the EXIF spec',
+        Notes => 'called PixelXDimension by the EXIF spec.',
     },
     0xa003 => {
         Name => 'ExifImageHeight',
-        Notes => 'called PixelYDimension by the EXIF spec',
+        Notes => 'called PixelYDimension by the EXIF spec.',
     },
     0xa004 => 'RelatedSoundFile',
     0xa005 => {
@@ -1712,6 +1761,7 @@ my %sampleFormat = (
             0 => 'Auto',
             1 => 'Manual',
             2 => 'Auto bracket',
+            # have seen 3 for Samsung EX1 images - PH
         },
     },
     0xa403 => {
@@ -1732,7 +1782,7 @@ my %sampleFormat = (
     },
     0xa405 => {
         Name => 'FocalLengthIn35mmFormat',
-        Notes => 'called FocalLengthIn35mmFilm by the EXIF spec',
+        Notes => 'called FocalLengthIn35mmFilm by the EXIF spec.',
         Groups => { 2 => 'Camera' },
         PrintConv => '"$val mm"',
     },
@@ -1800,6 +1850,26 @@ my %sampleFormat = (
         },
     },
     0xa420 => 'ImageUniqueID',
+    0xa430 => { #24
+        Name => 'OwnerName',
+        Notes => 'called CameraOwnerName by the EXIF spec.',
+    },
+    0xa431 => { #24
+        Name => 'SerialNumber',
+        Notes => 'called BodySerialNumber by the EXIF spec.',
+    },
+    0xa432 => { #24
+        Name => 'LensInfo',
+        Notes => q{
+            4 rational values giving focal and aperture ranges, called LensSpecification
+            by the EXIF spec.
+        },
+        # convert to the form "12-20mm f/3.8-4.5" or "50mm f/1.4"
+        PrintConv => \&Image::ExifTool::Exif::PrintLensInfo,
+    },
+    0xa433 => 'LensMake', #24
+    0xa434 => 'LensModel', #24
+    0xa435 => 'LensSerialNumber', #24
     0xa480 => 'GDALMetadata', #3
     0xa481 => 'GDALNoData', #3
     0xa500 => 'Gamma',
@@ -2046,7 +2116,7 @@ my %sampleFormat = (
     0xc630 => {
         Name => 'DNGLensInfo',
         Groups => { 2 => 'Camera' },
-        PrintConv => '$_=$val;s/(\S+) (\S+) (\S+) (\S+)/$1-$2mm f\/$3-$4/;$_',
+        PrintConv =>\&PrintLensInfo,
     },
     0xc631 => 'ChromaBlurRadius',
     0xc632 => 'AntiAliasStrength',
@@ -2851,8 +2921,8 @@ sub CalcScaleFactor35efl
 }
 
 #------------------------------------------------------------------------------
-# Convert exposure compensation fraction
-sub ConvertFraction($)
+# Print exposure compensation fraction
+sub PrintFraction($)
 {
     my $val = shift;
     my $str;
@@ -2871,6 +2941,17 @@ sub ConvertFraction($)
         }
     }
     return $str;
+}
+
+#------------------------------------------------------------------------------
+# Convert fraction or number to floating point value (or 'undef' or 'inf')
+sub ConvertFraction($)
+{
+    my $val = shift;
+    if ($val =~ m{([-+]?\d+)/(\d+)}) {
+        $val = $2 ? $1 / $2 : ($1 ? 'inf' : 'undef');
+    }
+    return $val;
 }
 
 #------------------------------------------------------------------------------
@@ -2903,6 +2984,7 @@ sub ConvertExifText($$)
         $exifTool->Warn("Invalid EXIF text encoding");
         $str = $id . $str;
     }
+    $str =~ s/ +$//;    # trim trailing blanks
     return $str;
 }
 
@@ -3043,6 +3125,51 @@ sub PrintCFAPattern($)
 }
 
 #------------------------------------------------------------------------------
+# Print conversion for lens info
+# Inputs: 0) string of values (min focal, max focal, min F, max F)
+# Returns: string in the form "12-20mm f/3.8-4.5" or "50mm f/1.4"
+sub PrintLensInfo($)
+{
+    my $val = shift;
+    my @vals = split ' ', $val;
+    return $val unless @vals == 4;
+    my $c = 0;
+    foreach (@vals) {
+        Image::ExifTool::IsFloat($_) and ++$c, next;
+        $_ eq 'inf' and $_ = '?', ++$c, next;
+        $_ eq 'undef' and $_ = '?', ++$c, next;
+    }
+    return $val unless $c == 4;
+    $val = "$vals[1]mm f/$vals[2]";
+    $val = "$vals[0]-$val" if $vals[0] ne $vals[1];
+    $val .= "-$vals[3]" if $vals[3] ne $vals[2];
+    return $val;
+}
+
+#------------------------------------------------------------------------------
+# Get lens info from lens model string
+# Inputs: 0) lens string, 1) flag to allow unknown "?" values
+# Returns: 0) min focal, 1) max focal, 2) min aperture, 3) max aperture
+# Notes: returns empty list if lens string could not be parsed
+sub GetLensInfo($;$)
+{
+    my ($lens, $unk) = @_;
+    # extract focal length and aperture ranges for this lens
+    my $pat = '\\d+(?:\\.\\d+)?';
+    $pat .= '|\\?' if $unk;
+    return () unless $lens =~ /($pat)(?:-($pat))?\s*mm.*?(?:[fF]\/?\s*)($pat)(?:-($pat))?/;
+    # ($1=short focal, $2=long focal, $3=max aperture wide, $4=max aperture tele)
+    my @a = ($1, $2, $3, $4);
+    $a[1] or $a[1] = $a[0];
+    $a[3] or $a[3] = $a[2];
+    if ($unk) {
+        local $_;
+        $_ eq '?' and $_ = 'undef' foreach @a;
+    }
+    return @a;
+}
+
+#------------------------------------------------------------------------------
 # Attempt to identify the specific lens if multiple lenses have the same LensType
 # Inputs: 0) ExifTool object ref, 1) LensType string, 2) LensType value,
 #         3) FocalLength, 4) MaxAperture, 5) MaxApertureValue, 6) ShortFocal,
@@ -3089,13 +3216,9 @@ sub PrintLensID($$@)
             push @user, $lens;
             next;
         }
-        # extract focal length and aperture ranges for this lens
-        next unless $lens =~ /(\d+)(?:-(\d+))?mm.*?(?:[fF]\/?)(\d+(?:\.\d+)?)(?:-(\d+(?:\.\d+)?))?/;
-        # ($1=short focal, $2=long focal, $3=max aperture wide, $4=max aperture tele)
-        my ($sf, $lf, $sa, $la) = ($1, $2, $3, $4);
+        my ($sf, $lf, $sa, $la) = GetLensInfo($lens);
+        next unless $sf;
         # see if we can rule out this lens using FocalLength and MaxAperture
-        $lf = $sf if $sf and not $lf;
-        $la = $sa if $sa and not $la;
         if ($focalLength) {
             next if $focalLength < $sf - 0.5;
             next if $focalLength > $lf + 0.5;
@@ -3544,7 +3667,9 @@ sub ProcessExif($$$)
         if (defined $tagInfo and not $tagInfo) {
             # GetTagInfo() required the value for a Condition
             my $tmpVal = substr($$valueDataPt, $valuePtr, $readSize < 48 ? $readSize : 48);
-            $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \$tmpVal, $formatStr, $count);
+            # (use original format name in this call -- $formatStr may have been changed to int8u)
+            $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \$tmpVal,
+                                             $formatName[$format], $count);
         }
         # make sure we are handling the 'ifd' format properly
         if (($format == 13 or $format == 18) and (not $tagInfo or not $$tagInfo{SubIFD})) {
@@ -3936,7 +4061,9 @@ sub ProcessExif($$$)
             # must validate SubIFD1 because the nextIFD pointer is invalid for some RAW formats
             if ($newDirInfo{DirName} ne 'SubIFD1' or ValidateIFD(\%newDirInfo)) {
                 $exifTool->{INDENT} =~ s/..$//; # keep indent the same
+                my $cur = pop @{$$exifTool{PATH}};
                 $exifTool->ProcessDirectory(\%newDirInfo, $tagTablePtr) or $success = 0;
+                push @{$$exifTool{PATH}}, $cur;
             } elsif ($verbose or $exifTool->{TIFF_TYPE} eq 'TIFF') {
                 $exifTool->Warn('Ignored bad IFD linked from SubIFD');
             }
@@ -3974,6 +4101,8 @@ under the same terms as Perl itself.
 =over 4
 
 =item L<http://www.exif.org/Exif2-2.PDF>
+
+=item L<http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-008-2010_E.pdf>
 
 =item L<http://partners.adobe.com/asn/developer/pdfs/tn/TIFF6.pdf>
 

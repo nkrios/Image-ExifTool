@@ -30,6 +30,11 @@ value.</p>
 <tr><td>BASE</td><td>Absolute position of current image in containing file
     (for example, when processing JPEG image in FujiFilm RAF file)</td></tr>
 
+<tr><td>BOTH</td><td>Reference to HASH of ValueConv/PrintConv arrays, saved for
+    tags when GetValue is called for 'Both' values, and used to avoid having to
+    recalculate both values again (which speeds up building the Composite tags
+    because often the same tag is Require'd by multiple Composite tags).</td></tr>
+
 <tr><td>CameraType</td><td>Camera type used for decoding some Olympus tags</td></tr>
 
 <tr><td>CHANGED</td><td>Number of tags changed during writing</td></tr>
@@ -161,11 +166,17 @@ value.</p>
 <tr><td>PREVIEW_INFO</td><td>Information about preview image used while writing JPEG
     images only.  This is a reference to a hash with the following entries:
     <table class='clear'>
+    <tr valign='top'><td>Absolute</td><td>-</td><td>flag set if PreviewImage pointer is relative to the
+    start of file</td></tr>
     <tr><td>BaseShift</td><td>-</td><td>shift for base of pointer offsets</td></tr>
     <tr valign='top'><td>Data</td><td>-</td><td>data for PreviewImage to be written (may either be data
     for the old or new image, or 'LOAD_PREVIEW' to indicate that the data must be loaded from outside
     the EXIF segment)</td></tr>
     <tr><td>Fixup</td><td>-</td><td>fixup for PreviewImage pointers when writing JPEG images</td></tr>
+    <tr valign='top'><td>IsShort</td><td>-</td><td>flag indicates PreviewImage pointers
+    are 2-byte (instead of 4-byte) integers</td></tr>
+    <tr valign='top'><td>IsTrailer</td><td>-</td><td>flag indicates image should always be written as a JPEG
+    trailer, even if it fits inside the APP1 EXIF segment (as with Samsung STMN maker notes)</td></tr>
     <tr><td>Relative</td><td>-</td><td>flag to indicate that pointer offsets are relative</td></tr>
     </table></td></tr>
 

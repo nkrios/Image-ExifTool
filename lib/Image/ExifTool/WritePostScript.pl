@@ -470,7 +470,7 @@ sub WritePS($$)
     $xmpHint = 0 if $$exifTool{DEL_GROUP}{XMP};
     $$newTags{XMP_HINT} = $xmpHint if $xmpHint;  # add special tag to newTags list
 
-    my @lines;
+    my (@lines, $changedNL);
     my $altnl = ($/ eq "\x0d") ? "\x0a" : "\x0d";
 
     for (;;) {
@@ -480,8 +480,24 @@ sub WritePS($$)
             $raf->ReadLine($data) or last;
             $dos and CheckPSEnd($raf, $psEnd, $data);
             # split line if it contains other newline sequences
-            SplitLine(\$data, \@lines) if $data =~ /$altnl/;
+            if ($data =~ /$altnl/) {
+                if (length($data) > 500000 and IsPC()) {
+                    # patch for Windows memory problem
+                    unless ($changedNL) {
+                        $changedNL = 1;
+                        my $t = $/;
+                        $/ = $altnl;
+                        $altnl = $t;
+                        $raf->Seek(-length($data), 1);
+                        next;
+                    }
+                } else {
+                    # split into separate lines
+                    SplitLine(\$data, \@lines);
+                }
+            }
         }
+        undef $changedNL;
         if ($endToken) {
             # look for end token
             if ($data =~ m/^$endToken\s*$/is) {

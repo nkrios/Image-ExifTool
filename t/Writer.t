@@ -1,7 +1,7 @@
 # Before "make install", this script should be runnable with "make test".
 # After "make install" it should work as "perl t/Writer.t".
 
-BEGIN { $| = 1; print "1..40\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..41\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -713,6 +713,18 @@ my $testOK;
     ++$testnum;
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
                                    't/images/Canon.jpg', \@check);
+    print "ok $testnum\n";
+}
+
+# test 41: Test writing Kodak APP3 Meta information
+{
+    ++$testnum;
+    my @writeInfo = (
+        ['Meta:SerialNumber' => '12345'],
+    );
+    my @check = qw(SerialNumber);
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
+                                   't/images/ExifTool.jpg', \@check);
     print "ok $testnum\n";
 }
 

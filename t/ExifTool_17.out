@@ -1,8 +1,8 @@
-  ExifToolVersion = 8.02
+  ExifToolVersion = 8.17
   FileName = Canon.jpg
   Directory = t/images
   FileSize = 2697
-  FileModifyDate = 1159902631
+  FileModifyDate = 1178019278
   FilePermissions = 33188
   FileType = JPEG
   MIMEType = image/jpeg
@@ -277,6 +277,9 @@ JPEG APP1 (2442 bytes):
   | | | | OpticalZoomCode = 8
   | | | | - Tag 0x000a (2 bytes, int16s[1]):
   | | | |     0468: 08 00                                           [..]
+  | | | | CameraTemperature = 0
+  | | | | - Tag 0x000c (2 bytes, int16s[1]):
+  | | | |     046c: 00 00                                           [..]
   | | | | FlashGuideNumber = 0
   | | | | - Tag 0x000d (2 bytes, int16s[1]):
   | | | |     046e: 00 00                                           [..]

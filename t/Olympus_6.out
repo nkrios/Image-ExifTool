@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.10
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
 [File, System, Image] FileName - File Name: Olympus2.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 7.5 kB
@@ -133,6 +133,7 @@
 [MakerNotes, Olympus, Camera] 4613 - External Flash Zoom: 0
 [MakerNotes, Olympus, Camera] 4616 - Internal Flash: Off
 [MakerNotes, Olympus, Camera] 5632 - Image Stabilization: On, Mode 2
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0300
 [Composite, Composite, Image] Aperture - Aperture: 16.0
 [Composite, Composite, Camera] BlueBalance - Blue Balance: 1.523438
 [Composite, Composite, Image] ImageSize - Image Size: 8x8

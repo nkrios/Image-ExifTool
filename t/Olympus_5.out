@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.20
 [File, System, Image] FileName - File Name: Olympus_5_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 7.2 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:50-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:05:25 13:10:28-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -20,7 +20,7 @@
 [EXIF, IFD0, Image] 282 - X Resolution: 314
 [EXIF, IFD0, Image] 283 - Y Resolution: 314
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
-[EXIF, IFD0, Image] 305 - Software: Version 1.3                    
+[EXIF, IFD0, Image] 305 - Software: Version 1.3
 [EXIF, IFD0, Time] 306 - Modify Date: 2005:01:05 10:53:41
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
 [EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/100
@@ -54,11 +54,12 @@
 [EXIF, ExifIFD, Camera] 41992 - Contrast: Normal
 [EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
+[EXIF, ExifIFD, Image] 42037 - Lens Serial Number: 012345678
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD1, Image] 282 - X Resolution: 72
 [EXIF, IFD1, Image] 283 - Y Resolution: 72
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 7062
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 7084
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Olympus, Camera] 512 - Special Mode: Fast, Sequence: 2, Panorama: (none)
 [MakerNotes, Olympus, Camera] 513 - Quality: SHQ (Fine)
@@ -104,7 +105,7 @@
 [MakerNotes, Olympus, Camera] 4099 - Flash Serial Number: 
 [MakerNotes, Olympus, Camera] 0 - Camera Settings Version: 010
 [MakerNotes, Olympus, Camera] 256 - Preview Image Valid: Yes
-[MakerNotes, Olympus, Camera] 257 - Preview Image Start: 7090
+[MakerNotes, Olympus, Camera] 257 - Preview Image Start: 7112
 [MakerNotes, Olympus, Camera] 258 - Preview Image Length: 26
 [MakerNotes, Olympus, Camera] 512 - Exposure Mode: Program
 [MakerNotes, Olympus, Camera] 513 - AE Lock: Off
@@ -222,6 +223,7 @@
 [MakerNotes, Olympus, Camera] 4615 - Olympus Focus Info 0x1207: 0
 [MakerNotes, Olympus, Camera] 4616 - Internal Flash: Off
 [MakerNotes, Olympus, Camera] 5376 - Sensor Temperature: 20
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0250
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00140014
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x00000001
 [PrintIM, PrintIM, Printing] 3 - Print IM 0x0003: 0x00000088

@@ -232,8 +232,8 @@ in the file.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='VBR'>MPEG VBR Tags</a></h2>
-<p>These tags are extracted for variable bitrate audio.</p>
+<h2><a name='Xing'>MPEG Xing Tags</a></h2>
+<p>These tags are extracted from the Xing/Info frame.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -251,11 +251,71 @@ in the file.
 <td>VBRScale</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>Encoder</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LameVBRQuality</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>LameQuality</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LameHeader</td>
+<td class=c>-</td>
+<td>--&gt; <a href='MPEG.html#Lame'>MPEG Lame Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Lame'>MPEG Lame Tags</a></h2>
+<p>Tags extracted from Lame 3.90 or later header.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='9 = 0x9'>9</td>
+<td>LameMethod</td>
+<td class=c>N</td>
+<td><span class=s>[Mask 0x0f]
+  <br>0x1 = CBR
+  <br>0x2 = ABR
+  <br>0x3 = VBR (old/rh)
+  <br>0x4 = VBR (new/mtrh)
+  <br>0x5 = VBR (old/rh)
+  <br>0x6 = VBR
+  <br>0x8 = CBR (2-pass)
+  <br>0x9 = ABR (2-pass)</span></td></tr>
+<tr class=b>
+<td class=r title='10 = 0xa'>10</td>
+<td>LameLowPassFilter</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='20 = 0x14'>20</td>
+<td>LameBitrate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='24 = 0x18'>24</td>
+<td>LameStereoMode</td>
+<td class=c>N</td>
+<td><span class=s>[Mask 0x1c]
+  <br>0x0 = Mono
+  <br>0x1 = Stereo
+  <br>0x2 = Dual Channels
+  <br>0x3 = Joint Stereo
+  <br>0x4 = Forced Joint Stereo
+  <br>0x6 = Auto
+  <br>0x7 = Intensity Stereo</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Aug 25, 2008</i>
+<br><i>Last revised May 25, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

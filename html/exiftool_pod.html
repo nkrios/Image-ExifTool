@@ -39,7 +39,6 @@
 	<li><a href="#geotagging_examples">GEOTAGGING EXAMPLES</a></li>
 	<li><a href="#piping_examples">PIPING EXAMPLES</a></li>
 	<li><a href="#diagnostics">DIAGNOSTICS</a></li>
-	<li><a href="#bugs">BUGS</a></li>
 	<li><a href="#author">AUTHOR</a></li>
 	<li><a href="#see_also">SEE ALSO</a></li>
 </ul>
@@ -54,11 +53,18 @@
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p><strong>exiftool</strong> [<em>OPTIONS</em>] [-<em>TAG</em>...] [--<em>TAG</em>...] <em>FILE</em>...</p>
-<p><strong>exiftool</strong> [<em>OPTIONS</em>] -<em>TAG</em>[+-&lt;]=[<em>VALUE</em>]... <em>FILE</em>...</p>
-<p><strong>exiftool</strong> [<em>OPTIONS</em>] <strong>-tagsFromFile</strong> <em>SRCFILE</em>
-[-<em>SRCTAG</em>[&gt;<em>DSTTAG</em>]...] <em>FILE</em>...</p>
-<p><strong>exiftool</strong> [ <strong>-ver</strong> | <strong>-list</strong>[<strong>w</strong>|<strong>f</strong>|<strong>wf</strong>|<strong>g</strong>[<em>NUM</em>]|<strong>d</strong>|<strong>x</strong>] ]</p>
+<dl>
+<dt><strong><a name="item_exiftool__5boptions_5d__5b_2dtag_2e_2e_2e_5d__5b_2"><strong>exiftool</strong> [<em>OPTIONS</em>] [-<em>TAG</em>...] [--<em>TAG</em>...] <em>FILE</em>...</a></strong><br />
+</dt>
+<dt><strong><a name="item_exiftool__5boptions_5d__2dtag_5b_2b_2d_3c_5d_3d_5b"><strong>exiftool</strong> [<em>OPTIONS</em>] -<em>TAG</em>[+-&lt;]=[<em>VALUE</em>]... <em>FILE</em>...</a></strong><br />
+</dt>
+<dt><strong><a name="item_exiftool__5boptions_5d__2dtagsfromfile_srcfile__5b"><strong>exiftool</strong> [<em>OPTIONS</em>] <strong>-tagsFromFile</strong> <em>SRCFILE</em>
+[-<em>SRCTAG</em>[&gt;<em>DSTTAG</em>]...] <em>FILE</em>...</a></strong><br />
+</dt>
+<dt><strong><a name="item_exiftool__5b__2dver__7c_b_3c_2dlist_3e_5bb_3cw_3e_"><strong>exiftool</strong> [ <strong>-ver</strong> |
+<strong>-list</strong>[<strong>w</strong>|<strong>f</strong>|<strong>wf</strong>|<strong>g</strong>[<em>NUM</em>]|<strong>d</strong>|<strong>x</strong>] ]</a></strong><br />
+</dt>
+</dl>
 <p>For specific examples, see the <a href="#reading_examples">EXAMPLES</a> sections below.</p>
 <p>
 </p>
@@ -67,65 +73,67 @@
 <p>A command-line interface to <a href="ExifTool.html">Image::ExifTool</a>, used for
 reading and writing meta information in image, audio and video files.
 <em>FILE</em> is a source file name, directory name, or <code>-</code> for the standard
-input.  Information is read from the source file and output in readable form
-to the console (or written to an output text file with the <strong>-w</strong> option).</p>
+input.  Multiple files may be processed with a single command.  Information
+is read from the source files and output in readable form to the console (or
+written to output text files with the <strong>-w</strong> option).</p>
 <p>To write or copy information, new tag values are specified with the
--<em>TAG</em>=[<em>VALUE</em>] syntax or the <strong>-tagsFromFile</strong> or <strong>-geotag</strong> options. 
-This causes <em>FILE</em> to be rewritten, and by default the original file is
-preserved with <code>_original</code> appended to the file name.  (Be sure to verify
-that the new file is OK before erasing the original.)  Once in write mode,
-exiftool will ignore any read-specific options.</p>
-<p>Note:  If <em>FILE</em> is a directory name, then only file types with recognized
-extensions are processed when reading, and only writable types are processed
-when any tag is written.  However, a filename may be specified or the
-<strong>-ext</strong> option may be used to force processing of files with any extension.</p>
+-<em>TAG</em>=[<em>VALUE</em>] syntax or the <strong>-tagsFromFile</strong> or <strong>-geotag</strong> options.
+This causes each <em>FILE</em> to be rewritten, and by default the original files
+are preserved with <code>_original</code> appended to their names.  (Be sure to verify
+that the new files are OK before erasing the originals.)  Once in write
+mode, exiftool will ignore any read-specific options.</p>
+<p>Note:  If <em>FILE</em> is a directory name then only supported file types in the
+directory are processed, or only writable types are processed if any tag is
+written.  However, a filename may be specified or the <strong>-ext</strong> option may be
+used to force processing of files with any extension.</p>
 <p>Below is a list of file types and meta information formats currently
 supported by ExifTool (r = read, w = write, c = create):</p>
 <pre>
   File Types
   ------------+-------------+-------------+-------------+------------
-  3FR   r     | DOC   r     | K25   r     | PAGES r     | RWZ   r
-  3G2   r     | DOCX  r     | KDC   r     | PBM   r/w   | RM    r
-  3GP   r     | DVB   r     | KEY   r     | PDF   r/w   | SO    r
-  ACR   r     | DYLIB r     | LNK   r     | PEF   r/w   | SR2   r/w
-  AFM   r     | EIP   r     | M2TS  r     | PFA   r     | SRF   r
-  AI    r/w   | EPS   r/w   | M4A/V r     | PFB   r     | SRW   r/w
-  AIFF  r     | ERF   r/w   | MEF   r/w   | PFM   r     | SVG   r
-  APE   r     | EXE   r     | MIE   r/w/c | PGM   r/w   | SWF   r
-  ARW   r/w   | EXIF  r/w/c | MIFF  r     | PICT  r     | THM   r/w
-  ASF   r     | F4A/V r     | MNG   r/w   | PNG   r/w   | TIFF  r/w
-  AVI   r     | FLA   r     | MOS   r/w   | PPM   r/w   | TTC   r
-  BMP   r     | FLAC  r     | MOV   r     | PPT   r     | TTF   r
-  BTF   r     | FLV   r     | MP3   r     | PPTX  r     | VRD   r/w/c
-  COS   r     | FPX   r     | MP4   r     | PS    r/w   | WAV   r
-  CR2   r/w   | GIF   r/w   | MPC   r     | PSB   r/w   | WDP   r/w
-  CRW   r/w   | GZ    r     | MPG   r     | PSD   r/w   | WMA   r
-  CS1   r/w   | HDP   r/w   | MPO   r/w   | PSP   r     | WMV   r
-  DCM   r     | HTML  r     | MQV   r     | QTIF  r     | X3F   r
-  DCP   r/w   | ICC   r/w/c | MRW   r/w   | RA    r     | XLS   r
-  DCR   r     | IIQ   r     | NEF   r/w   | RAF   r/w   | XLSX  r
-  DFONT r     | IND   r/w   | NRW   r/w   | RAM   r     | XMP   r/w/c
-  DIVX  r     | ITC   r     | NUMBERS r   | RAW   r/w   | ZIP   r
-  DJVU  r     | JNG   r/w   | OGG   r     | RIFF  r     |
-  DLL   r     | JP2   r/w   | ORF   r/w   | RW2   r/w   |
-  DNG   r/w   | JPEG  r/w   | OTF   r     | RWL   r/w   |</pre>
+  3FR   r     | DVB   r     | M2TS  r     | PAGES r     | RWL   r/w
+  3G2   r     | DYLIB r     | M4A/V r     | PBM   r/w   | RWZ   r
+  3GP   r     | EIP   r     | MEF   r/w   | PDF   r/w   | RM    r
+  ACR   r     | EPS   r/w   | MIE   r/w/c | PEF   r/w   | SO    r
+  AFM   r     | ERF   r/w   | MIFF  r     | PFA   r     | SR2   r/w
+  AI    r/w   | EXE   r     | MKA   r     | PFB   r     | SRF   r
+  AIFF  r     | EXIF  r/w/c | MKS   r     | PFM   r     | SRW   r/w
+  APE   r     | F4A/V r     | MKV   r     | PGM   r/w   | SVG   r
+  ARW   r/w   | FLA   r     | MNG   r/w   | PICT  r     | SWF   r
+  ASF   r     | FLAC  r     | MOS   r/w   | PMP   r     | THM   r/w
+  AVI   r     | FLV   r     | MOV   r     | PNG   r/w   | TIFF  r/w
+  BMP   r     | FPX   r     | MP3   r     | PPM   r/w   | TTC   r
+  BTF   r     | GIF   r/w   | MP4   r     | PPT   r     | TTF   r
+  COS   r     | GZ    r     | MPC   r     | PPTX  r     | VRD   r/w/c
+  CR2   r/w   | HDP   r/w   | MPG   r     | PS    r/w   | WAV   r
+  CRW   r/w   | HTML  r     | MPO   r/w   | PSB   r/w   | WDP   r/w
+  CS1   r/w   | ICC   r/w/c | MQV   r     | PSD   r/w   | WMA   r
+  DCM   r     | IIQ   r     | MRW   r/w   | PSP   r     | WMV   r
+  DCP   r/w   | IND   r/w   | NEF   r/w   | QTIF  r     | X3F   r
+  DCR   r     | ITC   r     | NRW   r/w   | RA    r     | XLS   r
+  DFONT r     | JNG   r/w   | NUMBERS r   | RAF   r/w   | XLSX  r
+  DIVX  r     | JP2   r/w   | ODP   r     | RAM   r     | XMP   r/w/c
+  DJVU  r     | JPEG  r/w   | ODS   r     | RAW   r/w   | ZIP   r
+  DLL   r     | K25   r     | ODT   r     | RIFF  r     |
+  DNG   r/w   | KDC   r     | OGG   r     | RSRC  r     |
+  DOC   r     | KEY   r     | ORF   r/w   | RTF   r     |
+  DOCX  r     | LNK   r     | OTF   r     | RW2   r/w   |</pre>
 <pre>
   Meta Information
   ----------------------+----------------------+---------------------
-  EXIF           r/w/c  |  JPEG 2000      r    |  APE            r
-  GPS            r/w/c  |  DICOM          r    |  Vorbis         r
-  IPTC           r/w/c  |  Flash          r    |  SPIFF          r
-  XMP            r/w/c  |  FlashPix       r    |  DjVu           r
-  MakerNotes     r/w/c  |  QuickTime      r    |  M2TS           r
-  Photoshop IRB  r/w/c  |  GeoTIFF        r    |  PE/COFF        r
-  ICC Profile    r/w/c  |  PrintIM        r    |  AVCHD          r
-  MIE            r/w/c  |  ID3            r    |  ZIP            r
-  JFIF           r/w/c  |  Kodak Meta     r    |  (and more)
-  Ducky APP12    r/w/c  |  Ricoh RMETA    r    |
-  PDF            r/w/c  |  Picture Info   r    |
-  CIFF           r/w    |  Adobe APP14    r    |
-  AFCP           r/w    |  MPF            r    |
-  PhotoMechanic  r/w    |  Stim           r    |</pre>
+  EXIF           r/w/c  |  Kodak Meta     r/w  |  Adobe APP14    r
+  GPS            r/w/c  |  PhotoMechanic  r/w  |  MPF            r
+  IPTC           r/w/c  |  JPEG 2000      r    |  Stim           r
+  XMP            r/w/c  |  DICOM          r    |  APE            r
+  MakerNotes     r/w/c  |  Flash          r    |  Vorbis         r
+  Photoshop IRB  r/w/c  |  FlashPix       r    |  SPIFF          r
+  ICC Profile    r/w/c  |  QuickTime      r    |  DjVu           r
+  MIE            r/w/c  |  Matroska       r    |  M2TS           r
+  JFIF           r/w/c  |  GeoTIFF        r    |  PE/COFF        r
+  Ducky APP12    r/w/c  |  PrintIM        r    |  AVCHD          r
+  PDF            r/w/c  |  ID3            r    |  ZIP            r
+  CIFF           r/w    |  Ricoh RMETA    r    |  (and more)
+  AFCP           r/w    |  Picture Info   r    |</pre>
 <p>
 </p>
 <hr />
@@ -197,7 +205,7 @@ interpreted as a tag name.</p>
   -use MODULE                      Add features from plug-in module
   -v[NUM]     (-verbose)           Print verbose messages
   -ver                             Print exiftool version number
-  -w EXT      (-textOut)           Write console output to file
+  -w EXT      (-textOut)           Write output text files
   -x TAG      (-exclude)           Exclude specified tag
   -X          (-xmlFormat)         Use RDF/XML output format
   -z          (-zip)               Read/write compressed information</pre>
@@ -450,9 +458,9 @@ escaped.  The <strong>-E</strong> option is implied with <strong>-h</strong>, an
 </dt>
 <dd>
 Extract information from embedded documents in EPS and PDF files, embedded
-MPF images in JPEG and MPO files, streaming metadata from AVCHD videos, and
-the resource fork of Macintosh files.  Implies the <strong>-a</strong> option.  Use <strong>-g3</strong>
-or <strong>-G3</strong> to identify the originating document for extracted information.
+MPF images in JPEG and MPO files, streaming metadata in AVCHD videos, and
+the resource fork of Mac OS files.  Implies the <strong>-a</strong> option.  Use <strong>-g3</strong> or
+<strong>-G3</strong> to identify the originating document for extracted information.
 Embedded documents containing sub-documents are indicated with dashes in the
 family 3 group name.  (ie. <code>Doc2-3</code> is the 3rd sub-document of the 2nd
 embedded document.)
@@ -583,6 +591,12 @@ seconds behind GPS:</p>
 <dd>
 <pre>
     exiftool -geosync=+1:20 -geotag a.log DIR</pre>
+</dd>
+<dd>
+<p><code>Geosync</code> must be set before <code>Geotime</code> (if specified) to be effective.
+Advanced <code>Geosync</code> features allow a linear time drift correction and
+synchronization from previously geotagged images.  See ``geotag.html'' in the
+full ExifTool distribution for more information.</p>
 </dd>
 <dd>
 <p>Multiple <strong>-geotag</strong> options may be used to concatinate GPS track log data.
@@ -856,7 +870,7 @@ file was successfully written.
 Similar to <strong>-overwrite_original</strong> except that an extra step is added to
 allow the original file attributes to be preserved.  For example, on a Mac
 this causes the original file creation date, ownership, permissions, type,
-creator, icon and resource fork to be preserved.  This is implemented by
+creator, label color and icon to be preserved.  This is implemented by
 opening the original file in update mode and replacing its data with a copy
 of a temporary file before deleting the temporary.  The extra step results
 in slower performance, so the <strong>-overwrite_original</strong> option should be used
@@ -961,8 +975,9 @@ Short output format.  Prints tag names instead of descriptions.  Add up to 3
 <dt><strong><a name="item_s"><strong>-S</strong> (<strong>-veryShort</strong>)</a></strong><br />
 </dt>
 <dd>
-Very short format.  The same as two <strong>-s</strong> options.  Extra spaces used to
-column-align values are not printed.
+Very short format.  The same as two -s options.  Tag names are printed
+instead of descriptions, and no extra spaces are added to column-align
+values.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dscanforxmp"><strong>-scanForXMP</strong></a></strong><br />
@@ -1756,8 +1771,9 @@ Translate IPTC information to XMP with appropriate tag name conversions, and
 delete the original IPTC information from an image.  This example uses
 iptc2xmp.args, which is a file included with the ExifTool distribution that
 contains the required arguments to convert IPTC information to XMP format.
-Also included with the distribution is xmp2iptc.args, which performs the
-inverse conversion.
+Also included with the distribution are xmp2iptc.args (which performs the
+inverse conversion) and a few more .args files for other conversions between
+EXIF, IPTC and XMP.
 </dd>
 <p></p>
 <dt><strong><a name="item_exiftool__2dtagsfromfile__25d_25f_2ecrw__2dr__2dex">exiftool -tagsfromfile %d%f.CRW -r -ext JPG dir</a></strong><br />
@@ -2044,12 +2060,6 @@ flexibility of ExifTool.)
 <h1><a name="diagnostics">DIAGNOSTICS</a></h1>
 <p>The exiftool application exits with a status of 0 on success, or 1 if an
 error occured or if all files failed the <strong>-if</strong> condition.</p>
-<p>
-</p>
-<hr />
-<h1><a name="bugs">BUGS</a></h1>
-<p>ExifTool does not handle information stored in the resource fork on
-Macintosh filesystems.</p>
 <p>
 </p>
 <hr />

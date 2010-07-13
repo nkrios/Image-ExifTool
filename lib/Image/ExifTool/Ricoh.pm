@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -31,6 +31,7 @@ my %ricohLensIDs = (
     # (the exact lens model names used by Ricoh, except for a change in case)
     'RL1' => 'GR Lens A12 50mm F2.5 Macro',
     'RL2' => 'Ricoh Lens S10 24-70mm F2.5-4.4 VC',
+    'RL3' => 'Ricoh Lens P10 28-300mm F3.5-5.6 VC',
 );
 
 %Image::ExifTool::Ricoh::Main = (

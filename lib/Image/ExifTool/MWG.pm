@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 # enable MWG strict mode by default
 # (causes non-standard EXIF, IPTC and XMP to be ignored)
@@ -92,7 +92,7 @@ sub OverwriteStringList($$$$);
             4 => 'IPTCDigest',
         },
         ValueConv => q{
-            return $val[0] if defined $val[0];
+            return $val[0] if defined $val[0] and $val[0] !~ /^ *$/;
             return $val[2] if not defined $val[3] or (defined $val[2] and
                              (not defined $val[4] or $val[3] eq $val[4]));
             return Image::ExifTool::MWG::RecoverTruncatedIPTC($val[1], $val[2], 2000);
@@ -120,7 +120,9 @@ sub OverwriteStringList($$$$);
             6 => 'IPTCDigest',
         },
         ValueConv => q{
-            return $val[1] ? "$val[0].$val[1]" : $val[0] if defined $val[0];
+            if (defined $val[0] and $val[0] !~ /^[: ]*$/) {
+                return ($val[1] and $val[1] !~ /^ *$/) ? "$val[0].$val[1]" : $val[0];
+            }
             return $val[4] if not defined $val[5] or (defined $val[4] and
                              (not defined $val[6] or $val[5] eq $val[6]));
             return $val[3] ? "$val[2] $val[3]" : $val[2] if $val[2];
@@ -154,7 +156,9 @@ sub OverwriteStringList($$$$);
             6 => 'IPTCDigest',
         },
         ValueConv => q{
-            return $val[1] ? "$val[0].$val[1]" : $val[0] if defined $val[0];
+            if (defined $val[0] and $val[0] !~ /^[: ]*$/) {
+                return ($val[1] and $val[1] !~ /^ *$/) ? "$val[0].$val[1]" : $val[0];
+            }
             return $val[4] if not defined $val[5] or (defined $val[4] and
                              (not defined $val[6] or $val[5] eq $val[6]));
             return $val[3] ? "$val[2] $val[3]" : $val[2] if $val[2];
@@ -184,7 +188,9 @@ sub OverwriteStringList($$$$);
             4 => 'IPTCDigest',
         },
         ValueConv => q{
-            return $val[1] ? "$val[0].$val[1]" : $val[0] if defined $val[0];
+            if (defined $val[0] and $val[0] !~ /^[: ]*$/) {
+                return ($val[1] and $val[1] !~ /^ *$/) ? "$val[0].$val[1]" : $val[0];
+            }
             return $val[2] if not defined $val[3] or not defined $val[4] or $val[3] eq $val[4];
             return undef;
         },
@@ -232,7 +238,7 @@ sub OverwriteStringList($$$$);
             4 => 'IPTCDigest',
         },
         ValueConv => q{
-            return $val[0] if defined $val[0];
+            return $val[0] if defined $val[0] and $val[0] !~ /^ *$/;
             return $val[2] if not defined $val[3] or (defined $val[2] and
                              (not defined $val[4] or $val[3] eq $val[4]));
             return Image::ExifTool::MWG::RecoverTruncatedIPTC($val[1], $val[2], 128);
@@ -256,7 +262,7 @@ sub OverwriteStringList($$$$);
             4 => 'IPTCDigest',
         },
         ValueConv => q{
-            return $val[0] if defined $val[0];
+            return $val[0] if defined $val[0] and $val[0] !~ /^ *$/;
             return $val[2] if not defined $val[3] or (defined $val[2] and
                              (not defined $val[4] or $val[3] eq $val[4]));
             return Image::ExifTool::MWG::RecoverTruncatedIPTC($val[1], $val[2], 32);
@@ -422,8 +428,8 @@ sub StringToList($$)
 
 #------------------------------------------------------------------------------
 # Handle logic for overwriting EXIF string-type list tag
-# Inputs: 0) new value hash ref, 1) old string value (or undef if it didn't exist),
-#         2) reference to new value
+# Inputs: 0) new value hash ref, 1) new value hash ref,
+#         2) old string value (or undef if it didn't exist), 3) new value ref
 # Returns: 1 and sets the new value for the tag
 sub OverwriteStringList($$$$)
 {

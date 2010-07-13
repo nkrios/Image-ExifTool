@@ -1,7 +1,7 @@
 # Before "make install", this script should be runnable with "make test".
 # After "make install" it should work as "perl t/Sony.t".
 
-BEGIN { $| = 1; print "1..4\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..5\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -19,7 +19,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    my $info = $exifTool->ImageInfo('t/images/Sony.jpg',{'Unknown'=>1});
+    my $info = $exifTool->ImageInfo('t/images/Sony.jpg',{Unknown=>1});
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
@@ -47,6 +47,15 @@ my $testnum = 1;
         warn sprintf("    Expected 0x%x but got 0x%x\n", $expected, $got);
         print 'not ';
     }
+    print "ok $testnum\n";
+}
+
+# test 5: Extract information from a PMP image
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $info = $exifTool->ImageInfo('t/images/Sony.pmp');
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
 

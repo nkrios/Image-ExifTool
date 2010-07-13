@@ -10,6 +10,7 @@
 #               2) Joachim Loehr private communication
 #               3) http://homepage3.nifty.com/kamisaka/makernote/makernote_casio.htm
 #               4) http://www.gvsoft.homedns.org/exif/makernote-casio.html
+#               5) Robert Chi private communication (EX-F1)
 #               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -19,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.28';
+$VERSION = '1.30';
 
 # older Casio maker notes (ref 1)
 %Image::ExifTool::Casio::Main = (
@@ -653,6 +654,7 @@ $VERSION = '1.28';
             # 3 observed in MOV videos (EX-V7)
             # (newer models write 2 numbers here - PH)
             '0 0' => 'Off', #PH
+            # have seen '0 1' for EX-Z2000 which has 5 modes: Auto, Camera AS, Image AS, DEMO, Off
             '16 0' => 'Slow Shutter', #PH (EX-Z77)
             '18 0' => 'Anti-Shake', #PH (EX-Z77)
             '20 0' => 'High Sensitivity', #PH (EX-Z77)
@@ -693,6 +695,35 @@ $VERSION = '1.28';
             3 => 'Vivid Landscape',
         },
     },
+    0x3103 => { #5
+        Name => 'DriveMode',
+        Writable => 'int16u',
+        PrintConvColumns => 2,
+        PrintConv => {
+            OTHER => sub {
+                # handle new values of future models
+                my ($val, $inv) = @_;
+                return $val =~ /(\d+)/ ? $1 : undef if $inv;
+                return "Continuous ($val fps)";
+            },
+            0 => 'Single Shot', #PH (NC)
+            1 => 'Continuous Shooting', # (1 fps for the EX-F1)
+            2 => 'Continuous (2 fps)',
+            3 => 'Continuous (3 fps)',
+            4 => 'Continuous (4 fps)',
+            5 => 'Continuous (5 fps)',
+            6 => 'Continuous (6 fps)',
+            7 => 'Continuous (7 fps)',
+            10 => 'Continuous (10 fps)',
+            12 => 'Continuous (12 fps)',
+            15 => 'Continuous (15 fps)',
+            20 => 'Continuous (20 fps)',
+            30 => 'Continuous (30 fps)',
+            40 => 'Continuous (40 fps)', #PH (EX-FH25)
+            60 => 'Continuous (60 fps)',
+            240 => 'Auto-N',
+        },
+    },
     0x4001 => { #PH (AVI videos)
         Name => 'CaptureFrameRate',
         Writable => 'int16u',
@@ -714,6 +745,50 @@ $VERSION = '1.28';
             3 => 'HD',
             5 => 'Low', # used in High Speed modes
         },
+    },
+);
+
+# Casio APP1 QVCI segment found in QV-7000SX images (ref PH)
+%Image::ExifTool::Casio::QVCI = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    NOTES => q{
+        This information is found in the APP1 QVCI segment of JPEG images from the
+        Casio QV-7000SX.
+    },
+    0x2c => {
+        Name => 'CasioQuality',
+        PrintConv => {
+            1 => 'Economy',
+            2 => 'Normal',
+            3 => 'Fine',
+            4 => 'Super Fine',
+        },
+    },
+    0x37 => {
+        Name => 'FocalRange',
+        Unknown => 1,
+    },
+    0x4d => {
+        Name => 'DateTimeOriginal',
+        Description => 'Date/Time Original',
+        Format => 'string[20]',
+        Groups => { 2 => 'Time' },
+        ValueConv => '$val=~tr/./:/; $val=~s/(\d+:\d+:\d+):/$1 /; $val',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    0x62 => {
+        Name => 'ModelType',
+        Format => 'string[7]',
+    },
+    0x72 => { # could be serial number or manufacture date in form YYMMDDxx ?
+        Name => 'ManufactureIndex',
+        Format => 'string[9]',
+    },
+    0x7c => {
+        Name => 'ManufactureCode',
+        Format => 'string[9]',
     },
 );
 
@@ -765,7 +840,7 @@ under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Joachim Loehr for adding support for the type 2 maker notes, and
-Jens Duttke for decoding some tags.
+Jens Duttke and Robert Chi for decoding some tags.
 
 =head1 SEE ALSO
 

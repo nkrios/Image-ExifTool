@@ -1,8 +1,8 @@
-  ExifToolVersion = 8.02
+  ExifToolVersion = 8.16
   FileName = Olympus_7_failed.jpg
   Directory = t
   FileSize = 7335
-  FileModifyDate = 1260754790
+  FileModifyDate = 1269013012
   FilePermissions = 33188
   FileType = JPEG
   MIMEType = image/jpeg
@@ -380,6 +380,8 @@ JPEG APP1 (7080 bytes):
   | 11) PrintIM (SubDirectory) -->
   |     - Tag 0xc4a5 (528 bytes, undef[528])
   | + [PrintIM directory with 37 entries]
+  | | PrintIMVersion = 0300
+  | | - Tag 'PrintIMVersion' (4 bytes)
   | | 0)  PrintIM_0x0001 = 1310740
   | |     - Tag 0x0001 (4 bytes)
   | | 1)  PrintIM_0x0002 = 1

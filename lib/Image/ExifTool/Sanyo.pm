@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 my %offOn = (
     0 => 'Off',
@@ -246,7 +246,7 @@ my %offOn = (
         Name => 'ExposureCompensation',
         Format => 'int32s',
         ValueConv => '$val / 10',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
     0x44 => {
         Name => 'WhiteBalance',

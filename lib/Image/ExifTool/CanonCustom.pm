@@ -20,7 +20,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.38';
+$VERSION = '1.39';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -1150,7 +1150,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         ValueConv => 'exp(-Image::ExifTool::Canon::CanonEv($val*4)*log(2))*1000/8',
         ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(-log($val*8/1000)/log(2))/4',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     5 => {
         Name => 'PF4ExposureTimeMax',
@@ -1158,7 +1158,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         ValueConv => 'exp(-Image::ExifTool::Canon::CanonEv($val*4)*log(2))*1000/8',
         ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(-log($val*8/1000)/log(2))/4',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     6 => {
         Name => 'PF5ApertureMin',

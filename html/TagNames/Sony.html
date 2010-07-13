@@ -79,16 +79,53 @@ Sony models.
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
 <tr class=b>
+<td title='0x1000 = 4096'>0x1000</td>
+<td>MultiBurstMode</td>
+<td class=c>undef</td>
+<td><span class=s><span class=n>(MultiBurst tags valid only for models with this feature, like the F88)</span>
+  <br>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
+<td title='0x1001 = 4097'>0x1001</td>
+<td>MultiBurstImageWidth</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x1002 = 4098'>0x1002</td>
+<td>MultiBurstImageHeight</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x1003 = 4099'>0x1003</td>
+<td>Panorama</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Sony.html#Panorama'>Sony Panorama Tags</a></td></tr>
+<tr class=b>
 <td title='0x2001 = 8193'>0x2001</td>
 <td>PreviewImage</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td title='0x2004 = 8196'>0x2004</td>
+<td>Contrast</td>
+<td class=c>int32s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x2005 = 8197'>0x2005</td>
+<td>Saturation</td>
+<td class=c>int32s</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td title='0x200a = 8202'>0x200a</td>
-<td>AutoHDR</td>
+<td>HDR</td>
 <td class=c>int32u</td>
 <td><span class=s>0x0 = Off
-  <br>0x10001 = On</span></td></tr>
+  <br>0x10001 = Auto
+  <br>0x10010 = 1
+  <br>0x10012 = 2
+  <br>0x10014 = 3
+  <br>0x10016 = 4
+  <br>0x10018 = 5</span></td></tr>
 <tr class=b>
 <td title='0x3000 = 12288'>0x3000</td>
 <td>ShotInfo</td>
@@ -102,7 +139,8 @@ Sony models.
   <br>&#39;1 0 0 0&#39; = SR2
   <br>&#39;2 0 0 0&#39; = ARW 1.0
   <br>&#39;3 0 0 0&#39; = ARW 2.0
-  <br>&#39;3 1 0 0&#39; = ARW 2.1</span></td></tr>
+  <br>&#39;3 1 0 0&#39; = ARW 2.1
+  <br>&#39;3 2 0 0&#39; = ARW 2.2</span></td></tr>
 <tr class=b>
 <td title='0xb001 = 45057'>0xb001</td>
 <td>SonyModelID</td>
@@ -114,13 +152,16 @@ Sony models.
   <br>258 = DSLR-A700
   <br>259 = DSLR-A200
   <br>260 = DSLR-A350
-  <br>261 = DSLR-A300</td><td>&nbsp;&nbsp;</td>
-  <td>263 = DSLR-A380
-  <br>264 = DSLR-A330
+  <br>261 = DSLR-A300
+  <br>263 = DSLR-A380</td><td>&nbsp;&nbsp;</td>
+  <td>264 = DSLR-A330
   <br>265 = DSLR-A230
   <br>269 = DSLR-A850
   <br>273 = DSLR-A550
-  <br>274 = DSLR-A500</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>274 = DSLR-A500
+  <br>275 = DSLR-A450
+  <br>278 = NEX-5
+  <br>279 = NEX-3</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr>
 <td title='0xb020 = 45088'>0xb020</td>
@@ -172,7 +213,12 @@ Sony models.
   <br>9 = Advanced Lv2
   <br>10 = Advanced Lv3
   <br>11 = Advanced Lv4
-  <br>12 = Advanced Lv5</span></td></tr>
+  <br>12 = Advanced Lv5
+  <br>16 = 1
+  <br>17 = 2
+  <br>18 = 3
+  <br>19 = 4
+  <br>20 = 5</span></td></tr>
 <tr>
 <td title='0xb026 = 45094'>0xb026</td>
 <td>ImageStabilization</td>
@@ -256,7 +302,7 @@ original version of the lens has the same LensType)</span>
   <br>51 = Sony AF DT 16-105mm F3.5-5.6 or 55-200mm F4-5.5
   <br>51.1 = Sony AF DT 55-200mm F4-5.5
   <br>52 = Sony 70-300mm F4.5-5.6 G SSM
-  <br>53 = Sony AF 70-400mm F4.5-5.6 G SSM (SAL-70400G)
+  <br>53 = Sony AF 70-400mm F4-5.6 G SSM (SAL-70400G)
   <br>54 = Carl Zeiss Vario-Sonnar T* 16-35mm F2.8 ZA SSM (SAL-1635Z)
   <br>55 = Sony DT 18-55mm F3.5-5.6 SAM (SAL-1855)
   <br>56 = Sony AF DT 55-200mm F4-5.6 SAM
@@ -551,7 +597,9 @@ original version of the lens has the same LensType)</span>
 <td>Macro</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
-  <br>1 = On</span></td></tr>
+  <br>1 = On
+  <br>2 = Close Focus
+  <br>65535 = n/a</span></td></tr>
 <tr class=b>
 <td title='0xb041 = 45121'>0xb041</td>
 <td>ExposureMode</td>
@@ -569,21 +617,77 @@ original version of the lens has the same LensType)</span>
   <br>11 = Twilight Portrait
   <br>12 = Soft Snap
   <br>13 = Fireworks
+  <br>14 = Smile Shutter
   <br>15 = Manual
   <br>18 = High Sensitivity
+  <br>20 = Advanced Sports Shooting
   <br>29 = Underwater
   <br>33 = Gourmet
   <br>34 = Panorama
   <br>35 = Handheld Twilight
   <br>36 = Anti Motion Blur
   <br>37 = Pet
-  <br>38 = Backlight Correction HDR</span></td></tr>
+  <br>38 = Backlight Correction HDR
+  <br>65535 = n/a</span></td></tr>
 <tr>
+<td title='0xb042 = 45122'>0xb042</td>
+<td>FocusMode</td>
+<td class=c>int16u</td>
+<td><span class=s>1 = AF-S
+  <br>2 = AF-C
+  <br>4 = Permanent-AF
+  <br>65535 = n/a</span></td></tr>
+<tr class=b>
+<td title='0xb043 = 45123'>0xb043</td>
+<td>AFMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Default
+  <br>1 = Multi AF
+  <br>2 = Center AF
+  <br>3 = Spot AF
+  <br>4 = Flexible Spot AF
+  <br>6 = Touch AF
+  <br>14 = Manual Focus
+  <br>15 = Face Detected
+  <br>65535 = n/a</span></td></tr>
+<tr>
+<td title='0xb044 = 45124'>0xb044</td>
+<td>AFIlluminator</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = Auto
+  <br>65535 = n/a</span></td></tr>
+<tr class=b>
 <td title='0xb047 = 45127'>0xb047</td>
 <td>Quality</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Normal
-  <br>1 = Fine</span></td></tr>
+  <br>1 = Fine
+  <br>65535 = n/a</span></td></tr>
+<tr>
+<td title='0xb048 = 45128'>0xb048</td>
+<td>FlashLevel</td>
+<td class=c>int16s</td>
+<td><span class=s>-32768 = Low
+  <br>-1 = n/a
+  <br>0 = Normal
+  <br>32767 = High</span></td></tr>
+<tr class=b>
+<td title='0xb049 = 45129'>0xb049</td>
+<td>ReleaseMode</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Normal
+  <br>2 = Burst
+  <br>5 = Exposure Bracketing
+  <br>6 = White Balance Bracketing
+  <br>65535 = n/a</span></td></tr>
+<tr>
+<td title='0xb04a = 45130'>0xb04a</td>
+<td>SequenceNumber</td>
+<td class=c>int16u</td>
+<td><span class=s><span class=n>(shot number in continuous burst)</span>
+  <br>0 = Single
+  <br>65535 = n/a</span></td></tr>
 <tr class=b>
 <td title='0xb04b = 45131'>0xb04b</td>
 <td>Anti-Blur</td>
@@ -597,7 +701,8 @@ original version of the lens has the same LensType)</span>
 <td>LongExposureNoiseReduction</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
-  <br>1 = On</span></td></tr>
+  <br>1 = On
+  <br>65535 = n/a</span></td></tr>
 <tr class=b>
 <td title='0xb04f = 45135'>0xb04f</td>
 <td>DynamicRangeOptimizer</td>
@@ -619,7 +724,14 @@ original version of the lens has the same LensType)</span>
 <td><span class=s>0 = Auto
   <br>4 = Manual
   <br>5 = Daylight
-  <br>14 = Incandescent</span></td></tr>
+  <br>6 = Cloudy
+  <br>7 = White Flourescent
+  <br>8 = Cool White Flourescent
+  <br>9 = Day White Flourescent
+  <br>14 = Incandescent
+  <br>15 = Flash
+  <br>17 = Underwater 1 (Blue Water)
+  <br>18 = Underwater 2 (Green Water)</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Sony CameraSettings Tags</a></h2>
@@ -1000,6 +1112,73 @@ tags are only valid for certain models.</p>
 <tr><td colspan=4 class=c><i>[no tags known]</i></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Panorama'>Sony Panorama Tags</a></h2>
+<p>Tags found only in panorama images from Sony cameras such as the HX1, HX5
+and TX7.  The width/height values of these tags are not affected by camera
+rotation -- the width is always the longer dimension.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='1 = 0x1'>1</td>
+<td>PanoramaFullWidth</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='2 = 0x2'>2</td>
+<td>PanoramaFullHeight</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='3 = 0x3'>3</td>
+<td>PanoramaDirection</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = Right to Left
+  <br>1 = Left to Right</span></td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4</td>
+<td>PanoramaCropLeft</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='5 = 0x5'>5</td>
+<td>PanoramaCropTop</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='6 = 0x6'>6</td>
+<td>PanoramaCropRight</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='7 = 0x7'>7</td>
+<td>PanoramaCropBottom</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>PanoramaFrameWidth</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='9 = 0x9'>9</td>
+<td>PanoramaFrameHeight</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='10 = 0xa'>10</td>
+<td>PanoramaSourceWidth</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='11 = 0xb'>11</td>
+<td>PanoramaSourceHeight</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='ShotInfo'>Sony ShotInfo Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -1184,9 +1363,94 @@ this information is also written to ARW images by other models.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='PMP'>Sony PMP Tags</a></h2>
+<p>These tags are written in the proprietary-format header of PMP images from
+the DSC-F1.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='8 = 0x8'>8</td>
+<td>JpgFromRawStart</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(OK, not really a RAW file, but this mechanism is used to allow extraction of
+the JPEG image from a PMP file)</span></span></td></tr>
+<tr class=b>
+<td class=r title='12 = 0xc'>12</td>
+<td>JpgFromRawLength</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='22 = 0x16'>22</td>
+<td>SonyImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='24 = 0x18'>24</td>
+<td>SonyImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='27 = 0x1b'>27</td>
+<td>Orientation</td>
+<td class=c>N</td>
+<td><span class=s>0 = Horizontal (normal)
+  <br>2 = Rotate 180</span></td></tr>
+<tr class=b>
+<td class=r title='29 = 0x1d'>29</td>
+<td>ImageQuality</td>
+<td class=c>N</td>
+<td><span class=s>8 = Snap Shot
+  <br>23 = Standard
+  <br>51 = Fine</span></td></tr>
+<tr>
+<td class=r title='52 = 0x34'>52</td>
+<td>Comment</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='76 = 0x4c'>76</td>
+<td>DateTimeOriginal</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='84 = 0x54'>84</td>
+<td>ModifyDate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='102 = 0x66'>102</td>
+<td>ExposureTime</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='106 = 0x6a'>106</td>
+<td>FNumber</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='108 = 0x6c'>108</td>
+<td>ExposureCompensation</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='112 = 0x70'>112</td>
+<td>FocalLength</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='118 = 0x76'>118</td>
+<td>Flash</td>
+<td class=c>N</td>
+<td><span class=s>0 = No Flash
+  <br>1 = Fired</span></td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 1, 2010</i>
+<br><i>Last revised Jul 5, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

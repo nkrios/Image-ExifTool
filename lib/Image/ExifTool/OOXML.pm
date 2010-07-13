@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::XMP;
 use Image::ExifTool::ZIP;
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 # test for recognized OOXML document extensions
 my %isOOXML = (
@@ -75,10 +75,8 @@ my @vectorVals;
     #   ---------------  -------------
     #   DocSecurity      Security
     #   Application      Software
-    #   LastModifiedBy   LastSavedBy
-    #   Description      Comments
-    #   Creator          Author
-    #   TotalTime (min?) TotalEditTime (sec)
+    #   dc:Description   Comments
+    #   dc:Creator       Author
     Application => { },
     AppVersion  => { },
     category    => { },
@@ -103,7 +101,16 @@ my @vectorVals;
     Destination => { },
     Disposition => { },
     Division    => { },
-    DocSecurity => { },
+    DocSecurity => {
+        # (http://msdn.microsoft.com/en-us/library/documentformat.openxml.extendedproperties.documentsecurity.aspx)
+        PrintConv => {
+            0 => 'None',
+            1 => 'Password protected',
+            2 => 'Read-only recommended',
+            4 => 'Read-only enforced',
+            8 => 'Locked for annotations',
+        },
+    },
     DocumentNumber=> { },
     Editor      => { Groups => { 2 => 'Author'} },
     ForwardTo   => { },
@@ -115,6 +122,11 @@ my @vectorVals;
     keywords    => { },
     Language    => { },
     lastModifiedBy => { Groups => { 2 => 'Author'} },
+    lastPrinted => {
+        Groups => { 2 => 'Time' },
+        Format => 'date',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
     Lines       => { },
     LinksUpToDate=>{ PrintConv => { 'false' => 'No', 'true' => 'Yes' } },
     Mailstop    => { },
@@ -145,7 +157,7 @@ my @vectorVals;
         PrintConv => '$self->ConvertDateTime($val)',
     },
     Reference   => { },
-    revision    => { },
+    revision    => { Name => 'RevisionNumber' },
     ScaleCrop   => { PrintConv => { 'false' => 'No', 'true' => 'Yes' } },
     SharedDoc   => { PrintConv => { 'false' => 'No', 'true' => 'Yes' } },
     Slides      => { },
@@ -154,31 +166,13 @@ my @vectorVals;
     TelephoneNumber => { },
     Template    => { },
     TitlesOfParts=>{ },
-    TotalTime   => { PrintConv => 'Image::ExifTool::OOXML::ConvertTotalTime($val)' },
+    TotalTime   => {
+        Name => 'TotalEditTime',
+        PrintConv => 'ConvertTimeSpan($val, 60)',
+    },
     Typist      => { },
     Words       => { },
 );
-
-#------------------------------------------------------------------------------
-# Print conversion for TotalTime value
-# Inputs: 0) time in minutes (NC)
-# Returns: readable time
-sub ConvertTotalTime($)
-{
-    my $val = shift;
-    if (Image::ExifTool::IsFloat($val) and $val != 0) {
-        if ($val < 1) {
-            $val = sprintf("%d seconds", $val * 60); # (I don't think this will happen)
-        } elsif ($val < 60) {
-            $val = sprintf("%d minutes", $val);
-        } elsif ($val < 24 * 60) {
-            $val = sprintf("%.1f hours", $val / 60);
-        } else {
-            $val = sprintf("%.1f days", $val / (24 * 60));
-        }
-    }
-    return $val;
-}
 
 #------------------------------------------------------------------------------
 # Generate a tag ID for this XML tag
@@ -223,6 +217,8 @@ sub FoundTag($$$$;$)
 
     # un-escape XML character entities
     $val = Image::ExifTool::XMP::UnescapeXML($val);
+    # convert OOXML-escaped characters (ie. "_x0000d_" is a newline)
+    $val =~ s/_x([0-9a-f]{4})_/Image::ExifTool::PackUTF8(hex($1))/gie;
     # convert from UTF8 to ExifTool Charset
     $val = $exifTool->Decode($val, 'UTF8');
     # queue this attribute for later if necessary

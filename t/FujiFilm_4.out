@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
 [File, System, Image] FileSize - File Size: 38 kB
 [File, File, Image] RAFVersion - RAF Version: 0106
 [File, File, Image] FileType - File Type: RAF
@@ -94,6 +94,7 @@
 [MakerNotes, FujiFilm, Camera] 5126 - Max Aperture At Min Focal: 2.8
 [MakerNotes, FujiFilm, Camera] 5127 - Max Aperture At Max Focal: 2.8
 [MakerNotes, FujiFilm, Camera] 16640 - Faces Detected: 0
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0250
 [RAF, RAF, Image] 256 - Raw Image Full Size: 4352x1444
 [RAF, RAF, Image] 289 - Raw Image Size: 4288x1440
 [RAF, RAF, Image] 304 - Fuji Layout: 1 2 1 0

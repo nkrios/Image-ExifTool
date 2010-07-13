@@ -1,7 +1,7 @@
 # Before "make install", this script should be runnable with "make test".
 # After "make install" it should work as "perl t/ZIP.t".
 
-BEGIN { $| = 1; print "1..6\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..7\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -28,11 +28,11 @@ my $failed;
     }
 }
 
-# tests 4-6: Extract information from other ZIP-based files (requires Archive::Zip)
+# tests 4-7: Extract information from other ZIP-based files (requires Archive::Zip)
 {
     my $exifTool = new Image::ExifTool;
     my $file;
-    foreach $file ('OOXML.docx', 'CaptureOne.eip', 'iWork.numbers') {
+    foreach $file ('OOXML.docx', 'CaptureOne.eip', 'iWork.numbers', 'OpenDoc.ods') {
         ++$testnum;
         my $skip = '';
         if (eval 'require Archive::Zip') {
@@ -53,6 +53,7 @@ if ($Image::ExifTool::ZIP::warnString) {
 # print module versions if anything failed
 if ($failed) {
     my $mod;
+    warn "\n";
     foreach $mod ('Archive::Zip', 'Compress::Raw::Zlib') {
         my $v;
         if (eval "require $mod") {

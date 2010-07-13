@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.24
 [File, System, Image] FileName - File Name: Writer_9_failed.jpg
 [File, System, Image] Directory - Directory: t
-[File, System, Image] FileSize - File Size: 9.3 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:56-05:00
+[File, System, Image] FileSize - File Size: 9.2 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:06:21 15:13:11-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -60,11 +60,13 @@
 [EXIF, ExifIFD, Camera] 41992 - Contrast: High
 [EXIF, ExifIFD, Camera] 41993 - Saturation: High
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
+[EXIF, ExifIFD, Image] 42032 - Owner Name: Phil Harvey
+[EXIF, ExifIFD, Image] 42033 - Serial Number: 0560018150
 [EXIF, IFD1, Image] 259 - Compression: JPEG (old-style)
 [EXIF, IFD1, Image] 282 - X Resolution: 300
 [EXIF, IFD1, Image] 283 - Y Resolution: 300
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
-[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2388
+[EXIF, IFD1, Image] 513 - Thumbnail Offset: 2436
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [MakerNotes, Canon, Camera] 1 - Macro Mode: Unknown (0)
 [MakerNotes, Canon, Camera] 2 - Self Timer: Off
@@ -113,7 +115,7 @@
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
 [MakerNotes, Canon, Image] 19 - Focus Distance Upper: inf
-[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 5.46
+[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 5.46 m
 [MakerNotes, Canon, Image] 21 - F Number: 14
 [MakerNotes, Canon, Image] 22 - Exposure Time: 128
 [MakerNotes, Canon, Image] 23 - Measured EV 2: -1.25
@@ -157,10 +159,8 @@
 [MakerNotes, Canon, Camera] 9 - AF Area Y Positions: 0 0 -506 0 506 0 0
 [MakerNotes, Canon, Camera] 10 - AF Points In Focus: (none)
 [MakerNotes, Canon, Camera] 19 - Thumbnail Image Valid Area: 0 159 7 112
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.02
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.24
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
-[XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
-[XMP, XMP-aux, Camera] SerialNumber - Serial Number: 0560018150
 [XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -
 [XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 9
 [XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8
@@ -208,7 +208,7 @@
 [ICC_Profile, ICC_Profile, Image] gTRC - Green Tone Reproduction Curve: (Binary data 2060 bytes)
 [ICC_Profile, ICC_Profile, Image] bTRC - Blue Tone Reproduction Curve: (Binary data 2060 bytes)
 [Composite, Composite, Image] Aperture - Aperture: 14.0
-[Composite, Composite, Camera] DriveMode - Drive Mode: Continuous shooting
+[Composite, Composite, Camera] DriveMode - Drive Mode: Continuous Shooting
 [Composite, Composite, Camera] ISO - ISO: 100
 [Composite, Composite, Camera] Lens - Lens: 18.0 - 55.0 mm
 [Composite, Composite, Camera] LensID - Lens ID: Unknown 18-55mm

@@ -30,7 +30,7 @@ use Image::ExifTool::IPTC;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.07';
+$VERSION = '2.13';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -69,6 +69,12 @@ my %formatOK = (
     rational32u => 1,
     rational32s => 1,
     var_string  => 1,
+    var_int16u  => 1,
+    var_pstr32  => 1,
+    # Matroska
+    signed      => 1,
+    unsigned    => 1,
+    utf8        => 1,
 );
 
 my $caseInsensitive;    # flag to ignore case when sorting tag names
@@ -86,8 +92,8 @@ Image::ExifTool::TagNames - ExifTool tag name documentation
 ~head1 DESCRIPTION
 
 This document contains a complete list of ExifTool tag names, organized into
-tables based on information type.  Tag names are used to indicate the
-specific meta information that is extracted or written in an image.
+tables based on information type.  Tag names are used to reference specific
+meta information extracted from or written to a file.
 
 ~head1 TAG TABLES
 },
@@ -128,15 +134,15 @@ created when writing if another same-named tag may be created instead.  To
 write these tags, the group should be specified.  A tilde (C<~>) indicates a
 tag this is writable only when the print conversion is disabled (by setting
 PrintConv to 0, using the -n option, or suffixing the tag name with a C<#>
-character). An exclamation point (C<!>) indicates a tag that is considered
+character).  An exclamation point (C<!>) indicates a tag that is considered
 unsafe to write under normal circumstances.  These "unsafe" tags are not set
-when calling SetNewValuesFromFile() or when using the exiftool -tagsFromFile
-option unless specified explicitly, and care should be taken when editing
-them manually since they may affect the way an image is rendered.  An
-asterisk (C<*>) indicates a "protected" tag which is not writable directly,
-but is written automatically by exiftool (often when a corresponding
-Composite or Extra tag is written).  A colon (C<:>) indicates a mandatory
-tag which may be added automatically when writing.
+when calling SetNewValuesFromFile() or copied with the exiftool
+-tagsFromFile option unless specified explicitly, and care should be taken
+when editing them manually since they may affect the way an image is
+rendered.  An asterisk (C<*>) indicates a "protected" tag which is not
+writable directly, but is written automatically by ExifTool (often when a
+corresponding Composite or Extra tag is written).  A colon (C<:>) indicates
+a mandatory tag which may be added automatically when writing.
 
 The HTML version of these tables also lists possible B<Values> for
 discrete-valued tags, as well as B<Notes> for some tags.
@@ -161,10 +167,11 @@ B<Group> listed below is used unless another group is specified.
 
 The table below lists all EXIF tags.  Also listed are TIFF, DNG, HDP and
 other tags which are not part of the EXIF specification, but may co-exist
-with EXIF tags in some images.  Tags which are part of the EXIF 2.2
+with EXIF tags in some images.  Tags which are part of the EXIF 2.3
 specification have an underlined B<Tag Name> in the HTML version of this
-documentation.  See L<http://www.exif.org/specifications.html> for the
-official EXIF specification.
+documentation.  See
+L<http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-008-2010_E.pdf> for the
+official EXIF 2.3 specification.
 },
     GPS => q{
 These GPS tags are part of the EXIF standard, and are stored in a separate
@@ -246,16 +253,27 @@ format name.  For tags where a range of lengths is allowed, the minimum and
 maximum lengths are separated by a comma within the brackets.  IPTC strings
 are not null terminated.
 
+IPTC information is separated into different records, each of which has its
+own set of tags.  See
+L<http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf> for the
+official specification.
+
 When writing, ExifTool issues a minor warning and truncates the value if it
 is longer than allowed by the IPTC specification.  Minor errors may be
 ignored to allow writing of longer values, but beware that values like this
 may cause problems for other IPTC readers.
 
-IPTC information is separated into different records, each of which has its
-own set of tags.
+Separate IPTC date and time tags may be written with a combined date/time
+value and ExifTool automagically takes the appropriate part of the date/time
+string depending on whether a date or time tag is being written.  This is
+very useful when copying date/time values to IPTC from other metadata
+formats.
 
-See L<http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf> for the
-official specification.
+IPTC time values include a timezone offset.  If written with a value which
+doesn't include a timezone then the current local timezone offset is used
+(unless written with a combined date/time, in which case the local timezone
+offset at the specified date/time is used, which may be different due to
+changes in daylight savings time).
 },
     Photoshop => q{
 Photoshop tags are found in PSD and PSB files, as well as inside embedded
@@ -326,7 +344,7 @@ The tags listed in the PDF tables below are those which are used by ExifTool
 to extract meta information, but they are only a small fraction of the total
 number of available PDF tags.
 
-When writing PDF files, ExifTool uses an increment update.  This has the
+When writing PDF files, ExifTool uses an incremental update.  This has the
 advantages of being fast and reversible.  The original PDF can be easily
 recovered by deleting the C<PDF-update> pseudo-group (with
 C<-PDF-update:all=> on the command line).  But there are two main
@@ -404,42 +422,47 @@ my %shortcutNotes = (
         useful when copying tags between files to either copy the maker notes as a
         block or prevent it from being copied
     },
-    Unsafe => q{
-        "unsafe" tags in JPEG images which are normally not copied -- defined here
-        as a shortcut to use when rebuilding JPEG EXIF from scratch
+    CommonIFD0 => q{
+        common metadata tags found in IFD0 of TIFF-format images.  Used to simpify
+        deletion of all metadata from these images.  See FAQ number 7 for details
     },
-    CreatorContactInfoCiAdrCity => q{
-        Iptc4xmpCore tag name conversions for backward compatibility with ExifTool
-        7.44 and earlier
+    Unsafe => q{
+        "unsafe" tags in JPEG images which are normally not copied.  Defined here
+        as a shortcut to use when rebuilding JPEG EXIF from scratch
     },
 );
 
-# EXIF table tag ID's which are part of the EXIF 2.2 specification
+
+
+# EXIF table tag ID's which are part of the EXIF 2.3 specification
 # (used only to add underlines in HTML version of EXIF Tag Table)
 my %exifSpec = (
-    0x100 => 1,  0x201 => 1,   0x9204 => 1,  0xa210 => 1,
-    0x101 => 1,  0x202 => 1,   0x9205 => 1,  0xa214 => 1,
-    0x102 => 1,  0x211 => 1,   0x9206 => 1,  0xa215 => 1,
-    0x103 => 1,  0x212 => 1,   0x9207 => 1,  0xa217 => 1,
-    0x106 => 1,  0x213 => 1,   0x9208 => 1,  0xa300 => 1,
-    0x10e => 1,  0x214 => 1,   0x9209 => 1,  0xa301 => 1,
-    0x10f => 1,  0x8298 => 1,  0x920a => 1,  0xa302 => 1,
-    0x110 => 1,  0x829a => 1,  0x9214 => 1,  0xa401 => 1,
-    0x111 => 1,  0x829d => 1,  0x927c => 1,  0xa402 => 1,
-    0x112 => 1,  0x8769 => 1,  0x9286 => 1,  0xa403 => 1,
-    0x115 => 1,  0x8822 => 1,  0x9290 => 1,  0xa404 => 1,
-    0x116 => 1,  0x8824 => 1,  0x9291 => 1,  0xa405 => 1,
-    0x117 => 1,  0x8825 => 1,  0x9292 => 1,  0xa406 => 1,
-    0x11a => 1,  0x8827 => 1,  0xa000 => 1,  0xa407 => 1,
-    0x11b => 1,  0x8828 => 1,  0xa001 => 1,  0xa408 => 1,
-    0x11c => 1,  0x9000 => 1,  0xa002 => 1,  0xa409 => 1,
-    0x128 => 1,  0x9003 => 1,  0xa003 => 1,  0xa40a => 1,
-    0x12d => 1,  0x9004 => 1,  0xa004 => 1,  0xa40b => 1,
-    0x131 => 1,  0x9101 => 1,  0xa005 => 1,  0xa40c => 1,
-    0x132 => 1,  0x9102 => 1,  0xa20b => 1,  0xa420 => 1,
-    0x13b => 1,  0x9201 => 1,  0xa20c => 1,
-    0x13e => 1,  0x9202 => 1,  0xa20e => 1,
-    0x13f => 1,  0x9203 => 1,  0xa20f => 1,
+    0x100 => 1,  0x212 => 1,   0x9204 => 1,  0xa217 => 1,
+    0x101 => 1,  0x213 => 1,   0x9205 => 1,  0xa300 => 1,
+    0x102 => 1,  0x214 => 1,   0x9206 => 1,  0xa301 => 1,
+    0x103 => 1,  0x8298 => 1,  0x9207 => 1,  0xa302 => 1,
+    0x106 => 1,  0x829a => 1,  0x9208 => 1,  0xa401 => 1,
+    0x10e => 1,  0x829d => 1,  0x9209 => 1,  0xa402 => 1,
+    0x10f => 1,  0x8769 => 1,  0x920a => 1,  0xa403 => 1,
+    0x110 => 1,  0x8822 => 1,  0x9214 => 1,  0xa404 => 1,
+    0x111 => 1,  0x8824 => 1,  0x927c => 1,  0xa405 => 1,
+    0x112 => 1,  0x8825 => 1,  0x9286 => 1,  0xa406 => 1,
+    0x115 => 1,  0x8827 => 1,  0x9290 => 1,  0xa407 => 1,
+    0x116 => 1,  0x8828 => 1,  0x9291 => 1,  0xa408 => 1,
+    0x117 => 1,  0x8830 => 1,  0x9292 => 1,  0xa409 => 1,
+    0x11a => 1,  0x8831 => 1,  0xa000 => 1,  0xa40a => 1,
+    0x11b => 1,  0x8832 => 1,  0xa001 => 1,  0xa40b => 1,
+    0x11c => 1,  0x8833 => 1,  0xa002 => 1,  0xa40c => 1,
+    0x128 => 1,  0x8834 => 1,  0xa003 => 1,  0xa420 => 1,
+    0x12d => 1,  0x8835 => 1,  0xa004 => 1,  0xa430 => 1,
+    0x131 => 1,  0x9000 => 1,  0xa005 => 1,  0xa431 => 1,
+    0x132 => 1,  0x9003 => 1,  0xa20b => 1,  0xa432 => 1,
+    0x13b => 1,  0x9004 => 1,  0xa20c => 1,  0xa433 => 1,
+    0x13e => 1,  0x9101 => 1,  0xa20e => 1,  0xa434 => 1,
+    0x13f => 1,  0x9102 => 1,  0xa20f => 1,  0xa435 => 1,
+    0x201 => 1,  0x9201 => 1,  0xa210 => 1,
+    0x202 => 1,  0x9202 => 1,  0xa214 => 1,
+    0x211 => 1,  0x9203 => 1,  0xa215 => 1,
 );
 # same thing for RIFF INFO tags found in the EXIF spec
 my %riffSpec = (
@@ -593,8 +616,17 @@ TagID:  foreach $tagID (@keys) {
                 if ($processBinaryData and $$table{WRITABLE}) {
                     $isOffset{$tagID} = $name if $$tagInfo{IsOffset};
                     $hasSubdir{$tagID} = $name if $$tagInfo{SubDirectory};
-                    $datamember{$tagID} = $name if $$tagInfo{RawConv} and
-                        $$tagInfo{RawConv} =~ /\$self(->)?\{\w+\}\s*=(?!~)/;
+                    # require DATAMEMBER for writable var-format tags and DataMember tags
+                    if ($$tagInfo{Format} and $$tagInfo{Format} =~ /^var_/) {
+                        $datamember{$tagID} = $name;
+                        unless (defined $$tagInfo{Writable} and not $$tagInfo{Writable}) {
+                            warn "Warning: Var-format tag is writable - $short $name\n"
+                        }
+                    } elsif ($$tagInfo{RawConv} and
+                             $$tagInfo{RawConv} =~ /\$self(->)?\{\w+\}\s*=(?!~)/)
+                    {
+                        $datamember{$tagID} = $name;
+                    }
                 }
                 if ($$tagInfo{Hidden}) {
                     warn "Warning: Hidden tag in list - $short $name\n" if @infoArray > 1;
@@ -605,7 +637,7 @@ TagID:  foreach $tagID (@keys) {
                     $writable = $$tagInfo{Writable};
                     # validate Writable
                     unless ($formatOK{$writable} or  ($writable =~ /(.*)\[/ and $formatOK{$1})) {
-                        warn "Warning: Unknown Writable ($writable) for $short $name\n", 
+                        warn "Warning: Unknown Writable ($writable) for $short $name\n",
                     }
                 } elsif (not $$tagInfo{SubDirectory}) {
                     $writable = $$table{WRITABLE};
@@ -1289,6 +1321,7 @@ sub GetTableOrder()
        'Nikon::CameraSettingsD300' => 'Nikon::ShotInfoD300b',
        'Pentax::LensData' => 'Pentax::LensInfo2',
        'Sony::SRF2' => 'Sony::SRF',
+       'Samsung::INFO' => 'Samsung::Type2', # (necessary because Samsung doesn't have a main table)
     );
     my @tweak = sort keys %tweakOrder;
     while (@tweak) {
@@ -1812,7 +1845,7 @@ sub WriteTagNames($$)
             {
                 # underline "unknown" makernote tags only
                 my $n = $tagIDstr eq '0x927c' ? -1 : 0;
-                $htmlTags[$n] = '<u>' . $htmlTags[$n] . '</u>';
+                $htmlTags[$n] = "<u>$htmlTags[$n]</u>";
             }
             $rowClass = $rowClass ? '' : " class=b";
             my $isSubdir;

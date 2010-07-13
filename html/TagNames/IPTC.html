@@ -20,16 +20,27 @@ format name.  For tags where a range of lengths is allowed, the minimum and
 maximum lengths are separated by a comma within the brackets.  IPTC strings
 are not null terminated.</p>
 
+<p>IPTC information is separated into different records, each of which has its
+own set of tags.  See
+<a href="http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf">http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf</a> for the
+official specification.</p>
+
 <p>When writing, ExifTool issues a minor warning and truncates the value if it
 is longer than allowed by the IPTC specification.  Minor errors may be
 ignored to allow writing of longer values, but beware that values like this
 may cause problems for other IPTC readers.</p>
 
-<p>IPTC information is separated into different records, each of which has its
-own set of tags.</p>
+<p>Separate IPTC date and time tags may be written with a combined date/time
+value and ExifTool automagically takes the appropriate part of the date/time
+string depending on whether a date or time tag is being written.  This is
+very useful when copying date/time values to IPTC from other metadata
+formats.</p>
 
-<p>See <a href="http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf">http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf</a> for the
-official specification.
+<p>IPTC time values include a timezone offset.  If written with a value which
+doesn&#39;t include a timezone then the current local timezone offset is used
+(unless written with a combined date/time, in which case the local timezone
+offset at the specified date/time is used, which may be different due to
+changes in daylight savings time).
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -607,6 +618,11 @@ won&#39;t be able to read these tags as written by ExifTool)</span></span></td><
 <td>ExifCameraInfo</td>
 <td class=c>string[0,4096]</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='255 = 0xff'>255</td>
+<td>CatalogSets</td>
+<td class=c title='+ = List'>string[0,256]+</td>
+<td><span class=s><span class=n>(written by iView MediaPro)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='NewsPhoto'>IPTC NewsPhoto Tags</a></h2>
@@ -847,7 +863,7 @@ won&#39;t be able to read these tags as written by ExifTool)</span></span></td><
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 26, 2010</i>
+<br><i>Last revised Jun 8, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

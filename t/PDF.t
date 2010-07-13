@@ -108,7 +108,7 @@ my $testnum = 1;
     my $testSet;
     foreach $testSet (0,1) {
         my ($edit, $testfile2, $lastOK);
-        my $testfile = 't/images/PDF' . ($testSet ? '2' : '') . '.pdf';
+        my $testfile = 't/images/' . ($testSet ? 'PDF2.pdf' : 'PDF.pdf');
         my $testfile1 = $testfile;
         my $exifTool = new Image::ExifTool;
         $exifTool->Options(PrintConv => 0);

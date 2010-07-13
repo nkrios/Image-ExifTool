@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.17
 [File, System, Image] FileName - File Name: DNG.dng
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 13 kB
@@ -117,7 +117,7 @@
 [EXIF, IFD0, Image] 50732 - Baseline Sharpness: 1.5
 [EXIF, IFD0, Image] 50734 - Linear Response Limit: 1
 [EXIF, IFD0, Camera] 50735 - Camera Serial Number: 012345678
-[EXIF, IFD0, Camera] 50736 - DNG Lens Info: 18-55mm f/undef-undef
+[EXIF, IFD0, Camera] 50736 - DNG Lens Info: 18-55mm f/?
 [EXIF, IFD0, Image] 50739 - Shadow Scale: 1
 [EXIF, IFD0, Image] 50778 - Calibration Illuminant 1: Standard Light A
 [EXIF, IFD0, Image] 50779 - Calibration Illuminant 2: D65
@@ -150,7 +150,7 @@
 [XMP, XMP-exif, Camera] FocalPlaneYResolution - Focal Plane Y Resolution: 3958.76288659794
 [XMP, XMP-exif, Camera] FocalPlaneResolutionUnit - Focal Plane Resolution Unit: inches
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 012345678
-[XMP, XMP-aux, Camera] LensInfo - Lens Info: 18/1 55/1 0/0 0/0
+[XMP, XMP-aux, Camera] LensInfo - Lens Info: 18-55mm f/?
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0-55.0 mm
 [XMP, XMP-aux, Camera] ImageNumber - Image Number: 24
 [XMP, XMP-aux, Camera] FlashCompensation - Flash Compensation: 0
@@ -302,7 +302,7 @@
 [MakerNotes, Canon, Camera] 2 - Color Tone: Normal
 [Composite, Composite, Image] Aperture - Aperture: 8.0
 [Composite, Composite, Image] CFAPattern - CFA Pattern: [Red,Green][Green,Blue]
-[Composite, Composite, Camera] DriveMode - Drive Mode: Single-frame shooting
+[Composite, Composite, Camera] DriveMode - Drive Mode: Single-frame Shooting
 [Composite, Composite, Camera] ISO - ISO: 400
 [Composite, Composite, Image] ImageSize - Image Size: 3516x2328
 [Composite, Composite, Image] JpgFromRaw - Jpg From Raw: (Binary data 29 bytes)

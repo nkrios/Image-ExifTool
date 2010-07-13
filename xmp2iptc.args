@@ -1,4 +1,4 @@
-#
+#------------------------------------------------------------------------------
 # File:         xmp2iptc.args
 #
 # Description:  Tag name translations for converting from XMP to IPTC
@@ -18,7 +18,7 @@
 #               http://www.metadataworkinggroup.org/specs/
 #
 # Notes:        Also updates Photoshop:IPTCDigest as per MWG recommendation.
-#
+#------------------------------------------------------------------------------
 -IPTC:By-line < XMP-dc:Creator
 -IPTC:Caption-Abstract < XMP-dc:Description
 -IPTC:CopyrightNotice < XMP-dc:Rights

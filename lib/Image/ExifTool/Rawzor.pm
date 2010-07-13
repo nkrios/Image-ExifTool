@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 # currently support this version Rawzor images
 my $implementedRawzorVersion = 199; # (up to version 1.99)
@@ -22,6 +22,7 @@ my $implementedRawzorVersion = 199; # (up to version 1.99)
 # Rawzor-specific tags
 %Image::ExifTool::Rawzor::Main = (
     GROUPS => { 2 => 'Other' },
+    VARS => { NO_ID => 1 },
     NOTES => q{
         Rawzor files store compressed images of other formats. As well as the
         information listed below, exiftool uncompresses and extracts the meta

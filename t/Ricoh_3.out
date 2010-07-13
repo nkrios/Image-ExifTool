@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
 [File, System, Image] FileName - File Name: Ricoh_3_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 1907 bytes
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:54-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:03:19 11:36:59-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -74,6 +74,7 @@
 [MakerNotes, Ricoh, Camera] 10 - Ricoh Subdir 0x000a: 0.07485380117
 [MakerNotes, Ricoh, Camera] 11 - Ricoh Subdir 0x000b: 0.3939393939
 [MakerNotes, Ricoh, Camera] 12 - Ricoh Subdir 0x000c: 136 12
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0100
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00160016
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x00000000
 [PrintIM, PrintIM, Printing] 3 - Print IM 0x0003: 0x0000005e

@@ -11,7 +11,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 # (this main JPEG table is for documentation purposes only)
 %Image::ExifTool::JPEG::Main = (
@@ -45,6 +45,10 @@ $VERSION = '1.11';
         Name => 'XMP',
         Condition => '$$valPt =~ /^http/ or $$valPt =~ /<exif:/',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
+      }, {
+        Name => 'QVCI',
+        Condition => '$$valPt =~ /^QVCI\0/',
+        SubDirectory => { TagTable => 'Image::ExifTool::Casio::QVCI' },
     }],
     APP2 => [{
         Name => 'ICC_Profile',
@@ -71,12 +75,23 @@ $VERSION = '1.11';
         Name => 'Stim',
         Condition => '$$valPt =~ /^Stim\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::Stim::Main' },
+      }, {
+        Name => 'PreviewImage', # (written by HP R837 and Samsung S1060)
+        Condition => '$$valPt =~ /^\xff\xd8\xff\xdb/',
+        Notes => 'Hewlett-Packard or Samsung preview image',
     }],
-    APP4 => {
+    APP4 => [{
         Name => 'Scalado',
         Condition => '$$valPt =~ /^SCALADO\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::JPEG::Scalado' },
-    },
+      }, {
+        Name => 'FPXR', # (non-standard location written by some HP models)
+        Condition => '$$valPt =~ /^FPXR\0/',
+        SubDirectory => { TagTable => 'Image::ExifTool::FlashPix::Main' },
+      }, {
+        Name => 'PreviewImage', # (written by S1060)
+        Notes => 'Continued Samsung preview from APP3',
+    }],
     APP5 => {
         Name => 'RMETA',
         Condition => '$$valPt =~ /^RMETA\0/',
@@ -86,10 +101,14 @@ $VERSION = '1.11';
         Name => 'EPPIM',
         Condition => '$$valPt =~ /^EPPIM\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::JPEG::EPPIM' },
-      },{
+      }, {
         Name => 'NITF',
         Condition => '$$valPt =~ /^NTIF\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::JPEG::NITF' },
+      }, {
+        Name => 'HP_TDHD', # (written by R837)
+        Condition => '$$valPt =~ /^TDHD\x01\0\0\0/',
+        SubDirectory => { TagTable => 'Image::ExifTool::HP::TDHD' },
     }],
     APP8 => {
         Name => 'SPIFF',

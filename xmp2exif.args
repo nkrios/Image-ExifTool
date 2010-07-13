@@ -1,4 +1,4 @@
-#
+#------------------------------------------------------------------------------
 # File:         xmp2exif.args
 #
 # Description:  Tag name translations for converting XMP to EXIF
@@ -7,12 +7,12 @@
 #
 # Revisions:    2009/01/20 - P. Harvey Created
 #
+# References:   http://www.metadataworkinggroup.org/specs/
+#
 # Notes:        The first argument copies the bulk of the EXIF and GPS
 #               information, and the remaining arguments handle the tags
 #               which have different names and/or formats in XMP and EXIF.
-#
-# References:   http://www.metadataworkinggroup.org/specs/
-#
+#------------------------------------------------------------------------------
 -EXIF:all < XMP:all
 -EXIF:ImageDescription < XMP-dc:Description
 -EXIF:DateTimeOriginal < XMP-photoshop:DateCreated

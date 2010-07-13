@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.00
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.24
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
@@ -97,7 +97,7 @@
 [MakerNotes, Canon, Image] 17 - AEB Bracket Value: 0
 [MakerNotes, Canon, Image] 18 - Control Mode: Camera Local Control
 [MakerNotes, Canon, Image] 19 - Focus Distance Upper: inf
-[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 5.46
+[MakerNotes, Canon, Image] 20 - Focus Distance Lower: 5.46 m
 [MakerNotes, Canon, Image] 21 - F Number: 14
 [MakerNotes, Canon, Image] 22 - Exposure Time: 128
 [MakerNotes, Canon, Image] 23 - Measured EV 2: -1.25

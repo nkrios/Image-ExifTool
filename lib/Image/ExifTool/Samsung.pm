@@ -12,19 +12,56 @@ package Image::ExifTool::Samsung;
 
 use strict;
 use vars qw($VERSION);
+use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.00';
+$VERSION = '1.03';
+
+sub WriteSTMN($$$);
+sub ProcessINFO($$$);
+
+# Samsung "STMN" maker notes (ref PH)
+%Image::ExifTool::Samsung::Type1 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&WriteSTMN,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FORMAT => 'int32u',
+    FIRST_ENTRY => 0,
+    IS_OFFSET => [ 2 ],   # tag 2 is 'IsOffset'
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    NOTES => q{
+        Tags found in the binary "STMN" format maker notes written by a number of
+        Samsung models.
+    },
+    0 => {
+        Name => 'MakerNoteVersion',
+        Format => 'undef[8]',
+    },
+    2 => {
+        Name => 'PreviewImageStart',
+        OffsetPair => 3,  # associated byte count tagID
+        DataTag => 'PreviewImage',
+        IsOffset => 3,
+        Protected => 2,
+    },
+    3 => {
+        Name => 'PreviewImageLength',
+        OffsetPair => 2,   # point to associated offset
+        DataTag => 'PreviewImage',
+        Protected => 2,
+    },
+);
 
 # Samsung maker notes (ref PH)
-%Image::ExifTool::Samsung::Main = (
+%Image::ExifTool::Samsung::Type2 = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     WRITABLE => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     NOTES => q{
-        These tags used in the maker notes of cameras such as the NX10, ST500, ST550,
-        ST1000 and WB5000.
+        Tags found in the EXIF-format maker notes of cameras such as the NX10,
+        ST500, ST550, ST1000 and WB5000.
     },
     0x0001 => {
         Name => 'MakerNoteVersion',
@@ -110,7 +147,7 @@ $VERSION = '1.00';
         Name => 'ExposureTime',
         Writable => 'rational64u',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0xa019 => { #1
         Name => 'FNumber',
@@ -134,6 +171,60 @@ $VERSION = '1.00';
     },
 );
 
+# INFO tags in Samsung MP4 videos (ref PH)
+%Image::ExifTool::Samsung::INFO = (
+    PROCESS_PROC => \&ProcessINFO,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Video' },
+    NOTES => q{
+        This information is found in MP4 videos from Samsung models such as the
+        SMX-C20N.
+    },
+    EFCT => 'Effect', # (guess)
+    QLTY => 'Quality',
+    # MDEL - value: 0
+    # ASPT - value: 1, 2
+);
+
+#------------------------------------------------------------------------------
+# Process Samsung MP4 INFO data
+# Inputs: 0) ExifTool ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessINFO($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $pos = $$dirInfo{DirStart};
+    my $len = $$dirInfo{DirLen};
+    my $end = $pos + $len;
+    $exifTool->VerboseDir('INFO', undef, $len);
+    while ($pos + 8 <= $end) {
+        my $tag = substr($$dataPt, $pos, 4);
+        my $val = Get32u($dataPt, $pos + 4);
+        unless ($$tagTablePtr{$tag}) {
+            my $name = "Samsung_INFO_$tag";
+            $name =~ tr/-_0-9a-zA-Z//dc;
+            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => $name }) if $name;
+        }
+        $exifTool->HandleTag($tagTablePtr, $tag, $val);
+        $pos += 8;
+    }
+    return 1;
+}
+
+#------------------------------------------------------------------------------
+# Write Samsung STMN maker notes
+# Inputs: 0) ExifTool object ref, 1) source dirInfo ref, 2) tag table ref
+# Returns: Binary data block or undefined on error
+sub WriteSTMN($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    # create a Fixup for the PreviewImage
+    $$dirInfo{Fixup} = new Image::ExifTool::Fixup;
+    my $val = Image::ExifTool::WriteBinaryData($exifTool, $dirInfo, $tagTablePtr);
+    # force PreviewImage into the trailer even if it fits in EXIF segment
+    $$exifTool{PREVIEW_INFO}{IsTrailer} = 1 if $$exifTool{PREVIEW_INFO};
+    return $val;
+}
 
 1;  # end
 

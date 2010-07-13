@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.20
 [File, System, Image] FileName - File Name: Minolta_4_failed.mrw
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 2.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:48-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:05:18 14:36:36-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: MRW
 [File, File, Image] MIMEType - MIME Type: image/x-raw
@@ -83,7 +83,7 @@
 [MakerNotes, MinoltaRaw, Image] 4 - WB Mode: Auto (0)
 [MakerNotes, MinoltaRaw, Image] 5 - Program Mode: None
 [MakerNotes, MinoltaRaw, Image] 6 - ISO Setting: 65
-[MakerNotes, MinoltaRaw, Image] 7 - Color Mode: Normal
+[MakerNotes, MinoltaRaw, Image] 7 - Color Mode: Natural color
 [MakerNotes, MinoltaRaw, Image] 56 - Color Filter: 0
 [MakerNotes, MinoltaRaw, Image] 57 - BW Filter: 0
 [MakerNotes, MinoltaRaw, Image] 58 - Zone Matching: ISO Setting Used
@@ -125,6 +125,7 @@
 [EXIF, ExifIFD, Camera] 41993 - Saturation: Normal
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Normal
 [EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Distant
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0250
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00160016
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x01000000
 [PrintIM, PrintIM, Printing] 3 - Print IM 0x0003: 0x0000002e

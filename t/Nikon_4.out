@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.13
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.24
 [File, System, Image] FileName - File Name: Nikon_4_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 6.4 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:03:04 13:22:15-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:06:28 08:23:59-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -19,7 +19,7 @@
 [EXIF, IFD0, Image] 282 - X Resolution: 300
 [EXIF, IFD0, Image] 283 - Y Resolution: 300
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
-[EXIF, IFD0, Image] 305 - Software: Ver.1.02 
+[EXIF, IFD0, Image] 305 - Software: Ver.1.02
 [EXIF, IFD0, Time] 306 - Modify Date: 2005:01:14 08:57:59
 [EXIF, IFD0, Camera] 318 - White Point: 0.313 0.329
 [EXIF, IFD0, Image] 319 - Primary Chromaticities: 0.64 0.33 0.21 0.71 0.15 0.06
@@ -38,7 +38,7 @@
 [EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: Auto, Fired, Return detected
 [EXIF, ExifIFD, Camera] 37386 - Focal Length: 56.0 mm
-[EXIF, ExifIFD, Image] 37510 - User Comment: curve: fotogenics point and shoot   
+[EXIF, ExifIFD, Image] 37510 - User Comment: curve: fotogenics point and shoot
 [EXIF, ExifIFD, Time] 37520 - Sub Sec Time: 20
 [EXIF, ExifIFD, Time] 37521 - Sub Sec Time Original: 20
 [EXIF, ExifIFD, Time] 37522 - Sub Sec Time Digitized: 20
@@ -61,6 +61,7 @@
 [EXIF, ExifIFD, Camera] 41993 - Saturation: High
 [EXIF, ExifIFD, Camera] 41994 - Sharpness: Hard
 [EXIF, ExifIFD, Camera] 41996 - Subject Distance Range: Unknown
+[EXIF, ExifIFD, Image] 42033 - Serial Number: No= 20025585
 [EXIF, ExifIFD, Image] 42240 - Gamma: 2.2
 [MakerNotes, Nikon, Camera] 1 - Maker Note Version: 2.10
 [MakerNotes, Nikon, Image] 2 - ISO: 200
@@ -77,13 +78,13 @@
 [MakerNotes, PreviewIFD, Image] 282 - X Resolution: 300
 [MakerNotes, PreviewIFD, Image] 283 - Y Resolution: 300
 [MakerNotes, PreviewIFD, Image] 296 - Resolution Unit: inches
-[MakerNotes, PreviewIFD, Image] 513 - Preview Image Start: 2392
+[MakerNotes, PreviewIFD, Image] 513 - Preview Image Start: 2404
 [MakerNotes, PreviewIFD, Image] 514 - Preview Image Length: 0
 [MakerNotes, PreviewIFD, Image] 531 - Y Cb Cr Positioning: Co-sited
 [MakerNotes, Nikon, Camera] 18 - Flash Exposure Compensation: -5/3
 [MakerNotes, Nikon, Camera] 19 - ISO Setting: 200
 [MakerNotes, Nikon, Camera] 22 - Image Boundary: 0 0 3008 2000
-[MakerNotes, Nikon, Camera] 23 - Flash Exposure Compensation: 0
+[MakerNotes, Nikon, Camera] 23 - External Flash Exposure Comp: 0
 [MakerNotes, Nikon, Camera] 24 - Flash Exposure Bracket Value: 0.0
 [MakerNotes, Nikon, Camera] 25 - Exposure Bracket Value: 0
 [MakerNotes, Nikon, Camera] 129 - Tone Comp: CS
@@ -125,18 +126,18 @@
 [MakerNotes, Nikon, Camera] 8 - External Flash Flags: (none)
 [MakerNotes, Nikon, Camera] 9.1 - Flash Commander Mode: Off
 [MakerNotes, Nikon, Camera] 9.2 - Flash Control Mode: Off
-[MakerNotes, Nikon, Camera] 10 - Flash Exposure Compensation: 0
+[MakerNotes, Nikon, Camera] 10 - Flash Compensation: 0
 [MakerNotes, Nikon, Camera] 14 - Flash GN Distance: 0
 [MakerNotes, Nikon, Camera] 15 - Flash Group A Control Mode: Off
 [MakerNotes, Nikon, Camera] 16 - Flash Group B Control Mode: Off
-[MakerNotes, Nikon, Camera] 17 - Flash Group A Exposure Comp: 0
-[MakerNotes, Nikon, Camera] 18 - Flash Group B Exposure Comp: 0
+[MakerNotes, Nikon, Camera] 17 - Flash Group A Compensation: 0
+[MakerNotes, Nikon, Camera] 18 - Flash Group B Compensation: 0
 [MakerNotes, Nikon, Camera] 169 - Image Optimization: Custom
 [MakerNotes, Nikon, Camera] 170 - Saturation: Enhanced
 [MakerNotes, Nikon, Camera] 171 - Vari Program: 
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.13
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.24
+[XMP, XMP-aux, Camera] FlashCompensation - Flash Compensation: 0
 [XMP, XMP-aux, Camera] Lens - Lens: 18-70mm f/3.5-4.5
-[XMP, XMP-aux, Camera] SerialNumber - Serial Number: No= 20025585
 [XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -
 [XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 4
 [XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8

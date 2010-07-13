@@ -74,7 +74,7 @@ sub WriteCanon($$$);
 sub ProcessSerialData($$$);
 sub SwapWords($);
 
-$VERSION = '2.39';
+$VERSION = '2.48';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -136,7 +136,9 @@ my %canonLensTypes = ( #4
     31.1 => 'Tamron SP AF 300mm f/2.8 LD IF', #15
     32 => 'Canon EF 24mm f/2.8 or Sigma Lens', #10
     32.1 => 'Sigma 15mm f/2.8 EX Fisheye', #11
-    33 => 'Voigtlander Ultron 40mm f/2 SLII Aspherical', #45
+    33 => 'Voigtlander or Zeiss Lens',
+    33.1 => 'Voigtlander Ultron 40mm f/2 SLII Aspherical', #45
+    33.2 => 'Zeiss Distagon 35mm T* f/2 ZE', #PH
     35 => 'Canon EF 35-80mm f/4-5.6', #32
     36 => 'Canon EF 38-76mm f/4.5-5.6', #32
     37 => 'Canon EF 35-80mm f/4-5.6 or Tamron Lens', #32
@@ -215,9 +217,10 @@ my %canonLensTypes = ( #4
     160 => 'Canon EF 20-35mm f/3.5-4.5 USM or Tamron Lens',
     160.1 => 'Tamron AF 19-35mm f/3.5-4.5', #44
     161 => 'Canon EF 28-70mm f/2.8L or Sigma or Tamron Lens',
-    161.1 => 'Sigma 24-70mm EX f/2.8',
-    161.2 => 'Tamron 90mm f/2.8',
+    161.1 => 'Sigma 24-70mm f/2.8 EX',
+    161.2 => 'Sigma 28-70mm f/2.8 EX', #PH (http://www.breezesys.com/forum/showthread.php?t=3718)
     161.3 => 'Tamron AF 17-50mm f/2.8 Di-II LD Aspherical', #40
+    161.4 => 'Tamron 90mm f/2.8',
     162 => 'Canon EF 200mm f/2.8L', #32
     163 => 'Canon EF 300mm f/4L', #32
     164 => 'Canon EF 400mm f/5.6L', #32
@@ -352,10 +355,10 @@ my %canonLensTypes = ( #4
     0x1570000 => 'PowerShot A510',
     0x1590000 => 'PowerShot SD20 / Digital IXUS i5 / IXY Digital L2',
     0x1640000 => 'PowerShot S2 IS',
-    0x1650000 => 'PowerShot SD430 / IXUS Wireless / IXY Wireless',
+    0x1650000 => 'PowerShot SD430 / Digital IXUS Wireless / IXY Digital Wireless',
     0x1660000 => 'PowerShot SD500 / Digital IXUS 700 / IXY Digital 600',
     0x1668000 => 'EOS D60',
-    0x1700000 => 'PowerShot SD30 / Digital IXUS i zoom / IXY Digital L3',
+    0x1700000 => 'PowerShot SD30 / Digital IXUS i Zoom / IXY Digital L3',
     0x1740000 => 'PowerShot A430',
     0x1750000 => 'PowerShot A410',
     0x1760000 => 'PowerShot S80',
@@ -430,20 +433,34 @@ my %canonLensTypes = ( #4
     0x2810000 => 'PowerShot A490',
     0x2820000 => 'PowerShot A3100 IS',
     0x2830000 => 'PowerShot A3000 IS',
-    0x2840000 => 'PowerShot SD1400 IS / Digital IXUS 130 / IXY Digital 400F', # IS on IXUS/IXY?
-    0x2850000 => 'PowerShot SD1300 IS / Digital IXUS 105 / IXY Digital 200F', # IS on IXUS/IXY?
-    0x2860000 => 'PowerShot SD3500 IS / Digital IXUS 210 / IXY Digital 10S', # IS on IXUS/IXY?
+    0x2880000 => 'PowerShot SD4000 IS / IXUS 300 HS / IXY 30S',
+    # ---- Canon drops the "DIGITAL" and "IS" in IXUS and IXY camera names ----
+    0x2840000 => 'PowerShot SD1400 IS / IXUS 130 / IXY 400F',
+    0x2850000 => 'PowerShot SD1300 IS / IXUS 105 / IXY 200F',
+    0x2860000 => 'PowerShot SD3500 IS / IXUS 210 / IXY 10S',
     0x2870000 => 'PowerShot SX210 IS',
     0x3010000 => 'PowerShot Pro90 IS',
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
+    0x4007d673 => 'DC19 / DC22',
+    0x4007d674 => 'XH A1',
     0x4007d675 => 'HV10',
+    0x4007d676 => 'MD130 / MD140 / MD150 / MD160',
     0x4007d777 => 'iVIS DC50',
     0x4007d778 => 'iVIS HV20',
     0x4007d779 => 'DC211', #29
+    0x4007d77a => 'HG10',
     0x4007d77b => 'iVIS HR10', #29
+    0x4007d878 => 'HV30',
+    0x4007d87e => 'DC301 / DC310 / DC311 / DC320 / DC330',
     0x4007d87f => 'FS100',
     0x4007d880 => 'iVIS HF10', #29 (VIXIA HF10)
+    0x4007d882 => 'HG20 / HG21 / VIXIA HG21',
+    0x4007d978 => 'LEGRIA HV40',
+    0x4007d987 => 'DC410',
+    0x4007d988 => 'LEGRIA FS200',
+    0x4007d989 => 'LEGRIA HF20 / LEGRIA HF200',
+    0x4007d98a => 'VIXIA HF S100',
     0x80000001 => 'EOS-1D',
     0x80000167 => 'EOS-1DS',
     0x80000168 => 'EOS 10D',
@@ -583,8 +600,8 @@ my %focusDistanceByteSwap = (
     Format => 'int16uRev',
     ValueConv => '$val / 100',
     ValueConvInv => '$val * 100',
-    PrintConv => '$val > 655.345 ? "inf" : $val',
-    PrintConvInv => 'IsFloat($val) ? $val : 655.35',
+    PrintConv => '$val > 655.345 ? "inf" : "$val m"',
+    PrintConvInv => '$val =~ s/ ?m$//; IsFloat($val) ? $val : 655.35',
 );
 
 #------------------------------------------------------------------------------
@@ -1003,6 +1020,7 @@ my %focusDistanceByteSwap = (
         Condition => '$$valPt =~ /^\x08\0\0\0/',
         ValueConv => '$val =~ s/^8 //; $val',
         ValueConvInv => '"8 $val"',
+        PrintConvColumns => 2,
         PrintConv => { BITMASK => {
             0 => 'People',
             1 => 'Scenery',
@@ -1117,7 +1135,8 @@ my %focusDistanceByteSwap = (
     0x97 => { #PH
         Name => 'DustRemovalData',
         # some interesting stuff is stored in here, like LensType and InternalSerialNumber...
-        Binary => 1,
+        Writable => 'undef',
+        Flags => [ 'Binary', 'Protected' ],
     },
     0x99 => { #PH (EOS 1D Mark III, 40D, etc)
         Name => 'CustomFunctions2',
@@ -1401,6 +1420,7 @@ my %focusDistanceByteSwap = (
     },
     10 => {
         Name => 'CanonImageSize',
+        PrintConvColumns => 2,
         PrintConv => \%canonImageSize,
     },
     11 => {
@@ -1593,6 +1613,7 @@ my %focusDistanceByteSwap = (
     },
     29 => {
         Name => 'FlashBits',
+        PrintConvColumns => 2,
         PrintConv => { BITMASK => {
             0 => 'Manual', #PH
             1 => 'TTL', #PH
@@ -1654,6 +1675,7 @@ my %focusDistanceByteSwap = (
     40 => { #PH
         Name => 'PhotoEffect',
         RawConv => '$val==-1 ? undef : $val',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 'Off',
             1 => 'Vivid',
@@ -1832,14 +1854,14 @@ my %focusDistanceByteSwap = (
         ValueConv => 'exp(-Image::ExifTool::Canon::CanonEv($val)*log(2))',
         ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(-log($val)/log(2))',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     6 => {
         Name => 'ExposureCompensation',
         ValueConv => 'Image::ExifTool::Canon::CanonEv($val)',
         ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv($val)',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     7 => {
         Name => 'WhiteBalance',
@@ -1870,6 +1892,18 @@ my %focusDistanceByteSwap = (
         PrintConvInv => '$val =~ /[a-z]/i ? 8 : $val',
     },
     # 11 - (8 for all EOS samples, [0,8] for other models - PH)
+    12 => { #37
+        Name => 'CameraTemperature',
+        Condition => '$$self{Model} =~ /EOS/ and $$self{Model} !~ /EOS-1DS?$/',
+        Groups => { 2 => 'Camera' },
+        Notes => 'newer EOS models only',
+        # usually zero if not valid for an EOS model (exceptions: 1D, 1DS)
+        RawConv => '$val ? $val : undef',
+        ValueConv => '$val - 128',
+        ValueConvInv => '$val + 128',
+        PrintConv => '"$val C"',
+        PrintConvInv => '$val=~s/ ?C//; $val',
+    },
     13 => { #PH
         Name => 'FlashGuideNumber',
         RawConv => '$val==-1 ? undef : $val',
@@ -1883,6 +1917,7 @@ my %focusDistanceByteSwap = (
         Groups => { 2 => 'Camera' },
         Flags => 'PrintHex',
         RawConv => '$val==0 ? undef : $val',
+        PrintConvColumns => 2,
         PrintConv => {
             0x3000 => 'None (MF)',
             0x3001 => 'Right',
@@ -1899,8 +1934,8 @@ my %focusDistanceByteSwap = (
         Description => 'Flash Exposure Compensation',
         ValueConv => 'Image::ExifTool::Canon::CanonEv($val)',
         ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv($val)',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     16 => {
         Name => 'AutoExposureBracketing',
@@ -1916,8 +1951,8 @@ my %focusDistanceByteSwap = (
         Name => 'AEBBracketValue',
         ValueConv => 'Image::ExifTool::Canon::CanonEv($val)',
         ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv($val)',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     18 => { #22
         Name => 'ControlMode',
@@ -1938,8 +1973,8 @@ my %focusDistanceByteSwap = (
         RawConv => '($$self{FocusDistanceUpper} = $val) || undef',
         ValueConv => '$val / 100',
         ValueConvInv => '$val * 100',
-        PrintConv => '$val > 655.345 ? "inf" : $val',
-        PrintConvInv => 'IsFloat($val) ? $val : 655.35',
+        PrintConv => '$val > 655.345 ? "inf" : "$val m"',
+        PrintConvInv => '$val =~ s/ ?m$//; IsFloat($val) ? $val : 655.35',
     },
     20 => {
         Name => 'FocusDistanceLower',
@@ -1947,8 +1982,8 @@ my %focusDistanceByteSwap = (
         Format => 'int16u',
         ValueConv => '$val / 100',
         ValueConvInv => '$val * 100',
-        PrintConv => '$val > 655.345 ? "inf" : $val',
-        PrintConvInv => 'IsFloat($val) ? $val : 655.35',
+        PrintConv => '$val > 655.345 ? "inf" : "$val m"',
+        PrintConvInv => '$val =~ s/ ?m$//; IsFloat($val) ? $val : 655.35',
     },
     21 => {
         Name => 'FNumber',
@@ -1975,7 +2010,7 @@ my %focusDistanceByteSwap = (
             ValueConv => 'exp(-Image::ExifTool::Canon::CanonEv($val)*log(2))*1000/32',
             ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(-log($val*32/1000)/log(2))',
             PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-            PrintConvInv => 'eval $val',
+            PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         },
         {
             Name => 'ExposureTime',
@@ -1988,7 +2023,7 @@ my %focusDistanceByteSwap = (
             ValueConv => 'exp(-Image::ExifTool::Canon::CanonEv($val)*log(2))',
             ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(-log($val)/log(2))',
             PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-            PrintConvInv => 'eval $val',
+            PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         },
     ],
     23 => { #37
@@ -2066,7 +2101,7 @@ my %ciExposureTime = (
     ValueConv => 'exp(4*log(2)*(1-Image::ExifTool::Canon::CanonEv($val-24)))',
     ValueConvInv => 'Image::ExifTool::Canon::CanonEvInv(1-log($val)/(4*log(2)))+24',
     PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-    PrintConvInv => 'eval $val',
+    PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
 );
 my %ciISO = (
     Name => 'ISO',
@@ -2167,6 +2202,7 @@ my %ciLongFocal = (
         Name => 'SharpnessFrequency',
         Condition => '$$self{Model} =~ /\b1D$/',
         Notes => '1D only',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 'n/a',
             1 => 'Lowest',
@@ -2193,6 +2229,7 @@ my %ciLongFocal = (
         Name => 'SharpnessFrequency',
         Condition => '$$self{Model} =~ /\b1DS$/',
         Notes => '1DS only',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 'n/a',
             1 => 'Lowest',
@@ -2287,6 +2324,7 @@ my %ciLongFocal = (
     0x39 => {
         Name => 'CanonImageSize',
         Format => 'int16u',
+        PrintConvColumns => 2,
         PrintConv => \%canonImageSize,
     },
     0x66 => {
@@ -2728,18 +2766,21 @@ my %ciLongFocal = (
         Name => 'UserDef1PictureStyle',
         Format => 'int16u',
         PrintHex => 1,
+        PrintConvColumns => 2,
         PrintConv => \%userDefStyles,
     },
     0x10e => {
         Name => 'UserDef2PictureStyle',
         Format => 'int16u',
         PrintHex => 1,
+        PrintConvColumns => 2,
         PrintConv => \%userDefStyles,
     },
     0x110 => {
         Name => 'UserDef3PictureStyle',
         Format => 'int16u',
         PrintHex => 1,
+        PrintConvColumns => 2,
         PrintConv => \%userDefStyles,
     },
     0x11c => {
@@ -2920,6 +2961,20 @@ my %ciLongFocal = (
     0x07 => {
         Name => 'HighlightTonePriority',
         PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    0x08 => { #37
+        Name => 'MeasuredEV2',
+        Description => 'Measured EV 2',
+        RawConv => '$val ? $val : undef',
+        ValueConv => '$val / 8 - 6',
+        ValueConvInv => 'int(($val + 6) * 8 + 0.5)',
+    },
+    0x09 => { #37
+        Name => 'MeasuredEV',
+        Description => 'Measured EV',
+        RawConv => '$val ? $val : undef',
+        ValueConv => '$val / 8 - 6',
+        ValueConvInv => 'int(($val + 6) * 8 + 0.5)',
     },
     0x15 => { #PH (580 EX II)
         Name => 'FlashMeteringMode',
@@ -3676,7 +3731,7 @@ my %ciLongFocal = (
         ValueConv => 'exp(-$val/96*log(2))',
         ValueConvInv => '-log($val)*96/log(2)',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x17 => 'Rotation', # usually the same as Orientation (but not always! why?)
     # 0x25 - flash fired/not fired (ref 37)
@@ -3740,7 +3795,7 @@ my %ciLongFocal = (
         ValueConv => 'exp(-$val/96*log(2))',
         ValueConvInv => '-log($val)*96/log(2)',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x18 => 'Rotation',
     0x99 => {
@@ -4042,6 +4097,7 @@ my %ciLongFocal = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     0x02 => {
         Name => 'MyColorMode',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 'Off',
             1 => 'Positive Film', #15 (SD600)
@@ -4377,6 +4433,10 @@ my %ciLongFocal = (
     # 17 - values: 0, 3, 4
     # 18 - same as LiveViewShooting for all my samples (5DmkII, 50D) - PH
     19 => { #PH
+        # Note: this value is not displayed by Canon ImageBrowser for the following
+        # models with the live view feature:  1DmkIII, 1DSmkIII, 40D, 450D, 1000D
+        # (this tag could be valid only for some firmware versions:
+        # http://www.breezesys.com/forum/showthread.php?p=16980)
         Name => 'LiveViewShooting',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
@@ -4427,6 +4487,7 @@ my %ciLongFocal = (
     },
     3 => { #PH
         Name => 'SharpnessFrequency',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 'n/a',
             1 => 'Lowest',
@@ -5136,9 +5197,9 @@ my %ciLongFocal = (
         },
         ValueConv => '$val[0] ? 0 : ($val[1] ? 1 : 2)',
         PrintConv => {
-            0 => 'Continuous shooting',
+            0 => 'Continuous Shooting',
             1 => 'Self-timer Operation',
-            2 => 'Single-frame shooting',
+            2 => 'Single-frame Shooting',
         },
     },
     Lens => {

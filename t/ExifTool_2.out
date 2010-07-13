@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.13
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.24
 [File, System, Image] FileName - File Name: ExifTool.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 24 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:08:24 20:32:31-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:08:24 09:36:51-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -216,6 +216,7 @@
 [APP5, RMETA, Image] Lit - Lit: No
 [APP5, RMETA, Image] Condition - Condition: Good
 [APP5, RMETA, Image] Azimuth - Azimuth: E
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0250
 [APP6, NITF, Image] 0 - NITF Version: 2.00
 [APP6, NITF, Image] 2 - Image Format: IMode B
 [APP6, NITF, Image] 3 - Blocks Per Row: 1
@@ -337,10 +338,14 @@
 [CanonVRD, CanonVRD, Image] 122 - Dynamic Range Min: 0
 [CanonVRD, CanonVRD, Image] 124 - Dynamic Range Max: 4095
 [CanonVRD, CanonVRD, Image] 272 - Tone Curve Active: No
+[CanonVRD, CanonVRD, Image] 275 - Tone Curve Mode: RGB
 [CanonVRD, CanonVRD, Image] 276 - Brightness Adj: 0
 [CanonVRD, CanonVRD, Image] 277 - Contrast Adj: 0
 [CanonVRD, CanonVRD, Image] 278 - Saturation Adj: 100
 [CanonVRD, CanonVRD, Image] 286 - Color Tone Adj: 0
+[CanonVRD, CanonVRD, Image] 294 - Luminance Curve Points: (0,0) (255,255)
+[CanonVRD, CanonVRD, Image] 336 - Luminance Curve Limits: 255 0 255 0
+[CanonVRD, CanonVRD, Image] 345 - Tone Curve Interpolation: Curve
 [CanonVRD, CanonVRD, Image] 352 - Red Curve Points: (0,0) (255,255)
 [CanonVRD, CanonVRD, Image] 394 - Red Curve Limits: 255 0 255 0
 [CanonVRD, CanonVRD, Image] 410 - Green Curve Points: (0,0) (255,255)

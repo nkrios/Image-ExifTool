@@ -61,7 +61,9 @@ my %profileClass = (
         TIFF, PDF, PostScript, Photoshop, PNG, MIFF, PICT, QuickTime and some RAW
         formats.  While the tags listed below are not individually writable, the
         entire profile itself can be accessed via the extra 'ICC_Profile' tag, but
-        this tag is neither extracted nor written unless specified explicitly.
+        this tag is neither extracted nor written unless specified explicitly.  See
+        L<http://www.color.org/icc_specs2.xalter> for the official ICC
+        specification.
     },
     A2B0 => 'AToB0',
     A2B1 => 'AToB1',

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
 [File, System, Image] FileName - File Name: Unknown_3_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 7.0 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:12:13 20:39:55-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:03:19 11:37:02-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -69,6 +69,7 @@
 [MakerNotes, MakerUnknown, Camera] 6 - Unknown 0x0006: AFÿÿ...Û.ÿÿgò.rá.ıHî;ŸÍ.~4.". †.ˆ.Û.Û.Û.÷[...]
 [MakerNotes, MakerUnknown, Camera] 8 - Unknown 0x0008: WB.|ãÿÿÿ<.dCÿÿÿÄ.­..„.(.„.;n[...]
 [MakerNotes, MakerUnknown, Camera] 10 - Unknown 0x000a: ..;..SDSD512€...[...]
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0250
 [PrintIM, PrintIM, Printing] 1 - Print IM 0x0001: 0x00160016
 [PrintIM, PrintIM, Printing] 2 - Print IM 0x0002: 0x00000001
 [PrintIM, PrintIM, Printing] 256 - Print IM 0x0100: 0x00000005

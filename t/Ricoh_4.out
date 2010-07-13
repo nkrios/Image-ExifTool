@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
 [File, System, Image] FileName - File Name: Ricoh2.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 3.1 kB
@@ -91,6 +91,7 @@
 [MakerNotes, Ricoh, Camera] 4099 - Sharpness: Sharp
 [MakerNotes, Ricoh, Time] 4 - Manufacture Date 1: 2005:06:06          
 [MakerNotes, Ricoh, Time] 5 - Manufacture Date 2: 2003:08:19          
+[PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0250
 [APP5, RMETA, Image] Sign type - Sign Type: Information
 [APP5, RMETA, Image] Location - Location: Roundabout
 [APP5, RMETA, Image] Lit - Lit: No

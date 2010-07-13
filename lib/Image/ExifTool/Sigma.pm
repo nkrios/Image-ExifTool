@@ -5,6 +5,7 @@
 #
 # Revisions:    04/06/2004 - P. Harvey Created
 #               02/20/2007 - PH added SD14 tags
+#               24/06/2010 - PH decode some SD15 tags
 #
 # Reference:    http://www.x3f.info/technotes/FileDocs/MakerNoteDoc.html
 #------------------------------------------------------------------------------
@@ -15,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.06';
+$VERSION = '1.08';
 
 %Image::ExifTool::Sigma::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -45,18 +46,18 @@ $VERSION = '1.06';
             8 => 'Multi-segment',
         },
     },
-    0x000a => 'Lens',
+    0x000a => 'LensFocalRange',
     0x000b => 'ColorSpace',
+    # SIGMA PhotoPro writes these tags as strings, but some cameras (at least) write them as rational
     0x000c => [
         {
             Name => 'ExposureCompensation',
-            Condition => '$$self{Model} =~ /SD(9|10)$/',
-            Notes => 'SD9 and SD10 only',
+            Condition => '$format eq "string"',
             ValueConv => '$val =~ s/Expo:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Expo:%+.1f",$val) : undef',
         },
         { #PH
-            Name => 'UnknownCompensation',
+            Name => 'ExposureAdjust',
             Writable => 'rational64s',
             Unknown => 1,
         },
@@ -64,7 +65,7 @@ $VERSION = '1.06';
     0x000d => [
         {
             Name => 'Contrast',
-            Condition => '$$self{Model} !~ /SD14$/',
+            Condition => '$format eq "string"',
             ValueConv => '$val =~ s/Cont:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Cont:%+.1f",$val) : undef',
         },
@@ -76,7 +77,7 @@ $VERSION = '1.06';
     0x000e => [
         {
             Name => 'Shadow',
-            Condition => '$$self{Model} !~ /SD14$/',
+            Condition => '$format eq "string"',
             ValueConv => '$val =~ s/Shad:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Shad:%+.1f",$val) : undef',
         },
@@ -88,7 +89,7 @@ $VERSION = '1.06';
     0x000f => [
         {
             Name => 'Highlight',
-            Condition => '$$self{Model} !~ /SD14$/',
+            Condition => '$format eq "string"',
             ValueConv => '$val =~ s/High:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("High:%+.1f",$val) : undef',
         },
@@ -100,7 +101,7 @@ $VERSION = '1.06';
     0x0010 => [
         {
             Name => 'Saturation',
-            Condition => '$$self{Model} !~ /SD14$/',
+            Condition => '$format eq "string"',
             ValueConv => '$val =~ s/Satu:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Satu:%+.1f",$val) : undef',
         },
@@ -112,7 +113,7 @@ $VERSION = '1.06';
     0x0011 => [
         {
             Name => 'Sharpness',
-            Condition => '$$self{Model} !~ /SD14$/',
+            Condition => '$format eq "string"',
             ValueConv => '$val =~ s/Shar:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Shar:%+.1f",$val) : undef',
         },
@@ -124,7 +125,7 @@ $VERSION = '1.06';
     0x0012 => [
         {
             Name => 'X3FillLight',
-            Condition => '$$self{Model} !~ /SD14$/',
+            Condition => '$format eq "string"',
             ValueConv => '$val =~ s/Fill:\s*//, $val',
             ValueConvInv => 'IsFloat($val) ? sprintf("Fill:%+.1f",$val) : undef',
         },
@@ -136,7 +137,7 @@ $VERSION = '1.06';
     0x0014 => [
         {
             Name => 'ColorAdjustment',
-            Condition => '$$self{Model} !~ /SD14$/',
+            Condition => '$format eq "string"',
             ValueConv => '$val =~ s/CC:\s*//, $val',
             ValueConvInv => 'IsInt($val) ? "CC:$val" : undef',
         },
@@ -192,10 +193,28 @@ $VERSION = '1.06';
     # 0x0023 - string: "", 10, 83, 131, 145, 150, 152, 169
     0x0024 => 'Calibration',
     # 0x0025 - string: "", "0.70", "0.90"
-    # 0x0026-2d - int32u: 0
+    # 0x0026-2b - int32u: 0
+    0x002c => { #PH
+        Name => 'ColorMode',
+        Writable => 'int32u',
+        PrintConv => {
+            0 => 'n/a',
+            1 => 'Sepia',
+            2 => 'B&W',
+            3 => 'Standard',
+            4 => 'Vivid',
+            5 => 'Neutral',
+            6 => 'Portrait',
+            7 => 'Landscape',
+        },
+    },
+    # 0x002d - int32u: 0
     # 0x002e - rational64s: (the negative of FlashExposureComp, but why?)
     # 0x002f - int32u: 0, 1
-    0x0030 => 'LensApertureRange', #PH (MaxAperture for some models)
+    0x0030 => { #PH
+        Name => 'LensApertureRange',
+        Notes => 'changes with focal length. MaxAperture for some models',
+    },
     0x0031 => { #PH
         Name => 'FNumber',
         Writable => 'rational64u',
@@ -206,7 +225,7 @@ $VERSION = '1.06';
         Name => 'ExposureTime',
         Writable => 'rational64u',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x0033 => { #PH
         Name => 'ExposureTime2',
@@ -214,7 +233,11 @@ $VERSION = '1.06';
         ValueConv => '$val * 1e-6',
         ValueConvInv => 'int($val * 1e6 + 0.5)',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    0x0034 => { #PH
+        Name => 'BurstShot',
+        Writable => 'int32u',
     },
     # 0x0034 - int32u: 0,1,2,3 or 4
     0x0035 => { #PH
@@ -226,7 +249,12 @@ $VERSION = '1.06';
     },
     # 0x0036 - string: "                    "
     # 0x0037-38 - string: ""
-    # 0x0039 - string: "", 24, 26, 28, 31, 33, 34, 36, 28, 40, 41, 42
+    0x0039 => { #PH
+        Name => 'SensorTemperature',
+        # (string format)
+        PrintConv => 'IsInt($val) ? "$val C" : $val',
+        PrintConvInv => '$val=~s/ ?C$//; $val',
+    },
     0x003a => { #PH
         Name => 'FlashExposureComp',
         Writable => 'rational64s',
@@ -236,6 +264,10 @@ $VERSION = '1.06';
         Priority => 0,
     },
     0x003c => 'WhiteBalance', #PH
+    0x003d => { #PH (new for SD15)
+        Name => 'PictureMode',
+        Notes => 'same as ColorMode, but "Standard" when ColorMode is Sepia or B&W',
+    },
 );
 
 1;  # end

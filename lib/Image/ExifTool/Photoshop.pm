@@ -184,7 +184,7 @@ my %psdMap = (
         Protected => 1,
         Notes => q{
             when writing, special values of "new" and "old" represent the digests of the
-            IPTC from the output and original files respectively, and are undefined if
+            IPTC from the edited and original files respectively, and are undefined if
             the IPTC does not exist in the respective file
         },
         # also note the 'new' feature requires that the IPTC comes before this tag is written

@@ -20,9 +20,19 @@ use Image::ExifTool::PostScript;
 use Image::ExifTool::XMP qw(EscapeXML UnescapeXML);
 require Exporter;
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeHTML UnescapeHTML);
+
+sub SetHTMLCharset($$);
+
+# convert HTML charset (lower case) to ExifTool Charset name
+my %htmlCharset = (
+    macintosh     => 'MacRoman',
+   'iso-8859-1'   => 'Latin',
+   'utf-8'        => 'UTF8',
+   'windows-1252' => 'Latin',
+);
 
 # HTML 4 character entity references
 my %entityNum = (
@@ -120,7 +130,8 @@ my %entityName; # look up entity names by number (built as necessary)
     GROUPS => { 2 => 'Document' },
     NOTES => q{
         Meta information extracted from the header of HTML and XHTML files.  This is
-        a mix of information found in the C<META> elements and the C<TITLE> element.
+        a mix of information found in the C<META> elements, C<XML> element, and the
+        C<TITLE> element.
     },
     dc => {
         Name => 'DC',
@@ -142,6 +153,10 @@ my %entityName; # look up entity names by number (built as necessary)
         Name => 'HTTP-equiv',
         SubDirectory => { TagTable => 'Image::ExifTool::HTML::equiv' },
     },
+    o => {
+        Name => 'Office',
+        SubDirectory => { TagTable => 'Image::ExifTool::HTML::Office' },
+    },
     abstract        => { },
     author          => { },
     classification  => { },
@@ -156,6 +171,7 @@ my %entityName; # look up entity names by number (built as necessary)
     googlebot       => { Name => 'GoogleBot' },
     keywords        => { List => 1 },
     mssmarttagspreventparsing => { Name => 'NoMSSmartTags' },
+    originator      => { },
     owner           => { },
     progid          => { Name => 'ProgID' },
     rating          => { },
@@ -244,7 +260,8 @@ my %entityName; # look up entity names by number (built as necessary)
    'content-language'    => { Name => 'ContentLanguage' },
    'content-script-type' => { Name => 'ContentScriptType' },
    'content-style-type'  => { Name => 'ContentStyleType' },
-   'content-type'        => { Name => 'ContentType' },
+    # note: setting the HTMLCharset like this will miss any tags which come earlier
+   'content-type'        => { Name => 'ContentType', RawConv => \&SetHTMLCharset },
    'default-style'       => { Name => 'DefaultStyle' },
     expires              => { },
    'ext-cache'           => { Name => 'ExtCache' },
@@ -262,6 +279,65 @@ my %entityName; # look up entity names by number (built as necessary)
     vary                 => { },
    'window-target'       => { Name => 'WindowTarget' },
 );
+
+# MS Office namespace (ref PH)
+%Image::ExifTool::HTML::Office = (
+    GROUPS => { 1 => 'HTML-office', 2 => 'Document' },
+    NOTES => 'Tags written by Microsoft Office applications.',
+    Subject     => { },
+    Author      => { Groups => { 2 => 'Author' } },
+    Keywords    => { },
+    Description => { },
+    Template    => { },
+    LastAuthor  => { Groups => { 2 => 'Author' } },
+    Revision    => { Name => 'RevisionNumber' },
+    TotalTime   => { Name => 'TotalEditTime',   PrintConv => 'ConvertTimeSpan($val, 60)' },
+    Created     => {
+        Name => 'CreateDate',
+        Groups => { 2 => 'Time' },
+        ValueConv => 'Image::ExifTool::XMP::ConvertXMPDate($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    LastSaved   => {
+        Name => 'ModifyDate',
+        Groups => { 2 => 'Time' },
+        ValueConv => 'Image::ExifTool::XMP::ConvertXMPDate($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    LastSaved   => {
+        Name => 'ModifyDate',
+        Groups => { 2 => 'Time' },
+        ValueConv => 'Image::ExifTool::XMP::ConvertXMPDate($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    LastPrinted => {
+        Name => 'LastPrinted',
+        Groups => { 2 => 'Time' },
+        ValueConv => 'Image::ExifTool::XMP::ConvertXMPDate($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    Pages       => { },
+    Words       => { },
+    Characters  => { },
+    Category    => { },
+    Manager     => { },
+    Company     => { },
+    Lines       => { },
+    Paragraphs  => { },
+    CharactersWithSpaces => { },
+    Version     => { Name => 'RevisionNumber' },
+);
+
+#------------------------------------------------------------------------------
+# Set HTMLCharset member based on content type
+# Inputs: 0) content type string, 1) ExifTool ref
+# Returns: original string
+sub SetHTMLCharset($$)
+{
+    my ($val, $exifTool) = @_;
+    $$exifTool{HTMLCharset} = $htmlCharset{lc $1} if $val =~ /charset=['"]?([-\w]+)/;
+    return $val;
+}
 
 #------------------------------------------------------------------------------
 # Convert single UTF-8 character to HTML character reference
@@ -377,8 +453,8 @@ sub ProcessHTML($$)
             }
         }
         my $table = $tagTablePtr;
-        # parse HTML META element
         if ($tag eq 'meta') {
+            # parse HTML META element
             undef $tag;
             # tag name is in NAME or HTTP-EQUIV attribute
             if ($attrs =~ /name=['"]?([\w:.-]+)/si) {
@@ -402,8 +478,29 @@ sub ProcessHTML($$)
                     $tag = "$grp.$tag";
                 }
             }
+        } elsif ($tag eq 'xml') {
+            $exifTool->VPrint(0, "Parsing XML\n");
+            # parse XML tags (quick-and-dirty)
+            my $xml = $val;
+            while ($xml =~ /<([\w-]+):([\w-]+)(\s.*?)?>([^<]*?)<\/\1:\2>/g) {
+                ($grp, $tag, $val) = ($1, $2, $4);
+                my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $grp);
+                next unless $tagInfo and $$tagInfo{SubDirectory};
+                $table = GetTagTable($tagInfo->{SubDirectory}->{TagTable});
+                unless ($$table{$tag}) {
+                    my $name = ucfirst $tag;
+                    $name =~ s/_x([0-9a-f]{4})_/chr(hex($1))/gie; # convert hex codes
+                    $name =~ s/\s(.)/\U$1/g;     # capitalize all words in tag name
+                    $name =~ tr/-_a-zA-Z0-9//dc; # remove illegal characters (also hex code wide chars)
+                    Image::ExifTool::AddTagToTable($table, $tag, { Name => $name });
+                    $exifTool->VPrint(0, "  [adding $tag '$name']\n");
+                }
+                $val = $exifTool->Decode($val, $$exifTool{HTMLCharset}) if $$exifTool{HTMLCharset};
+                $exifTool->HandleTag($table, $tag, UnescapeXML($val));
+            }
+            next;
         } else {
-            # the only non-META element we process is TITLE
+            # the only other element we process is TITLE
             next unless $tag eq 'title';
         }
         unless ($$table{$tag}) {
@@ -414,6 +511,8 @@ sub ProcessHTML($$)
             Image::ExifTool::AddTagToTable($table, $tag, $info);
             $exifTool->VPrint(0, "  [adding $tag '$tagName']\n");
         }
+        # recode if necessary
+        $val = $exifTool->Decode($val, $$exifTool{HTMLCharset}) if $$exifTool{HTMLCharset};
         $val =~ s{\s*$/\s*}{ }sg;   # replace linefeeds and indenting spaces
         $val = UnescapeHTML($val);  # unescape HTML character references
         $exifTool->HandleTag($table, $tag, $val);

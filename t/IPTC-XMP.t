@@ -1,7 +1,7 @@
 # Before "make install", this script should be runnable with "make test".
 # After "make install" it should work as "perl t/IPTC-XMP.t".
 
-BEGIN { $| = 1; print "1..34\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..37\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # definitions for user-defined tag test (#28)
@@ -399,6 +399,50 @@ my $testnum = 1;
     my $info = $exifTool->ImageInfo($testfile, 'IPTC:*');
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# tests 35-37: Conditionally add XMP lang-alt tag
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    my $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    # write title only if it doesn't exist
+    $exifTool->SetNewValue('XMP-dc:Title-de' => '', DelValue => 1);
+    $exifTool->SetNewValue('XMP-dc:Title-de' => 'A');
+    $exifTool->WriteInfo('t/images/Writer.jpg',$testfile);
+    my $info = $exifTool->ImageInfo($testfile,'XMP:*');
+    print 'not ' unless check($exifTool, $info, $testname, $testnum);
+    print "ok $testnum\n";
+    
+    # try again when title already exists
+    ++$testnum;
+    my $testfile2 = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile2;
+    $exifTool->SetNewValue('XMP-dc:Title-de' => 'B');
+    $exifTool->WriteInfo($testfile,$testfile2);
+    $info = $exifTool->ImageInfo($testfile2,'XMP:*');
+    if (check($exifTool, $info, $testname, $testnum, 35)) {
+        unlink $testfile2
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+
+    ++$testnum;
+    $testfile2 = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile2;
+    $exifTool->SetNewValue('XMP-dc:Title-de' => 'A', DelValue => 1);
+    $exifTool->SetNewValue('XMP-dc:Title-de' => 'C');
+    $exifTool->WriteInfo($testfile,$testfile2);
+    $info = $exifTool->ImageInfo($testfile2,'XMP:*');
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+        unlink $testfile2
     } else {
         print 'not ';
     }

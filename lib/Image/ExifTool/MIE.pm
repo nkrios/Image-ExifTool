@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.32';
+$VERSION = '1.34';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -564,7 +564,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     ExposureTime    => {
         Writable => 'rational64u',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     Flash => {
         SubDirectory => {
@@ -2095,7 +2095,7 @@ ARM systems), regardless of the endian-ness of the stored values.
 Rational values are treated as two separate integers.  The numerator always
 comes first regardless of the byte ordering.  In a signed rational value,
 only the numerator is signed.  The denominator of all rational values is
-unsigned (ie. a signed 32-bit rational of 0x80000000/0x80000000 evaluates to
+unsigned (ie. a signed 64-bit rational of 0x80000000/0x80000000 evaluates to
 -1, not +1).
 
 =item 8.
@@ -2510,6 +2510,8 @@ tag name.  For example:
 
 =head1 REVISIONS
 
+  2010-04-05 - Fixed “Format Size” Note 7 to give the correct number of bits
+               in the example rational value
   2007-01-21 - Specified LF character (0x0a) for text newline sequence
   2007-01-19 - Specified ISO 8859-1 character set for extended ASCII codes
   2007-01-01 - Improved wording of Step 5 for scanning backwards in MIE file

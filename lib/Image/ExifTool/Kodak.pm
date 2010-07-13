@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.24';
+$VERSION = '1.26';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -122,7 +122,7 @@ sub WriteKodakIFD($$$);
         ValueConv => '$val / 1e5',
         ValueConvInv => '$val * 1e5',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x24 => {
         Name => 'ExposureCompensation',
@@ -130,7 +130,7 @@ sub WriteKodakIFD($$$);
         ValueConv => '$val / 1000',
         ValueConvInv => '$val * 1000',
         PrintConv => '$val > 0 ? "+$val" : $val',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x26 => {
         Name => 'VariousModes',
@@ -337,7 +337,7 @@ sub WriteKodakIFD($$$);
         ValueConv => '$val / 1e5',
         ValueConvInv => '$val * 1e5',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x3c => {
         Name => 'FNumber',
@@ -382,7 +382,7 @@ sub WriteKodakIFD($$$);
         ValueConv => '$val / 1e5',
         ValueConvInv => '$val * 1e5',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x1a => {
         Name => 'WhiteBalance',
@@ -446,7 +446,7 @@ sub WriteKodakIFD($$$);
         ValueConv => '$val / 1e5',
         ValueConvInv => '$val * 1e5',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x14 => {
         Name => 'ISOSetting',
@@ -524,18 +524,40 @@ sub WriteKodakIFD($$$);
         is a large amount of information stored in these maker notes (apparently
         with much duplication), but relatively few tags have so far been decoded.
     },
-    0xfc00 => {
+    0xfc00 => [{
+        Name => 'SubIFD0',
+        Condition => '$format eq "undef"',
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
+        NestedHtmlDump => 2, # (so HtmlDump doesn't show these as double-referenced)
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD0',
+            Base => '$start',
+            ProcessProc => \&ProcessKodakIFD,
+            WriteProc => \&WriteKodakIFD,
+        },
+    },{
         Name => 'SubIFD0',
         Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
         Flags => 'SubIFD',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::SubIFD0',
             Start => '$val',
+            # (odd but true: the Base for this SubIFD is different than 0xfc01-0xfc06)
         },
-    },
+    }],
     # SubIFD1 and higher data is preceded by a TIFF byte order mark to indicate
-    # the byte ordering used
-    0xfc01 => {
+    # the byte ordering used.  Beginning with the M580, these subdirectories are
+    # stored as 'undef' data rather than as a standard EXIF SubIFD.
+    0xfc01 => [{
+        Name => 'SubIFD1',
+        Condition => '$format eq "undef"',
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
+        NestedHtmlDump => 2,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD1',
+            Base => '$start',
+        },
+    },{
         Name => 'SubIFD1',
         Condition => '$$valPt ne "\0\0\0\0"',   # may be zero if dir doesn't exist
         Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
@@ -545,8 +567,17 @@ sub WriteKodakIFD($$$);
             Start => '$val',
             Base => '$start',
         },
-    },
-    0xfc02 => {
+    }],
+    0xfc02 => [{
+        Name => 'SubIFD2',
+        Condition => '$format eq "undef"',
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
+        NestedHtmlDump => 2,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD2',
+            Base => '$start',
+        },
+    },{
         Name => 'SubIFD2',
         Condition => '$$valPt ne "\0\0\0\0"',   # may be zero if dir doesn't exist
         Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
@@ -556,8 +587,17 @@ sub WriteKodakIFD($$$);
             Start => '$val',
             Base => '$start',
         },
-    },
-    0xfc03 => {
+    }],
+    0xfc03 => [{
+        Name => 'SubIFD3',
+        Condition => '$format eq "undef"',
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
+        NestedHtmlDump => 2,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD3',
+            Base => '$start',
+        },
+    },{
         Name => 'SubIFD3',
         Condition => '$$valPt ne "\0\0\0\0"',   # may be zero if dir doesn't exist
         Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
@@ -567,10 +607,19 @@ sub WriteKodakIFD($$$);
             Start => '$val',
             Base => '$start',
         },
-    },
+    }],
     # (SubIFD4 has the pointer zeroed in my samples, but support it
     # in case it is used by future models -- ignored if pointer is zero)
-    0xfc04 => {
+    0xfc04 => [{
+        Name => 'SubIFD4',
+        Condition => '$format eq "undef"',
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
+        NestedHtmlDump => 2,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD4',
+            Base => '$start',
+        },
+    },{
         Name => 'SubIFD4',
         Condition => '$$valPt ne "\0\0\0\0"',   # may be zero if dir doesn't exist
         Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
@@ -580,8 +629,17 @@ sub WriteKodakIFD($$$);
             Start => '$val',
             Base => '$start',
         },
-    },
-    0xfc05 => {
+    }],
+    0xfc05 => [{
+        Name => 'SubIFD5',
+        Condition => '$format eq "undef"',
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
+        NestedHtmlDump => 2,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD5',
+            Base => '$start',
+        },
+    },{
         Name => 'SubIFD5',
         Condition => '$$valPt ne "\0\0\0\0"',   # may be zero if dir doesn't exist
         Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
@@ -590,6 +648,36 @@ sub WriteKodakIFD($$$);
             TagTable => 'Image::ExifTool::Kodak::SubIFD5',
             Start => '$val',
             Base => '$start',
+        },
+    }],
+    0xfc06 => [{ # new for the M580
+        Name => 'SubIFD6',
+        Condition => '$format eq "undef"',
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
+        NestedHtmlDump => 2,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD6',
+            Base => '$start',
+        },
+    },{
+        Name => 'SubIFD6',
+        Condition => '$$valPt ne "\0\0\0\0"',   # may be zero if dir doesn't exist
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD6',
+            Start => '$val',
+            Base => '$start',
+        },
+    }],
+    0xfcff => {
+        Name => 'SubIFD255',
+        Condition => '$format eq "undef"',
+        Groups => { 1 => 'MakerNotes' },        # SubIFD needs group 1 set
+        NestedHtmlDump => 2,
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::SubIFD0',
+            # (uses the same Base as the main MakerNote IFD)
         },
     },
     0xff00 => {
@@ -600,6 +688,7 @@ sub WriteKodakIFD($$$);
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::CameraInfo',
             Start => '$val',
+            # (uses the same Base as the main MakerNote IFD)
         },
     },
 );
@@ -625,7 +714,7 @@ sub WriteKodakIFD($$$);
         ValueConv => '$val / 1e6',
         ValueConvInv => '$val * 1e6',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x14 => {
         Name => 'DateTimeOriginal',
@@ -683,10 +772,10 @@ sub WriteKodakIFD($$$);
     0x12 => {
         Name => 'ExposureTime',
         Writable => 'int32u',
-        ValueConv => '$val / 100000',
-        ValueConvInv => '$val * 100000',
+        ValueConv => '$val / 1e5',
+        ValueConvInv => '$val * 1e5',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x13 => {
         Name => 'FNumber',
@@ -737,10 +826,11 @@ sub WriteKodakIFD($$$);
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    NOTES => 'SubIFD0 through SubIFD5 tags are used by the Z612 and Z712.',
+    NOTES => 'SubIFD0 through SubIFD5 tags are written a number of newer Kodak models.',
     0xfa02 => {
         Name => 'SceneMode',
         Writable => 'int16u',
+        Notes => 'may not be valid for some models', # ie. M580?
         PrintConv => {
             1 => 'Sport',
             3 => 'Portrait',
@@ -804,7 +894,7 @@ sub WriteKodakIFD($$$);
         ValueConv => '$val / 1e5',
         ValueConvInv => '$val * 1e5',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0xfa2e => {
         Name => 'ISO',
@@ -947,7 +1037,7 @@ my %sceneModeUsed = (
         ValueConv => '$val / 1e6',
         ValueConvInv => '$val * 1e6',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0xf105 => {
         Name => 'ISO',
@@ -1095,6 +1185,15 @@ my %sceneModeUsed = (
     },
 );
 
+# Kodak SubIFD6 tags (ref PH)
+%Image::ExifTool::Kodak::SubIFD6 = (
+    PROCESS_PROC => \&ProcessKodakIFD,
+    WRITE_PROC => \&WriteKodakIFD,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'SubIFD6 is written by the M580.',
+);
+
 # Decoded from P712, P850 and P880 samples (ref PH)
 %Image::ExifTool::Kodak::CameraInfo = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -1153,7 +1252,7 @@ my %sceneModeUsed = (
         ValueConv => '$val / 1e6',
         ValueConvInv => '$val * 1e6',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0xfd06 => {
         Name => 'ISO',
@@ -1378,22 +1477,30 @@ my %sceneModeUsed = (
 # Kodak APP3 "Meta" tags (ref 2)
 %Image::ExifTool::Kodak::Meta = (
     GROUPS => { 0 => 'Meta', 1 => 'MetaIFD', 2 => 'Image'},
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    WRITE_GROUP => 'MetaIFD',   # default write group
     NOTES => q{
         These tags are found in the APP3 "Meta" segment of JPEG images from Kodak
-        cameras such as the DC280, DC3400, DC5000 and MC3.  The structure of this
-        segment is similar to the APP1 "Exif" segment, but a different set of tags
-        is used.
+        cameras such as the DC280, DC3400, DC5000, MC3, M580, Z950 and Z981.  The
+        structure of this segment is similar to the APP1 "Exif" segment, but a
+        different set of tags is used.
     },
     0xc350 => 'FilmProductCode',
     0xc351 => 'ImageSourceEK',
     0xc352 => 'CaptureConditionsPAR',
     0xc353 => {
         Name => 'CameraOwner',
-        PrintConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
+        Writable => 'undef',
+        RawConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
+        RawConvInv => 'Image::ExifTool::Exif::EncodeExifText($self,$val)',
     },
     0xc354 => {
         Name => 'SerialNumber',
+        Writable => 'undef',
         Groups => { 2 => 'Camera' },
+        RawConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)', #PH
+        RawConvInv => 'Image::ExifTool::Exif::EncodeExifText($self,$val)',
     },
     0xc355 => 'UserSelectGroupTitle',
     0xc356 => 'DealerIDNumber',
@@ -1425,6 +1532,7 @@ my %sceneModeUsed = (
     0xc36e => {
         Name => 'KodakEffectsIFD',
         Flags => 'SubIFD',
+        Groups => { 1 => 'KodakEffectsIFD' },
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::SpecialEffects',
             Start => '$val',
@@ -1433,6 +1541,7 @@ my %sceneModeUsed = (
     0xc36f => {
         Name => 'KodakBordersIFD',
         Flags => 'SubIFD',
+        Groups => { 1 => 'KodakBordersIFD' },
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Borders',
             Start => '$val',
@@ -1449,6 +1558,7 @@ my %sceneModeUsed = (
 # Kodak APP3 "Meta" Special Effects sub-IFD (ref 2)
 %Image::ExifTool::Kodak::SpecialEffects = (
     GROUPS => { 0 => 'Meta', 1 => 'KodakEffectsIFD', 2 => 'Image'},
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     0 => 'DigitalEffectsVersion',
     1 => {
         Name => 'DigitalEffectsName',
@@ -1460,6 +1570,7 @@ my %sceneModeUsed = (
 # Kodak APP3 "Meta" Borders sub-IFD (ref 2)
 %Image::ExifTool::Kodak::Borders = (
     GROUPS => { 0 => 'Meta', 1 => 'KodakBordersIFD', 2 => 'Image'},
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     0 => 'BordersVersion',
     1 => {
         Name => 'BorderName',
@@ -1505,7 +1616,7 @@ my %sceneModeUsed = (
     0x5a => {
         Name => 'ExposureCompensation',
         Format => 'rational64s',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
     # 0x6c => 'WhiteBalance', ?
     0x70 => {
@@ -1649,7 +1760,10 @@ sub ProcessKodakIFD($$$)
     my $dirStart = $$dirInfo{DirStart} || 0;
     return 1 if $dirStart <= 0 or $dirStart + 2 > $$dirInfo{DataLen};
     my $byteOrder = substr(${$$dirInfo{DataPt}}, $dirStart, 2);
-    return 1 unless Image::ExifTool::SetByteOrder($byteOrder);
+    unless (Image::ExifTool::SetByteOrder($byteOrder)) {
+        $exifTool->Warn("Invalid Kodak $$dirInfo{Name} directory");
+        return 1;
+    }
     $$dirInfo{DirStart} += 2;   # skip byte order mark
     $$dirInfo{DirLen} -= 2;
     if ($exifTool->{HTML_DUMP}) {

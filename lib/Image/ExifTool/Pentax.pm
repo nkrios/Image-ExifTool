@@ -50,7 +50,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.11';
+$VERSION = '2.15';
 
 sub CryptShutterCount($$);
 
@@ -224,10 +224,11 @@ my %pentaxLensTypes = (
     '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
     '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
     '7 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #23
+    '7 216' => 'smc PENTAX-DA L 55-300mm F4-5.8 ED', #PH
     '7 217' => 'smc PENTAX-DA 50-200mm F4-5.6 ED WR', #JD
     '7 218' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL WR', #JD
     '7 220' => 'Tamron SP AF 10-24mm F3.5-4.5 Di II LD Aspherical [IF]', #25
-    '7 222' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #PH (tag 0x003f -- was '7 229' in LensInfo)
+    '7 222' => 'smc PENTAX-DA L 18-55mm F3.5-5.6', #PH (tag 0x003f -- was '7 229' in LensInfo of one test image)
     '7 223' => 'Samsung D-XENON 18-55mm F3.5-5.6 II', #PH
     '7 224' => 'smc PENTAX-DA 15mm F4 ED AL Limited', #JD
     '7 225' => 'Samsung D-XENON 18-250mm F3.5-6.3', #8/PH
@@ -253,6 +254,11 @@ my %pentaxLensTypes = (
     '8 255' => 'Sigma Lens (8 255)',
     '8 255.1' => 'Sigma 70-200mm F2.8 EX DG Macro HSM II', #JD
     '8 255.2' => 'Sigma APO 150-500mm F5-6.3 DG OS HSM', #JD
+    '11 4' => 'smc PENTAX-FA 645 45-85mm F4.5', #PH
+    '11 8' => 'smc PENTAX-FA 645 80-160mm F4.5', #PH
+    '11 11' => 'smc PENTAX-FA 645 35mm F3.5 AL [IF]', #PH
+    '11 17' => 'smc PENTAX-FA 645 150-300mm F5.6 ED [IF]', #PH
+    '13 18' => 'smc PENTAX-D FA 645 55mm F2.8 AL [IF] SDM AW', #PH
 );
 
 # Pentax model ID codes - PH
@@ -312,10 +318,13 @@ my %pentaxModelID = (
     0x12c78 => 'Optio E30',
     0x12c7d => 'Optio E35',
     0x12c82 => 'Optio T30',
+    0x12c91 => 'Optio L30',
     0x12c96 => 'Optio W30',
     0x12ca0 => 'Optio A30',
     0x12cb4 => 'Optio E40',
     0x12cbe => 'Optio M40',
+    0x12cc3 => 'Optio L40',
+    0x12cc5 => 'Optio L36',
     0x12cc8 => 'Optio Z10',
     0x12cd2 => 'K20D',
     0x12cd4 => 'Samsung GX20', #8
@@ -326,6 +335,7 @@ my %pentaxModelID = (
     0x12d04 => 'Optio S12',
     0x12d0e => 'Optio E50',
     0x12d18 => 'Optio M50',
+    0x12d22 => 'Optio L50',
     0x12d2c => 'Optio V20',
     0x12d40 => 'Optio W60',
     0x12d4a => 'Optio M60',
@@ -340,7 +350,13 @@ my %pentaxModelID = (
     0x12dea => 'Optio P80',
     0x12df4 => 'Optio WS80',
     0x12dfe => 'K-x',
+    0x12e08 => '645D',
+    0x12e12 => 'Optio E80',
+    0x12e30 => 'Optio W90',
     0x12e3a => 'Optio I-10',
+    0x12e44 => 'Optio H90',
+    0x12e4e => 'Optio E90',
+    0x12e58 => 'X90',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -417,6 +433,7 @@ my %pentaxCities = (
     69 => 'Stockholm',
     70 => 'Lisbon', #14
     71 => 'Copenhagen', #26
+    # 72 - have seen this value - PH
 );
 
 # decoding for Pentax Firmware ID tags - PH
@@ -590,7 +607,10 @@ my %lensCode = (
         Name => 'PictureMode',
         Writable => 'int16u',
         Count => -1,
-        Notes => '1 or 2 values.  Decimals used to differentiate values for the Optio 555',
+        Notes => q{
+            1 or 2 values.  Decimal values differentiate Optio 555 modes which are
+            different from other models
+        },
         ValueConv => '($val < 4 and $$self{Model} =~ /Optio 555\b/) ? $val + 0.1 : $val',
         ValueConvInv => 'int $val',
         PrintConvColumns => 2,
@@ -766,7 +786,7 @@ my %lensCode = (
         ValueConvInv => '$val * 1e5',
         # value may be 0xffffffff in Bulb mode (ref JD)
         PrintConv => '$val > 42949 ? "Unknown (Bulb)" : Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => '$val=~/(unknown|bulb)/i ? $val : eval $val',
+        PrintConvInv => '$val=~/(unknown|bulb)/i ? $val : Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x0013 => { #PH
         Name => 'FNumber',
@@ -844,7 +864,7 @@ my %lensCode = (
         ValueConv => '($val - 50) / 10',
         ValueConvInv => 'int($val * 10 + 50.5)',
         PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x0017 => { #3
         Name => 'MeteringMode',
@@ -910,9 +930,9 @@ my %lensCode = (
             3 => 'Fluorescent', #2
             4 => 'Tungsten',
             5 => 'Manual',
-            6 => 'DaylightFluorescent', #13
-            7 => 'DaywhiteFluorescent', #13
-            8 => 'WhiteFluorescent', #13
+            6 => 'Daylight Fluorescent', #13
+            7 => 'Day White Fluorescent', #13
+            8 => 'White Fluorescent', #13
             9 => 'Flash', #13
             10 => 'Cloudy', #13
             17 => 'Kelvin', #PH
@@ -928,9 +948,9 @@ my %lensCode = (
             2 => 'Auto (Shade)',
             3 => 'Auto (Flash)',
             4 => 'Auto (Tungsten)',
-            6 => 'Auto (DaylightFluorescent)', #19 (NC)
-            7 => 'Auto (DaywhiteFluorescent)', #17 (K100D guess)
-            8 => 'Auto (WhiteFluorescent)', #17 (K100D guess)
+            6 => 'Auto (Daylight Fluorescent)', #19 (NC)
+            7 => 'Auto (Day White Fluorescent)', #17 (K100D guess)
+            8 => 'Auto (White Fluorescent)', #17 (K100D guess)
             10 => 'Auto (Cloudy)', #17 (K100D guess)
             # 0xfffd observed in K100D (ref 17)
             0xfffe => 'Unknown', #PH (you get this when shooting night sky shots)
@@ -1199,6 +1219,7 @@ my %lensCode = (
         },{
             0 => 'Single Exposure',
             1 => 'Multiple Exposure',
+            16 => 'HDR', #PH (645D)
             255 => 'Video', #PH (K-x)
         }],
     },
@@ -1302,7 +1323,7 @@ my %lensCode = (
         ValueConv => '$val / 256',
         ValueConvInv => 'int($val * 256 + ($val > 0 ? 0.5 : -0.5))',
         PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x004f => { #PH
         Name => 'ImageTone', # (Called CustomImageMode in K20D manual)
@@ -1314,6 +1335,8 @@ my %lensCode = (
             3 => 'Landscape', # K20D
             4 => 'Vibrant', # K20D
             5 => 'Monochrome', # K20D
+            6 => 'Muted', # 645D
+            7 => 'Reversal Film', # 645D
         },
     },
     0x0050 => { #PH
@@ -1373,6 +1396,7 @@ my %lensCode = (
             2 => 'Weak',
             3 => 'Strong',
             # have also seen '0 0 56' for K-7 - PH
+            # and '4 0 48','2 0 48','0 0 48','2 0 56','2 1 56' for 645D - PH
         },
     },
     0x0072 => { #JD (K20D)
@@ -1380,6 +1404,20 @@ my %lensCode = (
         Writable => 'int16s',
     },
     # 0x0073,0x0074: int16u - values: 65535 [and 0,4,8 in Monochrome] (K20D,K200D) - PH
+    0x0079 => { #PH
+        Name => 'ShadowCompensation',
+        Writable => 'int8u',
+        Count => -1,
+        PrintConv => {
+            # (1 value for K-m/K2000, 2 for 645D)
+            0 => 'Off',
+            1 => 'On',
+            '0 0' => 'Off',
+            '1 1' => 'Weak',
+            '1 2' => 'Normal',
+            '1 3' => 'Strong',
+        },
+    },
     0x0200 => { #5
         Name => 'BlackPoint',
         Writable => 'int16u',
@@ -1884,9 +1922,9 @@ my %lensCode = (
             16 => 'Daylight',
             32 => 'Shade',
             48 => 'Cloudy',
-            64 => 'DaylightFluorescent',
-            80 => 'DaywhiteFluorescent',
-            96 => 'WhiteFluorescent',
+            64 => 'Daylight Fluorescent',
+            80 => 'Day White Fluorescent',
+            96 => 'White Fluorescent',
             112 => 'Tungsten',
             128 => 'Flash',
             144 => 'Manual',
@@ -2031,7 +2069,7 @@ my %lensCode = (
         ValueConv => 'exp(-Image::ExifTool::Pentax::PentaxEv($val-68)*log(2))',
         ValueConvInv => 'Image::ExifTool::Pentax::PentaxEvInv(-log($val)/log(2))+68',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     19 => {
         Name => 'AvApertureSetting',
@@ -2062,7 +2100,7 @@ my %lensCode = (
         ValueConv => 'Image::ExifTool::Pentax::PentaxEv(64-$val)',
         ValueConvInv => '64-Image::ExifTool::Pentax::PentaxEvInv($val)',
         PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
 );
 
@@ -2081,7 +2119,7 @@ my %lensCode = (
         ValueConv => '24*exp(-($val-32)*log(2)/8)',
         ValueConvInv => '-log($val/24)*8/log(2)+32',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     1 => {
         Name => 'AEAperture',
@@ -2118,7 +2156,7 @@ my %lensCode = (
         ValueConv => '24*exp(-($val-32)*log(2)/8)', #JD
         ValueConvInv => '-log($val/24)*8/log(2)+32',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     6 => {
         Name => 'AEProgramMode',
@@ -2200,7 +2238,7 @@ my %lensCode = (
         ValueConv => 'Image::ExifTool::Pentax::PentaxEv($val)',
         ValueConvInv => 'Image::ExifTool::Pentax::PentaxEvInv($val)',
         PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
 );
 
@@ -2217,7 +2255,7 @@ my %lensCode = (
     0 => {
         Name => 'LensType',
         Format => 'int8u[2]',
-        Priority => 0,
+        Priority => 0, # (not valid for 645D)
         PrintConv => \%pentaxLensTypes,
         SeparateTable => 1,
     },

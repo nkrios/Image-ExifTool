@@ -22,7 +22,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.50';
+$VERSION = '1.51';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -556,8 +556,7 @@ sub BuildMakerNotes($$$$$$);
         ValueConv => 'abs($val)<100 ? 1/(2**$val) : 0',
         ValueConvInv => '$val>0 ? -log($val)/log(2) : -100',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        # do eval to convert things like '1/100'
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     2 => {
         Name => 'ApertureValue',

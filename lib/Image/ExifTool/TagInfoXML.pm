@@ -15,7 +15,7 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 @ISA = qw(Exporter);
 
 # set this to a language code to generate Lang module with 'MISSING' entries
@@ -31,7 +31,7 @@ sub NumbersFirst;
 # names for acknowledgements in the POD documentation
 my %credits = (
     cs   => 'Jens Duttke and Petr MichE<aacute>lek',
-    de   => 'Jens Duttke',
+    de   => 'Jens Duttke and Herbert Kauer',
     es   => 'Jens Duttke and Santiago del BrE<iacute>o GonzE<aacute>lez',
     fr   => 'Jens Duttke, Bernard Guillotin, Jean Glasser, Jean Piquemal and Harry Nizard',
     it   => 'Jens Duttke, Ferdinando Agovino and Emilio Dati',
@@ -64,7 +64,7 @@ my $caseInsensitive;    # used internally by sort routine
 # Inputs: 0) output file name (undef to send to console),
 #         1) group name (may be undef), 2) options hash ('Flags','NoDesc')
 # Returns: true on success
-sub Write(;$$$)
+sub Write(;$$%)
 {
     local ($_, *PTIFILE);
     my ($file, $group, %opts) = @_;
@@ -690,8 +690,8 @@ Image::ExifTool::TagInfoXML - Read/write tag information XML database
 =head1 DESCRIPTION
 
 This module is used to generate an XML database from all ExifTool tag
-information. This database may then be edited and used to re-generate the
-localized tag information modules (Image::ExifTool::Lang::*).
+information.  The XML database may then be edited and used to re-generate
+the language modules (Image::ExifTool::Lang::*).
 
 =head1 METHODS
 
@@ -712,7 +712,8 @@ Print complete tag information database in XML format.
 
 =item Inputs:
 
-0) [optional] Output file name, or undef for console output.
+0) [optional] Output file name, or undef for console output.  Output file
+will be overwritten if it already exists.
 
 1) [optional] String of group names separated by colons to specify the group
 to print.  A specific IFD may not be given as a group, since EXIF tags may
@@ -727,7 +728,7 @@ be written to any IFD.  Saves all groups if not specified.
 
 True on success.
 
-=item Sample XMP Output:
+=item Sample XML Output:
 
 =back
 

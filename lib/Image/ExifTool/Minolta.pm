@@ -42,7 +42,7 @@ use vars qw($VERSION %minoltaLensTypes %minoltaColorMode %sonyColorMode %minolta
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.65';
+$VERSION = '1.68';
 
 # lens ID numbers (ref 3)
 # ("New" and "II" appear in brackets if original version also has this LensType)
@@ -121,7 +121,7 @@ $VERSION = '1.65';
     51 => 'Sony AF DT 16-105mm F3.5-5.6 or 55-200mm F4-5.5', #11
     51.1 => 'Sony AF DT 55-200mm F4-5.5', #11
     52 => 'Sony 70-300mm F4.5-5.6 G SSM', #JD
-    53 => 'Sony AF 70-400mm F4.5-5.6 G SSM (SAL-70400G)', #17
+    53 => 'Sony AF 70-400mm F4-5.6 G SSM (SAL-70400G)', #17 (/w correction by Stephen Bishop)
     54 => 'Carl Zeiss Vario-Sonnar T* 16-35mm F2.8 ZA SSM (SAL-1635Z)', #17
     55 => 'Sony DT 18-55mm F3.5-5.6 SAM (SAL-1855)', #PH
     56 => 'Sony AF DT 55-200mm F4-5.6 SAM', #22
@@ -286,6 +286,7 @@ $VERSION = '1.65';
     16 => 'Evening', #10
     17 => 'Night Scene', #10
     18 => 'Night Portrait', #10
+    0x84 => 'Embed Adobe RGB',
 );
 
 %sonyColorMode = ( #15
@@ -393,6 +394,15 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             image stabilization is enabled
         },
         ValueConv => '"On"',
+    },
+    0x0020 => {
+        Name => 'WBInfoA100',
+        Condition => '$$self{Model} eq "DSLR-A100"',
+        Notes => 'currently decoded only for the Sony A100',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Minolta::WBInfoA100',
+            ByteOrder => 'BigEndian',
+        },
     },
     0x0040 => {
         Name => 'CompressedImageSize',
@@ -703,7 +713,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         ValueConv => '2 ** ((48-$val)/8)',
         ValueConvInv => '48 - 8*log($val)/log(2)',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     10 => {
         Name => 'FNumber',
@@ -731,8 +741,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ExposureCompensation',
         ValueConv => '$val/3 - 2',
         ValueConvInv => '($val + 2) * 3',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     14 => {
         Name => 'BracketStep',
@@ -842,8 +852,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Description => 'Flash Exposure Compensation',
         ValueConv => '($val - 6) / 3',
         ValueConvInv => '$val * 3 + 6',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     36 => {
         Name => 'ISOSetting',
@@ -1085,8 +1095,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Format => 'int16s',
         ValueConv => '$val / 24',
         ValueConvInv => '$val * 24',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x25 => {
         Name => 'ColorSpace',
@@ -1143,7 +1153,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         ValueConv => '2 ** ((48-$val)/8)',
         ValueConvInv => '48 - 8*log($val)/log(2)',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x4a => 'FreeMemoryCardImages',
     0x5e => {
@@ -1302,7 +1312,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         ValueConv => '2 ** ((48-$val)/8)',
         ValueConvInv => '48 - 8*log($val)/log(2)',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x36 => { #PH
         Name => 'FNumber',
@@ -1336,8 +1346,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ExposureCompensation',
         ValueConv => '$val / 100 - 3',
         ValueConvInv => '($val + 3) * 100',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x54 => 'FreeMemoryCardImages',
     0x65 => { #10
@@ -1433,7 +1443,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         ValueConv => '$val ? 2 ** ((48-$val)/8) : $val',
         ValueConvInv => '$val ? 48 - 8*log($val)/log(2) : $val',
         PrintConv => '$val ? Image::ExifTool::Exif::PrintExposureTime($val) : "Bulb"',
-        PrintConvInv => 'lc($val) eq "bulb" ? 0 : eval $val',
+        PrintConvInv => 'lc($val) eq "bulb" ? 0 : Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x07 => { #20
         Name => 'ManualFNumber',
@@ -1448,7 +1458,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         ValueConv => '$val ? 2 ** ((48-$val)/8) : $val',
         ValueConvInv => '$val ? 48 - 8*log($val)/log(2) : $val',
         PrintConv => '$val ? Image::ExifTool::Exif::PrintExposureTime($val) : "Bulb"',
-        PrintConvInv => 'lc($val) eq "bulb" ? 0 : eval $val',
+        PrintConvInv => 'lc($val) eq "bulb" ? 0 : Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x09 => { #15/20
         Name => 'FNumber',
@@ -1557,7 +1567,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         },
     },
     0x14 => { #15/20
-        Name => 'ZoneMatching',
+        Name => 'ZoneMatchingMode',
         PrintConv => {
             0 => 'Off',
             1 => 'Standard',
@@ -1967,6 +1977,45 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
 );
 
+# white balance information stored by the Sony DSLR-A100 (ref 20)
+%Image::ExifTool::Minolta::WBInfoA100 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    NOTES => 'White balance information for the Sony DSLR-A100.',
+    WRITABLE => 1,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    0x96  => { Name => 'WB_RGBLevels',          Format => 'int16u[3]' },
+    0xae  => { Name => 'WB_GBRGLevels',         Format => 'int16u[4]' },
+    0x304 => { Name => 'WB_RBPresetFlash',      Format => 'int16u[2]' },
+    0x308 => { Name => 'WB_RBPresetCoolWhiteF', Format => 'int16u[2]' },
+    0x3e8 => { Name => 'WB_RBPresetTungsten',   Format => 'int16u[2]' },
+    0x3ec => { Name => 'WB_RBPresetDaylight',   Format => 'int16u[2]' },
+    0x3f0 => { Name => 'WB_RBPresetCloudy',     Format => 'int16u[2]' },
+    0x3f4 => { Name => 'WB_RBPresetFlash',      Format => 'int16u[2]' },
+    0x3fc => {
+        Name => 'WB_RedPresetsFluorescent',
+        Format => 'int16u[7]',
+        Notes => q{
+            white balance red presets for fluorescent -2 through +4.  -2=Fluorescent,
+            -1=WhiteFluorescent, 0=CoolWhiteFluorescent, +1=DayWhiteFluorescent and
+            +3=DaylightFluorescent
+        },
+    },
+    0x40a => {
+        Name => 'WB_BluePresetsFluorescent',
+        Format => 'int16u[7]',
+        Notes => 'white balance blue presets for fluorescent -2 through +4',
+    },
+    0x418 => { Name => 'WB_RBPresetShade',                 Format => 'int16u[2]' },
+    0x424 => { Name => 'WB_RBPresetCustom',                Format => 'int16u[2]' },
+    0x49dc => {
+        Name => 'InternalSerialNumber',
+        Format => 'string[12]',
+    },
+);
+
 # tags in Konica Minolta MOV videos (ref PH)
 # (similar information in Kodak,Minolta,Nikon,Olympus,Pentax and Sanyo videos)
 %Image::ExifTool::Minolta::MOV1 = (
@@ -2000,7 +2049,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x3a => {
         Name => 'ExposureCompensation',
         Format => 'rational64s',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
     # 0x4c => 'WhiteBalance', ?
     0x50 => {
@@ -2043,7 +2092,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x32 => {
         Name => 'ExposureCompensation',
         Format => 'rational64s',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
     # 0x44 => 'WhiteBalance', ?
     0x48 => {

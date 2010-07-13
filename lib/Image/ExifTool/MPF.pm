@@ -94,7 +94,7 @@ sub ProcessMPImageList($$$);
     NOTES => q{
         The first MPF "Large Thumbnail" image is extracted as PreviewImage, and the
         rest of the embedded MPF images are extracted as MPImage#.  The
-        ExtractEmbedded option may be used to extract information from these
+        ExtractEmbedded (-ee) option may be used to extract information from these
         embedded images.
     },
     0.1 => {

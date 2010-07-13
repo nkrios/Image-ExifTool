@@ -22,7 +22,7 @@ require Exporter;
 use Image::ExifTool qw(ImageInfo);
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.15';
+$VERSION = '1.16';
 @ISA = qw(Exporter);
 @EXPORT = qw(check writeCheck testCompare binaryCompare testVerbose);
 
@@ -180,8 +180,17 @@ sub closeEnough($$)
             last unless $t1 == $t2;
         } else {
             # check to see if both tokens are floating point numbers (with decimal points!)
-            $tok1 =~ s/[^\d.]+$//; $tok2 =~ s/[^\d.]+$//;   # remove trailing units
-            $tok1 =~ s/^\d+:\d+://; $tok2 =~ s/^\d+:\d+://; # remove HH:MM:
+            if ($tok1 =~ s/([^\d.]+)$//) {  # remove trailing units
+                my $a = $1;
+                last unless $tok2 =~ s/\Q$a\E$//;
+            }
+            if ($tok1 =~ s/^(\d+:\d+:)//) { # remove leading HH:MM:
+                my $a = $1;
+                last unless $tok2 =~ s/^\Q$a//;
+            }
+            if ($tok1 =~ s/^'//) {          # remove leading quote
+                last unless $tok2 =~ s/^'//;
+            }
             last unless Image::ExifTool::IsFloat($tok1) and
                         Image::ExifTool::IsFloat($tok2) and
                         $tok1 =~ /\./ and $tok2 =~ /\./;
@@ -192,12 +201,11 @@ sub closeEnough($$)
                 my ($int1, $int2);
                 ($int1 = $tok1) =~ tr/0-9//dc;
                 ($int2 = $tok2) =~ tr/0-9//dc;
-                if (length($int1) != length($int2)) {
-                    if (length($int1) > length($int2)) {
-                        $int1 = substr($int1, 0, length($int2));
-                    } else {
-                        $int2 = substr($int2, 0, length($int1));
-                    }
+                my $dlen = length($int1) - length($int2);
+                if ($dlen > 0) {
+                    $int2 .= '0' x $dlen;
+                } elsif ($dlen < 0) {
+                    $int1 .= '0' x (-$dlen);
                 }
                 last if abs($int1-$int2) > 1.00001;
             }

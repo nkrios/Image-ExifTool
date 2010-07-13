@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::fr;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 %Image::ExifTool::Lang::fr::Translate = (
    'AEAperture' => 'Ouverture AE',
@@ -1261,7 +1261,7 @@ $VERSION = '1.14';
    'DeviceModelDesc' => 'Description du modèle d\'appareil',
    'DeviceSettingDescription' => 'Description des réglages du dispositif',
    'DialDirectionTvAv' => {
-      Description => 'Drehung Wählrad bei Tv/Av',
+      Description => 'Sens rotation molette Tv/Av',
       PrintConv => {
         'Normal' => 'Normale',
         'Reversed' => 'Sens inversé',
@@ -1340,7 +1340,7 @@ $VERSION = '1.14';
         'Burst' => 'Rafale',
         'Continuous' => 'Continu',
         'Continuous (Hi)' => 'Continu (ultrarapide)',
-        'Continuous shooting' => 'Prise de vues en continu',
+        'Continuous Shooting' => 'Prise de vues en continu',
         'Multiple Exposure' => 'Exposition multiple',
         'No Timer' => 'Pas de retardateur',
         'Off' => 'Désactivé',
@@ -1352,7 +1352,7 @@ $VERSION = '1.14';
         'Shutter Button' => 'Déclencheur',
         'Single Exposure' => 'Exposition unique',
         'Single-frame' => 'Vue par vue',
-        'Single-frame shooting' => 'Prise de vue unique',
+        'Single-frame Shooting' => 'Prise de vue unique',
       },
     },
    'DriveMode2' => {
@@ -2612,7 +2612,7 @@ $VERSION = '1.14';
         'Standard Light A' => 'Lumière standard A',
         'Standard Light B' => 'Lumière standard B',
         'Standard Light C' => 'Lumière standard C',
-        'Tungsten' => 'Tungstène (lumière incandescente)',
+        'Tungsten (Incandescent)' => 'Tungstène (lumière incandescente)',
         'Unknown' => 'Inconnue',
         'White Fluorescent' => 'Fluorescent blanc',
       },
@@ -4505,11 +4505,9 @@ $VERSION = '1.14';
         'Custom 2' => 'Personnalisée 2',
         'Custom 3' => 'Personnalisée 3',
         'Custom 4' => 'Personnalisée 4',
-        'Day White Fluorescent' => 'Fluorescente type blanc',
+        'Day White Fluorescent' => 'Fluorescent blanc jour',
         'Daylight' => 'Lumière du jour',
         'Daylight Fluorescent' => 'Fluorescente type jour',
-        'DaylightFluorescent' => 'Fluorescente type jour',
-        'DaywhiteFluorescent' => 'Fluorescent blanc jour',
         'Fluorescent' => 'Fluorescente',
         'Manual' => 'Manuelle',
         'Manual Temperature (Kelvin)' => 'Température de couleur (Kelvin)',
@@ -4518,7 +4516,6 @@ $VERSION = '1.14';
         'Unknown' => 'Inconnu',
         'User-Selected' => 'Sélectionnée par l\'utilisateur',
         'White Fluorescent' => 'Fluorescent blanc',
-        'WhiteFluorescent' => 'Fluorescent blanc',
       },
     },
    'WhiteBalanceAdj' => {
@@ -4539,12 +4536,12 @@ $VERSION = '1.14';
       PrintConv => {
         'Auto (Cloudy)' => 'Auto (nuageux)',
         'Auto (Daylight)' => 'Auto (lumière du jour)',
-        'Auto (DaylightFluorescent)' => 'Auto (fluo lum. jour)',
-        'Auto (DaywhiteFluorescent)' => 'Auto (fluo jour)',
+        'Auto (Daylight Fluorescent)' => 'Auto (fluo lum. jour)',
+        'Auto (Day White Fluorescent)' => 'Auto (fluo jour)',
         'Auto (Flash)' => 'Auto (flash)',
         'Auto (Shade)' => 'Auto (ombre)',
         'Auto (Tungsten)' => 'Auto (tungstène)',
-        'Auto (WhiteFluorescent)' => 'Auto (fluo blanc)',
+        'Auto (White Fluorescent)' => 'Auto (fluo blanc)',
         'Unknown' => 'Inconnu',
         'User-Selected' => 'Sélectionnée par l\'utilisateur',
       },
@@ -4554,15 +4551,15 @@ $VERSION = '1.14';
       PrintConv => {
         'Cloudy' => 'Temps nuageux',
         'Daylight' => 'Lumière du jour',
-        'DaylightFluorescent' => 'Fluorescente type jour',
-        'DaywhiteFluorescent' => 'Fluorescent blanc jour',
+        'Daylight Fluorescent' => 'Fluorescente type jour',
+        'Day White Fluorescent' => 'Fluorescent blanc jour',
         'Manual' => 'Manuelle',
         'Set Color Temperature 1' => 'Température de couleur définie 1',
         'Set Color Temperature 2' => 'Température de couleur définie 2',
         'Set Color Temperature 3' => 'Température de couleur définie 3',
         'Shade' => 'Ombre',
         'Tungsten' => 'Tungstène (lumière incandescente)',
-        'WhiteFluorescent' => 'Fluorescent blanc',
+        'White Fluorescent' => 'Fluorescent blanc',
       },
     },
    'WhiteLevel' => 'Niveau blanc',

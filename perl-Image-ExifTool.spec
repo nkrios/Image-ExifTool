@@ -1,6 +1,6 @@
 Summary: perl module for image data extraction
 Name: perl-Image-ExifTool
-Version: 8.15
+Version: 8.25
 Release: 1
 License: Artistic/GPL
 Group: Development/Libraries/Perl
@@ -14,55 +14,56 @@ for reading and writing meta information in image, audio and video files,
 including the maker note information of many digital cameras by various
 manufacturers such as Canon, Casio, FujiFilm, HP, JVC/Victor, Kodak, Leaf,
 Minolta/Konica-Minolta, Nikon, Olympus/Epson, Panasonic/Leica, Pentax/Asahi,
-Ricoh, Sanyo, Sigma/Foveon and Sony.
+Ricoh, Samsung, Sanyo, Sigma/Foveon and Sony.
 
 Below is a list of file types and meta information formats currently
 supported by ExifTool (r = read, w = write, c = create):
 
   File Types
   ------------+-------------+-------------+-------------+------------
-  3FR   r     | DOC   r     | K25   r     | PAGES r     | RWZ   r
-  3G2   r     | DOCX  r     | KDC   r     | PBM   r/w   | RM    r
-  3GP   r     | DVB   r     | KEY   r     | PDF   r/w   | SO    r
-  ACR   r     | DYLIB r     | LNK   r     | PEF   r/w   | SR2   r/w
-  AFM   r     | EIP   r     | M2TS  r     | PFA   r     | SRF   r
-  AI    r/w   | EPS   r/w   | M4A/V r     | PFB   r     | SRW   r/w
-  AIFF  r     | ERF   r/w   | MEF   r/w   | PFM   r     | SVG   r
-  APE   r     | EXE   r     | MIE   r/w/c | PGM   r/w   | SWF   r
-  ARW   r/w   | EXIF  r/w/c | MIFF  r     | PICT  r     | THM   r/w
-  ASF   r     | F4A/V r     | MNG   r/w   | PNG   r/w   | TIFF  r/w
-  AVI   r     | FLA   r     | MOS   r/w   | PPM   r/w   | TTC   r
-  BMP   r     | FLAC  r     | MOV   r     | PPT   r     | TTF   r
-  BTF   r     | FLV   r     | MP3   r     | PPTX  r     | VRD   r/w/c
-  COS   r     | FPX   r     | MP4   r     | PS    r/w   | WAV   r
-  CR2   r/w   | GIF   r/w   | MPC   r     | PSB   r/w   | WDP   r/w
-  CRW   r/w   | GZ    r     | MPG   r     | PSD   r/w   | WMA   r
-  CS1   r/w   | HDP   r/w   | MPO   r/w   | PSP   r     | WMV   r
-  DCM   r     | HTML  r     | MQV   r     | QTIF  r     | X3F   r
-  DCP   r/w   | ICC   r/w/c | MRW   r/w   | RA    r     | XLS   r
-  DCR   r     | IIQ   r     | NEF   r/w   | RAF   r/w   | XLSX  r
-  DFONT r     | IND   r/w   | NRW   r/w   | RAM   r     | XMP   r/w/c
-  DIVX  r     | ITC   r     | NUMBERS r   | RAW   r/w   | ZIP   r
-  DJVU  r     | JNG   r/w   | OGG   r     | RIFF  r     |
-  DLL   r     | JP2   r/w   | ORF   r/w   | RW2   r/w   |
-  DNG   r/w   | JPEG  r/w   | OTF   r     | RWL   r/w   |
+  3FR   r     | DVB   r     | M2TS  r     | PAGES r     | RWL   r/w
+  3G2   r     | DYLIB r     | M4A/V r     | PBM   r/w   | RWZ   r
+  3GP   r     | EIP   r     | MEF   r/w   | PDF   r/w   | RM    r
+  ACR   r     | EPS   r/w   | MIE   r/w/c | PEF   r/w   | SO    r
+  AFM   r     | ERF   r/w   | MIFF  r     | PFA   r     | SR2   r/w
+  AI    r/w   | EXE   r     | MKA   r     | PFB   r     | SRF   r
+  AIFF  r     | EXIF  r/w/c | MKS   r     | PFM   r     | SRW   r/w
+  APE   r     | F4A/V r     | MKV   r     | PGM   r/w   | SVG   r
+  ARW   r/w   | FLA   r     | MNG   r/w   | PICT  r     | SWF   r
+  ASF   r     | FLAC  r     | MOS   r/w   | PMP   r     | THM   r/w
+  AVI   r     | FLV   r     | MOV   r     | PNG   r/w   | TIFF  r/w
+  BMP   r     | FPX   r     | MP3   r     | PPM   r/w   | TTC   r
+  BTF   r     | GIF   r/w   | MP4   r     | PPT   r     | TTF   r
+  COS   r     | GZ    r     | MPC   r     | PPTX  r     | VRD   r/w/c
+  CR2   r/w   | HDP   r/w   | MPG   r     | PS    r/w   | WAV   r
+  CRW   r/w   | HTML  r     | MPO   r/w   | PSB   r/w   | WDP   r/w
+  CS1   r/w   | ICC   r/w/c | MQV   r     | PSD   r/w   | WMA   r
+  DCM   r     | IIQ   r     | MRW   r/w   | PSP   r     | WMV   r
+  DCP   r/w   | IND   r/w   | NEF   r/w   | QTIF  r     | X3F   r
+  DCR   r     | ITC   r     | NRW   r/w   | RA    r     | XLS   r
+  DFONT r     | JNG   r/w   | NUMBERS r   | RAF   r/w   | XLSX  r
+  DIVX  r     | JP2   r/w   | ODP   r     | RAM   r     | XMP   r/w/c
+  DJVU  r     | JPEG  r/w   | ODS   r     | RAW   r/w   | ZIP   r
+  DLL   r     | K25   r     | ODT   r     | RIFF  r     |
+  DNG   r/w   | KDC   r     | OGG   r     | RSRC  r     |
+  DOC   r     | KEY   r     | ORF   r/w   | RTF   r     |
+  DOCX  r     | LNK   r     | OTF   r     | RW2   r/w   |
 
   Meta Information
   ----------------------+----------------------+---------------------
-  EXIF           r/w/c  |  JPEG 2000      r    |  APE            r
-  GPS            r/w/c  |  DICOM          r    |  Vorbis         r
-  IPTC           r/w/c  |  Flash          r    |  SPIFF          r
-  XMP            r/w/c  |  FlashPix       r    |  DjVu           r
-  MakerNotes     r/w/c  |  QuickTime      r    |  M2TS           r
-  Photoshop IRB  r/w/c  |  GeoTIFF        r    |  PE/COFF        r
-  ICC Profile    r/w/c  |  PrintIM        r    |  AVCHD          r
-  MIE            r/w/c  |  ID3            r    |  ZIP            r
-  JFIF           r/w/c  |  Kodak Meta     r    |  (and more)
-  Ducky APP12    r/w/c  |  Ricoh RMETA    r    |
-  PDF            r/w/c  |  Picture Info   r    |
-  CIFF           r/w    |  Adobe APP14    r    |
-  AFCP           r/w    |  MPF            r    |
-  PhotoMechanic  r/w    |  Stim           r    |
+  EXIF           r/w/c  |  Kodak Meta     r/w  |  Adobe APP14    r
+  GPS            r/w/c  |  PhotoMechanic  r/w  |  MPF            r
+  IPTC           r/w/c  |  JPEG 2000      r    |  Stim           r
+  XMP            r/w/c  |  DICOM          r    |  APE            r
+  MakerNotes     r/w/c  |  Flash          r    |  Vorbis         r
+  Photoshop IRB  r/w/c  |  FlashPix       r    |  SPIFF          r
+  ICC Profile    r/w/c  |  QuickTime      r    |  DjVu           r
+  MIE            r/w/c  |  Matroska       r    |  M2TS           r
+  JFIF           r/w/c  |  GeoTIFF        r    |  PE/COFF        r
+  Ducky APP12    r/w/c  |  PrintIM        r    |  AVCHD          r
+  PDF            r/w/c  |  ID3            r    |  ZIP            r
+  CIFF           r/w    |  Ricoh RMETA    r    |  (and more)
+  AFCP           r/w    |  Picture Info   r    |
 
 See html/index.html for more details about ExifTool features.
 

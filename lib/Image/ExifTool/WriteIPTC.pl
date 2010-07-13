@@ -191,7 +191,7 @@ sub FormatIPTC($$$$$;$)
 sub IptcDate($)
 {
     my $val = shift;
-    unless ($val =~ s/.*(\d{4}):?(\d{2}):?(\d{2}).*/$1$2$3/) {
+    unless ($val =~ s/.*(\d{4}):?(\d{2}):?(\d{2}).*/$1$2$3/s) {
         warn "Invalid date format (use YYYY:MM:DD)\n";
         undef $val;
     }
@@ -205,21 +205,32 @@ sub IptcDate($)
 sub IptcTime($)
 {
     my $val = shift;
-    if ($val =~ /\s*\b(\d{1,2})(:?)(\d{2})(:?)(\d{2})(\S*)\s*$/ and ($2 or not $4)) {
-        $val = sprintf("%.2d%.2d%.2d",$1,$3,$5);
-        my $tz = $6;
+    if ($val =~ /(.*?)\b(\d{1,2})(:?)(\d{2})(:?)(\d{2})(\S*)\s*$/s and ($3 or not $5)) {
+        $val = sprintf("%.2d%.2d%.2d",$2,$4,$6);
+        my ($date, $tz) = ($1, $7);
         if ($tz =~ /([+-]\d{1,2}):?(\d{2})/) {
             $tz = sprintf("%+.2d%.2d",$1,$2);
-        } elsif ($tz !~ /Z/i) {
-            # use local system timezone by default (note: it is difficult to use
-            # the proper local timezone for this date/time because the date tag
-            # is written separately so we don't know what the local timezone offset
-            # really should be for this date/time)
-            my $now = time;
-            my @tm = localtime($now);
-            ($tz = Image::ExifTool::TimeZoneString(\@tm, $now)) =~ tr/://d;
+        } elsif ($tz =~ /Z/i) {
+            $tz = '+0000';  # UTC
         } else {
-            $tz = '+0000';  # don't know the time zone
+            # use local system timezone by default 
+            my (@tm, $time);
+            if ($date and $date =~ /^(\d{4}):(\d{2}):(\d{2})\s*$/ and eval 'require Time::Local') {
+                # we were given a date too, so determine the local timezone
+                # offset at the specified date/time
+                my @d = ($3,$2-1,$1-1900);
+                $val =~ /(\d{2})(\d{2})(\d{2})/;
+                @tm = ($3,$2,$1,@d);
+                $time = Image::ExifTool::TimeLocal(@tm);
+            } else {
+                # it is difficult to get the proper local timezone offset for this
+                # time because the date tag is written separately.  (The offset may be
+                # different on a different date due to daylight savings time.)  In this
+                # case the best we can do easily is to use the current timezone offset.
+                $time = time;
+                @tm = localtime($time);
+            }
+            ($tz = Image::ExifTool::TimeZoneString(\@tm, $time)) =~ tr/://d;
         }
         $val .= $tz;
     } else {

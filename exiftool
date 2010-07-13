@@ -12,7 +12,7 @@
 use strict;
 require 5.004;
 
-my $version = '8.15';
+my $version = '8.25';
 
 # add our 'lib' directory to the include list BEFORE 'use Image::ExifTool'
 my $exeDir;
@@ -312,20 +312,21 @@ for (;;) {
     ++$pass;
   }
   $_ = shift;
-  if (s/^-//) {
+  if (s/^(-|\xe2\x88\x92)//) {  # allow funny dashes (nroff dash bug for cut-n-paste from pod)
+    s/^\xe2\x88\x92/-/;         # translate double-dash too
     my $a = lc $_;
     if (/^list(w|f|wf|d|g(\d*)|x)?$/i) {
         $pass or push(@nextPass,"-$_");
         my $type = lc($1 || '');
         if (not $type or $type eq 'w' or $type eq 'x') {
             my $group;
-            if ($ARGV[0] and $ARGV[0] =~ /^-(.+):(all|\*)$/i) {
+            if ($ARGV[0] and $ARGV[0] =~ /^(-|\xe2\x88\x92)(.+):(all|\*)$/i) {
                 if ($pass == 0) {
-                    $useMWG = 1 if lc($1) eq 'mwg';
+                    $useMWG = 1 if lc($2) eq 'mwg';
                     push(@nextPass, shift);
                     next;
                 }
-                $group = $1;
+                $group = $2;
                 shift;
                 $group =~ /IFD/i and Warn("Can't list tags for specific IFD\n"), next;
                 $group =~ /^(all|\*)$/ and undef $group;
@@ -410,7 +411,7 @@ for (;;) {
     /^b(inary)?$/i and $mainTool->Options(Binary => 1), $binaryOutput = 1,  next;
     /^c(oordFormat)?$/i and $mainTool->Options('CoordFormat', shift || Die "Expecting coordinate format for -c option\n"), next;
     if ($a eq 'charset') {
-        my $charset = (@ARGV and $ARGV[0] !~ /^-/) ? shift : undef;
+        my $charset = (@ARGV and $ARGV[0] !~ /^(-|\xe2\x88\x92)/) ? shift : undef;
         if (not $charset or $charset =~ /=$/) {
             $pass or push(@nextPass, '-charset'), next;
             my %charsets;
@@ -494,6 +495,7 @@ for (;;) {
     if (/^(g)(roupHeadings|roupNames)?([\d:]*)$/i) {
         $showGroup = $3 || 0;
         $allGroup = ($2 ? lc($2) eq 'roupnames' : $1 eq 'G');
+        $mainTool->Options(SavePath => 1) if $showGroup =~ /\b5\b/;
         next;
     }
     if ($a eq 'geotag') {
@@ -828,7 +830,8 @@ if (@newValues) {
         }
         $verbose and print qq{Argument "-$addGeotime" is assumed\n};
     }
-    my %addDelOpt = ( '+' => 'AddValue', '-' => 'DelValue' );   # add/delete option lookup
+    # add/delete option lookup
+    my %addDelOpt = ( '+' => 'AddValue', '-' => 'DelValue', "\xe2\x88\x92" => 'DelValue' );
     foreach (@newValues) {
         /(.*?)=(.*)/s or next;
         my ($tag, $newVal) = ($1, $2);
@@ -880,7 +883,7 @@ if (@newValues) {
             if (defined FilenameSPrintf($newVal)) {
                 SlurpFile($newVal, \$newVal) or next;
             } else {
-                $tag =~ s/([-+])$// and $opts{$addDelOpt{$1}} = 1;
+                $tag =~ s/([-+]|\xe2\x88\x92)$// and $opts{$addDelOpt{$1}} = 1;
                 # verify that this tag can be written
                 my $result = Image::ExifTool::IsWritable($tag);
                 if ($result) {
@@ -895,7 +898,7 @@ if (@newValues) {
                 next;
             }
         }
-        if ($tag =~ s/([-+])$//) {
+        if ($tag =~ s/([-+]|\xe2\x88\x92)$//) {
             $opts{$addDelOpt{$1}} = 1;  # set AddValue or DelValue option
             # set $newVal to '' if deleting nothing
             $newVal = '' if $1 eq '-' and not defined $newVal;
@@ -932,8 +935,10 @@ $multiFile = 1 if @files > 1;
 if ($binaryOutput) {
     $outFormat = 99;    # shortest possible output format
     $mainTool->Options(PrintConv => 0);
-    binmode(STDOUT);
-    $binaryStdout = 1;
+    unless ($outputExt) {
+        binmode(STDOUT);
+        $binaryStdout = 1;
+    }
     # disable conflicting options
     undef $showGroup;
     $html = 0;
@@ -1044,7 +1049,7 @@ if (($countDir or $totWr or $countFailed or $tot > 1 or $outputExt) and
     printf($o "%5d output files created\n", $countCreated) if $outputExt;
 }
 
-# set error status if we had any errors
+# set error status if we had any errors or if all files failed the "-if" condition
 $rtnVal = 1 if $countBadWr or $countBadCr or $countBad or ($countFailed and not $count);
 
 } # end "Command" loop
@@ -1772,6 +1777,8 @@ sub SetImageInfo($$)
                     Warn "Error setting file time - $file\n";
                 }
                 if ($isTemporary) {
+                    # preserve original file attributes if possible
+                    Image::ExifTool::CopyFileAttrs($file, $outfile);
                     # move original out of the way
                     my $original = "${file}_original";
                     if (not $overwriteOrig and not -e $original) {
@@ -2401,14 +2408,19 @@ exiftool - Read and write meta information in files
 
 =head1 SYNOPSIS
 
-B<exiftool> [I<OPTIONS>] [-I<TAG>...] [--I<TAG>...] I<FILE>...
+=over 4
 
-B<exiftool> [I<OPTIONS>] -I<TAG>[+-E<lt>]=[I<VALUE>]... I<FILE>...
+=item B<exiftool> [I<OPTIONS>] [-I<TAG>...] [--I<TAG>...] I<FILE>...
 
-B<exiftool> [I<OPTIONS>] B<-tagsFromFile> I<SRCFILE>
+=item B<exiftool> [I<OPTIONS>] -I<TAG>[+-E<lt>]=[I<VALUE>]... I<FILE>...
+
+=item B<exiftool> [I<OPTIONS>] B<-tagsFromFile> I<SRCFILE>
 [-I<SRCTAG>[E<gt>I<DSTTAG>]...] I<FILE>...
 
-B<exiftool> [ B<-ver> | B<-list>[B<w>|B<f>|B<wf>|B<g>[I<NUM>]|B<d>|B<x>] ]
+=item B<exiftool> [ B<-ver> |
+B<-list>[B<w>|B<f>|B<wf>|B<g>[I<NUM>]|B<d>|B<x>] ]
+
+=back
 
 For specific examples, see the L<EXAMPLES|/READING EXAMPLES> sections below.
 
@@ -2417,68 +2429,70 @@ For specific examples, see the L<EXAMPLES|/READING EXAMPLES> sections below.
 A command-line interface to L<Image::ExifTool|Image::ExifTool>, used for
 reading and writing meta information in image, audio and video files.
 I<FILE> is a source file name, directory name, or C<-> for the standard
-input.  Information is read from the source file and output in readable form
-to the console (or written to an output text file with the B<-w> option).
+input.  Multiple files may be processed with a single command.  Information
+is read from the source files and output in readable form to the console (or
+written to output text files with the B<-w> option).
 
 To write or copy information, new tag values are specified with the
--I<TAG>=[I<VALUE>] syntax or the B<-tagsFromFile> or B<-geotag> options. 
-This causes I<FILE> to be rewritten, and by default the original file is
-preserved with C<_original> appended to the file name.  (Be sure to verify
-that the new file is OK before erasing the original.)  Once in write mode,
-exiftool will ignore any read-specific options.
+-I<TAG>=[I<VALUE>] syntax or the B<-tagsFromFile> or B<-geotag> options.
+This causes each I<FILE> to be rewritten, and by default the original files
+are preserved with C<_original> appended to their names.  (Be sure to verify
+that the new files are OK before erasing the originals.)  Once in write
+mode, exiftool will ignore any read-specific options.
 
-Note:  If I<FILE> is a directory name, then only file types with recognized
-extensions are processed when reading, and only writable types are processed
-when any tag is written.  However, a filename may be specified or the
-B<-ext> option may be used to force processing of files with any extension.
+Note:  If I<FILE> is a directory name then only supported file types in the
+directory are processed, or only writable types are processed if any tag is
+written.  However, a filename may be specified or the B<-ext> option may be
+used to force processing of files with any extension.
 
 Below is a list of file types and meta information formats currently
 supported by ExifTool (r = read, w = write, c = create):
 
   File Types
   ------------+-------------+-------------+-------------+------------
-  3FR   r     | DOC   r     | K25   r     | PAGES r     | RWZ   r
-  3G2   r     | DOCX  r     | KDC   r     | PBM   r/w   | RM    r
-  3GP   r     | DVB   r     | KEY   r     | PDF   r/w   | SO    r
-  ACR   r     | DYLIB r     | LNK   r     | PEF   r/w   | SR2   r/w
-  AFM   r     | EIP   r     | M2TS  r     | PFA   r     | SRF   r
-  AI    r/w   | EPS   r/w   | M4A/V r     | PFB   r     | SRW   r/w
-  AIFF  r     | ERF   r/w   | MEF   r/w   | PFM   r     | SVG   r
-  APE   r     | EXE   r     | MIE   r/w/c | PGM   r/w   | SWF   r
-  ARW   r/w   | EXIF  r/w/c | MIFF  r     | PICT  r     | THM   r/w
-  ASF   r     | F4A/V r     | MNG   r/w   | PNG   r/w   | TIFF  r/w
-  AVI   r     | FLA   r     | MOS   r/w   | PPM   r/w   | TTC   r
-  BMP   r     | FLAC  r     | MOV   r     | PPT   r     | TTF   r
-  BTF   r     | FLV   r     | MP3   r     | PPTX  r     | VRD   r/w/c
-  COS   r     | FPX   r     | MP4   r     | PS    r/w   | WAV   r
-  CR2   r/w   | GIF   r/w   | MPC   r     | PSB   r/w   | WDP   r/w
-  CRW   r/w   | GZ    r     | MPG   r     | PSD   r/w   | WMA   r
-  CS1   r/w   | HDP   r/w   | MPO   r/w   | PSP   r     | WMV   r
-  DCM   r     | HTML  r     | MQV   r     | QTIF  r     | X3F   r
-  DCP   r/w   | ICC   r/w/c | MRW   r/w   | RA    r     | XLS   r
-  DCR   r     | IIQ   r     | NEF   r/w   | RAF   r/w   | XLSX  r
-  DFONT r     | IND   r/w   | NRW   r/w   | RAM   r     | XMP   r/w/c
-  DIVX  r     | ITC   r     | NUMBERS r   | RAW   r/w   | ZIP   r
-  DJVU  r     | JNG   r/w   | OGG   r     | RIFF  r     |
-  DLL   r     | JP2   r/w   | ORF   r/w   | RW2   r/w   |
-  DNG   r/w   | JPEG  r/w   | OTF   r     | RWL   r/w   |
+  3FR   r     | DVB   r     | M2TS  r     | PAGES r     | RWL   r/w
+  3G2   r     | DYLIB r     | M4A/V r     | PBM   r/w   | RWZ   r
+  3GP   r     | EIP   r     | MEF   r/w   | PDF   r/w   | RM    r
+  ACR   r     | EPS   r/w   | MIE   r/w/c | PEF   r/w   | SO    r
+  AFM   r     | ERF   r/w   | MIFF  r     | PFA   r     | SR2   r/w
+  AI    r/w   | EXE   r     | MKA   r     | PFB   r     | SRF   r
+  AIFF  r     | EXIF  r/w/c | MKS   r     | PFM   r     | SRW   r/w
+  APE   r     | F4A/V r     | MKV   r     | PGM   r/w   | SVG   r
+  ARW   r/w   | FLA   r     | MNG   r/w   | PICT  r     | SWF   r
+  ASF   r     | FLAC  r     | MOS   r/w   | PMP   r     | THM   r/w
+  AVI   r     | FLV   r     | MOV   r     | PNG   r/w   | TIFF  r/w
+  BMP   r     | FPX   r     | MP3   r     | PPM   r/w   | TTC   r
+  BTF   r     | GIF   r/w   | MP4   r     | PPT   r     | TTF   r
+  COS   r     | GZ    r     | MPC   r     | PPTX  r     | VRD   r/w/c
+  CR2   r/w   | HDP   r/w   | MPG   r     | PS    r/w   | WAV   r
+  CRW   r/w   | HTML  r     | MPO   r/w   | PSB   r/w   | WDP   r/w
+  CS1   r/w   | ICC   r/w/c | MQV   r     | PSD   r/w   | WMA   r
+  DCM   r     | IIQ   r     | MRW   r/w   | PSP   r     | WMV   r
+  DCP   r/w   | IND   r/w   | NEF   r/w   | QTIF  r     | X3F   r
+  DCR   r     | ITC   r     | NRW   r/w   | RA    r     | XLS   r
+  DFONT r     | JNG   r/w   | NUMBERS r   | RAF   r/w   | XLSX  r
+  DIVX  r     | JP2   r/w   | ODP   r     | RAM   r     | XMP   r/w/c
+  DJVU  r     | JPEG  r/w   | ODS   r     | RAW   r/w   | ZIP   r
+  DLL   r     | K25   r     | ODT   r     | RIFF  r     |
+  DNG   r/w   | KDC   r     | OGG   r     | RSRC  r     |
+  DOC   r     | KEY   r     | ORF   r/w   | RTF   r     |
+  DOCX  r     | LNK   r     | OTF   r     | RW2   r/w   |
 
   Meta Information
   ----------------------+----------------------+---------------------
-  EXIF           r/w/c  |  JPEG 2000      r    |  APE            r
-  GPS            r/w/c  |  DICOM          r    |  Vorbis         r
-  IPTC           r/w/c  |  Flash          r    |  SPIFF          r
-  XMP            r/w/c  |  FlashPix       r    |  DjVu           r
-  MakerNotes     r/w/c  |  QuickTime      r    |  M2TS           r
-  Photoshop IRB  r/w/c  |  GeoTIFF        r    |  PE/COFF        r
-  ICC Profile    r/w/c  |  PrintIM        r    |  AVCHD          r
-  MIE            r/w/c  |  ID3            r    |  ZIP            r
-  JFIF           r/w/c  |  Kodak Meta     r    |  (and more)
-  Ducky APP12    r/w/c  |  Ricoh RMETA    r    |
-  PDF            r/w/c  |  Picture Info   r    |
-  CIFF           r/w    |  Adobe APP14    r    |
-  AFCP           r/w    |  MPF            r    |
-  PhotoMechanic  r/w    |  Stim           r    |
+  EXIF           r/w/c  |  Kodak Meta     r/w  |  Adobe APP14    r
+  GPS            r/w/c  |  PhotoMechanic  r/w  |  MPF            r
+  IPTC           r/w/c  |  JPEG 2000      r    |  Stim           r
+  XMP            r/w/c  |  DICOM          r    |  APE            r
+  MakerNotes     r/w/c  |  Flash          r    |  Vorbis         r
+  Photoshop IRB  r/w/c  |  FlashPix       r    |  SPIFF          r
+  ICC Profile    r/w/c  |  QuickTime      r    |  DjVu           r
+  MIE            r/w/c  |  Matroska       r    |  M2TS           r
+  JFIF           r/w/c  |  GeoTIFF        r    |  PE/COFF        r
+  Ducky APP12    r/w/c  |  PrintIM        r    |  AVCHD          r
+  PDF            r/w/c  |  ID3            r    |  ZIP            r
+  CIFF           r/w    |  Ricoh RMETA    r    |  (and more)
+  AFCP           r/w    |  Picture Info   r    |
 
 =head1 OPTIONS
 
@@ -2548,7 +2562,7 @@ interpreted as a tag name.
   -use MODULE                      Add features from plug-in module
   -v[NUM]     (-verbose)           Print verbose messages
   -ver                             Print exiftool version number
-  -w EXT      (-textOut)           Write console output to file
+  -w EXT      (-textOut)           Write output text files
   -x TAG      (-exclude)           Exclude specified tag
   -X          (-xmlFormat)         Use RDF/XML output format
   -z          (-zip)               Read/write compressed information
@@ -2756,9 +2770,9 @@ B<-X>.  The inverse conversion is applied when writing tags.
 =item B<-ee> (B<-extractEmbedded>)
 
 Extract information from embedded documents in EPS and PDF files, embedded
-MPF images in JPEG and MPO files, streaming metadata from AVCHD videos, and
-the resource fork of Macintosh files.  Implies the B<-a> option.  Use B<-g3>
-or B<-G3> to identify the originating document for extracted information.
+MPF images in JPEG and MPO files, streaming metadata in AVCHD videos, and
+the resource fork of Mac OS files.  Implies the B<-a> option.  Use B<-g3> or
+B<-G3> to identify the originating document for extracted information.
 Embedded documents containing sub-documents are indicated with dashes in the
 family 3 group name.  (ie. C<Doc2-3> is the 3rd sub-document of the 2nd
 embedded document.)
@@ -2860,6 +2874,11 @@ the following command compensates for image times which are 1 minute and 20
 seconds behind GPS:
 
     exiftool -geosync=+1:20 -geotag a.log DIR
+
+C<Geosync> must be set before C<Geotime> (if specified) to be effective.
+Advanced C<Geosync> features allow a linear time drift correction and
+synchronization from previously geotagged images.  See "geotag.html" in the
+full ExifTool distribution for more information.
 
 Multiple B<-geotag> options may be used to concatinate GPS track log data.
 Also, a single B<-geotag> option may be used to load multiple track log
@@ -3074,7 +3093,7 @@ file was successfully written.
 Similar to B<-overwrite_original> except that an extra step is added to
 allow the original file attributes to be preserved.  For example, on a Mac
 this causes the original file creation date, ownership, permissions, type,
-creator, icon and resource fork to be preserved.  This is implemented by
+creator, label color and icon to be preserved.  This is implemented by
 opening the original file in update mode and replacing its data with a copy
 of a temporary file before deleting the temporary.  The extra step results
 in slower performance, so the B<-overwrite_original> option should be used
@@ -3154,8 +3173,9 @@ Also effective when combined with B<-t>, B<-h>, B<-X> or B<-listx> options.
 
 =item B<-S> (B<-veryShort>)
 
-Very short format.  The same as two B<-s> options.  Extra spaces used to
-column-align values are not printed.
+Very short format.  The same as two -s options.  Tag names are printed
+instead of descriptions, and no extra spaces are added to column-align
+values.
 
 =item B<-scanForXMP>
 
@@ -3778,8 +3798,9 @@ Translate IPTC information to XMP with appropriate tag name conversions, and
 delete the original IPTC information from an image.  This example uses
 iptc2xmp.args, which is a file included with the ExifTool distribution that
 contains the required arguments to convert IPTC information to XMP format.
-Also included with the distribution is xmp2iptc.args, which performs the
-inverse conversion.
+Also included with the distribution are xmp2iptc.args (which performs the
+inverse conversion) and a few more .args files for other conversions between
+EXIF, IPTC and XMP.
 
 =item exiftool -tagsfromfile %d%f.CRW -r -ext JPG dir
 
@@ -4006,11 +4027,6 @@ flexibility of ExifTool.)
 
 The exiftool application exits with a status of 0 on success, or 1 if an
 error occured or if all files failed the B<-if> condition.
-
-=head1 BUGS
-
-ExifTool does not handle information stored in the resource fork on
-Macintosh filesystems.
 
 =head1 AUTHOR
 

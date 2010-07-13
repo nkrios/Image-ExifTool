@@ -51,7 +51,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.26';
+$VERSION = '2.30';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
@@ -215,6 +215,7 @@ my %nikonLensIDs = (
     '80 48 1A 1A 24 24 85 06' => 'AF DX Fisheye-Nikkor 10.5mm f/2.8G ED',
     '81 54 80 80 18 18 86 0E' => 'AF-S VR Nikkor 200mm f/2G IF-ED',
     '82 48 8E 8E 24 24 87 0E' => 'AF-S VR Nikkor 300mm f/2.8G IF-ED',
+    '83 00 B0 B0 5A 5A 88 04' => 'FSA-L2, EDG 65, 800mm F13 G',
     '89 3C 53 80 30 3C 8B 06' => 'AF-S DX Zoom-Nikkor 55-200mm f/4-5.6G ED',
     '8A 54 6A 6A 24 24 8C 0E' => 'AF-S VR Micro-Nikkor 105mm f/2.8G IF-ED', #10
     '8B 40 2D 80 2C 3C 8D 0E' => 'AF-S DX VR Zoom-Nikkor 18-200mm f/3.5-5.6G IF-ED',
@@ -302,6 +303,8 @@ my %nikonLensIDs = (
     '26 48 2D 50 24 24 1C 06' => 'Sigma 18-50mm F2.8 EX DC',
     '7F 48 2D 50 24 24 1C 06' => 'Sigma 18-50mm F2.8 EX DC Macro', #25
     '7A 48 2D 50 24 24 4B 06' => 'Sigma 18-50mm F2.8 EX DC Macro',
+    'F6 48 2D 50 24 24 4B 06' => 'Sigma 18-50mm F2.8 EX DC Macro',
+    'A4 47 2D 50 24 34 4B 0E' => 'Sigma 18-50mm F2.8-4.5 DC OS HSM',
     '26 40 2D 50 2C 3C 1C 06' => 'Sigma 18-50mm F3.5-5.6 DC',
     '7A 40 2D 50 2C 3C 4B 06' => 'Sigma 18-50mm F3.5-5.6 DC HSM',
     '26 40 2D 70 2B 3C 1C 06' => 'Sigma 18-125mm F3.5-5.6 DC',
@@ -338,6 +341,7 @@ my %nikonLensIDs = (
     '7A 47 50 76 24 24 4B 06' => 'Sigma 50-150mm F2.8 EX APO DC HSM',
     'FD 47 50 76 24 24 4B 06' => 'Sigma 50-150mm F2.8 EX APO DC HSM II',
     '48 3C 50 A0 30 40 4B 02' => 'Sigma 50-500mm F4-6.3 EX APO RF HSM',
+    '9F 37 50 A0 34 40 4B 0E' => 'Sigma 50-500mm F4.5-6.3 DG OS HSM', #16
     '26 3C 54 80 30 3C 1C 06' => 'Sigma 55-200mm F4-5.6 DC',
     '7A 3B 53 80 30 3C 4B 06' => 'Sigma 55-200mm F4-5.6 DC HSM',
     '48 54 5C 80 24 24 4B 02' => 'Sigma 70-200mm F2.8 EX APO IF HSM',
@@ -360,6 +364,7 @@ my %nikonLensIDs = (
     '26 44 73 98 34 3C 1C 02' => 'Sigma 135-400mm F4.5-5.6 APO Aspherical',
     'CE 34 76 A0 38 40 4B 0E' => 'Sigma 150-500mm F5-6.3 DG OS APO HSM', #JD
     '26 40 7B A0 34 40 1C 02' => 'Sigma APO 170-500mm F5-6.3 Aspherical RF',
+    'A7 49 80 A0 24 24 4B 06' => 'Sigma APO 200-500mm F2.8 EX DG',
     '48 3C 8E B0 3C 3C 4B 02' => 'Sigma APO 300-800mm F5.6 EX DG HSM',
 #
     '00 47 25 25 24 24 00 02' => 'Tamron SP AF 14mm f/2.8 Aspherical (IF) (69E)',
@@ -430,7 +435,9 @@ my %nikonLensIDs = (
     '25 48 3C 5C 24 24 1B 02.2' => 'Tokina AT-X 287 AF PRO SV (AF 28-70mm f/2.8)',
     '07 48 3C 5C 24 24 03 00' => 'Tokina AT-X 287 AF (AF 28-70mm f/2.8)',
     '07 47 3C 5C 25 35 03 00' => 'Tokina AF 287 SD (AF 28-70mm f/2.8-4.5)',
+    '07 40 3C 5C 2C 35 03 00' => 'Tokina AF 270 II (AF 28-70mm f/3.5-4.5)',
     '00 48 3C 60 24 24 00 02' => 'Tokina AT-X 280 AF PRO (AF 28-80mm f/2.8)',
+    '25 44 44 8E 34 42 1B 02' => 'Tokina AF 353 (AF 35-300mm f/4.5-6.7)',
     '00 48 50 72 24 24 00 06' => 'Tokina AT-X 535 PRO DX (AF 50-135mm f/2.8)',
     '12 44 5E 8E 34 3C 09 00' => 'Tokina AF 730 (AF 75-300mm F4.5-5.6)',
     '14 54 60 80 24 24 0B 00' => 'Tokina AT-X 828 AF (AF 80-200mm f/2.8)',
@@ -449,6 +456,7 @@ my %nikonLensIDs = (
     '00 40 31 31 2C 2C 00 00' => 'Voigtlander Color Skopar 20mm F3.5 SLII Aspherical',
     '00 54 48 48 18 18 00 00' => 'Voigtlander Ultron 40mm F2 SLII Aspherical',
     '00 54 55 55 0C 0C 00 00' => 'Voigtlander Nokton 58mm F1.4 SLII',
+    '00 40 64 64 2C 2C 00 00' => 'Voigtlander APO-Lanthar 90mm F3.5 SLII Close Focus',
 #
     '00 40 2D 2D 2C 2C 00 00' => 'Carl Zeiss Distagon T* 3,5/18 ZF.2',
     '00 48 32 32 24 24 00 00' => 'Carl Zeiss Distagon T* 2,8/21 ZF.2',
@@ -611,11 +619,9 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     # FlashType observed values:
     #   internal: "Built-in,TTL", "Built-in,RPT", "Comdr.", "NEW_TTL"
     #   external: "Optional,TTL", "Optional,RPT", "Optional,M", "Comdr."
-    0x0009 => { #2
-        Name => 'FlashType',
-        Writable => 'string',
-        Count => 13,
-    },
+    #   both:     "Built-in,TTL&Comdr."
+    #   no flash: ""
+    0x0009 => { Name => 'FlashType',    Writable => 'string' }, #2 (count varies by model - PH)
     # 0x000a - rational values: 5.6 to 9.283 - found in coolpix models - PH
     #          (not correlated with any LV or scale factor)
     0x000b => { #2
@@ -637,8 +643,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             my $a = int($val*6 + ($val>0 ? 0.5 : -0.5));
             $a<-128 or $a>127 ? undef : pack("c4",$a,1,6,0);
         },
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x000e => {
         Name => 'ExposureDifference',
@@ -667,7 +673,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Start => '$val',
         },
     },
-    0x0012 => { #2
+    0x0012 => { #2 (camera setting: combination of command dial and menus - PH)
         Name => 'FlashExposureComp',
         Description => 'Flash Exposure Compensation',
         Writable => 'undef',
@@ -678,8 +684,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             my $a = int($val*6 + ($val>0 ? 0.5 : -0.5));
             $a<-128 or $a>127 ? undef : pack("c4",$a,1,6,0);
         },
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     # D70 - another ISO tag
     0x0013 => { #2
@@ -705,8 +711,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Count => 4,
     },
     0x0017 => { #28
-        Name => 'FlashExposureComp',
-        Description => 'Flash Exposure Compensation',
+        Name => 'ExternalFlashExposureComp', #PH (setting from external flash unit)
         Writable => 'undef',
         Count => 4,
         ValueConv => 'my ($a,$b,$c)=unpack("c3",$val); $c ? $a*($b/$c) : 0',
@@ -714,8 +719,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             my $a = int($val*6 + ($val>0 ? 0.5 : -0.5));
             $a<-128 or $a>127 ? undef : pack("c4",$a,1,6,0);
         },
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x0018 => { #5
         Name => 'FlashExposureBracketValue',
@@ -732,8 +737,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x0019 => { #5
         Name => 'ExposureBracketValue',
         Writable => 'rational64s',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x001a => { #PH
         Name => 'ImageProcessing',
@@ -759,8 +764,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             my $a = int($val*6 + ($val>0 ? 0.5 : -0.5));
             $a<-128 or $a>127 ? undef : pack("c3",$a,1,6);
         },
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-        PrintConvInv => 'eval $val',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x001d => { #4
         Name => 'SerialNumber',
@@ -868,12 +873,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Writable => 'rational64u',
         Count => 4,
         # short focal, long focal, aperture at short focal, aperture at long focal
-        PrintConv => q{
-            $val =~ tr/,/./;    # in case locale is whacky
-            my ($a,$b,$c,$d) = split ' ', $val;
-            ($a==$b ? $a : "$a-$b") . "mm f/" . ($c==$d ? $c : "$c-$d")
-        },
-        PrintConvInv => '$_=$val; tr/a-z\///d; s/(^|\s)([0-9.]+)(?=\s|$)/$1$2-$2/g; s/-/ /g; $_',
+        PrintConv => \&Image::ExifTool::Exif::PrintLensInfo,
+        PrintConvInv => \&Image::ExifTool::Exif::ConvertLensInfo,
     },
     0x0085 => {
         Name => 'ManualFocusDistance',
@@ -1326,11 +1327,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             SubDirectory => { TagTable => 'Image::ExifTool::Nikon::FlashInfoUnknown' },
         },
     ],
-    0x00a9 => { #2
-        Name => 'ImageOptimization',
-        Writable => 'string',
-        Count => 16,
-    },
+    0x00a9 => { Name => 'ImageOptimization',Writable => 'string' },#2
     0x00aa => { Name => 'Saturation',       Writable => 'string' }, #2
     0x00ab => { Name => 'VariProgram',      Writable => 'string' }, #2 (scene mode for DSLR's - PH)
     0x00ac => { Name => 'ImageStabilization',Writable=> 'string' }, #14
@@ -3462,6 +3459,7 @@ my %nikonFocalConversions = (
             0 => 'Fired', #28
             2 => 'Bounce Flash', #PH
             4 => 'Wide Flash Adapter',
+            5 => 'Dome Diffuser', #28
         }},
     },
     9.1 => {
@@ -3490,14 +3488,13 @@ my %nikonFocalConversions = (
             PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
         },
         {
-            Name => 'FlashExposureComp',
-            Description => 'Flash Exposure Compensation',
+            Name => 'FlashCompensation',
             Format => 'int8s',
             Priority => 0,
             ValueConv => '-$val/6',
             ValueConvInv => '-6 * $val',
-            PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-            PrintConvInv => 'eval $val',
+            PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+            PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         },
     ],
     11 => {
@@ -3547,7 +3544,7 @@ my %nikonFocalConversions = (
             PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
         },
         {
-            Name => 'FlashGroupAExposureComp',
+            Name => 'FlashGroupACompensation',
             Format => 'int8s',
             ValueConv => '-$val/6',
             ValueConvInv => '-6 * $val',
@@ -3565,7 +3562,7 @@ my %nikonFocalConversions = (
             PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
         },
         {
-            Name => 'FlashGroupBExposureComp',
+            Name => 'FlashGroupBCompensation',
             Format => 'int8s',
             ValueConv => '-$val/6',
             ValueConvInv => '-6 * $val',
@@ -3584,7 +3581,10 @@ my %nikonFocalConversions = (
     FIRST_ENTRY => 0,
     DATAMEMBER => [ 9.2, 16.1, 17.1, 17.2 ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    NOTES => 'These tags are used by the D3 (firmware 1.x), D40, D40X, D60 and D300.',
+    NOTES => q{
+        These tags are used by the D3 (firmware 1.x), D40, D40X, D60 and D300
+        (firmware 1.00).
+    },
     # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
     0 => {
         Name => 'FlashInfoVersion',
@@ -3612,6 +3612,7 @@ my %nikonFocalConversions = (
             0 => 'Fired', #28
             2 => 'Bounce Flash', #PH
             4 => 'Wide Flash Adapter',
+            5 => 'Dome Diffuser', #28
         }},
     },
     9.1 => {
@@ -3640,14 +3641,15 @@ my %nikonFocalConversions = (
             PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
         },
         {
-            Name => 'FlashExposureComp',
-            Description => 'Flash Exposure Compensation',
+            Name => 'FlashCompensation',
+            # this is the compensation from the camera (0x0012) for "Built-in" FlashType, or
+            # the compensation from the external unit (0x0017) for "Optional" FlashType - PH
             Format => 'int8s',
             Priority => 0,
             ValueConv => '-$val/6',
             ValueConvInv => '-6 * $val',
-            PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-            PrintConvInv => 'eval $val',
+            PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+            PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         },
     ],
     12 => {
@@ -3674,6 +3676,7 @@ my %nikonFocalConversions = (
     16.1 => {
         Name => 'FlashGroupAControlMode',
         Mask => 0x0f,
+        Notes => 'note: group A tags may apply to the built-in flash settings for some models',
         DataMember => 'FlashGroupAControlMode',
         RawConv => '$$self{FlashGroupAControlMode} = $val',
         PrintConv => \%flashControlMode,
@@ -3682,6 +3685,7 @@ my %nikonFocalConversions = (
     17.1 => {
         Name => 'FlashGroupBControlMode',
         Mask => 0xf0,
+        Notes => 'note: group B tags may apply to group A settings for some models',
         DataMember => 'FlashGroupBControlMode',
         RawConv => '$$self{FlashGroupBControlMode} = $val',
         ValueConv => '$val >> 4',
@@ -3692,6 +3696,7 @@ my %nikonFocalConversions = (
     17.2 => { #PH
         Name => 'FlashGroupCControlMode',
         Mask => 0x0f,
+        Notes => 'note: group C tags may apply to group B settings for some models',
         DataMember => 'FlashGroupCControlMode',
         RawConv => '$$self{FlashGroupCControlMode} = $val',
         PrintConv => \%flashControlMode,
@@ -3707,7 +3712,7 @@ my %nikonFocalConversions = (
             PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
         },
         {
-            Name => 'FlashGroupAExposureComp',
+            Name => 'FlashGroupACompensation',
             Format => 'int8s',
             ValueConv => '-$val/6',
             ValueConvInv => '-6 * $val',
@@ -3725,7 +3730,7 @@ my %nikonFocalConversions = (
             PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
         },
         {
-            Name => 'FlashGroupBExposureComp',
+            Name => 'FlashGroupBCompensation',
             Format => 'int8s',
             ValueConv => '-$val/6',
             ValueConvInv => '-6 * $val',
@@ -3743,7 +3748,7 @@ my %nikonFocalConversions = (
             PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
         },
         {
-            Name => 'FlashGroupCExposureComp',
+            Name => 'FlashGroupCCompensation',
             Format => 'int8s',
             ValueConv => '-$val/6',
             ValueConvInv => '-6 * $val',
@@ -3763,8 +3768,8 @@ my %nikonFocalConversions = (
     DATAMEMBER => [ 9.2, 17.1, 18.1, 18.2 ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
-        These tags are used by the D3 (firmware 2.x), D3X, D3S, D90, D300S, D700,
-        D3000 and D5000.
+        These tags are used by the D3 (firmware 2.x), D3X, D3S, D90, D300 (firmware
+        1.10), D300S, D700, D3000 and D5000.
     },
     # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
     0 => {
@@ -3793,6 +3798,7 @@ my %nikonFocalConversions = (
             0 => 'Fired', #28
             2 => 'Bounce Flash', #PH
             4 => 'Wide Flash Adapter',
+            5 => 'Dome Diffuser', #28
         }},
     },
     9.1 => {
@@ -3821,14 +3827,15 @@ my %nikonFocalConversions = (
             PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
         },
         {
-            Name => 'FlashExposureComp',
-            Description => 'Flash Exposure Compensation',
+            Name => 'FlashCompensation',
+            # this is the compensation from the camera (0x0012) for "Built-in" FlashType, or
+            # the compensation from the external unit (0x0017) for "Optional" FlashType - PH
             Format => 'int8s',
             Priority => 0,
             ValueConv => '-$val/6',
             ValueConvInv => '-6 * $val',
-            PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
-            PrintConvInv => 'eval $val',
+            PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+            PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
         },
     ],
     12 => { #JD
@@ -3869,6 +3876,7 @@ my %nikonFocalConversions = (
     17.1 => {
         Name => 'FlashGroupAControlMode',
         Mask => 0x0f,
+        Notes => 'note: group A tags may apply to the built-in flash settings for some models',
         DataMember => 'FlashGroupAControlMode',
         RawConv => '$$self{FlashGroupAControlMode} = $val',
         PrintConv => \%flashControlMode,
@@ -3877,6 +3885,7 @@ my %nikonFocalConversions = (
     18.1 => {
         Name => 'FlashGroupBControlMode',
         Mask => 0xf0,
+        Notes => 'note: group B tags may apply to group A settings for some models',
         DataMember => 'FlashGroupBControlMode',
         RawConv => '$$self{FlashGroupBControlMode} = $val',
         ValueConv => '$val >> 4',
@@ -3887,6 +3896,7 @@ my %nikonFocalConversions = (
     18.2 => { #PH
         Name => 'FlashGroupCControlMode',
         Mask => 0x0f,
+        Notes => 'note: group C tags may apply to group B settings for some models',
         DataMember => 'FlashGroupCControlMode',
         RawConv => '$$self{FlashGroupCControlMode} = $val',
         PrintConv => \%flashControlMode,
@@ -3902,7 +3912,7 @@ my %nikonFocalConversions = (
             PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
         },
         {
-            Name => 'FlashGroupAExposureComp',
+            Name => 'FlashGroupACompensation',
             Format => 'int8s',
             ValueConv => '-$val/6',
             ValueConvInv => '-6 * $val',
@@ -3920,7 +3930,7 @@ my %nikonFocalConversions = (
             PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
         },
         {
-            Name => 'FlashGroupBExposureComp',
+            Name => 'FlashGroupBCompensation',
             Format => 'int8s',
             ValueConv => '-$val/6',
             ValueConvInv => '-6 * $val',
@@ -3938,7 +3948,7 @@ my %nikonFocalConversions = (
             PrintConvInv => '$val=~/(\d+)/ ? $1/100 : 1',
         },
         {
-            Name => 'FlashGroupCExposureComp',
+            Name => 'FlashGroupCCompensation',
             Format => 'int8s',
             ValueConv => '-$val/6',
             ValueConvInv => '-6 * $val',
@@ -4026,7 +4036,7 @@ my %nikonFocalConversions = (
     0x32 => {
         Name => 'ExposureCompensation',
         Format => 'rational64s',
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
     0x44 => {
         Name => 'WhiteBalance',
@@ -4131,7 +4141,7 @@ my %nikonFocalConversions = (
         Name => 'ExposureCompensation',
         Format => 'rational64s',
         Groups => { 2 => 'Image' },
-        PrintConv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
     },
     0x0b => {
         Name => 'MaxApertureValue',
@@ -4268,7 +4278,7 @@ my %nikonFocalConversions = (
     },
     NCTH => { Name => 'ThumbnailImage', Format => 'undef', Binary => 1 },
     NCVW => { Name => 'PreviewImage',   Format => 'undef', Binary => 1 },
-    # NCDB - 0 bytes long
+    # NCDB - 0 bytes long, or 4 null bytes
 );
 
 # Nikon NCTG tags from MOV videos (ref PH)
@@ -4293,13 +4303,13 @@ my %nikonFocalConversions = (
         Groups => { 2 => 'Time' },
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    # 0x13 - int32u[2], val: "467 0"
+    # 0x13 - int32u[2], val: "467 0", "1038 0"
     # 0x14 - int32u[2], val: "0 0"
     # 0x15 - int32u[2], val: "0 0"
     0x16 => {
         Name => 'FrameRate',
         Groups => { 2 => 'Video' },
-        PrintConv => 'int($val * 100) / 100',
+        PrintConv => 'int($val * 1000 + 0.5) / 1000',
     },
     # 0x21 - int16u, val: 2
     0x22 => {

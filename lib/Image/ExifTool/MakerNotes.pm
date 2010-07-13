@@ -18,7 +18,7 @@ sub ProcessUnknownOrPreview($$$);
 sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.56';
+$VERSION = '1.58';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -183,7 +183,11 @@ my $debug;          # set to 1 to enabled debugging code
         # not much to key on here, but we know the
         # upper byte of the year should be 0x07:
         Name => 'MakerNoteKodak3',
-        Condition => '$$self{Make}=~/^EASTMAN KODAK/ and $$valPt=~/^.{12}\x07/s',
+        Condition => q{
+            $$self{Make} =~ /^EASTMAN KODAK/ and
+            $$valPt =~ /^(?!MM|II).{12}\x07/s and
+            $$valPt !~ /^(MM|II|AOC)/
+        },
         NotIFD => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type3',
@@ -192,7 +196,11 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteKodak4',
-        Condition => '$$self{Make}=~/^Eastman Kodak/ and $$valPt=~/^.{41}JPG/s',
+        Condition => q{
+            $$self{Make} =~ /^Eastman Kodak/ and
+            $$valPt =~ /^.{41}JPG/s and
+            $$valPt !~ /^(MM|II|AOC)/
+        },
         NotIFD => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type4',
@@ -589,19 +597,29 @@ my $debug;          # set to 1 to enabled debugging code
         },
     },
     {
-        Name => 'MakerNoteSamsung',
-        Condition => '$$valPt =~ /^STMN\d{3}/',
+        Name => 'MakerNoteSamsung1a',
+        # Samsung STMN maker notes WITHOUT PreviewImage
+        Condition => '$$valPt =~ /^STMN\d{3}.\0{4}/s',
         Binary => 1,
-        Notes => 'Samsung unknown maker notes',
+        Notes => 'Samsung "STMN" maker notes without PreviewImage',
+    },
+    {
+        Name => 'MakerNoteSamsung1b',
+        # Samsung STMN maker notes WITH PreviewImage
+        Condition => '$$valPt =~ /^STMN\d{3}/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Samsung::Type1',
+        },
     },
     {
         Name => 'MakerNoteSamsung2',
+        # Samsung EXIF-format maker notes
         Condition => q{
             $$self{Make} eq 'SAMSUNG' and ($$self{TIFF_TYPE} eq 'SRW' or
             $$valPt=~/^(\0.\0\x01\0\x07\0{3}\x04|.\0\x01\0\x07\0\x04\0{3})0100/s)
         },
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Samsung::Main',
+            TagTable => 'Image::ExifTool::Samsung::Type2',
             # Samsung is very inconsistent here, and uses absolute offsets for some
             # models and relative offsets for others, so process as Unknown
             ProcessProc => \&ProcessUnknown,

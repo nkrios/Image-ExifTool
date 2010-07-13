@@ -7,6 +7,7 @@
 #
 # References:   1) http://www.cybercom.net/~dcoffin/dcraw/
 #               2) http://www.chauveau-central.net/mrw-format/
+#               3) Igal Milchtaich private communication (A100)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::MinoltaRaw;
@@ -14,8 +15,9 @@ package Image::ExifTool::MinoltaRaw;
 use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
+use Image::ExifTool::Minolta;
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 sub ProcessMRW($$;$);
 sub WriteMRW($$;$);
@@ -171,46 +173,114 @@ sub WriteMRW($$;$);
     6 => {
         Name => 'ISOSetting',
         RawConv => '$val == 255 ? undef : $val',
-        ValueConv => '2 ** (($val-48)/8) * 100',
-        ValueConvInv => '48 + 8*log($val/100)/log(2)',
-        PrintConv => 'int($val + 0.5)',
-        PrintConvInv => '$val',
-    },
-    7 => {
-        Name => 'ColorMode',
-        PrintHex => 1,
-        Priority => 0, # (so Sony ColorMode takes priority in ARW images)
-        PrintConv => {
-            0 => 'Normal',
-            1 => 'Black & White',
-            2 => 'Vivid color',
-            3 => 'Solarization',
-            4 => 'Adobe RGB',
-            13 => 'Natural sRGB',
-            14 => 'Natural+ sRGB',
-            0x84 => 'Embed Adobe RGB',
-            # have seen these values in Sony ARW images: - PH
-            # 0x00 = Standard
-            # 0x07 = AdobeRGB
-            # 0x30 = Vivid, Standard (??)
-            # 0x38 = AdobeRGB, Vivid (??)
-            # 0x40 = Standard, AdobeRGB (??)
-            # 0x58 = Standard (??)
+        PrintConv => { #3
+            0 => 'Auto',
+            48 => 100,
+            56 => 200,
+            64 => 400,
+            72 => 800,
+            80 => 1600,
+            174 => '80 (Zone Matching Low)',
+            184 => '200 (Zone Matching High)',
+            OTHER => sub {
+                my ($val, $inv) = @_;
+                return int(2 ** (($val-48)/8) * 100 + 0.5) unless $inv;
+                return 48 + 8*log($val/100)/log(2) if Image::ExifTool::IsFloat($val);
+                return undef;
+            },
         },
+        #ValueConv => '2 ** (($val-48)/8) * 100',
+        #ValueConvInv => '48 + 8*log($val/100)/log(2)',
+        #PrintConv => 'int($val + 0.5)',
+        #PrintConvInv => '$val',
+    },
+    7 => [
+        {
+            Name => 'ColorMode',
+            Condition => '$$self{Make} !~ /^SONY/',
+            Priority => 0,
+            Writable => 'int32u',
+            PrintConv => \%Image::ExifTool::Minolta::minoltaColorMode,
+        },
+        { #3
+            Name => 'ColorMode',
+            Condition => '$$self{Model} eq "DSLR-A100"',
+            Writable => 'int32u',
+            Notes => 'Sony A100',
+            Priority => 0,
+            PrintHex => 1,
+            PrintConv => \%Image::ExifTool::Minolta::sonyColorMode,
+        },
+    ],
+    # NOTE: some of these WB_RBLevels may apply to other models too...
+    8  => { #3
+        Name => 'WB_RBLevelsTungsten',
+        Condition => '$$self{Model} eq "DSLR-A100"',
+        Format => 'int16u[2]',
+        Notes => 'these WB_RBLevels currently decoded only for the Sony A100',
+    },
+    12 => { #3
+        Name => 'WB_RBLevelsDaylight',
+        Condition => '$$self{Model} eq "DSLR-A100"',
+        Format => 'int16u[2]',
+    },
+    16 => { #3
+        Name => 'WB_RBLevelsCloudy',
+        Condition => '$$self{Model} eq "DSLR-A100"',
+        Format => 'int16u[2]',
+    },
+    20 => { #3
+        Name => 'WB_RBLevelsCoolWhiteF',
+        Condition => '$$self{Model} eq "DSLR-A100"',
+        Format => 'int16u[2]',
+    },
+    24 => { #3
+        Name => 'WB_RBLevelsFlash',
+        Condition => '$$self{Model} eq "DSLR-A100"',
+        Format => 'int16u[2]',
+    },
+    28 => { #3
+        Name => 'WB_RBLevelsUnknown',
+        Condition => '$$self{Model} eq "DSLR-A100"',
+        Format => 'int16u[2]',
+        Unknown => 1,
+    },
+    32 => { #3
+        Name => 'WB_RBLevelsShade',
+        Condition => '$$self{Model} eq "DSLR-A100"',
+        Format => 'int16u[2]',
+    },
+    36 => { #3
+        Name => 'WB_RBLevelsDaylightF',
+        Condition => '$$self{Model} eq "DSLR-A100"',
+        Format => 'int16u[2]',
+    },
+    40 => { #3
+        Name => 'WB_RBLevelsDayWhiteF',
+        Condition => '$$self{Model} eq "DSLR-A100"',
+        Format => 'int16u[2]',
+    },
+    44 => { #3
+        Name => 'WB_RBLevelsWhiteF',
+        Condition => '$$self{Model} eq "DSLR-A100"',
+        Format => 'int16u[2]',
     },
     56 => {
         Name => 'ColorFilter',
+        Condition => '$$self{Make} !~ /^SONY/',
         Format => 'int8s',
+        Notes => 'Minolta models',
     },
     57 => 'BWFilter',
     58 => {
         Name => 'ZoneMatching',
-        Priority => 0, # # (so Sony ZoneMatching takes priority in ARW images)
+        Condition => '$$self{Make} !~ /^SONY/',
+        Priority => 0,
+        Notes => 'Minolta models',
         PrintConv => {
             0 => 'ISO Setting Used',
             1 => 'High Key',
             2 => 'Low Key',
-            # have seen values of 214 (Sony A100) and 212 (all other Sony DSLR's) - PH
         },
     },
     59 => {
@@ -219,8 +289,49 @@ sub WriteMRW($$;$);
     },
     60 => {
         Name => 'ColorTemperature',
+        Condition => '$$self{Make} !~ /^SONY/',
+        Notes => 'Minolta models',
         ValueConv => '$val * 100',
         ValueConvInv => '$val / 100',
+    },
+    74 => { #3
+        Name => 'ZoneMatching',
+        Condition => '$$self{Make} =~ /^SONY/',
+        Priority => 0,
+        Notes => 'Sony models',
+        PrintConv => {
+            0 => 'ISO Setting Used',
+            1 => 'High Key',
+            2 => 'Low Key',
+        },
+    },
+    76 => { #3
+        Name => 'ColorTemperature',
+        Condition => '$$self{Make} =~ /^SONY/ and $$self{Model} eq "DSLR-A100"',
+        Notes => 'A100',
+        ValueConv => '$val * 100',
+        ValueConvInv => '$val / 100',
+        PrintConv => '$val ? $val : "Auto"',
+        PrintConvInv => '$val=~/Auto/i ? 0 : $val',
+    },
+    77 => { #3
+        Name => 'ColorFilter',
+        Condition => '$$self{Make} =~ /^SONY/ and $$self{Model} eq "DSLR-A100"',
+        Notes => 'A100',
+    },
+    78 => { #3
+        Name => 'ColorTemperature',
+        Condition => '$$self{Make} =~ /^SONY/ and $$self{Model} =~ /^DSLR-A(200|700)$/',
+        Notes => 'A200 and A700',
+        ValueConv => '$val * 100',
+        ValueConvInv => '$val / 100',
+        PrintConv => '$val ? $val : "Auto"',
+        PrintConvInv => '$val=~/Auto/i ? 0 : $val',
+    },
+    79 => { #3
+        Name => 'ColorFilter',
+        Condition => '$$self{Make} =~ /^SONY/ and $$self{Model} =~ /^DSLR-A(200|700)$/',
+        Notes => 'A200 and A700',
     },
 );
 

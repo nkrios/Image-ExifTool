@@ -14,7 +14,7 @@ package Image::ExifTool::NikonCustom;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 # custom settings for the D80 (encrypted) - ref JD
 %Image::ExifTool::NikonCustom::SettingsD80 = (
@@ -284,7 +284,7 @@ $VERSION = '1.02';
         ValueConv => '2 ** (($val >> 3) - 6)',
         ValueConvInv => '$val>0 ? int(log($val)/log(2)+6+0.5) << 3 : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     7.3 => { # CS25
         Name => 'AutoFP',
@@ -321,7 +321,7 @@ $VERSION = '1.02';
             return 'Full' if $val > 0.99;
             Image::ExifTool::Exif::PrintExposureTime($val);
         },
-        PrintConvInv => '$val=~/F/i ? 1 : eval $val',
+        PrintConvInv => '$val=~/F/i ? 1 : Image::ExifTool::Exif::ConvertFraction($val)',
     },
     9.1 => { # CS22-b
         Name => 'RepeatingFlashOutput',
@@ -329,7 +329,7 @@ $VERSION = '1.02';
         ValueConv => '2 ** (-($val>>4)-2)',
         ValueConvInv => '$val > 0 ? int(-log($val)/log(2)-2+0.5)<<4 : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     9.2 => { # CS22-c
         Name => 'RepeatingFlashCount',
@@ -397,7 +397,7 @@ $VERSION = '1.02';
             return 'Full' if $val > 0.99;
             Image::ExifTool::Exif::PrintExposureTime($val);
         },
-        PrintConvInv => '$val=~/F/i ? 1 : eval $val',
+        PrintConvInv => '$val=~/F/i ? 1 : Image::ExifTool::Exif::ConvertFraction($val)',
     },
     13.1 => { # CS22-i
         Name => 'CommanderGroupA_TTL-AAComp',
@@ -416,7 +416,7 @@ $VERSION = '1.02';
             return 'Full' if $val > 0.99;
             Image::ExifTool::Exif::PrintExposureTime($val);
         },
-        PrintConvInv => '$val=~/F/i ? 1 : eval $val',
+        PrintConvInv => '$val=~/F/i ? 1 : Image::ExifTool::Exif::ConvertFraction($val)',
     },
     14.1 => { # CS22-l
         Name => 'CommanderGroupB_TTL-AAComp',
@@ -435,7 +435,7 @@ $VERSION = '1.02';
             return 'Full' if $val > 0.99;
             Image::ExifTool::Exif::PrintExposureTime($val);
         },
-        PrintConvInv => '$val=~/F/i ? 1 : eval $val',
+        PrintConvInv => '$val=~/F/i ? 1 : Image::ExifTool::Exif::ConvertFraction($val)',
     },
     15.1 => { # CS3
         Name => 'CenterAFArea',
@@ -666,7 +666,7 @@ $VERSION = '1.02';
             return 'Full' if $val > 0.99;
             Image::ExifTool::Exif::PrintExposureTime($val);
         },
-        PrintConvInv => '$val=~/F/i ? 1 : eval $val',
+        PrintConvInv => '$val=~/F/i ? 1 : Image::ExifTool::Exif::ConvertFraction($val)',
     },
     9 => { # CS8
         Name => 'FlashLevel',
@@ -884,7 +884,7 @@ $VERSION = '1.02';
         ValueConv => '($val > 0x7 ? $val - 0x10 : $val) / 6',
         ValueConvInv => 'int($val*6+($val>0?0.5:-0.5)) & 0x0f',
         PrintConv => '$val ? sprintf("%+.2f", $val) : 0',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     9.1 => { # CSb4-b
         Name => 'FineTuneOptCenterWeighted',
@@ -892,7 +892,7 @@ $VERSION = '1.02';
         ValueConv => '($val > 0x70 ? $val - 0x100 : $val) / 0x60',
         ValueConvInv => '(int($val*6+($val>0?0.5:-0.5))<<4) & 0xf0',
         PrintConv => '$val ? sprintf("%+.2f", $val) : 0',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     9.2 => { # CSb4-c
         Name => 'FineTuneOptSpotMetering',
@@ -900,7 +900,7 @@ $VERSION = '1.02';
         ValueConv => '($val > 0x7 ? $val - 0x10 : $val) / 6',
         ValueConvInv => 'int($val*6+($val>0?0.5:-0.5)) & 0x0f',
         PrintConv => '$val ? sprintf("%+.2f", $val) : 0',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     11.1 => { # CSd6
         Name => 'CLModeShootingSpeed',
@@ -1111,7 +1111,7 @@ $VERSION = '1.02';
             return 'Full' if $val > 0.99;
             Image::ExifTool::Exif::PrintExposureTime($val);
         },
-        PrintConvInv => '$val=~/F/i ? 1 : eval $val',
+        PrintConvInv => '$val=~/F/i ? 1 : Image::ExifTool::Exif::ConvertFraction($val)',
     },
     25.1 => { # CSe2-ca
         Name => 'RepeatingFlashOutput',
@@ -1119,7 +1119,7 @@ $VERSION = '1.02';
         ValueConv => '2 ** (-($val>>4)-2)',
         ValueConvInv => '$val > 0 ? int(-log($val)/log(2)-2+0.5)<<4 : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     25.2 => { # CSe2-cb
         Name => 'RepeatingFlashCount',
@@ -1440,7 +1440,7 @@ $VERSION = '1.02';
         ValueConv => '($val > 0x7 ? $val - 0x10 : $val) / 6',
         ValueConvInv => 'int($val*6+($val>0?0.5:-0.5)) & 0x0f',
         PrintConv => '$val ? sprintf("%+.2f", $val) : 0',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     8.1 => { # CSb6-a
         Name => 'FineTuneOptMatrixMetering',
@@ -1448,7 +1448,7 @@ $VERSION = '1.02';
         ValueConv => '($val > 0x70 ? $val - 0x100 : $val) / 0x60',
         ValueConvInv => '(int($val*6+($val>0?0.5:-0.5))<<4) & 0xf0',
         PrintConv => '$val ? sprintf("%+.2f", $val) : 0',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     8.2 => { # CSb6-c
         Name => 'FineTuneOptSpotMetering',
@@ -1456,7 +1456,7 @@ $VERSION = '1.02';
         ValueConv => '($val > 0x7 ? $val - 0x10 : $val) / 6',
         ValueConvInv => 'int($val*6+($val>0?0.5:-0.5)) & 0x0f',
         PrintConv => '$val ? sprintf("%+.2f", $val) : 0',
-        PrintConvInv => 'eval $val',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     9.1 => { # CSf1-a, CSf2-a (D300S)
         Name => 'MultiSelectorShootMode',
@@ -2298,7 +2298,7 @@ $VERSION = '1.02';
             return 'Full' if $val > 0.99;
             Image::ExifTool::Exif::PrintExposureTime($val);
         },
-        PrintConvInv => '$val=~/F/i ? 1 : eval $val',
+        PrintConvInv => '$val=~/F/i ? 1 : Image::ExifTool::Exif::ConvertFraction($val)',
     },
     32.1 => { # CSa3
         Name => 'LiveViewAF',

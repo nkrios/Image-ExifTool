@@ -812,6 +812,8 @@ sub ProcessNikonCapture($$$)
 
 1;  # end
 
+__END__
+
 =head1 NAME
 
 Image::ExifTool::NikonCapture - Read/write Nikon Capture information

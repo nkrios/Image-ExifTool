@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.16';
+$VERSION = '1.20';
 
 sub SetGeoValues($$;$);
 
@@ -182,7 +182,7 @@ sub LoadTrackLog($$;$)
                         if ($tag) {
                             if ($tag eq 'coords') {
                                 # read KML "Point" coordinates
-                                @$fix{'lat','lon','alt'} = split ',', $1;
+                                @$fix{'lon','lat','alt'} = split ',', $1;
                             } else {
                                 $$fix{$tag} = $1;
                             }
@@ -501,7 +501,7 @@ sub ApplySyncCorr($$)
             my ($t0, $t1) = ($$syncTimes[$i0], $$syncTimes[$i1]);
             # interpolate/extrapolate to account for linear camera clock drift
             my $syncPoints = $$sync{Points};
-            my $f = ($time - $t0) / ($t1 - $t0);
+            my $f = $t1 == $t0 ? 0 : ($time - $t0) / ($t1 - $t0);
             $sync = $$syncPoints{$t1} * $f + $$syncPoints{$t0} * (1 - $f);
         } else {
             $sync = $$sync{Offset}; # use fixed time offset
@@ -642,7 +642,7 @@ sub SetGeoValues($$;$)
                     $fix = $$points{$tn};
                 }
             } else {
-                my $f = ($time - $t0) / ($t1 - $t0);
+                my $f = $t1 == $t0 ? 0 : ($time - $t0) / ($t1 - $t0);
                 my $p0 = $$points{$t0};
                 $fix = { };
                 # loop through latitude, longitude, and altitude if available
@@ -725,14 +725,15 @@ sub ConvertGeosync($$)
     my $sync = $exifTool->GetNewValues('Geosync') || { };
     my ($syncFile, $gpsTime, $imgTime);
 
-    if ($val =~ /(.*?)@(.*)/) {
+    if ($val =~ /(.*?)\@(.*)/) {
         $gpsTime = $1;
         if (-f $2) {
             $syncFile = $2;
         } else {
             $imgTime = $2;
         }
-    } else {
+    # (take care because "-f '1:30'" crashes ActivePerl 5.10)
+    } elsif ($val !~ /^\d/ or $val !~ /:/) {
         $syncFile = $val if -f $val;
     }
     if ($gpsTime or defined $syncFile) {

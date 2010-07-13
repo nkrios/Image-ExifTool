@@ -1097,7 +1097,7 @@ other XMP tags.  (see <a href="http://www.optimasc.com/products/fileid/">http://
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>PatientsBirthDate</td>
+<td>PatientBirthDate</td>
 <td class=c>date</td>
 <td><span class=s><span class=n>(called PatientDOB by the spec)</span></span></td></tr>
 <tr class=b>
@@ -1105,13 +1105,13 @@ other XMP tags.  (see <a href="http://www.optimasc.com/products/fileid/">http://
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>PatientsName</td>
+<td>PatientName</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(called PatientName by the spec)</span></span></td></tr>
+<td>&nbsp;</td></tr>
 <tr class=b>
-<td>PatientsSex</td>
+<td>PatientSex</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(called PatientSex by the spec)</span></span></td></tr>
+<td>&nbsp;</td></tr>
 <tr>
 <td>SeriesDateTime</td>
 <td class=c>date</td>
@@ -1199,8 +1199,7 @@ other XMP tags.  (see <a href="http://www.optimasc.com/products/fileid/">http://
 <td class=c>integer</td>
 <td><span class=s>1 = sRGB
   <br>2 = Adobe RGB
-  <br>65535 = Uncalibrated
-  <br>4294967295 = Uncalibrated</span></td></tr>
+  <br>65535 = Uncalibrated</span></td></tr>
 <tr>
 <td>ComponentsConfiguration</td>
 <td class=c title='+ = List'>integer+</td>
@@ -1850,7 +1849,7 @@ but ExifTool shortens this for the &quot;XMP-iptcExt&quot; family 1 group name.
 </table></td></tr></table></blockquote>
 
 <h2><a name='MediaPro'>XMP MediaPro Tags</a></h2>
-<p>IView MediaPro schema tags.</p>
+<p>iView MediaPro schema tags.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -1950,9 +1949,9 @@ values of 1,25,50,75 and 99 respectively)</span></span></td></tr>
 
 <h2><a name='pdf'>XMP pdf Tags</a></h2>
 <p>Adobe PDF schema tags.  The official XMP specification defines only
-Keywords, PDFVersion and Producer.  The other tags are included because they
-have been observed in PDF files, but some are avoided when writing due to
-name conflicts with other XMP namespaces.</p>
+Keywords, PDFVersion, Producer and Trapped.  The other tags are included
+because they have been observed in PDF files, but some are avoided when
+writing due to name conflicts with other XMP namespaces.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -2048,7 +2047,14 @@ created to enable writing of XMP-pdfx information.</p>
 <tr>
 <td>ColorMode</td>
 <td class=c>string</td>
-<td>&nbsp;</td></tr>
+<td><span class=s>0 = Bitmap
+  <br>1 = Grayscale
+  <br>2 = Indexed
+  <br>3 = RGB
+  <br>4 = CMYK
+  <br>7 = Multichannel
+  <br>8 = Duotone
+  <br>9 = Lab</span></td></tr>
 <tr class=b>
 <td>Country</td>
 <td class=c>string</td>
@@ -2062,46 +2068,58 @@ created to enable writing of XMP-pdfx information.</p>
 <td class=c>date</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>Headline</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>History</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>ICCProfileName</td>
-<td class=c>string</td>
-<td><span class=s><span class=n>(called ICCProfile by the spec)</span></span></td></tr>
-<tr class=b>
-<td>Instructions</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>LegacyIPTCDigest</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>SidecarForExtension</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>Source</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>State</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>SupplementalCategories</td>
+<td>DocumentAncestorID</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>TransmissionReference</td>
+<td>Headline</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>History</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>ICCProfileName</td>
+<td class=c>string</td>
+<td><span class=s><span class=n>(called ICCProfile by the spec)</span></span></td></tr>
+<tr>
+<td>Instructions</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>LegacyIPTCDigest</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>SidecarForExtension</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Source</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>State</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>SupplementalCategories</td>
+<td class=c title='+ = List'>string+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>TextLayerName</td>
+<td class=c title='+ = List'>string+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>TextLayerText</td>
+<td class=c title='+ = List'>string+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>TransmissionReference</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>Urgency</td>
 <td class=c>integer</td>
 <td><span class=s><span class=n>(should be in the range 1-8 to conform with the XMP spec)</span>
@@ -2836,9 +2854,7 @@ below.  (see <a href="http://ns.useplus.org/">http://ns.useplus.org/</a>)</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='pur'>XMP pur Tags</a></h2>
-<p>Prism Usage Rights 2.1 schema tags.  The actual namespace prefix is
-&quot;prismusagerights&quot;, but ExifTool shortens this for the &quot;XMP-pur&quot; family 1
-group name.  (see <a href="http://www.prismstandard.org/">http://www.prismstandard.org/</a>)</p>
+<p>Prism Usage Rights 2.1 schema tags.  (see <a href="http://www.prismstandard.org/">http://www.prismstandard.org/</a>)</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -3293,6 +3309,30 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>CameraAngle</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraLabel</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CameraModel</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraMove</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Client</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>DMComment</td>
+<td class=c>string</td>
+<td><span class=s><span class=n>(called comment by the spec)</span></span></td></tr>
+<tr>
 <td>Composer</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
@@ -3333,6 +3373,14 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 <td class=c title='/ = Avoided'>string/</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>Director</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>DirectorPhotography</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>DurationScale</td>
 <td class=c>rational</td>
 <td>&nbsp;</td></tr>
@@ -3353,92 +3401,100 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>Good</td>
+<td class=c>boolean</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>Instrument</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>IntroTimeScale</td>
 <td class=c>rational</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>IntroTimeValue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Key</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LogComment</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Loop</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>MarkersComment</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>MarkersCuePointParamsKey</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>MarkersCuePointParamsValue</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>MarkersCuePointType</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>MarkersDuration</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>MarkersLocation</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>MarkersName</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>MarkersProbability</td>
 <td class=c title='+ = List'>real+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>MarkersSpeaker</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>MarkersStartTime</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>MarkersTarget</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>MarkersType</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>MetadataModDate</td>
 <td class=c>date</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>NumberOfBeats</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>OutCueScale</td>
 <td class=c>rational</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>OutCueValue</td>
 <td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>ProjectName</td>
+<td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>ProjectRefPath</td>
@@ -3487,32 +3543,48 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 <td class=c>date</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>ShotDay</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>ShotLocation</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ShotName</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>ShotNumber</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
 <tr>
+<td>ShotSize</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>SpeakerPlacement</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>StartTimecodeTimeFormat</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>StartTimecodeTimeValue</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>StartTimecodeValue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>StretchMode</td>
 <td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>TakeNumber</td>
+<td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>TapeName</td>
@@ -3759,98 +3831,106 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 <td><span class=s>&#39;All&#39; = All
   <br>&#39;None&#39; = None</span></td></tr>
 <tr class=b>
+<td>DerivedFromOriginalDocumentID</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>DerivedFromPartMapping</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>DerivedFromRenditionClass</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>DerivedFromRenditionParams</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>DerivedFromToPart</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>DerivedFromVersionID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>DocumentID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HistoryAction</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HistoryChanged</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HistoryInstanceID</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HistoryParameters</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HistorySoftwareAgent</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HistoryWhen</td>
 <td class=c title='+ = List'>date+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>IngredientsAlternatePaths</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>IngredientsDocumentID</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>IngredientsFilePath</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>IngredientsFromPart</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>IngredientsInstanceID</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>IngredientsLastModifyDate</td>
 <td class=c title='+ = List'>date+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>IngredientsManager</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>IngredientsManagerVariant</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>IngredientsManageTo</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>IngredientsManageUI</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>IngredientsMaskMarkers</td>
 <td class=c title='+ = List'>string+</td>
 <td><span class=s>&#39;All&#39; = All
   <br>&#39;None&#39; = None</span></td></tr>
+<tr class=b>
+<td>IngredientsOriginalDocumentID</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
 <tr>
 <td>IngredientsPartMapping</td>
 <td class=c title='+ = List'>string+</td>
@@ -3925,98 +4005,106 @@ namespace prefixes are found, they are translated to the newer &quot;xmp&quot;,
 <td><span class=s>&#39;All&#39; = All
   <br>&#39;None&#39; = None</span></td></tr>
 <tr>
+<td>ManagedFromOriginalDocumentID</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>ManagedFromPartMapping</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ManagedFromRenditionClass</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ManagedFromRenditionParams</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ManagedFromToPart</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ManagedFromVersionID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Manager</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ManagerVariant</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>ManageTo</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ManageUI</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>OriginalDocumentID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>PreservedFileName</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RenditionClass</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RenditionOfAlternatePaths</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RenditionOfDocumentID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RenditionOfFilePath</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RenditionOfFromPart</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RenditionOfInstanceID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RenditionOfLastModifyDate</td>
 <td class=c>date</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RenditionOfManager</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RenditionOfManagerVariant</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RenditionOfManageTo</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RenditionOfManageUI</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RenditionOfMaskMarkers</td>
 <td class=c>string</td>
 <td><span class=s>&#39;All&#39; = All
   <br>&#39;None&#39; = None</span></td></tr>
+<tr>
+<td>RenditionOfOriginalDocumentID</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
 <td>RenditionOfPartMapping</td>
 <td class=c>string</td>
@@ -4298,7 +4386,7 @@ XMP module for convenience.  (see <a href="http://www.w3.org/TR/SVG11/">http://w
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 26, 2010</i>
+<br><i>Last revised Jun 24, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

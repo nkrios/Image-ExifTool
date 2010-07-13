@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.25
 [File, System, Image] FileName - File Name: MP3.mp3
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 395 bytes
@@ -20,10 +20,10 @@
 [ID3, ID3v2_2, Audio] TRK - Track: 1/5
 [ID3, ID3v2_2, Audio] TPA - Part Of Set: 1/2
 [ID3, ID3v2_2, Audio] ULT-eng - Lyrics (eng): Do-wap she-bang
-[ID3, ID3v2_2, Audio] PIC-1 - Picture Format: JPG
-[ID3, ID3v2_2, Audio] PIC-2 - Picture Type: Other
-[ID3, ID3v2_2, Audio] PIC-3 - Picture Description: comment
-[ID3, ID3v2_2, Audio] PIC - Picture: (Binary data 15 bytes)
+[ID3, ID3v2_2, Image] PIC-1 - Picture Format: JPG
+[ID3, ID3v2_2, Image] PIC-2 - Picture Type: Other
+[ID3, ID3v2_2, Image] PIC-3 - Picture Description: comment
+[ID3, ID3v2_2, Image] PIC - Picture: (Binary data 15 bytes)
 [ID3, ID3v2_2, Audio] TT2 - Title: ExifTool Test
 [ID3, ID3v2_2, Author] TP1 - Artist: Phil Harvey
 [ID3, ID3v2_2, Audio] TCM - Composer: A Composer

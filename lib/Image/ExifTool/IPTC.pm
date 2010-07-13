@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.36';
+$VERSION = '1.37';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -488,9 +488,9 @@ my %fileFormat = (
         Name => 'Caption-Abstract',
         Format => 'string[0,2000]',
     },
-    121 => { # (format not certain)
+    121 => {
         Name => 'LocalCaption',
-        Format => 'string[0,256]',
+        Format => 'string[0,256]', # (guess)
         Notes => q{
             I haven't found a reference for the format of tags 121, 184-188 and
             225-232, so I have just make them writable as strings with
@@ -567,25 +567,25 @@ my %fileFormat = (
         Name => 'AudioOutcue',
         Format => 'string[0,64]',
     },
-    184 => { # (format not certain)
+    184 => {
         Name => 'JobID',
-        Format => 'string[0,64]',
+        Format => 'string[0,64]', # (guess)
     },
-    185 => { # (format not certain)
+    185 => {
         Name => 'MasterDocumentID',
-        Format => 'string[0,256]',
+        Format => 'string[0,256]', # (guess)
     },
-    186 => { # (format not certain)
+    186 => {
         Name => 'ShortDocumentID',
-        Format => 'string[0,64]',
+        Format => 'string[0,64]', # (guess)
     },
-    187 => { # (format not certain)
+    187 => {
         Name => 'UniqueDocumentID',
-        Format => 'string[0,128]',
+        Format => 'string[0,128]', # (guess)
     },
-    188 => { # (format not certain)
+    188 => {
         Name => 'OwnerID',
-        Format => 'string[0,128]',
+        Format => 'string[0,128]', # (guess)
     },
     200 => {
         Name => 'ObjectPreviewFileFormat',
@@ -620,25 +620,31 @@ my %fileFormat = (
             return $val;
         },
     },
-    225 => { # (format not certain)
+    225 => {
         Name => 'ClassifyState',
-        Format => 'string[0,64]',
+        Format => 'string[0,64]', # (guess)
     },
-    228 => { # (format not certain)
+    228 => {
         Name => 'SimilarityIndex',
-        Format => 'string[0,32]',
+        Format => 'string[0,32]', # (guess)
     },
-    230 => { # (format not certain)
+    230 => {
         Name => 'DocumentNotes',
-        Format => 'string[0,1024]',
+        Format => 'string[0,1024]', # (guess)
     },
-    231 => { # (format not certain)
+    231 => {
         Name => 'DocumentHistory',
-        Format => 'string[0,256]',
+        Format => 'string[0,256]', # (guess)
     },
-    232 => { # (format not certain)
+    232 => {
         Name => 'ExifCameraInfo',
-        Format => 'string[0,4096]',
+        Format => 'string[0,4096]', # (guess)
+    },
+    255 => { #PH
+        Name => 'CatalogSets',
+        List => 1,
+        Format => 'string[0,256]', # (guess)
+        Notes => 'written by iView MediaPro',
     },
 );
 

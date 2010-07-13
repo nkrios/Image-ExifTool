@@ -9,6 +9,7 @@
 #               2) http://www.getid3.org/
 #               3) http://dvd.sourceforge.net/dvdinfo/dvdmpeg.html
 #               4) http://ffmpeg.org/
+#               5) http://sourceforge.net/projects/mediainfo/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::MPEG;
@@ -17,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 %Image::ExifTool::MPEG::Audio = (
     GROUPS => { 2 => 'Audio' },
@@ -313,13 +314,65 @@ $VERSION = '1.11';
     #'Bit62'    => 'IntraQuantMatrixFlag',
 );
 
-%Image::ExifTool::MPEG::VBR = (
+%Image::ExifTool::MPEG::Xing = (
     GROUPS => { 2 => 'Audio' },
     VARS => { NO_ID => 1 },
-    NOTES => 'These tags are extracted for variable bitrate audio.',
+    NOTES => 'These tags are extracted from the Xing/Info frame.',
     1 => { Name => 'VBRFrames' },
     2 => { Name => 'VBRBytes' },
     3 => { Name => 'VBRScale' },
+    4 => { Name => 'Encoder' },
+    5 => { Name => 'LameVBRQuality' },
+    6 => { Name => 'LameQuality' },
+    7 => { # (for documentation only)
+        Name => 'LameHeader',
+        SubDirectory => { TagTable => 'Image::ExifTool::MPEG::Lame' },
+    },
+);
+
+# Lame header tags (ref 5)
+%Image::ExifTool::MPEG::Lame = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Audio' },
+    NOTES => 'Tags extracted from Lame 3.90 or later header.',
+    9 => {
+        Name => 'LameMethod',
+        Mask => 0x0f,
+        PrintConv => {
+            1 => 'CBR',
+            2 => 'ABR',
+            3 => 'VBR (old/rh)',
+            4 => 'VBR (new/mtrh)',
+            5 => 'VBR (old/rh)',
+            6 => 'VBR',
+            8 => 'CBR (2-pass)',
+            9 => 'ABR (2-pass)',
+        },
+    },
+    10 => {
+        Name => 'LameLowPassFilter',
+        ValueConv => '$val * 100',
+        PrintConv => '($val / 1000) . " kHz"',
+    },
+    # 19 - EncodingFlags
+    20 => {
+        Name => 'LameBitrate',
+        PrintConv => '"$val kbps"',
+    },
+    24 => {
+        Name => 'LameStereoMode',
+        Mask => 0x1c,
+        ValueConv => '$val >> 2',
+        PrintConv => {
+            0 => 'Mono',
+            1 => 'Stereo',
+            2 => 'Dual Channels',
+            3 => 'Joint Stereo',
+            4 => 'Forced Joint Stereo',
+            6 => 'Auto',
+            7 => 'Intensity Stereo',
+        },
+    },
 );
 
 # composite tags
@@ -353,6 +406,22 @@ $VERSION = '1.11';
             return (8 * ($val[0] - ($val[1]||0))) / (($prt[2]||0) + ($val[3]||0));
         },
         PrintConv => 'ConvertDuration($val) . " (approx)"',
+    },
+    AudioBitrate => {
+        Groups => { 2 => 'Audio' },
+        Notes => 'calculated for variable-bitrate MPEG audio',
+        Require => {
+            0 => 'MPEG:MPEGAudioVersion',
+            1 => 'MPEG:SampleRate',
+            2 => 'MPEG:VBRBytes',
+            3 => 'MPEG:VBRFrames',
+        },
+        ValueConv => q{
+            return undef unless $val[3];
+            my $mfs = $prt[1] / ($val[0] == 3 ? 144 : 72);
+            return $mfs * $val[2] / $val[3];
+        },
+        PrintConv => 'int($val + 0.5)',
     },
 );
 
@@ -429,17 +498,19 @@ sub ParseMPEGAudio($$)
         last if $pos + 8 > $len;
         my $buff = substr($$buffPt, $pos, 8);
         last unless $buff =~ /^(Xing|Info)/;
-        my $vbrTable = GetTagTable('Image::ExifTool::MPEG::VBR');
+        my $xingTable = GetTagTable('Image::ExifTool::MPEG::Xing');
+        my $vbrScale;
         my $flags = unpack('x4N', $buff);
+        my $isVBR = ($buff !~ /^Info/);     # Info frame is not VBR (ref 5)
         $pos += 8;
         if ($flags & 0x01) {    # VBRFrames
             last if $pos + 4 > $len;
-            $exifTool->HandleTag($vbrTable, 1, unpack("x${pos}N", $$buffPt));
+            $exifTool->HandleTag($xingTable, 1, unpack("x${pos}N", $$buffPt)) if $isVBR;
             $pos += 4;
         }
         if ($flags & 0x02) {    # VBRBytes
             last if $pos + 4 > $len;
-            $exifTool->HandleTag($vbrTable, 2, unpack("x${pos}N", $$buffPt));
+            $exifTool->HandleTag($xingTable, 2, unpack("x${pos}N", $$buffPt)) if $isVBR;
             $pos += 4;
         }
         if ($flags & 0x04) {    # VBR_TOC
@@ -449,10 +520,53 @@ sub ParseMPEGAudio($$)
         }
         if ($flags & 0x08) {    # VBRScale
             last if $pos + 4 > $len;
-            $exifTool->HandleTag($vbrTable, 3, unpack("x${pos}N", $$buffPt));
+            $vbrScale = unpack("x${pos}N", $$buffPt);
+            $exifTool->HandleTag($xingTable, 3, $vbrScale) if $isVBR;
             $pos += 4;
         }
-        last;
+        # process Lame header (ref 5)
+        if ($flags & 0x10) {    # Lame
+            last if $pos + 348 > $len;
+        } elsif ($pos + 4 <= $len) {
+            my $lib = substr($$buffPt, $pos, 4);
+            unless ($lib eq 'LAME' or $lib eq 'GOGO') {
+                # attempt to identify other encoders
+                my $n;
+                if (index($$buffPt, 'RCA mp3PRO Encoder') >= 0) {
+                    $lib = 'RCA mp3PRO';
+                } elsif (($n = index($$buffPt, 'THOMSON mp3PRO Encoder')) >= 0) {
+                    $lib = 'Thomson mp3PRO';
+                    $n += 22;
+                    $lib .= ' ' . substr($$buffPt, $n, 6) if length($$buffPt) - $n >= 6;
+                } elsif (index($$buffPt, 'MPGE') >= 0) {
+                    $lib = 'Gogo (<3.0)';
+                } else {
+                    last;
+                }
+                $exifTool->HandleTag($xingTable, 4, $lib);
+                last;
+            }
+        }
+        my $lameLen = $len - $pos;
+        last if $lameLen < 9;
+        my $enc = substr($$buffPt, $pos, 9);
+        if ($enc ge 'LAME3.90') {
+            $exifTool->HandleTag($xingTable, 4, $enc);
+            if ($vbrScale <= 100) {
+                $exifTool->HandleTag($xingTable, 5, int((100 - $vbrScale) / 10));
+                $exifTool->HandleTag($xingTable, 6, (100 - $vbrScale) % 10);
+            }
+            my %dirInfo = (
+                DataPt   => $buffPt,
+                DirStart => $pos,
+                DirLen   => length($$buffPt) - $pos,
+            );
+            my $subTablePtr = GetTagTable('Image::ExifTool::MPEG::Lame');
+            $exifTool->ProcessDirectory(\%dirInfo, $subTablePtr);
+        } else {
+            $exifTool->HandleTag($xingTable, 4, substr($$buffPt, $pos, 20));
+        }
+        last;   # (didn't want to loop anyway)
 	}
 
     return 1;
@@ -598,6 +712,8 @@ under the same terms as Perl itself.
 =item L<http://dvd.sourceforge.net/dvdinfo/dvdmpeg.html>
 
 =item L<http://ffmpeg.org/>
+
+=item L<http://sourceforge.net/projects/mediainfo/>
 
 =back
 

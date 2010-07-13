@@ -19,13 +19,12 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
 sub ProcessProperties($$$);
 sub ReadFPXValue($$$$$;$$);
-sub ConvertTimeSpan($);
 sub ProcessHyperlinks($$);
 sub ProcessContents($$$);
 
@@ -429,7 +428,7 @@ my %isMSOffice = (
         The Dictionary, CodePage and LocalIndicator tags are common to all FlashPix
         property tables, even though they are only listed in the SummaryInfo table.
     },
-    0x00 => { Name => 'Dictionary', Groups => { 2 => 'Other' }, Binary => 1 },
+    0x00 => { Name => 'Dictionary',     Groups => { 2 => 'Other' }, Binary => 1 },
     0x01 => {
         Name => 'CodePage',
         Groups => { 2 => 'Other' },
@@ -437,14 +436,14 @@ my %isMSOffice = (
     },
     0x02 => 'Title',
     0x03 => 'Subject',
-    0x04 => { Name => 'Author',     Groups => { 2 => 'Author' } },
+    0x04 => { Name => 'Author',         Groups => { 2 => 'Author' } },
     0x05 => 'Keywords',
     0x06 => 'Comments',
     0x07 => 'Template',
-    0x08 => { Name => 'LastSavedBy',Groups => { 2 => 'Author' } },
+    0x08 => { Name => 'LastModifiedBy', Groups => { 2 => 'Author' } },
     0x09 => 'RevisionNumber',
-    0x0a => { Name => 'TotalEditTime', PrintConv => \&ConvertTimeSpan },
-    0x0b => 'LastPrinted',
+    0x0a => { Name => 'TotalEditTime',  PrintConv => 'ConvertTimeSpan($val)' }, # (in sec)
+    0x0b => { Name => 'LastPrinted',    Groups => { 2 => 'Time' } },
     0x0c => {
         Name => 'CreateDate',
         Groups => { 2 => 'Time' },
@@ -455,12 +454,22 @@ my %isMSOffice = (
         Groups => { 2 => 'Time' },
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    0x0e => 'PageCount',
-    0x0f => 'WordCount',
-    0x10 => 'CharCount',
-    0x11 => { Name => 'ThumbnailClip', Binary => 1 },
+    0x0e => 'Pages',
+    0x0f => 'Words',
+    0x10 => 'Characters',
+    0x11 => { Name => 'ThumbnailClip',  Binary => 1 },
     0x12 => 'Software',
-    0x13 => 'Security',
+    0x13 => {
+        Name => 'Security',
+        # see http://msdn.microsoft.com/en-us/library/aa379255(VS.85).aspx
+        PrintConv => {
+            0 => 'None',
+            1 => 'Password protected',
+            2 => 'Read-only recommended',
+            4 => 'Read-only enforced',
+            8 => 'Locked for annotations',
+        },
+    },
     0x80000000 => { Name => 'LocaleIndicator', Groups => { 2 => 'Other' } },
 );
 
@@ -1009,27 +1018,6 @@ sub ProcessHyperlinks($$)
         $links[-1] .= '#' . $vals[$i+5] if length $vals[$i+5]; # add subaddress
     }
     return \@links;
-}
-
-#------------------------------------------------------------------------------
-# Print conversion for time span value
-# Inputs: 0) time in seconds
-# Returns: readable time
-sub ConvertTimeSpan($)
-{
-    my $val = shift;
-    if (Image::ExifTool::IsFloat($val) and $val != 0) {
-        if ($val < 60) {
-            $val = "$val seconds";
-        } elsif ($val < 3600) {
-            $val = sprintf("%.1f minutes", $val / 60);
-        } elsif ($val < 24 * 3600) {
-            $val = sprintf("%.1f hours", $val / 3600);
-        } else {
-            $val = sprintf("%.1f days", $val / (24 * 3600));
-        }
-    }
-    return $val;
 }
 
 #------------------------------------------------------------------------------

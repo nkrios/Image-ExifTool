@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessBitStream($$$);
 
@@ -31,6 +31,10 @@ sub ProcessBitStream($$$);
     4 => {
         Name => 'VorbisComment',
         SubDirectory => { TagTable => 'Image::ExifTool::Vorbis::Comments' },
+    },
+    6 => {
+        Name => 'Picture',
+        SubDirectory => { TagTable => 'Image::ExifTool::FLAC::Picture' },
     },
 );
 
@@ -52,6 +56,57 @@ sub ProcessBitStream($$$);
         ValueConv => '$val + 1',
     },
     'Bit108-143' => 'TotalSamples',
+);
+
+%Image::ExifTool::FLAC::Picture = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Image' },
+    FORMAT => 'int32u',
+    0 => {
+        Name => 'PictureType',
+        PrintConv => { # (Note: Duplicated in ID3, ASF and FLAC modules!)
+            0 => 'Other',
+            1 => '32x32 PNG Icon',
+            2 => 'Other Icon',
+            3 => 'Front Cover',
+            4 => 'Back Cover',
+            5 => 'Leaflet',
+            6 => 'Media',
+            7 => 'Lead Artist',
+            8 => 'Artist',
+            9 => 'Conductor',
+            10 => 'Band',
+            11 => 'Composer',
+            12 => 'Lyricist',
+            13 => 'Recording Studio or Location',
+            14 => 'Recording Session',
+            15 => 'Performance',
+            16 => 'Capture from Movie or Video',
+            17 => 'Bright(ly) Colored Fish',
+            18 => 'Illustration',
+            19 => 'Band Logo',
+            20 => 'Publisher Logo',
+        },
+    },
+    1 => {
+        Name => 'PictureMIMEType',
+        Format => 'var_pstr32',
+    },
+    2 => {
+        Name => 'PictureDescription',
+        Format => 'var_pstr32',
+        ValueConv => '$self->Decode($val, "UTF8")',
+    },
+    3 => 'PictureWidth',
+    4 => 'PictureHeight',
+    5 => 'PictureBitsPerPixel',
+    6 => 'PictureIndexedColors',
+    7 => 'PictureLength',
+    8 => {
+        Name => 'Picture',
+        Format => 'undef[$val{7}]',
+        Binary => 1,
+    },
 );
 
 # FLAC composite tags

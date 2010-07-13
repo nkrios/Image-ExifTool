@@ -54,6 +54,12 @@ use Image::ExifTool::XMP;
     },
     beatSpliceParamsRiseInTimeDurationScale => { Writable => 'rational' },
     beatSpliceParamsRiseInTimeDurationValue => { Writable => 'integer' },
+    cameraAngle         => { },
+    cameraLabel         => { },
+    cameraModel         => { },
+    cameraMove          => { },
+    client              => { },
+    comment             => { Name => 'DMComment' },
     composer        => { Groups => { 2 => 'Author' } },
     contributedMedia => {
         SubDirectory => { },
@@ -77,6 +83,8 @@ use Image::ExifTool::XMP;
     contributedMediaManaged      => { List => 1, Writable => 'boolean' },
     contributedMediaWebStatement => { List => 1 },
     copyright       => { Avoid => 1, Groups => { 2 => 'Author' } },
+    director            => { },
+    directorPhotography => { },
     duration        => {
         SubDirectory => { },
         Struct => 'Time',
@@ -86,6 +94,7 @@ use Image::ExifTool::XMP;
     engineer        => { },
     fileDataRate    => { Writable => 'rational' },
     genre           => { },
+    good                => { Writable => 'boolean' },
     instrument      => { },
     introTime => {
         SubDirectory => { },
@@ -126,6 +135,7 @@ use Image::ExifTool::XMP;
     },
     outCueScale         => { Writable => 'rational' },
     outCueValue         => { Writable => 'integer' },
+    projectName         => { },
     projectRef => {
         SubDirectory => { },
         Struct => 'ProjectLink',
@@ -149,8 +159,11 @@ use Image::ExifTool::XMP;
     scaleType           => { },
     scene               => { Avoid => 1 },
     shotDate            => { Groups => { 2 => 'Time' }, %dateTimeInfo },
+    shotDay             => { },
     shotLocation        => { },
     shotName            => { },
+    shotNumber          => { },
+    shotSize            => { },
     speakerPlacement    => { },
     startTimecode => {
         SubDirectory => { },
@@ -160,6 +173,7 @@ use Image::ExifTool::XMP;
     startTimecodeTimeValue  => { },
     startTimecodeValue      => { Writable => 'integer' },
     stretchMode     => { },
+    takeNumber      => { Writable => 'integer' },
     tapeName        => { },
     tempo           => { Writable => 'real' },
     timeScaleParams => {
@@ -188,9 +202,9 @@ use Image::ExifTool::XMP;
         Struct => 'CuePointParam',
         List => 1,
     },
-    TracksMarkersCuePointParamsKey      => { List => 1 },
-    TracksMarkersCuePointParamsValue    => { List => 1 },
-    TracksMarkersCuePointType           => { List => 1 },
+    TracksMarkersCuePointParamsKey  => { List => 1 },
+    TracksMarkersCuePointParamsValue=> { List => 1 },
+    TracksMarkersCuePointType       => { List => 1 },
     TracksMarkersDuration           => { List => 1 },
     TracksMarkersLocation           => { List => 1 },
     TracksMarkersName               => { List => 1 },
@@ -653,11 +667,9 @@ my %plusVocab = (
 %Image::ExifTool::XMP::pur = (
     %xmpTableDefaults,
     GROUPS => { 0 => 'XMP', 1 => 'XMP-pur', 2 => 'Document' },
-    NAMESPACE => 'prismusagerights',
+    NAMESPACE => 'pur',
     NOTES => q{
-        Prism Usage Rights 2.1 schema tags.  The actual namespace prefix is
-        "prismusagerights", but ExifTool shortens this for the "XMP-pur" family 1
-        group name.  (see L<http://www.prismstandard.org/>)
+        Prism Usage Rights 2.1 schema tags.  (see L<http://www.prismstandard.org/>)
     },
     adultContentWarning => { List => 'Bag' },
     agreement           => { List => 'Bag' },
@@ -683,11 +695,11 @@ my %plusVocab = (
     NAMESPACE => 'DICOM',
     NOTES => 'DICOM schema tags.',
     # change some tag names to correspond with DICOM tags
-    PatientName             => { Name => 'PatientsName' },
+    PatientName             => { },
     PatientID               => { },
-    PatientSex              => { Name => 'PatientsSex' },
+    PatientSex              => { },
     PatientDOB              => {
-        Name => 'PatientsBirthDate',
+        Name => 'PatientBirthDate',
         Groups => { 2 => 'Time' },
         %dateTimeInfo,
     },
@@ -809,12 +821,12 @@ my %plusVocab = (
     ffid        => { Name => 'FFID' },
 );
 
-# IView MediaPro schema properties (mediapro) (ref PH)
+# iView MediaPro schema properties (mediapro) (ref PH)
 %Image::ExifTool::XMP::MediaPro = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-mediapro', 2 => 'Image' },
     NAMESPACE => 'mediapro',
-    NOTES => 'IView MediaPro schema tags.',
+    NOTES => 'iView MediaPro schema tags.',
     Event       => { },
     Location    => {
         Avoid => 1,
