@@ -14,7 +14,7 @@ package Image::ExifTool::NikonCustom;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.06';
 
 # custom settings for the D80 (encrypted) - ref JD
 %Image::ExifTool::NikonCustom::SettingsD80 = (
@@ -408,7 +408,7 @@ $VERSION = '1.03';
         PrintConvInv => '$val',
     },
     13.2 => { # CS22-j
-        Name => 'CommanderGroupA_ManualOutput',
+        Name => 'CommanderGroupAManualOutput',
         Mask => 0xe0,
         ValueConv => '2 ** (-($val>>5))',
         ValueConvInv => '$val > 0 ? int(-log($val)/log(2)+0.5) << 5 : 0',
@@ -427,7 +427,7 @@ $VERSION = '1.03';
         PrintConvInv => '$val',
     },
     14.2 => { # CS22-m
-        Name => 'CommanderGroupB_ManualOutput',
+        Name => 'CommanderGroupBManualOutput',
         Mask => 0xe0,
         ValueConv => '2 ** (-($val>>5))',
         ValueConvInv => '$val > 0 ? int(-log($val)/log(2)+0.5) << 5 : 0',
@@ -712,7 +712,7 @@ $VERSION = '1.03';
     # CSe2 RepeatingFlashRate (needs verification)
     #      CommanderInternalFlash, CommanderGroupAMode, CommanderGroupBMode,
     #      CommanderChannel, CommanderInternalManualOutput,
-    #      CommanderGroupA_ManualOutput, CommanderGroupB_ManualOutput
+    #      CommanderGroupAManualOutput, CommanderGroupBManualOutput
     #      CommanderGroupA_TTL-AAComp, CommanderGroupB_TTL-AAComp,
     # CSe4 AutoBracketSet (some values need verification)
     # CSf2 OKButton ("Not Used" value needs verification)
@@ -1203,10 +1203,8 @@ $VERSION = '1.03';
     # these settings have been decoded using the D3 and D300, and
     # extrapolated to the other models, but these haven't yet been
     # verified, and the following custom settings are missing:
-    #   CSd4 (D300S), CSd7 (D3S) ScreenTips
     #   CSf1-d (D3X,D3S) MultiSelectorLiveView
     #   CSf1 (D300S) LightSwitch
-    #   CSf7 (D3S) BracketButton
     0.1 => { #1
         Name => 'CustomSettingsBank',
         Mask => 0x03,
@@ -1260,6 +1258,8 @@ $VERSION = '1.03';
     },
     1.5 => { # CSa4
         Name => 'FocusTrackingLockOn',
+        Condition => '$$self{Model} !~ /D3S\b/',
+        Notes => 'not D3S',
         Mask => 0x03,
         PrintConv => {
             0x00 => 'Long',
@@ -1371,6 +1371,53 @@ $VERSION = '1.03';
             0x60 => 'Same as FUNC Button',
         },
     },
+    4.1 => { # CSa4 (D3S)
+        Name => 'FocusTrackingLockOn',
+        Condition => '$$self{Model} =~ /D3S\b/',
+        Notes => 'D3S only',
+        Mask => 0x07,
+        PrintConv => {
+            0x00 => '5 (Long)',
+            0x01 => '4',
+            0x02 => '3 (Normal)',
+            0x03 => '2',
+            0x04 => '1 (Short)',
+            0x05 => 'Off',
+        },
+    },
+    4.2 => { # CSf7 (D3S)
+        Name => 'AssignBktButton',
+        Condition => '$$self{Model} =~ /D3S\b/',
+        Notes => 'D3S only',
+        Mask => 0x08,
+        PrintConv => {
+            0x00 => 'Auto Bracketing',
+            0x08 => 'Multiple Exposure',
+        },
+    },
+    4.3 => { # CSf1-c (D3S) (ref 1)
+        Name => 'MultiSelectorLiveView',
+        Condition => '$$self{Model} =~ /D3S\b/',
+        Notes => 'D3S only',
+        Mask => 0xc0,
+        PrintConv => {
+            0x00 => 'Reset',
+            0x40 => 'Zoom On/Off',
+            0x80 => 'Start Movie Recording',
+            0xc0 => 'Not Used',
+        },
+    },
+    4.4 => { # CSf1-c2 (D3S) (ref 1)
+        Name => 'InitialZoomLiveView',
+        Condition => '$$self{Model} =~ /D3S\b/',
+        Notes => 'D3S only',
+        Mask => 0x30,
+        PrintConv => {
+            0x00 => 'Low Magnification',
+            0x10 => 'Medium Magnification',
+            0x20 => 'High Magnification',
+        },
+    },
     6.1 => { # CSb1
         Name => 'ISOStepSize',
         Mask => 0xc0,
@@ -1469,6 +1516,8 @@ $VERSION = '1.03';
     },
     9.2 => { # CSf1-b, CSf2-b (D300S)
         Name => 'MultiSelectorPlaybackMode',
+        Condition => '$$self{Model} !~ /D3S\b/',
+        Notes => 'all models except D3S', # (not confirmed for D3X)
         Mask => 0x30,
         PrintConv => {
             0x00 => 'Thumbnail On/Off',
@@ -1477,7 +1526,7 @@ $VERSION = '1.03';
             0x30 => 'Choose Folder',
         },
     },
-    9.3 => [ # CSf1-c, CSf2-c (D300S)
+    9.3 => [ # CSf1-b2, CSf2-b2 (D300S)
         {
             Name => 'InitialZoomSetting',
             Condition => '$$self{Model} =~ /D3[SX]?\b/',
@@ -1599,6 +1648,15 @@ $VERSION = '1.03';
             0x03 => 'ZR6 (AA Ni-Mn)',
         },
     },
+    12.7 => { # CSd7 (D3S), CSd4, (D300S)
+        Name => 'ScreenTips',
+        Condition => '$$self{Model} =~ /(D3S|D300S)\b/',
+        Mask => 0x10,
+        PrintConv => {
+            0x00 => 'On',
+            0x10 => 'Off',
+        },
+    },
     13.1 => { # CSd1
         Name => 'Beep',
         Mask => 0xc0,
@@ -1632,12 +1690,23 @@ $VERSION = '1.03';
         Mask => 0x01,
         PrintConv => { 0x00 => 'On', 0x01 => 'Off' },
     },
+    13.5 => { # CSf1-b (D3S) (ref 1)
+        Name => 'MultiSelectorPlaybackMode',
+        Condition => '$$self{Model} =~ /D3S\b/',
+        Notes => 'D3S only',
+        Mask => 0x03,
+        PrintConv => {
+            0x00 => 'Thumbnail On/Off',
+            0x01 => 'View Histograms',
+            0x02 => 'Zoom On/Off',
+        },
+    },
     14.1 => [ # CSf5-a (ref 1), CSf6-a (D300S)
         {
             Name => 'PreviewButton',
             Condition => '$$self{Model} =~ /D3[SX]?\b/',
             Notes => 'D3',
-            Mask => 0x78,
+            Mask => 0xf8,
             PrintConv => {
                 0x00 => 'None',
                 0x08 => 'Preview',
@@ -1653,16 +1722,15 @@ $VERSION = '1.03';
                 0x58 => 'Center-weighted Metering',
                 0x60 => 'Spot Metering',
                 0x68 => 'Virtual Horizon',
-                # NOTE: the following for D3S/D3X not yet decoded - PH
-                # - Playback
-                # - My Menu Top
-                # - + NEF (RAW)
+                # 0x70 not used
+                0x78 => 'Playback',
+                0x80 => 'My Menu Top',
             },
         },
         { #PH
             Name => 'FuncButton',
             Notes => 'D300',
-            Mask => 0x78,
+            Mask => 0xf8,
             PrintConv => {
                 0x00 => 'None',
                 0x08 => 'Preview',
@@ -1672,15 +1740,15 @@ $VERSION = '1.03';
                 0x28 => 'AE Lock (reset on release)',
                 0x30 => 'AE Lock (hold)',
                 0x38 => 'AF Lock Only',
+                # 0x40 not used
                 0x48 => 'Flash Off',
                 0x50 => 'Bracketing Burst',
                 0x58 => 'Matrix Metering',
                 0x60 => 'Center-weighted Metering',
                 0x68 => 'Spot Metering',
-                # the following added in the D300S require decoding:
-                # - Playback
-                # - My Menu Top
-                # - + NEF (RAW)
+                0x70 => 'Playback', #PH (guess)
+                0x78 => 'My Menu Top', #PH (guess)
+                0x80 => '+ NEF (RAW)', #PH (guess)
             },
         },
     ],
@@ -1719,7 +1787,7 @@ $VERSION = '1.03';
             Name => 'FuncButton',
             Condition => '$$self{Model} =~ /D3[SX]?\b/',
             Notes => 'D3',
-            Mask => 0x78,
+            Mask => 0xf8,
             PrintConv => {
                 0x00 => 'None',
                 0x08 => 'Preview',
@@ -1735,16 +1803,15 @@ $VERSION = '1.03';
                 0x58 => 'Center-weighted Metering',
                 0x60 => 'Spot Metering',
                 0x68 => 'Virtual Horizon',
-                # NOTE: the following for D3S/D3X not yet decoded - PH
-                # - Playback
-                # - My Menu Top
-                # - + NEF (RAW)
+                # 0x70 not used
+                0x78 => 'Playback',
+                0x80 => 'My Menu Top',
             },
         },
         { #PH
             Name => 'PreviewButton',
             Notes => 'D300',
-            Mask => 0x78,
+            Mask => 0xf8,
             PrintConv => {
                 0x00 => 'None',
                 0x08 => 'Preview',
@@ -1754,15 +1821,15 @@ $VERSION = '1.03';
                 0x28 => 'AE Lock (reset on release)',
                 0x30 => 'AE Lock (hold)',
                 0x38 => 'AF Lock Only',
+                # 0x40 not used
                 0x48 => 'Flash Off',
                 0x50 => 'Bracketing Burst',
                 0x58 => 'Matrix Metering',
                 0x60 => 'Center-weighted Metering',
                 0x68 => 'Spot Metering',
-                # the following added in the D300S require decoding:
-                # - Playback
-                # - My Menu Top
-                # - + NEF (RAW)
+                0x70 => 'Playback', #PH (guess)
+                0x78 => 'My Menu Top', #PH (guess)
+                0x80 => '+ NEF (RAW)', #PH (guess)
             },
         },
     ],
@@ -1801,7 +1868,7 @@ $VERSION = '1.03';
             Name => 'AELockButton',
             Condition => '$$self{Model} =~ /D3[SX]?\b/',
             Notes => 'D3',
-            Mask => 0x78,
+            Mask => 0xf8,
             PrintConv => {
                 0x00 => 'None',
                 0x08 => 'Preview',
@@ -1818,16 +1885,14 @@ $VERSION = '1.03';
                 0x60 => 'Spot Metering',
                 0x68 => 'Virtual Horizon',
                 0x70 => 'AF On', # (AE-L/AF-L button only)
-                # NOTE: the following for D3S/D3X not yet decoded - PH
-                # - Playback
-                # - My Menu Top
-                # - + NEF (RAW)
+                0x78 => 'Playback',
+                0x80 => 'My Menu Top',
             },
         },
         { #PH
             Name => 'AELockButton',
             Notes => 'D300',
-            Mask => 0x78,
+            Mask => 0xf8,
             PrintConv => {
                 0x00 => 'None',
                 0x08 => 'Preview',
@@ -1837,16 +1902,15 @@ $VERSION = '1.03';
                 0x28 => 'AE Lock (reset on release)',
                 0x30 => 'AE Lock (hold)',
                 0x38 => 'AF Lock Only',
-                0x40 => 'AF On',
+                0x40 => 'AF On', # (AE-L/AF-L button only)
                 0x48 => 'Flash Off',
                 0x50 => 'Bracketing Burst',
                 0x58 => 'Matrix Metering',
                 0x60 => 'Center-weighted Metering',
                 0x68 => 'Spot Metering',
-                # the following added in the D300S require decoding:
-                # - Playback
-                # - My Menu Top
-                # - + NEF (RAW)
+                0x70 => 'Playback', #PH (guess)
+                0x78 => 'My Menu Top', #PH (guess)
+                0x80 => '+ NEF (RAW)', #PH (guess)
             },
         },
     ],

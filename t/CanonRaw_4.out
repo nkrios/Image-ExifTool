@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.24
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.35
 [File, System, Image] FileName - File Name: CanonRaw_4_failed.crw
 [File, System, Image] Directory - Directory: t
-[File, System, Image] FileSize - File Size: 6.1 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:06:21 15:12:31-04:00
+[File, System, Image] FileSize - File Size: 12 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:10:11 08:47:49-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: CRW
-[File, File, Image] MIMEType - MIME Type: image/x-raw
+[File, File, Image] MIMEType - MIME Type: image/x-canon-crw
 [MakerNotes, CanonRaw, Camera] 8197 - Raw Data: (Binary data 22 bytes)
 [MakerNotes, CanonRaw, Camera] 8199 - Jpg From Raw: (Binary data 16 bytes)
 [MakerNotes, CanonRaw, Image] 0 - File Format: CRW
@@ -32,7 +32,7 @@
 [MakerNotes, CanonRaw, Camera] 2064 - Owner Name: Phil Harvey
 [MakerNotes, CanonRaw, Camera] 0 - Make: Canon
 [MakerNotes, CanonRaw, Camera] 6 - Camera Model Name: Canon EOS DIGITAL REBEL
-[MakerNotes, CanonRaw, Camera] 6155 - Camera Body No.: 0000001234
+[MakerNotes, CanonRaw, Camera] 6155 - Serial Number: 0000001234
 [MakerNotes, CanonRaw, Camera] 4124 - Base ISO: 100
 [MakerNotes, CanonRaw, Camera] 2061 - ROM Operation Mode: CDN
 [MakerNotes, CanonRaw, Camera] 2059 - Canon Firmware Version: Firmware Version 1.1.1
@@ -62,7 +62,7 @@
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 4
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
-[MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
+[MakerNotes, Canon, Image] 28 - ND Filter: n/a
 [MakerNotes, Canon, Image] 29 - Self Timer 2: 0
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0
@@ -138,6 +138,53 @@
 [MakerNotes, CanonRaw, Image] 3 - Raw Jpg Width: 2048
 [MakerNotes, CanonRaw, Image] 4 - Raw Jpg Height: 1360
 [MakerNotes, CanonRaw, Camera] 6203 - Serial Number Format: Format 1
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.35
+[XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
+[XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
+[XMP, XMP-aux, Camera] SerialNumber - Serial Number: 1234
+[XMP, XMP-exif, Image] ApertureValue - Aperture Value: 14.0
+[XMP, XMP-exif, Image] ColorSpace - Color Space: sRGB
+[XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -
+[XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 9
+[XMP, XMP-exif, Camera] Contrast - Contrast: High
+[XMP, XMP-exif, Image] CustomRendered - Custom Rendered: Normal
+[XMP, XMP-exif, Time] DateTimeOriginal - Date/Time Original: 2003:12:04 06:46:52
+[XMP, XMP-exif, Image] ExifVersion - Exif Version: 0221
+[XMP, XMP-exif, Image] ExposureBiasValue - Exposure Compensation: 0
+[XMP, XMP-exif, Camera] ExposureMode - Exposure Mode: Manual
+[XMP, XMP-exif, Image] ExposureTime - Exposure Time: 4
+[XMP, XMP-exif, Image] FNumber - F Number: 14.0
+[XMP, XMP-exif, Image] FileSource - File Source: Digital Camera
+[XMP, XMP-exif, Image] FlashpixVersion - Flashpix Version: 0100
+[XMP, XMP-exif, Camera] FocalLength - Focal Length: 34.0 mm
+[XMP, XMP-exif, Camera] FocalPlaneResolutionUnit - Focal Plane Resolution Unit: inches
+[XMP, XMP-exif, Camera] FocalPlaneXResolution - Focal Plane X Resolution: 3443.94615384615
+[XMP, XMP-exif, Camera] FocalPlaneYResolution - Focal Plane Y Resolution: 3442.01680672269
+[XMP, XMP-exif, Image] ISOSpeedRatings - ISO: 100
+[XMP, XMP-exif, Camera] MaxApertureValue - Max Aperture Value: 4.5
+[XMP, XMP-exif, Camera] MeteringMode - Metering Mode: Center-weighted average
+[XMP, XMP-exif, Image] PixelXDimension - Exif Image Width: 160
+[XMP, XMP-exif, Image] PixelYDimension - Exif Image Height: 120
+[XMP, XMP-exif, Camera] Saturation - Saturation: High
+[XMP, XMP-exif, Camera] SceneCaptureType - Scene Capture Type: Standard
+[XMP, XMP-exif, Camera] SensingMethod - Sensing Method: One-chip color area
+[XMP, XMP-exif, Camera] Sharpness - Sharpness: Hard
+[XMP, XMP-exif, Image] ShutterSpeedValue - Shutter Speed Value: 1
+[XMP, XMP-exif, Image] UserComment - User Comment: 
+[XMP, XMP-exif, Camera] WhiteBalance - White Balance: Auto
+[XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8
+[XMP, XMP-tiff, Image] ImageLength - Image Height: 8
+[XMP, XMP-tiff, Image] ImageWidth - Image Width: 8
+[XMP, XMP-tiff, Camera] Make - Make: Canon
+[XMP, XMP-tiff, Camera] Model - Camera Model Name: Canon EOS DIGITAL REBEL
+[XMP, XMP-tiff, Image] Orientation - Orientation: Horizontal (normal)
+[XMP, XMP-tiff, Image] ResolutionUnit - Resolution Unit: inches
+[XMP, XMP-tiff, Image] XResolution - X Resolution: 180
+[XMP, XMP-tiff, Image] YCbCrPositioning - Y Cb Cr Positioning: Centered
+[XMP, XMP-tiff, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
+[XMP, XMP-tiff, Image] YResolution - Y Resolution: 180
+[XMP, XMP-xmp, Time] CreateDate - Create Date: 2003:12:04 06:46:52
+[XMP, XMP-xmp, Time] ModifyDate - Modify Date: 2003:12:04 06:46:52
 [Composite, Composite, Image] Aperture - Aperture: 14.3
 [Composite, Composite, Camera] DriveMode - Drive Mode: Continuous Shooting
 [Composite, Composite, Camera] ISO - ISO: 100

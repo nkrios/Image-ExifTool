@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.27
 [File, System, Image] FileName - File Name: Real.rm
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1915 bytes
@@ -6,8 +6,8 @@
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: RM
 [File, File, Image] MIMEType - MIME Type: audio/x-pn-realaudio
-[Real, Real-PROP, Video] 0 - Max Bit Rate: 32041
-[Real, Real-PROP, Video] 1 - Avg Bit Rate: 32041
+[Real, Real-PROP, Video] 0 - Max Bitrate: 32041
+[Real, Real-PROP, Video] 1 - Avg Bitrate: 32041
 [Real, Real-PROP, Video] 2 - Max Packet Size: 465
 [Real, Real-PROP, Video] 3 - Avg Packet Size: 465
 [Real, Real-PROP, Video] 4 - Num Packets: 16
@@ -16,8 +16,8 @@
 [Real, Real-PROP, Video] 9 - Num Streams: 2
 [Real, Real-PROP, Video] 10 - Flags: Allow Recording, Allow Download
 [Real, Real-MDPR, Video] 0 - Stream Number: 0
-[Real, Real-MDPR, Video] 1 - Stream Max Bit Rate: 32041
-[Real, Real-MDPR, Video] 2 - Stream Avg Bit Rate: 32041
+[Real, Real-MDPR, Video] 1 - Stream Max Bitrate: 32041
+[Real, Real-MDPR, Video] 2 - Stream Avg Bitrate: 32041
 [Real, Real-MDPR, Video] 3 - Stream Max Packet Size: 465
 [Real, Real-MDPR, Video] 4 - Stream Avg Packet Size: 465
 [Real, Real-MDPR, Video] 5 - Stream Start Time: 0
@@ -26,8 +26,8 @@
 [Real, Real-MDPR, Video] 9 - Stream Name: Audio Stream
 [Real, Real-MDPR, Video] 11 - Stream Mime Type: audio/x-pn-realaudio
 [Real, Real-MDPR2, Video] 0 - Stream Number: 1
-[Real, Real-MDPR2, Video] 1 - Stream Max Bit Rate: 0
-[Real, Real-MDPR2, Video] 2 - Stream Avg Bit Rate: 0
+[Real, Real-MDPR2, Video] 1 - Stream Max Bitrate: 0
+[Real, Real-MDPR2, Video] 2 - Stream Avg Bitrate: 0
 [Real, Real-MDPR2, Video] 3 - Stream Max Packet Size: 0
 [Real, Real-MDPR2, Video] 4 - Stream Avg Packet Size: 0
 [Real, Real-MDPR2, Video] 5 - Stream Start Time: 0

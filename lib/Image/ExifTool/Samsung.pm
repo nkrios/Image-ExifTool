@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub WriteSTMN($$$);
 sub ProcessINFO($$$);
@@ -183,6 +183,80 @@ sub ProcessINFO($$$);
     QLTY => 'Quality',
     # MDEL - value: 0
     # ASPT - value: 1, 2
+);
+
+# Samsung MP4 TAGS information (PH - from WP10 sample)
+# --> very similar to Sanyo MP4 information
+%Image::ExifTool::Samsung::MP4 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        This information is found in Samsung MP4 videos from models such as the
+        WP10.
+    },
+    0x00 => {
+        Name => 'Make',
+        Format => 'string[24]',
+        PrintConv => 'ucfirst(lc($val))',
+    },
+    0x18 => {
+        Name => 'Model',
+        Description => 'Camera Model Name',
+        Format => 'string[16]',
+    },
+    0x2e => { # (NC)
+        Name => 'ExposureTime',
+        Format => 'int32u',
+        ValueConv => '$val ? 10 / $val : 0',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x32 => {
+        Name => 'FNumber',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x3a => { # (NC)
+        Name => 'ExposureCompensation',
+        Format => 'rational64s',
+        PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
+    },
+    0x6a => {
+        Name => 'ISO',
+        Format => 'int32u',
+    },
+    0x7d => {
+        Name => 'Software',
+        Format => 'string[32]',
+        # (these tags are not at a constant offset for Sanyo videos,
+        #  so just to be safe use this to validate subsequent tags)
+        RawConv => q{
+            $val =~ /^SAMSUNG/ or return undef;
+            $$self{SamsungMP4} = 1;
+            return $val;
+        },
+    },
+    0xf8 => {
+        Name => 'ThumbnailWidth',
+        Condition => '$$self{SamsungMP4}',
+        Format => 'int32u',
+    },
+    0xfc => {
+        Name => 'ThumbnailHeight',
+        Condition => '$$self{SamsungMP4}',
+        Format => 'int32u',
+    },
+    0x100 => {
+        Name => 'ThumbnailLength',
+        Condition => '$$self{SamsungMP4}',
+        Format => 'int32u',
+    },
+    0x104 => {
+        Name => 'ThumbnailOffset',
+        Condition => '$$self{SamsungMP4}',
+        IsOffset => 1,
+        Format => 'int32u',
+        RawConv => '$val + 0xf4',
+    },
 );
 
 #------------------------------------------------------------------------------

@@ -16,10 +16,10 @@
 package Image::ExifTool::Font;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION %ttLang);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ProcessOTF($$);
 
@@ -77,8 +77,8 @@ my %ttCharset = (
 );
 
 # convert TrueType 'name' language code to ExifTool language code
-my %ttLang = (
-  # Macintosh language codes
+%ttLang = (
+  # Macintosh language codes (also used by QuickTime.pm)
   # oddities:
   #   49 - Cyrllic version    83 - Roman
   #   50 - Arabic version     84 - Arabic

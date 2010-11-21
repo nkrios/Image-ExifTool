@@ -14,7 +14,12 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
+
+# map for writing metadata to InDesign files (currently only write XMP)
+my %indMap = (
+    XMP => 'IND',
+);
 
 # GUID's used in InDesign files
 my $masterPageGUID    = "\x06\x06\xed\xf5\xd8\x1d\x46\xe5\xbd\x31\xef\xe7\xfe\x74\xb7\x1d";
@@ -73,6 +78,9 @@ sub ProcessIND($$)
         goto DONE;
     }
     if ($outfile) {
+        # make XMP the preferred group for writing
+        $exifTool->InitWriteDirs(\%indMap, 'XMP');
+
         Write($outfile, $buff, $buf2) or $err = 1, goto DONE;
         my $result = Image::ExifTool::CopyBlock($raf, $outfile, $pos - 8192);
         unless ($result) {

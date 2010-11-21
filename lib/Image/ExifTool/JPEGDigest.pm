@@ -1812,7 +1812,7 @@ my %PrintConv = ( #JD
     '558d017ce6d5b5282ce76727fe99b91e:221111' => 'Apple Aperture Quality 10',
     '0b52b82694040193aee10e8074cd7ad5:221111' => 'Apple Aperture Quality 11',
   # 'Independent JPEG Group library (used by many applications), Quality 100' => 'Apple Aperture Quality 12',
-    
+
     # Tested with Corel Paint Shop Pro PHOTO X2 (Win) - Different subsamplings possible
     '1c78c0daaa0bbfd4a1678b5569b0fa13' => 'Corel Paint Shop Pro PHOTO, Quality 1',
     '5ffdd2e918ec293efc79083703737290' => 'Corel Paint Shop Pro PHOTO, Quality 2',
@@ -2436,8 +2436,6 @@ my %PrintConv = ( #JD
     'f74b3853185743c111ccb13e6febdc21:211111' => 'Pentax Optio T20 (B)',
     'b6640d3879f9922708d23e6adb3d61c9:211111' => 'Pentax Optio V10, Best',
     '253467dc35dfbb32cb3d619fc635d689:211111' => 'Pentax Optio V20/W60, Best',
-    
-    
 
     # Sony
     '6bd350bf5df27ed1b5bf1d83fa9d021f:211111' => 'Sony DSLR-A700, Fine',

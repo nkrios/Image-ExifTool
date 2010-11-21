@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.24
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.39
 [File, System, Image] FileName - File Name: Canon1DmkIII.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 8.1 kB
@@ -107,11 +107,11 @@
 [MakerNotes, Canon, Image] 23 - Measured EV 2: 3.75
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS High-end
-[MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
+[MakerNotes, Canon, Image] 28 - ND Filter: n/a
 [MakerNotes, Canon, Image] 6 - Canon Image Type: Canon EOS-1D Mark III
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 5.3.1
 [MakerNotes, Canon, Camera] 9 - Owner Name: 
-[MakerNotes, Canon, Camera] 12 - Camera Body No.: 500292
+[MakerNotes, Canon, Camera] 12 - Serial Number: 500292
 [MakerNotes, Canon, Image] 3 - F Number: 5.7
 [MakerNotes, Canon, Image] 4 - Exposure Time: 1/128
 [MakerNotes, Canon, Image] 6 - ISO: 3200
@@ -130,6 +130,51 @@
 [MakerNotes, Canon, Image] 370 - File Index: 232
 [MakerNotes, Canon, Camera] 374 - Shutter Count: 1
 [MakerNotes, Canon, Image] 382 - Directory Index: 108
+[MakerNotes, Canon, Camera] 0 - Contrast Standard: 0
+[MakerNotes, Canon, Camera] 4 - Sharpness Standard: 3
+[MakerNotes, Canon, Camera] 8 - Saturation Standard: 0
+[MakerNotes, Canon, Camera] 12 - Color Tone Standard: 0
+[MakerNotes, Canon, Camera] 24 - Contrast Portrait: 0
+[MakerNotes, Canon, Camera] 28 - Sharpness Portrait: 2
+[MakerNotes, Canon, Camera] 32 - Saturation Portrait: 0
+[MakerNotes, Canon, Camera] 36 - Color Tone Portrait: 0
+[MakerNotes, Canon, Camera] 48 - Contrast Landscape: 0
+[MakerNotes, Canon, Camera] 52 - Sharpness Landscape: 4
+[MakerNotes, Canon, Camera] 56 - Saturation Landscape: 0
+[MakerNotes, Canon, Camera] 60 - Color Tone Landscape: 0
+[MakerNotes, Canon, Camera] 72 - Contrast Neutral: 0
+[MakerNotes, Canon, Camera] 76 - Sharpness Neutral: 0
+[MakerNotes, Canon, Camera] 80 - Saturation Neutral: 0
+[MakerNotes, Canon, Camera] 84 - Color Tone Neutral: 0
+[MakerNotes, Canon, Camera] 96 - Contrast Faithful: 0
+[MakerNotes, Canon, Camera] 100 - Sharpness Faithful: 0
+[MakerNotes, Canon, Camera] 104 - Saturation Faithful: 0
+[MakerNotes, Canon, Camera] 108 - Color Tone Faithful: 0
+[MakerNotes, Canon, Camera] 120 - Contrast Monochrome: 0
+[MakerNotes, Canon, Camera] 124 - Sharpness Monochrome: 3
+[MakerNotes, Canon, Camera] 136 - Filter Effect Monochrome: None
+[MakerNotes, Canon, Camera] 140 - Toning Effect Monochrome: None
+[MakerNotes, Canon, Camera] 144 - Contrast User Def 1: 0
+[MakerNotes, Canon, Camera] 148 - Sharpness User Def 1: 3
+[MakerNotes, Canon, Camera] 152 - Saturation User Def 1: 0
+[MakerNotes, Canon, Camera] 156 - Color Tone User Def 1: 0
+[MakerNotes, Canon, Camera] 160 - Filter Effect User Def 1: None
+[MakerNotes, Canon, Camera] 164 - Toning Effect User Def 1: None
+[MakerNotes, Canon, Camera] 168 - Contrast User Def 2: 0
+[MakerNotes, Canon, Camera] 172 - Sharpness User Def 2: 3
+[MakerNotes, Canon, Camera] 176 - Saturation User Def 2: 0
+[MakerNotes, Canon, Camera] 180 - Color Tone User Def 2: 0
+[MakerNotes, Canon, Camera] 184 - Filter Effect User Def 2: None
+[MakerNotes, Canon, Camera] 188 - Toning Effect User Def 2: None
+[MakerNotes, Canon, Camera] 192 - Contrast User Def 3: 0
+[MakerNotes, Canon, Camera] 196 - Sharpness User Def 3: 3
+[MakerNotes, Canon, Camera] 200 - Saturation User Def 3: 0
+[MakerNotes, Canon, Camera] 204 - Color Tone User Def 3: 0
+[MakerNotes, Canon, Camera] 208 - Filter Effect User Def 3: None
+[MakerNotes, Canon, Camera] 212 - Toning Effect User Def 3: None
+[MakerNotes, Canon, Camera] 216 - User Def 1 Picture Style: Standard
+[MakerNotes, Canon, Camera] 218 - User Def 2 Picture Style: Standard
+[MakerNotes, Canon, Camera] 220 - User Def 3 Picture Style: Standard
 [MakerNotes, Canon, Time] 1114 - Time Stamp 1: 2007:02:22 17:02:42
 [MakerNotes, Canon, Time] 1118 - Time Stamp: 1970:01:02 01:30:10
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS-1D Mark III
@@ -161,6 +206,10 @@
 [MakerNotes, Canon, Camera] 149 - Lens Model: EF16-35mm f/2.8L II USM
 [MakerNotes, Canon, Camera] 150 - Internal Serial Number: G002669
 [MakerNotes, Canon, Camera] 151 - Dust Removal Data: (Binary data 1024 bytes)
+[MakerNotes, Canon, Camera] 0 - Crop Left Margin: 0
+[MakerNotes, Canon, Camera] 1 - Crop Right Margin: 0
+[MakerNotes, Canon, Camera] 2 - Crop Top Margin: 0
+[MakerNotes, Canon, Camera] 3 - Crop Bottom Margin: 0
 [MakerNotes, CanonCustom, Camera] 257 - Exposure Level Increments: 1/3-stop set, 1/3-stop comp.
 [MakerNotes, CanonCustom, Camera] 258 - ISO Speed Increments: 1/3 Stop
 [MakerNotes, CanonCustom, Camera] 259 - ISO Speed Range: Disable; Max 3200; Min 100
@@ -218,6 +267,9 @@
 [MakerNotes, CanonCustom, Camera] 2062 - Add Aspect Ratio Info: Off
 [MakerNotes, CanonCustom, Camera] 2063 - Add Original Decision Data: Off
 [MakerNotes, CanonCustom, Camera] 2064 - Live View Exposure Simulation: Disable (LCD auto adjust)
+[MakerNotes, Canon, Camera] 0 - Aspect Ratio: 3:2
+[MakerNotes, Canon, Camera] 1 - Cropped Image Width: 3888
+[MakerNotes, Canon, Camera] 2 - Cropped Image Height: 2592
 [MakerNotes, Canon, Image] 1 - Tone Curve: Standard
 [MakerNotes, Canon, Image] 2 - Sharpness: 0
 [MakerNotes, Canon, Image] 3 - Sharpness Frequency: n/a
@@ -265,6 +317,7 @@
 [MakerNotes, Canon, Camera] 113 - WB RGGB Levels Flash: 2422 1024 1024 1295
 [MakerNotes, Canon, Camera] 117 - Color Temp Flash: 6777
 [MakerNotes, Canon, Camera] 640 - Raw Measured RGGB: 294111 455756 464315 279659
+[MakerNotes, Canon, Camera] 16400 - Custom Picture Style File Name: 
 [MakerNotes, Canon, Camera] 1 - AF Micro Adj Active: No
 [MakerNotes, Canon, Camera] 2 - AF Micro Adj Value: 0
 [Composite, Composite, Image] Aperture - Aperture: 5.6

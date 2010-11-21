@@ -4,7 +4,7 @@
 [EXIF, IFD0, Image] 282 - Risoluzione orizzontale immagine: 72
 [EXIF, IFD0, Image] 283 - Risoluzione verticale immagine: 72
 [EXIF, IFD0, Image] 296 - Unità di risoluzione in X e Y: Pollici
-[EXIF, IFD0, Image] 305 - Software: Digital Camera FinePix2400Zoom Ver1.70
+[EXIF, IFD0, Image] 305 - Software utilizzato: Digital Camera FinePix2400Zoom Ver1.70
 [EXIF, IFD0, Time] 306 - Data e ora di modifica del file: 2001:05:19 18:36:41
 [EXIF, IFD0, Image] 531 - Posizionamento Y e C: Affiancato
 [EXIF, IFD0, Author] 33432 - Titolare del copyright: 
@@ -28,12 +28,12 @@
 [EXIF, ExifIFD, Image] 40961 - Spazio colore: sRGB
 [EXIF, ExifIFD, Image] 40962 - Larghezza immagine: 1600
 [EXIF, ExifIFD, Image] 40963 - Altezza immagine: 1200
-[EXIF, InteropIFD, Image] 1 - Interoperability Index: R98: File base DCF (sRGB)
-[EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
+[EXIF, InteropIFD, Image] 1 - Identificazione interoperatività: R98: File base DCF (sRGB)
+[EXIF, InteropIFD, Image] 2 - Versione interoperatività: 0100
 [EXIF, ExifIFD, Camera] 41486 - Risoluzione X del piano focale: 3053
 [EXIF, ExifIFD, Camera] 41487 - Risoluzione Y del piano focale: 3053
 [EXIF, ExifIFD, Camera] 41488 - Unità risoluzione piano focale: cm
-[EXIF, ExifIFD, Camera] 41495 - Metodo di misurazione esposimetrica: One-chip color area
+[EXIF, ExifIFD, Camera] 41495 - Metodo di misurazione esposimetrica: Sensore area a colori a un chip
 [EXIF, ExifIFD, Image] 41728 - Origine file: Fotocamera Digitale
 [EXIF, ExifIFD, Image] 41729 - Tipo scena: Immagine fotografata direttamente
 [EXIF, IFD1, Image] 259 - Schema compressione: JPEG (vecchio stile)

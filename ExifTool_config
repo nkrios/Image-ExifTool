@@ -206,7 +206,7 @@ use Image::ExifTool::MIE;
 # in the logic to determine a lens model for the Composite:LensID tag
 @Image::ExifTool::UserDefined::Lenses = (
     'Sigma AF 10-20mm F4-5.6 EX DC',
-    'Tamron 35-90mm F4 AF',
+    'Tokina AF193-2 19-35mm f/3.5-4.5',
 );
 
 # Specify default ExifTool option values

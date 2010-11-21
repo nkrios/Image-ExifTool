@@ -540,7 +540,8 @@ sub CheckXMP($$$)
         # make sure the value is a valid floating point number
         unless (Image::ExifTool::IsFloat($$valPtr) or
             # allow 'inf' and 'undef' rational values
-            ($format eq 'rational' and ($$valPtr eq 'inf' or $$valPtr eq 'undef')))
+            ($format eq 'rational' and ($$valPtr eq 'inf' or
+             $$valPtr eq 'undef' or Image::ExifTool::IsRational($$valPtr))))
         {
             return 'Not a floating point number' 
         }
@@ -1016,13 +1017,14 @@ sub WriteXMP($$;$)
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access to autoload this package
     my $dataPt = $$dirInfo{DataPt};
-    my $dirStart = $$dirInfo{DirStart} || 0;
     my (%capture, %nsUsed, $xmpErr, $tagInfo, $about);
     my $changed = 0;
     my $xmpFile = (not $tagTablePtr);   # this is an XMP data file if no $tagTablePtr
-    # write XMP as preferred if this is an XMP, GIF or IND file
-    my $preferred = $xmpFile || ($$exifTool{FILE_TYPE} and $$exifTool{FILE_TYPE} =~ /^(GIF|IND)$/);
+    # prefer XMP over other metadata formats in some types of files
+    my $preferred = $xmpFile || ($$exifTool{PreferredGroup} and $$exifTool{PreferredGroup} eq 'XMP');
     my $verbose = $exifTool->Options('Verbose');
+    my $dirLen = $$dirInfo{DirLen};
+    $dirLen = length($$dataPt) if not defined $dirLen and $dataPt;
 #
 # extract existing XMP information into %capture hash
 #
@@ -1039,7 +1041,7 @@ sub WriteXMP($$;$)
     delete $exifTool->{XMP_IS_XML};
     delete $exifTool->{XMP_IS_SVG};
 
-    if ($xmpFile or ($dataPt and length $$dataPt)) {
+    if ($xmpFile or $dirLen) {
         delete $exifTool->{XMP_ERROR};
         delete $exifTool->{XMP_ABOUT};
         # extract all existing XMP information (to the XMP_CAPTURE hash)
@@ -1171,8 +1173,17 @@ sub WriteXMP($$;$)
         my $capList = $capture{$path};
         # MicrosoftPhoto screws up the case of some tags, so test for this
         unless ($capList) {
-            my ($path2) = grep /^\Q$path\E$/i, keys %capture;
-            $path2 and $capList = $capture{$path = $path2};
+            my $regex = quotemeta $path;
+            # also check for incorrect list types which can cause problems
+            $regex =~ s{\\/rdf\\:(Bag|Seq|Alt)\\/}{/rdf:(Bag|Seq|Alt)/}g;
+            my ($path2) = grep m{^$regex$}i, keys %capture;
+            if ($path2) {
+                my $tg = $exifTool->GetGroup($tagInfo, 1) . ':' . $$tagInfo{Name};
+                my $wrn = lc($path) eq lc($path2) ? 'tag ID case' : 'list type';
+                $exifTool->Warn("Incorrect $wrn for $tg", 1);
+                # use existing property path
+                $capList = $capture{$path = $path2};
+            }
         }
         my $nvHash = $exifTool->GetNewValueHash($tagInfo);
         my $overwrite = Image::ExifTool::IsOverwriting($nvHash);
@@ -1205,6 +1216,7 @@ sub WriteXMP($$;$)
                             my $newLang = lc($$tagInfo{LangCode} || 'x-default');
                             next unless $oldLang eq $newLang;
                             # only add new tag if we are overwriting this one
+                            # (note: this won't match if original XML contains CDATA!)
                             $addLang = Image::ExifTool::IsOverwriting($nvHash, UnescapeXML($val));
                             next unless $addLang;
                         }
@@ -1222,6 +1234,7 @@ sub WriteXMP($$;$)
                         }
                     } elsif ($overwrite < 0) {
                         # only overwrite specific values
+                        # (note: this won't match if original XML contains CDATA!)
                         next unless Image::ExifTool::IsOverwriting($nvHash, UnescapeXML($val));
                     }
                     if ($verbose > 1) {
@@ -1543,7 +1556,6 @@ sub WriteXMP($$;$)
         my $pad = (' ' x 100) . "\n";
         if ($$dirInfo{InPlace}) {
             # pad to specified DirLen
-            my $dirLen = $$dirInfo{DirLen} || length $$dataPt;
             my $len = length($newData) + length($pktCloseW);
             if ($len > $dirLen) {
                 $exifTool->Warn('Not enough room to edit XMP in place');

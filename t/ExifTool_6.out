@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.17
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.32
 [File, System, Image] FileName - File Name: Canon.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2007:05:01 07:34:38-04:00
@@ -12,8 +12,6 @@
 [File, File, Image] YCbCrSubSampling - Y Cb Cr Sub Sampling: YCbCr4:2:0 (2 2)
 [EXIF, IFD0, Camera] 272 - Camera Model Name: Canon EOS DIGITAL REBEL
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
-[EXIF, IFD0, Image] 282 - X Resolution: 180
-[EXIF, IFD0, Image] 283 - Y Resolution: 180
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
 [EXIF, IFD0, Time] 306 - Modify Date: 2003:12:04 06:46:52
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Centered
@@ -41,8 +39,6 @@
 [EXIF, InteropIFD, Image] 2 - Interoperability Version: 0100
 [EXIF, InteropIFD, Image] 4097 - Related Image Width: 3072
 [EXIF, InteropIFD, Image] 4098 - Related Image Height: 2048
-[EXIF, ExifIFD, Camera] 41486 - Focal Plane X Resolution: 3443.946188
-[EXIF, ExifIFD, Camera] 41487 - Focal Plane Y Resolution: 3442.016807
 [EXIF, ExifIFD, Camera] 41488 - Focal Plane Resolution Unit: inches
 [EXIF, ExifIFD, Camera] 41495 - Sensing Method: One-chip color area
 [EXIF, ExifIFD, Image] 41728 - File Source: Digital Camera

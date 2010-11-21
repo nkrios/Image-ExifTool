@@ -52,7 +52,7 @@ EncodingProcess: Baseline DCT, Huffman coding
 ExifByteOrder: Little-endian (Intel, II)
 ExifImageHeight: 120
 ExifImageWidth: 160
-ExifToolVersion: 8.24
+ExifToolVersion: 8.35
 ExifVersion: 0221
 ExposureCompensation: 0
 ExposureCompensation (1): 0
@@ -62,7 +62,7 @@ ExposureTime (1): 128
 FNumber: 14.0
 FNumber (1): 14
 FOV: 37.7 deg
-FileModifyDate: 2010:06:21 15:13:09-04:00
+FileModifyDate: 2010:10:11 08:48:10-04:00
 FileName: Writer_2_failed.jpg
 FileNumber: 118-1861
 FilePermissions: rw-r--r--
@@ -116,7 +116,7 @@ MeteringMode (1): Average
 MinAperture: 27
 Model: Canon EOS DIGITAL REBEL
 ModifyDate: 2003:12:04 06:46:52
-NDFilter: Unknown (-1)
+NDFilter: n/a
 NumAFPoints: 7
 OpticalZoomCode: n/a
 Orientation: Horizontal (normal)

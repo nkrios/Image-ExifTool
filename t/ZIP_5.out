@@ -1,9 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
-[ExifTool, ExifTool, ExifTool] Warning - Warning: [minor] Unrecognized MakerNotes
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.32
 [File, System, Image] FileName - File Name: CaptureOne.eip
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 5.3 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:04 08:41:15-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:11:04 08:26:59-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: EIP
 [File, File, Image] MIMEType - MIME Type: application/x-captureone
@@ -72,6 +71,7 @@
 [EXIF, ExifIFD, Image] 37122 - Compressed Bits Per Pixel: 3
 [EXIF, ExifIFD, Image] 37377 - Shutter Speed Value: 1/15
 [EXIF, ExifIFD, Camera] 37384 - Light Source: Other
+[EXIF, ExifIFD, Image] 37500 - Maker Note Unknown Text: IIIICwaRDt<Cut raw data><Dummy preview data>
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 4490
 [EXIF, ExifIFD, Image] 40963 - Exif Image Height: 3364
 [EXIF, ExifIFD, Camera] 41987 - White Balance: Unknown (5)

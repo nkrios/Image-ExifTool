@@ -22,7 +22,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Canon;
 
-$VERSION = '1.51';
+$VERSION = '1.54';
 
 sub WriteCRW($$);
 sub ProcessCanonRaw($$$);
@@ -269,7 +269,6 @@ sub BuildMakerNotes($$$$$$);
         {
             # D30
             Name => 'SerialNumber',
-            Description => 'Camera Body No.',
             Condition => '$$self{Model} =~ /EOS D30\b/',
             Writable => 'int32u',
             PrintConv => 'sprintf("%x-%.5d",$val>>16,$val&0xffff)',
@@ -278,7 +277,6 @@ sub BuildMakerNotes($$$$$$);
         {
             # all EOS models (D30, 10D, 300D)
             Name => 'SerialNumber',
-            Description => 'Camera Body No.',
             Condition => '$$self{Model} =~ /EOS/',
             Writable => 'int32u',
             PrintConv => 'sprintf("%.10d",$val)',
@@ -331,6 +329,7 @@ sub BuildMakerNotes($$$$$$);
     },
     0x1818 => { #3
         Name => 'ExposureInfo',
+        Groups => { 1 => 'CIFF' }, # (only so CIFF shows up in group lists)
         Writable => 0,
         SubDirectory => {
             TagTable => 'Image::ExifTool::CanonRaw::ExposureInfo',
@@ -654,7 +653,7 @@ sub ProcessCanonRaw($$$)
     # read the directory (10 bytes per entry)
     $raf->Read($buff, 10 * $entries) == 10 * $entries or return 0;
 
-    $verbose and $exifTool->VerboseDir('Raw', $entries);
+    $verbose and $exifTool->VerboseDir('CIFF', $entries);
     my $index;
     for ($index=0; $index<$entries; ++$index) {
         my $pt = 10 * $index;
@@ -839,7 +838,7 @@ sub ProcessCRW($$)
     $buildMakerNotes and InitMakerNotes($exifTool);
 
     # set the FileType tag unless already done (ie. APP0 CIFF record in JPEG image)
-    $exifTool->SetFileType() unless $exifTool->GetValue('FileType');
+    $exifTool->SetFileType();
 
     # build directory information for main raw directory
     my %dirInfo = (

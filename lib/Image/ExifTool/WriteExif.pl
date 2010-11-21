@@ -574,7 +574,7 @@ my %writeTable = (
     0xa432 => {             # LensInfo
         Writable => 'rational64u',
         Count => 4,
-        PrintConvInv => \&Image::ExifTool::Exif::ConvertLensInfo,
+        PrintConvInv => \&ConvertLensInfo,
     },
     0xa433 => 'string',     # LensMake
     0xa434 => 'string',     # LensModel
@@ -1696,7 +1696,16 @@ sub WriteExif($$$)
         }
         my ($addDirs, @newTags);
         if ($inMakerNotes) {
-            $addDirs = { };
+            $addDirs = { };     # can't currently add new directories in MakerNotes
+            # allow non-permanent makernotes tags to be added
+            # (note: we may get into trouble if there are too many of these
+            #  because we allow out-of-order tags in MakerNote IFD's but our
+            #  logic to add new tags relies on ordered entries)
+            foreach (keys %set) {
+                my $perm = $set{$_}{Permanent};
+                push @newTags, $_ if defined $perm and not $perm;
+            }
+            @newTags = sort { $a <=> $b } @newTags if @newTags > 1;
         } else {
             # get a hash of directories we will be writing in this one
             $addDirs = $exifTool->GetAddDirHash($tagTablePtr, $dirName);
@@ -2225,7 +2234,10 @@ NoOverwrite:            next if $isNew > 0;
                     my $dataTag = $$newInfo{DataTag};
                     # load data for this tag
                     unless (defined $offsetData{$dataTag} or $dataTag eq 'LeicaTrailer') {
-                        $offsetData{$dataTag} = $exifTool->GetNewValues($dataTag);
+                        # prefer tag from Composite table if it exists (otherwise
+                        # PreviewImage data would be taken from Extra tag)
+                        my $compInfo = $Image::ExifTool::Composite{$dataTag};
+                        $offsetData{$dataTag} = $exifTool->GetNewValues($compInfo || $dataTag);
                         my $err;
                         if (defined $offsetData{$dataTag}) {
                             my $len = length $offsetData{$dataTag};
@@ -2287,7 +2299,7 @@ NoOverwrite:            next if $isNew > 0;
                             TagInfo  => $newInfo,
                             RAF      => $raf,
                         );
-                        my ($subTable, $subdir, $loc, $writeProc);
+                        my ($subTable, $subdir, $loc, $writeProc, $notIFD);
                         if ($$newInfo{SubDirectory}) {
                             my $sub = $$newInfo{SubDirectory};
                             $subdirInfo{FixBase} = 1 if $$sub{FixBase};
@@ -2300,6 +2312,7 @@ NoOverwrite:            next if $isNew > 0;
                             $subTable = $$oldInfo{SubDirectory}{TagTable};
                             $subTable and $subTable = Image::ExifTool::GetTagTable($subTable);
                             $writeProc = $$oldInfo{SubDirectory}{WriteProc};
+                            $notIFD = $$oldInfo{NotIFD};
                         } else {
                             $exifTool->Warn('Internal problem getting maker notes tag table');
                         }
@@ -2309,7 +2322,7 @@ NoOverwrite:            next if $isNew > 0;
                             $oldValue =~ /^\xff\xd8\xff/)
                         {
                             $loc = 0;
-                        } else {
+                        } elsif (not $notIFD) {
                             # look for IFD-style maker notes
                             $loc = Image::ExifTool::MakerNotes::LocateIFD($exifTool,\%subdirInfo);
                         }
@@ -2333,10 +2346,13 @@ NoOverwrite:            next if $isNew > 0;
                             }
                             # rewrite maker notes
                             $subdir = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
-                        } elsif ($$exifTool{FILE_TYPE} eq 'JPEG') {
-                            $exifTool->Warn('Maker notes could not be parsed',1);
-                        } else {
-                            $exifTool->Error('Maker notes could not be parsed',1);
+                        } elsif (not $notIFD) {
+                            my $msg = 'Maker notes could not be parsed';
+                            if ($$exifTool{FILE_TYPE} eq 'JPEG') {
+                                $exifTool->Warn($msg, 1);
+                            } else {
+                                $exifTool->Error($msg, 1);
+                            }
                         }
                         if (defined $subdir) {
                             next unless length $subdir;
@@ -2449,6 +2465,7 @@ NoOverwrite:            next if $isNew > 0;
                                 DirStart => $subdirStart,
                                 DirName  => $subdirName,
                                 Name     => $$newInfo{Name},
+                                TagInfo  => $newInfo,
                                 Parent   => $dirName,
                                 Fixup    => new Image::ExifTool::Fixup,
                                 RAF      => $raf,
@@ -3203,7 +3220,7 @@ NoOverwrite:            next if $isNew > 0;
                         $buff = '';
                     }
                     if ($$tagInfo{Name} eq 'PreviewImageStart') {
-                        if ($$exifTool{FILE_TYPE} eq 'JPEG') {
+                        if ($$exifTool{FILE_TYPE} eq 'JPEG' and not $$tagInfo{MakerPreview}) {
                             # hold onto the PreviewImage until we can determine if it fits
                             $exifTool->{PREVIEW_INFO} or $exifTool->{PREVIEW_INFO} = { };
                             $exifTool->{PREVIEW_INFO}{Data} = $buff;

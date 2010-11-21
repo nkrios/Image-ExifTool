@@ -113,7 +113,8 @@ the root directory, <b>BlockSize</b> is the length of the file.</p>
 <p>The <b>OtherData</b> normally does not exist (ie. the <b>DirEntries</b>
 usually end at the <b>DirStart</b> pointer), but this is not always the case:
 Canon Digital Photo Professional uses this area in the root directory block to
-store VRD data in edited CRW images.</p>
+store VRD data in edited CRW images.  (Note that VRD supports embedded XMP,
+which provides a technique to store modern metadata in CRW images!)</p>
 
 <h3>CRW Directory Entry Format</h3>
 <p>The CRW directory consists of N 10-byte entries.  The format of each entry is
@@ -345,6 +346,7 @@ remain constant for all camera models.</p>
 </table></blockquote>
 
 <h3>Revisions</h3>
+<p>Sept. 20, 2010 - Added note about XMP support in the VRD data</p>
 <p>Feb. 12, 2009 - Moved a couple of entries in the TagID table that were in
 the wrong section</p>
 <p>Feb. 4, 2008 - Added a number of unknown TagID's, decode some tags in the
@@ -358,7 +360,7 @@ directory block</p>
 Please e-mail me if you find any errors or omissions in this document.  My
 address is phil at owl.phy.queensu.ca - Thanks!
 <p class='lf'><i>Created Jan. 28, 2005</i>
-<br><i>Last revised Feb. 12, 2009</i></p>
+<br><i>Last revised Sept. 20, 2010</i></p>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

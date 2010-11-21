@@ -24,11 +24,12 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# tests 3-4: Write an XMP tag then delete all XMP (writes empty XMP record)
+# tests 3-4: Write some XMP tags then delete all XMP (writes empty XMP record)
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->SetNewValue(Author => 'Phil Harvey');
+    $exifTool->SetNewValue(ImageDescription => 'A description');
     my $testfile = "t/${testname}_${testnum}_failed.indd";
     unlink $testfile;
     $exifTool->WriteInfo('t/images/InDesign.indd', $testfile);

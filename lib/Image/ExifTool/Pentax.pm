@@ -11,6 +11,7 @@
 #               03/30/2005 - P. Harvey Added new tags from ref 5
 #               10/04/2005 - P. Harvey Added MOV tags
 #               10/22/2007 - P. Harvey Got my new K10D! (more new tags to decode)
+#               11/03/2010 - P. Harvey Got my new K-5! (a gold mine of new tags to discover!)
 #
 # References:   1) Image::MakerNotes::Pentax
 #               2) http://johnst.org/sw/exiftags/ (Asahi cameras)
@@ -34,10 +35,9 @@
 #              20) Bogdan and yeryry (http://www.cpanforum.com/posts/8037)
 #              21) Peter (*istD, http://www.cpanforum.com/posts/8078)
 #              22) Bozi (K10D, http://www.cpanforum.com/posts/8480)
-#              23) Anton Bondar private communication
-#              24) Akos Szalkai (https://rt.cpan.org/Ticket/Display.html?id=43743)
-#              25) Albert Bogner private communication
-#              26) Niels Kristian Bech Jensen private communication
+#              23) Akos Szalkai (https://rt.cpan.org/Ticket/Display.html?id=43743)
+#              24) Albert Bogner private communication
+#              25) Niels Kristian Bech Jensen private communication
 #              JD) Jens Duttke private communication
 #
 # Notes:        See POD documentation at the bottom of this file
@@ -50,9 +50,10 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.15';
+$VERSION = '2.22';
 
 sub CryptShutterCount($$);
+sub PrintFilter($$$);
 
 # pentax lens type codes (ref 4)
 # The first number gives the lens series, and the 2nd gives the model number
@@ -111,7 +112,7 @@ my %pentaxLensTypes = (
     '3 44' => 'Sigma or Tamron Lens (3 44)',
     '3 44.1' => 'Sigma AF 10-20mm F4-5.6 EX DC', #JD
     '3 44.2' => 'Sigma 12-24mm F4.5 EX DG', #12
-    '3 44.3' => 'Sigma 17-70mm F2.8-4.5 DC Macro', # (Bart Hickman)
+    '3 44.3' => 'Sigma 17-70mm F2.8-4.5 DC Macro', #(Bart Hickman)
     '3 44.4' => 'Sigma 18-50mm F3.5-5.6 DC', #4
     '3 44.5' => 'Tamron 35-90mm F4 AF', #12
     '3 46' => 'Sigma Lens (3 46)',
@@ -180,7 +181,7 @@ my %pentaxLensTypes = (
     '4 230' => 'Tamron SP AF 17-50mm F2.8 XR Di II', #20
     '4 231' => 'smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]', #21
     '4 237' => 'Samsung/Schneider D-XENOGON 10-17mm F3.5-4.5', #JD
-    '4 239' => 'Samsung D-XENON 12-24mm F4 ED AL [IF]', #24
+    '4 239' => 'Samsung D-XENON 12-24mm F4 ED AL [IF]', #23
     '4 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #JD
     '4 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #9
     '4 245' => 'Schneider D-XENON 50-200mm F4-5.6', #15
@@ -223,11 +224,12 @@ my %pentaxLensTypes = (
     '6 13' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
     '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
     '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
-    '7 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #23
+    '7 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #(Anton Bondar)
+    '7 214' => 'smc PENTAX-DA 35mm F2.4 AL', #PH
     '7 216' => 'smc PENTAX-DA L 55-300mm F4-5.8 ED', #PH
     '7 217' => 'smc PENTAX-DA 50-200mm F4-5.6 ED WR', #JD
     '7 218' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL WR', #JD
-    '7 220' => 'Tamron SP AF 10-24mm F3.5-4.5 Di II LD Aspherical [IF]', #25
+    '7 220' => 'Tamron SP AF 10-24mm F3.5-4.5 Di II LD Aspherical [IF]', #24
     '7 222' => 'smc PENTAX-DA L 18-55mm F3.5-5.6', #PH (tag 0x003f -- was '7 229' in LensInfo of one test image)
     '7 223' => 'Samsung D-XENON 18-55mm F3.5-5.6 II', #PH
     '7 224' => 'smc PENTAX-DA 15mm F4 ED AL Limited', #JD
@@ -244,6 +246,8 @@ my %pentaxLensTypes = (
     '7 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)', #19
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH
     '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
+    '8 14' => 'Sigma 17-70mm F2.8-4.0 DC Macro OS HSM', #(Hubert Meier)
+    '8 215' => 'smc PENTAX-DA 18-135mm F3.5-5.6 ED AL [IF] DC WR', #PH
     '8 226' => 'smc PENTAX-DA* 55mm F1.4 SDM', #JD
     '8 227' => 'smc PENTAX DA* 60-250mm F4 [IF] SDM', #JD
     '8 232' => 'smc PENTAX-DA 17-70mm F4 AL [IF] SDM', #JD
@@ -268,6 +272,7 @@ my %pentaxModelID = (
     0x12958 => 'Optio 330GS',
     0x12962 => 'Optio 450/550',
     0x1296c => 'Optio S',
+    0x12971 => 'Optio S V1.01',
     0x12994 => '*ist D',
     0x129b2 => 'Optio 33L',
     0x129bc => 'Optio 33LF',
@@ -357,6 +362,8 @@ my %pentaxModelID = (
     0x12e44 => 'Optio H90',
     0x12e4e => 'Optio E90',
     0x12e58 => 'X90',
+    0x12e6c => 'K-r',
+    0x12e76 => 'K-5',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -432,8 +439,92 @@ my %pentaxCities = (
     68 => 'Amsterdam',
     69 => 'Stockholm',
     70 => 'Lisbon', #14
-    71 => 'Copenhagen', #26
-    # 72 - have seen this value - PH
+    71 => 'Copenhagen', #25
+    72 => 'Warsaw',
+    73 => 'Prague',
+    74 => 'Budapest',
+);
+
+# digital filter tag information (ref PH, K-5)
+# (also see %filterSettings below for decoding of filter parameters)
+my %digitalFilter = (
+    Format => 'undef[17]',
+    RawConv => '($val!~/^\\0/ or $$self{OPTIONS}{Unknown}) ? join(" ",unpack("Cc*",$val)) : undef',
+    SeparateTable => 'DigitalFilter',
+    ValueConvInv => q{
+        return "\0" x 17 if $val eq "0";
+        $val = pack("Cc*", $val=~/[-+]?\d+/g);
+        length($val)==17 or warn("Expecting 17 values\n"), return undef;
+        return $val;
+    },
+    PrintConv => {
+        OTHER => \&PrintFilter, # this routine actually converts all values
+        0 => 'Off',
+        1 => 'Base Parameter Adjust',
+        2 => 'Soft Focus',
+        3 => 'High Contrast',
+        4 => 'Color Filter',
+        5 => 'Extract Color',
+        6 => 'Monochrome',
+        7 => 'Slim',
+        9 => 'Fisheye',
+        10 => 'Toy Camera',
+        11 => 'Retro',
+        12 => 'Pastel',
+        13 => 'Water Color',
+        14 => 'HDR',
+        16 => 'Miniature',
+        17 => 'Starburst',
+        18 => 'Posterization',
+        19 => 'Sketch Filter',
+        254 => 'Custom Filter',
+    },
+);
+
+# digital filter setting names and conversions (ref PH, K-5)
+# Note: names must be unique for writing
+my %filterSettings = (
+    1 => ['Brightness', '%+d'],     # BPA (-8-+8)
+    2 => ['Saturation', '%+d'],     # BPA (-3-+3)
+    3 => ['Hue', '%+d'],            # BPA (-3-+3)
+    4 => ['Contrast', '%+d'],       # BPA (-3-+3)
+    5 => ['Sharpness', '%+d'],      # BPA (-3-+3)
+    6 => ['SoftFocus', '%d'],       # Soft Focus/Custom (1-3)
+    7 => ['ShadowBlur',     { 0=>'Off',1=>'On' }], # Soft Focus
+    8 => ['HighContrast', '%d'],    # High Contrast/Custom (1-5)
+    9 => ['Color',          { 1=>'Red',2=>'Magenta',3=>'Blue',4=>'Cyan',5=>'Green',6=>'Yellow' }], # Color Filter
+    10 => ['Density',       { 1=>'Light',2=>'Standard',3=>'Dark' }], # Color Filter
+    11 => ['ExtractedColor',{ 0=>'Off',1=>'Red',2=>'Magenta',3=>'Blue',4=>'Cyan',5=>'Green',6=>'Yellow' }], # ExtractColor [x2]
+    12 => ['ColorRange', '%+d'],    # ExtractColor [x2] (-2-+2)
+    13 => ['FilterEffect',  { 0=>'Off',1=>'Red',2=>'Green',3=>'Blue',4=>'Infrared'}], # Monochrome
+    14 => ['ToningBA', '%+d'],      # Monochrome (-3-+3)
+    15 => ['InvertColor',   { 0=>'Off',1=>'On' }], # Custom
+    16 => ['Slim', '%+d'],          # Slim (-8-+8)
+    17 => ['EffectDensity', { 1=>'Sparse',2=>'Normal',3=>'Dense' }], # Starburst
+    18 => ['Size',          { 1=>'Small',2=>'Medium',3=>'Large' }], # Starburst
+    19 => ['Angle',         { 0=>'0deg',2=>'30deg',3=>'45deg',4=>'60deg'}], # Starburst (1 is unused)
+    20 => ['Fisheye',       { 1=>'Weak',2=>'Medium',3=>'Strong' }], # Fisheye
+    21 => ['DistortionType', '%d'], # Custom (1-3)
+    22 => ['DistortionLevel',{0=>'Off',1=>'Weak',2=>'Medium',3=>'Strong' }], #Custom
+    23 => ['ShadingType', '%d'],    # Custom (1-6)
+    24 => ['ShadingLevel', '%+d'],  # Custom (-3-+3)
+    25 => ['Shading', '%d'],        # Toy Camera (1-3)
+    26 => ['Blur',  '%d'],          # Toy Camera (1-3)
+    27 => ['ToneBreak',     { 0=>'Off',1=>'Red',2=>'Green',3=>'Blue',4=>'Yellow'}], # Toy Camera/Custom
+    28 => ['Toning', '%+d'],        # Retro (-3-+3)
+    29 => ['FrameComposite',{ 0=>'None',1=>'Thin',2=>'Medium',3=>'Thick' }], # Retro
+    30 => ['PastelStrength',{ 1=>'Weak',2=>'Medium',3=>'Strong' }], # Pastel
+    31 => ['Intensity', '%d'],      # Water Color (1-3)
+    32 => ['Saturation2',   { 0=>'Off',1=>'Low',2=>'Medium',3=>'High' }], # Water Color
+    33 => ['HDR',           { 1=>'Weak',2=>'Medium',3=>'Strong' }], # HDR
+    35 => ['FocusPlane', '%+d'],    # Miniature (-3-+3)
+    36 => ['FocusWidth',    { 1=>'Narrow',2=>'Middle',3=>'Wide' }], # Miniature
+    37 => ['PlaneAngle',    { 0=>'Horizontal',1=>'Vertical',2=>'Positive slope',3=>'Negative slope' }], # Miniature
+    38 => ['Blur2', '%d'],          # Miniature (1-3)
+    39 => ['Shape',         { 1=>'Cross',2=>'Star',3=>'Snowflake',4=>'Heart',5=>'Note'}], # Starburst
+    40 => ['Posterization', '%d'],  # Posterization (1-5)
+    41 => ['Contrast2',     { 1=>'Low',2=>'Medium',3=>'High'}], # Sketch Filter
+    42 => ['ScratchEffect', { 0=>'Off',1=>'On' }], # Sketch Filter
 );
 
 # decoding for Pentax Firmware ID tags - PH
@@ -459,7 +550,7 @@ my %pentaxFirmwareID = (
     PrintConvInv => '$val=~s/^(\d+)\.(\d+)\.(\d+)\.(\d+)/$1 $2 $3 $4/ ? $val : undef',
 );
 
-# convert 16 metering segment values to approximate LV equivalent - PH
+# convert 16 or 77 metering segment values to approximate LV equivalent - PH
 my %convertMeteringSegments = (
     PrintConv    => sub { join ' ', map(
         { $_==255 ? 'n/a' : $_==0 ? '0' : sprintf '%.1f', $_ / 8 - 6 } split(' ',$_[0])
@@ -474,6 +565,15 @@ my %lensCode = (
     Unknown => 1,
     PrintConv => 'sprintf("0x%.2x", $val)',
     PrintConvInv => 'hex($val)',
+);
+
+# common attributes for writable BinaryData directories
+my %binaryDataAttrs = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
 );
 
 # Pentax makernote tags
@@ -559,6 +659,7 @@ my %lensCode = (
     0x0008 => { #2
         Name => 'Quality',
         Writable => 'int16u',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 'Good',
             1 => 'Better',
@@ -648,10 +749,10 @@ my %lensCode = (
             30 => 'Self Portrait', #PH
             31 => 'Illustrations', #13
             33 => 'Digital Filter', #13
-            35 => 'Night Scene Portrait', #26
+            35 => 'Night Scene Portrait', #25
             37 => 'Museum', #PH
             38 => 'Food', #PH
-            39 => 'Underwater', #26
+            39 => 'Underwater', #25
             40 => 'Green Mode', #PH
             49 => 'Light Pet', #PH
             50 => 'Dark Pet', #PH
@@ -661,7 +762,7 @@ my %lensCode = (
             55 => 'Natural Skin Tone', #PH
             56 => 'Synchro Sound Record', #PH
             58 => 'Frame Composite', #14
-            59 => 'Report', #26
+            59 => 'Report', #25
             60 => 'Kids', #13
             61 => 'Blur Reduction', #13
             65 => 'Half-length Portrait', #JD
@@ -719,6 +820,7 @@ my %lensCode = (
                 16 => 'AF-S', #17
                 17 => 'AF-C', #17
                 18 => 'AF-A', #PH (educated guess)
+                32 => 'Contrast-detect', #PH (K-5)
             },
         },
         {
@@ -738,10 +840,11 @@ my %lensCode = (
         Writable => 'int16u',
         PrintConvColumns => 2,
         PrintConv => {
+            # 0 - Contrast-detect AF? - PH (K-5)
             0xffff => 'Auto',
             0xfffe => 'Fixed Center',
             0xfffd => 'Automatic Tracking AF', #JD
-            0xfffc => 'Face Recognition AF', #JD
+            0xfffc => 'Face Detection AF', #JD
             1 => 'Upper-left',
             2 => 'Top',
             3 => 'Upper-right',
@@ -822,10 +925,19 @@ my %lensCode = (
             18 => 1600, #PH
             19 => 2000, #PH (NC)
             20 => 2500, #PH (NC)
-            21 => 3200, #(NC)
+            21 => 3200, #PH (K-5)
             22 => 4000, #(NC)
             23 => 5000, #(NC)
             24 => 6400, #PH (K20D)
+            25 => 8000, #PH (NC)
+            26 => 10000, #PH (NC)
+            27 => 12800, #PH (K-5)
+            28 => 16000, #PH (NC)
+            29 => 20000, #PH (NC)
+            30 => 25600, #PH (NC)
+            31 => 32000, #PH (NC)
+            32 => 40000, #PH (NC)
+            33 => 51200, #PH (K-5)
             50 => 50, #PH
             100 => 100, #PH
             200 => 200, #PH
@@ -883,8 +995,8 @@ my %lensCode = (
         Notes => q{
             1 or 2 values: exposure bracket step in EV, then extended bracket if
             available.  Extended bracket values are printed as 'WB-BA', 'WB-GM',
-            'Saturation', 'Sharpness' or 'Contrast' followed by '+1', '+2' or '+3' for
-            step size
+            'Saturation', 'Sharpness', 'Contrast', 'Hue' or 'HighLowKey' followed by
+            '+1', '+2' or '+3' for step size
         },
         # 1=.3ev, 2=.7, 3=1.0, ... 10=.5ev, 11=1.5, ...
         ValueConv => [ '$val<10 ? $val/3 : $val-9.5' ],
@@ -893,7 +1005,8 @@ my %lensCode = (
             my @v = split(' ', shift);
             $v[0] = sprintf('%.1f', $v[0]) if $v[0];
             if ($v[1]) {
-                my %s = (1=>'WB-BA',2=>'WB-GM',3=>'Saturation',4=>'Sharpness',5=>'Contrast');
+                my %s = (1=>'WB-BA',2=>'WB-GM',3=>'Saturation',4=>'Sharpness',
+                         5=>'Contrast',6=>'Hue',7=>'HighLowKey');
                 my $t = $v[1] >> 8;
                 $v[1] = sprintf('%s+%d', $s{$t} || "Unknown($t)", $v[1] & 0xff);
             } elsif (defined $v[1]) {
@@ -905,7 +1018,8 @@ my %lensCode = (
             my @v = split(/, ?/, shift);
             $v[0] =~ s/ ?EV//i;
             if ($v[1]) {
-                my %s = ('WB-BA'=>1,'WB-GM'=>2,Saturation=>3,Sharpness=>4,Contrast=>5);
+                my %s = ('WB-BA'=>1,'WB-GM'=>2,'Saturation'=>3,'Sharpness'=>4,
+                         'Contrast'=>5,'Hue'=>6,'HighLowKey'=>7);
                 if ($v[1] =~ /^No\b/i) {
                     $v[1] = 0;
                 } elsif ($v[1] =~ /Unknown\((\d+)\)\+(\d+)/i) {
@@ -935,6 +1049,7 @@ my %lensCode = (
             8 => 'White Fluorescent', #13
             9 => 'Flash', #13
             10 => 'Cloudy', #13
+            15 => 'Color Temperature Enhancement', #PH
             17 => 'Kelvin', #PH
             0xfffe => 'Unknown', #13
             0xffff => 'User-Selected', #13
@@ -1016,9 +1131,10 @@ my %lensCode = (
             4 => 'Med High', #2
             5 => 'Very Low', #(NC)
             6 => 'Very High', #(NC)
+            7 => '-4', #PH (K-5)
+            8 => '+4', #PH (NC)
             65535 => 'None', #PH (Monochrome)
         }],
-        # (the K20D supports -4 to +4 -- this needs decoding)
     },
     0x0020 => {
         Name => 'Contrast',
@@ -1033,7 +1149,9 @@ my %lensCode = (
             3 => 'Med Low', #2
             4 => 'Med High', #2
             5 => 'Very Low', #PH
-            6 => 'Very High', #(NC)
+            6 => 'Very High', #PH (NC)
+            7 => '-4', #PH (NC)
+            8 => '+4', #PH (K-5)
         }],
     },
     0x0021 => {
@@ -1050,6 +1168,8 @@ my %lensCode = (
             4 => 'Med Hard', #2
             5 => 'Very Soft', #(NC)
             6 => 'Very Hard', #(NC)
+            7 => '-4', #PH (NC)
+            8 => '+4', #PH (NC)
         }],
     },
     0x0022 => { #PH
@@ -1118,17 +1238,18 @@ my %lensCode = (
         PrintConvInv => '$val',
     },
     0x0032 => { #13
-        Name => 'ImageProcessing',
+        Name => 'ImageEditing',
         Writable => 'undef',
         Format => 'int8u',
         Count => 4,
         PrintConv => {
-            '0 0' => 'Unprocessed', #PH
-            '0 0 0 0' => 'Unprocessed',
+            '0 0' => 'None', #PH
+            '0 0 0 0' => 'None',
             '0 0 0 4' => 'Digital Filter',
             '2 0 0 0' => 'Cropped', #PH
-            # K10D gives "4 0 0 0" for any filter (bw,color,soft,slim,bright) - PH
-            '4 0 0 0' => 'Color Filter',
+            # note: doesn't apply to digital filters applied when picture is taken
+            '4 0 0 0' => 'Digital Filter 4', #PH (K10D)
+            '6 0 0 0' => 'Digital Filter 6', #PH (K-5)
             '16 0 0 0' => 'Frame Synthesis?',
         },
     },
@@ -1170,10 +1291,11 @@ my %lensCode = (
             '1 7'  => 'Auto PICT (Macro)', #13
             '1 8'  => 'Auto PICT (Sport)', #13
             # *istD modes (ref 7)
-            '2 0'  => 'Program (HyP)', #13
+            '2 0'  => 'Program (HyP)', #13 (K-5 Normal program line - PH)
             '2 1'  => 'Hi-speed Program (HyP)', #19 (K10D, custom settings: Program Line 2, e-dial in Program 1, 2)
             '2 2'  => 'DOF Program (HyP)', #19      (K10D, custom settings: Program Line 3, e-dial in Program 1, 2)
             '2 3'  => 'MTF Program (HyP)', #19      (K10D, custom settings: Program Line 4, e-dial in Program 1, 2)
+            '2 22' => 'Shallow DOF (HyP)', #PH (K-5)
             '3 0'  => 'Green Mode', #16
             '4 0'  => 'Shutter Speed Priority',
             '5 0'  => 'Aperture Priority',
@@ -1188,8 +1310,14 @@ my %lensCode = (
             '13 0' => 'Shutter & Aperture Priority AE',
             '15 0' => 'Sensitivity Priority AE',
             '16 0' => 'Flash X-Sync Speed AE',
-            '254 0' => 'Video (30 fps)', #PH (K-7)
-            '255 4' => 'Video (24 fps)', #PH (K-x)
+            '18 0' => 'Auto Program (Normal)', #PH (K-5)
+            '18 1' => 'Auto Program (Hi-speed)', #PH (NC)
+            '18 2' => 'Auto Program (DOF)', #PH (K-5)
+            '18 3' => 'Auto Program (MTF)', #PH (NC)
+            '18 22' => 'Auto Program (Shallow DOF)', #PH (NC)
+            '254 0' => 'Video', #PH (K-7,K-5)
+            '255 0' => 'Video (Auto Aperture)', #PH (K-5)
+            '255 4' => 'Video (4)', #PH (K-x)
         },{
             # EV step size (ref 19)
             0 => '1/2 EV steps',
@@ -1202,8 +1330,8 @@ my %lensCode = (
         Count => 4,
         PrintConv => [{
             0 => 'Single-frame',
-            1 => 'Continuous',
-            2 => 'Continuous (Hi)', #PH (NC) (K200D)
+            1 => 'Continuous', # (K-5 Hi)
+            2 => 'Continuous (Lo)', #PH (K-5)
             3 => 'Burst', #PH (K20D)
             255 => 'Video', #PH (K-x)
             # (K20D also has an Interval mode that needs decoding)
@@ -1211,19 +1339,35 @@ my %lensCode = (
             0 => 'No Timer',
             1 => 'Self-timer (12 s)',
             2 => 'Self-timer (2 s)',
+            16 => 'Mirror Lock-up', # (K-5)
             255 => 'n/a', #PH (K-x)
         },{
             0 => 'Shutter Button', # (also computer remote control - PH)
             1 => 'Remote Control (3 s delay)', #19
             2 => 'Remote Control', #19
+            4 => 'Remote Continuous Shooting', # (K-5)
         },{
-            0 => 'Single Exposure',
-            1 => 'Multiple Exposure',
-            16 => 'HDR', #PH (645D)
-            255 => 'Video', #PH (K-x)
+            0x00 => 'Single Exposure',
+            0x01 => 'Multiple Exposure',
+            0x10 => 'HDR', #PH (645D)
+            0x20 => 'HDR Strong 1', #PH (NC) (K-5)
+            0x30 => 'HDR Strong 2', #PH (K-5)
+            0x40 => 'HDR Strong 3', #PH (K-5)
+            0xe0 => 'HDR Auto', #PH (K-5)
+            0xff => 'Video', #PH (K-x)
         }],
     },
-    # 0x0035 - 2 numbers: 11894 7962 (not in JPEG images) - PH
+    0x0035 => { #PH
+        Name => 'SensorSize',
+        Format => 'int16u',
+        Count => 2,
+        Notes => 'includes masked pixels',
+        # Notes: Not sure why this is in 2um increments (1um would make more sense to me)
+        ValueConv => 'my @a=split(" ",$val); $_/=500 foreach @a; join(" ",@a)',
+        ValueConvInv => 'my @a=split(" ",$val); $_*=500 foreach @a; join(" ",@a)',
+        PrintConv => 'sprintf("%.3f x %.3f mm", split(" ",$val))',
+        PrintConvInv => '$val=~s/\s*mm$//; $val=~s/\s*x\s*/ /; $val',
+    },
     0x0037 => { #13
         Name => 'ColorSpace',
         Writable => 'int16u',
@@ -1269,7 +1413,8 @@ my %lensCode = (
             10 => 'Lower-right',
         } },
     },
-    # 0x003d = 8192 for most images, but occasionally 11571 for K100D/K110D - PH
+    # 0x003d - int16u: 8192 for most images, but occasionally 11571 for K100D/K110D,
+    #              and 8289 or 8456 for the K-x - PH
     0x003e => { #PH
         Name => 'PreviewImageBorders',
         Writable => 'int8u',
@@ -1295,7 +1440,7 @@ my %lensCode = (
         PrintConvInv => '$val',
     },
     0x0041 => { #19
-        Name => 'ImageProcessingCount',
+        Name => 'ImageEditCount',
         Writable => 'int16u',
     },
     0x0047 => { #PH
@@ -1328,15 +1473,17 @@ my %lensCode = (
     0x004f => { #PH
         Name => 'ImageTone', # (Called CustomImageMode in K20D manual)
         Writable => 'int16u',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => 'Natural',
             1 => 'Bright',
-            2 => 'Portrait', # K20D/K200D
-            3 => 'Landscape', # K20D
-            4 => 'Vibrant', # K20D
-            5 => 'Monochrome', # K20D
-            6 => 'Muted', # 645D
-            7 => 'Reversal Film', # 645D
+            2 => 'Portrait', # (K20D/K200D)
+            3 => 'Landscape', # (K20D)
+            4 => 'Vibrant', # (K20D)
+            5 => 'Monochrome', # (K20D)
+            6 => 'Muted', # (645D)
+            7 => 'Reversal Film', # (645D)
+            8 => 'Bleach Bypass', # (K-5)
         },
     },
     0x0050 => { #PH
@@ -1349,21 +1496,20 @@ my %lensCode = (
     # 0x0053-0x005a - not in JPEG images - PH
     0x005c => { #PH
         Name => 'ShakeReductionInfo',
-        Format => 'undef',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Pentax::SRInfo',
-        },
+        Format => 'undef', # (written as int8u) - do this just to save time converting the value
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::SRInfo' },
     },
     0x005d => { #JD/PH
         # (used by all Pentax DSLR's except *istD and *istDS until firmware 2.0 - PH)
         # Observed values for the first shot of a new K10D are:  81 [PH], 181 [19],
         # 246 [7], and 209 [18 (one of the first 20 shots)], so there must be a number
-        # of test images shot in the factory.
+        # of test images shot in the factory. (But my new K-5 started at 1 - PH)
         # This count includes shutter actuations even if they don't result in a
         # recorded image. (ie. manual white balance frame or digital preview) - PH
         Name => 'ShutterCount',
         Writable => 'undef',
         Count => 4,
+        Notes => 'does not include shutter actuations for live view or video recording',
         # raw value is a big-endian 4-byte integer, encrypted using Date and Time
         RawConv => 'length($val) == 4 ? unpack("N",$val) : undef',
         RawConvInv => q{
@@ -1373,10 +1519,36 @@ my %lensCode = (
         ValueConv => \&CryptShutterCount,
         ValueConvInv => '$val',
     },
-    # 0x0062: int16u - values: 1 for K10D/K200D, 3 for K20D (K10D,K20D,K200D)
-    # 0x0067: int16u - values: 1 [and 65535 in Monochrome] (K20D,K200D) - PH
-    # 0x0068: int8u  - values: 1 (K20D,K200D) - PH
-    0x0069 => { #PH (K20D)
+    0x0060 => { #PH (K-5)
+        Name => 'FaceInfo',
+        Format => 'undef', # (written as int8u)
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::FaceInfo' },
+    },
+    # 0x0062 - int16u: 1 (K10D,K200D,K-m,K2000), 3 (K20D), 4 (K-7), 5 (K-x), 6 (645D), 7 (K-r), 8 (K-5)
+    0x0067 => { #PH (K-5)
+        Name => 'Hue',
+        Writable => 'int16u',
+        PrintConvColumns => 2,
+        PrintConv => {
+            0 => -2,
+            1 => 'Normal',
+            2 => 2,
+            3 => -1,
+            4 => 1,
+            5 => -3,
+            6 => 3,
+            7 => -4,
+            8 => 4,
+            65535 => 'None', # (Monochrome)
+        },
+    },
+    # 0x0067 - int16u: 1 [and 65535 in Monochrome] (K20D,K200D) - PH
+    0x0068 => { #PH
+        Name => 'AWBInfo',
+        Format => 'undef', # (written as int8u)
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::AWBInfo' },
+    },
+    0x0069 => { #PH (K20D; K-5 highlights only)
         Name => 'DynamicRangeExpansion',
         Writable => 'undef',
         Format => 'int8u',
@@ -1386,28 +1558,166 @@ my %lensCode = (
             '1 0 0 0' => 'On',
         },
     },
-    # 0x0070: in8u   - values: 0, 1 (K20D,K200D) - PH
-    0x0071 => { #PH (K20D)
-        Name => 'HighISONoiseReduction',
-        Format => 'int8u',
+    0x006b => { #PH (K-5)
+        Name => 'TimeInfo',
+        Format => 'undef', # (written as int8u)
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::TimeInfo' },
+    },
+    0x006c => { #PH (K-5)
+        Name => 'HighLowKeyAdj',
+        Description => 'High/Low Key Adj',
+        Writable => 'int16s',
+        Count => 2,
+        PrintConvColumns => 3,
+        PrintConv => {
+            '-4 0' => -4,
+            '-3 0' => -3,
+            '-2 0' => -2,
+            '-1 0' => -1,
+             '0 0' => 0,
+             '1 0' => 1,
+             '2 0' => 2,
+             '3 0' => 3,
+             '4 0' => 4,
+        },
+    },
+    0x006d => { #PH (K-5)
+        Name => 'ContrastHighlight',
+        Writable => 'int16s',
+        Count => 2,
+        PrintConvColumns => 3,
+        PrintConv => {
+            '-4 0' => -4,
+            '-3 0' => -3,
+            '-2 0' => -2,
+            '-1 0' => -1,
+             '0 0' => 0,
+             '1 0' => 1,
+             '2 0' => 2,
+             '3 0' => 3,
+             '4 0' => 4,
+        },
+    },
+    0x006e => { #PH (K-5)
+        Name => 'ContrastShadow',
+        Writable => 'int16s',
+        Count => 2,
+        PrintConvColumns => 3,
+        PrintConv => {
+            '-4 0' => -4,
+            '-3 0' => -3,
+            '-2 0' => -2,
+            '-1 0' => -1,
+             '0 0' => 0,
+             '1 0' => 1,
+             '2 0' => 2,
+             '3 0' => 3,
+             '4 0' => 4,
+        },
+    },
+    0x006f => { #PH (K-5)
+        Name => 'ContrastHighlightShadowAdj',
+        Description => 'Contrast Highlight/Shadow Adj',
+        Writable => 'int8u',
         PrintConv => {
             0 => 'Off',
-            1 => 'Weakest',
-            2 => 'Weak',
-            3 => 'Strong',
-            # have also seen '0 0 56' for K-7 - PH
-            # and '4 0 48','2 0 48','0 0 48','2 0 56','2 1 56' for 645D - PH
+            1 => 'On',
         },
+    },
+    0x0070 => { #PH (K-5)
+        Name => 'FineSharpness',
+        Writable => 'int8u',
+        Count => -1,    # 1 for K20/K200, 2 for K-5
+        PrintConv => [{
+            0 => 'Off',
+            1 => 'On',
+        },{
+            0 => 'Normal',
+            2 => 'Extra fine',
+        }],
+    },
+    0x0071 => { #PH (K20D,K-x)
+        Name => 'HighISONoiseReduction',
+        Format => 'int8u',
+        PrintConv => [{
+            0 => 'Off',
+            1 => 'Weakest',
+            2 => 'Weak', # (called "Low" by K-x)
+            3 => 'Strong', # (called "High" by K-x)
+            4 => 'Medium',
+            255 => 'Auto', # (K-5)
+        },{
+            0 => 'Inactive',
+            1 => 'Active',
+            2 => 'Active (Weak)', # (K-5)
+            3 => 'Active (Strong)', # (K-5)
+            4 => 'Active (Medium)', # (K-5)
+        },{ # Start ISO level for NR (K-x)
+            48 => 'ISO>400',
+            56 => 'ISO>800',
+            64 => 'ISO>1600',
+            72 => 'ISO>3200',
+        }],
     },
     0x0072 => { #JD (K20D)
         Name => 'AFAdjustment',
         Writable => 'int16s',
     },
-    # 0x0073,0x0074: int16u - values: 65535 [and 0,4,8 in Monochrome] (K20D,K200D) - PH
+    0x0073 => { #PH (K-5)
+        Name => 'MonochromeFilterEffect',
+        Writable => 'int16u',
+        PrintConvColumns => 2,
+        PrintConv => {
+            65535 => 'None',
+            1 => 'Green',
+            2 => 'Yellow',
+            3 => 'Orange',
+            4 => 'Red',
+            5 => 'Magenta',
+            6 => 'Blue',
+            7 => 'Cyan',
+            8 => 'Infrared',
+        },
+    },
+    0x0074 => { #PH (K-5)
+        Name => 'MonochromeToning',
+        Writable => 'int16u',
+        PrintConvColumns => 2,
+        PrintConv => {
+            65535 => 'None',
+            0 => -4,
+            1 => -3,
+            2 => -2,
+            3 => -1,
+            4 => 0,
+            5 => 1,
+            6 => 2,
+            7 => 3,
+            8 => 4,
+        },
+    },
+    0x0076 => { #PH (K-5)
+        Name => 'FaceDetect',
+        Writable => 'int8u',
+        Count => 2,
+        PrintConv => [
+            { 0 => 'Off', 16 => 'On (16 faces max)' },
+            '"$val faces detected"',
+        ],
+    },
+    0x0077 => { #PH (K-5, guess)
+        # set by taking a picture with face detect AF,
+        # but it isn't reset until camera is turned off? - PH
+        Name => 'FaceDetectFrameSize',
+        Writable => 'int16u',
+        Count => 2,
+    },
+    # 0x0078 - int16u[2]: '0 0' (K-5,K-7,K-r,K-x)
     0x0079 => { #PH
         Name => 'ShadowCompensation',
         Writable => 'int8u',
         Count => -1,
+        PrintConvColumns => 2,
         PrintConv => {
             # (1 value for K-m/K2000, 2 for 645D)
             0 => 'Off',
@@ -1416,6 +1726,53 @@ my %lensCode = (
             '1 1' => 'Weak',
             '1 2' => 'Normal',
             '1 3' => 'Strong',
+        },
+    },
+    0x007a => { #PH
+        Name => 'ISOAutoParameters',
+        Writable => 'int8u',
+        Count => 2,
+        PrintConv => {
+            '1 0' => 'Slow',
+            '2 0' => 'Standard',
+            '3 0' => 'Fast',
+        },
+    },
+    0x007b => { #PH (K-5)
+        Name => 'CrossProcess',
+        Writable => 'int8u',
+        PrintConvColumns => 2,
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Random',
+            2 => 'Preset 1',
+            3 => 'Preset 2',
+            4 => 'Preset 3',
+            33 => 'Favorite 1',
+            34 => 'Favorite 2',
+            35 => 'Favorite 3',
+        },
+    },
+    0x007d => { #PH
+        Name => 'LensCorr',
+        Format => 'undef', # (written as int8u)
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::LensCorr' },
+    },
+    # 0x007e - int32u: 15859,15860,15864,15865,16315 (K-5 PEF/DNG only) - PH
+    0x007f => { #PH (K-5)
+        Name => 'BleachBypassToning',
+        Writable => 'int16u',
+        PrintConvColumns => 2,
+        PrintConv => {
+            65535 => 'Off',
+            1 => 'Green',
+            2 => 'Yellow',
+            3 => 'Orange',
+            4 => 'Red',
+            5 => 'Magenta',
+            6 => 'Purple',
+            7 => 'Blue',
+            8 => 'Cyan',
         },
     },
     0x0200 => { #5
@@ -1432,7 +1789,7 @@ my %lensCode = (
         Writable => 'int16u',
         Count => 4,
     },
-    # 0x0202: int16u[4] - values: all 0's in all my samples
+    # 0x0202: int16u[4]: all 0's in all my samples
     0x0203 => { #JD (not really sure what these mean)
         Name => 'ColorMatrixA',
         Writable => 'int16s',
@@ -1455,13 +1812,12 @@ my %lensCode = (
         Name => 'CameraSettings',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Pentax::CameraSettings',
+            ByteOrder => 'BigEndian',
         },
     },
     0x0206 => { #PH
         Name => 'AEInfo',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Pentax::AEInfo',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::AEInfo' },
     },
     0x0207 => [ #PH
         {
@@ -1474,51 +1830,65 @@ my %lensCode = (
                 $$self{Model}=~/(\*ist|GX-1[LS])/ or
                ($$self{Model}=~/(K100D|K110D)/ and $$valPt=~/^.{20}(\xff|\0\0)/s)
             },
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Pentax::LensInfo',
-            },
+            SubDirectory => { TagTable => 'Image::ExifTool::Pentax::LensInfo' },
         },{
             Name => 'LensInfo',
-            SubDirectory => {
-                TagTable => 'Image::ExifTool::Pentax::LensInfo2',
-            },
+            Condition => '$count < 90',
+            SubDirectory => { TagTable => 'Image::ExifTool::Pentax::LensInfo2' },
+        },{
+            Name => 'LensInfo',
+            Condition => '$count == 90',
+            SubDirectory => { TagTable => 'Image::ExifTool::Pentax::LensInfo3' },
+        },{
+            Name => 'LensInfo',
+            SubDirectory => { TagTable => 'Image::ExifTool::Pentax::LensInfo4' },
         }
     ],
-    0x0208 => { #PH
-        Name => 'FlashInfo',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Pentax::FlashInfo',
+    0x0208 => [ #PH
+        {
+            Name => 'FlashInfo',
+            Condition => '$count == 27',
+            Notes => 'K10D, K20D and K200D',
+            SubDirectory => { TagTable => 'Image::ExifTool::Pentax::FlashInfo' },
         },
-    },
+        {
+            Name => 'FlashInfoUnknown',
+            SubDirectory => { TagTable => 'Image::ExifTool::Pentax::FlashInfoUnknown' },
+        },
+    ],
     0x0209 => { #PH
         Name => 'AEMeteringSegments',
         Format => 'int8u',
-        Count => 16,
-        Notes => 'measurements from each of the 16 AE metering segments, converted to LV',
+        Count => -1,
+        Notes => q{
+            measurements from each of the 16 AE metering segments for models such as the
+            K10D, and 77 metering segments for models such as the K-5, converted to LV
+        },
         %convertMeteringSegments,
-        # metering segment locations (ref JD):
+        #    16 metering segment             77 metering segment
+        #    locations (ref JD)              locations (ref PH, K05)
         # +-------------------------+
-        # |           14            |
-        # |    +---+---+---+---+    |
-        # |    | 5 | 3/1\ 2| 4 |    |
-        # |  +-+-+-+-+ - +-+-+-+-+  |
-        # +--+ 9 | 7 ||0|| 6 | 8 +--+
-        # |  +-+-+-+-+ - +-+-+-+-+  |
-        # |    |13 |11\ /10|12 |    |
-        # |    +---+---+---+---+    |
-        # |           15            |
+        # |           14            | +----------------------------------+
+        # |    +---+---+---+---+    | |  0  1  2  3  4  5  6  7  8  9 10 |
+        # |    | 5 | 3/1\ 2| 4 |    | | 11 12 13 14 15 16 17 18 19 20 21 |
+        # |  +-+-+-+-+ - +-+-+-+-+  | | 22 23 24 25 26 27 28 29 30 31 32 |
+        # +--+ 9 | 7 ||0|| 6 | 8 +--+ | 33 34 35 36 37 38 39 40 41 42 43 |
+        # |  +-+-+-+-+ - +-+-+-+-+  | | 44 45 46 47 48 49 50 51 52 53 54 |
+        # |    |13 |11\ /10|12 |    | | 55 56 57 58 59 60 61 62 63 64 65 |
+        # |    +---+---+---+---+    | | 66 67 68 69 70 71 72 73 74 75 76 |
+        # |           15            | +----------------------------------+
         # +-------------------------+
     },
     0x020a => { #PH/JD/19
         Name => 'FlashMeteringSegments',
         Format => 'int8u',
-        Count => 16,
+        Count => -1,
         %convertMeteringSegments,
     },
     0x020b => { #PH/JD/19
         Name => 'SlaveFlashMeteringSegments',
         Format => 'int8u',
-        Count => 16,
+        Count => -1,
         Notes => 'used in wireless control mode',
         %convertMeteringSegments,
     },
@@ -1564,16 +1934,18 @@ my %lensCode = (
     },
     0x0215 => { #PH
         Name => 'CameraInfo',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Pentax::CameraInfo',
-        },
+        Format => 'undef', # (written as int32u)
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::CameraInfo' },
     },
     0x0216 => { #PH
         Name => 'BatteryInfo',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Pentax::BatteryInfo',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::BatteryInfo' },
+        # counts:
+        # 4 (K-m,K2000=4xAA), 6 (*istD,K10D,K100D,K110D=2xCR-V3/4xAA),
+        # 7 (K20D=D-LI50, K200D=4xAA), 8 (645D=D-LI90), 10 (K-r pre-production?),
+        # 14 (K-7=D-LI90, K-r=D-LI109/4xAA, K-x=4xAA), 26 (K-5=D-LI90)
     },
+    # 0x021a - undef[1068] (K-5)
     0x021b => { #19
         Name => 'SaturationInfo',
         Flags => [ 'Unknown', 'Binary' ],
@@ -1588,6 +1960,9 @@ my %lensCode = (
         # High:     0000000238c0e960fde0f9203140f5a0fce0f1e031403f00e600fb00f7803760f120fc60ef403460
         # Very High:000000023d20e520fdc0f7203420f4c0fb60ee6036404400e120fae0f5403aa0f020fac0eb403a00
     },
+    # 0x021c - undef[18] (K-5)
+    # 0x021d - undef[18] (K-5)
+    # 0x021e - undef[8] (K-5)
     0x021f => { #JD
         Name => 'AFInfo',
         SubDirectory => {
@@ -1605,23 +1980,49 @@ my %lensCode = (
         Writable => 0,
         Notes => 'found in K10D, K20D and K2000D PEF images',
     },
+    # 0x0221 - undef[138] (K-5)
     0x0222 => { #PH
         Name => 'ColorInfo',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Pentax::ColorInfo',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::ColorInfo' },
     },
+    # 0x0223 - undef[198] (K-5 PEF/DNG only)
     0x0224 => { #19
         Name => 'EVStepInfo',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Pentax::EVStepInfo',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::EVStepInfo' },
     },
-    # 0x0226: undef[9] (K20D,K200D) - PH
+    0x0226 => { #PH
+        Name => 'ShotInfo', # (may want to change this later when more is decoded)
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::ShotInfo' },
+    },
+    # 0x0227 - undef[64]: all zeros (K-5)
+    # 0x0228 - undef[64]: all zeros (K-5)
     0x0229 => { #PH (verified) (K-m, K-x, K-7)
         Name => 'SerialNumber',
         Writable => 'string',
         Notes => 'left blank by some cameras',
+    },
+    0x022a => { #PH (K-5)
+        Name => 'FilterInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::FilterInfo',
+            ByteOrder => 'BigEndian',
+        },
+    },
+    0x022b => { #PH (K-5)
+        Name => 'LevelInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::LevelInfo' },
+    },
+    # 0x022c - undef[46] (K-5)
+    # 0x022d - undef[100] (K-5)
+    0x022e => { #PH (K-5 AVI videos)
+        Name => 'Artist',
+        Groups => { 2 => 'Author' },
+        Writable => 'string',
+    },
+    0x022f => { #PH (K-5 AVI videos)
+        Name => 'Copyright',
+        Groups => { 2 => 'Author' },
+        Writable => 'string',
     },
     0x0230 => { #PH (K-x AVI videos)
         Name => 'FirmwareVersion',
@@ -1632,6 +2033,22 @@ my %lensCode = (
         # AVI Software tag for a different string, "PENTAX K-x".
         Writable => 'string',
     },
+    0x0231 => { #PH (K-5)
+        Name => 'ContrastDetectAFArea',
+        Writable => 'int16u',
+        Count => 4,
+        Notes => q{
+            AF area of the most recent contrast-detect focus operation. Coordinates
+            are left, top, width and height in a 720x480 frame, with Y downwards
+        },
+    },
+    0x0235 => { #PH (K-5)
+        Name => 'CrossProcessParams',
+        # (it would be interesting to know exactly what these mean)
+        Writable => 'undef',
+        Format => 'int8u',
+        Count => 10,
+    },
     0x03fe => { #PH
         Name => 'DataDump',
         Writable => 0,
@@ -1639,9 +2056,7 @@ my %lensCode = (
     },
     0x03ff => { #PH
         Name => 'UnknownInfo',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Pentax::UnknownInfo',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::UnknownInfo' },
     },
     0x0402 => { #5
         Name => 'ToneCurve',
@@ -1651,6 +2066,9 @@ my %lensCode = (
         Name => 'ToneCurves',
         PrintConv => '\$val',
     },
+    # 0x0404 - undef[2086] (K-5)
+    # 0x0405 - undef[24200] (K-5 PEF/DNG only)
+    # 0x0406 - undef[4116] (K-5)
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -1663,12 +2081,8 @@ my %lensCode = (
 
 # shake reduction information (ref PH)
 %Image::ExifTool::Pentax::SRInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     NOTES => 'Shake reduction information.',
     0 => {
         Name => 'SRResult',
@@ -1686,10 +2100,11 @@ my %lensCode = (
         PrintConv => {
             0 => 'Off',
             1 => 'On',
-            4 => 'Off (4)', # (K20D, K200D, K-7)
+            4 => 'Off (4)', # (K20D, K200D, K-7, K-5)
             5 => 'On (5)', #(guess) (K20D)
+            # (got 5 for K-5 with HDR [auto-align off only], Composition Adjust, and movie with SR off!)
             6 => 'On (Video)', # (K-7)
-            7 => 'On (7)', #(NC) (K20D, K200D, K-m)
+            7 => 'On (7)', #(NC) (K20D, K200D, K-m, K-5)
             15 => 'On (15)', # (K20D (with Tamron 10-20mm @ 10mm))
         },
     },
@@ -1717,15 +2132,102 @@ my %lensCode = (
     },
 );
 
+# face detection information (ref PH, K-5)
+%Image::ExifTool::Pentax::FaceInfo = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => 'FacesDetected',
+    2 => {
+        Name => 'FacePosition',
+        Notes => q{
+            X/Y coordinates of the main face in percent of frame size, with positive Y
+            downwards
+        },
+        Format => 'int8u[2]',
+    },
+);
+
+# automatic white balance settings (ref PH, K-5)
+%Image::ExifTool::Pentax::AWBInfo = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # 0 - always 1?
+    # (data ends here for the K20D, K200D, K-x and K-7)
+    0 => {
+        Name => 'WhiteBalanceAutoAdjustment',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+        },
+    },
+    1 => { # (exists only for K-5)
+        Name => 'TungstenAWB',
+        PrintConv => {
+            0 => 'Subtle Correction',
+            1 => 'Strong Correction',
+        },
+    },
+);
+
+# world time settings (ref PH, K-5)
+%Image::ExifTool::Pentax::TimeInfo = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Time' },
+    0.1 => {
+        Name => 'WorldTimeLocation',
+        Mask => 0x01,
+        PrintConv => {
+            0x00 => 'Hometown',
+            0x01 => 'Destination',
+        },
+    },
+    0.2 => {
+        Name => 'HometownDST',
+        Mask => 0x02,
+        PrintConv => {
+            0x00 => 'No',
+            0x02 => 'Yes',
+        },
+    },
+    0.3 => {
+        Name => 'DestinationDST',
+        Mask => 0x04,
+        PrintConv => {
+            0x00 => 'No',
+            0x04 => 'Yes',
+        },
+    },
+    2 => {
+        Name => 'HometownCity',
+        SeparateTable => 'City',
+        PrintConv => \%pentaxCities,
+    },
+    3 => {
+        Name => 'DestinationCity',
+        SeparateTable => 'City',
+        PrintConv => \%pentaxCities,
+    },
+);
+
+# lens distortion correction (ref PH, K-5)
+%Image::ExifTool::Pentax::LensCorr = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    0 => {
+        Name => 'DistortionCorrection',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    1 => {
+        Name => 'ChromaticAberrationCorrection',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+);
+
 # camera settings (ref 19)
 %Image::ExifTool::Pentax::CameraSettings = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    WRITABLE => 1,
     PRIORITY => 0,
-    FIRST_ENTRY => 0,
     NOTES => 'Shot information written by Pentax DSLR cameras.',
     0 => {
         Name => 'PictureMode2',
@@ -1759,15 +2261,15 @@ my %lensCode = (
             3 => 'MTF',
         },
     },
-    1.2 => {
+    1.2 => { # (K10D, K-5)
         Name => 'EVSteps',
         Mask => 0x20,
         PrintConv => {
-            0x00 => '1/2 EV steps',
-            0x20 => '1/3 EV steps',
+            0x00 => '1/2 EV Steps',
+            0x20 => '1/3 EV Steps',
         },
     },
-    1.3 => {
+    1.3 => { # (this bit is set for movies with the K-5 - PH)
         Name => 'E-DialInProgram',
         # always set even when not in Program AE mode
         Mask => 0x40,
@@ -1776,7 +2278,7 @@ my %lensCode = (
             0x40 => 'P Shift',
         },
     },
-    1.4 => {
+    1.4 => { # (K10D, K-5)
         Name => 'ApertureRingUse',
         # always set even Aperture Ring is in A mode
         Mask => 0x80,
@@ -1790,6 +2292,7 @@ my %lensCode = (
         Notes => 'the camera flash options settings, set even if the flash is off',
         Mask => 0xf0,
         ValueConv => '$val>>4',
+        ValueConvInv => '$val<<4',
         # Note: These tags correlate with the FlashMode and InternalFlashMode values,
         # and match what is displayed by the Pentax software
         PrintConv => {
@@ -1869,7 +2372,8 @@ my %lensCode = (
         PrintConv => {
             0 => 'Single-frame',
             BITMASK => {
-                0 => 'Continuous',
+                0 => 'Continuous', # (K-5 Hi)
+                1 => 'Continuous (Lo)', #PH (K-5)
                 2 => 'Self-timer (12 s)', #PH
                 3 => 'Self-timer (2 s)', #PH
                 4 => 'Remote Control (3 s delay)',
@@ -1901,6 +2405,8 @@ my %lensCode = (
         PrintHex => 1,
         PrintConv => {
             0 => 'n/a',
+            0x02 => '1 of 2', #PH (K-5)
+            0x12 => '2 of 2', #PH (K-5)
             0x03 => '1 of 3',
             0x13 => '2 of 3',
             0x23 => '3 of 3',
@@ -1948,37 +2454,69 @@ my %lensCode = (
         Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
         Notes => 'K10D only',
         # this is actually a bit field: - PH
-        # bit 0=JPEG, bit 1=RAW; high nibble: 0x0=best, 0x1=better, 0x2=good
+        # bit 0=JPEG, bit 2=PEF, bit 3=DNG; high nibble: 0x00=best, 0x20=better, 0x40=good
+        PrintHex => 1,
         PrintConv => {
-            1 => 'JPEG (Best)', #PH
-            4 => 'RAW (PEF, Best)',
-            5 => 'RAW+JPEG (PEF, Best)',
-            8 => 'RAW (DNG, Best)', #PH (NC)
-            9 => 'RAW+JPEG (DNG, Best)', #PH (NC)
-            33 => 'JPEG (Better)', #PH
-            36 => 'RAW (PEF, Better)',
-            37 => 'RAW+JPEG (PEF, Better)', #PH
-            40 => 'RAW (DNG, Better)', #PH
-            41 => 'RAW+JPEG (DNG, Better)', #PH (NC)
-            65 => 'JPEG (Good)',
-            68 => 'RAW (PEF, Good)', #PH (NC)
-            69 => 'RAW+JPEG (PEF, Good)', #PH (NC)
-            72 => 'RAW (DNG, Good)', #PH (NC)
-            73 => 'RAW+JPEG (DNG, Good)',
+            0x01 => 'JPEG (Best)', #PH
+            0x04 => 'RAW (PEF, Best)',
+            0x05 => 'RAW+JPEG (PEF, Best)',
+            0x08 => 'RAW (DNG, Best)', #PH (NC)
+            0x09 => 'RAW+JPEG (DNG, Best)', #PH (NC)
+            0x21 => 'JPEG (Better)', #PH
+            0x24 => 'RAW (PEF, Better)',
+            0x25 => 'RAW+JPEG (PEF, Better)', #PH
+            0x28 => 'RAW (DNG, Better)', #PH
+            0x29 => 'RAW+JPEG (DNG, Better)', #PH (NC)
+            0x41 => 'JPEG (Good)',
+            0x44 => 'RAW (PEF, Good)', #PH (NC)
+            0x45 => 'RAW+JPEG (PEF, Good)', #PH (NC)
+            0x48 => 'RAW (DNG, Good)', #PH (NC)
+            0x49 => 'RAW+JPEG (DNG, Good)',
             # have seen values of 0,2,34 for other models (not K10D) - PH
         },
     },
-    14 => { #PH
+    14.1 => { #PH
         Name => 'JpgRecordedPixels',
         Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
         Notes => 'K10D only',
+        Mask => 0x03,
         PrintConv => {
             0 => '10 MP',
             1 => '6 MP',
             2 => '2 MP',
-            # have seen 80,108,240,252 for *istD models - PH
         },
     },
+    14.2 => { #PH (K-5)
+        Name => 'LinkAEToAFPoint',
+        Condition => '$$self{Model} =~ /K-5\b/',
+        Notes => 'K-5 only',
+        Mask => 0x01,
+        PrintConv => {
+            0x00 => 'Off',
+            0x01 => 'On',
+        },
+    },
+    14.3 => { #PH (K-5)
+        Name => 'SensitivitySteps',
+        Condition => '$$self{Model} =~ /K-5\b/',
+        Notes => 'K-5 only',
+        Mask => 0x02,
+        PrintConv => {
+            0x00 => '1 EV Steps',
+            0x02 => 'As EV Steps',
+        },
+    },
+    14.4 => { #PH (K-5)
+        Name => 'ISOAuto',
+        Condition => '$$self{Model} =~ /K-5\b/',
+        Notes => 'K-5 only',
+        Mask => 0x04,
+        PrintConv => {
+            0x00 => 'Off',
+            0x04 => 'On',
+        },
+    },
+    # 14.5 Mask 0x80 - changes for K-5
     16 => {
         Name => 'FlashOptions2',
         Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
@@ -2015,6 +2553,7 @@ my %lensCode = (
             },
         },
     },
+    # 16 Mask 0x0f - changes when changing EV steps? (K-5)
     17.1 => {
         Name => 'SRActive',
         Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
@@ -2062,6 +2601,7 @@ my %lensCode = (
             0x02 => 'As EV Steps',
         },
     },
+    # 17 Mask 0x08 - changed when changing Auto ISO range (K-5)
     18 => {
         Name => 'TvExposureTimeSetting',
         Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
@@ -2106,12 +2646,8 @@ my %lensCode = (
 
 # auto-exposure information (ref PH)
 %Image::ExifTool::Pentax::AEInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     # instead of /8, should these be PentaxEV(), as in CameraSettings? - PH
     0 => {
         Name => 'AEExposureTime',
@@ -2227,6 +2763,7 @@ my %lensCode = (
             },
         },
     },
+    # 13 - related to program mode somehow - PH
     14 => { #19
         Name => 'FlashExposureCompSet',
         Format => 'int8s',
@@ -2244,18 +2781,14 @@ my %lensCode = (
 
 # lens information (ref PH)
 %Image::ExifTool::Pentax::LensInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    VARS => { HAS_SUBDIR => 1 },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
-    NOTES => 'Pentax lens information structure.',
+    IS_SUBDIR => [ 3 ],
+    NOTES => 'Pentax lens information structure for models such as the *istD.',
     0 => {
         Name => 'LensType',
         Format => 'int8u[2]',
-        Priority => 0, # (not valid for 645D)
+        Priority => 0,
         PrintConv => \%pentaxLensTypes,
         SeparateTable => 1,
     },
@@ -2268,14 +2801,10 @@ my %lensCode = (
 
 # lens information for newer models (ref PH)
 %Image::ExifTool::Pentax::LensInfo2 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    VARS => { HAS_SUBDIR => 1 },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
-    NOTES => 'Pentax lens information structure for newer models (K10D and later).',
+    IS_SUBDIR => [ 4 ],
+    NOTES => 'Pentax lens information structure for models such as the K10D and K20D.',
     0 => {
         Name => 'LensType',
         Format => 'int8u[4]',
@@ -2296,14 +2825,62 @@ my %lensCode = (
     },
 );
 
+# lens information for 645D (ref PH)
+%Image::ExifTool::Pentax::LensInfo3 = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    IS_SUBDIR => [ 13 ],
+    NOTES => 'Pentax lens information structure for 645D.',
+    1 => {
+        Name => 'LensType',
+        Format => 'int8u[4]',
+        Priority => 0,
+        ValueConv => q{
+            my @v = split(' ',$val);
+            $v[0] &= 0x0f;
+            $v[1] = $v[2] * 256 + $v[3]; # (always high byte first)
+            return "$v[0] $v[1]";
+        },
+        PrintConv => \%pentaxLensTypes,
+        SeparateTable => 1,
+    },
+    13 => {
+        Name => 'LensData',
+        Format => 'undef[17]',
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::LensData' },
+    },
+);
+
+# lens information for K-5, K-r, etc (ref PH)
+%Image::ExifTool::Pentax::LensInfo4 = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    IS_SUBDIR => [ 12 ],
+    NOTES => 'Pentax lens information structure for models such as the K-5 and K-r.',
+    1 => {
+        Name => 'LensType',
+        Format => 'int8u[4]',
+        Priority => 0,
+        ValueConv => q{
+            my @v = split(' ',$val);
+            $v[0] &= 0x0f;
+            $v[1] = $v[2] * 256 + $v[3]; # (always high byte first)
+            return "$v[0] $v[1]";
+        },
+        PrintConv => \%pentaxLensTypes,
+        SeparateTable => 1,
+    },
+    12 => {
+        Name => 'LensData',
+        Format => 'undef[17]',
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::LensData' },
+    },
+);
+
 # lens data information, including lens codes (ref PH)
 %Image::ExifTool::Pentax::LensData = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     NOTES => q{
         Pentax lens data information.  Some of these tags require interesting binary
         gymnastics to decode them into useful values.
@@ -2339,7 +2916,7 @@ my %lensCode = (
         Name => 'LensKind',
         %lensCode,
     },
-    2 => { # LC1 = lens data
+    2 => { # LC1 = lens data (changes with AF setting)
         Name => 'LC1',
         %lensCode,
     },
@@ -2446,17 +3023,14 @@ my %lensCode = (
 
 # flash information (ref PH)
 %Image::ExifTool::Pentax::FlashInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     0 => {
         Name => 'FlashStatus',
         PrintHex => 1,
         PrintConv => { #19
             0x00 => 'Off',
+            0x01 => 'Off (1)', #PH (K-5)
             0x02 => 'External, Did not fire', # 0010
             0x06 => 'External, Fired',        # 0110
             0x09 => 'Internal, Did not fire', # 1001
@@ -2503,6 +3077,7 @@ my %lensCode = (
             0xc6 => 'On, High-speed Sync',
             0xcc => 'On, Wireless',
             0xcd => 'On, Wireless, High-speed Sync',
+            0xf0 => 'Not Connected', #PH (K-5)
         },
     },
     3 => {
@@ -2574,14 +3149,16 @@ my %lensCode = (
     # ? => 'ExternalFlashBOutput',
 );
 
+%Image::ExifTool::Pentax::FlashInfoUnknown = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # 4 - changes with FEC for K-5 - PH
+);
+
 # camera manufacture information (ref PH)
 %Image::ExifTool::Pentax::CameraInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     FORMAT => 'int32u',
     0 => {
         Name => 'PentaxModelID',
@@ -2620,56 +3197,78 @@ my %lensCode = (
 
 # battery information (ref PH)
 %Image::ExifTool::Pentax::BatteryInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
-    0 => { #19
+    0.1 => { #19
         Name => 'PowerSource',
-        PrintHex => 1,
+        Mask => 0x0f,
         # have seen the upper bit set (value of 0x82) for the
         # *istDS and K100D, but I'm not sure what this means - PH
-        # I've also seen: 0x42 (K2000), 0xf2 (K-7) - PH
-        #
+        # I've also seen: 0x42 (K2000), 0xf2 (K-7,K-r,K-5), 0x12,0x22 (K-x) - PH
         PrintConv => {
             2 => 'Body Battery',
             3 => 'Grip Battery',
             4 => 'External Power Supply', #PH
         },
     },
-    1 => [
+    1.1 => [
         {
-            Name => 'BatteryStates',
-            Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
-            Notes => 'decoded for K10D only',
-            ValueConv => '($val >> 4) . " " . ($val & 0x0f)',
-            ValueConvInv => 'my @a=split(" ",$val); ($a[0] << 4) + $a[1]',
-            PrintConv => [{ #19
-                 1 => 'Body Battery Empty or Missing',
-                 2 => 'Body Battery Almost Empty',
-                 3 => 'Body Battery Running Low',
-                 4 => 'Body Battery Full',
-            },{
-                 1 => 'Grip Battery Empty or Missing',
-                 2 => 'Grip Battery Almost Empty',
-                 3 => 'Grip Battery Running Low',
-                 4 => 'Grip Battery Full',
-            }],
+            Name => 'BodyBatteryState',
+            Condition => '$$self{Model} =~ /(K10D|GX10|K20D|GX20)\b/',
+            Notes => 'K10D and K20D',
+            Mask => 0xf0,
+            PrintConv => { #19
+                 0x10 => 'Empty or Missing',
+                 0x20 => 'Almost Empty',
+                 0x30 => 'Running Low',
+                 0x40 => 'Full',
+            },
+        },{
+            Name => 'BodyBatteryState',
+            Condition => '$$self{Model} =~ /(K-5|K-7)\b/',
+            Notes => 'K-5 and K-7',
+            Mask => 0xf0,
+            PrintConv => {
+                 0x10 => 'Empty or Missing',
+                 0x20 => 'Almost Empty',
+                 0x30 => 'Running Low',
+                 0x40 => 'Close to Full',
+                 0x50 => 'Full',
+            },
+        },{
+            Name => 'BodyBatteryState',
+            Notes => 'decoding unknown for other models',
+            Mask => 0xf0,
+            ValueConv => '$val >> 4',
+            ValueConvInv => '$val << 4',
         },
+    ],
+    1.2 => [
         {
-            Name => 'BatteryStates',
-            ValueConv => '($val >> 4) . " " . ($val & 0x0f)',
-            ValueConvInv => 'my @a=split(" ",$val); ($a[0] << 4) + $a[1]',
-        }
+            Name => 'GripBatteryState',
+            Condition => '$$self{Model} =~ /(K10D|GX10|K20D|GX20)\b/',
+            Notes => 'K10D and K20D',
+            Mask => 0x0f,
+            PrintConv => { #19
+                 0x01 => 'Empty or Missing',
+                 0x02 => 'Almost Empty',
+                 0x03 => 'Running Low',
+                 0x04 => 'Full',
+            },
+        },{
+            Name => 'GripBatteryState',
+            Notes => 'decoding unknown for other models',
+            Unknown => 1, # (doesn't appear to be valid for the K-5)
+            Mask => 0x0f,
+        },
     ],
     # internal and grip battery voltage Analogue to Digital measurements,
     # open circuit and under load
     2 => [
         {
-            Name => 'BatteryADBodyNoLoad',
-            Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
+            Name => 'BodyBatteryADNoLoad',
+            Description => 'Body Battery A/D No Load',
+            Condition => '$$self{Model} =~ /(K10D|GX10|K20D|GX20)\b/',
             Notes => 'roughly calibrated for K10D with a new Pentax battery',
             # rough linear calibration drops quickly below 30% - PH
             # DVM readings: 8.18V=186, 8.42-8.40V=192 (full), 6.86V=155 (empty)
@@ -2677,33 +3276,70 @@ my %lensCode = (
             PrintConvInv => '$val=~s/ .*//; $val',
         },
         {
-            Name => 'BatteryADBodyNoLoad',
+            Name => 'BodyBatteryVoltage1',
+            Condition => '$$self{Model} =~ /(K-5|K-7)\b/',
+            Format => 'int16u',
+            Notes => 'K-5 and K-7',
+            ValueConv => '$val / 100',
+            ValueConvInv => '$val * 100',
+            PrintConv => 'sprintf("%.2f V", $val)',
+            PrintConvInv => '$val =~ s/\s*V$//',
         },
     ],
-    3 => [
+    3 => {
+        Name => 'BodyBatteryADLoad',
+        Description => 'Body Battery A/D Load',
+        Condition => '$$self{Model} =~ /(K10D|GX10|K20D|GX20)\b/',
+        # [have seen 187] - PH
+        PrintConv => 'sprintf("%d (%.1fV, %d%%)",$val,$val*8.18/186,($val-152)*100/34)',
+        PrintConvInv => '$val=~s/ .*//; $val',
+    },
+    4 => [
         {
-            Name => 'BatteryADBodyLoad',
-            Condition => '$$self{Model} =~ /(K10D|GX10)\b/',
-            # [have seen 187] - PH
-            PrintConv => 'sprintf("%d (%.1fV, %d%%)",$val,$val*8.18/186,($val-152)*100/34)',
-            PrintConvInv => '$val=~s/ .*//; $val',
+            Name => 'GripBatteryADNoLoad',
+            Description => 'Grip Battery A/D No Load',
+            Condition => '$$self{Model} =~ /(K10D|GX10|K20D|GX20)\b/',
         },
         {
-            Name => 'BatteryADBodyLoad',
+            Name => 'BodyBatteryVoltage2',
+            Condition => '$$self{Model} =~ /(K-5|K-7)\b/',
+            Format => 'int16u',
+            ValueConv => '$val / 100',
+            ValueConvInv => '$val * 100',
+            PrintConv => 'sprintf("%.2f V", $val)',
+            PrintConvInv => '$val =~ s/\s*V$//',
         },
     ],
-    4 => 'BatteryADGripNoLoad',
-    5 => 'BatteryADGripLoad',
+    5 => {
+        Name => 'GripBatteryADLoad',
+        Condition => '$$self{Model} =~ /(K10D|GX10|K20D|GX20)\b/',
+        Description => 'Grip Battery A/D Load',
+    },
+    6 => {
+        Name => 'BodyBatteryVoltage3',
+        Condition => '$$self{Model} =~ /K-5\b/',
+        Format => 'int16u',
+        Notes => 'K-5 only',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+        PrintConv => 'sprintf("%.2f V", $val)',
+        PrintConvInv => '$val =~ s/\s*V$//',
+    },
+    8 => {
+        Name => 'BodyBatteryVoltage4',
+        Condition => '$$self{Model} =~ /K-5\b/',
+        Format => 'int16u',
+        ValueConv => '$val / 100',
+        ValueConvInv => '$val * 100',
+        PrintConv => 'sprintf("%.2f V", $val)',
+        PrintConvInv => '$val =~ s/\s*V$//',
+    },
 );
 
 # auto focus information
 %Image::ExifTool::Pentax::AFInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     # AF Info tag names in K10D debugging output - PH:
     # SelectArea, InFocusArea, Predictor, Defocus, IntegTime2msStep,
     # CalFlag, ContrastFlag, PrecalFlag, SelectSensor
@@ -2809,12 +3445,8 @@ my %lensCode = (
 
 # color information - PH
 %Image::ExifTool::Pentax::ColorInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     FORMAT => 'int8s',
     16 => {
         Name => 'WBShiftAB',
@@ -2828,13 +3460,8 @@ my %lensCode = (
 
 # EV step size information - ref 19
 %Image::ExifTool::Pentax::EVStepInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    WRITABLE => 1,
-    FORMAT => 'int8u',
-    FIRST_ENTRY => 0,
     0 => {
         Name => 'EVSteps',
         PrintConv => {
@@ -2851,19 +3478,140 @@ my %lensCode = (
     },
 );
 
+# shot information? - ref PH (K-5)
+%Image::ExifTool::Pentax::ShotInfo = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # 0: 0xf2/0xf3 (HDR), 0xf0 (otherwise)
+    1 => { # (presumably this is from an orientation sensor)
+        Name => 'CameraOrientation',
+        Condition => '$$self{Model} =~ /K-[^m]/',
+        Notes => 'K-5, K-7, K-r and K-x',
+        PrintHex => 1,
+        PrintConv => {
+            0x10 => 'Horizontal (normal)',
+            0x20 => 'Rotate 180',
+            0x30 => 'Rotate 90 CW',
+            0x40 => 'Rotate 270 CW',
+            # 0x50 - got this when pointing up
+        },
+    },
+    # 2: 0xd3 (live view), 0xdb (HDR), 0x7b (otherwise)
+    # 3: 0xff
+    # 4: 0x64, 0x6a, 0x6f, 0xa4, 0xaa, 0xab, 0xbf
+    # 5: 0xfe
+    # 6: 0x0e
+    # 7: 0x02 (live view), 0x06 (otherwise)
+    # 8-10: 0x00
+);
+
+# digital filter information - ref PH (K-5)
+%Image::ExifTool::Pentax::FilterInfo = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    FORMAT => 'int8u',
+    NOTES => q{
+        The parameters associated with each type of digital filter are unique, and
+        these settings are also extracted with the DigitalFilter tag.  Information
+        is not extracted for filters that are "Off" unless the Unknown option is
+        used.
+    },
+    0 => {
+        Name => 'SourceDirectoryIndex',
+        Format => 'int16u',
+    },
+    2 => {
+        Name => 'SourceFileIndex',
+        Format => 'int16u',
+    },
+    0x005 => { Name => 'DigitalFilter01', %digitalFilter },
+    0x016 => { Name => 'DigitalFilter02', %digitalFilter },
+    0x027 => { Name => 'DigitalFilter03', %digitalFilter },
+    0x038 => { Name => 'DigitalFilter04', %digitalFilter },
+    0x049 => { Name => 'DigitalFilter05', %digitalFilter },
+    0x05a => { Name => 'DigitalFilter06', %digitalFilter },
+    0x06b => { Name => 'DigitalFilter07', %digitalFilter },
+    0x07c => { Name => 'DigitalFilter08', %digitalFilter },
+    0x08d => { Name => 'DigitalFilter09', %digitalFilter },
+    0x09e => { Name => 'DigitalFilter10', %digitalFilter },
+    0x0af => { Name => 'DigitalFilter11', %digitalFilter },
+    0x0c0 => { Name => 'DigitalFilter12', %digitalFilter },
+    0x0d1 => { Name => 'DigitalFilter13', %digitalFilter },
+    0x0e2 => { Name => 'DigitalFilter14', %digitalFilter },
+    0x0f3 => { Name => 'DigitalFilter15', %digitalFilter },
+    0x104 => { Name => 'DigitalFilter16', %digitalFilter },
+    0x115 => { Name => 'DigitalFilter17', %digitalFilter },
+    0x126 => { Name => 'DigitalFilter18', %digitalFilter },
+    0x137 => { Name => 'DigitalFilter19', %digitalFilter },
+    0x148 => { Name => 'DigitalFilter20', %digitalFilter },
+);
+
+# electronic level information - ref PH (K-5)
+%Image::ExifTool::Pentax::LevelInfo = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FORMAT => 'int8s',
+    NOTES => 'Tags decoded from the electronic level information.',
+    0 => {
+        Name => 'LevelOrientation',
+        PrintConv => {
+            1 => 'Horizontal (normal)',
+            2 => 'Rotate 180',
+            3 => 'Rotate 90 CW',
+            4 => 'Rotate 270 CW',
+            9 => 'Unknown',
+            # 13 - got this when pointing up
+            # 33 - got this for Composition Adjust
+        },
+    },
+    1 => {
+        Name => 'RollAngle',
+        Notes => 'extracted as degrees of clockwise rotation',
+        ValueConv => '-$val / 2',
+        ValueConvInv => '-$val * 2',
+    },
+    2 => {
+        Name => 'PitchAngle',
+        Notes => 'extracted as degrees of upward tilt',
+        ValueConv => '-$val / 2',
+        ValueConvInv => '-$val * 2',
+    },
+);
+
 # unknown information - PH
 %Image::ExifTool::Pentax::UnknownInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
-    # first 8 bytes seem to be short integers which change with ISO (value is
-    # usually close to ISO/100) possibly smoothing or gain parameters? - PH
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # K10D: first 8 bytes seem to be short integers which change with ISO (value
+    # is usually close to ISO/100) possibly smoothing or gain parameters? - PH
     # byte 0-1 - Higher for high color temperatures (red boost or red noise suppression?)
     # byte 6-7 - Higher for low color temperatures (blue boost or blue noise suppression?)
     # also changing are bytes 10,11,14,15
+    0x0c => {
+        Name => 'CameraTemperature2',
+        # (it would be nice to know where these temperature sensors are located,
+        #  but since according to the manual the Slow Shutter Speed NR Auto mode
+        #  is based on "internal temperature", my guess is on the sensor itself.
+        #  These temperatures seem to rise more quickly than CameraTemperature when
+        #  shooting video.)
+        Condition => '$$self{Model} =~ /K-5\b/',
+        Format => 'int16s',
+        Notes => 'K-5 only',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+        PrintConv => 'sprintf("%.1f C", $val)',
+        PrintConvInv => '$val=~s/ ?c$//i; $val',
+    },
+    0x0e => {
+        Name => 'CameraTemperature3',
+        Condition => '$$self{Model} =~ /K-5\b/',
+        Format => 'int16s',
+        Notes => 'K-5 only',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+        PrintConv => 'sprintf("%.1f C", $val)',
+        PrintConvInv => '$val=~s/ ?c$//i; $val',
+    },
 );
 
 # Pentax type 2 (Casio-like) maker notes (ref 1)
@@ -3073,6 +3821,72 @@ my %lensCode = (
 );
 
 #------------------------------------------------------------------------------
+# Convert filter settings (ref PH, K-5)
+# Inputs: 0) value to convert, 1) flag for inverse conversion, 2) lookup table
+# Returns: converted value
+sub PrintFilter($$$)
+{
+    my ($val, $inv, $conv) = @_;
+    my (@vals, @cval, $t, $v);
+
+    if (not $inv) {
+        # forward conversion (reading):
+        @vals = split ' ',$val;
+        $t = shift @vals;
+        push @cval, $$conv{$t} || "Unknown ($t)";
+        while (@vals) {
+            $t = shift @vals;
+            $v = shift @vals;
+            next unless $t;
+            last unless defined $v;
+            my $c = $filterSettings{$t};
+            if ($c) {
+                my $c1 = $$c[1];
+                if (ref $c1) {
+                    $v = $$c1{$v} || "Unknown($v)";
+                } elsif ($v) {
+                    $v = sprintf $c1, $v;
+                }
+                push @cval, "$$c[0]=$v";
+            } else {
+                push @cval, "Unknown($t)=$v";
+            }
+        }
+        return @cval ? \@cval : undef;
+    } else {
+        # reverse conversion (writing):
+        @vals = split /,\s*/, $val;
+        # convert filter name
+        delete $$conv{OTHER}; # avoid recursion
+        $v = Image::ExifTool::ReverseLookup(shift(@vals), $conv);
+        $$conv{OTHER} = \&PrintFilter;
+        return undef unless defined $v;
+        push @cval, $v;
+        # generate a lookup table for the filter setting name
+        my %settingNames;
+        $settingNames{$_} = $filterSettings{$_}[0] foreach keys %filterSettings;
+        # convert filter settings
+        foreach $v (@vals) {
+            $v =~ /^(.*)=(.*)$/ or return undef;
+            ($t, $v) = ($1, $2);
+            # look up settings name
+            $t = Image::ExifTool::ReverseLookup($t, \%settingNames);
+            return undef unless defined $t;
+            if (ref $filterSettings{$t}[1]) {
+                # look up settings value
+                $v = Image::ExifTool::ReverseLookup($v, $filterSettings{$t}[1]);
+                return undef unless defined $v;
+            } else {
+                return undef unless Image::ExifTool::IsInt($v);
+            }
+            push @cval, $t, $v;
+        }
+        push @cval, (0) x (17 - @cval) if @cval < 17; # pad with zeros if necessary
+        return join(' ', @cval);
+    }
+}
+
+#------------------------------------------------------------------------------
 # Convert Pentax hex-based EV (modulo 8) to real number
 # Inputs: 0) value to convert
 # ie) 0x00 -> 0
@@ -3179,18 +3993,17 @@ the information should be stored to deduce the correct offsets.
 
 =item L<http://www.cybercom.net/~dcoffin/dcraw/>
 
-=item (...plus lots of testing with my Optio WP and K10D!)
+=item (...plus lots of testing with my Optio WP, K10D and K-5!)
 
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Wayne Smith, John Francis, Douglas O'Brien Cvetan Ivanov, Jens
-Duttke and Dave Nicholson for help figuring out some Pentax tags, Denis
-Bourez, Kazumichi Kawabata, David Buret, Barney Garrett, Axel Kellner, Anton
-Bondar and Albert Bogner for adding to the LensType list, and Ger Vermeulen
-and Niels Kristian Bech Jensen for contributing print conversion values for
-some tags.
+Duttke and Dave Nicholson for help figuring out some Pentax tags, Ger
+Vermeulen and Niels Kristian Bech Jensen for contributing print conversion
+values for some tags, and everyone who helped contribute to the LensType
+decoding.
 
 =head1 AUTHOR
 

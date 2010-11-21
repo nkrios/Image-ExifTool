@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.04';
+$VERSION = '1.06';
 
 # enable MWG strict mode by default
 # (causes non-standard EXIF, IPTC and XMP to be ignored)
@@ -31,17 +31,27 @@ sub OverwriteStringList($$$$);
     GROUPS => { 0 => 'Composite', 1 => 'MWG', 2 => 'Image' },
     VARS => { NO_ID => 1 },
     NOTES => q{
-        This table lists special Composite tags which are used to access other tags
-        based on the Metadata Working Group 1.01 recommendations.  These tags are
-        only accessible when the MWG module is loaded (via C<-use MWG> on the
-        command line, or C<use Image::ExifTool::MWG> in the API).  When reading, the
-        value of each MWG tag is B<Derived From> the specified tags based on the MWG
-        guidelines.  When writing, the value of the IPTCDigest tag is updated
-        automatically when the IPTC is changed if either the IPTCDigest tag didn't
-        exist beforehand or its value agreed with the original IPTC digest
-        (indicating that the XMP is synchronized with the IPTC).  IPTC information
-        is written only if the original file contained IPTC.  For more information
-        about the MWG recommendation, see L<http://www.metadataworkinggroup.org/>.
+        The Metadata Working Group (MWG) recommendations provide a set of rules to
+        allow certain overlapping EXIF, IPTC and XMP tags to be reconciled when
+        reading, and synchronized when writing.  The ExifTool MWG module is designed
+        to aid in the implementation of these recommendations.  (See
+        L<http://www.metadataworkinggroup.org/> for the complete MWG technical
+        specifications.)
+
+        The table below lists special Composite tags which are used to access other
+        tags based on the MWG 1.01 recommendations.  These tags are only accessible
+        when the MWG module is loaded.  The MWG module is loaded automatically by
+        the exiftool application if MWG is specified as a group for any tag on the
+        command line, or manually with the C<-use MWG> option.  Via the API, the MWG
+        module is loaded with "C<use Image::ExifTool::MWG>".
+
+        When reading, the value of each MWG tag is B<Derived From> the specified
+        tags based on the MWG guidelines.  When writing, the appropriate associated
+        tags are written.  The value of the IPTCDigest tag is updated automatically
+        when the IPTC is changed if either the IPTCDigest tag didn't exist
+        beforehand or its value agreed with the original IPTC digest (indicating
+        that the XMP is synchronized with the IPTC).  IPTC information is written
+        only if the original file contained IPTC.
 
         Loading the MWG module activates "strict MWG conformance mode", which has
         the effect of causing EXIF, IPTC and XMP in non-standard locations to be

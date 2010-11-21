@@ -8,6 +8,7 @@
 # References:   1) http://www.pkware.com/documents/casestudies/APPNOTE.TXT
 #               2) http://www.cpanforum.com/threads/9046
 #               3) http://www.gzip.org/zlib/rfc-gzip.html
+#               4) http://DataCompression.info/ArchiveFormats/RAR202.txt
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::ZIP;
@@ -16,7 +17,7 @@ use strict;
 use vars qw($VERSION $warnString);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.07';
 
 sub WarnProc($) { $warnString = $_[0]; }
 
@@ -163,6 +164,128 @@ my %openDocType = (
     10 => 'ArchivedFileName',
     11 => 'Comment',
 );
+
+# RAR tags (ref 4)
+%Image::ExifTool::ZIP::RAR = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Other' },
+    NOTES => 'These tags are extracted from RAR archive files.',
+    0 => {
+        Name => 'CompressedSize',
+        Format => 'int32u',
+    },
+    4 => {
+        Name => 'UncompressedSize',
+        Format => 'int32u',
+    },
+    8 => {
+        Name => 'OperatingSystem',
+        PrintConv => {
+            0 => 'MS-DOS',
+            1 => 'OS/2',
+            2 => 'Win32',
+            3 => 'Unix',
+        },
+    },
+    13 => {
+        Name => 'ModifyDate',
+        Format => 'int32u',
+        Groups => { 2 => 'Time' },
+        ValueConv => sub {
+            my $val = shift;
+            return sprintf('%.4d:%.2d:%.2d %.2d:%.2d:%.2d',
+                ($val >> 25) + 1980, # year
+                ($val >> 21) & 0x0f, # month
+                ($val >> 16) & 0x1f, # day
+                ($val >> 11) & 0x1f, # hour
+                ($val >> 5)  & 0x3f, # minute
+                 $val        & 0x1f  # second
+            );
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    18 => {
+        Name => 'PackingMethod',
+        PrintHex => 1,
+        PrintConv => {
+            0x30 => 'Stored',
+            0x31 => 'Fastest',
+            0x32 => 'Fast',
+            0x33 => 'Normal',
+            0x34 => 'Good Compression',
+            0x35 => 'Best Compression',
+        },
+    },
+    19 => {
+        Name => 'FileNameLength',
+        Format => 'int16u',
+        Hidden => 1,
+        RawConv => '$$self{FileNameLength} = $val; undef',
+    },
+    25 => {
+        Name => 'ArchivedFileName',
+        Format => 'string[$$self{FileNameLength}]',
+    },
+);
+
+#------------------------------------------------------------------------------
+# Extract information from a RAR file (ref 4)
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
+# Returns: 1 on success, 0 if this wasn't a valid RAR file
+sub ProcessRAR($$)
+{
+    my ($exifTool, $dirInfo) = @_;
+    my $raf = $$dirInfo{RAF};
+    my ($flags, $buff);
+
+    return 0 unless $raf->Read($buff, 7) and $buff eq "Rar!\x1a\x07\0";
+
+    $exifTool->SetFileType();
+    SetByteOrder('II');
+    my $tagTablePtr = GetTagTable('Image::ExifTool::ZIP::RAR');
+    my $docNum = 0;
+
+    for (;;) {
+        # read block header
+        $raf->Read($buff, 7) == 7 or last;
+        my ($type, $flags, $size) = unpack('xxCvv', $buff);
+        $size -= 7;
+        if ($flags & 0x8000) {
+            $raf->Read($buff, 4) == 4 or last;
+            $size += unpack('V',$buff) - 4;
+        }
+        last if $size < 0;
+        next unless $size;  # ignore blocks with no data
+        # don't try to read very large blocks unless LargeFileSupport is enabled
+        if ($size > 0x80000000 and not $exifTool->Options('LargeFileSupport')) {
+            $exifTool->Warn('Large block encountered. Aborting.');
+            last;
+        }
+        # process the block
+        if ($type == 0x74) { # file block
+            # read maximum 4 KB from a file block
+            my $n = $size > 4096 ? 4096 : $size;
+            $raf->Read($buff, $n) == $n or last;
+            # add compressed size to start of data so we can extract it with the other tags
+            $buff = pack('V',$size) . $buff;
+            $$exifTool{DOC_NUM} = ++$docNum;
+            $exifTool->ProcessDirectory({ DataPt => \$buff }, $tagTablePtr);
+            $size -= $n;
+        } elsif ($type == 0x75 and $size > 6) { # comment block
+            $raf->Read($buff, $size) == $size or last;
+            # save comment, only if "Stored" (this is untested)
+            if (Get8u(\$buff, 3) == 0x30) {
+                $exifTool->FoundTag('Comment', substr($buff, 6));
+            }
+            next;
+        }
+        # seek to the start of the next block
+        $raf->Seek($size, 1) or last if $size;
+    }
+    $$exifTool{DOC_NUM} = 0;
+
+    return 1;
+}
 
 #------------------------------------------------------------------------------
 # Extract information from a GNU ZIP file (ref 3)
@@ -441,8 +564,8 @@ This module is used by Image::ExifTool
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to extract meta
-information from ZIP and GZIP archives.  This includes ZIP-based file types
-like DOCX, PPTX, XLSX, ODP, ODS, ODT and EIP.
+information from ZIP, GZIP and RAR archives.  This includes ZIP-based file
+types like DOCX, PPTX, XLSX, ODP, ODS, ODT and EIP.
 
 =head1 AUTHOR
 
@@ -458,6 +581,8 @@ under the same terms as Perl itself.
 =item L<http://www.pkware.com/documents/casestudies/APPNOTE.TXT>
 
 =item L<http://www.gzip.org/zlib/rfc-gzip.html>
+
+=item L<http://DataCompression.info/ArchiveFormats/RAR202.txt>
 
 =back
 

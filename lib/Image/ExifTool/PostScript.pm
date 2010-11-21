@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.31';
+$VERSION = '1.33';
 
 sub WritePS($$);
 sub ProcessPS($$;$);
@@ -160,7 +160,8 @@ sub PSErr($$)
 {
     my ($exifTool, $str) = @_;
     # set file type if not done already
-    $exifTool->SetFileType('PS') unless $exifTool->GetValue('FileType');
+    my $ext = $$exifTool{FILE_EXT};
+    $exifTool->SetFileType(($ext and $ext eq 'AI') ? 'AI' : 'PS');
     $exifTool->Warn("PostScript format error ($str)");
     return 1;
 }
@@ -362,7 +363,21 @@ sub ProcessPS($$;$)
 
     # set file type (PostScript or EPS)
     $raf->ReadLine($data) or $data = '';
-    $exifTool->SetFileType($data =~ /EPSF/ ? 'EPS' : 'PS');
+    my $type;
+    if ($data =~ /EPSF/) {
+        $type = 'EPS';
+    } else {
+        # read next line to see if this is an Illustrator file
+        my $line2;
+        my $pos = $raf->Tell();
+        if ($raf->ReadLine($line2) and $line2 =~ /^%%Creator: Adobe Illustrator/) {
+            $type = 'AI';
+        } else {
+            $type = 'PS';
+        }
+        $raf->Seek($pos, 0);
+    }
+    $exifTool->SetFileType($type);
 #
 # extract TIFF information from DOS header
 #

@@ -30,10 +30,12 @@ use Image::ExifTool::IPTC;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.13';
+$VERSION = '2.23';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
+
+my $numbersFirst = 1;   # set to -1 to sort numbers last
 
 # list of all tables in plug-in modules
 my @pluginTables = ('Image::ExifTool::MWG::Composite');
@@ -145,7 +147,14 @@ corresponding Composite or Extra tag is written).  A colon (C<:>) indicates
 a mandatory tag which may be added automatically when writing.
 
 The HTML version of these tables also lists possible B<Values> for
-discrete-valued tags, as well as B<Notes> for some tags.
+discrete-valued tags, as well as B<Notes> for some tags.  The B<Values> are
+listed as the computer-readable and human-readable values on the left and
+right hand side of an equals sign (C<=>) respectively.  The human-readable
+values are used by default when reading and writing, but the
+computer-readable values may be accessed by disabling the value conversion
+with the -n option on the command line, by setting the ValueConv option to 0
+in the API, or or on a per-tag basis by appending a number symbol (C<#>) to
+the tag name.
 
 B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
@@ -157,8 +166,8 @@ question.
     EXIF => q{
 EXIF stands for "Exchangeable Image File Format".  This type of information
 is formatted according to the TIFF specification, and may be found in JPG,
-TIFF, PNG, MIFF, HDP and PSP images, as well as many TIFF-based RAW images,
-and even some AVI and MOV videos.
+TIFF, PNG, MIFF, HDP, PSP and XCF images, as well as many TIFF-based RAW
+images, and even some AVI and MOV videos.
 
 The EXIF meta information is organized into different Image File Directories
 (IFD's) within an image.  The names of these IFD's correspond to the
@@ -199,9 +208,9 @@ GPSVersionID tag automatically if new a GPS IFD is added to an image.
 XMP stands for "Extensible Metadata Platform", an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
 embedded in many different image file types including JPG, JP2, TIFF, GIF,
-EPS, PDF, PSD, DNG, IND, PNG, DJVU, SVG and MIFF, as well as MOV, AVI, ASF,
-WMV, FLV, SWF and MP4 videos, and WMA and audio formats supporting ID3v2
-information.
+EPS, PDF, PSD, IND, PNG, DJVU, SVG, MIFF, XCF, CRW, DNG and a variety of
+proprietary TIFF-based RAW images, as well as MOV, AVI, ASF, WMV, FLV, SWF
+and MP4 videos, and WMA and audio formats supporting ID3v2 information.
 
 The XMP B<Tag ID>'s aren't listed because in most cases they are identical
 to the B<Tag Name>.
@@ -238,30 +247,29 @@ tables.  For example, the C<pdfx> namespace doesn't have a predefined set of
 tag names because it is used to store application-defined PDF information,
 but this information is extracted by ExifTool.
 
-See L<http://www.adobe.com/devnet/xmp/> for the offical XMP specification.
+See L<http://www.adobe.com/devnet/xmp/> for the official XMP specification.
 },
     IPTC => q{
 The tags listed below are part of the International Press Telecommunications
 Council (IPTC) and the Newspaper Association of America (NAA) Information
 Interchange Model (IIM).  This is an older meta information format, slowly
 being phased out in favor of XMP.  IPTC information may be embedded in JPG,
-TIFF, PNG, MIFF, PS, PDF, PSD and DNG images.
-
-The IPTC specification dictates a length for ASCII (C<string> or C<digits>)
-values.  These lengths are given in square brackets after the B<Writable>
-format name.  For tags where a range of lengths is allowed, the minimum and
-maximum lengths are separated by a comma within the brackets.  IPTC strings
-are not null terminated.
+TIFF, PNG, MIFF, PS, PDF, PSD, XCF and DNG images.
 
 IPTC information is separated into different records, each of which has its
 own set of tags.  See
 L<http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf> for the
 official specification.
 
-When writing, ExifTool issues a minor warning and truncates the value if it
-is longer than allowed by the IPTC specification.  Minor errors may be
-ignored to allow writing of longer values, but beware that values like this
-may cause problems for other IPTC readers.
+This specification dictates a length for ASCII (C<string> or C<digits>)
+values.  These lengths are given in square brackets after the B<Writable>
+format name.  For tags where a range of lengths is allowed, the minimum and
+maximum lengths are separated by a comma within the brackets.  IPTC strings
+are not null terminated.  When writing, ExifTool issues a minor warning and
+truncates the value if it is longer than allowed by the IPTC specification.
+Minor errors may be ignored with the IgnoreMinorErrors (-m) option, allowing
+longer values to be written, but beware that values like this may cause
+problems for some other IPTC readers.
 
 Separate IPTC date and time tags may be written with a combined date/time
 value and ExifTool automagically takes the appropriate part of the date/time
@@ -334,6 +342,10 @@ These tags apply to CRW-format Canon RAW files and information in the APP0
 length of the information is preserved (and the new information is truncated
 or padded as required) unless B<Writable> is C<resize>. Currently, only
 JpgFromRaw and ThumbnailImage are allowed to change size.
+
+CRW images also support the addition of a CanonVRD trailer, which in turn
+supports XMP.  This trailer is created automatically if necessary when
+ExifTool is used to write XMP to a CRW image.
 },
     Unknown => q{
 The following tags are decoded in unsupported maker notes.  Use the Unknown
@@ -342,7 +354,14 @@ The following tags are decoded in unsupported maker notes.  Use the Unknown
     PDF => q{
 The tags listed in the PDF tables below are those which are used by ExifTool
 to extract meta information, but they are only a small fraction of the total
-number of available PDF tags.
+number of available PDF tags.  See
+L<http://www.adobe.com/devnet/pdf/pdf_reference.html> for the official PDF
+specification.
+
+ExifTool supports reading and writing PDF documents up to version 1.7
+extension level 3, including support for RC4, AES-128 and AES-256
+encryption.  A Password option is provided to allow processing of
+password-protected PDF files.
 
 When writing PDF files, ExifTool uses an incremental update.  This has the
 advantages of being fast and reversible.  The original PDF can be easily
@@ -466,11 +485,11 @@ my %exifSpec = (
 );
 # same thing for RIFF INFO tags found in the EXIF spec
 my %riffSpec = (
-  IARL => 1,  ICRD => 1,  IGNR => 1,  IPLT => 1,  ISRC => 1,
-  IART => 1,  ICRP => 1,  IKEY => 1,  IPRD => 1,  ISRF => 1,
-  ICMS => 1,  IDIM => 1,  ILGT => 1,  ISBJ => 1,  ITCH => 1,
-  ICMT => 1,  IDPI => 1,  IMED => 1,  ISFT => 1,
-  ICOP => 1,  IENG => 1,  INAM => 1,  ISHP => 1,
+    IARL => 1,  ICRD => 1,  IGNR => 1,  IPLT => 1,  ISRC => 1,
+    IART => 1,  ICRP => 1,  IKEY => 1,  IPRD => 1,  ISRF => 1,
+    ICMS => 1,  IDIM => 1,  ILGT => 1,  ISBJ => 1,  ITCH => 1,
+    ICMT => 1,  IDPI => 1,  IMED => 1,  ISFT => 1,
+    ICOP => 1,  IENG => 1,  INAM => 1,  ISHP => 1,
 );
 
 #------------------------------------------------------------------------------
@@ -569,8 +588,8 @@ sub new
         # save all tag names
         my ($tagID, $binaryTable, $noID, $isIPTC, $isXMP);
         $isIPTC = 1 if $writeProc and $writeProc eq \&Image::ExifTool::IPTC::WriteIPTC;
-        $isXMP = 1 if $short =~ /^XMP\b/;
-        $noID = 1 if $short =~ /^(XMP|Shortcuts|ASF.*)$/ or $$vars{NO_ID};
+        $isXMP = 1 if $$table{GROUPS} and $$table{GROUPS}{0} eq 'XMP';
+        $noID = 1 if $isXMP or $short =~ /^(Shortcuts|ASF.*)$/ or $$vars{NO_ID};
         my $processBinaryData = ($$table{PROCESS_PROC} and (
             $$table{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData or
             $$table{PROCESS_PROC} eq \&Image::ExifTool::Nikon::ProcessNikonEncrypted));
@@ -582,8 +601,10 @@ sub new
         } elsif (not $noID) {
             $id{$tableName} = 'Tag ID';
         }
-        $caseInsensitive = ($tableName =~ /::XMP::/);
+        $caseInsensitive = $isXMP;
+        $numbersFirst = -1 if $$table{VARS} and $$table{VARS}{ALPHA_FIRST};
         my @keys = sort NumbersFirst TagTableKeys($table);
+        $numbersFirst = 1;
         my $defFormat = $table->{FORMAT};
         # use default format for binary data tables
         $defFormat = 'int8u' if not $defFormat and $binaryTable;
@@ -616,14 +637,14 @@ TagID:  foreach $tagID (@keys) {
                 if ($processBinaryData and $$table{WRITABLE}) {
                     $isOffset{$tagID} = $name if $$tagInfo{IsOffset};
                     $hasSubdir{$tagID} = $name if $$tagInfo{SubDirectory};
-                    # require DATAMEMBER for writable var-format tags and DataMember tags
+                    # require DATAMEMBER for writable var-format tags, Hook and DataMember tags
                     if ($$tagInfo{Format} and $$tagInfo{Format} =~ /^var_/) {
                         $datamember{$tagID} = $name;
                         unless (defined $$tagInfo{Writable} and not $$tagInfo{Writable}) {
                             warn "Warning: Var-format tag is writable - $short $name\n"
                         }
-                    } elsif ($$tagInfo{RawConv} and
-                             $$tagInfo{RawConv} =~ /\$self(->)?\{\w+\}\s*=(?!~)/)
+                    } elsif ($$tagInfo{Hook} or ($$tagInfo{RawConv} and
+                             $$tagInfo{RawConv} =~ /\$self(->)?\{\w+\}\s*=(?!~)/))
                     {
                         $datamember{$tagID} = $name;
                     }
@@ -700,7 +721,7 @@ TagID:  foreach $tagID (@keys) {
                 }
                 if ($subdir) {
                     # don't show XMP structure tags
-                    next TagID if $short =~ /^XMP /;
+                    next TagID if $isXMP and $short ne 'XMP';
                     my $subTable = $$subdir{TagTable} || $tableName;
                     push @values, $shortName{$subTable}
                 }
@@ -1013,18 +1034,13 @@ TagID:  foreach $tagID (@keys) {
         if ($processBinaryData and $$table{WRITABLE}) {
             my %lookup = (
                 IS_OFFSET => \%isOffset,
+                IS_SUBDIR => \%hasSubdir,
                 DATAMEMBER => \%datamember,
-                HAS_SUBDIR => \%hasSubdir,
             );
             my ($var, $tagID);
             foreach $var (sort keys %lookup) {
                 my $hash = $lookup{$var};
-                if ($var eq 'HAS_SUBDIR') {
-                    if ($$table{VARS} and $$table{VARS}{HAS_SUBDIR}) {
-                        warn "Warning: Extra $var for $short\n" unless %$hash;
-                        undef %$hash;
-                    }
-                } elsif ($$table{$var}) {
+                if ($$table{$var}) {
                     foreach $tagID (@{$$table{$var}}) {
                         $$hash{$tagID} and delete($$hash{$tagID}), next;
                         warn "Warning: Extra $var for $short tag $tagID\n";
@@ -1180,9 +1196,9 @@ sub NumbersFirst
     my $rtnVal;
     my $bNum = ($b =~ /^-?[0-9]+(\.\d*)?$/);
     if ($a =~ /^-?[0-9]+(\.\d*)?$/) {
-        $rtnVal = ($bNum ? $a <=> $b : -1);
+        $rtnVal = ($bNum ? $a <=> $b : -$numbersFirst);
     } elsif ($bNum) {
-        $rtnVal = 1;
+        $rtnVal = $numbersFirst;
     } else {
         my ($a2, $b2) = ($a, $b);
         # expand numbers to 3 digits (with restrictions to avoid messing up ascii-hex tags)
@@ -1248,8 +1264,10 @@ sub GetTableOrder()
         my $table = GetTagTable($tableName);
         # recursively scan through tables in subdirectories
         my @moreTables;
-        $caseInsensitive = ($tableName =~ /::XMP::/);
+        $caseInsensitive = ($$table{GROUPS} and $$table{GROUPS}{0} eq 'XMP');
+        $numbersFirst = -1 if $$table{VARS} and $$table{VARS}{ALPHA_FIRST};
         my @keys = sort NumbersFirst TagTableKeys($table);
+        $numbersFirst = 1;
         foreach (@keys) {
             my @infoArray = GetTagInfoList($table,$_);
             my $tagInfo;
@@ -1318,10 +1336,14 @@ sub GetTableOrder()
         Ricoh   => 'Pentax',
         Sanyo   => 'Ricoh',
         PhotoMechanic => 'FotoStation',
+        Microsoft     => 'PhotoMechanic',
+       'Microsoft::MP'=> 'Microsoft::MP1',
+        GIMP    => 'Microsoft',
        'Nikon::CameraSettingsD300' => 'Nikon::ShotInfoD300b',
        'Pentax::LensData' => 'Pentax::LensInfo2',
        'Sony::SRF2' => 'Sony::SRF',
        'Samsung::INFO' => 'Samsung::Type2', # (necessary because Samsung doesn't have a main table)
+       'Samsung::MP4' => 'Samsung::INFO', # (necessary because Samsung doesn't have a main table)
     );
     my @tweak = sort keys %tweakOrder;
     while (@tweak) {
@@ -1555,7 +1577,7 @@ sub WriteTagNames($$)
             $head =~ s/.* //;
             close HTMLFILE;
             if (OpenHtmlFile($htmldir, $tableName, 1)) {
-                print HTMLFILE Doc2Html($notes), "\n" if $notes;
+                print HTMLFILE '<p>', Doc2Html($notes), "</p>\n" if $notes;
                 print HTMLFILE "<blockquote>\n";
                 print HTMLFILE "<table class=frame><tr><td>\n";
                 print HTMLFILE "<table class='inner sep' cellspacing=1>\n";
@@ -1663,7 +1685,6 @@ sub WriteTagNames($$)
             my $col = ($podIdLen <= 10) ? 12 : 20;
             $podIdLen = $col if $podIdLen < $col;
         }
-        $id = '' if $short =~ /^XMP/;
         if ($id) {
             ($hid = "<th>$id</th>") =~ s/ /&nbsp;/g;
             $wTag -= $podIdLen - $wID;
@@ -1726,6 +1747,7 @@ sub WriteTagNames($$)
             ++$infoCount;
             my ($tagIDstr, $tagNames, $writable, $values, $require, $writeGroup) = @$infoList;
             my ($align, $idStr, $w, $tip);
+            my $wTag2 = $wTag;
             if (not $id) {
                 $idStr = '  ';
             } elsif ($tagIDstr =~ /^\d+(\.\d+)?$/) {
@@ -1735,13 +1757,19 @@ sub WriteTagNames($$)
             } else {
                 $tagIDstr =~ s/^'$prefix/'/ if $prefix;
                 $w = $wID;
-                if (length $tagIDstr > $w) {
-                    # put tag name on next line if ID is too long
-                    $idStr = "  $tagIDstr\n   " . (' ' x $w);
-                    warn "Notice: Split $$tagNames[0] line\n";
-                } else {
-                    $idStr = sprintf "  %-${w}s ", $tagIDstr;
+                my $over = length($tagIDstr) - $w;
+                if ($over > 0) {
+                    # shift over tag name if there is room
+                    if ($over <= $wTag - length($$tagNames[0])) {
+                        $wTag2 -= $over;
+                        $w += $over;
+                    } else {
+                        # put tag name on next line if ID is too long
+                        $idStr = "  $tagIDstr\n   " . (' ' x $w);
+                        warn "Notice: Split $$tagNames[0] line\n";
+                    }
                 }
+                $idStr = sprintf "  %-${w}s ", $tagIDstr unless defined $idStr;
                 $align = '';
             }
             my @reqs;
@@ -1792,13 +1820,13 @@ sub WriteTagNames($$)
                 # add Mask to Writable column in POD doc
                 $wrStr .= " & $1" if $mask =~ /(0x[\da-f]+)/;
             }
-            printf PODFILE "%s%-${wTag}s", $idStr, $tag;
-            warn "Warning: Pushed $tag\n" if $id and length($tag) > $wTag;
+            printf PODFILE "%s%-${wTag2}s", $idStr, $tag;
+            warn "Warning: Pushed $tag\n" if $id and length($tag) > $wTag2;
             printf PODFILE " %-${wGrp}s", shift(@wGrp) || '-' if $showGrp;
             if ($composite) {
                 @reqs = @$require;
                 $w = $wReq; # Keep writable column in line
-                length($tag) > $wTag and $w -= length($tag) - $wTag;
+                length($tag) > $wTag2 and $w -= length($tag) - $wTag2;
                 printf PODFILE " %-${w}s", shift(@reqs) || '';
             }
             printf PODFILE " $wrStr\n";
@@ -1808,7 +1836,7 @@ sub WriteTagNames($$)
                 my $more = (@tags or @reqs);
                 $line = '  ';
                 $line .= ' 'x($wID+1) if $id;
-                $line .= sprintf("%-${wTag}s", shift(@tags) || '');
+                $line .= sprintf("%-${wTag2}s", shift(@tags) || '');
                 $line .= sprintf(" %-${wReq}s", shift(@reqs) || '') if $composite;
                 $line .= sprintf(" %-${wGrp}s", shift(@wGrp) || '-') if $showGrp;
                 ++$n;

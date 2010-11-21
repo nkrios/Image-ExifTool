@@ -229,7 +229,13 @@ L10 and LC80)</span>
   <br>33 = Elegant (My Color)
   <br>37 = Nostalgic (Color Film)
   <br>41 = Dynamic Art (My Color)
-  <br>42 = Retro (My Color)</span></td></tr>
+  <br>42 = Retro (My Color)
+  <br><span class=n>(these values are used by the TZ10 and ZS7)</span>
+  <br>0 = Normal
+  <br>1 = -2
+  <br>2 = +2
+  <br>5 = -1
+  <br>6 = +1</span></td></tr>
 <tr class=b>
 <td title='0x002d = 45'>0x002d</td>
 <td>NoiseReduction</td>
@@ -377,6 +383,16 @@ L10 and LC80)</span>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(positive is a shift toward green)</span></span></td></tr>
 <tr>
+<td title='0x004b = 75'>0x004b</td>
+<td>PanasonicImageWidth</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x004c = 76'>0x004c</td>
+<td>PanasonicImageHeight</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td title='0x004d = 77'>0x004d</td>
 <td>AFPointPosition</td>
 <td class=c>rational64u[2]</td>
@@ -437,32 +453,57 @@ L10 and LC80)</span>
 <td class=c>undef[4]</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td title='0x0065 = 101'>0x0065</td>
+<td>Title</td>
+<td class=c>undef</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0066 = 102'>0x0066</td>
+<td>BabyName</td>
+<td class=c>undef</td>
+<td><span class=s><span class=n>(or pet name)</span></span></td></tr>
+<tr>
+<td title='0x0067 = 103'>0x0067</td>
+<td>Location</td>
+<td class=c>undef</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td title='0x0069 = 105'>0x0069</td>
 <td>Country</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x006b = 107'>0x006b</td>
 <td>State</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x006d = 109'>0x006d</td>
 <td>City</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x006f = 111'>0x006f</td>
 <td>Landmark</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0070 = 112'>0x0070</td>
 <td>IntelligentResolution</td>
 <td class=c>int8u</td>
 <td><span class=s>0 = Off
-  <br>2 = Auto
-  <br>3 = On</span></td></tr>
+  <br>1 = Low
+  <br>2 = Standard
+  <br>3 = High
+  <br>4 = Extended</span></td></tr>
+<tr>
+<td title='0x0079 = 121'>0x0079</td>
+<td>IntelligentD-Range</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Off
+  <br>1 = Low
+  <br>2 = Standard
+  <br>3 = High</span></td></tr>
 <tr class=b>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
@@ -817,9 +858,9 @@ user-supplied set of known faces.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='LensType'>Panasonic LensType Values</a></h2>
-Entries with 2 numbers give the lower 2 bits of the LensType value which are
+<p>Entries with 2 numbers give the lower 2 bits of the LensType value which are
 used to identify certain manually coded lenses on the M9, or the focal
-length of some multi-focal lenses.
+length of some multi-focal lenses.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class='inner sep' cellspacing=1>
@@ -1164,7 +1205,7 @@ iPalm.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 12, 2010</i>
+<br><i>Last revised Nov 18, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

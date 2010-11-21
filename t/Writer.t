@@ -1,7 +1,7 @@
 # Before "make install", this script should be runnable with "make test".
 # After "make install" it should work as "perl t/Writer.t".
 
-BEGIN { $| = 1; print "1..41\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..42\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -24,7 +24,7 @@ my $testfile;
     my $testfile1 = "t/${testname}_${testnum}_failed.jpg";
     -e $testfile1 and unlink $testfile1;
     $exifTool->SetNewValue('Comment','New comment in JPG file');
-    $exifTool->WriteInfo('t/images/Canon.jpg', $testfile1);
+    writeInfo($exifTool, 't/images/Canon.jpg', $testfile1);
     my $info = ImageInfo($testfile1);
     print 'not ' unless check($info, $testname, $testnum);
     print "ok $testnum\n";
@@ -33,7 +33,7 @@ my $testfile;
     my $testfile2 = "t/${testname}_${testnum}_failed.jpg";
     -e $testfile2 and unlink $testfile2;
     $exifTool->SetNewValue('Comment');
-    $exifTool->WriteInfo($testfile1, $testfile2);
+    writeInfo($exifTool, $testfile1, $testfile2);
     if (binaryCompare($testfile2, 't/images/Canon.jpg')) {
         unlink $testfile1;
         unlink $testfile2;
@@ -53,7 +53,7 @@ my $testfile;
     $exifTool->SetNewValue(ImageDescription => 'Modified TIFF');
     $exifTool->SetNewValue(Keywords => 'another keyword', AddValue => 1);
     $exifTool->SetNewValue('xmp:SupplementalCategories' => 'new XMP info');
-    $exifTool->WriteInfo('t/images/ExifTool.tif', \$newtiff);
+    writeInfo($exifTool, 't/images/ExifTool.tif', \$newtiff);
     my $info = $exifTool->ImageInfo(\$newtiff);
     unless (check($exifTool, $info, $testname, $testnum)) {
         $testfile = "t/${testname}_${testnum}_failed.tif";
@@ -72,7 +72,7 @@ my $testfile;
     $exifTool->SetNewValue(ImageDescription => 'The picture caption');
     $exifTool->SetNewValue(Keywords => 'another keyword', DelValue => 1);
     $exifTool->SetNewValue(SupplementalCategories);
-    $exifTool->WriteInfo(\$newtiff, \$newtiff2);
+    writeInfo($exifTool, \$newtiff, \$newtiff2);
     $testfile = "t/${testname}_${testnum}_failed.tif";
     open(TESTFILE,">$testfile");
     binmode(TESTFILE);
@@ -102,7 +102,7 @@ my $testfile;
     $exifTool->SetNewValue(FocalPlaneResolutionUnit => 'mm');
     $exifTool->SetNewValue(Category => 'IPTC test');
     $exifTool->SetNewValue(Description => 'New description');
-    $exifTool->WriteInfo('t/images/Canon.jpg', $testfile1);
+    writeInfo($exifTool, 't/images/Canon.jpg', $testfile1);
     my $info = $exifTool->ImageInfo($testfile1);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
@@ -119,7 +119,7 @@ my $testfile;
     $exifTool->SetNewValue(Category);
     $exifTool->SetNewValue(Description);
     my $image;
-    $exifTool->WriteInfo($testfile1, \$image);
+    writeInfo($exifTool, $testfile1, \$image);
     $exifTool->Options(Composite => 0);
     $info = $exifTool->ImageInfo(\$image, '-filesize');
     my $testfile2 = "t/${testname}_${testnum}_failed.jpg";
@@ -151,7 +151,7 @@ my $testfile;
     }
     undef $info;
     my $image;
-    $exifTool->WriteInfo('t/images/Canon.jpg', \$image);
+    writeInfo($exifTool, 't/images/Canon.jpg', \$image);
     # (must drop Composite tags because their order may change)
     $exifTool->Options(Unknown => 1, Binary => 0, List => 0, Composite => 0);
     # (must ignore filesize because it changes as null padding is discarded)
@@ -179,7 +179,7 @@ my $testfile;
     $exifTool->SetNewValuesFromFile('t/images/ExifTool.tif', 'ICC_Profile');
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/Nikon.jpg', $testfile);
+    writeInfo($exifTool, 't/images/Nikon.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -197,7 +197,7 @@ my $testfile;
     $exifTool->SetNewValuesFromFile('t/images/Pentax.jpg');
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/Canon.jpg', $testfile);
+    writeInfo($exifTool, 't/images/Canon.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -222,7 +222,7 @@ my $testfile;
     $exifTool->SetNewValue(Keywords => 'this; that');
     my $testfile1 = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile1;
-    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile1);
+    writeInfo($exifTool, 't/images/Writer.jpg', $testfile1);
     my $info = $exifTool->ImageInfo($testfile1);
     my $success = check($exifTool, $info, $testname, $testnum);
     print 'not ' unless $success;
@@ -237,7 +237,7 @@ my $testfile;
     $exifTool->SetNewValue('Keywords');
     my $testfile2 = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile2;
-    $exifTool->WriteInfo($testfile1, $testfile2);
+    writeInfo($exifTool, $testfile1, $testfile2);
     if (binaryCompare('t/images/Writer.jpg', $testfile2)) {
         unlink $testfile1 if $success;
         unlink $testfile2;
@@ -254,7 +254,7 @@ my $testfile;
     $exifTool->SetNewValuesFromFile('t/images/CanonRaw.crw');
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
+    writeInfo($exifTool, 't/images/Writer.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -271,7 +271,7 @@ my $testfile;
     $exifTool->SetNewValue('All' => undef, Group => 'MakerNotes');
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/Canon.jpg', $testfile);
+    writeInfo($exifTool, 't/images/Canon.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -289,7 +289,7 @@ my $testfile;
     $exifTool->SetNewValuesFromFile('t/images/Olympus.jpg', @copyTags);
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/Canon.jpg', $testfile);
+    writeInfo($exifTool, 't/images/Canon.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -313,7 +313,7 @@ my $testfile;
         $exifTool->SetNewValuesFromFile('t/images/GPS.jpg', @$args);
         $testfile = "t/${testname}_${testnum}_failed.jpg";
         unlink $testfile;
-        $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
+        writeInfo($exifTool, 't/images/Writer.jpg', $testfile);
         my $info = $exifTool->ImageInfo($testfile, 'xresolution');
         if (check($exifTool, $info, $testname, $testnum)) {
             unlink $testfile;
@@ -342,7 +342,7 @@ my $testOK;
     $exifTool->RestoreNewValues();
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
+    writeInfo($exifTool, 't/images/Writer.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         $testOK = 1;
@@ -361,9 +361,9 @@ my $testOK;
         my $exifTool = new Image::ExifTool;
         my $newComment = 'This is a new test comment';
         $exifTool->SetNewValue(Comment => $newComment);
-        $exifTool->WriteInfo($testfile);
+        my $ok = writeInfo($exifTool, $testfile);
         my $info = $exifTool->ImageInfo($testfile, 'Comment');
-        if ($$info{Comment} and $$info{Comment} eq $newComment) {
+        if ($$info{Comment} and $$info{Comment} eq $newComment and $ok) {
             $size = -s $testfile;
         } else {
             $testOK = 0;
@@ -382,7 +382,7 @@ my $testOK;
         my $shortComment = 'short comment';
         $exifTool->SetNewValue(Comment => $shortComment);
         open FILE, "+<$testfile";   # open test file for update
-        $exifTool->WriteInfo(\*FILE);
+        writeInfo($exifTool, \*FILE);
         close FILE;
         my $info = $exifTool->ImageInfo($testfile, 'Comment');
         if ($$info{Comment} and $$info{Comment} eq $shortComment) {
@@ -425,7 +425,7 @@ my $testOK;
         my $exifTool = new Image::ExifTool;
         $exifTool->Options(DateFormat => "${testname}_${testnum}_%Y%m%d_failed.jpg");
         $exifTool->SetNewValuesFromFile($testfile, 'FileName<DateTimeOriginal');
-        $exifTool->WriteInfo($testfile);
+        writeInfo($exifTool, $testfile);
         if (-e $newfile and not -e $testfile) {
             $testfile = $newfile;
         } else {
@@ -449,7 +449,7 @@ my $testOK;
     );
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
+    writeInfo($exifTool, 't/images/Writer.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile, 'Comment');
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -471,7 +471,7 @@ my $testOK;
         $exifTool->SetNewValue(fnumber => 25) if $i == 0;
         $testfile = "t/${testname}_${testnum}_failed.jpg";
         unlink $testfile;
-        $exifTool->WriteInfo('t/images/Canon.jpg', $testfile);
+        writeInfo($exifTool, 't/images/Canon.jpg', $testfile);
         my $info = $exifTool->ImageInfo($testfile);
         if (check($exifTool, $info, $testname, $testnum)) {
             unlink $testfile;
@@ -489,20 +489,12 @@ my $testOK;
     $exifTool->SetNewValue('exif:all');     # delete all EXIF
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
+    writeInfo($exifTool, 't/images/ExifTool.jpg', $testfile);
     $exifTool->SetNewValue();
     $exifTool->SetNewValue('exif:datetimeoriginal', '2000:01:02 03:04:05');
-    my $result = $exifTool->WriteInfo($testfile);
-    my $err = '';
-    $err .= "  Error: WriteInfo() returned $result\n" if $result != 1;
-    my $info = $exifTool->GetInfo('Warning', 'Error');
-    foreach (sort keys %$info) {
-        my $tag = Image::ExifTool::GetTagName($_);
-        $err .= "  $tag: $$info{$_}\n";
-    }
-    warn "\n$err" if $err;
+    my $ok = writeInfo($exifTool, $testfile);
     $info = $exifTool->ImageInfo($testfile, 'XResolution', 'YResolution', 'DateTimeOriginal');
-    if (check($exifTool, $info, $testname, $testnum) and not $err) {
+    if (check($exifTool, $info, $testname, $testnum) and $ok) {
         unlink $testfile;
     } else {
         print 'not ';
@@ -516,14 +508,14 @@ my $testOK;
     my $exifTool = new Image::ExifTool;
     $exifTool->SetNewValue('IFD0:ISO',100);
     $exifTool->SetNewValue('ExifIFD:ISO',200);
-    $exifTool->WriteInfo('t/images/Writer.jpg', 't/tmp.jpg');
+    writeInfo($exifTool, 't/images/Writer.jpg', 't/tmp.jpg');
     foreach $group ('EXIF', 'IFD0', 'ExifIFD') {
         ++$testnum;
         $exifTool->SetNewValue();   # reset values
         $exifTool->SetNewValue("$group:ISO");     # delete ISO from specific group
         $testfile = "t/${testname}_${testnum}_failed.jpg";
         unlink $testfile;
-        $exifTool->WriteInfo('t/tmp.jpg', $testfile);
+        writeInfo($exifTool, 't/tmp.jpg', $testfile);
         my $info = $exifTool->ImageInfo($testfile, 'FileName', 'ISO');
         if (check($exifTool, $info, $testname, $testnum)) {
             unlink $testfile;
@@ -545,7 +537,7 @@ my $testOK;
     $exifTool->SetNewValue('IPTC:*', undef, Replace => 2);
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
+    writeInfo($exifTool, 't/images/ExifTool.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -566,7 +558,7 @@ my $testOK;
     $testfile = "t/${testname}_${testnum}_failed.tif";
     unlink $testfile;
     my @tags = qw(ICC_Profile AsShotICCProfile CurrentICCProfile);
-    $exifTool->WriteInfo('t/images/ExifTool.tif', $testfile);
+    writeInfo($exifTool, 't/images/ExifTool.tif', $testfile);
     my $info = $exifTool->ImageInfo($testfile, @tags);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
@@ -577,7 +569,7 @@ my $testOK;
     $exifTool->SetNewValue(ICC_Profile => $hdr . '<another dummy>', Protected => 1);
     $testfile = "t/${testname}_${testnum}_failed.tif";
     unlink $testfile;
-    $exifTool->WriteInfo($srcfile, $testfile);
+    writeInfo($exifTool, $srcfile, $testfile);
     $info = $exifTool->ImageInfo($testfile, @tags);
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $srcfile;
@@ -604,7 +596,7 @@ my $testOK;
     );
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
+    writeInfo($exifTool, 't/images/Writer.jpg', $testfile);
     $info = $exifTool->ImageInfo($testfile, 'xmp:subject', 'comment', 'HierarchicalSubject');
     my $err;
     if (check($exifTool, $info, $testname, $testnum)) {
@@ -637,7 +629,7 @@ my $testOK;
                                     'icc_profile', 'canonvrd');
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/ExifTool.jpg', $testfile);
+    writeInfo($exifTool, 't/images/ExifTool.jpg', $testfile);
     $exifTool->Options(Composite => 0);
     my $info = $exifTool->ImageInfo($testfile);
     if (check($exifTool, $info, $testname, $testnum)) {
@@ -656,7 +648,7 @@ my $testOK;
     $exifTool->SetNewValue('IPTC:Keywords', 'in', AddValue => 1);
     $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
-    $exifTool->WriteInfo('t/images/Writer.jpg', $testfile);
+    writeInfo($exifTool, 't/images/Writer.jpg', $testfile);
     my $info = $exifTool->ImageInfo($testfile, 'IPTC:all');
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
@@ -683,7 +675,7 @@ my $testOK;
         }
         $testfile = "t/${testname}_${testnum}_failed.exif";
         unlink $testfile;
-        $exifTool->WriteInfo(undef, $testfile);
+        writeInfo($exifTool, undef, $testfile);
         my $info = $exifTool->ImageInfo($testfile, @tags);
         if (check($exifTool, $info, $testname, $testnum)) {
             unlink $testfile;
@@ -712,7 +704,7 @@ my $testOK;
 
     ++$testnum;
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
-                                   't/images/Canon.jpg', \@check);
+                                   't/images/Canon.jpg', \@check, 1);
     print "ok $testnum\n";
 }
 
@@ -725,6 +717,24 @@ my $testOK;
     my @check = qw(SerialNumber);
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
                                    't/images/ExifTool.jpg', \@check);
+    print "ok $testnum\n";
+}
+
+# test 42: Test SetNewValuesFromFile with wildcards
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValuesFromFile('t/images/ExifTool.jpg', 'ifd0:*<jfif:?resolution');
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    writeInfo($exifTool, 't/images/Writer.jpg', $testfile);
+    $exifTool->Options(Composite => 0);
+    my $info = $exifTool->ImageInfo($testfile, '-file:all');
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
     print "ok $testnum\n";
 }
 

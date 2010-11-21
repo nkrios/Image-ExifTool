@@ -13,6 +13,96 @@
 <p><b>Note:</b> This page gives the history of older exiftool versions.  See
 <a href="history.html">history.html</a> for the recent history.</p>
 
+<a name='v8.14'><b>Mar. 16, 2010 - Version 8.14</b></a>
+<ul>
+<li>Added some new Canon AFMode values for the EOS 7D (thanks Dieter Steiner)
+    and renamed tag to AFAreaMode
+<li>Decode ColorData and some new MOV tags for the production Canon EOS 550D
+<li>Decode Panasonic IntelligentResolution tag
+<li>Allow times with timezones in GPX track logs
+<li>Improved handling of maker notes in Olympus MP4 videos
+<li>Changed H264 GPS tags to the GPS group
+<li>Fixed date/time format error in reverse geotagging GPX example
+<li>Fixed problem introduced in version 8.09 where XMP:GPSLatitude/GPSLongitude
+    require the -a option to be extracted
+<li>API Changes:
+    <ul>
+    <li>Fixed bug where some options (Charset, Escape, Exclude and Lang) weren't
+        activated properly when set via options hash in calls to some functions
+    <li>Fixed some potential problems when used with mod_perl
+    </ul>
+</ul>
+
+<a name='v8.13'><b>Mar. 5, 2010 - Version 8.13</b></a>
+<ul>
+<li>Added read/write support for Samsung SRW images and decode some NX10 maker
+    note tags (thanks Tae-Sun Park)
+<li>Added new values for some Sony tags (thanks Michael Reitinger)
+<li>Added a new Canon LensType
+<li>Decode maker notes in Nikon Coolpix S8000 MOV videos
+<li>Decode a number of obscure TIFF FX tags
+<li>Implemented list-type behaviour for MWG:Creator tag
+<li>More improvements to German translations (thanks Herbert Kauer)
+<li>Changed name of NikonPreview group to PreviewIFD
+<li>Fixed problem which prevented ThumbnailImage from being written to ARW, SR2
+    and PEF images
+</ul>
+
+<a name='v8.12'><b>Feb. 26, 2010 - Version 8.12</b></a>
+<ul>
+<li>Added a number of missing ProgramMode values for the Sony DSLR-A330
+<li>Added XMP-iptcCore:DigitalSourceType (IPTC Extension version 1.1)
+<li>Added a couple more Nikon LensID's (thanks Jens Kriese and Robert
+    Rottmerhusen)
+<li>Improved German language tag descriptions (thanks Herbert Kauer)
+<li>Improved identification of some RAW file types
+<li>Moved MPF PreviewImage into the Composite group
+<li>Fixed some problems in HtmlDump output
+<li>Fixed problem copying makernotes as a block into DNGAdobeData
+</ul>
+
+<a name='v8.11'><b>Feb. 20, 2010 - Version 8.11</b></a>
+<ul>
+<li>Added support for Leica S2 maker notes
+<li>Added a bunch of new CanonModelID's
+<li>Decode MacroMagnification for more Canon models (MP-E 65mm only)
+<li>Decode a number of Canon CameraInfo tags for the 1DmkIV and 550D
+<li>Updated CanonCustom tags for the 550D
+<li>Improved parsing of Canon OriginalDecisionData
+<li>Improved decoding of Canon CameraInfo LensType
+<li>Improved decoding of some Sigma tags
+<li>Recognize a number of new Paint Shop Pro file extensions
+<li>Prevent a directory from being recreated in the wrong location when deleting
+    a group and adding back information in the same step
+<li>Changed -fileOrder option to sort numbers numerically
+<li>Fixed bug in -fileOrder option when directory names are specified
+<li>Fixed problem extracting information from some Panasonic AVCHD videos
+<li>Fixed some minor compatibility problems with Perl 5.11
+<li>Fixed problem which could result in runtime error when using MWG feature
+<li>Fixed an inconsistency in the way duplicate tags were handled in the grouped
+    JSON (-j -g) and short XML (-X -s) output formats
+</ul>
+
+<a name='v8.10'><b>Feb. 8, 2010 - Version 8.10</b> <span class=grn>(production release)</span></a>
+<ul>
+<li>Added read/write support for Photoshop PSB file format
+<li>Added -fileOrder option to provide control over file processing order
+<li>Added a few new Sony/Minolta LensTypes (thanks Marcin Krol)
+<li>Added more Nikon LensID's (thanks Robert Rottmerhusen)
+<li>Decode metadata from all frames in AVCHD H.264 video with -ee option
+<li>Decode more H.264 tags and improved decoding of others
+<li>Improved decoding of some Olympus E-P1 tags
+<li>Improved handling of some types of unknown maker notes
+<li>Enhanced -p option to support output file headers and footers, and to parse
+    embedded documents as separate input files when combined with -ee
+<li>Relaxed validation of PFM files to accommodate incorrect device type string
+    written by FontForge software
+<li>API Changes:
+    <ul>
+    <li>Enhanced GetFileType() to return descriptions for more file types
+    </ul>
+</ul>
+
 <a name='v8.09'><b>Jan. 29, 2010 - Version 8.09</b></a>
 <ul>
 <li>Added a number of new Nikon LensID's (thanks Robert Rottmerhusen)
@@ -215,7 +305,7 @@
 <li>Added a couple of new Canon LensType's
 <li>Added a new Panasonic ShootingMode (thanks Joerg)
 <li>Added a new PentaxModelID (Optio P80)
-<li>Added a new CanonModelID (thanks Laurent Clevy)
+<li>Added a new CanonModelID
 <li>Added a few new Canon 1D Mark IV custom functions values
 <li>Added warning for superfluous tag names on the command line when writing
 <li>Decode a few more tags for the Canon EOS 5D and 7D
@@ -308,7 +398,7 @@
 <li>Added a few more Sony/Minolta LensType's
 <li>Added a couple more Canon LensType's (thanks Norbert Wasser)
 <li>Added a PentaxModelID for the new K-x
-<li>Decode a couple more Canon VignettingCorr tags (thanks Laurent Clevy)
+<li>Decode a couple more Canon VignettingCorr tags
 <li>Improved Canon FocusDistance conversions to indicate "inf" for maximum value
 <li>Improved DOF calculation to use SubjectDistance if FocusDistance is not
     available
@@ -330,7 +420,7 @@
 
 <a name='v7.93'><b>Sept. 5, 2009 - Version 7.93</b></a>
 <ul>
-<li>Added a new CanonModelID (thanks Laurent Clevy)
+<li>Added a new CanonModelID
 <li>Added a couple of new Nikon LensType's (thanks Robert Rottmerhusen)
 <li>Added a few new Pentax LensType's
 <li>Decode a number of new tags for the Canon EOS 7D
@@ -404,7 +494,7 @@
 <li>Added lookup for XMP-photoshop:Urgency
 <li>Added a few new Nikon RetouchHistory values
 <li>Decode a number of new Sony tags for the A700 (thanks R&uuml;diger Lange)
-<li>Decode Canon PeripheralLighting tags (thanks Laurent Clevy)
+<li>Decode Canon PeripheralLighting tags
 <li>Decode Olympus AFFineTuneAdj (thanks Yrjo Rauste)
 <li>Extract System tags from unknown file types
 <li>Enhanced -E option to work when writing, and when used in combination with
@@ -633,7 +723,7 @@
     bug introduced in version 7.64 which disabled write support for these images
 <li>Added a new Canon EasyMode value (thanks Irwin Poche)
 <li>Added a number of new Nikon LensID's (thanks Robert Rottmerhusen)
-<li>Added CanonModelID for the new 500D (thanks Laurent Clevy)
+<li>Added CanonModelID for the new 500D
 <li>Decode many CameraInfo and ColorData tags for the Canon EOS 500D
 <li>Decode track-level 'meta' atom in MOV videos
 <li>Enhanced Canon Composite:ShootingMode logic to distinguish Bulb mode
@@ -652,7 +742,7 @@
 <li>Added support for localized language descriptions of "lang-alt" tags
 <li>Added support for Nikon NRW files (please just kill me now)
 <li>Added two new PentaxModelID's and a new PentaxImageSize
-<li>Decode Pentax PEF HuffmanTable as Unknown Binary tag (thanks Laurent Clevy)
+<li>Decode Pentax PEF HuffmanTable as Unknown Binary tag
 <li>Decode Leaf and Kodak records in DNGAdobeData information
 <li>Made "Empty PrintIM data" a minor warning
 <li>Minor improvement to Canon lens recognition logic
@@ -688,7 +778,7 @@
 <a name='v7.70'><b>Feb. 26, 2009 - Version 7.70</b></a>
 <ul>
 <li>Added a few new Nikon LensID's (thanks Robert Rottmerhusen)
-<li>Added a number of new CanonModelID's (thanks Laurent Clevy)
+<li>Added a number of new CanonModelID's
 <li>Added ability to use -f before -listx to output 'flags' attribute
 <li>Added xml:lang attribute to -X output (when used with -t, -H or -D) to
     identify alternate language entries for XMP lang-alt tags
@@ -1089,10 +1179,10 @@
 <ul>
 <li>Added two new Pentax LensTypes (thanks Jens Duttke and Anton Bondar)
 <li>Added PentaxModelID's for the Optio E60 and M60
-<li>Added a number of new CanonModelID's (thanks Laurent Clevy for the 5DmkII)
+<li>Added a number of new CanonModelID's
 <li>Extract XMP from MOV and AVI videos (as written by Adobe CS3 Bridge)
 <li>Decode information from QuickTime HintInfo atoms (hinf and hnti)
-<li>Decode Canon 50D/5DmkII AutoLightingOptimizer (thanks Laurent Clevy)
+<li>Decode Canon 50D/5DmkII AutoLightingOptimizer
 <li>Enable writing of ThumbnailImage in CR2 images
 <li>Avoid extracting invalid Canon FocusDistance tags
 <li>Improved handling of timezones in date/time values (fixes failed EXE test)
@@ -1104,8 +1194,8 @@
 <li>Added read support for ZIP and RWZ (Rawzor) compressed files
 <li>Added a number of new XMP tags written by PS Elements 4.0 (thanks Drew
     Holland) and LightRoom 2.0
-<li>Added new Sony, Canon and Nikon LensTypes (thanks Jens Duttke, Laurent Clevy
-    and Werner Kober)
+<li>Added new Sony, Canon and Nikon LensTypes (thanks Jens Duttke and Werner
+    Kober)
 <li>Decode a few new Canon CameraInfo tags for the 40D, 50D, 450D and 1000D
     (thanks D.J. Cristi)
 <li>Decode Nikon D90 LensData
@@ -1377,7 +1467,7 @@
 <li>Decode Nikon D300 AFFineTuneAdj (thanks Neil Nappe)
 <li>Decode a number of new Pentax tags and values (thanks Jens Duttke)
 <li>Decode a number of new QuickTime tags, including 'mdta' information
-<li>Decode a missing Custom Function for Canon 450D (thanks Laurent Clevy)
+<li>Decode a missing Custom Function for Canon 450D
 <li>Avoid extracting any unknown tag in binary data tables when -u option used
 <li>Avoid writing Canon 1D/1DS RAW images masquerading as TIF (writing 1D
     RAW images is not yet supported)
@@ -1531,7 +1621,7 @@
     images
 <li>Added ValueConv translations for some of the new Nikon PictureControl tags
 <li>Decode a number of new Nikon tags (thanks Jens Duttke and Gregor Dorlars)
-<li>Decode Canon CR2Segmentation tag (thanks Laurent Clevy)
+<li>Decode Canon CR2Segmentation tag
 <li>Decode a new Canon CustomFunction of the EOS 450D
 <li>Improved handling of mandatory tags in EXIF information
 <li>Changed all FocalLength print conversions to add a space before "mm"
@@ -1557,7 +1647,7 @@
 <ul>
 <li>Added read support for ITC (iTunes Cover Flow) files
 <li>Added ability to deal with corrupted IPTC written by Nikon Capture NX
-<li>Added a few new Canon LensType's (thanks Steve Balcombe and Laurent Clevy)
+<li>Added a few new Canon LensType's (thanks Steve Balcombe)
 <li>Decode a number of new Nikon D3/D300 tags (thanks Gregor Dorlars)
 <li>Decode a number of new FujiFilm and Panasonic tags and values
 <li>Decode ColorBalance information for the Canon 40D, 1DmkIII and 1DSmkIII

@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.32
 [File, System, Image] FileSize - File Size: 38 kB
 [File, File, Image] RAFVersion - RAF Version: 0106
 [File, File, Image] FileType - File Type: RAF
-[File, File, Image] MIMEType - MIME Type: image/x-raw
+[File, File, Image] MIMEType - MIME Type: image/x-fujifilm-raf
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
 [File, File, Image] ImageWidth - Image Width: 8
 [File, File, Image] ImageHeight - Image Height: 8
@@ -39,7 +39,7 @@
 [EXIF, ExifIFD, Camera] 37384 - Light Source: Unknown
 [EXIF, ExifIFD, Camera] 37385 - Flash: Off, Did not fire
 [EXIF, ExifIFD, Camera] 37386 - Focal Length: 70.0 mm
-[EXIF, ExifIFD, Image] 37510 - User Comment:                                                                                                                                                                                                                                                         
+[EXIF, ExifIFD, Image] 37510 - User Comment: 
 [EXIF, ExifIFD, Image] 40960 - Flashpix Version: 0100
 [EXIF, ExifIFD, Image] 40961 - Color Space: sRGB
 [EXIF, ExifIFD, Image] 40962 - Exif Image Width: 1440

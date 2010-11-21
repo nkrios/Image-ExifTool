@@ -529,7 +529,7 @@
 <td><span class=s>[Mask 0x1f]</span></td></tr>
 <tr class=b>
 <td class=r title='13 = 0xd'>13.2</td>
-<td>CommanderGroupA_ManualOutput</td>
+<td>CommanderGroupAManualOutput</td>
 <td class=c>int8u</td>
 <td><span class=s>[Mask 0xe0]</span></td></tr>
 <tr>
@@ -539,7 +539,7 @@
 <td><span class=s>[Mask 0x1f]</span></td></tr>
 <tr class=b>
 <td class=r title='14 = 0xe'>14.2</td>
-<td>CommanderGroupB_ManualOutput</td>
+<td>CommanderGroupBManualOutput</td>
 <td class=c>int8u</td>
 <td><span class=s>[Mask 0xe0]</span></td></tr>
 <tr>
@@ -1068,7 +1068,8 @@
 <td class=r title='1 = 0x1'>1.5</td>
 <td>FocusTrackingLockOn</td>
 <td class=c>int8u</td>
-<td><span class=s>[Mask 0x03]
+<td><span class=s><span class=n>(not D3S)</span>
+  <br>[Mask 0x03]
   <br>0x0 = Long
   <br>0x1 = Normal
   <br>0x2 = Short
@@ -1159,6 +1160,45 @@
   <br>0x50 = AF Lock Only
   <br>0x60 = Same as FUNC Button</span></td></tr>
 <tr class=b>
+<td class=r title='4 = 0x4'>4.1</td>
+<td>FocusTrackingLockOn</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(D3S only)</span>
+  <br>[Mask 0x07]
+  <br>0x0 = 5 (Long)
+  <br>0x1 = 4
+  <br>0x2 = 3 (Normal)
+  <br>0x3 = 2
+  <br>0x4 = 1 (Short)
+  <br>0x5 = Off</span></td></tr>
+<tr>
+<td class=r title='4 = 0x4'>4.2</td>
+<td>AssignBktButton</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(D3S only)</span>
+  <br>[Mask 0x08]
+  <br>0x0 = Auto Bracketing
+  <br>0x8 = Multiple Exposure</span></td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4.3</td>
+<td>MultiSelectorLiveView</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(D3S only)</span>
+  <br>[Mask 0xc0]
+  <br>0x0 = Reset
+  <br>0x40 = Zoom On/Off
+  <br>0x80 = Start Movie Recording
+  <br>0xc0 = Not Used</span></td></tr>
+<tr>
+<td class=r title='4 = 0x4'>4.4</td>
+<td>InitialZoomLiveView</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(D3S only)</span>
+  <br>[Mask 0x30]
+  <br>0x0 = Low Magnification
+  <br>0x10 = Medium Magnification
+  <br>0x20 = High Magnification</span></td></tr>
+<tr class=b>
 <td class=r title='6 = 0x6'>6.1</td>
 <td>ISOStepSize</td>
 <td class=c>int8u</td>
@@ -1235,7 +1275,8 @@
 <td class=r title='9 = 0x9'>9.2</td>
 <td>MultiSelectorPlaybackMode</td>
 <td class=c>int8u</td>
-<td><span class=s>[Mask 0x30]
+<td><span class=s><span class=n>(all models except D3S)</span>
+  <br>[Mask 0x30]
   <br>0x0 = Thumbnail On/Off
   <br>0x10 = View Histograms
   <br>0x20 = Zoom On/Off
@@ -1341,6 +1382,13 @@
   <br>0x2 = FR6 (AA lithium)
   <br>0x3 = ZR6 (AA Ni-Mn)</span></td></tr>
 <tr class=b>
+<td class=r title='12 = 0xc'>12.7</td>
+<td>ScreenTips</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x10]
+  <br>0x0 = On
+  <br>0x10 = Off</span></td></tr>
+<tr>
 <td class=r title='13 = 0xd'>13.1</td>
 <td>Beep</td>
 <td class=c>int8u</td>
@@ -1348,7 +1396,7 @@
   <br>0x0 = High
   <br>0x40 = Low
   <br>0x80 = Off</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='13 = 0xd'>13.2</td>
 <td>ShootingInfoDisplay</td>
 <td class=c>int8u</td>
@@ -1357,7 +1405,7 @@
   <br>0x10 = Auto
   <br>0x20 = Manual (dark on light)
   <br>0x30 = Manual (light on dark)</span></td></tr>
-<tr class=b>
+<tr>
 <td class=r title='13 = 0xd'>13.3</td>
 <td>GridDisplay</td>
 <td class=c>int8u</td>
@@ -1365,7 +1413,7 @@
   <br>[Mask 0x02]
   <br>0x0 = Off
   <br>0x2 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='13 = 0xd'>13.4</td>
 <td>ViewfinderWarning</td>
 <td class=c>int8u</td>
@@ -1373,13 +1421,22 @@
   <br>[Mask 0x01]
   <br>0x0 = On
   <br>0x1 = Off</span></td></tr>
+<tr>
+<td class=r title='13 = 0xd'>13.5</td>
+<td>MultiSelectorPlaybackMode</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(D3S only)</span>
+  <br>[Mask 0x03]
+  <br>0x0 = Thumbnail On/Off
+  <br>0x1 = View Histograms
+  <br>0x2 = Zoom On/Off</span></td></tr>
 <tr class=b>
 <td class=r title='14 = 0xe'>14.1</td>
 <td>PreviewButton
   <br>FuncButton</td>
 <td class=c>int8u<br>int8u</td>
 <td><span class=s><span class=n>(D3)</span>
-  <br>[Mask 0x78]
+  <br>[Mask 0xf8]
   <br>0x0 = None
   <br>0x8 = Preview
   <br>0x10 = FV Lock
@@ -1394,8 +1451,10 @@
   <br>0x58 = Center-weighted Metering
   <br>0x60 = Spot Metering
   <br>0x68 = Virtual Horizon
+  <br>0x78 = Playback
+  <br>0x80 = My Menu Top
   <br><span class=n>(D300)</span>
-  <br>[Mask 0x78]
+  <br>[Mask 0xf8]
   <br>0x0 = None
   <br>0x8 = Preview
   <br>0x10 = FV Lock
@@ -1408,7 +1467,10 @@
   <br>0x50 = Bracketing Burst
   <br>0x58 = Matrix Metering
   <br>0x60 = Center-weighted Metering
-  <br>0x68 = Spot Metering</span></td></tr>
+  <br>0x68 = Spot Metering
+  <br>0x70 = Playback
+  <br>0x78 = My Menu Top
+  <br>0x80 = + NEF (RAW)</span></td></tr>
 <tr>
 <td class=r title='14 = 0xe'>14.2</td>
 <td>PreviewButtonPlusDials
@@ -1436,7 +1498,7 @@
   <br>PreviewButton</td>
 <td class=c>int8u<br>int8u</td>
 <td><span class=s><span class=n>(D3)</span>
-  <br>[Mask 0x78]
+  <br>[Mask 0xf8]
   <br>0x0 = None
   <br>0x8 = Preview
   <br>0x10 = FV Lock
@@ -1451,8 +1513,10 @@
   <br>0x58 = Center-weighted Metering
   <br>0x60 = Spot Metering
   <br>0x68 = Virtual Horizon
+  <br>0x78 = Playback
+  <br>0x80 = My Menu Top
   <br><span class=n>(D300)</span>
-  <br>[Mask 0x78]
+  <br>[Mask 0xf8]
   <br>0x0 = None
   <br>0x8 = Preview
   <br>0x10 = FV Lock
@@ -1465,7 +1529,10 @@
   <br>0x50 = Bracketing Burst
   <br>0x58 = Matrix Metering
   <br>0x60 = Center-weighted Metering
-  <br>0x68 = Spot Metering</span></td></tr>
+  <br>0x68 = Spot Metering
+  <br>0x70 = Playback
+  <br>0x78 = My Menu Top
+  <br>0x80 = + NEF (RAW)</span></td></tr>
 <tr>
 <td class=r title='15 = 0xf'>15.2</td>
 <td>FuncButtonPlusDials
@@ -1493,7 +1560,7 @@
 <td>AELockButton</td>
 <td class=c>int8u</td>
 <td><span class=s><span class=n>(D3)</span>
-  <br>[Mask 0x78]
+  <br>[Mask 0xf8]
   <br>0x0 = None
   <br>0x8 = Preview
   <br>0x10 = FV Lock
@@ -1509,8 +1576,10 @@
   <br>0x60 = Spot Metering
   <br>0x68 = Virtual Horizon
   <br>0x70 = AF On
+  <br>0x78 = Playback
+  <br>0x80 = My Menu Top
   <br><span class=n>(D300)</span>
-  <br>[Mask 0x78]
+  <br>[Mask 0xf8]
   <br>0x0 = None
   <br>0x8 = Preview
   <br>0x10 = FV Lock
@@ -1524,7 +1593,10 @@
   <br>0x50 = Bracketing Burst
   <br>0x58 = Matrix Metering
   <br>0x60 = Center-weighted Metering
-  <br>0x68 = Spot Metering</span></td></tr>
+  <br>0x68 = Spot Metering
+  <br>0x70 = Playback
+  <br>0x78 = My Menu Top
+  <br>0x80 = + NEF (RAW)</span></td></tr>
 <tr>
 <td class=r title='16 = 0x10'>16.2</td>
 <td>AELockButtonPlusDials</td>
@@ -1945,7 +2017,7 @@
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 4, 2010</i>
+<br><i>Last revised Nov 7, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -27,7 +27,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD $iptcDigestInfo);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.40';
+$VERSION = '1.41';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -67,7 +67,7 @@ my %psdMap = (
     },
     0x03ee => {
         Name => 'AlphaChannelsNames',
-        PrintConv => 'Image::ExifTool::Photoshop::ConvertPascalString($val)',
+        ValueConv => 'Image::ExifTool::Photoshop::ConvertPascalString($self,$val)',
     },
     0x03ef => { Unknown => 1, Name => 'DisplayInfo' },
     0x03f0 => { Unknown => 1, Name => 'PStringCaption' },
@@ -211,13 +211,12 @@ my %psdMap = (
     # 0x07d0-0x0bb6 Path information
     0x0bb7 => {
         Name => 'ClippingPathName',
-        # convert from a Pascal string
+        # convert from a Pascal string (ignoring 6 bytes of unknown data after string)
         ValueConv => q{
             my $len = ord($val);
-            $val = substr($val, 1, $len) if $len < length($val);
-            return $val;
+            $val = substr($val, 0, $len+1) if $len < length($val);
+            return Image::ExifTool::Photoshop::ConvertPascalString($self,$val);
         },
-        # there are 6 bytes of unknown information that follow the name
     },
     0x2710 => { Unknown => 1, Name => 'PrintFlagsInfo' },
 );
@@ -342,9 +341,9 @@ sub AUTOLOAD
 # Convert pascal string(s) to something we can use
 # Inputs: 1) Pascal string data
 # Returns: Strings, concatenated with ', '
-sub ConvertPascalString($)
+sub ConvertPascalString($$)
 {
-    my $inStr = shift;
+    my ($exifTool, $inStr) = @_;
     my $outStr = '';
     my $len = length($inStr);
     my $i=0;
@@ -355,7 +354,8 @@ sub ConvertPascalString($)
         $outStr .= substr($inStr, $i+1, $n);
         $i += $n + 1;
     }
-    return $outStr;
+    my $charset = $exifTool->Options('CharsetPhotoshop') || 'Latin';
+    return $exifTool->Decode($outStr, $charset);
 }
 
 #------------------------------------------------------------------------------

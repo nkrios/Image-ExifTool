@@ -15,7 +15,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.35';
+$VERSION = '1.37';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -199,7 +199,9 @@ $VERSION = '1.35';
         'MakerNoteSony2',
         'MakerNoteSony3',
         'MakerNoteSony4',
+        'MakerNoteSonyEricsson',
         'MakerNoteSonySRF',
+        'MakerNoteUnknownText',
         'MakerNoteUnknown',
     ],
     # "unsafe" tags we normally don't copy in JPEG images, defined

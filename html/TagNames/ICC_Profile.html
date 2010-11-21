@@ -8,8 +8,8 @@
 <body>
 <h2 class=top>ICC_Profile Tags</h2>
 <p>ICC profile information is used in many different file types including JPEG,
-TIFF, PDF, PostScript, Photoshop, PNG, MIFF, PICT, QuickTime and some RAW
-formats.  While the tags listed below are not individually writable, the
+TIFF, PDF, PostScript, Photoshop, PNG, MIFF, PICT, QuickTime, XCF and some
+RAW formats.  While the tags listed below are not individually writable, the
 entire profile itself can be accessed via the extra &#39;ICC_Profile&#39; tag, but
 this tag is neither extracted nor written unless specified explicitly.  See
 <a href="http://www.color.org/icc_specs2.xalter">http://www.color.org/icc_specs2.xalter</a> for the official ICC
@@ -47,6 +47,46 @@ specification.</p>
 <tr class=b>
 <td>'B2A2'</td>
 <td>BToA2</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'B2D0'</td>
+<td>BToD0</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'B2D1'</td>
+<td>BToD1</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'B2D2'</td>
+<td>BToD2</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'B2D3'</td>
+<td>BToD3</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'D2B0'</td>
+<td>DToB0</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'D2B1'</td>
+<td>DToB1</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'D2B2'</td>
+<td>DToB2</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'D2B3'</td>
+<td>DToB3</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -95,53 +135,63 @@ specification.</p>
 <td class=c>-</td>
 <td>--&gt; <a href='ICC_Profile.html#Chromaticity'>ICC_Profile Chromaticity Tags</a></td></tr>
 <tr class=b>
+<td>'ciis'</td>
+<td>ColorimetricIntentImageState</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'clot'</td>
 <td>ColorantTableOut</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'clro'</td>
 <td>ColorantOrder</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'clrt'</td>
 <td>ColorantTable</td>
 <td class=c>-</td>
 <td>--&gt; <a href='ICC_Profile.html#ColorantTable'>ICC_Profile ColorantTable Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'cprt'</td>
 <td>ProfileCopyright</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'crdi'</td>
 <td>CRDInfo</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'desc'</td>
 <td>ProfileDescription</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'devs'</td>
 <td>DeviceSettings</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'dmdd'</td>
 <td>DeviceModelDesc</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'dmnd'</td>
 <td>DeviceMfgDesc</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'dscm'</td>
 <td>ProfileDescriptionML</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'fpce'</td>
+<td>FocalPlaneColorimetryEstimates</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -175,68 +225,78 @@ specification.</p>
 <td class=c>-</td>
 <td>--&gt; <a href='ICC_Profile.html#Measurement'>ICC_Profile Measurement Tags</a></td></tr>
 <tr class=b>
+<td>'meta'</td>
+<td>Metadata</td>
+<td class=c>-</td>
+<td>--&gt; <a href='ICC_Profile.html#Metadata'>ICC_Profile Metadata Tags</a></td></tr>
+<tr>
 <td>'mmod'</td>
 <td>MakeAndModel</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'ncl2'</td>
 <td>NamedColor2</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'ncol'</td>
 <td>NamedColor</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'ndin'</td>
 <td>NativeDisplayInfo</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'pre0'</td>
 <td>Preview0</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'pre1'</td>
 <td>Preview1</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'pre2'</td>
 <td>Preview2</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'ps2i'</td>
-<td>PS2RenteringIntent</td>
+<td>PS2RenderingIntent</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'ps2s'</td>
 <td>PostScript2CSA</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'psd0'</td>
 <td>PostScript2CRD0</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'psd1'</td>
 <td>PostScript2CRD1</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'psd2'</td>
 <td>PostScript2CRD2</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'pseq'</td>
 <td>ProfileSequenceDesc</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'psid'</td>
+<td>ProfileSequenceIdentifier</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -257,6 +317,36 @@ specification.</p>
 <tr class=b>
 <td>'resp'</td>
 <td>OutputResponse</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'rhoc'</td>
+<td>ReflectionHardcopyOrigColorimetry</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'rig0'</td>
+<td>PerceptualRenderingIntentGamut</td>
+<td class=c>N</td>
+<td><span class=s>&#39;prmg&#39; = Perceptual Reference Medium Gamut</span></td></tr>
+<tr>
+<td>'rig2'</td>
+<td>SaturationRenderingIntentGamut</td>
+<td class=c>N</td>
+<td><span class=s>&#39;prmg&#39; = Perceptual Reference Medium Gamut</span></td></tr>
+<tr class=b>
+<td>'rpoc'</td>
+<td>ReflectionPrintOutputColorimetry</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'sape'</td>
+<td>SceneAppearanceEstimates</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'scoe'</td>
+<td>SceneColorimetryEstimates</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -283,6 +373,8 @@ specification.</p>
   <br>&#39;KPCD&#39; = Photo CD
   <br>&#39;PMD &#39; = Passive Matrix Display
   <br>&#39;dcam&#39; = Digital Camera
+  <br>&#39;dcpj&#39; = Digital Cinema Projector
+  <br>&#39;dmpc&#39; = Digital Motion Picture Camera
   <br>&#39;dsub&#39; = Dye Sublimation Printer
   <br>&#39;epho&#39; = Electrophotographic Printer
   <br>&#39;esta&#39; = Electrostatic Printer
@@ -292,6 +384,8 @@ specification.</p>
   <br>&#39;grav&#39; = Gravure
   <br>&#39;ijet&#39; = Ink Jet Printer
   <br>&#39;imgs&#39; = Photo Image Setter
+  <br>&#39;mpfr&#39; = Motion Picture Film Recorder
+  <br>&#39;mpfs&#39; = Motion Picture Film Scanner
   <br>&#39;offs&#39; = Offset Lithography
   <br>&#39;pjtv&#39; = Projection Television
   <br>&#39;rpho&#39; = Photographic Paper Printer
@@ -550,6 +644,28 @@ specification.</p>
   <br>8 = F8</span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Metadata'>ICC_Profile Metadata Tags</a></h2>
+<p>Only these few tags have been pre-defined, but ExifTool will extract any
+Metadata tags that exist.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>ManufacturerName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>MediaColor</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>MediaWeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='ViewingConditions'>ICC_Profile ViewingConditions Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -582,7 +698,7 @@ specification.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 21, 2010</i>
+<br><i>Last revised Oct 7, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

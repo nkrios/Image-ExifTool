@@ -15,10 +15,11 @@ use Image::ExifTool::Exif;
 
 sub ProcessUnknown($$$);
 sub ProcessUnknownOrPreview($$$);
+sub ProcessCanon($$$);
 sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.58';
+$VERSION = '1.61';
 
 my $debug;          # set to 1 to enabled debugging code
 
@@ -36,6 +37,7 @@ my $debug;          # set to 1 to enabled debugging code
         Condition => '$$self{Make} =~ /^Canon/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Canon::Main',
+            ProcessProc => \&ProcessCanon,
             ByteOrder => 'Unknown',
         },
     },
@@ -44,7 +46,7 @@ my $debug;          # set to 1 to enabled debugging code
         # do negative lookahead assertion just to get tags
         # in a nice order for documentation
         # (starts with an IFD)
-        Condition => '$$self{Make}=~/^CASIO(?! COMPUTER CO.,LTD)/',
+        Condition => '$$self{Make}=~/^CASIO/ and $$valPt!~/^(QVC|DCI)\0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Casio::Main',
             ByteOrder => 'Unknown',
@@ -52,9 +54,9 @@ my $debug;          # set to 1 to enabled debugging code
     },
     {
         Name => 'MakerNoteCasio2',
-        # (starts with "QVC\0")
+        # (starts with "QVC\0" [Casio] or "DCI\0" [Concord])
         # (also found in AVI and MOV videos)
-        Condition => '$$self{Make}=~/^CASIO COMPUTER CO.,LTD/',
+        Condition => '$$valPt =~ /^(QVC|DCI)\0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Casio::Type2',
             Start => '$valuePtr + 6',
@@ -293,10 +295,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteKodak9',
         # test header and Kodak:DateTimeOriginal
-        Condition => q{
-            $$self{Make}=~/Kodak/i and
-            $$valPt =~ /^IIII.{16}\d{4}\/\d{2}\/\d{2} /s
-        },
+        Condition => '$$valPt =~ m{^IIII[\x02\x03]\0.{14}\d{4}/\d{2}/\d{2} }s',
         NotIFD => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Kodak::Type9',
@@ -331,7 +330,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNoteKyocera',
         # (starts with "KYOCERA")
-        Condition => '$$self{Make}=~/^KYOCERA/',
+        Condition => '$$valPt =~ /^KYOCERA/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Unknown::Main',
             Start => '$valuePtr + 22',
@@ -371,7 +370,6 @@ my $debug;          # set to 1 to enabled debugging code
         Name => 'MakerNoteMinolta3',
         Condition => '$$self{Make} =~ /^(Konica Minolta|Minolta)/i',
         Binary => 1,
-        NotIFD => 1,
         Notes => 'not EXIF-based',
     },
     {
@@ -506,7 +504,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNotePanasonic',
         # (starts with "Panasonic\0")
-        Condition => '$$self{Make} =~ /^Panasonic/ and $$valPt!~/^MKE/',
+        Condition => '$$valPt=~/^Panasonic/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Main',
             Start => '$valuePtr + 12',
@@ -516,7 +514,7 @@ my $debug;          # set to 1 to enabled debugging code
     {
         Name => 'MakerNotePanasonic2',
         # (starts with "Panasonic\0")
-        Condition => '$$self{Make} =~ /^Panasonic/',
+        Condition => '$$self{Make}=~/^Panasonic/ and $$valPt=~/^MKE/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Type2',
             ByteOrder => 'LittleEndian',
@@ -713,6 +711,16 @@ my $debug;          # set to 1 to enabled debugging code
         },
     },
     {
+        Name => 'MakerNoteSonyEricsson',
+        Condition => '$$valPt =~ /^SEMC MS\0/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Sony::Ericsson',
+            Start => '$valuePtr + 20',
+            Base => '$start - 8',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
         Name => 'MakerNoteSonySRF',
         Condition => '$$self{Make}=~/^SONY/',
         SubDirectory => {
@@ -720,6 +728,14 @@ my $debug;          # set to 1 to enabled debugging code
             Start => '$valuePtr',
             ByteOrder => 'Unknown',
         },
+    },
+    {
+        Name => 'MakerNoteUnknownText',
+        Condition => '$$valPt =~ /^[\x09\x0d\x0a\x20-\x7e]+\0*$/',
+        Notes => 'unknown text-based maker notes',
+        # show as binary if it is too long
+        ValueConv => 'length($val) > 64 ? \$val : $val',
+        ValueConvInv => '$val',
     },
     {
         Name => 'MakerNoteUnknown',
@@ -741,7 +757,7 @@ foreach $tagInfo (@Image::ExifTool::MakerNotes::Main) {
     $$tagInfo{WriteGroup} = 'ExifIFD';
     $$tagInfo{Groups} = { 1 => 'MakerNotes' };
     next unless $$tagInfo{SubDirectory};
-    # set up this tag so we can write it
+    # make all SubDirectory tags block-writable
     $$tagInfo{Binary} = 1,
     $$tagInfo{MakerNotes} = 1;
 }
@@ -900,21 +916,13 @@ sub FixBase($$)
 # handle special case of Canon maker notes with TIFF footer containing original offset
 #
     if ($$exifTool{Make} =~ /^Canon/ and $$dirInfo{DirLen} > 8) {
-        my $trailerPos = $dirStart + $$dirInfo{DirLen} - 8;
-        my $footer = substr($$dataPt, $trailerPos, 8);
+        my $footerPos = $dirStart + $$dirInfo{DirLen} - 8;
+        my $footer = substr($$dataPt, $footerPos, 8);
         if ($footer =~ /^(II\x2a\0|MM\0\x2a)/ and  # check for TIFF footer
             substr($footer,0,2) eq GetByteOrder()) # validate byte ordering
         {
             my $oldOffset = Get32u(\$footer, 4);
             my $newOffset = $dirStart + $dataPos;
-            if ($$exifTool{HTML_DUMP}) {
-                my $filePos = ($$dirInfo{Base} || 0) + $dataPos + $trailerPos;
-                my $str = sprintf('Original maker note offset: 0x%.4x', $oldOffset);
-                if ($oldOffset != $newOffset) {
-                    $str .= sprintf("\nCurrent maker note offset: 0x%.4x", $newOffset);
-                }
-                $exifTool->HDump($filePos, 8, '[Canon MakerNotes footer]', $str);
-            }
             if ($setBase) {
                 $fix = $fixBase;
             } else {
@@ -1271,6 +1279,33 @@ sub FixLeicaBase($$;$)
         $success = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
     }
     return $success;
+}
+
+#------------------------------------------------------------------------------
+# Process Canon maker notes
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessCanon($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    # identify Canon MakerNote footer in HtmlDump
+    # (this code moved from FixBase so it also works for Adobe MakN in DNG images)
+    if ($$exifTool{HTML_DUMP} and $$dirInfo{DirLen} > 8) {
+        my $dataPos = $$dirInfo{DataPos};
+        my $dirStart = $$dirInfo{DirStart} || 0;
+        my $footerPos = $dirStart + $$dirInfo{DirLen} - 8;
+        my $footer = substr(${$$dirInfo{DataPt}}, $footerPos, 8);
+        my $oldOffset = Get32u(\$footer, 4);
+        my $newOffset = $dirStart + $dataPos;
+        my $str = sprintf('Original maker note offset: 0x%.4x', $oldOffset);
+        if ($oldOffset != $newOffset) {
+            $str .= sprintf("\nCurrent maker note offset: 0x%.4x", $newOffset);
+        }
+        my $filePos = ($$dirInfo{Base} || 0) + $dataPos + $footerPos;
+        $exifTool->HDump($filePos, 8, '[Canon MakerNotes footer]', $str);
+    }
+    # process as normal
+    return Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
 }
 
 #------------------------------------------------------------------------------

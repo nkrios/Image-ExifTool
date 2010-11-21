@@ -26,7 +26,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -76,7 +76,7 @@ $Image::ExifTool::PNG::colorType = -1;
     PREFERRED => 1, # always add these tags when writing
     NOTES => q{
         Tags extracted from PNG images.  See
-        L<http://www.libpng.org/pub/png/spec/1.2/> for the offical PNG 1.2
+        L<http://www.libpng.org/pub/png/spec/1.2/> for the official PNG 1.2
         specification.
     },
     bKGD => {
@@ -438,6 +438,7 @@ my %unreg = ( Notes => 'unregistered' );
             # EXIF table must come first because we key on this in ProcessProfile()
             # (No condition because this is just for BuildTagLookup)
             Name => 'APP1_Profile',
+            %unreg,
             SubDirectory => {
                 TagTable=>'Image::ExifTool::Exif::Main',
                 ProcessProc => \&ProcessProfile,
@@ -453,6 +454,7 @@ my %unreg = ( Notes => 'unregistered' );
     ],
    'Raw profile type exif' => {
         Name => 'EXIF_Profile',
+        %unreg,
         SubDirectory => {
             TagTable=>'Image::ExifTool::Exif::Main',
             ProcessProc => \&ProcessProfile,
@@ -460,6 +462,7 @@ my %unreg = ( Notes => 'unregistered' );
     },
    'Raw profile type icc' => {
         Name => 'ICC_Profile',
+        %unreg,
         SubDirectory => {
             TagTable => 'Image::ExifTool::ICC_Profile::Main',
             ProcessProc => \&ProcessProfile,
@@ -467,6 +470,7 @@ my %unreg = ( Notes => 'unregistered' );
     },
    'Raw profile type icm' => {
         Name => 'ICC_Profile',
+        %unreg,
         SubDirectory => {
             TagTable => 'Image::ExifTool::ICC_Profile::Main',
             ProcessProc => \&ProcessProfile,
@@ -474,6 +478,7 @@ my %unreg = ( Notes => 'unregistered' );
     },
    'Raw profile type iptc' => {
         Name => 'IPTC_Profile',
+        %unreg,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Photoshop::Main',
             ProcessProc => \&ProcessProfile,
@@ -481,6 +486,7 @@ my %unreg = ( Notes => 'unregistered' );
     },
    'Raw profile type xmp' => {
         Name => 'XMP_Profile',
+        %unreg,
         SubDirectory => {
             TagTable => 'Image::ExifTool::XMP::Main',
             ProcessProc => \&ProcessProfile,

@@ -237,16 +237,18 @@ requested information.  All tags are returned if no tags are specified.
 <br>&nbsp;<br>
 Tag names are case-insensitive and may be prefixed by optional group names
 separated by colons.  A group name may begin with a family number (ie.
-'<code>1IPTC:Keywords</code>'), to restrict matches to a specific family. A tag
-name of '<code>*</code>' may be used, thus allowing '<code>GROUP:*</code>' to
-represent all tags in a specific group, or a group name of '<code>*</code>' may
-be used, in which case all available instances of the specified tag are returned
-regardless of the <a href="#Duplicates">Duplicates</a> setting (ie.
-'<code>*:WhiteBalance</code>'). Multiple groups may be specified (ie.
-'<code>EXIF:Time:*</code>' extracts all EXIF Time tags).  And finally, a leading
-'<code>-</code>' indicates a tag to be excluded (ie. '<code>-IFD1:*</code>'), or
-a trailing '<code>#</code>' causes the ValueConv value to be returned for this
-tag.<br>&nbsp;<br>
+'<code>1IPTC:Keywords</code>'), to restrict matches to a specific family. In the
+tag name, a '<code>?</code>' matches any single character and a '<code>*</code>'
+matches zero or more characters.  Thus '<code>GROUP:*</code>' represents all
+tags in a specific group.  Wildcards may not be used in group names, with the
+exception that a group name of '<code>*</code>' may be used to extract all
+available instances of a tag regardless of the
+<a href="#Duplicates">Duplicates</a> setting (ie. '<code>*:WhiteBalance</code>').
+Multiple groups may be specified (ie. '<code>EXIF:Time:*</code>' extracts all
+EXIF Time tags).  And finally, a leading '<code>-</code>' indicates a tag to be
+excluded (ie. '<code>-IFD1:*</code>'), or a trailing '<code>#</code>' causes the
+ValueConv value to be returned for this tag.
+<br>&nbsp;<br>
 Note that keys in the returned information hash and elements of the
 returned tag list are not necessarily the same as these tag names because
 group names are removed, the case may be changed, and an instance number may
@@ -413,11 +415,12 @@ to some functions.</p>
     This can also be set via the ExifByteOrder tag, but the ByteOrder option takes
     precedence if both are set.</td>
     <td align='center'>'MM','II' or undef</td><td align=center>undef</td></tr>
-<tr><td><a name="Charset">Charset</a></td><td>Character set for encoding character strings containing code
-    points above U+007F.  Note that this option affects some types of information
-    when reading/writing the file and other types when getting/setting tag values, so
-    it must be defined for both types of access. Charset values listed to the right
-    have aliases which are given in brackets. Case is not significant.</td>
+<tr><td><a name="Charset">Charset</a></td><td>Character set for encoding character
+    strings passed to/from ExifTool containing code points above U+007F.  Note
+    that this option affects some types of information when reading/writing the
+    file and other types when getting/setting tag values, so it must be defined
+    for both types of access. Charset values listed to the right have aliases
+    which are given in brackets. Case is not significant.</td>
     <td align='center'><table class='clear'>
     <tr><td valign='top' align=right>UTF8</td><td>(cp65001, UTF-8)</td></tr>
     <tr><td valign='top' align=right>Latin</td><td>(cp1252, Latin1)</td></tr>
@@ -446,6 +449,8 @@ to some functions.</p>
     <td align=center><i>(see <a href="#Charset">Charset</a> option)</i></td><td align=center>'Latin'</td></tr>
 <tr><td>CharsetIPTC</td><td>Fallback IPTC character set to assume if IPTC information
     contains no CodedCharacterSet tag.</td>
+    <td align=center><i>(see <a href="#Charset">Charset</a> option)</i></td><td align=center>'Latin'</td></tr>
+<tr><td>CharsetPhotoshop</td><td>Character encoding to assume for Photoshop IRB resource names.</td>
     <td align=center><i>(see <a href="#Charset">Charset</a> option)</i></td><td align=center>'Latin'</td></tr>
 <tr><td>Compact</td><td>Flag to write compact output.  The XMP specification suggests
     that the data be padded with blanks to allow in-place editing.  By setting this
@@ -552,11 +557,13 @@ to some functions.</p>
     <tr><td valign='top' align=right><b><i>non&#8209;zero</i></b>&nbsp;=</td><td>Relative offsets</td></tr>
     <tr><td valign='top' align=right><b>undef</b>&nbsp;=</td><td>EXIF/TIFF offsets</td></tr>
     </table></td><td align=center>undef</td></tr>
-<tr><td>IgnoreMinorErrors</td><td>Flag to ignore minor errors.  Causes minor errors
-    to be downgraded to warnings, and minor warnings to be ignored.  
-    This option is provided mainly to allow writing of files when minor errors
-    occur, but also allows thumbnail and preview images to be extracted even if
-    they don't have a recognizable header.</td>
+<tr><td>IgnoreMinorErrors</td><td>Flag to ignore minor errors.  Causes minor
+    errors to be downgraded to warnings, and minor warnings to be ignored.  This
+    option is provided mainly to allow writing of files when minor errors occur,
+    but by ignoring some minor warnings the behaviour of ExifTool may be changed
+    to allow some questionable operations to proceed (such as extracting
+    thumbnail and preview images even if they don't have a recognizable header).
+     Minor errors/warnings are denoted by '[minor]' at the start of the message.</td>
     <td align='center'>0 or 1</td><td align='center'>0</td></tr>
 <tr><td>Lang</td><td>Localized language for exiftool tag descriptions, etc.  If the
     specified language isn't available, the option is not changed.  May be set to
@@ -568,7 +575,7 @@ to some functions.</p>
 <tr><td>List</td><td>Flag to extract lists of PrintConv values into arrays instead of combining
     them into a string of values.</td><td align='center'>0 or 1</td><td align='center'>0</td></tr>
 <tr><td>ListSep</td><td>Separator string used to join lists of PrintConv values when
-    List option is not set.</td><td align='center'>any string</td><td align='center'>', '</td></tr>
+    List option is not set.</td><td align='center'>Any string</td><td align='center'>', '</td></tr>
 <tr><td>ListSplit</td><td>Regular expression used to split values of list-type tags
     into individual items when writing.  (ie. use ',\\s*' to split a comma-separated list)</td>
     <td align='center'>A regular expression pattern</td><td align='center'>undef</td></tr>
@@ -586,6 +593,10 @@ to some functions.</p>
     If not set, a minor error is issued for missing values, or the value
     is set to '' if IgnoreMinorErrors is set.</td>
     <td align='center'>Any string, or undef</td><td align='center'>undef</td></tr>
+<tr><td>Password</td><td><a name="Passwd"></a>Password for processing password-protected
+    PDF documents. Ignored if a password is not required. Character encoding of the
+    password is determined by the value of the Charset option at processing time.</td>
+    <td align='center'>Any string</td><td align=center>undef</td></tr>
 <tr><td>PrintConv</td><td><a name="PrintConv"></a>Flag to enable print conversion.  Also enables inverse print
     conversion for writing.</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
 <tr><td>ScanForXMP</td><td><a name="ScanForXMP"></a>Flag for scan all files (even unrecognized
@@ -962,7 +973,8 @@ the same tag name for each value, or call with a reference to the list of values
  the same effect as setting Type to 'ValueConv'.
  <br><b>2)</b> [<i>optional</i>] New value for tag.  Undefined to delete tag from file.
      May be a scalar, scalar reference, or list reference to set a list
-     of values.
+     of values. Integer values may be specified in hexadecimal (with a leading '0x'),
+     and simple rational values may be specified as fractions.
  <br><b>3-N)</b> [<i>optional</i>] SetNewValue option/value pairs (see below).
 </td></tr>
 <tr><td><b>Returns</b></td><td>Scalar context: The number of tags set, and
@@ -1217,6 +1229,8 @@ transferred separately if desired, in a separate call to
 <p>When simply copying all information between files of the same type, it is
 usually desirable to preserve the original groups by specifying
 '<code>*:*</code>' for the tags to set.</p>
+<p>The Duplicates option is always in effect for tags extracted from the source
+file using this routine.</p>
 
 <hr><h2><a name="GetNewValues">GetNewValues</a></h2>
 <p>Get list of new Raw values for the specified tag.  These are the values
@@ -1447,7 +1461,8 @@ ICC_Profile groups to give more detail about the specific location where the
 information was found.  The EXIF group is split up based on the specific IFD
 (Image File Directory), the MakerNotes group is divided into groups for each
 manufacturer, and the XMP group is separated based on the XMP namespace prefix. 
-Note that only common XMP namespaces are listed below but additional namespaces
+Note that only common XMP namespaces are listed in the
+<a href="#GetAllGroups">GetAllGroups</a> documentation, but additional namespaces
 may be present in some XMP data.  Also note that the '<code>XMP-xmp</code>...'
 group names may appear in the older form '<code>XMP-xap</code>...' since these
 names evolved as the XMP standard was developed.  The ICC_Profile group is
@@ -1633,40 +1648,40 @@ the specific IFD).
 <tr><td><b>0 (Information&nbsp;Type)</b></td>
 <td>AFCP, AIFF, APE, APP0, APP12, APP13, APP14, APP15, APP4, APP5, APP6, APP8,
 ASF, BMP, CanonVRD, Composite, DICOM, DNG, DjVu, Ducky, EXE, EXIF, ExifTool,
-FLAC, File, Flash, FlashPix, Font, FotoStation, GIF, GeoTiff, H264, HTML,
-ICC_Profile, ID3, IPTC, ITC, JFIF, JPEG, Jpeg2000, LNK, Leaf, M2TS, MIE,
-MIFF, MNG, MPC, MPEG, MPF, MakerNotes, Matroska, Meta, PDF, PICT, PNG, PSP,
-PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF, RSRC,
-RTF, Rawzor, Real, SVG, SigmaRaw, SonyIDC, Stim, Vorbis, XML, XMP, ZIP
+FLAC, File, Flash, FlashPix, Font, FotoStation, GIF, GIMP, GeoTiff, H264,
+HTML, ICC_Profile, ID3, IPTC, ITC, JFIF, JPEG, Jpeg2000, LNK, Leaf, M2TS,
+MIE, MIFF, MNG, MPC, MPEG, MPF, MakerNotes, Matroska, Meta, PDF, PICT, PNG,
+PSP, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF,
+RSRC, RTF, Rawzor, Real, SVG, SigmaRaw, Stim, Vorbis, XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, BMP, Canon, CanonCustom,
-CanonRaw, CanonVRD, Casio, Chapter#, Composite, DICOM, DNG, DjVu, DjVu-Meta,
-Ducky, EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File, Flash, FlashPix,
-Font, FotoStation, FujiFilm, GIF, GPS, GeoTiff, GlobParamIFD, GraphConv,
-H264, HP, HTML, HTML-dc, HTML-ncc, HTML-office, HTML-prod, HTML-vw96,
-HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas, ICC-view, ICC_Profile,
-ICC_Profile#, ID3, ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1,
-IPTC, IPTC#, ITC, InteropIFD, JFIF, JPEG, JVC, Jpeg2000, KDC_IFD, Kodak,
-KodakBordersIFD, KodakEffectsIFD, KodakIFD, KyoceraRaw, LNK, Leaf,
-LeafSubIFD, Leica, M2TS, MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc,
-MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
-MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM,
-MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MPF0, MPImage, MakerNotes,
-MakerUnknown, Matroska, MetaIFD, Minolta, MinoltaRaw, NITF, Nikon,
-NikonCapture, NikonCustom, NikonScan, Olympus, PDF, PICT, PNG, PSP,
-Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo, PostScript,
-PreviewIFD, PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, RSRC,
-RTF, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4,
-Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG,
-Samsung, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD,
-System, Track#, Version0, Vorbis, XML, XMP, XMP-DICOM, XMP-MP,
-XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-crs, XMP-dc,
-XMP-dex, XMP-digiKam, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr,
-XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-pdfx, XMP-photomech,
-XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-swf,
-XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote,
-XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
+<td>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, BMP, CIFF, Canon,
+CanonCustom, CanonRaw, CanonVRD, Casio, Chapter#, Composite, DICOM, DNG,
+DjVu, DjVu-Meta, Ducky, EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File,
+Flash, FlashPix, Font, FotoStation, FujiFilm, GIF, GIMP, GPS, GeoTiff,
+GlobParamIFD, GraphConv, H264, HP, HTML, HTML-dc, HTML-ncc, HTML-office,
+HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
+ICC-meta, ICC-view, ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v1_Enh,
+ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC, InteropIFD, JFIF,
+JPEG, JVC, Jpeg2000, KDC_IFD, Kodak, KodakBordersIFD, KodakEffectsIFD,
+KodakIFD, KyoceraRaw, LNK, Leaf, LeafSubIFD, Leica, M2TS, MAC, MIE-Audio,
+MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo,
+MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient,
+MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MNG, MPC,
+MPEG, MPF0, MPImage, MakerNotes, MakerUnknown, Matroska, MetaIFD, Microsoft,
+Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom, NikonScan,
+Olympus, PDF, PICT, PNG, PSP, Panasonic, Pentax, PhotoMechanic, Photoshop,
+PictureInfo, PostScript, PreviewIFD, PrintIM, ProfileIFD, QuickTime, RAF,
+RAF2, RIFF, RMETA, RSRC, RTF, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP,
+Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Ricoh, SPIFF, SR2, SR2DataIFD,
+SR2SubIFD, SRF#, SVG, Samsung, Sanyo, Scalado, Sigma, SigmaRaw, Sony,
+SonyIDC, Stim, SubIFD, System, Track#, Version0, Vorbis, XML, XMP,
+XMP-DICOM, XMP-MP, XMP-MP1, XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux,
+XMP-cc, XMP-crs, XMP-dc, XMP-dex, XMP-digiKam, XMP-exif, XMP-iptcCore,
+XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-pdf, XMP-pdfx,
+XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur,
+XMP-rdf, XMP-swf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
+XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,

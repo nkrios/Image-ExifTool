@@ -5,6 +5,7 @@
 #
 # Revisions:    2009/08/28 - P. Harvey created
 #               2010/01/20 - P. Harvey complete re-write
+#               2010/07/16 - P. Harvey added UTF-16 support
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Charset;
@@ -13,7 +14,7 @@ use strict;
 use vars qw($VERSION %csType);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.03';
+$VERSION = '1.05';
 
 my %charsetTable;   # character set tables we've loaded
 
@@ -68,11 +69,12 @@ my %unicode2byte = (
     Turkish      => 0x101,
     Vietnam      => 0x101,
     MacArabic    => 0x103, # (directional characters not supported)
+    PDFDoc       => 0x181,
     Unicode      => 0x200, # (UCS2)
     UCS2         => 0x200,
+    UTF16        => 0x200,
     Symbol       => 0x201,
     JIS          => 0x201,
-    ShiftJIS     => 0x281,
     UCS4         => 0x400,
     MacChineseCN => 0x803,
     MacChineseTW => 0x803,
@@ -81,6 +83,7 @@ my %unicode2byte = (
     MacRSymbol   => 0x803,
     MacThai      => 0x803,
     MacJapanese  => 0x883,
+    ShiftJIS     => 0x883,
 );
 
 #------------------------------------------------------------------------------
@@ -181,6 +184,16 @@ sub Decompose($$$;$)
                     @uni = unpack($fmt, $val);
                 }
             }
+            # handle surrogate pairs of UTF-16
+            if ($charset eq 'UTF16') {
+                my $i;
+                for ($i=0; $i<$#uni; ++$i) {
+                    next unless ($uni[$i]   & 0xfc00) == 0xd800 and
+                                ($uni[$i+1] & 0xfc00) == 0xdc00;
+                    my $cp = 0x10000 + (($uni[$i] & 0x3ff) << 10) + ($uni[$i+1] & 0x3ff);
+                    splice(@uni, $i, 2, $cp);
+                }
+            }
         } elsif ($unknown) {
             # count encoding errors as we do the translation
             my $e1 = 0;
@@ -239,7 +252,7 @@ sub Decompose($$$;$)
 
 #------------------------------------------------------------------------------
 # Convert array of code point integers into a string with specified encoding
-# Inputs: 0) ExifTool ref, 1) unicode character array ref,
+# Inputs: 0) ExifTool ref (or undef), 1) unicode character array ref,
 #         2) character set (note: not all types are supported)
 #         3) byte order ('MM' or 'II', multi-byte sets only, defaults to current byte order)
 # Returns: converted string (truncated at null character if it exists), empty on error
@@ -300,6 +313,18 @@ sub Recompose($$;$$)
         if ($inv) {
             $$inv{$_} and $_ = $$inv{$_} foreach @$uni;
         }
+        # generate surrogate pairs of UTF-16
+        if ($charset eq 'UTF16') {
+            my $i;
+            for ($i=0; $i<@$uni; ++$i) {
+                next unless $$uni[$i] >= 0x10000 and $$uni[$i] < 0x10ffff;
+                my $t = $$uni[$i] - 0x10000;
+                my $w1 = 0xd800 + (($t >> 10) & 0x3ff);
+                my $w2 = 0xdc00 + ($t & 0x3ff);
+                splice(@$uni, $i, 1, $w1, $w2);
+                ++$i;   # skip surrogate pair
+            }
+        }
         # pack as 2- or 4-byte integer in specified byte order
         my $byteOrder = $_[3] || GetByteOrder();
         my $fmt = $byteOrder eq 'MM' ? 'n*' : 'v*';
@@ -326,11 +351,11 @@ This module is required by Image::ExifTool.
 This module contains routines used by ExifTool to translate special
 character sets.  Currently, the following character sets are supported:
 
-  UTF8, UCS2, UCS4, Arabic, Baltic, Cyrillic, Greek, Hebrew, JIS, Latin,
-  Latin2, MacArabic, MacChineseCN, MacChineseTW, MacCroatian, MacCyrillic,
-  MacGreek, MacHebrew, MacIceland, MacJapanese, MacKorean, MacLatin2,
-  MacRSymbol, MacRoman, MacRomanian, MacThai, MacTurkish, RSymbol,
-  ShiftJIS, Symbol, Thai, Turkish, Vietnam
+  UTF8, UTF16, UCS2, UCS4, Arabic, Baltic, Cyrillic, Greek, Hebrew, JIS,
+  Latin, Latin2, MacArabic, MacChineseCN, MacChineseTW, MacCroatian,
+  MacCyrillic, MacGreek, MacHebrew, MacIceland, MacJapanese, MacKorean,
+  MacLatin2, MacRSymbol, MacRoman, MacRomanian, MacThai, MacTurkish,
+  PDFDoc, RSymbol, ShiftJIS, Symbol, Thai, Turkish, Vietnam
 
 However, only some of these character sets are available to the user via
 ExifTool options; the multi-byte character sets are used only internally

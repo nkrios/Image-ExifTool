@@ -9,10 +9,34 @@
 <h2 class=top>CanonVRD Tags</h2>
 <p>Canon Digital Photo Professional writes VRD (Recipe Data) information as a
 trailer record to JPEG, TIFF, CRW and CR2 images, or as a stand-alone VRD
-file. The tags listed below represent information found in this record.  The
-complete VRD data record may be accessed as a block using the Extra
+file.  The tags listed below represent information found in this record.
+The complete VRD data record may be accessed as a block using the Extra
 &#39;CanonVRD&#39; tag, but this tag is not extracted or copied unless specified
 explicitly.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td title='0xffff00f4 = 4294902004'>0xffff00f4</td>
+<td>EditData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='CanonVRD.html#Edit'>CanonVRD Edit Tags</a></td></tr>
+<tr class=b>
+<td title='0xffff00f5 = 4294902005'>0xffff00f5</td>
+<td>IHLData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='CanonVRD.html#IHL'>CanonVRD IHL Tags</a></td></tr>
+<tr>
+<td title='0xffff00f6 = 4294902006'>0xffff00f6</td>
+<td>XMP</td>
+<td class=c title='! = Unsafe'>undef!</td>
+<td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Edit'>CanonVRD Edit Tags</a></h2>
+<p>Canon VRD edit information.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -947,11 +971,78 @@ explicitly.</p>
 <td>AngleAdj</td>
 <td class=c>int32s</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td class=r title='142 = 0x8e'>142</td>
+<td>CheckMark2</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = Clear
+  <br>1 = 1
+  <br>2 = 2
+  <br>3 = 3
+  <br>4 = 4
+  <br>5 = 5</span></td></tr>
+<tr class=b>
+<td class=r title='144 = 0x90'>144</td>
+<td>UnsharpMask</td>
+<td class=c>int16s</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
+<td class=r title='146 = 0x92'>146</td>
+<td>UnsharpMaskStrength</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='148 = 0x94'>148</td>
+<td>UnsharpMaskFineness</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='150 = 0x96'>150</td>
+<td>UnsharpMaskThreshold</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='IHL'>CanonVRD IHL Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td title='0x0001 = 1'>0x0001</td>
+<td>IHL_EXIF
+  <br>IHL_EXIF?</td>
+<td class=c>-<br>N</td>
+<td>--&gt; <a href='EXIF.html'>EXIF Tags</a>
+  <br><span class=n>(extracted as a block if the Unknown option is used, or processed as the
+first sub-document with the ExtractEmbedded option)</span></td></tr>
+<tr class=b>
+<td title='0x0003 = 3'>0x0003</td>
+<td>ThumbnailImage</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0004 = 4'>0x0004</td>
+<td>PreviewImage</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0005 = 5'>0x0005</td>
+<td>RawCodecVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0006 = 6'>0x0006</td>
+<td>CRCDevelParams?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 22, 2010</i>
+<br><i>Last revised Nov 2, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

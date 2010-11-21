@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.26';
+$VERSION = '1.28';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -61,8 +61,6 @@ my %dateTimeConv = (
     ValueConv => 'require Image::ExifTool::XMP; Image::ExifTool::XMP::ConvertXMPDate($val)',
     PrintConv => '$self->ConvertDateTime($val)',
 );
-
-my %warnedOnce;     # hash of warnings we issued
 
 # This table is just for documentation purposes
 %Image::ExifTool::ID3::Main = (
@@ -747,18 +745,6 @@ sub DecodeString($$;$)
 }
 
 #------------------------------------------------------------------------------
-# Issue one warning of each type
-# Inputs: 0) ExifTool object reference, 1) warning
-sub WarnOnce($$)
-{
-    my ($exifTool, $warn) = @_;
-    unless ($warnedOnce{$warn}) {
-        $warnedOnce{$warn} = 1;
-        $exifTool->Warn($warn);
-    }
-}
-
-#------------------------------------------------------------------------------
 # Convert sync-safe integer to a number we can use
 # Inputs: 0) int32u sync-safe value
 # Returns: actual number or undef on invalid value
@@ -786,7 +772,6 @@ sub ProcessID3v2($$$)
     my $len;    # frame data length
 
     $verbose and $exifTool->VerboseDir($tagTablePtr->{GROUPS}->{1}, 0, $size);
-    undef %warnedOnce;
 
     for (;;$offset+=$len) {
         my ($id, $flags, $hi);
@@ -852,7 +837,7 @@ sub ProcessID3v2($$$)
             }
         }
         if ($flags{Encrypt}) {
-            WarnOnce($exifTool, 'Encrypted frames currently not supported');
+            $exifTool->WarnOnce('Encrypted frames currently not supported');
             next;
         }
         # extract the value
@@ -886,7 +871,7 @@ sub ProcessID3v2($$$)
                     next;
                 }
             } else {
-                WarnOnce($exifTool,'Install Compress::Zlib to decode compressed frames');
+                $exifTool->WarnOnce('Install Compress::Zlib to decode compressed frames');
                 next;
             }
         }
@@ -981,12 +966,11 @@ sub ProcessID3v2($$$)
             $exifTool->Warn("Don't know how to handle $id frame");
             next;
         }
-        if ($lang and $lang =~ /^[a-z]{3}$/i) {
+        if ($lang and $lang =~ /^[a-z]{3}$/i and $lang ne 'eng') {
             $tagInfo = Image::ExifTool::GetLangInfo($tagInfo, lc $lang);
         }
         $exifTool->FoundTag($tagInfo, $val);
     }
-    undef %warnedOnce;
 }
 
 #------------------------------------------------------------------------------

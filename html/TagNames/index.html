@@ -29,8 +29,8 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='CanonVRD.html'>CanonVRD</a><br>
 <a href='Casio.html'>Casio</a><br>
 <a href='HP.html'>HP</a><br>
-<a href='FujiFilm.html'>FujiFilm</a></td><td width='16%'>
-<a href='JVC.html'>JVC</a><br>
+<a href='FujiFilm.html'>FujiFilm</a><br>
+<a href='JVC.html'>JVC</a></td><td width='16%'>
 <a href='Kodak.html'>Kodak</a><br>
 <a href='Leaf.html'>Leaf</a><br>
 <a href='Minolta.html'>Minolta</a><br>
@@ -44,9 +44,9 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='Sanyo.html'>Sanyo</a><br>
 <a href='Samsung.html'>Samsung</a><br>
 <a href='Sigma.html'>Sigma</a><br>
-<a href='Sony.html'>Sony</a></td><td width='16%'>
+<a href='Sony.html'>Sony</a><br>
 <a href='SonyIDC.html'>SonyIDC</a><br>
-<a href='Unknown.html'>Unknown</a><br>
+<a href='Unknown.html'>Unknown</a></td><td width='16%'>
 <a href='DNG.html'>DNG</a><br>
 <a href='CanonRaw.html'>CanonRaw</a><br>
 <a href='KyoceraRaw.html'>KyoceraRaw</a><br>
@@ -59,8 +59,10 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='Stim.html'>Stim</a><br>
 <a href='APP12.html'>APP12</a><br>
 <a href='AFCP.html'>AFCP</a><br>
-<a href='FotoStation.html'>FotoStation</a></td><td width='16%'>
+<a href='FotoStation.html'>FotoStation</a><br>
 <a href='PhotoMechanic.html'>PhotoMechanic</a><br>
+<a href='Microsoft.html'>Microsoft</a><br>
+<a href='GIMP.html'>GIMP</a></td><td width='16%'>
 <a href='MIE.html'>MIE</a><br>
 <a href='Jpeg2000.html'>Jpeg2000</a><br>
 <a href='GIF.html'>GIF</a><br>
@@ -74,9 +76,9 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='PostScript.html'>PostScript</a><br>
 <a href='ID3.html'>ID3</a><br>
 <a href='ITC.html'>ITC</a><br>
-<a href='Vorbis.html'>Vorbis</a></td><td width='16%'>
+<a href='Vorbis.html'>Vorbis</a><br>
 <a href='FLAC.html'>FLAC</a><br>
-<a href='APE.html'>APE</a><br>
+<a href='APE.html'>APE</a></td><td width='16%'>
 <a href='MPC.html'>MPC</a><br>
 <a href='MPEG.html'>MPEG</a><br>
 <a href='M2TS.html'>M2TS</a><br>
@@ -89,10 +91,10 @@ The tables listed below give the names of all tags recognized by ExifTool.
 <a href='AIFF.html'>AIFF</a><br>
 <a href='ASF.html'>ASF</a><br>
 <a href='DICOM.html'>DICOM</a><br>
-<a href='DjVu.html'>DjVu</a></td><td width='16%'>
+<a href='DjVu.html'>DjVu</a><br>
 <a href='HTML.html'>HTML</a><br>
 <a href='EXE.html'>EXE</a><br>
-<a href='LNK.html'>LNK</a><br>
+<a href='LNK.html'>LNK</a></td><td width='16%'>
 <a href='Font.html'>Font</a><br>
 <a href='RSRC.html'>RSRC</a><br>
 <a href='Rawzor.html'>Rawzor</a><br>
@@ -150,7 +152,14 @@ corresponding Composite or Extra tag is written).  A colon (<code>:</code>) indi
 a mandatory tag which may be added automatically when writing.</p>
 
 <p>The HTML version of these tables also lists possible <b>Values</b> for
-discrete-valued tags, as well as <b>Notes</b> for some tags.</p>
+discrete-valued tags, as well as <b>Notes</b> for some tags.  The <b>Values</b> are
+listed as the computer-readable and human-readable values on the left and
+right hand side of an equals sign (<code>=</code>) respectively.  The human-readable
+values are used by default when reading and writing, but the
+computer-readable values may be accessed by disabling the value conversion
+with the -n option on the command line, by setting the ValueConv option to 0
+in the API, or or on a per-tag basis by appending a number symbol (<code>#</code>) to
+the tag name.</p>
 
 <p><b>Note</b>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
@@ -161,7 +170,7 @@ question.
 </p>
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 13, 2010</i>
+<br><i>Last revised Oct 7, 2010</i>
 <p class=lf><a href='../index.html'>&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

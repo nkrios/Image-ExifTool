@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.20
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.40
 [File, System, Image] FileName - File Name: Writer_10_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 6.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:05:21 08:47:08-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:11:20 08:21:46-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -100,14 +100,14 @@
 [MakerNotes, Pentax, Camera] 39 - DSP Firmware Version: 1.30.00.18
 [MakerNotes, Pentax, Camera] 40 - CPU Firmware Version: 1.30.00.18
 [MakerNotes, Pentax, Camera] 45 - Effective LV: 14.8
-[MakerNotes, Pentax, Camera] 50 - Image Processing: Unprocessed
+[MakerNotes, Pentax, Camera] 50 - Image Editing: None
 [MakerNotes, Pentax, Camera] 51 - Picture Mode: Aperture Priority; 1/3 EV steps
 [MakerNotes, Pentax, Camera] 52 - Drive Mode: Single-frame; No Timer; Shutter Button; Single Exposure
 [MakerNotes, Pentax, Camera] 55 - Color Space: sRGB
 [MakerNotes, Pentax, Camera] 62 - Preview Image Borders: 28 28 0 0
 [MakerNotes, Pentax, Camera] 63 - Lens Type: Sigma or Tamron Lens (3 44)
 [MakerNotes, Pentax, Camera] 64 - Sensitivity Adjust: 0
-[MakerNotes, Pentax, Camera] 65 - Image Processing Count: 0
+[MakerNotes, Pentax, Camera] 65 - Image Edit Count: 0
 [MakerNotes, Pentax, Camera] 71 - Camera Temperature: 12 C
 [MakerNotes, Pentax, Camera] 72 - AE Lock: Off
 [MakerNotes, Pentax, Camera] 73 - Noise Reduction: Off
@@ -122,7 +122,7 @@
 [MakerNotes, Pentax, Camera] 513 - White Point: 13568 8192 8192 9088
 [MakerNotes, Pentax, Camera] 0 - Picture Mode 2: Aperture Priority
 [MakerNotes, Pentax, Camera] 1.1 - Program Line: Normal
-[MakerNotes, Pentax, Camera] 1.2 - EV Steps: 1/3 EV steps
+[MakerNotes, Pentax, Camera] 1.2 - EV Steps: 1/3 EV Steps
 [MakerNotes, Pentax, Camera] 1.3 - E-Dial In Program: Tv or Av
 [MakerNotes, Pentax, Camera] 1.4 - Aperture Ring Use: Permitted
 [MakerNotes, Pentax, Camera] 2 - Flash Options: Wireless (Master)
@@ -137,7 +137,7 @@
 [MakerNotes, Pentax, Camera] 10 - White Balance Set: Auto
 [MakerNotes, Pentax, Camera] 10.1 - Multiple Exposure Set: Off
 [MakerNotes, Pentax, Camera] 13 - Raw And Jpg Recording: RAW+JPEG (PEF, Better)
-[MakerNotes, Pentax, Camera] 14 - Jpg Recorded Pixels: 6 MP
+[MakerNotes, Pentax, Camera] 14.1 - Jpg Recorded Pixels: 6 MP
 [MakerNotes, Pentax, Camera] 16 - Flash Options 2: Wireless (Master)
 [MakerNotes, Pentax, Camera] 16.1 - Metering Mode 3: Multi-segment
 [MakerNotes, Pentax, Camera] 17.1 - SR Active: Yes
@@ -194,12 +194,13 @@
 [MakerNotes, Pentax, Time] 1 - Manufacture Date: 2007:09:13
 [MakerNotes, Pentax, Camera] 2 - Production Code: 2.1
 [MakerNotes, Pentax, Camera] 4 - Internal Serial Number: 132352
-[MakerNotes, Pentax, Camera] 0 - Power Source: Body Battery
-[MakerNotes, Pentax, Camera] 1 - Battery States: Body Battery Full; Grip Battery Empty or Missing
-[MakerNotes, Pentax, Camera] 2 - Battery AD Body No Load: 173 (7.6V, 51%)
-[MakerNotes, Pentax, Camera] 3 - Battery AD Body Load: 168 (7.4V, 47%)
-[MakerNotes, Pentax, Camera] 4 - Battery AD Grip No Load: 5
-[MakerNotes, Pentax, Camera] 5 - Battery AD Grip Load: 1
+[MakerNotes, Pentax, Camera] 0.1 - Power Source: Body Battery
+[MakerNotes, Pentax, Camera] 1.1 - Body Battery State: Full
+[MakerNotes, Pentax, Camera] 1.2 - Grip Battery State: Empty or Missing
+[MakerNotes, Pentax, Camera] 2 - Body Battery A/D No Load: 173 (7.6V, 51%)
+[MakerNotes, Pentax, Camera] 3 - Body Battery A/D Load: 168 (7.4V, 47%)
+[MakerNotes, Pentax, Camera] 4 - Grip Battery A/D No Load: 5
+[MakerNotes, Pentax, Camera] 5 - Grip Battery A/D Load: 1
 [MakerNotes, Pentax, Camera] 4 - AF Predictor: 4
 [MakerNotes, Pentax, Camera] 6 - AF Defocus: 2
 [MakerNotes, Pentax, Camera] 7 - AF Integration Time: 0 ms
@@ -207,7 +208,7 @@
 [MakerNotes, Pentax, Image] 16 - WB Shift AB: 0
 [MakerNotes, Pentax, Image] 17 - WB Shift MG: 0
 [PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0300
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.20
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.40
 [XMP, XMP-dc, Time] date - Date: 2008:03:02
 [XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -
 [XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8

@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::fr;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.15';
+$VERSION = '1.17';
 
 %Image::ExifTool::Lang::fr::Translate = (
    'AEAperture' => 'Ouverture AE',
@@ -250,7 +250,7 @@ $VERSION = '1.15';
         'Automatic Tracking AF' => 'AF en suivi auto',
         'Bottom' => 'Bas',
         'Center' => 'Centre',
-        'Face Recognition AF' => 'AF en reconnaissance de visage',
+        'Face Detect AF' => 'AF en reconnaissance de visage',
         'Fixed Center' => 'Fixe au centre',
         'Left' => 'Gauche',
         'Lower-left' => 'Bas gauche',
@@ -639,25 +639,8 @@ $VERSION = '1.15';
    'BaselineExposure' => 'Exposition de base',
    'BaselineNoise' => 'Bruit de base',
    'BaselineSharpness' => 'Accentuation de base',
-   'BatteryADBodyLoad' => 'Tension accu boîtier en charge',
-   'BatteryADBodyNoLoad' => 'Tension accu boîtier à vide',
-   'BatteryADGripLoad' => 'Tension accu poignée en charge',
-   'BatteryADGripNoLoad' => 'Tension accu poignée à vide',
    'BatteryInfo' => 'Source d\'alimentation',
    'BatteryLevel' => 'Niveau de batterie',
-   'BatteryStates' => {
-      Description => 'Etat des accus',
-      PrintConv => {
-        'Body Battery Almost Empty' => 'Accu boîtier : presque vide',
-        'Body Battery Empty or Missing' => 'Accu boîtier : vide ou absent',
-        'Body Battery Full' => 'Accu boîtier : plein',
-        'Body Battery Running Low' => 'Accu boîtier : en baisse',
-        'Grip Battery Almost Empty' => 'Accu poignée : presque vide',
-        'Grip Battery Empty or Missing' => 'Accu poignée : vide ou absent',
-        'Grip Battery Full' => 'Accu poignée : plein',
-        'Grip Battery Running Low' => 'Accu poignée : en baisse',
-      },
-    },
    'BayerGreenSplit' => 'Séparation de vert Bayer',
    'Beep' => {
       PrintConv => {
@@ -683,6 +666,17 @@ $VERSION = '1.15';
    'BlurWarning' => {
       PrintConv => {
         'None' => 'Aucune',
+      },
+    },
+   'BodyBatteryADLoad' => 'Tension accu boîtier en charge',
+   'BodyBatteryADNoLoad' => 'Tension accu boîtier à vide',
+   'BodyBatteryState' => {
+      Description => 'État de accu boîtier',
+      PrintConv => {
+        'Almost Empty' => 'Presque vide',
+        'Empty or Missing' => 'Vide ou absent',
+        'Full' => 'Plein',
+        'Running Low' => 'En baisse',
       },
     },
    'BracketMode' => {
@@ -917,6 +911,7 @@ $VERSION = '1.15';
       },
     },
    'ColorFilter' => {
+      Description => 'Filtre de couleur',
       PrintConv => {
         'Blue' => 'Bleu',
         'Green' => 'Vert',
@@ -1053,6 +1048,7 @@ $VERSION = '1.15';
       PrintConv => {
         'Epson ERF Compressed' => 'Compression Epson ERF',
         'JBIG Color' => 'JBIG Couleur',
+        'JPEG' => 'Compression JPEG',
         'JPEG (old-style)' => 'JPEG (ancien style)',
         'Kodak DCR Compressed' => 'Compression Kodak DCR',
         'Kodak KDC Compressed' => 'Compression Kodak KDC',
@@ -1500,6 +1496,7 @@ $VERSION = '1.15';
    'ExifCameraInfo' => 'Info d\'appareil photo Exif',
    'ExifImageHeight' => 'Hauteur d\'image',
    'ExifImageWidth' => 'Largeur d\'image',
+   'ExifOffset' => 'Pointeur Exif IFD',
    'ExifToolVersion' => 'Version ExifTool',
    'ExifUnicodeByteOrder' => 'Indicateur d\'ordre des octets Unicode Exif',
    'ExifVersion' => 'Version Exif',
@@ -2051,6 +2048,8 @@ $VERSION = '1.15';
    'ForwardMatrix1' => 'Matrice forward 1',
    'ForwardMatrix2' => 'Matrice forward 2',
    'FrameNumber' => 'Numéro de vue',
+   'FrameRate' => 'Vitesse',
+   'FrameSize' => 'Taille du cadre',
    'FreeByteCounts' => 'Nombre d\'octets libres',
    'FreeOffsets' => 'Offsets libres',
    'FujiFlashMode' => {
@@ -2120,6 +2119,7 @@ $VERSION = '1.15';
         'True North' => 'Direction vraie',
       },
     },
+   'GPSInfo' => 'Pointeur IFD d\'informations GPS',
    'GPSLatitude' => 'Latitude',
    'GPSLatitudeRef' => {
       Description => 'Latitude nord ou sud',
@@ -2197,6 +2197,7 @@ $VERSION = '1.15';
    'GeoTiffAsciiParams' => 'Tag de paramètres Ascii GeoTiff',
    'GeoTiffDirectory' => 'Tag de répertoire de clé GeoTiff',
    'GeoTiffDoubleParams' => 'Tag de paramètres doubles GeoTiff',
+   'Gradation' => 'Luminosite',
    'GrayResponseCurve' => 'Courbe de réponse du gris',
    'GrayResponseUnit' => {
       Description => 'Unité de réponse en gris',
@@ -2215,6 +2216,17 @@ $VERSION = '1.15';
       PrintConv => {
         'Off' => 'Désactivé',
         'On' => 'Activé',
+      },
+    },
+   'GripBatteryADLoad' => 'Tension accu poignée en charge',
+   'GripBatteryADNoLoad' => 'Tension accu poignée à vide',
+   'GripBatteryState' => {
+      Description => 'État de accu poignée',
+      PrintConv => {
+        'Almost Empty' => 'Presque vide',
+        'Empty or Missing' => 'Vide ou absent',
+        'Full' => 'Plein',
+        'Running Low' => 'En baisse',
       },
     },
    'HCUsage' => 'Usage HC',
@@ -2254,6 +2266,7 @@ $VERSION = '1.15';
       },
     },
    'HostComputer' => 'Ordinateur hôte',
+   'Hue' => 'Nuance',
    'HueAdjustment' => 'Teinte',
    'HyperfocalDistance' => 'Distanace hyperfocale',
    'ICCProfileName' => 'Nom du profil ICC',
@@ -2347,6 +2360,17 @@ $VERSION = '1.15';
         'On' => 'Activé',
       },
     },
+   'ImageEditCount' => 'Compteur de traitement d\'image',
+   'ImageEditing' => {
+      Description => 'Traitement de l\'image',
+      PrintConv => {
+        'Color Filter' => 'Filtre de couleur',
+        'Cropped' => 'Recadré',
+        'Digital Filter' => 'Filtre numérique',
+        'Frame Synthesis?' => 'Synthèse de vue ?',
+        'None' => 'Aucun',
+      },
+    },
    'ImageHeight' => 'Hauteur d\'image',
    'ImageHistory' => 'Historique de l\'image',
    'ImageID' => 'ID d\'image',
@@ -2360,17 +2384,6 @@ $VERSION = '1.15';
         'Square' => 'Carré',
       },
     },
-   'ImageProcessing' => {
-      Description => 'Traitement de l\'image',
-      PrintConv => {
-        'Color Filter' => 'Filtre de couleur',
-        'Cropped' => 'Recadré',
-        'Digital Filter' => 'Filtre numérique',
-        'Frame Synthesis?' => 'Synthèse de vue ?',
-        'Unprocessed' => 'Aucun',
-      },
-    },
-   'ImageProcessingCount' => 'Compteur de traitement d\'image',
    'ImageQuality' => {
       PrintConv => {
         'Normal' => 'Normale',
@@ -2479,6 +2492,7 @@ $VERSION = '1.15';
         'THM - DCF thumbnail file' => 'THM: fichier de vignette DCF',
       },
     },
+   'InteropOffset' => 'Indicateur d\'interfonctionnement',
    'InteropVersion' => 'Version d\'interopérabilité',
    'IptcLastEdited' => 'Derniere edition IPTC',
    'JFIFVersion' => 'Version JFIF',
@@ -2624,6 +2638,7 @@ $VERSION = '1.15';
       },
     },
    'LightValue' => 'Luminosite',
+   'Lightness' => 'Luminosité',
    'LinearResponseLimit' => 'Limite de réponse linéaire',
    'LinearizationTable' => 'Table de linéarisation',
    'Lit' => {
@@ -2725,6 +2740,7 @@ $VERSION = '1.15';
       },
     },
    'MakerNoteVersion' => 'Version des informations spécifiques fabricant',
+   'MakerNotes' => 'Notes fabricant',
    'ManualFlashOutput' => {
       PrintConv => {
         'Low' => 'Bas',
@@ -2797,8 +2813,10 @@ $VERSION = '1.15';
         'Center-weighted average' => 'Centrale pondérée',
         'Evaluative' => 'Évaluative',
         'Multi-segment' => 'Multizone',
+        'Multi-spot' => 'MultiSpot',
         'Other' => 'Autre',
         'Partial' => 'Partielle',
+        'Spot' => 'Grain',
         'Unknown' => 'Inconnu',
       },
     },
@@ -3515,6 +3533,7 @@ $VERSION = '1.15';
       },
     },
    'RecordMode' => {
+      Description => 'Mode d\'enregistrement',
       PrintConv => {
         'Aperture Priority' => 'Priorité ouverture',
         'Manual' => 'Manuelle',
@@ -3586,6 +3605,7 @@ $VERSION = '1.15';
       Description => 'Unité de résolution en X et Y',
       PrintConv => {
         'None' => 'Aucune',
+        'cm' => 'pixels/cm',
         'inches' => 'Pouce',
       },
     },
@@ -3856,6 +3876,7 @@ $VERSION = '1.15';
       },
     },
    'ShadingCompensation' => {
+      Description => 'Compensation de l\'ombrage',
       PrintConv => {
         'Off' => 'Désactivé',
         'On' => 'Activé',
@@ -4180,6 +4201,7 @@ $VERSION = '1.15';
    'Thresholding' => 'Seuil',
    'ThumbnailHeight' => 'Hauteur de la vignette',
    'ThumbnailImage' => 'Vignette',
+   'ThumbnailImageSize' => 'Taille des miniatures',
    'ThumbnailWidth' => 'Hauteur de la vignette',
    'TileByteCounts' => 'Nombre d\'octets d\'élément',
    'TileDepth' => 'Profondeur d\'élément',
@@ -4498,8 +4520,10 @@ $VERSION = '1.15';
    'WhiteBalance' => {
       Description => 'Balance des blancs',
       PrintConv => {
+        'Auto' => 'Equilibrage des blancs automatique',
         'Black & White' => 'Monochrome',
         'Cloudy' => 'Temps nuageux',
+        'Cool White Fluorescent' => 'Fluorescent blanc froid',
         'Custom' => 'Personnalisée',
         'Custom 1' => 'Personnalisée 1',
         'Custom 2' => 'Personnalisée 2',
@@ -4535,9 +4559,9 @@ $VERSION = '1.15';
       Description => 'Mode de balance des blancs',
       PrintConv => {
         'Auto (Cloudy)' => 'Auto (nuageux)',
-        'Auto (Daylight)' => 'Auto (lumière du jour)',
-        'Auto (Daylight Fluorescent)' => 'Auto (fluo lum. jour)',
         'Auto (Day White Fluorescent)' => 'Auto (fluo jour)',
+        'Auto (Daylight Fluorescent)' => 'Auto (fluo lum. jour)',
+        'Auto (Daylight)' => 'Auto (lumière du jour)',
         'Auto (Flash)' => 'Auto (flash)',
         'Auto (Shade)' => 'Auto (ombre)',
         'Auto (Tungsten)' => 'Auto (tungstène)',
@@ -4550,9 +4574,9 @@ $VERSION = '1.15';
       Description => 'Réglage de balance des blancs',
       PrintConv => {
         'Cloudy' => 'Temps nuageux',
+        'Day White Fluorescent' => 'Fluorescent blanc jour',
         'Daylight' => 'Lumière du jour',
         'Daylight Fluorescent' => 'Fluorescente type jour',
-        'Day White Fluorescent' => 'Fluorescent blanc jour',
         'Manual' => 'Manuelle',
         'Set Color Temperature 1' => 'Température de couleur définie 1',
         'Set Color Temperature 2' => 'Température de couleur définie 2',

@@ -45,7 +45,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.28';
+$VERSION = '2.33';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -115,6 +115,7 @@ my %stdXlatNS = (
     Iptc4xmpCore => 'http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/',
     Iptc4xmpExt => 'http://iptc.org/std/Iptc4xmpExt/2008-02-29/',
     MicrosoftPhoto => 'http://ns.microsoft.com/photo/1.0',
+    MP1       => 'http://ns.microsoft.com/photo/1.1', #PH (MP1 is fabricated)
     MP        => 'http://ns.microsoft.com/photo/1.2/',
     MPRI      => 'http://ns.microsoft.com/photo/1.2/t/RegionInfo#',
     MPReg     => 'http://ns.microsoft.com/photo/1.2/t/Region#',
@@ -191,9 +192,10 @@ my %recognizedAttrs = (
     'rdf:parseType' => 1,
     'rdf:nodeID' => 1,
     'et:toolkit' => 1,
+    'rdf:xmlns' => 1, # this is presumably the default namespace, which we currently ignore
 );
 
-# main XMP tag table
+# main XMP tag table (tag ID's are used for the family 1 group names)
 %Image::ExifTool::XMP::Main = (
     GROUPS => { 2 => 'Unknown' },
     PROCESS_PROC => \&ProcessXMP,
@@ -296,11 +298,15 @@ my %recognizedAttrs = (
     },
     microsoft => {
         Name => 'microsoft',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Microsoft' },
+        SubDirectory => { TagTable => 'Image::ExifTool::Microsoft::XMP' },
     },
     MP => {
         Name => 'MP',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::MP' },
+        SubDirectory => { TagTable => 'Image::ExifTool::Microsoft::MP' },
+    },
+    MP1 => {
+        Name => 'MP1',
+        SubDirectory => { TagTable => 'Image::ExifTool::Microsoft::MP1' },
     },
     lr => {
         Name => 'lr',
@@ -425,7 +431,7 @@ my %recognizedAttrs = (
         namespace prefixes are found, they are translated to the newer "xmp",
         "xmpBJ", "xmpMM" and "xmpRights" prefixes for use in family 1 group names.
     },
-    Advisory    => { List => 'Bag' },
+    Advisory    => { List => 'Bag' }, # (deprecated)
     BaseURL     => { },
     # (date/time tags not as reliable as EXIF)
     CreateDate  => { Groups => { 2 => 'Time' }, %dateTimeInfo, Priority => 0 },
@@ -608,8 +614,8 @@ my %recognizedAttrs = (
     VersionsModifyDate          => { List => 1, Groups => { 2 => 'Time' }, %dateTimeInfo },
     VersionsModifier            => { List => 1 },
     VersionsVersion             => { List => 1 },
-    LastURL                     => { },
-    RenditionOf => {
+    LastURL                     => { }, # (deprecated)
+    RenditionOf => { # (deprecated)
         SubDirectory => { },
         Struct => 'ResourceRef',
     },
@@ -630,7 +636,7 @@ my %recognizedAttrs = (
     RenditionOfPartMapping      => { },
     RenditionOfToPart           => { },
     RenditionOfOriginalDocumentID => { },
-    SaveID          => { Writable => 'integer' },
+    SaveID          => { Writable => 'integer' }, # (deprecated)
 );
 
 # XMP Basic Job Ticket schema properties (xmpBJ, xapBJ)
@@ -757,7 +763,6 @@ my %recognizedAttrs = (
     CaptionWriter   => { Groups => { 2 => 'Author' } },
     Category        => { },
     City            => { Groups => { 2 => 'Location' } },
-    Country         => { Groups => { 2 => 'Location' } },
     ColorMode       => {
         # (this should probably be integer type, but is string in the April 2010 XMP spec)
         PrintConv => {
@@ -771,6 +776,7 @@ my %recognizedAttrs = (
             9 => 'Lab',
         },
     },
+    Country         => { Groups => { 2 => 'Location' } },
     Credit          => { Groups => { 2 => 'Author' } },
     DateCreated     => { Groups => { 2 => 'Time' }, %dateTimeInfo },
     DocumentAncestors => {
@@ -779,10 +785,10 @@ my %recognizedAttrs = (
         List => 'bag',
     },
     DocumentAncestorsAncestorID => { Name => 'DocumentAncestorID', List => 1 },
-    History         => { }, #PH (CS3)
     Headline        => { },
-    Instructions    => { },
+    History         => { }, #PH (CS3)
     ICCProfile      => { Name => 'ICCProfileName' }, #PH
+    Instructions    => { },
     LegacyIPTCDigest=> { }, #PH
     SidecarForExtension => { }, #PH (CS3)
     Source          => { Groups => { 2 => 'Author' } },
@@ -1820,7 +1826,7 @@ my %recognizedAttrs = (
         but ExifTool shortens this for the "XMP-iptcExt" family 1 group name.
         (see L<http://www.iptc.org/IPTC4XMP/>)
     },
-    AdditionalModelInformation => { },
+    AddlModelInfo   => { Name => 'AdditionalModelInformation' },
     ArtworkOrObject => {
         SubDirectory => { },
         Struct => 'ArtworkOrObjectDetails',
@@ -1884,62 +1890,6 @@ my %recognizedAttrs = (
     LocationCreatedWorldRegion  => { List => 1, Groups => { 2 => 'Location' } },
     MaxAvailHeight  => { Writable => 'integer' },
     MaxAvailWidth   => { Writable => 'integer' },
-);
-
-# Microsoft Photo schema properties (MicrosoftPhoto) (ref PH)
-%Image::ExifTool::XMP::Microsoft = (
-    %xmpTableDefaults,
-    GROUPS => { 1 => 'XMP-microsoft', 2 => 'Image' },
-    NAMESPACE => 'MicrosoftPhoto',
-    TABLE_DESC => 'XMP Microsoft',
-    NOTES => q{
-        Microsoft Photo schema tags.  This is likely not a complete list, but
-        represents tags which have been observed in sample images.  The actual
-        namespace prefix is "MicrosoftPhoto", but ExifTool shortens this to
-        "XMP-microsoft" in the family 1 group name.
-    },
-    CameraSerialNumber => { },
-    DateAcquired       => { Groups => { 2 => 'Time' }, %dateTimeInfo },
-    FlashManufacturer  => { },
-    FlashModel         => { },
-    LastKeywordIPTC    => { List => 'Bag' },
-    LastKeywordXMP     => { List => 'Bag' },
-    LensManufacturer   => { },
-    LensModel          => { },
-    Rating => {
-        Name => 'RatingPercent',
-        Notes => q{
-            normal Rating values of 1,2,3,4 and 5 stars correspond to RatingPercent
-            values of 1,25,50,75 and 99 respectively
-        },
-    },
-);
-
-# Microsoft Photo 1.2 schema properties (MP) (ref PH)
-%Image::ExifTool::XMP::MP = (
-    %xmpTableDefaults,
-    GROUPS => { 1 => 'XMP-MP', 2 => 'Image' },
-    NAMESPACE => 'MP',
-    TABLE_DESC => 'XMP Microsoft Photo',
-    NOTES => q{
-        Microsoft Photo 1.2 schema tags.  Again, not a complete list.
-    },
-    RegionInfo => {
-        SubDirectory => { },
-        Struct => 'RegionInfo',
-    },
-    RegionInfoRegions => {
-        SubDirectory => { },
-        Struct => 'Regions',
-    },
-    RegionInfoRegionsRectangle => {
-        Name => 'RegionRectangle',
-        List => 1,
-    },
-    RegionInfoRegionsPersonDisplayName => {
-        Name => 'RegionPersonDisplayName',
-        List => 1,
-    },
 );
 
 # Adobe Lightroom schema properties (lr) (ref PH)
@@ -2441,8 +2391,24 @@ sub FoundXMP($$$$;$)
         my $langInfo = GetLangInfo($tagInfo, $lang);
         $tagInfo = $langInfo if $langInfo;
     }
-    # un-escape XML character entities and decode from UTF8
-    $val = $exifTool->Decode(UnescapeXML($val), 'UTF8');
+    # un-escape XML character entities (handling CDATA)
+    pos($val) = 0;
+    if ($val =~ /<!\[CDATA\[(.*?)\]\]>/sg) {
+        my $p = pos $val;
+        # unescape everything up to the start of the CDATA section
+        # (the length of "<[[CDATA[]]>" is 12 characters)
+        my $v = UnescapeXML(substr($val, 0, $p - length($1) - 12)) . $1;
+        while ($val =~ /<!\[CDATA\[(.*?)\]\]>/sg) {
+            my $p1 = pos $val;
+            $v .= UnescapeXML(substr($val, $p, $p1 - length($1) - 12)) . $1;
+            $p = $p1;
+        }
+        $val = $v . UnescapeXML(substr($val, $p));
+    } else {
+        $val = UnescapeXML($val);
+    }
+    # decode from UTF8
+    $val = $exifTool->Decode($val, 'UTF8');
     # convert rational and date values to a more sensible format
     my $fmt = $$tagInfo{Writable};
     my $new = $$tagInfo{WasAdded};
@@ -2758,7 +2724,7 @@ sub ProcessXMP($$;$)
     if ($Image::ExifTool::MWG::strict and not $$exifTool{XMP_CAPTURE} and
         $$exifTool{FILE_TYPE} =~ /^(JPEG|TIFF|PSD)$/)
     {
-        my $path = join('-', @{$$exifTool{PATH}});
+        my $path = $exifTool->MetadataPath();
         unless ($path =~ /^(JPEG-APP1-XMP|TIFF-IFD0-XMP|PSD-XMP)$/) {
             $exifTool->Warn("Ignored non-standard XMP at $path");
             return 1;

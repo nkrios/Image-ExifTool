@@ -42,7 +42,7 @@ use vars qw($VERSION %minoltaLensTypes %minoltaColorMode %sonyColorMode %minolta
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.68';
+$VERSION = '1.72';
 
 # lens ID numbers (ref 3)
 # ("New" and "II" appear in brackets if original version also has this LensType)
@@ -127,6 +127,9 @@ $VERSION = '1.68';
     56 => 'Sony AF DT 55-200mm F4-5.6 SAM', #22
     57 => 'Sony AF DT 50mm F1.8 SAM', #22
     58 => 'Sony AF DT 30mm F2.8 SAM Macro', #22
+    60 => 'Carl Zeiss Distagon T* 24mm F2 SSM', #17
+    61 => 'Sony 85mm F2.8 SAM (SAL-85F28)', #17
+    62 => 'Sony DT 35mm F1.8 SAM (SAL-35F18)', #PH
     128 => 'Tamron or Sigma Lens (128)',
     128.1 => 'Tamron 18-200mm F3.5-6.3',
     128.2 => 'Tamron 28-300mm F3.5-6.3',
@@ -320,6 +323,8 @@ $VERSION = '1.68';
     9 => 'Super Macro',
     16 => 'Auto',
     17 => 'Night View/Portrait',
+    18 => 'Sweep Panorama', #PH (SLT-A55V)
+    23 => '3D Sweep Panorama', #PH (SLT-A55V)
 );
 
 my %exposureIndicator = (

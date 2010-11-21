@@ -1,16 +1,16 @@
-  ExifToolVersion = 8.21
+  ExifToolVersion = 8.32
   FileName = CanonRaw.crw
   Directory = t/images
   FileSize = 6255
   FileModifyDate = 1131997641
   FilePermissions = 33188
   FileType = CRW
-  MIMEType = image/x-raw
-  + [Raw directory with 3 entries]
+  MIMEType = image/x-canon-crw
+  + [CIFF directory with 3 entries]
   | 0)  RawData = <Dummy raw image data>
   | 1)  JpgFromRaw = <Dummy JpgFromRaw image data>
   | 2)  ImageProps (SubDirectory) -->
-  | + [Raw directory with 13 entries]
+  | + [CIFF directory with 13 entries]
   | | 0)  ImageFormat (SubDirectory) -->
   | | + [BinaryData directory, 8 bytes]
   | | | FileFormat = 131073
@@ -36,27 +36,27 @@
   | | 7)  ThumbnailFileName = CRW_1602.THM
   | | 8)  UserComment = 
   | | 9)  MeasuredInfo (SubDirectory) -->
-  | | + [Raw directory with 1 entries]
+  | | + [CIFF directory with 1 entries]
   | | | 0)  MeasuredEV = -0.375
   | | 10) ImageDescription (SubDirectory) -->
-  | | + [Raw directory with 2 entries]
+  | | + [CIFF directory with 2 entries]
   | | | 0)  CanonFileDescription = EOS DIGITAL REBEL CMOS RAW
   | | | 1)  CanonImageType = CRW:EOS DIGITAL REBEL CMOS RAW
   | | 11) CameraObject (SubDirectory) -->
-  | | + [Raw directory with 3 entries]
+  | | + [CIFF directory with 3 entries]
   | | | 0)  OwnerName = Phil Harvey
   | | | 1)  CanonRawMakeModel (SubDirectory) -->
   | | | + [BinaryData directory, 32 bytes]
   | | | | Make = Canon
   | | | | Model = Canon EOS DIGITAL REBEL
   | | | 2)  CameraSpecification (SubDirectory) -->
-  | | | + [Raw directory with 4 entries]
+  | | | + [CIFF directory with 4 entries]
   | | | | 0)  SerialNumber = 560018150
   | | | | 1)  BaseISO = 100
   | | | | 2)  ROMOperationMode = USA
   | | | | 3)  CanonFirmwareVersion = Firmware Version 1.1.1
   | | 12) ExifInformation (SubDirectory) -->
-  | | + [Raw directory with 23 entries]
+  | | + [CIFF directory with 23 entries]
   | | | 0)  CanonFlashInfo = 0 100 0 0
   | | | 1)  CanonFocalLength (SubDirectory) -->
   | | | + [BinaryData directory, 8 bytes]

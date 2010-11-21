@@ -12,13 +12,13 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 # Sony IDC tags (ref PH)
 %Image::ExifTool::SonyIDC::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    GROUPS => { 2 => 'Image' },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     NOTES => 'Tags written by the Sony Image Data Converter utility in ARW images.',
     SET_GROUP1 => 1,
     0x201 => {

@@ -1328,7 +1328,7 @@ well as newer tags and values added by later models.</p>
 <td title='0x0105 = 261'>0x0105</td>
 <td>AEBSequence</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 2 not used by 40D, 50D, 5DmkII and 7D)</span>
+<td><span class=s><span class=n>(value of 2 not used by 40D, 50D, 60D, 5DmkII and 7D)</span>
   <br>0 = 0,-,+
   <br>1 = -,0,+
   <br>2 = +,0,-</span></td></tr>
@@ -1352,7 +1352,7 @@ well as newer tags and values added by later models.</p>
 <td title='0x0108 = 264'>0x0108</td>
 <td>SafetyShift</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(value of 2 not used by 40D, 50D, 5DmkII and 7D)</span>
+<td><span class=s><span class=n>(value of 2 not used by 40D, 50D, 60D, 5DmkII and 7D)</span>
   <br>0 = Disable
   <br>1 = Enable (Tv/Av)
   <br>2 = Enable (ISO speed)</span></td></tr>
@@ -1407,7 +1407,7 @@ well as newer tags and values added by later models.</p>
 <td><span class=s><span class=n>(40D)</span>
   <br>0 = Auto
   <br>1 = 1/250 Fixed
-  <br><span class=n>(50D and 7D)</span>
+  <br><span class=n>(50D, 60D and 7D)</span>
   <br>0 = Auto
   <br>1 = 1/250-1/60 Auto
   <br>2 = 1/250 Fixed
@@ -1450,7 +1450,7 @@ well as newer tags and values added by later models.</p>
 <td title='0x0202 = 514'>0x0202</td>
 <td>HighISONoiseReduction</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(50D, 500D, 550D, 5DmkII and 7D)</span>
+<td><span class=s><span class=n>(50D, 60D, 500D, 550D, 5DmkII and 7D)</span>
   <br>0 = Standard
   <br>1 = Low
   <br>2 = Strong
@@ -1639,19 +1639,23 @@ well as newer tags and values added by later models.</p>
 <td><span class=s><span class=n>(1D Mark IV)</span>
   <br>0 = Emits
   <br>1 = Does not emit
-  <br>2 = IR AF assist bean only
-  <br><span class=n>(values 2-3 not used by 1DmkIII or 5DmkII, value 3 new for 7D)</span>
+  <br>2 = IR AF assist beam only
+  <br><span class=n>(other models; values 2-3 not used by 1DmkIII or 5DmkII, value 3 new for 7D)</span>
   <br>0 = Emits
   <br>1 = Does not emit
   <br>2 = Only ext. flash emits
-  <br>3 = IR AF assist bean only</span></td></tr>
+  <br>3 = IR AF assist beam only</span></td></tr>
 <tr class=b>
 <td title='0x050f = 1295'>0x050f</td>
 <td>AFPointSelectionMethod</td>
 <td class=c>int32s</td>
-<td><span class=s>0 = Normal
+<td><span class=s><span class=n>(40D, 50D and 5DmkII)</span>
+  <br>0 = Normal
   <br>1 = Multi-controller direct
-  <br>2 = Quick Control Dial direct</span></td></tr>
+  <br>2 = Quick Control Dial direct
+  <br><span class=n>(60D)</span>
+  <br>0 = AF point button: Activate AF Sel; Rear dial: Select AF points
+  <br>1 = AF point button: Auto selection; Rear dial: Manual selection</span></td></tr>
 <tr>
 <td title='0x0510 = 1296'>0x0510</td>
 <td>VFDisplayIllumination
@@ -1739,13 +1743,20 @@ well as newer tags and values added by later models.</p>
 <tr class=b>
 <td title='0x0701 = 1793'>0x0701</td>
 <td>Shutter-AELock
+  <br>AFAndMeteringButtons
   <br>ShutterButtonAFOnButton</td>
-<td class=c>int32s<br>int32s</td>
+<td class=c>int32s<br>int32s<br>int32s</td>
 <td><span class=s><span class=n>(500D, 550D and 1000D)</span>
   <br>0 = AF/AE lock
   <br>1 = AE lock/AF
   <br>2 = AF/AF lock, No AE lock
   <br>3 = AE/AF, No AE lock
+  <br><span class=n>(60D)</span>
+  <br>0 = Metering start
+  <br>1 = Metering + AF start
+  <br>2 = AE lock
+  <br>3 = AF stop
+  <br>4 = No function
   <br><span class=n>(other models)</span>
   <br>0 = Metering + AF start
   <br>1 = Metering + AF start/AF stop
@@ -1779,6 +1790,13 @@ well as newer tags and values added by later models.</p>
   <br>4 = Image playback
   <br>5 = Quick control screen
   <br>6 = Record movie (Live View)
+  <br><span class=n>(60D)</span>
+  <br>0 = Normal (disabled)
+  <br>1 = Image quality
+  <br>2 = Picture style
+  <br>3 = White balance
+  <br>4 = Flash exposure compensation
+  <br>5 = Viewfinder leveling gauge
   <br><span class=n>(450D and 550D; value of 5 is new for 550D)</span>
   <br>0 = Normal (disabled)
   <br>1 = Image quality
@@ -1869,7 +1887,7 @@ well as newer tags and values added by later models.</p>
 <td title='0x080b = 2059'>0x080b</td>
 <td>FocusingScreen</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(40D and 50D)</span>
+<td><span class=s><span class=n>(40D, 50D and 60D)</span>
   <br>0 = Ef-A
   <br>1 = Ef-D
   <br>2 = Ef-S
@@ -1928,7 +1946,7 @@ well as newer tags and values added by later models.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 18, 2010</i>
+<br><i>Last revised Sep 7, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

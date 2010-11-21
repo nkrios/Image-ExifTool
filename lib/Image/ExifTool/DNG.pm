@@ -17,7 +17,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::MakerNotes;
 use Image::ExifTool::CanonRaw;
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 sub ProcessOriginalRaw($$$);
 sub ProcessAdobeData($$$);
@@ -56,7 +56,7 @@ sub WriteAdobeStuff($$$);
 
         The maker notes ('MakN') are processed by ExifTool, but some information may
         have been lost by the Adobe DNG Converter.  This is because the Adobe DNG
-        Converter (as of version 4.3) doesn't properly handle information referenced
+        Converter (as of version 6.3) doesn't properly handle information referenced
         from inside the maker notes that lies outside the original maker notes
         block.  This information is lost when only the maker note block is copied to
         the DNG image.   While this doesn't effect all makes of cameras, it is a

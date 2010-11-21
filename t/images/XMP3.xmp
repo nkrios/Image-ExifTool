@@ -1,11 +1,17 @@
 <?xpacket begin='﻿' id='W5M0MpCehiHzreSzNTczkc9d'?>
 <x:xmpmeta xmlns:x='adobe:ns:meta/' x:xmptk='Image::ExifTool 6.32'>
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-         xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:dd="http://purl.org/dc/elements/1.1/"
          xmlns:ph="http://owl.phy.queensu.ca/ph/1.0/"
          xmlns:xxx="http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/">
   <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar"
-         dc:title="ExifTool common node and nonstandard namespace prefix test">
+         dd:title="ExifTool common node, nonstandard namespace prefix, and bad list type tests">
+    <dd:creator>
+      <rdf:Bag>
+        <rdf:li>bad_list_type_A</rdf:li>
+        <rdf:li>bad_list_type_B</rdf:li>
+      </rdf:Bag>
+    </dd:creator>
     <ph:supervisor>
       <rdf:Description rdf:nodeID="abc" ph:food="cookies">
         <ph:exclamation>doh!</ph:exclamation>

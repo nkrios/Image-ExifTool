@@ -12,9 +12,11 @@
 package Image::ExifTool::PDF;
 
 use strict;
+use vars qw($lastFetched);
 
 sub WriteObject($$);
 sub EncodeString($);
+sub CryptObject($);
 
 # comments to mark beginning and end of ExifTool incremental update
 my $beginComment = '%BeginExifToolUpdate';
@@ -23,6 +25,11 @@ my $endComment   = '%EndExifToolUpdate ';
 my $keyExt;     # crypt key extension
 my $pdfVer;     # version of PDF file we are currently writing
 
+# internal tags used in dictionary objects
+my %myDictTags = (
+    _tags => 1, _stream => 1, _decrypted => 1, _needCrypt => 1,
+    _filtered => 1, _entry_size => 1, _table => 1,
+);
 
 #------------------------------------------------------------------------------
 # Validate raw PDF values for writing (string date integer real boolean name)
@@ -104,7 +111,7 @@ sub EncodeString($)
         }
         return;
     }
-    Crypt($strPt, $keyExt);  # encrypt if necessary
+    Crypt($strPt, $keyExt, 1);  # encrypt if necessary
     # encode as hex if we have any control characters (except tab)
     if ($$strPt=~/[\x00-\x08\x0a-\x1f\x7f\xff]/) {
         # encode as hex
@@ -122,6 +129,46 @@ sub EncodeString($)
     } else {
         $$strPt =~ s/([()\\])/\\$1/g;   # must escape round brackets and backslashes
         $$strPt = "($$strPt)";
+    }
+}
+
+#------------------------------------------------------------------------------
+# Encrypt an object
+# Inputs: 0) PDF object (encrypts in place)
+# Notes: Encrypts according to "_needCrypt" dictionary entry,
+#        then deletes "_needCrypt" when done
+sub CryptObject($)
+{
+    my $obj = $_[0];
+    if (not ref $obj) {
+        # only literal strings and hex strings are encrypted
+        if ($obj =~ /^[(<]/) {
+            undef $lastFetched; # (reset this just in case)
+            my $val = ReadPDFValue($obj);
+            EncodeString(\$val);
+            $_[0] = $val;
+        }
+    } elsif (ref $obj eq 'HASH') {
+        my $tag;
+        my $needCrypt = $$obj{_needCrypt};
+        foreach $tag (keys %$obj) {
+            next if $myDictTags{$tag};
+            # re-encrypt necessary objects only (others are still encrypted)
+            # (this is really annoying, but is necessary because objects stored
+            # in encrypted streams are decrypted when extracting, but strings stored
+            # as direct objects are decrypted later since they must be decoded
+            # before being decrypted)
+            if ($needCrypt) {
+                next unless defined $$needCrypt{$tag} ? $$needCrypt{$tag} : $$needCrypt{'*'};
+            }
+            CryptObject($$obj{$tag});
+        }
+        delete $$obj{_needCrypt};   # avoid re-re-crypting
+    } elsif (ref $obj eq 'ARRAY') {
+        my $val;
+        foreach $val (@$obj) {
+            CryptObject($val);
+        }
     }
 }
 
@@ -181,16 +228,23 @@ sub WriteObject($$)
         # write dictionary
         my $tag;
         Write($outfile, $/, '<<') or return 0;
-        # add "Length" entry if this is a stream
+        # prepare object as required if it has a stream
         if ($$obj{_stream}) {
+            # encrypt stream if necessary (must be done before determining Length)
+            CryptStream($obj, $keyExt) if $$obj{_decrypted};
+            # write "Length" entry in dictionary
             $$obj{Length} = length $$obj{_stream};
             push @{$$obj{_tags}}, 'Length';
+            # delete Filter-related entries since we don't yet write filtered streams
+            delete $$obj{Filter};
+            delete $$obj{DecodeParms};
+            delete $$obj{DL};
         }
         # don't write my internal entries
-        my %wrote = ( _tags => 1, _stream => 1, _decrypted => 1,
-                      _oldFilter => 1, _entry_size => 1, _table => 1 );
+        my %wrote = %myDictTags;
         # write tags in original order, adding new ones later alphabetically
         foreach $tag (@{$$obj{_tags}}, sort keys %$obj) {
+            # ignore already-written or missing entries
             next if $wrote{$tag} or not defined $$obj{$tag};
             Write($outfile, $/, "/$tag") or return 0;
             WriteObject($outfile, $$obj{$tag}) or return 0;
@@ -198,13 +252,9 @@ sub WriteObject($$)
         }
         Write($outfile, $/, '>>') or return 0;
         if ($$obj{_stream}) {
+            # write object stream
             # (a single 0x0d may not follow 'stream', so use 0x0d+0x0a here to be sure)
             Write($outfile, $/, "stream\x0d\x0a") or return 0;
-            # encrypt stream if necessary
-            if ($$obj{_decrypted}) {
-                delete $$obj{_decrypted};
-                CryptStream($obj, $keyExt);
-            }
             Write($outfile, $$obj{_stream}, $/, 'endstream') or return 0;
         }
     } else {
@@ -237,13 +287,16 @@ sub WritePDF($$)
     # create a new ExifTool object and use it to read PDF and XMP information
     my $newTool = new Image::ExifTool;
     $newTool->Options(List => 1);
+    $newTool->Options(Password => $exifTool->Options('Password'));
     $$newTool{PDF_CAPTURE} = \%capture;
     my $info = $newTool->ImageInfo($raf, 'XMP', 'PDF:*', 'Error', 'Warning');
     # not a valid PDF file unless we got a version number
-    $pdfVer = $$info{PDFVersion} or return 0;
-
+    # (note: can't just check $$info{PDFVersion} due to possibility of XMP-pdf:PDFVersion)
+    my $vers = $newTool->GetInfo('PDF:PDFVersion');
+    ($pdfVer) = values %$vers;
+    $pdfVer or $exifTool->Error('Missing PDF:PDFVersion'), return 0;
     # check version number
-    if ($pdfVer > 1.6) {
+    if ($pdfVer > 1.7) {
         if ($pdfVer >= 2.0) {
             $exifTool->Error("Can't yet write PDF version $pdfVer"); # (future major version changes)
             return 1;
@@ -339,6 +392,9 @@ sub WritePDF($$)
     my $infoRef = $prevInfoRef || \ "$nextObject 0 R";
     $keyExt = $$infoRef;
 
+    # must encrypt all values in dictionary if they came from an encrypted stream
+    CryptObject($infoDict) if $$infoDict{_needCrypt};
+    
     # must set line separator before calling WritePDFValue()
     local $/ = $capture{newline};
 
@@ -479,9 +535,9 @@ sub WritePDF($$)
                 Type       => '/Metadata',
                 Subtype    => '/XML',
               # Length     => length $newXMP, (set by WriteObject)
-                _tags      => [ qw(Type Subtype Length) ],
+                _tags      => [ qw(Type Subtype) ],
                 _stream    => $newXMP,
-                _decrypted => 1,
+                _decrypted => 1, # (this will be ignored if EncryptMetadata is false)
             };
         } elsif ($capture{Root}->{Metadata}) {
             # free existing metadata object
@@ -584,10 +640,6 @@ sub WritePDF($$)
         # must write xref as a stream in xref-stream-only files
         if ($$mainDict{Type} and $$mainDict{Type} eq '/XRef') {
 
-            # delete encoding-related entries since we aren't encoding our stream
-            delete $$mainDict{Filter};
-            delete $$mainDict{DecodeParms};
-            delete $$mainDict{DL};
             # create entry for the xref stream object itself
             $newXRef{$nextObject++} = [ Tell($outfile) + length($/), 0, 'n' ];
             $$mainDict{Size} = $nextObject;

@@ -10,8 +10,8 @@
 <p>
 EXIF stands for &quot;Exchangeable Image File Format&quot;.  This type of information
 is formatted according to the TIFF specification, and may be found in JPG,
-TIFF, PNG, MIFF, HDP and PSP images, as well as many TIFF-based RAW images,
-and even some AVI and MOV videos.</p>
+TIFF, PNG, MIFF, HDP, PSP and XCF images, as well as many TIFF-based RAW
+images, and even some AVI and MOV videos.</p>
 
 <p>The EXIF meta information is organized into different Image File Directories
 (IFD&#39;s) within an image.  The names of these IFD&#39;s correspond to the
@@ -781,6 +781,18 @@ OtherImageLength in everything else)</span></span></td></tr>
 <td class=c title='/ = Avoided'>int16u/</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td title='0x4747 = 18247'>0x4747</td>
+<td>XP_DIP_XML</td>
+<td class=c>N</td>
+<td class=c>-</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x4748 = 18248'>0x4748</td>
+<td>StitchInfo</td>
+<td class=c>-</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Microsoft.html#Stitch'>Microsoft Stitch Tags</a></td></tr>
 <tr>
 <td title='0x4749 = 18249'>0x4749</td>
 <td>RatingPercent</td>
@@ -1653,10 +1665,12 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNoteSony2
   <br>MakerNoteSony3
   <br>MakerNoteSony4
+  <br>MakerNoteSonyEricsson
   <br>MakerNoteSonySRF
+  <br>MakerNoteUnknownText
   <br><u>MakerNoteUnknown</u></td>
-<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
-<td class=c>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
+<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td class=c>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
 <td>--&gt; <a href='Canon.html'>Canon Tags</a>
   <br>--&gt; <a href='Casio.html'>Casio Tags</a>
   <br>--&gt; <a href='Casio.html#Type2'>Casio Type2 Tags</a>
@@ -1716,7 +1730,9 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>--&gt; <a href='Olympus.html'>Olympus Tags</a>
   <br>--&gt; <a href='Olympus.html'>Olympus Tags</a>
   <br>--&gt; <a href='Sony.html'>Sony Tags</a>
+  <br>--&gt; <a href='Sony.html#Ericsson'>Sony Ericsson Tags</a>
   <br>--&gt; <a href='Sony.html#SRF'>Sony SRF Tags</a>
+  <br><span class=n>(unknown text-based maker notes)</span>
   <br>--&gt; <a href='Unknown.html'>Unknown Tags</a></td></tr>
 <tr>
 <td title='0x9286 = 37510'>0x9286</td>
@@ -3076,7 +3092,7 @@ these unless they already exist in the file)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 9, 2010</i>
+<br><i>Last revised Oct 6, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

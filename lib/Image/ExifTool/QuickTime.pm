@@ -6,6 +6,7 @@
 # Revisions:    10/04/2005 - P. Harvey Created
 #               12/19/2005 - P. Harvey Added MP4 support
 #               09/22/2006 - P. Harvey Added M4A support
+#               07/27/2010 - P. Harvey Updated to 2010-05-03 QuickTime spec
 #
 # References:   1) http://developer.apple.com/mac/library/documentation/QuickTime/QTFF/QTFFChap1/qtff1.html
 #               2) http://search.cpan.org/dist/MP4-Info-1.04/
@@ -18,6 +19,9 @@
 #               9) http://www.adobe.com/devnet/xmp/pdfs/XMPSpecificationPart3.pdf (Oct 2008)
 #               10) http://code.google.com/p/mp4v2/wiki/iTunesMetadata
 #               11) http://www.canieti.com.mx/assets/files/1011/IEC_100_1384_DC.pdf
+#               12) QuickTime file format specification 2010-05-03
+#               13) http://www.adobe.com/devnet/flv/pdf/video_file_format_spec_v10.pdf
+#               14) http://standards.iso.org/ittf/PubliclyAvailableStandards/c051533_ISO_IEC_14496-12_2008.zip
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::QuickTime;
@@ -27,12 +31,14 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.35';
+$VERSION = '1.42';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
 sub ProcessKeys($$$);
 sub ProcessMetaData($$$);
+sub ConvertISO6709($);
+sub PrintGPSCoordinates($);
 
 # information for time/date-based tags (time zero is Jan 1, 1904)
 my %timeInfo = (
@@ -63,6 +69,15 @@ my %vendorID = (
     # have also seen:
     # VendorID - 'SMI ', fe20 (Olympus FE200), pr01, 
     # HandlerVendorID - ZORA, pr01, 'GIC '
+);
+
+# QuickTime data atom encodings for string types (ref 12)
+my %stringEncoding = (
+    1 => 'UTF8',
+    2 => 'UTF16',
+    3 => 'ShiftJIS',
+    4 => 'UTF8',
+    5 => 'UTF16',
 );
 
 # MIME types for all entries in the ftypLookup with file extensions
@@ -245,7 +260,14 @@ my %ftypLookup = (
         Name => 'Movie',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Movie' },
     },
-    mdat => { Unknown => 1, Binary => 1 },
+    mdat => { Name => 'MovieData', Unknown => 1, Binary => 1 },
+    'mdat-size' => {
+        Name => 'MovieDataSize',
+        Notes => q{
+            not a real tag ID, this tag represents the size of the 'mdat' data in bytes
+            and is used in the AvgBitrate calculation
+        },
+    },
     junk => { Unknown => 1, Binary => 1 }, #8
     uuid => [
         { #9 (MP4 files)
@@ -264,6 +286,15 @@ my %ftypLookup = (
                 Start => 24, # uid(16) + version(1) + flags(3) + count(4)
             },
         },
+        { #PH (Flip MP4 files)
+            Name => 'UUID-Flip',
+            Condition => '$$valPt=~/\x4a\xb0\x3b\x0f\x61\x8d\x40\x75\x82\xb2\xd9\xfa\xce\xd3\x5f\xf5/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::QuickTime::Flip',
+                Start => 16,
+            },
+        },
+        # "\x98\x7f\xa3\xdf\x2a\x85\x43\xc0\x8f\x8f\xd9\x7c\x47\x1e\x8e\xea" - unknown data in Flip videos
         { #8
             Name => 'UUID-Unknown',
             Unknown => 1,
@@ -403,7 +434,7 @@ my %ftypLookup = (
     GROUPS => { 2 => 'Video' },
     mvhd => {
         Name => 'MovieHeader',
-        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::MovieHdr' },
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::MovieHeader' },
     },
     trak => {
         Name => 'Track',
@@ -436,29 +467,45 @@ my %ftypLookup = (
             Binary => 1,
         },
     ],
+    # prfl - Profile (ref 12)
+    # clip - clipping --> contains crgn (clip region) (ref 12)
+    # mvex - movie extends --> contains mehd (movie extends header), trex (track extends) (ref 14)
 );
 
 # movie header data block
-%Image::ExifTool::QuickTime::MovieHdr = (
+%Image::ExifTool::QuickTime::MovieHeader = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Video' },
     FORMAT => 'int32u',
-    0 => { Name => 'Version', Format => 'int8u' },
+    0 => {
+        Name => 'MovieHeaderVersion',
+        Format => 'int8u',
+        RawConv => '$$self{MovieHeaderVersion} = $val',
+    },
     1 => {
         Name => 'CreateDate',
         Groups => { 2 => 'Time' },
         %timeInfo,
+        # this is int64u if MovieHeaderVersion == 1 (ref 13)
+        Hook => '$$self{MovieHeaderVersion} and $format = "int64u", $varSize += 4',
     },
     2 => {
         Name => 'ModifyDate',
         Groups => { 2 => 'Time' },
         %timeInfo,
+        # this is int64u if MovieHeaderVersion == 1 (ref 13)
+        Hook => '$$self{MovieHeaderVersion} and $format = "int64u", $varSize += 4',
     },
     3 => {
         Name => 'TimeScale',
         RawConv => '$$self{TimeScale} = $val',
     },
-    4 => { Name => 'Duration', %durationInfo },
+    4 => {
+        Name => 'Duration',
+        %durationInfo,
+        # this is int64u if MovieHeaderVersion == 1 (ref 13)
+        Hook => '$$self{MovieHeaderVersion} and $format = "int64u", $varSize += 4',
+    },
     5 => {
         Name => 'PreferredRate',
         ValueConv => '$val / 0x10000',
@@ -494,7 +541,7 @@ my %ftypLookup = (
     GROUPS => { 2 => 'Video' },
     tkhd => {
         Name => 'TrackHeader',
-        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::TrackHdr' },
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::TrackHeader' },
     },
     udta => {
         Name => 'UserData',
@@ -534,29 +581,35 @@ my %ftypLookup = (
     # matt - track matt --> contains kmat (compressed matt)
     # load - track loading settings
     # imap - track input map --> contains '  in' --> contains '  ty', obid
+    # prfl - Profile (ref 12)
 );
 
 # track header data block
-%Image::ExifTool::QuickTime::TrackHdr = (
+%Image::ExifTool::QuickTime::TrackHeader = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 1 => 'Track#', 2 => 'Video' },
     FORMAT => 'int32u',
     0 => {
-        Name => 'TrackVersion',
+        Name => 'TrackHeaderVersion',
         Format => 'int8u',
         Priority => 0,
+        RawConv => '$$self{TrackHeaderVersion} = $val',
     },
     1 => {
         Name => 'TrackCreateDate',
         Priority => 0,
         Groups => { 2 => 'Time' },
         %timeInfo,
+        # this is int64u if TrackHeaderVersion == 1 (ref 13)
+        Hook => '$$self{TrackHeaderVersion} and $format = "int64u", $varSize += 4',
     },
     2 => {
         Name => 'TrackModifyDate',
         Priority => 0,
         Groups => { 2 => 'Time' },
         %timeInfo,
+        # this is int64u if TrackHeaderVersion == 1 (ref 13)
+        Hook => '$$self{TrackHeaderVersion} and $format = "int64u", $varSize += 4',
     },
     3 => {
         Name => 'TrackID',
@@ -566,6 +619,8 @@ my %ftypLookup = (
         Name => 'TrackDuration',
         Priority => 0,
         %durationInfo,
+        # this is int64u if TrackHeaderVersion == 1 (ref 13)
+        Hook => '$$self{TrackHeaderVersion} and $format = "int64u", $varSize += 4',
     },
     8 => {
         Name => 'TrackLayer',
@@ -607,9 +662,9 @@ my %ftypLookup = (
     GROUPS => { 2 => 'Video' },
     NOTES => q{
         Tag ID's beginning with the copyright symbol (hex 0xa9) are multi-language
-        text, but ExifTool only extracts the text from the first language in the
-        record.  ExifTool will extract any multi-language user data tags found, even
-        if they don't exist in this table.
+        text.  Alternate language tags are accessed by adding a dash followed by the
+        language/country code to the tag name.  ExifTool will extract any
+        multi-language user data tags found, even if they don't exist in this table.
     },
     "\xa9cpy" => { Name => 'Copyright',  Groups => { 2 => 'Author' } },
     "\xa9day" => {
@@ -624,7 +679,14 @@ my %ftypLookup = (
         },
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    "\xa9dir" => 'Director',
+    "\xa9ART" => 'Artist', #PH (iTunes 8.0.2)
+    "\xa9alb" => 'Album', #PH (iTunes 8.0.2)
+    "\xa9arg" => 'Arranger', #12
+    "\xa9ark" => 'ArrangerKeywords', #12
+    "\xa9cmt" => 'Comment', #PH (iTunes 8.0.2)
+    "\xa9cok" => 'ComposerKeywords', #12
+    "\xa9com" => 'Composer', #12
+    "\xa9dir" => 'Director', #12
     "\xa9ed1" => 'Edit1',
     "\xa9ed2" => 'Edit2',
     "\xa9ed3" => 'Edit3',
@@ -635,12 +697,40 @@ my %ftypLookup = (
     "\xa9ed8" => 'Edit8',
     "\xa9ed9" => 'Edit9',
     "\xa9fmt" => 'Format',
+    "\xa9gen" => 'Genre', #PH (iTunes 8.0.2)
+    "\xa9grp" => 'Grouping', #PH (NC)
     "\xa9inf" => 'Information',
+    "\xa9isr" => 'ISRCCode', #12
+    "\xa9lab" => 'RecordLabelName', #12
+    "\xa9lal" => 'RecordLabelURL', #12
+    "\xa9lyr" => 'Lyrics', #PH (NC)
+    "\xa9mak" => 'Make', #12
+    "\xa9mal" => 'MakerURL', #12
+    "\xa9mod" => 'Model', #PH
+    "\xa9nam" => 'Title', #12
+    "\xa9pdk" => 'ProducerKeywords', #12
+    "\xa9phg" => 'RecordingCopyright', #12
     "\xa9prd" => 'Producer',
     "\xa9prf" => 'Performers',
+    "\xa9prk" => 'PerformerKeywords', #12
+    "\xa9prl" => 'PerformerURL',
+    "\xa9dir" => 'Director', #12
     "\xa9req" => 'Requirements',
-    "\xa9src" => 'Source',
-    "\xa9wrt" => 'Writer',
+    "\xa9snk" => 'SubtitleKeywords', #12
+    "\xa9snm" => 'Subtitle', #12
+    "\xa9src" => 'SourceCredits', #12
+    "\xa9swf" => 'SongWriter', #12
+    "\xa9swk" => 'SongWriterKeywords', #12
+    "\xa9swr" => 'SoftwareVersion', #12
+    "\xa9too" => 'Encoder', #PH (NC)
+    "\xa9trk" => 'Track', #PH (NC)
+    "\xa9wrt" => 'Composer',
+    "\xa9xyz" => { #PH (iPhone 3GS)
+        Name => 'GPSCoordinates',
+        Groups => { 2 => 'Location' },
+        ValueConv => \&ConvertISO6709,
+        PrintConv => \&PrintGPSCoordinates,
+    },
     name => 'Name',
     WLOC => {
         Name => 'WindowLocation',
@@ -755,6 +845,14 @@ my %ftypLookup = (
             },
         },
         {
+            Name => 'SamsungTags',
+            Condition => '$$valPt =~ /^SAMSUNG DIGITAL CAMERA\0/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Samsung::MP4',
+                ByteOrder => 'LittleEndian',
+            },
+        },
+        {
             Name => 'SanyoMOV',
             Condition => q{
                 $$valPt =~ /^SANYO DIGITAL CAMERA\0/ and
@@ -816,7 +914,15 @@ my %ftypLookup = (
     CNCV => 'CompressorVersion', #PH (5D Mark II)
     CNMN => 'Model', #PH (EOS 550D)
     CNFV => 'FirmwareVersion', #PH (EOS 550D)
-    # CNDB - ? (550D)
+    CNTH => { #PH (PowerShot S95)
+        Name => 'CanonCNTH',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Canon::CNTH',
+            ProcessProc => \&ProcessMOV,
+        },
+    },
+    # CNDB - 2112 bytes (550D)
+    # CNDM - 4 bytes - 0xff,0xd8,0xff,0xd9 (S95)
     INFO => {
         Name => 'SamsungINFO',
         SubDirectory => { TagTable => 'Image::ExifTool::Samsung::INFO' },
@@ -1002,9 +1108,9 @@ my %ftypLookup = (
     PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     ilst => {
-        Name => 'InfoList',
+        Name => 'ItemList',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::QuickTime::InfoList',
+            TagTable => 'Image::ExifTool::QuickTime::ItemList',
             HasData => 1, # process atoms as containers with 'data' elements
         },
     },
@@ -1049,6 +1155,10 @@ my %ftypLookup = (
         Name => 'PrimaryItemReference',
         Flags => ['Binary','Unknown'],
     },
+    free => { #PH
+        Name => 'Free',
+        Flags => ['Binary','Unknown'],
+    },
 );
 
 # track reference atoms
@@ -1059,9 +1169,9 @@ my %ftypLookup = (
     # also: tmcd, sync, scpt, ssrc, iTunesInfo
 );
 
-# info list atoms
+# item list atoms
 # -> these atoms are unique, and contain one or more 'data' atoms
-%Image::ExifTool::QuickTime::InfoList = (
+%Image::ExifTool::QuickTime::ItemList = (
     PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Audio' },
     NOTES => q{
@@ -1074,7 +1184,7 @@ my %ftypLookup = (
     "\xa9alb" => 'Album',
     "\xa9cmt" => 'Comment',
     "\xa9com" => 'Composer',
-    "\xa9day" => 'Year',
+    "\xa9day" => { Name => 'Year', Groups => { 2 => 'Time' } },
     "\xa9des" => 'Description', #4
     "\xa9enc" => 'EncodedBy', #10
     "\xa9gen" => 'Genre',
@@ -1131,13 +1241,13 @@ my %ftypLookup = (
         Name => 'AlbumTitleID',
         Format => 'int32u',
     },
-    auth => 'Author',
+    auth => { Name => 'Author', Groups => { 2 => 'Author' } },
     catg => 'Category', #7
     cnID => { #10
         Name => 'AppleStoreCatalogID',
         Format => 'int32u',
     },
-    cprt => 'Copyright',
+    cprt => { Name => 'Copyright', Groups => { 2 => 'Author' } },
     dscp => 'Description',
     desc => 'Description', #7
     gnre => { #10
@@ -1244,15 +1354,80 @@ my %ftypLookup = (
     yrrc => 'Year', #(ffmpeg source)
 );
 
-# info list keys
+# item list keys (ref PH)
 %Image::ExifTool::QuickTime::Keys = (
     PROCESS_PROC => \&Image::ExifTool::QuickTime::ProcessKeys,
     NOTES => q{
         This directory contains a list of key names which are used to decode
-        InfoList tags written by the "mdta" handler.  The prefix of
+        ItemList tags written by the "mdta" handler.  The prefix of
         "com.apple.quicktime." has been removed from all TagID's below.
     },
-    'version'                       => 'Version',
+    version     => 'Version',
+    album       => 'Album',
+    artist      => { },
+    artwork     => { },
+    author      => { Name => 'Author',      Groups => { 2 => 'Author' } },
+    comment     => { },
+    copyright   => { Name => 'Copyright',   Groups => { 2 => 'Author' } },
+    creationdate=> {
+        Name => 'CreationDate',
+        Groups => { 2 => 'Time' },
+        ValueConv => q{
+            require Image::ExifTool::XMP;
+            $val =  Image::ExifTool::XMP::ConvertXMPDate($val,1);
+            $val =~ s/([-+]\d{2})(\d{2})$/$1:$2/; # add colon to timezone if necessary
+            return $val;
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    description => { },
+    director    => { },
+    genre       => { },
+    information => { },
+    keywords    => { },
+    make        => { Name => 'Make',        Groups => { 2 => 'Camera' } },
+    model       => { Name => 'Model',       Groups => { 2 => 'Camera' } },
+    publisher   => { },
+    software    => { },
+    year        => { Groups => { 2 => 'Time' } },
+    'camera.identifier' => 'CameraIdentifier', # (iPhone 4)
+    'camera.framereadouttimeinmicroseconds' => { # (iPhone 4)
+        Name => 'FrameReadoutTime',
+        ValueConv => '$val * 1e-6',
+        PrintConv => '$val * 1e6 . " microseconds"',
+    },
+    'location.ISO6709' => {
+        Name => 'GPSCoordinates',
+        Groups => { 2 => 'Location' },
+        ValueConv => \&ConvertISO6709,
+        PrintConv => \&PrintGPSCoordinates,
+    },
+    'location.name' => { Name => 'LocationName', Groups => { 2 => 'Location' } },
+    'location.body' => { Name => 'LocationBody', Groups => { 2 => 'Location' } },
+    'location.note' => { Name => 'LocationNote', Groups => { 2 => 'Location' } },
+    'location.role' => {
+        Name => 'LocationRole',
+        Groups => { 2 => 'Location' },
+        PrintConv => {
+            0 => 'Shooting Location',
+            1 => 'Real Location',
+            2 => 'Fictional Location',
+        },
+    },
+    'location.date' => {
+        Name => 'LocationDate',
+        Groups => { 2 => 'Time' },
+        ValueConv => q{
+            require Image::ExifTool::XMP;
+            $val =  Image::ExifTool::XMP::ConvertXMPDate($val);
+            $val =~ s/([-+]\d{2})(\d{2})$/$1:$2/; # add colon to timezone if necessary
+            return $val;
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    'direction.facing' => { Name => 'CameraDirection', Groups => { 2 => 'Location' } },
+    'direction.motion' => { Name => 'CameraMotion', Groups => { 2 => 'Location' } },
+    'location.body' => { Name => 'LocationBody', Groups => { 2 => 'Location' } },
     'player.version'                => 'PlayerVersion',
     'player.movie.visual.brightness'=> 'Brightness',
     'player.movie.visual.color'     => 'Color',
@@ -1270,7 +1445,7 @@ my %ftypLookup = (
     },
 );
 
-# info list atoms
+# iTunes info ('----') atoms
 %Image::ExifTool::QuickTime::iTunesInfo = (
     PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Audio' },
@@ -1405,15 +1580,10 @@ my %ftypLookup = (
     PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     NOTES => 'MP4 media box.',
-    mdhd => [{
+    mdhd => {
         Name => 'MediaHeader',
-        Condition => '$$valPt =~ /^\0{4}/',
-        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::MediaHeader0' },
-    },{
-        Name => 'MediaHeader',
-        Condition => '$$valPt =~ /^\0{3}\x01/',
-        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::MediaHeader1' },
-    }],
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::MediaHeader' },
+    },
     hdlr => {
         Name => 'Handler',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::Handler' },
@@ -1424,25 +1594,28 @@ my %ftypLookup = (
     },
 );
 
-# MP4 media header box, version 0 (ref 5)
-%Image::ExifTool::QuickTime::MediaHeader0 = (
+# MP4 media header box (ref 5)
+%Image::ExifTool::QuickTime::MediaHeader = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Video' },
-    NOTES => 'MP4 media header version 0.',
     FORMAT => 'int32u',
     0 => {
         Name => 'MediaHeaderVersion',
-        Notes => 'version 0',
+        RawConv => '$$self{MediaHeaderVersion} = $val',
     },
     1 => {
         Name => 'MediaCreateDate',
         Groups => { 2 => 'Time' },
         %timeInfo,
+        # this is int64u if MediaHeaderVersion == 1 (ref 5/13)
+        Hook => '$$self{MediaHeaderVersion} and $format = "int64u", $varSize += 4',
     },
     2 => {
         Name => 'MediaModifyDate',
         Groups => { 2 => 'Time' },
         %timeInfo,
+        # this is int64u if MediaHeaderVersion == 1 (ref 5/13)
+        Hook => '$$self{MediaHeaderVersion} and $format = "int64u", $varSize += 4',
     },
     3 => {
         Name => 'MediaTimeScale',
@@ -1452,51 +1625,20 @@ my %ftypLookup = (
         Name => 'MediaDuration',
         RawConv => '$$self{MediaTS} ? $val / $$self{MediaTS} : $val',
         PrintConv => '$$self{MediaTS} ? ConvertDuration($val) : $val',
+        # this is int64u if MediaHeaderVersion == 1 (ref 5/13)
+        Hook => '$$self{MediaHeaderVersion} and $format = "int64u", $varSize += 4',
     },
     5 => {
         Name => 'MediaLanguageCode',
         Format => 'int16u',
         RawConv => '$val ? $val : undef',
-        ValueConv => 'pack "C*", map({ (($val>>$_)&0x1f)+0x60 } 10, 5, 0)',
-    },
-);
-
-# MP4 media header box, version 1 (ref 5)
-%Image::ExifTool::QuickTime::MediaHeader1 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    GROUPS => { 2 => 'Video' },
-    NOTES => 'MP4 media header version 1.',
-    FORMAT => 'int32u',
-    0 => {
-        Name => 'MediaHeaderVersion',
-        Notes => 'version 1',
-    },
-    1 => {
-        Name => 'MediaCreateDate',
-        Format => 'int64u',
-        Groups => { 2 => 'Time' },
-        %timeInfo,
-    },
-    3 => {
-        Name => 'MediaModifyDate',
-        Format => 'int64u',
-        Groups => { 2 => 'Time' },
-        %timeInfo,
-    },
-    5 => {
-        Name => 'MediaTimescale',
-        RawConv => '$$self{MediaTS} = $val',
-    },
-    6 => {
-        Name => 'MediaDuration',
-        Format => 'int64u',
-        RawConv => '$$self{MediaTS} ? $val / $$self{MediaTS} : $val',
-        PrintConv => '$$self{MediaTS} ? ConvertDuration($val) : $val',
-    },
-    8 => {
-        Name => 'MediaLanguageCode',
-        Format => 'undef[4]',
-        ValueConv => 'pack "C*", map({ (($val>>$_)&0x1f)+0x60 } 10, 5, 0)',
+        # allow both Macintosh (for MOV files) and ISO (for MP4 files) language codes
+        ValueConv => '$val < 0x400 ? $val : pack "C*", map { (($val>>$_)&0x1f)+0x60 } 10, 5, 0',
+        PrintConv => q{
+            return $val unless $val =~ /^\d+$/;
+            require Image::ExifTool::Font;
+            return $Image::ExifTool::Font::ttLang{Macintosh}{$val} || "Unknown ($val)";
+        },
     },
 );
 
@@ -1846,6 +1988,28 @@ my %ftypLookup = (
     },
 );
 
+# Flip uuid data (ref PH)
+%Image::ExifTool::QuickTime::Flip = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int32u',
+    FIRST_ENTRY => 0,
+    NOTES => 'Found in MP4 files from Flip Video cameras.',
+    GROUPS => { 1 => 'MakerNotes', 2 => 'Image' },
+    1 => 'PreviewImageWidth',
+    2 => 'PreviewImageHeight',
+    13 => 'PreviewImageLength',
+    14 => { # (confirmed for FlipVideoMinoHD)
+        Name => 'SerialNumber',
+        Groups => { 2 => 'Camera' },
+        Format => 'string[16]',
+    },
+    28 => {
+        Name => 'PreviewImage',
+        Format => 'undef[$val{13}]',
+        RawConv => '$self->ValidateImage(\$val, $tag)',
+    },
+);
+
 # QuickTime composite tags
 %Image::ExifTool::QuickTime::Composite = (
     GROUPS => { 2 => 'Video' },
@@ -1855,6 +2019,18 @@ my %ftypLookup = (
             1 => 'QuickTime:HandlerType',
         },
         ValueConv => 'Image::ExifTool::QuickTime::CalcRotation($self)',
+    },
+    AvgBitrate => {
+        Priority => 0,  # let QuickTime::AvgBitrate take priority
+        Require => {
+            0 => 'QuickTime::MovieDataSize',
+            1 => 'QuickTime::Duration',
+        },
+        RawConv => q{
+            return undef unless $val[1];
+            $val[1] /= $$self{TimeScale} if $$self{TimeScale};
+            return int($val[0] * 8 / $val[1] + 0.5);
+        },
     },
 );
 
@@ -1928,6 +2104,74 @@ sub FixWrongFormat($)
 }
 
 #------------------------------------------------------------------------------
+# Convert ISO 6709 string to standard lag/lon format
+# Inputs: 0) ISO 6709 string (lat, lon, and optional alt)
+# Returns: position in decimal degress with altitude if available
+# Notes: Wikipedia indicates altitude may be in feet -- how is this specified?
+sub ConvertISO6709($)
+{
+    my $val = shift;
+    if ($val =~ /^([-+]\d{2}(?:\.\d*)?)([-+]\d{3}(?:\.\d*)?)([-+]\d+)?/) {
+        $val = ($1 + 0) . ' ' . ($2 + 0);
+        $val .= ' ' . ($3 + 0) if $3;
+    } elsif ($val =~ /^([-+])(\d{2})(\d{2}(?:\.\d*)?)([-+])(\d{3})(\d{2}(?:\.\d*)?)([-+]\d+)?/) {
+        my $lat = $2 + $3 / 60;
+        $lat = -$lat if $1 eq '-';
+        my $lon = $5 + $6 / 60;
+        $lon = -$lon if $4 eq '-';
+        $val = "$lat $lon";
+        $val .= ' ' . ($7 + 0) if $7;
+    } elsif ($val =~ /^([-+])(\d{2})(\d{2})(\d{2}(?:\.\d*)?)([-+])(\d{3})(\d{2})(\d{2}(?:\.\d*)?)([-+]\d+)?/) {
+        my $lat = $2 + $3 / 60 + $4 / 3600;
+        $lat = -$lat if $1 eq '-';
+        my $lon = $6 + $7 / 60 + $8 / 3600;
+        $lon = -$lon if $5 eq '-';
+        $val = "$lat $lon";
+        $val .= ' ' . ($9 + 0) if $9;
+    }
+    return $val;
+}
+
+#------------------------------------------------------------------------------
+# Format GPSCoordinates for printing
+# Inputs: 0) string with numerical lat, lon and optional alt, separated by spaces
+#         1) ExifTool object reference
+# Returns: PrintConv value
+sub PrintGPSCoordinates($)
+{
+    my ($val, $exifTool) = @_;
+    require Image::ExifTool::GPS;
+    my @v = split ' ', $val;
+    my $prt = Image::ExifTool::GPS::ToDMS($exifTool, $v[0], 1, "N") . ', ' .
+              Image::ExifTool::GPS::ToDMS($exifTool, $v[1], 1, "E");
+    if (defined $v[2]) {
+        $prt .= ', ' . ($v[2] < 0 ? -$v[2] . ' m Below' : $v[2] . ' m Above') . ' Sea Level';
+    }
+    return $prt;
+}
+
+#------------------------------------------------------------------------------
+# Unpack packed ISO 639/T language code
+# Inputs: 0) packed language code (or undef)
+# Returns: language code, or undef for default language, or 'err' for format error
+sub UnpackLang($)
+{
+    my $lang = shift;
+    if ($lang) {
+        # language code is packed in 5-bit characters
+        $lang = pack "C*", map { (($lang>>$_)&0x1f)+0x60 } 10, 5, 0;
+        # validate language code
+        if ($lang =~ /^[a-z]+$/) {
+            # treat 'eng' or 'und' as the default language
+            undef $lang if $lang eq 'und' or $lang eq 'eng';
+        } else {
+            $lang = 'err';  # invalid language code
+        }
+    }
+    return $lang;
+}
+
+#------------------------------------------------------------------------------
 # Process MPEG-4 MTDT atom (ref 11)
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success
@@ -1953,11 +2197,9 @@ sub ProcessMetaData($$$)
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         if ($tagInfo) {
             # convert language code to ASCII (ignore read-only bit)
-            $lang = pack('C*',(($lang >> 10) & 0x1f) + 0x60,
-                              (($lang >>  5) & 0x1f) + 0x60, 
-                               ($lang        & 0x1f) + 0x60);
+            $lang = UnpackLang($lang);
             # handle alternate languages
-            if ($lang ne 'und' and $lang ne 'eng' and $lang =~ /^[a-z]+$/) {
+            if ($lang) {
                 my $langInfo = Image::ExifTool::GetLangInfo($tagInfo, $lang);
                 $tagInfo = $langInfo if $langInfo;
             }
@@ -1982,7 +2224,7 @@ sub ProcessMetaData($$$)
 }
 
 #------------------------------------------------------------------------------
-# Process Meta keys and add tags to the InfoList table ('mdta' handler) (ref PH)
+# Process Meta keys and add tags to the ItemList table ('mdta' handler) (ref PH)
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success
 sub ProcessKeys($$$)
@@ -1997,27 +2239,33 @@ sub ProcessKeys($$$)
     }
     my $pos = 8;
     my $index = 1;
-    my $infoTable = GetTagTable('Image::ExifTool::QuickTime::InfoList');
+    my $infoTable = GetTagTable('Image::ExifTool::QuickTime::ItemList');
+    my $userTable = GetTagTable('Image::ExifTool::QuickTime::UserData');
     while ($pos < $dirLen - 4) {
         my $len = unpack("x${pos}N", $$dataPt);
-        last if $len < 4 or $pos + $len > $dirLen;
+        last if $len < 8 or $pos + $len > $dirLen;
         delete $$tagTablePtr{$index};
-        my $tag = substr($$dataPt, $pos + 4, $len - 4);
+        my $ns  = substr($$dataPt, $pos + 4, 4);
+        my $tag = substr($$dataPt, $pos + 8, $len - 8);
         $tag =~ s/\0.*//s; # truncate at null
-        $tag =~ s/^mdta//; # remove 'mdta' prefix
-        $tag =~ s/^com\.apple\.quicktime\.//;   # remove common apple quicktime domain
+        if ($ns eq 'mdta') {
+            $tag =~ s/^com\.apple\.quicktime\.//;   # remove common apple quicktime domain
+        }
         next unless $tag;
+        # (I have some samples where the tag is a reversed ItemList or UserData tag ID)
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
-        my $newInfo;
-        if (not $tagInfo and $tag =~ /^\w{3}\xa9$/) {
-            # I have some samples where the tag is a reversed InfoList or UserData tag ID
-            $tag = pack('N', unpack('V', $tag));
+        unless ($tagInfo) {
             $tagInfo = $exifTool->GetTagInfo($infoTable, $tag);
             unless ($tagInfo) {
-                my $tbl = GetTagTable('Image::ExifTool::QuickTime::UserData');
-                $tagInfo = $exifTool->GetTagInfo($tbl, $tag);
+                $tagInfo = $exifTool->GetTagInfo($userTable, $tag);
+                if (not $tagInfo and $tag =~ /^\w{3}\xa9$/) {
+                    $tag = pack('N', unpack('V', $tag));
+                    $tagInfo = $exifTool->GetTagInfo($infoTable, $tag);
+                    $tagInfo or $tagInfo = $exifTool->GetTagInfo($userTable, $tag);
+                }
             }
         }
+        my $newInfo;
         if ($tagInfo) {
             $newInfo = {
                 Name      => $$tagInfo{Name},
@@ -2025,17 +2273,19 @@ sub ProcessKeys($$$)
                 ValueConv => $$tagInfo{ValueConv},
                 PrintConv => $$tagInfo{PrintConv},
             };
+            my $groups = $$tagInfo{Groups};
+            $$newInfo{Groups} = { %$groups } if $groups;
         } elsif ($tag =~ /^[-\w.]+$/) {
             # create info for tags with reasonable id's
             my $name = $tag;
             $name =~ s/\.(.)/\U$1/g;
             $newInfo = { Name => ucfirst($name) };
         }
-        # substitute this tag in the InfoList table with the given index
+        # substitute this tag in the ItemList table with the given index
         delete $$infoTable{$index};
         if ($newInfo) {
             Image::ExifTool::AddTagToTable($infoTable, $index, $newInfo);
-            $out and printf $out "%sAdded InfoList Tag 0x%.4x = $tag\n", $exifTool->{INDENT}, $index;
+            $out and printf $out "%sAdded ItemList Tag 0x%.4x = $tag\n", $exifTool->{INDENT}, $index;
         }
         $pos += $len;
         ++$index;
@@ -2140,6 +2390,8 @@ sub ProcessMOV($$;$)
             }
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
+        # save required tag sizes
+        $exifTool->HandleTag($tagTablePtr, "$tag-size", $size) if $$tagTablePtr{"$tag-size"};
         # load values only if associated with a tag (or verbose) and < 16MB long
         if ((defined $tagInfo or $verbose) and $size < 0x1000000) {
             my $val;
@@ -2149,7 +2401,7 @@ sub ProcessMOV($$;$)
             }
             # use value to get tag info if necessary
             $tagInfo or $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag, \$val);
-            my $hasData = ($$dirInfo{HasData} and $val =~ /^\0...data\0/s);
+            my $hasData = ($$dirInfo{HasData} and $val =~ /\0...data\0/s);
             if ($verbose and not $hasData) {
                 $exifTool->VerboseInfo($tag, $tagInfo,
                     Value => $val,
@@ -2187,10 +2439,11 @@ sub ProcessMOV($$;$)
                     SetByteOrder('MM');
                 } elsif ($hasData) {
                     # handle atoms containing 'data' tags
+                    # (currently ignore contained atoms: 'itif', 'name', etc.)
                     my $pos = 0;
                     for (;;) {
                         last if $pos + 16 > $size;
-                        my ($len, $type, $flags) = unpack("x${pos}Na4N", $val);
+                        my ($len, $type, $flags, $ctry, $lang) = unpack("x${pos}Na4Nnn", $val);
                         last if $pos + $len > $size;
                         my $value;
                         my $format = $$tagInfo{Format};
@@ -2198,34 +2451,61 @@ sub ProcessMOV($$;$)
                             $pos += 16;
                             $len -= 16;
                             $value = substr($val, $pos, $len);
-                            # format flags: 0x0=binary, 0x1=text, 0xd=image,
-                            #   0x15=boolean, 0x17=float
-                            # (I have a sample where 0x3 looks like string data,
-                            #  but this should be verified - PH)
-                            if ($format) {
-                                # don't apply format to text
-                                undef $format if $flags == 0x01;
-                            } elsif ($flags == 0x0015) {
-                                $format = 'int8u';
-                            } elsif ($flags == 0x0017) {
-                                $format = 'float';
-                            } elsif ($flags == 0) {
-                                # read 1 and 2-byte binary as integers
-                                if ($len == 1) {
-                                    $format = 'int8u',
-                                } elsif ($len == 2) {
-                                    $format = 'int16u',
+                            # format flags (ref 12):
+                            # 0x0=binary, 0x1=UTF-8, 0x2=UTF-16, 0x3=ShiftJIS,
+                            # 0x4=UTF-8  0x5=UTF-16, 0xd=JPEG, 0xe=PNG,
+                            # 0x15=signed int, 0x16=unsigned int, 0x17=float,
+                            # 0x18=double, 0x1b=BMP, 0x1c='meta' atom
+                            if ($stringEncoding{$flags}) {
+                                # handle all string formats
+                                $value = $exifTool->Decode($value, $stringEncoding{$flags});
+                            } else {
+                                if (not $format) {
+                                    if ($flags == 0x15 or $flags == 0x16) {
+                                        $format = { 1=>'int8', 2=>'int16', 4=>'int32' }->{$len};
+                                        $format .= $flags == 0x15 ? 's' : 'u' if $format;
+                                    } elsif ($flags == 0x17) {
+                                        $format = 'float';
+                                    } elsif ($flags == 0x18) {
+                                        $format = 'double';
+                                    } elsif ($flags == 0x00) {
+                                        # read 1 and 2-byte binary as integers
+                                        if ($len == 1) {
+                                            $format = 'int8u',
+                                        } elsif ($len == 2) {
+                                            $format = 'int16u',
+                                        }
+                                    }
+                                }
+                                if ($format) {
+                                    $value = ReadValue(\$value, 0, $format, $$tagInfo{Count}, $len);
+                                } elsif (not $$tagInfo{ValueConv}) {
+                                    # make binary data a scalar reference unless a ValueConv exists
+                                    my $buf = $value;
+                                    $value = \$buf;
                                 }
                             }
-                            if ($format) {
-                                $value = ReadValue(\$value, 0, $format, $$tagInfo{Count}, $len);
-                            } elsif ($flags != 0x01 and $flags != 0x03 and not $$tagInfo{ValueConv}) {
-                                # make binary data a scalar reference unless a ValueConv exists
-                                my $buf = $value;
-                                $value = \$buf;
-                            }
                         }
-                        $exifTool->VerboseInfo($tag, $tagInfo,
+                        my $langInfo;
+                        if ($ctry or $lang) {
+                            # ignore country ('ctry') and language lists ('lang') for now
+                            undef $ctry if $ctry and $ctry <= 255;
+                            undef $lang if $lang and $lang <= 255;
+                            $lang = UnpackLang($lang);
+                            # add country code if specified
+                            if ($ctry) {
+                                $ctry = unpack('a2',pack('n',$ctry)); # unpack as ISO 3166-1
+                                # treat 'ZZ' like a default country (see ref 12)
+                                undef $ctry if $ctry eq 'ZZ';
+                                if ($ctry and $ctry =~ /^[A-Z]{2}$/) {
+                                    $lang or $lang = 'und';
+                                    $lang .= "-$ctry";
+                                }
+                            }
+                            $langInfo = Image::ExifTool::GetLangInfo($tagInfo, $lang) if $lang;
+                        }
+                        $langInfo or $langInfo = $tagInfo;
+                        $exifTool->VerboseInfo($tag, $langInfo,
                             Value   => ref $value ? $$value : $value,
                             DataPt  => \$val,
                             DataPos => $dataPos,
@@ -2234,18 +2514,52 @@ sub ProcessMOV($$;$)
                             Format  => $format,
                             Extra   => sprintf(", Type='$type', Flags=0x%x",$flags)
                         ) if $verbose;
-                        $exifTool->FoundTag($tagInfo, $value) if defined $value;
+                        $exifTool->FoundTag($langInfo, $value) if defined $value;
+                        $pos += $len;
+                    }
+                } elsif ($tag =~ /^\xa9/) {
+                    # parse international text to extract all languages
+                    my $pos = 0;
+                    for (;;) {
+                        last if $pos + 4 > $size;
+                        my ($len, $lang) = unpack("x${pos}nn", $val);
+                        $pos += 4;
+                        # according to the QuickTime spec (ref 12), $len should include
+                        # 4 bytes for length and type words, but nobody (including
+                        # Apple, Pentax and Kodak) seems to add these in, so try
+                        # to allow for either
+                        if ($pos + $len > $size) {
+                            $len -= 4;
+                            last if $pos + $len > $size or $len < 0;
+                        }
+                        # ignore any empty entries (or null padding) after the first
+                        next if not $len and $pos;
+                        my $str = substr($val, $pos, $len);
+                        my $langInfo;
+                        if ($lang < 0x400) {
+                            # this is a Macintosh language code
+                            # a language code of 0 is Macintosh english, so treat as default
+                            if ($lang) { 
+                                # use Font.pm to look up language string
+                                require Image::ExifTool::Font;
+                                $lang = $Image::ExifTool::Font::ttLang{Macintosh}{$lang};
+                            }
+                            # the spec says only "Macintosh text encoding", so
+                            # I can only assume that it is the most common one
+                            $str = $exifTool->Decode($str, 'MacRoman');
+                        } else {
+                            # convert language code to ASCII (ignore read-only bit)
+                            $lang = UnpackLang($lang);
+                            # may be either UTF-8 or UTF-16BE
+                            my $enc = $str=~s/^\xfe\xff// ? 'UTF16' : 'UTF8';
+                            $str = $exifTool->Decode($str, $enc);
+                        }
+                        $langInfo = Image::ExifTool::GetLangInfo($tagInfo, $lang) if $lang;
+                        $exifTool->FoundTag($langInfo || $tagInfo, $str);
                         $pos += $len;
                     }
                 } else {
-                    if ($tag =~ /^\xa9/) {
-                        # parse international text to extract first string
-                        my $len = unpack('n', $val);
-                        # $len should include 4 bytes for length and type words,
-                        # but Pentax and Kodak forget to add these in, so allow for this
-                        $len += 4 if $len <= $size - 4;
-                        $val = substr($val, 4, $len - 4) if $len <= $size;
-                    } elsif ($$tagInfo{Format}) {
+                    if ($$tagInfo{Format}) {
                         $val = ReadValue(\$val, 0, $$tagInfo{Format}, $$tagInfo{Count}, length($val));
                     }
                     $exifTool->FoundTag($tagInfo, $val);
@@ -2315,6 +2629,8 @@ under the same terms as Perl itself.
 =item L<http://code.google.com/p/mp4v2/wiki/iTunesMetadata>
 
 =item L<http://www.canieti.com.mx/assets/files/1011/IEC_100_1384_DC.pdf>
+
+=item L<http://www.adobe.com/devnet/flv/pdf/video_file_format_spec_v10.pdf>
 
 =back
 

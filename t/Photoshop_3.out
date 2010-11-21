@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.05
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.32
 [File, System, Image] FileName - File Name: Photoshop_3_failed.psd
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 16 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:01:09 08:04:48-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:09:20 08:06:56-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: PSD
-[File, File, Image] MIMEType - MIME Type: application/photoshop
+[File, File, Image] MIMEType - MIME Type: application/vnd.adobe.photoshop
 [File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 7eea28616594f46e45fbc9db62cd784e
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
 [Photoshop, Photoshop, Image] 6 - Num Channels: 3
@@ -41,7 +41,7 @@
 [IPTC, IPTC, Other] 5 - Object Name: Test Picture
 [IPTC, IPTC, Author] 116 - Copyright Notice: Free for all
 [IPTC, IPTC, Author] 80 - By-line: Phil Again
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.05
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.32
 [XMP, XMP-rdf, Document] about - About: uuid:c197d41e-f8f7-11d9-b03e-c023c3939af5
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: This is a teeny weeny white square

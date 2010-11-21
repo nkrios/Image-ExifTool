@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::it;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 %Image::ExifTool::Lang::it::Translate = (
    'AEMeteringMode' => {
@@ -170,6 +170,7 @@ $VERSION = '1.04';
     },
    'AudioType' => 'Tipo Audio',
    'Author' => 'Autore',
+   'AuthorsPosition' => 'Posizione dell\'autore',
    'AutoBracketRelease' => {
       PrintConv => {
         'None' => 'Nessuno',
@@ -286,6 +287,8 @@ $VERSION = '1.04';
       },
     },
    'Caption-Abstract' => 'Didascalia/Descrizione',
+   'CaptionWriter' => 'Autore della didascalia',
+   'Categories' => 'Categorie',
    'Category' => 'Categoria',
    'CenterWeightedAreaSize' => {
       PrintConv => {
@@ -311,7 +314,13 @@ $VERSION = '1.04';
    'ColorBalance' => 'Bilanciamento Colore',
    'ColorBalance1' => 'Bilanciamento Colore',
    'ColorBalanceA' => 'Bilanciamento Colore',
+   'ColorEffect' => {
+      PrintConv => {
+        'Sepia' => 'Viraggio seppia',
+      },
+    },
    'ColorFilter' => {
+      Description => 'Filtro colori',
       PrintConv => {
         'Green' => 'Verde',
         'Red' => 'Rosso',
@@ -344,6 +353,7 @@ $VERSION = '1.04';
       },
     },
    'ColorSpaceData' => 'Dati Spazio Colore',
+   'ColorTemperature' => 'Temperatura colore',
    'ColorTone' => {
       PrintConv => {
         'Normal' => 'Normale',
@@ -384,6 +394,7 @@ $VERSION = '1.04';
       Description => 'Schema compressione',
       PrintConv => {
         'Epson ERF Compressed' => 'Epson ERF Compresso',
+        'JPEG' => 'Compressione JPEG',
         'JPEG (old-style)' => 'JPEG (vecchio stile)',
         'Kodak DCR Compressed' => 'Kodak DCR Compresso',
         'Kodak KDC Compressed' => 'Kodak KDC Compresso',
@@ -420,6 +431,7 @@ $VERSION = '1.04';
         'Unknown' => 'Sconosciuta',
       },
     },
+   'Country' => 'Paese',
    'Country-PrimaryLocationCode' => 'Codice ISO Nazione',
    'Country-PrimaryLocationName' => 'Nazione',
    'CreateDate' => 'Data e ora di creazione dei dati digitali',
@@ -515,6 +527,7 @@ $VERSION = '1.04';
       },
     },
    'DigitalZoomRatio' => 'Rapporto zoom digitale',
+   'Directory' => 'Posizione file',
    'DisplaySize' => {
       PrintConv => {
         'Normal' => 'Normale',
@@ -539,6 +552,7 @@ $VERSION = '1.04';
    'DocumentHistory' => 'Cronologia Documento',
    'DocumentName' => 'Nome Documento',
    'DocumentNotes' => 'Note del Documento',
+   'DriveMode' => 'Modalità esecuzione',
    'ETTLII' => {
       PrintConv => {
         'Average' => 'Media',
@@ -589,6 +603,7 @@ $VERSION = '1.04';
    'ExifCameraInfo' => 'Info Exif Fotocamera',
    'ExifImageHeight' => 'Altezza immagine',
    'ExifImageWidth' => 'Larghezza immagine',
+   'ExifOffset' => 'Puntatore Exif IFD',
    'ExifToolVersion' => 'Versione ExifTool',
    'ExifVersion' => 'Versione Exif',
    'ExitPupilPosition' => 'Posizione pupilla d\'uscita',
@@ -621,6 +636,7 @@ $VERSION = '1.04';
    'ExposureProgram' => {
       Description => 'Programma esposizione',
       PrintConv => {
+        'Action (High speed)' => 'Programma di azione',
         'Aperture Priority' => 'Priorità diaframma',
         'Aperture-priority AE' => 'Priorità diaframma',
         'Creative (Slow speed)' => 'Programma Creativo (basato sulla profondità di campo)',
@@ -654,6 +670,7 @@ $VERSION = '1.04';
       },
     },
    'FileFormat' => 'Formato File',
+   'FileModifyDate' => 'Data aggiornamento',
    'FileName' => 'Nome File',
    'FileSize' => 'Dimensione File',
    'FileSource' => {
@@ -696,6 +713,8 @@ $VERSION = '1.04';
       PrintConv => {
         'Auto, Did not fire' => 'Flash non emesso, modo auto',
         'Auto, Fired' => 'Flash emesso, modo auto',
+        'Auto, Fired, Red-eye reduction' => '"Attivato (flash automatico, riduzione occhi rossi)"',
+        'Auto, Fired, Red-eye reduction, Return detected' => '"Attivato (flash automatico, riduzione occhi rossi, rilevato riflesso)"',
         'Auto, Fired, Return detected' => 'Flash emesso, modo auto, luce di ritorno rilevata',
         'Auto, Fired, Return not detected' => 'Flash emesso, modo auto, luce di ritorno non rilevata',
         'Did not fire' => 'Flash non emesso',
@@ -715,6 +734,7 @@ $VERSION = '1.04';
         'On, Did not fire' => 'On, flash non emesso',
         'On, Fired' => 'Flash emesso, modalità flash forzata',
         'On, Red-eye reduction' => 'Flash emesso, modalità forzata, modo riduzione occhi rossi',
+        'On, Red-eye reduction, Return detected' => '"Attivato (flash schiarimento, riduzione occhi rossi, rilevato riflesso)"',
         'On, Return detected' => 'Flash emesso, modalità flash forzata, luce di ritorno rilevata',
         'On, Return not detected' => 'Flash emesso, modalità flash forzata, luce di ritorno non rilevata',
       },
@@ -866,23 +886,46 @@ $VERSION = '1.04';
         'Normal' => 'Normale',
       },
     },
+   'FrameRate' => 'Frequenza fotogramma',
+   'FrameSize' => 'Dimensioni fotogrammi',
    'GIFVersion' => 'Versione GIF',
    'GPSAltitude' => 'Altitudine',
    'GPSAltitudeRef' => {
       Description => 'Riferimento Altitudine',
       PrintConv => {
         'Above Sea Level' => 'Livello del mare',
+        'Below Sea Level' => 'Riferimento livello del mare (valore negativo)',
       },
     },
    'GPSAreaInformation' => 'Nome dell\'area GPS',
+   'GPSDOP' => 'Precisione di misurazione',
+   'GPSDateStamp' => 'Data GPS',
    'GPSDateTime' => 'Ora GPS (orologio atomico)',
+   'GPSDestBearing' => 'Direzione di destinazione',
+   'GPSDestBearingRef' => 'Riferimento per direzione di destinazione',
+   'GPSDestDistance' => 'Distanza di destinazione',
    'GPSDestDistanceRef' => {
+      Description => 'Riferimento per distanza di destinazione',
       PrintConv => {
         'Kilometers' => 'Chilometri',
         'Miles' => 'Miglia',
         'Nautical Miles' => 'Nodi',
       },
     },
+   'GPSDestLatitude' => 'Latitudine di destinazione',
+   'GPSDestLatitudeRef' => 'Riferimento per latitudine di destinazione',
+   'GPSDestLongitude' => 'Longitudine di destinazione',
+   'GPSDestLongitudeRef' => 'Riferimento per longitudine di destinazione',
+   'GPSDifferential' => {
+      Description => 'Correzione differenziale GPS',
+      PrintConv => {
+        'Differential Corrected' => 'Correzione differenziale applicata',
+        'No Correction' => 'Misurazione senza correzione differenziale',
+      },
+    },
+   'GPSImgDirection' => 'Direzione di immagine',
+   'GPSImgDirectionRef' => 'Riferimento per direzione di immagine',
+   'GPSInfo' => 'Puntatore GPS Info IFD',
    'GPSLatitude' => 'Latitudine',
    'GPSLatitudeRef' => {
       Description => 'Latitudine Nord o Sud',
@@ -899,19 +942,48 @@ $VERSION = '1.04';
         'West' => 'Longitudine Ovest',
       },
     },
+   'GPSMapDatum' => 'Dati di rilevamento geodetico utilizzati',
+   'GPSMeasureMode' => {
+      Description => 'Modalità misurazione GPS',
+      PrintConv => {
+        '3-Dimensional Measurement' => 'Misurazione tridimensionale',
+      },
+    },
+   'GPSProcessingMethod' => 'Nome metodo di elaborazione GPS',
    'GPSSatellites' => 'Satelliti GPS usati per la misurazione',
+   'GPSSpeed' => 'Velocità ricevitore GPS',
    'GPSSpeedRef' => {
+      Description => 'Unità velocità',
       PrintConv => {
         'km/h' => 'Chilometri all\'ora',
         'knots' => 'Nodi',
         'mph' => 'Miglie all\'ora',
       },
     },
+   'GPSStatus' => {
+      Description => 'Stato ricevitore GPS',
+      PrintConv => {
+        'Measurement Active' => 'Misurazione in corso',
+        'Measurement Void' => 'Interoperatività misurazione',
+      },
+    },
    'GPSTimeStamp' => 'Ora GPS (orologio atomico)',
+   'GPSTrack' => 'Direzione di movimento',
+   'GPSTrackRef' => {
+      Description => 'Riferimento per direzione di movimento',
+      PrintConv => {
+        'Magnetic North' => 'Direzione magnetica',
+        'True North' => 'Direzione effettiva',
+      },
+    },
    'GPSVersionID' => 'Versione tag GPS',
    'GainControl' => {
       Description => 'Controllo di Guadagno',
       PrintConv => {
+        'High gain down' => 'Diminuire il guadagno alto',
+        'High gain up' => 'Aumentare il guadagno alto',
+        'Low gain down' => 'Diminuire il guadagno basso',
+        'Low gain up' => 'Aumentare il guadagno basso',
         'None' => 'Nessuno',
       },
     },
@@ -921,6 +993,7 @@ $VERSION = '1.04';
         'Yes' => 'Si',
       },
     },
+   'Gradation' => 'Ottimizzaz.',
    'GrayResponseCurve' => 'Curva di risposta Grigio',
    'GrayResponseUnit' => 'Unità di risposta Grigio',
    'GrayTRC' => 'Curva Riproduzione Tono Grigio',
@@ -939,6 +1012,7 @@ $VERSION = '1.04';
         'Yes' => 'Si',
       },
     },
+   'Hue' => 'Tonalità',
    'HueAdjustment' => 'Regolazione Hue',
    'IPTC-NAA' => 'Metadati IPTC-NAA',
    'IPTCBitsPerSample' => 'Numero di Bits per Campione',
@@ -997,6 +1071,7 @@ $VERSION = '1.04';
         'Yes' => 'Si',
       },
     },
+   'ImageSize' => 'Dimensioni immagini',
    'ImageStabilization' => 'Stabilizzazione Immagine',
    'ImageTone' => {
       PrintConv => {
@@ -1007,6 +1082,8 @@ $VERSION = '1.04';
    'ImageType' => 'Tipo Immagine',
    'ImageUniqueID' => 'ID unico immagine',
    'ImageWidth' => 'Larghezza immagine',
+   'Index' => 'Indice',
+   'Instructions' => 'Istruzioni',
    'IntellectualGenre' => 'Genere Intellettuale',
    'InternalFlash' => {
       PrintConv => {
@@ -1017,10 +1094,13 @@ $VERSION = '1.04';
       },
     },
    'InteropIndex' => {
+      Description => 'Identificazione interoperatività',
       PrintConv => {
         'R98 - DCF basic file (sRGB)' => 'R98: File base DCF (sRGB)',
       },
     },
+   'InteropOffset' => 'Etichetta interoperatività',
+   'InteropVersion' => 'Versione interoperatività',
    'JFIFVersion' => 'Versione JFIF',
    'JPEGTables' => 'Tavole JPEG',
    'JobID' => 'ID Lavoro',
@@ -1033,6 +1113,7 @@ $VERSION = '1.04';
    'LensFStops' => 'F-Stops Obiettivo',
    'LensID' => 'Obiettivo Utilizzato',
    'LensIDNumber' => 'Numero ID Obiettivo',
+   'LensInfo' => 'Informazioni su lente',
    'LensSpec' => 'Obiettivo',
    'LensType' => 'Tipo Obiettivo',
    'LicenseType' => {
@@ -1061,6 +1142,7 @@ $VERSION = '1.04';
         'White Fluorescent' => 'Fluorescente bianca',
       },
     },
+   'Lightness' => 'Luce',
    'Lit' => {
       PrintConv => {
         'Yes' => 'Si',
@@ -1095,6 +1177,7 @@ $VERSION = '1.04';
    'MakeAndModel' => 'Marca e Modello',
    'MakerNote' => 'Dati DNG Privati',
    'MakerNoteVersion' => 'Note Versione Costruttore',
+   'MakerNotes' => 'Note produttore',
    'ManualFlashOutput' => {
       PrintConv => {
         'Low' => 'Leggero',
@@ -1102,6 +1185,7 @@ $VERSION = '1.04';
     },
    'ManualFocusDistance' => 'Messa a Fuoco Manuale',
    'MasterDocumentID' => 'ID Documento Principale',
+   'MaxAperture' => 'Massima apertura delle lenti',
    'MaxApertureAtMaxFocal' => 'Diaframma Massimo alla Focale Massima',
    'MaxApertureAtMinFocal' => 'Diaframma Massimo alla Focale Minima',
    'MaxApertureValue' => 'Diaframma massimo obiettivo',
@@ -1129,8 +1213,10 @@ $VERSION = '1.04';
         'Average' => 'Media',
         'Center-weighted average' => 'Media centrale ponderata',
         'Multi-segment' => 'Multi zona',
+        'Multi-spot' => 'Multipunto',
         'Other' => 'Altro',
         'Partial' => 'Parziale',
+        'Spot' => 'Punto',
         'Unknown' => 'Sconosciuta',
       },
     },
@@ -1248,6 +1334,7 @@ $VERSION = '1.04';
    'ObjectTypeReference' => 'Riferimento Tipo Oggetto',
    'OffsetSchema' => 'Schema Offset',
    'OldSubfileType' => 'Tipo subfile',
+   'Opto-ElectricConvFactor' => 'Fattore di conversione optoelettrica',
    'Orientation' => {
       Description => 'Orientamento dell\'immagine',
       PrintConv => {
@@ -1333,7 +1420,13 @@ $VERSION = '1.04';
         'Unknown' => 'Sconosciuta',
       },
     },
-   'PlanarConfiguration' => 'Regolazione Dati Immagine',
+   'PlanarConfiguration' => {
+      Description => 'Regolazione Dati Immagine',
+      PrintConv => {
+        'Chunky' => 'formato spezzettato',
+        'Planar' => 'formato planare',
+      },
+    },
    'Preview0' => 'Anteprima 0 ',
    'Preview1' => 'Anteprima 1 ',
    'Preview2' => 'Anteprima 2',
@@ -1463,6 +1556,7 @@ $VERSION = '1.04';
       },
     },
    'RecordMode' => {
+      Description => 'Modo registrazione',
       PrintConv => {
         'Aperture Priority' => 'Priorità diaframma',
         'Manual' => 'Manuale',
@@ -1484,7 +1578,9 @@ $VERSION = '1.04';
    'ReferenceDate' => 'Data di Riferimento',
    'ReferenceNumber' => 'Numero di Riferimento',
    'ReferenceService' => 'Riferimento Servizio',
+   'RelatedImageFileFormat' => 'Formato file immagine correlato',
    'RelatedImageHeight' => 'Numero delle righe dei dati immagine',
+   'RelatedImageWidth' => 'Larghezza immagine correlata',
    'RelatedSoundFile' => 'File audio relativo',
    'ReleaseButtonToUseDial' => {
       PrintConv => {
@@ -1515,6 +1611,7 @@ $VERSION = '1.04';
       Description => 'Unità di risoluzione in X e Y',
       PrintConv => {
         'None' => 'Nessuno',
+        'cm' => 'pixel/cm',
         'inches' => 'Pollici',
       },
     },
@@ -1539,6 +1636,7 @@ $VERSION = '1.04';
         'Rotated 90 CW' => '90° senso antiorario (destra/alto)',
       },
     },
+   'RowsPerStrip' => 'Numero righe per striscia',
    'SPIFFVersion' => 'Versione SPIFF',
    'SRActive' => {
       PrintConv => {
@@ -1579,6 +1677,7 @@ $VERSION = '1.04';
         'Normal' => 'Normale',
         'Portrait' => 'Verticale',
         'Shutter Priority' => 'Priorità otturatore',
+        'Sunset' => 'Tramonto',
       },
     },
    'SceneModeUsed' => {
@@ -1616,7 +1715,13 @@ $VERSION = '1.04';
    'SensingMethod' => {
       Description => 'Metodo di misurazione esposimetrica',
       PrintConv => {
+        'Color sequential area' => 'Sensore area sequenziale a colori',
+        'Color sequential linear' => 'Sensore lineare sequenziale a colori',
         'Not defined' => 'Non definito',
+        'One-chip color area' => 'Sensore area a colori a un chip',
+        'Three-chip color area' => 'Sensore area a colori a tre chip',
+        'Trilinear' => 'Sensore trilineare',
+        'Two-chip color area' => 'Sensore area a colori a due chip',
       },
     },
    'SensorPixelSize' => 'Dimensione Pixel Sensore',
@@ -1632,6 +1737,7 @@ $VERSION = '1.04';
         'Normal' => 'Normale',
       },
     },
+   'ShadingCompensation' => 'Compensazione ombreggiatura',
    'Sharpness' => {
       Description => 'Nitidezza',
       PrintConv => {
@@ -1681,24 +1787,31 @@ $VERSION = '1.04';
         'None' => 'Nessuno',
       },
     },
+   'Software' => 'Software utilizzato',
    'Source' => 'Origine',
+   'SpatialFrequencyResponse' => 'Risposta in frequenza spaziale',
    'SpecialEffectsOpticalFilter' => {
       PrintConv => {
         'None' => 'Nessuno',
       },
     },
    'SpecialInstructions' => 'Istruzioni',
+   'SpectralSensitivity' => 'Sensibilità spettro',
    'SpotMeteringMode' => {
       PrintConv => {
         'Center' => 'Centro',
       },
     },
+   'State' => 'Stato',
+   'StripByteCounts' => 'Byte per striscia compressa',
    'StripOffsets' => 'Ubicazione dati immagine',
    'Sub-location' => 'Località',
    'SubSecCreateDate' => 'Data e ora di creazione dei dati digitali',
    'SubSecDateTimeOriginal' => 'Data e ora di creazione dei dati originali',
    'SubSecModifyDate' => 'Data e ora di modifica del file',
    'SubSecTime' => 'Frazioni di secondo di DataTime',
+   'SubSecTimeDigitized' => 'Sottosecondi DataOraDigitalizzate',
+   'SubSecTimeOriginal' => 'Sottosecondi DataOraOriginali',
    'SubfileType' => 'Nuovo tipo subfile',
    'Subject' => 'Soggetto',
    'SubjectArea' => 'Area soggetto',
@@ -1765,6 +1878,7 @@ $VERSION = '1.04';
     },
    'Thresholding' => 'Soglia',
    'ThumbnailImage' => 'Miniatura',
+   'ThumbnailImageSize' => 'Dimensione delle miniature',
    'TimeCreated' => 'Ora di Creazione',
    'TimeScaleParamsQuality' => {
       PrintConv => {
@@ -1815,6 +1929,7 @@ $VERSION = '1.04';
         'Rotate 90 CW' => '90° senso antiorario (destra/alto)',
       },
     },
+   'TransmissionReference' => 'Riferimento trasmissione',
    'Trapped' => {
       PrintConv => {
         'Unknown' => 'Sconosciuta',
@@ -1913,7 +2028,14 @@ $VERSION = '1.04';
    'WhiteBalance' => {
       Description => 'Bilanciamento del Bianco',
       PrintConv => {
+        'Auto' => 'Equilibrio del bianco automatico',
+        'Black & White' => 'Monocromatico',
         'Cloudy' => 'Nuvoloso',
+        'Cool White Fluorescent' => 'Fluorescente bianca fredda',
+        'Custom 1' => 'PERSONAL.1',
+        'Custom 2' => 'PERSONAL.2',
+        'Custom 3' => 'PERSONAL.3',
+        'Custom 4' => 'PERSONAL.4',
         'Day White Fluorescent' => 'Fluorescente a luce del giorno bianca',
         'Daylight' => 'Luce del giorno',
         'Daylight Fluorescent' => 'Fluorescente a luce del giorno',
@@ -1961,6 +2083,7 @@ $VERSION = '1.04';
    'XPTitle' => 'Titolo',
    'XPosition' => 'Posizione X',
    'XResolution' => 'Risoluzione orizzontale immagine',
+   'YCbCrCoefficients' => 'Coefficienti matrice trasformazione spazio colori',
    'YCbCrPositioning' => {
       Description => 'Posizionamento Y e C',
       PrintConv => {
@@ -1968,6 +2091,7 @@ $VERSION = '1.04';
         'Co-sited' => 'Affiancato',
       },
     },
+   'YCbCrSubSampling' => 'Indice sottocampionamento da Y a C',
    'YPosition' => 'Posizione Y',
    'YResolution' => 'Risoluzione verticale immagine',
 );

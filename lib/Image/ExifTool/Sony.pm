@@ -26,7 +26,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.45';
+$VERSION = '1.47';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -214,6 +214,7 @@ my %sonyExposureProgram = (
             0x10014 => 3,
             0x10016 => 4,
             0x10018 => 5,
+            0x1001a => 6, # (SLT-A55V)
         },
     },
     0x3000 => {
@@ -255,15 +256,20 @@ my %sonyExposureProgram = (
             259 => 'DSLR-A200',
             260 => 'DSLR-A350',
             261 => 'DSLR-A300',
-            263 => 'DSLR-A380',
+            263 => 'DSLR-A380/A390', #PH (A390)
             264 => 'DSLR-A330',
             265 => 'DSLR-A230',
+            266 => 'DSLR-A290', #PH
             269 => 'DSLR-A850',
             273 => 'DSLR-A550',
             274 => 'DSLR-A500', #PH
             275 => 'DSLR-A450', # (http://dev.exiv2.org/issues/show/0000611)
             278 => 'NEX-5', #PH
             279 => 'NEX-3', #PH
+            280 => 'SLT-A33', #PH
+            281 => 'SLT-A55V', #PH
+            282 => 'DSLR-A560', #PH
+            283 => 'DSLR-A580', # (http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2881.0.html)
         },
     },
     0xb020 => { #2
@@ -549,6 +555,36 @@ my %sonyExposureProgram = (
             17 => 'Underwater 1 (Blue Water)', #9
             18 => 'Underwater 2 (Green Water)', #9
         },
+    },
+);
+
+# "SEMC MS" maker notes
+%Image::ExifTool::Sony::Ericsson = (
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    NOTES => 'Maker notes found in images from some Sony Ericsson phones.',
+    0x2000 => {
+        Name => 'MakerNoteVersion',
+        Writable => 'undef',
+        Count => 4,
+    },
+    0x201 => {
+        Name => 'PreviewImageStart',
+        IsOffset => 1,
+        MakerPreview => 1, # force preview inside maker notes
+        OffsetPair => 0x202,
+        DataTag => 'PreviewImage',
+        Writable => 'int32u',
+        Protected => 2,
+        Notes => 'a small 320x200 preview image',
+    },
+    0x202 => {
+        Name => 'PreviewImageLength',
+        OffsetPair => 0x201,
+        DataTag => 'PreviewImage',
+        Writable => 'int32u',
+        Protected => 2,
     },
 );
 

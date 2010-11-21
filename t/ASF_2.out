@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.25
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.39
 [File, System, Image] FileName - File Name: ASF.wmv
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 12 kB
@@ -16,7 +16,7 @@
 [ASF, ASF, Video] IsVBR - Is VBR: True
 [ASF, ASF, Video] ASFLeakyBucketPairs - ASF Leaky Bucket Pairs: (Binary data 114 bytes)
 [ASF, ASF, Video] 0 - File ID: 5F69B0C4-04F7-4B21-9842-46CCA542D8D3
-[ASF, ASF, Video] 16 - File Size: 414891
+[ASF, ASF, Video] 16 - File Length: 414891
 [ASF, ASF, Time] 24 - Creation Date: 2004:10:28 17:23:34Z
 [ASF, ASF, Video] 32 - Data Packets: 287
 [ASF, ASF, Video] 40 - Play Duration: 01:39

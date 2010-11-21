@@ -49,19 +49,19 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
 # don't test DateFormat because strftime output varies with locale
 #    $exifTool->Options(DateFormat => '%H:%M:%S %a. %b. %e, %Y');
-    my @tags = ('CreateDate', 'DateTimeOriginal', 'ModifyDate', 'Orientation#');
+    my @tags = ('CreateDate', 'DateTimeOriginal', 'ModifyDate', 'Orientation#', '?Resolution');
     my $info = $exifTool->ImageInfo('t/images/Canon.jpg', \@tags);
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
 }
 
-# test 6: test the 4 different ways to exclude tags...
+# test 6: test the 5 different ways to exclude tags...
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(Exclude => 'ImageWidth');
     my @tagList = ( '-ImageHeight', '-Make' );
-    my $info = $exifTool->ImageInfo('t/images/Canon.jpg', '-FileSize',
+    my $info = $exifTool->ImageInfo('t/images/Canon.jpg', '-FileSize', '-*resolution',
                         \@tagList, {Group0 => '-MakerNotes'});
     print 'not ' unless check($exifTool, $info, $testname, $testnum);
     print "ok $testnum\n";
@@ -104,10 +104,11 @@ my $testnum = 1;
 # don't test DateFormat because strftime output is system dependent
 #    $exifTool->Options(DateFormat => '%H:%M:%S %a. %b. %e, %Y');
     $exifTool->ExtractInfo('t/images/Canon.jpg');
-    my @tags = ('createdate', 'datetimeoriginal', 'modifydate', 'orientation#');
+    my @tags = ('createdate', 'datetimeoriginal', 'modifydate', 'orientation#', '?resolution');
     my $info = $exifTool->GetInfo(\@tags);
     my $good = 1;
-    my @expectedTags = ('CreateDate', 'DateTimeOriginal', 'ModifyDate', 'Orientation');
+    my @expectedTags = ('CreateDate', 'DateTimeOriginal', 'ModifyDate', 'Orientation',
+                        'XResolution', 'YResolution');
     for (my $i=0; $i<scalar(@tags); ++$i) {
         $tags[$i] = $expectedTags[$i] or $good = 0;
     }

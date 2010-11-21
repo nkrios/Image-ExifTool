@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.20';
+$VERSION = '1.23';
 
 sub SetGeoValues($$;$);
 
@@ -46,6 +46,7 @@ my %xmlTag = (
     # XML containers (fix is reset at the opening tag of these properties)
     wpt         => '',          # GPX
     trkpt       => '',          # GPX
+    rtept       => '',          # GPX
     trackpoint  => '',          # Garmin
     placemark   => '',          # KML
 );
@@ -87,22 +88,38 @@ sub LoadTrackLog($$;$)
     }
     # add data to existing track
     my $geotag = $exifTool->GetNewValues('Geotag') || { };
-    if ($val =~ /(\x0d\x0a|\x0d|\x0a)/) {
-        # $val is track log data
+    my $format = '';
+    # is $val track log data?
+    if ($val =~ /^(\xef\xbb\xbf)?<(\?xml|gpx)\s/) {
+        $format = 'XML';
+        $/ = '>';   # set input record separator to '>' for XML/GPX data
+    } elsif ($val =~ /(\x0d\x0a|\x0d|\x0a)/) {
         $/ = $1;
-        $raf = new File::RandomAccess(\$val);
-        $from = 'data';
     } else {
         # $val is track file name
         open EXIFTOOL_TRKFILE, $val or return "Error opening GPS file '$val'";
         $raf = new File::RandomAccess(\*EXIFTOOL_TRKFILE);
-        unless ($raf->Read($_, 256) and /(\x0d\x0a|\x0d|\x0a)/) {
+        unless ($raf->Read($_, 256)) {
+            close EXIFTOOL_TRKFILE;
+            return "Empty track file '$val'";
+        }
+        # look for XML or GPX header (might as well allow UTF-8 BOM)
+        if (/^(\xef\xbb\xbf)?<(\?xml|gpx)\s/) {
+            $format = 'XML';
+            $/ = '>';   # set input record separator to '>' for XML/GPX data
+        } elsif (/(\x0d\x0a|\x0d|\x0a)/) {
+            $/ = $1;
+        } else {
             close EXIFTOOL_TRKFILE;
             return "Invalid track file '$val'";
         }
-        $/ = $1;
         $raf->Seek(0,0);
         $from = "file '$val'";
+    }
+    unless ($from) {
+        # set up RAF for reading log file in memory
+        $raf = new File::RandomAccess(\$val);
+        $from = 'data';
     }
     # initialize track points lookup
     my $points = $$geotag{Points};
@@ -117,7 +134,6 @@ sub LoadTrackLog($$;$)
     my $numPoints = 0;
     my $skipped = 0;
     my $lastSecs = 0;
-    my $format = '';
     my $fix = { };
     for (;;) {
         $raf->ReadLine($_) or last;
@@ -192,7 +208,7 @@ sub LoadTrackLog($$;$)
                         $td = 1;
                     }
                     # validate and store GPS fix
-                    if ($$fix{lat} and $$fix{lon} and $$fix{'time'} and
+                    if (defined $$fix{lat} and defined $$fix{lon} and $$fix{'time'} and
                         $$fix{lat} =~ /^[+-]?\d+\.?\d*/ and
                         $$fix{lon} =~ /^[+-]?\d+\.?\d*/ and
                         $$fix{'time'} =~ /^(\d{4})-(\d+)-(\d+)T(\d+):(\d+):(\d+)(\.\d+)?(.*)/)
@@ -207,7 +223,7 @@ sub LoadTrackLog($$;$)
                             $time += $tz;
                         }
                         # validate altitude
-                        undef $$fix{alt} if $$fix{alt} and $$fix{alt} !~ /^[+-]?\d+\.?\d*/;
+                        undef $$fix{alt} if defined $$fix{alt} and $$fix{alt} !~ /^[+-]?\d+\.?\d*/;
                         $isDate = 1;
                         $canCut= 1 if defined $$fix{pdop} or defined $$fix{hdop} or defined $$fix{nsats};
                         $$points{$time} = $fix;
@@ -668,9 +684,9 @@ sub SetGeoValues($$;$)
         # write GPSDateStamp if date included in track log, otherwise delete it
         $gpsDate = sprintf('%.2d:%.2d:%.2d', $t[5]+1900, $t[4]+1, $t[3]) unless $noDate;
         # write GPSAltitude tags if altitude included in track log, otherwise delete them
-        if ($$fix{alt}) {
+        if (defined $$fix{alt}) {
             $gpsAlt = abs $$fix{alt};
-            $gpsAltRef = ($$fix{alt} > 0 ? 0 : 1);
+            $gpsAltRef = ($$fix{alt} < 0 ? 1 : 0);
         }
         # set new GPS tag values (EXIF, or XMP if write group is 'xmp')
         my ($xmp, $exif, @r);

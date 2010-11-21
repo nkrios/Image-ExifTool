@@ -1,18 +1,19 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.05
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.40
 [File, System, Image] FileName - File Name: PDF.pdf
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 8.7 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:25 06:39:26-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2009:07:23 11:36:39-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: PDF
 [File, File, Image] MIMEType - MIME Type: application/pdf
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
-[PDF, PDF, Other] Version - PDF Version: 1.3
-[PDF, PDF, Image] Creator - Creator: Adobe Photoshop 7.0
+[PDF, PDF, Document] Version - PDF Version: 1.3
+[PDF, PDF, Document] _linearized - Linearized: No
+[PDF, PDF, Document] Creator - Creator: Adobe Photoshop 7.0
 [PDF, PDF, Time] CreationDate - Create Date: 2005:07:18 14:30:45-04:00
 [PDF, PDF, Time] ModDate - Modify Date: 2005:07:18 14:30:45-04:00
-[PDF, PDF, Image] Producer - Producer: Adobe Photoshop for Macintosh
-[PDF, PDF, Image] Count - Page Count: 1
+[PDF, PDF, Document] Producer - Producer: Adobe Photoshop for Macintosh
+[PDF, PDF, Document] Count - Page Count: 1
 [IPTC, IPTC, Other] 0 - Application Record Version: 2
 [IPTC, IPTC, Other] 120 - Caption-Abstract: A witty caption
 [IPTC, IPTC, Author] 122 - Writer-Editor: I wrote it

@@ -12,23 +12,22 @@ The tags listed below are part of the International Press Telecommunications
 Council (IPTC) and the Newspaper Association of America (NAA) Information
 Interchange Model (IIM).  This is an older meta information format, slowly
 being phased out in favor of XMP.  IPTC information may be embedded in JPG,
-TIFF, PNG, MIFF, PS, PDF, PSD and DNG images.</p>
-
-<p>The IPTC specification dictates a length for ASCII (<code>string</code> or <code>digits</code>)
-values.  These lengths are given in square brackets after the <b>Writable</b>
-format name.  For tags where a range of lengths is allowed, the minimum and
-maximum lengths are separated by a comma within the brackets.  IPTC strings
-are not null terminated.</p>
+TIFF, PNG, MIFF, PS, PDF, PSD, XCF and DNG images.</p>
 
 <p>IPTC information is separated into different records, each of which has its
 own set of tags.  See
 <a href="http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf">http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf</a> for the
 official specification.</p>
 
-<p>When writing, ExifTool issues a minor warning and truncates the value if it
-is longer than allowed by the IPTC specification.  Minor errors may be
-ignored to allow writing of longer values, but beware that values like this
-may cause problems for other IPTC readers.</p>
+<p>This specification dictates a length for ASCII (<code>string</code> or <code>digits</code>)
+values.  These lengths are given in square brackets after the <b>Writable</b>
+format name.  For tags where a range of lengths is allowed, the minimum and
+maximum lengths are separated by a comma within the brackets.  IPTC strings
+are not null terminated.  When writing, ExifTool issues a minor warning and
+truncates the value if it is longer than allowed by the IPTC specification.
+Minor errors may be ignored with the IgnoreMinorErrors (-m) option, allowing
+longer values to be written, but beware that values like this may cause
+problems for some other IPTC readers.</p>
 
 <p>Separate IPTC date and time tags may be written with a combined date/time
 value and ExifTool automagically takes the appropriate part of the date/time
@@ -863,7 +862,7 @@ won&#39;t be able to read these tags as written by ExifTool)</span></span></td><
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 8, 2010</i>
+<br><i>Last revised Oct 13, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

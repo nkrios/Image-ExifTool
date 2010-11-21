@@ -7,17 +7,27 @@
 </head>
 <body>
 <h2 class=top><a name='Composite'>MWG Composite Tags</a></h2>
-<p>This table lists special Composite tags which are used to access other tags
-based on the Metadata Working Group 1.01 recommendations.  These tags are
-only accessible when the MWG module is loaded (via <code>-use MWG</code> on the
-command line, or <code>use Image::ExifTool::MWG</code> in the API).  When reading, the
-value of each MWG tag is <b>Derived From</b> the specified tags based on the MWG
-guidelines.  When writing, the value of the IPTCDigest tag is updated
-automatically when the IPTC is changed if either the IPTCDigest tag didn&#39;t
-exist beforehand or its value agreed with the original IPTC digest
-(indicating that the XMP is synchronized with the IPTC).  IPTC information
-is written only if the original file contained IPTC.  For more information
-about the MWG recommendation, see <a href="http://www.metadataworkinggroup.org/">http://www.metadataworkinggroup.org/</a>.</p>
+<p>The Metadata Working Group (MWG) recommendations provide a set of rules to
+allow certain overlapping EXIF, IPTC and XMP tags to be reconciled when
+reading, and synchronized when writing.  The ExifTool MWG module is designed
+to aid in the implementation of these recommendations.  (See
+<a href="http://www.metadataworkinggroup.org/">http://www.metadataworkinggroup.org/</a> for the complete MWG technical
+specifications.)</p>
+
+<p>The table below lists special Composite tags which are used to access other
+tags based on the MWG 1.01 recommendations.  These tags are only accessible
+when the MWG module is loaded.  The MWG module is loaded automatically by
+the exiftool application if MWG is specified as a group for any tag on the
+command line, or manually with the <code>-use MWG</code> option.  Via the API, the MWG
+module is loaded with &quot;<code>use Image::ExifTool::MWG</code>&quot;.</p>
+
+<p>When reading, the value of each MWG tag is <b>Derived From</b> the specified
+tags based on the MWG guidelines.  When writing, the appropriate associated
+tags are written.  The value of the IPTCDigest tag is updated automatically
+when the IPTC is changed if either the IPTCDigest tag didn&#39;t exist
+beforehand or its value agreed with the original IPTC digest (indicating
+that the XMP is synchronized with the IPTC).  IPTC information is written
+only if the original file contained IPTC.</p>
 
 <p>Loading the MWG module activates &quot;strict MWG conformance mode&quot;, which has
 the effect of causing EXIF, IPTC and XMP in non-standard locations to be
@@ -160,7 +170,7 @@ implements this policy and changes EXIF:Artist to a list-type tag.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 4, 2010</i>
+<br><i>Last revised Oct 4, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

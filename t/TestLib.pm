@@ -12,6 +12,7 @@
 #               May  18/05 - P. Harvey Tolerate round-off errors in floats.
 #               Feb. 02/08 - P. Harvey Allow different timezones in time values
 #               Sep. 16/08 - P. Harvey Improve timezone testing
+#               Jul. 14/10 - P. Harvey Added writeInfo()
 #------------------------------------------------------------------------------
 
 package t::TestLib;
@@ -24,13 +25,14 @@ use Image::ExifTool qw(ImageInfo);
 use vars qw($VERSION @ISA @EXPORT);
 $VERSION = '1.16';
 @ISA = qw(Exporter);
-@EXPORT = qw(check writeCheck testCompare binaryCompare testVerbose);
+@EXPORT = qw(check writeCheck writeInfo testCompare binaryCompare testVerbose);
 
 sub closeEnough($$);
 sub formatValue($);
+sub writeInfo($$;$$);
 
 #------------------------------------------------------------------------------
-# compare 2 binary files
+# Compare 2 binary files
 # Inputs: 0) file name 1, 1) file name 2
 # Returns: 1 if files are identical
 sub binaryCompare($$)
@@ -309,14 +311,15 @@ sub check($$$;$$$)
 }
 
 #------------------------------------------------------------------------------
-# test writing feature by writing specified information to JPEG file
+# Test writing feature by writing specified information to JPEG file
 # Inputs: 0) list reference to lists of SetNewValue arguments
 #         1) test name, 2) test number, 3) optional source file name,
 #         4) true to only check tags which were written (or list ref for tags to check)
+#         5) flag set if nothing is expected to change in the output file
 # Returns: 1 if check passed
-sub writeCheck($$$;$$)
+sub writeCheck($$$;$$$)
 {
-    my ($writeInfo, $testname, $testnum, $srcfile, $onlyWritten) = @_;
+    my ($writeInfo, $testname, $testnum, $srcfile, $onlyWritten, $same) = @_;
     $srcfile or $srcfile = "t/images/$testname.jpg";
     my ($ext) = ($srcfile =~ /\.(.+?)$/);
     my $testfile = "t/${testname}_${testnum}_failed.$ext";
@@ -331,17 +334,41 @@ sub writeCheck($$$;$$)
         push @tags, $$_[0] if $onlyWritten;
     }
     unlink $testfile;
-    $exifTool->WriteInfo($srcfile, $testfile);
+    my $ok = writeInfo($exifTool, $srcfile, $testfile, $same);
     my $info = $exifTool->GetInfo('Error');
     foreach (keys %$info) { warn "$$info{$_}\n"; }
     $info = $exifTool->ImageInfo($testfile,{Duplicates=>1,Unknown=>1},@tags);
     my $rtnVal = check($exifTool, $info, $testname, $testnum);
-    $rtnVal and unlink $testfile;
-    return $rtnVal;
+    return 0 unless $ok and $rtnVal;
+    unlink $testfile;
+    return 1;
 }
 
 #------------------------------------------------------------------------------
-# test verbose output
+# Call Image::ExifTool::WriteInfo with error checking
+# Inputs: 0) ExifTool ref, 1) src file, 2) dst file, 3) true if nothing should change
+# Return: true on success
+sub writeInfo($$;$$)
+{
+    my ($exifTool, $src, $dst, $same) = @_;
+    # erase temporary file created by WriteInfo() if no destination file is given
+    # (may be left over from previous crashed tests)
+    unlink "${src}_exiftool_tmp" if not defined $dst and not ref $src;
+    my $result = $exifTool->WriteInfo($src, $dst);
+    my $err = '';
+    $err .= "  Error: WriteInfo() returned $result\n" if $result != ($same ? 2 : 1);
+    my $info = $exifTool->GetInfo('Warning', 'Error');
+    foreach (sort keys %$info) {
+        my $tag = Image::ExifTool::GetTagName($_);
+        $err .= "  $tag: $$info{$_}\n";
+    }
+    return 1 unless $err;
+    warn "\n$err";
+    return 0;
+}
+
+#------------------------------------------------------------------------------
+# Test verbose output
 # Inputs: 0) test name, 1) test number, 2) Input file, 3) verbose level
 # Returns: true if test passed
 sub testVerbose($$$$)

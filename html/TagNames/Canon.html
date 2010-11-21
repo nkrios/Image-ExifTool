@@ -79,6 +79,7 @@
   <br>CanonCameraInfo7D
   <br>CanonCameraInfo40D
   <br>CanonCameraInfo50D
+  <br>CanonCameraInfo60D
   <br>CanonCameraInfo450D
   <br>CanonCameraInfo500D
   <br>CanonCameraInfo550D
@@ -88,7 +89,7 @@
   <br>CanonCameraInfoUnknown32
   <br>CanonCameraInfoUnknown16
   <br>CanonCameraInfoUnknown</td>
-<td class=c>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
+<td class=c>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='Canon.html#CameraInfo1D'>Canon CameraInfo1D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo1DmkII'>Canon CameraInfo1DmkII Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo1DmkIIN'>Canon CameraInfo1DmkIIN Tags</a>
@@ -99,6 +100,7 @@
   <br>--&gt; <a href='Canon.html#CameraInfo7D'>Canon CameraInfo7D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo40D'>Canon CameraInfo40D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo50D'>Canon CameraInfo50D Tags</a>
+  <br>--&gt; <a href='Canon.html#CameraInfo60D'>Canon CameraInfo60D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo450D'>Canon CameraInfo450D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo500D'>Canon CameraInfo500D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo550D'>Canon CameraInfo550D Tags</a>
@@ -142,29 +144,34 @@
 <td class=c>int32u</td>
 <td>--&gt; <a href='Canon.html#CanonModelID'>Canon CanonModelID Values</a></td></tr>
 <tr class=b>
+<td title='0x0011 = 17'>0x0011</td>
+<td>MovieInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#MovieInfo'>Canon MovieInfo Tags</a></td></tr>
+<tr>
 <td title='0x0012 = 18'>0x0012</td>
 <td>CanonAFInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#AFInfo'>Canon AFInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0013 = 19'>0x0013</td>
 <td>ThumbnailImageValidArea</td>
 <td class=c>int16u[4]</td>
 <td><span class=s><span class=n>(all zeros for full frame)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0015 = 21'>0x0015</td>
 <td>SerialNumberFormat</td>
 <td class=c>int32u</td>
 <td><span class=s>0x90000000 = Format 1
   <br>0xa0000000 = Format 2</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x001a = 26'>0x001a</td>
 <td>SuperMacro</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On (1)
   <br>2 = On (2)</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x001c = 28'>0x001c</td>
 <td>DateStampMode</td>
 <td class=c>int16u</td>
@@ -172,17 +179,17 @@
   <br>0 = Off
   <br>1 = Date
   <br>2 = Date &amp; Time</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x001d = 29'>0x001d</td>
 <td>MyColors</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#MyColors'>Canon MyColors Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x001e = 30'>0x001e</td>
 <td>FirmwareRevision</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0023 = 35'>0x0023</td>
 <td>Categories</td>
 <td class=c>int32u[2]</td>
@@ -195,164 +202,174 @@
   <br>Bit 5 = User 3
   <br>Bit 6 = To Do</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x0024 = 36'>0x0024</td>
 <td>FaceDetect1</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#FaceDetect1'>Canon FaceDetect1 Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0025 = 37'>0x0025</td>
 <td>FaceDetect2</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#FaceDetect2'>Canon FaceDetect2 Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0026 = 38'>0x0026</td>
 <td>CanonAFInfo2</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#AFInfo2'>Canon AFInfo2 Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0028 = 40'>0x0028</td>
 <td>ImageUniqueID</td>
 <td class=c>int8u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0081 = 129'>0x0081</td>
 <td>RawDataOffset</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0083 = 131'>0x0083</td>
 <td>OriginalDecisionDataOffset</td>
 <td class=c title='* = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0090 = 144'>0x0090</td>
 <td>CustomFunctions1D</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonCustom.html#Functions1D'>CanonCustom Functions1D Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0091 = 145'>0x0091</td>
 <td>PersonalFunctions</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonCustom.html#PersonalFuncs'>CanonCustom PersonalFuncs Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0092 = 146'>0x0092</td>
 <td>PersonalFunctionValues</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonCustom.html#PersonalFuncValues'>CanonCustom PersonalFuncValues Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0093 = 147'>0x0093</td>
 <td>CanonFileInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#FileInfo'>Canon FileInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0094 = 148'>0x0094</td>
 <td>AFPointsInFocus1D</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(EOS 1D -- 5 rows: A1-7, B1-10, C1-11, D1-10, E1-7, center point is C6)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0095 = 149'>0x0095</td>
 <td>LensModel</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0096 = 150'>0x0096</td>
 <td>SerialInfo
   <br>InternalSerialNumber</td>
 <td class=c>-<br>string</td>
 <td>--&gt; <a href='Canon.html#SerialInfo'>Canon SerialInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0097 = 151'>0x0097</td>
 <td>DustRemovalData</td>
 <td class=c title='! = Unsafe'>undef!</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td title='0x0098 = 152'>0x0098</td>
+<td>CropInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#CropInfo'>Canon CropInfo Tags</a></td></tr>
 <tr class=b>
 <td title='0x0099 = 153'>0x0099</td>
 <td>CustomFunctions2</td>
 <td class=c>-</td>
 <td>--&gt; <a href='CanonCustom.html#Functions2'>CanonCustom Functions2 Tags</a></td></tr>
 <tr>
+<td title='0x009a = 154'>0x009a</td>
+<td>AspectInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#AspectInfo'>Canon AspectInfo Tags</a></td></tr>
+<tr class=b>
 <td title='0x00a0 = 160'>0x00a0</td>
 <td>ProcessingInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#Processing'>Canon Processing Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x00a1 = 161'>0x00a1</td>
 <td>ToneCurveTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x00a2 = 162'>0x00a2</td>
 <td>SharpnessTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x00a3 = 163'>0x00a3</td>
 <td>SharpnessFreqTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x00a4 = 164'>0x00a4</td>
 <td>WhiteBalanceTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x00a9 = 169'>0x00a9</td>
 <td>ColorBalance</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#ColorBalance'>Canon ColorBalance Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x00aa = 170'>0x00aa</td>
 <td>MeasuredColor</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#MeasuredColor'>Canon MeasuredColor Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x00ae = 174'>0x00ae</td>
 <td>ColorTemperature</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x00b0 = 176'>0x00b0</td>
 <td>CanonFlags</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#Flags'>Canon Flags Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x00b1 = 177'>0x00b1</td>
 <td>ModifiedInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#ModifiedInfo'>Canon ModifiedInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x00b2 = 178'>0x00b2</td>
 <td>ToneCurveMatching</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x00b3 = 179'>0x00b3</td>
 <td>WhiteBalanceMatching</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x00b4 = 180'>0x00b4</td>
 <td>ColorSpace</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = sRGB
   <br>2 = Adobe RGB</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x00b6 = 182'>0x00b6</td>
 <td>PreviewImageInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#PreviewImageInfo'>Canon PreviewImageInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x00d0 = 208'>0x00d0</td>
 <td>VRDOffset</td>
 <td class=c title='* = Protected'>int32u*</td>
 <td><span class=s><span class=n>(offset of VRD &quot;recipe data&quot; if it exists)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x00e0 = 224'>0x00e0</td>
 <td>SensorInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#SensorInfo'>Canon SensorInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x4001 = 16385'>0x4001</td>
 <td>ColorData1
   <br>ColorData2
@@ -367,25 +384,30 @@
   <br>--&gt; <a href='Canon.html#ColorData4'>Canon ColorData4 Tags</a>
   <br>--&gt; <a href='Canon.html#ColorData5'>Canon ColorData5 Tags</a>
   <br>--&gt; <a href='Canon.html#ColorDataUnknown'>Canon ColorDataUnknown Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x4002 = 16386'>0x4002</td>
-<td>UnknownBlock1?</td>
+<td>CRWParam?</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x4003 = 16387'>0x4003</td>
 <td>ColorInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#ColorInfo'>Canon ColorInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x4005 = 16389'>0x4005</td>
-<td>UnknownBlock2?</td>
+<td>Flavor?</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(unknown 49kB block, not copied to JPEG images)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x4008 = 16392'>0x4008</td>
 <td>BlackLevel?</td>
 <td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x4010 = 16400'>0x4010</td>
+<td>CustomPictureStyleFileName</td>
+<td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x4013 = 16403'>0x4013</td>
@@ -407,6 +429,21 @@
 <td>LightingOpt</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#LightingOpt'>Canon LightingOpt Tags</a></td></tr>
+<tr class=b>
+<td title='0x4019 = 16409'>0x4019</td>
+<td>LensInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#LensInfo'>Canon LensInfo Tags</a></td></tr>
+<tr>
+<td title='0x4020 = 16416'>0x4020</td>
+<td>AmbienceInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#Ambience'>Canon Ambience Tags</a></td></tr>
+<tr class=b>
+<td title='0x4024 = 16420'>0x4024</td>
+<td>FilterInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#FilterInfo'>Canon FilterInfo Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CanonModelID'>Canon CanonModelID Values</a></h2>
@@ -542,10 +579,15 @@
 </tr><tr><td class=r>0x2860000</td><td>= PowerShot SD3500 IS / IXUS 210 / IXY 10S</td>
 </tr><tr><td class=r>0x2870000</td><td>= PowerShot SX210 IS</td>
 </tr><tr><td class=r>0x2880000</td><td>= PowerShot SD4000 IS / IXUS 300 HS / IXY 30S</td>
+</tr><tr><td class=r>0x2890000</td><td>= PowerShot SD4500 IS / IXUS 1000 HS / IXY 50S</td>
+</tr><tr><td class=r>0x2920000</td><td>= PowerShot G12</td>
+</tr><tr><td class=r>0x2930000</td><td>= PowerShot SX30 IS</td>
+</tr><tr><td class=r>0x2940000</td><td>= PowerShot SX130 IS</td>
+</tr><tr><td class=r>0x2950000</td><td>= PowerShot S95</td>
 </tr><tr><td class=r>0x3010000</td><td>= PowerShot Pro90 IS</td>
 </tr><tr><td class=r>0x4040000</td><td>= PowerShot G1</td>
 </tr><tr><td class=r>0x6040000</td><td>= PowerShot S100 / Digital IXUS / IXY Digital</td>
-</tr><tr><td class=r>0x4007d673</td><td>= DC19 / DC22</td>
+</tr><tr><td class=r>0x4007d673</td><td>= DC19 / DC21 / DC22</td>
 </tr><tr><td class=r>0x4007d674</td><td>= XH A1</td>
 </tr><tr><td class=r>0x4007d675</td><td>= HV10</td>
 </tr><tr><td class=r>0x4007d676</td><td>= MD130 / MD140 / MD150 / MD160</td>
@@ -559,11 +601,15 @@
 </tr><tr><td class=r>0x4007d87f</td><td>= FS100</td>
 </tr><tr><td class=r>0x4007d880</td><td>= iVIS HF10</td>
 </tr><tr><td class=r>0x4007d882</td><td>= HG20 / HG21 / VIXIA HG21</td>
+</tr><tr><td class=r>0x4007d925</td><td>= LEGRIA HF21</td>
 </tr><tr><td class=r>0x4007d978</td><td>= LEGRIA HV40</td>
-</tr><tr><td class=r>0x4007d987</td><td>= DC410</td>
-</tr><tr><td class=r>0x4007d988</td><td>= LEGRIA FS200</td>
-</tr><tr><td class=r>0x4007d989</td><td>= LEGRIA HF20 / LEGRIA HF200</td>
-</tr><tr><td class=r>0x4007d98a</td><td>= VIXIA HF S100</td>
+</tr><tr><td class=r>0x4007d987</td><td>= DC410 / DC420</td>
+</tr><tr><td class=r>0x4007d988</td><td>= LEGRIA FS19 / FS20 / FS21 / FS22 / FS200</td>
+</tr><tr><td class=r>0x4007d989</td><td>= LEGRIA HF20 / HF200</td>
+</tr><tr><td class=r>0x4007d98a</td><td>= VIXIA HF S10 / S100</td>
+</tr><tr><td class=r>0x4007da8e</td><td>= LEGRIA HF R16 / R17 / R106</td>
+</tr><tr><td class=r>0x4007da90</td><td>= LEGRIA HF S21</td>
+</tr><tr><td class=r>0x4007da92</td><td>= LEGRIA FS36 / FS305 / FS306 / FS307</td>
 </tr><tr><td class=r>0x80000001</td><td>= EOS-1D</td>
 </tr><tr><td class=r>0x80000167</td><td>= EOS-1DS</td>
 </tr><tr><td class=r>0x80000168</td><td>= EOS 10D</td>
@@ -580,13 +626,14 @@
 </tr><tr><td class=r>0x80000218</td><td>= EOS 5D Mark II</td>
 </tr><tr><td class=r>0x80000232</td><td>= EOS-1D Mark II N</td>
 </tr><tr><td class=r>0x80000234</td><td>= EOS 30D</td>
-</tr><tr><td class=r>0x80000236</td><td>= EOS Digital Rebel XTi / 400D / Kiss Digital X (and rare K236)</td>
+</tr><tr><td class=r>0x80000236</td><td>= EOS Digital Rebel XTi / 400D / Kiss Digital X</td>
 </tr><tr><td class=r>0x80000250</td><td>= EOS 7D</td>
 </tr><tr><td class=r>0x80000252</td><td>= EOS Rebel T1i / 500D / Kiss X3</td>
 </tr><tr><td class=r>0x80000254</td><td>= EOS Rebel XS / 1000D / Kiss F</td>
 </tr><tr><td class=r>0x80000261</td><td>= EOS 50D</td>
 </tr><tr><td class=r>0x80000270</td><td>= EOS Rebel T2i / 550D / Kiss X4</td>
 </tr><tr><td class=r>0x80000281</td><td>= EOS-1D Mark IV</td>
+</tr><tr><td class=r>0x80000287</td><td>= EOS 60D</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Canon CameraSettings Tags</a></h2>
@@ -660,7 +707,8 @@
   <br>4 = TIF
   <br>5 = TIF+JPEG
   <br>6 = CR2
-  <br>7 = CR2+JPEG</span></td></tr>
+  <br>7 = CR2+JPEG
+  <br>9 = Video</span></td></tr>
 <tr class=b>
 <td class=r title='10 = 0xa'>10</td>
 <td>CanonImageSize</td>
@@ -670,12 +718,15 @@
   <br>1 = Medium
   <br>2 = Small
   <br>5 = Medium 1
-  <br>6 = Medium 2</td><td>&nbsp;&nbsp;</td>
-  <td>7 = Medium 3
-  <br>8 = Postcard
-  <br>9 = Widescreen
+  <br>6 = Medium 2
+  <br>7 = Medium 3
+  <br>8 = Postcard</td><td>&nbsp;&nbsp;</td>
+  <td>9 = Widescreen
+  <br>128 = 640x480 Movie
   <br>129 = Medium Movie
-  <br>130 = Small Movie</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>130 = Small Movie
+  <br>137 = 1280x720 Movie
+  <br>142 = 1920x1080 Movie</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr>
 <td class=r title='11 = 0xb'>11</td>
@@ -930,9 +981,9 @@ others use a range of 0 to 7 where 0 is no sharpening)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='LensType'>Canon LensType Values</a></h2>
-Decimal values differentiate lenses which would otherwise have the same
+<p>Decimal values differentiate lenses which would otherwise have the same
 LensType, and are used by the Composite LensID tag when attempting to
-identify the specific lens model.
+identify the specific lens model.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class='inner sep' cellspacing=1>
@@ -947,9 +998,10 @@ identify the specific lens model.
 </tr><tr><td>6.1</td><td>= Sigma 18-50mm f/3.5-5.6 DC</td>
 </tr><tr><td>6.2</td><td>= Sigma 18-125mm f/3.5-5.6 DC IF ASP</td>
 </tr><tr><td>6.3</td><td>= Tokina AF193-2 19-35mm f/3.5-4.5</td>
+</tr><tr><td>6.4</td><td>= Sigma 28-80mm f/3.5-5.6 II Macro</td>
 </tr><tr><td>7</td><td>= Canon EF 100-300mm f/5.6L</td>
 </tr><tr><td>8</td><td>= Canon EF 100-300mm f/5.6 or Sigma or Tokina Lens</td>
-</tr><tr><td>8.1</td><td>= Sigma 70-300mm f/4-5.6 DG Macro</td>
+</tr><tr><td>8.1</td><td>= Sigma 70-300mm f/4-5.6 [APO] DG Macro</td>
 </tr><tr><td>8.2</td><td>= Tokina AT-X242AF 24-200mm f/3.5-5.6</td>
 </tr><tr><td>9</td><td>= Canon EF 70-210mm f/4</td>
 </tr><tr><td>9.1</td><td>= Sigma 55-200mm f/4-5.6 DC</td>
@@ -982,7 +1034,7 @@ identify the specific lens model.
 </tr><tr><td>28.2</td><td>= Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical [IF] Macro</td>
 </tr><tr><td>28.3</td><td>= Tamron AF 70-300mm f/4.5-5.6 Di LD 1:2 Macro Zoom</td>
 </tr><tr><td>28.4</td><td>= Tamron AF Aspherical 28-200mm f/3.8-5.6</td>
-</tr><tr><td>29</td><td>= Canon EF 50mm f/1.8 MkII</td>
+</tr><tr><td>29</td><td>= Canon EF 50mm f/1.8 II</td>
 </tr><tr><td>30</td><td>= Canon EF 35-105mm f/4.5-5.6</td>
 </tr><tr><td>31</td><td>= Canon EF 75-300mm f/4-5.6 or Tamron Lens</td>
 </tr><tr><td>31.1</td><td>= Tamron SP AF 300mm f/2.8 LD IF</td>
@@ -996,6 +1048,8 @@ identify the specific lens model.
 </tr><tr><td>37</td><td>= Canon EF 35-80mm f/4-5.6 or Tamron Lens</td>
 </tr><tr><td>37.1</td><td>= Tamron 70-200mm f/2.8 Di LD IF Macro</td>
 </tr><tr><td>37.2</td><td>= Tamron AF 28-300mm f/3.5-6.3 XR Di VC LD Aspherical [IF] Macro Model A20</td>
+</tr><tr><td>37.3</td><td>= Tamron SP AF 17-50mm f/2.8 XR Di II VC LD Aspherical [IF]</td>
+</tr><tr><td>37.4</td><td>= Tamron AF 18-270mm f/3.5-6.3 Di II VC LD Aspherical [IF] Macro</td>
 </tr><tr><td>38</td><td>= Canon EF 80-200mm f/4.5-5.6</td>
 </tr><tr><td>39</td><td>= Canon EF 75-300mm f/4-5.6</td>
 </tr><tr><td>40</td><td>= Canon EF 28-80mm f/3.5-5.6</td>
@@ -1004,7 +1058,7 @@ identify the specific lens model.
 </tr><tr><td>42.1</td><td>= Tamron AF 28-300mm f/3.5-6.3 XR Di VC LD Aspherical [IF] Macro Model A20</td>
 </tr><tr><td>43</td><td>= Canon EF 28-105mm f/4-5.6</td>
 </tr><tr><td>44</td><td>= Canon EF 90-300mm f/4.5-5.6</td>
-</tr><tr><td>45</td><td>= Canon EF-S 18-55mm f/3.5-5.6</td>
+</tr><tr><td>45</td><td>= Canon EF-S 18-55mm f/3.5-5.6 [II]</td>
 </tr><tr><td>46</td><td>= Canon EF 28-90mm f/4-5.6</td>
 </tr><tr><td>48</td><td>= Canon EF-S 18-55mm f/3.5-5.6 IS</td>
 </tr><tr><td>49</td><td>= Canon EF-S 55-250mm f/4-5.6 IS</td>
@@ -1034,6 +1088,7 @@ identify the specific lens model.
 </tr><tr><td>137.3</td><td>= Sigma 18-250mm f/3.5-6.3 DC OS HSM</td>
 </tr><tr><td>137.4</td><td>= Sigma 24-70mm f/2.8 IF EX DG HSM</td>
 </tr><tr><td>137.5</td><td>= Sigma 18-125mm f/3.8-5.6 DC OS HSM</td>
+</tr><tr><td>137.6</td><td>= Sigma 17-70mm f/2.8-4 DC Macro OS HSM</td>
 </tr><tr><td>138</td><td>= Canon EF 28-80mm f/2.8-4L</td>
 </tr><tr><td>139</td><td>= Canon EF 400mm f/2.8L</td>
 </tr><tr><td>140</td><td>= Canon EF 500mm f/4.5L</td>
@@ -1083,13 +1138,15 @@ identify the specific lens model.
 </tr><tr><td>169.2</td><td>= Sigma 15-30mm f/3.5-4.5 EX DG Aspherical</td>
 </tr><tr><td>169.3</td><td>= Sigma 18-50mm f/2.8 Macro</td>
 </tr><tr><td>169.4</td><td>= Sigma 50mm f/1.4 EX DG HSM</td>
+</tr><tr><td>169.5</td><td>= Sigma 85mm f/1.4 EX DG HSM</td>
 </tr><tr><td>170</td><td>= Canon EF 200mm f/2.8L II</td>
 </tr><tr><td>171</td><td>= Canon EF 300mm f/4L</td>
 </tr><tr><td>172</td><td>= Canon EF 400mm f/5.6L</td>
 </tr><tr><td>173</td><td>= Canon EF 180mm Macro f/3.5L or Sigma Lens</td>
 </tr><tr><td>173.1</td><td>= Sigma 180mm EX HSM Macro f/3.5</td>
 </tr><tr><td>173.2</td><td>= Sigma APO Macro 150mm f/2.8 EX DG HSM</td>
-</tr><tr><td>174</td><td>= Canon EF 135mm f/2L</td>
+</tr><tr><td>174</td><td>= Canon EF 135mm f/2L or Sigma Lens</td>
+</tr><tr><td>174.1</td><td>= Sigma 70-200mm f/2.8 EX DG APO OS HSM</td>
 </tr><tr><td>175</td><td>= Canon EF 400mm f/2.8L</td>
 </tr><tr><td>176</td><td>= Canon EF 24-85mm f/3.5-4.5 USM</td>
 </tr><tr><td>177</td><td>= Canon EF 300mm f/4L IS</td>
@@ -1123,7 +1180,7 @@ identify the specific lens model.
 </tr><tr><td>211</td><td>= Canon EF 28-200mm f/3.5-5.6 USM</td>
 </tr><tr><td>212</td><td>= Canon EF 28-105mm f/4-5.6 USM</td>
 </tr><tr><td>213</td><td>= Canon EF 90-300mm f/4.5-5.6 USM</td>
-</tr><tr><td>214</td><td>= Canon EF-S 18-55mm f/3.5-4.5 USM</td>
+</tr><tr><td>214</td><td>= Canon EF-S 18-55mm f/3.5-5.6 USM</td>
 </tr><tr><td>215</td><td>= Canon EF 55-200mm f/4.5-5.6 II USM</td>
 </tr><tr><td>224</td><td>= Canon EF 70-200mm f/2.8L IS</td>
 </tr><tr><td>225</td><td>= Canon EF 70-200mm f/2.8L IS + 1.4x</td>
@@ -1304,8 +1361,7 @@ models)</span></span></td></tr>
 <td class=r title='19 = 0x13'>19</td>
 <td>FocusDistanceUpper</td>
 <td class=c>int16u</td>
-<td><span class=s><span class=n>(FocusDistance tags are only extracted if FocusDistanceUpper is non-zero
-since they are not used by some newer models such as 450D and 1000D)</span></span></td></tr>
+<td><span class=s><span class=n>(FocusDistance tags are only extracted if FocusDistanceUpper is non-zero)</span></span></td></tr>
 <tr>
 <td class=r title='20 = 0x14'>20</td>
 <td>FocusDistanceLower</td>
@@ -1343,7 +1399,7 @@ since they are not used by some newer models such as 450D and 1000D)</span></spa
 <td class=r title='27 = 0x1b'>27</td>
 <td>AutoRotate</td>
 <td class=c>int16s</td>
-<td><span class=s>-1 = Unknown
+<td><span class=s>-1 = n/a
   <br>0 = None
   <br>1 = Rotate 90 CW
   <br>2 = Rotate 180
@@ -1352,7 +1408,8 @@ since they are not used by some newer models such as 450D and 1000D)</span></spa
 <td class=r title='28 = 0x1c'>28</td>
 <td>NDFilter</td>
 <td class=c>int16s</td>
-<td><span class=s>0 = Off
+<td><span class=s>-1 = n/a
+  <br>0 = Off
   <br>1 = On</span></td></tr>
 <tr>
 <td class=r title='29 = 0x1d'>29</td>
@@ -1614,12 +1671,15 @@ lists CameraInfo tags for the 1D and 1DS.</p>
   <br>1 = Medium
   <br>2 = Small
   <br>5 = Medium 1
-  <br>6 = Medium 2</td><td>&nbsp;&nbsp;</td>
-  <td>7 = Medium 3
-  <br>8 = Postcard
-  <br>9 = Widescreen
+  <br>6 = Medium 2
+  <br>7 = Medium 3
+  <br>8 = Postcard</td><td>&nbsp;&nbsp;</td>
+  <td>9 = Widescreen
+  <br>128 = 640x480 Movie
   <br>129 = Medium Movie
-  <br>130 = Small Movie</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>130 = Small Movie
+  <br>137 = 1280x720 Movie
+  <br>142 = 1920x1080 Movie</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr class=b>
 <td class=r title='102 = 0x66'>102</td>
@@ -1837,16 +1897,375 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td class=r title='682 = 0x2aa'>682</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo'>Canon PSInfo Tags</a></td></tr>
+<tr>
 <td class=r title='1114 = 0x45a'>1114</td>
 <td>TimeStamp1</td>
 <td class=c>int32u</td>
 <td><span class=s><span class=n>(only valid for some versions of the 1DmkIII firmware)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td class=r title='1118 = 0x45e'>1118</td>
 <td>TimeStamp</td>
 <td class=c>int32u</td>
 <td><span class=s><span class=n>(valid for the 1DSmkIII and some versions of the 1DmkIII firmware)</span></span></td></tr>
 </table></td></tr></table></blockquote>
+
+<h2><a name='PSInfo'>Canon PSInfo Tags</a></h2>
+<p>Custom picture style information for various models.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>ContrastStandard</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4</td>
+<td>SharpnessStandard</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='8 = 0x8'>8</td>
+<td>SaturationStandard</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='12 = 0xc'>12</td>
+<td>ColorToneStandard</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>FilterEffectStandard?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='20 = 0x14'>20</td>
+<td>ToningEffectStandard?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='24 = 0x18'>24</td>
+<td>ContrastPortrait</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='28 = 0x1c'>28</td>
+<td>SharpnessPortrait</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='32 = 0x20'>32</td>
+<td>SaturationPortrait</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='36 = 0x24'>36</td>
+<td>ColorTonePortrait</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='40 = 0x28'>40</td>
+<td>FilterEffectPortrait?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='44 = 0x2c'>44</td>
+<td>ToningEffectPortrait?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='48 = 0x30'>48</td>
+<td>ContrastLandscape</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='52 = 0x34'>52</td>
+<td>SharpnessLandscape</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='56 = 0x38'>56</td>
+<td>SaturationLandscape</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='60 = 0x3c'>60</td>
+<td>ColorToneLandscape</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='64 = 0x40'>64</td>
+<td>FilterEffectLandscape?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='68 = 0x44'>68</td>
+<td>ToningEffectLandscape?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='72 = 0x48'>72</td>
+<td>ContrastNeutral</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='76 = 0x4c'>76</td>
+<td>SharpnessNeutral</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='80 = 0x50'>80</td>
+<td>SaturationNeutral</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='84 = 0x54'>84</td>
+<td>ColorToneNeutral</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='88 = 0x58'>88</td>
+<td>FilterEffectNeutral?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='92 = 0x5c'>92</td>
+<td>ToningEffectNeutral?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='96 = 0x60'>96</td>
+<td>ContrastFaithful</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='100 = 0x64'>100</td>
+<td>SharpnessFaithful</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='104 = 0x68'>104</td>
+<td>SaturationFaithful</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='108 = 0x6c'>108</td>
+<td>ColorToneFaithful</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='112 = 0x70'>112</td>
+<td>FilterEffectFaithful?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='116 = 0x74'>116</td>
+<td>ToningEffectFaithful?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='120 = 0x78'>120</td>
+<td>ContrastMonochrome</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='124 = 0x7c'>124</td>
+<td>SharpnessMonochrome</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='128 = 0x80'>128</td>
+<td>SaturationMonochrome?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='132 = 0x84'>132</td>
+<td>ColorToneMonochrome?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='136 = 0x88'>136</td>
+<td>FilterEffectMonochrome</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Yellow
+  <br>0x2 = Orange
+  <br>0x3 = Red
+  <br>0x4 = Green</span></td></tr>
+<tr class=b>
+<td class=r title='140 = 0x8c'>140</td>
+<td>ToningEffectMonochrome</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Sepia
+  <br>0x2 = Blue
+  <br>0x3 = Purple
+  <br>0x4 = Green</span></td></tr>
+<tr>
+<td class=r title='144 = 0x90'>144</td>
+<td>ContrastUserDef1</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='148 = 0x94'>148</td>
+<td>SharpnessUserDef1</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='152 = 0x98'>152</td>
+<td>SaturationUserDef1</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='156 = 0x9c'>156</td>
+<td>ColorToneUserDef1</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='160 = 0xa0'>160</td>
+<td>FilterEffectUserDef1</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Yellow
+  <br>0x2 = Orange
+  <br>0x3 = Red
+  <br>0x4 = Green</span></td></tr>
+<tr class=b>
+<td class=r title='164 = 0xa4'>164</td>
+<td>ToningEffectUserDef1</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Sepia
+  <br>0x2 = Blue
+  <br>0x3 = Purple
+  <br>0x4 = Green</span></td></tr>
+<tr>
+<td class=r title='168 = 0xa8'>168</td>
+<td>ContrastUserDef2</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='172 = 0xac'>172</td>
+<td>SharpnessUserDef2</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='176 = 0xb0'>176</td>
+<td>SaturationUserDef2</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='180 = 0xb4'>180</td>
+<td>ColorToneUserDef2</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='184 = 0xb8'>184</td>
+<td>FilterEffectUserDef2</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Yellow
+  <br>0x2 = Orange
+  <br>0x3 = Red
+  <br>0x4 = Green</span></td></tr>
+<tr class=b>
+<td class=r title='188 = 0xbc'>188</td>
+<td>ToningEffectUserDef2</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Sepia
+  <br>0x2 = Blue
+  <br>0x3 = Purple
+  <br>0x4 = Green</span></td></tr>
+<tr>
+<td class=r title='192 = 0xc0'>192</td>
+<td>ContrastUserDef3</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='196 = 0xc4'>196</td>
+<td>SharpnessUserDef3</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='200 = 0xc8'>200</td>
+<td>SaturationUserDef3</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='204 = 0xcc'>204</td>
+<td>ColorToneUserDef3</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='208 = 0xd0'>208</td>
+<td>FilterEffectUserDef3</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Yellow
+  <br>0x2 = Orange
+  <br>0x3 = Red
+  <br>0x4 = Green</span></td></tr>
+<tr class=b>
+<td class=r title='212 = 0xd4'>212</td>
+<td>ToningEffectUserDef3</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Sepia
+  <br>0x2 = Blue
+  <br>0x3 = Purple
+  <br>0x4 = Green</span></td></tr>
+<tr>
+<td class=r title='216 = 0xd8'>216</td>
+<td>UserDef1PictureStyle</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Canon.html#UserDefStyle'>Canon UserDefStyle Values</a></td></tr>
+<tr class=b>
+<td class=r title='218 = 0xda'>218</td>
+<td>UserDef2PictureStyle</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Canon.html#UserDefStyle'>Canon UserDefStyle Values</a></td></tr>
+<tr>
+<td class=r title='220 = 0xdc'>220</td>
+<td>UserDef3PictureStyle</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Canon.html#UserDefStyle'>Canon UserDefStyle Values</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='UserDefStyle'>Canon UserDefStyle Values</a></h2>
+<p>Base style for user-defined picture styles.  PC values represent external
+picture styles which may be downloaded from Canon and installed in the
+camera.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class='inner sep' cellspacing=1>
+<tr class=h><th>Value</th><th>UserDefStyle</th><th>Value</th><th>UserDefStyle</th></tr>
+<tr><td class=r>0x41</td><td>= PC 1</td>
+<td class='r b'>0x83</td><td class=b>= Landscape</td>
+</tr><tr><td class=r>0x42</td><td>= PC 2</td>
+<td class='r b'>0x84</td><td class=b>= Neutral</td>
+</tr><tr><td class=r>0x43</td><td>= PC 3</td>
+<td class='r b'>0x85</td><td class=b>= Faithful</td>
+</tr><tr><td class=r>0x81</td><td>= Standard</td>
+<td class='r b'>0x86</td><td class=b>= Monochrome</td>
+</tr><tr><td class=r>0x82</td><td>= Portrait</td>
+<td class='r b'>&nbsp;</td><td class=b>&nbsp;</td>
+</tr></table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo1DmkIV'>Canon CameraInfo1DmkIV Tags</a></h2>
 <p>CameraInfo tags for the 1DmkIV.</p>
@@ -1876,6 +2295,16 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=c>int8u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
+<tr>
+<td class=r title='8 = 0x8'>8</td>
+<td>MeasuredEV2</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='9 = 0x9'>9</td>
+<td>MeasuredEV3</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
 <tr>
 <td class=r title='21 = 0x15'>21</td>
 <td>FlashMeteringMode</td>
@@ -1913,6 +2342,58 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=c>int16uRev</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r title='119 = 0x77'>119</td>
+<td>WhiteBalance</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance Values</a>
+  <br><span class='n s'>(firmware 4.2.1)</span></td></tr>
+<tr class=b>
+<td class=r title='120 = 0x78'>120</td>
+<td>WhiteBalance</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance Values</a>
+  <br><span class='n s'>(firmware 1.0.4)</span></td></tr>
+<tr>
+<td class=r title='123 = 0x7b'>123</td>
+<td>ColorTemperature</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='124 = 0x7c'>124</td>
+<td>ColorTemperature</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='334 = 0x14e'>334</td>
+<td>LensType</td>
+<td class=c>int16uRev</td>
+<td>--&gt; <a href='Canon.html#LensType'>Canon LensType Values</a></td></tr>
+<tr class=b>
+<td class=r title='335 = 0x14f'>335</td>
+<td>LensType</td>
+<td class=c>int16uRev</td>
+<td>--&gt; <a href='Canon.html#LensType'>Canon LensType Values</a></td></tr>
+<tr>
+<td class=r title='336 = 0x150'>336</td>
+<td>ShortFocal</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='337 = 0x151'>337</td>
+<td>ShortFocal</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='338 = 0x152'>338</td>
+<td>LongFocal</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='339 = 0x153'>339</td>
+<td>LongFocal</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td class=r title='488 = 0x1e8'>488</td>
 <td>FirmwareVersion</td>
 <td class=c>N</td>
@@ -1922,6 +2403,36 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td>FirmwareVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td class=r title='551 = 0x227'>551</td>
+<td>FileIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='556 = 0x22c'>556</td>
+<td>FileIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='563 = 0x233'>563</td>
+<td>DirectoryIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='568 = 0x238'>568</td>
+<td>DirectoryIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='867 = 0x363'>867</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo'>Canon PSInfo Tags</a></td></tr>
+<tr class=b>
+<td class=r title='872 = 0x368'>872</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo'>Canon PSInfo Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo5D'>Canon CameraInfo5D Tags</a></h2>
@@ -2158,7 +2669,8 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=r title='255 = 0xff'>255</td>
 <td>FilterEffectMonochrome</td>
 <td class=c>int8s</td>
-<td><span class=s>0 = None
+<td><span class=s>-559038737 = n/a
+  <br>0 = None
   <br>1 = Yellow
   <br>2 = Orange
   <br>3 = Red
@@ -2207,7 +2719,8 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=r title='264 = 0x108'>264</td>
 <td>ToningEffectMonochrome</td>
 <td class=c>int8s</td>
-<td><span class=s>0 = None
+<td><span class=s>-559038737 = n/a
+  <br>0 = None
   <br>1 = Sepia
   <br>2 = Blue
   <br>3 = Purple
@@ -2231,47 +2744,17 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=r title='268 = 0x10c'>268</td>
 <td>UserDef1PictureStyle</td>
 <td class=c>int16u</td>
-<td><table class=cols><tr>
-  <td>0x41 = Nostalgia
-  <br>0x42 = Clear
-  <br>0x43 = Twilight
-  <br>0x81 = Standard
-  <br>0x82 = Portrait</td><td>&nbsp;&nbsp;</td>
-  <td>0x83 = Landscape
-  <br>0x84 = Neutral
-  <br>0x85 = Faithful
-  <br>0x86 = Monochrome</td><td>&nbsp;&nbsp;</td></tr></table>
-</td></tr>
+<td>--&gt; <a href='Canon.html#UserDefStyle'>Canon UserDefStyle Values</a></td></tr>
 <tr class=b>
 <td class=r title='270 = 0x10e'>270</td>
 <td>UserDef2PictureStyle</td>
 <td class=c>int16u</td>
-<td><table class=cols><tr>
-  <td>0x41 = Nostalgia
-  <br>0x42 = Clear
-  <br>0x43 = Twilight
-  <br>0x81 = Standard
-  <br>0x82 = Portrait</td><td>&nbsp;&nbsp;</td>
-  <td>0x83 = Landscape
-  <br>0x84 = Neutral
-  <br>0x85 = Faithful
-  <br>0x86 = Monochrome</td><td>&nbsp;&nbsp;</td></tr></table>
-</td></tr>
+<td>--&gt; <a href='Canon.html#UserDefStyle'>Canon UserDefStyle Values</a></td></tr>
 <tr>
 <td class=r title='272 = 0x110'>272</td>
 <td>UserDef3PictureStyle</td>
 <td class=c>int16u</td>
-<td><table class=cols><tr>
-  <td>0x41 = Nostalgia
-  <br>0x42 = Clear
-  <br>0x43 = Twilight
-  <br>0x81 = Standard
-  <br>0x82 = Portrait</td><td>&nbsp;&nbsp;</td>
-  <td>0x83 = Landscape
-  <br>0x84 = Neutral
-  <br>0x85 = Faithful
-  <br>0x86 = Monochrome</td><td>&nbsp;&nbsp;</td></tr></table>
-</td></tr>
+<td>--&gt; <a href='Canon.html#UserDefStyle'>Canon UserDefStyle Values</a></td></tr>
 <tr class=b>
 <td class=r title='284 = 0x11c'>284</td>
 <td>TimeStamp</td>
@@ -2396,34 +2879,45 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='346 = 0x15a'>346</td>
-<td>FirmwareVersion</td>
-<td class=c>N</td>
-<td><span class=s><span class=n>(at this location for firmware 3.4.6 and 3.6.1)</span></span></td></tr>
+<td>CameraInfo5DmkII_2a</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#CameraInfo5DmkII_2'>Canon CameraInfo5DmkII_2 Tags</a>
+  <br><span class='n s'>(at this location for firmware 3.4.6 and 3.6.1)</span></td></tr>
 <tr>
 <td class=r title='382 = 0x17e'>382</td>
+<td>CameraInfo5DmkII_2b</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#CameraInfo5DmkII_2'>Canon CameraInfo5DmkII_2 Tags</a>
+  <br><span class='n s'>(at this location for firmware 1.0.6 and 4.1.1)</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraInfo5DmkII_2'>Canon CameraInfo5DmkII_2 Tags</a></h2>
+<p>More CameraInfo tags for the EOS 5D Mark II.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
 <td>FirmwareVersion</td>
 <td class=c>N</td>
-<td><span class=s><span class=n>(at this location for firmware 1.0.6 and 4.1.1)</span></span></td></tr>
+<td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='407 = 0x197'>407</td>
+<td class=r title='61 = 0x3d'>61</td>
 <td>FileIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='419 = 0x1a3'>419</td>
+<td class=r title='73 = 0x49'>73</td>
 <td>DirectoryIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='443 = 0x1bb'>443</td>
-<td>FileIndex</td>
-<td class=c>int32u</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='455 = 0x1c7'>455</td>
-<td>DirectoryIndex</td>
-<td class=c>int32u</td>
-<td>&nbsp;</td></tr>
+<td class=r title='377 = 0x179'>377</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo'>Canon PSInfo Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo7D'>Canon CameraInfo7D Tags</a></h2>
@@ -2494,7 +2988,7 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td>CameraInfo7D_2b</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#CameraInfo7D_2'>Canon CameraInfo7D_2 Tags</a>
-  <br><span class='n s'>(at this location for firmware 1.0.7 and 1.0.8)</span></td></tr>
+  <br><span class='n s'>(at this location for firmware 1.0.7, 1.0.8, 1.1.0, 1.2.1 and 1.2.2)</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo7D_2'>Canon CameraInfo7D_2 Tags</a></h2>
@@ -2569,6 +3063,11 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td>DirectoryIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td class=r title='771 = 0x303'>771</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo'>Canon PSInfo Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo40D'>Canon CameraInfo40D Tags</a></h2>
@@ -2675,6 +3174,11 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r title='603 = 0x25b'>603</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo'>Canon PSInfo Tags</a></td></tr>
+<tr class=b>
 <td class=r title='2347 = 0x92b'>2347</td>
 <td>LensModel</td>
 <td class=c>string[64]</td>
@@ -2821,6 +3325,481 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td>DirectoryIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td class=r title='723 = 0x2d3'>723</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo'>Canon PSInfo Tags</a></td></tr>
+<tr class=b>
+<td class=r title='727 = 0x2d7'>727</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo'>Canon PSInfo Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CameraInfo60D'>Canon CameraInfo60D Tags</a></h2>
+<p>CameraInfo tags for the EOS 60D.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='3 = 0x3'>3</td>
+<td>FNumber</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4</td>
+<td>ExposureTime</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='6 = 0x6'>6</td>
+<td>ISO</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='25 = 0x19'>25</td>
+<td>CameraTemperature</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='30 = 0x1e'>30</td>
+<td>FocalLength</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='54 = 0x36'>54</td>
+<td>CameraOrientation</td>
+<td class=c>int8u</td>
+<td><span class=s>0 = Horizontal (normal)
+  <br>1 = Rotate 90 CW
+  <br>2 = Rotate 270 CW</span></td></tr>
+<tr>
+<td class=r title='85 = 0x55'>85</td>
+<td>FocusDistanceUpper</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='87 = 0x57'>87</td>
+<td>FocusDistanceLower</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='125 = 0x7d'>125</td>
+<td>ColorTemperature</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='232 = 0xe8'>232</td>
+<td>LensType</td>
+<td class=c>int16uRev</td>
+<td>--&gt; <a href='Canon.html#LensType'>Canon LensType Values</a></td></tr>
+<tr>
+<td class=r title='234 = 0xea'>234</td>
+<td>ShortFocal</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='236 = 0xec'>236</td>
+<td>LongFocal</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='409 = 0x199'>409</td>
+<td>FirmwareVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='473 = 0x1d9'>473</td>
+<td>FileIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='485 = 0x1e5'>485</td>
+<td>DirectoryIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='801 = 0x321'>801</td>
+<td>PictureStyleInfo2</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo2'>Canon PSInfo2 Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='PSInfo2'>Canon PSInfo2 Tags</a></h2>
+<p>Custom picture style information for the EOS 60D.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>ContrastStandard</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4</td>
+<td>SharpnessStandard</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='8 = 0x8'>8</td>
+<td>SaturationStandard</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='12 = 0xc'>12</td>
+<td>ColorToneStandard</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>FilterEffectStandard?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='20 = 0x14'>20</td>
+<td>ToningEffectStandard?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='24 = 0x18'>24</td>
+<td>ContrastPortrait</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='28 = 0x1c'>28</td>
+<td>SharpnessPortrait</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='32 = 0x20'>32</td>
+<td>SaturationPortrait</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='36 = 0x24'>36</td>
+<td>ColorTonePortrait</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='40 = 0x28'>40</td>
+<td>FilterEffectPortrait?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='44 = 0x2c'>44</td>
+<td>ToningEffectPortrait?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='48 = 0x30'>48</td>
+<td>ContrastLandscape</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='52 = 0x34'>52</td>
+<td>SharpnessLandscape</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='56 = 0x38'>56</td>
+<td>SaturationLandscape</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='60 = 0x3c'>60</td>
+<td>ColorToneLandscape</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='64 = 0x40'>64</td>
+<td>FilterEffectLandscape?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='68 = 0x44'>68</td>
+<td>ToningEffectLandscape?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='72 = 0x48'>72</td>
+<td>ContrastNeutral</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='76 = 0x4c'>76</td>
+<td>SharpnessNeutral</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='80 = 0x50'>80</td>
+<td>SaturationNeutral</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='84 = 0x54'>84</td>
+<td>ColorToneNeutral</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='88 = 0x58'>88</td>
+<td>FilterEffectNeutral?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='92 = 0x5c'>92</td>
+<td>ToningEffectNeutral?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='96 = 0x60'>96</td>
+<td>ContrastFaithful</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='100 = 0x64'>100</td>
+<td>SharpnessFaithful</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='104 = 0x68'>104</td>
+<td>SaturationFaithful</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='108 = 0x6c'>108</td>
+<td>ColorToneFaithful</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='112 = 0x70'>112</td>
+<td>FilterEffectFaithful?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='116 = 0x74'>116</td>
+<td>ToningEffectFaithful?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='120 = 0x78'>120</td>
+<td>ContrastMonochrome</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='124 = 0x7c'>124</td>
+<td>SharpnessMonochrome</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='128 = 0x80'>128</td>
+<td>SaturationMonochrome?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='132 = 0x84'>132</td>
+<td>ColorToneMonochrome?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='136 = 0x88'>136</td>
+<td>FilterEffectMonochrome</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Yellow
+  <br>0x2 = Orange
+  <br>0x3 = Red
+  <br>0x4 = Green</span></td></tr>
+<tr class=b>
+<td class=r title='140 = 0x8c'>140</td>
+<td>ToningEffectMonochrome</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Sepia
+  <br>0x2 = Blue
+  <br>0x3 = Purple
+  <br>0x4 = Green</span></td></tr>
+<tr>
+<td class=r title='144 = 0x90'>144</td>
+<td>ContrastUnknown?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='148 = 0x94'>148</td>
+<td>SharpnessUnknown?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='152 = 0x98'>152</td>
+<td>SaturationUnknown?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='156 = 0x9c'>156</td>
+<td>ColorToneUnknown?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='160 = 0xa0'>160</td>
+<td>FilterEffectUnknown?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Yellow
+  <br>0x2 = Orange
+  <br>0x3 = Red
+  <br>0x4 = Green</span></td></tr>
+<tr class=b>
+<td class=r title='164 = 0xa4'>164</td>
+<td>ToningEffectUnknown?</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Sepia
+  <br>0x2 = Blue
+  <br>0x3 = Purple
+  <br>0x4 = Green</span></td></tr>
+<tr>
+<td class=r title='168 = 0xa8'>168</td>
+<td>ContrastUserDef1</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='172 = 0xac'>172</td>
+<td>SharpnessUserDef1</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='176 = 0xb0'>176</td>
+<td>SaturationUserDef1</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='180 = 0xb4'>180</td>
+<td>ColorToneUserDef1</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='184 = 0xb8'>184</td>
+<td>FilterEffectUserDef1</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Yellow
+  <br>0x2 = Orange
+  <br>0x3 = Red
+  <br>0x4 = Green</span></td></tr>
+<tr class=b>
+<td class=r title='188 = 0xbc'>188</td>
+<td>ToningEffectUserDef1</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Sepia
+  <br>0x2 = Blue
+  <br>0x3 = Purple
+  <br>0x4 = Green</span></td></tr>
+<tr>
+<td class=r title='192 = 0xc0'>192</td>
+<td>ContrastUserDef2</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='196 = 0xc4'>196</td>
+<td>SharpnessUserDef2</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='200 = 0xc8'>200</td>
+<td>SaturationUserDef2</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='204 = 0xcc'>204</td>
+<td>ColorToneUserDef2</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='208 = 0xd0'>208</td>
+<td>FilterEffectUserDef2</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Yellow
+  <br>0x2 = Orange
+  <br>0x3 = Red
+  <br>0x4 = Green</span></td></tr>
+<tr class=b>
+<td class=r title='212 = 0xd4'>212</td>
+<td>ToningEffectUserDef2</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Sepia
+  <br>0x2 = Blue
+  <br>0x3 = Purple
+  <br>0x4 = Green</span></td></tr>
+<tr>
+<td class=r title='216 = 0xd8'>216</td>
+<td>ContrastUserDef3</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='220 = 0xdc'>220</td>
+<td>SharpnessUserDef3</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='224 = 0xe0'>224</td>
+<td>SaturationUserDef3</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr class=b>
+<td class=r title='228 = 0xe4'>228</td>
+<td>ColorToneUserDef3</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a</span></td></tr>
+<tr>
+<td class=r title='232 = 0xe8'>232</td>
+<td>FilterEffectUserDef3</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Yellow
+  <br>0x2 = Orange
+  <br>0x3 = Red
+  <br>0x4 = Green</span></td></tr>
+<tr class=b>
+<td class=r title='236 = 0xec'>236</td>
+<td>ToningEffectUserDef3</td>
+<td class=c>int32s</td>
+<td><span class=s>-559038737 = n/a
+  <br>0x0 = None
+  <br>0x1 = Sepia
+  <br>0x2 = Blue
+  <br>0x3 = Purple
+  <br>0x4 = Green</span></td></tr>
+<tr>
+<td class=r title='240 = 0xf0'>240</td>
+<td>UserDef1PictureStyle</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Canon.html#UserDefStyle'>Canon UserDefStyle Values</a></td></tr>
+<tr class=b>
+<td class=r title='242 = 0xf2'>242</td>
+<td>UserDef2PictureStyle</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Canon.html#UserDefStyle'>Canon UserDefStyle Values</a></td></tr>
+<tr>
+<td class=r title='244 = 0xf4'>244</td>
+<td>UserDef3PictureStyle</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Canon.html#UserDefStyle'>Canon UserDefStyle Values</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo450D'>Canon CameraInfo450D Tags</a></h2>
@@ -2907,15 +3886,25 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=c>string[6]</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r title='271 = 0x10f'>271</td>
+<td>OwnerName</td>
+<td class=c>string[32]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td class=r title='307 = 0x133'>307</td>
 <td>DirectoryIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='319 = 0x13f'>319</td>
 <td>FileIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='611 = 0x263'>611</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo'>Canon PSInfo Tags</a></td></tr>
 <tr>
 <td class=r title='2355 = 0x933'>2355</td>
 <td>LensModel</td>
@@ -3048,6 +4037,11 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td>DirectoryIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='779 = 0x30b'>779</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo'>Canon PSInfo Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo550D'>Canon CameraInfo550D Tags</a></h2>
@@ -3159,6 +4153,11 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td>DirectoryIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='796 = 0x31c'>796</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo'>Canon PSInfo Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo1000D'>Canon CameraInfo1000D Tags</a></h2>
@@ -3255,6 +4254,11 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r title='615 = 0x267'>615</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo'>Canon PSInfo Tags</a></td></tr>
+<tr class=b>
 <td class=r title='2359 = 0x937'>2359</td>
 <td>LensModel</td>
 <td class=c>string[64]</td>
@@ -3304,10 +4308,11 @@ SD950, SD1000, SX100 and TX1)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfoPowerShot2'>Canon CameraInfoPowerShot2 Tags</a></h2>
-<p>CameraInfo tags for PowerShot models such as the A470, A480, A580, A590,
-A1000, A1100, A2000, A2100, D10, E1, G10, G11, S90, SD770, SD780, SD790,
-SD880, SD890, SD940, SD960, SD970, SD980, SD990, SD1100, SD1200, SX1, SX10,
-SX20, SX110, SX120 and SX200.</p>
+<p>CameraInfo tags for PowerShot models such as the A470, A480, A490, A495,
+A580, A590, A1000, A1100, A2000, A2100, A3000, A3100, D10, E1, G10, G11,
+S90, S95, SD770, SD780, SD790, SD880, SD890, SD940, SD960, SD970, SD980,
+SD990, SD1100, SD1200, SD1300, SD1400, SD3500, SD4000, SD4500, SX1, SX10,
+SX20, SX110, SX120, SX130, SX200 and SX210.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -3352,7 +4357,13 @@ SX20, SX110, SX120 and SX200.</p>
 <td class=r title='168 = 0xa8'>168</td>
 <td>CameraTemperature</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(G11, S90, SD940, SD980, SX20 and SX120)</span></span></td></tr>
+<td><span class=s><span class=n>(A490, A495, A3000, A3100, G11, S90, SD940, SD980, SD1300, SD1400, SD3500,
+SD4000, SX20, SX120 and SX210)</span></span></td></tr>
+<tr>
+<td class=r title='261 = 0x105'>261</td>
+<td>CameraTemperature</td>
+<td class=c>int32s</td>
+<td><span class=s><span class=n>(S95, SD4500 and SX130)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfoUnknown32'>Canon CameraInfoUnknown32 Tags</a></h2>
@@ -3405,6 +4416,60 @@ SX20, SX110, SX120 and SX200.</p>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr><td colspan=4 class=c><i>[no tags known]</i></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='MovieInfo'>Canon MovieInfo Tags</a></h2>
+<p>Tags written by some Canon cameras when recording video.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='1 = 0x1'>1</td>
+<td>FrameRate</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='2 = 0x2'>2</td>
+<td>FrameCount</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>FrameCount</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='6 = 0x6'>6</td>
+<td>FrameRate</td>
+<td class=c>rational32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='106 = 0x6a'>106</td>
+<td>Duration</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='108 = 0x6c'>108</td>
+<td>AudioBitrate</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='110 = 0x6e'>110</td>
+<td>AudioSampleRate</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='112 = 0x70'>112</td>
+<td>AudioChannels</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='116 = 0x74'>116</td>
+<td>VideoCodec</td>
+<td class=c>undef[4]</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='AFInfo'>Canon AFInfo Tags</a></h2>
@@ -3747,8 +4812,11 @@ images with a directory number of 164 or greater)</span></span></td></tr>
   <br>7 = Medium 3
   <br>8 = Postcard
   <br>9 = Widescreen
+  <br>128 = 640x480 Movie
   <br>129 = Medium Movie
-  <br>130 = Small Movie</span></td></tr>
+  <br>130 = Small Movie
+  <br>137 = 1280x720 Movie
+  <br>142 = 1920x1080 Movie</span></td></tr>
 <tr>
 <td class=r title='8 = 0x8'>8</td>
 <td>LongExposureNoiseReduction2</td>
@@ -3825,6 +4893,60 @@ valid for all camera models)</span></span></td></tr>
 <td class=r title='9 = 0x9'>9</td>
 <td>InternalSerialNumber</td>
 <td class=c>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CropInfo'>Canon CropInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>CropLeftMargin</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>CropRightMargin</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>CropTopMargin</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='3 = 0x3'>3</td>
+<td>CropBottomMargin</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AspectInfo'>Canon AspectInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>AspectRatio</td>
+<td class=c>int32u</td>
+<td><span class=s>0 = 3:2
+  <br>1 = 1:1
+  <br>2 = 4:3
+  <br>7 = 16:9</span></td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>CroppedImageWidth</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>CroppedImageHeight</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -5697,9 +6819,98 @@ and 550D.</p>
   <br>3 = Off</span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='LensInfo'>Canon LensInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>LensSerialNumber</td>
+<td class=c>undef[5]</td>
+<td><span class=s><span class=n>(apparently this is an internal serial number because it doesn&#39;t correspond
+to the one printed on the lens)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Ambience'>Canon Ambience Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='1 = 0x1'>1</td>
+<td>AmbienceSelection</td>
+<td class=c>int32s</td>
+<td><span class=s>0 = Standard
+  <br>1 = Vivid
+  <br>2 = Warm
+  <br>3 = Soft
+  <br>4 = Cool
+  <br>5 = Intense
+  <br>6 = Brighter
+  <br>7 = Darker</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FilterInfo'>Canon FilterInfo Tags</a></h2>
+<p>Information about creative filter settings.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td title='0x0101 = 257'>0x0101</td>
+<td>GrainyBWFilter</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0201 = 513'>0x0201</td>
+<td>SoftFocusFilter</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0301 = 769'>0x0301</td>
+<td>ToyCameraFilter</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0401 = 1025'>0x0401</td>
+<td>MiniatureFilter</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0402 = 1026'>0x0402</td>
+<td>MiniatureFilterOrientation</td>
+<td class=c>N</td>
+<td><span class=s>0 = Horizontal
+  <br>1 = Vertical</span></td></tr>
+<tr class=b>
+<td title='0x0403 = 1027'>0x0403</td>
+<td>MiniatureFilterPosition</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CNTH'>Canon CNTH Tags</a></h2>
+<p>Canon-specific QuickTime tags found in the CNTH atom of MOV videos from some
+cameras such as the PowerShot S95.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'CNDA'</td>
+<td>ThumbnailImage</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(the full THM image, embedded metadata is extracted as the first sub-document)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 9, 2010</i>
+<br><i>Last revised Nov 21, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

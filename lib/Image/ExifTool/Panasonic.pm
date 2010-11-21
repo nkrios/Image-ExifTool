@@ -17,6 +17,7 @@
 #              12) Joerg - http://www.cpanforum.com/threads/11602 (LX3 firmware 2.0)
 #              13) Michael Byczkowski private communication (Leica M9)
 #              14) Carl Bretteville private communication (M9)
+#              15) Zdenek Mihula private communication (TZ8)
 #              JD) Jens Duttke private communication (TZ3,FZ30,FZ50)
 #------------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.55';
+$VERSION = '1.57';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -428,7 +429,7 @@ my %shootingMode = (
     0x2c => [
         {
             Name => 'ContrastMode',
-            Condition => '$$self{Model} !~ /^DMC-(FX10|G1|L1|L10|LC80|GF1)$/',
+            Condition => '$$self{Model} !~ /^DMC-(FX10|G1|L1|L10|LC80|GF1|TZ10|ZS7)$/',
             Flags => 'PrintHex',
             Writable => 'int16u',
             Notes => q{
@@ -471,6 +472,18 @@ my %shootingMode = (
                 37 => 'Nostalgic (Color Film)',
                 41 => 'Dynamic Art (My Color)',
                 42 => 'Retro (My Color)',
+            },
+        },{
+            Name => 'ContrastMode',
+            Condition => '$$self{Model} =~ /^DMC-(TZ10|ZS7)$/',
+            Notes => 'these values are used by the TZ10 and ZS7',
+            Writable => 'int16u',
+            PrintConv => {
+                0 => 'Normal',
+                1 => '-2',
+                2 => '+2',
+                5 => '-1',
+                6 => '+1',
             },
         },{
             Name => 'ContrastMode',
@@ -527,6 +540,7 @@ my %shootingMode = (
             0 => 'Normal',
             1 => 'Natural',
             2 => 'Vivid',
+            # have seen 3 for GF2 - PH
         },
     },
     0x33 => { #JD
@@ -644,6 +658,7 @@ my %shootingMode = (
         Name => 'FilmMode',
         Writable => 'int16u',
         PrintConv => {
+            # have seen 0 for GF2 - PH
             1 => 'Standard (color)',
             2 => 'Dynamic (color)',
             3 => 'Nature (color)',
@@ -658,6 +673,9 @@ my %shootingMode = (
             # 12 => 'Multi Film'? (in the GH1 specs)
         },
     },
+    # 0x43 - int16u: 2,3
+    # 0x44 - int16u: 0,2500
+    # 0x45 - int16u: 0
     0x46 => { #PH/JD
         Name => 'WBAdjustAB',
         Format => 'int16s',
@@ -669,6 +687,17 @@ my %shootingMode = (
         Format => 'int16s',
         Writable => 'int16u',
         Notes => 'positive is a shift toward green',
+    },
+    # 0x48 - int16u: 0
+    # 0x49 - int16u: 2
+    # 0x4a - int16u: 0
+    0x4b => { #PH
+        Name => 'PanasonicImageWidth',
+        Writable => 'int32u',
+    },
+    0x4c => { #PH
+        Name => 'PanasonicImageHeight',
+        Writable => 'int32u',
     },
     0x4d => { #PH (FS7)
         Name => 'AFPointPosition',
@@ -689,6 +718,7 @@ my %shootingMode = (
             TagTable => 'Image::ExifTool::Panasonic::FaceDetInfo',
         },
     },
+    # 0x4f,0x50 - int16u: 0
     0x51 => {
         Name => 'LensType',
         Writable => 'string',
@@ -701,6 +731,9 @@ my %shootingMode = (
         Name => 'AccessoryType',
         Writable => 'string',
     },
+    # 0x54 - string[14]: "0000000"
+    # 0x55 - int16u: 1
+    # 0x57 - int16u: 0
     0x59 => { #PH (FS7)
         Name => 'Transform',
         Writable => 'undef',
@@ -715,6 +748,9 @@ my %shootingMode = (
             '3 2' => 'Stretch High',
         },
     },
+    # 0x5a - int16u: 0,2
+    # 0x5b - int16u: 0
+    # 0x5c - int16u: 0,2
     0x5d => { #PH (GF1, FZ35)
         Name => 'IntelligentExposure',
         Notes => 'not valid for some models', # (doesn't change in ZS7 and GH1 images)
@@ -726,6 +762,7 @@ my %shootingMode = (
             3 => 'High',
         },
     },
+    # 0x5e,0x5f,0x60 - undef[4]
     0x61 => { #PH
         Name => 'FaceRecInfo',
         SubDirectory => {
@@ -746,39 +783,77 @@ my %shootingMode = (
         Writable => 'undef',
         Unknown => 1,
     },
+    0x65 => { #15
+        Name => 'Title',
+        Format => 'string',
+        Writable => 'undef', # (Count 64)
+    },
+    0x66 => { #15
+        Name => 'BabyName',
+        Notes => 'or pet name',
+        Format => 'string',
+        Writable => 'undef', # (Count 64)
+    },
+    0x67 => { #15
+        Name => 'Location',
+        Groups => { 2 => 'Location' },
+        Format => 'string',
+        Writable => 'undef', # (Count 64)
+    },
+    # 0x68 - int8u: 1
     0x69 => { #PH (ZS7)
         Name => 'Country', # (Country/Region)
         Groups => { 2 => 'Location' },
         Format => 'string',
-        Writable => 'undef',
+        Writable => 'undef', # (Count 72)
     },
+    # 0x6a - int8u: 1
     0x6b => { #PH (ZS7)
         Name => 'State', # (State/Province/Count -- what is Count?)
         Groups => { 2 => 'Location' },
         Format => 'string',
-        Writable => 'undef',
+        Writable => 'undef', # (Count 72)
     },
+    # 0x6c - int8u: 1
     0x6d => { #PH (ZS7)
         Name => 'City', # (City/Town)
         Groups => { 2 => 'Location' },
         Format => 'string',
-        Writable => 'undef',
+        Writable => 'undef', # (Count 72)
     },
+    # 0x6e - int8u: 1
     0x6f => { #PH (ZS7)
         Name => 'Landmark', # (Landmark)
         Groups => { 2 => 'Location' },
         Format => 'string',
-        Writable => 'undef',
+        Writable => 'undef', # (Count 128)
     },
     0x70 => { #PH (ZS7)
         Name => 'IntelligentResolution',
         Writable => 'int8u',
         PrintConv => {
             0 => 'Off',
-            2 => 'Auto', # (NC) (TS2 in intelligent auto mode)
-            3 => 'On',
+            # Note: I think these values make sense for the GH2, but meanings
+            #       may be different for other models
+            1 => 'Low',
+            2 => 'Standard',
+            3 => 'High',
+            4 => 'Extended',
         },
     },
+    # 0x71 - undef[128] (maybe text stamp text?)
+    # 0x72,0x73,0x74,0x75,0x76,0x77,0x78: 0
+    0x79 => { #PH (GH2)
+        Name => 'IntelligentD-Range',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Low',
+            2 => 'Standard',
+            3 => 'High',
+        },
+    },
+    # 0x7a,0x7b: 0
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',

@@ -11,6 +11,12 @@ use strict;
 use vars qw($VERSION $AUTOLOAD %crwTagFormat);
 use Image::ExifTool::Fixup;
 
+# map for adding directories to CRW
+my %crwMap = (
+    XMP      => 'CanonVRD',
+    CanonVRD => 'Trailer',
+);
+
 # mappings to from RAW tagID to MakerNotes tagID
 # (Note: upper two bits of RawTagID are zero)
 my %mapRawTag = (
@@ -240,7 +246,7 @@ sub WriteCR2($$$)
 # Write CanonRaw (CRW) information
 # Inputs: 0) ExifTool object reference, 1) source dirInfo reference,
 #         2) tag table reference
-# Returns: true on sucess
+# Returns: true on success
 # Notes: Increments ExifTool CHANGED flag for each tag changed This routine is
 # different from all of the other write routines because Canon RAW files are
 # designed well!  So it isn't necessary to buffer the data in memory before
@@ -522,6 +528,10 @@ sub WriteCRW($$)
             return 1;
         }
     }
+    # make XMP the preferred group for CRW files
+    if ($$exifTool{FILE_TYPE} eq 'CRW') {
+        $exifTool->InitWriteDirs(\%crwMap, 'XMP');
+    }
 
     # write header
     $raf->Seek(0, 0)            or return 0;
@@ -562,6 +572,16 @@ sub WriteCRW($$)
     if ($success) {
         # add CanonVRD trailer if writing as a block
         $trailPt = $exifTool->AddNewTrailers($trailPt,'CanonVRD');
+        if (not $trailPt and $$exifTool{ADD_DIRS}{CanonVRD}) {
+            # create CanonVRD from scratch if necessary
+            my $outbuff = '';
+            my $saveOrder = GetByteOrder();
+            require Image::ExifTool::CanonVRD;
+            if (Image::ExifTool::CanonVRD::ProcessCanonVRD($exifTool, { OutFile => \$outbuff }) > 0) {
+                $trailPt = \$outbuff;
+            }
+            SetByteOrder($saveOrder);
+        }
         # write trailer
         if ($trailPt) {
             # must append DirStart pointer to end of trailer

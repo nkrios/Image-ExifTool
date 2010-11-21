@@ -1,7 +1,7 @@
 # Before "make install", this script should be runnable with "make test".
 # After "make install" it should work as "perl t/CanonVRD.t".
 
-BEGIN { $| = 1; print "1..10\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..12\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -32,6 +32,7 @@ my @checkTags = qw(FileSize Warning VRDVersion VRDOffset);
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->SetNewValuesFromFile('t/images/ExifTool.jpg');
+    $exifTool->SetNewValue('xmp:*');
     my $testfile = "t/${testname}_${testnum}_failed.vrd";
     unlink $testfile;
     $exifTool->WriteInfo('t/images/CanonVRD.vrd', $testfile);
@@ -103,6 +104,26 @@ my @checkTags = qw(FileSize Warning VRDVersion VRDOffset);
         print 'not ';
     }
     print "ok $testnum\n";
+}
+
+# test 11-12: Add XMP to a VRD file
+{
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValue('XMP:Title', 'XMP in VRD test');
+    my $srcfile;
+    foreach $srcfile ('t/images/CanonVRD.vrd', undef) {
+        ++$testnum;
+        my $testfile = "t/${testname}_${testnum}_failed.vrd";
+        unlink $testfile;
+        $exifTool->WriteInfo($srcfile, $testfile);
+        my $info = $exifTool->ImageInfo($testfile);
+        if (check($exifTool, $info, $testname, $testnum)) {
+            unlink $testfile;
+        } else {
+            print 'not ';
+        }
+        print "ok $testnum\n";
+    }
 }
 
 # end

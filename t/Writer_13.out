@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.24
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.35
 [File, System, Image] FileName - File Name: Writer_13_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 4.4 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:06:21 15:13:12-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:10:11 08:48:11-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -92,13 +92,13 @@
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
-[MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
+[MakerNotes, Canon, Image] 28 - ND Filter: n/a
 [MakerNotes, Canon, Image] 29 - Self Timer 2: 0
 [MakerNotes, Canon, Image] 6 - Canon Image Type: CRW:EOS DIGITAL REBEL CMOS RAW
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware Version 1.1.1
 [MakerNotes, Canon, Image] 8 - File Number: 116-1602
 [MakerNotes, Canon, Camera] 9 - Owner Name: Phil Harvey
-[MakerNotes, Canon, Camera] 12 - Camera Body No.: 0560018150
+[MakerNotes, Canon, Camera] 12 - Serial Number: 0560018150
 [MakerNotes, Canon, Camera] 16 - Canon Model ID: EOS Digital Rebel / 300D / Kiss Digital
 [MakerNotes, Canon, Camera] 0 - Num AF Points: 7
 [MakerNotes, Canon, Camera] 1 - Valid AF Points: 7
@@ -128,7 +128,7 @@
 [MakerNotes, Canon, Camera] 1 - Measured RGGB: 554 1022 1026 754
 [MakerNotes, Canon, Camera] 174 - Color Temperature: 5200
 [MakerNotes, Canon, Camera] 180 - Color Space: sRGB
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.24
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.35
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 2048
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 3072

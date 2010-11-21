@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.24
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.35
 [File, System, Image] FileName - File Name: CanonRaw.crw
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 6.1 kB
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2005:11:14 14:47:21-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: CRW
-[File, File, Image] MIMEType - MIME Type: image/x-raw
+[File, File, Image] MIMEType - MIME Type: image/x-canon-crw
 [MakerNotes, CanonRaw, Camera] 8197 - Raw Data: (Binary data 22 bytes)
 [MakerNotes, CanonRaw, Camera] 8199 - Jpg From Raw: (Binary data 29 bytes)
 [MakerNotes, CanonRaw, Image] 0 - File Format: CRW
@@ -32,7 +32,7 @@
 [MakerNotes, CanonRaw, Camera] 2064 - Owner Name: Phil Harvey
 [MakerNotes, CanonRaw, Camera] 0 - Make: Canon
 [MakerNotes, CanonRaw, Camera] 6 - Camera Model Name: Canon EOS DIGITAL REBEL
-[MakerNotes, CanonRaw, Camera] 6155 - Camera Body No.: 0560018150
+[MakerNotes, CanonRaw, Camera] 6155 - Serial Number: 0560018150
 [MakerNotes, CanonRaw, Camera] 4124 - Base ISO: 100
 [MakerNotes, CanonRaw, Camera] 2061 - ROM Operation Mode: USA
 [MakerNotes, CanonRaw, Camera] 2059 - Canon Firmware Version: Firmware Version 1.1.1
@@ -61,7 +61,7 @@
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
-[MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
+[MakerNotes, Canon, Image] 28 - ND Filter: n/a
 [MakerNotes, Canon, Image] 29 - Self Timer 2: 0
 [MakerNotes, Canon, Image] 3 - Bracket Mode: Off
 [MakerNotes, Canon, Image] 4 - Bracket Value: 0

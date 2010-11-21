@@ -96,7 +96,7 @@ fixed or added.  New additions to the specification have not been made since
 version 2.21 in 2003.  And to make things worse, version 2.21 is not freely
 available -- it must be purchased from JEITA<a class=ref
 href="#ref5">[5]</a>. <i class=lt>[Surprise!  The Exif 2.3 specification
-has been released and is publicly available -- see below.]</i></p>
+has been released and is publicly available -- see the update below.]</i></p>
 
 <p>Current problems with the EXIF specification are:</p>
 
@@ -110,6 +110,9 @@ UserComment tag has this feature).</li>
 <li>Byte ordering for "Unicode" text strings, and the meaning of "Unicode"
 itself is not clearly specified.</li>
 <li>Mandatory tags are unnecessary and painful to implement.</li>
+<li>MaxApertureValue is stored as an unsigned RATIONAL, which means that
+lenses with F numbers faster than 1.0 (with equivalent APEX values of less
+than zero) can not be represented.</li>
 </ol>
 
 <p><b>Simple solutions:</b></p>
@@ -135,6 +138,7 @@ ordering. regardless of the EXIF byte order.)  Also, it should be made clear
 that by "Unicode" the EXIF specification actually means UCS-2, although updating
 this to allow UTF-16 surrogate pairs may be a good idea.</li>
 <li>Define reasonable fallback values for required tags which are missing.</li>
+<li>Allow MaxApertureValue to be stored as a signed SRATIONAL.</li>
 </ol>
 
 <p><b>Update:</b> The Exif 2.3 specification <a class=ref href="#ref12">[12]</a>
@@ -262,7 +266,7 @@ inside a JPEG segment.</p>
 </ol>
 <hr>
 <i>Created Sep 17, 2009</i><br>
-<i>Last revised May 26, 2010</i>
+<i>Last revised Aug 19, 2010</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

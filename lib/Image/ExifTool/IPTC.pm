@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.37';
+$VERSION = '1.38';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -978,6 +978,16 @@ sub TranslateCodedString($$$$)
 }
 
 #------------------------------------------------------------------------------
+# Is this IPTC in a standard location?
+# Inputs: 0) Current metadata path string
+# Returns: true if path is standard
+sub IsStandardIPTC($)
+{
+    my $path = shift;
+    return $path =~ /^(JPEG-APP13-Photoshop-IPTC|TIFF-IFD0-IPTC|PSD-IPTC|MIE-IPTC)$/
+}
+
+#------------------------------------------------------------------------------
 # get IPTC info
 # Inputs: 0) ExifTool object reference, 1) dirInfo reference
 #         2) reference to tag table
@@ -997,8 +1007,8 @@ sub ProcessIPTC($$$)
 
     if ($tagTablePtr eq \%Image::ExifTool::IPTC::Main) {
         # calculate MD5 if Digest::MD5 is available (for standard IPTC only)
-        my $path = join('-', @{$$exifTool{PATH}});
-        if ($path =~ /^(JPEG-APP13-Photoshop-IPTC|TIFF-IFD0-IPTC|PSD-IPTC|MIE-IPTC)$/) {
+        my $path = $exifTool->MetadataPath();
+        if (IsStandardIPTC($path)) {
             my $md5;
             if (eval 'require Digest::MD5') {
                 if ($pos or $dirLen != length($$dataPt)) {

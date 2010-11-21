@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.40
 [File, System, Image] FileName - File Name: Panasonic.rw2
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 12 kB
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2009:03:25 11:54:31-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: RW2
-[File, File, Image] MIMEType - MIME Type: image/x-raw
+[File, File, Image] MIMEType - MIME Type: image/x-panasonic-rw2
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
 [File, File, Image] ImageWidth - Image Width: 8
@@ -31,7 +31,7 @@
 [EXIF, IFD0, Image] 282 - X Resolution: 180
 [EXIF, IFD0, Image] 283 - Y Resolution: 180
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
-[EXIF, IFD0, Image] 305 - Software: Ver.1.0  
+[EXIF, IFD0, Image] 305 - Software: Ver.1.0
 [EXIF, IFD0, Time] 306 - Modify Date: 2008:08:06 15:21:56
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
 [EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/250
@@ -135,6 +135,8 @@
 [MakerNotes, Panasonic, Camera] 66 - Film Mode: Standard (color)
 [MakerNotes, Panasonic, Camera] 70 - WB Adjust AB: 0
 [MakerNotes, Panasonic, Camera] 71 - WB Adjust GM: 0
+[MakerNotes, Panasonic, Camera] 75 - Panasonic Image Width: 3648
+[MakerNotes, Panasonic, Camera] 76 - Panasonic Image Height: 2736
 [MakerNotes, Panasonic, Camera] 77 - AF Point Position: 0.5 0.5
 [MakerNotes, Panasonic, Image] 0 - Num Face Positions: 0
 [MakerNotes, Panasonic, Camera] 32768 - Maker Note Version: 0130

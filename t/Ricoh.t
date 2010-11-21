@@ -28,7 +28,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my @writeInfo = (
-        ['MakerNoteVersion' => 'Rev1234'],
+        ['Ricoh:Sharpness' => 'Soft'],
     );
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum);
     print "ok $testnum\n";

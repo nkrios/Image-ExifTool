@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 sub ProcessJpeg2000Box($$$);
 
@@ -498,7 +498,7 @@ sub ProcessJpeg2000Box($$$)
         }
         if (defined $tagInfo and not $tagInfo) {
             # GetTagInfo() required the value for a Condition
-            my $tmpVal = substr($$dataPt, $valuePtr, $boxLen < 48 ? $boxLen : 48);
+            my $tmpVal = substr($$dataPt, $valuePtr, $boxLen < 128 ? $boxLen : 128);
             $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $boxID, \$tmpVal);
         }
         # delete all UUID boxes if deleting all information

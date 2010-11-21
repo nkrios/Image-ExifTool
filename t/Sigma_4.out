@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.32
 [File, System, Image] FileName - File Name: Sigma.x3f
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1464 bytes
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2005:11:14 14:47:22-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: X3F
-[File, File, Image] MIMEType - MIME Type: image/x-raw
+[File, File, Image] MIMEType - MIME Type: image/x-sigma-x3f
 [SigmaRaw, SigmaRaw, Other] 1 - File Version: 2.2
 [SigmaRaw, SigmaRaw, Other] 2 - Image Unique ID: 303230303132333413d14f3a3b2aa914
 [SigmaRaw, SigmaRaw, Other] 6 - Mark Bits: (none)
@@ -48,7 +48,7 @@
 [SigmaRaw, SigmaRaw, Camera] LENSARANGE - Lens Aperture Range: 29 to 4.5
 [SigmaRaw, SigmaRaw, Camera] LENSFRANGE - Lens Focal Range: 15 to 30
 [SigmaRaw, SigmaRaw, Camera] FLENGTH - Focal Length: 30.0 mm
-[SigmaRaw, SigmaRaw, Camera] FLEQ35MM - Focal Length In 35mm Format: 51
+[SigmaRaw, SigmaRaw, Camera] FLEQ35MM - Focal Length In 35mm Format: 51.0 mm
 [Composite, Composite, Image] Aperture - Aperture: 8.4
 [Composite, Composite, Image] ImageSize - Image Size: 2268x1512
 [Composite, Composite, Camera] LensID - Lens ID: Sigma 15-30mm F3.5-4.5 EX DG Aspherical

@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.30';
+$VERSION = '1.31';
 
 # older Casio maker notes (ref 1)
 %Image::ExifTool::Casio::Main = (
@@ -485,6 +485,7 @@ $VERSION = '1.30';
             '2 0 0' => 'Mist Removal',
             '3 0 0' => 'Vivid Landscape',
             # have also seen '1 1 1', '2 2 4', '4 3 3', '4 4 4'
+            # '0 0 14' and '0 0 42' - premium auto night shot (EX-Z2300)
         },
     },
     0x3000 => {
@@ -537,6 +538,7 @@ $VERSION = '1.30';
            3 => 'Single-Area Auto Focus',
            5 => 'Infinity', #PH
            6 => 'Multi-Area Auto Focus',
+           8 => 'Super Macro', #PH (EX-Z2300)
         },
     },
     0x3006 => {
@@ -632,6 +634,9 @@ $VERSION = '1.30';
         PrintConv => {
             0 => 'Normal',
             8 => 'Silent Movie',
+            45 => 'Premium Auto', # (EX-2300)
+            47 => 'Painting', # (EX-2300)
+            49 => 'Crayon Drawing', # (EX-2300)
         },
     },
     0x301c => { #3
@@ -693,6 +698,7 @@ $VERSION = '1.30';
             1 => 'Makeup',
             2 => 'Mist Removal',
             3 => 'Vivid Landscape',
+            16 => 'Art Shot', # (EX-Z2300)
         },
     },
     0x3103 => { #5

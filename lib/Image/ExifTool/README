@@ -14,13 +14,13 @@ the binary data block (floating point IDs allow multiple tags for the same
 offset, with the integer part being used for the offset).  The corresponding
 hash value provides information about the tag (explained later).
 
-Twenty-four special keys (TABLE_NAME, SHORT_NAME, PROCESS_PROC, WRITE_PROC,
+Twenty-five special keys (TABLE_NAME, SHORT_NAME, PROCESS_PROC, WRITE_PROC,
 CHECK_PROC, GROUPS, FORMAT, FIRST_ENTRY, TAG_PREFIX, PRINT_CONV, WRITABLE,
-TABLE_DESC, NOTES, IS_OFFSET, EXTRACT_UNKNOWN, NAMESPACE, PREFERRED, SRC_TABLE,
-PRIORITY, WRITE_GROUP, LANG_INFO, VARS, DATAMEMBER and SET_GROUP1) are used to
-provide additional information about a table. The special keys have names that
-are all capitalized to avoid possible conflicts with tag keys.  Below is an
-explanation of the meaning of each special key:
+TABLE_DESC, NOTES, IS_OFFSET, IS_SUBDIR, EXTRACT_UNKNOWN, NAMESPACE, PREFERRED,
+SRC_TABLE, PRIORITY, WRITE_GROUP, LANG_INFO, VARS, DATAMEMBER and SET_GROUP1)
+are used to provide additional information about a table. The special keys have
+names that are all capitalized to avoid possible conflicts with tag keys.  Below
+is an explanation of the meaning of each special key:
 
   TABLE_NAME : Name of this table (set by GetTagTable()).
 
@@ -125,8 +125,11 @@ explanation of the meaning of each special key:
   NOTES : Notes to introduce the table in the TagNames documentation.  Pod
   formatting codes B<> and C<> may be used in this text.
 
-  IS_OFFSET : Reference to list of TagID's representing offsets for writable
-  binary data tables only.  Not used for EXIF tables.
+  IS_OFFSET : Reference to list of sorted TagID's representing offsets for
+  writable binary data tables only.  Not used for EXIF tables.
+
+  IS_SUBDIR : BinaryData tables only.  A reference to a list of sorted tag ID's
+  representing subdirectories.  Required for writable subdirectories only.
 
   EXTRACT_UNKNOWN : Used in PDF tables to specify a directory where all unknown
   tags should be extracted.  Set to 0 to extract only unknown numbered tags for
@@ -172,19 +175,18 @@ explanation of the meaning of each special key:
     CAPTURE       Used by PDF module to name dictionaries to capture when
                   writing.
 
-    HAS_SUBDIR    Flag used in binary data tables to indicate that one of the
-                  tags represents a subdirectory.  This is required in order to
-                  write tags in nested binary subdirectories.
-
     MINOR_ERRORS  [EXIF tables only] Flag to make errors in this IFD minor, or
                   to downgrade already minor errors to warnings while writing.
                   (Errors in MakerNote IFD's are already classified as minor.)
                   Note that for certain types errors, the response is to delete
                   the entire IFD from the image.
 
-  DATAMEMBER : BinaryData tables only.  A reference to a list of tag ID's which
-  must be extracted as data members when writing.  Must also list "var_" format
-  tags so offsets are properly calculated if the table is writable.
+    NUMBERS_LAST  Sort numerical tags after character tags in documentation.
+
+  DATAMEMBER : BinaryData tables only.  A reference to a list of sorted tag ID's
+  which must be extracted as data members when writing.  Must also list "var_"
+  format tags and tags with Hook so offsets are properly calculated if the table
+  is writable.
 
   SET_GROUP1 : [EXIF tables only] Flag to set group1 name to the directory name
   for all tags in the table.
@@ -224,15 +226,15 @@ numerical.
                   above. For BinaryData tables, the format may have a size in
                   trailing brackets which is a perl expression to be evaluated.
                   The expression may access any of the previous table entries
-                  through a %val hash, the data size via $size, or the ExifTool
-                  object via $self. For example, 'string[$val{3}]' defines a
-                  string with length given by the table entry with tag index
-                  '3'.  If not specified, the format of an EXIF entry is taken
-                  from the EXIF information, and the format of a BinaryData
-                  entry is taken from the FORMAT specified for the table (or
-                  int8u if FORMAT is not specified). Must be specified for
-                  Writable tags where the value must be converted for a
-                  Condition.
+                  through a %val hash (read-only tables), the data size via
+                  $size, or the ExifTool object via $self. For example,
+                  'string[$val{3}]' defines a string with length given by the
+                  table entry with tag index '3'.  If not specified, the format
+                  of an EXIF entry is taken from the EXIF information, and the
+                  format of a BinaryData entry is taken from the FORMAT
+                  specified for the table (or int8u if FORMAT is not specified).
+                  Must be specified for Writable tags where the value must be
+                  converted for a Condition.
 
   Count         : Used when writing EXIF information to specify the number
                   values to write, or the number of characters in a fixed-length
@@ -316,6 +318,9 @@ numerical.
 
                   'MakerNotes' - set if this tag is maker note data.
 
+                  'MakerPreview' - set in the PreviewImageStart tag information
+                  if the preview must be stored inside the maker notes.
+
                   'Mandatory' - set for mandatory tags.  Used only by TagInfoXML
                   and documentation purposes.  Mandatory tags may be added
                   automatically by ExifTool.
@@ -326,7 +331,8 @@ numerical.
                   only be underlined if nested inside other maker notes.
 
                   'NotIFD' - set for 'MakerNotes' tags only if the data is not
-                  in standard EXIF IFD format.
+                  in standard EXIF IFD format.  (Note: All SubDirectory tags in
+                  the MakerNotes table are 'MakerNotes' type by default.)
 
                   'OffsetPair' - set if the tag represents half of an offset/
                   byte count pair.  Data for these tags must be handled
@@ -368,7 +374,8 @@ numerical.
                   'SeparateTable' - set to list PrintConv values in a separate
                   table in the HTML documentation.  Value is 1 for a table name
                   of 'Module TagName', or 'TAG' for 'Module TAG', or 'MODULE
-                  TAG' to fully specify the table name.
+                  TAG' to fully specify the table name.  The table may have a
+                  'Notes' entry for a description of the table.
 
                   'SetResourceName' - [Photoshop tags only] set to 1 to append
                   resource name to the extracted value (ie. 'VALUE/#NAME#/').
@@ -525,7 +532,7 @@ numerical.
   Mask          : [BinaryData tags only] Bitmask for this value.  (Multiple tags
                   may have the same index by using floating point indices.  An
                   unknown tag will only be generated for a certain TagID if
-                  there is no integral TagID for that tag.) When Mask is used,
+                  there is no integral TagID for that tag.)  When Mask is used,
                   PrintHex=1 is implied unless otherwise defined.
 
   Condition     : If given, specifies scalar which is evaluated as a Perl
@@ -534,16 +541,19 @@ numerical.
                   first list entry with a true condition is taken.  If no
                   condition exists, then a 'true' condition is assumed.  The
                   expression may use $self to access the ExifTool object.  The
-                  first 48 bytes of the raw data value are accessible through
-                  the reference $valPt for EXIF and Jpeg2000 tags only.  EXIF
-                  tags may also reference the format string and value count
-                  through $format and $count.  Note that if the value is
-                  writable and $valPt is used, the tag must have a Format
-                  (unless 'undef' or 'string'), and a Count (unless 1 or length
-                  of the 'undef' or 'string'), so the raw data may be generated
-                  for evaluating the Condition.  When writing, $valPt, $format
-                  and $count refer to the new value, except for MakerNotes tags
-                  where $format and $count refer to the old tag if it existed.
+                  first 128 bytes of the raw data value are accessible through
+                  the reference $valPt for EXIF, Jpeg2000 and BinaryData tags
+                  only (note that for BinaryData tags, the raw data of $$valPt
+                  is always 'undef' type, and may not be used when writing
+                  except for SubDirectory tags).  EXIF tags may also reference
+                  the format string and value count through $format and $count.
+                  Note that if the value is writable and $valPt is used, the tag
+                  must have a Format (unless 'undef' or 'string'), and a Count
+                  (unless 1 or length of the 'undef' or 'string'), so the raw
+                  data may be generated for evaluating the Condition.  When
+                  writing, $valPt, $format and $count refer to the new value,
+                  except for MakerNotes tags where $format and $count refer to
+                  the old tag if it existed.
 
   Require       : [Composite tags only] A hash reference specifying the tags
                   required to calculate the composite tag value.  The hash
@@ -619,9 +629,10 @@ numerical.
 
   DelCheck      : Similar to WriteCheck, but called when the tag is deleted. The
                   expression may access $self, $tagInfo and $wantGroup.  Returns
-                  error string, or undef on success.  May return empty string
-                  ('') to suppress warning messages but not delete tag (ie.
-                  when deleting only associated tags).
+                  error string, or undef on success, and may set $val to
+                  something other than undef.  May return empty string ('') to
+                  suppress warning messages but not delete tag (ie. when
+                  deleting only associated tags).
 
   WriteCondition: [Writable EXIF tags only] Specifies a condition to be
                   evaluated before the tag can be written to a specific file.
@@ -670,6 +681,12 @@ numerical.
   Units         : [MIE tags only] Reference to a list of valid units strings.
                   The default units are the first item in the list.
 
+  Hook          : [BinaryData tags only] Expression to be evaluated when
+                  extracting tag to allow dynamic Format, etc for BinaryData
+                  tags.  May assign a new value to $format to dynamically set
+                  the tag format, and/or increment $varSize to add a byte offset
+                  to subsequent tags.
+
   TagID         : [reserved] Used internally to save the table key for this tag.
 
   NewTagID      : [reserved] Used internally to save new ID of tag in Composite
@@ -691,7 +708,8 @@ numerical.
                   Composite tags.
 
   LangCode      : [reserved] Used internally to indicate language code for
-                  alternate language tags (ie. 'fr').  XMP and MIE only.
+                  alternate language tags (ie. 'fr').  Only used with formats
+                  which support alternate languages (ie. XMP, MIE, etc).
 
   SubDirectory {  If it exists, this specifies the start of a new subdirectory.
                   It contains a collection of variables which specify the type
@@ -719,7 +737,9 @@ numerical.
                   May use $start to represent the subdirectory start location
                   relative to the current base, and $base for the value of the
                   current base.  If this is defined, the automatic validation of
-                  base offsets is disabled for maker notes directories.
+                  base offsets is disabled for maker notes directories.  The
+                  IFD is flagged as using relative offsets when writing if
+                  '$start' is used in this expression.
 
      EntryBased : Flag indicating that the offsets are based on the individual
                   directory entry position, so offsets are incremented by 12

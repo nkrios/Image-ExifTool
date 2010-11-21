@@ -11,9 +11,9 @@
 XMP stands for &quot;Extensible Metadata Platform&quot;, an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
 embedded in many different image file types including JPG, JP2, TIFF, GIF,
-EPS, PDF, PSD, DNG, IND, PNG, DJVU, SVG and MIFF, as well as MOV, AVI, ASF,
-WMV, FLV, SWF and MP4 videos, and WMA and audio formats supporting ID3v2
-information.</p>
+EPS, PDF, PSD, IND, PNG, DJVU, SVG, MIFF, XCF, CRW, DNG and a variety of
+proprietary TIFF-based RAW images, as well as MOV, AVI, ASF, WMV, FLV, SWF
+and MP4 videos, and WMA and audio formats supporting ID3v2 information.</p>
 
 <p>The XMP <b>Tag ID</b>&#39;s aren&#39;t listed because in most cases they are identical
 to the <b>Tag Name</b>.</p>
@@ -50,7 +50,7 @@ tables.  For example, the <code>pdfx</code> namespace doesn&#39;t have a predefi
 tag names because it is used to store application-defined PDF information,
 but this information is extracted by ExifTool.</p>
 
-<p>See <a href="http://www.adobe.com/devnet/xmp/">http://www.adobe.com/devnet/xmp/</a> for the offical XMP specification.
+<p>See <a href="http://www.adobe.com/devnet/xmp/">http://www.adobe.com/devnet/xmp/</a> for the official XMP specification.
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -116,92 +116,96 @@ but this information is extracted by ExifTool.</p>
 <tr>
 <td>microsoft</td>
 <td class=c>-</td>
-<td>--&gt; <a href='XMP.html#Microsoft'>XMP Microsoft Tags</a></td></tr>
+<td>--&gt; <a href='Microsoft.html#XMP'>Microsoft XMP Tags</a></td></tr>
 <tr class=b>
 <td>MP</td>
 <td class=c>-</td>
-<td>--&gt; <a href='XMP.html#MP'>XMP MP Tags</a></td></tr>
+<td>--&gt; <a href='Microsoft.html#MP'>Microsoft MP Tags</a></td></tr>
 <tr>
+<td>MP1</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Microsoft.html#MP1'>Microsoft MP1 Tags</a></td></tr>
+<tr class=b>
 <td>pdf</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#pdf'>XMP pdf Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>pdfx</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#pdfx'>XMP pdfx Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>photomech</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PhotoMechanic.html#XMP'>PhotoMechanic XMP Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>photoshop</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#photoshop'>XMP photoshop Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>PixelLive</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#PixelLive'>XMP PixelLive Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>plus</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#plus'>XMP plus Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>prism</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#prism'>XMP prism Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>prl</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#prl'>XMP prl Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>pur</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#pur'>XMP pur Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>rdf</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#rdf'>XMP rdf Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>swf</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#swf'>XMP swf Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>tiff</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#tiff'>XMP tiff Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>x</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#x'>XMP x Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>xmp</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmp'>XMP xmp Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>xmpBJ</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpBJ'>XMP xmpBJ Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>xmpDM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpDM'>XMP xmpDM Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>xmpMM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpMM'>XMP xmpMM Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>xmpNote</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpNote'>XMP xmpNote Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>xmpPLUS</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpPLUS'>XMP xmpPLUS Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>xmpRights</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpRights'>XMP xmpRights Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>xmpTPg</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#xmpTPg'>XMP xmpTPg Tags</a></td></tr>
@@ -1700,7 +1704,7 @@ but ExifTool shortens this for the &quot;XMP-iptcExt&quot; family 1 group name.
 <tr>
 <td>AdditionalModelInformation</td>
 <td class=c>string</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(called AddlModelInfo by the spec)</span></span></td></tr>
 <tr class=b>
 <td>ArtworkCopyrightNotice</td>
 <td class=c title='+ = List'>string+</td>
@@ -1877,72 +1881,6 @@ but ExifTool shortens this for the &quot;XMP-iptcExt&quot; family 1 group name.
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>UserFields</td>
-<td class=c title='+ = List'>string+</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='Microsoft'>XMP Microsoft Tags</a></h2>
-<p>Microsoft Photo schema tags.  This is likely not a complete list, but
-represents tags which have been observed in sample images.  The actual
-namespace prefix is &quot;MicrosoftPhoto&quot;, but ExifTool shortens this to
-&quot;XMP-microsoft&quot; in the family 1 group name.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>CameraSerialNumber</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>DateAcquired</td>
-<td class=c>date</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>FlashManufacturer</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>FlashModel</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>LastKeywordIPTC</td>
-<td class=c title='+ = List'>string+</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>LastKeywordXMP</td>
-<td class=c title='+ = List'>string+</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>LensManufacturer</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>LensModel</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>RatingPercent</td>
-<td class=c>string</td>
-<td><span class=s><span class=n>(normal Rating values of 1,2,3,4 and 5 stars correspond to RatingPercent
-values of 1,25,50,75 and 99 respectively)</span></span></td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='MP'>XMP MP Tags</a></h2>
-<p>Microsoft Photo 1.2 schema tags.  Again, not a complete list.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>RegionPersonDisplayName</td>
-<td class=c title='+ = List'>string+</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>RegionRectangle</td>
 <td class=c title='+ = List'>string+</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -2962,6 +2900,10 @@ treated specially to allow it to be set to a specific value if required.</p>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>MaxStorage</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>Type</td>
 <td class=c title='/ = Avoided'>string/</td>
 <td>&nbsp;</td></tr>
@@ -4360,25 +4302,30 @@ XMP module for convenience.  (see <a href="http://www.w3.org/TR/SVG11/">http://w
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
-<tr class=h><th>Tag Name</th>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td>'height'</td>
 <td>ImageHeight</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'id'</td>
 <td>ID</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'metadataId'</td>
 <td>MetadataID</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'version'</td>
 <td>SVGVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'width'</td>
 <td>ImageWidth</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -4386,7 +4333,7 @@ XMP module for convenience.  (see <a href="http://www.w3.org/TR/SVG11/">http://w
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 24, 2010</i>
+<br><i>Last revised Oct 7, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

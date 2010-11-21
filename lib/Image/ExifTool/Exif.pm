@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # File:         Exif.pm
 #
-# Description:  Read EXIF meta information
+# Description:  Read EXIF/TIFF meta information
 #
 # Revisions:    11/25/2003 - P. Harvey Created
 #               02/06/2004 - P. Harvey Moved processing functions from ExifTool
@@ -48,7 +48,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.13';
+$VERSION = '3.18';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -66,13 +66,13 @@ sub ConvertLensInfo($);
 sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
 
 # byte sizes for the various EXIF format types below
-@formatSize = (undef,1,1,2,4,8,1,1,2,4,8,4,8,4,undef,undef,8,8,8);
+@formatSize = (undef,1,1,2,4,8,1,1,2,4,8,4,8,4,2,8,8,8,8);
 
 @formatName = (
     undef, 'int8u', 'string', 'int16u',
     'int32u', 'rational64u', 'int8s', 'undef',
     'int16s', 'int32s', 'rational64s', 'float',
-    'double', 'ifd', undef, undef, # (14 is unicode, 15 is complex? http://remotesensing.org/libtiff/bigtiffdesign.html)
+    'double', 'ifd', 'unicode', 'complex',
     'int64u', 'int64s', 'ifd64', # (new BigTIFF formats)
 );
 
@@ -93,9 +93,16 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
     'float'       => 11, # FLOAT
     'double'      => 12, # DOUBLE
     'ifd'         => 13, # IFD (with int32u format)
+    'unicode'     => 14, # UNICODE [see Note below]
+    'complex'     => 15, # COMPLEX [see Note below]
     'int64u'      => 16, # LONG8 [BigTIFF]
     'int64s'      => 17, # SLONG8 [BigTIFF]
     'ifd64'       => 18, # IFD8 (with int64u format) [BigTIFF]
+    # Note: unicode and complex types are not yet properly supported by ExifTool.
+    # These are types which have been observed in the Adobe DNG SDK code, but
+    # aren't fully supported there either.  We know the sizes, but that's about it.
+    # We don't know if the unicode is null terminated, or the format for complex
+    # (although I suspect it would be two 4-byte floats, real and imaginary).
 );
 
 # lookup for integer format strings
@@ -336,8 +343,8 @@ my %sampleFormat = (
         # even though Group 1 is set dynamically we need to register IFD1 once
         # so it will show up in the group lists
         Groups => { 1 => 'IFD1' },
-        # set Priority to zero so the value found in the first IFD (IFD0) doesn't
-        # get overwritten by subsequent IFD's (same for ImageHeight below)
+        # Note: priority 0 tags automatically have their priority increased for the
+        # priority direcory (the directory with a SubfileType of "Full-resolution image")
         Priority => 0,
     },
     0x101 => {
@@ -611,7 +618,7 @@ my %sampleFormat = (
     },
     0x131 => {
         Name => 'Software',
-        RawConv => '$val =~ s/\s+$//; $val',
+        RawConv => '$val =~ s/\s+$//; $val', # trim trailing blanks
     },
     0x132 => {
         Name => 'ModifyDate',
@@ -623,7 +630,7 @@ my %sampleFormat = (
         Name => 'Artist',
         Groups => { 2 => 'Author' },
         Notes => 'becomes a list-type tag when the MWG module is loaded',
-        RawConv => '$val =~ s/\s+$//; $val',
+        RawConv => '$val =~ s/\s+$//; $val', # trim trailing blanks
     },
     0x13c => 'HostComputer',
     0x13d => {
@@ -1076,6 +1083,20 @@ my %sampleFormat = (
     },
     # (0x474x tags written by MicrosoftPhoto)
     0x4746 => 'Rating', #PH
+    0x4747 => { # (written by Digital Image Pro)
+        Name => 'XP_DIP_XML',
+        Format => 'undef',
+        # the following reference indicates this is Unicode:
+        # http://social.msdn.microsoft.com/Forums/en-US/isvvba/thread/ce6edcbb-8fc2-40c6-ad98-85f5d835ddfb
+        ValueConv => '$self->Decode($val,"UCS2","II")',
+    }, 
+    0x4748 => {
+        Name => 'StitchInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Microsoft::Stitch',
+            ByteOrder => 'LittleEndian', #PH (NC)
+        },
+    },
     0x4749 => 'RatingPercent', #PH
     0x800d => 'ImageID', #10
     0x80a3 => { Name => 'WangTag1', Binary => 1 }, #20
@@ -1229,7 +1250,8 @@ my %sampleFormat = (
     0x8568 => {
         Name => 'AFCP_IPTC',
         SubDirectory => {
-            DirName => 'IPTC2', # change name because this isn't the IPTC we want to write
+            # must change directory name so we don't create this directory
+            DirName => 'AFCP_IPTC',
             TagTable => 'Image::ExifTool::IPTC::Main',
         },
     },
@@ -2631,6 +2653,7 @@ my %sampleFormat = (
     PreviewImage => {
         Writable => 1,
         WriteCheck => '$self->CheckImage(\$val)',
+        DelCheck => '$val = ""; return undef', # can't delete, so set to empty string
         WriteAlso => {
             PreviewImageStart  => 'defined $val ? 0xfeedfeed : undef',
             PreviewImageLength => 'defined $val ? 0xfeedfeed : undef',
@@ -2804,7 +2827,12 @@ my %sampleFormat = (
             Applies only to LensType values with a lookup table.  May be configured
             by adding user-defined lenses
         },
-        ValueConv => '$val[0]',
+        # this LensID is only valid if the LensType has a PrintConv or is a model name
+        ValueConv => q{
+            return $val[0] if ref $$self{TAG_INFO}{LensType}{PrintConv} eq "HASH" or
+                              $prt[0] =~ /(mm|\d\/F)/;
+            return undef;
+        },
         PrintConv => 'Image::ExifTool::Exif::PrintLensID($self, $prt[0], @val)',
     },
 );
@@ -3200,7 +3228,7 @@ sub PrintLensID($$@)
                     $shortFocal, $longFocal, $maxAperture, $lensModel);
     }
     my $lens = $$printConv{$lensType};
-    return $lensTypePrt unless $lens;
+    return ($lensModel || $lensTypePrt) unless $lens;
     return $lens unless $$printConv{"$lensType.1"};
     $lens =~ s/ or .*//s;    # remove everything after "or"
     # make list of all possible matching lenses
@@ -3357,7 +3385,7 @@ sub ProcessExif($$$)
         $tagTablePtr eq \%Image::ExifTool::Exif::Main and
         $$exifTool{FILE_TYPE} =~ /^(JPEG|TIFF|PSD)$/)
     {
-        my $path = join('-', @{$$exifTool{PATH}});
+        my $path = $exifTool->MetadataPath();
         unless ($path =~ /^(JPEG-APP1-IFD0|TIFF-IFD0|PSD-EXIFInfo-IFD0)$/) {
             $exifTool->Warn("Ignored non-standard EXIF at $path");
             return 1;
@@ -3666,7 +3694,7 @@ sub ProcessExif($$$)
         }
         if (defined $tagInfo and not $tagInfo) {
             # GetTagInfo() required the value for a Condition
-            my $tmpVal = substr($$valueDataPt, $valuePtr, $readSize < 48 ? $readSize : 48);
+            my $tmpVal = substr($$valueDataPt, $valuePtr, $readSize < 128 ? $readSize : 128);
             # (use original format name in this call -- $formatStr may have been changed to int8u)
             $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \$tmpVal,
                                              $formatName[$format], $count);
@@ -3752,8 +3780,14 @@ sub ProcessExif($$$)
                         # translate non-printable characters
                         $tval =~ tr/\x00-\x1f\x7f-\xff/./;
                     } elsif ($tagInfo and Image::ExifTool::IsInt($tval)) {
-                        if ($$tagInfo{IsOffset}) {
+                        if ($$tagInfo{IsOffset} or $$tagInfo{SubIFD}) {
                             $tval = sprintf('0x%.4x', $tval);
+                            if ($base) {
+                                my $actPt = $val + $base - ($$exifTool{EXIF_POS} || 0);
+                                $tval .= sprintf("\nActual offset: 0x%.4x", $actPt);
+                                my $sign = $actPt > $val ? '' : '-';
+                                $tval .= sprintf("\nOffset base: ${sign}0x%.4x", abs($actPt - $val));
+                            }
                         } elsif ($$tagInfo{PrintHex}) {
                             $tval = sprintf('0x%x', $tval);
                         }
@@ -3929,6 +3963,7 @@ sub ProcessExif($$$)
                     DirLen     => $size,
                     RAF        => $raf,
                     Parent     => $dirName,
+                    DirName    => $$subdir{DirName},
                     FixBase    => $$subdir{FixBase},
                     FixOffsets => $$subdir{FixOffsets},
                     EntryBased => $$subdir{EntryBased},
@@ -4078,7 +4113,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::Exif - Read EXIF meta information
+Image::ExifTool::Exif - Read EXIF/TIFF meta information
 
 =head1 SYNOPSIS
 
@@ -4087,7 +4122,7 @@ This module is required by Image::ExifTool.
 =head1 DESCRIPTION
 
 This module contains routines required by Image::ExifTool for processing
-EXIF meta information.
+EXIF and TIFF meta information.
 
 =head1 AUTHOR
 

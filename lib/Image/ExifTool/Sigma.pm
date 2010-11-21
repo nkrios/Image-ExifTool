@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 %Image::ExifTool::Sigma::Main = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
@@ -156,21 +156,35 @@ $VERSION = '1.08';
     0x0017 => 'Firmware',
     0x0018 => 'Software',
     0x0019 => 'AutoBracket',
-    0x001a => { #PH
-        Name => 'PreviewImageStart',
-        IsOffset => 1,
-        OffsetPair => 0x001b,
-        DataTag => 'PreviewImage',
-        Writable => 'int32u',
-        Protected => 2,
-    },
-    0x001b => { #PH
-        Name => 'PreviewImageLength',
-        OffsetPair => 0x001a,
-        DataTag => 'PreviewImage',
-        Writable => 'int32u',
-        Protected => 2,
-    },
+    0x001a => [ #PH
+        {
+            Name => 'PreviewImageStart',
+            Condition => '$format eq "int32u"',
+            IsOffset => 1,
+            OffsetPair => 0x001b,
+            DataTag => 'PreviewImage',
+            Writable => 'int32u',
+            Protected => 2,
+        },{ # (written by Sigma Photo Pro)
+            Name => 'ChrominanceNoiseReduction',
+            ValueConv => '$val =~ s/Chro:\s*//, $val',
+            ValueConvInv => 'IsFloat($val) ? sprintf("Chro:%+.1f",$val) : undef',
+        },
+    ],
+    0x001b => [ #PH
+        {
+            Name => 'PreviewImageLength',
+            Condition => '$format eq "int32u"',
+            OffsetPair => 0x001a,
+            DataTag => 'PreviewImage',
+            Writable => 'int32u',
+            Protected => 2,
+        },{ # (written by Sigma Photo Pro)
+            Name => 'LuminanceNoiseReduction',
+            ValueConv => '$val =~ s/Luma:\s*//, $val',
+            ValueConvInv => 'IsFloat($val) ? sprintf("Luma:%+.1f",$val) : undef',
+        },
+    ],
     0x001c => { #PH
         Name => 'PreviewImageSize',
         Writable => 'int16u',

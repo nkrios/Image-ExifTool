@@ -299,7 +299,10 @@ sub DoWriteIPTC($$$)
     # - improves speed
     # - avoids changing current MD5 digest unnecessarily
     # - avoids adding mandatory tags unless some other IPTC is changed
-    unless (exists $exifTool->{EDIT_DIRS}->{$$dirInfo{DirName}}) {
+    unless (exists $$exifTool{EDIT_DIRS}{$$dirInfo{DirName}} or
+        # standard IPTC tags in other locations should be edited too (ie. AFCP_IPTC)
+        ($tagTablePtr = \%Image::ExifTool::IPTC::Main and exists $$exifTool{EDIT_DIRS}{IPTC}))
+    {
         print $out "$$exifTool{INDENT}  [nothing changed]\n" if $verbose;
         return undef;
     }
@@ -461,7 +464,8 @@ sub DoWriteIPTC($$$)
                                 # generate our new entry
                                 my $entry = pack("CCCn", 0x1c, $lastRec, $mandTag, length($value));
                                 $newData .= $entry . $value;    # add entry to new IPTC data
-                                ++$exifTool->{CHANGED};
+                                # (don't mark as changed if just mandatory tags changed)
+                                # ++$exifTool->{CHANGED};
                             }
                         }
                     }
@@ -586,11 +590,12 @@ sub WriteIPTC($$$)
 
     my $newData = DoWriteIPTC($exifTool, $dirInfo, $tagTablePtr);
 
-    # calculate IPTC digests only if we are writing or deleting
+    # calculate standard IPTC digests only if we are writing or deleting
     # Photoshop:IPTCDigest with a value of 'new' or 'old'
     while ($Image::ExifTool::Photoshop::iptcDigestInfo) {
         my $nvHash = $exifTool->{NEW_VALUE}{$Image::ExifTool::Photoshop::iptcDigestInfo};
         last unless defined $nvHash;
+        last unless IsStandardIPTC($exifTool->MetadataPath());
         my @values = Image::ExifTool::GetNewValues($nvHash);
         push @values, @{$$nvHash{DelValue}} if $$nvHash{DelValue};
         my $new = grep /^new$/, @values;

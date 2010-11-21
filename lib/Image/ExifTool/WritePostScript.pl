@@ -441,11 +441,12 @@ sub WritePS($$)
         return 1;
     }
     $data .= $buff;
-    unless ($data =~ /^%!PS-Adobe-3.(0|1)/) {
+    unless ($data =~ /^%!PS-Adobe-3\.(\d+)\b/ and $1 < 2) {
         if ($exifTool->Error("Document does not conform to DSC spec. Metadata may be unreadable by other apps", 1)) {
             return 1;
         }
     }
+    my $psRev = $1; # save PS revision number (3.x)
     Write($outfile, $data) or $err = 1;
     $flags{EPS} = 1 if $data =~ /EPSF/;
 
@@ -457,13 +458,6 @@ sub WritePS($$)
     my $addDirs = $exifTool->{ADD_DIRS};
     my $editDirs = $exifTool->{EDIT_DIRS};
     my %doneDir;
-
-    # disable writing XMP to PS-format Adobe Illustrator files (it confuses Illustrator)
-    if ($$editDirs{XMP} and $$exifTool{FILE_EXT} and $$exifTool{FILE_EXT} eq 'AI') {
-        $exifTool->Warn("Can't write XMP to PS-format AI files", 1);
-        delete $$addDirs{XMP};
-        delete $$editDirs{XMP}; # (need this too or XMP will still be added)
-    }
 
     # set XMP hint flag (1 for adding, 0 for deleting, undef for no change)
     $xmpHint = 1 if $$addDirs{XMP};
@@ -559,10 +553,34 @@ sub WritePS($$)
         } elsif ($data =~ /^%%(?!Page:|PlateFile:|BeginObject:)(\w+): ?(.*)/s) {
             # rewrite information from PostScript tags in comments
             my ($tag, $val) = ($1, $2);
+            # handle Adobe Illustrator files specially
+            # - EVENTUALLY IT WOULD BE BETTER TO FIND ANOTHER IDENTIFICATION METHOD
+            #   (because Illustrator doesn't care if the Creator is changed)
+            if ($tag eq 'Creator' and $val =~ /^Adobe Illustrator/) {
+                # disable writing XMP to PS-format Adobe Illustrator files and
+                # older Illustrator EPS files becaues it confuses Illustrator
+                # (Illustrator 8 and older write PS-Adobe-3.0, newer write PS-Adobe-3.1)
+                if ($$editDirs{XMP} and $psRev == 0) {
+                    if ($flags{EPS}) {
+                        $exifTool->Warn("Can't write XMP to Illustrator 8 or older EPS files");
+                    } else {
+                        $exifTool->Warn("Can't write XMP to PS-format AI files");
+                    }
+                    # pretend like we wrote it already so we won't try to add it later
+                    $doneDir{XMP} = 1;
+                }
+                # don't allow "Creator" to be changed in Illustrator files
+                # (we need it to be able to recognize these files)
+                # --> find a better way to do this!
+                if ($$newTags{$tag}) {
+                    $exifTool->Warn("Can't change Postscript:Creator of Illustrator files");
+                    delete $$newTags{$tag};
+                }
+            }
             if ($$newTags{$tag}) {
                 my $tagInfo = $$newTags{$tag};
-                next unless ref $tagInfo;
                 delete $$newTags{$tag}; # write it then forget it
+                next unless ref $tagInfo;
                 # decode comment string (reading continuation lines if necessary)
                 $val = DecodeComment($val, $raf, \@lines, \$data);
                 $val = join $exifTool->Options('ListSep'), @$val if ref $val eq 'ARRAY';
@@ -712,7 +730,7 @@ documents.  Six forms of meta information may be written:
 
 =head1 NOTES
 
-Currently, information is written only in the outter-level document.
+Currently, information is written only in the outer-level document.
 
 Photoshop will discard meta information in a PostScript document if it has
 to rasterize the image, and it will rasterize anything that doesn't contain

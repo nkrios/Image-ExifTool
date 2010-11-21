@@ -51,7 +51,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.30';
+$VERSION = '2.42';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
@@ -72,6 +72,8 @@ my %nikonLensIDs = (
         L<sample config file|../config.html> for details).
     },
     OTHER => \&LensIDConv,
+    # Note: Sync this list with Robert's Perl version at
+    # http://www.rottmerhusen.com/objektives/lensid/files/exif/fmountlens.p.txt
     # (hex digits must be uppercase in keys below)
     '01 58 50 50 14 14 02 00' => 'AF Nikkor 50mm f/1.8',
     '02 42 44 5C 2A 34 02 00' => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5',
@@ -246,8 +248,14 @@ my %nikonLensIDs = (
     'A2 48 5C 80 24 24 A4 0E' => 'AF-S Nikkor 70-200mm f/2.8G ED VR II',
     'A3 3C 29 44 30 30 A5 0E' => 'AF-S Nikkor 16-35mm f/4G ED VR',
     'A4 54 37 37 0C 0C A6 06' => 'AF-S Nikkor 24mm f/1.4G ED',
+    'A5 40 3C 8E 2C 3C A7 0E' => 'AF-S Nikkor 28-300mm f/3.5-5.6G ED VR',
     'A6 48 8E 8E 24 24 A8 0E' => 'AF-S VR Nikkor 300mm f/2.8G IF-ED II',
     'A7 4B 62 62 2C 2C A9 0E' => 'AF-S DX Micro Nikkor 85mm f/3.5G ED VR',
+    'A9 54 80 80 18 18 AB 0E' => 'AF-S Nikkor 200mm f/2G ED VR II',
+    'AA 3C 37 6E 30 30 AC 0E' => 'AF-S Nikkor 24-120mm f/4G ED VR',
+    'AC 38 53 8E 34 3C AE 0E' => 'AF-S DX VR Nikkor 55-300mm 4.5-5.6G ED',
+    'AE 54 62 62 0C 0C B0 06' => 'AF-S Nikkor 85mm f/1.4G',
+    'AF 54 44 44 0C 0C B1 06' => 'AF-S Nikkor 35mm f/1.4G',
     '01 00 00 00 00 00 02 00' => 'TC-16A',
     '01 00 00 00 00 00 08 00' => 'TC-16A',
     '00 00 00 00 00 00 F1 0C' => 'TC-14E [II] or Sigma APO Tele Converter 1.4x EX DG or Kenko Teleplus PRO 300 DG 1.4x',
@@ -360,6 +368,7 @@ my %nikonLensIDs = (
     'F3 48 68 8E 30 30 4B 02' => 'Sigma APO 100-300mm F4 EX IF HSM',
     '48 54 6F 8E 24 24 4B 02' => 'Sigma APO 120-300mm F2.8 EX DG HSM',
     '7A 54 6E 8E 24 24 4B 02' => 'Sigma APO 120-300mm F2.8 EX DG HSM',
+    'FA 54 6E 8E 24 24 4B 02' => 'Sigma APO 120-300mm F2.8 EX DG HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2787.0.html
     'CF 38 6E 98 34 3C 4B 0E' => 'Sigma APO 120-400mm F4.5-5.6 DG OS HSM',
     '26 44 73 98 34 3C 1C 02' => 'Sigma 135-400mm F4.5-5.6 APO Aspherical',
     'CE 34 76 A0 38 40 4B 0E' => 'Sigma 150-500mm F5-6.3 DG OS APO HSM', #JD
@@ -408,9 +417,11 @@ my %nikonLensIDs = (
     'F9 40 3C 8E 2C 40 40 0E' => 'Tamron AF 28-300mm f/3.5-6.3 XR Di VC LD Aspherical (IF) Macro (A20)',
     '00 47 53 80 30 3C 00 06' => 'Tamron AF 55-200mm f/4-5.6 Di II LD (A15)',
     'F7 53 5C 80 24 24 84 06' => 'Tamron SP AF 70-200mm f/2.8 Di LD (IF) Macro (A001)',
+    'FE 53 5C 80 24 24 84 06' => 'Tamron SP AF 70-200mm f/2.8 Di LD (IF) Macro (A001)',
     '69 48 5C 8E 30 3C 6F 02' => 'Tamron AF 70-300mm f/4-5.6 LD Macro 1:2 (772D)',
     '69 47 5C 8E 30 3C 00 02' => 'Tamron AF 70-300mm f/4-5.6 Di LD Macro 1:2 (A17N)',
     '00 48 5C 8E 30 3C 00 06' => 'Tamron AF 70-300mm f/4-5.6 Di LD Macro 1:2 (A17)', #JD
+    'F1 47 5C 8E 30 3C DF 0E' => 'Tamron SP 70-300mm f/4-5.6 Di VC USD (A005)',
     '20 3C 80 98 3D 3D 1E 02' => 'Tamron AF 200-400mm f/5.6 LD IF (75D)',
     '00 3E 80 A0 38 3F 00 02' => 'Tamron SP AF 200-500mm f/5-6.3 Di LD (IF) (A08)',
     '00 3F 80 A0 38 3F 00 02' => 'Tamron SP AF 200-500mm f/5-6.3 Di (A08)',
@@ -425,11 +436,12 @@ my %nikonLensIDs = (
     '00 48 1C 29 24 24 00 06' => 'Tokina AT-X 116 PRO DX (AF 11-16mm f/2.8)',
     '00 3C 1F 37 30 30 00 06' => 'Tokina AT-X 124 AF PRO DX (AF 12-24mm f/4)',
     '7A 3C 1F 37 30 30 7E 06.2' => 'Tokina AT-X 124 AF PRO DX II (AF 12-24mm f/4)',
+    '00 48 29 3C 24 24 00 06' => 'Tokina AT-X 16-28 AF PRO FX (AF 16-28mm f/2.8)',
     '00 48 29 50 24 24 00 06' => 'Tokina AT-X 165 PRO DX (AF 16-50mm f/2.8)',
     '00 40 2A 72 2C 3C 00 06' => 'Tokina AT-X 16.5-135 DX (AF 16.5-135mm F3.5-5.6)',
+    '2F 40 30 44 2C 34 29 02.2' => 'Tokina AF 193 (AF 19-35mm f/3.5-4.5)',
     '2F 48 30 44 24 24 29 02.2' => 'Tokina AT-X 235 AF PRO (AF 20-35mm f/2.8)',
-    '2F 40 30 44 2C 34 29 02.1' => 'Tokina AF 193 (AF 19-35mm f/3.5-4.5)',
-    '2F 40 30 44 2C 34 29 02.2' => 'Tokina AF 235 II (AF 20-35mm f/3.5-4.5)',
+    '2F 40 30 44 2C 34 29 02.1' => 'Tokina AF 235 II (AF 20-35mm f/3.5-4.5)',
     '00 40 37 80 2C 3C 00 02' => 'Tokina AT-X 242 AF (AF 24-200mm f/3.5-5.6)',
     '25 48 3C 5C 24 24 1B 02.1' => 'Tokina AT-X 270 AF PRO II (AF 28-70mm f/2.6-2.8)',
     '25 48 3C 5C 24 24 1B 02.2' => 'Tokina AT-X 287 AF PRO SV (AF 28-70mm f/2.8)',
@@ -474,6 +486,8 @@ my %nikonLensIDs = (
     '07 3E 30 43 2D 35 03 00' => 'Soligor AF Zoom 19-35mm 1:3.5-4.5 MC',
     '03 43 5C 81 35 35 02 00' => 'Soligor AF C/D Zoom UMCS 70-210mm 1:4.5',
     '12 4A 5C 81 31 3D 09 00' => 'Soligor AF C/D Auto Zoom+Macro 70-210mm 1:4-5.6 UMCS',
+#
+    '4A 60 62 62 0C 0C 4D 02' => 'Samyang AE 85mm f/1.4 AS IF UMC', # http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2888.0.html
 #
     '00 00 00 00 00 00 00 01' => 'Manual Lens No CPU',
 #
@@ -572,6 +586,15 @@ my %retouchValues = ( #PH
 );
 
 my %offOn = ( 0 => 'Off', 1 => 'On' );
+
+# common attributes for writable BinaryData directories
+my %binaryDataAttrs = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+);
 
 # Nikon maker note tags
 %Image::ExifTool::Nikon::Main = (
@@ -807,7 +830,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         },
     },
     0x0023 => { #PH (D300, but also found in D3,D3S,D3X,D90,D300S,D700,D3000,D5000)
-        Name => 'PictureControl',
+        Name => 'PictureControlData',
+        Writable => 'undef',
+        Permanent => 0,
+        Binary => 1,
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::PictureControl' },
     },
     0x0024 => { #JD
@@ -841,13 +867,19 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             ByteOrder => 'BigEndian', #(NC)
         },
     },
+    0x0032 => { #PH
+        Name => 'UnknownInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::UnknownInfo',
+            ByteOrder => 'BigEndian', #(NC)
+        },
+    },
     0x0080 => { Name => 'ImageAdjustment',  Writable => 'string' },
     0x0081 => { Name => 'ToneComp',         Writable => 'string' }, #2
     0x0082 => { Name => 'AuxiliaryLens',    Writable => 'string' },
     0x0083 => {
         Name => 'LensType',
         Writable => 'int8u',
-        NotLensID => 1,
         # credit to Tom Christiansen (ref 7) for figuring this out...
         PrintConv => q[$_ = $val ? Image::ExifTool::DecodeBits($val,
             {
@@ -1009,8 +1041,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
                 ByteOrder => 'BigEndian',
             },
         },
-        { #PH (D3, firmware 1.10, 2.00 and 2.01)
-            Condition => '$$valPt =~ /^0210/ and $count == 5408',
+        { #PH (D3, firmware 1.10, 2.00 and 2.01 [count 5408], and 2.02 [count 5412])
+            Condition => '$$valPt =~ /^0210/ and ($count == 5408 or $count == 5412)',
             Name => 'ShotInfoD3b',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::ShotInfoD3b',
@@ -1177,8 +1209,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
                 DirOffset => 10,
             },
         },
-        {
-            Condition => '$$valPt =~ /^02/', # (D2X=0204,D2Hs=0206,D200=0207,D40=0208)
+        {   # (D2X=0204,D2Hs=0206,D200=0207,D40=0208)
+            Condition => '$$valPt =~ /^02(\d{2})/ and $1 < 11',
             Name => 'ColorBalance02',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::ColorBalance2',
@@ -1189,7 +1221,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
                 DirOffset => 6,
             },
         },
-        {
+        {   # (D90/D5000=0211,D300S=0212,D3000=0213,D3S=0214,D3100=0215,D7000=0216)
             Name => 'ColorBalanceUnknown',
             Writable => 0,
         },
@@ -1220,8 +1252,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             },
         },
         { #PH
-            # 0204 - D90
-            Condition => '$$valPt =~ /^0204/',
+            Condition => '$$valPt =~ /^0204/', # D90
             Name => 'LensData0204',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::LensData0204',
@@ -1284,7 +1315,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         Name => 'ImageDataSize',
         Writable => 'int32u',
     },
-    # 0x00a3 - int8u, values: 0 (All DSLR's but D1,D1H,D1X,D100)
+    # 0x00a3 - int8u: 0 (All DSLR's but D1,D1H,D1X,D100)
     # 0x00a4 - version number found only in NEF images from DSLR models except the
     # D1,D1X,D2H and D100.  Value is "0200" for all available samples except images
     # edited by Nikon Capture Editor 4.3.1 W and 4.4.2 which have "0100" - PH
@@ -1393,7 +1424,10 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     # 0x00ba - custom curve data? (ref 28?) (only in NEF images)
     0x00bd => { #PH (P6000)
-        Name => 'PictureControl',
+        Name => 'PictureControlData',
+        Writable => 'undef',
+        Permanent => 0,
+        Binary => 1,
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::PictureControl' },
     },
     0x0e00 => {
@@ -1409,7 +1443,17 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     # they will get lost by any utility that blindly copies the maker notes (not ExifTool) - PH
     0x0e01 => {
         Name => 'NikonCaptureData',
+        Writable => 'undef',
+        Permanent => 0,
+        Drop => 1, # (may be too large for JPEG images)
+        Binary => 1,
+        Notes => q{
+            this data is dropped when copying Nikon MakerNotes since it may be too large
+            to fit in the EXIF segment of a JPEG image, but it may be copied as a block
+            into existing Nikon MakerNotes later if desired
+        },
         SubDirectory => {
+            DirName => 'NikonCapture',
             TagTable => 'Image::ExifTool::NikonCapture::Main',
         },
     },
@@ -1437,7 +1481,12 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
             Start => '$val',
         },
     },
-    # 0x0e13 - some sort of edit history written by Nikon Capture
+    0x0e13 => { # PH/http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2737.0.html
+        Name => 'NikonCaptureHistory',
+        Writable => 'undef',
+        Binary => 1,
+        Drop => 1,
+    },
     0x0e1d => { #JD
         Name => 'NikonICCProfile',
         Binary => 1,
@@ -1454,6 +1503,9 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x0e1e => { #PH
         Name => 'NikonCaptureOutput',
+        Writable => 'undef',
+        Permanent => 0,
+        Binary => 1,
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::CaptureOutput',
             Validate => '$val =~ /^0100/',
@@ -1519,12 +1571,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # ref 17
 %Image::ExifTool::Nikon::ROC = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     FORMAT => 'int32u',
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 1 => 'NikonScan', 2 => 'Image' },
     0 => {
         Name => 'DigitalROC',
@@ -1535,12 +1583,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # ref 17
 %Image::ExifTool::Nikon::GEM = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     FORMAT => 'int32u',
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 1 => 'NikonScan', 2 => 'Image' },
     0 => {
         Name => 'DigitalGEM',
@@ -1551,11 +1595,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # Vibration Reduction information - PH (D300)
 %Image::ExifTool::Nikon::VRInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
     0 => {
@@ -1576,11 +1616,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # Picture Control information - PH (D300,P6000)
 %Image::ExifTool::Nikon::PictureControl = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
     0 => {
@@ -1719,11 +1755,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # World Time information - JD (D300)
 %Image::ExifTool::Nikon::WorldTime = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Time' },
     0 => {
         Name => 'Timezone',
@@ -1754,11 +1786,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # ISO information - PH (D300)
 %Image::ExifTool::Nikon::ISOInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'ISO',
@@ -1831,11 +1859,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # distortion information - PH (D5000)
 %Image::ExifTool::Nikon::DistortInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'DistortionVersion',
@@ -1849,13 +1873,22 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
 );
 
+# unknown information - PH (D7000)
+%Image::ExifTool::Nikon::UnknownInfo = (
+    %binaryDataAttrs,
+    FORMAT => 'int32u',
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => {
+        Name => 'UnknownInfoVersion',
+        Format => 'undef[4]',
+        Writable => 0,
+        Unknown => 1,
+    },
+);
+
 # Nikon AF information (ref 13)
 %Image::ExifTool::Nikon::AFInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'AFAreaMode',
@@ -1911,11 +1944,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # Nikon AF information for D3 and D300 (ref JD)
 %Image::ExifTool::Nikon::AFInfo2 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     DATAMEMBER => [ 4, 6 ],
     NOTES => "These tags are written by Nikon DSLR's which have the live view feature.",
@@ -2128,11 +2157,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # Nikon AF fine-tune information (ref 28)
 %Image::ExifTool::Nikon::AFTune = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'AFFineTune',
@@ -2161,11 +2186,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # Nikon File information - D60, D3 and D300 (ref PH)
 %Image::ExifTool::Nikon::FileInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     0 => {
         Name => 'FileInfoVersion',
@@ -2197,12 +2218,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # ref PH (Written by capture NX)
 %Image::ExifTool::Nikon::CaptureOutput = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
+    %binaryDataAttrs,
     FORMAT => 'int32u',
-    FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     # 1 = 1
     2 => 'OutputImageWidth',
@@ -2213,12 +2230,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # ref 4
 %Image::ExifTool::Nikon::ColorBalanceA = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
+    %binaryDataAttrs,
     FORMAT => 'int16u',
-    FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     624 => {
         Name => 'RedBalance',
@@ -2236,12 +2249,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # ref 4
 %Image::ExifTool::Nikon::ColorBalance1 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
+    %binaryDataAttrs,
     FORMAT => 'int16u',
-    FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'WB_RBGGLevels',
@@ -2252,12 +2261,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # ref 4
 %Image::ExifTool::Nikon::ColorBalance2 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
+    %binaryDataAttrs,
     FORMAT => 'int16u',
-    FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'This information is encrypted for most camera models.',
     0 => {
@@ -2269,12 +2274,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # ref 4
 %Image::ExifTool::Nikon::ColorBalance3 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
+    %binaryDataAttrs,
     FORMAT => 'int16u',
-    FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'WB_RGBGLevels',
@@ -2285,12 +2286,8 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
 
 # ref 4
 %Image::ExifTool::Nikon::ColorBalance4 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
+    %binaryDataAttrs,
     FORMAT => 'int16u',
-    FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'WB_GRBGLevels',
@@ -2385,11 +2382,7 @@ my %nikonFocalConversions = (
 
 # Version 100 Nikon lens data
 %Image::ExifTool::Nikon::LensData00 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     NOTES => 'This structure is used by the D100, and D1X with firmware version 1.1.',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
@@ -2430,11 +2423,7 @@ my %nikonFocalConversions = (
 
 # Nikon lens data (note: needs decrypting if LensDataVersion is 020x)
 %Image::ExifTool::Nikon::LensData01 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     NOTES => q{
         Nikon encrypts the LensData information below if LensDataVersion is 0201 or
         higher, but  the decryption algorithm is known so the information can be
@@ -2519,11 +2508,7 @@ my %nikonFocalConversions = (
 
 # Nikon lens data (note: needs decrypting)
 %Image::ExifTool::Nikon::LensData0204 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     NOTES => q{
         Nikon encrypts the LensData information below if LensDataVersion is 0201 or
         higher, but  the decryption algorithm is known so the information can be
@@ -2620,11 +2605,7 @@ my %nikonFocalConversions = (
 
 # shot information (encrypted in some cameras) - ref 18
 %Image::ExifTool::Nikon::ShotInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     DATAMEMBER => [ 0 ],
     NOTES => q{
@@ -2639,9 +2620,9 @@ my %nikonFocalConversions = (
     },
     0x04 => {
         Name => 'FirmwareVersion',
-        Format => 'string[4]',
+        Format => 'string[5]',
         Writable => 0,
-        RawConv => '$val =~ /^\d\.\d+$/ ? $val : undef',
+        RawConv => '$val =~ /^\d\.\d+.$/ ? $val : undef',
     },
     0x10 => {
         Name => 'DistortionControl',
@@ -2737,7 +2718,8 @@ my %nikonFocalConversions = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
+    VARS => { ID_LABEL => 'Index' },
+    IS_SUBDIR => [ 729 ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -2775,7 +2757,8 @@ my %nikonFocalConversions = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
+    VARS => { ID_LABEL => 'Index' },
+    IS_SUBDIR => [ 748 ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -2854,7 +2837,8 @@ my %nikonFocalConversions = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
+    VARS => { ID_LABEL => 'Index' },
+    IS_SUBDIR => [ 0x374 ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -2869,7 +2853,7 @@ my %nikonFocalConversions = (
     },
     0x04 => {
         Name => 'FirmwareVersion',
-        Format => 'string[4]',
+        Format => 'string[5]',
         Writable => 0,
     },
     0x2b5 => { #JD (same value found at offset 0x39, 0x2bf, 0x346)
@@ -2899,7 +2883,8 @@ my %nikonFocalConversions = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
+    VARS => { ID_LABEL => 'Index' },
+    IS_SUBDIR => [ 0x301 ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -2962,14 +2947,15 @@ my %nikonFocalConversions = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
+    VARS => { ID_LABEL => 'Index' },
+    IS_SUBDIR => [ 0x30a ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     DATAMEMBER => [ 4 ],
     NOTES => q{
         These tags are extracted from encrypted data in images from the D3 with
-        firmware 1.10, 2.00 and 2.01.
+        firmware 1.10, 2.00, 2.01 and 2.02.
     },
     0x00 => {
         Name => 'ShotInfoVersion',
@@ -2978,11 +2964,10 @@ my %nikonFocalConversions = (
     },
     0x04 => {
         Name => 'FirmwareVersion',
-        Format => 'string[4]',
+        Format => 'string[5]',
         Writable => 0,
         RawConv => '$$self{FirmwareVersion} = $val',
     },
-    # 0x08 - related to firmware version (for side B?) (65=2.01, 67=2.00) - ref 28
     0x10 => { #28
         Name => 'ImageArea',
         PrintConv => {
@@ -3000,15 +2985,15 @@ my %nikonFocalConversions = (
     },
     0x27d => {
         Name => 'ShutterCount',
-        Condition => '$$self{FirmwareVersion} eq "1.10"',
+        Condition => '$$self{FirmwareVersion} =~ /^1.01/',
         Notes => 'firmware 1.10',
         Format => 'int32u',
         Priority => 0,
     },
     0x27f => {
         Name => 'ShutterCount',
-        Condition => '$$self{FirmwareVersion} =~ /^2.0[01]/',
-        Notes => 'firmware 2.00 and 2.01',
+        Condition => '$$self{FirmwareVersion} =~ /^2.0[012]/',
+        Notes => 'firmware 2.00, 2.01 and 2.02',
         Format => 'int32u',
         Priority => 0,
     },
@@ -3057,7 +3042,8 @@ my %nikonFocalConversions = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
+    VARS => { ID_LABEL => 'Index' },
+    IS_SUBDIR => [ 0x30b ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -3072,7 +3058,7 @@ my %nikonFocalConversions = (
     },
     0x04 => {
         Name => 'FirmwareVersion',
-        Format => 'string[4]',
+        Format => 'string[5]',
         Writable => 0,
     },
     0x25d => {
@@ -3102,7 +3088,8 @@ my %nikonFocalConversions = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
+    VARS => { ID_LABEL => 'Index' },
+    IS_SUBDIR => [ 0x2ce ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -3117,8 +3104,17 @@ my %nikonFocalConversions = (
     },
     0x04 => {
         Name => 'FirmwareVersion',
-        Format => 'string[4]',
+        Format => 'string[5]',
         Writable => 0,
+    },
+    0x10 => { #28
+        Name => 'ImageArea',
+        PrintConv => {
+            0 => 'FX (36x24)',
+            1 => 'DX (24x16)',
+            2 => '5:4 (30x24)',
+            3 => '1.2x (30x20)',
+        },
     },
     0x221 => {
         Name => 'ISO2',
@@ -3147,7 +3143,8 @@ my %nikonFocalConversions = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
+    VARS => { ID_LABEL => 'Index' },
+    IS_SUBDIR => [ 790 ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -3239,7 +3236,8 @@ my %nikonFocalConversions = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
+    VARS => { ID_LABEL => 'Index' },
+    IS_SUBDIR => [ 802 ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -3254,7 +3252,7 @@ my %nikonFocalConversions = (
     },
     0x04 => { #PH
         Name => 'FirmwareVersion',
-        Format => 'string[4]',
+        Format => 'string[5]',
         Writable => 0,
     },
     613 => {
@@ -3334,7 +3332,8 @@ my %nikonFocalConversions = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
+    VARS => { ID_LABEL => 'Index' },
+    IS_SUBDIR => [ 804 ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -3349,7 +3348,7 @@ my %nikonFocalConversions = (
     },
     0x04 => {
         Name => 'FirmwareVersion',
-        Format => 'string[4]',
+        Format => 'string[5]',
         Writable => 0,
     },
     613 => {
@@ -3379,7 +3378,8 @@ my %nikonFocalConversions = (
     PROCESS_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     WRITE_PROC => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    VARS => { ID_LABEL => 'Index', HAS_SUBDIR => 1 },
+    VARS => { ID_LABEL => 'Index' },
+    IS_SUBDIR => [ 0x378 ],
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -3394,7 +3394,7 @@ my %nikonFocalConversions = (
     },
     0x04 => {
         Name => 'FirmwareVersion',
-        Format => 'string[4]',
+        Format => 'string[5]',
         Writable => 0,
     },
     0x2b5 => { # (also found at 0x2c0)
@@ -3421,11 +3421,7 @@ my %nikonFocalConversions = (
 
 # Flash information (ref JD)
 %Image::ExifTool::Nikon::FlashInfo0100 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     DATAMEMBER => [ 9.2, 15, 16 ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
@@ -3574,11 +3570,7 @@ my %nikonFocalConversions = (
 
 # Flash information for D40, D40x, D3 and D300 (ref JD)
 %Image::ExifTool::Nikon::FlashInfo0102 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     DATAMEMBER => [ 9.2, 16.1, 17.1, 17.2 ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
@@ -3760,11 +3752,7 @@ my %nikonFocalConversions = (
 
 # Flash information for D90 and D700 (ref PH)
 %Image::ExifTool::Nikon::FlashInfo0103 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     DATAMEMBER => [ 9.2, 17.1, 18.1, 18.2 ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
@@ -3960,11 +3948,7 @@ my %nikonFocalConversions = (
 
 # Unknown Flash information
 %Image::ExifTool::Nikon::FlashInfoUnknown = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0 => {
         Name => 'FlashInfoVersion',
@@ -3975,11 +3959,7 @@ my %nikonFocalConversions = (
 
 # Multi exposure / image overlay information (ref PH)
 %Image::ExifTool::Nikon::MultiExposure = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
+    %binaryDataAttrs,
     FORMAT => 'int32u',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     # NOTE: Must set ByteOrder in SubDirectory if any multi-byte integer tags added
@@ -4303,15 +4283,19 @@ my %nikonFocalConversions = (
         Groups => { 2 => 'Time' },
         PrintConv => '$self->ConvertDateTime($val)',
     },
-    # 0x13 - int32u[2], val: "467 0", "1038 0"
-    # 0x14 - int32u[2], val: "0 0"
-    # 0x15 - int32u[2], val: "0 0"
+    0x13 => {
+        Name => 'FrameCount',
+        # int32u[2]: "467 0", "1038 0", "1127 0"
+        ValueConv => '$val =~ s/ 0$//; $val', # (not sure what the extra "0" is for)
+    },
+    # 0x14 - int32u[2]: "0 0"
+    # 0x15 - int32u[2]: "0 0"
     0x16 => {
         Name => 'FrameRate',
         Groups => { 2 => 'Video' },
         PrintConv => 'int($val * 1000 + 0.5) / 1000',
     },
-    # 0x21 - int16u, val: 2
+    # 0x21 - int16u: 1, 2
     0x22 => {
         Name => 'FrameWidth',
         Groups => { 2 => 'Video' },
@@ -4320,7 +4304,8 @@ my %nikonFocalConversions = (
         Name => 'FrameHeight',
         Groups => { 2 => 'Video' },
     },
-    # 0x31 - int16u, val: 2
+    # 0x24 - int16u: 2
+    # 0x31 - int16u: 1, 2
     0x32 => { #(guess)
         Name => 'AudioChannels',
         Groups => { 2 => 'Audio' },
@@ -4332,6 +4317,51 @@ my %nikonFocalConversions = (
     0x34 => {
         Name => 'AudioSampleRate',
         Groups => { 2 => 'Audio' },
+    },
+    0x2000001 => {
+        Name => 'MakerNoteVersion',
+        PrintConv => '$_=$val;s/^(\d{2})/$1\./;s/^0//;$_',
+    },
+    0x2000005 => 'WhiteBalance',
+    0x200000b => 'WhiteBalanceFineTune',
+    0x200001e => {
+        Name => 'ColorSpace',
+        PrintConv => {
+            1 => 'sRGB',
+            2 => 'Adobe RGB',
+        },
+    },
+    0x2000023 => {
+        Name => 'PictureControlData',
+        Binary => 1,
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::PictureControl' },
+    },
+    0x2000024 => {
+        Name => 'WorldTime',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::WorldTime' },
+    },
+    0x2000032 => {
+        Name => 'UnknownInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::UnknownInfo' },
+    },
+    0x2000083 => {
+        Name => 'LensType',
+        # credit to Tom Christiansen (ref 7) for figuring this out...
+        PrintConv => q[$_ = $val ? Image::ExifTool::DecodeBits($val,
+            {
+                0 => 'MF',
+                1 => 'D',
+                2 => 'G',
+                3 => 'VR',
+            }) : 'AF';
+            # remove commas and change "D G" to just "G"
+            s/,//g; s/\bD G\b/G/; $_
+        ],
+    },
+    0x2000084 => {
+        Name => "Lens",
+        # short focal, long focal, aperture at short focal, aperture at long focal
+        PrintConv => \&Image::ExifTool::Exif::PrintLensInfo,
     },
 );
 
@@ -4643,7 +4673,7 @@ sub ProcessNikonMOV($$$)
         }
         my $val = ReadValue($dataPt, $pos, $fmtStr, $count, $size);
         $exifTool->HandleTag($tagTablePtr, $tag, $val,
-            DataPt => $dataPt,
+            DataPt  => $dataPt,
             DataPos => $dataPos,
             Format  => $fmtStr,
             Start   => $pos,

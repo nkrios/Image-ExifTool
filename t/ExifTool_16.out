@@ -85,7 +85,7 @@ FocusDistanceLower : 5.46 m
 FocusDistanceUpper : inf
 MeasuredEV : -1.25
 MeasuredEV2 : -1.25
-NDFilter : Unknown (-1)
+NDFilter : n/a
 SelfTimer2 : 0
 SequenceNumber : 0
 SlowShutter : None
@@ -175,4 +175,4 @@ FileName : Canon.jpg
 FilePermissions : rw-r--r--
 FileSize : 2.6 kB
 ---- System:Time ----
-FileModifyDate : 2007:05:01 07:34:38-04:00
+FileModifyDate : 2006:10:03 15:10:31-04:00

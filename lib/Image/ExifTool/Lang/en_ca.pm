@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::en_ca;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 %Image::ExifTool::Lang::en_ca::Translate = (
    'AlternateDuotoneColors' => 'Alternate Duotone Colours',

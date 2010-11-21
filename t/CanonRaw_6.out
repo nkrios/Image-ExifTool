@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.20
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.35
 [File, System, Image] FileName - File Name: CanonRaw_6_failed.cr2
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 8.6 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:05:25 13:10:08-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:10:11 08:47:49-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: CR2
-[File, File, Image] MIMEType - MIME Type: image/x-raw
+[File, File, Image] MIMEType - MIME Type: image/x-canon-cr2
 [File, File, Image] ExifByteOrder - Exif Byte Order: Little-endian (Intel, II)
 [File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 74386a2844191f61317ffa999148834a
 [EXIF, IFD0, Image] 256 - Image Width: 1536
@@ -123,12 +123,12 @@
 [MakerNotes, Canon, Image] 24 - Bulb Duration: 0
 [MakerNotes, Canon, Camera] 26 - Camera Type: EOS Mid-range
 [MakerNotes, Canon, Image] 27 - Auto Rotate: None
-[MakerNotes, Canon, Image] 28 - ND Filter: Unknown (-1)
+[MakerNotes, Canon, Image] 28 - ND Filter: n/a
 [MakerNotes, Canon, Image] 29 - Self Timer 2: 0
 [MakerNotes, Canon, Image] 6 - Canon Image Type: Canon EOS 350D DIGITAL
 [MakerNotes, Canon, Camera] 7 - Canon Firmware Version: Firmware 1.0.2
 [MakerNotes, Canon, Camera] 9 - Owner Name: Phil Harvey
-[MakerNotes, Canon, Camera] 12 - Camera Body No.: 0123456789
+[MakerNotes, Canon, Camera] 12 - Serial Number: 0123456789
 [MakerNotes, CanonCustom, Camera] 0 - Set Button Cross Keys Func: Normal
 [MakerNotes, CanonCustom, Camera] 1 - Long Exposure Noise Reduction: Off
 [MakerNotes, CanonCustom, Camera] 2 - Flash Sync Speed Av: Auto

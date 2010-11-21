@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Canon;
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 sub ProcessRealMeta($$$);
 sub ProcessRealProperties($$$);
@@ -90,8 +90,8 @@ my %metadataFlag = (
     PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
     VARS => { ID_LABEL => 'Sequence' },
     FORMAT => 'int32u',
-    0  => 'MaxBitRate',
-    1  => 'AvgBitRate',
+    0  => 'MaxBitrate',
+    1  => 'AvgBitrate',
     2  => 'MaxPacketSize',
     3  => 'AvgPacketSize',
     4  => 'NumPackets',
@@ -119,8 +119,8 @@ my %metadataFlag = (
     FORMAT => 'int32u',
     PRIORITY => 0,  # first stream takes priority
     0  => { Name => 'StreamNumber',  Format => 'int16u' },
-    1  => { Name => 'StreamMaxBitRate' },
-    2  => { Name => 'StreamAvgBitRate' },
+    1  => { Name => 'StreamMaxBitrate' },
+    2  => { Name => 'StreamAvgBitrate' },
     3  => { Name => 'StreamMaxPacketSize' },
     4  => { Name => 'StreamAvgPacketSize' },
     5  => { Name => 'StreamStartTime' },

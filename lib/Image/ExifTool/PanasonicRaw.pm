@@ -38,7 +38,7 @@ my %jpgFromRawMap = (
     Comment      => 'COM',
 );
 
-# Tags found in Panasonic RAW/RW2/RWL images
+# Tags found in Panasonic RAW/RW2/RWL images (ref PH)
 %Image::ExifTool::PanasonicRaw::Main = (
     GROUPS => { 0 => 'EXIF', 1 => 'IFD0', 2 => 'Image'},
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,

@@ -163,6 +163,9 @@ value.</p>
 
 <tr><td>PDF_CAPTURE</td><td>Used by PDF module to store information when writing</td></tr>
 
+<tr><td>PreferredGroup</td><td>Preferred family 1 group for writing tags to the current file.
+    Not defined to use the default group priorities.  Set in call to InitWriteDirs().</td></tr>
+
 <tr><td>PREVIEW_INFO</td><td>Information about preview image used while writing JPEG
     images only.  This is a reference to a hash with the following entries:
     <table class='clear'>
@@ -220,6 +223,8 @@ information may include:
     are APP1, APP3, TIFF, CR2, MRW, JP2, JPX, NEF, PEF, ORF, DNG, etc.</td></tr>
 
 <tr><td>VALUE</td><td>Hash of raw tag values keyed by tag key</td></tr>
+
+<tr><td>WARNED_ONCE</td><td>Hash of warning messages that have been issued once already</td></tr>
 
 <tr><td>WRITE_GROUPS</td><td>List of write groups in order of priority</td></tr>
 

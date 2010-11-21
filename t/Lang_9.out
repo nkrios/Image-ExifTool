@@ -3,7 +3,7 @@
 [EXIF, IFD0, Image] 274 - 画像の向き: 水平（標準）
 [EXIF, IFD0, Image] 282 - 画像幅の解像度: 72
 [EXIF, IFD0, Image] 283 - 画像高さの解像度: 72
-[EXIF, IFD0, Image] 296 - XとY解像度単位: inches
+[EXIF, IFD0, Image] 296 - XとY解像度単位: インチ
 [EXIF, IFD0, Image] 305 - ソフトウェア: Digital Camera FinePix2400Zoom Ver1.70
 [EXIF, IFD0, Time] 306 - ファイル作成日時: 2001:05:19 18:36:41
 [EXIF, IFD0, Image] 531 - YとCの位置: 相互配置
@@ -40,7 +40,7 @@
 [EXIF, IFD1, Image] 274 - 画像の向き: 水平（標準）
 [EXIF, IFD1, Image] 282 - 画像幅の解像度: 72
 [EXIF, IFD1, Image] 283 - 画像高さの解像度: 72
-[EXIF, IFD1, Image] 296 - XとY解像度単位: inches
+[EXIF, IFD1, Image] 296 - XとY解像度単位: インチ
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 1096
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD1, Image] 531 - YとCの位置: 相互配置

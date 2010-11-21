@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.26
 [File, System, Image] FileName - File Name: Ricoh2.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 3.1 kB
@@ -106,5 +106,5 @@
 [Composite, Composite, Image] ImageSize - Image Size: 8x8
 [Composite, Composite, Image] ShutterSpeed - Shutter Speed: 1/1740
 [Composite, Composite, Image] ThumbnailImage - Thumbnail Image: (Binary data 28 bytes)
-[Composite, Composite, Camera] FocalLength35efl - Focal Length: 5.7 mm
 [Composite, Composite, Image] LightValue - Light Value: 15.4
+[Composite, Composite, Camera] FocalLength35efl - Focal Length: 5.7 mm

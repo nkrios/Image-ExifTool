@@ -23,6 +23,7 @@
 #              15) Yrjo Rauste private communication (E-30)
 #              16) Godfrey DiGiorgi private communcation (E-P1) + http://forums.dpreview.com/forums/read.asp?message=33187567
 #              17) Martin Hibers private communication
+#              18) Tomasz Kawecki private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -32,7 +33,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.71';
+$VERSION = '1.74';
 
 sub PrintLensInfo($$$);
 
@@ -116,6 +117,14 @@ my %filters = (
     '10 1280 0 0' => 'Cross Process',
     '12 1280 0 0' => 'Fish Eye',
     '13 1280 0 0' => 'Drawing',
+);
+
+# tag information for WAV "Index" tags
+my %indexInfo = (
+    Format => 'int32u',
+    RawConv => '$val == 0xffffffff ? undef : $val',
+    ValueConv => '$val / 1000',
+    PrintConv => 'ConvertDuration($val)',
 );
 
 # Olympus tags
@@ -397,6 +406,26 @@ my %filters = (
         Name => 'DataDump2',
         Writable => 0,
         Binary => 1,
+    },
+    0x0f04 => {
+        Name => 'ZoomedPreviewStart',
+        # NOTE: this tag is not currently updated properly when the image is rewritten!
+        OffsetPair => 0xf05,
+        DataTag => 'ZoomedPreviewImage',
+        Writable => 'int32u',
+        Protected => 2,
+    },
+    0x0f05 => {
+        Name => 'ZoomedPreviewLength',
+        OffsetPair => 0xf04,
+        DataTag => 'ZoomedPreviewImage',
+        Writable => 'int32u',
+        Protected => 2,
+    },
+    0x0f06 => {
+        Name => 'ZoomedPreviewSize',
+        Writable => 'int16u',
+        Count => 2,
     },
     0x1000 => { #6
         Name => 'ShutterSpeedValue',
@@ -710,6 +739,7 @@ my %filters = (
         Protected => 2,
     },
     0x1037 => { #6
+        # (may contain data from multiple previews - PH, FE320)
         Name => 'PreviewImageLength',
         OffsetPair => 0x1036, # point to associated offset
         DataTag => 'PreviewImage',
@@ -734,11 +764,11 @@ my %filters = (
         PrintConv => \%offOn,
     },
     0x103b => { #6
-        Name => 'InfinityLensStep',
+        Name => 'FocusStepInfinity',
         Writable => 'int16u',
     },
     0x103c => { #6
-        Name => 'NearLensStep',
+        Name => 'FocusStepNear',
         Writable => 'int16u',
     },
     0x103d => { #11
@@ -1357,6 +1387,7 @@ my %filters = (
             5 => 'FL-36',
             6 => 'FL-50R', #11 (or Metz mecablitz digital)
             7 => 'FL-36R', #11
+            # have seen value of 9 - PH
         },
     },
     0x1002 => { #6
@@ -1678,9 +1709,10 @@ my %filters = (
             15 => 'Movie', #11
             16 => 'Landscape+Portrait', #6
             17 => 'Night+Portrait',
-            18 => 'Indoor', #11
+            18 => 'Indoor', #11 (Party - PH)
             19 => 'Fireworks',
             20 => 'Sunset',
+            21 => 'Beauty Skin', #PH
             22 => 'Macro',
             23 => 'Super Macro', #11
             24 => 'Food', #11
@@ -1710,6 +1742,15 @@ my %filters = (
             48 => 'Nature Macro', #6
             49 => 'Underwater Snapshot', #11
             50 => 'Shooting Guide', #11
+            51 => 'Face Portrait', #PH (NC)
+            52 => 'Smile Shot', #PH (NC)
+            53 => 'Quick Shutter', #PH (NC)
+            54 => 'Slow Shutter', #PH (NC)
+            55 => 'Bird Watching', #PH (NC)
+            56 => 'Multiple Exposure', #PH (NC)
+            57 => 'e-Portrait', #PH (NC)
+            58 => 'Beauty Fix', #PH (NC)
+            59 => 'Soft Background', #PH (NC)
         },
     },
     0x50a => { #PH/4/6
@@ -1897,6 +1938,7 @@ my %filters = (
             2 => 'HQ',
             3 => 'SHQ',
             4 => 'RAW',
+            5 => 'SQ (5)', # (E-500)
         },
     },
     0x604 => { #PH
@@ -2464,17 +2506,17 @@ my %filters = (
         Name => 'AspectRatio',
         Writable => 'int8u',
         Count => 2,
-        PrintConv => [{
-            1 => '4:3',
-            2 => '3:2',
-            3 => '16:9',
-            4 => '6:6',
-            5 => '5:4',
-            6 => '7:6',
-            7 => '6:5',
-            8 => '7:5',
-            9 => '3:4',
-        }],
+        PrintConv => {
+            '1 1' => '4:3',
+            '2 2' => '3:2',
+            '3 3' => '16:9',
+            '4 4' => '6:6',
+            '5 5' => '5:4',
+            '6 6' => '7:6',
+            '7 7' => '6:5',
+            '8 8' => '7:5',
+            '9 9' => '3:4',
+        },
     },
     0x1113 => { #11
         Name => 'AspectFrame',
@@ -2571,16 +2613,16 @@ my %filters = (
         PrintConv => '$val ? "$val m" : "inf"',
         PrintConvInv => '$val eq "inf" ? 0 : $val=~s/\s*m$//, $val',
     },
-    0x308 => [
+    0x308 => [ # NEED A BETTER WAY TO DETERMINE WHICH MODELS USE WHICH ENCODING!
         {
             Name => 'AFPoint',
-            Condition => '$$self{Model} =~ /E-3\b/',
+            Condition => '$$self{Model} =~ /E-(3|5|30)\b/',
             Writable => 'int16u',
             PrintHex => 1,
             # decoded by ref 6
             Notes => q{
-                for E-3, the value is separated into 2 parts: low 5 bits give AP point,
-                upper bits give AF target selection mode
+                for the E-3, E-5 and E-30 the value is separated into 2 parts: low 5 bits
+                give AF point, upper bits give AF target selection mode
             },
             ValueConv => '($val & 0x1f) . " " . ($val & 0xffe0)',
             ValueConvInv => 'my @v=split(" ",$val); @v == 2 ? $v[0] + $v[1] : $val',
@@ -2616,6 +2658,25 @@ my %filters = (
                     0x80 => 'Dynamic Single Target',
                 }
             ],
+        },{ #PH (models with 7-point AF)
+            Name => 'AFPoint',
+            Condition => '$$self{Model} =~ /E-(520|600|620)\b/',
+            Notes => 'models with 7-point AF',
+            Writable => 'int16u',
+            PrintHex => 1,
+            ValueConv => '($val & 0x1f) . " " . ($val & 0xffe0)',
+            ValueConvInv => 'my @v=split(" ",$val); @v == 2 ? $v[0] + $v[1] : $val',
+            PrintConv => [
+                {
+                    0x00 => '(none)',
+                    0x01 => 'Center',
+                    # need to fill this in...
+                },
+                {
+                    0x00 => 'Single Target',
+                    0x40 => 'All Target', # (guess)
+                },
+            ]
         },{ #11
             Name => 'AFPoint',
             Writable => 'int16u',
@@ -2632,6 +2693,14 @@ my %filters = (
         }
     ],
     # 0x31a Continuous AF parameters?
+    # 0x328 Related to AF (maybe Imager AF data?) (ref PH, E-PL1):
+    #  - offset 0x2a (int8u)  ImagerAFMode?  0=Manual, 1=Auto
+    #  - offset 0x30 (int16u) AFAreaXPosition
+    #  - offset 0x32 (int16u) AFAreaWidth (202)
+    #  - offset 0x34 (int16u) AFAreaYPosition
+    #  - offset 0x36 (int16u) AFAreaHeight (50)
+    #  (AF area positions above give the top-left coordinates of the AF area in the
+    #   AF frame. Increasing Y is downwards, and the AF frame size is about 1280x256)
     # 0x1200-0x1209 Flash information:
     0x1201 => { #6
         Name => 'ExternalFlash',
@@ -3093,6 +3162,77 @@ my %filters = (
     },
 );
 
+# tags in WAV files from Olympus PCM linear recorders (ref 18)
+%Image::ExifTool::Olympus::WAV = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Audio' },
+    FIRST_ENTRY => 0,
+    NOTES => q{
+        This information is found in WAV files from Olympus PCM linear recorders
+        like the LS-5, LS-10, LS-11.
+    },
+    0x0c => {
+        Name => 'Model',
+        Format => 'string[16]',
+    },
+    0x1c => {
+        Name => 'FileNumber',
+        Format => 'int32u',
+        PrintConv => 'sprintf("%.4d", $val)',
+    },
+    0x26 => {
+        Name => 'DateTimeOriginal',
+        Groups => { 2 => 'Time' },
+        Format => 'undef[12]',
+        Notes => 'time at start of recording',
+        ValueConv => q{
+            return undef unless $val =~ /^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/;
+            my $y = $1 < 70 ? "20$1" : "19$1";
+            return "$y:$2:$3 $4:$5:$6";
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    0x32 => {
+        Name => 'DateTimeEnd',
+        Groups => { 2 => 'Time' },
+        Format => 'undef[12]',
+        Notes => 'time at end of recording',
+        ValueConv => q{
+            return undef unless $val =~ /^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/;
+            my $y = $1 < 70 ? "20$1" : "19$1";
+            return "$y:$2:$3 $4:$5:$6";
+        },
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    0x3e => {
+        Name => 'RecordingTime',
+        Format => 'undef[6]',
+        ValueConv => '$val =~ s/^(\d{2})(\d{2})/$1:$2:/; $val',
+    },
+    0x200 => {
+        Name => 'Duration',
+        Format => 'int32u',
+        ValueConv => '$val / 1000',
+        PrintConv => 'ConvertDuration($val)',
+    },
+    0x20a => { Name => 'Index01', %indexInfo },
+    0x214 => { Name => 'Index02', %indexInfo },
+    0x21e => { Name => 'Index03', %indexInfo },
+    0x228 => { Name => 'Index04', %indexInfo },
+    0x232 => { Name => 'Index05', %indexInfo },
+    0x23c => { Name => 'Index06', %indexInfo },
+    0x246 => { Name => 'Index07', %indexInfo },
+    0x250 => { Name => 'Index08', %indexInfo },
+    0x25a => { Name => 'Index09', %indexInfo },
+    0x264 => { Name => 'Index10', %indexInfo },
+    0x26e => { Name => 'Index11', %indexInfo },
+    0x278 => { Name => 'Index12', %indexInfo },
+    0x282 => { Name => 'Index13', %indexInfo },
+    0x28c => { Name => 'Index14', %indexInfo },
+    0x296 => { Name => 'Index15', %indexInfo },
+    0x2a0 => { Name => 'Index16', %indexInfo },
+);
+
 # Olympus composite tags
 %Image::ExifTool::Olympus::Composite = (
     GROUPS => { 2 => 'Camera' },
@@ -3113,6 +3253,13 @@ my %filters = (
             1 => 'Attached',
             2 => 'Removed',
         },
+    },
+    ZoomedPreviewImage => {
+        Require => {
+            0 => 'ZoomedPreviewStart',
+            1 => 'ZoomedPreviewLength',
+        },
+        RawConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"ZoomedPreviewImage")',
     },
 );
 
@@ -3223,9 +3370,9 @@ under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Markku Hanninen, Remi Guyomarch, Frank Ledwon, Michael Meissner,
-Mark Dapoz and Ioannis Panagiotopoulos for their help figuring out some
-Olympus tags, and Lilo Huang, Chris Shaw and Viktor Lushnikov for adding to
-the LensType list.
+Mark Dapoz, Ioannis Panagiotopoulos and Tomasz Kawecki for their help
+figuring out some Olympus tags, and Lilo Huang, Chris Shaw and Viktor
+Lushnikov for adding to the LensType list.
 
 =head1 SEE ALSO
 

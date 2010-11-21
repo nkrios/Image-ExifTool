@@ -17,7 +17,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -363,7 +363,7 @@ my %advancedContentEncryption = (
         Format => 'binary[16]',
         ValueConv => 'Image::ExifTool::ASF::GetGUID($val)',
     },
-    16 => { Name => 'FileSize',     Format => 'int64u' },
+    16 => { Name => 'FileLength',   Format => 'int64u' },
     24 => {
         Name => 'CreationDate',
         Format => 'int64u',

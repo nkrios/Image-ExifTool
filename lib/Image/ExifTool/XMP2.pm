@@ -82,7 +82,7 @@ use Image::ExifTool::XMP;
     contributedMediaStartTimeValue => { List => 1, Writable => 'integer' },
     contributedMediaManaged      => { List => 1, Writable => 'boolean' },
     contributedMediaWebStatement => { List => 1 },
-    copyright       => { Avoid => 1, Groups => { 2 => 'Author' } },
+    copyright       => { Avoid => 1, Groups => { 2 => 'Author' } }, # (deprecated)
     director            => { },
     directorPhotography => { },
     duration        => {
@@ -859,6 +859,7 @@ my %plusVocab = (
     type         => { Avoid => 1 },
     bgalpha      => { Name => 'BackgroundAlpha', Writable => 'integer' },
     forwardlock  => { Name => 'ForwardLock',     Writable => 'boolean' },
+    maxstorage   => { Name => 'MaxStorage',      Writable => 'integer' }, # (CS5)
 );
 
 # SVG schema properties (ref 9)

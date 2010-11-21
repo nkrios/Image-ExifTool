@@ -211,8 +211,12 @@ behaved.  Even so, the Nikon Transfer utility (version 1.3) still manages to
 corrupt some information in the 0th SubIFD when it is used to process NEF
 images.  (Beware that other Nikon utilities may have this same problem if they
 use the same NEF writing routines.)  But luckly  the lost information isn't very
-important.  (Only a few tags from the embedded full-sized preview image are lost:
-XResolution, YResolution and YCbCrPositioning.)</p>
+important.  (Only a few tags from the embedded full-sized preview image are
+lost: XResolution, YResolution and YCbCrPositioning.)  Also, Nikon Transfer and
+Nikon Capture both write an incorrect size for the maker notes, which could
+cause loss of MakerNote information if the file is edited by other software (but
+this isn't a problem with ExifTool, which will fix this type of problem
+automatically when writing).</p>
 
 <p><b>Nikon NRW:</b> Nikon should have just called this NEF with a different
 version number -- there should be no need to pollute the universe with zillions
@@ -227,7 +231,7 @@ instead of directly in IFD1 (dumb, dumb...).</p>
 
 <hr>
 <i>Created Mar. 25, 2005</i>
-<br><i>Last revised Mar. 1, 2010</i>
+<br><i>Last revised July 16, 2010</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

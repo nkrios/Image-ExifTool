@@ -50,7 +50,7 @@ in this case to remove the original copy.</p>
 
 <p>Conversely, the <code>-o</code> option may be used to force exiftool to
 always create a copy of the file, even if no meta-information tags are written. 
-This is true even if the <code>-o</code> option is overridden by writing the
+This is true even if the <code>-o</code> option is superseded by writing the
 <b>Directory</b> tag (which may be useful if you want to derive the directory
 name from the values of other tags, see example 5 below).</p>
 
@@ -73,6 +73,16 @@ Rename all images in directory '<code>DIR</code>' to names like
 value of the CreateDate (plus a copy number with a leading '<code>-</code>' if a
 file with the same name already exists), and with the same extension as the
 original image.
+<p><b>FAQ:</b> <i>"Why doesn't this command rename my files?"</i></p>
+<p>There are 2 common reasons for this:</p>
+<p>a) When a directory name is specified, this command will only rename "writable"
+files in the directory.  Use '<code>exiftool -listwf</code>' to list the
+extensions of currently writable file types.  The <code>-ext</code> option may
+be used to rename other file types (ie. '<code>-ext avi</code>').</p>
+<p>b) For this command to work, the CreateDate tag must exist in the source
+file. Use '<code>exiftool -createdate FILE</code>' to see if a file contains
+this information.  If it doesn't, you may need to use another date/time tag such
+as DateTimeOriginal or FileModifyDate.</p>
 </blockquote>
 
 <table cellpadding=6><tr><td valign='top'>&nbsp;2.</td><td bgcolor='#dddddd'><code class='blk'>
@@ -115,7 +125,7 @@ the second command the trailing '<code>/</code>' on '<code>dummy/</code>' is
 necessary because otherwise '<code>dummy</code>' would be interpreted as a file
 name.  This technique of using <code>-o</code> with a dummy directory name is
 necessary when the directory name is derived from the value of other tags (ie.
-'<code>-directory&lt;$createDate</code>') and you want the files to be copied
+'<code>-directory&lt;createDate</code>') and you want the files to be copied
 instead of moved.  (Because the values of other tags may not be used with the
 <code>-o</code> option.)
 </blockquote>
@@ -187,8 +197,9 @@ specified from the following list:  1) the <b>Directory</b> tag, 2) the
 file, in that order.  Note that both the <b>FileName</b> tag and the
 <code>-o</code> option may be used without a directory specification, in which
 case the directory with the next highest priority is used.  So in this example,
-the output file is '<code>dir1/image.jpg</code>'.  The order of the arguments on
-the command line is not significant.
+the target file is copied (not moved, because the <code>-o</code> option was
+used) to '<code>dir1/image.jpg</code>'.  The order of the arguments on the
+command line is not significant.
 </blockquote>
 
 <a name="codes"></a><h2>Common Date Format Codes</h2>

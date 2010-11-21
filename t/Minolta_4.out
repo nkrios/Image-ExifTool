@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.20
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.32
 [File, System, Image] FileName - File Name: Minolta_4_failed.mrw
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 2.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:05:18 14:36:36-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:09:20 08:06:48-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: MRW
-[File, File, Image] MIMEType - MIME Type: image/x-raw
+[File, File, Image] MIMEType - MIME Type: image/x-minolta-mrw
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
 [MakerNotes, MinoltaRaw, Camera] 0 - Firmware ID: 27200001
 [MakerNotes, MinoltaRaw, Camera] 8 - Sensor Height: 2456
@@ -95,7 +95,7 @@
 [EXIF, IFD0, Camera] 271 - Make: Konica Minolta Camera, Inc.
 [EXIF, IFD0, Camera] 272 - Camera Model Name: DiMAGE A2
 [EXIF, IFD0, Image] 274 - Orientation: Horizontal (normal)
-[EXIF, IFD0, Image] 305 - Software: DiMAGE A2 Ver.1.12 
+[EXIF, IFD0, Image] 305 - Software: DiMAGE A2 Ver.1.12
 [EXIF, IFD0, Time] 306 - Modify Date: 2004:11:18 23:14:58
 [EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/5
 [EXIF, ExifIFD, Image] 33437 - F Number: 2.8

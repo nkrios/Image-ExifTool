@@ -14,14 +14,18 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.03';
 
 my %noYes = ( 0 => 'No', 1 => 'Yes' );
 
+# Matroska tags
+# Note: The tag ID's in the Matroska documentation include the length designation
+#       (the upper bits), which is not included in the tag ID's below
 %Image::ExifTool::Matroska::Main = (
     GROUPS => { 2 => 'Video' },
     NOTES => q{
-        Tags extracted from Matroska multimedia container (MKA, MKV and MKS) files.
+        The following tags are extracted from Matroska multimedia container files. 
+        This container format is used by file types such as MKA, MKV, MKS and WEBM. 
         For speed, ExifTool extracts tags only up to the first Cluster unless the
         Verbose (-v) or Unknown = 2 (-U) option is used.  See
         L<http://www.matroska.org/technical/specs/index.html> for the official
@@ -40,7 +44,12 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
     0x2f7 => { Name => 'EBMLReadVersion',   Format => 'unsigned' },
     0x2f2 => { Name => 'EBMLMaxIDLength',   Format => 'unsigned', Unknown => 1 },
     0x2f3 => { Name => 'EBMLMaxSizeLength', Format => 'unsigned', Unknown => 1 },
-    0x282 => { Name => 'DocType',           Format => 'string' },
+    0x282 => {
+        Name => 'DocType',
+        Format => 'string',
+        # override FileType for "webm" files
+        RawConv => '$self->OverrideFileType("WEBM") if $val eq "webm"; $val',
+    },
     0x287 => { Name => 'DocTypeVersion',    Format => 'unsigned' },
     0x285 => { Name => 'DocTypeReadVersion',Format => 'unsigned' },
 #
@@ -627,7 +636,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
 #------------------------------------------------------------------------------
 # Get variable-length Matroska integer
 # Inputs: 0) data buffer, 1) position in data
-# Returns: integer value and updates position, -1 for unknown value,
+# Returns: integer value and updates position, -1 for unknown/reserved value,
 #          or undef if no data left
 sub GetVInt($$)
 {
@@ -692,7 +701,7 @@ sub ProcessMKV($$)
 
     # loop over all Matroska elements
     for (;;) {
-        while (@dirEnd and $pos + $dataPos >= $dirEnd[-1]) {
+        while (@dirEnd and $pos + $dataPos >= $dirEnd[-1][0]) {
             pop @dirEnd;
             # use INDENT to decide whether or not we are done this Track element
             delete $$exifTool{SET_GROUP1} if $trackIndent and $trackIndent eq $$exifTool{INDENT};
@@ -710,6 +719,21 @@ sub ProcessMKV($$)
         my $tag = GetVInt($buff, $pos);
         last unless defined $tag and $tag >= 0;
         my $size = GetVInt($buff, $pos);
+        last unless defined $size;
+        my $unknownSize;
+        $size < 0 and $unknownSize = 1, $size = 1e20;
+        if (@dirEnd and $pos + $dataPos + $size > $dirEnd[-1][0]) {
+            $exifTool->Warn("Invalid or corrupted $dirEnd[-1][1] master element");
+            $pos = $dirEnd[-1][0] - $dataPos;
+            if ($pos < 0 or $pos > $dataLen) {
+                $buff = '';
+                $dataPos += $pos;
+                $dataLen = 0;
+                $pos = 0;
+                $raf->Seek($dataPos, 0) or last;
+            }
+            next;
+        }
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
         # just fall through into the contained EBML elements
         if ($tagInfo and $$tagInfo{SubDirectory}) {
@@ -717,25 +741,39 @@ sub ProcessMKV($$)
             last if $$tagInfo{Name} eq 'Cluster' and not $processAll;
             $$exifTool{INDENT} .= '| ';
             $exifTool->VerboseDir($$tagTablePtr{$tag}{Name}, undef, $size);
-            push @dirEnd, $pos + $dataPos + $size;
+            push @dirEnd, [ $pos + $dataPos + $size, $$tagInfo{Name} ];
             if ($$tagInfo{Name} eq 'ChapterAtom') {
                 $$exifTool{SET_GROUP1} = 'Chapter' . (++$chapterNum);
                 $trackIndent = $$exifTool{INDENT};
             }
             next;
         }
-        last unless defined $size and $size >= 0;
+        last if $unknownSize;
         if ($pos + $size > $dataLen) {
-            # read more data in multiples of 64kB
-            my $more = (int(($pos + $size - $dataLen) / 65536) + 1) * 65536;
-            if ($raf->Read($buf2, $more)) {
-                $buff = substr($buff, $pos) . $buf2;
-                undef $buf2;
-                $dataPos += $pos;
-                $dataLen = length $buff;
+            # how much more do we need to read?
+            my $more = $pos + $size - $dataLen;
+            # just skip unknown and large data blocks
+            if (not $tagInfo or $more > 10000000) {
+                # don't try to skip very large blocks unless LargeFileSupport is enabled
+                last if $more > 0x80000000 and not $exifTool->Options('LargeFileSupport');
+                $raf->Seek($more, 1) or last;
+                $buff = '';
+                $dataPos += $dataLen + $more;
+                $dataLen = 0;
                 $pos = 0;
+                next;
+            } else {
+                # read data in multiples of 64kB
+                $more = (int($more / 65536) + 1) * 65536;
+                if ($raf->Read($buf2, $more)) {
+                    $buff = substr($buff, $pos) . $buf2;
+                    undef $buf2;
+                    $dataPos += $pos;
+                    $dataLen = length $buff;
+                    $pos = 0;
+                }
+                last if $pos + $size > $dataLen;
             }
-            last if $pos + $size > $dataLen;
         }
         unless ($tagInfo) {
             # ignore the element
@@ -827,7 +865,7 @@ This module is used by Image::ExifTool
 =head1 DESCRIPTION
 
 This module contains definitions required by Image::ExifTool to read meta
-information from Matroska multimedia files (MKA, MKV and MKS).
+information from Matroska multimedia files (MKA, MKV, MKS and WEBM).
 
 =head1 AUTHOR
 

@@ -36,6 +36,7 @@ html/TagNames/Font.html
 html/TagNames/FotoStation.html
 html/TagNames/FujiFilm.html
 html/TagNames/GIF.html
+html/TagNames/GIMP.html
 html/TagNames/GPS.html
 html/TagNames/GeoTiff.html
 html/TagNames/H264.html
@@ -62,6 +63,7 @@ html/TagNames/MPEG.html
 html/TagNames/MPF.html
 html/TagNames/MWG.html
 html/TagNames/Matroska.html
+html/TagNames/Microsoft.html
 html/TagNames/Minolta.html
 html/TagNames/MinoltaRaw.html
 html/TagNames/Nikon.html
@@ -130,6 +132,7 @@ lib/File/RandomAccess.pm
 lib/File/RandomAccess.pod
 lib/Image/ExifTool.pm
 lib/Image/ExifTool.pod
+lib/Image/ExifTool/AES.pm
 lib/Image/ExifTool/AFCP.pm
 lib/Image/ExifTool/AIFF.pm
 lib/Image/ExifTool/APE.pm
@@ -170,6 +173,7 @@ lib/Image/ExifTool/Charset/MacRoman.pm
 lib/Image/ExifTool/Charset/MacRomanian.pm
 lib/Image/ExifTool/Charset/MacThai.pm
 lib/Image/ExifTool/Charset/MacTurkish.pm
+lib/Image/ExifTool/Charset/PDFDoc.pm
 lib/Image/ExifTool/Charset/ShiftJIS.pm
 lib/Image/ExifTool/Charset/Symbol.pm
 lib/Image/ExifTool/Charset/Thai.pm
@@ -188,6 +192,7 @@ lib/Image/ExifTool/Font.pm
 lib/Image/ExifTool/FotoStation.pm
 lib/Image/ExifTool/FujiFilm.pm
 lib/Image/ExifTool/GIF.pm
+lib/Image/ExifTool/GIMP.pm
 lib/Image/ExifTool/GPS.pm
 lib/Image/ExifTool/GeoTiff.pm
 lib/Image/ExifTool/Geotag.pm
@@ -235,6 +240,7 @@ lib/Image/ExifTool/MPF.pm
 lib/Image/ExifTool/MWG.pm
 lib/Image/ExifTool/MakerNotes.pm
 lib/Image/ExifTool/Matroska.pm
+lib/Image/ExifTool/Microsoft.pm
 lib/Image/ExifTool/Minolta.pm
 lib/Image/ExifTool/MinoltaRaw.pm
 lib/Image/ExifTool/Nikon.pm
@@ -312,6 +318,8 @@ t/CanonRaw_5.out
 t/CanonRaw_6.out
 t/CanonRaw_7.out
 t/CanonVRD.t
+t/CanonVRD_11.out
+t/CanonVRD_12.out
 t/CanonVRD_2.out
 t/CanonVRD_3.out
 t/CanonVRD_4.out
@@ -382,6 +390,8 @@ t/GIF.t
 t/GIF_2.out
 t/GIF_3.out
 t/GIF_4.out
+t/GIMP.t
+t/GIMP_2.out
 t/GPS.t
 t/GPS_2.out
 t/GPS_3.out
@@ -574,6 +584,7 @@ t/Sigma.t
 t/Sigma_2.out
 t/Sigma_3.out
 t/Sigma_4.out
+t/Sigma_5.out
 t/Sony.t
 t/Sony_2.out
 t/Sony_3.out
@@ -615,6 +626,7 @@ t/Writer_39.out
 t/Writer_4.out
 t/Writer_40.out
 t/Writer_41.out
+t/Writer_42.out
 t/Writer_6.out
 t/Writer_7.out
 t/Writer_9.out
@@ -665,6 +677,7 @@ t/images/FotoStation.jpg
 t/images/FujiFilm.jpg
 t/images/FujiFilm.raf
 t/images/GIF.gif
+t/images/GIMP.xcf
 t/images/GPS.jpg
 t/images/GeoTiff.tif
 t/images/Geotag.gpx
@@ -724,6 +737,7 @@ t/images/Ricoh2.jpg
 t/images/Sanyo.jpg
 t/images/Sigma.jpg
 t/images/Sigma.x3f
+t/images/SigmaDP2.x3f
 t/images/Sony.jpg
 t/images/Sony.pmp
 t/images/Unknown.jpg

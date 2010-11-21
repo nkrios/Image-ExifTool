@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::ko;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 %Image::ExifTool::Lang::ko::Translate = (
    'AELock' => {
@@ -213,6 +213,7 @@ $VERSION = '1.01';
         'On' => '켜짐',
       },
     },
+   'Album' => '앨범',
    'Anti-Blur' => {
       PrintConv => {
         'Off' => '꺼짐',
@@ -222,6 +223,8 @@ $VERSION = '1.01';
    'ApertureValue' => '조리개',
    'ApplicationRecordVersion' => '어플리케이션 기록 버전',
    'Artist' => '이미지를 만든 사람',
+   'Author' => '작성자',
+   'AuthorsPosition' => '직책',
    'AutoAperture' => {
       PrintConv => {
         'Off' => '꺼짐',
@@ -353,6 +356,9 @@ $VERSION = '1.01';
       },
     },
    'Caption-Abstract' => '제목/설명',
+   'CaptionWriter' => '캡션 작성자',
+   'Categories' => '범주',
+   'Category' => '범주',
    'CenterAFArea' => {
       Description => '중앙 초점 영역',
       PrintConv => {
@@ -397,9 +403,11 @@ $VERSION = '1.01';
    'ColorEffect' => {
       PrintConv => {
         'Off' => '꺼짐',
+        'Sepia' => '세피아',
       },
     },
    'ColorFilter' => {
+      Description => '색 필터',
       PrintConv => {
         'Green' => '녹색',
         'Off' => '꺼짐',
@@ -431,6 +439,7 @@ $VERSION = '1.01';
         'Uncalibrated' => '조정되지 않음',
       },
     },
+   'ColorTemperature' => '색 온도',
    'CommandDials' => {
       Description => '커맨드 다이얼',
       PrintConv => {
@@ -497,11 +506,13 @@ $VERSION = '1.01';
    'CommanderInternalManualOutput' => '커맨드모드 내장플래시 M Comp.',
    'CommanderInternalTTLComp' => '커맨드모드 내장플래시 TTL Comp',
    'Comment' => '코멘트',
+   'ComponentsConfiguration' => '각 구성 요소의 의미',
    'CompressedBitsPerPixel' => '이미지 압축 모드',
    'Compression' => {
       Description => '압축 설계',
       PrintConv => {
         'Epson ERF Compressed' => 'Epson ERF 압축',
+        'JPEG' => 'JPEG 압축',
         'JPEG (old-style)' => 'JPEG (예전 스타일)',
         'Kodak DCR Compressed' => 'Kodak DCR 압축',
         'Kodak KDC Compressed' => 'Kodak KDC 압축',
@@ -532,9 +543,11 @@ $VERSION = '1.01';
     },
    'Copyright' => '저작권 소유자',
    'CopyrightNotice' => '저작권 공고',
+   'Country' => '국명',
    'Country-PrimaryLocationName' => '국가',
    'CreateDate' => '디지털 데이터 생성 일시',
    'CreationDate' => '촬영 날짜',
+   'Credit' => '정보',
    'Curves' => {
       PrintConv => {
         'Off' => '꺼짐',
@@ -592,6 +605,7 @@ $VERSION = '1.01';
       },
     },
    'DigitalZoomRatio' => '디지털 줌 비율',
+   'Directory' => '파일위치',
    'DirectoryNumber' => '디렉토리 숫자',
    'DistortionCorrection' => {
       PrintConv => {
@@ -606,6 +620,7 @@ $VERSION = '1.01';
       },
     },
    'DriveMode' => {
+      Description => '드라이브 모드',
       PrintConv => {
         'Multiple Exposure' => '다중 노출',
         'Off' => '꺼짐',
@@ -674,6 +689,7 @@ $VERSION = '1.01';
    'EnvelopeRecordVersion' => '압축 기록 버전',
    'ExifImageHeight' => '이미지 높이',
    'ExifImageWidth' => '이미지 넓이',
+   'ExifOffset' => 'Exif IFD Pointer',
    'ExifVersion' => 'Exif 버전',
    'ExitPupilPosition' => '출구공 위치',
    'ExposureBracketValue' => '노출 브라케팅 값',
@@ -688,6 +704,7 @@ $VERSION = '1.01';
       },
     },
    'ExposureDifference' => '노출 보정',
+   'ExposureIndex' => '노출 인덱스',
    'ExposureMode' => {
       Description => '노출 모드',
       PrintConv => {
@@ -701,6 +718,7 @@ $VERSION = '1.01';
       PrintConv => {
         'Action (High speed)' => '스포츠 모드 (빠른 셔터 스피드에 편향됨)',
         'Aperture-priority AE' => '조리개 우선',
+        'Bulb' => '벌브',
         'Creative (Slow speed)' => '독창적 프로그램 (피사계심도에 편향됨)',
         'Landscape' => '풍경 모드 (배경의 인포커스가 있는 풍경 사진)',
         'Manual' => '수동',
@@ -730,8 +748,10 @@ $VERSION = '1.01';
       },
     },
    'FNumber' => 'F 숫자',
+   'FileFormat' => '형식',
    'FileInfo' => '파일 정보',
    'FileInfoVersion' => '파일 정보 버전',
+   'FileModifyDate' => '갱신 일자',
    'FileName' => '파일명',
    'FileNumber' => '파일 숫자',
    'FileNumberMemory' => {
@@ -802,6 +822,7 @@ $VERSION = '1.01';
         'Auto, Fired, Red-eye reduction, Return not detected' => '플래시 발광, 자동모드, 복귀광 감지안됨, 적목감소모드',
         'Auto, Fired, Return detected' => '플래시 발광, 자동모드, 복귀광 감지됨',
         'Auto, Fired, Return not detected' => '플래시 발광, 자동모드, 복귀광 감지 안됨',
+        'Did not fire' => '플래시가 점등하지 않았습니다',
         'Fired' => '플래시 발광',
         'Fired, Red-eye reduction' => '플래시 발광, 적목감소모드',
         'Fired, Red-eye reduction, Return detected' => '플래시 발광, 적목감소모드, 복귀광 감지됨',
@@ -851,6 +872,7 @@ $VERSION = '1.01';
     },
    'FlashFired' => '플래시 발광됨',
    'FlashFocalLength' => '플래시 초점 길이',
+   'FlashGroupACompensation' => '그룹 A 플래시 보정',
    'FlashGroupAControlMode' => {
       Description => '그룹 A 플래시 모드',
       PrintConv => {
@@ -860,8 +882,8 @@ $VERSION = '1.01';
         'Repeating Flash' => '리피팅 플래시',
       },
     },
-   'FlashGroupACompensation' => '그룹 A 플래시 보정',
    'FlashGroupAOutput' => '그룹 A 플래시 출력',
+   'FlashGroupBCompensation' => '그룹 B 플래시 보정',
    'FlashGroupBControlMode' => {
       Description => '그룹 B 플래시 모드',
       PrintConv => {
@@ -871,8 +893,8 @@ $VERSION = '1.01';
         'Repeating Flash' => '리피팅 플래시',
       },
     },
-   'FlashGroupBCompensation' => '그룹 B 플래시 보정',
    'FlashGroupBOutput' => '그룹 B 플래시 출력',
+   'FlashGroupCCompensation' => '그룹 C 플래시 보정',
    'FlashGroupCControlMode' => {
       Description => '그룹 C 플래시 컨트롤 모드',
       PrintConv => {
@@ -882,7 +904,6 @@ $VERSION = '1.01';
         'Repeating Flash' => '리피팅 플래시',
       },
     },
-   'FlashGroupCCompensation' => '그룹 C 플래시 보정',
    'FlashGroupCOutput' => '그룹 C 플래시 출력',
    'FlashInfoVersion' => '플래시 정보 버전',
    'FlashLevel' => '플래시 보정',
@@ -929,12 +950,15 @@ $VERSION = '1.01';
         'On' => '켜짐',
       },
     },
+   'FlashpixVersion' => '지원되는 Flashpix 버전',
    'FocalLength' => '초점 길이',
+   'FocalLength35efl' => '초점거리 (35mm 변환)',
    'FocalLengthIn35mmFormat' => '35 mm 필름 환산 초점길이',
    'FocalPlaneResolutionUnit' => {
       Description => '초점면 해상도 단위',
       PrintConv => {
         'None' => '없음',
+        'inches' => '인치',
         'um' => 'µm (마이크로미터)',
       },
     },
@@ -1003,6 +1027,8 @@ $VERSION = '1.01';
         'Short' => '짧게',
       },
     },
+   'FrameRate' => '프레임 비율',
+   'FrameSize' => '프레임 크기',
    'FujiFlashMode' => {
       PrintConv => {
         'Auto' => '자동',
@@ -1022,6 +1048,85 @@ $VERSION = '1.01';
         'Spot Metering' => '스팟 측광',
       },
     },
+   'GPSAltitude' => '고도',
+   'GPSAltitudeRef' => {
+      Description => '고도 참조',
+      PrintConv => {
+        'Above Sea Level' => '해면',
+        'Below Sea Level' => '해면 참조(음수 값)',
+      },
+    },
+   'GPSAreaInformation' => 'GPS 영역 이름',
+   'GPSDOP' => '측정 정밀도',
+   'GPSDateStamp' => 'GPS 날짜',
+   'GPSDestBearing' => '목적지의 방위',
+   'GPSDestBearingRef' => '목적지 방위의 기준',
+   'GPSDestDistance' => '목적지까지의 거리',
+   'GPSDestDistanceRef' => '목적지까지의 거리 단위',
+   'GPSDestLatitude' => '목적지의 위도',
+   'GPSDestLatitudeRef' => '목적지 위도의 기준',
+   'GPSDestLongitude' => '목적지의 경도',
+   'GPSDestLongitudeRef' => '목적지 경도의 기준',
+   'GPSDifferential' => {
+      Description => 'GPS 편차 보정',
+      PrintConv => {
+        'Differential Corrected' => '편차 보정 적용',
+        'No Correction' => '편차 보정 없이 측정',
+      },
+    },
+   'GPSImgDirection' => '이미지 방향',
+   'GPSImgDirectionRef' => '이미지 방향의 기준',
+   'GPSInfo' => 'GPS Info IFD Pointer',
+   'GPSLatitude' => '위도',
+   'GPSLatitudeRef' => {
+      Description => '북위 또는 남위',
+      PrintConv => {
+        'North' => '북위',
+        'South' => '남위',
+      },
+    },
+   'GPSLongitude' => '경도',
+   'GPSLongitudeRef' => {
+      Description => '동경 또는 서경',
+      PrintConv => {
+        'East' => '동경',
+        'West' => '서경',
+      },
+    },
+   'GPSMapDatum' => '사용된 측지 데이터',
+   'GPSMeasureMode' => {
+      Description => 'GPS 측정 모드',
+      PrintConv => {
+        '3-Dimensional Measurement' => '3차원 측정',
+      },
+    },
+   'GPSProcessingMethod' => 'GPS 처리 방식 이름',
+   'GPSSatellites' => '측정에 사용된 GPS 위성',
+   'GPSSpeed' => 'GPS 수신기 속도',
+   'GPSSpeedRef' => {
+      Description => '속도 단위',
+      PrintConv => {
+        'km/h' => '시간당 킬로미터',
+        'knots' => '노트',
+        'mph' => '시간당 마일',
+      },
+    },
+   'GPSStatus' => {
+      Description => 'GPS 수신기 상태',
+      PrintConv => {
+        'Measurement Active' => '진행 중인 측정',
+        'Measurement Void' => '측정 상호 운용성',
+      },
+    },
+   'GPSTimeStamp' => 'GPS 시간(원자 시계)',
+   'GPSTrack' => '이동 방향',
+   'GPSTrackRef' => {
+      Description => '이동 방향의 기준',
+      PrintConv => {
+        'Magnetic North' => '자기 방향',
+        'True North' => '실제 방향',
+      },
+    },
    'GPSVersionID' => 'GPS 태그 버전',
    'GainControl' => {
       Description => '이득 제어',
@@ -1033,6 +1138,8 @@ $VERSION = '1.01';
         'None' => '없음',
       },
     },
+   'Gamma' => '감마',
+   'Gradation' => '계조',
    'GridDisplay' => {
       Description => '격자 표시',
       PrintConv => {
@@ -1040,6 +1147,7 @@ $VERSION = '1.01';
         'On' => '켜짐',
       },
     },
+   'Headline' => '헤드라인',
    'HighISONoiseReduction' => {
       Description => '고ISO에서 노이즈제거',
       PrintConv => {
@@ -1057,6 +1165,7 @@ $VERSION = '1.01';
         'On' => '켜짐',
       },
     },
+   'Hue' => '색상',
    'HueAdjustment' => '색조',
    'ISO' => 'ISO 속도',
    'ISODisplay' => 'ISO 표시',
@@ -1128,7 +1237,9 @@ $VERSION = '1.01';
         'On' => '켜짐',
       },
     },
+   'ImageUniqueID' => '고유 이미지 ID',
    'ImageWidth' => '이미지 넓이',
+   'Index' => '색인',
    'InitialZoomSetting' => {
       Description => '이니셜 줌 설정',
       PrintConv => {
@@ -1137,6 +1248,7 @@ $VERSION = '1.01';
         'Medium Magnification' => '중간 확대',
       },
     },
+   'Instructions' => '안내',
    'IntensityStereo' => {
       PrintConv => {
         'Off' => '꺼짐',
@@ -1159,6 +1271,8 @@ $VERSION = '1.01';
       },
     },
    'InteropIndex' => '상호운용성 증명',
+   'InteropOffset' => '상호 운용성 태그',
+   'InteropVersion' => '상호 운용성 버전',
    'Keyword' => '키워드',
    'Keywords' => '키워드',
    'LCDIllumination' => {
@@ -1185,6 +1299,7 @@ $VERSION = '1.01';
    'LensFStops' => '렌즈 F-숫자',
    'LensID' => '사용된 렌즈',
    'LensIDNumber' => '렌즈 ID 숫자',
+   'LensInfo' => '렌즈 정보',
    'LensType' => '렌즈 형식',
    'LightSource' => {
       Description => '광원 종류',
@@ -1208,6 +1323,7 @@ $VERSION = '1.01';
         'White Fluorescent' => '백색 형광등 (WW 3200 - 3700K)',
       },
     },
+   'Lightness' => '명도',
    'LinearizationTable' => '선형도표',
    'LiveViewShooting' => {
       PrintConv => {
@@ -1262,8 +1378,10 @@ $VERSION = '1.01';
    'Make' => '메이커',
    'MakerNote' => '제조사 노트',
    'MakerNoteVersion' => '제조사노트 버전',
+   'MakerNotes' => '제조업체 정보',
    'ManualFlashOutput' => '내장 플래시 수동 출력',
    'ManualFocusDistance' => '수동 초점 거리',
+   'MaxAperture' => '최대 렌즈 조리개',
    'MaxApertureAtMaxFocal' => '최대 초점길이에서 최대 조리개',
    'MaxApertureAtMinFocal' => '최소 초점길이에서 최대 조리개',
    'MaxApertureValue' => '최대 렌즈 조리개',
@@ -1320,6 +1438,7 @@ $VERSION = '1.01';
         'Auto' => '자동',
       },
     },
+   'ModifyDate' => '파일 변경 날짜 및 시간',
    'MoireFilter' => {
       PrintConv => {
         'Off' => '꺼짐',
@@ -1450,6 +1569,7 @@ $VERSION = '1.01';
         'Off' => '꺼짐',
       },
     },
+   'Opto-ElectricConvFactor' => '광전자 변환 계수',
    'Orientation' => {
       Description => '이미지 위치',
       PrintConv => {
@@ -1546,6 +1666,13 @@ $VERSION = '1.01';
         'Green' => '녹색',
       },
     },
+   'PlanarConfiguration' => {
+      Description => '이미지 데이터 정렬',
+      PrintConv => {
+        'Chunky' => '청키 형식',
+        'Planar' => '평면 형식',
+      },
+    },
    'PreviewIFD' => 'IFD 포인터 미리보기',
    'PrimaryAFPoint' => {
       PrintConv => {
@@ -1563,8 +1690,16 @@ $VERSION = '1.01';
         'Upper-right' => '우상단',
       },
     },
+   'PrimaryChromaticities' => '기본 색도',
    'ProgramShift' => '프로그램 쉬프트',
-   'Quality' => '화질',
+   'Province-State' => '도',
+   'Quality' => {
+      Description => '화질',
+      PrintConv => {
+        'Low' => '저화질',
+        'Normal' => '표준화질',
+      },
+    },
    'RawDevAutoGradation' => {
       PrintConv => {
         'Off' => '꺼짐',
@@ -1586,6 +1721,7 @@ $VERSION = '1.01';
     },
    'RawImageCenter' => 'RAW 이미지 중앙',
    'RecordMode' => {
+      Description => '이미지 화질 모드',
       PrintConv => {
         'Manual' => '수동',
       },
@@ -1607,6 +1743,10 @@ $VERSION = '1.01';
         'On' => '켜짐',
       },
     },
+   'ReferenceBlackWhite' => '흑백 참조 값의 쌍',
+   'RelatedImageFileFormat' => '관련 이미지 파일 형식',
+   'RelatedImageHeight' => '관련 이미지 길이',
+   'RelatedImageWidth' => '관련 이미지 너비',
    'RelatedSoundFile' => '연관된 오디오 파일',
    'ReleaseButtonToUseDial' => {
       Description => '다이얼로 릴리즈 버튼 사용',
@@ -1623,6 +1763,8 @@ $VERSION = '1.01';
       Description => 'X 와 Y 해상도 단위',
       PrintConv => {
         'None' => '없음',
+        'cm' => '센티미터',
+        'inches' => '인치',
       },
     },
    'RetouchHistory' => {
@@ -1650,6 +1792,8 @@ $VERSION = '1.01';
         'Rotated 90 CW' => '90° 우회전',
       },
     },
+   'RowsPerStrip' => '스트립 당 행의 수',
+   'SamplesPerPixel' => '구성 요소 수',
    'Saturation' => {
       Description => '채도',
       PrintConv => {
@@ -1680,6 +1824,7 @@ $VERSION = '1.01';
         'Auto' => '자동',
         'Manual' => '수동',
         'Off' => '꺼짐',
+        'Sunset' => '석양촬영',
       },
     },
    'SceneModeUsed' => {
@@ -1722,6 +1867,7 @@ $VERSION = '1.01';
    'SensorPixelSize' => '센서 픽셀 크기',
    'SerialNumber' => '시리얼번호',
    'ShadingCompensation' => {
+      Description => '주변광량 보정',
       PrintConv => {
         'Off' => '꺼짐',
         'On' => '켜짐',
@@ -1799,7 +1945,12 @@ $VERSION = '1.01';
       },
     },
    'Software' => '소프트웨어',
+   'Source' => '소스',
+   'SpatialFrequencyResponse' => '공간 주파수 응답',
    'SpectralSensitivity' => '분광 감도',
+   'State' => '도',
+   'StripByteCounts' => '압축된 스트립 당 바이트',
+   'StripOffsets' => '이미지 데이터 위치',
    'SubSecTime' => '일시 1/100 초',
    'SubSecTimeDigitized' => '디지털화 일시 1/100 초',
    'SubSecTimeOriginal' => '원본일시 1/100 초',
@@ -1827,12 +1978,15 @@ $VERSION = '1.01';
         'On' => '켜짐',
       },
     },
+   'SupplementalCategories' => '보충 범주',
    'TextStamp' => {
       PrintConv => {
         'Off' => '꺼짐',
         'On' => '켜짐',
       },
     },
+   'ThumbnailImage' => '축소 그림',
+   'ThumbnailImageSize' => '갤러리 크기',
    'TimerFunctionButton' => {
       Description => 'Fn 버튼',
       PrintConv => {
@@ -1844,6 +1998,7 @@ $VERSION = '1.01';
       },
     },
    'Timezone' => '표준 시간대',
+   'Title' => '제목',
    'ToneComp' => '계조 보정',
    'ToneCurve' => {
       PrintConv => {
@@ -1870,6 +2025,8 @@ $VERSION = '1.01';
       },
     },
    'ToningSaturation' => '채도 조정',
+   'TransferFunction' => '전송 기능',
+   'TransmissionReference' => '전송 참조',
    'Uncompressed' => '압축되지 않음',
    'Unsharp1Color' => {
       PrintConv => {
@@ -1905,6 +2062,7 @@ $VERSION = '1.01';
         'On' => '켜짐',
       },
     },
+   'Urgency' => '중요도',
    'UserComment' => '사용자 코멘트',
    'VRInfo' => '손떨림 보정 정보',
    'VRInfoVersion' => 'VR 정보 버전',
@@ -1952,8 +2110,16 @@ $VERSION = '1.01';
       Description => '화이트밸런스',
       PrintConv => {
         'Auto' => '자동',
+        'Black & White' => '흑백',
         'Cloudy' => '흐린날',
+        'Cool White Fluorescent' => '차가운 백색 형광',
+        'Custom 1' => '개인설정1',
+        'Custom 2' => '개인설정2',
+        'Custom 3' => '개인설정3',
+        'Custom 4' => '개인설정4',
+        'Day White Fluorescent' => '중성 백색 형광',
         'Daylight' => '맑은날',
+        'Daylight Fluorescent' => '일광 형광',
         'Flash' => '플래시',
         'Fluorescent' => '형광등',
         'Manual' => '수동',
@@ -1980,8 +2146,11 @@ $VERSION = '1.01';
         'Manual' => '수동',
       },
     },
+   'WhitePoint' => '흰색 점 색도',
    'WorldTime' => '표준 시간대',
+   'Writer-Editor' => '캡션 작성자',
    'XResolution' => '수평 해상도',
+   'YCbCrCoefficients' => '색상 공간 변환 매트릭스 계수',
    'YCbCrPositioning' => {
       Description => 'Y and C 위치',
       PrintConv => {
@@ -1989,6 +2158,7 @@ $VERSION = '1.01';
         'Co-sited' => '주변',
       },
     },
+   'YCbCrSubSampling' => 'Y->C 서브샘플링 비율',
    'YResolution' => '수직 해상도',
    'ZoneMatchingOn' => {
       PrintConv => {

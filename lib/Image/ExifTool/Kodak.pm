@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.26';
+$VERSION = '1.27';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -701,13 +701,24 @@ sub WriteKodakIFD($$$);
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     WRITABLE => 1,
     FIRST_ENTRY => 0,
-    NOTES => 'These tags are used by the C1013.',
-    0x0c => {
-        Name => 'FNumber',
-        Format => 'int16u',
-        ValueConv => '$val / 100',
-        ValueConvInv => 'int($val * 100 + 0.5)',
+    NOTES => q{
+        These tags are used by the Kodak C140, C180, C913, C1013, M320, M340 and
+        M550, as well as various cameras marketed by other manufacturers.
     },
+    0x0c => [
+        {
+            Name => 'FNumber',
+            Condition => '$$self{Make} =~ /Kodak/i',
+            Format => 'int16u',
+            ValueConv => '$val / 100',
+            ValueConvInv => 'int($val * 100 + 0.5)',
+        },{
+            Name => 'FNumber',
+            Format => 'int16u',
+            ValueConv => '$val / 10',
+            ValueConvInv => 'int($val * 10 + 0.5)',
+        },
+    ],
     0x10 => {
         Name => 'ExposureTime',
         Format => 'int32u',
@@ -733,11 +744,15 @@ sub WriteKodakIFD($$$);
     },
     0x57 => {
         Name => 'FirmwareVersion',
+        Condition => '$$self{Make} =~ /Kodak/i',
         Format => 'string[16]',
+        Notes => 'Kodak only',
     },
     0xa8 => { # (not confirmed)
         Name => 'SerialNumber',
+        Condition => '$$self{Make} =~ /Kodak/i',
         Format => 'string[12]',
+        Notes => 'Kodak only',
     },
 );
 

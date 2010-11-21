@@ -1,11 +1,11 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.05
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.32
 [File, System, Image] FileName - File Name: Photoshop.psd
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 17 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:04:14 21:00:40-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2007:04:16 07:18:42-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: PSD
-[File, File, Image] MIMEType - MIME Type: application/photoshop
+[File, File, Image] MIMEType - MIME Type: application/vnd.adobe.photoshop
 [File, File, Image] CurrentIPTCDigest - Current IPTC Digest: b765e54396f2885e9a76ff4ad665b190
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
 [Photoshop, Photoshop, Image] 6 - Num Channels: 3

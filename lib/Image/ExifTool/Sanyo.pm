@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 my %offOn = (
     0 => 'Off',
@@ -269,6 +269,7 @@ my %offOn = (
 );
 
 # tags in Sanyo MP4 videos (PH - from C4, C5 and HD1A samples)
+# --> very similar to Samsung MP4 information
 # (there is still a lot more information here that could be decoded!)
 %Image::ExifTool::Sanyo::MP4 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -289,9 +290,13 @@ my %offOn = (
     # some of the shutter speeds should be around 1/500 or so)
     0x32 => {
         Name => 'FNumber',
-        Format => 'int32u',
-        ValueConv => '$val / 10',
+        Format => 'rational64u',
         PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x3a => { # (NC)
+        Name => 'ExposureCompensation',
+        Format => 'rational64s',
+        PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
     },
     0x6a => {
         Name => 'ISO',

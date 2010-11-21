@@ -89,7 +89,7 @@ my $testnum = 1;
     $exifTool->SetNewValue(CodedCharacterSet => 'UTF8', Protected => 1);
     undef $info;
     my $image;
-    $exifTool->WriteInfo('t/images/IPTC-XMP.jpg',\$image);
+    my $ok = writeInfo($exifTool,'t/images/IPTC-XMP.jpg',\$image);
     # this is effectively what the RHEL 3 UTF8 LANG problem does:
     # $image = pack("U*", unpack("C*", $image));
 
@@ -97,7 +97,7 @@ my $testnum = 1;
     $exifTool2->Options(Duplicates => 1);
     $info = $exifTool2->ImageInfo(\$image);
     my $testfile = "t/${testname}_${testnum}_failed.jpg";
-    if (check($exifTool2, $info, $testname, $testnum)) {
+    if (check($exifTool2, $info, $testname, $testnum) and $ok) {
         unlink $testfile;
     } else {
         # save bad file
@@ -135,9 +135,9 @@ my $testnum = 1;
     $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg');
     my $testfile = "t/${testname}_${testnum}_failed.xmp";
     unlink $testfile;
-    $exifTool->WriteInfo(undef,$testfile);
+    my $ok = writeInfo($exifTool,undef,$testfile);
     my $info = $exifTool->ImageInfo($testfile);
-    if (check($exifTool, $info, $testname, $testnum)) {
+    if (check($exifTool, $info, $testname, $testnum) and $ok) {
         unlink $testfile;
     } else {
         print 'not ';
@@ -156,8 +156,8 @@ my $testnum = 1;
     $exifTool->SetNewValue(Subject => q{char test: & > < ' "}, AddValue => 1);
     $exifTool->SetNewValue('Rights' => "\xc2\xa9 Copyright Someone Else");
     $exifTool->Options(Compact => 1);
-    $exifTool->WriteInfo('t/images/XMP.xmp',$testfile);
-    print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);
+    my $ok = writeInfo($exifTool,'t/images/XMP.xmp',$testfile);
+    print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum) and $ok;
     print "ok $testnum\n";
 }
 
@@ -174,7 +174,7 @@ my $testnum = 1;
         ++$testnum;
         my $testfile = "t/${testname}_${testnum}_failed.xmp";
         unlink $testfile;
-        $exifTool->SetNewValue('XMP:Author' => 'Phil');
+        $exifTool->SetNewValue('XMP:Creator' => 'Phil', AddValue => 1);
         $exifTool->WriteInfo("t/images/$file", $testfile);
         print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);
         print "ok $testnum\n";
@@ -225,9 +225,9 @@ my $testnum = 1;
         unlink $testfile;
         $exifTool->SetNewValue();
         $exifTool->SetNewValuesFromFile('t/images/XMP.xmp', 'XMP:all>EXIF:all');
-        $exifTool->WriteInfo("t/images/Writer.jpg", $testfile);
+        my $ok = writeInfo($exifTool, "t/images/Writer.jpg", $testfile);
         my $info = $exifTool->ImageInfo($testfile, 'EXIF:all');
-        if (check($exifTool, $info, $testname, $testnum)) {
+        if (check($exifTool, $info, $testname, $testnum) and $ok) {
             unlink $testfile;
         } else {
             print 'not ';
@@ -246,9 +246,9 @@ my $testnum = 1;
         unlink $testfile;
         $exifTool->SetNewValue();
         $exifTool->SetNewValuesFromFile('t/images/Canon.jpg', 'EXIF:* > XMP:*');
-        $exifTool->WriteInfo(undef, $testfile);
+        my $ok = writeInfo($exifTool, undef, $testfile);
         my $info = $exifTool->ImageInfo($testfile, 'XMP:*');
-        if (check($exifTool, $info, $testname, $testnum)) {
+        if (check($exifTool, $info, $testname, $testnum) and $ok) {
             unlink $testfile;
         } else {
             print 'not ';
@@ -327,8 +327,8 @@ my $testnum = 1;
     $exifTool->SetNewValue('Custom1-en' => 'b');
     $exifTool->SetNewValue('ATestTag' => "http://www.exiftool.ca/t/$testname.t#$testnum-one");
     $exifTool->SetNewValue('ATestTag' => "http://www.exiftool.ca/t/$testname.t#$testnum-two");
-    $exifTool->WriteInfo(undef,$testfile);
-    print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum);
+    my $ok = writeInfo($exifTool, undef, $testfile);
+    print 'not ' unless testCompare("t/IPTC-XMP_$testnum.out",$testfile,$testnum) and $ok;
     print "ok $testnum\n";
 }
 
@@ -394,10 +394,10 @@ my $testnum = 1;
     $exifTool->Options(Charset => 'Cyrillic');
     $exifTool->SetNewValuesFromFile('t/images/MIE.mie', 'Comment-ru_RU>Caption-Abstract');
     $exifTool->Options(IPTCCharset => 'Cyrillic');
-    $exifTool->WriteInfo('t/images/Writer.jpg',$testfile);
+    my $ok = writeInfo($exifTool,'t/images/Writer.jpg',$testfile);
     $exifTool->Options(Charset => 'UTF8');
     my $info = $exifTool->ImageInfo($testfile, 'IPTC:*');
-    if (check($exifTool, $info, $testname, $testnum)) {
+    if (check($exifTool, $info, $testname, $testnum) and $ok) {
         unlink $testfile;
     } else {
         print 'not ';
@@ -414,9 +414,9 @@ my $testnum = 1;
     # write title only if it doesn't exist
     $exifTool->SetNewValue('XMP-dc:Title-de' => '', DelValue => 1);
     $exifTool->SetNewValue('XMP-dc:Title-de' => 'A');
-    $exifTool->WriteInfo('t/images/Writer.jpg',$testfile);
+    my $ok = writeInfo($exifTool,'t/images/Writer.jpg',$testfile);
     my $info = $exifTool->ImageInfo($testfile,'XMP:*');
-    print 'not ' unless check($exifTool, $info, $testname, $testnum);
+    print 'not ' unless check($exifTool, $info, $testname, $testnum) and $ok;
     print "ok $testnum\n";
     
     # try again when title already exists
@@ -438,9 +438,9 @@ my $testnum = 1;
     unlink $testfile2;
     $exifTool->SetNewValue('XMP-dc:Title-de' => 'A', DelValue => 1);
     $exifTool->SetNewValue('XMP-dc:Title-de' => 'C');
-    $exifTool->WriteInfo($testfile,$testfile2);
+    $ok = writeInfo($exifTool,$testfile,$testfile2);
     $info = $exifTool->ImageInfo($testfile2,'XMP:*');
-    if (check($exifTool, $info, $testname, $testnum)) {
+    if (check($exifTool, $info, $testname, $testnum) and $ok) {
         unlink $testfile;
         unlink $testfile2
     } else {

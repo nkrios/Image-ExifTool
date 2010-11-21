@@ -105,12 +105,20 @@ extracted, the <code>-a</code> option must be used:
 If you are having problems with other software reading information written by
 ExifTool, if possible try first writing the information from the other software,
 then use ExifTool to determine where the information was written. Once you know
-where it should go, you can use ExifTool to write to this location.</blockquote>
-
-<blockquote>You can read or write information in a specific location by
-prefixing the tag name on the command line with the desired group name.  ie)
+where it should go, you can use ExifTool to write to this location. You can read
+or write information in a specific location by prefixing the tag name on the
+command line with the desired group name.  ie)
 "<code>-ExifIFD:DateTimeOriginal</code>"
 </blockquote>
+
+<blockquote>This problem may also occur if contradictory information exists
+in different meta information formats within the same file.  The
+<a href="http://www.metadataworkinggroup.org/">Metadata Working Group</a>
+recommends techniques to keep the EXIF, IPTC and XMP metadata synchronized. 
+These recommendations are implemented by the ExifTool
+<a href="TagNames/MWG.html">MWG tags</a>.  For maximum compatibility with the
+widest range of applications, it is suggested that these MWG tags be used
+whenever possible.</blockquote>
 
 <a name="Q4"></a>
 <p>4. <b>"ExifTool reports more than one shutter speed or aperture value, and
@@ -196,7 +204,7 @@ exiftool -flash#=1 image.jpg
 exiftool -flash#=0x1 image.jpg
 exiftool -flash=fired image.jpg
 </pre>
-Programmers: These techniques look like this when calling Image::ExifTool
+<b>Programmers</b>: These techniques look like this when calling Image::ExifTool
 functions from a Perl script:
 <pre>$exifTool->SetNewValue(flash => 1, Type => 'ValueConv');
 $exifTool->SetNewValue(flash => 0x1, Type => 'ValueConv');
@@ -371,7 +379,7 @@ brackets):
 </table></blockquote>
 
 More specific details are given below about how character coding is
-handled for EXIF, IPTC, XMP, PNG, ID3, PDF and MIE information:</blockquote>
+handled for EXIF, IPTC, XMP, PNG, ID3, PDF, QuickTime and MIE information:</blockquote>
 
 <blockquote><b>EXIF</b>: Most textual information in EXIF is stored in ASCII
 format, and ExifTool does not convert these tags.  However it is not uncommon
@@ -390,20 +398,21 @@ this may be changed by setting the ExifUnicodeByteOrder tag (see the
 (XPTitle, XPComment, etc) are always stored as little-endian Unicode, and are
 read and written using the specified character set.</blockquote>
 
-<blockquote><b>IPTC</b>: The value of the IPTC:CodedCharacterSet tag determines
-how the internal IPTC string values are interpreted.  If CodedCharacterSet
-exists and has a value of "<code>UTF8</code>" (or
-"<code>ESC&nbsp;%&nbsp;G</code>") then string values are assumed to be stored as
-UTF&#8209;8, otherwise Windows Latin1 (cp1252) coding is assumed by default, but
-this can be changed with "<code>-charset iptc=CHARSET</code>".  When reading,
-these strings are converted to UTF&#8209;8 by default, or to the character set
-specified by the <code>-charset</code> or <code>-L</code> option.  When writing,
-the inverse conversions are performed.  No conversion is done if the internal
-(IPTC) and external (ExifTool) character sets are the same.  Note that ISO 2022
-character set shifting is not supported. Instead, a warning is issued and the
-string is not converted if an ISO 2022 shift code is found.  See the <a
-href="http://www.iptc.org/IIM/">IPTC specification</a> for more information
-about IPTC character coding.</blockquote>
+<blockquote><b>IPTC</b><span class='sm'><sup>&dagger;</sup></span>: The
+value of the IPTC:CodedCharacterSet tag determines how the internal IPTC string
+values are interpreted.  If CodedCharacterSet exists and has a value of
+"<code>UTF8</code>" (or "<code>ESC&nbsp;%&nbsp;G</code>") then string values are
+assumed to be stored as UTF&#8209;8, otherwise Windows Latin1 (cp1252) coding is
+assumed by default, but this can be changed with "<code>-charset
+iptc=CHARSET</code>".  When reading, these strings are converted to UTF&#8209;8
+by default, or to the character set specified by the <code>-charset</code> or
+<code>-L</code> option.  When writing, the inverse conversions are performed. 
+No conversion is done if the internal (IPTC) and external (ExifTool) character
+sets are the same.  Note that ISO 2022 character set shifting is not supported.
+Instead, a warning is issued and the string is not converted if an ISO 2022
+shift code is found.  See the
+<a href="http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf">IPTC IIM
+specification</a> for more information about IPTC character coding.</blockquote>
 
 <blockquote>ExifTool may be used to convert IPTC values to a different internal
 encoding.  To do this, all IPTC tags must be rewritten along with the desired
@@ -416,6 +425,13 @@ internal IPTC encoding to UTF&#8209;8:
 <pre>exiftool -tagsfromfile @ -iptc:all -codedcharacterset= -charset iptc=latin2 a.jpg
 </pre>But note that unless UTF&#8209;8 is used, applications have no reliable
 way to determine the IPTC character encoding.</blockquote>
+
+<blockquote class='sm'><sup>&dagger;</sup> <span class=lt>Refers to the older
+<a href="http://www.iptc.org/site/News_Exchange_Formats/IIM/">IPTC IIM</a> format.
+The more recent
+<a href="http://iptc.cms.apa.at/site/Photo_Metadata/IPTC_Core_&amp;_Extension/">IPTC
+Core and Extension specifications</a> actually use the XMP format (see below).</span>
+</blockquote>
 
 <blockquote><b>XMP</b>: Exiftool reads XMP encoded as UTF&#8209;8, UTF&#8209;16
 or UTF&#8209;32, and converts them all to UTF&#8209;8 internally.  Also, all XML
@@ -456,6 +472,16 @@ encodes input text from the specified character set as Unicode only if the
 string contains special characters, otherwise PDFDocEncoding is
 used.</blockquote>
 
+<blockquote><b>Photoshop</b>: Some Photoshop resource names are stored as
+Pascal strings with unknown encoding.  By default, ExifTool assumes MacRoman
+encoding and converts this to UTF&#8209;8, but the internal and external
+character sets may be specified with <code>-charset Photoshop=CHARSET</code>
+and <code>-charset CHARSET</code> respectively.</blockquote>
+
+<blockquote><b>QuickTime</b>: QuickTime text strings may be stored in a variety
+of poorly document formats.  ExifTool does its best to decode these according
+to the <code>-charset</code> option setting.</blockquote>
+
 <blockquote><b>MIE</b>: MIE strings are stored as either UTF&#8209;8 or ISO
 8859&#8209;1. When reading, UTF&#8209;8 strings are converted according to
 the <code>-charset</code> or <code>-L</code> option, and ISO 8859&#8209;1
@@ -469,31 +495,45 @@ otherwise they are stored as ISO 8859&#8209;1.</blockquote>
 
 <blockquote>
 For examples of how to add user-defined tags, see the
-<a href="config.html">ExifTool_config</a> file in the ExifTool distribution. To
-activate this file, rename it to "<code>.ExifTool_config</code>" and copy it to
-your <b>HOME</b> directory.  (Windows users must rename the file using the
-"<code>rename</code>" command in a cmd shell because the Windows GUI won't let
-you use a file name beginning with a "<code>.</code>".)  With this installed,
-you should be able to write and read the example tags (such as
-"<code>NewXMPxxxTag1</code>").  Try this first before you attempt to define your
-own tags.</blockquote>
+<a href="config.html">ExifTool_config</a> file in the ExifTool distribution.
+It may be useful to activate this file as a test before trying to implement
+your own config file.  To activate this file, copy it to your <b>HOME</b>
+directory then rename it to "<code>.ExifTool_config</code>".
+<blockquote class=lt><b>Note:</b> The config file must be renamed at the
+command line because neither the Windows nor Mac GUI allow a file name to
+begin with a "<code>.</code>".  To do this in Windows, run "cmd.exe" and type
+the following (pressing <i>RETURN</i> at the end of each line):
+<pre>cd %HOMEPATH%
+rename ExifTool_config .ExifTool_config
+</pre>
+or on a Mac, open the "Terminal" application (from the /Applications/Utilities
+folder) and type this command then press <i>RETURN</i>:
+<pre>mv ExifTool_config .ExifTool_config
+</pre></blockquote>
 
-<blockquote>If this doesn't work, the most common problem is that the
-"<code>.ExifTool_config</code>" configuration file isn't getting loaded
-properly, and there are a few things you can try which may help with this:
+With the sample config file installed, you should be able to write the example
+tags.  A command like this:
+<pre>exiftool -v2 -NewXMPxmpTag=test <i>FILE</i></pre>
+should print this as the first line of its output:
+<pre>Writing XMP-xmp:NewXMPxmpTag
+</pre>
+If this doesn't work, the most common problem is that the
+"<code>.ExifTool_config</code>" configuration file isn't getting loaded.  In
+this case, there are a few things you can try:
 <ol>
+<li>Make sure the config file name is correct.  It must be
+"<code>.ExifTool_config</code>" (note the leading "<code>.</code>", and the
+capital "<code>T</code>").</li>
 <li>Set either the <b>HOME</b> or the <b>EXIFTOOL_HOME</b> environment variable
 to the name of the directory where you put your "<code>.ExifTool_config</code>"
-file</li>
+file.</li>
 <li>Put the config file in the same directory as the exiftool script.  (Also, be
-sure the config filename starts with a dot!  In the Windows GUI you may be not
-be able to generate a file name that starts with a '<code>.</code>', but it can
-be done from the command line using the '<code>rename</code>' command.)</li>
-<li>If running on a system with case-sensitive filenames (ie. Linux), check the
-case of your config file.  It must be "<code>.ExifTool_config</code>" (note
-the capital "<code>T</code>").</li>
-<li>Use the <code>-config <i>CFGFILE</i></code> option to load the config file
-by name.  (If used, this must be the first option on the command line.)</li>
+sure the config filename starts with a dot!  See the note above for help
+renaming the config file.)</li>
+<li>If you can't get the config file to load automatically, you can try loading
+it manually with the exiftool <code>-config <i>CFGFILE</i></code> option. (Note:
+This must be the first option on the command line.)  This allows loading
+of a config file with any name.</li>
 </ol>
 </blockquote>
 
@@ -505,29 +545,18 @@ file by adding the following line to your file:
 
 If you see a "<code>LOADED!</code>" message when you run exiftool, but your new
 tags still don't work, make sure you are using the proper tag name and that the
-file you are writing can support these names.  Try copying the
-"<code>t/images/Writer.jpg</code>" file from the distribution and running
-exiftool with the following command:
+file you are writing can support these names.</blockquote>
 
-<pre>exiftool -v2 -NewXMPxxxTag1=test Writer.jpg
-</pre>
-
-If ExifTool recognizes the new tag, the first line of output from this command
-should be
-
-<pre>"Writing XMP-xxx:NewXMPxxxTag1"
-</pre>
-
-Then you can read back the new tag with "<code>exiftool -s Writer.jpg</code>".
-</blockquote>
-
-<blockquote>To specify the config file directory from within a Perl script when
-using the ExifTool API, set the <b>EXIFTOOL_HOME</b> environment variable before
-loading the ExifTool module:
-
+<blockquote><b>Programmers</b>: To specify the config file directory from within
+a Perl script when using the ExifTool API, set the <b>EXIFTOOL_HOME</b>
+environment variable before loading the ExifTool module:
 <pre>BEGIN { $ENV{EXIFTOOL_HOME} = '/config_file_directory' }
 use Image::ExifTool;
-</pre></blockquote>
+</pre>
+Also see the <a href="ExifTool.html#Config">Configuration section of the
+ExifTool API documentation</a> for techniques to use a config file with another
+name, or to disable the config file feature.
+</blockquote>
 
 <a name="Q12"></a>
 <p>12. <b>"How do I export information from exiftool to a database?"</b></p>
@@ -545,7 +574,7 @@ values.  The following exiftool options may be useful for this purpose:
 
 And here is an example command line:
 
-<pre>exiftool -T -r -filename -aperture -ISO t/images > out.txt
+<pre>exiftool -T -r -filename -aperture -ISO t/images &gt; out.csv
 </pre></blockquote>
 
 <blockquote>This command recursively processes all images in the
@@ -568,10 +597,41 @@ command line starts to get too long, you may want to look into using the
 feature).
 </blockquote>
 
+<blockquote>In Windows, a .BAT file containing the exiftool command may be used
+to give drag and drop functionality.  Dropping a folder on the following .BAT
+file will create "out.csv" in the folder:
+
+<pre>echo "FileName&lt;tab&gt;Aperture&lt;tab&gt;ISO" &gt; %1\out.csv
+exiftool -T -r -filename -aperture -ISO %1 &gt;&gt; %1\out.csv
+</pre>
+
+where "<code>&lt;tab&gt;</code>" in the "<code>echo</code>" command indicates a
+tab character.  This "<code>echo</code>" command was included to add column
+headings to the output.
+</blockquote>
+
 <blockquote>Another approach is to export information in RDF/XML format using
 the <code>-X</code> option, or JSON (JavaScript Object Notation) using the
 <code>-j</code> option.  These methods allow transfer of more complex data
 sets, but require that the importing software supports these formats.
+</blockquote>
+
+<blockquote>Finally, the <code>-p</code> option may be used to generate any
+arbitrary output format.  For example, the following format file
+(let's call it "<code>my.fmt</code>") may be used to give an output similar to
+the example above but with comma delimiters intead of tabs:
+
+<pre>#[HEAD]FileName, Aperture, ISO
+$filename, $aperture, $iso
+</pre>
+
+with a command like this:
+
+<pre>exiftool -f -r -p my.fmt t/images &gt; out.csv
+</pre>
+
+See the <code>-p</code> option in the <a href="exiftool_pod.html">application
+documentation</a> for more information about this feature.
 </blockquote>
 
 <a name="Q13"></a>
@@ -591,7 +651,7 @@ output image. When ExifTool rewrites an image it does not copy these unused
 blocks.  This can result in a significant reduction in file size for some
 images.  <i>[The <code>-htmlDump</code> option may be used to view the file
 structure if you are interested in seeing these unused data blocks -- use a
-command like "<code>exiftool -htmlDump a.jpg > out.html</code>", then open the
+command like "<code>exiftool -htmlDump a.jpg &gt; out.html</code>", then open the
 output HTML file with your web browser.]</i>
 </blockquote>
 
@@ -694,10 +754,10 @@ same command (as in the example above) to process any number of different file
 types.
 </blockquote>
 
-<blockquote class='sm'><sup>&dagger;</sup>The <code>-listwf</code> option
-may be used to list all writable file types.
-<br><sup>&Dagger;</sup> This includes "pseudo" tags like FileName, Directory and
-FileModifyDate.</blockquote>
+<blockquote class='sm'><sup>&dagger;</sup> <span class=lt>The
+<code>-listwf</code> option may be used to list all writable file types.</span>
+<br><sup>&Dagger;</sup> <span class=lt>This includes "pseudo" tags like
+FileName, Directory and FileModifyDate.</span></blockquote>
 
 <a name="Q17"></a>
 <p>17. <b>"List-type tags do not behave as expected"</b></p>
@@ -940,7 +1000,8 @@ when creating new EXIF (ie. "<code>-ExifByteOrder=II</code>" for little-endian).
 <blockquote>By default, exiftool converts all control characters to "." when
 extracting information (to avoid messing up the output formatting), so newlines
 will usually appear as a "." in the output.  The <code>-b</code> option may be
-used to bypass all output formatting, but this may not be appropriate when the
+used to bypass all output formatting (except that a line-feed character is
+inserted between items in a list), but this may not be appropriate when the
 values of many tags must be extracted.  In this case, the JSON (<code>-j</code>)
 and XML (<code>-X</code>) options provide alternative output formats which
 preserve newlines in values.</blockquote>
@@ -1003,13 +1064,32 @@ process all JPEG files in the current directory.
 <p>23a. <b>"Why do I get '<code>0 image files updated</code>' when writing?"</b>, or<br>
 23b. <b>"ExifTool doesn't write some tags to a file"</b></p>
 
-<blockquote>Warnings are NOT generated when a tag isn't written because it is
+<blockquote>There are two reasons why this may happen:
+
+<ol><li>The value of the tag is not being set correctly.</li></ol>
+
+This may be due to a tag value which can't be converted, in which case you
+should warning like this (note: you may need to use the <code>-v3</code> option
+to see the warning if other same-named tags are being set properly by the same
+assignment):
+<pre>Warning: Can't convert IFD0:Orientation (not in PrintConv)
+</pre>
+You get this warning if you write an invalid value to a tag which accepts only
+specific values.  See the "Values" column in the appropriate table of the
+<a href="TagNames/index.html">Tag Name documentation</a> for a list of valid
+values for these types of tags.  The value conversion may also be bypassed with
+the <code>-n</code> option, allowing numerical values to be written directly.
+
+<ol start="2"><li>The information type isn't supported by the format of the
+target file.</li></ol>
+
+Warnings are NOT generated when a tag isn't written because it is
 normal that many tags can't be written when copying between files of different
 formats.</blockquote>
 
 <blockquote>Tags are not written if the format of the target file doesn't
 support the specific type of meta information.  For example, CRW images do not
-support EXIF, IPTC or XMP metdata.  Follow the links in the
+support EXIF or IPTC metdata.  Follow the links in the
 <a href="index.html#supported">Supported File Types</a> table for an indication
 of the tags supported by your file.  If the tags aren't supported for your file
 type, then a <a href='metafiles.html'>metadata sidecar file</a> is an
@@ -1020,7 +1100,7 @@ individually, so they can only be written if they already exist in a
 file.</blockquote>
 
 <hr>
-<i>Last revised July 3, 2010</i>
+<i>Last revised Nov. 10, 2010</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::de;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.16';
+$VERSION = '1.18';
 
 %Image::ExifTool::Lang::de::Translate = (
    'AEAperture' => 'AE-Blende',
@@ -333,7 +333,7 @@ $VERSION = '1.16';
         'Automatic Tracking AF' => 'Nachführ AF',
         'Bottom' => 'Unten',
         'Center' => 'Mitte',
-        'Face Recognition AF' => 'Gesichtserkennungs-AF',
+        'Face Detect AF' => 'Gesichtserkennungs-AF',
         'Fixed Center' => 'Auf Mitte fixiert',
         'Left' => 'Links',
         'Lower-left' => 'Unten-links',
@@ -597,6 +597,7 @@ $VERSION = '1.16';
    'AudioSamplingResolution' => 'Audio-Samplingauflösung',
    'AudioType' => 'Audiotyp',
    'Author' => 'Autor',
+   'AuthorsPosition' => 'Autorenposition',
    'AutoAperture' => {
       Description => 'Blendenring auf A',
       PrintConv => {
@@ -734,10 +735,6 @@ $VERSION = '1.16';
    'BaseExposureCompensation' => 'Basis-Belichtungskorrektur',
    'BaseISO' => 'Basis-ISO',
    'BaseURL' => 'Basis URL',
-   'BatteryADBodyLoad' => 'Kamerabatterie A/D unter Last',
-   'BatteryADBodyNoLoad' => 'Kamerabatterie A/D im Leerlauf',
-   'BatteryADGripLoad' => 'Griffbatterie A/D unter Last',
-   'BatteryADGripNoLoad' => 'Griffbatterie A/D im Leerlauf',
    'BatteryInfo' => 'Stromquelle',
    'BatteryLevel' => 'Batteriestatus',
    'BatteryOrder' => {
@@ -745,19 +742,6 @@ $VERSION = '1.16';
       PrintConv => {
         'Camera Battery First' => 'Zuerst Akku in der Kamera',
         'MB-D10 First' => 'Zuerst Akkus im MB-D10',
-      },
-    },
-   'BatteryStates' => {
-      Description => 'Batterie-Status',
-      PrintConv => {
-        'Body Battery Almost Empty' => 'Kamerabatterie ist fast leer',
-        'Body Battery Empty or Missing' => 'Kamerabatterie ist leer oder nicht vorhanden',
-        'Body Battery Full' => 'Kamerabatterie ist voll geladen',
-        'Body Battery Running Low' => 'Kamerabatterie ist schwach',
-        'Grip Battery Almost Empty' => 'Griffbatterie ist fast leer',
-        'Grip Battery Empty or Missing' => 'Griffbatterie ist leer oder nicht vorhanden',
-        'Grip Battery Full' => 'Griffbatterie ist voll geladen',
-        'Grip Battery Running Low' => 'Griffbatterie ist schwach',
       },
     },
    'Beep' => {
@@ -780,6 +764,17 @@ $VERSION = '1.16';
       PrintConv => {
         'Blur Warning' => 'Verwackelungswarnung',
         'None' => 'Keine',
+      },
+    },
+   'BodyBatteryADLoad' => 'Kamerabatterie A/D unter Last',
+   'BodyBatteryADNoLoad' => 'Kamerabatterie A/D im Leerlauf',
+   'BodyBatteryState' => {
+      Description => 'Kamerabatterie-Status',
+      PrintConv => {
+        'Almost Empty' => 'Fast leer',
+        'Empty or Missing' => 'Leer oder nicht vorhanden',
+        'Full' => 'Voll geladen',
+        'Running Low' => 'Schwach',
       },
     },
    'BodyFirmwareVersion' => 'Kamera-Firmware-Version',
@@ -982,6 +977,7 @@ $VERSION = '1.16';
    'CanonImageWidth' => 'Canon-Bildbreite',
    'CanonModelID' => 'Canon-Modell',
    'Caption-Abstract' => 'Beschreibung/Zusammenfassung',
+   'CaptionWriter' => 'Bildtextautor',
    'CaptureXResolutionUnit' => {
       PrintConv => {
         'um' => 'µm (Mikrometer)',
@@ -1268,6 +1264,7 @@ $VERSION = '1.16';
       Description => 'Komprimierungsschema',
       PrintConv => {
         'Epson ERF Compressed' => 'Epson ERF-komprimiert',
+        'JPEG' => 'JPEG-Komprimierung',
         'JPEG (old-style)' => 'JPEG (alte Version)',
         'Kodak DCR Compressed' => 'Kodak DCR-komprimiert',
         'Kodak KDC Compressed' => 'Kodak KDC-komprimiert',
@@ -1747,6 +1744,7 @@ $VERSION = '1.16';
    'ExifCameraInfo' => 'Exif Kamerainformationen',
    'ExifImageHeight' => 'Exif-Bildhöhe',
    'ExifImageWidth' => 'Exif-Bildbreite',
+   'ExifOffset' => 'Exif IFD-Zeiger',
    'ExifToolVersion' => 'ExifTool-Version',
    'ExifUnicodeByteOrder' => 'Exif Unicode Byte-Reihenfolge',
    'ExifVersion' => 'Exif-Version',
@@ -2144,6 +2142,7 @@ $VERSION = '1.16';
    'FlashFirmwareVersion' => 'Blitz-Firmware-Version',
    'FlashFocalLength' => 'Blitz-Brennweite',
    'FlashGNDistance' => 'Blitzleitzahl Entfernung',
+   'FlashGroupACompensation' => 'Gruppe A, Blitzbelichtungs-Korrektur',
    'FlashGroupAControlMode' => {
       Description => 'Gruppe A, Blitzlichtsteuerungsmodus',
       PrintConv => {
@@ -2153,8 +2152,8 @@ $VERSION = '1.16';
         'Repeating Flash' => 'Stroboskopblitz',
       },
     },
-   'FlashGroupACompensation' => 'Gruppe A, Blitzbelichtungs-Korrektur',
    'FlashGroupAOutput' => 'Gruppe A, Blitz-Leistung',
+   'FlashGroupBCompensation' => 'Gruppe B, Blitzbelichtungs-Korrektur',
    'FlashGroupBControlMode' => {
       Description => 'Gruppe B, Blitzlichtsteuerungsmodus',
       PrintConv => {
@@ -2165,8 +2164,8 @@ $VERSION = '1.16';
         'Repeating Flash' => 'Stroboskopblitz',
       },
     },
-   'FlashGroupBCompensation' => 'Gruppe B, Blitzbelichtungs-Korrektur',
    'FlashGroupBOutput' => 'Gruppe B, Blitz-Leistung',
+   'FlashGroupCCompensation' => 'Gruppe C, Blitzbelichtungs-Korrektur',
    'FlashGroupCControlMode' => {
       Description => 'Gruppe C, Blitzlichtsteuerungsmodus',
       PrintConv => {
@@ -2176,7 +2175,6 @@ $VERSION = '1.16';
         'Repeating Flash' => 'Stroboskopblitz',
       },
     },
-   'FlashGroupCCompensation' => 'Gruppe C, Blitzbelichtungs-Korrektur',
    'FlashGroupCOutput' => 'Gruppe C, Blitz-Leistung',
    'FlashGuideNumber' => 'Blitzleitzahl',
    'FlashInfo' => 'Blitz-Informationen',
@@ -2476,6 +2474,8 @@ $VERSION = '1.16';
    'FocusingScreen' => 'Mattscheibe',
    'FolderName' => 'Ordner-Name',
    'FrameNumber' => 'Bildnummer',
+   'FrameRate' => 'Bildwechselfrequenz',
+   'FrameSize' => 'Einzelbildgröße',
    'FreeByteCounts' => 'Anzahl Bytes des leeren Datenbereiches',
    'FreeMemoryCardImages' => 'Platz auf Speicherkarten für',
    'FreeOffsets' => 'Leerdatenposition',
@@ -2564,6 +2564,7 @@ $VERSION = '1.16';
         'True North' => 'Geographische Ausrichtung',
       },
     },
+   'GPSInfo' => 'GPS Info IFD-Zeiger',
    'GPSLatitude' => 'Geografische Breite',
    'GPSLatitudeRef' => {
       Description => 'Nördl. oder südl. Breite',
@@ -2654,6 +2655,17 @@ $VERSION = '1.16';
       PrintConv => {
         'Off' => 'Aus',
         'On' => 'Ein',
+      },
+    },
+   'GripBatteryADLoad' => 'Griffbatterie A/D unter Last',
+   'GripBatteryADNoLoad' => 'Griffbatterie A/D im Leerlauf',
+   'GripBatteryState' => {
+      Description => 'Griffbatterie-Status',
+      PrintConv => {
+        'Almost Empty' => 'Fast leer',
+        'Empty or Missing' => 'Leer oder nicht vorhanden',
+        'Full' => 'Voll geladen',
+        'Running Low' => 'Schwach',
       },
     },
    'Headline' => 'Überschrift',
@@ -2793,6 +2805,17 @@ $VERSION = '1.16';
         'On' => 'Ein',
       },
     },
+   'ImageEditCount' => 'Bildverarbeitungszähler',
+   'ImageEditing' => {
+      Description => 'Bildverarbeitung',
+      PrintConv => {
+        'Color Filter' => 'Farbfilter',
+        'Cropped' => 'Beschnitten',
+        'Digital Filter' => 'Digitalfilter',
+        'Frame Synthesis?' => 'Rahmen?',
+        'None' => 'Unbearbeitet',
+      },
+    },
    'ImageHeight' => 'Bildhöhe',
    'ImageHistory' => 'Bild-Historie',
    'ImageNumber' => 'Bildnummer',
@@ -2807,17 +2830,6 @@ $VERSION = '1.16';
         'Square' => 'Quadratisch',
       },
     },
-   'ImageProcessing' => {
-      Description => 'Bildverarbeitung',
-      PrintConv => {
-        'Color Filter' => 'Farbfilter',
-        'Cropped' => 'Beschnitten',
-        'Digital Filter' => 'Digitalfilter',
-        'Frame Synthesis?' => 'Rahmen?',
-        'Unprocessed' => 'Unbearbeitet',
-      },
-    },
-   'ImageProcessingCount' => 'Bildverarbeitungszähler',
    'ImageProcessingVersion' => 'Bildverarbeitung Version',
    'ImageQuality' => {
       Description => 'Bildqualität',
@@ -2876,6 +2888,7 @@ $VERSION = '1.16';
         'Medium Magnification' => 'Mittlere Vergrößerung',
       },
     },
+   'Instructions' => 'Anweisungen',
    'IntellectualGenre' => 'Genre',
    'IntensityStereo' => {
       PrintConv => {
@@ -2931,6 +2944,7 @@ $VERSION = '1.16';
         'THM - DCF thumbnail file' => 'THM: DCF Miniaturbild-Format',
       },
     },
+   'InteropOffset' => 'Interoperabilitäts-Tag',
    'InteropVersion' => 'Interoperabilitäts-Version',
    'IntervalLength' => 'Intervallänge',
    'IntervalMode' => {
@@ -3084,6 +3098,7 @@ $VERSION = '1.16';
       },
     },
    'LightValue' => 'Lichtwert(ISO)',
+   'Lightness' => 'Graustufung',
    'LinearizationTable' => 'Linearisierungstabelle',
    'Lit' => {
       PrintConv => {
@@ -3202,6 +3217,7 @@ $VERSION = '1.16';
       },
     },
    'MakerNoteVersion' => 'MakerNote-Version',
+   'MakerNotes' => 'Hinweise des Herstellers',
    'ManometerPressure' => 'Gemessener Luft- bzw. Wasserdruck',
    'ManometerReading' => 'Berechnete Höhe oder Tauchtiefe',
    'ManualFlash' => 'Manueller Blitz',
@@ -3273,6 +3289,7 @@ $VERSION = '1.16';
         'Center-weighted average' => 'Mittenbetont',
         'Evaluative' => 'Mehrfeldmessung',
         'Multi-segment' => 'Multi-Segment',
+        'Multi-spot' => 'MultiSpot',
         'Other' => 'Andere',
         'Partial' => 'Teilbild',
         'Spot' => 'Spotmessung',
@@ -3861,7 +3878,13 @@ $VERSION = '1.16';
         'Unknown' => 'Unbekannt',
       },
     },
-   'PlanarConfiguration' => 'Bilddatenausrichtung',
+   'PlanarConfiguration' => {
+      Description => 'Bilddatenausrichtung',
+      PrintConv => {
+        'Chunky' => 'Kompaktformat',
+        'Planar' => 'ebenes Format',
+      },
+    },
    'PostalCode' => 'Postleitzahl',
    'PowerSource' => {
       Description => 'Stromquelle',
@@ -4006,6 +4029,7 @@ $VERSION = '1.16';
         'Good' => 'Gut',
         'High' => 'Hoch',
         'Low' => 'Leicht',
+        'Normal' => 'Standardqualität',
         'Super Fine' => 'Super-Fein',
         'Superfine' => 'Superfein',
       },
@@ -4211,6 +4235,7 @@ $VERSION = '1.16';
       Description => 'Einheit der X- und Y-Auflösung',
       PrintConv => {
         'None' => 'Keine',
+        'cm' => 'Pixel/cm',
         'inches' => 'Inch',
       },
     },
@@ -4706,6 +4731,7 @@ $VERSION = '1.16';
     },
    'Software' => 'Software',
    'Source' => 'Quelle',
+   'SpatialFrequencyResponse' => 'Raumfrequenz-Antwort',
    'SpecialEffectsOpticalFilter' => {
       PrintConv => {
         'None' => 'Keine',
@@ -4953,6 +4979,7 @@ $VERSION = '1.16';
         'Rotate 90 CW' => '90° gegen den Uhrzeigersinn (rechts/oben)',
       },
     },
+   'TransmissionReference' => 'Übertragungsbezug',
    'Trapped' => {
       PrintConv => {
         'Unknown' => 'Unbekannt',
@@ -5258,6 +5285,7 @@ $VERSION = '1.16';
         'Black & White' => 'Schwarz/Weiß',
         'Cloudy' => 'Bewölkt',
         'Color Temperature/Color Filter' => 'Farbtemperatur/Farbfilter',
+        'Cool White Fluorescent' => 'Fluoreszierendes kaltes Weiß',
         'Custom' => 'Benutzerdefiniert',
         'Custom 1' => 'Benutzerdefiniert 1',
         'Custom 2' => 'Benutzerdefiniert 2',
@@ -5321,9 +5349,9 @@ $VERSION = '1.16';
       Description => 'Weißabgleich-Modus',
       PrintConv => {
         'Auto (Cloudy)' => 'Automatisch (Bewölkt)',
-        'Auto (Daylight)' => 'Automatisch (Tageslicht)',
-        'Auto (Daylight Fluorescent)' => 'Automatisch (Neonlicht tageslichtweiß)',
         'Auto (Day White Fluorescent)' => 'Automatisch (Neonlicht neutralweiß)',
+        'Auto (Daylight Fluorescent)' => 'Automatisch (Neonlicht tageslichtweiß)',
+        'Auto (Daylight)' => 'Automatisch (Tageslicht)',
         'Auto (Flash)' => 'Automatisch (Blitz)',
         'Auto (Shade)' => 'Automatisch (Schatten)',
         'Auto (Tungsten)' => 'Automatisch (Glühbirne)',
@@ -5338,9 +5366,9 @@ $VERSION = '1.16';
       PrintConv => {
         'Auto' => 'Automatisch',
         'Cloudy' => 'Bewölkt',
+        'Day White Fluorescent' => 'Neonlicht neutralweiß',
         'Daylight' => 'Tageslicht',
         'Daylight Fluorescent' => 'Neonlicht tageslichtweiß',
-        'Day White Fluorescent' => 'Neonlicht neutralweiß',
         'Flash' => 'Blitz',
         'Manual' => 'Manuell',
         'Set Color Temperature 1' => 'Farbtemperatur-Einstellung 1',

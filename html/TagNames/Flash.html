@@ -15,18 +15,6 @@ with string ID&#39;s represent information extracted from the file header.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td title='0x0045 = 69'>0x0045</td>
-<td>FileAttributes</td>
-<td class=c>N</td>
-<td><span class=s>Bit 0 = UseNetwork
-  <br>Bit 3 = ActionScript3
-  <br>Bit 4 = HasMetadata</span></td></tr>
-<tr class=b>
-<td title='0x004d = 77'>0x004d</td>
-<td>XMP</td>
-<td class=c>-</td>
-<td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
-<tr>
 <td>'Compressed'</td>
 <td>Compressed</td>
 <td class=c>N</td>
@@ -62,6 +50,18 @@ with string ID&#39;s represent information extracted from the file header.</p>
 <td>ImageWidth</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0045 = 69'>0x0045</td>
+<td>FileAttributes</td>
+<td class=c>N</td>
+<td><span class=s>Bit 0 = UseNetwork
+  <br>Bit 3 = ActionScript3
+  <br>Bit 4 = HasMetadata</span></td></tr>
+<tr>
+<td title='0x004d = 77'>0x004d</td>
+<td>XMP</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='FLV'>Flash FLV Tags</a></h2>
@@ -104,8 +104,15 @@ files.</p>
   <br>1 = ADPCM
   <br>2 = MP3
   <br>3 = PCM-LE (uncompressed)
+  <br>4 = Nellymoser 16kHz Mono
   <br>5 = Nellymoser 8kHz Mono
-  <br>6 = Nellymoser</span></td></tr>
+  <br>6 = Nellymoser
+  <br>7 = G.711 A-law logarithmic PCM
+  <br>8 = G.711 mu-law logarithmic PCM
+  <br>10 = AAC
+  <br>11 = Speex
+  <br>13 = MP3 8-Khz
+  <br>15 = Device-specific sound</span></td></tr>
 <tr class=b>
 <td>'Bit4-5'</td>
 <td>AudioSampleRate</td>
@@ -135,11 +142,13 @@ files.</p>
 <td>'Bit4-7'</td>
 <td>VideoEncoding</td>
 <td class=c>N</td>
-<td><span class=s>2 = Sorensen H.263
+<td><span class=s>1 = JPEG
+  <br>2 = Sorensen H.263
   <br>3 = Screen Video
   <br>4 = On2 VP6
   <br>5 = On2 VP6 Alpha
-  <br>6 = Screen Video 2</span></td></tr>
+  <br>6 = Screen Video 2
+  <br>7 = H.264</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Meta'>Flash Meta Tags</a></h2>
@@ -181,68 +190,88 @@ information from any tag found.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'bytelength'</td>
+<td>ByteLength</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'canSeekToEnd'</td>
 <td>CanSeekToEnd</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>'canseekontime'</td>
+<td>CanSeekOnTime</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
+<td>'createdby'</td>
+<td>CreatedBy</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'creationdate'</td>
 <td>CreateDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'cuePoints'</td>
 <td>CuePoint</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Flash.html#CuePoint'>Flash CuePoint Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'datasize'</td>
 <td>DataSize</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'duration'</td>
 <td>Duration</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'filesize'</td>
 <td>FileSizeBytes</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'framerate'</td>
 <td>FrameRate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'hasAudio'</td>
 <td>HasAudio</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'hasCuePoints'</td>
 <td>HasCuePoints</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'hasKeyframes'</td>
 <td>HasKeyFrames</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'hasMetadata'</td>
 <td>HasMetadata</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'hasVideo'</td>
 <td>HasVideo</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'height'</td>
 <td>ImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'httphostheader'</td>
+<td>HTTPHostHeader</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -281,8 +310,38 @@ information from any tag found.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'pmsg'</td>
+<td>Message</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'purl'</td>
+<td>URL</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'sourcedata'</td>
+<td>SourceData</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'starttime'</td>
+<td>StartTime</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'stereo'</td>
 <td>Stereo</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'totaldatarate'</td>
+<td>TotalDataRate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'totalduration'</td>
+<td>TotalDuration</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -350,7 +409,7 @@ existing parameters, with tag names like &quot;CuePoint0ParameterXxx&quot;.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 24, 2008</i>
+<br><i>Last revised Oct 12, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>
