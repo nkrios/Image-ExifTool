@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.26
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.50
 [File, System, Image] FileName - File Name: Ricoh2.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 3.1 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2006:09:29 19:47:55-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2006:09:29 16:43:52-07:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -102,7 +102,7 @@
 [Composite, Composite, Time] GPSDateTime - GPS Date/Time: 2006:05:26 10:47:24Z
 [Composite, Composite, Location] GPSLatitude - GPS Latitude: 42 deg 2' 4.47" N
 [Composite, Composite, Location] GPSLongitude - GPS Longitude: 0 deg 30' 27.01" W
-[Composite, Composite, Image] GPSPosition - GPS Position: 42 deg 2' 4.47" N, 0 deg 30' 27.01" W
+[Composite, Composite, Location] GPSPosition - GPS Position: 42 deg 2' 4.47" N, 0 deg 30' 27.01" W
 [Composite, Composite, Image] ImageSize - Image Size: 8x8
 [Composite, Composite, Image] ShutterSpeed - Shutter Speed: 1/1740
 [Composite, Composite, Image] ThumbnailImage - Thumbnail Image: (Binary data 28 bytes)

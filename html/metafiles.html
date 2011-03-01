@@ -60,10 +60,9 @@ extension, and <code><i>DST</i></code> is the destination file name)</p>
 is an XMP file).  This is because <code>-all:all</code> preserves the family 1 group
 (ie. XMP namespace) while <code>-xmp:all</code> would copy tags to the preferred XMP
 namespace, which may be different for XMP tags that exist in multiple namespaces.
-Using <code>"-xmp:all>all:all"</code> would avoid the inefficiencies of assigning
-tags which aren't copied while still preserving the family 1 group, but this wasn't
-done above to keep the example as simple as possible.
-</p>
+To get the best of both worlds, <code>"-xmp:all>all:all"</code> may be used to
+avoid the inefficiencies of assigning tags which aren't copied, while still
+preserving the family 1 group.</p>
 
 <p class=a>4. Rewrite source to XMP file, preserving locations:</p>
 <p class=b>(same effect as above, but the command will fail if the XMP file already exists)</p>
@@ -210,11 +209,17 @@ does not contain EXIF:</p>
 <h3>MIE Files</h3>
 
 <p>The <a href="MIE1.1-20070121.pdf">MIE file format</a> allows storage of
-native binary meta information, and is the best option for saving metadata
-from a file in its original format.  Here is an example that copies all
-individual tags plus the ICC Profile to a MIE sidecar file:</p>
+native binary meta information, and is the best option for saving metadata from
+a file in its original format.  Here are two examples that copy all individual
+tags plus the ICC Profile to a MIE sidecar file:</p>
 
-<pre>exiftool -o a.mie -all:all -icc_profile -xmp a.jpg</pre>
+<pre>exiftool -tagsfromfile a.jpg -all:all -icc_profile a.mie</pre>
+<pre>exiftool -o a.mie -all:all -icc_profile a.jpg</pre>
+
+<p>And the following command performs the inverse operation, restoring metadata
+in a JPG image from a MIE file:</p>
+
+<pre>exiftool -tagsfromfile a.mie -all:all -icc_profile a.jpg</pre>
 
 <p>Information can also be copied in block form to a MIE file.  This allows
 preservation of the original data structure as well as unknown and non-writable
@@ -237,7 +242,7 @@ which may be useful if disk space is at a premium.</p>
 
 <hr>
 <i>Created Nov 12, 2008</i><br>
-<i>Last revised Apr 7, 2010</i>
+<i>Last revised Feb. 17, 2011</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::ko;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.04';
 
 %Image::ExifTool::Lang::ko::Translate = (
    'AELock' => {
@@ -241,14 +241,6 @@ $VERSION = '1.02';
       },
     },
    'AutoBracketOrder' => '브라케팅 순서',
-   'AutoBracketRelease' => {
-      Description => '자동 브라켓 릴리즈',
-      PrintConv => {
-        'Auto Release' => '자동 릴리즈',
-        'Manual Release' => '수동 릴리즈',
-        'None' => '없음',
-      },
-    },
    'AutoBracketSet' => {
       Description => '자동 브라케팅 설정',
       PrintConv => {
@@ -378,6 +370,50 @@ $VERSION = '1.02';
       },
     },
    'City' => '도시',
+   'CalibrationIlluminant1' => {
+      PrintConv => {
+        'Cloudy' => '흐린 날씨',
+        'Cool White Fluorescent' => '냉백색 형광등 (W 3800 - 4500K)',
+        'Day White Fluorescent' => '주백색 형광등 (N 4600 - 5500K)',
+        'Daylight' => '주광',
+        'Daylight Fluorescent' => '주광색 형광등 (D 5700 - 7100K)',
+        'Fine Weather' => '맑은 날씨',
+        'Flash' => '플래시',
+        'Fluorescent' => '형광등',
+        'ISO Studio Tungsten' => 'ISO 스튜디오 텅스텐',
+        'Other' => '기타 광원',
+        'Shade' => '그늘',
+        'Standard Light A' => '표준 광원 A',
+        'Standard Light B' => '표준 광원 B',
+        'Standard Light C' => '표준 광원 C',
+        'Tungsten (Incandescent)' => '텅스텐 (백열등)',
+        'Unknown' => '알 수 없음',
+        'Warm White Fluorescent' => '따뜻한 흰색 형광 (L 2600 - 3250K)',
+        'White Fluorescent' => '백색 형광등 (WW 3250 - 3800K)',
+      },
+    },
+   'CalibrationIlluminant2' => {
+      PrintConv => {
+        'Cloudy' => '흐린 날씨',
+        'Cool White Fluorescent' => '냉백색 형광등 (W 3800 - 4500K)',
+        'Day White Fluorescent' => '주백색 형광등 (N 4600 - 5500K)',
+        'Daylight' => '주광',
+        'Daylight Fluorescent' => '주광색 형광등 (D 5700 - 7100K)',
+        'Fine Weather' => '맑은 날씨',
+        'Flash' => '플래시',
+        'Fluorescent' => '형광등',
+        'ISO Studio Tungsten' => 'ISO 스튜디오 텅스텐',
+        'Other' => '기타 광원',
+        'Shade' => '그늘',
+        'Standard Light A' => '표준 광원 A',
+        'Standard Light B' => '표준 광원 B',
+        'Standard Light C' => '표준 광원 C',
+        'Tungsten (Incandescent)' => '텅스텐 (백열등)',
+        'Unknown' => '알 수 없음',
+        'Warm White Fluorescent' => '따뜻한 흰색 형광 (L 2600 - 3250K)',
+        'White Fluorescent' => '백색 형광등 (WW 3250 - 3800K)',
+      },
+    },
    'CodedCharacterSet' => '코드된 캐릭터 세트',
    'ColorAberrationControl' => {
       PrintConv => {
@@ -386,8 +422,6 @@ $VERSION = '1.02';
       },
     },
    'ColorBalance' => '컬러 밸런스',
-   'ColorBalance1' => '컬러 밸런스 1',
-   'ColorBalanceA' => '컬러 밸런스 A',
    'ColorBalanceAdj' => {
       PrintConv => {
         'Off' => '꺼짐',
@@ -419,7 +453,20 @@ $VERSION = '1.02';
    'ColorMode' => {
       Description => '컬러 모드',
       PrintConv => {
+        'Autumn Leaves' => '단풍',
+        'B&W' => '흑백',
+        'Clear' => '반투명',
+        'Deep' => '진한',
+        'Landscape' => '풍경',
+        'Light' => '라이트',
+        'Neutral' => '뉴트럴',
+        'Night View' => '야경',
+        'Night View/Portrait' => '야경 인물',
         'Off' => '꺼짐',
+        'Portrait' => '인물',
+        'Standard' => '표준',
+        'Sunset' => '일몰',
+        'Vivid' => '생생한',
       },
     },
    'ColorMoireReduction' => {
@@ -436,6 +483,7 @@ $VERSION = '1.02';
    'ColorSpace' => {
       Description => '색공간',
       PrintConv => {
+        'ICC Profile' => 'ICC 프로필',
         'Uncalibrated' => '조정되지 않음',
       },
     },
@@ -476,6 +524,7 @@ $VERSION = '1.02';
       },
     },
    'CommanderChannel' => '커맨드모드 채널',
+   'CommanderGroupAManualOutput' => '커맨드모드 그룹 A M Comp',
    'CommanderGroupAMode' => {
       Description => '커맨드모드 그룹 A 모드',
       PrintConv => {
@@ -484,8 +533,8 @@ $VERSION = '1.02';
         'Off' => '꺼짐',
       },
     },
-   'CommanderGroupA_ManualOutput' => '커맨드모드 그룹 A M Comp',
    'CommanderGroupA_TTL-AAComp' => '커맨드모드 그룹 A TTL/AA Comp',
+   'CommanderGroupBManualOutput' => '커맨드모드 그룹 B M Comp',
    'CommanderGroupBMode' => {
       Description => '커맨드모드 그룹 B 모드',
       PrintConv => {
@@ -494,7 +543,6 @@ $VERSION = '1.02';
         'Off' => '꺼짐',
       },
     },
-   'CommanderGroupB_ManualOutput' => '커맨드모드 그룹 B M Comp',
    'CommanderGroupB_TTL-AAComp' => '커맨드모드 그룹 B TTL/AA Comp',
    'CommanderInternalFlash' => {
       Description => '커맨드모드 내장 플래시 모드',
@@ -511,7 +559,6 @@ $VERSION = '1.02';
    'Compression' => {
       Description => '압축 설계',
       PrintConv => {
-        'Epson ERF Compressed' => 'Epson ERF 압축',
         'JPEG' => 'JPEG 압축',
         'JPEG (old-style)' => 'JPEG (예전 스타일)',
         'Kodak DCR Compressed' => 'Kodak DCR 압축',
@@ -642,8 +689,17 @@ $VERSION = '1.02';
       },
     },
    'DynamicRangeOptimizer' => {
+      Description => 'D-레인지 최적화',
       PrintConv => {
+        'Advanced Auto' => '고급 자동',
+        'Advanced Lv1' => '고급 레벨1',
+        'Advanced Lv2' => '고급 레벨2',
+        'Advanced Lv3' => '고급 레벨3',
+        'Advanced Lv4' => '고급 레벨4',
+        'Advanced Lv5' => '고급 레벨5',
+        'Auto' => '자동',
         'Off' => '꺼짐',
+        'Standard' => '표준',
       },
     },
    'EVStepSize' => {
@@ -1147,10 +1203,17 @@ $VERSION = '1.02';
         'On' => '켜짐',
       },
     },
+   'HDR' => {
+      Description => '자동 HDR',
+      PrintConv => {
+        'Off' => '없음',
+      },
+    },
    'Headline' => '헤드라인',
    'HighISONoiseReduction' => {
       Description => '고ISO에서 노이즈제거',
       PrintConv => {
+        'Auto' => '자동',
         'High' => '강함',
         'Low' => '약함',
         'Minimal' => '최소',
@@ -1305,8 +1368,8 @@ $VERSION = '1.02';
       Description => '광원 종류',
       PrintConv => {
         'Cloudy' => '흐린 날씨',
-        'Cool White Fluorescent' => '냉백색 형광등 (W 3900 - 4500K)',
-        'Day White Fluorescent' => '주백색 형광등 (N 4600 - 5400K)',
+        'Cool White Fluorescent' => '냉백색 형광등 (W 3800 - 4500K)',
+        'Day White Fluorescent' => '주백색 형광등 (N 4600 - 5500K)',
         'Daylight' => '주광',
         'Daylight Fluorescent' => '주광색 형광등 (D 5700 - 7100K)',
         'Fine Weather' => '맑은 날씨',
@@ -1320,7 +1383,8 @@ $VERSION = '1.02';
         'Standard Light C' => '표준 광원 C',
         'Tungsten (Incandescent)' => '텅스텐 (백열등)',
         'Unknown' => '알 수 없음',
-        'White Fluorescent' => '백색 형광등 (WW 3200 - 3700K)',
+        'Warm White Fluorescent' => '따뜻한 흰색 형광 (L 2600 - 3250K)',
+        'White Fluorescent' => '백색 형광등 (WW 3250 - 3800K)',
       },
     },
    'Lightness' => '명도',
@@ -1333,8 +1397,11 @@ $VERSION = '1.02';
     },
    'Location' => '위치',
    'LongExposureNoiseReduction' => {
+      Description => '장시간 노출 NR',
       PrintConv => {
         'Auto' => '자동',
+        'Off' => '없음',
+        'On' => '있음',
       },
     },
    'LuminanceNoiseReduction' => {
@@ -1477,6 +1544,13 @@ $VERSION = '1.02';
     },
    'MultiExposureShots' => '다중 노출 촬영',
    'MultiExposureVersion' => '다중 노출 데이터 버전',
+   'MultiFrameNoiseReduction' => {
+      Description => '다중 프레임 노이즈 감쇄',
+      PrintConv => {
+        'Off' => '없음',
+        'On' => '있음',
+      },
+    },
    'MultiSelector' => {
       Description => '멀티셀렉터',
       PrintConv => {
@@ -1696,8 +1770,14 @@ $VERSION = '1.02';
    'Quality' => {
       Description => '화질',
       PrintConv => {
+        'Compressed RAW' => 'cRAW',
+        'Compressed RAW + JPEG' => 'cRAW+JPEG',
+        'Extra Fine' => '엑스트라 파인',
+        'Fine' => '파인',
         'Low' => '저화질',
         'Normal' => '표준화질',
+        'RAW + JPEG' => 'RAW+JPEG',
+        'Standard' => '표준',
       },
     },
    'RawDevAutoGradation' => {
@@ -1821,10 +1901,23 @@ $VERSION = '1.02';
    'SceneMode' => {
       Description => '장면 모드',
       PrintConv => {
+        '3D Sweep Panorama' => '3D',
+        'Anti Motion Blur' => '인물 흔들림 방지',
         'Auto' => '자동',
+        'Cont. Priority AE' => '연속 촬영 우선 AE',
+        'Handheld Night Shot' => '손으로 야간 촬영',
+        'Landscape' => '풍경',
+        'Macro' => '매크로',
         'Manual' => '수동',
+        'Night Portrait' => '야경 인물',
+        'Night Scene' => '야경',
+        'Night View/Portrait' => '야경/인물',
         'Off' => '꺼짐',
+        'Portrait' => '인물',
+        'Sports' => '스포츠 액션',
+        'Standard' => '',
         'Sunset' => '석양촬영',
+        'Sweep Panorama' => '스위프 파노라마',
       },
     },
    'SceneModeUsed' => {
@@ -2112,7 +2205,9 @@ $VERSION = '1.02';
         'Auto' => '자동',
         'Black & White' => '흑백',
         'Cloudy' => '흐린날',
+        'Color Temperature/Color Filter' => '색 온도 / 컬러 필터',
         'Cool White Fluorescent' => '차가운 백색 형광',
+        'Custom' => '사용자 정의',
         'Custom 1' => '개인설정1',
         'Custom 2' => '개인설정2',
         'Custom 3' => '개인설정3',
@@ -2125,6 +2220,9 @@ $VERSION = '1.02';
         'Manual' => '수동',
         'Shade' => '그늘',
         'Tungsten' => '백열등',
+        'Unknown' => '알 수 없음',
+        'Warm White Fluorescent' => '따뜻한 흰색 형광',
+        'White Fluorescent' => '백색 형광등',
       },
     },
    'WhiteBalance2' => {
@@ -2160,6 +2258,14 @@ $VERSION = '1.02';
     },
    'YCbCrSubSampling' => 'Y->C 서브샘플링 비율',
    'YResolution' => '수직 해상도',
+   'ZoneMatching' => {
+      Description => '영역 전환',
+      PrintConv => {
+        'High Key' => 'Hi',
+        'ISO Setting Used' => '없음',
+        'Low Key' => 'Lo',
+      },
+    },
    'ZoneMatchingOn' => {
       PrintConv => {
         'Off' => '꺼짐',
@@ -2184,7 +2290,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

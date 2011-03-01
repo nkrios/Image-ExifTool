@@ -15,12 +15,12 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 # BMP chunks
 %Image::ExifTool::BMP::Main = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    GROUPS => { 2 => 'Image' },
+    GROUPS => { 0 => 'File', 1 => 'File', 2 => 'Image' },
     NOTES => q{
         There really isn't much meta information in a BMP file as such, just a bit
         of image related information.
@@ -97,7 +97,7 @@ $VERSION = '1.06';
 # OS/2 12-byte bitmap header (ref http://www.fileformat.info/format/bmp/egff.htm)
 %Image::ExifTool::BMP::OS2 = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    GROUPS => { 2 => 'Image' },
+    GROUPS => { 0 => 'File', 1 => 'File', 2 => 'Image' },
     NOTES => 'Information extracted from OS/2-format BMP images.',
     # 0 => size of bitmap structure (12)
     4  => { Name => 'ImageWidth',  Format => 'int16u' },
@@ -157,7 +157,7 @@ This module contains definitions required by Image::ExifTool to read BMP
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

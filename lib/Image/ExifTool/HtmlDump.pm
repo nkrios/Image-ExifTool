@@ -234,7 +234,7 @@ sub new
 # Add information to dump
 # Inputs: 0) HTML dump hash ref, 1) absolute offset in file, 2) data size,
 #         3) comment string, 4) tool tip (or SAME to use previous tip),
-#         5) bit flags (see below), 6) true to use same tooltip as last call
+#         5) bit flags (see below)
 # Bits: 0x01 - print at start of line
 #       0x02 - print red address
 #       0x04 - maker notes data ('M'-class span)
@@ -242,9 +242,9 @@ sub new
 #       0x10 - allow double references
 #       0x100 - (reserved)
 # Notes: Block will be shown in 'unused' color if comment string begins with '['
-sub Add($$$$;$$)
+sub Add($$$$;$)
 {
-    my ($self, $start, $size, $msg, $tip, $flag, $sameTip) = @_;
+    my ($self, $start, $size, $msg, $tip, $flag) = @_;
     my $block = $$self{Block};
     $$block{$start} or $$block{$start} = [ ];
     my $htip;
@@ -873,7 +873,7 @@ page.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

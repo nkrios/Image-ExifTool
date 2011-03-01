@@ -541,7 +541,6 @@ sub FoundPNG($$$$;$$$$)
     my ($exifTool, $tagTablePtr, $tag, $val, $compressed, $outBuff, $enc, $lang) = @_;
     return 0 unless defined $val;
     my $verbose = $exifTool->Options('Verbose');
-    my $out = $exifTool->Options('TextOut');
     my $id = $tag;  # generate tag ID which include language code
     if ($lang) {
         # case of language code must be normalized since they are case insensitive
@@ -1072,7 +1071,7 @@ and JNG (JPEG Network Graphics) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

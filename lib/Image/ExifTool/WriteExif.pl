@@ -10,7 +10,7 @@ package Image::ExifTool::Exif;
 
 use strict;
 use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber
-            %lightSource %compression %photometricInterpretation %orientation);
+            %compression %photometricInterpretation %orientation);
 
 use Image::ExifTool::Fixup;
 
@@ -1124,8 +1124,7 @@ sub GetCFAPattern($)
 
 #------------------------------------------------------------------------------
 # validate raw values for writing
-# Inputs: 0) ExifTool object reference, 1) tagInfo hash reference,
-#         2) raw value reference
+# Inputs: 0) ExifTool ref, 1) tagInfo hash ref, 2) raw value ref
 # Returns: error string or undef (and possibly changes value) on success
 sub CheckExif($$$)
 {
@@ -1588,7 +1587,6 @@ sub WriteExif($$$)
 
         # loop through new values and accumulate all information for this IFD
         my (%set, $tagInfo);
-        my $tableGroup = $tagTablePtr->{GROUPS}{0};
         my $wrongDir = $crossDelete{$dirName};
         foreach $tagInfo ($exifTool->GetNewTagInfoList($tagTablePtr)) {
             my $tagID = $$tagInfo{TagID};
@@ -1783,11 +1781,14 @@ WroteIt:                    ++$index;
                     $valueDataPos = $dataPos;
                     $valueDataLen = $dataLen;
                     $valuePtr = $entry + 8;
-                    # must try direct method first so we will get unknown tags too
-                    # (this is necessary so we don't miss a tag we want to Drop)
+                    # try direct method first for speed
                     $oldInfo = $$tagTablePtr{$oldID};
                     if (ref $oldInfo ne 'HASH' or $$oldInfo{Condition}) {
+                        # must get unknown tags too
+                        # (necessary so we don't miss a tag we want to Drop)
+                        my $unk = $exifTool->Options(Unknown => 1);
                         $oldInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID);
+                        $exifTool->Options(Unknown => $unk);
                     }
                     # patch incorrect count in Kodak SubIFD3 tags
                     if ($oldCount < 2 and $oldInfo and $$oldInfo{FixCount}) {
@@ -1936,7 +1937,9 @@ WroteIt:                    ++$index;
                     $oldValue = substr($$valueDataPt, $valuePtr, $oldSize) unless $readFromFile;
                     # get tagInfo using value if necessary
                     if (defined $oldInfo and not $oldInfo) {
+                        my $unk = $exifTool->Options(Unknown => 1);
                         $oldInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID, \$oldValue, $oldFormName, $oldCount);
+                        $exifTool->Options(Unknown => $unk);
                     }
                     # make sure we are handling the 'ifd' format properly
                     if (($oldFormat == 13 or $oldFormat == 18) and
@@ -2306,6 +2309,7 @@ NoOverwrite:            next if $isNew > 0;
                             $subdirInfo{FixOffsets} = $$sub{FixOffsets};
                             $subdirInfo{EntryBased} = $$sub{EntryBased};
                             $subdirInfo{NoFixBase} = 1 if defined $$sub{Base};
+                            $subdirInfo{AutoFix} = $$sub{AutoFix};
                         }
                         # get the proper tag table for these maker notes
                         if ($oldInfo and $$oldInfo{SubDirectory}) {
@@ -2389,7 +2393,9 @@ NoOverwrite:            next if $isNew > 0;
                                 # was used, but be careful of automatic FixBase with negative shifts
                                 # since they may lead to negative (invalid) offsets (casio_edit_problem.jpg)
                                 my $baseShift = $base - $subdirInfo{Base};
-                                if ($subdirInfo{FixBase} and $baseShift < 0 and
+                                if ($subdirInfo{AutoFix}) {
+                                    $baseShift = 0;
+                                } elsif ($subdirInfo{FixBase} and $baseShift < 0 and
                                     # allow negative base shift if offsets are bigger (PentaxOptioWP.jpg)
                                     (not $subdirInfo{MinOffset} or $subdirInfo{MinOffset} + $baseShift < 0))
                                 {
@@ -2473,6 +2479,8 @@ NoOverwrite:            next if $isNew > 0;
                                 # set ImageData only for 1st level SubIFD's
                                 ImageData=> $imageDataFlag eq 'Main' ? 'SubIFD' : undef,
                             );
+                            # pass on header pointer only for certain sub IFD's
+                            $subdirInfo{HeaderPtr} = $$dirInfo{HeaderPtr} if $$newInfo{SubIFD} == 2;
                             if ($$subdir{RelativeBase}) {
                                 # apply one-time fixup if offsets are relative (Sony IDC hack)
                                 delete $subdirInfo{Fixup};
@@ -2764,9 +2772,9 @@ NoOverwrite:            next if $isNew > 0;
                 } else {
                     $offsetVal = Set32u(length $valBuff);
                 }
-                my $dataTag;
-                if ($newInfo and $$newInfo{DataTag}) {
-                    $dataTag = $$newInfo{DataTag};
+                my ($dataTag, $putFirst);
+                ($dataTag, $putFirst) = @$newInfo{'DataTag','PutFirst'} if $newInfo;
+                if ($dataTag) {
                     if ($dataTag eq 'PreviewImage' and ($exifTool->{FILE_TYPE} eq 'JPEG' or
                         $$exifTool{GENERATE_PREVIEW_INFO}))
                     {
@@ -2784,13 +2792,20 @@ NoOverwrite:            next if $isNew > 0;
                         $$newValuePt = '';
                     }
                 }
-                $valBuff .= $$newValuePt;       # add value data to buffer
-                # must save a fixup pointer for every pointer in the directory
-                if ($entryBased) {
-                    $entryBasedFixup or $entryBasedFixup = new Image::ExifTool::Fixup;
-                    $entryBasedFixup->AddFixup(length($dirBuff) + 8, $dataTag);
+                if ($putFirst and $$dirInfo{HeaderPtr}) {
+                    my $hdrPtr = $$dirInfo{HeaderPtr};
+                    # place this value immediately after the TIFF header
+                    $offsetVal = Set32u(length $$hdrPtr);
+                    $$hdrPtr .= $$newValuePt;
                 } else {
-                    $dirFixup->AddFixup(length($dirBuff) + 8, $dataTag);
+                    $valBuff .= $$newValuePt;       # add value data to buffer
+                    # must save a fixup pointer for every pointer in the directory
+                    if ($entryBased) {
+                        $entryBasedFixup or $entryBasedFixup = new Image::ExifTool::Fixup;
+                        $entryBasedFixup->AddFixup(length($dirBuff) + 8, $dataTag);
+                    } else {
+                        $dirFixup->AddFixup(length($dirBuff) + 8, $dataTag);
+                    }
                 }
             } else {
                 $offsetVal = $$newValuePt;      # save value in offset if 4 bytes or less
@@ -3006,7 +3021,6 @@ NoOverwrite:            next if $isNew > 0;
     if (@offsetInfo) {
         my $ttwLen;     # length of MRW TTW segment
         my @writeLater; # write image data last
-        my $newDataLen = length $newData;
         for ($ifd=$#offsetInfo; $ifd>=-1; --$ifd) {
             # build list of offsets to process
             my @offsetList;
@@ -3305,7 +3319,8 @@ NoOverwrite:            next if $isNew > 0;
 # apply final shift to new data position if this is the top level IFD
 #
     unless ($$dirInfo{Fixup}) {
-        my $newDataPos = $$dirInfo{NewDataPos} || 0;
+        my $hdrPtr = $$dirInfo{HeaderPtr};
+        my $newDataPos = $hdrPtr ? length $$hdrPtr : $$dirInfo{NewDataPos} || 0;
         # adjust CanonVRD offset to point to end of regular TIFF if necessary
         # (NOTE: This will be incorrect if multiple trailers exist,
         #  but it is unlikely that it could ever be correct in this case anyway.
@@ -3334,7 +3349,7 @@ NoOverwrite:            next if $isNew > 0;
             {
                 # It fits! (or must exist in EXIF segment), so fixup the
                 # PreviewImage pointers and stuff the preview image in here
-                my $newPos = length($newData) + ($newDataPos || 0);
+                my $newPos = length($newData) + $newDataPos;
                 $newPos += ($previewInfo->{BaseShift} || 0);
                 if ($previewInfo->{Relative}) {
                     # calculate our base by looking at how far the pointer got shifted
@@ -3398,7 +3413,7 @@ This file contains routines to write EXIF metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

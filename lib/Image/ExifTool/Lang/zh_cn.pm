@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::zh_cn;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.05';
 
 %Image::ExifTool::Lang::zh_cn::Translate = (
    'AEProgramMode' => {
@@ -82,7 +82,7 @@ $VERSION = '1.03';
         'Rotate 180' => '180° (底/右)',
         'Rotate 270 CW' => '90° CW (左/底)',
         'Rotate 90 CW' => '90° CCW (右/上)',
-        'Unknown' => '未知',
+        'n/a' => '未知',
       },
     },
    'BatteryLevel' => '电池电量',
@@ -99,21 +99,45 @@ $VERSION = '1.03';
    'CalibrationIlluminant1' => {
       PrintConv => {
         'Cloudy' => '阴天',
+        'Cool White Fluorescent' => '冷白色荧光灯（W3800-4500K）',
+        'Day White Fluorescent' => '日光白色荧光灯（N4600-5500K）',
         'Daylight' => '太阳光',
+        'Daylight Fluorescent' => '日光色荧光灯（D5700-7100K）',
+        'Fine Weather' => '晴天',
         'Flash' => '闪光',
         'Fluorescent' => '荧光',
+        'ISO Studio Tungsten' => 'ISO相室白炽灯',
+        'Other' => '其他光源',
         'Shade' => '阴影',
+        'Standard Light A' => '标准光A',
+        'Standard Light B' => '标准光B',
+        'Standard Light C' => '标准光C',
+        'Tungsten (Incandescent)' => '白炽灯',
         'Unknown' => '未知',
+        'White Fluorescent' => '白色荧光灯（WW3250-3800K）',
+        'Warm White Fluorescent' => '暖白荧光灯（L2600-3250K）',
       },
     },
    'CalibrationIlluminant2' => {
       PrintConv => {
         'Cloudy' => '阴天',
+        'Cool White Fluorescent' => '冷白色荧光灯（W3800-4500K）',
+        'Day White Fluorescent' => '日光白色荧光灯（N4600-5500K）',
         'Daylight' => '太阳光',
+        'Daylight Fluorescent' => '日光色荧光灯（D5700-7100K）',
+        'Fine Weather' => '晴天',
         'Flash' => '闪光',
         'Fluorescent' => '荧光',
+        'ISO Studio Tungsten' => 'ISO相室白炽灯',
+        'Other' => '其他光源',
         'Shade' => '阴影',
+        'Standard Light A' => '标准光A',
+        'Standard Light B' => '标准光B',
+        'Standard Light C' => '标准光C',
+        'Tungsten (Incandescent)' => '白炽灯',
         'Unknown' => '未知',
+        'White Fluorescent' => '白色荧光灯（WW3250-3800K）',
+        'Warm White Fluorescent' => '暖白荧光灯（L2600-3250K）',
       },
     },
    'CameraOrientation' => {
@@ -158,14 +182,27 @@ $VERSION = '1.03';
     },
    'ColorFilter' => '颜色滤镜',
    'ColorMode' => {
+      Description => '创意风格',
       PrintConv => {
+        'Autumn Leaves' => '红叶',
+        'B&W' => '黑白',
+        'Clear' => '清澈',
+        'Deep' => '深色',
         'Landscape' => '风景',
+        'Light' => '轻淡',
+        'Neutral' => '中性',
+        'Night View' => '夜景',
+        'Night View/Portrait' => '夜晚肖像',
         'Portrait' => '人物',
+        'Standard' => '标准',
+        'Sunset' => '黄昏',
+        'Vivid' => '生动色彩',
       },
     },
    'ColorSpace' => {
       Description => '色彩空间信息',
       PrintConv => {
+        'ICC Profile' => '色彩特性文件',
         'Uncalibrated' => '自发',
       },
     },
@@ -191,7 +228,6 @@ $VERSION = '1.03';
    'Compression' => {
       Description => '压缩方案',
       PrintConv => {
-        'Epson ERF Compressed' => '爱普生 ERF 压缩',
         'JPEG' => 'JEPG压缩率',
         'JPEG (old-style)' => 'JPEG (旧样式)',
         'Kodak DCR Compressed' => '柯达 DCR 压缩',
@@ -256,6 +292,20 @@ $VERSION = '1.03';
     },
    'DjVuVersion' => 'DjVu 版本',
    'DriveMode' => '驱动模式',
+   'DynamicRangeOptimizer' => {
+      Description => '动态范围优化',
+      PrintConv => {
+        'Advanced Auto' => '高级自动',
+        'Advanced Lv1' => '高级优化程度 1',
+        'Advanced Lv2' => '高级优化程度 2',
+        'Advanced Lv3' => '高级优化程度 3',
+        'Advanced Lv4' => '高级优化程度 4',
+        'Advanced Lv5' => '高级优化程度 5',
+        'Auto' => '自动',
+        'Off' => '关',
+        'Standard' => '标准',
+      },
+    },
    'EasyMode' => {
       PrintConv => {
         'Landscape' => '风景',
@@ -576,7 +626,23 @@ $VERSION = '1.03';
     },
    'Gamma' => '对比系数',
    'Gradation' => '灰阶',
+   'HDR' => {
+      Description => '自动HDR',
+      PrintConv => {
+        'Off' => '关',
+      },
+    },
    'Headline' => '标题',
+   'HighISONoiseReduction' => {
+      Description => '高ISO降噪',
+      PrintConv => {
+        'Auto' => '自动',
+        'High' => '强',
+        'Low' => '弱',
+        'Normal' => '标准',
+        'Off' => '关',
+      },
+    },
    'Hue' => '色相',
    'IPTC-NAA' => 'IPTC-NAA 元数据',
    'ISOSetting' => {
@@ -631,8 +697,8 @@ $VERSION = '1.03';
       Description => '光源',
       PrintConv => {
         'Cloudy' => '阴天',
-        'Cool White Fluorescent' => '冷白色荧光灯（W3900-4500K）',
-        'Day White Fluorescent' => '日光白色荧光灯',
+        'Cool White Fluorescent' => '冷白色荧光灯（W3800-4500K）',
+        'Day White Fluorescent' => '日光白色荧光灯（N4600-5500K）',
         'Daylight' => '太阳光',
         'Daylight Fluorescent' => '日光色荧光灯（D5700-7100K）',
         'Fine Weather' => '晴天',
@@ -646,13 +712,17 @@ $VERSION = '1.03';
         'Standard Light C' => '标准光C',
         'Tungsten (Incandescent)' => '白炽灯',
         'Unknown' => '未知',
-        'White Fluorescent' => '白色荧光灯（WW3200-3700K）',
+        'White Fluorescent' => '白色荧光灯（WW3250-3800K）',
+        'Warm White Fluorescent' => '暖白荧光灯（L2600-3250K）',
       },
     },
    'Lightness' => '明暗度',
    'LongExposureNoiseReduction' => {
+      Description => '长时间曝光降噪',
       PrintConv => {
         'Auto' => '自动',
+        'Off' => '关',
+        'On' => '开',
       },
     },
    'MIEVersion' => 'MIE 版本',
@@ -712,6 +782,13 @@ $VERSION = '1.03';
       },
     },
    'ModifyDate' => '文件改变的日期和时间',
+   'MultiFrameNoiseReduction' => {
+      Description => '多帧降噪',
+      PrintConv => {
+        'Off' => '关',
+        'On' => '开',
+      },
+    },
    'NEFCompression' => {
       PrintConv => {
         'Uncompressed' => '未压缩',
@@ -820,9 +897,16 @@ $VERSION = '1.03';
     },
    'Province-State' => '州／省',
    'Quality' => {
+      Description => '图像质量',
       PrintConv => {
+        'Compressed RAW' => 'cRAW',
+        'Compressed RAW + JPEG' => 'cRAW+JPEG',
+        'Extra Fine' => '超精细',
+        'Fine' => '精细',
         'Low' => '低画质',
         'Normal' => '标准画质',
+        'RAW + JPEG' => 'RAW+JPEG',
+        'Standard' => '标准',
       },
     },
    'RAFVersion' => 'RAF 版本',
@@ -902,14 +986,26 @@ $VERSION = '1.03';
       },
     },
    'SceneMode' => {
+      Description => '场景选择',
       PrintConv => {
+        '3D Sweep Panorama' => '3D',
+        'Anti Motion Blur' => '动作防抖',
         'Aperture Priority' => '光圈优先',
         'Auto' => '自动',
+        'Cont. Priority AE' => '连续拍摄优先AE',
+        'Handheld Night Shot' => '手持夜景拍摄',
         'Landscape' => '风景',
+        'Macro' => '微距',
         'Manual' => '手动',
+        'Night Portrait' => '夜晚肖像',
+        'Night Scene' => '夜景',
+        'Night View/Portrait' => '夜景/肖像',
         'Portrait' => '人物',
         'Shutter Priority' => '快门优先',
+        'Sports' => '运动模式',
+        'Standard' => '',
         'Sunset' => '夕阳',
+        'Sweep Panorama' => '扫描全景',
       },
     },
    'SceneModeUsed' => {
@@ -1101,7 +1197,9 @@ $VERSION = '1.03';
         'Auto' => '自动',
         'Black & White' => '黑白',
         'Cloudy' => '阴天',
+        'Color Temperature/Color Filter' => '色温 / 彩色滤光片',
         'Cool White Fluorescent' => '白色荧光灯',
+        'Custom' => '自定义',
         'Custom 1' => '自定义1',
         'Custom 2' => '自定义2',
         'Custom 3' => '自定义3',
@@ -1115,6 +1213,8 @@ $VERSION = '1.03';
         'Shade' => '阴影',
         'Tungsten' => '白炽灯',
         'Unknown' => '未知',
+        'White Fluorescent' => '白色荧光灯',
+        'Warm White Fluorescent' => '暖白荧光灯',
       },
     },
    'WhiteBalance2' => {
@@ -1164,6 +1264,14 @@ $VERSION = '1.03';
       },
     },
    'YCbCrSubSampling' => 'YCC 像素结构(Y 至 C 的子采样率)',
+   'ZoneMatching' => {
+      Description => '区域匹配',
+      PrintConv => {
+        'High Key' => '强',
+        'ISO Setting Used' => '关',
+        'Low Key' => '弱',
+      },
+    },
 );
 
 1;  # end
@@ -1182,7 +1290,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

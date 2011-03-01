@@ -17,7 +17,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -163,14 +163,14 @@ my %advancedContentEncryption = (
     BannerImageData => {},
     BannerImageType => {},
     BannerImageURL => {},
-    Bitrate => {},
+    Bitrate => { PrintConv => 'ConvertBitrate($val)' },
     Broadcast => {},
     BufferAverage => {},
     Can_Skip_Backward => {},
     Can_Skip_Forward => {},
     Copyright => { Groups => { 2 => 'Author' } },
     CopyrightURL => { Groups => { 2 => 'Author' } },
-    CurrentBitrate => {},
+    CurrentBitrate => { PrintConv => 'ConvertBitrate($val)' },
     Description => {},
     DRM_ContentID => {},
     DRM_DRMHeader_ContentDistributor => {},
@@ -206,7 +206,7 @@ my %advancedContentEncryption = (
     NSC_Name => {},
     NSC_Phone => {},
     NumberOfFrames => {},
-    OptimalBitrate => {},
+    OptimalBitrate => { PrintConv => 'ConvertBitrate($val)' },
     PeakValue => {},
     Rating => {},
     Seekable => {},
@@ -273,7 +273,7 @@ my %advancedContentEncryption = (
     ParentalRating => {},
     ParentalRatingReason => {},
     PartOfSet => {},
-    PeakBitrate => {},
+    PeakBitrate => { PrintConv => 'ConvertBitrate($val)' },
     Period => {},
     Picture => {
         SubDirectory => {
@@ -391,7 +391,7 @@ my %advancedContentEncryption = (
     64 => { Name => 'Flags',        Format => 'int32u' },
     68 => { Name => 'MinPacketSize',Format => 'int32u' },
     72 => { Name => 'MaxPacketSize',Format => 'int32u' },
-    76 => { Name => 'MaxBitrate',   Format => 'int32u' },
+    76 => { Name => 'MaxBitrate',   Format => 'int32u', PrintConv => 'ConvertBitrate($val)' },
 );
 
 %Image::ExifTool::ASF::StreamProperties = (
@@ -848,7 +848,7 @@ Windows Media Audio (WMA) and Windows Media Video (WMV) files.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

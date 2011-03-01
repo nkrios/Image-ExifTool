@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::en_ca;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 %Image::ExifTool::Lang::en_ca::Translate = (
    'AlternateDuotoneColors' => 'Alternate Duotone Colours',
@@ -61,7 +61,6 @@ $VERSION = '1.05';
    'ColorAverages' => 'Colour Averages',
    'ColorBW' => 'Colour BW',
    'ColorBalance' => 'Colour Balance',
-   'ColorBalance1' => 'Colour Balance 1',
    'ColorBalanceAdj' => 'Colour Balance Adj',
    'ColorBalanceBlue' => 'Colour Balance Blue',
    'ColorBalanceGreen' => 'Colour Balance Green',
@@ -80,7 +79,6 @@ $VERSION = '1.05';
    'ColorComponents' => 'Colour Components',
    'ColorControl' => 'Colour Control',
    'ColorCorrection' => 'Colour Correction',
-   'ColorDataUnknown' => 'Colour Data Unknown',
    'ColorDataVersion' => 'Colour Data Version',
    'ColorEffect' => 'Colour Effect',
    'ColorFilter' => 'Colour Filter',
@@ -297,11 +295,6 @@ $VERSION = '1.05';
       },
     },
    'ImageColorValue' => 'Image Colour Value',
-   'ImageProcessing' => {
-      PrintConv => {
-        'Color Filter' => 'Colour Filter',
-      },
-    },
    'InterchangeColorSpace' => 'Interchange Colour Space',
    'LandscapeRawColorTone' => 'Landscape Raw Colour Tone',
    'LargeBluePaletteColorTableData' => 'Large Blue Palette Colour Table Data',
@@ -366,11 +359,6 @@ $VERSION = '1.05';
       },
     },
    'PreviewColorSpace' => 'Preview Colour Space',
-   'PreviewType' => {
-      PrintConv => {
-        'A bright colored fish' => 'A bright coloured fish',
-      },
-    },
    'ProfileClass' => {
       PrintConv => {
         'ColorSpace Conversion Profile' => 'ColourSpace Conversion Profile',
@@ -387,7 +375,6 @@ $VERSION = '1.05';
    'RGBFgCol' => 'Foreground Colour',
    'ROIDisplayColor' => 'ROI Display Colour',
    'RawColorAdj' => 'Raw Colour Adj',
-   'RawColorToneAdj' => 'Raw Colour Tone Adj',
    'RawDevColorSpace' => 'Raw Dev Colour Space',
    'RawDevMemoryColorEmphasis' => 'Raw Dev Memory Colour Emphasis',
    'RawDevSettings' => {
@@ -557,7 +544,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

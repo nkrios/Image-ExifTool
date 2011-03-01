@@ -116,7 +116,7 @@ sub CheckIPTC($$$)
         my $n;
         for ($n=0; $n<$bytes; ++$n) { $val >>= 8; }
         return "Value too large for $bytes-byte format" if $val;
-    } elsif ($format =~ /^(string|digits)\[?(\d+),?(\d*)\]?$/) {
+    } elsif ($format =~ /^(string|digits|undef)\[?(\d+),?(\d*)\]?$/) {
         my ($fmt, $minlen, $maxlen) = ($1, $2, $3);
         my $len = length $$valPtr;
         if ($fmt eq 'digits') {
@@ -186,13 +186,13 @@ sub FormatIPTC($$$$$;$)
 
 #------------------------------------------------------------------------------
 # generate IPTC-format date
-# Inputs: 0) EXIF-format date string (YYYY:MM:DD) or date/time string
-# Returns: IPTC-format date string (YYYYMMDD), or undef and issue warning on error
+# Inputs: 0) EXIF-format date string (YYYY:mm:dd) or date/time string
+# Returns: IPTC-format date string (YYYYmmdd), or undef and issue warning on error
 sub IptcDate($)
 {
     my $val = shift;
     unless ($val =~ s/.*(\d{4}):?(\d{2}):?(\d{2}).*/$1$2$3/s) {
-        warn "Invalid date format (use YYYY:MM:DD)\n";
+        warn "Invalid date format (use YYYY:mm:dd)\n";
         undef $val;
     }
     return $val;
@@ -380,6 +380,7 @@ sub DoWriteIPTC($$$)
     my $lastRecPos = 0;
     my $allMandatory = 0;
     my %foundRec;           # found flags: 0x01-existed before, 0x02-deleted, 0x04-created
+    my $addNow;
 
     for (;;$tail=$pos) {
         # get next IPTC record from input directory
@@ -420,11 +421,14 @@ sub DoWriteIPTC($$$)
                 undef $rec;
             }
         }
-        if (not defined $rec or $rec != $lastRec) {
-            # write out all our records that come before this one
+        # write out all our records that come before this one
+        my $writeRec = (not defined $rec or $rec != $lastRec);
+        if ($writeRec or $addNow) {
             for (;;) {
                 my $newRec = $recordList[0];
-                if (not defined $newRec or $newRec != $lastRec) {
+                if ($addNow) {
+                    $tagInfo = $addNow;
+                } elsif (not defined $newRec or $newRec != $lastRec) {
                     # handle mandatory tags in last record unless it was empty
                     if (length $newData > $lastRecPos) {
                         if ($allMandatory > 1) {
@@ -474,19 +478,21 @@ sub DoWriteIPTC($$$)
                     $lastRecPos = length $newData;
                     $allMandatory = 1;
                 }
-                $tagInfo = ${$iptcInfo{$newRec}}[0];
+                unless ($addNow) {
+                    # compare current entry with entry next in line to write out
+                    # (write out our tags in numerical order even though
+                    # this isn't required by the IPTC spec)
+                    last if defined $rec and $rec <= $newRec;
+                    $tagInfo = ${$iptcInfo{$newRec}}[0];
+                }
                 my $newTag = $$tagInfo{TagID};
-                # compare current entry with entry next in line to write out
-                # (write out our tags in numerical order even though
-                # this isn't required by the IPTC spec)
-                last if defined $rec and $rec <= $newRec;
                 my $nvHash = $exifTool->GetNewValueHash($tagInfo);
                 # only add new values if...
                 my ($doSet, @values);
                 my $found = $foundRec{$newRec}->{$newTag} || 0;
                 if ($found & 0x02) {
-                    # ...tag existed before and was deleted
-                    $doSet = 1;
+                    # ...tag existed before and was deleted (unless we already added it)
+                    $doSet = 1 unless $found & 0x04;
                 } elsif ($$tagInfo{List}) {
                     # ...tag is List and it existed before or we are creating it
                     $doSet = 1 if $found or Image::ExifTool::IsCreating($nvHash);
@@ -522,19 +528,27 @@ sub DoWriteIPTC($$$)
                         ++$exifTool->{CHANGED};
                     }
                 }
+                # continue on with regular programming if done adding tag now
+                if ($addNow) {
+                    undef $addNow;
+                    next if $writeRec;
+                    last;
+                }
                 # remove this tagID from the sorted write list
                 shift @{$iptcInfo{$newRec}};
                 shift @recordList unless @{$iptcInfo{$newRec}};
             }
-            # all done if no more records to write
-            last unless defined $rec;
-            # update last record variables
-            $lastRec = $rec;
-            $lastRecPos = length $newData;
-            $allMandatory = 1;
+            if ($writeRec) {
+                # all done if no more records to write
+                last unless defined $rec;
+                # update last record variables
+                $lastRec = $rec;
+                $lastRecPos = length $newData;
+                $allMandatory = 1;
+            }
         }
         # set flag indicating we found this tag
-        $foundRec{$rec}->{$tag} = 1;
+        $foundRec{$rec}->{$tag} = ($foundRec{$rec}->{$tag} || 0) || 0x01;
         # write out this record unless we are setting it with a new value
         $tagInfo = $set{$rec}->{$tag};
         if ($tagInfo) {
@@ -549,8 +563,14 @@ sub DoWriteIPTC($$$)
                 ++$exifTool->{CHANGED};
                 # set deleted flag to indicate we found and deleted this tag
                 $foundRec{$rec}->{$tag} |= 0x02;
-                # set allMandatory flag to 2 indicating a tag was removed
+                # increment allMandatory flag to indicate a tag was removed
                 $allMandatory and ++$allMandatory;
+                # write this tag now if overwriting an existing value
+                if ($$nvHash{Value} and @{$$nvHash{Value}} and @recordList and
+                    $recordList[0] == $rec and not $foundRec{$rec}->{$tag} & 0x04)
+                {
+                    $addNow = $tagInfo;
+                }
                 next;
             }
         } elsif ($rec == 1 and $tag == 90) {
@@ -656,7 +676,7 @@ seldom-used routines.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

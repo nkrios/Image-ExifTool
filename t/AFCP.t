@@ -28,7 +28,7 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg');
+    $exifTool->SetNewValuesFromFile('t/images/IPTC.jpg');
     my $testfile = "t/${testname}_${testnum}_failed.jpg";
     unlink $testfile;
     $exifTool->WriteInfo('t/images/AFCP.jpg',$testfile);

@@ -108,7 +108,7 @@ data in the Leica maker notes make normal pointer assumptions impossible).</li>
 (which is MUCH more reasonable, but using two different offset bases in the same
 directory is yet another level of idiocy).</li>
 <li>In DNG images the maker notes use an absolute base offset.  Yet again
-different from the M8 and M9.  Consistency isn't Leica's strong suit.
+different from the M8 and M9.  Consistency isn't Leica's strong suit.</li>
 </ul>
 
 <p><b>Minolta:</b> An obvious bug in the firmware of the Z2 writes an incorrect
@@ -225,13 +225,18 @@ a file identifier containing a version number in their NEF images -- Doh! In
 these images, CFAPattern2 is written incorrectly with UNDEFINED instead of BYTE
 format.</p>
 
+<p><b>Phase One IIQ:</b> Many values are referenced from more than one location
+in the TIFF structure of these images.  For instance, the IFD0 strip data
+actually exists within the MakerNotes data block.  This is a poor design, and
+leads to duplicated information when the image is rewritten.</p>
+
 <p><b>Samsung SRW:</b> Yet another TIFF-based RAW image with no proper file
 identifier.  In these images the thumbnail is stored inside a SubIFD of IFD1
 instead of directly in IFD1 (dumb, dumb...).</p>
 
 <hr>
 <i>Created Mar. 25, 2005</i>
-<br><i>Last revised July 16, 2010</i>
+<br><i>Last revised Jan. 27, 2011</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

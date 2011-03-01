@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 %Image::ExifTool::MPEG::Audio = (
     GROUPS => { 2 => 'Audio' },
@@ -47,7 +47,7 @@ $VERSION = '1.12';
             Condition => '$self->{MPEG_Vers} == 3 and $self->{MPEG_Layer} == 3',
             Notes => 'version 1, layer 1',
             PrintConvColumns => 3,
-            PrintConv => {
+            ValueConv => {
                 0 => 'free',
                 1 => 32000,
                 2 => 64000,
@@ -64,13 +64,14 @@ $VERSION = '1.12';
                 13 => 416000,
                 14 => 448000,
             },
+            PrintConv => 'ConvertBitrate($val)',
         },
         {
             Name => 'AudioBitrate',
             Condition => '$self->{MPEG_Vers} == 3 and $self->{MPEG_Layer} == 2',
             Notes => 'version 1, layer 2',
             PrintConvColumns => 3,
-            PrintConv => {
+            ValueConv => {
                 0 => 'free',
                 1 => 32000,
                 2 => 48000,
@@ -87,13 +88,14 @@ $VERSION = '1.12';
                 13 => 320000,
                 14 => 384000,
             },
+            PrintConv => 'ConvertBitrate($val)',
         },
         {
             Name => 'AudioBitrate',
             Condition => '$self->{MPEG_Vers} == 3 and $self->{MPEG_Layer} == 1',
             Notes => 'version 1, layer 3',
             PrintConvColumns => 3,
-            PrintConv => {
+            ValueConv => {
                 0 => 'free',
                 1 => 32000,
                 2 => 40000,
@@ -110,13 +112,14 @@ $VERSION = '1.12';
                 13 => 256000,
                 14 => 320000,
             },
+            PrintConv => 'ConvertBitrate($val)',
         },
         {
             Name => 'AudioBitrate',
             Condition => '$self->{MPEG_Vers} != 3 and $self->{MPEG_Layer} == 3',
             Notes => 'version 2 or 2.5, layer 1',
             PrintConvColumns => 3,
-            PrintConv => {
+            ValueConv => {
                 0 => 'free',
                 1 => 32000,
                 2 => 48000,
@@ -133,13 +136,14 @@ $VERSION = '1.12';
                 13 => 224000,
                 14 => 256000,
             },
+            PrintConv => 'ConvertBitrate($val)',
         },
         {
             Name => 'AudioBitrate',
             Condition => '$self->{MPEG_Vers} != 3 and $self->{MPEG_Layer}',
             Notes => 'version 2 or 2.5, layer 2 or 3',
             PrintConvColumns => 3,
-            PrintConv => {
+            ValueConv => {
                 0 => 'free',
                 1 => 8000,
                 2 => 16000,
@@ -156,6 +160,7 @@ $VERSION = '1.12';
                 13 => 144000,
                 14 => 160000,
             },
+            PrintConv => 'ConvertBitrate($val)',
         },
     ],
     'Bit20-21' => [
@@ -306,6 +311,7 @@ $VERSION = '1.12';
     'Bit32-49' => {
         Name => 'VideoBitrate',
         ValueConv => '$val eq 0x3ffff ? "Variable" : $val * 400',
+        PrintConv => 'ConvertBitrate($val)',
     },
     # these tags not very interesting
     #'Bit50'    => 'MarkerBit',
@@ -357,7 +363,8 @@ $VERSION = '1.12';
     # 19 - EncodingFlags
     20 => {
         Name => 'LameBitrate',
-        PrintConv => '"$val kbps"',
+        ValueConv => '$val * 1000',
+        PrintConv => 'ConvertBitrate($val)',
     },
     24 => {
         Name => 'LameStereoMode',
@@ -401,9 +408,9 @@ $VERSION = '1.12';
             # calculate duration as file size divided by total bitrate
             # (note: this is only approximate!)
             return undef unless $val[2] or $val[3];
-            return undef if $prt[2] and not $prt[2] =~ /^\d+$/;
+            return undef if $val[2] and not $val[2] =~ /^\d+$/;
             return undef if $val[3] and not $val[3] =~ /^\d+$/;
-            return (8 * ($val[0] - ($val[1]||0))) / (($prt[2]||0) + ($val[3]||0));
+            return (8 * ($val[0] - ($val[1]||0))) / (($val[2]||0) + ($val[3]||0));
         },
         PrintConv => 'ConvertDuration($val) . " (approx)"',
     },
@@ -421,7 +428,7 @@ $VERSION = '1.12';
             my $mfs = $prt[1] / ($val[0] == 3 ? 144 : 72);
             return $mfs * $val[2] / $val[3];
         },
-        PrintConv => 'int($val + 0.5)',
+        PrintConv => 'ConvertBitrate($val)',
     },
 );
 
@@ -696,7 +703,7 @@ based on unofficial sources which may be incomplete, inaccurate or outdated.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

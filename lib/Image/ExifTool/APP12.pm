@@ -139,8 +139,6 @@ sub WriteDucky($$$)
     my $pos = $$dirInfo{DirStart};
     my $newTags = $exifTool->GetNewTagInfoHash($tagTablePtr);
     my @addTags = sort { $a <=> $b } keys(%$newTags);
-    my $verbose = $exifTool->Options('Verbose');
-    my $out = $exifTool->Options('TextOut');
     my ($dirEnd, %doneTags);
     if ($dataPt) {
         $dirEnd = $pos + $$dirInfo{DirLen};
@@ -306,7 +304,7 @@ APP12 meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

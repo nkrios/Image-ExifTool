@@ -50,7 +50,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.22';
+$VERSION = '2.26';
 
 sub CryptShutterCount($$);
 sub PrintFilter($$$);
@@ -58,6 +58,7 @@ sub PrintFilter($$$);
 # pentax lens type codes (ref 4)
 # The first number gives the lens series, and the 2nd gives the model number
 # Series numbers: K=1; A=2; F=3; FAJ,DFA=4; FA=3,4,5,6; FA*=5,6; DA=3,4,7; DA*=7,8
+#                 FA645=11; DFA645=13
 my %pentaxLensTypes = (
     Notes => q{
         The first number gives the series of the lens, and the second identifies the
@@ -70,7 +71,7 @@ my %pentaxLensTypes = (
     '0 0' => 'M-42 or No Lens', #17
     '1 0' => 'K or M Lens',
     '2 0' => 'A Series Lens', #7 (from smc PENTAX-A 400mm F5.6)
-    '3 0' => 'Sigma',
+    '3 0' => 'Sigma', # (includes 'Sigma 30mm F1.4 EX DC' - PH)
     '3 17' => 'smc PENTAX-FA SOFT 85mm F2.8',
     '3 18' => 'smc PENTAX-F 1.7X AF ADAPTER',
     '3 19' => 'smc PENTAX-F 24-50mm F4',
@@ -164,7 +165,7 @@ my %pentaxLensTypes = (
     '4 36' => 'Tamron AF70-300mm F4-5.6 LD Macro', # both 572D and A17 (Di) - ref JD
     '4 37' => 'Tamron SP AF 24-135mm F3.5-5.6 AD AL (190D)', #13
     '4 38' => 'smc PENTAX-FA 28-105mm F3.2-4.5 AL[IF]',
-    '4 39' => 'smc PENTAX-FA 31mm F1.8AL Limited',
+    '4 39' => 'smc PENTAX-FA 31mm F1.8 AL Limited',
     '4 41' => 'Tamron AF 28-200mm Super Zoom F3.8-5.6 Aspherical XR [IF] Macro (A03)',
     '4 43' => 'smc PENTAX-FA 28-90mm F3.5-5.6',
     '4 44' => 'smc PENTAX-FA J 75-300mm F4.5-5.8 AL',
@@ -230,10 +231,13 @@ my %pentaxLensTypes = (
     '7 217' => 'smc PENTAX-DA 50-200mm F4-5.6 ED WR', #JD
     '7 218' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL WR', #JD
     '7 220' => 'Tamron SP AF 10-24mm F3.5-4.5 Di II LD Aspherical [IF]', #24
+    '7 221' => 'smc PENTAX-DA L 50-200mm F4-5.6 ED', #Ar't
     '7 222' => 'smc PENTAX-DA L 18-55mm F3.5-5.6', #PH (tag 0x003f -- was '7 229' in LensInfo of one test image)
     '7 223' => 'Samsung D-XENON 18-55mm F3.5-5.6 II', #PH
     '7 224' => 'smc PENTAX-DA 15mm F4 ED AL Limited', #JD
     '7 225' => 'Samsung D-XENON 18-250mm F3.5-6.3', #8/PH
+    '7 226' => 'smc PENTAX-DA* 55mm F1.4 SDM (SDM unused)', #PH (NC)
+    '7 227' => 'smc PENTAX DA* 60-250mm F4 [IF] SDM (SDM unused)', #PH (NC)
     '7 229' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #JD
     '7 230' => 'Tamron AF 17-50mm F2.8 XR Di-II LD (Model A16)', #JD
     '7 231' => 'smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]', #JD
@@ -247,6 +251,7 @@ my %pentaxLensTypes = (
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH
     '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
     '8 14' => 'Sigma 17-70mm F2.8-4.0 DC Macro OS HSM', #(Hubert Meier)
+    '8 18' => 'Sigma 8-16mm F4.5-5.6 DC HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2998.0.html
     '8 215' => 'smc PENTAX-DA 18-135mm F3.5-5.6 ED AL [IF] DC WR', #PH
     '8 226' => 'smc PENTAX-DA* 55mm F1.4 SDM', #JD
     '8 227' => 'smc PENTAX DA* 60-250mm F4 [IF] SDM', #JD
@@ -258,6 +263,7 @@ my %pentaxLensTypes = (
     '8 255' => 'Sigma Lens (8 255)',
     '8 255.1' => 'Sigma 70-200mm F2.8 EX DG Macro HSM II', #JD
     '8 255.2' => 'Sigma APO 150-500mm F5-6.3 DG OS HSM', #JD
+    '8 255.3' => 'Sigma 50-150mm F2.8 II APO EX DC HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2997.0.html
     '11 4' => 'smc PENTAX-FA 645 45-85mm F4.5', #PH
     '11 8' => 'smc PENTAX-FA 645 80-160mm F4.5', #PH
     '11 11' => 'smc PENTAX-FA 645 35mm F3.5 AL [IF]', #PH
@@ -344,10 +350,11 @@ my %pentaxModelID = (
     0x12d2c => 'Optio V20',
     0x12d40 => 'Optio W60',
     0x12d4a => 'Optio M60',
-    0x12d68 => 'Optio E60',
+    0x12d68 => 'Optio E60/M90',
     0x12d72 => 'K2000',
     0x12d73 => 'K-m',
     0x12d86 => 'Optio P70',
+    0x12d90 => 'Optio L70',
     0x12d9a => 'Optio E70',
     0x12dae => 'X70',
     0x12db8 => 'K-7',
@@ -364,6 +371,8 @@ my %pentaxModelID = (
     0x12e58 => 'X90',
     0x12e6c => 'K-r',
     0x12e76 => 'K-5',
+    0x12e8a => 'Optio RS1000',
+    0x12e94 => 'Optio RZ10',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -692,6 +701,9 @@ my %binaryDataAttrs = (
             25 => '2816x2212 or 2816x2112', #13 or #14
             27 => '3648x2736', #PH (Optio A20)
             29 => '4000x3000', #PH (X70)
+            30 => '4288x3216', #PH (Optio RS1000)
+            129 => '1920x1080', #PH (Optio RZ10)
+            257 => '3216x3216', #PH (Optio RZ10)
             '0 0' => '2304x1728', #13
             '4 0' => '1600x1200', #PH (Optio MX4)
             '5 0' => '2048x1536', #13
@@ -780,6 +792,7 @@ my %binaryDataAttrs = (
             0x001 => 'Off, Did not fire',
             0x002 => 'On, Did not fire', #19
             0x003 => 'Auto, Did not fire, Red-eye reduction',
+            0x005 => 'On, Did not fire, Wireless (Master)', #19
             0x100 => 'Auto, Fired',
             0x102 => 'On, Fired',
             0x103 => 'Auto, Fired, Red-eye reduction',
@@ -821,6 +834,7 @@ my %binaryDataAttrs = (
                 17 => 'AF-C', #17
                 18 => 'AF-A', #PH (educated guess)
                 32 => 'Contrast-detect', #PH (K-5)
+                33 => 'Tracking Contrast-detect', #PH (K-5)
             },
         },
         {
@@ -844,7 +858,7 @@ my %binaryDataAttrs = (
             0xffff => 'Auto',
             0xfffe => 'Fixed Center',
             0xfffd => 'Automatic Tracking AF', #JD
-            0xfffc => 'Face Detection AF', #JD
+            0xfffc => 'Face Detect AF', #JD
             1 => 'Upper-left',
             2 => 'Top',
             3 => 'Upper-right',
@@ -907,9 +921,10 @@ my %binaryDataAttrs = (
         Notes => 'may be different than EXIF:ISO, which can round to the nearest full stop',
         PrintConvColumns => 4,
         PrintConv => {
-            3 => 50, #(NC=Not Confirmed)
+            # 1/3 EV step values
+            3 => 50,
             4 => 64,
-            5 => 80, #(NC)
+            5 => 80,
             6 => 100,
             7 => 125, #PH
             8 => 160, #PH
@@ -923,21 +938,22 @@ my %binaryDataAttrs = (
             16 => 1000,
             17 => 1250,
             18 => 1600, #PH
-            19 => 2000, #PH (NC)
-            20 => 2500, #PH (NC)
-            21 => 3200, #PH (K-5)
-            22 => 4000, #(NC)
-            23 => 5000, #(NC)
-            24 => 6400, #PH (K20D)
-            25 => 8000, #PH (NC)
-            26 => 10000, #PH (NC)
-            27 => 12800, #PH (K-5)
-            28 => 16000, #PH (NC)
-            29 => 20000, #PH (NC)
-            30 => 25600, #PH (NC)
-            31 => 32000, #PH (NC)
-            32 => 40000, #PH (NC)
-            33 => 51200, #PH (K-5)
+            19 => 2000, #PH
+            20 => 2500, #PH
+            21 => 3200, #PH
+            22 => 4000,
+            23 => 5000,
+            24 => 6400, #PH
+            25 => 8000, #PH
+            26 => 10000, #PH
+            27 => 12800, #PH
+            28 => 16000, #PH
+            29 => 20000, #PH
+            30 => 25600, #PH
+            31 => 32000, #PH
+            32 => 40000, #PH
+            33 => 51200, #PH
+            # Optio 330/430 (oddball)
             50 => 50, #PH
             100 => 100, #PH
             200 => 200, #PH
@@ -945,6 +961,7 @@ my %binaryDataAttrs = (
             800 => 800, #PH
             1600 => 1600, #PH
             3200 => 3200, #PH
+            # 1/2 EV step values
             258 => 50, #PH (NC)
             259 => 70, #PH (NC)
             260 => 100, #19
@@ -956,8 +973,16 @@ my %binaryDataAttrs = (
             266 => 800, #19
             267 => 1100, #19
             268 => 1600, #19
-            269 => 2200, #PH (NC)
-            270 => 3200, #PH (NC)
+            269 => 2200, #PH
+            270 => 3200, #PH
+            271 => 4500, #PH
+            272 => 6400, #PH
+            273 => 9000, #PH
+            274 => 12800, #PH
+            275 => 18000, #PH
+            276 => 25600, #PH
+            277 => 36000, #PH
+            278 => 51200, #PH
         },
     },
     0x0015 => { #PH
@@ -1246,6 +1271,7 @@ my %binaryDataAttrs = (
             '0 0' => 'None', #PH
             '0 0 0 0' => 'None',
             '0 0 0 4' => 'Digital Filter',
+            '1 0 0 0' => 'Resized', #PH (K-5)
             '2 0 0 0' => 'Cropped', #PH
             # note: doesn't apply to digital filters applied when picture is taken
             '4 0 0 0' => 'Digital Filter 4', #PH (K10D)
@@ -1362,7 +1388,10 @@ my %binaryDataAttrs = (
         Format => 'int16u',
         Count => 2,
         Notes => 'includes masked pixels',
-        # Notes: Not sure why this is in 2um increments (1um would make more sense to me)
+        # values for various models (not sure why this is in 2um increments):
+        #  11894 7962 (K10D,K-m)   12012 7987 (*istDS,K100D,K110D)   12012 8019 (*istD),
+        #  12061 7988 (K-5)        12053 8005 (K-r,K-x)              14352 9535 (K20D,K-7)
+        #  22315 16711 (645)
         ValueConv => 'my @a=split(" ",$val); $_/=500 foreach @a; join(" ",@a)',
         ValueConvInv => 'my @a=split(" ",$val); $_*=500 foreach @a; join(" ",@a)',
         PrintConv => 'sprintf("%.3f x %.3f mm", split(" ",$val))',
@@ -1505,7 +1534,8 @@ my %binaryDataAttrs = (
         # 246 [7], and 209 [18 (one of the first 20 shots)], so there must be a number
         # of test images shot in the factory. (But my new K-5 started at 1 - PH)
         # This count includes shutter actuations even if they don't result in a
-        # recorded image. (ie. manual white balance frame or digital preview) - PH
+        # recorded image (ie. manual white balance frame or digital preview), but
+        # does not include actuations due to Live View or video recording - PH
         Name => 'ShutterCount',
         Writable => 'undef',
         Count => 4,
@@ -1700,12 +1730,19 @@ my %binaryDataAttrs = (
         Name => 'FaceDetect',
         Writable => 'int8u',
         Count => 2,
+        # the Optio S12 writes this but not the FacesDetected tag, so get FacesDetected from here
+        DataMember => 'FacesDetected',
+        RawConv => '$val =~ / (\d+)/ and $$self{FacesDetected} = $1; $val',
         PrintConv => [
-            { 0 => 'Off', 16 => 'On (16 faces max)' },
+            '$val ? "On ($val faces max)" : "Off"',
             '"$val faces detected"',
         ],
+        PrintConvInv => [
+            '$val =~ /(\d+)/ ? $1 : 0',
+            '$val =~ /(\d+)/ ? $1 : 0',
+        ],
     },
-    0x0077 => { #PH (K-5, guess)
+    0x0077 => { #PH (K-5)
         # set by taking a picture with face detect AF,
         # but it isn't reset until camera is turned off? - PH
         Name => 'FaceDetectFrameSize',
@@ -1848,7 +1885,6 @@ my %binaryDataAttrs = (
         {
             Name => 'FlashInfo',
             Condition => '$count == 27',
-            Notes => 'K10D, K20D and K200D',
             SubDirectory => { TagTable => 'Image::ExifTool::Pentax::FlashInfo' },
         },
         {
@@ -1866,7 +1902,7 @@ my %binaryDataAttrs = (
         },
         %convertMeteringSegments,
         #    16 metering segment             77 metering segment
-        #    locations (ref JD)              locations (ref PH, K05)
+        #    locations (ref JD)              locations (ref PH, K-5)
         # +-------------------------+
         # |           14            | +----------------------------------+
         # |    +---+---+---+---+    | |  0  1  2  3  4  5  6  7  8  9 10 |
@@ -1939,11 +1975,10 @@ my %binaryDataAttrs = (
     },
     0x0216 => { #PH
         Name => 'BatteryInfo',
-        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::BatteryInfo' },
-        # counts:
-        # 4 (K-m,K2000=4xAA), 6 (*istD,K10D,K100D,K110D=2xCR-V3/4xAA),
-        # 7 (K20D=D-LI50, K200D=4xAA), 8 (645D=D-LI90), 10 (K-r pre-production?),
-        # 14 (K-7=D-LI90, K-r=D-LI109/4xAA, K-x=4xAA), 26 (K-5=D-LI90)
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::BatteryInfo',
+            ByteOrder => 'BigEndian', # have seen makernotes changed to little-endian in DNG!
+        },
     },
     # 0x021a - undef[1068] (K-5)
     0x021b => { #19
@@ -1994,8 +2029,16 @@ my %binaryDataAttrs = (
         Name => 'ShotInfo', # (may want to change this later when more is decoded)
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::ShotInfo' },
     },
-    # 0x0227 - undef[64]: all zeros (K-5)
-    # 0x0228 - undef[64]: all zeros (K-5)
+    0x0227 => { #PH
+        Name => 'FacePos',
+        Condition => '$$self{FacesDetected}', # ignore if no faces to decode
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::FacePos' },
+    },
+    0x0228 => { #PH
+        Name => 'FaceSize',
+        Condition => '$$self{FacesDetected}', # ignore if no faces to decode
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::FaceSize' },
+    },
     0x0229 => { #PH (verified) (K-m, K-x, K-7)
         Name => 'SerialNumber',
         Writable => 'string',
@@ -2054,10 +2097,16 @@ my %binaryDataAttrs = (
         Writable => 0,
         PrintConv => '\$val',
     },
-    0x03ff => { #PH
-        Name => 'UnknownInfo',
-        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::UnknownInfo' },
-    },
+    0x03ff => [ #PH
+        {
+            Name => 'TempInfoK5',
+            Condition => '$$self{Model} =~ /K-5\b/',
+            SubDirectory => { TagTable => 'Image::ExifTool::Pentax::TempInfoK5' },
+        },{
+            Name => 'UnknownInfo',
+            SubDirectory => { TagTable => 'Image::ExifTool::Pentax::UnknownInfo' },
+        },
+    ],
     0x0402 => { #5
         Name => 'ToneCurve',
         PrintConv => '\$val',
@@ -2090,7 +2139,8 @@ my %binaryDataAttrs = (
             0 => 'Not stabilized',
             BITMASK => {
                 0 => 'Stabilized',
-                # have seen 1 for 0.5 sec exposure time, NR On - ref 19
+                # have seen 1 and 4 for 0.5 and 0.3 sec exposures with NR on and Bit 0 also set - ref 19
+                # have seen bits 1,2,3,4 in K-5 AVI videos - PH
                 6 => 'Not ready',
             },
         },
@@ -2136,12 +2186,16 @@ my %binaryDataAttrs = (
 %Image::ExifTool::Pentax::FaceInfo = (
     %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    0 => 'FacesDetected',
+    DATAMEMBER => [ 0 ],
+    0 => {
+        Name => 'FacesDetected',
+        RawConv => '$$self{FacesDetected} = $val',
+    },
     2 => {
         Name => 'FacePosition',
         Notes => q{
-            X/Y coordinates of the main face in percent of frame size, with positive Y
-            downwards
+            X/Y coordinates of the center of the main face in percent of frame size,
+            with positive Y downwards
         },
         Format => 'int8u[2]',
     },
@@ -2648,6 +2702,7 @@ my %binaryDataAttrs = (
 %Image::ExifTool::Pentax::AEInfo = (
     %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    DATAMEMBER => [ 8 ],
     # instead of /8, should these be PentaxEV(), as in CameraSettings? - PH
     0 => {
         Name => 'AEExposureTime',
@@ -2723,12 +2778,42 @@ my %binaryDataAttrs = (
             131 => 'Pet',
             139 => 'Candlelight',
             147 => 'Museum',
+            184 => 'Shallow DOF Program', # (K-5)
         },
     },
     7 => {
-        Name => 'AEExtra',
+        Name => 'AEFlags',
         Unknown => 1,
+        Writable => 0,
+        PrintConv => { #19
+            # (seems to be the warnings displayed in the viewfinder for several bits)
+            BITMASK => {
+                # 0 - seen in extreme low light conditions (e.g. Lens Cap On)
+                # 1 - seen in 2 cases, Aperture Priority mode, Auto ISO at 100,
+                #     Shutter speed at 1/4000 and aperture opened wider causing under exposure
+                # 2 - only (but not always) set in Shutter Speed Priority (seems to be when over/under exposed).
+                #     In one case set when auto exposure compensation changed the Tv from 1/250 to 1/80.
+                #     In another case set when external flash was in SB mode so did not fire.
+                3 => 'AE lock',
+                4 => 'Flash recommended?', # not 100% sure of this one
+                # 5 - seen lots...
+                # 6 - seen lots...
+                7 => 'Aperture wide open', # mostly true...  (Set for all my lenses except for DA* 16-50mm)
+            },
+        },
     },
+    8 => {
+        Name => 'AEUnknown',
+        Notes => 'indices after this are incremented by 1 for some models',
+        Format => 'var_int8u[$size > 20 ? 2 : 1]',
+        Writable => 0,
+        # (this tag can't be unknown because the Format must be evaluated
+        #  to shift the following offsets if necessary.  Instead, ignore
+        #  the return value unless Unknown > 1)
+        RawConv => '$$self{OPTIONS}{Unknown} > 1 ? $val : undef',
+    },
+    # Note: Offsets below shifted by 1 if record size is > 20 bytes
+    # (implemented by the var_int8u count above)
     9 => { #19
         Name => 'AEMaxAperture',
         Notes => 'val = 2**((raw-68)/16)',
@@ -2769,7 +2854,7 @@ my %binaryDataAttrs = (
         Format => 'int8s',
         Notes => q{
             reports the camera setting, unlike tag 0x004d which reports 0 in Green mode
-            or if flash was on but did not fire. Both this tag and 0x004d report the
+            or if flash was on but did not fire.  Both this tag and 0x004d report the
             setting even if the flash is off
         },
         ValueConv => 'Image::ExifTool::Pentax::PentaxEv($val)',
@@ -3025,6 +3110,7 @@ my %binaryDataAttrs = (
 %Image::ExifTool::Pentax::FlashInfo = (
     %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'Flash information tags for the K10D, K20D and K200D.',
     0 => {
         Name => 'FlashStatus',
         PrintHex => 1,
@@ -3033,6 +3119,7 @@ my %binaryDataAttrs = (
             0x01 => 'Off (1)', #PH (K-5)
             0x02 => 'External, Did not fire', # 0010
             0x06 => 'External, Fired',        # 0110
+            0x08 => 'Internal, Did not fire (0x08)',
             0x09 => 'Internal, Did not fire', # 1001
             0x0d => 'Internal, Fired',        # 1101
         },
@@ -3042,25 +3129,26 @@ my %binaryDataAttrs = (
         PrintHex => 1,
         PrintConv => {
             0x00 => 'n/a - Off-Auto-Aperture', #19
-            0x86 => 'On, Wireless (Control)', #19
-            0x95 => 'On, Wireless (Master)', #19
-            0xc0 => 'On', # K10D
-            0xc1 => 'On, Red-eye reduction', # *istDS2, K10D
-            0xc2 => 'On, Auto', # K100D, K110D
-            0xc3 => 'On, Auto, Red-eye reduction', #PH
-            0xc8 => 'On, Slow-sync', # K10D
-            0xc9 => 'On, Slow-sync, Red-eye reduction', # K10D
-            0xca => 'On, Trailing-curtain Sync', # K10D
-            0xf0 => 'Off, Normal', #19
-            0xf1 => 'Off, Red-eye reduction', #19
-            0xf2 => 'Off, Auto', #19
-            0xf3 => 'Off, Auto, Red-eye reduction', #19
-            0xf4 => 'Off, (Unknown 0xf4)', #19
-            0xf5 => 'Off, Wireless (Master)', #19
-            0xf6 => 'Off, Wireless (Control)', #19
-            0xf8 => 'Off, Slow-sync', #19
-            0xf9 => 'Off, Slow-sync, Red-eye reduction', #19
-            0xfa => 'Off, Trailing-curtain Sync', #19
+            0x86 => 'Fired, Wireless (Control)', #19
+            0x95 => 'Fired, Wireless (Master)', #19
+            0xc0 => 'Fired', # K10D
+            0xc1 => 'Fired, Red-eye reduction', # *istDS2, K10D
+            0xc2 => 'Fired, Auto', # K100D, K110D
+            0xc3 => 'Fired, Auto, Red-eye reduction', #PH
+            0xc6 => 'Fired, Wireless (Control), Fired normally not as control', #19 (Remote 3s)
+            0xc8 => 'Fired, Slow-sync', # K10D
+            0xc9 => 'Fired, Slow-sync, Red-eye reduction', # K10D
+            0xca => 'Fired, Trailing-curtain Sync', # K10D
+            0xf0 => 'Did not fire, Normal', #19
+            0xf1 => 'Did not fire, Red-eye reduction', #19
+            0xf2 => 'Did not fire, Auto', #19
+            0xf3 => 'Did not fire, Auto, Red-eye reduction', #19
+            0xf4 => 'Did not fire, (Unknown 0xf4)', #19
+            0xf5 => 'Did not fire, Wireless (Master)', #19
+            0xf6 => 'Did not fire, Wireless (Control)', #19
+            0xf8 => 'Did not fire, Slow-sync', #19
+            0xf9 => 'Did not fire, Slow-sync, Red-eye reduction', #19
+            0xfa => 'Did not fire, Trailing-curtain Sync', #19
         },
     },
     2 => {
@@ -3199,6 +3287,13 @@ my %binaryDataAttrs = (
 %Image::ExifTool::Pentax::BatteryInfo = (
     %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+# size of data:
+# 4 (K-m,K2000=4xAA), 6 (*istD,K10D,K100D,K110D=2xCR-V3/4xAA),
+# 7 (K20D=D-LI50, K200D=4xAA), 8 (645D=D-LI90), 10 (K-r pre-production?),
+# 14 (K-7=D-LI90, K-r=D-LI109/4xAA, K-x=4xAA), 26 (K-5=D-LI90)
+# battery grips available for:
+# BG1 (*istD), BG2 (K10D/K20D), BG3 (K200D), BG4 (K-7,K-5)
+# no grip available: K-x
     0.1 => { #19
         Name => 'PowerSource',
         Mask => 0x0f,
@@ -3214,8 +3309,8 @@ my %binaryDataAttrs = (
     1.1 => [
         {
             Name => 'BodyBatteryState',
-            Condition => '$$self{Model} =~ /(K10D|GX10|K20D|GX20)\b/',
-            Notes => 'K10D and K20D',
+            Condition => '$$self{Model} =~ /(\*ist|K100D|K200D|K10D|GX10|K20D|GX20)\b/',
+            Notes => '*istD, K100D, K200D, K10D and K20D',
             Mask => 0xf0,
             PrintConv => { #19
                  0x10 => 'Empty or Missing',
@@ -3225,8 +3320,8 @@ my %binaryDataAttrs = (
             },
         },{
             Name => 'BodyBatteryState',
-            Condition => '$$self{Model} =~ /(K-5|K-7)\b/',
-            Notes => 'K-5 and K-7',
+            Condition => '$$self{Model} =~ /(K-5|K-7|K-r|K-x|645D)\b/',
+            Notes => 'K-5, K-7, K-r, K-x and 645D',
             Mask => 0xf0,
             PrintConv => {
                  0x10 => 'Empty or Missing',
@@ -3276,33 +3371,45 @@ my %binaryDataAttrs = (
             PrintConvInv => '$val=~s/ .*//; $val',
         },
         {
-            Name => 'BodyBatteryVoltage1',
-            Condition => '$$self{Model} =~ /(K-5|K-7)\b/',
+            Name => 'BodyBatteryADNoLoad',
+            Description => 'Body Battery A/D No Load',
+            Condition => '$$self{Model} =~ /(\*ist|K100D|K200D)\b/',
+        },
+        {
+            Name => 'BodyBatteryVoltage1', # (static?)
+            Condition => '$$self{Model} =~ /(K-5|K-7|K-r|K-x|645D)\b/',
             Format => 'int16u',
-            Notes => 'K-5 and K-7',
             ValueConv => '$val / 100',
             ValueConvInv => '$val * 100',
             PrintConv => 'sprintf("%.2f V", $val)',
             PrintConvInv => '$val =~ s/\s*V$//',
         },
     ],
-    3 => {
-        Name => 'BodyBatteryADLoad',
-        Description => 'Body Battery A/D Load',
-        Condition => '$$self{Model} =~ /(K10D|GX10|K20D|GX20)\b/',
-        # [have seen 187] - PH
-        PrintConv => 'sprintf("%d (%.1fV, %d%%)",$val,$val*8.18/186,($val-152)*100/34)',
-        PrintConvInv => '$val=~s/ .*//; $val',
-    },
+    3 => [
+        {
+            Name => 'BodyBatteryADLoad',
+            Description => 'Body Battery A/D Load',
+            Condition => '$$self{Model} =~ /(K10D|GX10|K20D|GX20)\b/',
+            Notes => 'roughly calibrated for K10D with a new Pentax battery',
+            # [have seen 187] - PH
+            PrintConv => 'sprintf("%d (%.1fV, %d%%)",$val,$val*8.18/186,($val-152)*100/34)',
+            PrintConvInv => '$val=~s/ .*//; $val',
+        },
+        {
+            Name => 'BodyBatteryADLoad',
+            Description => 'Body Battery A/D Load',
+            Condition => '$$self{Model} =~ /(\*ist|K100D|K200D)\b/',
+        },
+    ],
     4 => [
         {
             Name => 'GripBatteryADNoLoad',
             Description => 'Grip Battery A/D No Load',
-            Condition => '$$self{Model} =~ /(K10D|GX10|K20D|GX20)\b/',
+            Condition => '$$self{Model} =~ /(\*ist|K10D|GX10|K20D|GX20)\b/',
         },
         {
-            Name => 'BodyBatteryVoltage2',
-            Condition => '$$self{Model} =~ /(K-5|K-7)\b/',
+            Name => 'BodyBatteryVoltage2', # (less than BodyBatteryVoltage1 -- under load?)
+            Condition => '$$self{Model} =~ /(K-5|K-7|K-r|K-x|645D)\b/',
             Format => 'int16u',
             ValueConv => '$val / 100',
             ValueConvInv => '$val * 100',
@@ -3312,23 +3419,24 @@ my %binaryDataAttrs = (
     ],
     5 => {
         Name => 'GripBatteryADLoad',
-        Condition => '$$self{Model} =~ /(K10D|GX10|K20D|GX20)\b/',
+        Condition => '$$self{Model} =~ /(\*ist|K10D|GX10|K20D|GX20)\b/',
         Description => 'Grip Battery A/D Load',
     },
     6 => {
-        Name => 'BodyBatteryVoltage3',
-        Condition => '$$self{Model} =~ /K-5\b/',
+        Name => 'BodyBatteryVoltage3', # (greater than BodyBatteryVoltage1)
+        Condition => '$$self{Model} =~ /(K-5|K-r|645D)\b/',
         Format => 'int16u',
-        Notes => 'K-5 only',
+        Notes => 'K-5, K-r and 645D only',
         ValueConv => '$val / 100',
         ValueConvInv => '$val * 100',
         PrintConv => 'sprintf("%.2f V", $val)',
         PrintConvInv => '$val =~ s/\s*V$//',
     },
     8 => {
-        Name => 'BodyBatteryVoltage4',
-        Condition => '$$self{Model} =~ /K-5\b/',
+        Name => 'BodyBatteryVoltage4', # (between BodyBatteryVoltage1 and BodyBatteryVoltage2)
+        Condition => '$$self{Model} =~ /(K-5|K-r)\b/',
         Format => 'int16u',
+        Notes => 'K-5 and K-r only',
         ValueConv => '$val / 100',
         ValueConvInv => '$val * 100',
         PrintConv => 'sprintf("%.2f V", $val)',
@@ -3493,7 +3601,8 @@ my %binaryDataAttrs = (
             0x20 => 'Rotate 180',
             0x30 => 'Rotate 90 CW',
             0x40 => 'Rotate 270 CW',
-            # 0x50 - got this when pointing up
+            0x50 => 'Upwards', # (to the sky)
+            0x60 => 'Downwards', # (to the ground)
         },
     },
     # 2: 0xd3 (live view), 0xdb (HDR), 0x7b (otherwise)
@@ -3503,6 +3612,341 @@ my %binaryDataAttrs = (
     # 6: 0x0e
     # 7: 0x02 (live view), 0x06 (otherwise)
     # 8-10: 0x00
+);
+
+# face detect positions - ref PH (Optio RZ10)
+%Image::ExifTool::Pentax::FacePos = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    FORMAT => 'int16u',
+    0 => {
+        Name => 'Face1Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 1 ? undef : $val',
+        Notes => 'X/Y coordinates of face center in full-sized image',
+    },
+    2 => {
+        Name => 'Face2Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 2 ? undef : $val',
+    },
+    4 => {
+        Name => 'Face3Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 3 ? undef : $val',
+    },
+    6 => {
+        Name => 'Face4Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 4 ? undef : $val',
+    },
+    8 => {
+        Name => 'Face5Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 5 ? undef : $val',
+    },
+    10 => {
+        Name => 'Face6Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 6 ? undef : $val',
+    },
+    12 => {
+        Name => 'Face7Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 7 ? undef : $val',
+    },
+    14 => {
+        Name => 'Face8Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 8 ? undef : $val',
+    },
+    16 => {
+        Name => 'Face9Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 9 ? undef : $val',
+    },
+    18 => {
+        Name => 'Face10Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 10 ? undef : $val',
+    },
+    20 => {
+        Name => 'Face11Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 11 ? undef : $val',
+    },
+    22 => {
+        Name => 'Face12Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 12 ? undef : $val',
+    },
+    24 => {
+        Name => 'Face13Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 13 ? undef : $val',
+    },
+    26 => {
+        Name => 'Face14Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 14 ? undef : $val',
+    },
+    28 => {
+        Name => 'Face15Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 15 ? undef : $val',
+    },
+    30 => {
+        Name => 'Face16Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 16 ? undef : $val',
+    },
+    32 => {
+        Name => 'Face17Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 17 ? undef : $val',
+    },
+    34 => {
+        Name => 'Face18Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 18 ? undef : $val',
+    },
+    36 => {
+        Name => 'Face19Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 19 ? undef : $val',
+    },
+    38 => {
+        Name => 'Face20Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 20 ? undef : $val',
+    },
+    40 => {
+        Name => 'Face21Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 21 ? undef : $val',
+    },
+    42 => {
+        Name => 'Face22Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 22 ? undef : $val',
+    },
+    44 => {
+        Name => 'Face23Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 23 ? undef : $val',
+    },
+    46 => {
+        Name => 'Face24Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 24 ? undef : $val',
+    },
+    48 => {
+        Name => 'Face25Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 25 ? undef : $val',
+    },
+    50 => {
+        Name => 'Face26Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 26 ? undef : $val',
+    },
+    52 => {
+        Name => 'Face27Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 27 ? undef : $val',
+    },
+    54 => {
+        Name => 'Face28Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 28 ? undef : $val',
+    },
+    56 => {
+        Name => 'Face29Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 29 ? undef : $val',
+    },
+    58 => {
+        Name => 'Face30Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 30 ? undef : $val',
+    },
+    60 => {
+        Name => 'Face31Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 31 ? undef : $val',
+    },
+    62 => {
+        Name => 'Face32Position',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 32 ? undef : $val',
+    },
+);
+
+# face detect sizes - ref PH (Optio RZ10)
+%Image::ExifTool::Pentax::FaceSize = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    FORMAT => 'int16u',
+    0 => {
+        Name => 'Face1Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 1 ? undef : $val',
+    },
+    2 => {
+        Name => 'Face2Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 2 ? undef : $val',
+    },
+    4 => {
+        Name => 'Face3Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 3 ? undef : $val',
+    },
+    6 => {
+        Name => 'Face4Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 4 ? undef : $val',
+    },
+    8 => {
+        Name => 'Face5Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 5 ? undef : $val',
+    },
+    10 => {
+        Name => 'Face6Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 6 ? undef : $val',
+    },
+    12 => {
+        Name => 'Face7Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 7 ? undef : $val',
+    },
+    14 => {
+        Name => 'Face8Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 8 ? undef : $val',
+    },
+    16 => {
+        Name => 'Face9Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 9 ? undef : $val',
+    },
+    18 => {
+        Name => 'Face10Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 10 ? undef : $val',
+    },
+    20 => {
+        Name => 'Face11Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 11 ? undef : $val',
+    },
+    22 => {
+        Name => 'Face12Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 12 ? undef : $val',
+    },
+    24 => {
+        Name => 'Face13Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 13 ? undef : $val',
+    },
+    26 => {
+        Name => 'Face14Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 14 ? undef : $val',
+    },
+    28 => {
+        Name => 'Face15Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 15 ? undef : $val',
+    },
+    30 => {
+        Name => 'Face16Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 16 ? undef : $val',
+    },
+    32 => {
+        Name => 'Face17Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 17 ? undef : $val',
+    },
+    34 => {
+        Name => 'Face18Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 18 ? undef : $val',
+    },
+    36 => {
+        Name => 'Face19Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 19 ? undef : $val',
+    },
+    38 => {
+        Name => 'Face20Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 20 ? undef : $val',
+    },
+    40 => {
+        Name => 'Face21Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 21 ? undef : $val',
+    },
+    42 => {
+        Name => 'Face22Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 22 ? undef : $val',
+    },
+    44 => {
+        Name => 'Face23Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 23 ? undef : $val',
+    },
+    46 => {
+        Name => 'Face24Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 24 ? undef : $val',
+    },
+    48 => {
+        Name => 'Face25Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 25 ? undef : $val',
+    },
+    50 => {
+        Name => 'Face26Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 26 ? undef : $val',
+    },
+    52 => {
+        Name => 'Face27Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 27 ? undef : $val',
+    },
+    54 => {
+        Name => 'Face28Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 28 ? undef : $val',
+    },
+    56 => {
+        Name => 'Face29Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 29 ? undef : $val',
+    },
+    58 => {
+        Name => 'Face30Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 30 ? undef : $val',
+    },
+    60 => {
+        Name => 'Face31Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 31 ? undef : $val',
+    },
+    62 => {
+        Name => 'Face32Size',
+        Format => 'int16u[2]',
+        RawConv => '$$self{FacesDetected} < 32 ? undef : $val',
+    },
 );
 
 # digital filter information - ref PH (K-5)
@@ -3554,31 +3998,110 @@ my %binaryDataAttrs = (
     NOTES => 'Tags decoded from the electronic level information.',
     0 => {
         Name => 'LevelOrientation',
+        Mask => 0x0f,
+        PrintHex => 0,
         PrintConv => {
             1 => 'Horizontal (normal)',
             2 => 'Rotate 180',
             3 => 'Rotate 90 CW',
             4 => 'Rotate 270 CW',
-            9 => 'Unknown',
-            # 13 - got this when pointing up
-            # 33 - got this for Composition Adjust
+            9 => 'Horizontal; Off Level',
+            10 => 'Rotate 180; Off Level',
+            11 => 'Rotate 90 CW; Off Level',
+            12 => 'Rotate 270 CW; Off Level',
+            13 => 'Upwards',
+            14 => 'Downwards',
+        },
+    },
+    0.1 => {
+        Name => 'CompositionAdjust',
+        Mask => 0xf0,
+        PrintConv => {
+            0x00 => 'Off',
+            0x20 => 'Composition Adjust',
+            0xa0 => 'Composition Adjust + Horizon Correction',
+            0xc0 => 'Horizon Correction',
         },
     },
     1 => {
         Name => 'RollAngle',
-        Notes => 'extracted as degrees of clockwise rotation',
+        Notes => 'degrees of clockwise camera rotation',
         ValueConv => '-$val / 2',
         ValueConvInv => '-$val * 2',
     },
     2 => {
         Name => 'PitchAngle',
-        Notes => 'extracted as degrees of upward tilt',
+        Notes => 'degrees of upward camera tilt',
+        ValueConv => '-$val / 2',
+        ValueConvInv => '-$val * 2',
+    },
+    # 3,4 - related somehow to horizon correction and composition adjust
+    # 5,6,7 - (the notes below refer to how the image moves in the LCD monitor)
+    5 => {
+        Name => 'CompositionAdjustX',
+        Notes => 'steps to the right, 1/16 mm per step',
+        ValueConv => '-$val',
+        ValueConvInv => '-$val',
+    },
+    6 => {
+        Name => 'CompositionAdjustY',
+        Notes => 'steps up, 1/16 mm per step',
+        ValueConv => '-$val',
+        ValueConvInv => '-$val',
+    },
+    7 => {
+        Name => 'CompositionAdjustRotation',
+        Notes => 'steps clockwise, 1/8 degree per step',
         ValueConv => '-$val / 2',
         ValueConvInv => '-$val * 2',
     },
 );
 
-# unknown information - PH
+# temperature information for the K5 - PH
+%Image::ExifTool::Pentax::TempInfoK5 = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        A number of additional temperature readings are extracted from this 256-byte
+        binary-data block in images from the K-5.  It is not currently known where
+        the corresponding temperature sensors are located in the camera.
+    },
+    # (it would be nice to know where these temperature sensors are located,
+    #  but since according to the manual the Slow Shutter Speed NR Auto mode
+    #  is based on "internal temperature", my guess is that there must be
+    #  at least one on the sensor itself.  These temperatures seem to rise
+    #  more quickly than CameraTemperature when shooting video.)
+    0x0c => {
+        Name => 'CameraTemperature2',
+        Format => 'int16s',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+        PrintConv => 'sprintf("%.1f C", $val)',
+        PrintConvInv => '$val=~s/ ?c$//i; $val',
+    },
+    0x0e => {
+        Name => 'CameraTemperature3',
+        Format => 'int16s',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+        PrintConv => 'sprintf("%.1f C", $val)',
+        PrintConvInv => '$val=~s/ ?c$//i; $val',
+    },
+    0x14 => {
+        Name => 'CameraTemperature4',
+        Format => 'int16s',
+        PrintConv => '"$val C"',
+        PrintConvInv => '$val=~s/ ?c$//i; $val',
+    },
+    0x16 => { # usually the same as CameraTemperature4, but not always
+        Name => 'CameraTemperature5',
+        Format => 'int16s',
+        PrintConv => '"$val C"',
+        PrintConvInv => '$val=~s/ ?c$//i; $val',
+    },
+);
+
+# currently unknown info
 %Image::ExifTool::Pentax::UnknownInfo = (
     %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -3587,31 +4110,6 @@ my %binaryDataAttrs = (
     # byte 0-1 - Higher for high color temperatures (red boost or red noise suppression?)
     # byte 6-7 - Higher for low color temperatures (blue boost or blue noise suppression?)
     # also changing are bytes 10,11,14,15
-    0x0c => {
-        Name => 'CameraTemperature2',
-        # (it would be nice to know where these temperature sensors are located,
-        #  but since according to the manual the Slow Shutter Speed NR Auto mode
-        #  is based on "internal temperature", my guess is on the sensor itself.
-        #  These temperatures seem to rise more quickly than CameraTemperature when
-        #  shooting video.)
-        Condition => '$$self{Model} =~ /K-5\b/',
-        Format => 'int16s',
-        Notes => 'K-5 only',
-        ValueConv => '$val / 10',
-        ValueConvInv => '$val * 10',
-        PrintConv => 'sprintf("%.1f C", $val)',
-        PrintConvInv => '$val=~s/ ?c$//i; $val',
-    },
-    0x0e => {
-        Name => 'CameraTemperature3',
-        Condition => '$$self{Model} =~ /K-5\b/',
-        Format => 'int16s',
-        Notes => 'K-5 only',
-        ValueConv => '$val / 10',
-        ValueConvInv => '$val * 10',
-        PrintConv => 'sprintf("%.1f C", $val)',
-        PrintConvInv => '$val=~s/ ?c$//i; $val',
-    },
 );
 
 # Pentax type 2 (Casio-like) maker notes (ref 1)
@@ -3820,6 +4318,17 @@ my %binaryDataAttrs = (
     },
 );
 
+# Pentax metadata in AVI videos from the RS1000 (PH)
+%Image::ExifTool::Pentax::Junk = (
+    NOTES => 'Tags found in the JUNK chunk of AVI videos from the RS1000.',
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0x0c => {
+        Name => 'Model',
+        Format => 'string[32]',
+    },
+);
+
 #------------------------------------------------------------------------------
 # Convert filter settings (ref PH, K-5)
 # Inputs: 0) value to convert, 1) flag for inverse conversion, 2) lookup table
@@ -3966,8 +4475,8 @@ Pentax and Asahi maker notes in EXIF information.
 
 I couldn't find a good source for Pentax maker notes information, but I've
 managed to discover a fair bit of information by analyzing sample images
-downloaded from the internet, and through tests with my own Optio WP and
-K10D, and with help provided by other ExifTool users (see
+downloaded from the internet, and through tests with my own Optio WP,
+K10D, and K-5, and with help provided by other ExifTool users (see
 L</ACKNOWLEDGEMENTS>).
 
 The Pentax maker notes are stored in standard EXIF format, but the offsets
@@ -4007,7 +4516,7 @@ decoding.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

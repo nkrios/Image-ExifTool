@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.40
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.42
 [File, System, Image] FileName - File Name: Writer_10_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 6.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:11:20 08:21:46-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:12:08 08:56:21-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -169,7 +169,7 @@
 [MakerNotes, Pentax, Camera] 10.1 - Nominal Min Aperture: 23
 [MakerNotes, Pentax, Camera] 14.1 - Max Aperture: 3.9
 [MakerNotes, Pentax, Camera] 0 - Flash Status: Off
-[MakerNotes, Pentax, Camera] 1 - Internal Flash Mode: Off, Wireless (Master)
+[MakerNotes, Pentax, Camera] 1 - Internal Flash Mode: Did not fire, Wireless (Master)
 [MakerNotes, Pentax, Camera] 2 - External Flash Mode: Off
 [MakerNotes, Pentax, Camera] 3 - Internal Flash Strength: 18
 [MakerNotes, Pentax, Camera] 4 - TTL DA A Up: 0
@@ -208,7 +208,7 @@
 [MakerNotes, Pentax, Image] 16 - WB Shift AB: 0
 [MakerNotes, Pentax, Image] 17 - WB Shift MG: 0
 [PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0300
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.40
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.42
 [XMP, XMP-dc, Time] date - Date: 2008:03:02
 [XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -
 [XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8

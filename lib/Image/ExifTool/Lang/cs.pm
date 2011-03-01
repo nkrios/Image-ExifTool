@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::cs;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 %Image::ExifTool::Lang::cs::Translate = (
    'AEMeteringMode' => {
@@ -75,11 +75,6 @@ $VERSION = '1.03';
     },
    'Author' => 'Autor',
    'AuthorsPosition' => 'Pozice autora',
-   'AutoBracketRelease' => {
-      PrintConv => {
-        'None' => 'Žádná',
-      },
-    },
    'AutoLightingOptimizer' => {
       PrintConv => {
         'Low' => 'Méně',
@@ -91,7 +86,7 @@ $VERSION = '1.03';
         'Rotate 180' => '180° (dolů/vpravo)',
         'Rotate 270 CW' => '90° po směru HR (vlevo/dolů)',
         'Rotate 90 CW' => '90° ptoti směru HR (vpravo/nahoru)',
-        'Unknown' => 'Neznámý',
+        'n/a' => 'Neznámý',
       },
     },
    'BadFaxLines' => 'Špatné faxové řádky',
@@ -134,7 +129,7 @@ $VERSION = '1.03';
         'Standard Light A' => 'Standardní světlo A',
         'Standard Light B' => 'Standardní světlo B',
         'Standard Light C' => 'Standardní světlo C',
-        'Tungsten' => 'Zářivka',
+        'Tungsten (Incandescent)' => 'Zářivka',
         'Unknown' => 'Neznámý',
         'White Fluorescent' => 'Bílá zářivka',
       },
@@ -155,7 +150,7 @@ $VERSION = '1.03';
         'Standard Light A' => 'Standardní světlo A',
         'Standard Light B' => 'Standardní světlo B',
         'Standard Light C' => 'Standardní světlo C',
-        'Tungsten' => 'Zářivka',
+        'Tungsten (Incandescent)' => 'Zářivka',
         'Unknown' => 'Neznámý',
         'White Fluorescent' => 'Bílá zářivka',
       },
@@ -261,7 +256,6 @@ $VERSION = '1.03';
    'Compression' => {
       Description => 'Kompresní algoritmus',
       PrintConv => {
-        'Epson ERF Compressed' => 'Epson ERF komprese',
         'JPEG' => 'JPEG komprese',
         'JPEG (old-style)' => 'JPEG (pův. verze)',
         'Kodak DCR Compressed' => 'Kodak DCR komprese',
@@ -1558,7 +1552,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

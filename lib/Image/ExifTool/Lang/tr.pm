@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::tr;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 %Image::ExifTool::Lang::tr::Translate = (
    'Album' => 'Albüm',
@@ -24,6 +24,48 @@ $VERSION = '1.01';
    'Brightness' => 'Parlaklık',
    'By-line' => 'Yazar',
    'CFAPattern' => 'CFA deseni',
+   'CalibrationIlluminant1' => {
+      PrintConv => {
+        'Cloudy' => 'Bulutlu Hava',
+        'Cool White Fluorescent' => 'Soğuk beyaz floresan (W 3800 - 4500K)',
+        'Day White Fluorescent' => 'Gün beyaz floresan (N 4600 - 5500K)',
+        'Daylight' => 'Günışığı',
+        'Daylight Fluorescent' => 'Günışığı floresan (D 5700 - 7100K)',
+        'Fine Weather' => 'İyi hava',
+        'Flash' => 'Flaş',
+        'Fluorescent' => 'Floresan',
+        'ISO Studio Tungsten' => 'ISO stüdyo tungsten',
+        'Other' => 'diğer ışık kaynağı',
+        'Shade' => 'Gölge',
+        'Standard Light A' => 'Standard Işık A',
+        'Standard Light B' => 'Standard Işık B',
+        'Standard Light C' => 'Standard Işık C',
+        'Tungsten (Incandescent)' => 'Tungsten',
+        'Unknown' => 'bilinmeyen',
+        'White Fluorescent' => 'Beyaz floresan (WW 3250 - 3800K)',
+      },
+    },
+   'CalibrationIlluminant2' => {
+      PrintConv => {
+        'Cloudy' => 'Bulutlu Hava',
+        'Cool White Fluorescent' => 'Soğuk beyaz floresan (W 3800 - 4500K)',
+        'Day White Fluorescent' => 'Gün beyaz floresan (N 4600 - 5500K)',
+        'Daylight' => 'Günışığı',
+        'Daylight Fluorescent' => 'Günışığı floresan (D 5700 - 7100K)',
+        'Fine Weather' => 'İyi hava',
+        'Flash' => 'Flaş',
+        'Fluorescent' => 'Floresan',
+        'ISO Studio Tungsten' => 'ISO stüdyo tungsten',
+        'Other' => 'diğer ışık kaynağı',
+        'Shade' => 'Gölge',
+        'Standard Light A' => 'Standard Işık A',
+        'Standard Light B' => 'Standard Işık B',
+        'Standard Light C' => 'Standard Işık C',
+        'Tungsten (Incandescent)' => 'Tungsten',
+        'Unknown' => 'bilinmeyen',
+        'White Fluorescent' => 'Beyaz floresan (WW 3250 - 3800K)',
+      },
+    },
    'Caption-Abstract' => 'Açıklama',
    'CaptionWriter' => 'Açıklama Yazarı',
    'Categories' => 'Kategoriler',
@@ -265,8 +307,8 @@ $VERSION = '1.01';
       Description => 'Işık kaynağı',
       PrintConv => {
         'Cloudy' => 'Bulutlu Hava',
-        'Cool White Fluorescent' => 'Soğuk beyaz floresan (W 3900 - 4500K)',
-        'Day White Fluorescent' => 'Gün beyaz floresan',
+        'Cool White Fluorescent' => 'Soğuk beyaz floresan (W 3800 - 4500K)',
+        'Day White Fluorescent' => 'Gün beyaz floresan (N 4600 - 5500K)',
         'Daylight' => 'Günışığı',
         'Daylight Fluorescent' => 'Günışığı floresan (D 5700 - 7100K)',
         'Fine Weather' => 'İyi hava',
@@ -280,7 +322,7 @@ $VERSION = '1.01';
         'Standard Light C' => 'Standard Işık C',
         'Tungsten (Incandescent)' => 'Tungsten',
         'Unknown' => 'bilinmeyen',
-        'White Fluorescent' => 'Beyaz floresan (WW 3200 - 3700K)',
+        'White Fluorescent' => 'Beyaz floresan (WW 3250 - 3800K)',
       },
     },
    'Lightness' => 'Işık',
@@ -315,8 +357,8 @@ $VERSION = '1.01';
    'PlanarConfiguration' => {
       Description => 'İmaj veri aranjmanı',
       PrintConv => {
-        'Chunky' => 'chunky format',
-        'Planar' => 'planar format',
+        'Chunky' => 'Chunky format',
+        'Planar' => 'Planar format',
       },
     },
    'PrimaryChromaticities' => 'İlklerin kromatikleri',
@@ -471,7 +513,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

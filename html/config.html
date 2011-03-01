@@ -23,10 +23,12 @@
 #
 #               To activate this file, rename it to ".ExifTool_config" and
 #               place it in your home directory or the exiftool application
-#               directory (to do this in Windows, use the "rename" command at
-#               the command line).  This causes ExifTool to automatically
-#               load the file when run.  Your home directory is determined by
-#               the first defined of the following environment variables:
+#               directory.  (On Windows and Mac systems this must be done via
+#               the command line since the GUI's don't allow filenames to begin
+#               with a dot.  Use the "rename" command in Windows or "mv" on the
+#               Mac.)  This causes ExifTool to automatically load the file when
+#               run.  Your home directory is determined by the first defined of
+#               the following environment variables:
 #
 #                   1. EXIFTOOL_HOME
 #                   2. HOME
@@ -39,7 +41,7 @@
 #
 #                   exiftool -config ExifTool_config ...
 #
-#               This sample file defines the following 13 new tags as well as a
+#               This sample file defines the following 12 new tags as well as a
 #               number of Shortcut and Composite tags:
 #
 #                   1.  EXIF:NewEXIFTag
@@ -48,13 +50,12 @@
 #                   4.  XMP-xxx:NewXMPxxxTag1
 #                   5.  XMP-xxx:NewXMPxxxTag2
 #                   6.  XMP-xxx:NewXMPxxxTag3
-#                   7.  XMP-xxx:NewXMPxxxStructX
-#                   8.  XMP-xxx:NewXMPxxxStructY
-#                   9.  PNG:NewPngTag1
-#                  10.  PNG:NewPngTag2
-#                  11.  PNG:NewPngTag3
-#                  12.  MIE-Meta:NewMieTag1
-#                  13.  MIE-Test:NewMieTag2
+#                   7.  XMP-xxx:NewXMPxxxStruct
+#                   8.  PNG:NewPngTag1
+#                   9.  PNG:NewPngTag2
+#                  10.  PNG:NewPngTag3
+#                  11.  MIE-Meta:NewMieTag1
+#                  12.  MIE-Test:NewMieTag2
 #
 #               For detailed information on the definition of tag tables and
 #               tag information hashes, see lib/Image/ExifTool/README.
@@ -96,7 +97,7 @@
     },
     <span class='com'># new XMP namespaces (ie. xxx) must be added to the Main XMP table:</span>
     'Image::ExifTool::XMP::Main' =&gt; {
-        xxx =&gt; { <span class='com'># <-- must be the same as the NAMESPACE prefix</span>
+        xxx =&gt; { <span class='com'># &lt;-- must be the same as the NAMESPACE prefix</span>
             SubDirectory =&gt; {
                 TagTable =&gt; 'Image::ExifTool::UserDefined::xxx',
                 <span class='com'># (see the definition of this table below)</span>
@@ -162,43 +163,54 @@
     },
 );
 
-<span class='com'># This is a basic example of the definition for a new XMP namespace.
+<a name='xmp-xxx'><span class='com'># This is a basic example of the definition for a new XMP namespace.
 # This table is referenced through a SubDirectory tag definition
 # in the %Image::ExifTool::UserDefined definition above.
 # The namespace prefix for these tags is 'xxx', which corresponds to
-# an ExifTool family 1 group name of 'XMP-xxx'.</span>
+# an ExifTool family 1 group name of 'XMP-xxx'.</span></a>
 %Image::ExifTool::UserDefined::xxx = (
     GROUPS =&gt; { 0 =&gt; 'XMP', 1 =&gt; 'XMP-xxx', 2 =&gt; 'Image' },
     NAMESPACE =&gt; { 'xxx' =&gt; 'http://ns.myname.com/xxx/1.0/' },
     WRITABLE =&gt; 'string',
     <span class='com'># replace "NewXMPxxxTag1" with your own tag name (ie. "MyTag")</span>
-    NewXMPxxxTag1 =&gt; { },
+    NewXMPxxxTag1 =&gt; { Writable => 'lang-alt' },
     NewXMPxxxTag2 =&gt; { Groups =&gt; { 2 =&gt; 'Author' } },
     NewXMPxxxTag3 =&gt; { List =&gt; 'Bag' },
-    <span class='com'># XMP structures are defined as SubDirectory's</span>
-    NewXMPxxxStruct =&gt; {
-        SubDirectory =&gt; { },  <span class='com'># treat as a subdirectory containing other tags</span>
-        Struct =&gt; 'MyStruct', <span class='com'># arbitrary name identifies entry in xmpStruct</span>
-        List =&gt; 'Seq',        <span class='com'># structures may also be elements of a list</span>
+    <span class='com'># example structured XMP tag</span>
+    NewXMPxxxStruct => {
+        <span class='com'># a structure with 3 fields (X, Y and Things):</span>
+        Struct =&gt; {
+            <span class='com'># optional namespace prefix and URI for structure fields
+            # (required only if different than NAMESPACE above)</span>
+            NAMESPACE =&gt; { 'test' =&gt; 'http://x.y.z/test/' },
+            <span class='com'># optional structure name (used for warning messages only)</span>
+            STRUCT_NAME =&gt; 'MyStruct',
+            <span class='com'># optional rdf:type property for the structure</span>
+            TYPE =&gt; 'http://x.y.z/test/xystruct',
+            <span class='com'># structure fields (very similar to tag definitions)</span>
+            X =&gt; { Writable =&gt; 'integer' },
+            Y =&gt; { Writable =&gt; 'integer' },
+            <span class='com'># a nested structure...</span>
+            Things =&gt; {
+                List =&gt; 'Bag',
+                Struct =&gt; {
+                    NAMESPACE =&gt; { thing =&gt; 'http://x.y.z/thing/' },
+                    What  =&gt; { },
+                    Where =&gt; { },
+                },
+            },
+        },
+        List =&gt; 'Seq', <span class='com'># structures may also be elements of a list</span>
     },
-    <span class='com'># structure elements must be defined as separate tags.  The tag ID's
-    # are the concatination of the structure tag ID with the ID of each
-    # structure element in turn.  The list flag should be set if the
-    # parent structure is contained in a list.</span>
-    NewXMPxxxStructX =&gt; { List =&gt; 1 },
-    NewXMPxxxStructY =&gt; { List =&gt; 1 },
-);
-
-<span class='com'># User-defined XMP structures are added to the xmpStruct lookup</span>
-%Image::ExifTool::UserDefined::xmpStruct = (
-    <span class='com'># A structure with 2 elements: X and Y</span>
-    MyStruct =&gt; {
-        NAMESPACE =&gt; { 'test' =&gt; 'http://x.y.z/test/' },
-        <span class='com'># TYPE is optional -- it adds an rdf:type element to the structure</span>
-        TYPE =&gt; 'http://x.y.z/test/xystruct',
-        X =&gt; { },
-        Y =&gt; { },
-    },
+<span class='com'>    # Each field in the structure has an automatically-generated
+    # corresponding flattened tag with an ID that is the concatenation
+    # of the original structure tag ID and the field name (after
+    # capitalizing the first letter of the field name if necessary).
+    # The Name and/or Description of these flattened tags may be changed
+    # if desired, but all other tag properties are taken from the
+    # structure field definition.  When this is done, the "Flat" flag
+    # must also be set in the tag definition.  For example:</span>
+    NewXMPxxxStructX => { Name => 'SomeOtherName', Flat => 1 },
 );
 
 <span class='com'># Adding a new MIE group requires a few extra definitions</span>
@@ -214,7 +226,7 @@ use Image::ExifTool::MIE;
 # in the logic to determine a lens model for the Composite:LensID tag</span>
 @Image::ExifTool::UserDefined::Lenses = (
     'Sigma AF 10-20mm F4-5.6 EX DC',
-    'Tamron 35-90mm F4 AF',
+    'Tokina AF193-2 19-35mm f/3.5-4.5',
 );
 
 <span class='com'># Specify default ExifTool option values

@@ -423,15 +423,15 @@ sub AUTOLOAD
 
 #------------------------------------------------------------------------------
 # Convert from PDF to EXIF-style date/time
-# Inputs: 0) PDF date/time string (D:yyyymmddhhmmss+hh'mm')
-# Returns: EXIF date string (yyyy:mm:dd hh:mm:ss+hh:mm)
+# Inputs: 0) PDF date/time string (D:YYYYmmddHHMMSS+HH'MM')
+# Returns: EXIF date string (YYYY:mm:dd HH:MM:SS+HH:MM)
 sub ConvertPDFDate($)
 {
     my $date = shift;
     # remove optional 'D:' prefix
     $date =~ s/^D://;
     # fill in default values if necessary
-    #              yyyymmddhhmmss
+    #              YYYYmmddHHMMSS
     my $default = '00000101000000';
     if (length $date < length $default) {
         $date .= substr($default, length $date);
@@ -905,7 +905,7 @@ sub ReadToNested($;$)
             next unless $2 eq '>>' and $delim[0] eq '>';
             pos($$dataPt) = pos($$dataPt) - 1;
         }
-        my $delim = shift @delim;   # remove from nesting list
+        shift @delim;               # remove from nesting list
         next if $delim[0];          # keep going if we have more nested delimiters
         my $pos = pos($$dataPt);
         my $buff = substr($$dataPt, 0, $pos);
@@ -1908,7 +1908,7 @@ including AESV2 (AES-128) and AESV3 (AES-256).
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

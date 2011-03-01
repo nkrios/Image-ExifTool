@@ -28,7 +28,8 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg','*:*');
+    $exifTool->SetNewValuesFromFile('t/images/IPTC.jpg','*:*');
+    $exifTool->SetNewValuesFromFile('t/images/XMP.jpg','*:*');
     $exifTool->SetNewValue(Title => 'new title');
     $exifTool->SetNewValue(Copyright => 'my copyright');
     $exifTool->SetNewValue(Creator => 'phil made it', Replace => 1);

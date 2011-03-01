@@ -28,7 +28,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.57';
+$VERSION = '1.59';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -658,7 +658,7 @@ my %shootingMode = (
         Name => 'FilmMode',
         Writable => 'int16u',
         PrintConv => {
-            # have seen 0 for GF2 - PH
+            0 => 'n/a', #PH (ie. FZ100 "Photo Frame" ShootingMode)
             1 => 'Standard (color)',
             2 => 'Dynamic (color)',
             3 => 'Nature (color)',
@@ -1407,9 +1407,9 @@ my %shootingMode = (
         Format => 'int16u[4]',
         RawConv => '$$self{NumFacePositions} < 1 ? undef : $val',
         Notes => q{
-            4 numbers: 1-2. X-Y coordinates of the face center, 3-4. Width-height of
-            face.  Coordinates are relative to an image twice the size of the thumbnail,
-            or 320 pixels wide
+            4 numbers: X/Y coordinates of the face center and width/height of face. 
+            Coordinates are relative to an image twice the size of the thumbnail, or 320
+            pixels wide
         },
     },
     5 => {
@@ -1712,7 +1712,7 @@ Panasonic and Leica maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

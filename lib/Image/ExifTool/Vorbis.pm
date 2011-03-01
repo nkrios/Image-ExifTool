@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 my $MAX_PACKETS = 2;    # maximum packets to scan from each stream at start of file
 
@@ -54,16 +54,19 @@ sub DecodeCoverArt($);
         Name => 'MaximumBitrate',
         Format => 'int32u',
         RawConv => '$val || undef',
+        PrintConv => 'ConvertBitrate($val)',
     },
     13 => {
         Name => 'NominalBitrate',
         Format => 'int32u',
         RawConv => '$val || undef',
+        PrintConv => 'ConvertBitrate($val)',
     },
     17 => {
         Name => 'MinimumBitrate',
         Format => 'int32u',
         RawConv => '$val || undef',
+        PrintConv => 'ConvertBitrate($val)',
     },
 );
 
@@ -329,7 +332,7 @@ information from Ogg Vorbis and Ogg FLAC audio files.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

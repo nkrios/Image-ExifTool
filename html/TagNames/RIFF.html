@@ -23,11 +23,13 @@ information is also extracted.</p>
 <td>OlympusJunk
   <br>CasioJunk
   <br>RicohJunk
-  <br>UnknownJunk</td>
-<td class=c>-<br>-<br>-<br>N</td>
+  <br>PentaxJunk
+  <br>TextJunk</td>
+<td class=c>-<br>-<br>-<br>-<br>N</td>
 <td>--&gt; <a href='Olympus.html#AVI'>Olympus AVI Tags</a>
   <br>--&gt; <a href='EXIF.html'>EXIF Tags</a>
-  <br>--&gt; <a href='Ricoh.html#AVI'>Ricoh AVI Tags</a></td></tr>
+  <br>--&gt; <a href='Ricoh.html#AVI'>Ricoh AVI Tags</a>
+  <br>--&gt; <a href='Pentax.html#Junk'>Pentax Junk Tags</a></td></tr>
 <tr class=b>
 <td>'JUNQ'</td>
 <td>OldXMP</td>
@@ -613,7 +615,20 @@ by some software.</p>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td>'dmlh'</td>
-<td>ExtendedAVIHeader?</td>
+<td>ExtendedAVIHeader</td>
+<td class=c>-</td>
+<td>--&gt; <a href='RIFF.html#ExtAVIHdr'>RIFF ExtAVIHdr Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ExtAVIHdr'>RIFF ExtAVIHdr Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>TotalFrameCount</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -649,7 +664,8 @@ by some software.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='StreamData'>RIFF StreamData Tags</a></h2>
-<p>This chunk contains EXIF information in FujiFilm AVI videos.</p>
+<p>This chunk is used to store proprietary information in AVI videos from some
+cameras.  The first 4 characters of the data are used as the Tag ID below.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -666,6 +682,11 @@ by some software.</p>
 <td class=c>-</td>
 <td>--&gt; <a href='Casio.html#AVI'>Casio AVI Tags</a></td></tr>
 <tr>
+<td>'Zora'</td>
+<td>VendorName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'unknown'</td>
 <td>UnknownData</td>
 <td class=c>N</td>
@@ -1088,7 +1109,7 @@ by some software.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 7, 2010</i>
+<br><i>Last revised Jan 3, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

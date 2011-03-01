@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Canon;
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub ProcessRealMeta($$$);
 sub ProcessRealProperties($$$);
@@ -90,8 +90,8 @@ my %metadataFlag = (
     PROCESS_PROC => \&Image::ExifTool::Canon::ProcessSerialData,
     VARS => { ID_LABEL => 'Sequence' },
     FORMAT => 'int32u',
-    0  => 'MaxBitrate',
-    1  => 'AvgBitrate',
+    0  => { Name => 'MaxBitrate', PrintConv => 'ConvertBitrate($val)' },
+    1  => { Name => 'AvgBitrate', PrintConv => 'ConvertBitrate($val)' },
     2  => 'MaxPacketSize',
     3  => 'AvgPacketSize',
     4  => 'NumPackets',
@@ -119,8 +119,8 @@ my %metadataFlag = (
     FORMAT => 'int32u',
     PRIORITY => 0,  # first stream takes priority
     0  => { Name => 'StreamNumber',  Format => 'int16u' },
-    1  => { Name => 'StreamMaxBitrate' },
-    2  => { Name => 'StreamAvgBitrate' },
+    1  => { Name => 'StreamMaxBitrate', PrintConv => 'ConvertBitrate($val)' },
+    2  => { Name => 'StreamAvgBitrate', PrintConv => 'ConvertBitrate($val)' },
     3  => { Name => 'StreamMaxPacketSize' },
     4  => { Name => 'StreamAvgPacketSize' },
     5  => { Name => 'StreamStartTime' },
@@ -712,7 +712,7 @@ little-endian, but the Real format is big-endian.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

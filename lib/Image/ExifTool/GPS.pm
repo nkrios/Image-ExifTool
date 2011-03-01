@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.33';
+$VERSION = '1.34';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -40,6 +40,11 @@ my %coordConv = (
         Writable => 'string',
         Count => 2,
         PrintConv => {
+            # extract N/S if written from Composite:GPSLatitude
+            OTHER => sub {
+                my ($val, $inv) = @_;
+                return ($inv and $val =~ /\b([NS])$/i) ? uc $1 : undef;
+            },
             N => 'North',
             S => 'South',
         },
@@ -55,6 +60,11 @@ my %coordConv = (
         Writable => 'string',
         Count => 2,
         PrintConv => {
+            # extract E/W if written from Composite:GPSLongitude
+            OTHER => sub {
+                my ($val, $inv) = @_;
+                return ($inv and $val =~ /\b([EW])$/i) ? uc $1 : undef;
+            },
             E => 'East',
             W => 'West',
         },
@@ -262,7 +272,7 @@ my %coordConv = (
         Name => 'GPSDateStamp',
         Groups => { 2 => 'Time' },
         Writable => 'string',
-        Notes => 'YYYY:MM:DD',
+        Notes => 'YYYY:mm:dd',
         Count => 11,
         Shift => 'Time',
         Notes => q{
@@ -334,18 +344,19 @@ my %coordConv = (
     },
     GPSAltitude => {
         SubDoc => 1,    # generate for all sub-documents
-        Require => {
-            0 => 'GPSAltitudeRef',
-        },
         Desire => {
-            1 => 'GPS:GPSAltitude',
+            0 => 'GPS:GPSAltitude',
+            1 => 'GPS:GPSAltitudeRef',
             2 => 'XMP:GPSAltitude',
+            3 => 'XMP:GPSAltitudeRef',
         },
+        # Require either GPS:GPSAltitudeRef or XMP:GPSAltitudeRef
+        RawConv => '(defined $val[1] or defined $val[3]) ? $val : undef',
         ValueConv => q{
-            my $alt = $val[1];
+            my $alt = $val[0];
             $alt = $val[2] unless defined $alt;
             return undef unless defined $alt;
-            return $val[0] ? -$alt : $alt;
+            return ($val[1] || $val[3]) ? -$alt : $alt;
         },
         PrintConv => q{
             $val = int($val * 10) / 10;
@@ -459,7 +470,7 @@ GPS (Global Positioning System) meta information in EXIF data.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

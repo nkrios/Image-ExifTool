@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::ru;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 %Image::ExifTool::Lang::ru::Translate = (
    'ActiveArea' => 'Активная область',
@@ -54,13 +54,47 @@ $VERSION = '1.01';
    'CalibrationIlluminant1' => {
       Description => 'Калибровочный иллюминант №1',
       PrintConv => {
-        'Unknown' => 'Неизвестно',
+        'Cloudy' => 'Облачность',
+        'Cool White Fluorescent' => 'Флуоресцентный белый холодный (W 3800 - 4500K)',
+        'Day White Fluorescent' => 'Флуоресцентный белый дневной',
+        'Daylight' => 'Дневной свет',
+        'Daylight Fluorescent' => 'Флуоресцентный белый дневного света (D 5700 - 7100K)',
+        'Fine Weather' => 'Ясная погода',
+        'Flash' => 'Вспышка',
+        'Fluorescent' => 'Флуоресцентный',
+        'ISO Studio Tungsten' => 'ISO для студийных ламп накаливания',
+        'Other' => 'другой источник света',
+        'Shade' => 'Тень',
+        'Standard Light A' => 'Стандартный свет A',
+        'Standard Light B' => 'Стандартный свет B',
+        'Standard Light C' => 'Стандартный свет C',
+        'Tungsten (Incandescent)' => 'Лампа накаливания (яркий свет)',
+        'Unknown' => 'неизвестно',
+        'Warm White Fluorescent' => 'Флуоресцентный теплый белый (L 2600 - 3250K)',
+        'White Fluorescent' => 'Флуоресцентный белый (WW 3250 - 3800K)',
       },
     },
    'CalibrationIlluminant2' => {
       Description => 'Калибровочный иллюминант №2',
       PrintConv => {
-        'Unknown' => 'Неизвестно',
+        'Cloudy' => 'Облачность',
+        'Cool White Fluorescent' => 'Флуоресцентный белый холодный (W 3800 - 4500K)',
+        'Day White Fluorescent' => 'Флуоресцентный белый дневной',
+        'Daylight' => 'Дневной свет',
+        'Daylight Fluorescent' => 'Флуоресцентный белый дневного света (D 5700 - 7100K)',
+        'Fine Weather' => 'Ясная погода',
+        'Flash' => 'Вспышка',
+        'Fluorescent' => 'Флуоресцентный',
+        'ISO Studio Tungsten' => 'ISO для студийных ламп накаливания',
+        'Other' => 'другой источник света',
+        'Shade' => 'Тень',
+        'Standard Light A' => 'Стандартный свет A',
+        'Standard Light B' => 'Стандартный свет B',
+        'Standard Light C' => 'Стандартный свет C',
+        'Tungsten (Incandescent)' => 'Лампа накаливания (яркий свет)',
+        'Unknown' => 'неизвестно',
+        'Warm White Fluorescent' => 'Флуоресцентный теплый белый (L 2600 - 3250K)',
+        'White Fluorescent' => 'Флуоресцентный белый (WW 3250 - 3800K)',
       },
     },
    'CameraCalibration1' => 'Калибровочная матрица фотоаппарата №1',
@@ -81,9 +115,28 @@ $VERSION = '1.01';
    'ColorFilter' => 'Цветовой фильтр',
    'ColorMatrix1' => 'Цветовая матрица №1',
    'ColorMatrix2' => 'Цветовая матрица №2',
+   'ColorMode' => {
+      Description => 'ТворческийСтиль',
+      PrintConv => {
+        'Autumn Leaves' => 'Осенние листья',
+        'B&W' => 'Черно-белое',
+        'Clear' => 'Прозрачный',
+        'Deep' => 'Глубокий',
+        'Landscape' => 'Пейзаж',
+        'Light' => 'Бледный',
+        'Neutral' => 'Нейтральный',
+        'Night View' => 'Ночной вид',
+        'Night View/Portrait' => 'Ночной портрет',
+        'Portrait' => 'Портрет',
+        'Standard' => 'Стандартное',
+        'Sunset' => 'Закат',
+        'Vivid' => 'Яркий цвет',
+      },
+    },
    'ColorSpace' => {
       Description => 'Данные о цветовой среде',
       PrintConv => {
+        'ICC Profile' => 'Профиль ICC',
         'Uncalibrated' => 'Не калиброванный',
       },
     },
@@ -136,6 +189,20 @@ $VERSION = '1.01';
    'DigitalZoomRatio' => 'Показатель цифрового зума',
    'Directory' => '"Файл, размещение"',
    'DriveMode' => 'Режим спуска',
+   'DynamicRangeOptimizer' => {
+      Description => 'Оптим.Д-диапаз.',
+      PrintConv => {
+        'Advanced Auto' => 'Улучш.авто',
+        'Advanced Lv1' => 'Улучш.уровень1',
+        'Advanced Lv2' => 'Улучш.уровень2',
+        'Advanced Lv3' => 'Улучш.уровень3',
+        'Advanced Lv4' => 'Улучш.уровень4',
+        'Advanced Lv5' => 'Улучш.уровень5',
+        'Auto' => 'Авто',
+        'Off' => 'Отключено',
+        'Standard' => 'Стандартное',
+      },
+    },
    'ExifImageHeight' => 'Допустимая высота снимка',
    'ExifImageWidth' => 'Допустимая ширина снимка',
    'ExifOffset' => 'Exif IFD указатель',
@@ -309,7 +376,23 @@ $VERSION = '1.01';
     },
    'Gamma' => 'Гамма',
    'Gradation' => 'Впечатляющ.режим',
+   'HDR' => {
+      Description => 'Авто HDR',
+      PrintConv => {
+        'Off' => 'Отключено',
+      },
+    },
    'Headline' => 'Заголовок',
+   'HighISONoiseReduction' => {
+      Description => 'NR высокого ISO',
+      PrintConv => {
+        'Auto' => 'Авто',
+        'High' => 'Hi',
+        'Low' => 'Lo',
+        'Normal' => 'Нормальная',
+        'Off' => 'Отключено',
+      },
+    },
    'Hue' => 'Оттенок',
    'ISO' => 'Значение ISO',
    'ImageHeight' => 'Высота снимка',
@@ -328,7 +411,7 @@ $VERSION = '1.01';
       Description => 'Источник света',
       PrintConv => {
         'Cloudy' => 'Облачность',
-        'Cool White Fluorescent' => 'Флуоресцентный белый холодный (W 3900 - 4500K)',
+        'Cool White Fluorescent' => 'Флуоресцентный белый холодный (W 3800 - 4500K)',
         'Day White Fluorescent' => 'Флуоресцентный белый дневной',
         'Daylight' => 'Дневной свет',
         'Daylight Fluorescent' => 'Флуоресцентный белый дневного света (D 5700 - 7100K)',
@@ -343,7 +426,8 @@ $VERSION = '1.01';
         'Standard Light C' => 'Стандартный свет C',
         'Tungsten (Incandescent)' => 'Лампа накаливания (яркий свет)',
         'Unknown' => 'неизвестно',
-        'White Fluorescent' => 'Флуоресцентный белый (WW 3200 - 3700K)',
+        'Warm White Fluorescent' => 'Флуоресцентный теплый белый (L 2600 - 3250K)',
+        'White Fluorescent' => 'Флуоресцентный белый (WW 3250 - 3800K)',
       },
     },
    'Lightness' => 'Освещенность',
@@ -351,6 +435,13 @@ $VERSION = '1.01';
    'LinearizationTable' => 'Таблица линеаризации',
    'LocalizedCameraModel' => 'Локализованное название фотоаппарата',
    'Location' => 'Место съемки',
+   'LongExposureNoiseReduction' => {
+      Description => 'NR долгой эксп.',
+      PrintConv => {
+        'Off' => 'Отключено',
+        'On' => 'Включено',
+      },
+    },
    'Make' => 'Изготовитель',
    'MakerNote' => 'Приватные данные DNG',
    'MakerNoteSafety' => {
@@ -378,6 +469,13 @@ $VERSION = '1.01';
     },
    'Model' => 'Камера',
    'ModifyDate' => '"Файл, изменить дату и время"',
+   'MultiFrameNoiseReduction' => {
+      Description => 'Многокадр. шумоподавл.',
+      PrintConv => {
+        'Off' => 'Отключено',
+        'On' => 'Включено',
+      },
+    },
    'NoiseReduction' => 'Шумоподавление',
    'NoiseReductionApplied' => 'Применённое шумоподавление',
    'Opto-ElectricConvFactor' => 'Фактор оптико-электрического преобразования',
@@ -431,9 +529,16 @@ $VERSION = '1.01';
    'ProfileToneCurve' => 'Кривая яроксти профиля',
    'Province-State' => 'Область/район',
    'Quality' => {
+      Description => 'Качество изображения',
       PrintConv => {
+        'Compressed RAW' => 'cRAW',
+        'Compressed RAW + JPEG' => 'cRAW+JPEG',
+        'Extra Fine' => 'Сверхвысокое',
+        'Fine' => 'Высокое',
         'Low' => 'Низкое качество',
         'Normal' => 'Стандартное качество',
+        'RAW + JPEG' => 'RAW+JPEG',
+        'Standard' => 'Стандартное',
       },
     },
    'RawDataUniqueID' => 'Уникальный идентификатор файла',
@@ -474,8 +579,23 @@ $VERSION = '1.01';
       },
     },
    'SceneMode' => {
+      Description => 'Выбор сцены',
       PrintConv => {
+        '3D Sweep Panorama' => '3D',
+        'Anti Motion Blur' => 'Устр. размыт. движ.',
+        'Auto' => 'Авто',
+        'Cont. Priority AE' => 'Непрер. приор. АЭ',
+        'Handheld Night Shot' => 'Ночная съемка с рук',
+        'Landscape' => 'Пейзаж',
+        'Macro' => 'Макросъёмка',
+        'Night Portrait' => 'Ночной портрет',
+        'Night Scene' => 'Ночной вид',
+        'Night View/Portrait' => 'Ночной вид/портрет',
+        'Portrait' => 'Портрет',
+        'Sports' => 'Спортивные сцены',
+        'Standard' => '',
         'Sunset' => 'Закат',
+        'Sweep Panorama' => 'Панорамный обзор',
       },
     },
    'SceneType' => {
@@ -546,7 +666,9 @@ $VERSION = '1.01';
         'Auto' => 'Автоматический баланс белого',
         'Black & White' => 'Монохром',
         'Cloudy' => 'Облачность',
+        'Color Temperature/Color Filter' => 'Цветовая температура / Цветовой фильтр',
         'Cool White Fluorescent' => 'Флуоресцентный белый холодный',
+        'Custom' => 'Пользователь',
         'Custom 1' => 'ПЕРСОНАЛЬНЫЙ 1',
         'Custom 2' => 'ПЕРСОНАЛЬНЫЙ 2',
         'Custom 3' => 'ПЕРСОНАЛЬНЫЙ 3',
@@ -554,10 +676,14 @@ $VERSION = '1.01';
         'Day White Fluorescent' => 'Флуоресцентный белый дневной',
         'Daylight' => 'Дневной свет',
         'Daylight Fluorescent' => 'Флуоресцентный дневной',
+        'Flash' => 'Вспышка',
         'Fluorescent' => 'Флуоресцентный',
         'Manual' => 'Ручная настройка баланса белого',
         'Shade' => 'Тень',
         'Tungsten' => 'Лампа накаливания',
+        'Unknown' => 'неизвестно',
+        'Warm White Fluorescent' => 'Флуоресцентный теплый белый',
+        'White Fluorescent' => 'Флуоресцентный белый',
       },
     },
    'WhiteLevel' => 'Уровень белого',
@@ -572,6 +698,14 @@ $VERSION = '1.01';
       },
     },
    'YCbCrSubSampling' => 'Коэффициент субдискретизации Y и C',
+   'ZoneMatching' => {
+      Description => 'Соответствие областей',
+      PrintConv => {
+        'High Key' => 'Hi',
+        'ISO Setting Used' => 'Отключено',
+        'Low Key' => 'Lo',
+      },
+    },
 );
 
 1;  # end
@@ -590,7 +724,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

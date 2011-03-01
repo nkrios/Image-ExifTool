@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.13';
+$VERSION = '1.16';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -32,6 +32,7 @@ my %ricohLensIDs = (
     'RL1' => 'GR Lens A12 50mm F2.5 Macro',
     'RL2' => 'Ricoh Lens S10 24-70mm F2.5-4.4 VC',
     'RL3' => 'Ricoh Lens P10 28-300mm F3.5-5.6 VC',
+    'RL5' => 'GR Lens A12 28mm F2.5',
 );
 
 %Image::ExifTool::Ricoh::Main = (
@@ -72,15 +73,11 @@ my %ricohLensIDs = (
         Name => 'PrintIM',
         Writable => 0,
         Description => 'Print Image Matching',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::PrintIM::Main',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::PrintIM::Main' },
     },
     0x1001 => {
         Name => 'ImageInfo',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Ricoh::ImageInfo',
-        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::ImageInfo' },
     },
     0x1003 => {
         Name => 'Sharpness',
@@ -236,6 +233,7 @@ my %ricohLensIDs = (
     },
 );
 
+# Ricoh subdirectory tags (ref PH)
 # NOTE: this subdir is not currently writable because the offsets would require
 # special code to handle the funny start location and base offset
 %Image::ExifTool::Ricoh::Subdir = (
@@ -245,24 +243,57 @@ my %ricohLensIDs = (
     # the significance of the following 2 dates is not known.  They are usually
     # within a month of each other, but I have seen differences of nearly a year.
     # Sometimes the first is more recent, and sometimes the second.
-    0x0004 => { #PH (NC)
+    0x0004 => { # (NC)
         Name => 'ManufactureDate1',
         Groups => { 2 => 'Time' },
         Writable => 'string',
         Count => 20,
     },
-    0x0005 => { #PH (NC)
+    0x0005 => { # (NC)
         Name => 'ManufactureDate2',
         Groups => { 2 => 'Time' },
         Writable => 'string',
         Count => 20,
     },
     # 0x000c - int32u[2] 1st number is a counter (file number? shutter count?) - PH
-    0x002c => { #PH (GXR)
+    # 0x0015 - int8u[2]: related to noise reduction?
+    0x0029 => {
+        Name => 'FirmwareInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::FirmwareInfo' },
+    },
+    0x002a => {
+        Name => 'NoiseReduction',
+        # this is the applied value if NR is set to "Auto"
+        Writable => 'int32u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Weak',
+            2 => 'Strong',
+            3 => 'Max',
+        },
+    },
+    0x002c => { # (GXR)
         Name => 'SerialInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::SerialInfo' },
     }
     # 0x000E ProductionNumber? (ref 2) [no. zero for most models - PH]
+);
+
+# firmware version information (ref PH)
+%Image::ExifTool::Ricoh::FirmwareInfo = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    0x00 => {
+        Name => 'FirmwareRevision',
+        Format => 'string[12]',
+    },
+    0x0c => {
+        Name => 'FirmwareRevision2',
+        Format => 'string[12]',
+    },
 );
 
 # serial/version number information written by GXR (ref PH)
@@ -377,7 +408,8 @@ my %ricohLensIDs = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Video' },
     ucmt => {
         Name => 'Comment',
-        ValueConv => '$_=$val; s/^Unicode//; tr/\0//d; s/\s+$//; $_',
+        # Ricoh writes a "Unicode" header even when text is ASCII (spaces anyway)
+        ValueConv => '$_=$val; s/^(Unicode\0|ASCII\0\0\0)//; tr/\0//d; s/\s+$//; $_',
     },
     mnrt => {
         Name => 'MakerNoteRicoh',
@@ -406,6 +438,7 @@ my %ricohLensIDs = (
     LensID => {
         SeparateTable => 'Ricoh LensID',
         Require => 'Ricoh:LensFirmware',
+        RawConv => '$val[0] ? $val[0] : undef',
         ValueConv => '$val=~s/\s*:.*//; $val',
         PrintConv => \%ricohLensIDs,
     },
@@ -437,7 +470,6 @@ sub ProcessRicohText($$$)
         $exifTool->Warn('Bad Ricoh maker notes');
         return 0;
     }
-    my $pos = 0;
     while ($data =~ m/([A-Z][a-z]{1,2})([0-9A-F]+);/sg) {
         my $tag = $1;
         my $val = $2;
@@ -575,7 +607,7 @@ interpret Ricoh maker notes EXIF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

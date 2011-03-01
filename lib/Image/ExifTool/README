@@ -99,11 +99,11 @@ is an explanation of the meaning of each special key:
     pstring     - Pascal string [BinaryData tables only]
     undef       - Undefined-format binary data            (EXIF 'UNDEFINED')
     binary      - Binary data
-    var_string  - variable-length null-terminated ASCII string [r/o BinaryData]
-    var_ustring - variable-length null-terminated UCS-2 string [r/o BinaryData]
-    var_pstring - variable-length Pascal string                [r/o BinaryData]
-    var_pstr32  - variable-length Pascal string /w 32-bit len  [r/o BinaryData]
-    var_int16u  - variable-length undef data with int6u count  [r/o BinaryData]
+    var_string  - variable-length null-terminated ASCII string [BinaryData]
+    var_ustring - variable-length null-terminated UCS-2 string [BinaryData]
+    var_pstring - variable-length Pascal string                [BinaryData]
+    var_pstr32  - variable-length Pascal string /w 32-bit len  [BinaryData]
+    var_int16u  - variable-length undef data with int6u count  [BinaryData]
 
   FIRST_ENTRY : Specifies the index for the first tag entry in a binary table.
   This value is only used if the Unknown option is set to 2 or higher, and
@@ -111,9 +111,9 @@ is an explanation of the meaning of each special key:
 
   TAG_PREFIX : Prefix for names of unknown tags.
 
-  PRINT_CONV : Default print conversion tags where PrintConv isn't specified.
-  PrintConv may be set to undef for individual tags to disable print conversion
-  when PRINT_CONV is defined for a table.
+  PRINT_CONV : Default print conversion for tags where PrintConv isn't
+  specified.  PrintConv may be set to undef for individual tags to disable print
+  conversion when PRINT_CONV is defined for a table.
 
   WRITABLE : Indicates that all tags in this table are writable.  This is the
   same as setting the Writable flag for each individual tag in the table, except
@@ -139,7 +139,8 @@ is an explanation of the meaning of each special key:
   standard (pre-defined) namespace, then the URI must be defined as well.  To do
   this, the NAMESPACE value is a reference to either a list or a hash, where the
   first element (or hash key) is the namespace prefix and and the second element
-  (or hash value) is the URI.
+  (or hash value) is the URI.  This is undef for XMP tables in which tags have
+  variable namespaces, and in this case each tag must have a Namespace entry.
 
   PREFERRED : Set to true if the tags in this table should always be added when
   writing information.  Overrides the order specified by SetNewGroups().  When
@@ -223,18 +224,24 @@ numerical.
   Format        : Only valid for BinaryData, EXIF and IPTC tables. For a Binary
                   or EXIF table, this gives the format that is used to convert
                   the binary data, and is one of the FORMAT types specified
-                  above. For BinaryData tables, the format may have a size in
-                  trailing brackets which is a perl expression to be evaluated.
-                  The expression may access any of the previous table entries
-                  through a %val hash (read-only tables), the data size via
-                  $size, or the ExifTool object via $self. For example,
+                  above.  If not specified, the Format of an EXIF entry is taken
+                  from the EXIF information, and the Format of a BinaryData
+                  entry is taken from the FORMAT specified for the table (or
+                  int8u if FORMAT is not specified).  Must be specified for
+                  Writable tags where the value must be converted for a
+                  Condition.  For BinaryData tables, the format may have a size
+                  in trailing brackets which is a Perl expression to be
+                  evaluated. The expression may access any of the previous table
+                  entries through a %val hash (read-only tables), the data size
+                  via $size, or the ExifTool object via $self. For example,
                   'string[$val{3}]' defines a string with length given by the
-                  table entry with tag index '3'.  If not specified, the format
-                  of an EXIF entry is taken from the EXIF information, and the
-                  format of a BinaryData entry is taken from the FORMAT
-                  specified for the table (or int8u if FORMAT is not specified).
-                  Must be specified for Writable tags where the value must be
-                  converted for a Condition.
+                  table entry with tag index '3'.  An initial "var_" may be
+                  added to the Format name of any BinaryData tag with a size in
+                  brackets.  In this case, subsequent offsets are adjusted by
+                  the total size minus the size of the base Format (ie.
+                  "var_int16u[10]" causes subsequent offsets to be incremented
+                  by sizeof(int16u) * 9).  Note that all "var_" Format tags must
+                  have corresponding DATAMEMBER entries.
 
   Count         : Used when writing EXIF information to specify the number
                   values to write, or the number of characters in a fixed-length
@@ -279,7 +286,7 @@ numerical.
                   writing information.  Necessary only if the value of the tag
                   affects other written information.  Currently only used for
                   tags in EXIF tables where it triggers the execution of the
-                  RawConv to convert and store the value as an ExifTool data
+                  RawConv to convert and stores the value as an ExifTool data
                   member when writing.
 
                   'DataTag' - associated tag name containing data for offset or
@@ -292,6 +299,15 @@ numerical.
                   on the IFD entry position.  This allows individual values to
                   be entry-based even though some others aren't (as with the
                   Casio PrintIM information).
+
+                  'Flat' - [flattened XMP structure tags only] must be set for
+                  all pre-defined flattened tags (including user-defined
+                  flattened tags).  This flag is reset to 0 internally after all
+                  associated flattened tags in the structure have been
+                  generated.
+
+                  'Flattened' - [reserved] used internally to mark Struct tags
+                  which have been processed to generate flattened equivalents.
 
                   'GotGroups' - [reserved] flag used internally to indicate that
                   the Groups hash has been initialized for this tag.
@@ -312,9 +328,12 @@ numerical.
                   are allowed, and will be accumulated in a list.  Note that for
                   XMP information, 3 different types of lists are supported and
                   the List value specifies the type: 'Bag', 'Seq' or 'Alt'.  As
-                  well, a value of '1' is used in XMP to allow list behaviour
-                  for a tag which is itself not a list element (ie. a member of
-                  list of structures).
+                  well, a value of '1' is used internally in XMP to allow list
+                  behaviour for a flattened tag which is itself not a list
+                  element (ie. a member of list of structures).  Note that in
+                  ExifTool an XMP lang-alt tag (Writable="lang-alt") is NOT a
+                  List-type tag (unless it is a list of lang-alt lists, which is
+                  uncommon).
 
                   'MakerNotes' - set if this tag is maker note data.
 
@@ -368,6 +387,11 @@ numerical.
                   Bit 0x02 indicates a 'protected' tag, which should not be set
                   directly by the user.
 
+                  'PutFirst' - [EXIF only] flag to place this value before IFD0
+                  when writing (ie. immediately after TIFF header).  Only used
+                  for main IFD's (IFD0, IFD1, etc) and IFD's where SubIFD flag
+                  is set to 2 (currently only ExifIFD).
+
                   'Resource' - [XMP only] flag to write value as an rdf:resource
                   in an empty element instead of as a normal string.
 
@@ -384,6 +408,10 @@ numerical.
                   resource name to use when writing if an appended name is not
                   provided.
 
+                  'StructType' - [reserved] used internally by XMP writer for
+                  flattened structure tags as a flag to indicate that one or
+                  more enclosing structures has a TYPE field.
+
                   'SubDoc' - [Composite tags only] set to cause this composite
                   tag to also be generated for each sub-document.  To achieve
                   this, 'Main:' and 'Doc#:' prefixes are added to all Require'd
@@ -395,7 +423,8 @@ numerical.
                   an offset to a sub-IFD.  When this flag is set, the Group1
                   name gives the name of the IFD.  Must be set if and only if
                   the tag has a SubDirectory Start of '$val' (this is validated
-                  by BuildTagLookup).
+                  by BuildTagLookup).  Set to 2 for standard EXIF SubIFD's where
+                  the PutFirst flag is valid.
 
                   'Unknown' - this is an unknown tag (only extracted when the
                   Unknown option is set).
@@ -506,10 +535,10 @@ numerical.
                   warning is generated when undef is returned.  An empty warning
                   ("\n") may be issued to suppress warning messages when undef
                   is returned.  If a scalar, the expression may use the
-                  variables $val, $self, $wantgroup, and %options (the
-                  SetNewValue options hash).  If a code ref, the routine is
-                  passed 2 arguments: $val and $self.  Note that this conversion
-                  is not applied for deleted tags (ie. $val is undef).
+                  variables $val, $self and $wantGroup.  If a code ref, the
+                  routine is passed 2 arguments: $val and $self.  Note that this
+                  conversion is not applied for deleted tags (ie. $val is
+                  undef).
 
   PrintConvInv  : The inverse of PrintConv.  Only necessary if for Writable tags
                   when PrintConv is specified (unless WriteAlso is used).  See
@@ -671,38 +700,52 @@ numerical.
                   image offset, and is only used if the preview is outside the
                   APP1 EXIF segment.
 
-  Struct        : [XMP tags only] Used by XMP writer code to specify name of XMP
-                  structure so the PropertyPath can be determined.  Tags with
-                  Struct entries should also include a dummy SubDirectory entry
-                  to prevent the tag name from showing up in the documentation.
-                  Tags for each element in the flattened structure hierarchy
-                  should be included parallel to each tag defining a Struct.
+  Struct        : [XMP tags only] Reference to structure hash for structured XMP
+                  tags.  See "STRUCTURES" section below for more details.  (For
+                  backward compatibility, this may be a name to an entry in
+                  %Image::ExifTool::UserDefined::xmpStruct, but this use is
+                  deprecated.)  Flattened tags are automatically generated for
+                  each field in the structure.  Note that Struct tags can NOT
+                  have ValueConv/PrintConv entries, because values that are HASH
+                  references are are also used by Composite tags, which use the
+                  the Conv entries to generate the composite value.
+
+  Namespace     : [XMP tags only] Gives standard XMP namespace prefix to use for
+                  this tag.  If not defined, the tag table NAMESPACE is used.
 
   Units         : [MIE tags only] Reference to a list of valid units strings.
                   The default units are the first item in the list.
 
   Hook          : [BinaryData tags only] Expression to be evaluated when
                   extracting tag to allow dynamic Format, etc for BinaryData
-                  tags.  May assign a new value to $format to dynamically set
-                  the tag format, and/or increment $varSize to add a byte offset
-                  to subsequent tags.
+                  tags.  May access $self, and assign a new value to $format to
+                  dynamically set the tag format, and/or increment $varSize to
+                  add a byte offset to subsequent tags.
 
   TagID         : [reserved] Used internally to save the table key for this tag.
+                  Note: For XMP tables this corresponds to the XMP property
+                  name, but the table key may have a full XMP namespace prefix
+                  added.
 
   NewTagID      : [reserved] Used internally to save new ID of tag in Composite
                   table if it is different that the original TagID (happens if
                   there was a conflict with an existing entry in the table)
 
-  Index         : [reserved] Used internally to save the index of tagInfo records
+  Index         : [reserved] Used internally to save the index of tagInfo items
                   which are in a conditional list.
 
   Table         : [reserved] Reference to parent tag table.
 
   PropertyPath  : [reserved] Used internally by XMP writer to save property path
-                  name.
+                  name.  Also used in structure field information hashes, but
+                  for these the full property path is not stored.
 
-  PropertyPath  : [StructType] Used internally by XMP writer to save name of
-                  structure for tags contained in a structure.
+  SrcTagInfo    : [reserved] Used internally by XMP module to store reference to
+                  default language tagInfo hash for alternate-language tags.
+
+  RootTagInfo   : [reserved] Used internally to store a reference to the tag
+                  information hash of the top-level structure for flattened
+                  structure tags.
 
   Module        : [reserved] Used internally to store module name for writable
                   Composite tags.
@@ -783,6 +826,9 @@ numerical.
                   unknown maker notes to be a bit more flexible in adjusting
                   the base offset.
 
+     AutoFix    : Flag set to patch GE makernote offset quirks and apply FixBase
+                  without warnings when writing.
+
      FixOffsets : Expression to evaluate for each value pointer to patch
                   problems with some EXIF maker note offsets.  May access the
                   following variables: $valuePtr, $valEnd, $size, $tagID and
@@ -798,5 +844,44 @@ numerical.
      Magic      : [TiffIFD directories only] Magic number used in TIFF-like
                   header.
   }
+
+STRUCTURES
+
+Structure hashes are very similar to tag tables in that their keys are structure
+field ID's and their values are structure field information hashes.  The special
+keys in structure hashes are:
+
+  NAMESPACE   : Same as in tag tables, but may be set to undef for a
+                variable-namespace structure which holds any top-level tag. This
+                is mandatory for built-in tags, but optional for user-defined
+                tags (where it defaults to the NAMESPACE of the tag table).
+
+  STRUCT_NAME : Name of structure (used in warning messages).
+
+  TYPE        : rdf:type resource for structure.
+
+  NOTES       : Notes for documentation.
+
+  GROUPS      : Same as in tag table, but only the family 2 group name is used,
+                as the default for the flattened tags.
+
+The contained structure field information hashes are similar to tag information
+hashes, except that only the following elements are used:
+
+  Raw/Value/PrintConv (and their inverses), TagID (optional), Groups, List,
+  Writable, Struct, Namespace, LangCode, PropertyPath.
+
+But note that for PropertyPath, only the element of the path corresponding to
+the specific field is stored (including any necessary list properties).  The
+full property path is obtained by walking the structure tree.
+
+Flattened tags corresponding to each field in a structure are automatically
+generated (using an on-demand approach to avoid spending time generating them
+unless necessary).  Pre-defined flattened tags are allowed, and are used when it
+is necessary to change the Name or Description of a flattened tag.  The
+flattened tag information hash entries are copied from the corresponding
+structure field definitions, even for pre-defined flattened tags.  The exception
+that the List tag is generated automatically unless explicity set to 0 in a
+pre-defined flattened tag.
 
 --------------------------------------------------------------------------------

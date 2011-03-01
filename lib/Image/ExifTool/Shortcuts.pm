@@ -15,7 +15,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.37';
+$VERSION = '1.40';
 
 # this is a special table used to define command-line shortcuts
 %Image::ExifTool::Shortcuts::Main = (
@@ -66,40 +66,8 @@ $VERSION = '1.37';
         'Sharpness',
         'Saturation',
         'ColorTone',
-        'FileSize',
-        'FileNumber',
-        'DriveMode',
-        'OwnerName',
-        'SerialNumber',
-    ],
-    # courtesy of Christian Koller
-    Canon20D => [
-        'FileName',
-        'Model',
-        'DateTimeOriginal',
-        'ShootingMode',
-        'ShutterSpeedValue', #changed for 20D
-        'ApertureValue', #changed for 20D
-        'MeteringMode',
-        'ExposureCompensation',
-        'ISO',
-        'Lens',
-        'FocalLength',
-        'ImageSize',
-        'Quality',
-        'Flash',
-        'FlashType',
-        'ConditionalFEC',
-        'RedEyeReduction',
-        'ShutterCurtainHack',
-        'WhiteBalance',
-        'FocusMode',
-        'Contrast',
-        'Sharpness',
-        'Saturation',
-        'ColorTone',
-        'ColorSpace', # new
-        'LongExposureNoiseReduction', #new
+        'ColorSpace',
+        'LongExposureNoiseReduction',
         'FileSize',
         'FileNumber',
         'DriveMode',
@@ -144,6 +112,8 @@ $VERSION = '1.37';
         'MakerNoteCasio',
         'MakerNoteCasio2',
         'MakerNoteFujiFilm',
+        'MakerNoteGE',
+        'MakerNoteGE2',
         'MakerNoteHP',
         'MakerNoteHP2',
         'MakerNoteHP4',
@@ -186,6 +156,8 @@ $VERSION = '1.37';
         'MakerNotePentax2',
         'MakerNotePentax3',
         'MakerNotePentax4',
+        'MakerNotePhaseOne',
+        'MakerNoteReconyx',
         'MakerNoteRicoh',
         'MakerNoteRicohText',
         'MakerNoteSamsung1a',
@@ -302,7 +274,7 @@ FocalLengthIn35mmFormat.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

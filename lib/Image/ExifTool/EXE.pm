@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub ProcessPEResources($$);
 sub ProcessPEVersion($$);
@@ -430,10 +430,17 @@ my %resourceType = (
     0 => 'CPUArchitecture',
     1 => 'CPUByteOrder',
     2 => 'CPUCount',
+    # ref /System/Library/Frameworks/Kernel.framework/Versions/A/Headers/mach/machine.h
     3 => {
         Name => 'CPUType',
         List => 1,
         PrintConv => {
+            # handle 64-bit flag (0x1000000)
+            OTHER => sub {
+                my ($val, $inv, $conv) = @_;
+                my $v = $val & 0xfeffffff;
+                return $$conv{$v} ? "$$conv{$v} 64-bit" : "Unknown ($val)";
+            },
             -1 => 'Any',
             1 => 'VAX',
             2 => 'ROMP',
@@ -443,6 +450,7 @@ my %resourceType = (
             7 => 'x86',
             8 => 'MIPS',
             9 => 'NS32532',
+            10 => 'MC98000',
             11 => 'HPPA',
             12 => 'ARM',
             13 => 'MC88000',
@@ -452,15 +460,21 @@ my %resourceType = (
             17 => 'RS6000',
             18 => 'PowerPC',
             255 => 'VEO',
-            0x1000007 => 'x86 64-bit',
-            0x1000012 => 'PowerPC 64-bit',
         },
     },
+    # ref /System/Library/Frameworks/Kernel.framework/Versions/A/Headers/mach/machine.h
     4 => {
         Name => 'CPUSubtype',
         List => 1,
         PrintConv => {
-            # in theory, subtype can by -1 for multiple CPU types,
+            # handle 64-bit flags on CPUType (0x1000000) and CPUSubtype (0x80000000)
+            OTHER => sub {
+                my ($val, $inv, $conv) = @_;
+                my @v = split ' ', $val;
+                my $v = ($v[0] & 0xfeffffff) . ' ' . ($v[1] & 0x7fffffff);
+                return $$conv{$v} ? "$$conv{$v} 64-bit" : "Unknown ($val)";
+            },
+            # in theory, subtype can be -1 for multiple CPU types,
             # but in practice I'm not sure anyone uses this - PH
             '1 0' => 'VAX (all)',
             '1 1' => 'VAX780',
@@ -492,30 +506,38 @@ my %resourceType = (
             '5 3' => 'NS32332 APC FPU (32081)',
             '5 4' => 'NS32332 APC FPA (Weitek)',
             '5 5' => 'NS32332 XPC (532)',
+            '6 1' => 'MC680x0 (all)',
+            '6 2' => 'MC68040',
+            '6 3' => 'MC68030',
             '7 3' => 'i386 (all)',
             '7 4' => 'i486',
             '7 132' => 'i486SX',
             '7 5' => 'i586',
             '7 22' => 'Pentium Pro',
-            '7 54' => 'PentiumII M3',
-            '7 86' => 'PentiumII M5',
+            '7 54' => 'Pentium II M3',
+            '7 86' => 'Pentium II M5',
+            '7 103' => 'Celeron',
+            '7 119' => 'Celeron Mobile',
+            '7 8' => 'Pentium III',
+            '7 24' => 'Pentium III M',
+            '7 40' => 'Pentium III Xeon',
+            '7 9' => 'Pentium M',
             '7 10' => 'Pentium 4',
-            '16777223 3' => 'i386 64-bit (all)',
-            '16777223 4' => 'i486 64-bit',
-            '16777223 132' => 'i486SX 64-bit',
-            '16777223 5' => 'i586 64-bit',
-            '16777223 22' => 'Pentium Pro 64-bit',
-            '16777223 54' => 'PentiumII M3 64-bit',
-            '16777223 86' => 'PentiumII M5 64-bit',
-            '16777223 10' => 'Pentium 4 64-bit',
+            '7 26' => 'Pentium 4 M',
+            '7 11' => 'Itanium',
+            '7 27' => 'Itanium 2',
+            '7 12' => 'Xeon',
+            '7 28' => 'Xeon MP',
             '8 0' => 'MIPS (all)',
             '8 1' => 'MIPS R2300',
             '8 2' => 'MIPS R2600',
             '8 3' => 'MIPS R2800',
             '8 4' => 'MIPS R2000a',
-            '6 1' => 'MC680x0 (all)',
-            '6 2' => 'MC68040',
-            '6 3' => 'MC68030',
+            '8 5' => 'MIPS R2000',
+            '8 6' => 'MIPS R3000a',
+            '8 7' => 'MIPS R3000',
+            '10 0' => 'MC98000 (all)',
+            '10 1' => 'MC98601',
             '11 0' => 'HPPA (all)',
             '11 1' => 'HPPA 7100LC',
             '12 0' => 'ARM (all)',
@@ -523,7 +545,11 @@ my %resourceType = (
             '12 2' => 'ARM A500',
             '12 3' => 'ARM A440',
             '12 4' => 'ARM M4',
-            '12 5' => 'ARM A680',
+            '12 5' => 'ARM A680/V4T',
+            '12 6' => 'ARM V6',
+            '12 7' => 'ARM V5TEJ',
+            '12 8' => 'ARM XSCALE',
+            '12 9' => 'ARM V7',
             '13 0' => 'MC88000 (all)',
             '13 1' => 'MC88100',
             '13 2' => 'MC88110',
@@ -549,7 +575,6 @@ my %resourceType = (
             '18 10' => 'PowerPC 7400',
             '18 11' => 'PowerPC 7450',
             '18 100' => 'PowerPC 970',
-            '16777234 0' => 'PowerPC 64-bit (all)',
             '255 1' => 'VEO 1',
             '255 2' => 'VEO 2',
         },
@@ -743,7 +768,7 @@ sub ProcessPEVersion($$)
                     # (not sure what the CharacterSet tag is for, but the string
                     # values stored here are UCS-2 in all my files even if the
                     # CharacterSet is otherwise)
-                    my ($lang, $char);
+                    my $char;
                     if (length($string) > 4) {
                         $char = substr($string, 4);
                         $string = substr($string, 0, 4);
@@ -1018,7 +1043,7 @@ sub ProcessEXE($$)
             my $i;
             for ($i=0; $i<$count; ++$i) {
                 my $cpuType = Get32s(\$buff, 8 + $i * 20);
-                my $cpuSubtype = Get32s(\$buff, 12 + $i * 20);
+                my $cpuSubtype = Get32u(\$buff, 12 + $i * 20);
                 $exifTool->HandleTag($tagTablePtr, 3, $cpuType);
                 $exifTool->HandleTag($tagTablePtr, 4, "$cpuType $cpuSubtype");
             }
@@ -1127,7 +1152,7 @@ library files.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

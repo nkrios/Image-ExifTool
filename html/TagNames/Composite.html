@@ -210,9 +210,21 @@ manual mode)</span>
 <tr class=b>
 <td>GPSAltitude</td>
 <td class=c>N</td>
-<td class=n>GPSAltitudeRef
-  <br>GPS:GPSAltitude
-  <br>XMP:GPSAltitude</td>
+<td class=n>QuickTime:GPSCoordinates</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>GPSAltitudeRef</td>
+<td class=c>N</td>
+<td class=n>QuickTime:GPSCoordinates</td>
+<td><span class=s>0 = Above Sea Level
+  <br>1 = Below Sea Level</span></td></tr>
+<tr class=b>
+<td>GPSAltitude</td>
+<td class=c>N</td>
+<td class=n>GPS:GPSAltitude
+  <br>GPS:GPSAltitudeRef
+  <br>XMP:GPSAltitude
+  <br>XMP:GPSAltitudeRef</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>GPSDateTime</td>
@@ -223,8 +235,7 @@ manual mode)</span>
 <tr class=b>
 <td>GPSLatitude</td>
 <td class=c>N</td>
-<td class=n>GPS:GPSLatitude
-  <br>GPS:GPSLatitudeRef</td>
+<td class=n>QuickTime:GPSCoordinates</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>GPSLatitudeRef</td>
@@ -233,17 +244,28 @@ manual mode)</span>
 <td><span class=s>&#39;N&#39; = North
   <br>&#39;S&#39; = South</span></td></tr>
 <tr class=b>
-<td>GPSLongitude</td>
+<td>GPSLatitude</td>
 <td class=c>N</td>
-<td class=n>GPS:GPSLongitude
-  <br>GPS:GPSLongitudeRef</td>
+<td class=n>GPS:GPSLatitude
+  <br>GPS:GPSLatitudeRef</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>GPSLongitude</td>
+<td class=c>N</td>
+<td class=n>QuickTime:GPSCoordinates</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>GPSLongitudeRef</td>
 <td class=c>N</td>
 <td class=n>XMP:GPSLongitude</td>
 <td><span class=s>&#39;E&#39; = East
   <br>&#39;W&#39; = West</span></td></tr>
+<tr>
+<td>GPSLongitude</td>
+<td class=c>N</td>
+<td class=n>GPS:GPSLongitude
+  <br>GPS:GPSLongitudeRef</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
 <td>GPSPosition</td>
 <td class=c>N</td>
@@ -365,7 +387,7 @@ of the embedded MPF images are extracted as MPImage#.  The ExtractEmbedded
 option may be used to extract information from these embedded images.)</span></span></td></tr>
 <tr class=b>
 <td>OriginalDecisionData</td>
-<td class=c title='! = Unsafe'>Y!</td>
+<td class=c title=' ! = Unsafe'>Y!</td>
 <td class=n>OriginalDecisionDataOffset</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -537,7 +559,7 @@ option may be used to extract information from these embedded images.)</span></s
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 13, 2010</i>
+<br><i>Last revised Feb 25, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

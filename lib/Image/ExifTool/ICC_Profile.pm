@@ -786,7 +786,6 @@ sub ProcessICC_Profile($$$)
     my $dirStart = $$dirInfo{DirStart};
     my $dirLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
-    my $raf;
 
     return 0 if $dirLen < 4;
 
@@ -944,7 +943,6 @@ sub ProcessICC_Profile($$$)
         } else {
             $value = substr($$dataPt, $valuePtr, $size);
             # treat unsupported formats as binary data
-            my $oldValueConv = $$tagInfo{ValueConv};
             $$tagInfo{ValueConv} = '\$val' unless defined $$tagInfo{ValueConv};
             $exifTool->FoundTag($tagInfo, $value);
         }
@@ -975,7 +973,7 @@ data created on one device into another device's native color space.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

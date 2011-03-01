@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::XMP;
 
-$VERSION = '1.01';
+$VERSION = '1.03';
 
 # tags written by Microsoft HDView (ref 1)
 %Image::ExifTool::Microsoft::Stitch = (
@@ -124,6 +124,12 @@ $VERSION = '1.01';
 );
 
 # Microsoft Photo 1.2 schema properties (MP) (ref PH)
+my %sRegions = (
+    STRUCT_NAME => 'Regions',
+    NAMESPACE   => 'MPReg',
+    Rectangle => { },
+    PersonDisplayName => { },
+);
 %Image::ExifTool::Microsoft::MP = (
     %Image::ExifTool::XMP::xmpTableDefaults,
     GROUPS => { 0 => 'XMP', 1 => 'XMP-MP', 2 => 'Image' },
@@ -134,20 +140,20 @@ $VERSION = '1.01';
         Microsoft Photo 1.2 schema XMP tags which have been observed.
     },
     RegionInfo => {
-        SubDirectory => { },
-        Struct => 'RegionInfo',
-    },
-    RegionInfoRegions => {
-        SubDirectory => { },
-        Struct => 'Regions',
+        Name => 'RegionInfoMP',
+        Struct => {
+            STRUCT_NAME => 'RegionInfoMP',
+            NAMESPACE   => 'MPRI',
+            Regions   => { Struct => \%sRegions, List => 'Bag' },
+        },
     },
     RegionInfoRegionsRectangle => {
         Name => 'RegionRectangle',
-        List => 1,
+        Flat => 1,
     },
     RegionInfoRegionsPersonDisplayName => {
         Name => 'RegionPersonDisplayName',
-        List => 1,
+        Flat => 1,
     },
 );
 
@@ -171,7 +177,7 @@ Microsoft-specific EXIF and XMP tags.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

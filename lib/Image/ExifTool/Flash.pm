@@ -26,7 +26,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::FLAC;
 
-$VERSION = '1.07';
+$VERSION = '1.09';
 
 sub ProcessMeta($$$;$);
 
@@ -121,7 +121,7 @@ my %processMetaPacket = ( onMetaData => 1, onXMPData => 1 );
         },
     },
     'Bit6' => {
-        Name => 'AudioSampleBits',
+        Name => 'AudioBitsPerSample',
         ValueConv => '8 * ($val + 1)',
     },
     'Bit7' => {
@@ -166,7 +166,7 @@ my %processMetaPacket = ( onMetaData => 1, onXMPData => 1 );
         Name => 'AudioBitrate',
         Groups => { 2 => 'Audio' },
         ValueConv => '$val * 1000',
-        PrintConv => 'int($val + 0.5)',
+        PrintConv => 'ConvertBitrate($val)',
     },
     'audiodelay'    => { Name => 'AudioDelay',      Groups => { 2 => 'Audio' } },
     'audiosamplerate'=>{ Name => 'AudioSampleRate', Groups => { 2 => 'Audio' } },
@@ -235,7 +235,7 @@ my %processMetaPacket = ( onMetaData => 1, onXMPData => 1 );
     'videodatarate' => {
         Name => 'VideoBitrate',
         ValueConv => '$val * 1000',
-        PrintConv => 'int($val + 0.5)',
+        PrintConv => 'ConvertBitrate($val)',
     },
     'videosize'     => 'VideoSize',
     'width'         => 'ImageWidth',
@@ -598,7 +598,7 @@ sub ProcessSWF($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
-    my ($buff, $inflate, $hasMeta);
+    my ($buff, $hasMeta);
 
     $raf->Read($buff, 8) == 8 or return 0;
     $buff =~ /^(F|C)WS([^\0])/ or return 0;
@@ -721,7 +721,7 @@ will add AMF3 support.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

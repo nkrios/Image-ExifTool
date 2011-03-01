@@ -1361,11 +1361,11 @@ This module is used by Image::ExifTool
 This module contains definitions required by Image::ExifTool to read and
 write VRD Recipe Data information as written by the Canon Digital Photo
 Professional software.  This information is written to VRD files, and as a
-trailer in JPEG, CRW and CR2 images.
+trailer in JPEG, CRW, CR2 and TIFF images.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

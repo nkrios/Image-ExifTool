@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.30
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.44
 [File, System, Image] FileName - File Name: MP3.mp3
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 395 bytes
@@ -9,7 +9,7 @@
 [File, File, Image] ID3Size - ID3 Size: 391
 [MPEG, MPEG, Audio] Bit11-12 - MPEG Audio Version: 1
 [MPEG, MPEG, Audio] Bit13-14 - Audio Layer: 3
-[MPEG, MPEG, Audio] Bit16-19 - Audio Bitrate: 128000
+[MPEG, MPEG, Audio] Bit16-19 - Audio Bitrate: 128 kbps
 [MPEG, MPEG, Audio] Bit20-21 - Sample Rate: 44100
 [MPEG, MPEG, Audio] Bit24-25 - Channel Mode: Joint Stereo
 [MPEG, MPEG, Audio] Bit26 - MS Stereo: On

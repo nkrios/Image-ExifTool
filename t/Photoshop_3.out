@@ -1,12 +1,12 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.32
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.48
 [File, System, Image] FileName - File Name: Photoshop_3_failed.psd
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 16 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:09:20 08:06:56-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2011:01:30 09:53:34-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: PSD
 [File, File, Image] MIMEType - MIME Type: application/vnd.adobe.photoshop
-[File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 7eea28616594f46e45fbc9db62cd784e
+[File, File, Image] CurrentIPTCDigest - Current IPTC Digest: 01c26dbee9b75ddbe23315cf1b5e1486
 [File, File, Image] ExifByteOrder - Exif Byte Order: Big-endian (Motorola, MM)
 [Photoshop, Photoshop, Image] 6 - Num Channels: 3
 [Photoshop, Photoshop, Image] 7 - Image Height: 8
@@ -37,11 +37,11 @@
 [IPTC, IPTC, Other] 0 - Application Record Version: 2
 [IPTC, IPTC, Other] 120 - Caption-Abstract: This is a teeny weeny white square
 [IPTC, IPTC, Author] 122 - Writer-Editor: Me too
+[IPTC, IPTC, Author] 80 - By-line: Phil Again
 [IPTC, IPTC, Author] 85 - By-line Title: Supreme leader
 [IPTC, IPTC, Other] 5 - Object Name: Test Picture
 [IPTC, IPTC, Author] 116 - Copyright Notice: Free for all
-[IPTC, IPTC, Author] 80 - By-line: Phil Again
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.32
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.48
 [XMP, XMP-rdf, Document] about - About: uuid:c197d41e-f8f7-11d9-b03e-c023c3939af5
 [XMP, XMP-dc, Author] creator - Creator: Phil Harvey
 [XMP, XMP-dc, Image] description - Description: This is a teeny weeny white square
@@ -96,11 +96,11 @@
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 388
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 0
+[PhotoMechanic, PhotoMechanic, Image] 221 - Tagged: No
 [PhotoMechanic, PhotoMechanic, Image] 222 - Color Class: 6 (Typical alt)
 [PhotoMechanic, PhotoMechanic, Image] 216 - Rotation: 180
 [PhotoMechanic, PhotoMechanic, Image] 217 - Crop Left: 438
 [PhotoMechanic, PhotoMechanic, Image] 218 - Crop Top: 618
 [PhotoMechanic, PhotoMechanic, Image] 219 - Crop Right: 890
 [PhotoMechanic, PhotoMechanic, Image] 220 - Crop Bottom: 1072
-[PhotoMechanic, PhotoMechanic, Image] 221 - Tagged: No
 [Composite, Composite, Image] ImageSize - Image Size: 8x8

@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::zh_tw;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.02';
+$VERSION = '1.04';
 
 %Image::ExifTool::Lang::zh_tw::Translate = (
    'Album' => '相簿',
@@ -28,6 +28,50 @@ $VERSION = '1.02';
    'CFAPattern' => '彩色濾鏡陣列圖',
    'CFAPattern2' => 'CFA 模式 2',
    'CFARepeatPatternDim' => 'CFA 重複模式尺寸',
+   'CalibrationIlluminant1' => {
+      PrintConv => {
+        'Cloudy' => '多雲',
+        'Cool White Fluorescent' => '冷白色熒光燈 (W 3800 - 4500K)',
+        'Day White Fluorescent' => '日光白色熒光燈 (N 4600 - 5500K)',
+        'Daylight' => '日光',
+        'Daylight Fluorescent' => '日光熒光燈 (D 5700 - 7100K)',
+        'Fine Weather' => '晴天',
+        'Flash' => '閃光燈',
+        'Fluorescent' => '日光燈',
+        'ISO Studio Tungsten' => 'ISO 攝影棚鎢燈',
+        'Other' => '其他光源',
+        'Shade' => '陰天',
+        'Standard Light A' => '標準燈光 A',
+        'Standard Light B' => '標準燈光 B',
+        'Standard Light C' => '標準燈光 C',
+        'Tungsten (Incandescent)' => '鎢絲燈',
+        'Unknown' => '未知',
+        'Warm White Fluorescent' => '暖白螢光燈 (L 2600 - 3250K)',
+        'White Fluorescent' => '白色熒光燈 (WW 3250 - 3800K)',
+      },
+    },
+   'CalibrationIlluminant2' => {
+      PrintConv => {
+        'Cloudy' => '多雲',
+        'Cool White Fluorescent' => '冷白色熒光燈 (W 3800 - 4500K)',
+        'Day White Fluorescent' => '日光白色熒光燈 (N 4600 - 5500K)',
+        'Daylight' => '日光',
+        'Daylight Fluorescent' => '日光熒光燈 (D 5700 - 7100K)',
+        'Fine Weather' => '晴天',
+        'Flash' => '閃光燈',
+        'Fluorescent' => '日光燈',
+        'ISO Studio Tungsten' => 'ISO 攝影棚鎢燈',
+        'Other' => '其他光源',
+        'Shade' => '陰天',
+        'Standard Light A' => '標準燈光 A',
+        'Standard Light B' => '標準燈光 B',
+        'Standard Light C' => '標準燈光 C',
+        'Tungsten (Incandescent)' => '鎢絲燈',
+        'Unknown' => '未知',
+        'Warm White Fluorescent' => '暖白螢光燈 (L 2600 - 3250K)',
+        'White Fluorescent' => '白色熒光燈 (WW 3250 - 3800K)',
+      },
+    },
    'Caption-Abstract' => '說明',
    'CaptionWriter' => '說明作者',
    'Categories' => '類別',
@@ -42,10 +86,29 @@ $VERSION = '1.02';
     },
    'ColorFilter' => '顏色濾鏡',
    'ColorMap' => '色彩地圖',
+   'ColorMode' => {
+      Description => '風格設定',
+      PrintConv => {
+        'Autumn Leaves' => '秋葉',
+        'B&W' => '黑白',
+        'Clear' => '透明',
+        'Deep' => '深色',
+        'Landscape' => '風景',
+        'Light' => '淡色',
+        'Neutral' => '中性',
+        'Night View' => '夜景',
+        'Night View/Portrait' => '夜間肖像',
+        'Portrait' => '肖像',
+        'Standard' => '標準',
+        'Sunset' => '日落',
+        'Vivid' => '鮮明色彩',
+      },
+    },
    'ColorResponseUnit' => '顏色反應單位',
    'ColorSpace' => {
       Description => '色彩空間',
       PrintConv => {
+        'ICC Profile' => '色彩描述檔',
         'Uncalibrated' => '未校準',
       },
     },
@@ -56,7 +119,6 @@ $VERSION = '1.02';
    'Compression' => {
       Description => '壓縮方式',
       PrintConv => {
-        'Epson ERF Compressed' => 'Epson ERF 壓縮',
         'JPEG' => 'JPEG壓縮率',
         'JPEG (old-style)' => 'JPEG (舊式)',
         'Kodak DCR Compressed' => 'Kodak DCR 壓縮',
@@ -101,6 +163,20 @@ $VERSION = '1.02';
    'Directory' => '儲存擋案位置',
    'DocumentName' => '文件名稱',
    'DriveMode' => '激勵模式',
+   'DynamicRangeOptimizer' => {
+      Description => '動態範圍最佳化',
+      PrintConv => {
+        'Advanced Auto' => '進階自動',
+        'Advanced Lv1' => '進階等級 1',
+        'Advanced Lv2' => '進階等級 2',
+        'Advanced Lv3' => '進階等級 3',
+        'Advanced Lv4' => '進階等級 4',
+        'Advanced Lv5' => '進階等級 5',
+        'Auto' => '自動',
+        'Off' => '關閉',
+        'Standard' => '標準',
+      },
+    },
    'ExifImageHeight' => '影像高度',
    'ExifImageWidth' => '影像寬度',
    'ExifOffset' => 'Exif IFD指針',
@@ -333,7 +409,23 @@ $VERSION = '1.02';
    'Gradation' => '灰階',
    'GrayResponseCurve' => '灰色反應曲線',
    'GrayResponseUnit' => '灰色反應單位',
+   'HDR' => {
+      Description => 'Auto HDR',
+      PrintConv => {
+        'Off' => '關閉',
+      },
+    },
    'Headline' => '標題',
+   'HighISONoiseReduction' => {
+      Description => '高 ISO 雜訊消除',
+      PrintConv => {
+        'Auto' => '自動',
+        'High' => '高',
+        'Low' => '低',
+        'Normal' => '一般',
+        'Off' => '關閉',
+      },
+    },
    'HostComputer' => '主機',
    'Hue' => '色相',
    'IPTC-NAA' => 'IPTC-NAA 元資料',
@@ -359,8 +451,8 @@ $VERSION = '1.02';
       Description => '光源',
       PrintConv => {
         'Cloudy' => '多雲',
-        'Cool White Fluorescent' => '冷白色熒光燈 (W 3900 - 4500K)',
-        'Day White Fluorescent' => '日光白色熒光燈 (N 4600 - 5400K)',
+        'Cool White Fluorescent' => '冷白色熒光燈 (W 3800 - 4500K)',
+        'Day White Fluorescent' => '日光白色熒光燈 (N 4600 - 5500K)',
         'Daylight' => '日光',
         'Daylight Fluorescent' => '日光熒光燈 (D 5700 - 7100K)',
         'Fine Weather' => '晴天',
@@ -374,11 +466,19 @@ $VERSION = '1.02';
         'Standard Light C' => '標準燈光 C',
         'Tungsten (Incandescent)' => '鎢絲燈',
         'Unknown' => '未知',
-        'White Fluorescent' => '白色熒光燈 (WW 3200 - 3700K)',
+        'Warm White Fluorescent' => '暖白螢光燈 (L 2600 - 3250K)',
+        'White Fluorescent' => '白色熒光燈 (WW 3250 - 3800K)',
       },
     },
    'Lightness' => '明暗度',
    'Location' => '地址',
+   'LongExposureNoiseReduction' => {
+      Description => '消除長曝雜訊',
+      PrintConv => {
+        'Off' => '關閉',
+        'On' => '開啟',
+      },
+    },
    'Make' => '製造商',
    'MakerNote' => '製造商註解',
    'MakerNotes' => '製造商記錄',
@@ -402,6 +502,13 @@ $VERSION = '1.02';
    'Model' => '相機型號',
    'Model2' => '第二影像輸入設備',
    'ModifyDate' => '檔案建立日期及時間',
+   'MultiFrameNoiseReduction' => {
+      Description => '多框雜訊消除',
+      PrintConv => {
+        'Off' => '關閉',
+        'On' => '開啟',
+      },
+    },
    'Noise' => '雜訊',
    'NoiseReduction' => '雜訊抑制',
    'Opto-ElectricConvFactor' => '光電轉換因子',
@@ -449,9 +556,16 @@ $VERSION = '1.02';
    'ProcessingSoftware' => '處理軟體',
    'Province-State' => '州/省',
    'Quality' => {
+      Description => '影像品質',
       PrintConv => {
+        'Compressed RAW' => 'cRAW',
+        'Compressed RAW + JPEG' => 'cRAW+JPEG',
+        'Extra Fine' => '超精細',
+        'Fine' => '精細',
         'Low' => '低品質',
         'Normal' => '標準品質',
+        'RAW + JPEG' => 'RAW+JPEG',
+        'Standard' => '標準',
       },
     },
    'Rating' => '評分',
@@ -490,8 +604,23 @@ $VERSION = '1.02';
       },
     },
    'SceneMode' => {
+      Description => '場景選擇',
       PrintConv => {
+        '3D Sweep Panorama' => '3D',
+        'Anti Motion Blur' => '防止移動模糊',
+        'Auto' => '自動',
+        'Cont. Priority AE' => '連拍優先AE',
+        'Handheld Night Shot' => '手持夜拍',
+        'Landscape' => '風景',
+        'Macro' => '超近拍攝',
+        'Night Portrait' => '夜間肖像',
+        'Night Scene' => '夜景',
+        'Night View/Portrait' => '夜景/肖像',
+        'Portrait' => '肖像',
+        'Sports' => '運動場面',
+        'Standard' => '',
         'Sunset' => '夕陽',
+        'Sweep Panorama' => '全景攝影',
       },
     },
    'SceneType' => {
@@ -577,7 +706,9 @@ $VERSION = '1.02';
         'Auto' => '自動',
         'Black & White' => '黑白',
         'Cloudy' => '多雲',
+        'Color Temperature/Color Filter' => '色溫 / 彩色濾鏡',
         'Cool White Fluorescent' => '冷白色螢光燈',
+        'Custom' => '自設',
         'Custom 1' => '用戶自定1',
         'Custom 2' => '用戶自定2',
         'Custom 3' => '用戶自定3',
@@ -585,10 +716,13 @@ $VERSION = '1.02';
         'Day White Fluorescent' => '日光白色螢光燈',
         'Daylight' => '日光',
         'Daylight Fluorescent' => '日光色螢光燈',
+        'Flash' => '閃光燈',
         'Fluorescent' => '熒光燈',
         'Manual' => '手動',
         'Shade' => '陰天',
         'Tungsten' => '白熾燈',
+        'Warm White Fluorescent' => '暖白螢光燈',
+        'White Fluorescent' => '白色熒光燈',
       },
     },
    'WhitePoint' => '白點色度',
@@ -607,6 +741,14 @@ $VERSION = '1.02';
    'YCbCrSubSampling' => 'Y 到 C 的抽樣比率',
    'YPosition' => 'Y 位置',
    'YResolution' => '垂直解析度',
+   'ZoneMatching' => {
+      Description => '區域匹配',
+      PrintConv => {
+        'High Key' => '高',
+        'ISO Setting Used' => '關閉',
+        'Low Key' => '低',
+      },
+    },
 );
 
 1;  # end
@@ -625,7 +767,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

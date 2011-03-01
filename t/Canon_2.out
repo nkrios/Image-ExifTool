@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.39
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.49
 [File, System, Image] FileName - File Name: Canon1DmkIII.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 8.1 kB
@@ -296,26 +296,26 @@
 [MakerNotes, Canon, Image] 11 - Black Mask Right Border: 0
 [MakerNotes, Canon, Image] 12 - Black Mask Bottom Border: 0
 [MakerNotes, Canon, Camera] 0 - Color Data Version: 2 (1DmkIII)
-[MakerNotes, Canon, Camera] 63 - WB RGGB Levels As Shot: 2275 1024 1024 1357
-[MakerNotes, Canon, Camera] 67 - Color Temp As Shot: 6142
-[MakerNotes, Canon, Camera] 68 - WB RGGB Levels Auto: 2275 1024 1024 1357
-[MakerNotes, Canon, Camera] 72 - Color Temp Auto: 6142
-[MakerNotes, Canon, Camera] 73 - WB RGGB Levels Measured: 2272 1026 1021 1355
-[MakerNotes, Canon, Camera] 77 - Color Temp Measured: 6142
-[MakerNotes, Canon, Camera] 83 - WB RGGB Levels Daylight: 2101 1024 1024 1535
-[MakerNotes, Canon, Camera] 87 - Color Temp Daylight: 5200
-[MakerNotes, Canon, Camera] 88 - WB RGGB Levels Shade: 2433 1024 1024 1259
-[MakerNotes, Canon, Camera] 92 - Color Temp Shade: 7000
-[MakerNotes, Canon, Camera] 93 - WB RGGB Levels Cloudy: 2270 1024 1024 1382
-[MakerNotes, Canon, Camera] 97 - Color Temp Cloudy: 6000
-[MakerNotes, Canon, Camera] 98 - WB RGGB Levels Tungsten: 1603 1134 1134 2760
-[MakerNotes, Canon, Camera] 102 - Color Temp Tungsten: 3200
-[MakerNotes, Canon, Camera] 103 - WB RGGB Levels Fluorescent: 1938 1073 1073 2419
-[MakerNotes, Canon, Camera] 107 - Color Temp Fluorescent: 3768
-[MakerNotes, Canon, Camera] 108 - WB RGGB Levels Kelvin: 2101 1024 1024 1535
-[MakerNotes, Canon, Camera] 112 - Color Temp Kelvin: 5210
-[MakerNotes, Canon, Camera] 113 - WB RGGB Levels Flash: 2422 1024 1024 1295
-[MakerNotes, Canon, Camera] 117 - Color Temp Flash: 6777
+[MakerNotes, Canon, Camera] 0 - WB RGGB Levels As Shot: 2275 1024 1024 1357
+[MakerNotes, Canon, Camera] 4 - Color Temp As Shot: 6142
+[MakerNotes, Canon, Camera] 5 - WB RGGB Levels Auto: 2275 1024 1024 1357
+[MakerNotes, Canon, Camera] 9 - Color Temp Auto: 6142
+[MakerNotes, Canon, Camera] 10 - WB RGGB Levels Measured: 2272 1026 1021 1355
+[MakerNotes, Canon, Camera] 14 - Color Temp Measured: 6142
+[MakerNotes, Canon, Camera] 20 - WB RGGB Levels Daylight: 2101 1024 1024 1535
+[MakerNotes, Canon, Camera] 24 - Color Temp Daylight: 5200
+[MakerNotes, Canon, Camera] 25 - WB RGGB Levels Shade: 2433 1024 1024 1259
+[MakerNotes, Canon, Camera] 29 - Color Temp Shade: 7000
+[MakerNotes, Canon, Camera] 30 - WB RGGB Levels Cloudy: 2270 1024 1024 1382
+[MakerNotes, Canon, Camera] 34 - Color Temp Cloudy: 6000
+[MakerNotes, Canon, Camera] 35 - WB RGGB Levels Tungsten: 1603 1134 1134 2760
+[MakerNotes, Canon, Camera] 39 - Color Temp Tungsten: 3200
+[MakerNotes, Canon, Camera] 40 - WB RGGB Levels Fluorescent: 1938 1073 1073 2419
+[MakerNotes, Canon, Camera] 44 - Color Temp Fluorescent: 3768
+[MakerNotes, Canon, Camera] 45 - WB RGGB Levels Kelvin: 2101 1024 1024 1535
+[MakerNotes, Canon, Camera] 49 - Color Temp Kelvin: 5210
+[MakerNotes, Canon, Camera] 50 - WB RGGB Levels Flash: 2422 1024 1024 1295
+[MakerNotes, Canon, Camera] 54 - Color Temp Flash: 6777
 [MakerNotes, Canon, Camera] 640 - Raw Measured RGGB: 294111 455756 464315 279659
 [MakerNotes, Canon, Camera] 16400 - Custom Picture Style File Name: 
 [MakerNotes, Canon, Camera] 1 - AF Micro Adj Active: No

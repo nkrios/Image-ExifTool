@@ -26,7 +26,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.25';
+$VERSION = '1.28';
 
 sub ConvertTimecode($);
 
@@ -358,9 +358,14 @@ $Image::ExifTool::RIFF::streamType = '';
             },
         },
         {
-            Name => 'UnknownJunk',
-            # try to interpret unknown junk as a string
-            RawConv => '$_=$val; /^[^\0-\x1f\x7f-\xff]+$/ ? $_ : undef',
+            Name => 'PentaxJunk', # (Optio RS1000)
+            Condition => '$$valPt =~ /^IIII\x01\0/',
+            SubDirectory => { TagTable => 'Image::ExifTool::Pentax::Junk' },
+        },
+        {
+            Name => 'TextJunk',
+            # try to interpret unknown junk as an ASCII string
+            RawConv => '$val =~ /^([^\0-\x1f\x7f-\xff]+)\0*$/ ? $1 : undef',
         }
     ],
     _PMX => { #PH (Adobe CS3 Bridge)
@@ -726,8 +731,16 @@ $Image::ExifTool::RIFF::streamType = '';
     GROUPS => { 2 => 'Video' },
     dmlh => {
         Name => 'ExtendedAVIHeader',
-        Flags => ['Binary','Unknown'],
+        SubDirectory => { TagTable => 'Image::ExifTool::RIFF::ExtAVIHdr' },
     },
+);
+
+# Extended AVI Header tags (ref http://www.morgan-multimedia.com/download/odmlff2.pdf)
+%Image::ExifTool::RIFF::ExtAVIHdr = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    FORMAT => 'int32u',
+    0 => 'TotalFrameCount',
 );
 
 %Image::ExifTool::RIFF::StreamHeader = (
@@ -819,7 +832,10 @@ $Image::ExifTool::RIFF::streamType = '';
 %Image::ExifTool::RIFF::StreamData = ( #PH
     PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessStreamData,
     GROUPS => { 2 => 'Video' },
-    NOTES => 'This chunk contains EXIF information in FujiFilm AVI videos.',
+    NOTES => q{
+        This chunk is used to store proprietary information in AVI videos from some
+        cameras.  The first 4 characters of the data are used as the Tag ID below.
+    },
     AVIF => {
         Name => 'AVIF',
         SubDirectory => {
@@ -833,6 +849,7 @@ $Image::ExifTool::RIFF::streamType = '';
         Name => 'CasioData',
         SubDirectory => { TagTable => 'Image::ExifTool::Casio::AVI' },
     },
+    Zora => 'VendorName',   # (Samsung PL90 AVI files)
     unknown => {
         Name => 'UnknownData',
         # try to interpret unknown stream data as a string
@@ -1131,7 +1148,7 @@ including Windows WAV audio and AVI video files.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

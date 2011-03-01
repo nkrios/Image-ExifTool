@@ -3,13 +3,13 @@
 [EXIF, IFD0, Image] 274 - Orientación de Imagen: 0° (arriba/izquierda)
 [EXIF, IFD0, Image] 282 - Resolución Imagen Horizontal: 72
 [EXIF, IFD0, Image] 283 - Resolución Imagen Vertical: 72
-[EXIF, IFD0, Image] 296 - Unidad de resolución de X e Y: Pulgada
-[EXIF, IFD0, Image] 305 - Programa utilizado: Digital Camera FinePix2400Zoom Ver1.70
+[EXIF, IFD0, Image] 296 - Unidad de Resolución de X e Y: Pulgada
+[EXIF, IFD0, Image] 305 - Programa Utilizado: Digital Camera FinePix2400Zoom Ver1.70
 [EXIF, IFD0, Time] 306 - Fecha y Hora de Cambio del Archivo: 2001:05:19 18:36:41
 [EXIF, IFD0, Image] 531 - Posicionamiento Y y C: Vecino
 [EXIF, IFD0, Author] 33432 - Copyright Perfil: 
 [EXIF, ExifIFD, Image] 33437 - Número F: 3.5
-[EXIF, ExifIFD, Camera] 34850 - Programa exposición: Programa normal
+[EXIF, ExifIFD, Camera] 34850 - Programa Exposición: Programa normal
 [EXIF, ExifIFD, Image] 34855 - Ratio Velocidad ISO: 100
 [EXIF, ExifIFD, Image] 36864 - Versión Exif: 0210
 [EXIF, ExifIFD, Time] 36867 - Fecha y Hora de Datos Original: 2001:05:19 18:36:41
@@ -40,7 +40,7 @@
 [EXIF, IFD1, Image] 274 - Orientación de Imagen: 0° (arriba/izquierda)
 [EXIF, IFD1, Image] 282 - Resolución Imagen Horizontal: 72
 [EXIF, IFD1, Image] 283 - Resolución Imagen Vertical: 72
-[EXIF, IFD1, Image] 296 - Unidad de resolución de X e Y: Pulgada
+[EXIF, IFD1, Image] 296 - Unidad de Resolución de X e Y: Pulgada
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 1096
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 28
 [EXIF, IFD1, Image] 531 - Posicionamiento Y y C: Vecino

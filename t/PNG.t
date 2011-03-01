@@ -28,7 +28,8 @@ my $testnum = 1;
 {
     ++$testnum;
     my $exifTool = new Image::ExifTool;
-    $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg');
+    $exifTool->SetNewValuesFromFile('t/images/IPTC.jpg');
+    $exifTool->SetNewValuesFromFile('t/images/XMP.jpg');
     $exifTool->SetNewValue('PNG:Comment');  # and delete a tag
     my $image;  
     my $rtnVal = $exifTool->WriteInfo('t/images/PNG.png', \$image);

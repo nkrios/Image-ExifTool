@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.40
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.42
 [File, System, Image] FileName - File Name: Pentax_3_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 2.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:11:20 08:21:39-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:12:08 11:52:54-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -145,7 +145,7 @@
 [MakerNotes, Pentax, Camera] 4 - AEB Xv: 0
 [MakerNotes, Pentax, Camera] 5 - AE Min Exposure Time: 1/3862
 [MakerNotes, Pentax, Camera] 6 - AE Program Mode: Av, B or X
-[MakerNotes, Pentax, Camera] 7 - AE Extra: 0
+[MakerNotes, Pentax, Camera] 7 - AE Flags: (none)
 [MakerNotes, Pentax, Camera] 9 - AE Max Aperture: 4.0
 [MakerNotes, Pentax, Camera] 10 - AE Max Aperture 2: 4.0
 [MakerNotes, Pentax, Camera] 11 - AE Min Aperture: 23
@@ -173,7 +173,7 @@
 [MakerNotes, Pentax, Camera] 15 - LC14: 0x6c
 [MakerNotes, Pentax, Camera] 16 - LC15: 0x03
 [MakerNotes, Pentax, Camera] 0 - Flash Status: Off
-[MakerNotes, Pentax, Camera] 1 - Internal Flash Mode: Off, Wireless (Master)
+[MakerNotes, Pentax, Camera] 1 - Internal Flash Mode: Did not fire, Wireless (Master)
 [MakerNotes, Pentax, Camera] 2 - External Flash Mode: Off
 [MakerNotes, Pentax, Camera] 3 - Internal Flash Strength: 18
 [MakerNotes, Pentax, Camera] 4 - TTL DA A Up: 0

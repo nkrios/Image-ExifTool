@@ -10,6 +10,8 @@
 #               3) http://ffmpeg.org/
 #               4) US Patent 2009/0052875 A1
 #               5) European Patent (EP2 051 528A1) application no. 07792522.0 filed 08.08.2007
+#               6) Dave Nicholson private communication
+#               7) http://www.freepatentsonline.com/20050076039.pdf
 #
 # Glossary:     RBSP = Raw Byte Sequence Payload
 #------------------------------------------------------------------------------
@@ -17,15 +19,22 @@
 package Image::ExifTool::H264;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION %convMake);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.04';
+$VERSION = '1.06';
 
 sub ProcessSEI($$);
 
 my $parsePictureTiming; # flag to enable parsing of picture timing information (test only)
+
+# lookup for camera manufacturer name
+%convMake = (
+    0x0103 => 'Panasonic',
+    0x0108 => 'Sony',
+    0x1011 => 'Canon',
+);
 
 # information extracted from H.264 video streams
 %Image::ExifTool::H264::Main = (
@@ -44,6 +53,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
 %Image::ExifTool::H264::MDPM = (
     GROUPS => { 2 => 'Camera' },
     PROCESS_PROC => \&ProcessSEI,
+    TAG_PREFIX => 'MDPM',
     NOTES => q{
         The following tags are decoded from the Modified Digital Video Pack Metadata
         (MDPM) of the unregistered user data with UUID
@@ -54,8 +64,28 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
         occurrence is extracted unless the ExtractEmbedded (-ee) option is used (in
         which case subsequent occurrences are extracted as sub-documents).
     },
-    # 0x13 - Timecode
-    # 0x14 - BinaryGrup
+    # (Note: all these are explained in IEC 61834-4, but it costs money so it is useless to me)
+    # 0x00 - ControlCassetteID (ref 7)
+    # 0x01 - ControlTapeLength (ref 7)
+    # 0x02 - ControlTimerActDate (ref 7)
+    # 0x03 - ControlTimerACS_S_S (ref 7)
+    # 0x04-0x05 - ControlPR_StartPoint (ref 7)
+    # 0x06 - ControlTagIDNoGenre (ref 7)
+    # 0x07 - ControlTopicPageHeader (ref 7)
+    # 0x08 - ControlTextHeader (ref 7)
+    # 0x09 - ControlText (ref 7)
+    # 0x0a-0x0b - ControlTag (ref 7)
+    # 0x0c - ControlTeletextInfo (ref 7)
+    # 0x0d - ControlKey (ref 7)
+    # 0x0e-0x0f - ControlZoneEnd (ref 7)
+    # 0x10 - TitleTotalTime (ref 7)
+    # 0x11 - TitleRemainTime (ref 7)
+    # 0x12 - TitleChapterTotalNo (ref 7)
+    # 0x13 - TitleTimecode
+    # 0x14 - TitleBinaryGroup
+    # 0x15 - TitleCassetteNo (ref 7)
+    # 0x16-0x17 - TitleSoftID (ref 7)
+    # (0x18,0x19 listed as TitleTextHeader/TitleText by ref 7)
     0x18 => {
         Name => 'DateTimeOriginal',
         Description => 'Date/Time Original',
@@ -76,6 +106,18 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
         },
         PrintConv => '$self->ConvertDateTime($val)',
     },
+    # 0x1a-0x1b - TitleStart (ref 7)
+    # 0x1c-0x1d - TitleReelID (ref 7)
+    # 0x1e-0x1f - TitleEnd (ref 7)
+    # 0x20 - ChapterTotalTime (ref 7)
+    # 0x42 - ProgramRecDTime (ref 7)
+    # 0x50/0x60 - (AAUX/VAUX)Source (ref 7)
+    # 0x51/0x61 - (AAUX/VAUX)SourceControl (ref 7)
+    # 0x52/0x62 - (AAUX/VAUX)RecDate (ref 7)
+    # 0x53/0x63 - (AAUX/VAUX)RecTime (ref 7)
+    # 0x54/0x64 - (AAUX/VAUX)BinaryGroup (ref 7)
+    # 0x55/0x65 - (AAUX/VAUX)ClosedCaption (ref 7)
+    # 0x56/0x66 - (AAUX/VAUX)TR (ref 7)
     0x70 => { # ConsumerCamera1
         Name => 'Camera1',
         SubDirectory => { TagTable => 'Image::ExifTool::H264::Camera1' },
@@ -95,16 +137,21 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     # 0x7e Knee
     0x7f => { # Shutter
         Name => 'Shutter',
-        SubDirectory => { TagTable => 'Image::ExifTool::H264::Shutter' },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::H264::Shutter',
+            ByteOrder => 'LittleEndian', # weird
+        },
     },
     0xa0 => {
         Name => 'ExposureTime',
         Format => 'rational32u',
+        Groups => { 2 => 'Image' },
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },
     0xa1 => {
         Name => 'FNumber',
         Format => 'rational32u',
+        Groups => { 2 => 'Image' },
     },
     0xa2 => {
         Name => 'ExposureProgram',
@@ -326,7 +373,28 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     },
     # 0xe1-0xef - MakerOption
     # 0xe1 - val: 0x01000670,0x01000678,0x06ffffff,0x01ffffff,0x01000020,0x01000400...
-    # 0xe2-0xe8 - val: 0x00000000
+    # 0xe2-0xe8 - val: 0x00000000 in many samples
+    0xe1 => { #6
+        Name => 'RecInfo',
+        Condition => '$$self{Make} eq "Canon"',
+        Notes => 'Canon only',
+        SubDirectory => { TagTable => 'Image::ExifTool::H264::RecInfo' },
+    },
+    0xe4 => { #PH
+        Name => 'Model',
+        Condition => '$$self{Make} eq "Sony"',
+        Description => 'Camera Model Name',
+        Notes => 'Sony cameras only, combined with tags 0xe5 and 0xe6',
+        Format => 'string',
+        Combine => 2, # (not sure about 0xe6, but include it just in case)
+        RawConv => '$val eq "" ? undef : $val',
+    },
+    0xee => { #6 (HFS200)
+        Name => 'FrameInfo',
+        Condition => '$$self{Make} eq "Canon"',
+        Notes => 'Canon only',
+        SubDirectory => { TagTable => 'Image::ExifTool::H264::FrameInfo' },
+    },
 );
 
 # ConsumerCamera1 information (ref PH)
@@ -345,13 +413,13 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
             OTHER => sub { sprintf('%.1f', 2 ** (($_[0] & 0x3f) / 8)) },
         },
     },
-    1.1 => {
+    1 => {
         Name => 'Gain',
         Mask => 0x0f,
         ValueConv => '($val - 1) * 3',
         PrintConv => '"$val dB"',
     },
-    1.2 => {
+    1.1 => {
         Name => 'ExposureProgram',
         Mask => 0xf0,
         ValueConv => '$val == 0xf0 ? undef : $val',
@@ -393,12 +461,13 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     FIRST_ENTRY => 0,
     1 => {
         Name => 'ImageStabilization',
-        # no stabilization feature if whole byte is 0xff
-        ValueConv => '$val == 0xff ? 0 : $val & 0x10',
-        PrintHex => 1,
         PrintConv => {
-            0x00 => 'Off',
-            0x10 => 'On',
+            0 => 'Off',
+            0xff => 'n/a',
+            OTHER => sub {
+                my $val = shift;
+                sprintf("%s (0x%.2x)", $val & 0x10 ? "On" : "Off", $val);
+            },
         },
     },
 );
@@ -406,19 +475,18 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
 # camera info 0x7f (ref PH)
 %Image::ExifTool::H264::Shutter = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    GROUPS => { 2 => 'Camera' },
+    GROUPS => { 2 => 'Image' },
     TAG_PREFIX => 'Shutter',
     PRINT_CONV => 'sprintf("0x%.2x",$val)',
     FIRST_ENTRY => 0,
-  # this worked for the HDR-CX500, but not for other models
-  # --> more work is needed to decode this
-  #  2.1 => {
-  #      Name => 'ExposureTime',
-  #      Mask => 0xf0,
-  #      RawConv => '$val == 0xf0 ? undef : $val',
-  #      ValueConv => '$val / 32000',
-  #      PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
-  #  },
+    FORMAT => 'int16u',
+    1.1 => { #6
+        Name => 'ExposureTime',
+        Mask => 0x7fff, # (what is bit 0x8000 for?)
+        RawConv => '$val == 0x7fff ? undef : $val', #7
+        ValueConv => '$val / 33640', #PH (conversion factor determined empirically)
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
 );
 
 # camera info 0xe0 (ref PH)
@@ -426,20 +494,50 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 2 => 'Camera' },
     FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
     0 => {
         Name => 'Make',
         PrintHex => 1,
-        PrintConv => {
-            0x0103 => 'Panasonic',
-            0x0108 => 'Sony',
-            0x1011 => 'Canon',
-        },
+        RawConv => '$$self{Make} = ($Image::ExifTool::H264::convMake{$val} || "Unknown"); $val',
+        PrintConv => \%convMake,
     },
     # 1 => ModelIDCode according to ref 4/5 (I think not)
     # vals: 0x3001 - Sony HDR-CX105E/TG3E/XR500V
     #       0x1000 - Sony HDR-UX1
     #       0x3000 - Canon HF100 (30p)
     #       0x2000 - Canon HF100 (60i)
+    #       0x3101 - Canon HFM300 (PH, all qualities and frame rates)
+);
+
+# camera info 0xe1 (ref 6)
+%Image::ExifTool::H264::RecInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Camera' },
+    FORMAT => 'int8u',
+    NOTES => 'Recording information stored by some Canon video cameras.',
+    FIRST_ENTRY => 0,
+    0 => {
+        Name => 'RecordingMode',
+        PrintConv => {
+            0x02 => 'XP+', # High Quality 12 Mbps
+            0x04 => 'SP',  # Standard Play 7 Mbps
+            0x05 => 'LP',  # Long Play 5 Mbps
+            0x06 => 'FXP', # High Quality 17 Mbps
+            0x07 => 'MXP', # High Quality 24 Mbps
+        },
+    },
+);
+
+# camera info 0xee (ref 6)
+%Image::ExifTool::H264::FrameInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    FORMAT => 'int8u',
+    NOTES => 'Frame rate information stored by some Canon video cameras.',
+    FIRST_ENTRY => 0,
+    0 => 'CaptureFrameRate',
+    1 => 'VideoFrameRate',
+    # 2 - 8=60i, 10=PF30, 74=PF24 (PH, HFM300)
 );
 
 #==============================================================================
@@ -834,7 +932,13 @@ sub ProcessSEI($$)
         $lastTag = $tag;
         my $buff = substr($$dataPt, $pos + 1, 4);
         my $from;
-        if ($$tagTablePtr{$tag}) {
+        my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
+        if ($tagInfo) {
+            # use our own print conversion for Unknown tags
+            if ($$tagInfo{Unknown} and not $$tagInfo{SetPrintConv}) {
+                $$tagInfo{PrintConv} = 'sprintf("0x%.8x", unpack("N", $val))';
+                $$tagInfo{SetPrintConv} = 1;
+            }
             # combine with next value(s) if necessary
             my $combine = $$tagTablePtr{$tag}{Combine};
             while ($combine) {
@@ -848,20 +952,13 @@ sub ProcessSEI($$)
                 ++$lastTag;
                 --$combine;
             }
-        } else {
-            my %tagInfo = (
-                Name        => sprintf('MDPM_0x%.2x', $tag),
-                Description => sprintf('MDPM 0x%.2x', $tag),
-                Unknown     => 1,
-                PrintConv   => 'sprintf("0x%.8x", unpack("N", $val))',
+            $exifTool->HandleTag($tagTablePtr, $tag, undef,
+                TagInfo => $tagInfo,
+                DataPt  => \$buff,
+                Size    => length($buff),
+                Index   => defined $from ? "$from-$index" : $index,
             );
-            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, \%tagInfo);
         }
-        $exifTool->HandleTag($tagTablePtr, $tag, undef,
-            DataPt => \$buff,
-            Size   => length($buff),
-            Index  => defined $from ? "$from-$index" : $index,
-        );
         $pos += 5;
     }
     $$exifTool{INDENT} = $oldIndent;
@@ -968,7 +1065,7 @@ information from H.264 video streams.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

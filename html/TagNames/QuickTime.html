@@ -347,17 +347,21 @@ and is used in the AvgBitrate calculation)</span></span></td></tr>
 <table class='inner sep' cellspacing=1>
 <tr class=h><th>Value</th><th>VendorID</th><th>Value</th><th>VendorID</th></tr>
 <tr><td>'FFMP'</td><td>= FFmpeg</td>
-<td class=b>'niko'</td><td class=b>= Nikon</td>
+<td class=b>'kdak'</td><td class=b>= Kodak</td>
+</tr><tr><td>'GIC '</td><td>= General Imaging Co.</td>
+<td class=b>'mino'</td><td class=b>= Minolta</td>
 </tr><tr><td>'KMPI'</td><td>= Konica-Minolta</td>
-<td class=b>'olym'</td><td class=b>= Olympus</td>
+<td class=b>'niko'</td><td class=b>= Nikon</td>
 </tr><tr><td>'NIKO'</td><td>= Nikon</td>
+<td class=b>'olym'</td><td class=b>= Olympus</td>
+</tr><tr><td>'SMI '</td><td>= Sorenson Media Inc.</td>
 <td class=b>'pana'</td><td class=b>= Panasonic</td>
-</tr><tr><td>'appl'</td><td>= Apple</td>
+</tr><tr><td>'ZORA'</td><td>= Zoran Corporation</td>
 <td class=b>'pent'</td><td class=b>= Pentax</td>
-</tr><tr><td>'kdak'</td><td>= Kodak</td>
+</tr><tr><td>'appl'</td><td>= Apple</td>
+<td class=b>'pr01'</td><td class=b>= Olympus (pr01)</td>
+</tr><tr><td>'fe20'</td><td>= Olympus (fe20)</td>
 <td class=b>'sany'</td><td class=b>= Sanyo</td>
-</tr><tr><td>'mino'</td><td>= Minolta</td>
-<td class=b>&nbsp;</td><td class=b>&nbsp;</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='ItemList'>QuickTime ItemList Tags</a></h2>
@@ -1714,11 +1718,16 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td class=c>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
 <tr>
+<td>'SDLN'</td>
+<td>PlayMode</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'SelO'</td>
 <td>PlaySelection</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'TAGS'</td>
 <td>KodakTags
   <br>KonicaMinoltaTags
@@ -1744,282 +1753,282 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
   <br>--&gt; <a href='Samsung.html#MP4'>Samsung MP4 Tags</a>
   <br>--&gt; <a href='Sanyo.html#MOV'>Sanyo MOV Tags</a>
   <br>--&gt; <a href='Sanyo.html#MP4'>Sanyo MP4 Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'WLOC'</td>
 <td>WindowLocation</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'XMP_'</td>
 <td>XMP</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'hinf'</td>
 <td>HintTrackInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#HintTrackInfo'>QuickTime HintTrackInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'hnti'</td>
 <td>HintInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#HintInfo'>QuickTime HintInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'meta'</td>
 <td>Meta</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Meta'>QuickTime Meta Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'name'</td>
 <td>Name</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'ptv '</td>
 <td>PrintToVideo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Video'>QuickTime Video Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'vndr'</td>
 <td>Vendor</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;ART"</td>
 <td>Artist</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;alb"</td>
 <td>Album</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;arg"</td>
 <td>Arranger</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;ark"</td>
 <td>ArrangerKeywords</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;cmt"</td>
 <td>Comment</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;cok"</td>
 <td>ComposerKeywords</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;com"</td>
 <td>Composer</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;cpy"</td>
 <td>Copyright</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;day"</td>
 <td>CreateDate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;dir"</td>
 <td>Director</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;ed1"</td>
 <td>Edit1</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;ed2"</td>
 <td>Edit2</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;ed3"</td>
 <td>Edit3</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;ed4"</td>
 <td>Edit4</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;ed5"</td>
 <td>Edit5</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;ed6"</td>
 <td>Edit6</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;ed7"</td>
 <td>Edit7</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;ed8"</td>
 <td>Edit8</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;ed9"</td>
 <td>Edit9</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;fmt"</td>
 <td>Format</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;gen"</td>
 <td>Genre</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;grp"</td>
 <td>Grouping</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;inf"</td>
 <td>Information</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;isr"</td>
 <td>ISRCCode</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;lab"</td>
 <td>RecordLabelName</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;lal"</td>
 <td>RecordLabelURL</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;lyr"</td>
 <td>Lyrics</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;mak"</td>
 <td>Make</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;mal"</td>
 <td>MakerURL</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;mod"</td>
 <td>Model</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;nam"</td>
 <td>Title</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;pdk"</td>
 <td>ProducerKeywords</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;phg"</td>
 <td>RecordingCopyright</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;prd"</td>
 <td>Producer</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;prf"</td>
 <td>Performers</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;prk"</td>
 <td>PerformerKeywords</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;prl"</td>
 <td>PerformerURL</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;req"</td>
 <td>Requirements</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;snk"</td>
 <td>SubtitleKeywords</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;snm"</td>
 <td>Subtitle</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;src"</td>
 <td>SourceCredits</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;swf"</td>
 <td>SongWriter</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;swk"</td>
 <td>SongWriterKeywords</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;swr"</td>
 <td>SoftwareVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;too"</td>
 <td>Encoder</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;trk"</td>
 <td>Track</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>"&copy;wrt"</td>
 <td>Composer</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>"&copy;xyz"</td>
 <td>GPSCoordinates</td>
 <td class=c>N</td>
@@ -2502,7 +2511,7 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 18, 2010</i>
+<br><i>Last revised Dec 14, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

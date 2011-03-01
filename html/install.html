@@ -49,7 +49,9 @@ application documentation, or drag-and-drop files and folders to run exiftool on
 selected files. To install exiftool for <b>use from the command line</b>,
 continue with the following steps:</p>
 <ol start=3>
-<li><b>Rename</b> "<code>exiftool(-k).exe</code>" to <b>"<code>exiftool.exe</code>"</b>.</li>
+<li><b>Rename</b> "<code>exiftool(-k).exe</code>" to <b>"<code>exiftool.exe</code>"</b>.
+<br><span class=lt>(or "<code>exiftool(-k)</code>" to "<code>exiftool</code>" if file name
+extensions are hidden on your system)</span></li>
 <li><b>Move "<code>exiftool.exe</code>"</b> to the "<code>C:\WINDOWS</code>" directory
 (or any other directory in your PATH).</li>
 </ol>
@@ -114,9 +116,9 @@ the ExifTool library available for your Perl scripts, as well as installing the
 man pages and POD documentation.</p>
 <p>Otherwise, you have a choice of two packages to install: The OS X package, or
 the full Perl distribution.  Both of the procedures below install the ExifTool
-files in the same location.  Installing the OS X package is easier, but the full
-distribution includes HTML documentation and some other files not included in
-the OS X package.  Both versions run natively on PPC and Intel Macs.</p>
+files in the same location.  Installing from the OS X package is easier, but the
+full distribution includes HTML documentation and some other files not included
+in the OS X package.  Both versions run natively on PPC and Intel Macs.</p>
 
 <h3>OS X Package</h3>
 <ol>
@@ -146,12 +148,13 @@ password.)</span></li>
 </ol>
 <p>You can now run exiftool by typing "<code>exiftool</code>" in a Terminal window.</p>
 
-<p class=lt>(Note: The OS X installations above place exiftool and its
-lib directory in /usr/bin, while the standard Unix "<code>make install</code>"
-described below puts "<code>exiftool</code>" in /usr/bin and the individual
-libraries in /Library/Perl/#.#.#, where "#.#.#" is your Perl version.  If both
-sets of libraries exist, /usr/bin/lib takes precedence for exiftool, but
-/Library/Perl/#.## is the default for any other Perl scripts.)</p>
+<p class=lt>(Note: Both OS X installation techniques outlined above place
+exiftool and its lib directory in /usr/bin, while the standard Unix
+"<code>make install</code>" described below puts "<code>exiftool</code>" in
+/usr/bin and the individual libraries in /Library/Perl/#.#.#, where "#.#.#" is
+your Perl version. If both sets of libraries exist, /usr/bin/lib takes
+precedence for exiftool, but /Library/Perl/#.#.# is the default for any other
+Perl scripts.)</p>
 
 <h3>Uninstalling</h3>
 <ol type='i'>
@@ -193,7 +196,7 @@ that you have su access, and will prompt for your password.  This will make
 ExifTool and its documentation accessible to all users on your system. If you
 don't have su access, you can run ExifTool in your own account by moving
 "<code>exiftool</code>" and its "<code>lib</code>" directory to any convienient
-location -- preferably somewhere in your PATH.)</span></li>
+location, preferably somewhere in your PATH.)</span></li>
 </ol>
 <p>You can now run exiftool by typing "<code>exiftool</code>".  Also, you can
 consult the ExifTool documentation with commands like:</p>

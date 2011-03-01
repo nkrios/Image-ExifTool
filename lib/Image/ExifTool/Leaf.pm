@@ -21,11 +21,11 @@ sub ProcessLeaf($$$);
     PROCESS_PROC => \&ProcessLeaf,
     GROUPS => { 0 => 'Leaf', 2 => 'Camera' },
     NOTES => q{
-These tags are found in .MOS images from Leaf digital camera backs as
-written by Creo Leaf Capture.  They exist within the Leaf-specific directory
-structure of EXIF tag 0x8606. The tables below list observed Leaf tags,
-however ExifTool will extract any tags found in the Leaf directories even if
-they don't appear in these tables.
+        These tags are found in .MOS images from Leaf digital camera backs as
+        written by Creo Leaf Capture.  They exist within the Leaf-specific directory
+        structure of EXIF tag 0x8606.  The tables below list observed Leaf tags,
+        however ExifTool will extract any tags found in the Leaf directories even if
+        they don't appear in these tables.
     },
     icc_camera_profile => {
         Name => 'ICC_Profile',
@@ -502,7 +502,7 @@ Capture.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

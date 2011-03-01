@@ -248,7 +248,6 @@ sub ProcessAnt($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
-    my $unknown = $exifTool->Options('Unknown');
 
     # quick pre-scan to check for metadata or XMP
     return 1 unless $$dataPt =~ /\(\s*(metadata|xmp)[\s("]/s;
@@ -349,7 +348,7 @@ Image::ExifTool::AIFF.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

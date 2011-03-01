@@ -31,7 +31,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 # program map table "stream_type" lookup (ref 6/1)
 my %streamType = (
@@ -149,7 +149,7 @@ my %noSyntax = (
     },
     AudioBitrate => {
         PrintConvColumns => 2,
-        PrintConv => {
+        ValueConv => {
             0 => 32000,
             1 => 40000,
             2 => 48000,
@@ -189,6 +189,7 @@ my %noSyntax = (
             49 => '576000 max',
             50 => '640000 max',
         },
+        PrintConv => 'ConvertBitrate($val)',
     },
     SurroundMode => {
         PrintConv => {
@@ -622,7 +623,7 @@ video.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

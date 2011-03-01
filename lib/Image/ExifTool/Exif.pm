@@ -48,7 +48,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.18';
+$VERSION = '3.21';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -603,6 +603,7 @@ my %sampleFormat = (
     },
     0x128 => {
         Name => 'ResolutionUnit',
+        Notes => 'the value 1 is not standard EXIF',
         PrintConv => {
             1 => 'None',
             2 => 'inches',
@@ -1284,7 +1285,7 @@ my %sampleFormat = (
     0x8769 => {
         Name => 'ExifOffset',
         Groups => { 1 => 'ExifIFD' },
-        Flags => 'SubIFD',
+        SubIFD => 2,
         SubDirectory => {
             DirName => 'ExifIFD',
             Start => '$val',
@@ -1451,6 +1452,7 @@ my %sampleFormat = (
     0x9101 => {
         Name => 'ComponentsConfiguration',
         Format => 'int8u',
+        PrintConvColumns => 2,
         PrintConv => {
             0 => '-',
             1 => 'Y',
@@ -1585,6 +1587,7 @@ my %sampleFormat = (
     0x9217 => { #12
         Name => 'SensingMethod',
         Groups => { 2 => 'Camera' },
+        Notes => 'values 1 and 6 are not standard EXIF',
         PrintConv => {
             1 => 'Monochrome area', #12 (not standard EXIF)
             2 => 'One-chip color area',
@@ -1605,6 +1608,8 @@ my %sampleFormat = (
     0x927c => \@Image::ExifTool::MakerNotes::Main,
     0x9286 => {
         Name => 'UserComment',
+        # may consider forcing a Format of 'undef' for this tag because I have
+        # seen other applications write it incorrectly as 'string' or 'int8u'
         RawConv => 'Image::ExifTool::Exif::ConvertExifText($self,$val)',
     },
     0x9290 => {
@@ -1673,17 +1678,19 @@ my %sampleFormat = (
     0xa001 => {
         Name => 'ColorSpace',
         Notes => q{
-            the value of 2 is not standard EXIF.  Instead, an Adobe RGB image is
-            indicated by "Uncalibrated" with an InteropIndex of "R03"
+            the value of 0x2 is not standard EXIF.  Instead, an Adobe RGB image is
+            indicated by "Uncalibrated" with an InteropIndex of "R03".  The values
+            0xfffd and 0xfffe are also non-standard, and are used by some Sony cameras
         },
+        PrintHex => 1,
         PrintConv => {
             1 => 'sRGB',
             2 => 'Adobe RGB',
             0xffff => 'Uncalibrated',
-            # Sony uses these definitions: (ref 19)
-            # 0xffff => 'AdobeRGB',
-            # 0xfffe => 'ICC Profile',
-            # 0xfffd => 'Wide Gamut RGB',
+            # Sony uses these definitions: (ref JD)
+            # 0xffff => 'Adobe RGB', (conflicts with Uncalibrated)
+            0xfffe => 'ICC Profile',
+            0xfffd => 'Wide Gamut RGB',
         },
     },
     0xa002 => {
@@ -1719,6 +1726,7 @@ my %sampleFormat = (
     0xa210 => {
         Name => 'FocalPlaneResolutionUnit',
         Groups => { 2 => 'Camera' },
+        Notes => 'values 1, 4 and 5 are not standard EXIF',
         PrintConv => {
             1 => 'None', # (not standard EXIF)
             2 => 'inches',
@@ -1871,6 +1879,8 @@ my %sampleFormat = (
             3 => 'Distant',
         },
     },
+    # 0xa40d - int16u: 0 (GE E1486 TW)
+    # 0xa40e - int16u: 1 (GE E1486 TW)
     0xa420 => 'ImageUniqueID',
     0xa430 => { #24
         Name => 'OwnerName',
@@ -2083,7 +2093,7 @@ my %sampleFormat = (
     0xc615 => {
         Name => 'LocalizedCameraModel',
         Format => 'string',
-        PrintConv => '$self->Printable($val)',
+        PrintConv => '$self->Printable($val, 0)',
     },
     0xc616 => {
         Name => 'CFAPlaneColor',
@@ -2801,6 +2811,7 @@ my %sampleFormat = (
         PrintConv => 'int($val * 1e6 + 0.5) * 1e-6',
     },
     GPSPosition => {
+        Groups => { 2 => 'Location' },
         Require => {
             0 => 'GPSLatitude',
             1 => 'GPSLongitude',
@@ -2985,7 +2996,7 @@ sub ConvertFraction($)
 #------------------------------------------------------------------------------
 # Convert EXIF text to something readable
 # Inputs: 0) ExifTool object reference, 1) EXIF text
-# Returns: UTF8 or Latin text
+# Returns: text encoded according to Charset option (with trailing spaces removed)
 sub ConvertExifText($$)
 {
     my ($exifTool, $val) = @_;
@@ -3253,7 +3264,7 @@ sub PrintLensID($$@)
         }
         if ($maxAperture) {
             # it seems that most manufacturers set MaxAperture and MaxApertureValue
-            # to the maximum aperture (minimum F-number) for the current focal length
+            # to the maximum aperture (smallest F number) for the current focal length
             # of the lens, so assume that MaxAperture varies with focal length and find
             # the closest match (this is somewhat contrary to the EXIF specification which
             # states "The smallest F number of the lens", without mention of focal length)
@@ -3762,7 +3773,7 @@ sub ProcessExif($$$)
                     my $style = ($valueDataLen < 0 or not defined $tval) ? 'V' : 'H';
                     if ($actPt != $offPt) {
                         $tip .= sprintf("Actual offset: 0x%.4x\n", $actPt);
-                        my $sign = $actPt > $offPt ? '' : '-';
+                        my $sign = $actPt < $offPt ? '-' : '';
                         $tip .= sprintf("Offset base: ${sign}0x%.4x\n", abs($actPt - $offPt));
                         $style = 'F' if $style eq 'H';  # purple for different offsets
                     }
@@ -3782,10 +3793,10 @@ sub ProcessExif($$$)
                     } elsif ($tagInfo and Image::ExifTool::IsInt($tval)) {
                         if ($$tagInfo{IsOffset} or $$tagInfo{SubIFD}) {
                             $tval = sprintf('0x%.4x', $tval);
-                            if ($base) {
-                                my $actPt = $val + $base - ($$exifTool{EXIF_POS} || 0);
+                            my $actPt = $val + $base - ($$exifTool{EXIF_POS} || 0);
+                            if ($actPt != $val) {
                                 $tval .= sprintf("\nActual offset: 0x%.4x", $actPt);
-                                my $sign = $actPt > $val ? '' : '-';
+                                my $sign = $actPt < $val ? '-' : '';
                                 $tval .= sprintf("\nOffset base: ${sign}0x%.4x", abs($actPt - $val));
                             }
                         } elsif ($$tagInfo{PrintHex}) {
@@ -3928,7 +3939,6 @@ sub ProcessExif($$$)
                 }
                 if ($subdirStart < 0 or $subdirStart + 2 > $subdirDataLen) {
                     # convert $subdirStart back to a file offset
-                    my $dirOK;
                     if ($raf) {
                         # reset SubDirectory buffer (we will load it later)
                         my $buff = '';
@@ -4126,7 +4136,7 @@ EXIF and TIFF meta information.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

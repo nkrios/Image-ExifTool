@@ -10,8 +10,8 @@
 
 <p>By writing the <b>FileName</b> and/or <b>Directory</b> tags, ExifTool can be
 used to rename and/or move images into directories according to any information
-contained in the image.  The most useful application of this feature is to
-organize images by date/time, but any other tag value may also be used.</p>
+contained in the image.  The most common use of this feature is to organize
+images by date/time, but any other tag value may also be used.</p>
 
 <p>Writing the <b>Directory</b> tag moves a file to a specified directory.  The
 directory is created if it didn't already exist.</p>
@@ -34,19 +34,18 @@ default behaviour of these format codes.  See the <code>-w</code> option in the
 
 <p>When organizing files by date/time, use of the <code>-d</code> (date format)
 option is essential to specify a format for the filename (and/or directory
-name).  The examples below demonstrate the use of this feature.  Also, a quick
-reference of <a href="#codes">common date format codes</a> is included.</p>
+name).  The examples below demonstrate the use of this feature.  Also, a list of
+of <a href="#codes">common date format codes</a> is provided for reference.</p>
 
 <h3>Notes:</h3>
 
 <p>Writing the <b>FileName</b> and/or <b>Directory</b> tags alone causes the
-file to be renamed or moved, not copied.  However, if any other tags are written
-at the same time, then the file is rewritten to the new destination and the
-original file is left unchanged.  (The only exception to this is
-<b>FileModifyDate</b> tag, which will not cause the file to be rewritten because
-it is the only other writable tag not representing meta information within the
-file.)  But if desired, the <code>-overwrite_original</code> option may be used
-in this case to remove the original copy.</p>
+file to be renamed or moved, not copied.  However, if any "real" tags are
+written at the same time, then the file is rewritten to the new destination and
+the original file is left unchanged.  (Only the three writable "pseudo" tags,
+<b>FileName</b>, <b>Directory</b> and <b>FileModifyDate</b>, may be set without
+causing the file to be rewritten.)  If desired, the <code>-overwrite_original</code>
+option may be used to remove the original copy when the file is rewritten.</p>
 
 <p>Conversely, the <code>-o</code> option may be used to force exiftool to
 always create a copy of the file, even if no meta-information tags are written. 

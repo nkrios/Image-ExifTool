@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 sub SetGeoValues($$;$);
 
@@ -217,8 +217,10 @@ sub LoadTrackLog($$;$)
                         $time += $7 if $7;  # add fractional seconds
                         my $tz = $8;
                         # adjust for time zone (otherwise assume UTC)
-                        if ($tz =~ /^([-+])(\d+):(\d{2})\b/) {
-                            $tz = ($2 * 60 + $3) * 60;
+                        # - allow timezone of +-HH:MM, +-H:MM, +-HHMM or +-HH since
+                        #   the spec is unclear about timezone format
+                        if ($tz =~ /^([-+])(\d+):(\d{2})\b/ or $tz =~ /^([-+])(\d{2})(\d{2})?\b/) {
+                            $tz = ($2 * 60 + ($3 || 0)) * 60;
                             $tz *= -1 if $1 eq '+'; # opposite sign to change back to UTC
                             $time += $tz;
                         }
@@ -586,7 +588,7 @@ sub SetGeoValues($$;$)
             ($year,$mon,$day) = (1970,1,2);
             $noDate = 1;
         } else {
-            $err = 'Invalid date/time (use YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM|Z])';
+            $err = 'Invalid date/time (use YYYY:mm:dd HH:MM:SS[.ss][+/-HH:MM|Z])';
             last;
         }
         if ($tz) {
@@ -880,7 +882,7 @@ in the tag name documentation).
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

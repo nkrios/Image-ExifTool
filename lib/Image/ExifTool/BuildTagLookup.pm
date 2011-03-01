@@ -19,6 +19,7 @@ require Exporter;
 BEGIN {
     # prevent ExifTool from loading the user config file
     $Image::ExifTool::configFile = '';
+    $Image::ExifTool::debug = 1; # enabled debug messages
 }
 
 use vars qw($VERSION @ISA);
@@ -27,10 +28,11 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::Shortcuts;
 use Image::ExifTool::HTML qw(EscapeHTML);
 use Image::ExifTool::IPTC;
+use Image::ExifTool::XMP;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.23';
+$VERSION = '2.27';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -48,8 +50,11 @@ my $docType = q{<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 };
 
+my $homePage = 'http://owl.phy.queensu.ca/~phil/exiftool';
+
 # list of all recognized Format strings
 # (not a complete list, but this is all we use so far)
+# (also, formats like "var_X[Y]" are allowed for any valid X)
 my %formatOK = (
     %Image::ExifTool::Exif::formatNumber,
     0 => 1,
@@ -166,8 +171,8 @@ question.
     EXIF => q{
 EXIF stands for "Exchangeable Image File Format".  This type of information
 is formatted according to the TIFF specification, and may be found in JPG,
-TIFF, PNG, MIFF, HDP, PSP and XCF images, as well as many TIFF-based RAW
-images, and even some AVI and MOV videos.
+TIFF, PNG, PGF, MIFF, HDP, PSP and XCF images, as well as many TIFF-based
+RAW images, and even some AVI and MOV videos.
 
 The EXIF meta information is organized into different Image File Directories
 (IFD's) within an image.  The names of these IFD's correspond to the
@@ -208,21 +213,30 @@ GPSVersionID tag automatically if new a GPS IFD is added to an image.
 XMP stands for "Extensible Metadata Platform", an XML/RDF-based metadata
 format which is being pushed by Adobe.  Information in this format can be
 embedded in many different image file types including JPG, JP2, TIFF, GIF,
-EPS, PDF, PSD, IND, PNG, DJVU, SVG, MIFF, XCF, CRW, DNG and a variety of
-proprietary TIFF-based RAW images, as well as MOV, AVI, ASF, WMV, FLV, SWF
-and MP4 videos, and WMA and audio formats supporting ID3v2 information.
+EPS, PDF, PSD, IND, PNG, DJVU, SVG, PGF, MIFF, XCF, CRW, DNG and a variety
+of proprietary TIFF-based RAW images, as well as MOV, AVI, ASF, WMV, FLV,
+SWF and MP4 videos, and WMA and audio formats supporting ID3v2 information.
 
 The XMP B<Tag ID>'s aren't listed because in most cases they are identical
-to the B<Tag Name>.
+to the B<Tag Name> (aside from differences in case).  Tags with different
+ID's are mentioned in the B<Notes> column of the HTML version of this
+document.
 
 All XMP information is stored as character strings.  The B<Writable> column
 specifies the information format:  C<string> is an unformatted string,
 C<integer> is a string of digits (possibly beginning with a '+' or '-'),
 C<real> is a floating point number, C<rational> is entered as a floating
 point number but stored as two C<integer> strings separated by a '/'
-character, C<date> is a date/time string entered in the format "YYYY:MM:DD
-HH:MM:SS[.SS][+/-HH:MM]", C<boolean> is either "True" or "False", and
-C<lang-alt> is a list of string alternatives in different languages.
+character, C<date> is a date/time string entered in the format "YYYY:mm:dd
+HH:MM:SS[.ss][+/-HH:MM]", C<boolean> is either "True" or "False",
+C<lang-alt> indicates that the tag supports alternate languages (see below),
+and C<struct> is an XMP structure.  When reading, structures are extracted
+only if the Struct (-struct) option is used.  Otherwise the corresponding
+"flattened" tags, indicated by an underline (C<_>) after the B<Writable>
+type, are extracted.  When copying information, the Struct option is in
+effect by default.  When writing, the Struct option has no effect, and both
+structured and flattened tags may be written.  See
+L<http://owl.phy.queensu.ca/~phil/exiftool/struct.html> for more details.
 
 Individual languages for C<lang-alt> tags are accessed by suffixing the tag
 name with a '-', followed by an RFC 3066 language code (ie. "XMP:Title-fr",
@@ -230,9 +244,8 @@ or "Rights-en-US").  (See L<http://www.ietf.org/rfc/rfc3066.txt> for the RFC
 3066 specification.)  A C<lang-alt> tag with no language code accesses the
 "x-default" language, but causes other languages for this tag to be deleted
 when writing.  The "x-default" language code may be specified when writing
-to preserve other existing languages (ie. "XMP-dc:Description-x-default"),
-but note that other languages are still deleted if the "x-default" language
-is deleted.  When reading, "x-default" is not specified.
+to preserve other existing languages (ie. "XMP-dc:Description-x-default"). 
+When reading, "x-default" is not specified.
 
 The XMP tags are organized according to schema B<Namespace> in the following
 tables.  Note that a few of the longer namespace prefixes given below have
@@ -241,6 +254,12 @@ from these by adding a leading "XMP-").  In cases where a tag name exists in
 more than one namespace, less common namespaces are avoided when writing.
 However, any namespace may be written by specifying a family 1 group name
 for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.
+
+For structures, the heading of the first column is B<Field Name>.  Field
+names are very similar to tag names, except they are used to identify fields
+inside structures instead of stand-alone tags.  See
+L<the Field Name section of the Structured Information documentation|http://owl.phy.queensu.ca/~phil/exiftool/struct.html#Fields> for more
+details.
 
 ExifTool will extract XMP information even if it is not listed in these
 tables.  For example, the C<pdfx> namespace doesn't have a predefined set of
@@ -253,23 +272,24 @@ See L<http://www.adobe.com/devnet/xmp/> for the official XMP specification.
 The tags listed below are part of the International Press Telecommunications
 Council (IPTC) and the Newspaper Association of America (NAA) Information
 Interchange Model (IIM).  This is an older meta information format, slowly
-being phased out in favor of XMP.  IPTC information may be embedded in JPG,
-TIFF, PNG, MIFF, PS, PDF, PSD, XCF and DNG images.
+being phased out in favor of XMP.  (In fact, the newer IPTCCore
+specification actually uses XMP format!)  IPTC information may be embedded
+in JPG, TIFF, PNG, MIFF, PS, PDF, PSD, XCF and DNG images.
 
 IPTC information is separated into different records, each of which has its
 own set of tags.  See
 L<http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf> for the
 official specification.
 
-This specification dictates a length for ASCII (C<string> or C<digits>)
-values.  These lengths are given in square brackets after the B<Writable>
-format name.  For tags where a range of lengths is allowed, the minimum and
-maximum lengths are separated by a comma within the brackets.  IPTC strings
-are not null terminated.  When writing, ExifTool issues a minor warning and
-truncates the value if it is longer than allowed by the IPTC specification.
-Minor errors may be ignored with the IgnoreMinorErrors (-m) option, allowing
-longer values to be written, but beware that values like this may cause
-problems for some other IPTC readers.
+This specification dictates a length for ASCII (C<string> or C<digits>) and
+binary (C<undef>) values.  These lengths are given in square brackets after
+the B<Writable> format name.  For tags where a range of lengths is allowed,
+the minimum and maximum lengths are separated by a comma within the
+brackets.  IPTC strings are not null terminated.  When writing, ExifTool
+issues a minor warning and truncates the value if it is longer than allowed
+by the IPTC specification. Minor errors may be ignored with the
+IgnoreMinorErrors (-m) option, allowing longer values to be written, but
+beware that values like this may cause problems for some other IPTC readers.
 
 Separate IPTC date and time tags may be written with a combined date/time
 value and ExifTool automagically takes the appropriate part of the date/time
@@ -298,6 +318,15 @@ Unknown (-u) option is used.
     PrintIM => q{
 The format of the PrintIM information is known, however no PrintIM tags have
 been decoded.  Use the Unknown (-u) option to extract PrintIM information.
+},
+    GeoTiff => q{
+ExifTool extracts the following tags from GeoTIFF images.  See
+L<http://www.remotesensing.org/geotiff/spec/geotiffhome.html> for the
+complete GeoTIFF specification.
+},
+    JFIF => q{
+The following information is extracted from the JPEG JFIF header.  See
+L<http://www.jpeg.org/public/jfif.pdf> for the JFIF 1.02 specification.
 },
     Kodak => q{
 Many Kodak models don't store the maker notes in standard IFD format, and
@@ -422,7 +451,7 @@ L<Image::ExifTool::BuildTagLookup|Image::ExifTool::BuildTagLookup>.
 
 ~head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -501,7 +530,7 @@ sub new
     my $that = shift;
     my $class = ref($that) || $that || 'Image::ExifTool::BuildTagLookup';
     my $self = bless {}, $class;
-    my (%subdirs, %isShortcut);
+    my (%subdirs, %isShortcut, %allStructs);
     my %count = (
         'unique tag names' => 0,
         'total tags' => 0,
@@ -510,8 +539,8 @@ sub new
 # loop through all tables, accumulating TagLookup and TagName information
 #
     my (%tagNameInfo, %id, %longID, %longName, %shortName, %tableNum,
-        %tagLookup, %tagExists, %tableWritable, %sepTable,
-        %compositeModules, %isPlugin);
+        %tagLookup, %tagExists, %tableWritable, %sepTable, %structs,
+        %compositeModules, %isPlugin, %flattened, %structLookup);
     $self->{TAG_NAME_INFO} = \%tagNameInfo;
     $self->{ID_LOOKUP} = \%id;
     $self->{LONG_ID} = \%longID;
@@ -520,8 +549,11 @@ sub new
     $self->{TABLE_NUM} = \%tableNum;
     $self->{TAG_LOOKUP} = \%tagLookup;
     $self->{TAG_EXISTS} = \%tagExists;
+    $self->{FLATTENED} = \%flattened;
     $self->{TABLE_WRITABLE} = \%tableWritable;
     $self->{SEPARATE_TABLE} = \%sepTable;
+    $self->{STRUCTURES} = \%structs;
+    $self->{STRUCT_LOOKUP} = \%structLookup;  # lookup for Struct hash ref based on Struct name
     $self->{COMPOSITE_MODULES} = \%compositeModules;
     $self->{COUNT} = \%count;
 
@@ -588,7 +620,15 @@ sub new
         # save all tag names
         my ($tagID, $binaryTable, $noID, $isIPTC, $isXMP);
         $isIPTC = 1 if $writeProc and $writeProc eq \&Image::ExifTool::IPTC::WriteIPTC;
-        $isXMP = 1 if $$table{GROUPS} and $$table{GROUPS}{0} eq 'XMP';
+        # generate flattened tag names for structure fields if this is an XMP table
+        if ($$table{GROUPS} and $$table{GROUPS}{0} eq 'XMP') {
+            $isXMP = 1;
+            foreach $tagID (TagTableKeys($table)) {
+                my $tagInfo = $$table{$tagID};
+                next unless ref $tagInfo eq 'HASH' and $$tagInfo{Struct};
+                Image::ExifTool::XMP::AddFlattenedTags($table, $tagID);
+            }
+        }
         $noID = 1 if $isXMP or $short =~ /^(Shortcuts|ASF.*)$/ or $$vars{NO_ID};
         my $processBinaryData = ($$table{PROCESS_PROC} and (
             $$table{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData or
@@ -686,13 +726,35 @@ TagID:  foreach $tagID (@keys) {
                 }
                 # validate SubIFD flag
                 my $subdir = $$tagInfo{SubDirectory};
+                my $struct = $$tagInfo{Struct};
+                my $strTable;
+                if (ref $struct) {
+                    $strTable = $struct;
+                    $struct = $$strTable{STRUCT_NAME};
+                    if ($struct) {
+                        my $oldTable = $structLookup{$struct};
+                        if ($oldTable and $oldTable ne $strTable) {
+                            warn "Duplicate XMP structure with name $struct\n";
+                        } else {
+                            $structLookup{$struct} = $strTable;
+                        }
+                    } else {
+                        warn "Missing STRUCT_NAME for structure in $$tagInfo{Name}\n";
+                        undef $strTable;
+                    }
+                } elsif ($struct) {
+                    $strTable = $structLookup{$struct};
+                    unless ($strTable) {
+                        warn "Missing XMP $struct structure!\n";
+                        undef $struct;
+                    }
+                }
                 my $isSub = ($subdir and $$subdir{Start} and $$subdir{Start} eq '$val');
                 if ($$tagInfo{SubIFD}) {
                     warn "Warning: Wrong SubDirectory Start for SubIFD tag - $short $name\n" unless $isSub;
                 } else {
                     warn "Warning: SubIFD flag not set for $short $name\n" if $isSub;
                 }
-
                 if ($$tagInfo{Notes}) {
                     my $note = $$tagInfo{Notes};
                     # remove leading/trailing blank lines
@@ -701,8 +763,12 @@ TagID:  foreach $tagID (@keys) {
                     $note =~ s/(^[ \t]+|[ \t]+$)//mg;
                     push @values, "($note)";
                 } elsif ($isXMP and lc $tagID ne lc $name) {
-                    # add note about different XMP Tag ID unless this is a structure tag
-                    push @values,"(called $tagID by the spec)" if $writable and not $$tagInfo{PropertyPath};
+                    # add note about different XMP Tag ID
+                    if ($$tagInfo{RootTagInfo}) {
+                        push @values, "($tagID)";
+                    } else {
+                        push @values,"(called $tagID by the spec)";
+                    }
                 }
                 my $writeGroup;
                 $writeGroup = $$tagInfo{WriteGroup};
@@ -714,16 +780,17 @@ TagID:  foreach $tagID (@keys) {
                     $format = $$tagInfo{Format};
                     # validate Format
                     unless ($formatOK{$format} or $short eq 'PICT' or
-                        ($format =~ /(.*)\[/ and $formatOK{$1}))
+                        ($format =~ /^(var_)?(.*)\[/ and $formatOK{$2}))
                     {
                         warn "Warning: Unknown Format ($format) for $short $name\n";
                     }
                 }
                 if ($subdir) {
-                    # don't show XMP structure tags
-                    next TagID if $isXMP and $short ne 'XMP';
                     my $subTable = $$subdir{TagTable} || $tableName;
                     push @values, $shortName{$subTable}
+                } elsif ($struct) {
+                    push @values, $struct;
+                    $structs{$struct} = 1;
                 }
                 my $type;
                 foreach $type ('Require','Desire') {
@@ -932,6 +999,8 @@ TagID:  foreach $tagID (@keys) {
                         }
                         $writable .= '/' if $$tagInfo{Avoid};
                     }
+                    $writable = "=struct" if $struct;
+                    $writable .= '_' if defined $$tagInfo{Flat};
                     $writable .= '+' if $$tagInfo{List};
                     $writable .= ':' if $$tagInfo{Mandatory};
                     # separate tables link like subdirectories (flagged with leading '-')
@@ -975,6 +1044,11 @@ TagID:  foreach $tagID (@keys) {
                 next unless $writeProc and ($wflag or ($$table{WRITABLE} and
                     not defined $wflag and not $$tagInfo{SubDirectory}));
                 $tagLookup{$lcName} or $tagLookup{$lcName} = { };
+                # add to lookup for flattened tags if necessary
+                if ($$tagInfo{RootTagInfo}) {
+                    $flattened{$lcName} or $flattened{$lcName} = { };
+                    $flattened{$lcName}{$tableNum} = $$tagInfo{RootTagInfo}{TagID};
+                }
                 # remember number for this table
                 my $tagIDs = $tagLookup{$lcName}->{$tableNum};
                 # must allow for duplicate tags with the same name in a single table!
@@ -1052,6 +1126,38 @@ TagID:  foreach $tagID (@keys) {
             }
         }
     }
+    # save information about structures
+    my $strName;
+    foreach $strName (keys %structs) {
+        my $struct = $structLookup{$strName};
+        my $info = $tagNameInfo{"XMP $strName Struct"} = [ ];
+        my $tag;
+        foreach $tag (sort keys %$struct) {
+            my $tagInfo = $$struct{$tag};
+            next unless ref $tagInfo eq 'HASH';
+            my $writable = $$tagInfo{Writable};
+            my @vals;
+            unless ($writable) {
+                $writable = $$tagInfo{Struct};
+                ref $writable and $writable = $$writable{STRUCT_NAME};
+                if ($writable) {
+                    push @vals, $writable;
+                    $structs{$writable} = 1;
+                    $writable = "=$writable";
+                } else {
+                    $writable = 'string';
+                }
+            }
+            $writable .= '+' if $$tagInfo{List};
+            push @$info, [
+                $tag,
+                [ $$tagInfo{Name} || ucfirst($tag) ],
+                [ $writable ],
+                \@vals,
+                [], []
+            ];
+        }
+    }
     return $self;
 }
 
@@ -1062,10 +1168,11 @@ TagID:  foreach $tagID (@keys) {
 # Returns: true on success
 sub WriteTagLookup($$)
 {
-    local $_;
+    local ($_, *INFILE, *OUTFILE);
     my ($self, $file) = @_;
     my $tagLookup = $self->{TAG_LOOKUP};
     my $tagExists = $self->{TAG_EXISTS};
+    my $flattened = $self->{FLATTENED};
     my $tableWritable = $self->{TABLE_WRITABLE};
 #
 # open/create necessary files and transfer file headers
@@ -1119,9 +1226,11 @@ sub WriteTagLookup($$)
         my @tableNums = sort { $a <=> $b } keys %{$$tagLookup{$tag}};
         my (@entries, $tableNum);
         foreach $tableNum (@tableNums) {
-            my $tagID = $$tagLookup{$tag}->{$tableNum};
+            my $tagID = $$tagLookup{$tag}{$tableNum};
+            my $rootID = $$flattened{$tag}{$tableNum};
             my $entry;
-            if (ref $tagID eq 'HASH') {
+            if (ref $tagID eq 'HASH' or $rootID) {
+                $tagID = { $tagID => 1 } unless ref $tagID eq 'HASH';
                 my @tagIDs = sort keys %$tagID;
                 foreach (@tagIDs) {
                     if (/^\d+$/) {
@@ -1133,6 +1242,9 @@ sub WriteTagLookup($$)
                         $_ = $quot . $_ . $quot;
                     }
                 }
+                # reference to root structure ID must come first in lookup
+                # (so we can generate the flattened tags just before we need them)
+                unshift @tagIDs, "\\'$rootID'" if $rootID;
                 $entry = '[' . join(',', @tagIDs) . ']';
             } elsif ($tagID =~ /^\d+$/) {
                 $entry = sprintf('0x%x',$tagID);
@@ -1181,7 +1293,25 @@ sub WriteTagLookup($$)
 # return success code
 #
     if ($success) {
-        rename($tmpFile, $file);
+        local (*ORG, *TMP);
+        # only rename the file if something changed
+        open ORG, $file or return 0;
+        open TMP, $tmpFile or return 0;
+        my ($buff, $buf2, $changed);
+        for (;;) {
+            my $n1 = read ORG, $buff, 65536;
+            my $n2 = read TMP, $buf2, 65536;
+            $n1 eq $n2 or $changed = 1, last;
+            last unless $n1;
+            $buff eq $buf2 or $changed = 1, last;
+        }
+        close ORG;
+        close TMP;
+        if ($changed) {
+            rename($tmpFile, $file) or warn("Error renaming $tmpFile\n"), $success = 0;
+        } else {
+            unlink($tmpFile);
+        }
     } else {
         unlink($tmpFile);
         warn "Error rewriting file\n";
@@ -1214,11 +1344,14 @@ sub NumbersFirst
 # Convert pod documentation to pod
 # (funny, I know, but the pod headings must be hidden to prevent confusing
 #  the pod parser)
-# Inputs: 0) string
-sub Doc2Pod($)
+# Inputs: 0-N) documentation strings
+sub Doc2Pod($;@)
 {
     my $doc = shift;
+    local $_;
+    $doc .= shift while @_;
     $doc =~ s/\n~/\n=/g;
+    $doc =~ s/L<[^>]+?\|(http[^>]+)>/L<$1>/g; # POD doesn't support text for http links
     return $doc;
 }
 
@@ -1232,8 +1365,10 @@ sub Doc2Html($)
     $doc =~ s/B&lt;(.*?)&gt;/<b>$1<\/b>/sg;
     $doc =~ s/C&lt;(.*?)&gt;/<code>$1<\/code>/sg;
     $doc =~ s/I&lt;(.*?)&gt;/<i>$1<\/i>/sg;
-    # Note: the following illegal L<> syntax should only be used in Notes
-    #       which are using in the HTML documentation only (not in POD)
+    $doc =~ s{L&lt;([^&]+?)\|\Q$homePage\E/TagNames/(.*?)&gt;}{<a href="$2">$1<\/a>}sg;
+    $doc =~ s{L&lt;([^&]+?)\|\Q$homePage\E/(.*?)&gt;}{<a href="../$2">$1<\/a>}sg;
+    $doc =~ s{L&lt;\Q$homePage\E/TagNames/(.*?)&gt;}{<a href="$1">$1<\/a>}sg;
+    $doc =~ s{L&lt;\Q$homePage\E/(.*?)&gt;}{<a href="../$1">$1<\/a>}sg;
     $doc =~ s/L&lt;([^&]+?)\|(.+?)&gt;/<a href="$2">$1<\/a>/sg;
     $doc =~ s/L&lt;(.*?)&gt;/<a href="$1">$1<\/a>/sg;
     return $doc;
@@ -1245,7 +1380,6 @@ sub Doc2Html($)
 sub GetTableOrder()
 {
     my %gotTable;
-    my $count = 0;
     my @tableNames = @tableOrder;
     my (@orderedTables, %mainTables, @outOfOrder);
     my $lastTable = '';
@@ -1332,9 +1466,6 @@ sub GetTableOrder()
         KyoceraRaw => 'CanonRaw',
         SigmaRaw => 'PanasonicRaw',
         Olympus => 'NikonCapture',
-        Pentax  => 'Panasonic',
-        Ricoh   => 'Pentax',
-        Sanyo   => 'Ricoh',
         PhotoMechanic => 'FotoStation',
         Microsoft     => 'PhotoMechanic',
        'Microsoft::MP'=> 'Microsoft::MP1',
@@ -1381,7 +1512,12 @@ sub OpenHtmlFile($;$$)
         my @names = split ' ', $category;
         $class = shift @names;
         $htmlFile = "$htmldir/TagNames/$class.html";
-        $head = $category . ($sepTable ? ' Values' : ' Tags');
+        $head = $category;
+        if ($head =~ /^XMP .+ Struct$/) {
+            pop @names;
+        } else {
+            $head .= ($sepTable ? ' Values' : ' Tags');
+        }
         ($title = $head) =~ s/ .* / /;
         @names and $url = join '_', @names;
     } else {
@@ -1495,19 +1631,20 @@ sub CloseHtmlFiles($)
 sub WriteTagNames($$)
 {
     my ($self, $podFile, $htmldir) = @_;
-    my ($tableName, $short, $url, @sepTables);
+    my ($tableName, $short, $url, @sepTables, @structs);
     my $tagNameInfo = $self->{TAG_NAME_INFO} or return 0;
     my $idLabel = $self->{ID_LOOKUP};
     my $shortName = $self->{SHORT_NAME};
     my $sepTable = $self->{SEPARATE_TABLE};
+    my $structs = $self->{STRUCTURES};
+    my $structLookup = $self->{STRUCT_LOOKUP};
     my $success = 1;
-    my %htmlFiles;
     my $columns = 6;    # number of columns in html index
     my $percent = int(100 / $columns);
 
     # open the file and write the header
     open(PODFILE, ">$podFile") or return 0;
-    print PODFILE Doc2Pod($docs{PodHeader}), $docs{ExifTool}, $docs{ExifTool2};
+    print PODFILE Doc2Pod($docs{PodHeader}, $docs{ExifTool}, $docs{ExifTool2});
     mkdir "$htmldir/TagNames";
     OpenHtmlFile($htmldir) or return 0;
     print HTMLFILE "<blockquote>\n";
@@ -1561,7 +1698,7 @@ sub WriteTagNames($$)
     print HTMLFILE "\n</td></tr></table></td></tr></table></blockquote>\n";
     print HTMLFILE '<p>',Doc2Html($docs{ExifTool2}),"</p>\n";
     # write all the tag tables
-    while (@tableNames or @sepTables) {
+    while (@tableNames or @sepTables or @structs) {
         while (@sepTables) {
             $tableName = shift @sepTables;
             my $printConv = $$sepTable{$tableName};
@@ -1635,17 +1772,30 @@ sub WriteTagNames($$)
                 print HTMLFILE "</table></td></tr></table></blockquote>\n\n";
             }
         }
-        last unless @tableNames;
-        $tableName = shift @tableNames;
+        last unless @tableNames or @structs;
+        my $isStruct;
+        if (@structs) {
+            $tableName = shift @structs;
+            next if $$structs{$tableName} == 2; # only list each structure once
+            $$structs{$tableName} = 2;
+            $isStruct = $$structLookup{$tableName};
+            $isStruct or warn("Missing structure $tableName\n"), next;
+            $short = $tableName = "XMP $tableName Struct";
+            my $maxLen = 0;
+            $maxLen < length and $maxLen = length foreach keys %$isStruct;
+            $$self{LONG_ID}{$tableName} = $maxLen;
+        } else {
+            $tableName = shift @tableNames;
+            $short = $$shortName{$tableName};
+            unless ($short) {
+                # this is just an index heading
+                print PODFILE "\n=head2 $tableName Tags\n";
+                print PODFILE Doc2Pod($docs{$tableName}) if $docs{$tableName};
+                next;
+            }
+        }
         my $isExif = $tableName eq 'Image::ExifTool::Exif::Main' ? 1 : undef;
         my $isRiff = $tableName eq 'Image::ExifTool::RIFF::Info' ? 1 : undef;
-        $short = $$shortName{$tableName};
-        unless ($short) {
-            # this is just an index heading
-            print PODFILE "\n=head2 $tableName Tags\n";
-            print PODFILE $docs{$tableName} if $docs{$tableName};
-            next;
-        }
         my $info = $$tagNameInfo{$tableName};
         my $id = $$idLabel{$tableName};
         my ($hid, $showGrp);
@@ -1655,6 +1805,9 @@ sub WriteTagNames($$)
         if ($short eq 'Shortcuts') {
             $derived = '<th>Refers To</th>';
             $composite = 2;
+        } elsif ($isStruct) {
+            $derived = '';
+            $notes = $$isStruct{NOTES};
         } else {
             my $table = GetTagTable($tableName);
             $notes = $$table{NOTES};
@@ -1710,9 +1863,10 @@ sub WriteTagNames($$)
             $wTag -= $wGrp + 1;
         }
         my $head = ($short =~ / /) ? 'head3' : 'head2';
-        print PODFILE "\n=$head $short Tags\n";
-        print PODFILE $docs{$short} if $docs{$short};
-        print PODFILE "\n$notes\n" if $notes;
+        my $str = $isStruct ? '' : ' Tags';
+        print PODFILE "\n=$head $short$str\n";
+        print PODFILE Doc2Pod($docs{$short}) if $docs{$short};
+        print PODFILE "\n", Doc2Pod($notes), "\n" if $notes;
         my $line = "\n";
         if ($id) {
             # shift over 'Index' heading by one character for a bit more balance
@@ -1721,7 +1875,7 @@ sub WriteTagNames($$)
         } else {
             $line .= ' ';
         }
-        my $tagNameHeading = ($short eq 'XMP') ? 'Namespace' : 'Tag Name';
+        my $tagNameHeading = ($short eq 'XMP') ? 'Namespace' : ($isStruct?'Field':'Tag').' Name';
         $line .= sprintf " %-${wTag}s", $tagNameHeading;
         $line .= sprintf " %-${wReq}s", $composite == 2 ? 'Refers To' : 'Derived From' if $composite;
         $line .= sprintf " %-${wGrp}s", 'Group' if $showGrp;
@@ -1780,8 +1934,8 @@ sub WriteTagNames($$)
             my $subdir;
             my @masks = grep /^\[Mask 0x[\da-f]+\]/, @$values;
             my $tag = shift @tags;
-            # if this is a subdirectory, print subdir name (from values) instead of writable
-            if ($wrStr =~ /^-/) {
+            # if this is a subdirectory or structure, print subdir name (from values) instead of writable
+            if ($wrStr =~ /^[-=]/) {
                 $subdir = 1;
                 if (@masks) {
                     # combine any mask into the format string
@@ -1803,8 +1957,11 @@ sub WriteTagNames($$)
                     }
                 }
                 if ($$sepTable{$vals[0]}) {
-                    $wrStr =~ s/^-//;
+                    $wrStr =~ s/^[-=]//;
                     $wrStr = 'N' unless $wrStr;
+                } elsif ($$structs{$vals[0]}) {
+                    my $flags = $wrStr =~ /([+_]+)$/ ? $1 : '';
+                    $wrStr = "$vals[0] Struct$flags";
                 } else {
                     $wrStr = $vals[0];
                 }
@@ -1844,10 +2001,10 @@ sub WriteTagNames($$)
                     my $val = shift @vals;
                     # use writable if this is a note
                     my $wrStr = $$writable[$n];
-                    if ($subdir and ($val =~ /^\(/ or $val =~ /=/ or ($wrStr and $wrStr !~ /^-/))) {
+                    if ($subdir and ($val =~ /^\(/ or $val =~ /=/ or ($wrStr and $wrStr !~ /^[-=]/))) {
                         $val = $wrStr;
                         if (defined $val) {
-                            $val =~ s/^-//;
+                            $val =~ s/^[-=]//;
                         } else {
                             # done with tag if nothing else to print
                             last unless $more;
@@ -1877,11 +2034,9 @@ sub WriteTagNames($$)
             }
             $rowClass = $rowClass ? '' : " class=b";
             my $isSubdir;
-            if ($$writable[0] =~ /^-/) {
+            if ($$writable[0] =~ /^[-=]/) {
                 $isSubdir = 1;
-                foreach (@$writable) {
-                    s/^-(.+)/$1/;
-                }
+                s/^[-=](.+)/$1/ foreach @$writable;
             }
             # add tooltip for hex conversion of Tag ID
             if ($tagIDstr =~ /^0x[0-9a-f]+$/i) {
@@ -1896,6 +2051,7 @@ sub WriteTagNames($$)
             # add tooltip for special writable attributes
             my $wtip = '';
             my %wattr = (
+                '_' => 'Flattened',
                 '+' => 'List',
                 '/' => 'Avoided',
                 '~' => 'Writable only with -n',
@@ -1903,19 +2059,22 @@ sub WriteTagNames($$)
                 '*' => 'Protected',
                 ':' => 'Mandatory',
             );
-            my %hasAttr;
-            my $wstr;
+            my ($wstr, %hasAttr, @hasAttr);
             foreach $wstr (@$writable) {
-                next unless $wstr =~ m{([+/~!*:]+)$};
+                next unless $wstr =~ m{([+/~!*:_]+)$};
                 my @a = split //, $1;
-                $hasAttr{$_} = 1 foreach @a;
+                foreach (@a) {
+                    next if $hasAttr{$_};
+                    push @hasAttr, $_;
+                    $hasAttr{$_} = 1;
+                }
             }
-            if (%hasAttr) {
+            if (@hasAttr) {
                 $wtip = " title='";
                 my $n = 0;
-                foreach (sort keys %hasAttr) {
+                foreach (@hasAttr) {
                     $wtip .= "\n" if $n;
-                    $wtip .= "$_ = $wattr{$_}";
+                    $wtip .= " $_ = $wattr{$_}";
                     ++$n;
                 }
                 $wtip .= "'";
@@ -1942,13 +2101,19 @@ sub WriteTagNames($$)
                         /^\[/ and push(@values, "<span class=s>$_</span>"), next;
                         /=/ and push(@values, $_), next;
                         my @names = split;
-                        $url = (shift @names) . '.html';
-                        @names and $url .= '#' . join '_', @names;
                         my $suffix = ' Tags';
                         if ($$sepTable{$_}) {
                             push @sepTables, $_;
                             $suffix = ' Values';
                         }
+                        # currently all structures are in XMP documentation
+                        if ($$structs{$_} and $short =~ /^XMP/) {
+                            unshift @names, 'XMP';
+                            push @structs, $_;  # list this later
+                            $suffix = ' Struct';
+                        }
+                        $url = (shift @names) . '.html';
+                        @names and $url .= '#' . join '_', @names;
                         push @values, "--&gt; <a href='$url'>$_$suffix</a>";
                     }
                     # put small note last
@@ -2011,7 +2176,7 @@ This module is used to generate the tag lookup tables in
 Image::ExifTool::TagLookup.pm and tag name documentation in
 Image::ExifTool::TagNames.pod, as well as HTML tag name documentation.  It
 is used before each new ExifTool release to update the lookup tables and
-documentation.
+documentation, but it is not used otherwise.
 
 =head1 SYNOPSIS
 
@@ -2043,7 +2208,7 @@ WriteTagNames().
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

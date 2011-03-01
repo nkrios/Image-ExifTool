@@ -2242,7 +2242,7 @@ sub ProcessCanonCustom2($$$)
                 $exifTool->VerboseValue("+ CanonCustom:$$tagInfo{Name}", $newVal);
                 ++$exifTool->{CHANGED};
             } else {
-                # extract the value
+                # save extracted tag
                 my $oldInfo = $$tagTablePtr{$tag};
                 $exifTool->HandleTag($tagTablePtr, $tag, $val,
                     Index  => $i,
@@ -2345,7 +2345,6 @@ sub WriteCanonCustom($$$)
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen} || length($$dataPt) - $dirStart;
     my $dirName = $$dirInfo{DirName};
-    my $verbose = $exifTool->Options('Verbose');
     my $newData = substr($$dataPt, $dirStart, $dirLen) or return undef;
     $dataPt = \$newData;
 
@@ -2397,7 +2396,7 @@ Image::ExifTool to read this information.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

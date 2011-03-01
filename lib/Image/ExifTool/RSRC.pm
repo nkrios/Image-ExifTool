@@ -89,7 +89,6 @@ sub ProcessRSRC($$)
         my $resType = substr($map,$off,4);  # resource type
         my $resNum = Get16u(\$map,$off+4);  # number of resources - 1
         my $refOff = Get16u(\$map,$off+6) + $typeOff; # offset to first resource reference
-        my $tmp = $resNum + 1;
         # loop through all resources
         for ($j=0; $j<=$resNum; ++$j) {
             my $roff = $refOff + 12 * $j;
@@ -205,7 +204,7 @@ resource files.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

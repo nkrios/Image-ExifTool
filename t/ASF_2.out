@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.39
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.44
 [File, System, Image] FileName - File Name: ASF.wmv
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 12 kB
@@ -19,13 +19,13 @@
 [ASF, ASF, Video] 16 - File Length: 414891
 [ASF, ASF, Time] 24 - Creation Date: 2004:10:28 17:23:34Z
 [ASF, ASF, Video] 32 - Data Packets: 287
-[ASF, ASF, Video] 40 - Play Duration: 01:39
-[ASF, ASF, Video] 48 - Send Duration: 01:37
+[ASF, ASF, Video] 40 - Play Duration: 0:01:39
+[ASF, ASF, Video] 48 - Send Duration: 0:01:37
 [ASF, ASF, Video] 56 - Preroll: 5000
 [ASF, ASF, Video] 64 - Flags: 2
 [ASF, ASF, Video] 68 - Min Packet Size: 1400
 [ASF, ASF, Video] 72 - Max Packet Size: 1400
-[ASF, ASF, Video] 76 - Max Bitrate: 30610
+[ASF, ASF, Video] 76 - Max Bitrate: 30.6 kbps
 [ASF, ASF, Other] AudioCodecName - Audio Codec Name: Windows Media Audio 9.1
 [ASF, ASF, Other] AudioCodecDescription - Audio Codec Description:  20 kbps, 22 kHz, stereo 1-pass CBR
 [ASF, ASF, Other] VideoCodecName - Video Codec Name: Windows Media Video 9 Image v2

@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.31';
+$VERSION = '1.32';
 
 # older Casio maker notes (ref 1)
 %Image::ExifTool::Casio::Main = (
@@ -634,9 +634,12 @@ $VERSION = '1.31';
         PrintConv => {
             0 => 'Normal',
             8 => 'Silent Movie',
+            39 => 'HDR', # (EX-ZR10)
             45 => 'Premium Auto', # (EX-2300)
             47 => 'Painting', # (EX-2300)
             49 => 'Crayon Drawing', # (EX-2300)
+            51 => 'Panorama', # (EX-ZR10)
+            52 => 'Art HDR', # (EX-ZR10)
         },
     },
     0x301c => { #3
@@ -742,13 +745,14 @@ $VERSION = '1.31';
         ValueConvInv => '$val <= 60 ? $val * 1000 : int($val) . " 0"',
     },
     # 0x4002 - AVI videos, related to video quality or size - PH
-    0x4003 => { #PH (AVI videos)
+    0x4003 => { #PH (AVI and MOV videos)
         Name => 'VideoQuality',
         Writable => 'int16u',
         PrintConv => {
             1 => 'Standard',
             # 2 - could this be LP?
-            3 => 'HD',
+            3 => 'HD (720p)',
+            4 => 'Full HD (1080p)', # (EX-ZR10, 30fps 1920x1080)
             5 => 'Low', # used in High Speed modes
         },
     },
@@ -830,7 +834,7 @@ Casio maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

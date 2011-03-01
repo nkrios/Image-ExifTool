@@ -65,14 +65,14 @@ and Agfa cameras.
 <tr class=b>
 <td title='0x0200 = 512'>0x0200</td>
 <td>SpecialMode</td>
-<td class=c title='~ = Writable only with -n'>int32u[3]~</td>
+<td class=c title=' ~ = Writable only with -n'>int32u[3]~</td>
 <td><span class=s><span class=n>(3 numbers: 1. Shooting mode: 0=Normal, 2=Fast, 3=Panorama;
 2. Sequence Number; 3. Panorama Direction: 1=Left-Right,
 2=Right-Left, 3=Bottom-Top, 4=Top-Bottom)</span></span></td></tr>
 <tr>
 <td title='0x0201 = 513'>0x0201</td>
 <td>Quality</td>
-<td class=c title='~ = Writable only with -n'>int16u~</td>
+<td class=c title=' ~ = Writable only with -n'>int16u~</td>
 <td><span class=s><span class=n>(Quality values are decoded based on the CameraType tag. All types
 represent SQ, HQ and SHQ as sequential integers, but in general
 SX-type cameras start with a value of 0 for SQ while others start
@@ -235,12 +235,12 @@ with 1)</span></span></td></tr>
 <tr>
 <td title='0x0f04 = 3844'>0x0f04</td>
 <td>ZoomedPreviewStart</td>
-<td class=c title='* = Protected'>int32u*</td>
+<td class=c title=' * = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0f05 = 3845'>0x0f05</td>
 <td>ZoomedPreviewLength</td>
-<td class=c title='* = Protected'>int32u*</td>
+<td class=c title=' * = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x0f06 = 3846'>0x0f06</td>
@@ -533,12 +533,12 @@ with 1)</span></span></td></tr>
 <tr class=b>
 <td title='0x1036 = 4150'>0x1036</td>
 <td>PreviewImageStart</td>
-<td class=c title='* = Protected'>int32u*</td>
+<td class=c title=' * = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x1037 = 4151'>0x1037</td>
 <td>PreviewImageLength</td>
-<td class=c title='* = Protected'>int32u*</td>
+<td class=c title=' * = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x1038 = 4152'>0x1038</td>
@@ -791,6 +791,7 @@ the Make, Model and Sub-model are used to determine the lens model)</span>
   <br>&#39;0 7 0&#39; = Olympus Zuiko Digital 11-22mm F2.8-3.5
   <br>&#39;0 7 1&#39; = Olympus Zuiko Digital 18-180mm F3.5-6.3
   <br>&#39;0 8 1&#39; = Olympus Zuiko Digital 70-300mm F4.0-5.6
+  <br>&#39;0 9 16&#39; = Olympus M.Zuiko Digital 14-42mm F3.5-5.6 II
   <br>&#39;0 21 0&#39; = Olympus Zuiko Digital ED 7-14mm F4.0
   <br>&#39;0 23 0&#39; = Olympus Zuiko Digital Pro ED 35-100mm F2.0
   <br>&#39;0 24 0&#39; = Olympus Zuiko Digital 14-45mm F3.5-5.6
@@ -952,12 +953,12 @@ the Make and Model are used to determine the extender model)</span>
 <tr>
 <td title='0x0101 = 257'>0x0101</td>
 <td>PreviewImageStart</td>
-<td class=c title='* = Protected'>int32u*</td>
+<td class=c title=' * = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0102 = 258'>0x0102</td>
 <td>PreviewImageLength</td>
-<td class=c title='* = Protected'>int32u*</td>
+<td class=c title=' * = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x0200 = 512'>0x0200</td>
@@ -1032,12 +1033,12 @@ the Make and Model are used to determine the extender model)</span>
 <tr>
 <td title='0x0304 = 772'>0x0304</td>
 <td>AFAreas</td>
-<td class=c title='~ = Writable only with -n'>int32u[64]~</td>
+<td class=c title=' ~ = Writable only with -n'>int32u[64]~</td>
 <td><span class=s><span class=n>(coordinates range from 0 to 255)</span></span></td></tr>
 <tr class=b>
 <td title='0x0305 = 773'>0x0305</td>
 <td>AFPointSelected</td>
-<td class=c title='~ = Writable only with -n'>rational64s[5]~</td>
+<td class=c title=' ~ = Writable only with -n'>rational64s[5]~</td>
 <td><span class=s><span class=n>(coordinates expressed as a percent)</span></span></td></tr>
 <tr>
 <td title='0x0307 = 775'>0x0307</td>
@@ -1130,7 +1131,7 @@ the Make and Model are used to determine the extender model)</span>
 <tr>
 <td title='0x0503 = 1283'>0x0503</td>
 <td>CustomSaturation</td>
-<td class=c title='~ = Writable only with -n'>int16s[3]~</td>
+<td class=c title=' ~ = Writable only with -n'>int16s[3]~</td>
 <td><span class=s><span class=n>(3 numbers: 1. CS Value, 2. Min, 3. Max)</span></span></td></tr>
 <tr class=b>
 <td title='0x0504 = 1284'>0x0504</td>
@@ -1350,12 +1351,12 @@ the Make and Model are used to determine the extender model)</span>
 <tr class=b>
 <td title='0x0600 = 1536'>0x0600</td>
 <td>DriveMode</td>
-<td class=c title='~ = Writable only with -n'>int16u[n]~</td>
+<td class=c title=' ~ = Writable only with -n'>int16u[n]~</td>
 <td><span class=s><span class=n>(2 or 3 numbers: 1. Mode, 2. Shot number, 3. Mode bits)</span></span></td></tr>
 <tr>
 <td title='0x0601 = 1537'>0x0601</td>
 <td>PanoramaMode</td>
-<td class=c title='~ = Writable only with -n'>int16u~</td>
+<td class=c title=' ~ = Writable only with -n'>int16u~</td>
 <td><span class=s><span class=n>(2 numbers: 1. Mode, 2. Shot number)</span></span></td></tr>
 <tr class=b>
 <td title='0x0603 = 1539'>0x0603</td>
@@ -1914,17 +1915,32 @@ the Make and Model are used to determine the extender model)</span>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x1200 = 4608'>0x1200</td>
-<td>FaceDetect</td>
+<td>FacesDetected</td>
 <td class=c>int32u[n]</td>
-<td><span class=s><span class=n>(1, 2 or 3 values)</span>
-  <br>[Value 0]
-  <br>0 = Off
-  <br>1 = On</span></td></tr>
+<td><span class=s><span class=n>(2 or 3 values)</span></span></td></tr>
 <tr class=b>
 <td title='0x1201 = 4609'>0x1201</td>
 <td>FaceDetectArea</td>
-<td class=c>int16s[80]</td>
+<td class=c>int16s[n]</td>
+<td><span class=s><span class=n>(for models with 2 values in FacesDetected this gives X/Y coordinates in the
+FaceDetectFrame for all 4 corners of the face rectangle.  For models with 3
+values in FacesDetected this gives X/Y coordinates, size and rotation angle
+of the face detect square)</span></span></td></tr>
+<tr>
+<td title='0x1202 = 4610'>0x1202</td>
+<td>MaxFaces</td>
+<td class=c>int32u[3]</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x1203 = 4611'>0x1203</td>
+<td>FaceDetectFrameSize</td>
+<td class=c>int16u[6]</td>
+<td><span class=s><span class=n>(width/height of the full face detect frame)</span></span></td></tr>
+<tr>
+<td title='0x1207 = 4615'>0x1207</td>
+<td>FaceDetectFrameCrop</td>
+<td class=c>int16s[12]</td>
+<td><span class=s><span class=n>(X/Y offset and width/height of the cropped face detect frame)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='FocusInfo'>Olympus FocusInfo Tags</a></h2>
@@ -2064,7 +2080,7 @@ give AF point, upper bits give AF target selection mode)</span>
 <tr>
 <td title='0x1209 = 4617'>0x1209</td>
 <td>ManualFlash</td>
-<td class=c title='~ = Writable only with -n'>int16u[2]~</td>
+<td class=c title=' ~ = Writable only with -n'>int16u[2]~</td>
 <td><span class=s><span class=n>(2 numbers: 1. 0=Off, 1=On, 2. Flash strength)</span></span></td></tr>
 <tr class=b>
 <td title='0x1500 = 5376'>0x1500</td>
@@ -2075,7 +2091,7 @@ always zero for E-300/330/400/500, divide by 10 for E-P1?)</span></span></td></t
 <tr>
 <td title='0x1600 = 5632'>0x1600</td>
 <td>ImageStabilization</td>
-<td class=c title='~ = Writable only with -n'>undef~</td>
+<td class=c title=' ~ = Writable only with -n'>undef~</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -2584,7 +2600,7 @@ like the LS-5, LS-10, LS-11.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 9, 2010</i>
+<br><i>Last revised Feb 28, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

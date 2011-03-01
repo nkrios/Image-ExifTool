@@ -42,11 +42,17 @@ use vars qw($VERSION %minoltaLensTypes %minoltaColorMode %sonyColorMode %minolta
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.72';
+$VERSION = '1.75';
 
 # lens ID numbers (ref 3)
 # ("New" and "II" appear in brackets if original version also has this LensType)
 %minoltaLensTypes = (
+    Notes => q{
+        Decimal values differentiate lenses which would otherwise have the same
+        LensType, and are used by the Composite LensID tag when attempting to
+        identify the specific lens model.  "New" or "II" appear in brackets if the
+        original version of the lens has the same LensType.
+    },
     0 => 'Minolta AF 28-85mm F3.5-4.5 New', # New added (ref 13/18)
     1 => 'Minolta AF 80-200mm F2.8 HS-APO G',
     2 => 'Minolta AF 28-70mm F2.8 G',
@@ -127,6 +133,7 @@ $VERSION = '1.72';
     56 => 'Sony AF DT 55-200mm F4-5.6 SAM', #22
     57 => 'Sony AF DT 50mm F1.8 SAM', #22
     58 => 'Sony AF DT 30mm F2.8 SAM Macro', #22
+    59 => 'Sony 28-75/2.8 SAM', #21
     60 => 'Carl Zeiss Distagon T* 24mm F2 SSM', #17
     61 => 'Sony 85mm F2.8 SAM (SAL-85F28)', #17
     62 => 'Sony DT 35mm F1.8 SAM (SAL-35F18)', #PH
@@ -324,6 +331,10 @@ $VERSION = '1.72';
     16 => 'Auto',
     17 => 'Night View/Portrait',
     18 => 'Sweep Panorama', #PH (SLT-A55V)
+    19 => 'Handheld Night Shot', #PH
+    20 => 'Anti Motion Blur', #PH
+    21 => 'Cont. Priority AE', #PH
+    22 => 'Auto+',
     23 => '3D Sweep Panorama', #PH (SLT-A55V)
 );
 
@@ -548,12 +559,7 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     0x010c => { #3 (Alpha 7)
         Name => 'LensType',
         Writable => 'int32u',
-        Notes => q{
-            decimal values differentiate lenses which would otherwise have the same
-            LensType, and are used by the Composite LensID tag when attempting to
-            identify the specific lens model.  "New" or "II" appear in brackets if the
-            original version of the lens has the same LensType
-        },
+        SeparateTable => 1,
         PrintConv => \%minoltaLensTypes,
     },
     # 0x010e - WhiteBalance according to ref #10
@@ -2193,7 +2199,7 @@ and write Minolta RAW (MRW) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

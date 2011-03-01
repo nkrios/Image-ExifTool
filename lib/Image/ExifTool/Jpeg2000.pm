@@ -589,7 +589,6 @@ sub ProcessJP2($$)
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
     my $outfile = $$dirInfo{OutFile};
-    my $rtnVal = 0;
     my $hdr;
 
     # check to be sure this is a valid JPG2000 file
@@ -642,7 +641,7 @@ files.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

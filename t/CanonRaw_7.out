@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.35
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.49
 [File, System, Image] FileName - File Name: CanonRaw_7_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 12 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:10:11 08:47:49-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2011:02:10 10:34:17-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -192,24 +192,24 @@
 [MakerNotes, Canon, Camera] 69 - Color Temp Custom 1: 5200
 [MakerNotes, Canon, Camera] 70 - WB RGGB Levels Custom 2: 2312 1022 1024 1501
 [MakerNotes, Canon, Camera] 74 - Color Temp Custom 2: 5200
-[MakerNotes, Canon, Camera] 75 - Camera Color Calibration 01:  333 1013 -410 (11109K)
-[MakerNotes, Canon, Camera] 79 - Camera Color Calibration 02:  346  963 -376 (9523K)
-[MakerNotes, Canon, Camera] 83 - Camera Color Calibration 03:  364  897 -329 (8000K)
-[MakerNotes, Canon, Camera] 87 - Camera Color Calibration 04:  386  841 -284 (7000K)
-[MakerNotes, Canon, Camera] 91 - Camera Color Calibration 05:  417  773 -225 (6000K)
-[MakerNotes, Canon, Camera] 95 - Camera Color Calibration 06:  433  738 -194 (5600K)
-[MakerNotes, Canon, Camera] 99 - Camera Color Calibration 07:  453  698 -156 (5200K)
-[MakerNotes, Canon, Camera] 103 - Camera Color Calibration 08:  482  650 -108 (4749K)
-[MakerNotes, Canon, Camera] 107 - Camera Color Calibration 09:  518  600  -53 (4312K)
-[MakerNotes, Canon, Camera] 111 - Camera Color Calibration 10:  549  565  -10 (4023K)
-[MakerNotes, Canon, Camera] 115 - Camera Color Calibration 11:  596  516   51 (3696K)
-[MakerNotes, Canon, Camera] 119 - Camera Color Calibration 12:  677  443  151 (3250K)
-[MakerNotes, Canon, Camera] 123 - Camera Color Calibration 13:  720  415  196 (3051K)
-[MakerNotes, Canon, Camera] 127 - Camera Color Calibration 14:  770  382  248 (2871K)
-[MakerNotes, Canon, Camera] 131 - Camera Color Calibration 15:  949  307  397 (2413K)
+[MakerNotes, Canon, Camera] 0 - Camera Color Calibration 01:  333 1013 -410 (11109K)
+[MakerNotes, Canon, Camera] 4 - Camera Color Calibration 02:  346  963 -376 (9523K)
+[MakerNotes, Canon, Camera] 8 - Camera Color Calibration 03:  364  897 -329 (8000K)
+[MakerNotes, Canon, Camera] 12 - Camera Color Calibration 04:  386  841 -284 (7000K)
+[MakerNotes, Canon, Camera] 16 - Camera Color Calibration 05:  417  773 -225 (6000K)
+[MakerNotes, Canon, Camera] 20 - Camera Color Calibration 06:  433  738 -194 (5600K)
+[MakerNotes, Canon, Camera] 24 - Camera Color Calibration 07:  453  698 -156 (5200K)
+[MakerNotes, Canon, Camera] 28 - Camera Color Calibration 08:  482  650 -108 (4749K)
+[MakerNotes, Canon, Camera] 32 - Camera Color Calibration 09:  518  600  -53 (4312K)
+[MakerNotes, Canon, Camera] 36 - Camera Color Calibration 10:  549  565  -10 (4023K)
+[MakerNotes, Canon, Camera] 40 - Camera Color Calibration 11:  596  516   51 (3696K)
+[MakerNotes, Canon, Camera] 44 - Camera Color Calibration 12:  677  443  151 (3250K)
+[MakerNotes, Canon, Camera] 48 - Camera Color Calibration 13:  720  415  196 (3051K)
+[MakerNotes, Canon, Camera] 52 - Camera Color Calibration 14:  770  382  248 (2871K)
+[MakerNotes, Canon, Camera] 56 - Camera Color Calibration 15:  949  307  397 (2413K)
 [MakerNotes, Canon, Camera] 16386 - CRW Param: (Binary data 5352 bytes)
 [MakerNotes, Canon, Camera] 2 - Color Tone: Normal
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.35
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.49
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: -, -, -, -
 [XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8, 8, 8

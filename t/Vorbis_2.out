@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.44
 [File, System, Image] FileName - File Name: Vorbis.ogg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 5.2 kB
@@ -9,7 +9,7 @@
 [Vorbis, Vorbis, Audio] 0 - Vorbis Version: 0
 [Vorbis, Vorbis, Audio] 4 - Audio Channels: 2
 [Vorbis, Vorbis, Audio] 5 - Sample Rate: 22050
-[Vorbis, Vorbis, Audio] 13 - Nominal Bitrate: 32000
+[Vorbis, Vorbis, Audio] 13 - Nominal Bitrate: 32 kbps
 [Vorbis, Vorbis, Audio] vendor - Vendor: AO; aoTuV b4b [20051117] (based on Xiph.Org's libVorbis)
 [Vorbis, Vorbis, Audio] COVERARTMIME - Cover Art MIME Type: image/jpeg
 [Vorbis, Vorbis, Audio] COVERART - Cover Art: (Binary data 1351 bytes)

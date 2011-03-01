@@ -363,7 +363,8 @@ L10 and LC80)</span>
 <td title='0x0042 = 66'>0x0042</td>
 <td>FilmMode</td>
 <td class=c>int16u</td>
-<td><span class=s>1 = Standard (color)
+<td><span class=s>0 = n/a
+  <br>1 = Standard (color)
   <br>2 = Dynamic (color)
   <br>3 = Nature (color)
   <br>4 = Smooth (color)
@@ -633,9 +634,9 @@ FacesDetected)</span></span></td></tr>
 <td class=r title='1 = 0x1'>1</td>
 <td>Face1Position</td>
 <td class=c>int16u[4]</td>
-<td><span class=s><span class=n>(4 numbers: 1-2. X-Y coordinates of the face center, 3-4. Width-height of
-face.  Coordinates are relative to an image twice the size of the thumbnail,
-or 320 pixels wide)</span></span></td></tr>
+<td><span class=s><span class=n>(4 numbers: X/Y coordinates of the face center and width/height of face.
+Coordinates are relative to an image twice the size of the thumbnail, or 320
+pixels wide)</span></span></td></tr>
 <tr>
 <td class=r title='5 = 0x5'>5</td>
 <td>Face2Position</td>
@@ -1205,7 +1206,7 @@ iPalm.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 18, 2010</i>
+<br><i>Last revised Feb 25, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

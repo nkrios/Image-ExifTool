@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub WriteSTMN($$$);
 sub ProcessINFO($$$);
@@ -116,14 +116,19 @@ sub ProcessINFO($$$);
         Groups => { 2 => 'Camera' },
         Writable => 'string',
     },
-    0xa003 => { #1
+    0xa003 => { #1 (SRW images only)
         Name => 'LensType',
         Groups => { 2 => 'Camera' },
         Writable => 'int16u',
         PrintConv => {
-            1 => 'Samsung 30mm F2',
+            0 => 'Built-in', #PH (EX1, WB2000)
+            1 => 'Samsung 30mm F2 Pancake',
             2 => 'Samsung Zoom 18-55mm F3.5-5.6 OIS',
             3 => 'Samsung Zoom 50-200mm F4-5.6 ED OIS',
+            # what about the non-OIS version of the 18-55,
+            # which was supposed to be available before the 20-50?
+            4 => 'Samsung 20-50mm F3.5-5.6 Compact Zoom', #PH
+            5 => 'Samsung 20mm F2.8 Pancake', #PH (guess)
         },
     },
     # 0xa004 - lens firmware version? #1
@@ -319,7 +324,7 @@ Samsung maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

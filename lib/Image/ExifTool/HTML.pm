@@ -224,7 +224,7 @@ my %entityName; # look up entity names by number (built as necessary)
     pagespecial     => { Name => 'PageSpecial' },
     prodnotes       => { Name => 'ProdNotes' },
     producer        => { },
-    produceddate    => { Name => 'ProducedDate', Groups => { 2 => 'Time' } }, # yyyy-mm-dd
+    produceddate    => { Name => 'ProducedDate', Groups => { 2 => 'Time' } }, # YYYY-mm-dd
     revision        => { },
     revisiondate    => { Name => 'RevisionDate', Groups => { 2 => 'Time' } },
     setinfo         => { Name => 'SetInfo' },
@@ -235,7 +235,7 @@ my %entityName; # look up entity names by number (built as necessary)
     sourcerights    => { Name => 'SourceRights' },
     sourcetitle     => { Name => 'SourceTitle' },
     tocitems        => { Name => 'TOCItems' },
-    totaltime       => { Name => 'Duration' }, # hh:mm:ss
+    totaltime       => { Name => 'Duration' }, # HH:MM:SS
 );
 
 # ref 3
@@ -403,8 +403,7 @@ sub ProcessHTML($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
-    my $verbose = $exifTool->Options('Verbose');
-    my ($buff, $err);
+    my $buff;
 
     # validate HTML or XHTML file
     $raf->Read($buff, 256) or return 0;
@@ -539,7 +538,7 @@ meta information from HTML documents.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

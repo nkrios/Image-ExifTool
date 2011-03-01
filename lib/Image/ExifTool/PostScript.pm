@@ -556,7 +556,6 @@ sub ProcessPS($$;$)
             $inflate or $exifTool->Warn('Error initializing inflate'), last;
             # generate a PS-like file in memory from the compressed data
             my $verbose = $exifTool->Options('Verbose');
-            my $out = $exifTool->Options('TextOut');
             if ($verbose > 1) {
                 $exifTool->VerboseDir('AI12_CompressedData (first 4kB)');
                 $exifTool->VerboseDump(\$data);
@@ -665,7 +664,7 @@ This code reads meta information from EPS (Encapsulated PostScript), PS
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

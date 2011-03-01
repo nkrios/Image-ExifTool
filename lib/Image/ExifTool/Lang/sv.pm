@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::sv;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.01';
+$VERSION = '1.03';
 
 %Image::ExifTool::Lang::sv::Translate = (
    'Aperture' => 'Bländare',
@@ -23,15 +23,77 @@ $VERSION = '1.01';
    'Brightness' => 'Ljusstyrka',
    'By-line' => 'Upphovsman',
    'CFAPattern' => 'CFA-mönster',
+   'CalibrationIlluminant1' => {
+      PrintConv => {
+        'Cloudy' => 'Mulet',
+        'Cool White Fluorescent' => 'Kalljusrör (W 3800 - 4500 k)',
+        'Day White Fluorescent' => 'Dagljusrör, högdager (N 4600 - 5500k)',
+        'Daylight' => 'Dagsljus',
+        'Daylight Fluorescent' => 'Dagljusrör (D 5700 - 7100 k)',
+        'Fine Weather' => 'Fint väder',
+        'Flash' => 'Blixt',
+        'Fluorescent' => 'Lysrörsbelysning',
+        'ISO Studio Tungsten' => 'ISO tungsten studiobelysning',
+        'Other' => 'annan ljuskälla',
+        'Shade' => 'Skugga',
+        'Standard Light A' => 'Standardljus A',
+        'Standard Light B' => 'Standardljus B',
+        'Standard Light C' => 'Standardljus C',
+        'Tungsten (Incandescent)' => 'Tungsten',
+        'Unknown' => 'okänt',
+        'Warm White Fluorescent' => 'Varmt vitt fluorescerande (L 2600 - 3250k)',
+        'White Fluorescent' => 'Vit lysrörsbelysning (WW 3250 - 3800 k)',
+      },
+    },
+   'CalibrationIlluminant2' => {
+      PrintConv => {
+        'Cloudy' => 'Mulet',
+        'Cool White Fluorescent' => 'Kalljusrör (W 3800 - 4500 k)',
+        'Day White Fluorescent' => 'Dagljusrör, högdager (N 4600 - 5500k)',
+        'Daylight' => 'Dagsljus',
+        'Daylight Fluorescent' => 'Dagljusrör (D 5700 - 7100 k)',
+        'Fine Weather' => 'Fint väder',
+        'Flash' => 'Blixt',
+        'Fluorescent' => 'Lysrörsbelysning',
+        'ISO Studio Tungsten' => 'ISO tungsten studiobelysning',
+        'Other' => 'annan ljuskälla',
+        'Shade' => 'Skugga',
+        'Standard Light A' => 'Standardljus A',
+        'Standard Light B' => 'Standardljus B',
+        'Standard Light C' => 'Standardljus C',
+        'Tungsten (Incandescent)' => 'Tungsten',
+        'Unknown' => 'okänt',
+        'Warm White Fluorescent' => 'Varmt vitt fluorescerande (L 2600 - 3250k)',
+        'White Fluorescent' => 'Vit lysrörsbelysning (WW 3250 - 3800 k)',
+      },
+    },
    'Caption-Abstract' => 'Bildtext',
    'CaptionWriter' => 'Bildtextredigerare',
    'Categories' => 'Kategorier',
    'Category' => 'Kategorier',
    'City' => 'Ort',
    'ColorFilter' => 'Färgfilter',
+   'ColorMode' => {
+      Description => 'Kreativa inst.',
+      PrintConv => {
+        'Autumn Leaves' => 'Höstlöv',
+        'B&W' => 'Svartvitt',
+        'Clear' => 'Klart',
+        'Deep' => 'Djupt',
+        'Landscape' => 'Landskap',
+        'Light' => 'Ljust',
+        'Neutral' => 'Neutralt',
+        'Night View' => 'Nattvy',
+        'Night View/Portrait' => 'Nattporträtt',
+        'Portrait' => 'Porträtt',
+        'Sunset' => 'Solnedgång',
+        'Vivid' => 'Levande färg',
+      },
+    },
    'ColorSpace' => {
       Description => 'Färgområdesinformation',
       PrintConv => {
+        'ICC Profile' => 'ICC-profil',
         'Uncalibrated' => 'Ej kalibrerat',
       },
     },
@@ -74,6 +136,19 @@ $VERSION = '1.01';
    'DigitalZoomRatio' => 'Digitalt zoomomfång',
    'Directory' => 'Filplats',
    'DriveMode' => 'Enhetsläge',
+   'DynamicRangeOptimizer' => {
+      Description => 'Opt.av dyn.omr.',
+      PrintConv => {
+        'Advanced Auto' => 'Avancerad auto',
+        'Advanced Lv1' => 'Avancerad niv1',
+        'Advanced Lv2' => 'Avancerad niv2',
+        'Advanced Lv3' => 'Avancerad niv3',
+        'Advanced Lv4' => 'Avancerad niv4',
+        'Advanced Lv5' => 'Avancerad niv5',
+        'Auto' => 'Automatisk',
+        'Off' => 'Av',
+      },
+    },
    'ExifImageHeight' => 'Giltig bildhöjd',
    'ExifImageWidth' => 'Giltig bildbredd',
    'ExifOffset' => 'IFD-pekare för Exif',
@@ -241,7 +316,22 @@ $VERSION = '1.01';
       },
     },
    'Gradation' => 'Effektfull',
+   'HDR' => {
+      Description => 'Auto HDR',
+      PrintConv => {
+        'Off' => 'Av',
+      },
+    },
    'Headline' => 'Rubrik',
+   'HighISONoiseReduction' => {
+      Description => 'Hög-ISO brusred',
+      PrintConv => {
+        'Auto' => 'Automatisk',
+        'High' => 'Hög',
+        'Low' => 'Låg',
+        'Off' => 'Av',
+      },
+    },
    'Hue' => 'Nyans',
    'ISO' => 'ISO värde',
    'ImageHeight' => 'Bildhöjd',
@@ -260,8 +350,8 @@ $VERSION = '1.01';
       Description => 'Ljuskälla',
       PrintConv => {
         'Cloudy' => 'Mulet',
-        'Cool White Fluorescent' => 'Kalljusrör (W 3900 - 4500 k)',
-        'Day White Fluorescent' => '"Dagljusrör, högdager"',
+        'Cool White Fluorescent' => 'Kalljusrör (W 3800 - 4500 k)',
+        'Day White Fluorescent' => 'Dagljusrör, högdager (N 4600 - 5500k)',
         'Daylight' => 'Dagsljus',
         'Daylight Fluorescent' => 'Dagljusrör (D 5700 - 7100 k)',
         'Fine Weather' => 'Fint väder',
@@ -275,11 +365,19 @@ $VERSION = '1.01';
         'Standard Light C' => 'Standardljus C',
         'Tungsten (Incandescent)' => 'Tungsten',
         'Unknown' => 'okänt',
-        'White Fluorescent' => 'Vit lysrörsbelysning (WW 3200 - 3700 k)',
+        'Warm White Fluorescent' => 'Varmt vitt fluorescerande (L 2600 - 3250k)',
+        'White Fluorescent' => 'Vit lysrörsbelysning (WW 3250 - 3800 k)',
       },
     },
    'Lightness' => 'Ljushet',
    'Location' => 'Plats',
+   'LongExposureNoiseReduction' => {
+      Description => 'Långexp.brusred',
+      PrintConv => {
+        'Off' => 'Av',
+        'On' => 'På',
+      },
+    },
    'Make' => 'Tillverkare',
    'MakerNotes' => 'Tillverkare',
    'MaxAperture' => 'Största bländare',
@@ -297,6 +395,13 @@ $VERSION = '1.01';
     },
    'Model' => 'Kamera',
    'ModifyDate' => 'Filändringsdatum och -tid',
+   'MultiFrameNoiseReduction' => {
+      Description => 'Multi Frame brusred.',
+      PrintConv => {
+        'Off' => 'Av',
+        'On' => 'På',
+      },
+    },
    'NoiseReduction' => 'Brusreducering',
    'Opto-ElectricConvFactor' => 'Optoelektrisk konverteringsfaktor',
    'Orientation' => {
@@ -310,16 +415,22 @@ $VERSION = '1.01';
    'PlanarConfiguration' => {
       Description => 'Bilddataordning',
       PrintConv => {
-        'Chunky' => 'kompakt format',
-        'Planar' => 'planar format',
+        'Chunky' => 'Kompakt format',
+        'Planar' => 'Planar format',
       },
     },
    'PrimaryChromaticities' => 'Kromaticitet för primärfärger',
    'Province-State' => 'Län/provins',
    'Quality' => {
+      Description => 'Bildkvalitet',
       PrintConv => {
+        'Compressed RAW' => 'cRAW',
+        'Compressed RAW + JPEG' => 'cRAW+JPEG',
+        'Extra Fine' => 'Extra fin',
+        'Fine' => 'Fin',
         'Low' => 'Låg kvalitet',
         'Normal' => 'Standardkvalitet',
+        'RAW + JPEG' => 'RAW+JPEG',
       },
     },
    'RecordMode' => 'Inspelningsläge',
@@ -354,8 +465,23 @@ $VERSION = '1.01';
       },
     },
    'SceneMode' => {
+      Description => 'Scenval',
       PrintConv => {
+        '3D Sweep Panorama' => '3D',
+        'Anti Motion Blur' => 'Anti-rörelseoskärpa',
+        'Auto' => 'Automatisk',
+        'Cont. Priority AE' => 'Kont. prioritet AE',
+        'Handheld Night Shot' => 'Manuell nattbild',
+        'Landscape' => 'Landskap',
+        'Macro' => 'Makro',
+        'Night Portrait' => 'Nattporträtt',
+        'Night Scene' => 'Nattvy',
+        'Night View/Portrait' => 'Nattvy/porträtt',
+        'Portrait' => 'Porträtt',
+        'Sports' => 'Sporthändelse',
+        'Standard' => '',
         'Sunset' => 'Solnedgång',
+        'Sweep Panorama' => 'Panorering',
       },
     },
    'SceneType' => {
@@ -423,7 +549,9 @@ $VERSION = '1.01';
         'Auto' => 'Automatisk vitbalans',
         'Black & White' => 'Monokrom',
         'Cloudy' => 'Mulet',
+        'Color Temperature/Color Filter' => 'Färgtemperatur / Färgfilter',
         'Cool White Fluorescent' => 'Kalljusrör',
+        'Custom' => 'Special',
         'Custom 1' => 'ANPASSNING1',
         'Custom 2' => 'ANPASSNING2',
         'Custom 3' => 'ANPASSNING3',
@@ -431,9 +559,14 @@ $VERSION = '1.01';
         'Day White Fluorescent' => '"Dagljusrör, högdager"',
         'Daylight' => 'Dagsljus',
         'Daylight Fluorescent' => 'Dagljusrör',
+        'Flash' => 'Blixt',
         'Fluorescent' => 'Lysrörsbelysning',
         'Manual' => 'Manuell vitbalans',
         'Shade' => 'Skugga',
+        'Tungsten' => 'Glödlampa',
+        'Unknown' => 'okänt',
+        'Warm White Fluorescent' => 'Varmt vitt fluorescerande',
+        'White Fluorescent' => 'Vit lysrörsbelysning',
       },
     },
    'WhitePoint' => 'Vitpunktskromaticitet',
@@ -447,6 +580,14 @@ $VERSION = '1.01';
       },
     },
    'YCbCrSubSampling' => 'Subsampling ratio of Y to C',
+   'ZoneMatching' => {
+      Description => 'Zonmatchning',
+      PrintConv => {
+        'High Key' => 'Hög',
+        'ISO Setting Used' => 'Av',
+        'Low Key' => 'Låg',
+      },
+    },
 );
 
 1;  # end
@@ -465,7 +606,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -33,7 +33,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.74';
+$VERSION = '1.76';
 
 sub PrintLensInfo($$$);
 
@@ -59,6 +59,7 @@ my %olympusLensTypes = (
     '0 7 0'  => 'Olympus Zuiko Digital 11-22mm F2.8-3.5',
     '0 7 1'  => 'Olympus Zuiko Digital 18-180mm F3.5-6.3', #6
     '0 8 1'  => 'Olympus Zuiko Digital 70-300mm F4.0-5.6', #7 (seen as release 1 - PH)
+    '0 9 16' => 'Olympus M.Zuiko Digital 14-42mm F3.5-5.6 II', #PH (E-PL2)
     '0 21 0' => 'Olympus Zuiko Digital ED 7-14mm F4.0',
     '0 23 0' => 'Olympus Zuiko Digital Pro ED 35-100mm F2.0', #7
     '0 24 0' => 'Olympus Zuiko Digital 14-45mm F3.5-5.6',
@@ -2523,21 +2524,40 @@ my %indexInfo = (
         Writable => 'int16u',
         Count => 4,
     },
-    0x1200 => { #11
-        Name => 'FaceDetect',
+    0x1200 => { #11/PH
+        Name => 'FacesDetected',
         Writable => 'int32u',
         Count => -1,
-        Notes => '1, 2 or 3 values',
-        PrintConv => [{
-            0 => 'Off',
-            1 => 'On',
-        }], # (other values are usually 0, but have seen 1 for 2nd value with FaceDetect On)
+        Notes => '2 or 3 values',
     },
-    0x1201 => { #11
+    0x1201 => { #11/PH
         Name => 'FaceDetectArea',
         Writable => 'int16s',
-        Count => 80,
-        Binary => 1,
+        Count => -1, # (varies with model)
+        Binary => 1, # (too long)
+        Notes => q{
+            for models with 2 values in FacesDetected this gives X/Y coordinates in the
+            FaceDetectFrame for all 4 corners of the face rectangle.  For models with 3
+            values in FacesDetected this gives X/Y coordinates, size and rotation angle
+            of the face detect square
+        },
+    },
+    0x1202 => { #PH
+        Name => 'MaxFaces',
+        Writable => 'int32u',
+        Count => 3,
+    },
+    0x1203 => { #PH
+        Name => 'FaceDetectFrameSize',
+        Writable => 'int16u',
+        Count => 6,
+        Notes => 'width/height of the full face detect frame',
+    },
+    0x1207 => { #PH
+        Name => 'FaceDetectFrameCrop',
+        Writable => 'int16s',
+        Count => 12,
+        Notes => 'X/Y offset and width/height of the cropped face detect frame',
     },
 );
 
@@ -3182,6 +3202,7 @@ my %indexInfo = (
     },
     0x26 => {
         Name => 'DateTimeOriginal',
+        Description => 'Date/Time Original',
         Groups => { 2 => 'Time' },
         Format => 'undef[12]',
         Notes => 'time at start of recording',
@@ -3348,7 +3369,7 @@ Olympus or Epson maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

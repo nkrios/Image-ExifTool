@@ -411,7 +411,7 @@ my $testOK;
         ['CreateDate' => '200 0', 'Shift' => -1],
         ['DateCreated' => '20:', 'Shift' => -1],
     );
-    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/IPTC-XMP.jpg', 1);
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/XMP.jpg', 1);
     print "ok $testnum\n";
 }
 
@@ -585,7 +585,7 @@ my $testOK;
     ++$testnum;
     my $exifTool = new Image::ExifTool;
     $exifTool->Options(List => 1);
-    $exifTool->SetNewValuesFromFile('t/images/IPTC-XMP.jpg',
+    $exifTool->SetNewValuesFromFile('t/images/IPTC.jpg',
             { Replace => 1 },
             'xmp:subject<filename',
             'xmp:subject<iptc:keywords',

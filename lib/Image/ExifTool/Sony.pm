@@ -15,6 +15,7 @@
 #               8) Igal Milchtaich private communication
 #               9) Michael Reitinger private communication (DSC-TX7)
 #               10) http://www.klingebiel.com/tempest/hd/pmp.html
+#               11 Mike Battilana private communication
 #               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -26,7 +27,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.47';
+$VERSION = '1.49';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -50,6 +51,14 @@ my %sonyExposureProgram = (
     20 => 'Landscape', # (A330)
     16 => 'Portrait', # (A330)
     35 => 'Auto No Flash', # (A330)
+);
+
+my %binaryDataAttrs = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
 );
 
 %Image::ExifTool::Sony::Main = (
@@ -200,8 +209,40 @@ my %sonyExposureProgram = (
         PrintConv => '$val > 0 ? "+$val" : $val',
         PrintConvInv => '$val',
     },
-    # 0x2006 - possibly Brightness? (PH guess)
-    # 0x2009 - NoiseReduction? 1=Weak, 256=Normal (PH)
+    0x2006 => { #PH
+        Name => 'Sharpness',
+        Writable => 'int32s',
+        PrintConv => '$val > 0 ? "+$val" : $val',
+        PrintConvInv => '$val',
+    },
+    0x2007 => { #PH
+        Name => 'Brightness',
+        Writable => 'int32s',
+        PrintConv => '$val > 0 ? "+$val" : $val',
+        PrintConvInv => '$val',
+    },
+    0x2008 => { #PH
+        Name => 'LongExposureNoiseReduction',
+        Writable => 'int32u',
+        PrintHex => 1,
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+            0xffff0000 => 'Off 2',
+            0xffff0001 => 'On 2',
+        },
+    },
+    0x2009 => { #PH
+        Name => 'HighISONoiseReduction',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'Low',
+            2 => 'Normal',
+            3 => 'High',
+            256 => 'Auto',
+        },
+    },
     0x200a => { #PH (A550)
         Name => 'HDR',
         Writable => 'int32u',
@@ -209,12 +250,26 @@ my %sonyExposureProgram = (
         PrintConv => {
             0x0 => 'Off',
             0x10001 => 'Auto',
-            0x10010 => 1, # (NEX_5)
-            0x10012 => 2,
-            0x10014 => 3,
-            0x10016 => 4,
-            0x10018 => 5,
-            0x1001a => 6, # (SLT-A55V)
+            0x10010 => '1.0 EV', # (NEX_5)
+            0x10011 => '1.5 EV',
+            0x10012 => '2.0 EV',
+            0x10013 => '2.5 EV',
+            0x10014 => '3.0 EV',
+            0x10015 => '3.5 EV',
+            0x10016 => '4.0 EV',
+            0x10017 => '4.5 EV',
+            0x10018 => '5.0 EV',
+            0x10019 => '5.5 EV',
+            0x1001a => '6.0 EV', # (SLT-A55V)
+        },
+    },
+    0x200b => { #PH
+        Name => 'MultiFrameNoiseReduction',
+        Writable => 'int32u',
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+            255 => 'n/a',
         },
     },
     0x3000 => {
@@ -316,11 +371,11 @@ my %sonyExposureProgram = (
             10 => 'Advanced Lv3', #JD
             11 => 'Advanced Lv4', #JD
             12 => 'Advanced Lv5', #JD
-            16 => 1, # (NEX_5)
-            17 => 2,
-            18 => 3,
-            19 => 4,
-            20 => 5,
+            16 => 'Lv1', # (NEX_5)
+            17 => 'Lv2',
+            18 => 'Lv3',
+            19 => 'Lv4',
+            20 => 'Lv5',
         },
     },
     0xb026 => { #PH (A100)
@@ -331,12 +386,7 @@ my %sonyExposureProgram = (
     0xb027 => { #2
         Name => 'LensType',
         Writable => 'int32u',
-        Notes => q{
-            decimal values differentiate lenses which would otherwise have the same
-            LensType, and are used by the Composite LensID tag when attempting to
-            identify the specific lens model.  "New" or "II" appear in brackets if the
-            original version of the lens has the same LensType
-        },
+        SeparateTable => 1,
         PrintConv => \%sonyLensTypes,
     },
     0xb028 => { #2
@@ -590,12 +640,8 @@ my %sonyExposureProgram = (
 
 # Camera settings (ref PH) (decoded mainly from A200)
 %Image::ExifTool::Sony::CameraSettings = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     FORMAT => 'int16u',
     NOTES => q{
         Camera settings for the A200, A230, A300, A350, A700, A850 and A900.  Some
@@ -864,12 +910,8 @@ my %sonyExposureProgram = (
 
 # Camera settings (ref PH) (A330 and A380)
 %Image::ExifTool::Sony::CameraSettings2 = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     FORMAT => 'int16u',
     NOTES => 'Camera settings for the A330 and A380.',
     0x10 => { #7 (A700, not confirmed for other models)
@@ -1005,25 +1047,26 @@ my %sonyExposureProgram = (
 
 # Camera settings for other models
 %Image::ExifTool::Sony::CameraSettingsUnknown = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     FORMAT => 'int16u',
 );
 
 # shot information (ref PH)
 %Image::ExifTool::Sony::ShotInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
-    # 0 - byte order 'II'
-    6 => {
+    DATAMEMBER => [ 0x02, 0x30, 0x32 ],
+    IS_SUBDIR => [ 0x48, 0x5e ],
+    # 0x00 - byte order 'II'
+    0x02 => {
+        Name => 'FaceInfoOffset',
+        Format => 'int16u',
+        DataMember => 'FaceInfoOffset',
+        Writable => 0,
+        RawConv => '$$self{FaceInfoOffset} = $val',
+    },
+    0x06 => {
         Name => 'SonyDateTime',
         Format => 'string[20]',
         Groups => { 2 => 'Time' },
@@ -1031,22 +1074,147 @@ my %sonyExposureProgram = (
         PrintConv => '$self->ConvertDateTime($val)',
         PrintConvInv => '$self->InverseDateTime($val,0)',
     },
-    #52 => {
-    #    # values: 'DC6303320222000' or 'DC5303320222000'
+    0x30 => { #Jeffrey Friedl
+        Name => 'FacesDetected',
+        DataMember => 'FacesDetected',
+        Format => 'int16u',
+        RawConv => '$$self{FacesDetected} = $val',
+    },
+    0x32 => {
+        Name => 'FaceInfoLength', # length of a single FaceInfo entry
+        DataMember => 'FaceInfoLength',
+        Format => 'int16u',
+        Writable => 0,
+        RawConv => '$$self{FaceInfoLength} = $val',
+    },
+    #0x34 => {
+    #    # values: 'DC5303320222000', 'DC6303320222000' or 'DC7303320222000'
     #    Name => 'UnknownString',
     #    Format => 'string[16]',
     #    Unknown => 1,
     #},
+    0x48 => { # (most models: DC5303320222000 and DC6303320222000)
+        Name => 'FaceInfo1',
+        Condition => q{
+            $$self{FacesDetected} and
+            $$self{FaceInfoOffset} == 0x48 and
+            $$self{FaceInfoLength} == 0x20
+        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Sony::FaceInfo1' },
+    },
+    0x5e => { # (HX7V: DC7303320222000)
+        Name => 'FaceInfo2',
+        Condition => q{
+            $$self{FacesDetected} and
+            $$self{FaceInfoOffset} == 0x5e and
+            $$self{FaceInfoLength} == 0x25
+        },
+        SubDirectory => { TagTable => 'Image::ExifTool::Sony::FaceInfo2' },
+    },
+);
+
+%Image::ExifTool::Sony::FaceInfo1 = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    0x00 => {
+        Name => 'Face1Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 1 ? undef : $val',
+        Notes => q{
+            top, left, height and width of detected face.  Coordinates are relative to
+            the full-sized unrotated image, with increasing Y downwards
+        },
+    },
+    0x20 => {
+        Name => 'Face2Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 2 ? undef : $val',
+    },
+    0x40 => {
+        Name => 'Face3Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 3 ? undef : $val',
+    },
+    0x60 => {
+        Name => 'Face4Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 4 ? undef : $val',
+    },
+    0x80 => {
+        Name => 'Face5Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 5 ? undef : $val',
+    },
+    0xa0 => {
+        Name => 'Face6Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 6 ? undef : $val',
+    },
+    0xc0 => {
+        Name => 'Face7Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 7 ? undef : $val',
+    },
+    0xe0 => {
+        Name => 'Face8Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 8 ? undef : $val',
+    },
+);
+
+%Image::ExifTool::Sony::FaceInfo2 = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    0x00 => {
+        Name => 'Face1Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 1 ? undef : $val',
+        Notes => q{
+            top, left, height and width of detected face.  Coordinates are relative to
+            the full-sized unrotated image, with increasing Y downwards
+        },
+    },
+    0x25 => {
+        Name => 'Face2Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 2 ? undef : $val',
+    },
+    0x4a => {
+        Name => 'Face3Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 3 ? undef : $val',
+    },
+    0x6f => {
+        Name => 'Face4Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 4 ? undef : $val',
+    },
+    0x94 => {
+        Name => 'Face5Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 5 ? undef : $val',
+    },
+    0xb9 => {
+        Name => 'Face6Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 6 ? undef : $val',
+    },
+    0xde => {
+        Name => 'Face7Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 7 ? undef : $val',
+    },
+    0x103 => {
+        Name => 'Face8Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 8 ? undef : $val',
+    },
 );
 
 # panorama info for cameras such as the HX1, HX5, TX7 (ref 9/PH)
 %Image::ExifTool::Sony::Panorama = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    WRITABLE => 1,
-    FIRST_ENTRY => 0,
     FORMAT => 'int32u',
     NOTES => q{
         Tags found only in panorama images from Sony cameras such as the HX1, HX5
@@ -1252,7 +1420,9 @@ my %sonyExposureProgram = (
         Name => 'Orientation',
         PrintConv => {
             0 => 'Horizontal (normal)',
+            1 => 'Rotate 270 CW',#11
             2 => 'Rotate 180',
+            3 => 'Rotate 90 CW',#11
         },
     },
     29 => {
@@ -1325,14 +1495,17 @@ my %sonyExposureProgram = (
 
 # fill in Sony LensType lookup based on Minolta values
 {
-    %sonyLensTypes = %Image::ExifTool::Minolta::minoltaLensTypes;
+    my $minoltaTypes = \%Image::ExifTool::Minolta::minoltaLensTypes;
+    %sonyLensTypes = %$minoltaTypes;
+    my $notes = $$minoltaTypes{Notes};
+    delete $$minoltaTypes{Notes};
     my $id;
-    foreach $id (sort { $a <=> $b } keys %Image::ExifTool::Minolta::minoltaLensTypes) {
+    foreach $id (sort { $a <=> $b } keys %$minoltaTypes) {
         # higher numbered lenses are missing last digit of ID for some Sony models
         next if $id < 10000;
         my $sid = int($id/10);
         my $i;
-        my $lens = $Image::ExifTool::Minolta::minoltaLensTypes{$id};
+        my $lens = $$minoltaTypes{$id};
         if ($sonyLensTypes{$sid}) {
             # put lens name with "or" first in list
             if ($lens =~ / or /) {
@@ -1348,6 +1521,7 @@ my %sonyExposureProgram = (
         }
         $sonyLensTypes{$sid} = $lens;
     }
+    $$minoltaTypes{Notes} = $sonyLensTypes{Notes} = $notes;
 }
 
 #------------------------------------------------------------------------------
@@ -1510,7 +1684,6 @@ sub ProcessSRF($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
-    my $dirLen = $$dirInfo{DirLen};
     my $start = $$dirInfo{DirStart};
     my $verbose = $exifTool->Options('Verbose');
 
@@ -1655,7 +1828,6 @@ sub ProcessSR2($$$)
         $exifTool->Warn($err);
         return 0;
     }
-    my $dirLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
     my $result;
     if ($outfile) {
@@ -1795,7 +1967,7 @@ Minolta.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

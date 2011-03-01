@@ -22,7 +22,7 @@ contained within the file data.  These &quot;pseudo&quot; tags belong to the fam
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td>CanonVRD</td>
-<td class=c title='! = Unsafe'>Y!</td>
+<td class=c title=' ! = Unsafe'>Y!</td>
 <td><span class=s><span class=n>(the full Canon DPP VRD trailer block)</span></span></td></tr>
 <tr class=b>
 <td>Comment</td>
@@ -33,14 +33,16 @@ contained within the file data.  These &quot;pseudo&quot; tags belong to the fam
 <td class=c>N</td>
 <td><span class=s><span class=n>(MD5 digest of existing IPTC data.  All zeros if IPTC exists but Digest::MD5
 is not installed.  Only calculated for IPTC in the standard location as
-specified by the <a href="http://www.metadataworkinggroup.org/">MWG</a>)</span></span></td></tr>
+specified by the <a href="http://www.metadataworkinggroup.org/">MWG</a>.  ExifTool
+automates the handling of this tag in the MWG module -- see the
+<a href="MWG.html">MWG Tag Name documentation</a> for details)</span></span></td></tr>
 <tr class=b>
 <td>Directory</td>
-<td class=c title='! = Unsafe'>Y!</td>
+<td class=c title=' ! = Unsafe'>Y!</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>EXIF</td>
-<td class=c title='! = Unsafe'>Y!</td>
+<td class=c title=' ! = Unsafe'>Y!</td>
 <td><span class=s><span class=n>(the full EXIF data block from JPEG, PNG, JP2, MIE and MIFF images)</span></span></td></tr>
 <tr class=b>
 <td>Error</td>
@@ -67,13 +69,14 @@ tag may be used to force a specific byte order)</span>
   <br>&#39;MM&#39; = Big-endian (Motorola, MM)</span></td></tr>
 <tr class=b>
 <td>FileModifyDate</td>
-<td class=c title='! = Unsafe'>Y!</td>
+<td class=c title=' ! = Unsafe'>Y!</td>
 <td><span class=s><span class=n>(the filesystem modification time)</span></span></td></tr>
 <tr>
 <td>FileName</td>
-<td class=c title='! = Unsafe'>Y!</td>
+<td class=c title=' ! = Unsafe'>Y!</td>
 <td><span class=s><span class=n>(may be written with a full path name to set FileName and Directory in one
-operation)</span></span></td></tr>
+operation.  See <a href="../filename.html">filename.html</a> for more information on
+writing the FileName and Directory tags)</span></span></td></tr>
 <tr class=b>
 <td>FilePermissions</td>
 <td class=c>N</td>
@@ -103,7 +106,8 @@ and extraction of synchronization times from image files. See the
 <td class=c>Y</td>
 <td><span class=s><span class=n>(this write-only tag is used to define the GPS track log data or track log
 file name.  Currently supported track log formats are GPX, NMEA RMC/GGA/GLL,
-KML, IGC, Garmin XML and TCX, and Magellan PMGNTRK)</span></span></td></tr>
+KML, IGC, Garmin XML and TCX, and Magellan PMGNTRK.  See
+<a href="../geotag.html">geotag.html</a> for details)</span></span></td></tr>
 <tr>
 <td>Geotime</td>
 <td class=c>Y</td>
@@ -117,7 +121,7 @@ A group name of &#39;EXIF&#39; or &#39;XMP&#39; may be specified to write or del
 EXIF or XMP GPS tags.  The value of Geotag must be assigned before this tag)</span></span></td></tr>
 <tr class=b>
 <td>ICC_Profile</td>
-<td class=c title='! = Unsafe'>Y!</td>
+<td class=c title=' ! = Unsafe'>Y!</td>
 <td><span class=s><span class=n>(the full ICC_Profile data block)</span></span></td></tr>
 <tr>
 <td>ID3Size</td>
@@ -176,7 +180,7 @@ resource-fork information as a sub-document)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 <tr>
 <td>XMP</td>
-<td class=c title='! = Unsafe'>Y!</td>
+<td class=c title=' ! = Unsafe'>Y!</td>
 <td><span class=s><span class=n>(the full XMP data block)</span></span></td></tr>
 <tr class=b>
 <td>XResolution</td>
@@ -190,7 +194,7 @@ resource-fork information as a sub-document)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 22, 2010</i>
+<br><i>Last revised Jan 8, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

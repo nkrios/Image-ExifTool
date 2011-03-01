@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::ASF;   # for GetGUID()
 
-$VERSION = '1.16';
+$VERSION = '1.18';
 
 sub ProcessFPX($$);
 sub ProcessFPXR($$$);
@@ -27,6 +27,7 @@ sub ProcessProperties($$$);
 sub ReadFPXValue($$$$$;$$);
 sub ProcessHyperlinks($$);
 sub ProcessContents($$$);
+sub SetDocNum($$;$$$);
 
 # sector type constants
 sub HDR_SIZE           () { 512; }
@@ -301,7 +302,9 @@ my %isMSOffice = (
         FPXR segment of JPEG images.  As well, FlashPix information is extracted
         from DOC, PPT, XLS (Microsoft Word, PowerPoint and Excel) documents and FLA
         (Macromedia/Adobe Flash project) files since these are based on the same
-        format as FlashPix.
+        file format as FlashPix (the Windows Compound Binary File format).  See
+        L<http://graphcomp.com/info/specs/livepicture/fpx.pdf> for the FlashPix
+        specification.
     },
     "\x05SummaryInformation" => {
         Name => 'SummaryInfo',
@@ -1192,7 +1195,7 @@ sub ProcessProperties($$$)
     my $dirLen = $$dirInfo{DirLen} || length($$dataPt) - $pos;
     my $dirEnd = $pos + $dirLen;
     my $verbose = $exifTool->Options('Verbose');
-    my ($out, $n);
+    my $n;
 
     if ($dirLen < 48) {
         $exifTool->Warn('Truncated FPX properties');
@@ -1511,6 +1514,35 @@ sub ProcessFPXR($$$)
 }
 
 #------------------------------------------------------------------------------
+# Set document number for objects
+# Inputs: 0) object hierarchy hash ref, 1) object index, 2) doc number list ref,
+#         3) doc numbers used at each level, 4) flag set for metadata levels
+sub SetDocNum($$;$$$)
+{
+    my ($hier, $index, $doc, $used, $meta) = @_;
+    my $obj = $$hier{$index} or return;
+    return if exists $$obj{DocNum};
+    $$obj{DocNum} = $doc;
+    SetDocNum($hier, $$obj{Left}, $doc, $used, $meta) if $$obj{Left};
+    SetDocNum($hier, $$obj{Right}, $doc, $used, $meta) if $$obj{Right};
+    if (defined $$obj{Child}) {
+        $used or $used = [ ];
+        my @subDoc;
+        push @subDoc, @$doc if $doc;
+        # we must dive down 2 levels for each sub-document, so use the
+        # $meta flag to add a sub-document level only for every 2nd generation
+        if ($meta) {
+            my $subNum = ($$used[scalar @subDoc] || 0);
+            $$used[scalar @subDoc] = $subNum;
+            push @subDoc, $subNum;
+        } elsif (@subDoc) {
+            $subDoc[-1] = ++$$used[$#subDoc];
+        }
+        SetDocNum($hier, $$obj{Child}, \@subDoc, $used, not $meta) 
+    }
+}
+
+#------------------------------------------------------------------------------
 # Extract information from a FlashPix (FPX) file
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref
 # Returns: 1 on success, 0 if this wasn't a valid FPX-format file
@@ -1519,6 +1551,7 @@ sub ProcessFPX($$)
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
     my ($buff, $out, %dumpParms, $oldIndent, $miniStreamBuff);
+    my ($tag, %hier, %objIndex);
 
     # read header
     return 0 unless $raf->Read($buff,HDR_SIZE) == HDR_SIZE;
@@ -1622,7 +1655,7 @@ sub ProcessFPX($$)
     $endPos = length($dir);
     my $index = 0;
 
-    for ($pos=0; $pos<=$endPos-128; $pos+=128) {
+    for ($pos=0; $pos<=$endPos-128; $pos+=128, ++$index) {
 
         # get directory entry type
         # (0=invalid, 1=storage, 2=stream, 3=lockbytes, 4=property, 5=root)
@@ -1637,7 +1670,7 @@ sub ProcessFPX($$)
         # be very tolerant of this count -- it's null terminated anyway)
         my $len = Get16u(\$dir, $pos + 0x40);
         $len > 32 and $len = 32;
-        my $tag = Image::ExifTool::Decode(undef, substr($dir,$pos,$len*2), 'UCS2', 'II', 'Latin');
+        $tag = Image::ExifTool::Decode(undef, substr($dir,$pos,$len*2), 'UCS2', 'II', 'Latin');
         $tag =~ s/\0.*//s;  # truncate at null (in case length was wrong)
 
         my $sect = Get32u(\$dir, $pos + 0x74);  # start sector number
@@ -1661,6 +1694,21 @@ sub ProcessFPX($$)
             $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $1) if
                 ($tag =~ /(.*) \d{6}$/s and $$tagTablePtr{$1}) or
                 ($tag =~ /(.*)_[0-9a-f]{16}$/s and $$tagTablePtr{$1});
+        }
+
+        my $lSib = Get32u(\$dir, $pos + 0x44);  # left sibling
+        my $rSib = Get32u(\$dir, $pos + 0x48);  # right sibling
+        my $chld = Get32u(\$dir, $pos + 0x4c);  # child directory
+
+        # save information about object hierachy
+        my ($obj, $sub);
+        $obj = $hier{$index} or $obj = $hier{$index} = { };
+        $$obj{Left} = $lSib unless $lSib == FREE_SECT;
+        $$obj{Right} = $rSib unless $rSib == FREE_SECT;
+        unless ($chld == FREE_SECT) {
+            $$obj{Child} = $chld;
+            $sub = $hier{$chld} or $sub = $hier{$chld} = { };
+            $$sub{Parent} = $index;
         }
 
         next unless $tagInfo or $verbose;
@@ -1692,16 +1740,13 @@ sub ProcessFPX($$)
         }
         if ($verbose) {
             my $flags = Get8u(\$dir, $pos + 0x43);  # 0=red, 1=black
-            my $lSib = Get32u(\$dir, $pos + 0x44);  # left sibling
-            my $rSib = Get32u(\$dir, $pos + 0x48);  # right sibling
-            my $chld = Get32u(\$dir, $pos + 0x4c);  # child directory
             my $col = { 0 => 'Red', 1 => 'Black' }->{$flags} || $flags;
             $extra .= " Type=$typeStr Flags=$col";
             $extra .= " Left=$lSib" unless $lSib == FREE_SECT;
             $extra .= " Right=$rSib" unless $rSib == FREE_SECT;
             $extra .= " Child=$chld" unless $chld == FREE_SECT;
             $exifTool->VerboseInfo($tag, $tagInfo,
-                Index  => $index++,
+                Index  => $index,
                 Value  => $buff,
                 DataPt => \$buff,
                 Extra  => $extra,
@@ -1709,6 +1754,7 @@ sub ProcessFPX($$)
             );
         }
         if ($tagInfo and $buff) {
+            my $num = $$exifTool{NUM_FOUND};
             my $subdir = $$tagInfo{SubDirectory};
             if ($subdir) {
                 my %dirInfo = (
@@ -1721,6 +1767,42 @@ sub ProcessFPX($$)
                 $exifTool->ProcessDirectory(\%dirInfo, $subTablePtr,  $$subdir{ProcessProc});
             } else {
                 $exifTool->FoundTag($tagInfo, $buff);
+            }
+            # save object index number for all found tags
+            my $num2 = $$exifTool{NUM_FOUND};
+            $objIndex{++$num} = $index while $num < $num2;
+        }
+    }
+    # set document numbers for tags extracted from embedded documents
+    unless ($$exifTool{DOC_NUM}) {
+        # initialize document number for all objects, beginning at root (index 0)
+        SetDocNum(\%hier, 0);
+        # set family 3 group name for all tags in embedded documents
+        my $order = $$exifTool{FILE_ORDER};
+        my (@pri, $copy, $member);
+        foreach $tag (keys %$order) {
+            my $num = $$order{$tag};
+            next unless defined $num and $objIndex{$num};
+            my $obj = $hier{$objIndex{$num}} or next;
+            my $docNums = $$obj{DocNum};
+            next unless $docNums and @$docNums;
+            $$exifTool{TAG_EXTRA}{$tag}{G3} = join '-', @$docNums;
+            push @pri, $tag unless $tag =~ / /; # save keys for priority sub-doc tags
+        }
+        # swap priority sub-document tags with main document tags if they exist
+        foreach $tag (@pri) {
+            for ($copy=1; ;++$copy) {
+                my $key = "$tag ($copy)";
+                last unless defined $$exifTool{VALUE}{$key};
+                my $extra = $$exifTool{TAG_EXTRA}{$key};
+                next if $extra and $$extra{G3}; # not Main if family 3 group is set
+                foreach $member ('PRIORITY','VALUE','FILE_ORDER','TAG_INFO','TAG_EXTRA') {
+                    my $pHash = $$exifTool{$member};
+                    my $t = $$pHash{$tag};
+                    $$pHash{$tag} = $$pHash{$key};
+                    $$pHash{$key} = $t;
+                }
+                last;
             }
         }
     }
@@ -1748,7 +1830,7 @@ JPEG images.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

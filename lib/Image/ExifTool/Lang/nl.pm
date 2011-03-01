@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::nl;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.05';
+$VERSION = '1.07';
 
 %Image::ExifTool::Lang::nl::Translate = (
    'AEBAutoCancel' => {
@@ -327,11 +327,6 @@ $VERSION = '1.05';
       },
     },
    'AutoBracketOrder' => 'Bracketingvolgorde',
-   'AutoBracketRelease' => {
-      PrintConv => {
-        'None' => 'Geen',
-      },
-    },
    'AutoBracketSet' => {
       Description => 'Inst. voor auto bracketing',
       PrintConv => {
@@ -353,7 +348,6 @@ $VERSION = '1.05';
       },
     },
    'AutoFP' => {
-      Description => 'Auto FP',
       PrintConv => {
         'Off' => 'Uit',
         'On' => 'Aan',
@@ -399,7 +393,7 @@ $VERSION = '1.05';
         'Rotate 180' => '180° (onder/rechts)',
         'Rotate 270 CW' => 'Draai 270° met de klok mee',
         'Rotate 90 CW' => '90° tegen de klok in (rechts/boven)',
-        'Unknown' => 'Onbekend',
+        'n/a' => 'Onbekend',
       },
     },
    'BWMode' => {
@@ -480,10 +474,10 @@ $VERSION = '1.05';
    'CalibrationIlluminant1' => {
       PrintConv => {
         'Cloudy' => 'Bewolkt',
-        'Cool White Fluorescent' => 'Koel wit TL licht',
-        'Day White Fluorescent' => 'Daglicht TL licht',
+        'Cool White Fluorescent' => 'Koel wit TL-licht',
+        'Day White Fluorescent' => 'Daglicht wit TL-licht',
         'Daylight' => 'Daglicht',
-        'Daylight Fluorescent' => 'Daglicht TL licht',
+        'Daylight Fluorescent' => 'Daglicht TL-licht',
         'Fine Weather' => 'Onbewolkt',
         'Flash' => 'Flits',
         'Fluorescent' => 'Fluoresceren',
@@ -493,18 +487,19 @@ $VERSION = '1.05';
         'Standard Light A' => 'Standaard licht A',
         'Standard Light B' => 'Standaard licht B',
         'Standard Light C' => 'Standaard licht C',
-        'Tungsten' => 'Kunstlicht (gloeilamp)',
+        'Tungsten (Incandescent)' => 'Kunstlicht (gloeilamp)',
         'Unknown' => 'Onbekend',
-        'White Fluorescent' => 'Warm wit TL licht',
+        'Warm White Fluorescent' => 'Warm wit TL-licht',
+        'White Fluorescent' => 'Wit TL-licht',
       },
     },
    'CalibrationIlluminant2' => {
       PrintConv => {
         'Cloudy' => 'Bewolkt',
-        'Cool White Fluorescent' => 'Koel wit TL licht',
-        'Day White Fluorescent' => 'Daglicht TL licht',
+        'Cool White Fluorescent' => 'Koel wit TL-licht',
+        'Day White Fluorescent' => 'Daglicht wit TL-licht',
         'Daylight' => 'Daglicht',
-        'Daylight Fluorescent' => 'Daglicht TL licht',
+        'Daylight Fluorescent' => 'Daglicht TL-licht',
         'Fine Weather' => 'Onbewolkt',
         'Flash' => 'Flits',
         'Fluorescent' => 'Fluoresceren',
@@ -514,9 +509,10 @@ $VERSION = '1.05';
         'Standard Light A' => 'Standaard licht A',
         'Standard Light B' => 'Standaard licht B',
         'Standard Light C' => 'Standaard licht C',
-        'Tungsten' => 'Kunstlicht (gloeilamp)',
+        'Tungsten (Incandescent)' => 'Kunstlicht (gloeilamp)',
         'Unknown' => 'Onbekend',
-        'White Fluorescent' => 'Warm wit TL licht',
+        'Warm White Fluorescent' => 'Warm wit TL-licht',
+        'White Fluorescent' => 'Wit TL-licht',
       },
     },
    'CameraOrientation' => {
@@ -624,13 +620,24 @@ $VERSION = '1.05';
       },
     },
    'ColorMode' => {
+      Description => 'Instellingen',
       PrintConv => {
+        'Autumn Leaves' => 'Herfstbladeren',
+        'B&W' => 'Zwart-wit',
+        'Clear' => 'Doorzichtig',
+        'Deep' => 'Diep',
         'Evening' => 'Avond',
         'Landscape' => 'Landschap',
+        'Light' => 'Licht',
+        'Neutral' => 'Neutraal',
+        'Night View' => 'Nacht',
+        'Night View/Portrait' => 'Nachtportret',
         'Normal' => 'Normaal',
         'Off' => 'Uit',
         'Portrait' => 'Portret',
         'Standard' => 'Standaard',
+        'Sunset' => 'Zonsondergang',
+        'Vivid' => 'Levendige kleuren',
       },
     },
    'ColorMoireReduction' => {
@@ -649,6 +656,7 @@ $VERSION = '1.05';
    'ColorSpace' => {
       Description => 'Kleur ruimte',
       PrintConv => {
+        'ICC Profile' => 'ICC-profiel',
         'Uncalibrated' => 'Niet vastgelegd',
       },
     },
@@ -696,6 +704,7 @@ $VERSION = '1.05';
       },
     },
    'CommanderChannel' => 'Commanderstand Kanaal',
+   'CommanderGroupAManualOutput' => 'Commanderstand Groep A M Corrct',
    'CommanderGroupAMode' => {
       Description => 'Commanderstand Groep A Stand',
       PrintConv => {
@@ -704,8 +713,8 @@ $VERSION = '1.05';
         'TTL' => 'DDL',
       },
     },
-   'CommanderGroupA_ManualOutput' => 'Commanderstand Groep A M Corrct',
    'CommanderGroupA_TTL-AAComp' => 'Commanderstand Groep A DDL/AA Corrct',
+   'CommanderGroupBManualOutput' => 'Commanderstand Groep B M Corrct',
    'CommanderGroupBMode' => {
       Description => 'Commanderstand Groep B Stand',
       PrintConv => {
@@ -714,7 +723,6 @@ $VERSION = '1.05';
         'TTL' => 'DDL',
       },
     },
-   'CommanderGroupB_ManualOutput' => 'Commanderstand Groep B M Corrct',
    'CommanderGroupB_TTL-AAComp' => 'Commanderstand Groep B DDL/AA Corrct',
    'CommanderInternalFlash' => {
       Description => 'Commanderstand Ingb. flitsr Stand',
@@ -738,7 +746,6 @@ $VERSION = '1.05';
    'Compression' => {
       Description => 'Compressie schema',
       PrintConv => {
-        'Epson ERF Compressed' => 'Epson ERF gecomprimeerd',
         'JPEG' => 'JPEG-compressie',
         'JPEG (old-style)' => 'JPEG (oude versie)',
         'Kodak DCR Compressed' => 'Kodak DCR gcomprimeerd',
@@ -961,7 +968,15 @@ $VERSION = '1.05';
       },
     },
    'DynamicRangeOptimizer' => {
+      Description => 'Dyn.-bereikoptim',
       PrintConv => {
+        'Advanced Auto' => 'Geavancrd Auto',
+        'Advanced Lv1' => 'Geavanceerd-1',
+        'Advanced Lv2' => 'Geavanceerd-2',
+        'Advanced Lv3' => 'Geavanceerd-3',
+        'Advanced Lv4' => 'Geavanceerd-4',
+        'Advanced Lv5' => 'Geavanceerd-5',
+        'Auto' => 'Automatisch',
         'Off' => 'Uit',
         'Standard' => 'Standaard',
       },
@@ -1631,10 +1646,19 @@ $VERSION = '1.05';
         'On' => 'Aan',
       },
     },
+   'HDR' => {
+      Description => 'Auto HDR',
+      PrintConv => {
+        'Off' => 'Uit',
+      },
+    },
    'Headline' => 'Opschrift',
    'HeightResolution' => 'Beeldresolutie verticaal',
    'HighISONoiseReduction' => {
+      Description => 'NR bij hoge-ISO',
       PrintConv => {
+        'Auto' => 'Automatisch',
+        'High' => 'Hi',
         'Low' => 'Laag',
         'Normal' => 'Normaal',
         'Off' => 'Uit',
@@ -1856,10 +1880,10 @@ $VERSION = '1.05';
       Description => 'Lichtbron',
       PrintConv => {
         'Cloudy' => 'Bewolkt',
-        'Cool White Fluorescent' => 'Koel wit TL licht',
-        'Day White Fluorescent' => 'Daglicht TL licht',
+        'Cool White Fluorescent' => 'Koel wit TL-licht',
+        'Day White Fluorescent' => 'Daglicht wit TL-licht',
         'Daylight' => 'Daglicht',
-        'Daylight Fluorescent' => 'Daglicht TL licht',
+        'Daylight Fluorescent' => 'Daglicht TL-licht',
         'Fine Weather' => 'Onbewolkt',
         'Flash' => 'Flits',
         'Fluorescent' => 'Fluoresceren',
@@ -1871,7 +1895,8 @@ $VERSION = '1.05';
         'Standard Light C' => 'Standaard licht C',
         'Tungsten (Incandescent)' => 'Kunstlicht (gloeilamp)',
         'Unknown' => 'Onbekend',
-        'White Fluorescent' => 'Warm wit TL licht',
+        'Warm White Fluorescent' => 'Warm wit TL-licht',
+        'White Fluorescent' => 'Wit TL-licht',
       },
     },
    'LightSourceSpecial' => {
@@ -1895,6 +1920,7 @@ $VERSION = '1.05';
     },
    'Location' => 'Lokatie',
    'LongExposureNoiseReduction' => {
+      Description => 'NR lang-belicht',
       PrintConv => {
         'Auto' => 'Automatisch',
         'Off' => 'Uit',
@@ -2048,7 +2074,7 @@ $VERSION = '1.05';
         'Auto' => 'Automatisch',
         'Cloudy' => 'Bewolkt',
         'Daylight' => 'Daglicht',
-        'Daylight Fluorescent' => 'Daglicht TL licht',
+        'Daylight Fluorescent' => 'Daglicht TL-licht',
         'Flash' => 'Flits',
         'Fluorescent' => 'Fluoresceren',
         'Shade' => 'Schaduw',
@@ -2088,6 +2114,13 @@ $VERSION = '1.05';
    'MultiExposureMode' => {
       PrintConv => {
         'Off' => 'Uit',
+      },
+    },
+   'MultiFrameNoiseReduction' => {
+      Description => 'Ruisond. Multi Frame',
+      PrintConv => {
+        'Off' => 'Uit',
+        'On' => 'Aan',
       },
     },
    'MultiSelector' => {
@@ -2388,10 +2421,16 @@ $VERSION = '1.05';
    'ProgramVersion' => 'Programmaversie',
    'Province-State' => 'Provincie',
    'Quality' => {
+      Description => 'Beeldkwaliteit',
       PrintConv => {
+        'Compressed RAW' => 'cRAW',
+        'Compressed RAW + JPEG' => 'cRAW+JPEG',
+        'Extra Fine' => 'Extra fijn',
+        'Fine' => 'Fijn',
         'High' => 'Hoog',
         'Low' => 'Laag',
         'Normal' => 'Normaal',
+        'RAW + JPEG' => 'RAW+JPEG',
         'Standard' => 'Standaard',
       },
     },
@@ -2419,12 +2458,6 @@ $VERSION = '1.05';
    'RawJpgQuality' => {
       PrintConv => {
         'Normal' => 'Normaal',
-      },
-    },
-   'RawLinear' => {
-      PrintConv => {
-        'No' => 'Nee',
-        'Yes' => 'Ja',
       },
     },
    'RecordMode' => {
@@ -2569,17 +2602,27 @@ $VERSION = '1.05';
       },
     },
    'SceneMode' => {
+      Description => 'Scènekeuze',
       PrintConv => {
+        '3D Sweep Panorama' => '3D',
+        'Anti Motion Blur' => 'Anti-bewegingswaas',
         'Aperture Priority' => 'Diafragmaprioriteit',
         'Auto' => 'Automatisch',
+        'Cont. Priority AE' => 'Continuvoork. AE',
+        'Handheld Night Shot' => 'Nachtopname uit hand',
         'Landscape' => 'Landschap',
         'Manual' => 'Handmatig',
+        'Night Portrait' => 'Nachtportret',
+        'Night Scene' => 'Nacht',
+        'Night View/Portrait' => 'Nacht/portret',
         'Normal' => 'Normaal',
         'Off' => 'Uit',
         'Portrait' => 'Portret',
         'Shutter Priority' => 'Sluiterprioriteit',
+        'Sports' => 'Sportactie',
         'Standard' => 'Standaard',
         'Sunset' => 'Zonsondergang',
+        'Sweep Panorama' => 'Panorama d. beweg.',
       },
     },
    'SceneModeUsed' => {
@@ -2670,6 +2713,7 @@ $VERSION = '1.05';
    'Sharpness' => {
       Description => 'Scherpte',
       PrintConv => {
+        'Hard' => '+',
         'Normal' => 'Normaal',
         'Soft' => 'Zacht',
       },
@@ -3027,21 +3071,24 @@ $VERSION = '1.05';
         'Auto' => 'Automatisch',
         'Black & White' => 'Monochroom',
         'Cloudy' => 'Bewolkt',
+        'Color Temperature/Color Filter' => 'Kleurtemperatuur / Kleurfilter',
         'Cool White Fluorescent' => 'Koelwit TL-licht',
+        'Custom' => 'Eigen instel.',
         'Custom 1' => 'VOORKEUR 1',
         'Custom 2' => 'VOORKEUR 2',
         'Custom 3' => 'VOORKEUR 3',
         'Custom 4' => 'VOORKEUR 4',
-        'Day White Fluorescent' => 'Daglicht TL licht',
+        'Day White Fluorescent' => 'Daglicht wit TL-licht',
         'Daylight' => 'Daglicht',
-        'Daylight Fluorescent' => 'Daglicht TL licht',
+        'Daylight Fluorescent' => 'Daglicht TL-licht',
         'Flash' => 'Flits',
         'Fluorescent' => 'Fluoresceren',
         'Manual' => 'Handmatig',
         'Shade' => 'Schaduw',
         'Tungsten' => 'Kunstlicht (gloeilamp)',
         'Unknown' => 'Onbekend',
-        'White Fluorescent' => 'Warm wit TL licht',
+        'Warm White Fluorescent' => 'Warm wit TL-licht',
+        'White Fluorescent' => 'Wit TL-licht',
       },
     },
    'WhiteBalance2' => {
@@ -3072,12 +3119,12 @@ $VERSION = '1.05';
         'Auto' => 'Automatisch',
         'Cloudy' => 'Bewolkt',
         'Daylight' => 'Daglicht',
-        'Daylight Fluorescent' => 'Daglicht TL licht',
+        'Daylight Fluorescent' => 'Daglicht TL-licht',
         'Flash' => 'Flits',
         'Manual' => 'Handmatig',
         'Shade' => 'Schaduw',
         'Tungsten' => 'Kunstlicht (gloeilamp)',
-        'White Fluorescent' => 'Warm wit TL licht',
+        'White Fluorescent' => 'Warm wit TL-licht',
       },
     },
    'WhitePoint' => 'Wit punt chromaticiteit',
@@ -3108,6 +3155,14 @@ $VERSION = '1.05';
    'YCbCrSubSampling' => 'Subsampling ratio van Y tot C',
    'YPosition' => 'Y positie',
    'YResolution' => 'Vertikale afbeelding resolutie',
+   'ZoneMatching' => {
+      Description => 'Zoneaanpassing',
+      PrintConv => {
+        'High Key' => 'Hi',
+        'ISO Setting Used' => 'Uit',
+        'Low Key' => 'Lo',
+      },
+    },
    'ZoneMatchingOn' => {
       PrintConv => {
         'Off' => 'Uit',
@@ -3132,7 +3187,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

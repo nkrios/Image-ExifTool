@@ -31,7 +31,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.42';
+$VERSION = '1.47';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -56,7 +56,9 @@ my %durationInfo = (
 # 4-character Vendor ID codes (ref PH)
 my %vendorID = (
     appl => 'Apple',
+    fe20 => 'Olympus (fe20)', # (FE200)
     FFMP => 'FFmpeg',
+   'GIC '=> 'General Imaging Co.',
     kdak => 'Kodak',
     KMPI => 'Konica-Minolta',
     mino => 'Minolta',
@@ -65,10 +67,10 @@ my %vendorID = (
     olym => 'Olympus',
     pana => 'Panasonic',
     pent => 'Pentax',
+    pr01 => 'Olympus (pr01)', # (FE100,FE110,FE115)
     sany => 'Sanyo',
-    # have also seen:
-    # VendorID - 'SMI ', fe20 (Olympus FE200), pr01, 
-    # HandlerVendorID - ZORA, pr01, 'GIC '
+   'SMI '=> 'Sorenson Media Inc.',
+    ZORA => 'Zoran Corporation',
 );
 
 # QuickTime data atom encodings for string types (ref 12)
@@ -910,6 +912,7 @@ my %ftypLookup = (
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
     },
     vndr => 'Vendor', #PH (Samsung PL70)
+    SDLN => 'PlayMode', #PH (NC, Samsung ST80 "SEQ_PLAY")
     # Canon tags
     CNCV => 'CompressorVersion', #PH (5D Mark II)
     CNMN => 'Model', #PH (EOS 550D)
@@ -947,9 +950,10 @@ my %ftypLookup = (
     0x01 => 'Title',
     0x03 => {
         Name => 'ProductionDate',
-        # translate from format "yyyy/mm/dd hh:mm:ss"
+        Groups => { 2 => 'Time' },
+        # translate from format "YYYY/mm/dd HH:MM:SS"
         ValueConv => '$val=~tr{/}{:}; $val',
-        PrintConv => '$exifTool->ConvertDateTime($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
     },
     0x04 => 'Software',
     0x05 => 'Product',
@@ -971,9 +975,9 @@ my %ftypLookup = (
     0x0c => {
         Name => 'ModifyDate',
         Groups => { 2 => 'Time' },
-        # translate from format "yyyy/mm/dd hh:mm:ss"
+        # translate from format "YYYY/mm/dd HH:MM:SS"
         ValueConv => '$val=~tr{/}{:}; $val',
-        PrintConv => '$exifTool->ConvertDateTime($val)',
+        PrintConv => '$self->ConvertDateTime($val)',
     },
 );
 
@@ -1039,10 +1043,12 @@ my %ftypLookup = (
     5 => {
         Name => 'AudioAvgBitrate',
         ValueConv => '$val * 1000',
+        PrintConv => 'ConvertBitrate($val)',
     },
     6 => {
         Name => 'AudioMaxBitrate',
         ValueConv => '$val * 1000',
+        PrintConv => 'ConvertBitrate($val)',
     },
     7 => 'AudioSampleRate',
     8 => 'AudioChannels',
@@ -1076,10 +1082,12 @@ my %ftypLookup = (
     5 => {
         Name => 'VideoAvgBitrate',
         ValueConv => '$val * 1000',
+        PrintConv => 'ConvertBitrate($val)',
     },
     6 => {
         Name => 'VideoMaxBitrate',
         ValueConv => '$val * 1000',
+        PrintConv => 'ConvertBitrate($val)',
     },
     7 => {
         Name => 'VideoAvgFrameRate',
@@ -1570,8 +1578,8 @@ my %ftypLookup = (
 %Image::ExifTool::QuickTime::DcME = (
     PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
-    # Mtmd = binary data
-    # Keyw = keywords?
+    # Mtmd = binary data ("00 00 00 00 00 00 00 01" x 3)
+    # Keyw = keywords? (six bytes all zero)
     # Rate = 2 bytes "00 00"
 );
 
@@ -1712,8 +1720,8 @@ my %ftypLookup = (
     FORMAT => 'int16u',
     2 => 'MaxPDUSize',
     3 => 'AvgPDUSize',
-    4 => { Name => 'MaxBitrate', Format => 'int32u' },
-    6 => { Name => 'AvgBitrate', Format => 'int32u' },
+    4 => { Name => 'MaxBitrate', Format => 'int32u', PrintConv => 'ConvertBitrate($val)' },
+    6 => { Name => 'AvgBitrate', Format => 'int32u', PrintConv => 'ConvertBitrate($val)' },
 );
 
 # MP4 sample table box (ref 5)
@@ -2030,6 +2038,43 @@ my %ftypLookup = (
             return undef unless $val[1];
             $val[1] /= $$self{TimeScale} if $$self{TimeScale};
             return int($val[0] * 8 / $val[1] + 0.5);
+        },
+        PrintConv => 'ConvertBitrate($val)',
+    },
+    GPSLatitude => {
+        Require => 'QuickTime:GPSCoordinates',
+        Groups => { 2 => 'Location' },
+        ValueConv => 'my @c = split " ", $val; $c[0]',
+        PrintConv => q{
+            require Image::ExifTool::GPS;
+            Image::ExifTool::GPS::ToDMS($self, $val, 1, 'N');
+        },
+    },
+    GPSLongitude => {
+        Require => 'QuickTime:GPSCoordinates',
+        Groups => { 2 => 'Location' },
+        ValueConv => 'my @c = split " ", $val; $c[1]',
+        PrintConv => q{
+            require Image::ExifTool::GPS;
+            Image::ExifTool::GPS::ToDMS($self, $val, 1, 'E');
+        },
+    },
+    # split altitude into GPSAltitude/GPSAltitudeRef like EXIF and XMP
+    GPSAltitude => {
+        Require => 'QuickTime:GPSCoordinates',
+        Groups => { 2 => 'Location' },
+        Priority => 0, # (because it may not exist)
+        ValueConv => 'my @c = split " ", $val; defined $c[2] ? abs($c[2]) : undef',
+        PrintConv => '"$val m"',
+    },
+    GPSAltitudeRef  => {
+        Require => 'QuickTime:GPSCoordinates',
+        Groups => { 2 => 'Location' },
+        Priority => 0, # (because altitude information may not exist)
+        ValueConv => 'my @c = split " ", $val; defined $c[2] ? ($c[2] < 0 ? 1 : 0) : undef',
+        PrintConv => {
+            0 => 'Above Sea Level',
+            1 => 'Below Sea Level',
         },
     },
 );
@@ -2605,7 +2650,7 @@ information from QuickTime and MP4 video, and M4A audio files.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

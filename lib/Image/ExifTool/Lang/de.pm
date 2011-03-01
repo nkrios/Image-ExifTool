@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::de;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.18';
+$VERSION = '1.20';
 
 %Image::ExifTool::Lang::de::Translate = (
    'AEAperture' => 'AE-Blende',
@@ -616,14 +616,6 @@ $VERSION = '1.18';
       },
     },
    'AutoBracketOrder' => 'BKT-Reihenfolge',
-   'AutoBracketRelease' => {
-      Description => 'Belichtungsreihen-Auslösung',
-      PrintConv => {
-        'Auto Release' => 'Automatisches Auslösen (Fortlaufend)',
-        'Manual Release' => 'Manuelles Auslösen (Einzelbild)',
-        'None' => 'Keine',
-      },
-    },
    'AutoBracketSet' => {
       Description => 'Belichtungsreihen',
       PrintConv => {
@@ -701,7 +693,7 @@ $VERSION = '1.18';
         'Rotate 180' => '180° (unten/rechts)',
         'Rotate 270 CW' => '90° im Uhrzeigersinn (links/unten)',
         'Rotate 90 CW' => '90° gegen den Uhrzeigersinn (rechts/oben)',
-        'Unknown' => 'Unbekannt',
+        'n/a' => 'Unbekannt',
       },
     },
    'AuxiliaryLens' => 'Vorsatzlinse',
@@ -854,7 +846,7 @@ $VERSION = '1.18';
       PrintConv => {
         'Cloudy' => 'Bewölkt',
         'Cool White Fluorescent' => 'Neonlicht kaltweiß',
-        'Day White Fluorescent' => 'Neonlicht tageslichtweiß',
+        'Day White Fluorescent' => 'Neonlicht neutralweiß',
         'Daylight' => 'Tageslicht',
         'Daylight Fluorescent' => 'Neonlicht tageslichtweiß',
         'Fine Weather' => 'Wolkenlos',
@@ -866,9 +858,10 @@ $VERSION = '1.18';
         'Standard Light A' => 'Standard-Licht A',
         'Standard Light B' => 'Standard-Licht B',
         'Standard Light C' => 'Standard-Licht C',
-        'Tungsten' => 'Glühbirne',
+        'Tungsten (Incandescent)' => 'Kunstlicht (Glühbirne)',
         'Unknown' => 'Unbekannt',
-        'White Fluorescent' => 'Neonlicht warmweiß',
+        'Warm White Fluorescent' => 'Neonlicht warmweiß',
+        'White Fluorescent' => 'Neonlicht universalweiß',
       },
     },
    'CalibrationIlluminant2' => {
@@ -888,9 +881,10 @@ $VERSION = '1.18';
         'Standard Light A' => 'Standard-Licht A',
         'Standard Light B' => 'Standard-Licht B',
         'Standard Light C' => 'Standard-Licht C',
-        'Tungsten' => 'Glühbirne',
+        'Tungsten (Incandescent)' => 'Kunstlicht (Glühbirne)',
         'Unknown' => 'Unbekannt',
-        'White Fluorescent' => 'Neonlicht warmweiß',
+        'Warm White Fluorescent' => 'Neonlicht warmweiß',
+        'White Fluorescent' => 'Neonlicht universalweiß',
       },
     },
    'CameraBody' => 'Kamera Gehäuse',
@@ -969,6 +963,9 @@ $VERSION = '1.18';
         'Medium Movie' => 'Mittelgroßer Film',
         'Postcard' => 'Postkarte',
         'Small' => 'Klein',
+        'Small 1' => 'Klein 1',
+        'Small 2' => 'Klein 2',
+        'Small 3' => 'Klein 3',
         'Small Movie' => 'Kleiner Film',
         'Widescreen' => 'Breitbild',
       },
@@ -1090,7 +1087,6 @@ $VERSION = '1.18';
         'B & W' => 'S/W',
         'B&W' => 'Schwarz-Weiß',
         'Black & White' => 'Schwarz/Weiß',
-        'Black&white' => 'Schwarz/Weiß',
         'Clear' => 'Klar',
         'Deep' => 'Tief',
         'Evening' => 'Abends',
@@ -1136,6 +1132,7 @@ $VERSION = '1.18';
    'ColorSpace' => {
       Description => 'Farbraum',
       PrintConv => {
+        'ICC Profile' => 'ICC-Profil',
         'Monochrome' => 'Monochrom',
         'Natural sRGB' => 'Neutral sRGB',
         'Natural+ sRGB' => 'Neutral+ sRGB',
@@ -1220,6 +1217,7 @@ $VERSION = '1.18';
       },
     },
    'CommanderChannel' => 'Master-Steuerung Kanal',
+   'CommanderGroupAManualOutput' => 'Master-Steuerung Gruppe A M Korr',
    'CommanderGroupAMode' => {
       Description => 'Master-Steuerung Gruppe A Modus',
       PrintConv => {
@@ -1228,8 +1226,8 @@ $VERSION = '1.18';
         'Off' => 'Aus',
       },
     },
-   'CommanderGroupA_ManualOutput' => 'Master-Steuerung Gruppe A M Korr',
    'CommanderGroupA_TTL-AAComp' => 'Master-Steuerung Gruppe A TTL/AA Korr',
+   'CommanderGroupBManualOutput' => 'Master-Steuerung Gruppe B M Korr',
    'CommanderGroupBMode' => {
       Description => 'Master-Steuerung Gruppe B Modus',
       PrintConv => {
@@ -1238,7 +1236,6 @@ $VERSION = '1.18';
         'Off' => 'Aus',
       },
     },
-   'CommanderGroupB_ManualOutput' => 'Master-Steuerung Gruppe B M Korr',
    'CommanderGroupB_TTL-AAComp' => 'Master-Steuerung Gruppe B TTL/AA Korr',
    'CommanderInternalFlash' => {
       Description => 'Master-Steuerung Intgr. Blitz Modus',
@@ -1263,7 +1260,6 @@ $VERSION = '1.18';
    'Compression' => {
       Description => 'Komprimierungsschema',
       PrintConv => {
-        'Epson ERF Compressed' => 'Epson ERF-komprimiert',
         'JPEG' => 'JPEG-Komprimierung',
         'JPEG (old-style)' => 'JPEG (alte Version)',
         'Kodak DCR Compressed' => 'Kodak DCR-komprimiert',
@@ -1558,8 +1554,8 @@ $VERSION = '1.18';
       PrintConv => {
         'Bracketing' => 'Belichtungsreihe',
         'Continuous' => 'Serienaufnahme',
-        'Continuous (Hi)' => 'Serienaufnahme (Hi)',
         'Continuous Bracketing' => 'Serienbild-Belichtungsreihe',
+        'Continuous High' => 'Serienaufnahme (Hi)',
         'Continuous Shooting' => 'Serienaufnahme',
         'HS continuous' => 'High-Speed Serienbild',
         'Multiple Exposure' => 'Mehrfachbelichtung',
@@ -1621,6 +1617,7 @@ $VERSION = '1.18';
         'Advanced Lv3' => 'Erw. Stufe 3',
         'Advanced Lv4' => 'Erw. Stufe 4',
         'Advanced Lv5' => 'Erw. Stufe 5',
+        'Auto' => 'Automatisch',
         'Off' => 'Aus',
       },
     },
@@ -1656,9 +1653,7 @@ $VERSION = '1.18';
       Description => 'LW-Schritte',
       PrintConv => {
         '1/2 EV Steps' => '1/2 LW-Schritte',
-        '1/2 EV steps' => '1/2 LW-Schritte',
         '1/3 EV Steps' => '1/3 LW-Schritte',
-        '1/3 EV steps' => '1/3 LW-Schritte',
       },
     },
    'EasyExposureCompensation' => {
@@ -1807,7 +1802,6 @@ $VERSION = '1.18';
         'Bulb' => 'Bulb-Modus',
         'Landscape' => 'Landschaft',
         'Manual' => 'Manuelle Belichtung',
-        'Night Scene' => 'Nachtszene',
         'Night Scene / Twilight' => 'Nachtszene',
         'Portrait' => 'Porträt',
         'Program' => 'Programm',
@@ -1942,8 +1936,6 @@ $VERSION = '1.18';
         'On' => 'Ein',
       },
     },
-   'FaceDetect1' => 'Gesichter erkannt',
-   'FaceDetect2' => 'Gesichter erkannt',
    'FaceDetectArea' => 'Gesichtserkennung Bereich',
    'FaceDetectFrameHeight' => 'Bereichshöhe',
    'FaceDetectFrameWidth' => 'Bereichsbreite',
@@ -2014,11 +2006,6 @@ $VERSION = '1.18';
       },
     },
    'FilmType' => 'Filmtyp',
-   'Filter' => {
-      PrintConv => {
-        'Off' => 'Aus',
-      },
-    },
    'FilterEffect' => {
       Description => 'Filter-Effekt',
       PrintConv => {
@@ -2593,7 +2580,6 @@ $VERSION = '1.18';
         '3-Dimensional Measurement' => '3-Dimensionale Messung',
       },
     },
-   'GPSPosition' => 'GPS Position',
    'GPSProcessingMethod' => 'Name der GPS-Verarbeitungsmethode',
    'GPSSatellites' => 'Für die Messung verwendete Satelliten',
    'GPSSpeed' => 'Geschwindigkeit des GPS-Empfängers',
@@ -2668,12 +2654,18 @@ $VERSION = '1.18';
         'Running Low' => 'Schwach',
       },
     },
+   'HDR' => {
+      Description => 'Auto HDR',
+      PrintConv => {
+        'Off' => 'Aus',
+      },
+    },
    'Headline' => 'Überschrift',
    'HeightResolution' => 'Vertikale Bildauflösung',
    'HighISONoiseReduction' => {
       Description => 'Rauschunterdrückung bei hoher Empfindlichkeit',
       PrintConv => {
-        'Disable' => 'Ausgeschaltet',
+        'Auto' => 'Automatisch',
         'High' => 'Stärker',
         'Low' => 'Schwächer',
         'Off' => 'Aus',
@@ -2809,7 +2801,6 @@ $VERSION = '1.18';
    'ImageEditing' => {
       Description => 'Bildverarbeitung',
       PrintConv => {
-        'Color Filter' => 'Farbfilter',
         'Cropped' => 'Beschnitten',
         'Digital Filter' => 'Digitalfilter',
         'Frame Synthesis?' => 'Rahmen?',
@@ -2911,25 +2902,25 @@ $VERSION = '1.18';
    'InternalFlashMode' => {
       Description => 'Slave-Blitz-Messfeld 2',
       PrintConv => {
-        'Off, (Unknown 0xf4)' => 'Aus (Unbekannt 0xF4?)',
-        'Off, Auto' => 'Aus, Auto',
-        'Off, Auto, Red-eye reduction' => 'Aus, Auto, Rote-Augen-Reduzierung',
-        'Off, Normal' => 'Aus, Normal',
-        'Off, Red-eye reduction' => 'Aus, Rote-Augen-Reduzierung',
-        'Off, Slow-sync' => 'Aus, Langzeit-Synchronisation',
-        'Off, Slow-sync, Red-eye reduction' => 'Aus, Langzeit-Synchronisation, Rote-Augen-Reduzierung',
-        'Off, Trailing-curtain Sync' => 'Aus, 2. Verschlussvorhang',
-        'Off, Wireless (Control)' => 'Aus, Drahtlos (Steuerblitz)',
-        'Off, Wireless (Master)' => 'Aus, Drahtlos (Hauptblitz)',
-        'On' => 'Ein',
-        'On, Auto' => 'Ein, Auto',
-        'On, Auto, Red-eye reduction' => 'Ein, Auto, Rote-Augen-Reduzierung',
-        'On, Red-eye reduction' => 'Ein, Rote-Augen-Reduzierung',
-        'On, Slow-sync' => 'Ein, Langzeit-Synchronisation',
-        'On, Slow-sync, Red-eye reduction' => 'Ein, Langzeit-Synchronisation, Rote-Augen-Reduzierung',
-        'On, Trailing-curtain Sync' => 'Ein, 2. Verschlussvorhang',
-        'On, Wireless (Control)' => 'Ein, Drahtlos (Steuerblitz)',
-        'On, Wireless (Master)' => 'Ein, Drahtlos (Hauptblitz)',
+        'Did not fire, (Unknown 0xf4)' => 'Aus (Unbekannt 0xF4?)',
+        'Did not fire, Auto' => 'Aus, Auto',
+        'Did not fire, Auto, Red-eye reduction' => 'Aus, Auto, Rote-Augen-Reduzierung',
+        'Did not fire, Normal' => 'Aus, Normal',
+        'Did not fire, Red-eye reduction' => 'Aus, Rote-Augen-Reduzierung',
+        'Did not fire, Slow-sync' => 'Aus, Langzeit-Synchronisation',
+        'Did not fire, Slow-sync, Red-eye reduction' => 'Aus, Langzeit-Synchronisation, Rote-Augen-Reduzierung',
+        'Did not fire, Trailing-curtain Sync' => 'Aus, 2. Verschlussvorhang',
+        'Did not fire, Wireless (Control)' => 'Aus, Drahtlos (Steuerblitz)',
+        'Did not fire, Wireless (Master)' => 'Aus, Drahtlos (Hauptblitz)',
+        'Fired' => 'Ein',
+        'Fired, Auto' => 'Ein, Auto',
+        'Fired, Auto, Red-eye reduction' => 'Ein, Auto, Rote-Augen-Reduzierung',
+        'Fired, Red-eye reduction' => 'Ein, Rote-Augen-Reduzierung',
+        'Fired, Slow-sync' => 'Ein, Langzeit-Synchronisation',
+        'Fired, Slow-sync, Red-eye reduction' => 'Ein, Langzeit-Synchronisation, Rote-Augen-Reduzierung',
+        'Fired, Trailing-curtain Sync' => 'Ein, 2. Verschlussvorhang',
+        'Fired, Wireless (Control)' => 'Ein, Drahtlos (Steuerblitz)',
+        'Fired, Wireless (Master)' => 'Ein, Drahtlos (Hauptblitz)',
         'n/a - Off-Auto-Aperture' => 'K/A - Blendenring nicht auf A',
       },
     },
@@ -3071,7 +3062,7 @@ $VERSION = '1.18';
       PrintConv => {
         'Cloudy' => 'Bewölkt',
         'Cool White Fluorescent' => 'Neonlicht kaltweiß',
-        'Day White Fluorescent' => 'Neonlicht tageslichtweiß',
+        'Day White Fluorescent' => 'Neonlicht neutralweiß',
         'Daylight' => 'Tageslicht',
         'Daylight Fluorescent' => 'Neonlicht tageslichtweiß',
         'Evening Sunlight' => 'Abendstimmung',
@@ -3088,7 +3079,8 @@ $VERSION = '1.18';
         'Tungsten' => 'Glühbirne',
         'Tungsten (Incandescent)' => 'Kunstlicht (Glühbirne)',
         'Unknown' => 'Unbekannt',
-        'White Fluorescent' => 'Neonlicht warmweiß',
+        'Warm White Fluorescent' => 'Neonlicht warmweiß',
+        'White Fluorescent' => 'Neonlicht universalweiß',
       },
     },
    'LightSourceSpecial' => {
@@ -3340,7 +3332,6 @@ $VERSION = '1.18';
         'Extra Fine' => 'Extra-Fein',
         'Fine' => 'Fein',
         'Super Fine' => 'Super-Fein',
-        'Superfine' => 'Superfein',
       },
     },
    'MinoltaTime' => 'Minolta-Zeit',
@@ -3457,6 +3448,13 @@ $VERSION = '1.18';
     },
    'MultiExposureShots' => 'Mehrfachbelichtung Anzahl Aufnahmen',
    'MultiExposureVersion' => 'Mehrfachbelichtungsdaten-Version',
+   'MultiFrameNoiseReduction' => {
+      Description => 'Ruisond. Multi Frame',
+      PrintConv => {
+        'Off' => 'Aus',
+        'On' => 'An',
+      },
+    },
    'MultiSelector' => {
       Description => 'Multifunktionswähler',
       PrintConv => {
@@ -3554,8 +3552,6 @@ $VERSION = '1.18';
         'Low' => 'Gering',
         'Off' => 'Aus',
         'On' => 'Ein',
-        'On 1' => 'Ein (Modus 1)',
-        'On 2' => 'Ein (Modus 2)',
       },
     },
    'NominalMaxAperture' => 'Nominaler AVmin',
@@ -3882,7 +3878,7 @@ $VERSION = '1.18';
       Description => 'Bilddatenausrichtung',
       PrintConv => {
         'Chunky' => 'Kompaktformat',
-        'Planar' => 'ebenes Format',
+        'Planar' => 'Ebenes Format',
       },
     },
    'PostalCode' => 'Postleitzahl',
@@ -4030,6 +4026,7 @@ $VERSION = '1.18';
         'High' => 'Hoch',
         'Low' => 'Leicht',
         'Normal' => 'Standardqualität',
+        'RAW + JPEG' => 'RAW+JPEG',
         'Super Fine' => 'Super-Fein',
         'Superfine' => 'Superfein',
       },
@@ -4142,12 +4139,6 @@ $VERSION = '1.18';
         'Small' => 'Klein',
         'Small Movie' => 'Kleiner Film',
         'Widescreen' => 'Breitbild',
-      },
-    },
-   'RawLinear' => {
-      PrintConv => {
-        'No' => 'Nein',
-        'Yes' => 'Ja',
       },
     },
    'RawMeasuredRGGB' => 'Raw Messung RGGB',
@@ -4359,6 +4350,8 @@ $VERSION = '1.18';
    'SceneMode' => {
       Description => 'Szenen-Modus',
       PrintConv => {
+        '3D Sweep Panorama' => '3D',
+        'Anti Motion Blur' => 'Anti-bewegingswaas',
         'Aperture Priority' => 'Blendenpriorität',
         'Auto' => 'Automatisch',
         'Available Light' => 'Verfügbares Licht',
@@ -4368,8 +4361,10 @@ $VERSION = '1.18';
         'Candle' => 'Kerzenlicht',
         'Candlelight' => 'Kerzenlicht',
         'Children' => 'Kinder',
+        'Cont. Priority AE' => 'Continuvoork. AE',
         'Documents' => 'Dokumente',
         'Fireworks' => 'Feuerwerk',
+        'Handheld Night Shot' => 'Nachtopname uit hand',
         'Indoor' => 'Innenaufnahme',
         'Landscape' => 'Landschaft',
         'Landscape+Portrait' => 'Landschaft+Porträt',
@@ -4389,8 +4384,10 @@ $VERSION = '1.18';
         'Snow' => 'Schnee',
         'Sports' => 'Sport',
         'Spot' => 'Spotmessung',
+        'Standard' => '',
         'Sunset' => 'Sonnenuntergang',
         'Super Macro' => 'Super-Makro',
+        'Sweep Panorama' => 'Panorama d. beweg.',
         'Underwater' => 'Tauchen',
       },
     },
@@ -4729,7 +4726,6 @@ $VERSION = '1.18';
         'On' => 'An',
       },
     },
-   'Software' => 'Software',
    'Source' => 'Quelle',
    'SpatialFrequencyResponse' => 'Raumfrequenz-Antwort',
    'SpecialEffectsOpticalFilter' => {
@@ -4986,7 +4982,6 @@ $VERSION = '1.18';
       },
     },
    'TvExposureTimeSetting' => 'Tv Belichtungszeit-Einstellung',
-   'URL' => 'URL',
    'USMLensElectronicMF' => {
       Description => 'USM-Objektiv, elektr. MF',
       PrintConv => {
@@ -5285,7 +5280,7 @@ $VERSION = '1.18';
         'Black & White' => 'Schwarz/Weiß',
         'Cloudy' => 'Bewölkt',
         'Color Temperature/Color Filter' => 'Farbtemperatur/Farbfilter',
-        'Cool White Fluorescent' => 'Fluoreszierendes kaltes Weiß',
+        'Cool White Fluorescent' => 'Neonlicht kaltweiß',
         'Custom' => 'Benutzerdefiniert',
         'Custom 1' => 'Benutzerdefiniert 1',
         'Custom 2' => 'Benutzerdefiniert 2',
@@ -5434,7 +5429,9 @@ $VERSION = '1.18';
    'ZoneMatching' => {
       Description => 'Zonenabgleich',
       PrintConv => {
+        'High Key' => 'Hi',
         'ISO Setting Used' => 'Aus (ISO-Einstellung verwendet)',
+        'Low Key' => 'Lo',
       },
     },
    'ZoneMatchingOn' => {
@@ -5465,7 +5462,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -104,9 +104,11 @@
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x0014 = 20'>0x0014</td>
-<td>ColorBalanceA</td>
-<td class=c>-</td>
-<td>--&gt; <a href='Nikon.html#ColorBalanceA'>Nikon ColorBalanceA Tags</a></td></tr>
+<td>ColorBalanceA
+  <br>NRWData?</td>
+<td class=c>-<br>Y</td>
+<td>--&gt; <a href='Nikon.html#ColorBalanceA'>Nikon ColorBalanceA Tags</a>
+  <br><span class=n>(large unknown block in NRW images, not copied to JPEG images)</span></td></tr>
 <tr class=b>
 <td title='0x0016 = 22'>0x0016</td>
 <td>ImageBoundary</td>
@@ -135,7 +137,7 @@
 <tr>
 <td title='0x001b = 27'>0x001b</td>
 <td>CropHiSpeed</td>
-<td class=c title='~ = Writable only with -n'>int16u[7]~</td>
+<td class=c title=' ~ = Writable only with -n'>int16u[7]~</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x001c = 28'>0x001c</td>
@@ -145,7 +147,7 @@
 <tr>
 <td title='0x001d = 29'>0x001d</td>
 <td>SerialNumber</td>
-<td class=c title='! = Unsafe'>string!</td>
+<td class=c title=' ! = Unsafe'>string!</td>
 <td><span class=s><span class=n>(this value is used as a key to decrypt other information -- writing this tag
 causes the other information to be re-encrypted with the new key)</span></span></td></tr>
 <tr class=b>
@@ -166,6 +168,11 @@ causes the other information to be re-encrypted with the new key)</span></span><
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr>
+<td title='0x0021 = 33'>0x0021</td>
+<td>FaceDetect</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Nikon.html#FaceDetect'>Nikon FaceDetect Tags</a></td></tr>
+<tr class=b>
 <td title='0x0022 = 34'>0x0022</td>
 <td>ActiveD-Lighting</td>
 <td class=c>int16u</td>
@@ -175,22 +182,22 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>5 = High
   <br>7 = Extra High
   <br>65535 = Auto</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0023 = 35'>0x0023</td>
 <td>PictureControlData</td>
 <td class=c>undef</td>
 <td>--&gt; <a href='Nikon.html#PictureControl'>Nikon PictureControl Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0024 = 36'>0x0024</td>
 <td>WorldTime</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#WorldTime'>Nikon WorldTime Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0025 = 37'>0x0025</td>
 <td>ISOInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#ISOInfo'>Nikon ISOInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x002a = 42'>0x002a</td>
 <td>VignetteControl</td>
 <td class=c>int16u</td>
@@ -198,32 +205,32 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>1 = Low
   <br>3 = Normal
   <br>5 = High</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x002b = 43'>0x002b</td>
 <td>DistortInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#DistortInfo'>Nikon DistortInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0032 = 50'>0x0032</td>
 <td>UnknownInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#UnknownInfo'>Nikon UnknownInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0080 = 128'>0x0080</td>
 <td>ImageAdjustment</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0081 = 129'>0x0081</td>
 <td>ToneComp</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0082 = 130'>0x0082</td>
 <td>AuxiliaryLens</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0083 = 131'>0x0083</td>
 <td>LensType</td>
 <td class=c>int8u</td>
@@ -231,22 +238,22 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>Bit 1 = D
   <br>Bit 2 = G
   <br>Bit 3 = VR</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0084 = 132'>0x0084</td>
 <td>Lens</td>
 <td class=c>rational64u[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0085 = 133'>0x0085</td>
 <td>ManualFocusDistance</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0086 = 134'>0x0086</td>
 <td>DigitalZoom</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0087 = 135'>0x0087</td>
 <td>FlashMode</td>
 <td class=c>int8u</td>
@@ -256,16 +263,16 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>7 = Fired, External
   <br>8 = Fired, Commander Mode
   <br>9 = Fired, TTL Mode</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0088 = 136'>0x0088</td>
 <td>AFInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#AFInfo'>Nikon AFInfo Tags</a>
   <br>--&gt; <a href='Nikon.html#AFInfo'>Nikon AFInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0089 = 137'>0x0089</td>
 <td>ShootingMode</td>
-<td class=c title='~ = Writable only with -n'>int16u~</td>
+<td class=c title=' ~ = Writable only with -n'>int16u~</td>
 <td><span class=s><span class=n>(for the D70, Bit 5 = Unused LE-NR Slowdown)</span>
   <br>Bit 0 = Continuous
   <br>Bit 1 = Delay
@@ -274,32 +281,32 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>Bit 5 = Auto ISO
   <br>Bit 6 = White-Balance Bracketing
   <br>Bit 7 = IR Control</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x008b = 139'>0x008b</td>
 <td>LensFStops</td>
 <td class=c>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x008c = 140'>0x008c</td>
 <td>ContrastCurve</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x008d = 141'>0x008d</td>
 <td>ColorHue</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x008f = 143'>0x008f</td>
 <td>SceneMode</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0090 = 144'>0x0090</td>
 <td>LightSource</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0091 = 145'>0x0091</td>
 <td>ShotInfoD40
   <br>ShotInfoD80
@@ -328,12 +335,12 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>--&gt; <a href='Nikon.html#ShotInfoD5000'>Nikon ShotInfoD5000 Tags</a>
   <br>--&gt; <a href='Nikon.html#ShotInfo'>Nikon ShotInfo Tags</a>
   <br>--&gt; <a href='Nikon.html#ShotInfo'>Nikon ShotInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0092 = 146'>0x0092</td>
 <td>HueAdjustment</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0093 = 147'>0x0093</td>
 <td>NEFCompression</td>
 <td class=c>int16u</td>
@@ -341,22 +348,22 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>2 = Uncompressed
   <br>3 = Lossless
   <br>4 = Lossy (type 2)</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0094 = 148'>0x0094</td>
 <td>Saturation</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0095 = 149'>0x0095</td>
 <td>NoiseReduction</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0096 = 150'>0x0096</td>
 <td>LinearizationTable</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0097 = 151'>0x0097</td>
 <td>ColorBalance0100
   <br>ColorBalance0102
@@ -372,7 +379,7 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>--&gt; <a href='Nikon.html#ColorBalance2'>Nikon ColorBalance2 Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalance4'>Nikon ColorBalance4 Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalance2'>Nikon ColorBalance2 Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0098 = 152'>0x0098</td>
 <td>LensData0100
   <br>LensData0101
@@ -385,22 +392,22 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>--&gt; <a href='Nikon.html#LensData01'>Nikon LensData01 Tags</a>
   <br>--&gt; <a href='Nikon.html#LensData0204'>Nikon LensData0204 Tags</a>
   <br>--&gt; <a href='Nikon.html#LensDataUnknown'>Nikon LensDataUnknown Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0099 = 153'>0x0099</td>
 <td>RawImageCenter</td>
 <td class=c>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x009a = 154'>0x009a</td>
 <td>SensorPixelSize</td>
 <td class=c>rational64u[2]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x009c = 156'>0x009c</td>
 <td>SceneAssist</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x009e = 158'>0x009e</td>
 <td>RetouchHistory</td>
 <td class=c>int16u[10]</td>
@@ -431,33 +438,33 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>31 = Soft Filter
   <br>33 = Miniature Effect</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr>
+<tr class=b>
 <td title='0x00a0 = 160'>0x00a0</td>
 <td>SerialNumber</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x00a2 = 162'>0x00a2</td>
 <td>ImageDataSize</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x00a5 = 165'>0x00a5</td>
 <td>ImageCount</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x00a6 = 166'>0x00a6</td>
 <td>DeletedImageCount</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x00a7 = 167'>0x00a7</td>
 <td>ShutterCount</td>
-<td class=c title='! = Unsafe'>int32u!</td>
+<td class=c title=' ! = Unsafe'>int32u!</td>
 <td><span class=s><span class=n>(this value is used as a key to decrypt other information -- writing this tag
 causes the other information to be re-encrypted with the new key)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x00a8 = 168'>0x00a8</td>
 <td>FlashInfo0100
   <br>FlashInfo0102
@@ -468,37 +475,37 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>--&gt; <a href='Nikon.html#FlashInfo0102'>Nikon FlashInfo0102 Tags</a>
   <br>--&gt; <a href='Nikon.html#FlashInfo0103'>Nikon FlashInfo0103 Tags</a>
   <br>--&gt; <a href='Nikon.html#FlashInfoUnknown'>Nikon FlashInfoUnknown Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x00a9 = 169'>0x00a9</td>
 <td>ImageOptimization</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x00aa = 170'>0x00aa</td>
 <td>Saturation</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x00ab = 171'>0x00ab</td>
 <td>VariProgram</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x00ac = 172'>0x00ac</td>
 <td>ImageStabilization</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x00ad = 173'>0x00ad</td>
 <td>AFResponse</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x00b0 = 176'>0x00b0</td>
 <td>MultiExposure</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#MultiExposure'>Nikon MultiExposure Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x00b1 = 177'>0x00b1</td>
 <td>HighISONoiseReduction</td>
 <td class=c>int16u</td>
@@ -507,42 +514,42 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>2 = Low
   <br>4 = Normal
   <br>6 = High</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x00b3 = 179'>0x00b3</td>
 <td>ToningEffect</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x00b6 = 182'>0x00b6</td>
 <td>PowerUpTime</td>
-<td class=c title='~ = Writable only with -n'>undef~</td>
+<td class=c>undef</td>
 <td><span class=s><span class=n>(date/time when camera was last powered up)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x00b7 = 183'>0x00b7</td>
 <td>AFInfo2</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#AFInfo2'>Nikon AFInfo2 Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x00b8 = 184'>0x00b8</td>
 <td>FileInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#FileInfo'>Nikon FileInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x00b9 = 185'>0x00b9</td>
 <td>AFTune</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#AFTune'>Nikon AFTune Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x00bd = 189'>0x00bd</td>
 <td>PictureControlData</td>
 <td class=c>undef</td>
 <td>--&gt; <a href='Nikon.html#PictureControl'>Nikon PictureControl Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0e01 = 3585'>0x0e01</td>
 <td>NikonCaptureData</td>
 <td class=c>undef</td>
@@ -550,40 +557,40 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br><span class='n s'>(this data is dropped when copying Nikon MakerNotes since it may be too large
 to fit in the EXIF segment of a JPEG image, but it may be copied as a block
 into existing Nikon MakerNotes later if desired)</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0e09 = 3593'>0x0e09</td>
 <td>NikonCaptureVersion</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0e0e = 3598'>0x0e0e</td>
 <td>NikonCaptureOffsets</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#CaptureOffsets'>Nikon CaptureOffsets Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0e10 = 3600'>0x0e10</td>
 <td>NikonScanIFD</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#Scan'>Nikon Scan Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0e13 = 3603'>0x0e13</td>
 <td>NikonCaptureHistory</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0e1d = 3613'>0x0e1d</td>
 <td>NikonICCProfile</td>
-<td class=c title='! = Unsafe'>undef!</td>
+<td class=c title=' ! = Unsafe'>undef!</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0e1e = 3614'>0x0e1e</td>
 <td>NikonCaptureOutput</td>
 <td class=c>undef</td>
 <td>--&gt; <a href='Nikon.html#CaptureOutput'>Nikon CaptureOutput Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0e22 = 3618'>0x0e22</td>
 <td>NEFBitDepth</td>
-<td class=c title='! = Unsafe'>int16u[4]!</td>
+<td class=c title=' ! = Unsafe'>int16u[4]!</td>
 <td><span class=s>&#39;0 0 0 0&#39; = n/a (JPEG)
   <br>&#39;8 8 8 0&#39; = 8 x 3
   <br>&#39;12 0 0 0&#39; = 12
@@ -639,12 +646,12 @@ into existing Nikon MakerNotes later if desired)</span></td></tr>
 <tr class=b>
 <td title='0x0201 = 513'>0x0201</td>
 <td>PreviewImageStart</td>
-<td class=c title='* = Protected'>int32u*</td>
+<td class=c title=' * = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x0202 = 514'>0x0202</td>
 <td>PreviewImageLength</td>
-<td class=c title='* = Protected'>int32u*</td>
+<td class=c title=' * = Protected'>int32u*</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0x0213 = 531'>0x0213</td>
@@ -663,12 +670,12 @@ into existing Nikon MakerNotes later if desired)</span></td></tr>
 <tr>
 <td class=r title='624 = 0x270'>624</td>
 <td>RedBalance</td>
-<td class=c title='! = Unsafe'>int16u!</td>
+<td class=c title=' ! = Unsafe'>int16u!</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='625 = 0x271'>625</td>
 <td>BlueBalance</td>
-<td class=c title='! = Unsafe'>int16u!</td>
+<td class=c title=' ! = Unsafe'>int16u!</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -689,6 +696,85 @@ into existing Nikon MakerNotes later if desired)</span></td></tr>
 <td class=c>int8u</td>
 <td><span class=s>1 = On
   <br>2 = Off</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FaceDetect'>Nikon FaceDetect Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='1 = 0x1'>1</td>
+<td>FaceDetectFrameSize</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='3 = 0x3'>3</td>
+<td>FacesDetected</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>Face1Position</td>
+<td class=c>int16u[4]</td>
+<td><span class=s><span class=n>(top, left, width and height of face detect area in coordinates of
+FaceDetectFrameSize)</span></span></td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>Face2Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='12 = 0xc'>12</td>
+<td>Face3Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='16 = 0x10'>16</td>
+<td>Face4Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='20 = 0x14'>20</td>
+<td>Face5Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='24 = 0x18'>24</td>
+<td>Face6Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='28 = 0x1c'>28</td>
+<td>Face7Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='32 = 0x20'>32</td>
+<td>Face8Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='36 = 0x24'>36</td>
+<td>Face9Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='40 = 0x28'>40</td>
+<td>Face10Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='44 = 0x2c'>44</td>
+<td>Face11Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='48 = 0x30'>48</td>
+<td>Face12Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='PictureControl'>Nikon PictureControl Tags</a></h2>
@@ -1602,7 +1688,7 @@ only valid for specific models.</p>
 <tr>
 <td class=r title='0 = 0x0'>0</td>
 <td>WB_RBGGLevels</td>
-<td class=c title='! = Unsafe'>int16u[4]!</td>
+<td class=c title=' ! = Unsafe'>int16u[4]!</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1616,7 +1702,7 @@ only valid for specific models.</p>
 <tr>
 <td class=r title='0 = 0x0'>0</td>
 <td>WB_RGGBLevels</td>
-<td class=c title='! = Unsafe'>int16u[4]!</td>
+<td class=c title=' ! = Unsafe'>int16u[4]!</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1629,7 +1715,7 @@ only valid for specific models.</p>
 <tr>
 <td class=r title='0 = 0x0'>0</td>
 <td>WB_RGBGLevels</td>
-<td class=c title='! = Unsafe'>int16u[4]!</td>
+<td class=c title=' ! = Unsafe'>int16u[4]!</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1642,7 +1728,7 @@ only valid for specific models.</p>
 <tr>
 <td class=r title='0 = 0x0'>0</td>
 <td>WB_GRBGLevels</td>
-<td class=c title='! = Unsafe'>int16u[4]!</td>
+<td class=c title=' ! = Unsafe'>int16u[4]!</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -2458,7 +2544,7 @@ D200.</p>
 <td>AFPointsUsed
   <br>AFPointsUsed
   <br>AFPointsUsed</td>
-<td class=c title='~ = Writable only with -n'>undef[7]~<br>undef[2]<br>undef[7]~</td>
+<td class=c title=' ~ = Writable only with -n'>undef[7]~<br>undef[2]<br>undef[7]~</td>
 <td><span class=s><span class=n>(models with 51-point AF -- 5 rows: A1-9, B1-11, C1-11, D1-11, E1-9, center
 point is C6)</span>
   <br><span class=n>(models with 11-point AF)</span></span><table class=cols><tr>
@@ -3419,6 +3505,7 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'49 3C A6 A6 30 30 E1 02'</td><td>= AF-S Nikkor 600mm f/4D IF-ED + TC-17E</td>
 </tr><tr><td>'49 3C A6 A6 30 30 F1 02'</td><td>= AF-S Nikkor 600mm f/4D IF-ED + TC-14E</td>
 </tr><tr><td>'49 3C A6 A6 30 30 F2 02'</td><td>= AF-S Nikkor 600mm f/4D IF-ED + TC-20E</td>
+</tr><tr><td>'4A 48 24 24 24 0C 4D 02'</td><td>= Samyang AE 14mm f/2.8 ED AS IF UMC</td>
 </tr><tr><td>'4A 54 62 62 0C 0C 4D 02'</td><td>= AF Nikkor 85mm f/1.4D IF</td>
 </tr><tr><td>'4A 60 62 62 0C 0C 4D 02'</td><td>= Samyang AE 85mm f/1.4 AS IF UMC</td>
 </tr><tr><td>'4B 3C A0 A0 30 30 4E 02'</td><td>= AF-S Nikkor 500mm f/4D IF-ED</td>
@@ -3514,6 +3601,7 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'9A 40 2D 53 2C 3C 9C 0E'</td><td>= AF-S DX VR Zoom-Nikkor 18-55mm f/3.5-5.6G</td>
 </tr><tr><td>'9B 00 4C 4C 24 24 9D 06'</td><td>= PC-E Micro Nikkor 45mm f/2.8D ED</td>
 </tr><tr><td>'9B 54 4C 4C 24 24 9D 02'</td><td>= PC-E Micro Nikkor 45mm f/2.8D ED</td>
+</tr><tr><td>'9C 48 5C 80 24 24 4B 0E'</td><td>= Sigma 70-200mm F2.8 EX DG OS HSM</td>
 </tr><tr><td>'9C 54 56 56 24 24 9E 06'</td><td>= AF-S Micro Nikkor 60mm f/2.8G ED</td>
 </tr><tr><td>'9D 00 62 62 24 24 9F 06'</td><td>= PC-E Micro Nikkor 85mm f/2.8D</td>
 </tr><tr><td>'9D 54 62 62 24 24 9F 02'</td><td>= PC-E Micro Nikkor 85mm f/2.8D</td>
@@ -3577,7 +3665,7 @@ ExifTool to choose in these cases (see the
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 18, 2010</i>
+<br><i>Last revised Feb 28, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

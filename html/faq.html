@@ -142,10 +142,10 @@ for display, so with these you may see odd values like 1/102 instead of
 <blockquote>All information (including date/time information) is written in the
 same format as it is read out.  When reading, ExifTool converts all date and
 time information to standard EXIF format, so this is also the way it is
-specified when writing. The standard EXIF date/time format is "<code>YYYY:MM:DD
-hh:mm:ss</code>", and some meta information formats such as XMP also allow
+specified when writing. The standard EXIF date/time format is "<code>YYYY:mm:dd
+HH:MM:SS</code>", and some meta information formats such as XMP also allow
 sub-seconds and a timezone to be specified.  The timezone format is
-"<code>+hh:mm</code>", "<code>-hh:mm</code>" or "<code>Z</code>". For
+"<code>+HH:MM</code>", "<code>-HH:MM</code>" or "<code>Z</code>". For
 example:
 
 <pre>exiftool -xmp:dateTimeOriginal="2005:10:23 20:06:34.33-05:00" a.jpg
@@ -155,13 +155,19 @@ When writing XMP or other information types which allow incomplete date/time
 values, the following input formats are also accepted:
 
 <pre>YYYY
-YYYY:MM
-YYYY:MM:DD
-YYYY:MM:DD hh:mm
+YYYY:mm
+YYYY:mm:dd
+YYYY:mm:dd HH:MM
 </pre>
 
-ExifTool will attempt to reformat input date/time values into the standard
-format unless the <code>-n</code> option is used.
+Having said this, ExifTool is very flexible about the actual format of input
+date/time values when writing, and will attempt to reformat any values into the
+standard format unless the <code>-n</code> option is used.  Any separators may
+be used (or in fact, none at all).  The first 4 consecutive digits found in the
+value are interpreted as the year, then next 2 digits are the month, and so on.
+For EXIF date/time values, all 6 date/time fields must exist
+("<code>YYYYmmddHHMMSS</code>"), but XMP date/time values require only the year
+("<code>YYYY</code>").
 </blockquote>
 
 <a name="Q6"></a>
@@ -179,7 +185,7 @@ GPSAltitudeRef tag defines the following conversions:
 </pre>
 For this tag, a value of '0' is printed as 'Above Sea Level', and '1' is printed
 as 'Below Sea Level'.  Reading and writing with ExifTool is symmetrical <i>[with
-the possible exception of List-type tags -- see <a href="#Q17">FAQ #17</a>
+the possible exception of List-type tags -- see <a href="#Q17">FAQ number 17</a>
 below]</i>, so a value that is printed as 'Above Sea Level' must also be written in
 that form.  (In other words, the inverse print conversion is applied when writing
 values.)  For example, to write GPSAltitudeRef you can type:
@@ -229,9 +235,10 @@ subdirectory, so any information stored in other directories is preserved.
 
 <blockquote>Use "<code>exiftool -a -G1 -s img.tif</code>" to see where the
 information is stored.  Any tags remaining in other IFD's must be deleted
-individually from a TIFF-format file if desired.  For convenience, a shortcut
-tag is provided to simplify the deletion of common metadata tags from IFD0 by
-adding "<code>-CommonIFD0=</code>" to the command line.
+individually from a TIFF-format file if desired.  For convenience, a
+<a href="TagNames/Shortcuts.html">shortcut tag</a> is provided to simplify the
+deletion of common metadata tags from IFD0 by adding "<code>-CommonIFD0=</code>"
+to the command line.
 </blockquote>
 
 <a name="Q8"></a>
@@ -545,7 +552,7 @@ file by adding the following line to your file:
 
 If you see a "<code>LOADED!</code>" message when you run exiftool, but your new
 tags still don't work, make sure you are using the proper tag name and that the
-file you are writing can support these names.</blockquote>
+file you are writing can support this type of information.</blockquote>
 
 <blockquote><b>Programmers</b>: To specify the config file directory from within
 a Perl script when using the ExifTool API, set the <b>EXIFTOOL_HOME</b>
@@ -766,21 +773,21 @@ FileName, Directory and FileModifyDate.</span></blockquote>
 <a href="TagNames/index.html">tag name documentation</a> are List-type tags.
 Two common examples of List-type tags are
 <a href="TagNames/IPTC.html#ApplicationRecord">IPTC:Keywords</a> and
-<a href="TagNames/XMP.html#dc">XMP:Subject</a>.  These tags may have multiple
-values which are combined into a single string when reading.  (By default,
-extracted values are separated by a comma and a space, but the <code>-sep</code>
-option may be used to change this.)  When writing, separate values are always
-assigned individually.  For example, the following command writes three keywords
-to all writable files in directory <code>DIR</code>, replacing any previously
-existing keywords:
+<a href="TagNames/XMP.html#dc">XMP:Subject</a>.  These tags may contain multiple
+items which are combined into a single string when reading.  (By default,
+extracted list items are separated by a comma and a space, but the
+<code>-sep</code> option may be used to change this.)  When writing, separate
+items are always assigned individually.  For example, the following command
+writes three keywords to all writable files in directory <code>DIR</code>,
+replacing any previously existing keywords:
 
 <pre>exiftool -keywords=one -keywords=two -keywords=three DIR
 </pre>
 
-Values are assigned separately, NOT all together, because this would represent a
-single keyword:
+List items are assigned separately, NOT all together, because this would
+represent a single keyword:
 
-<pre>exiftool -keywords="one, two, three" test.jpg
+<pre>exiftool -keywords="one, two, three" test.jpg  <span class=blk>(WRONG!)</span>
 </pre>
 
 With exiftool version 7.56 or later, the <code>-sep</code> option may be used to
@@ -816,30 +823,32 @@ and produces an output like this:
 
 Note that the above examples overwrite any values which already existed in the
 original file for these tags.  Alternatively, "<code>+=</code>" or
-"<code>-=</code> may be used to add to or remove from an existing list:
+"<code>-=</code> may be used to add to or remove items from an existing list:
 
 <pre>exiftool -keywords+="add this" -keywords-="remove this" DIR
 </pre>
 
-Using "<code>=</code>" is equivalent to "<code>+=</code>" in any command where
-the same tag is set with "<code>+=</code>" or "<code>-=</code>" in another
-assignment.  (ie. existing values will be preserved unless specifically deleted
-with "<code>-=</code>".)
-</blockquote>
+In commands like this, new items are added to the list in place of the first
+deleted item, or at the end of the list if no items were removed.</blockquote>
 
-<blockquote>To prevent duplication when adding new values, specific values can
-be deleted then added back again in the same command.  For example, the
-following command adds the keywords "one" and "two", ensuring that they are not
-duplicated if they already existed in the keywords of an image:
+<blockquote>Note: Using "<code>=</code>" is equivalent to "<code>+=</code>" in
+any command where the same tag is set with "<code>+=</code>" or
+"<code>-=</code>" in another assignment.  (ie. existing items will be preserved
+unless specifically deleted with "<code>-=</code>".)</blockquote>
+
+<blockquote>To prevent duplication when adding new items, specific items can be
+deleted then added back again in the same command.  For example, the following
+command adds the keywords "one" and "two", ensuring that they are not duplicated
+if they already existed in the keywords of an image:
 
 <pre>exiftool -keywords-=one -keywords+=one -keywords-=two -keywords+=two DIR
 </pre>
 
-When copying list tags using the <code>-tagsFromFile</code> option,
-values are copied individually to form proper lists.  However, it gets a bit
-tricky when copying multiple tags to a single list tag:  Here, any assignment to
-a tag overrides earlier assignments to the same tag in the command.  For
-instance, this command
+When copying list tags using the <code>-tagsFromFile</code> option, items are
+copied individually to form proper lists.  However, it gets a bit tricky when
+copying multiple tags to a single list tag:  Here, any assignment to a tag
+overrides earlier assignments to the same tag in the command.  For instance,
+this command
 
 <pre>exiftool "-keywords&lt;filename" "-keywords&lt;comment" DIR
 </pre>
@@ -997,14 +1006,14 @@ when creating new EXIF (ie. "<code>-ExifByteOrder=II</code>" for little-endian).
 <a name="Q21"></a>
 <p>21. <b>"How do I read/write values containing newline characters?"</b></p>
 
-<blockquote>By default, exiftool converts all control characters to "." when
-extracting information (to avoid messing up the output formatting), so newlines
-will usually appear as a "." in the output.  The <code>-b</code> option may be
-used to bypass all output formatting (except that a line-feed character is
-inserted between items in a list), but this may not be appropriate when the
-values of many tags must be extracted.  In this case, the JSON (<code>-j</code>)
-and XML (<code>-X</code>) options provide alternative output formats which
-preserve newlines in values.</blockquote>
+<blockquote>When reading, by default exiftool converts all control characters to
+"." to avoid messing up the output formatting, so newlines will appear as a "."
+in the output.  The <code>-b</code> option may be used to bypass all output
+formatting (except that a line-feed character is inserted between items in a
+list), but this may not be appropriate when the values of many tags must be
+extracted.  In this case, the formatted output (<code>-p</code>), JSON
+(<code>-j</code>) and XML (<code>-X</code>) options provide alternative output
+formats which preserve newlines in values.</blockquote>
 
 <blockquote>When writing, there are a number of options:
 
@@ -1079,6 +1088,7 @@ specific values.  See the "Values" column in the appropriate table of the
 <a href="TagNames/index.html">Tag Name documentation</a> for a list of valid
 values for these types of tags.  The value conversion may also be bypassed with
 the <code>-n</code> option, allowing numerical values to be written directly.
+See <a href="#Q6">FAQ number 6</a> for more details.
 
 <ol start="2"><li>The information type isn't supported by the format of the
 target file.</li></ol>
@@ -1100,7 +1110,7 @@ individually, so they can only be written if they already exist in a
 file.</blockquote>
 
 <hr>
-<i>Last revised Nov. 10, 2010</i>
+<i>Last revised Feb. 25, 2011</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

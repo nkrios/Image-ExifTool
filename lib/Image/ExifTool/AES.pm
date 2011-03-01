@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# File:         PDF.pm
+# File:         AES.pm
 #
 # Description:  AES encryption with cipher-block chaining
 #
@@ -454,7 +454,7 @@ __END__
 
 =head1 NAME
 
-Image::ExifTool::PDF - AES encryption with cipher-block chaining
+Image::ExifTool::AES - AES encryption with cipher-block chaining
 
 =head1 SYNOPSIS
 
@@ -522,7 +522,7 @@ main purpose of encryption, so this really can't be considered a bug.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

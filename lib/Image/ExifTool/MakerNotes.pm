@@ -16,12 +16,13 @@ use Image::ExifTool::Exif;
 sub ProcessUnknown($$$);
 sub ProcessUnknownOrPreview($$$);
 sub ProcessCanon($$$);
+sub ProcessGE2($$$);
 sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.61';
+$VERSION = '1.63';
 
-my $debug;          # set to 1 to enabled debugging code
+my $debug;          # set to 1 to enable debugging code
 
 # conditional list of maker notes
 # Notes:
@@ -69,7 +70,8 @@ my $debug;          # set to 1 to enabled debugging code
         # TIFF file, but with "FUJIFILM" instead of the standard TIFF header
         Name => 'MakerNoteFujiFilm',
         # (starts with "FUJIFILM" -- also used by some Leica, Minolta and Sharp models)
-        Condition => '$$valPt =~ /^FUJIFILM/',
+        # (GE FujiFilm models start with "GENERALE")
+        Condition => '$$valPt =~ /^(FUJIFILM|GENERALE)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::FujiFilm::Main',
             # there is an 8-byte maker tag (FUJIFILM) we must skip over
@@ -79,6 +81,32 @@ my $debug;          # set to 1 to enabled debugging code
             Base => '$start',
             ByteOrder => 'LittleEndian',
         },
+    },
+    {
+        Name => 'MakerNoteGE',
+        Condition => '$$valPt =~ /^GE(\0\0|NIC\0)/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::GE::Main',
+            Start => '$valuePtr + 18',
+            FixBase => 1,
+            AutoFix => 1,
+            ByteOrder => 'Unknown',
+       },
+    },
+    {
+        Name => 'MakerNoteGE2',
+        Condition => '$$valPt =~ /^GE\x0c\0\0\0\x16\0\0\0/',
+        # Note: we will get a "Maker notes could not be parsed" warning when writing
+        #       these maker notes because they aren't currently supported for writing
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::FujiFilm::Main',
+            ProcessProc => \&ProcessGE2,
+            Start => '$valuePtr + 12',
+            Base => '$start - 6',
+            ByteOrder => 'LittleEndian',
+            # hard patch for crazy offsets
+            FixOffsets => '$valuePtr -= 210 if $tagID >= 0x1303',
+       },
     },
     {
         Name => 'MakerNoteHP',  # PhotoSmart 720 (also Vivitar 3705, 3705B and 3715)
@@ -576,6 +604,28 @@ my $debug;          # set to 1 to enabled debugging code
         },
     },
     {
+        Name => 'MakerNotePhaseOne',
+        # Starts with: 'IIIITwaR' or 'IIIICwaR' (have seen both written by P25)
+        # (have also seen code which expects 'MMMMRawT')
+        Condition => q{
+            return undef unless $$valPt =~ /^(IIII.waR|MMMMRaw.)/s;
+            $self->OverrideFileType($$self{TIFF_TYPE} = 'IIQ') if $count > 1000000;
+            return 1;
+        },
+        NotIFD => 1,
+        Binary => 1,
+        PutFirst => 1, # place immediately after TIFF header
+        Notes => 'the raw image data in PhaseOne IIQ images',
+    },
+    {
+        Name => 'MakerNoteReconyx',
+        Condition => '$$valPt =~ /^\x01\xf1\x03\x00/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Reconyx::Main',
+            ByteOrder => 'Little-endian',
+        },
+    },
+    {
         Name => 'MakerNoteRicoh',
         # (my test R50 image starts with "      \x02\x01" - PH)
         Condition => '$$self{Make}=~/^RICOH/ and $$valPt=~/^(Ricoh|      )/i',
@@ -791,6 +841,8 @@ sub GetMakerNoteOffset($)
         # Casio AVI and MOV images use no padding, and their JPEG's use 4,
         # except some models like the EX-S770,Z65,Z70,Z75 and Z700 which use 16
         push @offsets, $$exifTool{FILE_TYPE} =~ /^(RIFF|MOV)$/ ? 0 : (4, 16);
+    } elsif ($make =~ /^(General Imaging Co.|GEDSC IMAGING CORP.)/i) {
+        push @offsets, 0;
     } elsif ($make =~ /^KYOCERA/) {
         push @offsets, 12;
     } elsif ($make =~ /^Leica Camera AG/) {
@@ -1309,6 +1361,22 @@ sub ProcessCanon($$$)
 }
 
 #------------------------------------------------------------------------------
+# Process GE type 2 maker notes
+# Inputs: 0) ExifTool object ref, 1) DirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessGE2($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt} or return 0;
+    my $dirStart = $$dirInfo{DirStart} || 0;
+
+    # these maker notes are missing the IFD entry count, but they
+    # always have 25 entries, so write the entry count manually
+    Set16u(25, $dataPt, $dirStart);
+    return Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
+}
+
+#------------------------------------------------------------------------------
 # Process unknown maker notes or PreviewImage
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success, and updates $dirInfo if necessary for new directory
@@ -1409,7 +1477,7 @@ maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

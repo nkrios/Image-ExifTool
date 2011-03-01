@@ -608,7 +608,6 @@ sub ProcessAdobeIFD($$$)
     my $dataPt = $$dirInfo{DataPt};
     my $pos = $$dirInfo{DirStart};
     my $dataPos = $$dirInfo{DataPos};
-    my $base = $$dirInfo{Base};
 
     return 0 if $$dirInfo{DirLen} < 4;
     my $dataOrder = substr($$dataPt, $pos, 2);
@@ -811,7 +810,7 @@ information in DNG (Digital Negative) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

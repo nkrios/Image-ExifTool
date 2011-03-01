@@ -51,7 +51,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.42';
+$VERSION = '2.44';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
@@ -355,6 +355,7 @@ my %nikonLensIDs = (
     '48 54 5C 80 24 24 4B 02' => 'Sigma 70-200mm F2.8 EX APO IF HSM',
     '7A 48 5C 80 24 24 4B 06' => 'Sigma 70-200mm F2.8 EX APO DG Macro HSM II',
     'EE 48 5C 80 24 24 4B 06' => 'Sigma 70-200mm F2.8 EX APO DG Macro HSM II', #JD
+    '9C 48 5C 80 24 24 4B 0E' => 'Sigma 70-200mm F2.8 EX DG OS HSM', #Rolando Ruzic
     '02 46 5C 82 25 25 02 00' => 'Sigma 70-210mm F2.8 APO', #JD
     '26 3C 5C 82 30 3C 1C 02' => 'Sigma 70-210mm F4-5.6 UC-II',
     '26 3C 5C 8E 30 3C 1C 02' => 'Sigma 70-300mm F4-5.6 DG Macro',
@@ -487,7 +488,8 @@ my %nikonLensIDs = (
     '03 43 5C 81 35 35 02 00' => 'Soligor AF C/D Zoom UMCS 70-210mm 1:4.5',
     '12 4A 5C 81 31 3D 09 00' => 'Soligor AF C/D Auto Zoom+Macro 70-210mm 1:4-5.6 UMCS',
 #
-    '4A 60 62 62 0C 0C 4D 02' => 'Samyang AE 85mm f/1.4 AS IF UMC', # http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2888.0.html
+    '4A 60 62 62 0C 0C 4D 02' => 'Samyang AE 85mm f/1.4 AS IF UMC', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2888.0.html
+    '4A 48 24 24 24 0C 4D 02' => 'Samyang AE 14mm f/2.8 ED AS IF UMC', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3150.0.html
 #
     '00 00 00 00 00 00 00 01' => 'Manual Lens No CPU',
 #
@@ -718,15 +720,23 @@ my %binaryDataAttrs = (
         PrintConv => '$_=$val;s/^0 //;$_',
         PrintConvInv => '"0 $val"',
     },
-    0x0014 => { #4
-        Name => 'ColorBalanceA',
-        Condition => '$format eq "undef" and $count == 2560',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Nikon::ColorBalanceA',
-            ByteOrder => 'BigEndian',
+    0x0014 => [
+        { #4
+            Name => 'ColorBalanceA',
+            Condition => '$format eq "undef" and $count == 2560',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::ColorBalanceA',
+                ByteOrder => 'BigEndian',
+            },
         },
-    },
-    # 0x0014 - Found in NRW images, starts with "NRW 0100"
+        { #PH
+            Name => 'NRWData',
+            Condition => '$$valPt =~ /^NRW/', # starts with "NRW 0100"
+            Notes => 'large unknown block in NRW images, not copied to JPEG images',
+            # 'Drop' because not found in JPEG images (too large for APP1 anyway)
+            Flags => [ 'Unknown', 'Binary', 'Drop' ],
+        },
+    ],
     # D70 Image boundary?? top x,y bot-right x,y
     0x0016 => { #2
         Name => 'ImageBoundary',
@@ -816,6 +826,10 @@ my %binaryDataAttrs = (
         Name => 'ImageAuthentication',
         Writable => 'int8u',
         PrintConv => \%offOn,
+    },
+    0x0021 => { #PH
+        Name => 'FaceDetect',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::FaceDetect' },
     },
     0x0022 => { #21
         Name => 'ActiveD-Lighting',
@@ -1402,10 +1416,11 @@ my %binaryDataAttrs = (
         RawConvInv => sub {
             my $val = shift;
             my $shrt = GetByteOrder() eq 'II' ? 'v' : 'n';
-            my @date = /\d+/g;
+            my @date = ($val =~ /\d+/g);
             return pack("${shrt}C6", @date, 0);
         },
         PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$self->InverseDateTime($val,0)',
     },
     0x00b7 => { #JD
         Name => 'AFInfo2',
@@ -1612,6 +1627,87 @@ my %binaryDataAttrs = (
     },
     # 5 - values: 0, 1, 2
     # 6 and 7 - values: 0
+);
+
+# Face detection information - PH (S8100)
+%Image::ExifTool::Nikon::FaceDetect = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    FORMAT => 'int16u',
+    DATAMEMBER => [ 0x03 ],
+    0x01 => {
+        Name => 'FaceDetectFrameSize',
+        Format => 'int16u[2]',
+    },
+    0x03 => {
+        Name => 'FacesDetected',
+        DataMember => 'FacesDetected',
+        RawConv => '$$self{FacesDetected} = $val',
+    },
+    0x04 => {
+        Name => 'Face1Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 1 ? undef : $val',
+        Notes => q{
+            top, left, width and height of face detect area in coordinates of
+            FaceDetectFrameSize
+        },
+    },
+    0x08 => {
+        Name => 'Face2Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 2 ? undef : $val',
+    },
+    0x0c => {
+        Name => 'Face3Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 3 ? undef : $val',
+    },
+    0x10 => {
+        Name => 'Face4Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 4 ? undef : $val',
+    },
+    0x14 => {
+        Name => 'Face5Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 5 ? undef : $val',
+    },
+    0x18 => {
+        Name => 'Face6Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 6 ? undef : $val',
+    },
+    0x1c => {
+        Name => 'Face7Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 7 ? undef : $val',
+    },
+    0x20 => {
+        Name => 'Face8Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 8 ? undef : $val',
+    },
+    0x24 => {
+        Name => 'Face9Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 9 ? undef : $val',
+    },
+    0x28 => {
+        Name => 'Face10Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 10 ? undef : $val',
+    },
+    0x2c => {
+        Name => 'Face11Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 11 ? undef : $val',
+    },
+    0x30 => {
+        Name => 'Face12Position',
+        Format => 'int16u[4]',
+        RawConv => '$$self{FacesDetected} < 12 ? undef : $val',
+    },
 );
 
 # Picture Control information - PH (D300,P6000)
@@ -4893,8 +4989,6 @@ sub ProcessNikon($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access
-    my $verbose = $exifTool->Options('Verbose');
-    my $nikonInfo = $exifTool->{NikonInfo} = { };
 
     # pre-scan IFD to get SerialNumber (0x001d) and ShutterCount (0x00a7) for use in decryption
     my %needTags = ( 0x001d => 0, 0x00a7 => undef );
@@ -4940,7 +5034,7 @@ Nikon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

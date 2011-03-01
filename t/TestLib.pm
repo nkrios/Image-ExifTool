@@ -23,7 +23,7 @@ require Exporter;
 use Image::ExifTool qw(ImageInfo);
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.16';
+$VERSION = '1.17';
 @ISA = qw(Exporter);
 @EXPORT = qw(check writeCheck writeInfo testCompare binaryCompare testVerbose);
 
@@ -59,11 +59,11 @@ sub binaryCompare($$)
 
 #------------------------------------------------------------------------------
 # Compare 2 files and return true and erase the 2nd file if they are the same
-# Inputs: 0) file1, 1) file2
+# Inputs: 0) file1, 1) file2, 2) test number, 3) flag to not erase test file
 # Returns: true if files are the same
-sub testCompare($$$)
+sub testCompare($$$;$)
 {
-    my ($stdfile, $testfile, $testnum) = @_;
+    my ($stdfile, $testfile, $testnum, $keep) = @_;
     my $success = 0;
     my $linenum;
     
@@ -110,7 +110,7 @@ sub testCompare($$$)
     $/ = $oldSep;       # restore input line separator
     
     # erase .failed file if test was successful
-    $success and unlink $testfile;
+    $success and not $keep and unlink $testfile;
     
     return $success
 }
@@ -153,8 +153,8 @@ sub closeEnough($$)
         my $tok2 = $toks2[$i];
         last unless defined $tok1 and defined $tok2;
         next if $tok1 eq $tok2;
-        # can't compare any more if either line was truncated (ie. ends with '[...]')
-        return $lenChanged if $tok1 =~ /\Q[...]\E$/ or $tok2 =~ /\Q[...]\E$/;
+        # can't compare any more if either line was truncated (ie. ends with '[...]' or '[snip]')
+        return $lenChanged if $tok1 =~ /\[(\.{3}|snip)\]$/ or $tok2 =~ /\[(\.{3}|snip)\]$/;
         # account for different timezones
         if ($tok1 =~ /^(\d{2}:\d{2}:\d{2})(Z|[-+]\d{2}:\d{2})$/i) {
             my $time = $1;  # remove timezone
@@ -237,14 +237,14 @@ sub formatValue($)
         foreach (@$val) {
             push @a, formatValue($_);
         }
-        $str = join(', ', @a);
+        $str = '[' . join(',', @a) . ']';
     } elsif (ref $val eq 'HASH') {
         my $key;
         foreach $key (sort keys %$val) {
             push @a, $key . '=' . formatValue($$val{$key});
         }
-        $str = '{ ' . join('; ',@a) . ' }';
-    } else {
+        $str = '{' . join(',', @a) . '}';
+    } elsif (defined $val) {
         # make sure there are no linefeeds in output
         ($str = $val) =~ tr/\x0a\x0d/;/;
         # translate unknown characters
@@ -252,6 +252,8 @@ sub formatValue($)
         $str =~ tr/\x01-\x1f\x7f/./;
         # remove NULL chars
         $str =~ s/\x00//g;
+    } else {
+        $str = '';
     }
     return $str;
 }
@@ -335,9 +337,7 @@ sub writeCheck($$$;$$$)
     }
     unlink $testfile;
     my $ok = writeInfo($exifTool, $srcfile, $testfile, $same);
-    my $info = $exifTool->GetInfo('Error');
-    foreach (keys %$info) { warn "$$info{$_}\n"; }
-    $info = $exifTool->ImageInfo($testfile,{Duplicates=>1,Unknown=>1},@tags);
+    my $info = $exifTool->ImageInfo($testfile,{Duplicates=>1,Unknown=>1},@tags);
     my $rtnVal = check($exifTool, $info, $testname, $testnum);
     return 0 unless $ok and $rtnVal;
     unlink $testfile;

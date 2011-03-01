@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION %csType);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 my %charsetTable;   # character set tables we've loaded
 
@@ -87,6 +87,25 @@ my %unicode2byte = (
 );
 
 #------------------------------------------------------------------------------
+# Load character set module
+# Inputs: 0) Module name
+# Returns: Reference to lookup hash, or undef on error
+sub LoadCharset($)
+{
+    my $charset = shift;
+    my $conv = $charsetTable{$charset};
+    unless ($conv) {
+        # load translation module
+        my $module = "Image::ExifTool::Charset::$charset";
+        no strict 'refs';
+        if (%$module or eval "require $module") {
+            $conv = $charsetTable{$charset} = \%$module;
+        }
+    }
+    return $conv;
+}
+
+#------------------------------------------------------------------------------
 # Decompose string with specified encoding into an array of integer code points
 # Inputs: 0) ExifTool object ref (or undef), 1) string, 2) character set name,
 #         3) optional byte order ('II','MM','Unknown' or undef to use ExifTool ordering)
@@ -103,17 +122,11 @@ sub Decompose($$$;$)
     my (@uni, $conv);
 
     if ($type & 0x001) {
-        $conv = $charsetTable{$charset};
+        $conv = LoadCharset($charset);
         unless ($conv) {
-            # load translation module
-            my $module = "Image::ExifTool::Charset::$charset";
-            no strict 'refs';
-            unless (%$module or eval "require $module") {
-                # (shouldn't happen)
-                $exifTool->Warn("Invalid character set $charset") if $exifTool;
-                return \@uni;   # error!
-            }
-            $conv = $charsetTable{$charset} = \%$module;
+            # (shouldn't happen)
+            $exifTool->Warn("Invalid character set $charset") if $exifTool;
+            return \@uni;   # error!
         }
     } elsif ($type == 0x100) {
         # convert ASCII and UTF8 (treat ASCII as UTF8)
@@ -262,7 +275,7 @@ sub Recompose($$;$$)
 {
     local $_;
     my ($exifTool, $uni, $charset) = @_; # ($byteOrder assigned later if required)
-    my $outVal;
+    my ($outVal, $conv, $inv);
     $charset or $charset = $$exifTool{OPTIONS}{Charset};
     my $csType = $csType{$charset};
     if ($csType == 0x100) {     # UTF8 (also treat ASCII as UTF8)
@@ -276,30 +289,38 @@ sub Recompose($$;$$)
         $outVal =~ s/\0.*//s;   # truncate at null terminator
         return $outVal;
     }
-    # get reference to inverse lookup table
-    my $inv = $unicode2byte{$charset};
-    if (not $inv and $csType & 0x801) {
-        # generate inverse lookup
-        my $conv = "Image::ExifTool::Charset::$charset";
-        if (not $csType or $csType & 0x802 or not eval "require $conv") {
-            $exifTool->Warn("Invalid destination charset $charset") if $exifTool;
+    # get references to forward and inverse lookup tables
+    if ($csType & 0x801) {
+        $conv = LoadCharset($charset);
+        unless ($conv) {
+            $exifTool->Warn("Missing charset $charset");
             return '';
         }
-        # prepare table to convert from Unicode to 1-byte characters
-        my ($char, %inv);
-        no strict 'refs';
-        foreach $char (keys %$conv) {
-            $inv{$$conv{$char}} = $char;
+        $inv = $unicode2byte{$charset};
+        # generate inverse lookup if necessary
+        unless ($inv) {
+            if (not $csType or $csType & 0x802) {
+                $exifTool->Warn("Invalid destination charset $charset") if $exifTool;
+                return '';
+            }
+            # prepare table to convert from Unicode to 1-byte characters
+            my ($char, %inv);
+            foreach $char (keys %$conv) {
+                $inv{$$conv{$char}} = $char;
+            }
+            $inv = $unicode2byte{$charset} = \%inv;
         }
-        $inv = $unicode2byte{$charset} = \%inv;
     }
     if ($csType & 0x100) {      # 1-byte fixed-width
         # convert to specified character set
         foreach (@$uni) {
             next if $_ < 0x80;
             $$inv{$_} and $_ = $$inv{$_}, next;
-            next if $_ < 0x100;
-            $_ = ord('?');  # set to '?'
+            # our tables omit 1-byte characters with the same values as Unicode,
+            # so pass them straight through after making sure there isn't a
+            # different character with this byte value
+            next if $_ < 0x100 and not $$conv{$_};
+            $_ = ord('?');  # set invalid characters to '?'
             if ($exifTool and not $$exifTool{EncodingError}) {
                 $exifTool->Warn("Some character(s) could not be encoded in $charset");
                 $$exifTool{EncodingError} = 1;
@@ -363,7 +384,7 @@ when decoding certain types of information.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

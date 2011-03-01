@@ -23,6 +23,8 @@ sub CreateDirectory($);
 sub RemoveNewValueHash($$$);
 sub RemoveNewValuesForGroup($$);
 sub GetWriteGroup1($$);
+sub Sanitize($$);
+sub ConvInv($$$$$;$$);
 
 my $loadedAllTables;    # flag indicating we loaded all tables
 
@@ -238,23 +240,10 @@ sub SetNewValue($;$$%)
             $value = $$value;
         }
     }
-    # make sure the Perl UTF-8 flag is OFF for the value if perl 5.6 or greater
-    # (otherwise our byte manipulations get corrupted!!)
-    if (defined $value) {
-        if ($] >= 5.006 and (eval 'require Encode; Encode::is_utf8($value)' or $@)) {
-            # repack by hand if Encode isn't available
-            $value = $@ ? pack('C*',unpack('U0C*',$value)) : Encode::encode('utf8',$value);
-        }
-        # un-escape value if necessary
-        if ($self->{OPTIONS}{Escape}) {
-            # (XMP.pm and HTML.pm were require'd as necessary when option was set)
-            if ($self->{OPTIONS}{Escape} eq 'XML') {
-                $value = Image::ExifTool::XMP::UnescapeXML($value);
-            } elsif ($self->{OPTIONS}{Escape} eq 'HTML') {
-                $value = Image::ExifTool::HTML::UnescapeHTML($value);
-            }
-        }
-    }
+    # un-escape as necessary and make sure the Perl UTF-8 flag is OFF for the value
+    # if perl is 5.6 or greater (otherwise our byte manipulations get corrupted!!)
+    $self->Sanitize(\$value) if defined $value and not ref $value;
+
     # set group name in options if specified
     if ($tag =~ /(.+):(.+)/) {
         $options{Group} = $1 if $1 ne '*' and lc($1) ne 'all';
@@ -422,7 +411,7 @@ sub SetNewValue($;$$%)
     }
     # get group name that we're looking for
     my $foundMatch = 0;
-    my ($ifdName, $mieGroup, $notWritable);
+    my ($ifdName, $mieGroup);
     if ($wantGroup) {
         # set $ifdName if this group is a valid IFD or SubIFD name
         if ($wantGroup =~ /^IFD(\d+)$/i) {
@@ -599,7 +588,7 @@ sub SetNewValue($;$$%)
         next if $alsoWrote{$tagInfo};   # don't rewrite tags we already wrote
         # only process List or non-List tags if specified
         next if defined $listOnly and ($listOnly xor $$tagInfo{List});
-        my ($noConv, $type);
+        my $noConv;
         my $writeGroup = $writeGroup{$tagInfo};
         my $permanent = $$tagInfo{Permanent};
         $writeGroup eq 'MakerNotes' and $permanent = 1 unless defined $permanent;
@@ -679,176 +668,21 @@ sub SetNewValue($;$$%)
             }
             $noConv = 1;    # value is not defined, so don't do conversion
         }
-        # loop through inverse PrintConv and ValueConv conversions
-Conv:   for (;;) {
-            if (not defined $type) {
-                last if $noConv;
-                # split value into list if necessary
-                if ($$tagInfo{List}) {
-                    my $listSplit = $$tagInfo{AutoSplit} || $self->{OPTIONS}{ListSplit};
-                    if (defined $listSplit) {
-                        $listSplit = ',?\s+' if $listSplit eq '1' and $$tagInfo{AutoSplit};
-                        my @splitVal = split /$listSplit/, $val;
-                        $val = \@splitVal if @splitVal > 1;
-                    }
-                }
-                $type = $options{Type} || ($self->{OPTIONS}{PrintConv} ? 'PrintConv' : 'ValueConv');
-            } elsif ($type ne 'ValueConv') {
-                $type = 'ValueConv';
-            } else {    
-                # finally, do our value check
-                my ($err2, $v);
-                if ($tagInfo->{WriteCheck}) {
-                    #### eval WriteCheck ($self, $tagInfo, $val)
-                    $err2 = eval $tagInfo->{WriteCheck};
-                    $@ and warn($@), $err2 = 'Error evaluating WriteCheck';
-                }
-                unless ($err2) {
-                    my $table = $tagInfo->{Table};
-                    if ($table and $table->{CHECK_PROC} and not $$tagInfo{RawConvInv}) {
-                        my $checkProc = $table->{CHECK_PROC};
-                        if (ref $val eq 'ARRAY') {
-                            # loop through array values
-                            foreach $v (@$val) {
-                                $err2 = &$checkProc($self, $tagInfo, \$v);
-                                last if $err2;
-                            }
-                        } else {
-                            $err2 = &$checkProc($self, $tagInfo, \$val);
-                        }
-                    }
-                }
-                if (defined $err2) {
-                    # skip writing this tag if error string is empty
-                    $err2 or goto WriteAlso;
-                    $err = "$err2 for $wgrp1:$tag";
-                    $verbose > 2 and print $out "$err\n";
-                    undef $val; # value was invalid
-                }
-                last;
-            }
-            my $conv = $tagInfo->{$type};
-            my $convInv = $tagInfo->{"${type}Inv"};
-            # nothing to do at this level if no conversion defined
-            next unless defined $conv or defined $convInv;
-
-            my (@valList, $index, $convList, $convInvList);
-            if (ref $val eq 'ARRAY') {
-                # handle ValueConv of ListSplit and AutoSplit values
-                @valList = @$val;
-                $val = $valList[$index = 0];
-            } elsif (ref $conv eq 'ARRAY' or ref $convInv eq 'ARRAY') {
-                # handle conversion lists
-                @valList = split /$listSep{$type}/, $val;
-                $val = $valList[$index = 0];
-                if (ref $conv eq 'ARRAY') {
-                    $convList = $conv;
-                    $conv = $$conv[0];
-                }
-                if (ref $convInv eq 'ARRAY') {
-                    $convInvList = $convInv;
-                    $convInv = $$convInv[0];
+        # apply inverse PrintConv and ValueConv conversions
+        # save ValueConv setting for use in ConvInv()
+        unless ($noConv) {
+            # set default conversion type used by ConvInv() and CHECK_PROC routines
+            $$self{ConvType} = $options{Type} || ($self->{OPTIONS}{PrintConv} ? 'PrintConv' : 'ValueConv');
+            my $e;
+            ($val,$e) = $self->ConvInv($val, $tagInfo, $tag, $wgrp1, $$self{ConvType}, $wantGroup);
+            if (defined $e) {
+                if ($e) {
+                    ($err = $e) =~ s/\$wgrp1/$wgrp1/g;
+                } else {
+                    ++$numSet;  # an empty error string causes error to be ignored
                 }
             }
-            # loop through multiple values if necessary
-            for (;;) {
-                if ($convInv) {
-                    # capture eval warnings too
-                    local $SIG{'__WARN__'} = \&SetWarning;
-                    undef $evalWarning;
-                    if (ref($convInv) eq 'CODE') {
-                        $val = &$convInv($val, $self);
-                    } else {
-                        #### eval PrintConvInv/ValueConvInv ($val, $self, $writeGroup)
-                        $val = eval $convInv;
-                        $@ and $evalWarning = $@;
-                    }
-                    if ($evalWarning) {
-                        # an empty warning ("\n") ignores tag with no error
-                        if ($evalWarning eq "\n") {
-                            $err = '' unless defined $err;
-                            ++$numSet;
-                        } else {
-                            $err = CleanWarning() . " in $wgrp1:$tag (${type}Inv)";
-                            $verbose > 2 and print $out "$err\n";
-                        }
-                        undef $val;
-                        last Conv;
-                    } elsif (not defined $val) {
-                        $err = "Error converting value for $wgrp1:$tag (${type}Inv)";
-                        $verbose > 2 and print $out "$err\n";
-                        last Conv;
-                    }
-                } elsif ($conv) {
-                    if (ref $conv eq 'HASH') {
-                        my ($multi, $lc);
-                        # insert alternate language print conversions if required
-                        if ($$self{CUR_LANG} and $type eq 'PrintConv' and
-                            ref($lc = $self->{CUR_LANG}{$tag}) eq 'HASH' and
-                            ($lc = $$lc{PrintConv}))
-                        {
-                            my %newConv;
-                            foreach (keys %$conv) {
-                                my $val = $$conv{$_};
-                                defined $$lc{$val} or $newConv{$_} = $val, next;
-                                $newConv{$_} = $self->Decode($$lc{$val}, 'UTF8');
-                            }
-                            if ($$conv{BITMASK}) {
-                                foreach (keys %{$$conv{BITMASK}}) {
-                                    my $val = $$conv{BITMASK}{$_};
-                                    defined $$lc{$val} or $newConv{BITMASK}{$_} = $val, next;
-                                    $newConv{BITMASK}{$_} = $self->Decode($$lc{$val}, 'UTF8');
-                                }
-                            }
-                            $conv = \%newConv;
-                        }
-                        if ($$conv{BITMASK}) {
-                            my $lookupBits = $$conv{BITMASK};
-                            my ($val2, $err2) = EncodeBits($val, $lookupBits);
-                            if ($err2) {
-                                # ok, try matching a straight value
-                                ($val, $multi) = ReverseLookup($val, $conv);
-                                unless (defined $val) {
-                                    $err = "Can't encode $wgrp1:$tag ($err2)";
-                                    $verbose > 2 and print $out "$err\n";
-                                    last Conv;
-                                }
-                            } elsif (defined $val2) {
-                                $val = $val2;
-                            } else {
-                                delete $$conv{BITMASK};
-                                ($val, $multi) = ReverseLookup($val, $conv);
-                                $$conv{BITMASK} = $lookupBits;
-                            }
-                        } else {
-                            ($val, $multi) = ReverseLookup($val, $conv);
-                        }
-                        unless (defined $val) {
-                            $err = "Can't convert $wgrp1:$tag (" .
-                                   ($multi ? 'matches more than one' : 'not in') . " $type)";
-                            $verbose > 2 and print $out "$err\n";
-                            last Conv;
-                        }
-                    } elsif (not $$tagInfo{WriteAlso}) {
-                        $err = "Can't convert value for $wgrp1:$tag (no ${type}Inv)";
-                        $verbose > 2 and print $out "$err\n";
-                        undef $val;
-                        last Conv;
-                    }
-                }
-                last unless @valList;
-                $valList[$index] = $val;
-                if (++$index >= @valList) {
-                    # leave AutoSplit lists in ARRAY form, or join conversion lists
-                    $val = $$tagInfo{List} ? \@valList : join ' ', @valList;
-                    last;
-                }
-                $conv = $$convList[$index] if $convList;
-                $convInv = $$convInvList[$index] if $convInvList;
-                $val = $valList[$index];
-            }
-        } # end ValueConv/PrintConv loop
-
+        }
         if (not defined $val and defined $value) {
             # if value conversion failed, we must still add a NEW_VALUE
             # entry for this tag it it was a DelValue
@@ -894,6 +728,10 @@ Conv:   for (;;) {
                         my $fromList = $tagInfo->{List} ? ' from list' : '';
                         my @vals = (ref $val eq 'ARRAY' ? @$val : $val);
                         foreach (@vals) {
+                            if (ref $_ eq 'HASH') {
+                                require 'Image/ExifTool/XMPStruct.pl';
+                                $_ = Image::ExifTool::XMP::SerializeStruct($_);
+                            }
                             print $out "$verb $wgrp1:$tag$fromList if value is '$_'\n";
                         }
                     }
@@ -1020,6 +858,7 @@ WriteAlso:
         warn "$err\n" unless wantarray;
     } elsif ($$self{CHECK_WARN}) {
         $err = $$self{CHECK_WARN};
+        $verbose > 2 and print $out "$err\n";
     } elsif ($err and not $verbose) {
         undef $err;
     }
@@ -1067,15 +906,18 @@ sub SetNewValuesFromFile($$;@)
     $srcExifTool->Options(
         Binary      => 1,
         Charset     => $$options{Charset},
+        CharsetID3  => $$options{CharsetID3},
+        CharsetIPTC => $$options{CharsetIPTC},
+        CharsetPhotoshop => $$options{CharsetPhotoshop},
         Composite   => $$options{Composite},
         CoordFormat => $$options{CoordFormat} || '%d %d %.8f', # copy coordinates at high resolution unless otherwise specified
         DateFormat  => $$options{DateFormat},
         Duplicates  => 1,
         Escape      => $$options{Escape},
+        ExtractEmbedded => $$options{ExtractEmbedded},
         FastScan    => $$options{FastScan},
         FixBase     => $$options{FixBase},
         IgnoreMinorErrors => $$options{IgnoreMinorErrors},
-        CharsetIPTC => $$options{CharsetIPTC},
         Lang        => $$options{Lang},
         LargeFileSupport => $$options{LargeFileSupport},
         List        => 1,
@@ -1085,6 +927,7 @@ sub SetNewValuesFromFile($$;@)
         PrintConv   => $$options{PrintConv},
         ScanForXMP  => $$options{ScanForXMP},
         StrictDate  => 1,
+        Struct      => ($$options{Struct} or not defined $$options{Struct}) ? 1 : 0,
         Unknown     => $$options{Unknown},
     );
     my $printConv = $$options{PrintConv};
@@ -1248,7 +1091,6 @@ sub SetNewValuesFromFile($$;@)
             $rtnInfo{$tag} = $$info{$tag};
             next;
         }
-        my @dstList;
         # only set specified tags
         my $lcTag = lc(GetTagName($tag));
         my (@grp, %grp);
@@ -2212,6 +2054,214 @@ sub GetDeleteGroups()
 # Functions below this are not part of the public API
 
 #------------------------------------------------------------------------------
+# Un-escape string according to options settings and clear UTF-8 flag
+# Inputs: 0) ExifTool ref, 1) string ref or string ref ref
+# Notes: also de-references SCALAR values
+sub Sanitize($$)
+{
+    my ($self, $valPt) = @_;
+    # de-reference SCALAR references
+    $$valPt = $$$valPt if ref $$valPt eq 'SCALAR';
+    # make sure the Perl UTF-8 flag is OFF for the value if perl 5.6 or greater
+    # (otherwise our byte manipulations get corrupted!!)
+    if ($] >= 5.006 and (eval 'require Encode; Encode::is_utf8($$valPt)' or $@)) {
+        # repack by hand if Encode isn't available
+        $$valPt = $@ ? pack('C*',unpack('U0C*',$$valPt)) : Encode::encode('utf8',$$valPt);
+    }
+    # un-escape value if necessary
+    if ($$self{OPTIONS}{Escape}) {
+        # (XMP.pm and HTML.pm were require'd as necessary when option was set)
+        if ($$self{OPTIONS}{Escape} eq 'XML') {
+            $$valPt = Image::ExifTool::XMP::UnescapeXML($$valPt);
+        } elsif ($$self{OPTIONS}{Escape} eq 'HTML') {
+            $$valPt = Image::ExifTool::HTML::UnescapeHTML($$valPt);
+        }
+    }
+}
+
+#------------------------------------------------------------------------------
+# Apply inverse conversions
+# Inputs: 0) ExifTool ref, 1) value, 2) tagInfo (or Struct item) ref,
+#         3) tag name, 4) group 1 name, 5) conversion type (or undef),
+#         6) [optional] want group
+# Returns: 0) converted value, 1) error string (or undef on success)
+# Notes: Uses ExifTool "ConvType" member to specify conversion type
+sub ConvInv($$$$$;$$)
+{
+    my ($self, $val, $tagInfo, $tag, $wgrp1, $convType, $wantGroup) = @_;
+    my ($err, $type);
+
+Conv: for (;;) {
+        if (not defined $type) {
+            # split value into list if necessary
+            if ($$tagInfo{List}) {
+                my $listSplit = $$tagInfo{AutoSplit} || $self->{OPTIONS}{ListSplit};
+                if (defined $listSplit) {
+                    $listSplit = ',?\s+' if $listSplit eq '1' and $$tagInfo{AutoSplit};
+                    my @splitVal = split /$listSplit/, $val;
+                    $val = \@splitVal if @splitVal > 1;
+                }
+            }
+            $type = $convType || $$self{ConvType} || 'PrintConv';
+        } elsif ($type ne 'ValueConv') {
+            $type = 'ValueConv';
+        } else {    
+            # finally, do our value check
+            my ($err2, $v);
+            if ($tagInfo->{WriteCheck}) {
+                #### eval WriteCheck ($self, $tagInfo, $val)
+                $err2 = eval $tagInfo->{WriteCheck};
+                $@ and warn($@), $err2 = 'Error evaluating WriteCheck';
+            }
+            unless ($err2) {
+                my $table = $tagInfo->{Table};
+                if ($table and $table->{CHECK_PROC} and not $$tagInfo{RawConvInv}) {
+                    my $checkProc = $table->{CHECK_PROC};
+                    if (ref $val eq 'ARRAY') {
+                        # loop through array values
+                        foreach $v (@$val) {
+                            $err2 = &$checkProc($self, $tagInfo, \$v);
+                            last if $err2;
+                        }
+                    } else {
+                        $err2 = &$checkProc($self, $tagInfo, \$val);
+                    }
+                }
+            }
+            if (defined $err2) {
+                # skip writing this tag if error string is empty
+                $err2 or goto WriteAlso;
+                $err = "$err2 for $wgrp1:$tag";
+                $self->VPrint(2, "$err\n");
+                undef $val; # value was invalid
+            }
+            last;
+        }
+        my $conv = $tagInfo->{$type};
+        my $convInv = $tagInfo->{"${type}Inv"};
+        # nothing to do at this level if no conversion defined
+        next unless defined $conv or defined $convInv;
+
+        my (@valList, $index, $convList, $convInvList);
+        if (ref $val eq 'ARRAY') {
+            # handle ValueConv of ListSplit and AutoSplit values
+            @valList = @$val;
+            $val = $valList[$index = 0];
+        } elsif (ref $conv eq 'ARRAY' or ref $convInv eq 'ARRAY') {
+            # handle conversion lists
+            @valList = split /$listSep{$type}/, $val;
+            $val = $valList[$index = 0];
+            if (ref $conv eq 'ARRAY') {
+                $convList = $conv;
+                $conv = $$conv[0];
+            }
+            if (ref $convInv eq 'ARRAY') {
+                $convInvList = $convInv;
+                $convInv = $$convInv[0];
+            }
+        }
+        # loop through multiple values if necessary
+        for (;;) {
+            if ($convInv) {
+                # capture eval warnings too
+                local $SIG{'__WARN__'} = \&SetWarning;
+                undef $evalWarning;
+                if (ref($convInv) eq 'CODE') {
+                    $val = &$convInv($val, $self);
+                } else {
+                    #### eval PrintConvInv/ValueConvInv ($val, $self, $wantGroup)
+                    $val = eval $convInv;
+                    $@ and $evalWarning = $@;
+                }
+                if ($evalWarning) {
+                    # an empty warning ("\n") ignores tag with no error
+                    if ($evalWarning eq "\n") {
+                        $err = '' unless defined $err;
+                    } else {
+                        $err = CleanWarning() . " in $wgrp1:$tag (${type}Inv)";
+                        $self->VPrint(2, "$err\n");
+                    }
+                    undef $val;
+                    last Conv;
+                } elsif (not defined $val) {
+                    $err = "Error converting value for $wgrp1:$tag (${type}Inv)";
+                    $self->VPrint(2, "$err\n");
+                    last Conv;
+                }
+            } elsif ($conv) {
+                if (ref $conv eq 'HASH') {
+                    my ($multi, $lc);
+                    # insert alternate language print conversions if required
+                    if ($$self{CUR_LANG} and $type eq 'PrintConv' and
+                        ref($lc = $self->{CUR_LANG}{$tag}) eq 'HASH' and
+                        ($lc = $$lc{PrintConv}))
+                    {
+                        my %newConv;
+                        foreach (keys %$conv) {
+                            my $val = $$conv{$_};
+                            defined $$lc{$val} or $newConv{$_} = $val, next;
+                            $newConv{$_} = $self->Decode($$lc{$val}, 'UTF8');
+                        }
+                        if ($$conv{BITMASK}) {
+                            foreach (keys %{$$conv{BITMASK}}) {
+                                my $val = $$conv{BITMASK}{$_};
+                                defined $$lc{$val} or $newConv{BITMASK}{$_} = $val, next;
+                                $newConv{BITMASK}{$_} = $self->Decode($$lc{$val}, 'UTF8');
+                            }
+                        }
+                        $conv = \%newConv;
+                    }
+                    if ($$conv{BITMASK}) {
+                        my $lookupBits = $$conv{BITMASK};
+                        my ($val2, $err2) = EncodeBits($val, $lookupBits);
+                        if ($err2) {
+                            # ok, try matching a straight value
+                            ($val, $multi) = ReverseLookup($val, $conv);
+                            unless (defined $val) {
+                                $err = "Can't encode $wgrp1:$tag ($err2)";
+                                $self->VPrint(2, "$err\n");
+                                last Conv;
+                            }
+                        } elsif (defined $val2) {
+                            $val = $val2;
+                        } else {
+                            delete $$conv{BITMASK};
+                            ($val, $multi) = ReverseLookup($val, $conv);
+                            $$conv{BITMASK} = $lookupBits;
+                        }
+                    } else {
+                        ($val, $multi) = ReverseLookup($val, $conv);
+                    }
+                    unless (defined $val) {
+                        $err = "Can't convert $wgrp1:$tag (" .
+                               ($multi ? 'matches more than one' : 'not in') . " $type)";
+                        $self->VPrint(2, "$err\n");
+                        last Conv;
+                    }
+                } elsif (not $$tagInfo{WriteAlso}) {
+                    $err = "Can't convert value for $wgrp1:$tag (no ${type}Inv)";
+                    $self->VPrint(2, "$err\n");
+                    undef $val;
+                    last Conv;
+                }
+            }
+            last unless @valList;
+            $valList[$index] = $val;
+            if (++$index >= @valList) {
+                # leave AutoSplit lists in ARRAY form, or join conversion lists
+                $val = $$tagInfo{List} ? \@valList : join ' ', @valList;
+                last;
+            }
+            $conv = $$convList[$index] if $convList;
+            $convInv = $$convInvList[$index] if $convInvList;
+            $val = $valList[$index];
+        }
+    } # end ValueConv/PrintConv loop
+
+    return($val, $err);
+}
+
+#------------------------------------------------------------------------------
 # convert tag names to values in a string (ie. "${EXIF:ISO}x $$" --> "100x $")
 # Inputs: 0) ExifTool object ref, 1) reference to list of found tags
 #         2) string with embedded tag names, 3) Options:
@@ -3047,7 +3097,8 @@ sub WriteDirectory($$$;$)
     # guard against writing the same directory twice
     if (defined $dataPt and defined $$dirInfo{DirStart} and defined $$dirInfo{DataPos}) {
         my $addr = $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base}||0) + $$self{BASE};
-        if ($self->{PROCESSED}{$addr}) {
+        # (Phase One P25 IIQ files have ICC_Profile duplicated in IFD0 and IFD1)
+        if ($self->{PROCESSED}{$addr} and ($dirName ne 'ICC_Profile' or $$self{TIFF_TYPE} ne 'IIQ')) {
             if ($self->Error("$dirName pointer references previous $self->{PROCESSED}{$addr} directory", 1)) {
                 return undef;
             } else {
@@ -3143,26 +3194,26 @@ sub HexDump($;$%)
     $len = $opts{Len} if defined $opts{Len};
 
     $addr = $start + ($opts{DataPos} || 0) unless defined $addr;
-    if (not defined $len) {
-        $len = $datLen;
-    } elsif ($len > $datLen) {
-        print $out "$prefix    Warning: Attempted dump outside data\n";
-        print $out "$prefix    ($len bytes specified, but only $datLen available)\n";
-        $len = $datLen;
-    }
+    $len = $datLen unless defined $len;
     if ($maxLen and $len > $maxLen) {
         # print one line less to allow for $more line below
         $maxLen = int(($maxLen - 1) / $wid) * $wid;
         $more = $len - $maxLen;
         $len = $maxLen;
     }
+    if ($len > $datLen) {
+        print $out "$prefix    Warning: Attempted dump outside data\n";
+        print $out "$prefix    ($len bytes specified, but only $datLen available)\n";
+        $len = $datLen;
+    }
     my $format = sprintf("%%-%ds", $wid * 3);
+    my $tmpl = 'H2' x $wid; # ('(H2)*' would have been nice, but older perl versions don't support it)
     my $i;
     for ($i=0; $i<$len; $i+=$wid) {
-        $wid > $len-$i and $wid = $len-$i;
+        $wid > $len-$i and $wid = $len-$i, $tmpl = 'H2' x $wid;
         printf $out "$prefix%8.4x: ", $addr+$i;
         my $dat = substr($$dataPt, $i+$start, $wid);
-        my $s = join(' ',(unpack('H*',$dat) =~ /../g));
+        my $s = join(' ', unpack($tmpl, $dat));
         printf $out $format, $s;
         $dat =~ tr /\x00-\x1f\x7f-\xff/./;
         print $out "[$dat]\n";
@@ -3190,7 +3241,7 @@ sub VerboseInfo($$$%)
     my ($self, $tagID, $tagInfo, %parms) = @_;
     my $verbose = $self->{OPTIONS}{Verbose};
     my $out = $self->{OPTIONS}{TextOut};
-    my ($tag, $tagDesc, $line, $hexID);
+    my ($tag, $line, $hexID);
 
     # generate hex number if tagID is numerical
     if (defined $tagID) {
@@ -3227,11 +3278,14 @@ sub VerboseInfo($$$%)
     $line .= $tag;
     if ($tagInfo and $$tagInfo{SubDirectory}) {
         $line .= ' (SubDirectory) -->';
-    } elsif (defined $parms{Value}) {
-        $line .= ' = ' . $self->Printable($parms{Value});
-    } elsif ($dataPt) {
-        my $start = $parms{Start} || 0;
-        $line .= ' = ' . $self->Printable(substr($$dataPt,$start,$size));
+    } else {
+        my $maxLen = 90 - length($line);
+        if (defined $parms{Value}) {
+            $line .= ' = ' . $self->Printable($parms{Value}, $maxLen);
+        } elsif ($dataPt) {
+            my $start = $parms{Start} || 0;
+            $line .= ' = ' . $self->Printable(substr($$dataPt,$start,$size), $maxLen);
+        }
     }
     print $out "$line\n";
 
@@ -3239,8 +3293,13 @@ sub VerboseInfo($$$%)
     if ($verbose > 1 and ($parms{Extra} or $parms{Format} or
         $parms{DataPt} or defined $size or $tagID =~ /\//))
     {
-        $line = $indent;
-        $line .= '- Tag ' . ($hexID ? $hexID : "'$tagID'");
+        $line = $indent . '- Tag ';
+        if ($hexID) {
+            $line .= $hexID;
+        } else {
+            $tagID =~ s/([\0-\x1f\x7f-\xff])/sprintf('\\x%.2x',ord $1)/ge;
+            $line .= "'$tagID'";
+        }
         $line .= $parms{Extra} if defined $parms{Extra};
         my $format = $parms{Format};
         if ($format or defined $size) {
@@ -3427,8 +3486,9 @@ sub VerboseValue($$$;$)
     return unless $_[0]{OPTIONS}{Verbose} > 1;
     my ($self, $str, $val, $xtra) = @_;
     my $out = $self->{OPTIONS}{TextOut};
-    $val = $self->Printable($val);
     $xtra or $xtra = '';
+    my $maxLen = 81 - length($str) - length($xtra);
+    $val = $self->Printable($val, $maxLen);
     print $out "    $str = '$val'$xtra\n";
 }
 
@@ -3511,12 +3571,12 @@ sub UnpackUTF8($)
 }
 
 #------------------------------------------------------------------------------
-# Inverse date/time print conversion (reformat to YYYY:MM:DD HH:MM:SS[.ss][+-hh:mm|Z])
+# Inverse date/time print conversion (reformat to YYYY:mm:dd HH:MM:SS[.ss][+-HH:MM|Z])
 # Inputs: 0) ExifTool object ref, 1) Date/Time string, 2) timezone flag:
 #               0     - remove timezone and sub-seconds if they exist
 #               1     - add timezone if it doesn't exist
 #               undef - leave timezone alone
-#         3) flag to allow date-only (YYYY, YYYY:MM or YYYY:MM:DD) or time without seconds
+#         3) flag to allow date-only (YYYY, YYYY:mm or YYYY:mm:dd) or time without seconds
 # Returns: formatted date/time string (or undef and issues warning on error)
 # Notes: currently accepts different separators, but doesn't use DateFormat yet
 sub InverseDateTime($$;$$)
@@ -3535,10 +3595,10 @@ sub InverseDateTime($$;$$)
     my $fs = $val =~ /(\.\d+)$/ ? $1 : '';
     if ($val =~ /(\d{4})/g) {           # get YYYY
         my $yr = $1;
-        my @a = ($val =~ /\d{2}/g);     # get MM, DD, hh, and maybe mm, ss
+        my @a = ($val =~ /\d{2}/g);     # get mm, dd, HH, and maybe MM, SS
         if (@a >= 3) {
-            my $ss = $a[4];             # get ss
-            push @a, '00' while @a < 5; # add mm, ss if not given
+            my $ss = $a[4];             # get SS
+            push @a, '00' while @a < 5; # add MM, SS if not given
             # add/remove timezone if necessary
             if ($tzFlag) {
                 if (not $tz) {
@@ -3567,7 +3627,7 @@ sub InverseDateTime($$;$$)
             $rtnVal = join ':', $yr, @a;
         }
     }
-    $rtnVal or warn "Invalid date/time (use YYYY:MM:DD HH:MM:SS[.SS][+/-HH:MM|Z])\n";
+    $rtnVal or warn "Invalid date/time (use YYYY:mm:dd HH:MM:SS[.ss][+/-HH:MM|Z])\n";
     return $rtnVal;
 }
 
@@ -3885,96 +3945,6 @@ sub Write($@)
         return 1;
     }
     return 0;
-}
-
-#------------------------------------------------------------------------------
-# Read/rewrite trailer information (including multiple trailers)
-# Inputs: 0) ExifTool object ref, 1) DirInfo ref:
-# - requires RAF and DirName
-# - OutFile is a scalar reference for writing
-# - scans from current file position if ScanForAFCP is set
-# Returns: 1 if trailer was processed or couldn't be processed (or written OK)
-#          0 if trailer was recognized but offsets need fixing (or write error)
-# - DirName, DirLen, DataPos, Offset, Fixup and OutFile are updated
-# - preserves current file position and byte order
-sub ProcessTrailers($$)
-{
-    my ($self, $dirInfo) = @_;
-    my $dirName = $$dirInfo{DirName};
-    my $outfile = $$dirInfo{OutFile};
-    my $offset = $$dirInfo{Offset} || 0;
-    my $fixup = $$dirInfo{Fixup};
-    my $raf = $$dirInfo{RAF};
-    my $pos = $raf->Tell();
-    my $byteOrder = GetByteOrder();
-    my $success = 1;
-    my $path = $$self{PATH};
-
-    for (;;) { # loop through all trailers
-        require "Image/ExifTool/$dirName.pm";
-        my $proc = "Image::ExifTool::${dirName}::Process$dirName";
-        my $outBuff;
-        if ($outfile) {
-            # write to local buffer so we can add trailer in proper order later
-            $$outfile and $$dirInfo{OutFile} = \$outBuff, $outBuff = '';
-            # must generate new fixup if necessary so we can shift
-            # the old fixup separately after we prepend this trailer
-            delete $$dirInfo{Fixup};
-        }
-        delete $$dirInfo{DirLen};       # reset trailer length
-        $$dirInfo{Offset} = $offset;    # set offset from end of file
-        $$dirInfo{Trailer} = 1;         # set Trailer flag in case proc cares
-        # add trailer and DirName to SubDirectory PATH
-        push @$path, 'Trailer', $dirName;
-
-        # read or write this trailer
-        # (proc takes Offset as offset from end of trailer to end of file,
-        #  and returns DataPos and DirLen, and Fixup if applicable)
-        no strict 'refs';
-        my $result = &$proc($self, $dirInfo);
-        use strict 'refs';
-
-        # restore PATH
-        pop @$path;
-        pop @$path;
-        # check result
-        if ($outfile) {
-            if ($result > 0) {
-                if ($outBuff) {
-                    # write trailers to OutFile in original order
-                    $$outfile = $outBuff . $$outfile;
-                    # must adjust old fixup start if it exists
-                    $$fixup{Start} += length($outBuff) if $fixup;
-                    $outBuff = '';      # free memory
-                }
-                if ($fixup) {
-                    # add new fixup information if any
-                    $fixup->AddFixup($$dirInfo{Fixup}) if $$dirInfo{Fixup};
-                } else {
-                    $fixup = $$dirInfo{Fixup};  # save fixup
-                }
-            } else {
-                $success = 0 if $self->Error("Error rewriting $dirName trailer", 1);
-                last;
-            }
-        } elsif ($result < 0) {
-            # can't continue if we must scan for this trailer
-            $success = 0;
-            last;
-        }
-        last unless $result > 0 and $$dirInfo{DirLen};
-        # look for next trailer
-        $offset += $$dirInfo{DirLen};
-        my $nextTrail = IdentifyTrailer($raf, $offset) or last;
-        $dirName = $$dirInfo{DirName} = $$nextTrail{DirName};
-        $raf->Seek($pos, 0);
-    }
-    SetByteOrder($byteOrder);       # restore original byte order
-    $raf->Seek($pos, 0);            # restore original file position
-    $$dirInfo{OutFile} = $outfile;  # restore original outfile
-    $$dirInfo{Offset} = $offset;    # return offset from EOF to start of first trailer
-    $$dirInfo{Fixup} = $fixup;      # return fixup information
-    return $success;
 }
 
 #------------------------------------------------------------------------------
@@ -5146,7 +5116,7 @@ sub CopyImageData($$$)
 {
     my ($self, $imageDataBlocks, $outfile) = @_;
     my $raf = $self->{RAF};
-    my ($dataBlock, $buff, $err);
+    my ($dataBlock, $err);
     my $num = @$imageDataBlocks;
     $self->VPrint(0, "  Copying $num image data blocks\n") if $num;
     foreach $dataBlock (@$imageDataBlocks) {
@@ -5195,7 +5165,6 @@ sub WriteBinaryData($$$)
     my $dirLen = $$dirInfo{DirLen} || length($$dataPt) - $dirStart;
     my $newData = substr($$dataPt, $dirStart, $dirLen) or return undef;
     my $dirName = $$dirInfo{DirName};
-    my $verbose = $self->Options('Verbose');
     my $varSize = 0;
     my @varInfo = @varOffsets;
     my $tagInfo;
@@ -5365,7 +5334,7 @@ used routines.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

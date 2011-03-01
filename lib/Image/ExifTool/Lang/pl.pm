@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::pl;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 %Image::ExifTool::Lang::pl::Translate = (
    'AFPoint' => {
@@ -29,11 +29,6 @@ $VERSION = '1.03';
    'Artist' => 'Artysta',
    'Author' => 'Autor',
    'AuthorsPosition' => 'Pozycja autora',
-   'AutoBracketRelease' => {
-      PrintConv => {
-        'None' => 'Brak',
-      },
-    },
    'AutoRotate' => {
       PrintConv => {
         'None' => 'Brak',
@@ -64,12 +59,44 @@ $VERSION = '1.03';
     },
    'CalibrationIlluminant1' => {
       PrintConv => {
-        'Unknown' => 'Nieznany',
+        'Cloudy' => 'Zachmurzone niebo',
+        'Cool White Fluorescent' => 'Zimna biała jarzeniówka (W 3800 - 4500K)',
+        'Day White Fluorescent' => 'Jarzeniówka z naturalnym białym światłem (N 4600 - 5500K)',
+        'Daylight' => 'Światło dzienne',
+        'Daylight Fluorescent' => 'Jarzeniówka dająca światło dzienne (D 5700 - 7100K)',
+        'Fine Weather' => 'Dobra pogoda',
+        'Flash' => 'Lampa błyskowa',
+        'Fluorescent' => 'Jarzeniowy',
+        'ISO Studio Tungsten' => 'ISO dla studyjnych lamp żarowych',
+        'Other' => 'inne źródło światła',
+        'Shade' => 'Cień',
+        'Standard Light A' => 'Standardowe światło A',
+        'Standard Light B' => 'Standardowe światło B',
+        'Standard Light C' => 'Standardowe światło C',
+        'Tungsten (Incandescent)' => 'Światło żarowe',
+        'Unknown' => 'Nieznane',
+        'White Fluorescent' => 'Biała jarzeniówka (WW3250 - 3800K)',
       },
     },
    'CalibrationIlluminant2' => {
       PrintConv => {
-        'Unknown' => 'Nieznany',
+        'Cloudy' => 'Zachmurzone niebo',
+        'Cool White Fluorescent' => 'Zimna biała jarzeniówka (W 3800 - 4500K)',
+        'Day White Fluorescent' => 'Jarzeniówka z naturalnym białym światłem (N 4600 - 5500K)',
+        'Daylight' => 'Światło dzienne',
+        'Daylight Fluorescent' => 'Jarzeniówka dająca światło dzienne (D 5700 - 7100K)',
+        'Fine Weather' => 'Dobra pogoda',
+        'Flash' => 'Lampa błyskowa',
+        'Fluorescent' => 'Jarzeniowy',
+        'ISO Studio Tungsten' => 'ISO dla studyjnych lamp żarowych',
+        'Other' => 'inne źródło światła',
+        'Shade' => 'Cień',
+        'Standard Light A' => 'Standardowe światło A',
+        'Standard Light B' => 'Standardowe światło B',
+        'Standard Light C' => 'Standardowe światło C',
+        'Tungsten (Incandescent)' => 'Światło żarowe',
+        'Unknown' => 'Nieznane',
+        'White Fluorescent' => 'Biała jarzeniówka (WW3250 - 3800K)',
       },
     },
    'CameraOrientation' => {
@@ -415,8 +442,8 @@ $VERSION = '1.03';
       Description => 'Źródło światła',
       PrintConv => {
         'Cloudy' => 'Zachmurzone niebo',
-        'Cool White Fluorescent' => 'Zimna biała jarzeniówka (W 3900 - 4500K)',
-        'Day White Fluorescent' => 'Jarzeniówka z naturalnym białym światłem',
+        'Cool White Fluorescent' => 'Zimna biała jarzeniówka (W 3800 - 4500K)',
+        'Day White Fluorescent' => 'Jarzeniówka z naturalnym białym światłem (N 4600 - 5500K)',
         'Daylight' => 'Światło dzienne',
         'Daylight Fluorescent' => 'Jarzeniówka dająca światło dzienne (D 5700 - 7100K)',
         'Fine Weather' => 'Dobra pogoda',
@@ -429,8 +456,8 @@ $VERSION = '1.03';
         'Standard Light B' => 'Standardowe światło B',
         'Standard Light C' => 'Standardowe światło C',
         'Tungsten (Incandescent)' => 'Światło żarowe',
-        'Unknown' => 'nieznane',
-        'White Fluorescent' => 'Biała jarzeniówka (WW3200 - 3700K)',
+        'Unknown' => 'Nieznane',
+        'White Fluorescent' => 'Biała jarzeniówka (WW3250 - 3800K)',
       },
     },
    'Lightness' => 'Jasność',
@@ -461,7 +488,7 @@ $VERSION = '1.03';
         'Other' => 'inne',
         'Partial' => 'Częściowy',
         'Spot' => 'Punktowy',
-        'Unknown' => 'nieznane',
+        'Unknown' => 'Nieznane',
       },
     },
    'Model' => 'Aparat',
@@ -820,7 +847,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

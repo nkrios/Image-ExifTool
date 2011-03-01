@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.38';
+$VERSION = '1.40';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -506,7 +506,7 @@ my %fileFormat = (
     },
     125 => {
         Name => 'RasterizedCaption',
-        Format => 'string[7360]',
+        Format => 'undef[7360]',
         Binary => 1,
     },
     130 => {
@@ -601,7 +601,7 @@ my %fileFormat = (
     202 => {
         Name => 'ObjectPreviewData',
         Groups => { 2 => 'Image' },
-        Format => 'string[0,256000]',
+        Format => 'undef[0,256000]',
         Binary => 1,
     },
     221 => {
@@ -962,7 +962,6 @@ sub HandleCodedCharset($$)
 sub TranslateCodedString($$$$)
 {
     my ($exifTool, $valPtr, $xlatPtr, $read) = @_;
-    my $escaped;
     if ($$xlatPtr eq 'bad') {
         $exifTool->Warn('Some IPTC characters not converted (unsupported CodedCharacterSet)');
         undef $$xlatPtr;
@@ -1133,7 +1132,7 @@ sub ProcessIPTC($$$)
                 }
             } elsif ($format =~ /^digits/) {
                 $val =~ s/\0+$//;
-            } else {
+            } elsif ($format !~ /^undef/) {
                 warn("Invalid IPTC format: $format");
             }
         }
@@ -1176,7 +1175,7 @@ image files.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -25,7 +25,7 @@
 [EXIF, ExifIFD, Camera] 37385 - Flash : Flash déclenché
 [EXIF, ExifIFD, Camera] 37386 - Focale de l'objectif: 6.0 mm
 [EXIF, ExifIFD, Image] 40960 - Version Flashpix supportée: 0100
-[EXIF, ExifIFD, Image] 40961 - Espace colorimétrique: sRGB
+[EXIF, ExifIFD, Image] 40961 - Espace colorimétrique: sRVB
 [EXIF, ExifIFD, Image] 40962 - Largeur d'image: 1600
 [EXIF, ExifIFD, Image] 40963 - Hauteur d'image: 1200
 [EXIF, InteropIFD, Image] 1 - Identification d'interopérabilité: R98: fichier de base DCF (sRGB)

@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.06';
+$VERSION = '1.08';
 
 # enable MWG strict mode by default
 # (causes non-standard EXIF, IPTC and XMP to be ignored)
@@ -39,7 +39,7 @@ sub OverwriteStringList($$$$);
         specifications.)
 
         The table below lists special Composite tags which are used to access other
-        tags based on the MWG 1.01 recommendations.  These tags are only accessible
+        tags based on the MWG 2.0 recommendations.  These tags are only accessible
         when the MWG module is loaded.  The MWG module is loaded automatically by
         the exiftool application if MWG is specified as a group for any tag on the
         command line, or manually with the C<-use MWG> option.  Via the API, the MWG
@@ -445,7 +445,7 @@ sub OverwriteStringList($$$$)
 {
     local $_;
     my ($exifTool, $nvHash, $val, $newValuePt) = @_;
-    my @new;
+    my (@new, $delIndex);
     if ($$nvHash{DelValue} and defined $val) {
         # preserve specified old values
         my $old = StringToList($val, $exifTool);
@@ -453,13 +453,22 @@ sub OverwriteStringList($$$$)
         if (@{$$nvHash{DelValue}}) {
             my %del;
             $del{$_} = 1 foreach @{$$nvHash{DelValue}};
-            $del{$_} or push(@new, $_) foreach @old;
+            foreach (@old) {
+                $del{$_} or push(@new, $_), next;
+                $delIndex or $delIndex = scalar @new;
+            }
         } else {
             push @new, @old;
         }
     }
-    # add new values
-    push @new, @{$$nvHash{Value}} if $$nvHash{Value};
+    # add new values (at location of deleted values, if any)
+    if ($$nvHash{Value}) {
+        if (defined $delIndex) {
+            splice @new, $delIndex, 0, @{$$nvHash{Value}};
+        } else {
+            push @new, @{$$nvHash{Value}};
+        }
+    }
     if (@new) {
         # convert back to string format
         $$newValuePt = ListToString(\@new);
@@ -547,7 +556,7 @@ after loading the MWG module):
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -75,7 +75,6 @@ sub ProcessJVCText($$$)
         $exifTool->Warn('Bad JVC text maker notes');
         return 0;
     }
-    my $pos = 0;
     while ($data =~ m/([A-Z]+):(.{3,4})/sg) {
         my ($tag, $val) = ($1, $2);
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
@@ -117,7 +116,7 @@ notes.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

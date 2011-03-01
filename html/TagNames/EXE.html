@@ -414,7 +414,7 @@ libraries.</p>
 <tr class=b>
 <td class=r title='3 = 0x3'>3</td>
 <td>CPUType</td>
-<td class=c title='+ = List'>N+</td>
+<td class=c title=' + = List'>N+</td>
 <td><span class=s>-1 = Any
   <br>1 = VAX
   <br>2 = ROMP
@@ -424,6 +424,7 @@ libraries.</p>
   <br>7 = x86
   <br>8 = MIPS
   <br>9 = NS32532
+  <br>10 = MC98000
   <br>11 = HPPA
   <br>12 = ARM
   <br>13 = MC88000
@@ -432,13 +433,11 @@ libraries.</p>
   <br>16 = i860 little endian
   <br>17 = RS6000
   <br>18 = PowerPC
-  <br>255 = VEO
-  <br>16777223 = x86 64-bit
-  <br>16777234 = PowerPC 64-bit</span></td></tr>
+  <br>255 = VEO</span></td></tr>
 <tr>
 <td class=r title='4 = 0x4'>4</td>
 <td>CPUSubtype</td>
-<td class=c title='+ = List'>N+</td>
+<td class=c title=' + = List'>N+</td>
 <td><span class=s>&#39;1 0&#39; = VAX (all)
   <br>&#39;1 1&#39; = VAX780
   <br>&#39;1 2&#39; = VAX785
@@ -474,16 +473,32 @@ libraries.</p>
   <br>&#39;7 3&#39; = i386 (all)
   <br>&#39;7 4&#39; = i486
   <br>&#39;7 5&#39; = i586
+  <br>&#39;7 8&#39; = Pentium III
+  <br>&#39;7 9&#39; = Pentium M
   <br>&#39;7 10&#39; = Pentium 4
+  <br>&#39;7 11&#39; = Itanium
+  <br>&#39;7 12&#39; = Xeon
   <br>&#39;7 22&#39; = Pentium Pro
-  <br>&#39;7 54&#39; = PentiumII M3
-  <br>&#39;7 86&#39; = PentiumII M5
+  <br>&#39;7 24&#39; = Pentium III M
+  <br>&#39;7 26&#39; = Pentium 4 M
+  <br>&#39;7 27&#39; = Itanium 2
+  <br>&#39;7 28&#39; = Xeon MP
+  <br>&#39;7 40&#39; = Pentium III Xeon
+  <br>&#39;7 54&#39; = Pentium II M3
+  <br>&#39;7 86&#39; = Pentium II M5
+  <br>&#39;7 103&#39; = Celeron
+  <br>&#39;7 119&#39; = Celeron Mobile
   <br>&#39;7 132&#39; = i486SX
   <br>&#39;8 0&#39; = MIPS (all)
   <br>&#39;8 1&#39; = MIPS R2300
   <br>&#39;8 2&#39; = MIPS R2600
   <br>&#39;8 3&#39; = MIPS R2800
   <br>&#39;8 4&#39; = MIPS R2000a
+  <br>&#39;8 5&#39; = MIPS R2000
+  <br>&#39;8 6&#39; = MIPS R3000a
+  <br>&#39;8 7&#39; = MIPS R3000
+  <br>&#39;10 0&#39; = MC98000 (all)
+  <br>&#39;10 1&#39; = MC98601
   <br>&#39;11 0&#39; = HPPA (all)
   <br>&#39;11 1&#39; = HPPA 7100LC
   <br>&#39;12 0&#39; = ARM (all)
@@ -491,7 +506,11 @@ libraries.</p>
   <br>&#39;12 2&#39; = ARM A500
   <br>&#39;12 3&#39; = ARM A440
   <br>&#39;12 4&#39; = ARM M4
-  <br>&#39;12 5&#39; = ARM A680
+  <br>&#39;12 5&#39; = ARM A680/V4T
+  <br>&#39;12 6&#39; = ARM V6
+  <br>&#39;12 7&#39; = ARM V5TEJ
+  <br>&#39;12 8&#39; = ARM XSCALE
+  <br>&#39;12 9&#39; = ARM V7
   <br>&#39;13 0&#39; = MC88000 (all)
   <br>&#39;13 1&#39; = MC88100
   <br>&#39;13 2&#39; = MC88110
@@ -517,15 +536,6 @@ libraries.</p>
   <br>&#39;18 10&#39; = PowerPC 7400
   <br>&#39;18 11&#39; = PowerPC 7450
   <br>&#39;18 100&#39; = PowerPC 970
-  <br>&#39;16777223 3&#39; = i386 64-bit (all)
-  <br>&#39;16777223 4&#39; = i486 64-bit
-  <br>&#39;16777223 5&#39; = i586 64-bit
-  <br>&#39;16777223 10&#39; = Pentium 4 64-bit
-  <br>&#39;16777223 22&#39; = Pentium Pro 64-bit
-  <br>&#39;16777223 54&#39; = PentiumII M3 64-bit
-  <br>&#39;16777223 86&#39; = PentiumII M5 64-bit
-  <br>&#39;16777223 132&#39; = i486SX 64-bit
-  <br>&#39;16777234 0&#39; = PowerPC 64-bit (all)
   <br>&#39;255 1&#39; = VEO 1
   <br>&#39;255 2&#39; = VEO 2</span></td></tr>
 <tr class=b>
@@ -635,7 +645,7 @@ libraries.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 8, 2010</i>
+<br><i>Last revised Feb 8, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::fr;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.17';
+$VERSION = '1.19';
 
 %Image::ExifTool::Lang::fr::Translate = (
    'AEAperture' => 'Ouverture AE',
@@ -533,11 +533,6 @@ $VERSION = '1.17';
         'On' => 'Activé',
       },
     },
-   'AutoBracketRelease' => {
-      PrintConv => {
-        'None' => 'Aucune',
-      },
-    },
    'AutoBracketing' => {
       Description => 'Bracketing auto',
       PrintConv => {
@@ -599,7 +594,7 @@ $VERSION = '1.17';
         'Rotate 180' => '180° (bas/droit)',
         'Rotate 270 CW' => '90° sens horaire (gauche/bas)',
         'Rotate 90 CW' => '90° sens antihoraire (droit/haut)',
-        'Unknown' => 'Inconnu',
+        'n/a' => 'Inconnu',
       },
     },
    'AuxiliaryLens' => 'Objectif Auxiliaire',
@@ -757,8 +752,9 @@ $VERSION = '1.17';
         'Standard Light A' => 'Lumière standard A',
         'Standard Light B' => 'Lumière standard B',
         'Standard Light C' => 'Lumière standard C',
-        'Tungsten' => 'Tungstène (lumière incandescente)',
-        'Unknown' => 'Inconnu',
+        'Tungsten (Incandescent)' => 'Tungstène (lumière incandescente)',
+        'Unknown' => 'Inconnue',
+        'Warm White Fluorescent' => 'Fluorescent blanc chaud',
         'White Fluorescent' => 'Fluorescent blanc',
       },
     },
@@ -778,15 +774,15 @@ $VERSION = '1.17';
         'Standard Light A' => 'Lumière standard A',
         'Standard Light B' => 'Lumière standard B',
         'Standard Light C' => 'Lumière standard C',
-        'Tungsten' => 'Tungstène (lumière incandescente)',
-        'Unknown' => 'Inconnu',
+        'Tungsten (Incandescent)' => 'Tungstène (lumière incandescente)',
+        'Unknown' => 'Inconnue',
+        'Warm White Fluorescent' => 'Fluorescent blanc chaud',
         'White Fluorescent' => 'Fluorescent blanc',
       },
     },
    'CameraCalibration1' => 'Calibration d\'appareil 1',
    'CameraCalibration2' => 'Calibration d\'appareil 2',
    'CameraCalibrationSig' => 'Signature de calibration de l\'appareil',
-   'CameraInfo' => 'Modèle Pentax',
    'CameraOrientation' => {
       Description => 'Orientation de l\'image',
       PrintConv => {
@@ -824,6 +820,9 @@ $VERSION = '1.17';
         'Medium 2' => 'Moyenne 2',
         'Medium 3' => 'Moyenne 3',
         'Small' => 'Petite',
+        'Small 1' => 'Petite 1',
+        'Small 2' => 'Petite 2',
+        'Small 3' => 'Petite 3',
       },
     },
    'Caption-Abstract' => 'Légende / Description',
@@ -884,7 +883,6 @@ $VERSION = '1.17';
       },
     },
    'ColorBalance' => 'Balance des couleurs',
-   'ColorBalanceA' => 'Balance des Couleurs A',
    'ColorBalanceAdj' => {
       PrintConv => {
         'Off' => 'Désactivé',
@@ -928,10 +926,19 @@ $VERSION = '1.17';
    'ColorMode' => {
       Description => 'Mode colorimétrique',
       PrintConv => {
+        'Adobe RGB' => 'AdobeRVB',
+        'Autumn Leaves' => 'Feuilles automne',
+        'B&W' => 'Noir & Blanc',
+        'Clear' => 'Lumineux',
+        'Deep' => 'Profond',
         'Evening' => 'Soir',
         'Landscape' => 'Paysage',
+        'Light' => 'Pastel',
         'Natural' => 'Naturel',
+        'Neutral' => 'Neutre',
         'Night Scene' => 'Nocturne',
+        'Night View' => 'Vision nocturne',
+        'Night View/Portrait' => 'Portrait nocturne',
         'Normal' => 'Normale',
         'Off' => 'Désactivé',
         'RGB' => 'RVB',
@@ -976,8 +983,11 @@ $VERSION = '1.17';
    'ColorSpace' => {
       Description => 'Espace colorimétrique',
       PrintConv => {
+        'ICC Profile' => 'Profil ICC',
         'RGB' => 'RVB',
         'Uncalibrated' => 'Non calibré',
+        'Wide Gamut RGB' => 'Wide Gamut RVB',
+        'sRGB' => 'sRVB',
       },
     },
    'ColorSpaceData' => 'Espace de couleur de données',
@@ -1046,7 +1056,6 @@ $VERSION = '1.17';
    'Compression' => {
       Description => 'Schéma de compression',
       PrintConv => {
-        'Epson ERF Compressed' => 'Compression Epson ERF',
         'JBIG Color' => 'JBIG Couleur',
         'JPEG' => 'Compression JPEG',
         'JPEG (old-style)' => 'JPEG (ancien style)',
@@ -1335,7 +1344,7 @@ $VERSION = '1.17';
       PrintConv => {
         'Burst' => 'Rafale',
         'Continuous' => 'Continu',
-        'Continuous (Hi)' => 'Continu (ultrarapide)',
+        'Continuous High' => 'Continu (ultrarapide)',
         'Continuous Shooting' => 'Prise de vues en continu',
         'Multiple Exposure' => 'Exposition multiple',
         'No Timer' => 'Pas de retardateur',
@@ -1366,7 +1375,15 @@ $VERSION = '1.17';
       },
     },
    'DynamicRangeOptimizer' => {
+      Description => 'Optimiseur Dyna',
       PrintConv => {
+        'Advanced Auto' => 'Avancé Auto',
+        'Advanced Lv1' => 'Avancé Niv1',
+        'Advanced Lv2' => 'Avancé Niv2',
+        'Advanced Lv3' => 'Avancé Niv3',
+        'Advanced Lv4' => 'Avancé Niv4',
+        'Advanced Lv5' => 'Avancé Niv5',
+        'Auto' => 'Auto.',
         'Off' => 'Désactivé',
       },
     },
@@ -1387,9 +1404,7 @@ $VERSION = '1.17';
       Description => 'Pas IL',
       PrintConv => {
         '1/2 EV Steps' => 'Pas de 1/2 IL',
-        '1/2 EV steps' => 'Pas de 1/2 IL',
         '1/3 EV Steps' => 'Pas de 1/3 IL',
-        '1/3 EV steps' => 'Pas de 1/3 IL',
       },
     },
    'EasyExposureCompensation' => {
@@ -1540,7 +1555,6 @@ $VERSION = '1.17';
         'Bulb' => 'Pose B',
         'Landscape' => 'Paysage',
         'Manual' => 'Exposition manuelle',
-        'Night Scene' => 'Nocturne',
         'Night Scene / Twilight' => 'Nocturne',
         'Shutter Priority' => 'Priorité vitesse',
         'Shutter speed priority AE' => 'Priorité vitesse',
@@ -1703,11 +1717,6 @@ $VERSION = '1.17';
         'Smooth (color)' => 'Couleurs pastel',
         'Standard (B&W)' => 'Normales (N & B)',
         'Standard (color)' => 'Couleurs normales',
-      },
-    },
-   'Filter' => {
-      PrintConv => {
-        'Off' => 'Désactivé',
       },
     },
    'FilterEffect' => {
@@ -2230,12 +2239,18 @@ $VERSION = '1.17';
       },
     },
    'HCUsage' => 'Usage HC',
+   'HDR' => {
+      Description => 'HDR auto',
+      PrintConv => {
+        'Off' => 'Désactivée',
+      },
+    },
    'HalftoneHints' => 'Indications sur les demi-treintes',
    'Headline' => 'Titre principal',
    'HighISONoiseReduction' => {
       Description => 'Réduction du bruit en haute sensibilité ISO',
       PrintConv => {
-        'Disable' => 'Désactivé',
+        'Auto' => 'Auto.',
         'High' => 'Fort',
         'Low' => 'Bas',
         'Normal' => 'Normale',
@@ -2364,7 +2379,6 @@ $VERSION = '1.17';
    'ImageEditing' => {
       Description => 'Traitement de l\'image',
       PrintConv => {
-        'Color Filter' => 'Filtre de couleur',
         'Cropped' => 'Recadré',
         'Digital Filter' => 'Filtre numérique',
         'Frame Synthesis?' => 'Synthèse de vue ?',
@@ -2460,25 +2474,25 @@ $VERSION = '1.17';
    'InternalFlashMode' => {
       Description => 'Segment de mesure flash esclave 2',
       PrintConv => {
-        'Off, (Unknown 0xf4)' => 'Hors service (inconnue 0xF4)',
-        'Off, Auto' => 'Hors service, auto',
-        'Off, Auto, Red-eye reduction' => 'Hors service, auto, réduction yeux rouges',
-        'Off, Normal' => 'Hors service, normal',
-        'Off, Red-eye reduction' => 'Hors service, réduction yeux rouges',
-        'Off, Slow-sync' => 'Hors service, synchro lente',
-        'Off, Slow-sync, Red-eye reduction' => 'Hors service, synchro lente, réduction yeux rouges',
-        'Off, Trailing-curtain Sync' => 'Hors service, synchro 2e rideau',
-        'Off, Wireless (Control)' => 'Hors service, sans cordon (contrôleur)',
-        'Off, Wireless (Master)' => 'Hors service, sans cordon (maître)',
-        'On' => 'Activé',
-        'On, Auto' => 'En service, auto',
-        'On, Auto, Red-eye reduction' => 'En service, auto, réduction yeux rouges',
-        'On, Red-eye reduction' => 'En service, réduction yeux rouges',
-        'On, Slow-sync' => 'En service, synchro lente',
-        'On, Slow-sync, Red-eye reduction' => 'En service, synchro lente, réduction yeux rouges',
-        'On, Trailing-curtain Sync' => 'En service, synchro 2e rideau',
-        'On, Wireless (Control)' => 'En service, sans cordon (contrôleur)',
-        'On, Wireless (Master)' => 'En service, sans cordon (maître)',
+        'Did not fire, (Unknown 0xf4)' => 'Hors service (inconnue 0xF4)',
+        'Did not fire, Auto' => 'Hors service, auto',
+        'Did not fire, Auto, Red-eye reduction' => 'Hors service, auto, réduction yeux rouges',
+        'Did not fire, Normal' => 'Hors service, normal',
+        'Did not fire, Red-eye reduction' => 'Hors service, réduction yeux rouges',
+        'Did not fire, Slow-sync' => 'Hors service, synchro lente',
+        'Did not fire, Slow-sync, Red-eye reduction' => 'Hors service, synchro lente, réduction yeux rouges',
+        'Did not fire, Trailing-curtain Sync' => 'Hors service, synchro 2e rideau',
+        'Did not fire, Wireless (Control)' => 'Hors service, sans cordon (contrôleur)',
+        'Did not fire, Wireless (Master)' => 'Hors service, sans cordon (maître)',
+        'Fired' => 'Activé',
+        'Fired, Auto' => 'En service, auto',
+        'Fired, Auto, Red-eye reduction' => 'En service, auto, réduction yeux rouges',
+        'Fired, Red-eye reduction' => 'En service, réduction yeux rouges',
+        'Fired, Slow-sync' => 'En service, synchro lente',
+        'Fired, Slow-sync, Red-eye reduction' => 'En service, synchro lente, réduction yeux rouges',
+        'Fired, Trailing-curtain Sync' => 'En service, synchro 2e rideau',
+        'Fired, Wireless (Control)' => 'En service, sans cordon (contrôleur)',
+        'Fired, Wireless (Master)' => 'En service, sans cordon (maître)',
         'n/a - Off-Auto-Aperture' => 'N/c - auto-diaph hors service',
       },
     },
@@ -2628,6 +2642,7 @@ $VERSION = '1.17';
         'Standard Light C' => 'Lumière standard C',
         'Tungsten (Incandescent)' => 'Tungstène (lumière incandescente)',
         'Unknown' => 'Inconnue',
+        'Warm White Fluorescent' => 'Fluorescent blanc chaud',
         'White Fluorescent' => 'Fluorescent blanc',
       },
     },
@@ -2939,6 +2954,13 @@ $VERSION = '1.17';
     },
    'MultiExposureShots' => 'Nombre de prises de vue',
    'MultiExposureVersion' => 'Version Surimpression',
+   'MultiFrameNoiseReduction' => {
+      Description => 'Réduc. bruit multi-photos',
+      PrintConv => {
+        'Off' => 'Désactivée',
+        'On' => 'Activé(e)',
+      },
+    },
    'MultipleExposureSet' => {
       Description => 'Exposition multiple',
       PrintConv => {
@@ -3038,7 +3060,6 @@ $VERSION = '1.17';
    'OpticalZoomMode' => {
       Description => 'Mode Zoom optique',
       PrintConv => {
-        'EX Optics' => 'Optique EX',
         'Extended' => 'Optique EX',
         'Standard' => 'Normal',
       },
@@ -3418,9 +3439,13 @@ $VERSION = '1.17';
       PrintConv => {
         'Best' => 'La meilleure',
         'Better' => 'Meilleure',
+        'Compressed RAW' => 'cRAW',
+        'Compressed RAW + JPEG' => 'cRAW+JPEG',
+        'Extra Fine' => 'Extra fine',
         'Good' => 'Bonne',
         'Low' => 'Bas',
         'Normal' => 'Normale',
+        'RAW + JPEG' => 'RAW+JPEG',
       },
     },
    'QualityMode' => {
@@ -3526,12 +3551,6 @@ $VERSION = '1.17';
         'Normal' => 'Normale',
       },
     },
-   'RawLinear' => {
-      PrintConv => {
-        'No' => 'Non',
-        'Yes' => 'Oui',
-      },
-    },
    'RecordMode' => {
       Description => 'Mode d\'enregistrement',
       PrintConv => {
@@ -3605,7 +3624,7 @@ $VERSION = '1.17';
       Description => 'Unité de résolution en X et Y',
       PrintConv => {
         'None' => 'Aucune',
-        'cm' => 'pixels/cm',
+        'cm' => 'Pixels/cm',
         'inches' => 'Pouce',
       },
     },
@@ -3726,17 +3745,26 @@ $VERSION = '1.17';
    'SceneMode' => {
       Description => 'Modes scène',
       PrintConv => {
+        '3D Sweep Panorama' => '3D',
+        'Anti Motion Blur' => 'Anti-flou de mvt',
         'Aperture Priority' => 'Priorité ouverture',
+        'Auto' => 'Auto.',
         'Candlelight' => 'Bougie',
+        'Cont. Priority AE' => 'AE priorité continue',
+        'Handheld Night Shot' => 'Vue de nuit manuelle',
         'Landscape' => 'Paysage',
         'Manual' => 'Manuelle',
+        'Night Portrait' => 'Portrait nocturne',
         'Night Scene' => 'Nocturne',
+        'Night View/Portrait' => 'Vision/portrait nocturne',
         'Normal' => 'Normale',
         'Off' => 'Désactivé',
         'Shutter Priority' => 'Priorité vitesse',
         'Snow' => 'Neige',
+        'Standard' => '',
         'Sunset' => 'Coucher de soleil',
         'Super Macro' => 'Super macro',
+        'Sweep Panorama' => 'Panora. par balayage',
         'Text' => 'Texte',
       },
     },
@@ -4427,7 +4455,6 @@ $VERSION = '1.17';
    'ViewingCondIlluminant' => 'Illuminant des conditions de visionnage',
    'ViewingCondIlluminantType' => 'Type d\'illuminant des conditions de visionnage',
    'ViewingCondSurround' => 'Environnement des conditions de visionnage',
-   'ViewingConditions' => 'Illuminant des conditions de visionnage',
    'VignetteControl' => {
       Description => 'Controle du vignettage',
       PrintConv => {
@@ -4523,13 +4550,14 @@ $VERSION = '1.17';
         'Auto' => 'Equilibrage des blancs automatique',
         'Black & White' => 'Monochrome',
         'Cloudy' => 'Temps nuageux',
-        'Cool White Fluorescent' => 'Fluorescent blanc froid',
+        'Color Temperature/Color Filter' => 'Temp.Couleur / Filtre couleur',
+        'Cool White Fluorescent' => 'Fluorescente type soft',
         'Custom' => 'Personnalisée',
         'Custom 1' => 'Personnalisée 1',
         'Custom 2' => 'Personnalisée 2',
         'Custom 3' => 'Personnalisée 3',
         'Custom 4' => 'Personnalisée 4',
-        'Day White Fluorescent' => 'Fluorescent blanc jour',
+        'Day White Fluorescent' => 'Fluorescente type blanc',
         'Daylight' => 'Lumière du jour',
         'Daylight Fluorescent' => 'Fluorescente type jour',
         'Fluorescent' => 'Fluorescente',
@@ -4539,6 +4567,7 @@ $VERSION = '1.17';
         'Tungsten' => 'Tungstène (lumière incandescente)',
         'Unknown' => 'Inconnu',
         'User-Selected' => 'Sélectionnée par l\'utilisateur',
+        'Warm White Fluorescent' => 'Fluorescent blanc chaud',
         'White Fluorescent' => 'Fluorescent blanc',
       },
     },
@@ -4625,6 +4654,14 @@ $VERSION = '1.17';
    'YPosition' => 'Position en Y',
    'YResolution' => 'Résolution d\'image verticale',
    'Year' => 'Année',
+   'ZoneMatching' => {
+      Description => 'Ajustage de la zone',
+      PrintConv => {
+        'High Key' => 'Hi',
+        'ISO Setting Used' => 'Désactivée',
+        'Low Key' => 'Lo',
+      },
+    },
    'ZoneMatchingOn' => {
       PrintConv => {
         'Off' => 'Désactivé',
@@ -4649,7 +4686,7 @@ and values.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

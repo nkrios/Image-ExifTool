@@ -13,6 +13,171 @@
 <p><b>Note:</b> This page gives the history of older exiftool versions.  See
 <a href="history.html">history.html</a> for the recent history.</p>
 
+<a name='v8.24'><b>June 30, 2010 - Version 8.24</b></a>
+<ul>
+<li>Added ability to write some Kodak APP3 Meta tags
+<li>Added a few new Olympus LensType's and new values for a couple of other tags
+<li>Added support for yet another Kodak MakerNote variation (M580)
+<li>Added conversion for OOXML DocSecurity tag (thanks Jeff Harmon)
+<li>Added another Nikon ExternalFlashFlags value (thanks Warren Hatch)
+<li>Decode more Canon VRD tags (thanks Gert Kello) and changed some tag names
+<li>Decode a couple of new Canon 7D tags (thanks Vesa Kivisto)
+<li>Decode a few more Sigma tags
+<li>Decode HTML tags written by Microsoft Office
+<li>Decode some MakerNotes tags from Samsung MP4 videos
+<li>Allow RFC 8601 date/time values to be written without seconds
+<li>Fixed conversion for Kodak Meta:SerialNumber
+<li>Changed conversion of Canon FocusDistanceUpper/Lower tags to add units (m)
+<li>Changed the names of some Nikon FlashExposureComp tags
+<li>Changed name of RTF CharactersNoWhiteSpace tag to CharactersWithSpaces to
+    conform with what Microsoft does with their software as opposed to what they
+    say in their RTF specification
+<li>Changed a few FlashPix tags for better consistency with OOXML and RTF
+<li>Properly convert OOXML Unicode character entities
+<li>Fixed problem writing some Sigma MakerNote tags
+<li>Fixed problem writing incorrect value for "Uncalibrated" XMP:ColorSpace
+<li>Fixed bug where some unknown Canon values were extracted twice with -U
+</ul>
+
+<a name='v8.23'><b>June 20, 2010 - Version 8.23</b></a>
+<ul>
+<li>Added write support for FujiFilm RAF images from the HS10 and S100FS
+<li>Added read support for RTF files
+<li>Added read support for FPXR in JPEG APP4 as written by some HP cameras
+<li>Added ability to copy files of any type (now does a straight copy instead of
+    processing the file if no new values are set for any "real" tag)
+<li>Added new values for CanonModelID, PentaxModelID and SonyModelID
+<li>Added a new Ricoh LensID
+<li>Added conversion for "Off" and "On" values when writing EXIF:Flash
+<li>Added a new Canon LensType and changed the name of one Sigma lens
+<li>Decode more Canon VRD tags and update to DPP 3.8 (thanks Gert Kello)
+<li>Decode FujiFilm AutoDynamicRange
+<li>Changed some DNG tags to make them writable (but "unsafe")
+</ul>
+
+<a name='v8.22'><b>June 9, 2010 - Version 8.22</b></a>
+<ul>
+<li>Implemented PNG alternate language tags and special character translations
+<li>Added print conversion for XMP-photoshop:ColorMode
+<li>Decode some new Pentax 645D tags/values and added more PentaxModelID's
+<li>Changed family 1 group names for Matroska Chapters
+<li>Changed frame rate conversions to round to 3 decimal points
+<li>Enable summary messages when -b is combined with -w
+<li>Assume local system timezone on specified date (instead of current local
+    timezone) when writing an IPTC time tag with a date/time value which doesn't
+    include a timezone
+<li>Fixed conversion of Matroska:ChapterTimeStart/End values
+<li>Fixed an incorrect Panasonic Lens name (thanks Michael Byczkowski)
+</ul>
+
+<a name='v8.21'><b>June 2, 2010 - Version 8.21</b></a>
+<ul>
+<li>Added read support for Matroska multimedia files (MKA, MKV and MKS)
+<li>Added a new PentaxModelID (Optio E80)
+<li>Decode some information from Casio EX-7000SX APP1 "QVCI", HP Photosmart
+    R837 APP6 "TDHD" JPEG segments
+<li>Extract more Samsung and HP PreviewImages hidden in other JPEG APP segments
+<li>Extract unknown tags with numerical ID's by default when -v option is used
+<li>Updated default GPSVersionID to 2.3.0.0 when writing
+<li>Fixed bug geotagging from KML file (lat/long were swapped)
+</ul>
+
+<a name='v8.20'><b>May 26, 2010 - Version 8.20</b></a>
+<ul>
+<li>Added read support for Open Document files (ODP, ODS, ODT)
+<li>Added Composite:AudioBitrate tag for VBR MPEG audio
+<li>Added support for IPTC:CatalogSets written by iView MediaPro
+<li>Decode Olympus MagicFilter tag and add a two new SceneMode values
+<li>Decode a few new Sony tags written by NEX models
+<li>Decode a number of new Sony A100 tags (thanks Igal Milchtaich)
+<li>Decode some information from MPEG audio LAME header
+<li>Updated to Exif 2.3 specification (!!)
+<li>Allow date/time tags to be shifted by the values of other tags when using
+    the -tagsFromFile feature
+<li>Fixed formatting of QuickTime:CreateDate as written by iPhone
+<li>Fixed problem conditionally replacing some blank EXIF tags and alternate
+    language tags in XMP
+</ul>
+
+<a name='v8.19'><b>May 11, 2010 - Version 8.19</b></a>
+<ul>
+<li>Added ability to read/write Samsung PreviewImage trailer
+<li>Added two new PentaxModelID's (Optio H90 and W90)
+<li>Added a new Canon LensType
+<li>Added a new CanonModelID
+<li>Decode more Sony tags/values (thanks Michael Reitinger)
+<li>Decode more Leica M9 tags (thanks Michael Byczkowski and Carl Bretteville)
+<li>Updated to XMP April 2010 specification
+<li>Avoid extracting Sony DSLR-A100 tags which have "n/a" values
+<li>Improved German language translations (thanks Herbert Kauer)
+<li>Improved efficiency of Composite tag calculations
+<li>Made RSRC a deletable group
+<li>Tolerate extra white space at the start of an XMP file
+<li>Changed MWG logic to ignore blank EXIF tags
+<li>Changed a few print conversion strings to improve interoperability
+<li>Changed XMP namespace prefix 'prismusagerights' to 'pur' as per most recent
+    PRISM specification
+<li>Patched memory problem in Windows when processing very large EPS files
+<li>Fixed a couple of incorrectly named Sony Panorama tags
+<li>Fixed bug which could prevent file from being updated when deleting
+    mandatory tags and adding back tags in other locations
+</ul>
+
+<a name='v8.18'><b>Apr. 16, 2010 - Version 8.18</b></a>
+<ul>
+<li>Added read support for Sony DSC-F1 PMP images
+<li>Added a new Nikon LensID (thanks Jeffrey Friedl)
+<li>Decode a number of new Sony tags (thanks Michael Reitinger)
+<li>Decode a few more Leica M9 tags (thanks Michael Byczkowski)
+<li>Preserve original file permissions and ownership when writing
+<li>Made Canon DustRemovalData writable
+<li>Changed some Pentax WhiteBalance strings for consistency
+<li>Patched potential security problem when writing values
+<li>Fixed bug extracting unsynchronized ID3v2.4 information
+</ul>
+
+<a name='v8.17'><b>Apr. 9, 2010 - Version 8.17</b></a>
+<ul>
+<li>Added a new Sony ExposureMode (thanks Michael Reitinger)
+<li>Decode Casio DriveMode (thanks Robert Chi)
+<li>Decode CameraTemperature for more Canon EOS models (thanks Vesa Kivisto)
+<li>Updated to the DICOM 2009 specification (Note: Changed some DICOM tag names)
+<li>Improved conversions for XMP:LensInfo, EXIF:DNGLensInfo and Nikon:Lens
+<li>Changed case of some Canon DriveMode strings
+<li>Fixed divide-by-zero error when Geotagging from a track with only one point
+<li>Fixed incorrect ImageHeight reported for top-to-bottom BMP images
+<li>API Changes:
+    <ul>
+    <li>Fixed a problem passing options to Image::ExifTool::TagInfoXML::Write()
+    </ul>
+</ul>
+
+<a name='v8.16'><b>Mar. 31, 2010 - Version 8.16</b></a>
+<ul>
+<li>Preserve Mac OS resource fork when writing (OS X only)
+<li>Added a number of new Nikon LensID's (thanks Robert Rottmerhusen)
+<li>Decode a couple more Mac OS resources
+<li>Decode Olympus LensModel tag (thanks Martin Hilbers)
+<li>Extract PrintIMVersion tag from PrintIM information
+<li>Separate extraction of Leica FrameSelector information from LensType tag
+<li>Recognize Bitstream PFA/PFB font files
+<li>Patched ActivePerl 5.10 bug which could cause Perl crash during Geotag tests
+<li>Fixed another Geotag test that fails due to round-off errors on some systems
+</ul>
+
+<a name='v8.15'><b>Mar. 18, 2010 - Version 8.15</b> <span class=grn>(production release)</span></a>
+<ul>
+<li>Added read support for Macintosh resource files:
+    <ul>
+    <li>Generate ResourceForkSize tag if data exists in a file's resource fork
+    <li>Enhanced -ee option to process resource fork as a sub-document
+    </ul>
+<li>Added a new PentaxModelID (Optio I-10)
+<li>Decode Panasonic DMC-ZS7 landmark tags
+<li>Fixed decoding of Pentax Optio 555 PictureMode and added a number of new
+    values (thanks Ralf Medow)
+</ul>
+
 <a name='v8.14'><b>Mar. 16, 2010 - Version 8.14</b></a>
 <ul>
 <li>Added some new Canon AFMode values for the EOS 7D (thanks Dieter Steiner)

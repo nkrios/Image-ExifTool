@@ -234,6 +234,23 @@ which case subsequent occurrences are extracted as sub-documents).</p>
 <td>MakeModel</td>
 <td class=c>-</td>
 <td>--&gt; <a href='H264.html#MakeModel'>H264 MakeModel Tags</a></td></tr>
+<tr>
+<td title='0x00e1 = 225'>0x00e1</td>
+<td>RecInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='H264.html#RecInfo'>H264 RecInfo Tags</a>
+  <br><span class='n s'>(Canon only)</span></td></tr>
+<tr class=b>
+<td title='0x00e4 = 228'>0x00e4</td>
+<td>Model</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(Sony cameras only, combined with tags 0xe5 and 0xe6)</span></span></td></tr>
+<tr>
+<td title='0x00ee = 238'>0x00ee</td>
+<td>FrameInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='H264.html#FrameInfo'>H264 FrameInfo Tags</a>
+  <br><span class='n s'>(Canon only)</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Camera1'>H264 Camera1 Tags</a></h2>
@@ -249,12 +266,12 @@ which case subsequent occurrences are extracted as sub-documents).</p>
 <td><span class=s>0xfe = Closed
   <br>0xff = Auto</span></td></tr>
 <tr class=b>
-<td class=r title='1 = 0x1'>1.1</td>
+<td class=r title='1 = 0x1'>1</td>
 <td>Gain</td>
 <td class=c>N</td>
 <td><span class=s>[Mask 0x0f]</span></td></tr>
 <tr>
-<td class=r title='1 = 0x1'>1.2</td>
+<td class=r title='1 = 0x1'>1.1</td>
 <td>ExposureProgram</td>
 <td class=c>N</td>
 <td><span class=s>[Mask 0xf0]
@@ -289,8 +306,8 @@ which case subsequent occurrences are extracted as sub-documents).</p>
 <td class=r title='1 = 0x1'>1</td>
 <td>ImageStabilization</td>
 <td class=c>N</td>
-<td><span class=s>0x0 = Off
-  <br>0x10 = On</span></td></tr>
+<td><span class=s>0 = Off
+  <br>255 = n/a</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Shutter'>H264 Shutter Tags</a></h2>
@@ -299,7 +316,11 @@ which case subsequent occurrences are extracted as sub-documents).</p>
 <table class=inner cellspacing=1>
 <tr class=h><th>Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr><td colspan=4 class=c><i>[no tags known]</i></td></tr>
+<tr>
+<td class=r title='1 = 0x1'>1.1</td>
+<td>ExposureTime</td>
+<td class=c>N</td>
+<td><span class=s>[Mask 0x7fff]</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='MakeModel'>H264 MakeModel Tags</a></h2>
@@ -317,9 +338,46 @@ which case subsequent occurrences are extracted as sub-documents).</p>
   <br>0x1011 = Canon</span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='RecInfo'>H264 RecInfo Tags</a></h2>
+<p>Recording information stored by some Canon video cameras.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>RecordingMode</td>
+<td class=c>N</td>
+<td><span class=s>2 = XP+
+  <br>4 = SP
+  <br>5 = LP
+  <br>6 = FXP
+  <br>7 = MXP</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FrameInfo'>H264 FrameInfo Tags</a></h2>
+<p>Frame rate information stored by some Canon video cameras.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>CaptureFrameRate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>VideoFrameRate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 31, 2010</i>
+<br><i>Last revised Dec 16, 2010</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

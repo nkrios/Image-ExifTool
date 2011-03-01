@@ -82,7 +82,6 @@ sub BuildMakerNotes($$$$$$)
     # special case: ignore user comment because it gets saved in EXIF
     # (and has the same raw tagID as CanonFileDescription)
     return if $tagInfo and $$tagInfo{Name} eq 'UserComment';
-    my $tagType = ($rawTag >> 8) & 0x38;
     my $format = $Image::ExifTool::Exif::formatNumber{$formName};
     my $fsiz = $Image::ExifTool::Exif::formatSize[$format];
     my $size = length($$valuePt);
@@ -197,8 +196,8 @@ sub WriteCR2($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt} or return 0;
-    my $raf = $$dirInfo{RAF} or return 0;
     my $outfile = $$dirInfo{OutFile} or return 0;
+    $$dirInfo{RAF} or return 0;
 
     # check CR2 signature
     if ($$dataPt !~ /^.{8}CR\x02\0/s) {
@@ -623,7 +622,7 @@ files, and would lead to far fewer problems with corrupted metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2010, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
