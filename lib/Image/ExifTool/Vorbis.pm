@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 my $MAX_PACKETS = 2;    # maximum packets to scan from each stream at start of file
 
@@ -153,7 +153,7 @@ sub ProcessComments($$$)
             $name =~ s/([a-z0-9])_([a-z])/$1\U$2/g;
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => $name });
         }
-        $exifTool->HandleTag($tagTablePtr, $tag, $val,
+        $exifTool->HandleTag($tagTablePtr, $tag, $exifTool->Decode($val, 'UTF8'),
             Index   => $index,
             DataPt  => $dataPt,
             DataPos => $dataPos,

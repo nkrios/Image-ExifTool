@@ -331,6 +331,19 @@
   <br>&#39;2 0 0&#39; = Mist Removal
   <br>&#39;3 0 0&#39; = Vivid Landscape</span></td></tr>
 <tr class=b>
+<td title='0x2089 = 8329'>0x2089</td>
+<td>FaceInfo1
+  <br>FaceInfo2
+  <br>FaceInfoUnknown?</td>
+<td class=c>-<br>-<br>Y</td>
+<td>--&gt; <a href='Casio.html#FaceInfo1'>Casio FaceInfo1 Tags</a>
+  <br>--&gt; <a href='Casio.html#FaceInfo2'>Casio FaceInfo2 Tags</a></td></tr>
+<tr>
+<td title='0x211c = 8476'>0x211c</td>
+<td>FacesDetected</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td title='0x3000 = 12288'>0x3000</td>
 <td>RecordMode</td>
 <td class=c>int16u</td>
@@ -548,6 +561,155 @@
   <br>5 = Low</span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='FaceInfo1'>Casio FaceInfo1 Tags</a></h2>
+<p>Face-detect tags extracted from models such as the EX-H5.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>FacesDetected</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>FaceDetectFrameSize</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='13 = 0xd'>13</td>
+<td>Face1Position</td>
+<td class=c>int16u[4]</td>
+<td><span class=s><span class=n>(left, top, right and bottom of detected face in coordinates of
+FaceDetectFrameSize, with increasing Y downwards)</span></span></td></tr>
+<tr class=b>
+<td class=r title='124 = 0x7c'>124</td>
+<td>Face2Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='235 = 0xeb'>235</td>
+<td>Face3Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='346 = 0x15a'>346</td>
+<td>Face4Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='457 = 0x1c9'>457</td>
+<td>Face5Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='568 = 0x238'>568</td>
+<td>Face6Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='679 = 0x2a7'>679</td>
+<td>Face7Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='790 = 0x316'>790</td>
+<td>Face8Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='901 = 0x385'>901</td>
+<td>Face9Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1012 = 0x3f4'>1012</td>
+<td>Face10Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FaceInfo2'>Casio FaceInfo2 Tags</a></h2>
+<p>Face-detect tags extracted from models such as the EX-H20G and EX-ZR100.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>FacesDetected</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4</td>
+<td>FaceDetectFrameSize</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='8 = 0x8'>8</td>
+<td>FaceOrientation</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(orientation of face relative to unrotated image)</span>
+  <br>0 = Horizontal (normal)
+  <br>1 = Rotate 90 CW
+  <br>2 = Rotate 270 CW
+  <br>3 = Rotate 180</span></td></tr>
+<tr class=b>
+<td class=r title='24 = 0x18'>24</td>
+<td>Face1Position</td>
+<td class=c>int16u[4]</td>
+<td><span class=s><span class=n>(left, top, right and bottom of detected face in coordinates of
+FaceDetectFrameSize, with increasing Y downwards)</span></span></td></tr>
+<tr>
+<td class=r title='76 = 0x4c'>76</td>
+<td>Face2Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='128 = 0x80'>128</td>
+<td>Face3Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='180 = 0xb4'>180</td>
+<td>Face4Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='232 = 0xe8'>232</td>
+<td>Face5Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='284 = 0x11c'>284</td>
+<td>Face6Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='336 = 0x150'>336</td>
+<td>Face7Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='388 = 0x184'>388</td>
+<td>Face8Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='440 = 0x1b8'>440</td>
+<td>Face9Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='492 = 0x1ec'>492</td>
+<td>Face10Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='QVCI'>Casio QVCI Tags</a></h2>
 <p>This information is found in the APP1 QVCI segment of JPEG images from the
 Casio QV-7000SX.</p>
@@ -607,7 +769,7 @@ Casio QV-7000SX.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 21, 2010</i>
+<br><i>Last revised Mar 22, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

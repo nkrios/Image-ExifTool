@@ -45,7 +45,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.36';
+$VERSION = '2.39';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -1085,10 +1085,10 @@ my %sPantryItem = (
     PostCropVignetteMidpoint    => { Writable => 'integer' },
     PostCropVignetteFeather     => { Writable => 'integer' },
     PostCropVignetteRoundness   => { Writable => 'integer' },
-    # don't allow writing of flattened Gradient/PaintBasedCorrections
+    PostCropVignetteStyle       => { Writable => 'integer' },
+    # disable List behaviour of flattened Gradient/PaintBasedCorrections
     # because these are nested in lists and the flattened tags can't
-    # do justice to this complex structure.  Disable List behaviour
-    # in these tags for the same reason.
+    # do justice to this complex structure
     GradientBasedCorrections => { Struct => \%sCorrection, List => 'Seq' },
     GradientBasedCorrectionsWhat => {
         Name => 'GradientBasedCorrWhat',
@@ -1267,6 +1267,28 @@ my %sPantryItem = (
         Name => 'PaintCorrectionMaskFullY',
         Flat => 1, List => 0,
     },
+    # new tags written by LR 3 (thanks Wolfgang Guelcker)
+    ProcessVersion                       => { },
+    LensProfileEnable                    => { Writable => 'integer' },
+    LensProfileSetup                     => { },
+    LensProfileName                      => { },
+    LensProfileFilename                  => { },
+    LensProfileDigest                    => { },
+    LensProfileDistortionScale           => { Writable => 'integer' },
+    LensProfileChromaticAberrationScale  => { Writable => 'integer' },
+    LensProfileVignettingScale           => { Writable => 'integer' },
+    LensManualDistortionAmount           => { Writable => 'integer' },
+    PerspectiveVertical                  => { Writable => 'integer' },
+    PerspectiveHorizontal                => { Writable => 'integer' },
+    PerspectiveRotate                    => { Writable => 'real'    },
+    PerspectiveScale                     => { Writable => 'integer' },
+    CropConstrainToWarp                  => { Writable => 'integer' },      
+    LuminanceNoiseReductionDetail        => { Writable => 'integer' },
+    LuminanceNoiseReductionContrast      => { Writable => 'integer' },
+    ColorNoiseReductionDetail            => { Writable => 'integer' },
+    GrainAmount                          => { Writable => 'integer' },
+    GrainSize                            => { Writable => 'integer' },
+    GrainFrequency                       => { Writable => 'integer' },
 );
 
 # Tiff schema properties (tiff)
@@ -1785,7 +1807,7 @@ my %sPantryItem = (
     NativeDigest => { }, #PH
 );
 
-# Auxiliary schema properties (aux) - not fully documented
+# Auxiliary schema properties (aux) - not fully documented (ref PH)
 %Image::ExifTool::XMP::aux = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-aux', 2 => 'Camera' },
@@ -1834,6 +1856,7 @@ my %sPantryItem = (
             return $val;
         },
     },
+    ApproximateFocusDistance => { Writable => 'rational' }, #PH (LR3)
 );
 
 # IPTC Core schema properties (Iptc4xmpCore) (ref 4)
@@ -2002,6 +2025,57 @@ my %sPantryItem = (
         PrintConv => {
             E => 'East',
             W => 'West',
+        },
+    },
+    LensID => {
+        Notes => 'attempt to convert numerical XMP-aux:LensID stored by Adobe applications',
+        Require => {
+            0 => 'XMP-aux:LensID',
+            1 => 'Make',
+        },
+        Desire => {
+            2 => 'LensInfo',
+            3 => 'FocalLength',
+            4 => 'LensModel',
+        },
+        Inhibit => {
+            5 => 'Composite:LensID',    # don't override existing Composite:LensID
+        },
+        ValueConv => '$val',
+        PrintConv => 'Image::ExifTool::XMP::PrintLensID($self, @val)',
+    },
+    Flash => {
+        Notes => 'facilitates copying camera flash information between XMP and EXIF',
+        Desire => {
+            0 => 'XMP:FlashFired',
+            1 => 'XMP:FlashReturn',
+            2 => 'XMP:FlashMode',
+            3 => 'XMP:FlashFunction',
+            4 => 'XMP:FlashRedEyeMode',
+            5 => 'XMP:Flash', # handle structured flash information too
+        },
+        Writable => 1,
+        PrintHex => 1,
+        SeparateTable => 'EXIF Flash',
+        ValueConv => q{
+            if (ref $val[5] eq 'HASH') {
+                # copy structure fields into value array
+                my $i = 0;
+                $val[$i++] = $val[5]{$_} foreach qw(Fired Return Mode Function RedEyeMode);
+            }
+            return (($val[0] and lc($val[0]) eq 'true') ? 0x01 : 0) |
+                   (($val[1] || 0) << 1) |
+                   (($val[2] || 0) << 3) |
+                   (($val[3] and lc($val[3]) eq 'true') ? 0x20 : 0) |
+                   (($val[4] and lc($val[4]) eq 'true') ? 0x40 : 0);
+        },
+        PrintConv => \%Image::ExifTool::Exif::flash,
+        WriteAlso => {
+            'XMP:FlashFired'      => '$val & 0x01 ? "True" : "False"',
+            'XMP:FlashReturn'     => '($val & 0x06) >> 1',
+            'XMP:FlashMode'       => '($val & 0x18) >> 3',
+            'XMP:FlashFunction'   => '$val & 0x20 ? "True" : "False"',
+            'XMP:FlashRedEyeMode' => '$val & 0x40 ? "True" : "False"',
         },
     },
 );
@@ -2452,6 +2526,52 @@ sub ScanForXMP($$)
 }
 
 #------------------------------------------------------------------------------
+# Print conversion for XMP-aux:LensID
+# Inputs: 0) ExifTool ref, 1) LensID, 2) Make, 3) LensInfo, 4) FocalLength, 5) LensModel
+# (yes, this is ugly -- blame Adobe)
+sub PrintLensID(@)
+{
+    local $_;
+    my ($exifTool, $id, $make, $info, $focalLength, $lensModel) = @_;
+    my ($mk, $printConv);
+    # missing: Olympus (no XMP:LensID written by Adobe)
+    foreach $mk (qw(Canon Nikon Pentax Sony Sigma Samsung Leica)) {
+        next unless $make =~ /$mk/i;
+        # get name of module containing the lens lookup (default "Make.pm")
+        my $mod = { Sigma => 'SigmaRaw', Leica => 'Panasonic' }->{$mk} || $mk;
+        require "Image/ExifTool/$mod.pm";
+        # get the name of the lens name lookup (default "makeLensTypes")
+        my $convName = "Image::ExifTool::${mod}::" .
+            ({ Nikon => 'nikonLensIDs' }->{$mk} || lc($mk) . 'LensTypes');
+        no strict 'refs';
+        %$convName or last;
+        my $printConv = \%$convName;
+        use strict 'refs';
+        my ($minf, $maxf, $maxa, $mina);
+        if ($info) {
+            my @a = split ' ', $info;
+            $_ eq 'undef' and $_ = undef foreach @a;
+            ($minf, $maxf, $maxa, $mina) = @a;
+        }
+        my $str = $$printConv{$id} || "Unknown ($id)";
+        # Nikon is a special case because Adobe doesn't store the full LensID
+        if ($mk eq 'Nikon') {
+            my $hex = sprintf("%.2X", $id);
+            my %newConv;
+            my $i = 0;
+            foreach (grep /^$hex /, keys %$printConv) {
+                $newConv{$i ? "$id.$i" : $id} = $$printConv{$_};
+                ++$i;
+            }
+            $printConv = \%newConv;
+        }
+        return Image::ExifTool::Exif::PrintLensID($exifTool, $str, $id, $focalLength,
+                    $maxa, undef, $minf, $maxf, $lensModel, undef, $printConv);
+    }
+    return "Unknown ($id)";
+}
+
+#------------------------------------------------------------------------------
 # Convert XMP date/time to EXIF format
 # Inputs: 0) XMP date/time string, 1) set if we aren't sure this is a date
 # Returns: EXIF date/time
@@ -2762,7 +2882,7 @@ sub ParseXMPElement($$$;$$$)
         # reset nodeID before processing each element
         my $nodeID = $$blankInfo{NodeID} = $oldNodeID;
         # get next element
-        last unless $$dataPt =~ m/<([\w:-]+)(.*?)>/sg;
+        last unless $$dataPt =~ m/<([-\w:.\x80-\xff]+)(.*?)>/sg;
         my ($prop, $attrs) = ($1, $2);
         my $val = '';
         # only look for closing token if this is not an empty element
@@ -2775,7 +2895,10 @@ sub ParseXMPElement($$$;$$$)
 #                $$dataPt =~ m/(.*?)<\/$prop>/sg or last Element;
 #                my $val2 = $1;
                 my $pos = pos($$dataPt);
-                $$dataPt =~ m/<\/$prop>/sg or last Element;
+                unless ($$dataPt =~ m/<\/$prop>/sg) {
+                    $exifTool->Warn("XMP format error (no closing tag for $prop)");
+                    last Element;
+                }
                 my $len = pos($$dataPt) - $pos - length($prop) - 3;
                 my $val2 = substr($$dataPt, $pos, $len);
                 # increment nesting level for each contained similar opening token

@@ -33,7 +33,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.76';
+$VERSION = '1.79';
 
 sub PrintLensInfo($$$);
 
@@ -99,6 +99,7 @@ my %olympusLensTypes = (
     '2 4 0'  => 'Leica D Vario Elmar 14-150mm F3.5-5.6', #13
     '2 4 16' => 'Lumix G Vario 7-14mm F4 Asph.', #PH (E-P1 pre-production)
     '2 5 16' => 'Lumix G 20mm F1.7 Asph.', #16
+    '2 6 16' => 'Leica DG Macro-Elmarit 45mm F2.8', #PH
     '2 8 16' => 'Lumix G Fisheye 8mm F3.5', #PH
     '3 1 0'  => 'Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
     '3 2 0'  => 'Leica D Summilux 25mm F1.4 Asph.',
@@ -106,18 +107,18 @@ my %olympusLensTypes = (
 
 # ArtFilter and MagicFilter values (ref PH)
 my %filters = (
-    '0 0 0 0'    => 'Off', # ArtFilter
-    '0 1280 0 0' => 'Off', # MagicFilter
-    '1 1280 0 0' => 'Soft Focus',
-    '2 1280 0 0' => 'Pop Art',
-    '3 1280 0 0' => 'Pale & Light Color',
-    '4 1280 0 0' => 'Light Tone',
-    '5 1280 0 0' => 'Pin Hole',
-    '6 1280 0 0' => 'Grainy Film',
-    '9 1280 0 0' => 'Diorama',
-    '10 1280 0 0' => 'Cross Process',
-    '12 1280 0 0' => 'Fish Eye',
-    '13 1280 0 0' => 'Drawing',
+    '0'    => 'Off',
+    '1' => 'Soft Focus',
+    '2' => 'Pop Art',
+    '3' => 'Pale & Light Color',
+    '4' => 'Light Tone',
+    '5' => 'Pin Hole',
+    '6' => 'Grainy Film',
+    '9' => 'Diorama',
+    '10' => 'Cross Process',
+    '12' => 'Fish Eye',
+    '13' => 'Drawing',
+    # Punk? Sparkle?
 );
 
 # tag information for WAV "Index" tags
@@ -1263,6 +1264,7 @@ my %indexInfo = (
             6 numbers: 0. Make, 1. Unknown, 2. Model, 3. Sub-model, 4-5. Unknown.  Only
             the Make, Model and Sub-model are used to determine the lens model
         },
+        SeparateTable => 'LensType',
         # Have seen these values for the unknown numbers:
         # 1: 0
         # 4: 0, 2(Olympus lenses for which I have also seen 0 for this number)
@@ -1879,13 +1881,13 @@ my %indexInfo = (
         Name => 'ArtFilter',
         Writable => 'int16u',
         Count => 4,
-        PrintConv => \%filters,
+        PrintConv => [ \%filters ],
     },
     0x52c => { #PH
         Name => 'MagicFilter',
         Writable => 'int16u',
-        Count => 4,
-        PrintConv => \%filters,
+        Count => 4, # (2nd number is 0 or 1280, 3rd/4th are 0)
+        PrintConv => [ \%filters ],
     },
     0x600 => { #PH/4
         Name => 'DriveMode',

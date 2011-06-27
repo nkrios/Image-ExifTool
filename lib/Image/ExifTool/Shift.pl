@@ -14,7 +14,7 @@ sub ShiftTime($$$;$);
 
 #------------------------------------------------------------------------------
 # apply shift to value in new value hash
-# Inputs: 0) shift type, 1) shift string, 2) value to shift, 3) new value hash ref
+# Inputs: 0) shift type, 1) shift string, 2) raw date/time value, 3) new value hash ref
 # Returns: error string or undef on success and updates value in new value hash
 sub ApplyShift($$$;$)
 {

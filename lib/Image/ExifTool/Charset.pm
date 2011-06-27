@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION %csType);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 my %charsetTable;   # character set tables we've loaded
 
@@ -293,7 +293,7 @@ sub Recompose($$;$$)
     if ($csType & 0x801) {
         $conv = LoadCharset($charset);
         unless ($conv) {
-            $exifTool->Warn("Missing charset $charset");
+            $exifTool->Warn("Missing charset $charset") if $exifTool;
             return '';
         }
         $inv = $unicode2byte{$charset};

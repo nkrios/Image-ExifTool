@@ -51,7 +51,10 @@ been shortened for convenience (since the family 1 group names are derived
 from these by adding a leading &quot;XMP-&quot;).  In cases where a tag name exists in
 more than one namespace, less common namespaces are avoided when writing.
 However, any namespace may be written by specifying a family 1 group name
-for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.</p>
+for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.  When deciding on
+which tags to add to an image, using standard schemas such as
+<a href="#dc">dc</a>, <a href="#xmp">xmp</a> or <a href="#iptcCore">iptc</a> is
+recommended if possible.</p>
 
 <p>For structures, the heading of the first column is <b>Field Name</b>.  Field
 names are very similar to tag names, except they are used to identify fields
@@ -313,34 +316,38 @@ to themselves instead of speaking out for the rest of the world to hear.)</p>
 <tr class=h><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td>ApproximateFocusDistance</td>
+<td class=c>rational</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>Firmware</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>FlashCompensation</td>
 <td class=c>rational</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ImageNumber</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Lens</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LensID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LensInfo</td>
 <td class=c>string</td>
 <td><span class=s><span class=n>(4 rational values giving focal and aperture ranges)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>OwnerName</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SerialNumber</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
@@ -469,24 +476,32 @@ to themselves instead of speaking out for the rest of the world to hear.)</p>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>ColorNoiseReductionDetail</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>Contrast</td>
 <td class=c title=' / = Avoided'>integer/</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Converter</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ConvertToGrayscale</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>CropAngle</td>
 <td class=c>real</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>CropBottom</td>
 <td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CropConstrainToWarp</td>
+<td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>CropHeight</td>
@@ -627,95 +642,143 @@ to themselves instead of speaking out for the rest of the world to hear.)</p>
 <td class=c title=' _ = Flattened'>string_</td>
 <td><span class=s><span class=n>(GradientBasedCorrectionsWhat)</span></span></td></tr>
 <tr>
+<td>GrainAmount</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>GrainFrequency</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>GrainSize</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>GrayMixerAqua</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GrayMixerBlue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GrayMixerGreen</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GrayMixerMagenta</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GrayMixerOrange</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GrayMixerPurple</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GrayMixerRed</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GrayMixerYellow</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>GreenHue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>GreenSaturation</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HasCrop</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HasSettings</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HighlightRecovery</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HueAdjustmentAqua</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HueAdjustmentBlue</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HueAdjustmentGreen</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HueAdjustmentMagenta</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HueAdjustmentOrange</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HueAdjustmentPurple</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>HueAdjustmentRed</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>HueAdjustmentYellow</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>IncrementalTemperature</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>IncrementalTint</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LensManualDistortionAmount</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>LensProfileChromaticAberrationScale</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LensProfileDigest</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>LensProfileDistortionScale</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LensProfileEnable</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>LensProfileFilename</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LensProfileName</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>LensProfileSetup</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LensProfileVignettingScale</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -748,6 +811,14 @@ to themselves instead of speaking out for the rest of the world to hear.)</p>
 <td>&nbsp;</td></tr>
 <tr>
 <td>LuminanceAdjustmentYellow</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>LuminanceNoiseReductionContrast</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LuminanceNoiseReductionDetail</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -882,6 +953,22 @@ to themselves instead of speaking out for the rest of the world to hear.)</p>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>PerspectiveHorizontal</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>PerspectiveRotate</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>PerspectiveScale</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>PerspectiveVertical</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>PostCropVignetteAmount</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
@@ -896,6 +983,14 @@ to themselves instead of speaking out for the rest of the world to hear.)</p>
 <tr>
 <td>PostCropVignetteRoundness</td>
 <td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>PostCropVignetteStyle</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>ProcessVersion</td>
+<td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>RawFileName</td>
@@ -6526,7 +6621,7 @@ XMP module for convenience.  (see <a href="http://www.w3.org/TR/SVG11/">http://w
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 28, 2011</i>
+<br><i>Last revised Apr 7, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

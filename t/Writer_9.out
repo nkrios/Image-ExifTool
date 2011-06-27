@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.35
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.60
 [File, System, Image] FileName - File Name: Writer_9_failed.jpg
 [File, System, Image] Directory - Directory: t
-[File, System, Image] FileSize - File Size: 9.2 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:10:11 08:48:10-04:00
+[File, System, Image] FileSize - File Size: 9.4 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2011:06:22 14:05:50-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -159,10 +159,15 @@
 [MakerNotes, Canon, Camera] 9 - AF Area Y Positions: 0 0 -506 0 506 0 0
 [MakerNotes, Canon, Camera] 10 - AF Points In Focus: (none)
 [MakerNotes, Canon, Camera] 19 - Thumbnail Image Valid Area: 0 159 7 112
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.35
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.60
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -
 [XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 9
+[XMP, XMP-exif, Camera] FlashFired - Flash Fired: False
+[XMP, XMP-exif, Camera] FlashFunction - Flash Function: False
+[XMP, XMP-exif, Camera] FlashMode - Flash Mode: Unknown
+[XMP, XMP-exif, Camera] FlashRedEyeMode - Flash Red Eye Mode: False
+[XMP, XMP-exif, Camera] FlashReturn - Flash Return: No return detection
 [XMP, XMP-tiff, Image] BitsPerSample - Bits Per Sample: 8
 [XMP, XMP-tiff, Image] ImageLength - Image Height: 8
 [XMP, XMP-tiff, Image] ImageWidth - Image Width: 8
@@ -209,6 +214,7 @@
 [ICC_Profile, ICC_Profile, Image] bTRC - Blue Tone Reproduction Curve: (Binary data 2060 bytes)
 [Composite, Composite, Image] Aperture - Aperture: 14.0
 [Composite, Composite, Camera] DriveMode - Drive Mode: Continuous Shooting
+[Composite, Composite, Other] Flash - Flash: No Flash
 [Composite, Composite, Camera] ISO - ISO: 100
 [Composite, Composite, Camera] Lens - Lens: 18.0 - 55.0 mm
 [Composite, Composite, Camera] LensID - Lens ID: Unknown 18-55mm

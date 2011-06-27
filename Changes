@@ -5,8 +5,130 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 8.50. (Other versions are
+Note: The most recent production release is Version 8.60. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+June 25, 2011 - Version 8.60 (production release)
+
+  - Added Composite Flash tag to facilitate copying of flash information between
+    XMP and EXIF
+  - Added new Pentax and Canon LensType values and fixed a Pentax lens name
+  - Added a few new Leica LensType's (thanks Olaf Ulrich)
+  - Added a new PentaxModelID
+  - Enhanced GPSDateStamp conversion to tolerate null separators (Casio EX-H20G)
+  - Made DNG LinearizationCurve and Nikon ContrastCurve writable but protected
+  - Renamed Nikon LinearizationTable to NEFLinearizationTable and made writable
+    but protected
+  - Removed Leica M8 FrameSelector tag since it seems to have evolved into an
+    extension of the LensType tag for newer lenses
+  - Fixed problem with order of operations when using multiple -if options
+
+June 11, 2011 - Version 8.59
+
+  - Added new Composite:LensID derived from XMP-aux:LensID
+  - Added new PentaxModelID and CanonModelID values
+  - Added a new Pentax LensType (thanks Artur)
+  - Decode maker notes in Pentax Optio S1 AVI videos
+  - Extract PreviewWMF from DOCX files
+  - Recognize WMF images
+  - Fixed decoding of CanonVRD WBAdjRGBLevels and renamed to WBAdjRGGBLevels
+
+June 2, 2011 - Version 8.58
+
+  - Decode a number of CameraInfo tags for the Canon EOS 600D and 1100D
+  - Improved speed by a factor of 2 when reading M2TS videos
+  - Fixed memory leak with -stay_open feature when writing
+
+May 26, 2011 - Version 8.57
+
+  - Added a couple of new Canon LensType values
+  - Added a few new Nikon LensID's (thanks Robert Rottmerhusen)
+  - Added format string to -v2 output for IPTC tags
+  - Added extra logic to avoid misidentifying unknown IFD-style maker notes
+  - Decode custom settings for Nikon D700 and D7000
+  - Fixed problem recognizing NikonCaptureData for ViewNX version 2.1.1
+
+Apr. 16, 2011 - Version 8.56
+
+  - Added a new Canon LensType (thanks Rodolfo Borges)
+  - Decode EXIF information in FujiFilm HS20EXR MOV videos
+  - Decode NikonCaptureEditVersions when ExtractEmbedded option is used
+    (previously called NikonCaptureHistory)
+  - Decode another Samsung tag (thanks Tae-Sun Park)
+  - Recognize CaptureOne ".newer" COS files
+  - Reverted JSON output to pre-8.51 behaviour by removing '#' suffix from tag
+    names when print conversion is disabled on a per-tag basis
+  - Fixed bug introduced in 8.32 interpreting some expressions when copying tags
+
+Apr. 11, 2011 - Version 8.55
+
+  - Added write support for FujiFilm RAF version 0716 images
+  - Added support for a number of new LR3 XMP tags (thanks Wolfgang Guelcker)
+  - Decode some more Samsung tags (thanks Tae-Sun Park)
+  - Improved handling of incorrectly formatted XMP
+  - Recognize a few alternate PS and EPS file extensions (thanks Jeff Harmon)
+  - Reverted a few Pentax macro lens names (less consistent, but at least they
+    match the official Pentax names)
+  - Fixed problem reading some XMP custom properties
+  - Fixed minor problem in HtmlDump output for Canon MakerNotes footer
+
+Apr. 2, 2011 - Version 8.54
+
+  - Added a number of new values for various tags
+  - Added a new Nikon LensID
+  - Decode a number of encrypted Samsung SRW tags (thanks Tae-Sun Park)
+  - Enhanced -s option so allow a number to be specified
+  - Fixed problem reading some Casio EX-Z35 MakerNote values
+
+Mar. 27, 2011 - Version 8.53
+
+  - Added a new Olympus LensType
+  - Added a new Nikon LensID
+  - Added a new PentaxModelID value
+  - Decode new Pentax MakerNotes format of Optio WG-1 GPS
+  - Decode Casio, Ricoh and Sanyo face detection information (thanks Jeffrey
+    Friedl and Emilio for samples)
+  - Decode FujiFilm face recognition information (thanks Jeffrey Friedl)
+  - Decode a new FujiFilm tag for GE models
+  - Allow writing GPSLatitudeRef/GPSLongitudeRef with a signed number
+  - Return proper FileType for M4P audio files
+  - Combined Canon FaceDetectFrameWidth/FaceDetectFrameHeight tags into
+    FaceDetectFrameSize for consistency with other makes
+  - API Changes:
+      - Fixed problem when specifying family 1 group in call to SetNewValue()
+        when tags were previously extracted with ExtractInfo()
+
+Mar. 20, 2011 - Version 8.52
+
+  - Added -listr option and mechanism to recognize some unsupported file types
+  - Added read support for VSD (Microsoft Visio Drawing) files
+  - Added a new Pentax LensType and improved consistency of macro lens names
+  - Added another CanonModelID
+  - Calculate Duration for M2TS (AVCHD) videos
+  - Decode a new FujiFilm tag
+  - Recognize .TS extension
+  - Recognize FotoStation IPTC record 240
+  - Attempt to better identify FPX-format MSOffice documents with incorrect file
+    extensions
+  - Fixed bug applying time shift to Nikon PowerUpTime
+  - API Changes:
+      - Enhanced GetNewValues() to allow group name to be specified
+      - Allow description flag to be set to '0' when calling GetFileType() to
+        return types of recognized-yet-unsupported files
+
+Mar. 12, 2011 - Version 8.51
+
+  - Added -csv option for import/export of CSV database files
+  - Added ability to import JSON files
+  - Added read support for APP1 "Ocad" segment
+  - Added a new Nikon LensID (thanks Robert Rottmerhusen)
+  - Decode more Reconyx MakerNotes tags (thanks Robert Hass of Reconyx!)
+  - Report the number of encryption bits in the PDF:Encryption tag value
+  - Allow empty group name when specifying a tag
+  - Improved decoding of Olympus ArtFilter and MagicFilter tags
+  - Improved exception handling to continue with next -execute command after
+    aborting a command due to a serious error
+  - Fixed problem reading indexed PGF images
 
 Mar. 1, 2011 - Version 8.50 (production release)
 
@@ -123,6 +245,7 @@ Dec. 21, 2010 - Version 8.43
   - Added a couple of new Pentax LensType's
   - Added a couple of new CanonModelID's
   - Added a few more values to Casio UnknownMode
+  - Recognize 3GPP and 3GP2 file extensions
   - Improved handling of character encoding errors
   - Changed Duration format to always include hours for times > 1 minute
   - Fixed minor quirk in HtmlDump output

@@ -469,7 +469,7 @@ my $testnum = 1;
     my $exifTool = new Image::ExifTool;
     my $testfile = "t/${testname}_${testnum}_failed.xmp";
     unlink $testfile;
-    $exifTool->SetNewValuesFromFile('t/images/XMP5.xmp', 'all:all');
+    $exifTool->SetNewValuesFromFile('t/images/XMP5.xmp', 'xmp:all');
     my $ok = writeInfo($exifTool,undef,$testfile);
     print 'not ' unless testCompare("t/images/XMP5.xmp",$testfile,$testnum) and $ok;
     print "ok $testnum\n";

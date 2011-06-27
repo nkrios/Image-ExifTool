@@ -11,7 +11,10 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.12';
+$VERSION = '1.13';
+
+sub ProcessScalado($$$);
+sub ProcessOcad($$$);
 
 # (this main JPEG table is for documentation purposes only)
 %Image::ExifTool::JPEG::Main = (
@@ -32,6 +35,10 @@ $VERSION = '1.12';
         Name => 'AVI1',
         Condition => '$$valPt =~ /^AVI1/',
         SubDirectory => { TagTable => 'Image::ExifTool::JPEG::AVI1' },
+      }, {
+        Name => 'Ocad',
+        Condition => '$$valPt =~ /^Ocad/',
+        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::Ocad' },
     }],
     APP1 => [{
         Name => 'EXIF',
@@ -363,6 +370,21 @@ $VERSION = '1.12';
     },    
 );
 
+# Ocad APP0 segment (ref PH)
+%Image::ExifTool::JPEG::Ocad = (
+    PROCESS_PROC => \&ProcessOcad,
+    GROUPS => { 0 => 'APP0', 1 => 'Ocad', 2 => 'Image' },
+    FIRST_ENTRY => 0,
+    NOTES => q{
+        Tags extracted from the JPEG APP0 "Ocad" segment (found in Photobucket
+        images).
+    },
+    Rev => {
+        Name => 'OcadRevision',
+        Format => 'string[6]',
+    }
+);
+
 # NITF APP6 segment (National Imagery Transmission Format)
 # ref http://www.gwg.nga.mil/ntb/baseline/docs/n010697/bwcguide25aug98.pdf
 %Image::ExifTool::JPEG::NITF = (
@@ -426,7 +448,7 @@ $VERSION = '1.12';
 # information written by Scalado software (PhotoFusion maybe?)
 %Image::ExifTool::JPEG::Scalado = (
     GROUPS => { 0 => 'APP4', 1 => 'Scalado', 2 => 'Image' },
-    PROCESS_PROC => \&Image::ExifTool::JPEG::ProcessScalado,
+    PROCESS_PROC => \&ProcessScalado,
     TAG_PREFIX => 'Scalado',
     FORMAT => 'int32s',
     # I presume this was written by 
@@ -462,6 +484,27 @@ $VERSION = '1.12';
     # SCX1: (+ve data length)
     # WDEC: 0
 );
+
+#------------------------------------------------------------------------------
+# Extract information from the JPEG APP0 Ocad segment
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessOcad($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    $exifTool->VerboseDir('APP0 Ocad', undef, length $$dataPt);
+    for (;;) {
+        last unless $$dataPt =~ /\$(\w+):([^\0\$]+)/g;
+        my ($tag, $val) = ($1, $2);
+        $val =~ s/(^\s+|\s+$)//g;   # remove leading/trailing spaces
+        unless ($$tagTablePtr{$tag}) {
+            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => "Ocad_$tag" });
+        }
+        $exifTool->HandleTag($tagTablePtr, $tag, $val);
+    }
+    return 1;
+}
 
 #------------------------------------------------------------------------------
 # Extract information from the JPEG APP4 SCALADO segment

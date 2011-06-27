@@ -3,7 +3,8 @@
 <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
          xmlns:dd="http://purl.org/dc/elements/1.1/"
          xmlns:ph="http://owl.phy.queensu.ca/ph/1.0/"
-         xmlns:xxx="http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/">
+         xmlns:xxx="http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/"
+         xmlns:pdfx="http://ns.adobe.com/pdfx/1.3/">
   <rdf:Description rdf:about="http://www.w3.org/TR/rdf-syntax-grammar"
          dd:title="ExifTool common node, nonstandard namespace prefix, and bad list type tests">
     <dd:creator>
@@ -29,6 +30,8 @@
         <rdf:li>scene1</rdf:li>
       </rdf:Bag>
     </xxx:Scene>
+    <pdfx:Customↂ0020Propertyↂ00201>a custom property value</pdfx:Customↂ0020Propertyↂ00201>
+    <pdfx:Customↂ0020Propertyↂ00202>some other value</pdfx:Customↂ0020Propertyↂ00202>
   </rdf:Description>
 
   <rdf:Description rdf:nodeID="abc"

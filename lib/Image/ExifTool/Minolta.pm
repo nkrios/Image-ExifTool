@@ -42,7 +42,7 @@ use vars qw($VERSION %minoltaLensTypes %minoltaColorMode %sonyColorMode %minolta
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.75';
+$VERSION = '1.76';
 
 # lens ID numbers (ref 3)
 # ("New" and "II" appear in brackets if original version also has this LensType)
@@ -315,6 +315,7 @@ $VERSION = '1.75';
     103 => 'Light', #JD
     104 => 'Night View', #JD
     105 => 'Autumn Leaves', #JD
+    0xffffffff => 'n/a', #PH
 );
 
 %minoltaSceneMode = (
@@ -336,6 +337,7 @@ $VERSION = '1.75';
     21 => 'Cont. Priority AE', #PH
     22 => 'Auto+',
     23 => '3D Sweep Panorama', #PH (SLT-A55V)
+    0xffff => 'n/a', #PH
 );
 
 my %exposureIndicator = (

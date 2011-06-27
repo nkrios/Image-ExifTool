@@ -20,7 +20,7 @@ sub ProcessGE2($$$);
 sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.63';
+$VERSION = '1.67';
 
 my $debug;          # set to 1 to enable debugging code
 
@@ -108,6 +108,8 @@ my $debug;          # set to 1 to enable debugging code
             FixOffsets => '$valuePtr -= 210 if $tagID >= 0x1303',
        },
     },
+    # (the GE X5 has really messed up EXIF-like maker notes starting with
+    #  "GENIC\x0c\0" --> currently not decoded)
     {
         Name => 'MakerNoteHP',  # PhotoSmart 720 (also Vivitar 3705, 3705B and 3715)
         Condition => '$$valPt =~ /^(Hewlett-Packard|Vivitar)/',
@@ -604,6 +606,28 @@ my $debug;          # set to 1 to enable debugging code
         },
     },
     {
+        Name => 'MakerNotePentax5',
+        # (starts with "PENTAX \0")
+        Condition => '$$valPt=~/^PENTAX \0/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::Main',
+            Start => '$valuePtr + 10',
+            Base => '$start - 10',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNotePentax6',
+        # (starts with "S1\0\0\0\0\0\0\x0c\0\0\0")
+        Condition => '$$valPt=~/^S1\0{6}\x0c\0{3}/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::S1',
+            Start => '$valuePtr + 12',
+            Base => '$start - 12',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
         Name => 'MakerNotePhaseOne',
         # Starts with: 'IIIITwaR' or 'IIIICwaR' (have seen both written by P25)
         # (have also seen code which expects 'MMMMRawT')
@@ -619,7 +643,7 @@ my $debug;          # set to 1 to enable debugging code
     },
     {
         Name => 'MakerNoteReconyx',
-        Condition => '$$valPt =~ /^\x01\xf1\x03\x00/',
+        Condition => '$$valPt =~ /^\x01\xf1[\x02\x03]\x00/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Reconyx::Main',
             ByteOrder => 'Little-endian',
@@ -839,8 +863,9 @@ sub GetMakerNoteOffset($)
         push @offsets, 16 if $model =~ /(PowerShot|IXUS|IXY)/;
     } elsif ($make =~ /^CASIO/) {
         # Casio AVI and MOV images use no padding, and their JPEG's use 4,
-        # except some models like the EX-S770,Z65,Z70,Z75 and Z700 which use 16
-        push @offsets, $$exifTool{FILE_TYPE} =~ /^(RIFF|MOV)$/ ? 0 : (4, 16);
+        # except some models like the EX-S770,Z65,Z70,Z75 and Z700 which use 16,
+        # and the EX-Z35 which uses 2 (grrrr...)
+        push @offsets, $$exifTool{FILE_TYPE} =~ /^(RIFF|MOV)$/ ? 0 : (4, 16, 2);
     } elsif ($make =~ /^(General Imaging Co.|GEDSC IMAGING CORP.)/i) {
         push @offsets, 0;
     } elsif ($make =~ /^KYOCERA/) {
@@ -1296,6 +1321,14 @@ IFD_TRY: for ($offset=$firstTry; $offset<=$lastTry; $offset+=2) {
                 # count must be reasonable (can't test for zero count because
                 # cameras like the 1DmkIII use this value)
                 next IFD_TRY if $count & 0xff000000;
+                # extra tests to avoid mis-identifying Samsung makernotes (GT-I9000, etc)
+                next unless $num == 1;
+                my $valueSize = $count * $Image::ExifTool::Exif::formatSize[$format];
+                if ($valueSize > 4) {
+                    next IFD_TRY if $valueSize > $size;
+                    my $valuePtr = Get32u($dataPt, $entry+8);
+                    next IFD_TRY if $valuePtr > 0x10000;
+                }
             }
             $$dirInfo{DirStart} += $offset;    # update directory start
             $$dirInfo{DirLen} -= $offset;
@@ -1347,14 +1380,16 @@ sub ProcessCanon($$$)
         my $dirStart = $$dirInfo{DirStart} || 0;
         my $footerPos = $dirStart + $$dirInfo{DirLen} - 8;
         my $footer = substr(${$$dirInfo{DataPt}}, $footerPos, 8);
-        my $oldOffset = Get32u(\$footer, 4);
-        my $newOffset = $dirStart + $dataPos;
-        my $str = sprintf('Original maker note offset: 0x%.4x', $oldOffset);
-        if ($oldOffset != $newOffset) {
-            $str .= sprintf("\nCurrent maker note offset: 0x%.4x", $newOffset);
+        if ($footer =~ /^(II\x2a\0|MM\0\x2a)/ and substr($footer,0,2) eq GetByteOrder()) {
+            my $oldOffset = Get32u(\$footer, 4);
+            my $newOffset = $dirStart + $dataPos;
+            my $str = sprintf('Original maker note offset: 0x%.4x', $oldOffset);
+            if ($oldOffset != $newOffset) {
+                $str .= sprintf("\nCurrent maker note offset: 0x%.4x", $newOffset);
+            }
+            my $filePos = ($$dirInfo{Base} || 0) + $dataPos + $footerPos;
+            $exifTool->HDump($filePos, 8, '[Canon MakerNotes footer]', $str);
         }
-        my $filePos = ($$dirInfo{Base} || 0) + $dataPos + $footerPos;
-        $exifTool->HDump($filePos, 8, '[Canon MakerNotes footer]', $str);
     }
     # process as normal
     return Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);

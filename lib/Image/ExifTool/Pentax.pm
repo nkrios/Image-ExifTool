@@ -46,20 +46,20 @@
 package Image::ExifTool::Pentax;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION %pentaxLensTypes);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.26';
+$VERSION = '2.32';
 
 sub CryptShutterCount($$);
 sub PrintFilter($$$);
 
 # pentax lens type codes (ref 4)
 # The first number gives the lens series, and the 2nd gives the model number
-# Series numbers: K=1; A=2; F=3; FAJ,DFA=4; FA=3,4,5,6; FA*=5,6; DA=3,4,7; DA*=7,8
-#                 FA645=11; DFA645=13
-my %pentaxLensTypes = (
+# Series numbers: K=1; A=2; F=3; FAJ=4; DFA=4,7; FA=3,4,5,6; FA*=5,6;
+#                 DA=3,4,7; DA*=7,8; FA645=11; DFA645=13; Q=21
+%pentaxLensTypes = (
     Notes => q{
         The first number gives the series of the lens, and the second identifies the
         lens model.  Note that newer series numbers may not always be properly
@@ -107,8 +107,8 @@ my %pentaxLensTypes = (
     '3 36' => 'Sigma 20mm F1.8 EX DG Aspherical RF',
     '3 38' => 'smc PENTAX-F* 300mm F4.5 ED[IF]',
     '3 39' => 'smc PENTAX-F* 600mm F4 ED[IF]',
-    '3 40' => 'smc PENTAX-F MACRO 100mm F2.8',
-    '3 41' => 'smc PENTAX-F MACRO 50mm F2.8 or Sigma Lens', #4
+    '3 40' => 'smc PENTAX-F Macro 100mm F2.8',
+    '3 41' => 'smc PENTAX-F Macro 50mm F2.8 or Sigma Lens', #4
     '3 41.1' => 'Sigma 50mm F2.8 Macro', #16
     '3 44' => 'Sigma or Tamron Lens (3 44)',
     '3 44.1' => 'Sigma AF 10-20mm F4-5.6 EX DC', #JD
@@ -155,7 +155,7 @@ my %pentaxLensTypes = (
     '4 23' => 'smc PENTAX-FA 20-35mm F4 AL',
     '4 24' => 'smc PENTAX-FA 77mm F1.8 Limited',
     '4 25' => 'Tamron SP AF 14mm F2.8', #13
-    '4 26' => 'smc PENTAX-FA MACRO 100mm F3.5 or Cosina Lens',
+    '4 26' => 'smc PENTAX-FA Macro 100mm F3.5 or Cosina Lens',
     '4 26.1' => 'Cosina 100mm F3.5 Macro', #JD
     '4 27' => 'Tamron AF 28-300mm F3.5-6.3 LD Aspherical[IF] Macro (185D/285D)',
     '4 28' => 'smc PENTAX-FA 35mm F2 AL',
@@ -175,8 +175,8 @@ my %pentaxLensTypes = (
     '4 46' => 'smc PENTAX-FA J 28-80mm F3.5-5.6 AL',
     '4 47' => 'smc PENTAX-FA J 18-35mm F4-5.6 AL',
     '4 49' => 'Tamron SP AF 28-75mm F2.8 XR Di (A09)',
-    '4 51' => 'smc PENTAX-D FA 50mm F2.8 MACRO',
-    '4 52' => 'smc PENTAX-D FA 100mm F2.8 MACRO',
+    '4 51' => 'smc PENTAX-D FA 50mm F2.8 Macro',
+    '4 52' => 'smc PENTAX-D FA 100mm F2.8 Macro',
     '4 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #JD
     '4 229' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #JD
     '4 230' => 'Tamron SP AF 17-50mm F2.8 XR Di II', #20
@@ -202,8 +202,8 @@ my %pentaxLensTypes = (
     '5 5' => 'smc PENTAX-FA* 600mm F4 ED[IF]',
     '5 6' => 'smc PENTAX-FA* 300mm F4.5 ED[IF]',
     '5 7' => 'smc PENTAX-FA 135mm F2.8 [IF]',
-    '5 8' => 'smc PENTAX-FA MACRO 50mm F2.8',
-    '5 9' => 'smc PENTAX-FA MACRO 100mm F2.8',
+    '5 8' => 'smc PENTAX-FA Macro 50mm F2.8',
+    '5 9' => 'smc PENTAX-FA Macro 100mm F2.8',
     '5 10' => 'smc PENTAX-FA* 85mm F1.4 [IF]',
     '5 11' => 'smc PENTAX-FA* 200mm F2.8 ED[IF]',
     '5 12' => 'smc PENTAX-FA 28-80mm F3.5-4.7',
@@ -223,8 +223,9 @@ my %pentaxLensTypes = (
     '6 9' => 'smc PENTAX-FA 20mm F2.8',
     '6 10' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
     '6 13' => 'smc PENTAX-FA* 400mm F5.6 ED[IF]',
-    '6 14' => 'smc PENTAX-FA* MACRO 200mm F4 ED[IF]',
+    '6 14' => 'smc PENTAX-FA* Macro 200mm F4 ED[IF]',
     '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
+    '7 58' => 'smc PENTAX-D FA Macro 100mm F2.8 WR', #PH - this bit of information cost me $600 ;)
     '7 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #(Anton Bondar)
     '7 214' => 'smc PENTAX-DA 35mm F2.4 AL', #PH
     '7 216' => 'smc PENTAX-DA L 55-300mm F4-5.8 ED', #PH
@@ -250,6 +251,8 @@ my %pentaxLensTypes = (
     '7 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)', #19
     '7 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #PH
     '7 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #16
+    '8 4' => 'Sigma 50mm F1.4 EX DG HSM', #Artur private communication
+    '8 12' => 'Sigma 70-300mm F4-5.6 DG OS', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3382.0.html
     '8 14' => 'Sigma 17-70mm F2.8-4.0 DC Macro OS HSM', #(Hubert Meier)
     '8 18' => 'Sigma 8-16mm F4.5-5.6 DC HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2998.0.html
     '8 215' => 'smc PENTAX-DA 18-135mm F3.5-5.6 ED AL [IF] DC WR', #PH
@@ -264,11 +267,18 @@ my %pentaxLensTypes = (
     '8 255.1' => 'Sigma 70-200mm F2.8 EX DG Macro HSM II', #JD
     '8 255.2' => 'Sigma APO 150-500mm F5-6.3 DG OS HSM', #JD
     '8 255.3' => 'Sigma 50-150mm F2.8 II APO EX DC HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2997.0.html
+    '8 255.3' => 'Sigma 4.5mm F2.8 EX DC HSM Circular Fisheye', #PH
     '11 4' => 'smc PENTAX-FA 645 45-85mm F4.5', #PH
     '11 8' => 'smc PENTAX-FA 645 80-160mm F4.5', #PH
     '11 11' => 'smc PENTAX-FA 645 35mm F3.5 AL [IF]', #PH
     '11 17' => 'smc PENTAX-FA 645 150-300mm F5.6 ED [IF]', #PH
     '13 18' => 'smc PENTAX-D FA 645 55mm F2.8 AL [IF] SDM AW', #PH
+    # Q-mount lenses
+    '21 1' => '01 Standard Prime 8.5mm F1.9', #PH
+    '21 2' => '02 Standard Zoom 5-15mm F2.8-4.5', #PH (NC)
+    '21 3' => '03 Fish-eye 3.2mm F5.6', #PH (NC)
+    '21 4' => '04 Toy Lens Wide 6.3mm F7.1', #PH (NC)
+    '21 5' => '05 Toy Lens Telephoto 18mm F8', #PH (NC)
 );
 
 # Pentax model ID codes - PH
@@ -371,8 +381,12 @@ my %pentaxModelID = (
     0x12e58 => 'X90',
     0x12e6c => 'K-r',
     0x12e76 => 'K-5',
-    0x12e8a => 'Optio RS1000',
+    0x12e8a => 'Optio RS1000 / RS1500',
     0x12e94 => 'Optio RZ10',
+    0x12e9e => 'Optio LS1000',
+    0x12ebc => 'Optio WG-1 GPS',
+    0x12ed0 => 'Optio S1',
+    0x12ee4 => 'Q',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -493,15 +507,15 @@ my %digitalFilter = (
 # digital filter setting names and conversions (ref PH, K-5)
 # Note: names must be unique for writing
 my %filterSettings = (
-    1 => ['Brightness', '%+d'],     # BPA (-8-+8)
-    2 => ['Saturation', '%+d'],     # BPA (-3-+3)
-    3 => ['Hue', '%+d'],            # BPA (-3-+3)
-    4 => ['Contrast', '%+d'],       # BPA (-3-+3)
-    5 => ['Sharpness', '%+d'],      # BPA (-3-+3)
-    6 => ['SoftFocus', '%d'],       # Soft Focus/Custom (1-3)
-    7 => ['ShadowBlur',     { 0=>'Off',1=>'On' }], # Soft Focus
-    8 => ['HighContrast', '%d'],    # High Contrast/Custom (1-5)
-    9 => ['Color',          { 1=>'Red',2=>'Magenta',3=>'Blue',4=>'Cyan',5=>'Green',6=>'Yellow' }], # Color Filter
+    1  => ['Brightness', '%+d'],    # BPA (-8-+8)
+    2  => ['Saturation', '%+d'],    # BPA (-3-+3)
+    3  => ['Hue', '%+d'],           # BPA (-3-+3)
+    4  => ['Contrast', '%+d'],      # BPA (-3-+3)
+    5  => ['Sharpness', '%+d'],     # BPA (-3-+3)
+    6  => ['SoftFocus', '%d'],      # Soft Focus/Custom (1-3)
+    7  => ['ShadowBlur',    { 0=>'Off',1=>'On' }], # Soft Focus
+    8  => ['HighContrast', '%d'],   # High Contrast/Custom (1-5)
+    9  => ['Color',         { 1=>'Red',2=>'Magenta',3=>'Blue',4=>'Cyan',5=>'Green',6=>'Yellow' }], # Color Filter
     10 => ['Density',       { 1=>'Light',2=>'Standard',3=>'Dark' }], # Color Filter
     11 => ['ExtractedColor',{ 0=>'Off',1=>'Red',2=>'Magenta',3=>'Blue',4=>'Cyan',5=>'Green',6=>'Yellow' }], # ExtractColor [x2]
     12 => ['ColorRange', '%+d'],    # ExtractColor [x2] (-2-+2)
@@ -740,7 +754,7 @@ my %binaryDataAttrs = (
             6 => 'Landscape',
             8 => 'Sport', #PH
             9 => 'Night Scene',
-            # 10 FURUMODO? #13
+            # 10 "full mode"? #13
             11 => 'Soft', #PH
             12 => 'Surf & Snow',
             13 => 'Candlelight', #13
@@ -1539,7 +1553,10 @@ my %binaryDataAttrs = (
         Name => 'ShutterCount',
         Writable => 'undef',
         Count => 4,
-        Notes => 'does not include shutter actuations for live view or video recording',
+        Notes => q{
+            Note: May be reset by servicing!  Also, does not include shutter actuations
+            for live view or video recording
+        },
         # raw value is a big-endian 4-byte integer, encrypted using Date and Time
         RawConv => 'length($val) == 4 ? unpack("N",$val) : undef',
         RawConvInv => q{
@@ -3383,6 +3400,13 @@ my %binaryDataAttrs = (
             ValueConvInv => '$val * 100',
             PrintConv => 'sprintf("%.2f V", $val)',
             PrintConvInv => '$val =~ s/\s*V$//',
+            # For my K-5:          Min (0%) Max (100%) Meas
+            # BodyBatteryVoltage1  6.24 V   7.75 V     7.66 V
+            # BodyBatteryVoltage2  5.98 V   7.43 V     7.34 V
+            # BodyBatteryVoltage3  6.41 V   7.93 V     7.84 V
+            # BodyBatteryVoltage4  6.10 V   7.55 V     7.45 V
+            # "Meas" open-circuit voltages with DVM: AB=0V, AC=+8.33V, BC=+8.22V
+            # (terminal "C" is closest to edge of battery)
         },
     ],
     3 => [
@@ -4318,6 +4342,17 @@ my %binaryDataAttrs = (
     },
 );
 
+# Pentax metadata in S1 AVI maker notes (PH)
+%Image::ExifTool::Pentax::S1 = (
+    NOTES => 'Tags extracted from the maker notes of Optio S1 AVI videos.',
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0x0000 => { #5
+        Name => 'MakerNoteVersion',
+        Writable => 'undef',
+        Count => 4,
+    },
+);
+
 # Pentax metadata in AVI videos from the RS1000 (PH)
 %Image::ExifTool::Pentax::Junk = (
     NOTES => 'Tags found in the JUNK chunk of AVI videos from the RS1000.',
@@ -4512,7 +4547,7 @@ Thanks to Wayne Smith, John Francis, Douglas O'Brien Cvetan Ivanov, Jens
 Duttke and Dave Nicholson for help figuring out some Pentax tags, Ger
 Vermeulen and Niels Kristian Bech Jensen for contributing print conversion
 values for some tags, and everyone who helped contribute to the LensType
-decoding.
+values.
 
 =head1 AUTHOR
 

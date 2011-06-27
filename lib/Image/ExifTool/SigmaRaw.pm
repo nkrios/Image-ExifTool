@@ -12,17 +12,17 @@
 package Image::ExifTool::SigmaRaw;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION %sigmaLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.14';
+$VERSION = '1.15';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
 sub ProcessX3FProperties($$$);
 
 # sigma LensType lookup (ref PH)
-my %sigmaLensTypes = (
+%sigmaLensTypes = (
     # 0 => 'Sigma 50mm F2.8 EX Macro', (0 used for other lenses too)
     # 8 - 18-125mm LENSARANGE@18mm=22-4
     16 => 'Sigma 18-50mm F3.5-5.6 DC',

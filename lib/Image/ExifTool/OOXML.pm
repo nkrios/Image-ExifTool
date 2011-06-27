@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::XMP;
 use Image::ExifTool::ZIP;
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 # test for recognized OOXML document extensions
 my %isOOXML = (
@@ -346,14 +346,15 @@ sub ProcessDOCX($$)
         # set the document number and extract ZIP tags
         $$exifTool{DOC_NUM} = ++$docNum;
         Image::ExifTool::ZIP::HandleMember($exifTool, $member);
-        # process only XML and JPEG files in "docProps" directory
-        next unless $file =~ m{^docProps/.*\.(xml|jpe?g)$}i;
+        # process only XML and JPEG/WMF thumbnail images in "docProps" directory
+        next unless $file =~ m{^docProps/(.*\.xml|(thumbnail\.(jpe?g|wmf)))$}i;
         # get the file contents (CAREFUL! $buff MUST be local since we hand off a value ref)
         my ($buff, $status) = $zip->contents($member);
         $status and $exifTool->Warn("Error extracting $file"), next;
-        # extract JPEG as PreviewImage (should only be docProps/thumbnail.jpeg)
-        if ($file =~ /\.jpe?g/i) {
-            $exifTool->FoundTag('PreviewImage', \$buff);
+        # extract docProps/thumbnail.(jpg|mwf) as PreviewImage|PreviewMWF
+        if ($file =~ /\.(jpe?g|wmf)$/i) {
+            my $tag = $file =~ /\.wmf$/i ? 'PreviewWMF' : 'PreviewImage';
+            $exifTool->FoundTag($tag, \$buff);
             next;
         }
         # process XML files (docProps/app.xml, docProps/core.xml, docProps/custom.xml)

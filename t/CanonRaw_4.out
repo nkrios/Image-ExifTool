@@ -1,8 +1,8 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.35
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.60
 [File, System, Image] FileName - File Name: CanonRaw_4_failed.crw
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 12 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:10:11 08:47:49-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2011:06:22 14:05:13-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: CRW
 [File, File, Image] MIMEType - MIME Type: image/x-canon-crw
@@ -138,7 +138,7 @@
 [MakerNotes, CanonRaw, Image] 3 - Raw Jpg Width: 2048
 [MakerNotes, CanonRaw, Image] 4 - Raw Jpg Height: 1360
 [MakerNotes, CanonRaw, Camera] 6203 - Serial Number Format: Format 1
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.35
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.60
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-aux, Camera] OwnerName - Owner Name: Phil Harvey
 [XMP, XMP-aux, Camera] SerialNumber - Serial Number: 1234
@@ -155,6 +155,11 @@
 [XMP, XMP-exif, Image] ExposureTime - Exposure Time: 4
 [XMP, XMP-exif, Image] FNumber - F Number: 14.0
 [XMP, XMP-exif, Image] FileSource - File Source: Digital Camera
+[XMP, XMP-exif, Camera] FlashFired - Flash Fired: False
+[XMP, XMP-exif, Camera] FlashFunction - Flash Function: False
+[XMP, XMP-exif, Camera] FlashMode - Flash Mode: Unknown
+[XMP, XMP-exif, Camera] FlashRedEyeMode - Flash Red Eye Mode: False
+[XMP, XMP-exif, Camera] FlashReturn - Flash Return: No return detection
 [XMP, XMP-exif, Image] FlashpixVersion - Flashpix Version: 0100
 [XMP, XMP-exif, Camera] FocalLength - Focal Length: 34.0 mm
 [XMP, XMP-exif, Camera] FocalPlaneResolutionUnit - Focal Plane Resolution Unit: inches
@@ -187,6 +192,7 @@
 [XMP, XMP-xmp, Time] ModifyDate - Modify Date: 2003:12:04 06:46:52
 [Composite, Composite, Image] Aperture - Aperture: 14.3
 [Composite, Composite, Camera] DriveMode - Drive Mode: Continuous Shooting
+[Composite, Composite, Other] Flash - Flash: No Flash
 [Composite, Composite, Camera] ISO - ISO: 100
 [Composite, Composite, Camera] Lens - Lens: 18.0 - 55.0 mm
 [Composite, Composite, Camera] LensID - Lens ID: Unknown 18-55mm

@@ -79,19 +79,19 @@ supported by ExifTool (r = read, w = write, c = create):
   BMP   r     | FPX   r     | MP4   r     | PPM   r/w   | TTC   r
   BTF   r     | GIF   r/w   | MPC   r     | PPT   r     | TTF   r
   COS   r     | GZ    r     | MPG   r     | PPTX  r     | VRD   r/w/c
-  CR2   r/w   | HDP   r/w   | MPO   r/w   | PS    r/w   | WAV   r
-  CRW   r/w   | HTML  r     | MQV   r     | PSB   r/w   | WDP   r/w
-  CS1   r/w   | ICC   r/w/c | MRW   r/w   | PSD   r/w   | WEBP  r
-  DCM   r     | IIQ   r/w   | MXF   r     | PSP   r     | WEBM  r
-  DCP   r/w   | IND   r/w   | NEF   r/w   | QTIF  r     | WMA   r
-  DCR   r     | ITC   r     | NRW   r/w   | RA    r     | WMV   r
-  DFONT r     | JNG   r/w   | NUMBERS r   | RAF   r/w   | X3F   r/w
-  DIVX  r     | JP2   r/w   | ODP   r     | RAM   r     | XCF   r
-  DJVU  r     | JPEG  r/w   | ODS   r     | RAR   r     | XLS   r
-  DLL   r     | K25   r     | ODT   r     | RAW   r/w   | XLSX  r
-  DNG   r/w   | KDC   r     | OGG   r     | RIFF  r     | XMP   r/w/c
-  DOC   r     | KEY   r     | ORF   r/w   | RSRC  r     | ZIP   r
-  DOCX  r     | LNK   r     | OTF   r     | RTF   r     |
+  CR2   r/w   | HDP   r/w   | MPO   r/w   | PS    r/w   | VSD   r
+  CRW   r/w   | HTML  r     | MQV   r     | PSB   r/w   | WAV   r
+  CS1   r/w   | ICC   r/w/c | MRW   r/w   | PSD   r/w   | WDP   r/w
+  DCM   r     | IIQ   r/w   | MXF   r     | PSP   r     | WEBP  r
+  DCP   r/w   | IND   r/w   | NEF   r/w   | QTIF  r     | WEBM  r
+  DCR   r     | ITC   r     | NRW   r/w   | RA    r     | WMA   r
+  DFONT r     | JNG   r/w   | NUMBERS r   | RAF   r/w   | WMV   r
+  DIVX  r     | JP2   r/w   | ODP   r     | RAM   r     | X3F   r/w
+  DJVU  r     | JPEG  r/w   | ODS   r     | RAR   r     | XCF   r
+  DLL   r     | K25   r     | ODT   r     | RAW   r/w   | XLS   r
+  DNG   r/w   | KDC   r     | OGG   r     | RIFF  r     | XLSX  r
+  DOC   r     | KEY   r     | ORF   r/w   | RSRC  r     | XMP   r/w/c
+  DOCX  r     | LNK   r     | OTF   r     | RTF   r     | ZIP   r
   DV    r     | M2TS  r     | PAGES r     | RW2   r/w   |
 
   Meta Information
@@ -269,7 +269,13 @@ A reference to image data in memory.
 Reference to a list of tag names.  On entry, any elements in the list are
 added to the list of requested tags.  Tags with names beginning with '-' are
 excluded.  On return, this list is updated to contain an ordered list of tag
-keys for all extracted tags.
+keys for the returned information.
+
+There will be 1:1 correspondence between the requested tags and the returned
+tag keys only if the L</Duplicates> option is 0 and L</Sort> is 'Input'. 
+(With L</Duplicates> enabled, there may be more entries in the returned list
+of tag keys, and with other L</Sort> settings the entries may not be in the
+same order as requested.)
 
 =item HASH ref
 
@@ -648,7 +654,7 @@ are rebuilt to include data outside the boundaries of the original maker
 note data block, but a value of 2 disables this feature.  Possible values
 are:
 
-  0 - Do not extract writable subdirectories [default]
+  0 - Do not extract writable subdirectories (default)
   1 - Extract and rebuild maker notes into self-contained block
   2 - Extract without rebuilding maker notes
 
@@ -679,13 +685,13 @@ option, only unrecognized file types are scanned for XMP.  Default is 0.
 
 Specifies order to sort tags in returned list:
 
+  Input  - Sort in same order as input tag arguments (default)
   Alpha  - Sort alphabetically
   File   - Sort in order that tags were found in the file
   Group# - Sort by tag group, where # is zero or more family
            numbers separated by colons. If # is not specified,
            Group0 is assumed.  See GetGroup for a description
            of group families.
-  Input  - Sort in same order as input tag arguments (default)
 
 =item StrictDate
 
@@ -700,7 +706,7 @@ reading (with L<ExtractInfo>), and structured when copying (with
 L</SetNewValuesFromFile>).  Has no effect when writing since both flattened
 and structured tags may always be written.  Possible values are:
 
-  undef - Read flattened tags, copy structured tags
+  undef - Read flattened tags, copy structured tags (default)
     0   - Read and copy flattened tags
     1   - Read and copy structured tags
 
@@ -851,8 +857,8 @@ file write error.
 
 If an error code is returned, an Error tag is set and GetValue('Error') can
 be called to obtain the error description.  A Warning tag may be set even if
-this routine is successful.  Calling this routine clears any pre-existing
-Error and Warning tags.
+this routine is successful.  Calling WriteInfo clears any pre-existing Error
+and Warning tags.
 
     $errorMessage = $exifTool->GetValue('Error');
     $warningMessage = $exifTool->GetValue('Warning');
@@ -1095,8 +1101,8 @@ name for each value, or call with a reference to the list of values.
     $exifTool->SetNewValue(Headline => $val, Group => 'XMP');
     $exifTool->SetNewValue('XMP:Headline' => $val);  # (equivalent)
 
-    # shift original date/time back by 1 hour
-    $exifTool->SetNewValue(DateTimeOriginal => '1:00', Shift => -1);
+    # shift original date/time back by 2.5 hours
+    $exifTool->SetNewValue(DateTimeOriginal => '2:30', Shift => -1);
 
     # write a tag only if it had a specific value
     # (the order of the following calls is not significant)
@@ -1139,10 +1145,10 @@ argument.  Also, a '#' may be appended to the tag name (ie.
 
 2) [optional] New value for tag.  Undefined to delete tag from file.  May be
 a scalar, scalar reference, list reference to set a list of values, or hash
-reference for a structure.  Integer values may be specified in hexadecimal
-(with a leading '0x'), and simple rational values may be specified as
-fractions.  Structure tags may be specified either as a hash reference or
-a serialized string (see the last two examples above).
+reference for a structure.  Integer values may be specified as a hexadecimal
+string (with a leading '0x'), and simple rational values may be specified in
+fractional form (ie. '4/10').  Structure tags may be specified either as a
+hash reference or a serialized string (see the last two examples above).
 
 3-N) [optional] SetNewValue option/value pairs (see below).
 
@@ -1192,10 +1198,12 @@ names indicating 'unsafe' and 'protected' tags.  Default is 0.
 
 =item Replace
 
-Flag to replace the previous new value for this tag (ie. replace the value
-set in a previous call to L</SetNewValue>).  Valid values are 0 (don't
-replace), 1 (replace with specified new value) or 2 (reset previous new
-value only).
+Flag to replace the previous new values for this tag (ie. replace the values
+set in previous calls to L</SetNewValue>).  This option is most commonly
+used to replace previously-set new values for List-type tags.  Valid values
+are 0 (set new value normally -- adds to new values for List-type tags), 1
+(reset previous new values for this tag and replace with the specified new
+value) or 2 (reset previous new values only).
 
 =item Shift
 
@@ -1227,6 +1235,12 @@ example above to exclude specific groups from a mass delete.  However, this
 technique may not be used to exclude individual tags.  Instead, use
 L</SetNewValuesFromFile> to recover the values of individual tags after
 deleting a group.
+
+Setting a new value generates a cyclical reference which will prevent memory
+from being reclaimed when the ExifTool object goes out of scope (due to
+Perl's garbage collection technique).  To avoid this problem, call
+L</SetNewValue> with no additional arguments to clear new values before the
+ExifTool object goes out of scope.
 
 =back
 
@@ -1369,7 +1383,7 @@ more than one value.
 
 0) ExifTool object reference
 
-1) Tag name (case sensitive, group names not allowed)
+1) Tag name (case sensitive, may be prefixed by family 0 or 1 group name)
 
 =item Return Values:
 
@@ -1941,7 +1955,9 @@ Get type of file given file name.
 
 0) [optional] File name (or just an extension)
 
-1) [optional]  Flag to return a description instead of a type
+1) [optional] Flag to return a description instead of a type.  Set to 0 to
+return type for recognized but unsupported files (otherwise the return value
+for unsupported files is undef).
 
 =item Return Value:
 
@@ -1950,9 +1966,10 @@ the file.  Note that some files may be based on other formats (like many RAW
 image formats are based on TIFF).  In array context, may return more than
 one file type if the file may be based on different formats.  Returns undef
 if files with this extension are not yet supported by ExifTool.  Returns a
-list of extensions for all recognized file types if no input extension is
-specified.  Returns a more detailed description of the specific file format
-when the description flag is set.
+list of extensions for all supported file types if no input extension is
+specified (or all recognized file types if the description flag is set to 0). 
+Returns a more detailed description of the specific file format when the
+description flag is set.
 
 =back
 

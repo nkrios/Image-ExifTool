@@ -475,7 +475,7 @@ my %writeTable = (
         Notes => q{
             tags 0x9c9b-0x9c9f are used by Windows Explorer; special characters
             in these values are converted to UTF-8 by default, or Windows Latin1
-            with the -L option. XPTitle is ignored by Windows Explorer if
+            with the -L option.  XPTitle is ignored by Windows Explorer if
             ImageDescription exists
         },
         ValueConvInv => '$self->Encode($val,"UCS2","II") . "\0\0"',
@@ -605,6 +605,12 @@ my %writeTable = (
         WriteGroup => 'IFD0',
         PrintConvInv => '$val',
     },
+    0xc618 => {             # LinearizationTable
+        Writable => 'int16u',
+        WriteGroup => 'SubIFD',
+        Count => -1,
+        Protected => 1,
+    },,
     0xc619 => {             # BlackLevelRepeatDim
         Writable => 'int16u',
         WriteGroup => 'SubIFD',
@@ -2705,13 +2711,16 @@ NoOverwrite:            next if $isNew > 0;
                         }
                         # only support int32 pointers (for now)
                         if ($formatSize[$newFormat] != 4 and $$newInfo{IsOffset}) {
-                            die "Internal error (Offset not int32)" if $isNew > 0;
-                            die "Wrong count!" if $newCount != $readCount;
+                            $isNew > 0 and warn("Internal error (Offset not int32)"), return undef;
+                            $newCount != $readCount and warn("Wrong count!"), return undef;
                             # change to int32
                             $newFormName = 'int32u';
                             $newFormat = $formatNumber{$newFormName};
                             $newValue = WriteValue(join(' ',@vals), $newFormName, $newCount);
-                            die "Internal error writing offsets for $$newInfo{Name}\n" unless defined $newValue;
+                            unless (defined $newValue) {
+                                warn "Internal error writing offsets for $$newInfo{Name}\n";
+                                return undef;
+                            }
                         }
                         $offsetInfo or $offsetInfo = $offsetInfo[$ifd] = { };
                         # save location of valuePtr in new directory
@@ -2742,8 +2751,8 @@ NoOverwrite:            next if $isNew > 0;
                         if (ref $conv eq 'CODE') {
                             &$conv($val, $exifTool);
                         } else {
-                            my ($self, $tag) = ($exifTool, $$newInfo{Name});
-                            #### eval RawConv ($self, $val, $tag)
+                            my ($self, $tag, $taginfo) = ($exifTool, $$newInfo{Name}, $newInfo);
+                            #### eval RawConv ($self, $val, $tag, $tagInfo)
                             eval $conv;
                         }
                     } else {

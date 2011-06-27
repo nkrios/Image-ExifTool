@@ -772,66 +772,9 @@ any information found here will be extracted, even if the tag is not listed.</p>
 <td title='0x0201 = 513'>0x0201</td>
 <td>LensType</td>
 <td class=c>int8u[6]</td>
-<td><span class=s><span class=n>(6 numbers: 0. Make, 1. Unknown, 2. Model, 3. Sub-model, 4-5. Unknown.  Only
-the Make, Model and Sub-model are used to determine the lens model)</span>
-  <br>&#39;0 0 0&#39; = None
-  <br>&#39;0 1 0&#39; = Olympus Zuiko Digital ED 50mm F2.0 Macro
-  <br>&#39;0 1 1&#39; = Olympus Zuiko Digital 40-150mm F3.5-4.5
-  <br>&#39;0 1 16&#39; = Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6
-  <br>&#39;0 2 0&#39; = Olympus Zuiko Digital ED 150mm F2.0
-  <br>&#39;0 2 16&#39; = Olympus M.Zuiko Digital 17mm F2.8 Pancake
-  <br>&#39;0 3 0&#39; = Olympus Zuiko Digital ED 300mm F2.8
-  <br>&#39;0 3 16&#39; = Olympus M.Zuiko Digital ED 14-150mm F4.0-5.6
-  <br>&#39;0 4 16&#39; = Olympus M.Zuiko Digital ED 9-18mm F4.0-5.6
-  <br>&#39;0 5 0&#39; = Olympus Zuiko Digital 14-54mm F2.8-3.5
-  <br>&#39;0 5 1&#39; = Olympus Zuiko Digital Pro ED 90-250mm F2.8
-  <br>&#39;0 5 16&#39; = Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6
-  <br>&#39;0 6 0&#39; = Olympus Zuiko Digital ED 50-200mm F2.8-3.5
-  <br>&#39;0 6 1&#39; = Olympus Zuiko Digital ED 8mm F3.5 Fisheye
-  <br>&#39;0 7 0&#39; = Olympus Zuiko Digital 11-22mm F2.8-3.5
-  <br>&#39;0 7 1&#39; = Olympus Zuiko Digital 18-180mm F3.5-6.3
-  <br>&#39;0 8 1&#39; = Olympus Zuiko Digital 70-300mm F4.0-5.6
-  <br>&#39;0 9 16&#39; = Olympus M.Zuiko Digital 14-42mm F3.5-5.6 II
-  <br>&#39;0 21 0&#39; = Olympus Zuiko Digital ED 7-14mm F4.0
-  <br>&#39;0 23 0&#39; = Olympus Zuiko Digital Pro ED 35-100mm F2.0
-  <br>&#39;0 24 0&#39; = Olympus Zuiko Digital 14-45mm F3.5-5.6
-  <br>&#39;0 32 0&#39; = Olympus Zuiko Digital 35mm F3.5 Macro
-  <br>&#39;0 34 0&#39; = Olympus Zuiko Digital 17.5-45mm F3.5-5.6
-  <br>&#39;0 35 0&#39; = Olympus Zuiko Digital ED 14-42mm F3.5-5.6
-  <br>&#39;0 36 0&#39; = Olympus Zuiko Digital ED 40-150mm F4.0-5.6
-  <br>&#39;0 48 0&#39; = Olympus Zuiko Digital ED 50-200mm F2.8-3.5 SWD
-  <br>&#39;0 49 0&#39; = Olympus Zuiko Digital ED 12-60mm F2.8-4.0 SWD
-  <br>&#39;0 50 0&#39; = Olympus Zuiko Digital ED 14-35mm F2.0 SWD
-  <br>&#39;0 51 0&#39; = Olympus Zuiko Digital 25mm F2.8
-  <br>&#39;0 52 0&#39; = Olympus Zuiko Digital ED 9-18mm F4.0-5.6
-  <br>&#39;0 53 0&#39; = Olympus Zuiko Digital 14-54mm F2.8-3.5 II
-  <br>&#39;1 1 0&#39; = Sigma 18-50mm F3.5-5.6
-  <br>&#39;1 2 0&#39; = Sigma 55-200mm F4.0-5.6 DC
-  <br>&#39;1 3 0&#39; = Sigma 18-125mm F3.5-5.6 DC
-  <br>&#39;1 4 0&#39; = Sigma 18-125mm F3.5-5.6
-  <br>&#39;1 5 0&#39; = Sigma 30mm F1.4
-  <br>&#39;1 6 0&#39; = Sigma 50-500mm F4.0-6.3 EX DG APO HSM RF
-  <br>&#39;1 7 0&#39; = Sigma 105mm F2.8 DG
-  <br>&#39;1 8 0&#39; = Sigma 150mm F2.8 DG HSM
-  <br>&#39;1 16 0&#39; = Sigma 24mm F1.8 EX DG Aspherical Macro
-  <br>&#39;1 17 0&#39; = Sigma 135-400mm F4.5-5.6 DG ASP APO RF
-  <br>&#39;1 18 0&#39; = Sigma 300-800mm F5.6 EX DG APO
-  <br>&#39;1 20 0&#39; = Sigma 50-500mm F4.0-6.3 EX DG APO HSM RF
-  <br>&#39;1 21 0&#39; = Sigma 10-20mm F4.0-5.6 EX DC HSM
-  <br>&#39;1 22 0&#39; = Sigma 70-200mm F2.8 EX DG Macro HSM II
-  <br>&#39;1 23 0&#39; = Sigma 50mm F1.4 EX DG HSM
-  <br>&#39;2 1 0&#39; = Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.
-  <br>&#39;2 1 16&#39; = Lumix G Vario 14-45mm F3.5-5.6 Asph. Mega OIS
-  <br>&#39;2 2 0&#39; = Leica D Summilux 25mm F1.4 Asph.
-  <br>&#39;2 2 16&#39; = Lumix G Vario 45-200mm F4-5.6 Mega OIS
-  <br>&#39;2 3 1&#39; = Leica D Vario Elmar 14-50mm F3.8-5.6 Asph.
-  <br>&#39;2 3 16&#39; = Lumix G Vario HD 14-140mm F4-5.8 Asph. Mega OIS
-  <br>&#39;2 4 0&#39; = Leica D Vario Elmar 14-150mm F3.5-5.6
-  <br>&#39;2 4 16&#39; = Lumix G Vario 7-14mm F4 Asph.
-  <br>&#39;2 5 16&#39; = Lumix G 20mm F1.7 Asph.
-  <br>&#39;2 8 16&#39; = Lumix G Fisheye 8mm F3.5
-  <br>&#39;3 1 0&#39; = Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.
-  <br>&#39;3 2 0&#39; = Leica D Summilux 25mm F1.4 Asph.</span></td></tr>
+<td>--&gt; <a href='Olympus.html#LensType'>Olympus LensType Values</a>
+  <br><span class='n s'>(6 numbers: 0. Make, 1. Unknown, 2. Model, 3. Sub-model, 4-5. Unknown.  Only
+the Make, Model and Sub-model are used to determine the lens model)</span></td></tr>
 <tr class=b>
 <td title='0x0202 = 514'>0x0202</td>
 <td>LensSerialNumber</td>
@@ -932,6 +875,72 @@ the Make and Model are used to determine the extender model)</span>
 <td class=c>string[32]</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
+
+<h2><a name='LensType'>Olympus LensType Values</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class='inner sep' cellspacing=1>
+<tr class=h><th>Value</th><th>LensType</th></tr>
+<tr><td>'0 0 0'</td><td>= None</td>
+</tr><tr><td>'0 1 0'</td><td>= Olympus Zuiko Digital ED 50mm F2.0 Macro</td>
+</tr><tr><td>'0 1 1'</td><td>= Olympus Zuiko Digital 40-150mm F3.5-4.5</td>
+</tr><tr><td>'0 1 16'</td><td>= Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6</td>
+</tr><tr><td>'0 2 0'</td><td>= Olympus Zuiko Digital ED 150mm F2.0</td>
+</tr><tr><td>'0 2 16'</td><td>= Olympus M.Zuiko Digital 17mm F2.8 Pancake</td>
+</tr><tr><td>'0 3 0'</td><td>= Olympus Zuiko Digital ED 300mm F2.8</td>
+</tr><tr><td>'0 3 16'</td><td>= Olympus M.Zuiko Digital ED 14-150mm F4.0-5.6</td>
+</tr><tr><td>'0 4 16'</td><td>= Olympus M.Zuiko Digital ED 9-18mm F4.0-5.6</td>
+</tr><tr><td>'0 5 0'</td><td>= Olympus Zuiko Digital 14-54mm F2.8-3.5</td>
+</tr><tr><td>'0 5 1'</td><td>= Olympus Zuiko Digital Pro ED 90-250mm F2.8</td>
+</tr><tr><td>'0 5 16'</td><td>= Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6</td>
+</tr><tr><td>'0 6 0'</td><td>= Olympus Zuiko Digital ED 50-200mm F2.8-3.5</td>
+</tr><tr><td>'0 6 1'</td><td>= Olympus Zuiko Digital ED 8mm F3.5 Fisheye</td>
+</tr><tr><td>'0 7 0'</td><td>= Olympus Zuiko Digital 11-22mm F2.8-3.5</td>
+</tr><tr><td>'0 7 1'</td><td>= Olympus Zuiko Digital 18-180mm F3.5-6.3</td>
+</tr><tr><td>'0 8 1'</td><td>= Olympus Zuiko Digital 70-300mm F4.0-5.6</td>
+</tr><tr><td>'0 9 16'</td><td>= Olympus M.Zuiko Digital 14-42mm F3.5-5.6 II</td>
+</tr><tr><td>'0 21 0'</td><td>= Olympus Zuiko Digital ED 7-14mm F4.0</td>
+</tr><tr><td>'0 23 0'</td><td>= Olympus Zuiko Digital Pro ED 35-100mm F2.0</td>
+</tr><tr><td>'0 24 0'</td><td>= Olympus Zuiko Digital 14-45mm F3.5-5.6</td>
+</tr><tr><td>'0 32 0'</td><td>= Olympus Zuiko Digital 35mm F3.5 Macro</td>
+</tr><tr><td>'0 34 0'</td><td>= Olympus Zuiko Digital 17.5-45mm F3.5-5.6</td>
+</tr><tr><td>'0 35 0'</td><td>= Olympus Zuiko Digital ED 14-42mm F3.5-5.6</td>
+</tr><tr><td>'0 36 0'</td><td>= Olympus Zuiko Digital ED 40-150mm F4.0-5.6</td>
+</tr><tr><td>'0 48 0'</td><td>= Olympus Zuiko Digital ED 50-200mm F2.8-3.5 SWD</td>
+</tr><tr><td>'0 49 0'</td><td>= Olympus Zuiko Digital ED 12-60mm F2.8-4.0 SWD</td>
+</tr><tr><td>'0 50 0'</td><td>= Olympus Zuiko Digital ED 14-35mm F2.0 SWD</td>
+</tr><tr><td>'0 51 0'</td><td>= Olympus Zuiko Digital 25mm F2.8</td>
+</tr><tr><td>'0 52 0'</td><td>= Olympus Zuiko Digital ED 9-18mm F4.0-5.6</td>
+</tr><tr><td>'0 53 0'</td><td>= Olympus Zuiko Digital 14-54mm F2.8-3.5 II</td>
+</tr><tr><td>'1 1 0'</td><td>= Sigma 18-50mm F3.5-5.6</td>
+</tr><tr><td>'1 2 0'</td><td>= Sigma 55-200mm F4.0-5.6 DC</td>
+</tr><tr><td>'1 3 0'</td><td>= Sigma 18-125mm F3.5-5.6 DC</td>
+</tr><tr><td>'1 4 0'</td><td>= Sigma 18-125mm F3.5-5.6</td>
+</tr><tr><td>'1 5 0'</td><td>= Sigma 30mm F1.4</td>
+</tr><tr><td>'1 6 0'</td><td>= Sigma 50-500mm F4.0-6.3 EX DG APO HSM RF</td>
+</tr><tr><td>'1 7 0'</td><td>= Sigma 105mm F2.8 DG</td>
+</tr><tr><td>'1 8 0'</td><td>= Sigma 150mm F2.8 DG HSM</td>
+</tr><tr><td>'1 16 0'</td><td>= Sigma 24mm F1.8 EX DG Aspherical Macro</td>
+</tr><tr><td>'1 17 0'</td><td>= Sigma 135-400mm F4.5-5.6 DG ASP APO RF</td>
+</tr><tr><td>'1 18 0'</td><td>= Sigma 300-800mm F5.6 EX DG APO</td>
+</tr><tr><td>'1 20 0'</td><td>= Sigma 50-500mm F4.0-6.3 EX DG APO HSM RF</td>
+</tr><tr><td>'1 21 0'</td><td>= Sigma 10-20mm F4.0-5.6 EX DC HSM</td>
+</tr><tr><td>'1 22 0'</td><td>= Sigma 70-200mm F2.8 EX DG Macro HSM II</td>
+</tr><tr><td>'1 23 0'</td><td>= Sigma 50mm F1.4 EX DG HSM</td>
+</tr><tr><td>'2 1 0'</td><td>= Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.</td>
+</tr><tr><td>'2 1 16'</td><td>= Lumix G Vario 14-45mm F3.5-5.6 Asph. Mega OIS</td>
+</tr><tr><td>'2 2 0'</td><td>= Leica D Summilux 25mm F1.4 Asph.</td>
+</tr><tr><td>'2 2 16'</td><td>= Lumix G Vario 45-200mm F4-5.6 Mega OIS</td>
+</tr><tr><td>'2 3 1'</td><td>= Leica D Vario Elmar 14-50mm F3.8-5.6 Asph.</td>
+</tr><tr><td>'2 3 16'</td><td>= Lumix G Vario HD 14-140mm F4-5.8 Asph. Mega OIS</td>
+</tr><tr><td>'2 4 0'</td><td>= Leica D Vario Elmar 14-150mm F3.5-5.6</td>
+</tr><tr><td>'2 4 16'</td><td>= Lumix G Vario 7-14mm F4 Asph.</td>
+</tr><tr><td>'2 5 16'</td><td>= Lumix G 20mm F1.7 Asph.</td>
+</tr><tr><td>'2 6 16'</td><td>= Leica DG Macro-Elmarit 45mm F2.8</td>
+</tr><tr><td>'2 8 16'</td><td>= Lumix G Fisheye 8mm F3.5</td>
+</tr><tr><td>'3 1 0'</td><td>= Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.</td>
+</tr><tr><td>'3 2 0'</td><td>= Leica D Summilux 25mm F1.4 Asph.</td>
+</tr></table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Olympus CameraSettings Tags</a></h2>
 <blockquote>
@@ -1320,34 +1329,34 @@ the Make and Model are used to determine the extender model)</span>
 <td title='0x0529 = 1321'>0x0529</td>
 <td>ArtFilter</td>
 <td class=c>int16u[4]</td>
-<td><span class=s>&#39;0 0 0 0&#39; = Off
-  <br>&#39;0 1280 0 0&#39; = Off
-  <br>&#39;1 1280 0 0&#39; = Soft Focus
-  <br>&#39;2 1280 0 0&#39; = Pop Art
-  <br>&#39;3 1280 0 0&#39; = Pale &amp; Light Color
-  <br>&#39;4 1280 0 0&#39; = Light Tone
-  <br>&#39;5 1280 0 0&#39; = Pin Hole
-  <br>&#39;6 1280 0 0&#39; = Grainy Film
-  <br>&#39;9 1280 0 0&#39; = Diorama
-  <br>&#39;10 1280 0 0&#39; = Cross Process
-  <br>&#39;12 1280 0 0&#39; = Fish Eye
-  <br>&#39;13 1280 0 0&#39; = Drawing</span></td></tr>
+<td><span class=s>[Value 0]
+  <br>0 = Off
+  <br>1 = Soft Focus
+  <br>2 = Pop Art
+  <br>3 = Pale &amp; Light Color
+  <br>4 = Light Tone
+  <br>5 = Pin Hole
+  <br>6 = Grainy Film
+  <br>9 = Diorama
+  <br>10 = Cross Process
+  <br>12 = Fish Eye
+  <br>13 = Drawing</span></td></tr>
 <tr>
 <td title='0x052c = 1324'>0x052c</td>
 <td>MagicFilter</td>
 <td class=c>int16u[4]</td>
-<td><span class=s>&#39;0 0 0 0&#39; = Off
-  <br>&#39;0 1280 0 0&#39; = Off
-  <br>&#39;1 1280 0 0&#39; = Soft Focus
-  <br>&#39;2 1280 0 0&#39; = Pop Art
-  <br>&#39;3 1280 0 0&#39; = Pale &amp; Light Color
-  <br>&#39;4 1280 0 0&#39; = Light Tone
-  <br>&#39;5 1280 0 0&#39; = Pin Hole
-  <br>&#39;6 1280 0 0&#39; = Grainy Film
-  <br>&#39;9 1280 0 0&#39; = Diorama
-  <br>&#39;10 1280 0 0&#39; = Cross Process
-  <br>&#39;12 1280 0 0&#39; = Fish Eye
-  <br>&#39;13 1280 0 0&#39; = Drawing</span></td></tr>
+<td><span class=s>[Value 0]
+  <br>0 = Off
+  <br>1 = Soft Focus
+  <br>2 = Pop Art
+  <br>3 = Pale &amp; Light Color
+  <br>4 = Light Tone
+  <br>5 = Pin Hole
+  <br>6 = Grainy Film
+  <br>9 = Diorama
+  <br>10 = Cross Process
+  <br>12 = Fish Eye
+  <br>13 = Drawing</span></td></tr>
 <tr class=b>
 <td title='0x0600 = 1536'>0x0600</td>
 <td>DriveMode</td>
@@ -2600,7 +2609,7 @@ like the LS-5, LS-10, LS-11.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 28, 2011</i>
+<br><i>Last revised Mar 22, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

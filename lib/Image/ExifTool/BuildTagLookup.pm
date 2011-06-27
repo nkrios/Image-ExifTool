@@ -32,7 +32,7 @@ use Image::ExifTool::XMP;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.27';
+$VERSION = '2.28';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -253,7 +253,10 @@ been shortened for convenience (since the family 1 group names are derived
 from these by adding a leading "XMP-").  In cases where a tag name exists in
 more than one namespace, less common namespaces are avoided when writing.
 However, any namespace may be written by specifying a family 1 group name
-for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.
+for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.  When deciding on
+which tags to add to an image, using standard schemas such as
+L<dc|/XMP dc Tags>, L<xmp|/XMP xmp Tags> or L<iptc|/XMP iptcCore Tags> is
+recommended if possible.
 
 For structures, the heading of the first column is B<Field Name>.  Field
 names are very similar to tag names, except they are used to identify fields
@@ -817,7 +820,8 @@ TagID:  foreach $tagID (@keys) {
                         }
                         foreach (keys %$printConv) {
                             next if $_ !~ /^\d+$/ or ($_ & $val) == $_;
-                            warn "$short $name PrintConv value $_ is not in Mask!\n";
+                            my $hex = sprintf '0x%.2x', $_;
+                            warn "$short $name PrintConv value $hex is not in Mask!\n";
                         }
                     }
                 }
@@ -1369,6 +1373,7 @@ sub Doc2Html($)
     $doc =~ s{L&lt;([^&]+?)\|\Q$homePage\E/(.*?)&gt;}{<a href="../$2">$1<\/a>}sg;
     $doc =~ s{L&lt;\Q$homePage\E/TagNames/(.*?)&gt;}{<a href="$1">$1<\/a>}sg;
     $doc =~ s{L&lt;\Q$homePage\E/(.*?)&gt;}{<a href="../$1">$1<\/a>}sg;
+    $doc =~ s{L&lt;([^&]+?)\|/\w+ ([^/&|]+) Tags&gt;}{<a href="#$2">$1</a>}sg;
     $doc =~ s/L&lt;([^&]+?)\|(.+?)&gt;/<a href="$2">$1<\/a>/sg;
     $doc =~ s/L&lt;(.*?)&gt;/<a href="$1">$1<\/a>/sg;
     return $doc;

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.35
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.60
 [File, System, Image] FileName - File Name: DNG.dng
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 13 kB
@@ -303,6 +303,7 @@
 [Composite, Composite, Image] Aperture - Aperture: 8.0
 [Composite, Composite, Image] CFAPattern - CFA Pattern: [Red,Green][Green,Blue]
 [Composite, Composite, Camera] DriveMode - Drive Mode: Single-frame Shooting
+[Composite, Composite, Other] Flash - Flash: Off, Did not fire
 [Composite, Composite, Camera] ISO - ISO: 400
 [Composite, Composite, Image] ImageSize - Image Size: 3516x2328
 [Composite, Composite, Image] JpgFromRaw - Jpg From Raw: (Binary data 29 bytes)

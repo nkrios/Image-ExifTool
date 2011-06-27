@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::de;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 %Image::ExifTool::Lang::de::Translate = (
    'AEAperture' => 'AE-Blende',
@@ -1937,8 +1937,7 @@ $VERSION = '1.20';
       },
     },
    'FaceDetectArea' => 'Gesichtserkennung Bereich',
-   'FaceDetectFrameHeight' => 'Bereichshöhe',
-   'FaceDetectFrameWidth' => 'Bereichsbreite',
+   'FaceDetectFrameSize' => 'Bereichsgröße',
    'FacesDetected' => 'Gesichter erkannt',
    'FastSeek' => {
       PrintConv => {

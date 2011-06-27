@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.32
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.60
 [File, System, Image] FileName - File Name: Nikon.nef
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 6.0 kB
@@ -119,7 +119,7 @@
 [MakerNotes, Nikon, Camera] 146 - Hue Adjustment: 0
 [MakerNotes, Nikon, Camera] 147 - NEF Compression: Lossy (type 1)
 [MakerNotes, Nikon, Camera] 149 - Noise Reduction: Off
-[MakerNotes, Nikon, Camera] 150 - Linearization Table: (Binary data 17 bytes)
+[MakerNotes, Nikon, Camera] 150 - NEF Linearization Table: (Binary data 17 bytes)
 [MakerNotes, Nikon, Camera] 0 - WB RGBG Levels: 478 265 493 265
 [MakerNotes, Nikon, Camera] 0 - Lens Data Version: 0101
 [MakerNotes, Nikon, Camera] 4 - Exit Pupil Position: 102.4 mm

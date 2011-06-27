@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.47
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.51
 [File, System, Image] FileName - File Name: PGF.pgf
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 286 bytes
@@ -6,7 +6,7 @@
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: PGF
 [File, File, Image] MIMEType - MIME Type: image/pgf
-[File, File, Image] 3 - PGF Version: 6
+[File, File, Image] 3 - PGF Version: 0x36
 [File, File, Image] 8 - Image Width: 8
 [File, File, Image] 12 - Image Height: 8
 [File, File, Image] 16 - Pyramid Levels: 0

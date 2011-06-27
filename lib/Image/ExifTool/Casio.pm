@@ -486,7 +486,33 @@ $VERSION = '1.32';
             '3 0 0' => 'Vivid Landscape',
             # have also seen '1 1 1', '2 2 4', '4 3 3', '4 4 4'
             # '0 0 14' and '0 0 42' - premium auto night shot (EX-Z2300)
+            # and '0 0 2' for Art HDR
         },
+    },
+    0x2089 => [ #PH
+        {
+            Name => 'FaceInfo1',
+            Condition => '$$valPt =~ /^(\0\0|.\x02\x80\x01\xe0)/s', # (EX-H5)
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Casio::FaceInfo1',
+                ByteOrder => 'BigEndian',
+            },
+        },{
+            Name => 'FaceInfo2',
+            Condition => '$$valPt =~ /^\x02\x01/', # (EX-H20G,EX-ZR100)
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Casio::FaceInfo2',
+                ByteOrder => 'LittleEndian',
+            },
+        },{
+            Name => 'FaceInfoUnknown',
+            Unknown => 1,
+        },
+    ],
+    # 0x208a - also some sort of face detection information - PH
+    0x211c => { #PH
+        Name => 'FacesDetected',
+        Format => 'int8u',
     },
     0x3000 => {
         Name => 'RecordMode',
@@ -570,7 +596,7 @@ $VERSION = '1.32';
         PrintConv => {
             0 => 'Off',
             1 => 'On',
-            # have seen 2, 3(portrait) and 5(auto mode)
+            # have seen 2(EX-Z35 macro/portrait), 3(portrait) and 5(auto mode)
             4 => 'Face Recognition', # "Family First"
         },
     },
@@ -639,7 +665,7 @@ $VERSION = '1.32';
             47 => 'Painting', # (EX-2300)
             49 => 'Crayon Drawing', # (EX-2300)
             51 => 'Panorama', # (EX-ZR10)
-            52 => 'Art HDR', # (EX-ZR10)
+            52 => 'Art HDR', # (EX-ZR10,EX-Z3000)
         },
     },
     0x301c => { #3
@@ -755,6 +781,173 @@ $VERSION = '1.32';
             4 => 'Full HD (1080p)', # (EX-ZR10, 30fps 1920x1080)
             5 => 'Low', # used in High Speed modes
         },
+    },
+);
+
+# face detection information (ref PH) (EX-H5)
+%Image::ExifTool::Casio::FaceInfo1 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    DATAMEMBER => [ 0 ],
+    NOTES => 'Face-detect tags extracted from models such as the EX-H5.',
+    0x00 => { # (NC)
+        Name => 'FacesDetected',
+        DataMember => 'FacesDetected',
+        RawConv => '$$self{FacesDetected} = $val',
+    },
+    0x01 => {
+        Name => 'FaceDetectFrameSize',
+        Condition => '$$self{FacesDetected} >= 1', # (otherwise zeros)
+        Format => 'int16u[2]',
+    },
+    0x0d => {
+        Name => 'Face1Position',
+        Condition => '$$self{FacesDetected} >= 1',
+        Format => 'int16u[4]',
+        Notes => q{
+            left, top, right and bottom of detected face in coordinates of
+            FaceDetectFrameSize, with increasing Y downwards
+        },
+    },
+    # decoding NOT CONFIRMED (NC) for faces 2-10!
+    0x7c => {
+        Name => 'Face2Position',
+        Condition => '$$self{FacesDetected} >= 2',
+        Format => 'int16u[4]',
+    },
+    0xeb => {
+        Name => 'Face3Position',
+        Condition => '$$self{FacesDetected} >= 3',
+        Format => 'int16u[4]',
+    },
+    0x15a => {
+        Name => 'Face4Position',
+        Condition => '$$self{FacesDetected} >= 4',
+        Format => 'int16u[4]',
+    },
+    0x1c9 => {
+        Name => 'Face5Position',
+        Condition => '$$self{FacesDetected} >= 5',
+        Format => 'int16u[4]',
+    },
+    0x238 => {
+        Name => 'Face6Position',
+        Condition => '$$self{FacesDetected} >= 6',
+        Format => 'int16u[4]',
+    },
+    0x2a7 => {
+        Name => 'Face7Position',
+        Condition => '$$self{FacesDetected} >= 7',
+        Format => 'int16u[4]',
+    },
+    0x316 => {
+        Name => 'Face8Position',
+        Condition => '$$self{FacesDetected} >= 8',
+        Format => 'int16u[4]',
+    },
+    0x385 => {
+        Name => 'Face9Position',
+        Condition => '$$self{FacesDetected} >= 9',
+        Format => 'int16u[4]',
+    },
+    0x3f4 => {
+        Name => 'Face10Position',
+        Condition => '$$self{FacesDetected} >= 10',
+        Format => 'int16u[4]',
+    },
+);
+
+# face detection information (ref PH) (EX-ZR100)
+%Image::ExifTool::Casio::FaceInfo2 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    DATAMEMBER => [ 2 ],
+    NOTES => 'Face-detect tags extracted from models such as the EX-H20G and EX-ZR100.',
+    0x02 => {
+        Name => 'FacesDetected',
+        DataMember => 'FacesDetected',
+        RawConv => '$$self{FacesDetected} = $val',
+    },
+    0x04 => {
+        Name => 'FaceDetectFrameSize',
+        Condition => '$$self{FacesDetected} >= 1',
+        Format => 'int16u[2]',
+    },
+    0x08 => {
+        Name => 'FaceOrientation',
+        Condition => '$$self{FacesDetected} >= 1',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+            3 => 'Rotate 180', # (NC)
+        },
+        Notes => 'orientation of face relative to unrotated image',
+    },
+    # 0x0a - FaceDetectFrameSize again
+    # 0x11 - Face1Detected flag (1=detected)
+    0x18 => {
+        Name => 'Face1Position',
+        Condition => '$$self{FacesDetected} >= 1',
+        Format => 'int16u[4]',
+        Notes => q{
+            left, top, right and bottom of detected face in coordinates of
+            FaceDetectFrameSize, with increasing Y downwards
+        },
+    },
+    # 0x45 - Face2Detected, etc...
+    0x4c => {
+        Name => 'Face2Position',
+        Condition => '$$self{FacesDetected} >= 2',
+        Format => 'int16u[4]',
+    },
+    0x80 => {
+        Name => 'Face3Position',
+        Condition => '$$self{FacesDetected} >= 3',
+        Format => 'int16u[4]',
+    },
+    0xb4 => {
+        Name => 'Face4Position',
+        Condition => '$$self{FacesDetected} >= 4',
+        Format => 'int16u[4]',
+    },
+    0xe8 => {
+        Name => 'Face5Position',
+        Condition => '$$self{FacesDetected} >= 5',
+        Format => 'int16u[4]',
+    },
+    0x11c => {
+        Name => 'Face6Position',
+        Condition => '$$self{FacesDetected} >= 6',
+        Format => 'int16u[4]',
+    },
+    0x150 => {
+        Name => 'Face7Position',
+        Condition => '$$self{FacesDetected} >= 7',
+        Format => 'int16u[4]',
+    },
+    0x184 => {
+        Name => 'Face8Position',
+        Condition => '$$self{FacesDetected} >= 8',
+        Format => 'int16u[4]',
+    },
+    0x1b8 => {
+        Name => 'Face9Position',
+        Condition => '$$self{FacesDetected} >= 9',
+        Format => 'int16u[4]',
+    },
+    0x1ec => {
+        Name => 'Face10Position',
+        Condition => '$$self{FacesDetected} >= 10',
+        Format => 'int16u[4]',
     },
 );
 

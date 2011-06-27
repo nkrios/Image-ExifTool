@@ -211,6 +211,7 @@ lib/Image/ExifTool/ICC_Profile.pm
 lib/Image/ExifTool/ID3.pm
 lib/Image/ExifTool/IPTC.pm
 lib/Image/ExifTool/ITC.pm
+lib/Image/ExifTool/Import.pm
 lib/Image/ExifTool/InDesign.pm
 lib/Image/ExifTool/JPEG.pm
 lib/Image/ExifTool/JPEGDigest.pm

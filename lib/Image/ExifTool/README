@@ -412,11 +412,11 @@ numerical.
                   flattened structure tags as a flag to indicate that one or
                   more enclosing structures has a TYPE field.
 
-                  'SubDoc' - [Composite tags only] set to cause this composite
+                  'SubDoc' - [Composite tags only] set to cause this Composite
                   tag to also be generated for each sub-document.  To achieve
                   this, 'Main:' and 'Doc#:' prefixes are added to all Require'd
                   and Desire'd tag names which don't already start with 'Main:'
-                  or 'Doc#:', and the composite tag is built once for each of
+                  or 'Doc#:', and the Composite tag is built once for each of
                   the main document and all sub-documents.
 
                   'SubIFD' - used in writing to determine that the tag specifies
@@ -437,23 +437,24 @@ numerical.
                   image file is still open, unlike ValueConv and PrintConv below
                   which are done later only if the value is requested).  May be
                   a scalar expression using $val (the Raw tag value), $self (the
-                  current ExifTool object) and $tag (the tag key), or a code
-                  reference with $val and $self as arguments.  For Composite
-                  tags, $val is a reference to a hash of source ("derived from")
-                  tag names, and @val may be used to access the Raw values of
-                  these tags. If RawConv is specified for a Composite tag, then
-                  ValueConv and PrintConv evals will no longer have access to
-                  the source @val and @prt values.  The returned value may be a
-                  scalar which is used as the new Raw value, a scalar reference
-                  to a binary data value, a hash reference for Composite tags,
-                  an ARRAY reference for a list of values, or undefined to
-                  indicate that the tag should be ignored.  Also, RawConv may
-                  generate Warning or Error tags, while ValueConv and PrintConv
-                  may not.  Note: RawConv should only be used if necessary (in
-                  general, only if the conversion may return undef to ignore the
-                  tag) because ValueConv is more efficient since it is only
-                  executed if the tag value is requested, while RawConv is
-                  executed for all extracted tags.
+                  current ExifTool object), $tag (the tag key) and $tagInfo
+                  (reference to the tag information hash) or a code reference
+                  with $val and $self as arguments.  For Composite tags, $val is
+                  a reference to a hash of source ("derived from") tag names,
+                  and @val may be used to access the Raw values of these tags.
+                  If RawConv is specified for a Composite tag, then ValueConv
+                  and PrintConv evals will no longer have access to the source
+                  @val and @prt values.  The returned value may be a scalar
+                  which is used as the new Raw value, a scalar reference to a
+                  binary data value, a hash reference for Composite tags, an
+                  ARRAY reference for a list of values, or undefined to indicate
+                  that the tag should be ignored.  Also, RawConv may generate
+                  Warning or Error tags, while ValueConv and PrintConv may not. 
+                  Note: RawConv should only be used if necessary (in general,
+                  only if the conversion may return undef to ignore the tag)
+                  because ValueConv is more efficient since it is only executed
+                  if the tag value is requested, while RawConv is executed for
+                  all extracted tags.
 
   ValueConv     : Used to convert the Raw value to a useable form. May be a hash
                   reference to act as a lookup table, a scalar which is
@@ -466,11 +467,11 @@ numerical.
                   "Unknown (X)", where X is the Raw value (unless either of the
                   special keys exist: 'BITMASK', a reference to a hash used to
                   decode individual value bits; or 'OTHER', a reference to a
-                  subroutine used to convert unknown values.  The subroutine
-                  takes 3 arguments: the value, a flag which is set for the
-                  inverse conversion, and a reference to the PrintConv hash, and
-                  returns the converted value or undef on error.  The lookup
-                  hash may also contain a 'Notes' entry which is used for
+                  subroutine used to convert unknown values.  The OTHER
+                  subroutine takes 3 arguments: the value, a flag which is set
+                  for the inverse conversion, and a reference to the PrintConv
+                  hash, and returns the converted value or undef on error.  The
+                  lookup hash may also contain a 'Notes' entry which is used for
                   documentation if the SeparateTable flag is set).  In an
                   expression, $self is a reference to the current ExifTool
                   object, $val is the Raw value, and $tag is the tag key.  The
@@ -491,15 +492,15 @@ numerical.
                   previously defined value when the Duplicates option is not
                   enabled.  If this isn't possible (as with Composite tags where
                   the converted values of the source tags are needed), set the
-                  Priority to 0 to avoid taking priority over a valid tag. 
+                  Priority to 0 to avoid taking priority over a valid tag.  If
+                  ValueConv is not specified, the Raw value is not converted.
                   Composite tags which Require or Desire other tags may access
                   the ValueConv, PrintConv and Raw values of these tags through
                   the elements of the @val, @prt and @raw lists respectively
                   (only if there was no RawConv or it returned a hash
                   reference).  For these tags, $val may be used in an expression
                   to represent $val[0], and the first argument passed for a code
-                  reference is a reference to @val. If ValueConv is not
-                  specified, the Raw value is not converted.
+                  reference is a reference to @val.
 
   PrintConv     : This entry is similar to ValueConv above, except that it is
                   used to further convert the tag value to a human readable
@@ -585,28 +586,35 @@ numerical.
                   the old tag if it existed.
 
   Require       : [Composite tags only] A hash reference specifying the tags
-                  required to calculate the composite tag value.  The hash
+                  required to calculate the Composite tag value.  The hash
                   values are the names of the required tags, and the keys
                   specify the indices where the tag values are stored in the
                   @val list used in the ValueConv and/or PrintConv expression.
-                  The composite value is only calculated if the values for all
-                  Require'd tags are defined.  Require and Desire tag names may
-                  be prefixed by an optional group family 0 or 1 name followed
-                  by a colon.  Case IS significant.  A special feature allows
-                  a scalar tag name to be used instead of the hash reference
-                  when only the 0th tag is defined.  For example, the following
-                  two definitions are equivalent:
+                  The Composite value is only calculated if the values for all
+                  Require'd tags are defined.  Require, Desire and Inhibit tag
+                  names may be prefixed by an optional group family 0 or 1 name
+                  followed by a colon.  Case IS significant.  The keys used by
+                  the Require, Desire and Inhibit hashes must not overlap (since
+                  they are used as indices into the common @val, @prt and @raw
+                  lists), and together the keys must be sequential starting from
+                  0.  A special feature allows a scalar tag name to be used
+                  instead of the hash reference when only the 0th tag is
+                  defined.  For example, the following two definitions are
+                  equivalent:
 
                         Require => { 0 => 'XMP:Title' },
                         Require => 'XMP:Title',
 
   Desire        : [Composite tags only] This is the same as Require except that
-                  the value is still calculated even if the specified tags don't
-                  exist.  Beware that the elements of @val, @prt and @raw may be
-                  undefined for Desire'd tags.  Both Require and Desire may
-                  exist together, however be sure to specify unique keys for
-                  each tag since they are used as indices into the @val, @prt
-                  and @raw lists common to both Require'd and Desire'd tags.
+                  the Composite value is calculated even if the specified tags
+                  don't exist.  Beware that the elements of @val, @prt and @raw
+                  may be undefined for Desire'd tags.  Even if no tags are
+                  Require'd, at least one of the Desire'd tags must exist for
+                  the Composite tag to be generated.
+
+  Inhibit       : [Composite tags only] Similar to the Require and Desire
+                  hashes, except that the Composite tag is NOT built if any of
+                  the Inhibit tags exist.
 
   Shift         : [Writable tags only] Specifies type of shift to apply if this
                   value may be shifted.  Set to 'Time' for shifting date/time
@@ -708,7 +716,7 @@ numerical.
                   each field in the structure.  Note that Struct tags can NOT
                   have ValueConv/PrintConv entries, because values that are HASH
                   references are are also used by Composite tags, which use the
-                  the Conv entries to generate the composite value.
+                  the Conv entries to generate the Composite value.
 
   Namespace     : [XMP tags only] Gives standard XMP namespace prefix to use for
                   this tag.  If not defined, the tag table NAMESPACE is used.

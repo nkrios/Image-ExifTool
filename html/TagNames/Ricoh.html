@@ -161,11 +161,16 @@ serial number of the lens unit)</span></span></td></tr>
 <td class=c>string[20]</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td title='0x001a = 26'>0x001a</td>
+<td>FaceInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Ricoh.html#FaceInfo'>Ricoh FaceInfo Tags</a></td></tr>
+<tr class=b>
 <td title='0x0029 = 41'>0x0029</td>
 <td>FirmwareInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Ricoh.html#FirmwareInfo'>Ricoh FirmwareInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x002a = 42'>0x002a</td>
 <td>NoiseReduction</td>
 <td class=c>int32u</td>
@@ -173,11 +178,70 @@ serial number of the lens unit)</span></span></td></tr>
   <br>1 = Weak
   <br>2 = Strong
   <br>3 = Max</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x002c = 44'>0x002c</td>
 <td>SerialInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Ricoh.html#SerialInfo'>Ricoh SerialInfo Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='FaceInfo'>Ricoh FaceInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='181 = 0xb5'>181</td>
+<td>FacesDetected</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='182 = 0xb6'>182</td>
+<td>FaceDetectFrameSize</td>
+<td class=c>int16u[2]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='188 = 0xbc'>188</td>
+<td>Face1Position</td>
+<td class=c>int16u[4]</td>
+<td><span class=s><span class=n>(left, top, width and height of detected face in coordinates of
+FaceDetectFrameSize with increasing Y downwards)</span></span></td></tr>
+<tr class=b>
+<td class=r title='200 = 0xc8'>200</td>
+<td>Face2Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='212 = 0xd4'>212</td>
+<td>Face3Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='224 = 0xe0'>224</td>
+<td>Face4Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='236 = 0xec'>236</td>
+<td>Face5Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='248 = 0xf8'>248</td>
+<td>Face6Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='260 = 0x104'>260</td>
+<td>Face7Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='272 = 0x110'>272</td>
+<td>Face8Position</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='FirmwareInfo'>Ricoh FirmwareInfo Tags</a></h2>
@@ -367,7 +431,7 @@ model names have already been scaled to include the 35mm crop factor.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 25, 2011</i>
+<br><i>Last revised Mar 22, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

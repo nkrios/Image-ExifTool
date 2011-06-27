@@ -19,7 +19,7 @@
 #               Note that unknown tags may be extracted even if they aren't
 #               defined, but tags must be defined to be written.  Also note
 #               that it is possible to override an existing tag definition
-#               with a new tag.
+#               with a user-defined tag.
 #
 #               To activate this file, rename it to ".ExifTool_config" and
 #               place it in your home directory or the exiftool application
@@ -159,6 +159,18 @@
         FileTypeDescription =&gt; {
             Require =&gt; 'FileType',
             ValueConv =&gt; 'GetFileType($val,1) || $val',
+        },
+        <span class='com'># calculate actual image size based on resolution</span>
+        ActualImageSize => {
+            Require => {
+                0 => 'ImageWidth',
+                1 => 'ImageHeight',
+                2 => 'XResolution',
+                3 => 'YResolution',
+                4 => 'ResolutionUnit',
+            },
+            ValueConv => '$val[0]/$val[2] . " " . $val[1]/$val[3]',
+            PrintConv => 'sprintf("%.1fx%.1f $prt[4]", split(" ",$val))',
         },
     },
 );

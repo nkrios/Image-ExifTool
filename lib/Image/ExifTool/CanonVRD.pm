@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 sub ProcessCanonVRD($$;$);
 sub WriteCanonVRD($$;$);
@@ -158,10 +158,9 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         RawConv => '$$self{VRDVersion} = $val',
         PrintConv => 'sprintf("%.2f", $val / 100)',
     },
-    # 0x006 related somehow to RGB levels
-    0x008 => {
-        Name => 'WBAdjRGBLevels',
-        Format => 'int16u[3]',
+    0x006 => {
+        Name => 'WBAdjRGGBLevels',
+        Format => 'int16u[4]',
     },
     0x018 => {
         Name => 'WhiteBalanceAdj',
@@ -184,7 +183,6 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
         Format => 'int16u',
     },
     # 0x01c similar to 0x006
-    # 0x01e similar to 0x008
     0x024 => {
         Name => 'WBFineTuneActive',
         Format => 'int16u',

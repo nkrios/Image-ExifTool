@@ -215,9 +215,14 @@ sub SetNewValue($;$$%)
 
     unless (defined $tag) {
         # remove any existing set values
+        if ($$self{NEW_VALUE}) {
+            # remove circular references for garbage collection
+            foreach (keys %{$$self{NEW_VALUE}}) {
+                delete $$self{NEW_VALUE}{$_}{Self};
+            }
+        }
         delete $self->{NEW_VALUE};
         $self->{DEL_GROUP} = { };
-        $verbose > 1 and print $out "Cleared new values\n";
         return 1;
     }
     # allow value to be scalar or list reference
@@ -245,7 +250,7 @@ sub SetNewValue($;$$%)
     $self->Sanitize(\$value) if defined $value and not ref $value;
 
     # set group name in options if specified
-    if ($tag =~ /(.+):(.+)/) {
+    if ($tag =~ /(.*):(.+)/) {
         $options{Group} = $1 if $1 ne '*' and lc($1) ne 'all';
         $tag = $2;
     }
@@ -638,6 +643,10 @@ sub SetNewValue($;$$%)
                 $noConv = 1;    # no conversions if shifting tag
             } elsif (not length $val and $options{DelValue}) {
                 $noConv = 1;    # no conversions for deleting empty value
+            } elsif (ref $val eq 'HASH' and not $$tagInfo{Struct}) {
+                $err = "Can't write a structure to $wgrp1:$tag";
+                $verbose > 2 and print $out "$err\n";
+                next;
             }
         } elsif ($permanent) {
             # can't delete permanent tags, so set them to DelValue or empty string instead
@@ -986,7 +995,7 @@ sub SetNewValuesFromFile($$;@)
         # (also use this hash to store expression and wildcard flags, EXPR and WILD)
         my $opts = { %opts };
         $tag = lc($_);  # change tag/group names to all lower case
-        my ($fam, $grp, $dst, $dstGrp, $dstTag);
+        my ($fam, $grp, $dst, $dstGrp, $dstTag, $isExclude);
         # handle redirection to another tag
         if ($tag =~ /(.+?)\s*(>|<)\s*(.+)/) {
             $dstGrp = '';
@@ -1004,6 +1013,7 @@ sub SetNewValuesFromFile($$;@)
                     # recover leading whitespace (except for initial single space)
                     $tag =~ s/(.+?)\s*(>|<) ?//;
                     $$opts{EXPR} = 1; # flag this expression
+                    $grp = '';
                 } else {
                     $opt = $1 if $tag =~ s/^([-+])\s*//;
                 }
@@ -1013,7 +1023,7 @@ sub SetNewValuesFromFile($$;@)
                 $$opts{{ '+' => 'AddValue', '-' => 'DelValue' }->{$opt}} = 1;
                 $$opts{Shift} = 0;  # shift if this is a date/time tag
             }
-            ($dstGrp, $dstTag) = ($1, $2) if $dstTag =~ /(.+):(.+)/;
+            ($dstGrp, $dstTag) = ($1, $2) if $dstTag =~ /(.*):(.+)/;
             # ValueConv may be specified separately on the destination with '#'
             $$opts{Type} = 'ValueConv' if $dstTag =~ s/#$//;
             # ignore leading family number
@@ -1022,15 +1032,15 @@ sub SetNewValuesFromFile($$;@)
             $dstTag = '*' if $dstTag eq 'all';
             $dstGrp = '*' if $dstGrp eq 'all';
         }
-        my $isExclude = ($tag =~ s/^-//);
-        if ($tag =~ /^([\w-]+?|\*):(.+)/) {
-            ($grp, $tag) = ($1, $2);
-            # separate leading family number
-            ($fam, $grp) = ($1, $2) if $grp =~ /^(\d+)(.+)/;
-        } else {
-            $grp = '';  # flag for don't care about group
-        }
         unless ($$opts{EXPR}) {
+            $isExclude = ($tag =~ s/^-//);
+            if ($tag =~ /^([-\w]*?|\*):(.+)/) {
+                ($grp, $tag) = ($1, $2);
+                # separate leading family number
+                ($fam, $grp) = ($1, $2) if $grp =~ /^(\d+)(.*)/;
+            } else {
+                $grp = '';  # flag for don't care about group
+            }
             # allow ValueConv to be specified by a '#' on the tag name
             if ($tag =~ s/#$//) {
                 $$opts{SrcType} = 'ValueConv';
@@ -1066,14 +1076,12 @@ sub SetNewValuesFromFile($$;@)
           # $dstGrp = $grp if $dstGrp eq '*' and $grp;
             # write to specified destination group/tag
             $dst = [ $dstGrp, $dstTag ];
+        } elsif ($isExclude) {
+            # implicitly assume '*' if first entry is an exclusion
+            unshift @setList, [ undef, '*', '*', [ '', '*' ], $opts ] unless @setList;
+            # exclude this tag by leaving $dst undefined
         } else {
-            if ($isExclude) {
-                # implicitly assume '*' if first entry is an exclusion
-                unshift @setList, [ undef, '*', '*', [ '', '*' ], $opts ] unless @setList;
-                # exclude this tag by leaving $dst undefined
-            } else {
-                $dst = [ $grp, $$opts{WILD} ? '*' : $tag ]; # copy to same group
-            }
+            $dst = [ $grp, $$opts{WILD} ? '*' : $tag ]; # copy to same group
         }
         $grp or $grp = '*';     # use '*' for any group
         # save in reverse order so we don't set tags before an exclude
@@ -1189,6 +1197,7 @@ sub SetNewValuesFromFile($$;@)
 # Returns: List of new Raw values (list may be empty if tag is being deleted)
 # Notes: 1) Preferentially returns new value from Extra table if writable Extra tag exists
 # 2) Must call AFTER IsOverwriting() returns 1 to get proper value for shifted times
+# 3) Tag name is case sensitive and may be prefixed by family 0 or 1 group name
 sub GetNewValues($;$$)
 {
     local $_;
@@ -1198,7 +1207,7 @@ sub GetNewValues($;$$)
     } else {
         my ($self, $tag, $newValueHashPt) = @_;
         if ($self->{NEW_VALUE}) {
-            my $tagInfo;
+            my ($group, $tagInfo);
             if (ref $tag) {
                 $nvHash = $self->GetNewValueHash($tag);
             } elsif (defined($tagInfo = $Image::ExifTool::Extra{$tag}) and
@@ -1206,11 +1215,27 @@ sub GetNewValues($;$$)
             {
                 $nvHash = $self->GetNewValueHash($tagInfo);
             } else {
+                # separate group from tag name
+                $group = $1 if $tag =~ s/(.*)://;
                 my @tagInfoList = FindTagInfo($tag);
-                # choose the one that we are creating
-                foreach $tagInfo (@tagInfoList) {
+                # decide which tag we want
+GNV_TagInfo:    foreach $tagInfo (@tagInfoList) {
                     my $nvh = $self->GetNewValueHash($tagInfo) or next;
+                    # select tag in specified group if necessary
+                    while ($group and $group ne $$nvh{WriteGroup}) {
+                        my @grps = $self->GetGroup($tagInfo);
+                        if ($grps[0] eq $$nvh{WriteGroup}) {
+                            # check family 1 group only if WriteGroup is not specific
+                            last if $group eq $grps[1];
+                        } else {
+                            # otherwise check family 0 group
+                            last if $group eq $grps[0];
+                        }
+                        # step to next entry in list
+                        $nvh = $$nvh{Next} or next GNV_TagInfo;
+                    }
                     $nvHash = $nvh;
+                    # give priority to the one we are creating
                     last if defined $nvHash->{IsCreating};
                 }
             }
@@ -1236,7 +1261,7 @@ sub GetNewValues($;$$)
                 if (ref($conv) eq 'CODE') {
                     $val = &$conv($val, $self);
                 } else {
-                    #### eval RawConvInv ($self, $val)
+                    #### eval RawConvInv ($self, $val, $taginfo)
                     $val = eval $conv;
                     $@ and $evalWarning = $@;
                 }
@@ -1364,6 +1389,7 @@ sub RestoreNewValues($)
     if ($savedValues) {
         $newValues or $newValues = $self->{NEW_VALUE} = { };
         foreach $key (keys %$savedValues) {
+            $$savedValues{$key}{Self} = $self;  # restore Self reference
             if ($$newValues{$key}) {
                 # add saved values to end of list
                 my $nvHash = LastInList($$newValues{$key});
@@ -1933,7 +1959,8 @@ sub GetAllTags(;$)
             my @infoArray = GetTagInfoList($table,$tagID);
             my $tagInfo;
 GATInfo:    foreach $tagInfo (@infoArray) {
-                my $tag = $$tagInfo{Name} || die "no name for tag!\n";
+                my $tag = $$tagInfo{Name};
+                $tag or warn("no name for tag!\n"), next;
                 # don't list subdirectories unless they are writable
                 next if $$tagInfo{SubDirectory} and not $$tagInfo{Writable};
                 next if $$tagInfo{Hidden};  # ignore hidden tags
@@ -1981,7 +2008,8 @@ sub GetWritableTags(;$)
             my @infoArray = GetTagInfoList($table,$tagID);
             my $tagInfo;
 GWTInfo:    foreach $tagInfo (@infoArray) {
-                my $tag = $$tagInfo{Name} || die "no name for tag!\n";
+                my $tag = $$tagInfo{Name};
+                $tag or warn("no name for tag!\n"), next;
                 my $writable = $$tagInfo{Writable};
                 next unless $writable or ($table->{WRITABLE} and
                     not defined $writable and not $$tagInfo{SubDirectory});
@@ -2277,7 +2305,7 @@ sub InsertTagValues($$$;$)
 {
     my ($self, $foundTags, $line, $opt) = @_;
     my $rtnStr = '';
-    while ($line =~ /(.*?)\$(\{?)([\w-]+|\$|\/)(.*)/s) {
+    while ($line =~ /(.*?)\$(\{?)([-\w]+|\$|\/)(.*)/s) {
         my (@tags, $pre, $var, $bra, $val, $tg, @vals, $type);
         ($pre, $bra, $var, $line) = ($1, $2, $3, $4);
         # "$$" represents a "$" symbol, and "$/" is a newline
@@ -2288,7 +2316,7 @@ sub InsertTagValues($$$;$)
             next;
         }
         # allow multiple group names
-        while ($line =~ /^:([\w-]+)(.*)/s) {
+        while ($line =~ /^:([-\w]+)(.*)/s) {
             my $group = $var;
             ($var, $line) = ($1, $2);
             $var = "$group:$var";
@@ -2303,7 +2331,7 @@ sub InsertTagValues($$$;$)
 
         for (;;) {
             my $tag = shift @tags;
-            if ($tag =~ /(.+):(.+)/) {
+            if ($tag =~ /(.*):(.+)/) {
                 my $group;
                 ($group, $tag) = ($1, $2);
                 # find the specified tag
@@ -2377,7 +2405,7 @@ sub InsertTagValues($$$;$)
 sub IsWritable($)
 {
     my $tag = shift;
-    $tag =~ s/^(.+)://; # ignore group name
+    $tag =~ s/^(.*)://; # ignore group name
     my @tagInfo = FindTagInfo($tag);
     unless (@tagInfo) {
         return 0 if TagExists($tag);
@@ -2530,25 +2558,10 @@ sub IsOverwriting($;$)
     my ($nvHash, $val) = @_;
     return 0 unless $nvHash;
     # overwrite regardless if no DelValues specified
-    return 1 unless $nvHash->{DelValue};
-    # apply time shift if necessary
-    if (defined $nvHash->{Shift}) {
-        return -1 unless defined $val;
-        my $type = $nvHash->{TagInfo}{Shift};
-        my $shift = $nvHash->{Shift};
-        require 'Image/ExifTool/Shift.pl';
-        my $err = ApplyShift($type, $shift, $val, $nvHash);
-        if ($err) {
-            my $tag = $nvHash->{TagInfo}{Name};
-            $nvHash->{Self}->Warn("$err when shifting $tag");
-            return 0;
-        }
-        # don't bother overwriting if value is the same
-        return 0 if $val eq $nvHash->{Value}[0];
-        return 1;
-    }
+    return 1 unless $$nvHash{DelValue};
     # never overwrite if DelValue list exists but is empty
-    return 0 unless @{$nvHash->{DelValue}};
+    my $shift = $$nvHash{Shift};
+    return 0 unless @{$$nvHash{DelValue}} or defined $shift;
     # return "don't know" if we don't have a value to test
     return -1 unless defined $val;
     # apply raw conversion if necessary
@@ -2562,15 +2575,27 @@ sub IsOverwriting($;$)
         } else {
             my $self = $$nvHash{Self};
             my $tag = $$tagInfo{Name};
-            #### eval RawConv ($self, $val, $tag)
+            #### eval RawConv ($self, $val, $tag, $tagInfo)
             $val = eval $conv;
             $@ and $evalWarning = $@;
         }
         return -1 unless defined $val;
     }
+    # apply time shift if necessary
+    if (defined $shift) {
+        require 'Image/ExifTool/Shift.pl';
+        my $err = ApplyShift($$tagInfo{Shift}, $shift, $val, $nvHash);
+        if ($err) {
+            $nvHash->{Self}->Warn("$err when shifting $$tagInfo{Name}");
+            return 0;
+        }
+        # don't bother overwriting if value is the same
+        return 0 if $val eq $$nvHash{Value}[0];
+        return 1;
+    }
     # return 1 if value matches a DelValue
     my $delVal;
-    foreach $delVal (@{$nvHash->{DelValue}}) {
+    foreach $delVal (@{$$nvHash{DelValue}}) {
         return 1 if $val eq $delVal;
     }
     return 0;
@@ -2637,8 +2662,9 @@ sub GetNewValueHash($$;$$)
         } else {
             # save a copy of this new value hash
             my %copy = %$nvHash;
-            my $key;
+            delete $copy{Self};     # break circular reference
             # make copy of Value and DelValue lists
+            my $key;
             foreach $key (keys %copy) {
                 next unless ref $copy{$key} eq 'ARRAY';
                 $copy{$key} = [ @{$copy{$key}} ];
@@ -2647,7 +2673,7 @@ sub GetNewValueHash($$;$$)
             # add to linked list of saved new value hashes
             $copy{Next} = $saveHash->{$tagInfo};
             $saveHash->{$tagInfo} = \%copy;
-            delete $nvHash->{Save};   # don't save it again
+            delete $nvHash->{Save}; # don't save it again
         }
     }
     if (not defined $nvHash and $opts{'create'}) {
@@ -2717,6 +2743,7 @@ sub RemoveNewValueHash($$$)
 {
     my ($self, $nvHash, $tagInfo) = @_;
     my $firstHash = $self->{NEW_VALUE}{$tagInfo};
+    delete $$nvHash{Self};      # break circular reference
     if ($nvHash eq $firstHash) {
         # remove first entry from linked list
         if ($nvHash->{Next}) {
@@ -4572,6 +4599,7 @@ sub WriteJPEG($$)
                 if ($$segDataPt =~ /^JFIF\0/) {
                     $segType = 'JFIF';
                     $$delGroup{JFIF} and $del = 1, last;
+                    last unless $$editDirs{JFIF};
                     SetByteOrder('MM');
                     my $tagTablePtr = GetTagTable('Image::ExifTool::JFIF::Main');
                     my %dirInfo = (
@@ -4592,6 +4620,7 @@ sub WriteJPEG($$)
                 } elsif ($$segDataPt =~ /^(II|MM).{4}HEAPJPGM/s) {
                     $segType = 'CIFF';
                     $$delGroup{CIFF} and $del = 1, last;
+                    last unless $$editDirs{CIFF};
                     my $newData = '';
                     my %dirInfo = (
                         RAF => new File::RandomAccess($segDataPt),

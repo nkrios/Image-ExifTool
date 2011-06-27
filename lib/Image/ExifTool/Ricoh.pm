@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -256,7 +256,12 @@ my %ricohLensIDs = (
         Count => 20,
     },
     # 0x000c - int32u[2] 1st number is a counter (file number? shutter count?) - PH
+    # 0x0014 - int8u[338] - could contain some data related to face detection? - PH
     # 0x0015 - int8u[2]: related to noise reduction?
+    0x001a => { #PH
+        Name => 'FaceInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::FaceInfo' },
+    },
     0x0029 => {
         Name => 'FirmwareInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::FirmwareInfo' },
@@ -277,6 +282,70 @@ my %ricohLensIDs = (
         SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::SerialInfo' },
     }
     # 0x000E ProductionNumber? (ref 2) [no. zero for most models - PH]
+);
+
+# face detection information (ref PH, CX4)
+%Image::ExifTool::Ricoh::FaceInfo = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    DATAMEMBER => [ 181 ],
+    0xb5 => { # (should be int16u at 0xb4?)
+        Name => 'FacesDetected',
+        DataMember => 'FacesDetected',
+        RawConv => '$$self{FacesDetected} = $val',
+    },
+    0xb6 => {
+        Name => 'FaceDetectFrameSize',
+        Format => 'int16u[2]',
+    },
+    0xbc => {
+        Name => 'Face1Position',
+        Condition => '$$self{FacesDetected} >= 1',
+        Format => 'int16u[4]',
+        Notes => q{
+            left, top, width and height of detected face in coordinates of
+            FaceDetectFrameSize with increasing Y downwards
+        },
+    },
+    0xc8 => {
+        Name => 'Face2Position',
+        Condition => '$$self{FacesDetected} >= 2',
+        Format => 'int16u[4]',
+    },
+    0xd4 => {
+        Name => 'Face3Position',
+        Condition => '$$self{FacesDetected} >= 3',
+        Format => 'int16u[4]',
+    },
+    0xe0 => {
+        Name => 'Face4Position',
+        Condition => '$$self{FacesDetected} >= 4',
+        Format => 'int16u[4]',
+    },
+    0xec => {
+        Name => 'Face5Position',
+        Condition => '$$self{FacesDetected} >= 5',
+        Format => 'int16u[4]',
+    },
+    0xf8 => {
+        Name => 'Face6Position',
+        Condition => '$$self{FacesDetected} >= 6',
+        Format => 'int16u[4]',
+    },
+    0x104 => {
+        Name => 'Face7Position',
+        Condition => '$$self{FacesDetected} >= 7',
+        Format => 'int16u[4]',
+    },
+    0x110 => {
+        Name => 'Face8Position',
+        Condition => '$$self{FacesDetected} >= 8',
+        Format => 'int16u[4]',
+    },
 );
 
 # firmware version information (ref PH)

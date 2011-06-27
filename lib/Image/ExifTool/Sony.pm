@@ -22,18 +22,18 @@
 package Image::ExifTool::Sony;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION %sonyLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.49';
+$VERSION = '1.51';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
 sub WriteSR2($$$);
 
-my %sonyLensTypes;  # filled in based on Minolta LensType's
+# (%sonyLensTypes is filled in based on Minolta LensType's)
 
 # ExposureProgram values (ref PH, mainly decoded from A200)
 my %sonyExposureProgram = (
@@ -230,6 +230,7 @@ my %binaryDataAttrs = (
             1 => 'On',
             0xffff0000 => 'Off 2',
             0xffff0001 => 'On 2',
+            0xffffffff => 'n/a',
         },
     },
     0x2009 => { #PH
@@ -241,6 +242,7 @@ my %binaryDataAttrs = (
             2 => 'Normal',
             3 => 'High',
             256 => 'Auto',
+            65535 => 'n/a',
         },
     },
     0x200a => { #PH (A550)

@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::ja;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 %Image::ExifTool::Lang::ja::Translate = (
    'AEAperture' => 'AE絞り',
@@ -1962,8 +1962,7 @@ $VERSION = '1.16';
       },
     },
    'FaceDetectArea' => '顔エリア',
-   'FaceDetectFrameHeight' => 'フレーム高',
-   'FaceDetectFrameWidth' => 'フレーム幅',
+   'FaceDetectFrameSize' => 'フレームサイズ',
    'FacesDetected' => '顔認識',
    'FastSeek' => {
       PrintConv => {

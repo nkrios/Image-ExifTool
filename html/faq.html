@@ -35,7 +35,7 @@ ol.index { margin: 0; padding: 0 0 0 2em }
 <li><a href="#Q19">Formatting tag values</a></li>
 <li><a href="#Q20">Write errors (repair corrupted EXIF)</a></li>
 <li><a href="#Q21">Newlines in values</a></li>
-<li><a href="#Q22">File names beginning with dash (-)</a></li>
+<li><a href="#Q22">Order of operations</a></li>
 <li><a href="#Q23">"0 image files updated"</a></li>
 </ol>
 </div>
@@ -54,10 +54,11 @@ ExifTool issues can be discussed on the ExifTool forum at
 <p>2. <b>"How do I determine the tag name for some information?"</b></p>
 
 <blockquote>When you run exiftool, by default it prints descriptions, not tag
-names, for the information it extracts.  As well as other differences,
-descriptions often contain spaces between words but tag names never do.  To
-print the tag names instead instead of descriptions, use the <code>-s</code>
-option when extracting information.  Also, see the
+names, for the information it extracts.  (The language of these descriptions is
+English by default, but may be changed with the <code>-lang</code> option.)  As
+well as other differences, descriptions often contain spaces between words but
+tag names never do.  To print the tag names instead instead of descriptions, use
+the <code>-s</code> option when extracting information.  Also, see the
 <a href="TagNames/index.html">tag names documentation</a> for a complete list of
 available tag names.</blockquote>
 
@@ -386,7 +387,8 @@ brackets):
 </table></blockquote>
 
 More specific details are given below about how character coding is
-handled for EXIF, IPTC, XMP, PNG, ID3, PDF, QuickTime and MIE information:</blockquote>
+handled for EXIF, IPTC, XMP, PNG, ID3, PDF, QuickTime, MIE and
+Vorbis information:</blockquote>
 
 <blockquote><b>EXIF</b>: Most textual information in EXIF is stored in ASCII
 format, and ExifTool does not convert these tags.  However it is not uncommon
@@ -417,7 +419,7 @@ by default, or to the character set specified by the <code>-charset</code> or
 No conversion is done if the internal (IPTC) and external (ExifTool) character
 sets are the same.  Note that ISO 2022 character set shifting is not supported.
 Instead, a warning is issued and the string is not converted if an ISO 2022
-shift code is found.  See the
+shift code is encountered.  See the
 <a href="http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf">IPTC IIM
 specification</a> for more information about IPTC character coding.</blockquote>
 
@@ -497,6 +499,10 @@ the specified character set to UTF&#8209;8.  The resulting strings are stored as
 UTF&#8209;8 if they contain multi-byte UTF&#8209;8 character sequences,
 otherwise they are stored as ISO 8859&#8209;1.</blockquote>
 
+<blockquote><b>Vorbis:</b> Vorbis comments are stored as UTF&#8209;8,
+and are converted to the character set specified by <code>-charset</code> or
+<code>-L</code> when reading.</blockquote>
+
 <a name="Q11"></a>
 <p>11. <b>"My user-defined tags don't work"</b></p>
 
@@ -569,40 +575,46 @@ name, or to disable the config file feature.
 <p>12. <b>"How do I export information from exiftool to a database?"</b></p>
 
 <blockquote>
-It is often easiest to export information formatted as a tab-delimited list of
-values.  The following exiftool options may be useful for this purpose:
-<pre>-t  - use a tab instead of spaces to separate output values
--S  - very short format (with -t, prints only tag values)
--q  - quiet (suppresses any other messages)
--f  - force '-' to be printed for non-existent values
--T  - shortcut for the combination of all above options (-t -S -q -f)
--r  - recursively process files in subdirectories
-</pre>
+It is often easiest to export information formatted as  a tab-delimited or
+comma-separated list of values using the exiftool <code>-T</code> or
+<code>-csv</code> option.  As well, the <code>-r</code> option is useful for
+recursing through all images in a hierarchy of directories.  For example:
 
-And here is an example command line:
-
-<pre>exiftool -T -r -filename -aperture -ISO t/images &gt; out.csv
+<pre>exiftool -T -r -filename -exposuremode -ISO t/images &gt; out.txt
 </pre></blockquote>
 
-<blockquote>This command recursively processes all images in the
-"<code>t/images</code>" directory, extracting FileName, Aperture and ISO tags,
-and writing the output to a file called "<code>out.txt</code>".  After the
-command has executed, the output file will contain information in the following
-format:
+<blockquote>This command recursively processes all images in the "<code>t/images</code>"
+directory, extracting FileName, ExposureMode and ISO tags, and writing the
+output to a CSV-format file called "<code>out.txt</code>". After the command has
+executed, "<code>out.txt</code>" will look something like this:
 
-<pre>Canon.jpg       14.0    100
-Casio.jpg       2.0     -
-Nikon.nef       3.5     200
-OlympusE1.jpg   4.5     400
+<pre>Canon.jpg       Manual  100
+Casio.jpg       -       64
+Nikon.jpg       -       100
+OlympusE1.jpg   Auto    400
 </pre>
 
-It should be possible to import a file like this directly into most database
-applications.  On the command line, any list of tag names may be used, and
-any number of file or directory names may be specified. (Hint: If your
-command line starts to get too long, you may want to look into using the
-<code>-@</code> option and/or the <a href="index.html#shortcut">ShortCut</a>
-feature).
-</blockquote>
+With the <code>-csv</code> option, the output also includes a header line
+containing the tag names, as well as a first column labelled "SourceFile":
+
+<pre>SourceFile,FileName,ExposureMode,ISO
+t/images/Canon.jpg,Canon.jpg,Manual,100
+t/images/Casio.jpg,Casio.jpg,,64
+t/images/Nikon.jpg,Nikon.jpg,,100
+t/images/OlympusE1.jpg,OlympusE1.jpg,Auto,400
+</pre>
+
+It should be possible to import these files directly into most database
+applications.  On the command line, any list of tag names may be used, and any
+number of file or directory names may be specified. (Hint: If your command line
+starts to get too long, you may want to look into using the <code>-@</code>
+option and/or the <a href="index.html#shortcut">ShortCut</a> feature).  The
+<code>-csv</code> option functions properly event if no tags are specified on
+the command line (in this case all tags are exported in alphabetical order and
+any missing entries are padded with empty strings, or dashes with the
+<code>-f</code> option).  However, this can not be done with the <code>-T</code>
+option because the columns of information are not arranged and padded as with
+the <code>-csv</code> output.</blockquote>
 
 <blockquote>In Windows, a .BAT file containing the exiftool command may be used
 to give drag and drop functionality.  Dropping a folder on the following .BAT
@@ -617,16 +629,16 @@ tab character.  This "<code>echo</code>" command was included to add column
 headings to the output.
 </blockquote>
 
-<blockquote>Another approach is to export information in RDF/XML format using
-the <code>-X</code> option, or JSON (JavaScript Object Notation) using the
-<code>-j</code> option.  These methods allow transfer of more complex data
-sets, but require that the importing software supports these formats.
-</blockquote>
+<blockquote>Other possible export formats include RDF/XML (with the the
+<code>-X</code> option), or JSON (with the <code>-j</code> option).  These
+methods allow transfer of more complex data sets (including structured
+information with the <code>-struct</code> option), but require that the
+importing software supports these formats.</blockquote>
 
 <blockquote>Finally, the <code>-p</code> option may be used to generate any
 arbitrary output format.  For example, the following format file
-(let's call it "<code>my.fmt</code>") may be used to give an output similar to
-the example above but with comma delimiters intead of tabs:
+(let's call it "<code>my.fmt</code>") may be used to emulate a CSV-formatted
+output:
 
 <pre>#[HEAD]FileName, Aperture, ISO
 $filename, $aperture, $iso
@@ -637,9 +649,29 @@ with a command like this:
 <pre>exiftool -f -r -p my.fmt t/images &gt; out.csv
 </pre>
 
+Alternatively, the <code>-p</code> option may be used with a format string instead
+of a file name.  The following command has the same effect as above except that
+the row of headings is not printed (Note: Use single quotes as below on Mac/Linux,
+or double quotes instead on Windows):
+
+<pre>exiftool -f -r -p '$filename, $aperture, $iso' t/images &gt; out.csv
+</pre>
+
+With the <code>-f</code> option, the value of any missing tag is printed as a
+dash.  Without this option, missing tags generate a minor warning and the
+line in the <code>-p</code> output is not printed.  The <code>-m</code> option
+may be used to ignore minor warnings, which causes these lines to be printed
+with an empty value for missing tags.</blockquote>
+
+<blockquote>
 See the <code>-p</code> option in the <a href="exiftool_pod.html">application
 documentation</a> for more information about this feature.
 </blockquote>
+
+<blockquote><b>Note:</b>  Information may be <b>imported</b> from CSV or JSON files for
+writing to images by specifying an input file name with the <code>-csv</code> or
+<code>-j</code> option.  See the <a href="exiftool_pod.html">exiftool
+application documentation</a> for more details.</blockquote>
 
 <a name="Q13"></a>
 <p>13. <b>"Why is my file smaller after I use ExifTool to write information?"</b></p>
@@ -658,8 +690,8 @@ output image. When ExifTool rewrites an image it does not copy these unused
 blocks.  This can result in a significant reduction in file size for some
 images.  <i>[The <code>-htmlDump</code> option may be used to view the file
 structure if you are interested in seeing these unused data blocks -- use a
-command like "<code>exiftool -htmlDump a.jpg &gt; out.html</code>", then open the
-output HTML file with your web browser.]</i>
+command like "<code>exiftool -htmlDump a.jpg &gt; out.html</code>", then open
+<code>out.html</code> in your web browser.]</i>
 </blockquote>
 
 <blockquote>Also, the size of an XMP record may easily shrink or grow when it is
@@ -771,15 +803,15 @@ FileName, Directory and FileModifyDate.</span></blockquote>
 
 <blockquote>Tags indicated by a plus sign (<code>+</code>) in the
 <a href="TagNames/index.html">tag name documentation</a> are List-type tags.
-Two common examples of List-type tags are
+Two examples of common List-type tags are
 <a href="TagNames/IPTC.html#ApplicationRecord">IPTC:Keywords</a> and
 <a href="TagNames/XMP.html#dc">XMP:Subject</a>.  These tags may contain multiple
 items which are combined into a single string when reading.  (By default,
 extracted list items are separated by a comma and a space, but the
 <code>-sep</code> option may be used to change this.)  When writing, separate
-items are always assigned individually.  For example, the following command
-writes three keywords to all writable files in directory <code>DIR</code>,
-replacing any previously existing keywords:
+items are assigned individually.  For example, the following command writes
+three keywords to all writable files in directory <code>DIR</code>, replacing
+any previously existing keywords:
 
 <pre>exiftool -keywords=one -keywords=two -keywords=three DIR
 </pre>
@@ -791,7 +823,7 @@ represent a single keyword:
 </pre>
 
 With exiftool version 7.56 or later, the <code>-sep</code> option may be used to
-split values of list-type tags into separate items.  For example,
+split values of list-type tags into separate items when writing.  For example,
 
 <pre>exiftool -sep ", " -keywords="one, two, three" DIR
 </pre>
@@ -1050,24 +1082,28 @@ In Windows a newline is "<code>&amp;#xd;&amp;#xa;</code>" instead of just
 </blockquote>
 
 <a name="Q22"></a>
-<p>22. <b>"How do I run exiftool on a file with a name beginning with a dash (-)?"</b></p>
+<p>22. <b>"In what order are command-line assignments applied when writing?"</b></p>
 
-<blockquote>This is a problem because command-line arguments starting with a
-dash are interpreted as exiftool options.  A work-around is to add the directory
-name so the argument no longer begins with a dash.  For example, to process a
-file named "<code>-file.jpg</code>" in the current directory, you could do this:
-
-<pre>exiftool ./-file.jpg
-</pre>
-
-In Mac/Unix shells, the same problem exists when specifying files using
-wildcards since these shells automatically expand wildcards into separate
-command-line arguments.  This problem may also be avoided by specifying the
-directory name as above, but a better solution is to use the <code>-ext</code>
-option instead of wildcards.  For example, use
-"<code>exiftool -ext jpg .</code>" instead of "<code>exiftool *.jpg</code>" to
-process all JPEG files in the current directory.
-</blockquote>
+<blockquote>When writing, tag assignments on the command line are queued and
+applied together as each target file is processed.  In general, assignments
+later on the command line override earlier assignments, but there are
+exceptions:
+<ol><li>When writing list-type tags (ie. <code>-keywords=one</code>), new values
+are accumulated rather than overriding earlier assignments.<br>&nbsp;</li>
+<li>When copying values to list-type tags (ie.
+<code>"-keywords&lt;filename"</code>), new values are accumulated only if
+<code>-addTagsFromFile</code> is used, otherwise they override earlier
+assigments if <code>-tagsFromFile</code> is used or implied.<br>&nbsp;</li>
+<li>Tags copied with the <code>-tagsFromFile</code> option are assigned in order,
+but after all other assignments, unless the <code>-tagsFromFile</code> argument
+is a simple file name. (ie. Assignments are delayed if the
+<code>-tagsFromFile</code> argument is <code>@</code> or contains
+<code>%f</code>, <code>%e</code> or <code>%d</code>.)</li></ol>
+Note: When copying tag values, adding to lists, or shifting date/time values,
+the source value is always the original value found in the file, regardless of
+any previous assignments.  For example, the following command sets Subject to
+the original value of Title in the file (NOT to "test"):
+<pre>exiftool -title=test "-subject&lt;title" a.jpg</pre></blockquote>
 
 <a name="Q23"></a>
 <p>23a. <b>"Why do I get '<code>0 image files updated</code>' when writing?"</b>, or<br>
@@ -1107,10 +1143,11 @@ alternative.</blockquote>
 
 <blockquote>Also note that MakerNotes tags can not be created or deleted
 individually, so they can only be written if they already exist in a
-file.</blockquote>
+file.  The entire MakerNotes must be created or deleted as a block (see
+<a href="#Q8">FAQ number 8</a> for details).</blockquote>
 
 <hr>
-<i>Last revised Feb. 25, 2011</i>
+<i>Last revised June 24, 2011</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

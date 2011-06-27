@@ -760,9 +760,9 @@ user-supplied set of known faces.</p>
   <br>11 = Shade</span></td></tr>
 <tr>
 <td title='0x0310 = 784'>0x0310</td>
-<td>LensInfo</td>
-<td class=c>-</td>
-<td>--&gt; <a href='Panasonic.html#LensInfo'>Panasonic LensInfo Tags</a></td></tr>
+<td>LensType</td>
+<td class=c>int32u</td>
+<td>--&gt; <a href='Panasonic.html#LensType'>Panasonic LensType Values</a></td></tr>
 <tr class=b>
 <td title='0x0311 = 785'>0x0311</td>
 <td>ExternalSensorBrightnessValue</td>
@@ -836,28 +836,6 @@ user-supplied set of known faces.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='LensInfo'>Panasonic LensInfo Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='0 = 0x0'>0</td>
-<td>LensType</td>
-<td class=c>int32u</td>
-<td><span class=s>[Mask 0xfffffffc]</span>
-  <br>--&gt; <a href='Panasonic.html#LensType'>Panasonic LensType Values</a></td></tr>
-<tr class=b>
-<td class=r title='0 = 0x0'>0.1</td>
-<td>FrameSelector</td>
-<td class=c>int32u</td>
-<td><span class=s>[Mask 0x03]
-  <br>0x1 = 28/90mm frame lines engaged
-  <br>0x2 = 24/35mm frame lines engaged
-  <br>0x3 = 50/75mm frame lines engaged</span></td></tr>
-</table></td></tr></table></blockquote>
-
 <h2><a name='LensType'>Panasonic LensType Values</a></h2>
 <p>Entries with 2 numbers give the lower 2 bits of the LensType value which are
 used to identify certain manually coded lenses on the M9, or the focal
@@ -901,7 +879,9 @@ length of some multi-focal lenses.</p>
 </tr><tr><td>48</td><td>= Summilux-M 24mm f/1.4 ASPH.</td>
 </tr><tr><td>49</td><td>= Noctilux-M 50mm f/0.95 ASPH.</td>
 </tr><tr><td>50</td><td>= Elmar-M 24mm f/3.8 ASPH.</td>
+</tr><tr><td>51</td><td>= Super-Elmar-M 21mm f/3.4 Asph</td>
 </tr><tr><td>52</td><td>= Super-Elmar-M 18mm f/3.8 ASPH.</td>
+</tr><tr><td>53</td><td>= Apo-Telyt-M 135mm f/3.4</td>
 </tr><tr><td>'0 0'</td><td>= Uncoded lens</td>
 </tr><tr><td>'6 0'</td><td>= Summilux-M 35mm f/1.4</td>
 </tr><tr><td>'9 0'</td><td>= Apo-Telyt-M 135mm f/3.4</td>
@@ -914,6 +894,7 @@ length of some multi-focal lenses.</p>
 </tr><tr><td>'42 1'</td><td>= Tri-Elmar-M 28-35-50mm f/4 ASPH. (at 28mm)</td>
 </tr><tr><td>'42 2'</td><td>= Tri-Elmar-M 28-35-50mm f/4 ASPH. (at 35mm)</td>
 </tr><tr><td>'42 3'</td><td>= Tri-Elmar-M 28-35-50mm f/4 ASPH. (at 50mm)</td>
+</tr><tr><td>'51 2'</td><td>= Super-Elmar-M 14mm f/3.8 Asph</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='Leica3'>Panasonic Leica3 Tags</a></h2>
@@ -1206,7 +1187,7 @@ iPalm.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 25, 2011</i>
+<br><i>Last revised Jun 22, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

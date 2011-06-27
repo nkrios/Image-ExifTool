@@ -32,6 +32,8 @@ table.links th  { border-right: 1px solid white; font-weight: normal;
 table.links th.rt { border-right: 0 }
 table.dl        { border: 1px solid gray; border-collapse: collapse }
 table.dl td     { padding: .4em .8em }
+.TEST       { color: #fff; background: #c00 }
+
 -->
 </style>
 </head>
@@ -44,7 +46,7 @@ table.dl td     { padding: .4em .8em }
 <th><a href="TagNames/index.html" class='wt'>&nbsp;Tag&nbsp;Names&nbsp;</a></th>
 <th><a href="#links" class='wt'>&nbsp;Resources&nbsp;</a></th>
 <th><a href="history.html" class='wt'>&nbsp;History&nbsp;</a></th>
-<th><a href="http://owl.phy.queensu.ca/~phil/exiftool/forum/" class='wt'>&nbsp;Forum&nbsp;</a></th>
+<th><a href="http://u88.n24.queensu.ca/exiftool/forum/" class='wt'>&nbsp;Forum&nbsp;</a></th>
 <th class='rt'><a href="faq.html" class='wt'>&nbsp;FAQ&nbsp;</a></th>
 </tr></table></div>
 <div class='index'>
@@ -67,14 +69,14 @@ table.dl td     { padding: .4em .8em }
 <br><a href="#boldly">New Discoveries</a>
 <br><a href="#ack">Acknowledgements</a>
 <br><a href="#license">License</a>
-<br><a href="#donate">Donations</a>
+<br><a href="#donate">Donate</a>
 <br><a href="#contact">Contact Me</a>
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-8.50.tar.gz">
-Download        Version 8.50</a> (3.0 MB) -
-<a href="history.html">Mar. 1, 2011</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-8.60.tar.gz">
+Download        Version 8.60</a> (3.0 MB) -
+<a href="history.html">June 25, 2011</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -120,8 +122,8 @@ distribution above.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-8.50.zip">
-         exiftool-8.50.zip</a> (3.1 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-8.60.zip">
+         exiftool-8.60.zip</a> (3.2 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -132,8 +134,8 @@ of Windows (including Windows 7).</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 Mac OS X Package:
-<a href="ExifTool-8.50.dmg">
-         ExifTool-8.50.dmg</a> (1.9 MB)</b></td></tr></table></blockquote>
+<a href="ExifTool-8.60.dmg">
+         ExifTool-8.60.dmg</a> (2.0 MB)</b></td></tr></table></blockquote>
 
 <p><b>The OS X package</b> installs the ExifTool command-line application and
 libraries in /usr/bin. After installing, type "<code>exiftool</code>" in a
@@ -235,10 +237,12 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <blockquote><table class='norm tight'>
 <tr><th>File Type</th><th>Support</th><th>Description</th></tr>
 <tr><td>3FR</td><td>R</td><td>Hasselblad RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
+<tr><td>3G2, 3GP2</td><td>R</td><td>3rd Gen. Partnership Project 2 audio/video (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td></tr>
+<tr><td>3GP, 3GPP</td><td>R</td><td>3rd Gen. Partnership Project audio/video (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td></tr>
 <tr><td><a href="TagNames/DICOM.html">ACR</a></td><td>R</td><td>American College of Radiology ACR-NEMA (DICOM-like)</td></tr>
 <tr><td><a href="TagNames/Font.html">AFM, ACFM, AMFM</a></td><td>R</td><td>Adobe [Composite/Multiple Master] Font Metrics</td></tr>
 <tr><td>AI, AIT</td><td>R/W</td><td>Adobe Illustrator [Template] (<a href="TagNames/PostScript.html">PS</a> or <a href="TagNames/PDF.html">PDF</a>)</td></tr>
-<tr><td><a href="TagNames/AIFF.html">AIFF, AIF, AIFC</a></td><td>R</td><td>Audio Interchange File Format</td></tr>
+<tr><td><a href="TagNames/AIFF.html">AIFF, AIF, AIFC</a></td><td>R</td><td>Audio Interchange File Format [Compressed]</td></tr>
 <tr><td><a href="TagNames/APE.html">APE</a></td><td>R</td><td>Monkey's Audio</td></tr>
 <tr><td>ARW</td><td>R/W</td><td>Sony Alpha RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/ASF.html">ASF</a></td><td>R</td><td>Microsoft Advanced Systems Format</td></tr>
@@ -261,6 +265,7 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td><a href="TagNames/OOXML.html">DOTX, DOTM</a></td><td>R</td><td>Office Open XML Document Template [Macro-enabled]</td></tr>
 <tr><td><a href="TagNames/EXE.html#MachO">DYLIB</a></td><td>R</td><td>Mac OS X Mach-O executable and library files</td></tr>
 <tr><td><a href="TagNames/DV.html">DV</a></td><td>R</td><td>Digital Video</td></tr>
+<tr><td>DVB</td><td>R</td><td>Digital Video Broadcasting (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td></tr>
 <tr><td>EIP</td><td>R</td><td>Capture One Enhanced Image Package (<a href="TagNames/ZIP.html">ZIP</a>-based)</td></tr>
 <tr><td><a href="TagNames/PostScript.html">EPS, EPSF, PS</a></td><td>R/W</td><td>[Encapsulated] PostScript Format</td></tr>
 <tr><td>ERF</td><td>R/W</td><td>Epson RAW Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
@@ -279,13 +284,13 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td>IIQ</td><td>R/W</td><td>Phase One Intelligent Image Quality RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td>IND, INDD, INDT</td><td>R/W</td><td>Adobe InDesign Document/Template (<a href="TagNames/XMP.html">XMP</a> metadata only)</td></tr>
 <tr><td><a href="TagNames/ITC.html">ITC</a></td><td>R</td><td>iTunes Cover Flow artwork</td></tr>
-<tr><td><a href="TagNames/Jpeg2000.html">JP2, JPX</a></td><td>R/W</td><td>JPEG 2000 image</td></tr>
+<tr><td><a href="TagNames/Jpeg2000.html">JP2, JPM, JPX</a></td><td>R/W</td><td>JPEG 2000 image</td></tr>
 <tr><td><a href="TagNames/JPEG.html">JPEG, JPG</a></td><td>R/W</td><td>Joint Photographic Experts Group image (<a href="#JPEG">see table below</a>)</td></tr>
 <tr><td>K25</td><td>R</td><td>Kodak DC25 RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td>KDC</td><td>R</td><td>Kodak Digital Camera RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/iWork.html">KEY, KTH</a></td><td>R</td><td>Apple iWork '09 Keynote presentation/Theme</td></tr>
 <tr><td><a href="TagNames/LNK.html">LNK</a></td><td>R</td><td>Microsoft Shell Link (Windows shortcut)</td></tr>
-<tr><td><a href="TagNames/M2TS.html">M2TS, MTS, M2T</a></td><td>R</td><td>MPEG-2 Transport Stream (used for AVCHD video)</td></tr>
+<tr><td><a href="TagNames/M2TS.html">M2TS, MTS, M2T, TS</a></td><td>R</td><td>MPEG-2 Transport Stream (used for AVCHD video)</td></tr>
 <tr><td>M4A, M4B, M4P, M4V</td><td>R</td><td>MPEG-4 Audio/Video (<a href="TagNames/QuickTime.html">Quicktime</a>-based)</td></tr>
 <tr><td>MEF</td><td>R/W</td><td>Mamiya (RAW) Electronic Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
 <tr><td><a href="TagNames/MIE.html">MIE</a></td><td>R/W/C</td><td>Meta Information Encapsulation (<a href="MIE1.1-20070121.pdf">MIE specification</a>)</td></tr>
@@ -351,6 +356,7 @@ suck the last bit of metadata out of whatever image file you throw at it!</i>" -
 <tr><td><a href="TagNames/Font.html">TTF, TTC</a></td><td>R</td><td>True Type Font/Collection</td></tr>
 <tr><td>VOB</td><td>R</td><td>Video Object (<a href="TagNames/MPEG.html">MPEG</a>-based)</td></tr>
 <tr><td><a href="TagNames/CanonVRD.html">VRD</a></td><td>R/W/C</td><td>Canon DPP Recipe Data</td></tr>
+<tr><td>VSD</td><td>R</td><td>Microsoft Visio Drawing (<a href="TagNames/FlashPix.html">FPX</a>-like)</td></tr>
 <tr><td>WAV</td><td>R</td><td>Windows digital audio WAVeform (<a href="TagNames/RIFF.html">RIFF</a>-based)</td></tr>
 <tr><td>WEBM</td><td>R</td><td>Google Web Movie (<a href="TagNames/Matroska.html">MKV</a>-based)</td></tr>
 <tr><td>WEBP</td><td>R</td><td>Google Web Picture (<a href="TagNames/RIFF.html">RIFF</a>-based)</td></tr>
@@ -373,6 +379,7 @@ of meta information in JPEG images:</p>
 <tr><td>APP0 - <a href="TagNames/JFIF.html#Extension">JFXX</a></td><td>R</td><td>Extended JFIF</td></tr>
 <tr><td>APP0 - <a href="TagNames/CanonRaw.html">CIFF</a></td><td>R/W</td><td><a href="canon_raw.html">Camera Image File Format</a> (used by some Canon models)</td></tr>
 <tr><td>APP0 - <a href="TagNames/JPEG.html#AVI1">AVI1</a></td><td>R</td><td>JPEG AVI information</td></tr>
+<tr><td>APP0 - <a href="TagNames/JPEG.html#Ocad">Ocad</a></td><td>R</td><td>Photobucket Ocad segment</td></tr>
 <tr><td>APP1 - <a href="TagNames/EXIF.html">EXIF</a></td><td>R/W/C</td><td>Exchangeable Image File Format (including maker notes)</td></tr>
 <tr><td>APP1 - <a href="TagNames/XMP.html">XMP</a></td><td>R/W/C</td><td>Extensible Metadata Platform (multi-segment)</td></tr>
 <tr><td>APP1 - <a href="TagNames/Casio.html#QVCI">QVCI</a></td><td>R</td><td>Casio QV-7000SX QVCI information</td></tr>
@@ -399,6 +406,7 @@ of meta information in JPEG images:</p>
 <tr><td>APP14 - <a href="TagNames/JPEG.html#Adobe">Adobe</a></td><td>R</td><td>Adobe DCT filter</td></tr>
 <tr><td>APP15 - <a href="TagNames/JPEG.html#GraphConv">GraphicConverter</a></td><td>R</td><td>GraphicConverter quality</td></tr>
 <tr><td>COM</td><td>R/W/C</td><td>JPEG Comment (multi-segment)</td></tr>
+<tr><td>DQT</td><td>R</td><td>(used to calculate the <a href="TagNames/Extra.html">Extra:JPEGDigest</a> tag value)</td></tr>
 <tr><td><a href="TagNames/JPEG.html#SOF">SOF</a></td><td>R</td><td>JPEG Start Of Frame</td></tr>
 <tr><td><a href="TagNames/AFCP.html">AFCP trailer</a></td><td>R/W</td><td>AXS File Concatenation Protocol (includes <a href="TagNames/IPTC.html">IPTC</a>)</td></tr>
 <tr><td><a href="TagNames/CanonVRD.html">CanonVRD trailer</a></td><td>R/W/C</td><td>Canon DPP Recipe Data</td></tr>
@@ -811,13 +819,12 @@ edited <b>Sony ARW</b> images to be displayed with the wrong tone curve. This
 problem has been observed in Photoshop CS4 Camera Raw 5.6, DNG Converter 5.6 and
 Lightroom 2.6 with ARW images from the A500, A550, A700, A850 and A900. Other
 software such as the Sony IDC utility, Apple RAW utilities, dcraw and Capture
-One have no problems with edited images.  If this problem effects you, please
-submit a bug report to Adobe. <i>[This bug is fixed in Camera Raw 6.3 and LR
-3.3]</i></li>
+One have no problems with edited images. <i class=grn>[This bug is fixed in
+Camera Raw 6.3 and LR 3.3]</i></li>
 <li>There is a bug in the <b>Apple</b> RAW file support (OS X 10.4.11) which
 prevents some edited <b>Pentax PEF</b> images from being displayed properly. 
 Other software such as the Pentax Silkypix software and dcraw have no problems
-with these images. <i>[This bug is fixed in OS X 10.5.4]</i></li>
+with these images. <i class=grn>[This bug is fixed in OS X 10.5.4]</i></li>
 <li>In <b>Windows</b>, ExifTool will not process files with <b>Unicode
 characters in the file name</b>.  This is due to an underlying lack of support
 for Unicode filenames in the Windows standard C I/O libraries.</li>
@@ -886,15 +893,6 @@ feature.</p>
 <h2><a name="performance">Improving Performance</a>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
 
-<p>The processing speed of ExifTool can be improved when extracting information
-by reducing the amount of work that it must do.  Decrease the number of
-extracted tags by specifying them individually (<code>-TAG</code>) or by group
-(<code>-GROUP:all</code>), and disable the composite tags (<code>-e</code>) and
-the print conversions (<code>-n</code>) if these features aren't required.  Note
-that the exclude options (<code>-x</code> or <code>--TAG</code>) are not very
-efficient, and may have a negative impact on performance if a large number of
-tags are excluded individually.</p>
-
 <p>There is a large overhead in loading ExifTool, so performance may be greatly
 improved by taking advantage of ExifTool's batch processing capabilities (the
 ability to process multiple files or entire directories with a single command)
@@ -906,6 +904,15 @@ exiftool separately on each file.]</i> Also, the <code>-execute</code> option
 may be used to perform multiple independent operations with a single invocation
 of exiftool, and together with the <code>-stay_open</code> option provides a
 method for calling applications to avoid this startup overhead.</p>
+
+<p>The processing speed of ExifTool can be improved when extracting information
+by reducing the amount of work that it must do.  Decrease the number of
+extracted tags by specifying them individually (<code>-TAG</code>) or by group
+(<code>-GROUP:all</code>), and disable the composite tags (<code>-e</code>) and
+the print conversions (<code>-n</code>) if these features aren't required.  Note
+that the exclude options (<code>-x</code> or <code>--TAG</code>) are not very
+efficient, and may have a negative impact on performance if a large number of
+tags are excluded individually.</p>
 
 <p>The <code>-fast</code> option can significantly increase speed when
 extracting information from JPEG images which are piped across a slow network
@@ -960,7 +967,7 @@ binary data.  The simple script above does not handle this case.</p>
 <li><a href="MIE1.1-20070121.pdf">MIE 1.1 File Format Specification (pdf)</a></li>
 <li><a href="http://owl.phy.queensu.ca/~phil/exiftool/sample_images.html">JPEG Image Samples</a> (and
     <a href="http://owl.phy.queensu.ca/~phil/exiftool/makernote_types.html">Table of Makernote Types</a>)</li>
-<li><a href="http://owl.phy.queensu.ca/~phil/exiftool/forum/">ExifTool Forum</a></li>
+<li><a href="http://u88.n24.queensu.ca/exiftool/forum/">ExifTool Forum</a></li>
 <li><a href="http://search.cpan.org/dist/Image-ExifTool/">Image::ExifTool at CPAN</a> (CPAN Search)</li>
 <li><a href="http://rt.cpan.org/Public/Dist/Display.html?Name=Image-ExifTool">ExifTool Bug Reports</a> (CPAN Request Tracker)</li>
 <li><a href="http://cpantesters.perl.org/show/Image-ExifTool.html">ExifTool Test Reports</a> (CPAN Testers)</li>
@@ -985,7 +992,7 @@ binary data.  The simple script above does not handle this case.</p>
 <li><a href="http://exifcopier.110mb.com/">Exif Copier</a>: Copy Exif data between sets of multiple images</li>
 <li><a href="http://www.xtrasimplicity.info/archives/185">ExifyMe</a>: Restore Exif metadata from an original image</li>
 <li><a href="http://mjbpix.com/automatically-move-photos-to-directories-or-folders-based-on-exif-date/">PhotoMove</a>: Automatically move photos to directories or folders based on Exif date taken</li>
-</ul>
+<li><a href="http://code.google.com/p/tinyexif/">TinyExif</a>: Simple Windows GUI for ExifTool written in Python using the Qt4 toolkit</ul>
 
 <p><b><a name="related_mac">Mac OS X</a></b></p>
 <ul>
@@ -996,7 +1003,7 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="http://fidel.vido.info/show/applescript/Tierprogramm/">Tierprogramm</a>: Droplet to perform some basic operations</li>
 <li><a href="http://xray.bmc.uu.se/markh/photos/macmetamod.html">MacMetaMod</a>: Droplet for adding Keywords to images</li>
 <li><a href="http://www.earlyinnovations.com/gpsphotolinker/">GPSPhotoLinker</a>: Geotagging on the Mac</li>
-<!---seems to be dead: <li><a href="http://www.scriptamac.at/geotaggingactions.html">Geotagging Automator Action</a>: Application to geotag images from GPX tracks</li>--->
+<!-- seems to be dead: <li><a href="http://www.scriptamac.at/geotaggingactions.html">Geotagging Automator Action</a>: Application to geotag images from GPX tracks</li> -->
 <li><a href="http://www.mmisoftware.co.uk/pages/photogpseditor.php">PhotoGPSEditor</a> and <a href="http://www.mmisoftware.co.uk/pages/photoinfoeditor.php">PhotoInfoEditor</a>: Geocoding utilities</li>
 <li><a href="http://6v8.gamboni.org/Move-Rename-files-according-to.html">MetaDataMover</a>: GUI-based automator utility for moving/renaming images</li>
 <li><a href="http://www.lintburger.com/software.php">CS1ToCR2</a>: Utility that uses Sony GPS-CS1 log files to add GPS information to CR2 images</li>
@@ -1113,19 +1120,15 @@ to the code:</p>
 <li>Malcolm Wotton for his help with the D30 Custom Functions</li>
 <li>David Anson for his help sorting out binary file problems on Windows</li>
 <li>Leon Booyens for his suggestions</li>
-<li>Jeremy Brown for the "35efl" tags</li>
 <li>Dan Heller for his bug reports, detailed suggestions and guidance</li>
 <li>Wayne Smith for his help figuring out the Pentax maker notes</li>
 <li>Michael Rommel for his bug fixes and additions to the Canon maker notes</li>
 <li>Joseph Heled for help figuring out some of the Nikon D70 maker notes</li>
 <li>Joachim Loehr for adding the Casio type 2 maker notes</li>
 <li>Greg Troxel for his suggestions and for adding ExifTool to pkgsrc</li>
-<li>Jay Al-Saadi for his discoveries with the Minolta white balance tag</li>
 <li>Thomas Walter for figuring out some Nikon tags</li>
 <li>Brian Ristuccia for more information about some Nikon tags</li>
-<li>Daniel Pittman for his additions to the Canon WhiteBalance conversion</li>
 <li>Christian Koller for decoding the 20D custom functions</li>
-<li>Juha Eskelinen for figuring out the 20D FileNumber</li>
 <li>Matt Madrid for his testing and feedback</li>
 <li>Tom Christiansen for his help decoding some Nikon tags</li>
 <li>Markku H&auml;nninen for help decoding tags for the Olympus E-1</li>
@@ -1151,7 +1154,7 @@ time-consuming hobby of mine.</p>
 <p>This is free software; you can redistribute it and/or modify it under the
 same terms as <a href="http://dev.perl.org/licenses/">Perl itself</a>.</p>
 
-<h2><a name="donate">Donations</a>
+<h2><a name="donate">Donate</a>
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
 
 <p>ExifTool is free, but due to popular request I am providing a way for
@@ -1179,7 +1182,7 @@ $<input name="amount" value="0.00" size="6">
 <a href='#top' class='top' title='go to top of page'>^</a></h2>
 
 <p>If you have any comments, suggestions or questions, please post to the
-<a href="http://owl.phy.queensu.ca/~phil/exiftool/forum/">ExifTool Forum</a> so
+<a href="http://u88.n24.queensu.ca/exiftool/forum/">ExifTool Forum</a> so
 other people may benefit from your experiences.  (I check the forum at least as
 often as my email.)  Otherwise, if you must contact me directly, my e-mail
 address is on the first line of the README file in the full distribution. 
@@ -1190,7 +1193,7 @@ Thanks. &nbsp; - <i>Phil Harvey</i></p>
 <th><a href="TagNames/index.html" class='wt'>&nbsp;Tag&nbsp;Names&nbsp;</a></th>
 <th><a href="#links" class='wt'>&nbsp;Resources&nbsp;</a></th>
 <th><a href="history.html" class='wt'>&nbsp;History&nbsp;</a></th>
-<th><a href="http://owl.phy.queensu.ca/~phil/exiftool/forum/" class='wt'>&nbsp;Forum&nbsp;</a></th>
+<th><a href="http://u88.n24.queensu.ca/exiftool/forum/" class='wt'>&nbsp;Forum&nbsp;</a></th>
 <th class='rt'><a href="faq.html" class='wt'>&nbsp;FAQ&nbsp;</a></th>
 </tr></table></div>
 </body>

@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.46
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.60
 [File, System, Image] FileName - File Name: XMP5.xmp
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 4.6 kB
@@ -30,3 +30,4 @@
 [XMP, XMP-myXMPns, Other] BTestTagField1-en-US - Renamed (en-US): huh?, groovy
 [XMP, XMP-myXMPns, Other] BTestTagField1-fr - Renamed (fr): ing&eacute;nieux
 [XMP, XMP-plus, Author] LicenseeLicenseeName - Licensee Name: Phil
+[Composite, Composite, Other] Flash - Flash: Off, Did not fire

@@ -21,7 +21,7 @@ use vars qw($VERSION $AUTOLOAD $lastFetched);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.28';
+$VERSION = '1.29';
 
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
@@ -145,7 +145,13 @@ my $pdfVer;         # version of PDF file being processed
 %Image::ExifTool::PDF::Encrypt = (
     GROUPS => { 2 => 'Document' },
     NOTES => 'Tags extracted from the document Encrypt dictionary.',
-    Filter => 'Encryption',
+    Filter => {
+        Name => 'Encryption',
+        Notes => q{
+            extracted value is actually a combination of the Filter, SubFilter, V, R and
+            Length information from the Encrypt dictionary
+        },
+    },
     P => {
         Name => 'UserAccess',
         ValueConv => '$val & 0x0f3c',  # ignore reserved bits
@@ -1100,6 +1106,7 @@ sub DecryptInit($$$)
     my $enc = "$filt V$ver";
     $enc .= ".$rev" if $filt eq 'Standard';
     $enc .= " ($1)" if $$encrypt{SubFilter} and $$encrypt{SubFilter} =~ /^\/(.*)/;
+    $enc .= ' (' . ($$encrypt{Length} || 40) . '-bit)' if $filt eq 'Standard';
     my $tagTablePtr = GetTagTable('Image::ExifTool::PDF::Encrypt');
     $exifTool->HandleTag($tagTablePtr, 'Filter', $enc);
     if ($filt ne 'Standard') {

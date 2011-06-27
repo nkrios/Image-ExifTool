@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.40';
+$VERSION = '1.42';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -107,6 +107,12 @@ my %fileFormat = (
         Groups => { 1 => 'IPTC#' }, #(just so this shows up in group list)
         SubDirectory => {
             TagTable => 'Image::ExifTool::IPTC::PostObjectData',
+        },
+    },
+    240 => {
+        Name => 'IPTCFotoStation',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::IPTC::FotoStation',
         },
     },
 );
@@ -883,6 +889,14 @@ my %fileFormat = (
     },
 );
 
+# Record 240 -- FotoStation proprietary data (ref PH)
+%Image::ExifTool::IPTC::FotoStation = (
+    GROUPS => { 2 => 'Other' },
+    WRITE_PROC => \&WriteIPTC,
+    CHECK_PROC => \&CheckIPTC,
+    WRITABLE => 1,
+);
+
 # IPTC Composite tags
 %Image::ExifTool::IPTC::Composite = (
     GROUPS => { 2 => 'Image' },
@@ -969,10 +983,9 @@ sub TranslateCodedString($$$$)
         $$valPtr = $exifTool->Decode($$valPtr, undef, undef, $$xlatPtr);
     } elsif ($$valPtr !~ /[\x14\x15\x1b]/) {
         $$valPtr = $exifTool->Decode($$valPtr, $$xlatPtr);
-    } elsif (not $$exifTool{WarnShift2022}) {
+    } else {
         # don't yet support reading ISO 2022 shifted character sets
-        $exifTool->Warn('Some IPTC characters not converted (ISO 2022 shifting not supported)');
-        $$exifTool{WarnShift2022} = 1;
+        $exifTool->WarnOnce('Some IPTC characters not converted (ISO 2022 shifting not supported)');
     }
 }
 
@@ -1144,6 +1157,7 @@ sub ProcessIPTC($$$)
             Size    => $len,
             Start   => $pos,
             Extra   => ", $recordName record",
+            Format  => $format,
         );
         $exifTool->FoundTag($tagInfo, $val) if $tagInfo;
         $success = 1;

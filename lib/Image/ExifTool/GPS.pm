@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.34';
+$VERSION = '1.35';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -41,9 +41,13 @@ my %coordConv = (
         Count => 2,
         PrintConv => {
             # extract N/S if written from Composite:GPSLatitude
+            # (also allow writing from a signed number)
             OTHER => sub {
                 my ($val, $inv) = @_;
-                return ($inv and $val =~ /\b([NS])$/i) ? uc $1 : undef;
+                return undef unless $inv;
+                return uc $1 if $val =~ /\b([NS])$/i;
+                return $1 eq '-' ? 'S' : 'N' if $val =~ /^([-+]?)\d+(\.\d*)?$/;
+                return undef;
             },
             N => 'North',
             S => 'South',
@@ -61,9 +65,13 @@ my %coordConv = (
         Count => 2,
         PrintConv => {
             # extract E/W if written from Composite:GPSLongitude
+            # (also allow writing from a signed number)
             OTHER => sub {
                 my ($val, $inv) = @_;
-                return ($inv and $val =~ /\b([EW])$/i) ? uc $1 : undef;
+                return undef unless $inv;
+                return uc $1 if $val =~ /\b([EW])$/i;
+                return $1 eq '-' ? 'W' : 'E' if $val =~ /^([-+]?)\d+(\.\d*)?$/;
+                return undef;
             },
             E => 'East',
             W => 'West',
@@ -272,6 +280,7 @@ my %coordConv = (
         Name => 'GPSDateStamp',
         Groups => { 2 => 'Time' },
         Writable => 'string',
+        Format => 'undef', # (Casio EX-H20G uses "\0" instead of ":" as a separator)
         Notes => 'YYYY:mm:dd',
         Count => 11,
         Shift => 'Time',

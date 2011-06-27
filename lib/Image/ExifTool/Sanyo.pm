@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 my %offOn = (
     0 => 'Off',
@@ -121,6 +121,7 @@ my %offOn = (
         Writable => 'int16u',
         PrintConv => \%offOn,
     },
+    # 0x0215 - Flash?
     0x0216 => {
         Name => 'VoiceMemo',
         Writable => 'int16u',
@@ -175,10 +176,16 @@ my %offOn = (
             6 => 'Lamp', #PH
         },
     },
-    0x0223 => {
-        Name => 'ManualFocusDistance',
-        Writable => 'rational64u',
-    },
+    0x0223 => [
+        {
+            Name => 'ManualFocusDistance',
+            Condition => '$format eq "rational64u"',
+            Writable => 'rational64u',
+        }, { #PH
+            Name => 'FaceInfo',
+            SubDirectory => { TagTable => 'Image::ExifTool::Sanyo::FaceInfo' },
+        },
+    ],
     0x0224 => {
         Name => 'SequenceShotInterval',
         Writable => 'int16u',
@@ -211,6 +218,26 @@ my %offOn = (
         Name => 'DataDump',
         Writable => 0,
         Binary => 1,
+    },
+);
+
+# face detection information (ref PH)
+%Image::ExifTool::Sanyo::FaceInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    WRITABLE => 1,
+    FORMAT => 'int32u',
+    FIRST_ENTRY => 0,
+    0 => 'FacesDetected',
+    4 => {
+        Name => 'FacePosition',
+        Format => 'int32u[4]',
+        Notes => q{
+            left, top, right and bottom coordinates of detected face in an unrotated
+            640-pixel-wide image, with increasing Y downwards
+        },
     },
 );
 

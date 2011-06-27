@@ -31,7 +31,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.47';
+$VERSION = '1.48';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -895,6 +895,7 @@ my %ftypLookup = (
         SubDirectory => {
             TagTable => 'Image::ExifTool::Exif::Main',
             DirName => 'IFD0',
+            Multi => 0, # (no NextIFD pointer)
             Start => 10,
             ByteOrder => 'BigEndian',
         },
@@ -929,6 +930,20 @@ my %ftypLookup = (
     INFO => {
         Name => 'SamsungINFO',
         SubDirectory => { TagTable => 'Image::ExifTool::Samsung::INFO' },
+    },
+    FFMV => { #PH (FinePix HS20EXR)
+        Name => 'FujiFilmFFMV',
+        SubDirectory => { TagTable => 'Image::ExifTool::FujiFilm::FFMV' },
+    },
+    MVTG => { #PH (FinePix HS20EXR)
+        Name => 'FujiFilmMVTG',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Exif::Main',
+            DirName => 'IFD0',
+            Start => 16,
+            Base => '$start',
+            ByteOrder => 'LittleEndian',
+        },
     },
 );
 
@@ -1845,7 +1860,12 @@ my %ftypLookup = (
     2  => {
         Name => 'AudioFormat',
         Format => 'undef[4]',
-        RawConv => '$val =~ /^[\w ]{4}$/i ? $val : undef',
+        RawConv => q{
+            return undef unless $val =~ /^[\w ]{4}$/i;
+            # check for protected audio format
+            $self->OverrideFileType('M4P') if $val eq 'drms' and $$self{VALUE}{FileType} eq 'M4A';
+            return $val;
+        },
     },
     10 => { #PH
         Name => 'AudioVendorID',
@@ -2458,16 +2478,22 @@ sub ProcessMOV($$;$)
                 my $subdir = $$tagInfo{SubDirectory};
                 if ($subdir) {
                     my $start = $$subdir{Start} || 0;
+                    my ($base, $dPos) = ($dataPos, 0);
+                    if ($$subdir{Base}) {
+                        $dPos -= eval $$subdir{Base};
+                        $base -= $dPos;
+                    }
                     my %dirInfo = (
                         DataPt   => \$val,
                         DataLen  => $size,
                         DirStart => $start,
                         DirLen   => $size - $start,
-                        DirName  => $$tagInfo{Name},
+                        DirName  => $$subdir{DirName} || $$tagInfo{Name},
                         HasData  => $$subdir{HasData},
-                        DataPos  => 0,
+                        Multi    => $$subdir{Multi},
+                        DataPos  => $dPos,
                         # Base needed for IsOffset tags in binary data
-                        Base     => $dataPos,
+                        Base     => $base,
                     );
                     if ($$subdir{ByteOrder} and $$subdir{ByteOrder} =~ /^Little/) {
                         SetByteOrder('II');

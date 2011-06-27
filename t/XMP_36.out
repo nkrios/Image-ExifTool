@@ -1,4 +1,4 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.46
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.60
 [File, System, Image] FileName - File Name: XMP5.xmp
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 4.6 kB
@@ -13,3 +13,4 @@
 [XMP, XMP-mwg-rs, Image] Regions - Region Info: {RegionList=[{Area={H=8,W=8,X=0,Y=0},Name=Region 1,SeeAlso=plus:Licensee,Type=Face},{Extensions={XMP-exif:Flash={Mode=On,Return=Return not detected},XMP-iptcExt:ArtworkOrObject=[{AOTitle-de=verf&auml;nglich}],XMP-myXMPns:BTestTag={Field1=[this is wild]},XMP-xmpRights:UsageTerms-fr=libre}}]}
 [XMP, XMP-myXMPns, Other] BTestTag - B Test Tag: {Field1-en-CA=[eh?],Field1-en-US=[huh?,groovy],Field1-fr=[,ing&eacute;nieux]}
 [XMP, XMP-plus, Author] Licensee - Licensee: [{LicenseeName=Phil}]
+[Composite, Composite, Other] Flash - Flash: Off, Did not fire

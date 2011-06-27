@@ -6,6 +6,7 @@
 # Usage:        exiftool -tagsFromFile SRCFILE -@ xmp2exif.args DSTFILE
 #
 # Revisions:    2009/01/20 - P. Harvey Created
+#               2011/06/22 - PH Copy flash information via Composite:Flash
 #
 # References:   http://www.metadataworkinggroup.org/specs/
 #
@@ -24,6 +25,8 @@
 -EXIF:SubSecTime < XMP-xmp:ModifyDate
 -EXIF:Copyright < XMP-dc:Rights
 -EXIF:Artist < XMP-dc:Creator
+# XMP flash information is translated by the Composite Flash tag
+-EXIF:Flash < Composite:Flash
 # generate GPS tags which have been combined into other XMP tags
 -GPS:GPSLatitudeRef < Composite:GPSLatitudeRef
 -GPS:GPSLongitudeRef < Composite:GPSLongitudeRef

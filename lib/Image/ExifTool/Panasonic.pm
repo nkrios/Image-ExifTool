@@ -18,23 +18,24 @@
 #              13) Michael Byczkowski private communication (Leica M9)
 #              14) Carl Bretteville private communication (M9)
 #              15) Zdenek Mihula private communication (TZ8)
+#              16) Olaf Ulrich private communication
 #              JD) Jens Duttke private communication (TZ3,FZ30,FZ50)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Panasonic;
 
 use strict;
-use vars qw($VERSION);
+use vars qw($VERSION %leicaLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.59';
+$VERSION = '1.60';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
 
 # Leica lens types (ref 10)
-my %leicaLensType = (
+%leicaLensTypes = (
     OTHER => sub {
         my ($val, $inv, $conv) = @_;
         return undef if $inv or not $val =~ s/ .*//;
@@ -54,6 +55,10 @@ my %leicaLensType = (
     # shows as uncoded for certain lenses and some incorrect positions of the
     # frame selector.  The bits are zero for uncoded lenses when manually coding
     # from the menu on the M9. - PH
+    # Frame selector bits (from ref 10, M8):
+    #   1 => '28/90mm frame lines engaged',
+    #   2 => '24/35mm frame lines engaged',
+    #   3 => '50/75mm frame lines engaged',
     '0 0' => 'Uncoded lens',
 #
 # NOTE: MUST ADD ENTRY TO %frameSelectorBits below when a new lens is added!!!!
@@ -105,7 +110,11 @@ my %leicaLensType = (
     48 => 'Summilux-M 24mm f/1.4 ASPH.',    # ? (ref 11)
     49 => 'Noctilux-M 50mm f/0.95 ASPH.',   # ? (ref 11)
     50 => 'Elmar-M 24mm f/3.8 ASPH.',       # ? (ref 11)
+    51 => 'Super-Elmar-M 21mm f/3.4 Asph',  # ? (ref 16, frameSelectorBits=1)
+    '51 2' => 'Super-Elmar-M 14mm f/3.8 Asph', # ? (ref 16)
     52 => 'Super-Elmar-M 18mm f/3.8 ASPH.', # ? (ref PH/11)
+    53 => 'Apo-Telyt-M 135mm f/3.4',        # ? (ref 16)
+
 );
 
 # M9 frame selector bits for each lens
@@ -148,7 +157,9 @@ my %frameSelectorBits = (
     48 => 2, # (NC)
     49 => 3, # (NC)
     50 => 2, # (NC)
+    51 => 1, # or 2 (ref 16)
     52 => 3,
+    53 => 2, #16
 );
 
 # conversions for ShootingMode and SceneMode
@@ -977,8 +988,12 @@ my %shootingMode = (
         },
     },
     0x310 => {
-        Name => 'LensInfo',
-        SubDirectory => { TagTable => 'Image::ExifTool::Panasonic::LensInfo' },
+        Name => 'LensType',
+        Writable => 'int32u',
+        SeparateTable => 1,
+        ValueConv => '($val >> 2) . " " . ($val & 0x3)',
+        ValueConvInv => \&LensTypeConvInv,
+        PrintConv => \%leicaLensTypes,
     },
     0x311 => {
         Name => 'ExternalSensorBrightnessValue',
@@ -1208,7 +1223,7 @@ my %shootingMode = (
         SeparateTable => 1,
         ValueConv => '($val >> 2) . " " . ($val & 0x3)',
         ValueConvInv => \&LensTypeConvInv,
-        PrintConv => \%leicaLensType,
+        PrintConv => \%leicaLensTypes,
     },
     0x3406 => { #PH/13
         Name => 'ApproximateFNumber',
@@ -1260,7 +1275,7 @@ my %shootingMode = (
         SeparateTable => 1,
         ValueConv => '($val >> 2) . " " . ($val & 0x3)',
         ValueConvInv => \&LensTypeConvInv,
-        PrintConv => \%leicaLensType,
+        PrintConv => \%leicaLensTypes,
     },
 );
 
@@ -1350,35 +1365,6 @@ my %shootingMode = (
     # seems to vary inversely with amount of light, so I'll call it 'Gain' - PH
     # (minimum is 16, maximum is 136.  Value is 0 for pictures captured from video)
     3 => 'Gain',
-);
-
-# lens information (ref 10)
-%Image::ExifTool::Panasonic::LensInfo = (
-    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
-    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
-    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
-    GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
-    WRITABLE => 1,
-    FORMAT => 'int32u',
-    FIRST_ENTRY => 0,
-    0 => {
-        Name => 'LensType',
-        Mask => 0xfffffffc,
-        PrintHex => 0,
-        SeparateTable => 1,
-        ValueConv => '$val >> 2',
-        ValueConvInv => '$val << 2',
-        PrintConv => \%leicaLensType,
-    },
-    0.1 => { # lower 2 bits give frame selector position
-        Name => 'FrameSelector',
-        Mask => 0x03,
-        PrintConv => {
-            1 => '28/90mm frame lines engaged',
-            2 => '24/35mm frame lines engaged',
-            3 => '50/75mm frame lines engaged',
-        },
-    },
 );
 
 # Face detection position information (ref PH)
@@ -1737,8 +1723,8 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Tels for the information he provided on decoding some tags, and to
-Marcel Coenen, Jens Duttke and Michael Byczkowski for their contributions.
+Thanks to Tels, Marcel Coenen, Jens Duttke, Joerg, Michael Byczkowski, Carl
+Bretteville, Zdenek Mihula and Olaf Ulrich for their contributions.
 
 =head1 SEE ALSO
 

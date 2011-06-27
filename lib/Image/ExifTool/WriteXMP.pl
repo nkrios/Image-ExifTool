@@ -758,7 +758,9 @@ sub WriteXMP($$;$)
         $path = ConformPathToNamespace($exifTool, $path);
         # find existing property
         my $cap = $capture{$path}; 
-        # MicrosoftPhoto screws up the case of some tags, so test for this
+        # MicrosoftPhoto screws up the case of some tags, and some other software,
+        # including Adobe software, has been known to write the wrong list type or
+        # not properly enclose properties in a list, so we check for this
         # (NOTE: we don't currently do these tests when writing structures!
         #  --> add this to DeleteStruct() below if it turns out to be a problem)
         unless ($cap or $isStruct) {
@@ -767,19 +769,46 @@ sub WriteXMP($$;$)
             $regex =~  s/ \d+/ \\d\+/g;
             my $ok = $regex; # regular expression to match standard property names
             # also check for incorrect list types which can cause problems
-            $regex =~ s{\\/rdf\\:(Bag|Seq|Alt)\\/}{/rdf:(Bag|Seq|Alt)/}g;
-            # also allow for missing structure fields in lists of structures
-            $regex =~  s/ \d+/ \\d\+/g;
-            my ($path2) = sort grep m{^$regex$}i, keys %capture;
-            if ($path2) {
-                # issue warning (seen only in Verbose mode) if a property name was wrong
-                unless ($path2 =~ /^$ok$/) {
+            if ($regex =~ s{\\/rdf\\:(Bag|Seq|Alt)\\/}{/rdf:(Bag|Seq|Alt)/}g) {
+                # also look for missing bottom-level list
+                $regex =~ s{/rdf:\(Bag\|Seq\|Alt\)\/rdf\\:li\\ \\d\+$}{(/.*)?};
+            }
+            my @matches = sort grep m{^$regex$}i, keys %capture;
+            if (@matches) {
+                if ($matches[0] =~ /^$ok$/) {
+                    $path = $matches[0];    # use existing property path
+                    $cap = $capture{$path};
+                } else {
+                    # property list was wrong, so issue a warning and fix it
+                    my ($match, @fixed, %fixed, $err);
+                    foreach $match (@matches) {
+                        my $fixed = $path;
+                        # set list indices
+                        while ($match =~ / (\d+)/g) {
+                            my $idx = $1;
+                            # insert leading "X" so we don't replace this one again
+                            $fixed =~ s/ \d+/ X$idx/;
+                        }
+                        $fixed =~ s/ X/ /g if $fixed ne $path;  # remove "X"s
+                        $err = 1 if $capture{$fixed} or $fixed{$fixed};
+                        push @fixed, $fixed;
+                        $fixed{$fixed} = 1;
+                    }
                     my $tg = $exifTool->GetGroup($tagInfo, 1) . ':' . $$tagInfo{Name};
-                    my $wrn = lc($path) eq lc($path2) ? 'tag ID case' : 'list type';
-                    $exifTool->Warn("Incorrect $wrn for $tg", 1);
+                    my $wrn = lc($path) eq lc($matches[0]) ? 'tag ID case' : 'list type';
+                    if ($err) {
+                        $exifTool->Warn("Incorrect $wrn for $tg conflicts with existing tag");
+                    } else {
+                        # fix the incorrect property paths for all values of this tag
+                        foreach $match (@matches) {
+                            my $fixed = shift @fixed;
+                            $capture{$fixed} = $capture{$match};
+                            delete $capture{$match};
+                        }
+                        $cap = $capture{$path} || $capture{$fixed[0]};
+                        $exifTool->Warn("Fixed incorrect $wrn for $tg", 1);
+                    }
                 }
-                # use existing property path
-                $cap = $capture{$path = $path2};
             }
         }
         my $nvHash = $exifTool->GetNewValueHash($tagInfo);

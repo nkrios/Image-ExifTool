@@ -153,10 +153,11 @@ use Image::ExifTool;
 <hr><h2><a name="ImageInfo">ImageInfo</a></h2>
 
 <p>Read image file and return meta information.  This is the one-step function for
-retrieving meta information from an image.  Internally, <a href="#ImageInfo">ImageInfo</a>
-calls <a href="#ExtractInfo">ExtractInfo</a> to extract data from the image, and
-<a href="#GetInfo">GetInfo</a> and <a href="#GetTagList">GetTagList</a> to generate the
-returned information hash and tag list.</p>
+retrieving meta information from an image.  Internally,
+<a href="#ImageInfo">ImageInfo</a> calls <a href="#ExtractInfo">ExtractInfo</a>
+to extract data from the image, <a href="#GetInfo">GetInfo</a> to generate the
+information hash, and <a href="#GetTagList">GetTagList</a> for the returned tag
+list.</p>
 
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>ImageInfo($;@)</td></tr>
@@ -278,9 +279,16 @@ the file if necessary, and may be used to re-read the file after
 A reference to image data in memory.
 
 </td></tr><tr><td valign='top'><b>ARRAY&nbsp;ref</b></td><td>
-Reference to a list of tag names.  On entry, any elements in the list are
-added to the list of requested tags.  On return, this list is updated to
-contain an ordered list of tag keys for all extracted tags.
+Reference to a list of tag names.  On entry, any elements in the list are added
+to the list of requested tags.  On return, this list is updated to contain an
+ordered list of tag keys for the returned information.
+<br>&nbsp;<br>
+There will be 1:1 correspondence between the requested tags and the returned
+tag keys only if the <a href="#Duplicates">Duplicates</a> option is 0 and
+<a href="#Sort">Sort</a> is 'Input'.   (With
+<a href="#Duplicates">Duplicates</a> enabled, there may be more entries in the
+returned list of tag keys, and with other <a href="#Sort">Sort</a> settings the
+entries may not be in the same order as requested.)
 
 </td></tr><tr><td valign='top'><b>HASH&nbsp;ref</b></td><td>
 Reference to a hash containing the options settings.  See
@@ -815,7 +823,7 @@ $warningMessage = $exifTool-&gt;<a href="#GetValue">GetValue</a>('Warning');
 </pre></td></tr></table></blockquote>
 <p>If an error code is returned, an Error tag is set and GetValue('Error') can
 be called to obtain the error description.  A Warning tag may be set even if
-this routine is successful.  Calling this routine clears any pre-existing Error
+this routine is successful.  Calling WriteInfo clears any pre-existing Error
 and Warning tags.</p>
 <p>The following ExifTool options are effective in the call to
 <a href="#WriteInfo">WriteInfo</a>:</p>
@@ -990,10 +998,11 @@ the same tag name for each value, or call with a reference to the list of values
  the same effect as setting Type to 'ValueConv'.
  <br><b>2)</b> [<i>optional</i>] New value for tag.  Undefined to delete tag from file.
      May be a scalar, scalar reference, list reference to set a list of values, or
-     hash reference for a structure. Integer values may be specified in hexadecimal
-     (with a leading '0x'), and simple rational values may be specified as fractions.
-     Structure tags may be specified either as a hash reference or a serialized string
-     (see the last two examples below).
+     hash reference for a structure. Integer values may be specified as a
+     hexadecimal string (with a leading '0x'), and simple rational values may be
+     specified in fractional form (ie. '4/10'). Structure tags may be specified
+     either as a hash reference or a serialized string (see the last two
+     examples below).
  <br><b>3-N)</b> [<i>optional</i>] SetNewValue option/value pairs (see below).
 </td></tr>
 <tr><td><b>Returns</b></td><td>Scalar context: The number of tags set, and
@@ -1027,12 +1036,13 @@ errors are printed to STDERR.
     <tr><td valign='top' align=center><b>0x02</b>&nbsp;=</td>
     <td>Write '<a href="TagNames/index.html">protected</a>' tags (internal use only)</td></tr>
     </table></td><td align=center>0</td></tr>
-<tr><td>Replace</td><td>Replace previous new value for this tag (ie. replace the value
-    set in a previous call to <a href="#SetNewValue">SetNewValue</a>)</td>
+<tr><td>Replace</td><td>Replace previous new values for this tag (ie. replace the values
+    set in previous calls to <a href="#SetNewValue">SetNewValue</a>). This option
+    is most commonly used to replace previously-set new values for List-type tags.</td>
     <td><table class='clear'>
-    <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Don't replace</td></tr>
-    <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Replace with specified new value</td></tr>
-    <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>Reset previous new value only</td></tr>
+    <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Set new value normally</td></tr>
+    <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Reset previous new values and replace with the specifed new value</td></tr>
+    <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>Reset previous new values only</td></tr>
     </table></td><td align=center>0</td></tr>
 <tr><td>Shift</td><td>Shift the tag by the specified value.  Currently only date/time
     tags can be shifted.  Value is added if Shift is 1, or subtracted if Shift is -1.
@@ -1096,8 +1106,8 @@ $exifTool-&gt;<b>SetNewValue</b>('XMP:Headline' =&gt; $val);  <span class=com># 
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
-<span class=com># shift original date/time back by 1 hour</span>
-$exifTool-&gt;<b>SetNewValue</b>(DateTimeOriginal =&gt; '1:00', Shift =&gt; -1);
+<span class=com># shift original date/time back by 2.5 hours</span>
+$exifTool-&gt;<b>SetNewValue</b>(DateTimeOriginal =&gt; '2:30', Shift =&gt; -1);
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
@@ -1136,6 +1146,11 @@ example above to exclude specific groups from a mass delete. However, this
 technique may not be used to exclude individual tags.  Instead, use
 <a href="#SetNewValuesFromFile">SetNewValuesFromFile</a> to recover the values
 of individual tags after deleting a group.</p>
+<p>Setting a new value generates a cyclical reference which will prevent memory
+from being reclaimed when the ExifTool object goes out of scope (due to Perl's
+garbage collection technique).  To avoid this problem, call
+<a href="#SetNewValue">SetNewValue</a> with no additional arguments to clear new
+values before the ExifTool object goes out of scope.</p>
 <p>The following ExifTool options are effective in the call to
 <a href="#SetNewValue">SetNewValue</a>:</p>
 <blockquote>
@@ -1274,7 +1289,7 @@ more than one value.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>GetNewValues($$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
- <br><b>1)</b> Tag name (case sensitive, group names not allowed)
+ <br><b>1)</b> Tag name (case sensitive, may be prefixed by family 0 or 1 group name)
 </td></tr>
 <tr><td><b>Returns</b></td><td>List of new Raw tag values, or first value in
 list when called in scalar context. The list may be empty either if the tag
@@ -1770,16 +1785,19 @@ my @delGroups = Image::ExifTool::<b>GetDelGroups</b>();
 <tr><td><b>Prototype</b></td><td>GetFileType(;$$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td>
 <td><b>0)</b> [<i>optional</i>] File name or extension
-<br><b>1)</b> [<i>optional</i>] Flag to return a description instead of a type
+<br><b>1)</b> [<i>optional</i>] Flag to return a description instead of a type.
+Set to 0 to return type for recognized but unsupported files (otherwise the
+return value for unsupported files is undef).
 </td></tr>
 <tr><td><b>Returns</b></td><td>A string, based on the file extension, which
 indicates the basic format of the file.  Note that some files may be based on
 other formats (like many RAW image formats are based on TIFF).  In array
 context, may return more than one file type if the file may be based on
 different formats.  Returns undef if files with this extension are not yet
-supported by ExifTool.  Returns a list of extensions for all recognized file
-types if no input extension is specified.  Returns a more detailed description
-of the specific file format when the description flag is set.</td></tr>
+supported by ExifTool.  Returns a list of extensions for all supported file
+types if no input extension is specified (or all recognized file types if the
+description flag is set to 0).  Returns a more detailed description of the
+specific file format when the description flag is set.</td></tr>
 </table></blockquote>
 <p><b>Examples:</b></p>
 <blockquote><table class='box'><tr><td><pre>

@@ -36,6 +36,7 @@
 #                  --> ftp://ftp.meta.moleculardevices.com/support/stack/STK.doc
 #              24) http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-008-2010_E.pdf (Exif 2.3)
 #              25) Vesa Kivisto private communication (7D)
+#              26) Jeremy Brown private communication
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -48,7 +49,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.21';
+$VERSION = '3.23';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -2494,7 +2495,7 @@ my %sampleFormat = (
         ValueConv => 'Image::ExifTool::Exif::CalculateLV($val[0],$val[1],$prt[2])',
         PrintConv => 'sprintf("%.1f",$val)',
     },
-    FocalLength35efl => {
+    FocalLength35efl => { #26/PH
         Description => 'Focal Length',
         Notes => 'this value may be incorrect if the image has been resized',
         Groups => { 2 => 'Camera' },
@@ -2507,7 +2508,7 @@ my %sampleFormat = (
         ValueConv => 'ToFloat(@val); ($val[0] || 0) * ($val[1] || 1)',
         PrintConv => '$val[1] ? sprintf("%.1f mm (35 mm equivalent: %.1f mm)", $val[0], $val) : sprintf("%.1f mm", $val)',
     },
-    ScaleFactor35efl => {
+    ScaleFactor35efl => { #26/PH
         Description => 'Scale Factor To 35 mm Equivalent',
         Notes => 'this value and any derived values may be incorrect if image has been resized',
         Groups => { 2 => 'Camera' },
@@ -2899,7 +2900,7 @@ sub CalculateLV($$$)
 }
 
 #------------------------------------------------------------------------------
-# Calculate scale factor for 35mm effective focal length
+# Calculate scale factor for 35mm effective focal length (ref 26/PH)
 # Inputs: 0) Focal length
 #         1) Focal length in 35mm format
 #         2) Canon digital zoom factor
@@ -3212,14 +3213,16 @@ sub GetLensInfo($;$)
 # Attempt to identify the specific lens if multiple lenses have the same LensType
 # Inputs: 0) ExifTool object ref, 1) LensType string, 2) LensType value,
 #         3) FocalLength, 4) MaxAperture, 5) MaxApertureValue, 6) ShortFocal,
-#         7) LongFocal, 8) LensModel, 9) LensFocalRange
+#         7) LongFocal, 8) LensModel, 9) LensFocalRange, 10) optional PrintConv hash ref
 sub PrintLensID($$@)
 {
     my ($exifTool, $lensTypePrt, $lensType, $focalLength, $maxAperture,
-        $maxApertureValue, $shortFocal, $longFocal, $lensModel, $lensFocalRange) = @_;
+        $maxApertureValue, $shortFocal, $longFocal, $lensModel, $lensFocalRange,
+        $printConv) = @_;
     # the rest of the logic relies on the LensType lookup:
     return undef unless defined $lensType;
-    my $printConv = $exifTool->{TAG_INFO}{LensType}{PrintConv};
+    # get print conversion hash if necessary
+    $printConv or $printConv = $exifTool->{TAG_INFO}{LensType}{PrintConv};
     # just copy LensType PrintConv value if it was a lens name
     # (Olympus or Panasonic -- just exclude things like Nikon and Leaf LensType)
     unless (ref $printConv eq 'HASH') {
@@ -3306,8 +3309,9 @@ sub ExifDate($)
 {
     my $date = shift;
     $date =~ s/\0$//;       # remove any null terminator
-    # separate year:month:day with colons (instead of -, /, space or nothing)
-    $date =~ s/(\d{4})[- \/:]*(\d{2})[- \/:]*(\d{2})$/$1:$2:$3/;
+    # separate year:month:day with colons
+    # (have seen many other characters, including nulls, used erroneously)
+    $date =~ s/(\d{4})[^\d]*(\d{2})[^\d]*(\d{2})$/$1:$2:$3/;
     return $date;
 }
 
@@ -4187,7 +4191,8 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Matt Madrid for his help with the XP character code conversions.
+Thanks to Jeremy Brown for the 35efl tags, and Matt Madrid for his help with
+the XP character code conversions.
 
 =head1 SEE ALSO
 
