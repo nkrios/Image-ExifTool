@@ -4,6 +4,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+exif2iptc.args
 exif2xmp.args
 exiftool
 gps2xmp.args
@@ -73,6 +74,7 @@ html/TagNames/Nikon.html
 html/TagNames/NikonCapture.html
 html/TagNames/NikonCustom.html
 html/TagNames/OOXML.html
+html/TagNames/Ogg.html
 html/TagNames/Olympus.html
 html/TagNames/PDF.html
 html/TagNames/PGF.html
@@ -102,6 +104,7 @@ html/TagNames/SigmaRaw.html
 html/TagNames/Sony.html
 html/TagNames/SonyIDC.html
 html/TagNames/Stim.html
+html/TagNames/Theora.html
 html/TagNames/Unknown.html
 html/TagNames/Vorbis.html
 html/TagNames/XMP.html
@@ -131,6 +134,7 @@ html/style.css
 html/under.html
 html/verbose.html
 html/writing.html
+iptc2exif.args
 iptc2xmp.args
 kml.fmt
 lib/File/RandomAccess.pm
@@ -256,6 +260,7 @@ lib/Image/ExifTool/Nikon.pm
 lib/Image/ExifTool/NikonCapture.pm
 lib/Image/ExifTool/NikonCustom.pm
 lib/Image/ExifTool/OOXML.pm
+lib/Image/ExifTool/Ogg.pm
 lib/Image/ExifTool/Olympus.pm
 lib/Image/ExifTool/PDF.pm
 lib/Image/ExifTool/PGF.pm
@@ -291,6 +296,7 @@ lib/Image/ExifTool/Stim.pm
 lib/Image/ExifTool/TagInfoXML.pm
 lib/Image/ExifTool/TagLookup.pm
 lib/Image/ExifTool/TagNames.pod
+lib/Image/ExifTool/Theora.pm
 lib/Image/ExifTool/Unknown.pm
 lib/Image/ExifTool/Vorbis.pm
 lib/Image/ExifTool/WriteCanonRaw.pl
@@ -442,6 +448,7 @@ t/JVC_3.out
 t/Jpeg2000.t
 t/Jpeg2000_2.out
 t/Jpeg2000_3.out
+t/Jpeg2000_4.out
 t/Kodak.t
 t/Kodak_2.out
 t/Kodak_3.out
@@ -621,6 +628,8 @@ t/Writer_4.out
 t/Writer_40.out
 t/Writer_41.out
 t/Writer_42.out
+t/Writer_43.out
+t/Writer_44.out
 t/Writer_6.out
 t/Writer_7.out
 t/Writer_9.out
@@ -720,6 +729,7 @@ t/images/ITC.itc
 t/images/InDesign.indd
 t/images/JVC.jpg
 t/images/JVC2.jpg
+t/images/Jpeg2000.j2c
 t/images/Jpeg2000.jp2
 t/images/Kodak.jpg
 t/images/KyoceraRaw.raw

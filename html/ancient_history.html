@@ -13,6 +13,164 @@
 <p><b>Note:</b> This page gives the history of older exiftool versions.  See
 <a href="history.html">history.html</a> for the recent history.</p>
 
+<a name='v8.49'><b>Feb. 12, 2011 - Version 8.49</b></a>
+<ul>
+<li>Added a number of new values for various Canon tags
+<li>Added a new Pentax LensType
+<li>Added ability to write Nikon PowerUpTime tag
+<li>Added a number of MachO CPUSubtype's and improved handling of 64-bit flag
+<li>Decode ColorData for the Canon EOS 600D and 1100D
+<li>Decode a few new Sony tags
+<li>Set document number for FlashPix tags extracted from embedded documents
+<li>Attempted to patch OS X 10.6 quirk where FileModifyDate may not be preserved
+    for some files when -P is combined with -overwrite_original_in_place
+</ul>
+
+<a name='v8.48'><b>Feb. 3, 2011 - Version 8.48</b></a>
+<ul>
+<li>Added a new Canon LensType value
+<li>Changed order of stored information when rewriting existing IPTC tags (to
+    make the order of items in list-type tags consistent with XMP when deleting
+    and adding back values in the same command)
+<li>Fixed problems with format of binary data in lists for some output options
+</ul>
+
+<a name='v8.47'><b>Jan. 29, 2011 - Version 8.47</b></a>
+<ul>
+<li>Added -args option
+<li>Added read support for PGF (Progressive Graphics File) images
+<li>Added write support for Phase One IIQ images
+<li>Added ability to write XMP-xmpMM:Pantry
+<li>Added print conversions for a number of closed-choice XMP properties
+<li>Added some new CanonModelID's
+<li>Included new argument files in distribution: pdf2xmp.args and xmp2pdf.args
+<li>Avoid copying TIFF trailers containing nothing but zeros when rewriting
+<li>Handle binary data in serialized structure output
+<li>Moved BMP tags to the File group
+<li>Fixed bug reading/writing some IPTC binary data tags
+<li>Fixed problem copying XMP:Thumbnails structure
+<li>Fixed conversion of MXF:ByteOrder value
+<li>Fixed potential "Undefined subroutine ConvertStruct" crash bug
+<li>API Changes:
+    <ul>
+    <li>Fixed bug introduced in 8.46 when calling GetValue(xxx,'Raw')
+    </ul>
+</ul>
+
+<a name='v8.46'><b>Jan. 22, 2011 - Version 8.46</b></a>
+<ul>
+<li>Simpified definition of user-defined XMP structures: flattened tags are now
+    automatically generated, and UserDefined::xmpStruct is no longer needed (but
+    backward compatibility is maintained with the old-style definitions)
+<li>Added ability to handle multi-dimensional arrays in structured output
+<li>Added a new Canon LensType (thanks Jean-Michel Dubois)
+<li>Added some new XMP-xmpMM tags
+<li>Enabled writing of a number of XMP-crs tags
+<li>Decode Reconyx TriggerMode tag
+<li>Relaxed structure validation to allow a structure to be written even if
+    there were errors with some fields
+<li>Patched problem with formatting of very large numbers in JSON (-j) output
+<li>Fixed a few problems reading and writing structured information
+<li>Fixed bug which could cause hang with some user-defined tag definitions
+</ul>
+
+<a name='v8.45'><b>Jan. 12, 2011 - Version 8.45</b></a>
+<ul>
+<li>Fixed a couple of minor bugs with the new -struct option
+</ul>
+
+<a name='v8.44'><b>Jan. 12, 2011 - Version 8.44</b> - "Structured XMP"</a>
+<ul>
+<li>Added ability to specify <a href="struct.html">XMP structures</a> when writing (yet another Christmas
+    vacation spent adding a significant new feature to ExifTool)
+<li>Added support for new XMP tags in the MWG 2.0 specification
+<li>Added read support for DV video files
+<li>Added support for Reconyx maker notes
+<li>Added option to overwrite existing text output files (-w!)
+<li>Added ability to ignore symbolic directory links with "-i SYMLINKS"
+<li>Added support for Sony Ericsson XMP cell phone location tags
+<li>Added a few new CanonModelID's
+<li>Added a new Minolta/Sony LensType (thanks Jean-Michel Dubois)
+<li>Added a new Olympus LensType
+<li>Added print conversion for all Bitrate tags
+<li>Decode a couple new RIFF tags
+<li>Decode CameraTemperature for a few new Canon PowerShot models
+<li>Improved -struct option to work with all text output formats
+<li>Changed behaviour of XMP lang-alt lists to conform to the July 2010
+    specification (x-default item is no longer mandatory)
+<li>Renamed AudioSampleBits tags to AudioBitsPerSample
+<li>Renamed XMP-crs:Temperature tag to ColorTemperature
+<li>Minor change to behaviour when replacing values in XMP lists: new list
+    items are now all inserted in place of the first deleted item (previously
+    new items were inserted one-by-one into the holes left by deleted items)
+<li>Fixed bug writing alternate languages for XMP-iptcExt:ArtworkTitle tag
+<li>Fixed problem where console echo was disabled when using -k option from a
+    bash script
+<li>Attempted to patch problem of -b option affecting newline sequence for
+    subsequent -execute commands in Windows
+<li>API Changes:
+    <ul>
+    <li>SetNewValue() now accepts structured values (as HASH references or
+        serialized strings)
+    <li>Struct option now has 3 settings (undef, 0 and 1)
+    </ul>
+</ul>
+
+<a name='v8.43'><b>Dec. 21, 2010 - Version 8.43</b></a>
+<ul>
+<li>Added read support for MXF (Material Exchange Format) files
+<li>Added support for GE (General Imaging) maker notes
+<li>Added a couple of new Pentax LensType's
+<li>Added a couple of new CanonModelID's
+<li>Added a few more values to Casio UnknownMode
+<li>Recognize 3GPP and 3GP2 file extensions
+<li>Improved handling of character encoding errors
+<li>Changed Duration format to always include hours for times &gt; 1 minute
+<li>Fixed minor quirk in HtmlDump output
+<li>Fixed race condition with -stay_open when reading options requiring
+    additional arguments from the argfile
+</ul>
+
+<a name='v8.42'><b>Dec. 11, 2010 - Version 8.42</b></a>
+<ul>
+<li>Added a couple more Samsung LensType values
+<li>Added a few new Canon EasyMode values and a Canon LensType value
+<li>Added a new PentaxModelID
+<li>Decode some new H264 tags (thanks Dave Nicholson)
+<li>Decode JUNK chunk in Pentax RS1000 AVI videos
+<li>Flush console output before "{ready}" message when using -stay_open
+<li>Improved decoding of some Canon and Pentax tags (thanks Dave Nicholson)
+<li>Fixed problem copying makernotes from Nikon NRW image to JPEG
+<li>Fixed incorrect decoding of some AEInfo tags for newer Pentax DSLR's
+</ul>
+
+<a name='v8.41'><b>Dec. 3, 2010 - Version 8.41</b></a>
+<ul>
+<li>Added a new PentaxModelID
+<li>Added a few new values for some Canon tags
+<li>Added some non-standard values to a few XMP-exif tags
+<li>Decode a new Ricoh tag and added a LensID
+<li>Decode more Pentax K-5 tags and values
+<li>Improved decoding of Battery tags for various Pentax DSLR models
+<li>Fixed bug where time could be wrong by up to 2 seconds when shifting
+    multiple date/time values containing fractional seconds
+</ul>
+
+<a name='v8.40'><b>Nov. 21, 2010 - Version 8.40</b></a> <span class=grn>(production release)</span>
+<ul>
+<li>Added -restore_original and -delete_original options
+<li>Added new Canon, Pentax and Sony LensType values
+<li>Decode more Pentax K-5 tags
+<li>Decode a number of new tags in Nikon D7000 MOV videos
+<li>Decode FocusDistance tags for the Canon EOS 60D
+<li>Decode a few new Panasonic tags
+<li>Decode a few maker note tags from Flip Video MP4 files
+<li>Extract PDF PageMode and PageLayout tags
+<li>Changed family 2 group names for a number of PDF tags
+<li>Changed Canon LensType strings for a few lenses with updated models
+<li>Patched problem reading GPX files which contain no newlines
+</ul>
+
 <a name='v8.39'><b>Nov. 12, 2010 - Version 8.39</b></a>
 <ul>
 <li>Added read support for RAR archive files
@@ -1094,7 +1252,7 @@
 <li>Decode FujiFilm EXRAuto and EXRMode tags (FinePix F200EXR)
 <li>Decode Olympus ArtFilter tag
 <li>Allow EXIF ISO to have multiple values as per EXIF spec
-<li>Improved XMP-exif and XMP-tiff List-type tags to allow copying from EXIF
+<li>Improved XMP-exif and XMP-tiff list-type tags to allow copying from EXIF
 <li>Changed handling of ComponentsConfiguration to facilitate copying between
     EXIF and XMP
 <li>Changed name of EXIF tag 0x9214 from SubjectLocation to SubjectArea to match
@@ -1153,7 +1311,7 @@
 <li>Added a new Pentax LensType (thanks Akos Szalkai)
 <li>Added a new Canon LensType (thanks Kurt Garloff)
 <li>Added new PentaxModelID for the Optio P70
-<li>Added XMP List-type flag (Alt, Bag or Seq) to "-f -listx" output
+<li>Added XMP list-type flag (Alt, Bag or Seq) to "-f -listx" output
 <li>Decode a number of new Canon tags (thanks Vesa Kivisto)
 <li>Removed unreliable Canon Composite FlashOn tag (use Flash instead)
 <li>Removed Nikon FlashModel tag and replaced it with ExternalFlashFirmware
@@ -1603,7 +1761,7 @@
 <ul>
 <li>Added new Composite LensID tag and changed a number of LensType values in
     an attempt to disambiguate Canon, Pentax, Minolta and Sony 3rd party lenses
-<li>Added -sep option to specify separator for values in List-type tags
+<li>Added -sep option to specify separator for values in list-type tags
 <li>Added a new Nikon LensID (thanks Jens Duttke)
 <li>Added CanonModelID values for new models (SX110, A1000, A2000, E1, 50D)
 <li>Decode some CameraInfo tags of the Canon EOS 450D and 1000D (thanks Bogdan)
@@ -1654,7 +1812,7 @@
 <a name='v7.37'><b>July 16, 2008 - Version 7.37</b></a>
 <ul>
 <li>Added -addTagsFromFile option (variant of -tagsFromFile which allows copying
-    multiple tags into the values of a single List-type tag)
+    multiple tags into the values of a single list-type tag)
 <li>Added a new Sony LensID (thanks Jens Duttke)
 <li>Added PentaxModelID for the Optio W60
 <li>Added a couple of new YCbCrSubSampling values (thanks Jens Duttke) and made
@@ -1702,7 +1860,7 @@
 <li>Improved parsing of IPTC time values when writing, and assume the local
     timezone (if available) instead of UTC when a timezone is not specified
 <li>Improved handling of lists that exist in multiple groups in the same file
-<li>Disabled shifting of List-type date/time tags (allows += to add list items)
+<li>Disabled shifting of list-type date/time tags (allows += to add list items)
 <li>Reduced priority of XMP-exif and XMP-tiff tags so these values don't
     override more reliable EXIF and TIFF tags when extracting information
     without specifying a group
@@ -1734,7 +1892,7 @@
 <li>Added a new Pentax LensType (thanks yeryry)
 <li>Decode ColorBalance information for Canon 450D and 1000D
 <li>Fixed names of a few NikonCapture D-LightingHQ tags (thanks Jens Duttke)
-<li>Fixed bug where a List-type tag was not created when simultaneously adding
+<li>Fixed bug where a list-type tag was not created when simultaneously adding
     and deleting values from the list
 </ul>
 
@@ -2094,7 +2252,7 @@
 <li>Added write support for PDF files which use only cross-reference streams
 <li>Added a number of new Olympus tags, and changed names of some existing tags
 <li>Fixed problem decoding some PDF cross-reference streams
-<li>Fixed bug introduced in 7.07 which broke copying between two List-type tags
+<li>Fixed bug introduced in 7.07 which broke copying between two list-type tags
 </ul>
 
 <a name='v7.07'><b>Dec. 18, 2007 - Version 7.07</b></a>
@@ -2119,7 +2277,7 @@
 <li>Made "Entries out of sequence" a minor warning since this problem is fixed
 <li>Allow decimal seconds to be written in time values without needing to use -n
 <li>Improved parsing of PDF files
-<li>Improved behaviour when copying List-type tags to to non-List tags
+<li>Improved behaviour when copying list-type tags to to non-List tags
 <li>Improved exiftool summary message for files that were copied without changes
 <li>Adjusted Pentax K10D battery percentage calibration
 <li>Changed names of Pentax FirmwareID tags

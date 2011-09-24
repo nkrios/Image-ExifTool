@@ -56,7 +56,7 @@ sub XMPOpen($)
     my $nv = $exifTool->{NEW_VALUE}->{$Image::ExifTool::XMP::x{xmptk}};
     my $tk;
     if (defined $nv) {
-        $tk = Image::ExifTool::GetNewValues($nv);
+        $tk = $exifTool->GetNewValues($nv);
         $exifTool->VerboseValue(($tk ? '+' : '-') . ' XMP-x:XMPToolkit', $tk);
         ++$exifTool->{CHANGED};
     } else {
@@ -656,7 +656,7 @@ sub WriteXMP($$;$)
         }
         $tagInfo = $Image::ExifTool::XMP::rdf{about};
         if (defined $exifTool->{NEW_VALUE}->{$tagInfo}) {
-            $about = Image::ExifTool::GetNewValues($exifTool->{NEW_VALUE}->{$tagInfo}) || '';
+            $about = $exifTool->GetNewValues($exifTool->{NEW_VALUE}->{$tagInfo}) || '';
             if ($verbose > 1) {
                 my $wasAbout = $exifTool->{XMP_ABOUT};
                 $exifTool->VerboseValue('- XMP-rdf:About', UnescapeXML($wasAbout)) if defined $wasAbout;
@@ -679,7 +679,7 @@ sub WriteXMP($$;$)
         $tagInfo = $Image::ExifTool::Extra{XMP};
         if ($tagInfo and $exifTool->{NEW_VALUE}->{$tagInfo}) {
             my $rtnVal = 1;
-            my $newVal = Image::ExifTool::GetNewValues($exifTool->{NEW_VALUE}->{$tagInfo});
+            my $newVal = $exifTool->GetNewValues($exifTool->{NEW_VALUE}->{$tagInfo});
             if (defined $newVal and length $newVal) {
                 $exifTool->VPrint(0, "  Writing XMP as a block\n");
                 ++$exifTool->{CHANGED};
@@ -812,7 +812,7 @@ sub WriteXMP($$;$)
             }
         }
         my $nvHash = $exifTool->GetNewValueHash($tagInfo);
-        my $overwrite = Image::ExifTool::IsOverwriting($nvHash);
+        my $overwrite = $exifTool->IsOverwriting($nvHash);
         my $writable = $$tagInfo{Writable} || '';
         my (%attrs, $deleted, $added);
         # delete existing entry if necessary
@@ -846,7 +846,7 @@ sub WriteXMP($$;$)
                             next unless $oldLang eq $newLang;
                             # only add new tag if we are overwriting this one
                             # (note: this won't match if original XML contains CDATA!)
-                            $addLang = Image::ExifTool::IsOverwriting($nvHash, UnescapeXML($val));
+                            $addLang = $exifTool->IsOverwriting($nvHash, UnescapeXML($val));
                             next unless $addLang;
                         }
                         # delete all if deleting "x-default" and writing with no LangCode
@@ -860,8 +860,18 @@ sub WriteXMP($$;$)
                         }
                     } elsif ($overwrite < 0) {
                         # only overwrite specific values
+                        if ($$nvHash{Shift}) {
+                            # values to be shifted are checked (hence re-formatted) late,
+                            # so we must un-format the to-be-shifted value for IsOverwriting()
+                            my $fmt = $$tagInfo{Writable} || '';
+                            if ($fmt eq 'rational') {
+                                ConvertRational($val);
+                            } elsif ($fmt eq 'date') {
+                                $val = ConvertXMPDate($val);
+                            }
+                        }
                         # (note: this won't match if original XML contains CDATA!)
-                        next unless Image::ExifTool::IsOverwriting($nvHash, UnescapeXML($val));
+                        next unless $exifTool->IsOverwriting($nvHash, UnescapeXML($val));
                     }
                     if ($verbose > 1) {
                         my $grp = $exifTool->GetGroup($tagInfo, 1);
@@ -953,7 +963,7 @@ sub WriteXMP($$;$)
             (not $cap and $isCreating);
 
         # get list of new values (all done if no new values specified)
-        my @newValues = Image::ExifTool::GetNewValues($nvHash) or next;
+        my @newValues = $exifTool->GetNewValues($nvHash) or next;
 
         # set language attribute for lang-alt lists
         $attrs{'xml:lang'} = $$tagInfo{LangCode} || 'x-default' if $writable eq 'lang-alt';

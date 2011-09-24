@@ -42,7 +42,7 @@ use vars qw($VERSION %minoltaLensTypes %minoltaColorMode %sonyColorMode %minolta
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.76';
+$VERSION = '1.80';
 
 # lens ID numbers (ref 3)
 # ("New" and "II" appear in brackets if original version also has this LensType)
@@ -137,6 +137,7 @@ $VERSION = '1.76';
     60 => 'Carl Zeiss Distagon T* 24mm F2 SSM', #17
     61 => 'Sony 85mm F2.8 SAM (SAL-85F28)', #17
     62 => 'Sony DT 35mm F1.8 SAM (SAL-35F18)', #PH
+    63 => 'Sony DT 16-50mm F2.8 SSM (SAL-1650)', #17
     128 => 'Tamron or Sigma Lens (128)',
     128.1 => 'Tamron 18-200mm F3.5-6.3',
     128.2 => 'Tamron 28-300mm F3.5-6.3',
@@ -146,6 +147,9 @@ $VERSION = '1.76';
     128.6 => 'Sigma AF 50-150mm F2.8 EX DC APO HSM II', #JD
     128.7 => 'Sigma 10-20mm F3.5 EX DC HSM', #11 (model 202-205)
     128.8 => 'Sigma 70-200mm F2.8 II EX DG APO MACRO HSM', #24
+    128.9 => 'Sigma 10mm F2.8 EX DC HSM Fisheye', #Florian Knorn
+    # (yes, '128.10'.  My condolences to typed languages that use this database - PH)
+   '128.10' => 'Sigma 50mm F1.4 EX DG HSM', #Florian Knorn
     129 => 'Tamron Lens (129)',
     129.1 => 'Tamron 200-400mm F5.6 LD', #12 (LD ref 23)
     129.2 => 'Tamron 70-300mm F4-5.6 LD', #12
@@ -200,6 +204,7 @@ $VERSION = '1.76';
     25611.5 => 'Tokina AT-X AF 300mm F4', #JD
     25611.6 => 'Tokina AT-X AF 400mm F5.6 SD', #22
     25611.7 => 'Tokina AF 730 II 75-300mm F4.5-5.6', #JD
+    25611.8 => 'Sigma 800mm F5.6 APO', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3472.0.html
     25621 => 'Minolta AF 50mm F1.4 [New]', # original and New, not Sony (ref 13/18)
     25631 => 'Minolta AF 300mm F2.8 APO or Sigma Lens', # changed G to APO (ref 13)
     25631.1 => 'Sigma AF 50-500mm F4-6.3 EX DG APO', #JD
@@ -216,7 +221,8 @@ $VERSION = '1.76';
     25781.1 => 'Sigma 8mm F4 EX [DG] Fisheye',
     25781.2 => 'Sigma 14mm F3.5',
     25781.3 => 'Sigma 15mm F2.8 Fisheye', #JD (writes 16mm to EXIF)
-    25791 => 'Minolta/Sony AF 20mm F2.8', # Sony added (ref 11)
+    25791 => 'Minolta/Sony AF 20mm F2.8 or Tokina Lens', # Sony added (ref 11)
+    25791.1 => 'Tokina AT-X Pro DX 11-16mm F2.8', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3593.0.html
     25811 => 'Minolta AF 100mm F2.8 Macro [New] or Sigma or Tamron Lens', # not Sony (ref 13/18)
     25811.1 => 'Sigma AF 90mm F2.8 Macro', #JD
     25811.2 => 'Sigma AF 105mm F2.8 EX [DG] Macro', #JD
@@ -228,6 +234,7 @@ $VERSION = '1.76';
     25881 => 'Minolta AF 70-210mm F3.5-4.5',
     25891 => 'Minolta AF 80-200mm F2.8 APO or Tokina Lens',
     25891.1 => 'Tokina 80-200mm F2.8',
+    25901 => 'Minolta AF 200mm F2.8 G APO + Minolta AF 1.4x APO', #Wolfram (http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3521.0.html)
     25911 => 'Minolta AF 35mm F1.4', #(from Sony list) (not G as per ref 13)
     25921 => 'Minolta AF 85mm F1.4 G (D)',
     25931 => 'Minolta AF 200mm F2.8 G APO',
@@ -235,6 +242,7 @@ $VERSION = '1.76';
     25961 => 'Minolta AF 28mm F2',
     25971 => 'Minolta AF 35mm F2 [New]', #13
     25981 => 'Minolta AF 100mm F2',
+    26011 => 'Minolta AF 200mm F2.8 G APO + Minolta AF 2x APO', #Wolfram
     26041 => 'Minolta AF 80-200mm F4.5-5.6',
     26051 => 'Minolta AF 35-80mm F4-5.6', #(from Sony list)
     26061 => 'Minolta AF 100-300mm F4.5-5.6', # not (D) (ref 13/18)
@@ -270,6 +278,7 @@ $VERSION = '1.76';
     45741.3 => 'Tokina 300mm F2.8 x2',
     45751 => '1.4x Teleconverter', #18
     45851 => 'Tamron SP AF 300mm F2.8 LD IF', #11
+    45871 => 'Tamron AF 70-210mm f/2.8 SP LD', #Fabio Suprani
     # all M42-type lenses give a value of 65535 (and FocalLength=0, FNumber=1)
     65535 => 'T-Mount or Other Lens or no lens', #JD
     65535.1 => 'Arax MC 35mm F2.8 Tilt+Shift', #JD

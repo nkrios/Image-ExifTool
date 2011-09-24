@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION %sigmaLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
@@ -38,8 +38,9 @@ sub ProcessX3FProperties($$$);
     # 70-200mm F2.8 EX DG Macro (HSM) - Minimum focus distance reduced to 1m (2006)
     # 70-200mm F2.8 EX DG Macro HSM II - Improved optical performance (2007)
     169 => 'Sigma 18-50mm F2.8 EX DC', #(NC)
-    '100' => 'Sigma 24-70mm f/2.8 DG Macro', # (SD15)
-    8900 => 'Sigma 70-300mm f/4-5.6 DG OS', # (SD15)
+    581 => 'Sigma 18-50mm F2.8 EX DC Macro', # (SD1)
+    8900 => 'Sigma 70-300mm F4-5.6 DG OS', # (SD15)
+    'A100' => 'Sigma 24-70mm F2.8 DG Macro', # (SD15)
 );
 
 # main X3F sections (plus header stuff)

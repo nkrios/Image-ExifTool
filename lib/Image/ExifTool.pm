@@ -24,9 +24,9 @@ use vars qw($VERSION $RELEASE @ISA %EXPORT_TAGS $AUTOLOAD @fileTypes %allTables
             @tableOrder $exifAPP1hdr $xmpAPP1hdr $xmpExtAPP1hdr $psAPP13hdr
             $psAPP13old @loadAllTables %UserDefined $evalWarning %noWriteFile
             %magicNumber @langs $defaultLang %langName %charsetName %mimeType
-            $swapBytes $swapWords $currentByteOrder %unpackStd);
+            $swapBytes $swapWords $currentByteOrder %unpackStd %jpegMarker);
 
-$VERSION = '8.60';
+$VERSION = '8.65';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -55,7 +55,7 @@ Exporter::export_ok_tags(keys %EXPORT_TAGS);
 # autoloaded when any of them is called.
 sub SetNewValue($;$$%);
 sub SetNewValuesFromFile($$;@);
-sub GetNewValues($;$$);
+sub GetNewValues($$;$);
 sub CountNewValues($);
 sub SaveNewValues($);
 sub RestoreNewValues($);
@@ -103,6 +103,7 @@ sub UnpackUTF8($);
 sub SetPreferredByteOrder($);
 sub CopyBlock($$$);
 sub CopyFileAttrs($$);
+sub TimeNow(;$);
 
 # other subroutine definitions
 sub DoEscape($$);
@@ -116,12 +117,12 @@ sub ParseArguments($;@); #(defined in attempt to avoid mod_perl problem)
     PhotoMechanic Exif GeoTiff CanonRaw KyoceraRaw MinoltaRaw PanasonicRaw
     SigmaRaw JPEG GIMP Jpeg2000 GIF BMP BMP::OS2 PICT PNG MNG DjVu PGF MIFF PSP
     PDF PostScript Photoshop::Header FujiFilm::RAF Sony::SRF2 Sony::SR2SubIFD
-    Sony::PMP ITC ID3 Vorbis FLAC APE APE::NewHeader APE::OldHeader MPC
+    Sony::PMP ITC ID3 Vorbis Ogg APE APE::NewHeader APE::OldHeader MPC
     MPEG::Audio MPEG::Video MPEG::Xing M2TS QuickTime QuickTime::ImageFile
     Matroska MXF DV Flash Flash::FLV Real::Media Real::Audio Real::Metafile RIFF
     AIFF ASF DICOM MIE HTML XMP::SVG EXE EXE::PEVersion EXE::PEString EXE::MachO
-    EXE::PEF EXE::ELF LNK Font RSRC Rawzor ZIP ZIP::GZIP ZIP::RAR RTF OOXML
-    iWork
+    EXE::PEF EXE::ELF EXE::CHM LNK Font RSRC Rawzor ZIP ZIP::GZIP ZIP::RAR RTF
+    OOXML iWork
 );
 
 # alphabetical list of current Lang modules
@@ -156,7 +157,8 @@ $defaultLang = 'en';    # default language
 @fileTypes = qw(JPEG CRW TIFF GIF MRW RAF X3F JP2 PNG MIE MIFF PS PDF PSD XMP
                 BMP PPM RIFF AIFF ASF MOV MPEG Real SWF PSP FLV OGG FLAC APE MPC
                 MKV MXF DV PMP IND PGF ICC ITC HTML VRD RTF XCF QTIF FPX PICT
-                ZIP GZIP RAR BZ2 TAR RWZ EXE LNK WMF RAW Font RSRC M2TS MP3 DICM);
+                ZIP GZIP RAR BZ2 TAR RWZ EXE CHM LNK WMF DEX RAW Font RSRC M2TS
+                MP3 DICM);
 
 # file types that we can write (edit)
 my @writeTypes = qw(JPEG TIFF GIF CRW MRW ORF RAF RAW PNG MIE PSD XMP PPM
@@ -166,6 +168,7 @@ my @writeTypes = qw(JPEG TIFF GIF CRW MRW ORF RAF RAW PNG MIE PSD XMP PPM
 %noWriteFile = (
     TIFF => [ qw(3FR DCR K25 KDC SRF) ],
     XMP  => [ 'SVG' ],
+    JP2  => [ 'J2C', 'JPC' ],
 );
 
 # file types that we can create from scratch
@@ -195,6 +198,7 @@ my %fileTypeLookup = (
     BMP  => ['BMP',  'Windows Bitmap'],
     BTF  => ['BTF',  'Big Tagged Image File Format'], #(unofficial)
     BZ2  => ['BZ2',  'BZIP2 archive'],
+    CHM  => ['CHM',  'Microsoft Compiled HTML format'],
     CIFF => ['CRW',  'Camera Image File Format'],
     COS  => ['COS',  'Capture One Settings'],
     CR2  => ['TIFF', 'Canon RAW 2 format'],
@@ -204,6 +208,7 @@ my %fileTypeLookup = (
     DCM  =>  'DICM',
     DCP  => ['TIFF', 'DNG Camera Profile'],
     DCR  => ['TIFF', 'Kodak Digital Camera RAW'],
+    DEX  => ['DEX',  'Dalvik Executable format'],
     DFONT=> ['Font', 'Macintosh Data fork Font'],
     DIB  => ['BMP',  'Device Independent Bitmap'],
     DIC  =>  'DICM',
@@ -254,8 +259,12 @@ my %fileTypeLookup = (
     INDD => ['IND',  'Adobe InDesign Document'],
     INDT => ['IND',  'Adobe InDesign Template'],
     ITC  => ['ITC',  'iTunes Cover Flow'],
+    J2C  => ['JP2',  'JPEG 2000 codestream'],
+    J2K  =>  'JP2',
     JNG  => ['PNG',  'JPG Network Graphics'],
     JP2  => ['JP2',  'JPEG 2000 file'],
+    JPC  =>  'J2C',
+    JPF  =>  'JP2',
     # JP4? - looks like a JPEG but the image data is different
     JPEG =>  'JPG',
     JPG  => ['JPEG', 'Joint Photographic Experts Group'],
@@ -300,10 +309,16 @@ my %fileTypeLookup = (
     NMBTEMPLATE => ['ZIP','Apple Numbers Template'],
     NRW  => ['TIFF', 'Nikon RAW (2)'],
     NUMBERS => ['ZIP','Apple Numbers spreadsheet'],
+    ODB  => ['ZIP',  'Open Document Database'],
+    ODC  => ['ZIP',  'Open Document Chart'],
+    ODF  => ['ZIP',  'Open Document Formula'],
+    ODG  => ['ZIP',  'Open Document Graphics'],
+    ODI  => ['ZIP',  'Open Document Image'],
     ODP  => ['ZIP',  'Open Document Presentation'],
     ODS  => ['ZIP',  'Open Document Spreadsheet'],
     ODT  => ['ZIP',  'Open Document Text file'],
     OGG  => ['OGG',  'Ogg Vorbis audio file'],
+    OGV  => ['OGG',  'Ogg Video file'],
     ORF  => ['ORF',  'Olympus RAW format'],
     OTF  => ['Font', 'Open Type Font'],
     PAGES => ['ZIP', 'Apple Pages document'],
@@ -409,6 +424,8 @@ my %fileDescription = (
     'DJVU (multi-page)' => 'DjVu multi-page image',
     'Win32 EXE' => 'Windows 32-bit Executable',
     'Win32 DLL' => 'Windows 32-bit Dynamic Link Library',
+    'Win64 EXE' => 'Windows 64-bit Executable',
+    'Win64 DLL' => 'Windows 64-bit Dynamic Link Library',
 );
 
 # MIME types for applicable file types above
@@ -426,9 +443,11 @@ my %fileDescription = (
     BTF  => 'image/x-tiff-big', #(NC) (ref http://www.asmail.be/msg0055371937.html)
     BZ2  => 'application/bzip2',
    'Canon 1D RAW' => 'image/x-raw', # (uses .TIF file extension)
+    CHM  => 'application/x-chm',
     CR2  => 'image/x-canon-cr2',
     CRW  => 'image/x-canon-crw',
     DCR  => 'image/x-kodak-dcr',
+    DEX  => 'application/octet-stream',
     DFONT=> 'application/x-dfont',
     DICM => 'application/dicom',
     DIVX => 'video/divx',
@@ -459,6 +478,7 @@ my %fileDescription = (
     IND  => 'application/x-indesign',
     ITC  => 'application/itunes',
     JNG  => 'image/jng',
+    J2C  => 'image/x-j2c', #PH (NC)
     JP2  => 'image/jp2',
     JPEG => 'image/jpeg',
     JPM  => 'image/jpm',
@@ -485,10 +505,16 @@ my %fileDescription = (
     MXF  => 'application/mxf',
     NEF  => 'image/x-nikon-nef',
     NRW  => 'image/x-nikon-nrw',
+    ODB  => 'application/vnd.oasis.opendocument.database',
+    ODC  => 'application/vnd.oasis.opendocument.chart',
+    ODF  => 'application/vnd.oasis.opendocument.formula',
+    ODG  => 'application/vnd.oasis.opendocument.graphics',
+    ODI  => 'application/vnd.oasis.opendocument.image',
     ODP  => 'application/vnd.oasis.opendocument.presentation',
     ODS  => 'application/vnd.oasis.opendocument.spreadsheet',
     ODT  => 'application/vnd.oasis.opendocument.text',
     OGG  => 'audio/x-ogg',
+    OGV  => 'video/x-ogg',
     ORF  => 'image/x-olympus-orf',
     OTF  => 'application/x-font-otf',
     PBM  => 'image/x-portable-bitmap',
@@ -570,7 +596,9 @@ my %moduleName = (
     BZ2  => 0,
     CRW  => 'CanonRaw',
     DICM => 'DICOM',
+    CHM  => 'EXE',
     COS  => 'CaptureOne',
+    DEX  => 0,
     DOCX => 'OOXML',
     EPS  => 'PostScript',
     EXIF => '',
@@ -586,7 +614,7 @@ my %moduleName = (
     MKV  => 'Matroska',
     MP3  => 'ID3',
     MRW  => 'MinoltaRaw',
-    OGG  => 'Vorbis',
+    OGG  => 'Ogg',
     ORF  => 'Olympus',
   # PLIST=> 'XML',
     PMP  => 'Sony',
@@ -617,7 +645,9 @@ my %moduleName = (
     BMP  => 'BM',
     BTF  => '(II\x2b\0|MM\0\x2b)',
     BZ2  => 'BZh[1-9]\x31\x41\x59\x26\x53\x59',
+    CHM  => 'ITSF.{20}\x10\xfd\x01\x7c\xaa\x7b\xd0\x11\x9e\x0c\0\xa0\xc9\x22\xe6\xec',
     CRW  => '(II|MM).{4}HEAP(CCDR|JPGM)',
+    DEX  => "dex\n035\0",
     DICM => '(.{128}DICM|\0[\x02\x04\x06\x08]\0[\0-\x20]|[\x02\x04\x06\x08]\0[\0-\x20]\0)',
     DOCX => 'PK\x03\x04',
     DV   => '\x1f\x07\0[\x3f\xbf]', # (not tested if extension recognized)
@@ -635,7 +665,7 @@ my %moduleName = (
     ICC  => '.{12}(scnr|mntr|prtr|link|spac|abst|nmcl|nkpf)(XYZ |Lab |Luv |YCbr|Yxy |RGB |GRAY|HSV |HLS |CMYK|CMY |[2-9A-F]CLR){2}',
     IND  => '\x06\x06\xed\xf5\xd8\x1d\x46\xe5\xbd\x31\xef\xe7\xfe\x74\xb7\x1d',
     ITC  => '.{4}itch',
-    JP2  => '\0\0\0\x0cjP(  |\x1a\x1a)\x0d\x0a\x87\x0a',
+    JP2  => '(\0\0\0\x0cjP(  |\x1a\x1a)\x0d\x0a\x87\x0a|\xff\x4f\xff\x51\0)',
     JPEG => '\xff\xd8\xff',
     LNK  => '.{4}\x01\x14\x02\0{5}\xc0\0{6}\x46',
     M2TS => '(....)?\x47',
@@ -789,6 +819,7 @@ sub DummyWriteProc { return 1; }
     },
     FileSize => {
         Groups => { 1 => 'System' },
+        Notes => 'print conversion uses historic prefixes: 1 kB = 1024 bytes, etc.',
         PrintConv => \&ConvertFileSize,
     },
     ResourceForkSize => {
@@ -900,7 +931,10 @@ sub DummyWriteProc { return 1; }
     PreviewWMF  => { Binary => 1 },
     ExifByteOrder => {
         Writable => 1,
-        Notes => 'only writable for newly created EXIF segments',
+        Notes => q{
+            represents the byte order of EXIF information.  May be written to set the
+            byte order only for newly created EXIF segments
+        },
         PrintConv => {
             II => 'Little-endian (Intel, II)',
             MM => 'Big-endian (Motorola, MM)',
@@ -909,10 +943,11 @@ sub DummyWriteProc { return 1; }
     ExifUnicodeByteOrder => {
         Writable => 1,
         Notes => q{
-            the EXIF specification is particularly vague about the byte ordering for
-            Unicode text, and different applications use different conventions.  By
-            default ExifTool writes Unicode text in EXIF byte order, but this write-only
-            tag may be used to force a specific byte order
+            specifies the byte order to use when writing EXIF Unicode text.  The EXIF
+            specification is particularly vague about this byte ordering, and different
+            applications use different conventions.  By default ExifTool writes Unicode
+            text in EXIF byte order, but this write-only tag may be used to force a
+            specific order
         },
         PrintConv => {
             II => 'Little-endian (Intel, II)',
@@ -938,13 +973,6 @@ sub DummyWriteProc { return 1; }
         Notes => q{
             the current date/time.  Useful when setting the tag values, ie.
             C<"-modifydate<now">.  Not generated unless specifically requested
-        },
-        ValueConv => sub {
-            my $time = shift;
-            my @tm = localtime $time;
-            my $tz = Image::ExifTool::TimeZoneString(\@tm, $time);
-            sprintf("%4d:%.2d:%.2d %.2d:%.2d:%.2d%s", $tm[5]+1900, $tm[4]+1, $tm[3],
-                    $tm[2], $tm[1], $tm[0], $tz);
         },
         PrintConv => '$self->ConvertDateTime($val)',
     },
@@ -1342,6 +1370,7 @@ sub ClearOptions($)
     #   MissingTagValue =>undef,# value for missing tags when expanded in expressions
     #   Password    => undef,   # password for password-protected PDF documents
         PrintConv   => 1,       # flag to enable print conversion
+    #   QuickTimeUTC=> undef,   # assume that QuickTime date/time tags are stored as UTC
     #   SavePath    => undef,   # (undocumented) save family 5 location path
     #   ScanForXMP  => undef,   # flag to scan for XMP information in all files
         Sort        => 'Input', # order to sort found tags (Input, File, Alpha, Group#)
@@ -1416,7 +1445,7 @@ sub ExtractInfo($;@)
 
         # return our version number
         $self->FoundTag('ExifToolVersion', "$VERSION$RELEASE");
-        $self->FoundTag('Now', time()) if $self->{REQ_TAG_LOOKUP}{now} or $self->{TAGS_FROM_FILE};
+        $self->FoundTag('Now', TimeNow()) if $self->{REQ_TAG_LOOKUP}{now} or $self->{TAGS_FROM_FILE};
     }
     my $filename = $self->{FILENAME};   # image file name ('' if already open)
     my $raf = $self->{RAF};             # RandomAccess object
@@ -1479,13 +1508,13 @@ sub ExtractInfo($;@)
 
         # get list of file types to check
         my ($tiffType, %noMagic);
-        $self->{FILE_EXT} = GetFileExtension($realname);
+        $$self{FILE_EXT} = GetFileExtension($realname);
         my @fileTypeList = GetFileType($realname);
         if (@fileTypeList) {
             # add remaining types to end of list so we test them all
             my $pat = join '|', @fileTypeList;
             push @fileTypeList, grep(!/^($pat)$/, @fileTypes);
-            $tiffType = $self->{FILE_EXT};
+            $tiffType = $$self{FILE_EXT};
             $noMagic{MXF} = 1;  # don't do magic number test on MXF or DV files
             $noMagic{DV} = 1;
         } else {
@@ -2698,13 +2727,19 @@ sub GroupMatches($$$)
                     last unless grep /^$grps[$g]$/i, @groups;
                 }
             }
-            push @matches, $tag if $g == @grps;
+            if ($g == @grps) {
+                return $tag unless wantarray;
+                push @matches, $tag;
+            }
         }
     } else {
         my $family = ($group =~ s/^(\d+)//) ? $1 : -1;
         foreach $tag (@$tagList) {
             my @groups = $self->GetGroup($tag, $family);
-            push @matches, $tag if grep(/^$group$/i, @groups);
+            if (grep(/^$group$/i, @groups)) {
+                return $tag unless wantarray;
+                push @matches, $tag;
+            }
         }
     }
     return wantarray ? @matches : $matches[0];
@@ -3977,50 +4012,11 @@ sub ConvertBitrate($)
 sub HDump($$$$;$$)
 {
     my $self = shift;
-    my $pos = shift;
-    $pos += $$self{BASE} if $$self{BASE};
-    $$self{HTML_DUMP} and $self->{HTML_DUMP}->Add($pos, @_);
-}
-
-#------------------------------------------------------------------------------
-# JPEG constants
-my %jpegMarker = (
-    0x01 => 'TEM',
-    0xc0 => 'SOF0', # to SOF15, with a few exceptions below
-    0xc4 => 'DHT',
-    0xc8 => 'JPGA',
-    0xcc => 'DAC',
-    0xd0 => 'RST0',
-    0xd8 => 'SOI',
-    0xd9 => 'EOI',
-    0xda => 'SOS',
-    0xdb => 'DQT',
-    0xdc => 'DNL',
-    0xdd => 'DRI',
-    0xde => 'DHP',
-    0xdf => 'EXP',
-    0xe0 => 'APP0', # to APP15
-    0xf0 => 'JPG0',
-    0xfe => 'COM',
-);
-
-#------------------------------------------------------------------------------
-# Get JPEG marker name
-# Inputs: 0) Jpeg number
-# Returns: marker name
-sub JpegMarkerName($)
-{
-    my $marker = shift;
-    my $markerName = $jpegMarker{$marker};
-    unless ($markerName) {
-        $markerName = $jpegMarker{$marker & 0xf0};
-        if ($markerName and $markerName =~ /^([A-Z]+)\d+$/) {
-            $markerName = $1 . ($marker & 0x0f);
-        } else {
-            $markerName = sprintf("marker 0x%.2x", $marker);
-        }
+    if ($$self{HTML_DUMP}) {
+        my $pos = shift;
+        $pos += $$self{BASE} if $$self{BASE};
+        $self->{HTML_DUMP}->Add($pos, @_);
     }
-    return $markerName;
 }
 
 #------------------------------------------------------------------------------
@@ -4149,6 +4145,65 @@ sub ProcessTrailers($$)
 }
 
 #------------------------------------------------------------------------------
+# JPEG constants
+
+# JPEG marker names
+%jpegMarker = (
+    0x00 => 'NULL',
+    0x01 => 'TEM',
+    0xc0 => 'SOF0', # to SOF15, with a few exceptions below
+    0xc4 => 'DHT',
+    0xc8 => 'JPGA',
+    0xcc => 'DAC',
+    0xd0 => 'RST0',
+    0xd8 => 'SOI',
+    0xd9 => 'EOI',
+    0xda => 'SOS',
+    0xdb => 'DQT',
+    0xdc => 'DNL',
+    0xdd => 'DRI',
+    0xde => 'DHP',
+    0xdf => 'EXP',
+    0xe0 => 'APP0', # to APP15
+    0xf0 => 'JPG0',
+    0xfe => 'COM',
+);
+
+# lookup for size of JPEG marker length word
+# (2 bytes assumed unless specified here)
+my %markerLenBytes = (
+    0x00 => 0,  0x01 => 0,
+    0xd0 => 0,  0xd1 => 0,  0xd2 => 0,  0xd3 => 0,  0xd4 => 0,  0xd5 => 0,  0xd6 => 0,  0xd7 => 0,
+    0xd8 => 0,  0xd9 => 0,  0xda => 0,
+    # J2C
+    0x30 => 0,  0x31 => 0,  0x32 => 0,  0x33 => 0,  0x34 => 0,  0x35 => 0,  0x36 => 0,  0x37 => 0,
+    0x38 => 0,  0x39 => 0,  0x3a => 0,  0x3b => 0,  0x3c => 0,  0x3d => 0,  0x3e => 0,  0x3f => 0,
+    0x4f => 0,
+    0x92 => 0,  0x93 => 0,
+    # J2C extensions
+    0x74 => 4, 0x75 => 4, 0x77 => 4,
+);
+
+#------------------------------------------------------------------------------
+# Get JPEG marker name
+# Inputs: 0) Jpeg number
+# Returns: marker name
+sub JpegMarkerName($)
+{
+    my $marker = shift;
+    my $markerName = $jpegMarker{$marker};
+    unless ($markerName) {
+        $markerName = $jpegMarker{$marker & 0xf0};
+        if ($markerName and $markerName =~ /^([A-Z]+)\d+$/) {
+            $markerName = $1 . ($marker & 0x0f);
+        } else {
+            $markerName = sprintf("marker 0x%.2x", $marker);
+        }
+    }
+    return $markerName;
+}
+
+#------------------------------------------------------------------------------
 # Extract EXIF information from a jpg image
 # Inputs: 0) ExifTool object reference, 1) dirInfo ref with RAF set
 # Returns: 1 on success, 0 if this wasn't a valid JPEG file
@@ -4166,8 +4221,8 @@ sub ProcessJPEG($$)
     my ($success, $icc_profile, $wantTrailer, $trailInfo, %extendedXMP);
     my ($preview, $scalado, @dqt, $subSampling, $dumpEnd);
 
-    # check to be sure this is a valid JPG file
-    return 0 unless $raf->Read($s, 2) == 2 and $s eq "\xff\xd8";
+    # check to be sure this is a valid JPG (or J2C) file
+    return 0 unless $raf->Read($s, 2) == 2 and $s =~ /^\xff[\xd8\x4f]/;
     $dumpParms{MaxLen} = 128 if $verbose < 4;
     unless ($self->{VALUE}{FileType}) {
         $self->SetFileType();               # set FileType tag
@@ -4196,9 +4251,9 @@ sub ProcessJPEG($$)
         undef $nextMarker;
         undef $nextSegDataPt;
 #
-# read ahead to the next segment unless we have reached EOI or SOS
+# read ahead to the next segment unless we have reached EOI, SOS or SOD
 #
-        unless ($marker and ($marker==0xd9 or ($marker==0xda and not $wantTrailer))) {
+        unless ($marker and ($marker==0xd9 or ($marker==0xda and not $wantTrailer) or $marker==0x93)) {
             # read up to next marker (JPEG markers begin with 0xff)
             my $buff;
             $raf->ReadLine($buff) or last;
@@ -4208,11 +4263,8 @@ sub ProcessJPEG($$)
                 $nextMarker = ord($ch);
                 last unless $nextMarker == 0xff;
             }
-            # read data for all markers except 0xd9 (EOI) and stand-alone
-            # markers 0x00, 0x01 and 0xd0-0xd7 (NULL, TEM, RST0-RST7)
-            if ($nextMarker!=0xd9 and $nextMarker!=0x00 and $nextMarker!=0x01 and
-                ($nextMarker<0xd0 or $nextMarker>0xd7))
-            {
+            # read segment data if it exists
+            if (not defined $markerLenBytes{$nextMarker}) {
                 # read record length word
                 last unless $raf->Read($s, 2) == 2;
                 my $len = unpack('n',$s);   # get data length
@@ -4221,6 +4273,14 @@ sub ProcessJPEG($$)
                 $len -= 2;  # subtract size of length word
                 last unless $raf->Read($buff, $len) == $len;
                 $nextSegDataPt = \$buff;    # set pointer to our next data
+            } elsif ($markerLenBytes{$nextMarker} == 4) {
+                # handle J2C extensions with 4-byte length word
+                last unless $raf->Read($s, 4) == 4;
+                my $len = unpack('N',$s);   # get data length
+                last unless defined($len) and $len >= 4;
+                $nextSegPos = $raf->Tell();
+                $len -= 4;  # subtract size of length word
+                last unless $raf->Seek($len, 1);
             }
             # read second segment too if this was the first
             next unless defined $marker;
@@ -4379,9 +4439,15 @@ sub ProcessJPEG($$)
             # nothing interesting to parse after start of scan (SOS)
             $success = 1;
             last;   # all done parsing file
-        } elsif ($marker==0x00 or $marker==0x01 or ($marker>=0xd0 and $marker<=0xd7)) {
-            # handle stand-alone markers 0x00, 0x01 and 0xd0-0xd7 (NULL, TEM, RST0-RST7)
-            $verbose and $marker and print $out "JPEG $markerName:\n";
+        } elsif ($marker == 0x93) {
+            pop @$path;
+            $verbose and print $out "JPEG SOD\n";
+            $success = 1;
+            next if $verbose > 2 or $htmlDump;
+            last;   # all done parsing file
+        } elsif (defined $markerLenBytes{$marker}) {
+            # handle other stand-alone markers and segments we skipped over
+            $verbose and $marker and print $out "JPEG $markerName\n";
             next;
         } elsif ($marker == 0xdb and length($$segDataPt) and    # DQT
             # save the DQT data only if JPEGDigest has been requested
@@ -4449,7 +4515,7 @@ sub ProcessJPEG($$)
                 my %dirInfo = (
                     Parent => $markerName,
                     DataPt => $segDataPt,
-                    DataPos => $segPos,
+                    DataPos => -$hdrLen, # (remember: relative to Base!)
                     DirStart => $hdrLen,
                     Base => $segPos + $hdrLen,
                 );
@@ -4597,7 +4663,7 @@ sub ProcessJPEG($$)
                 my %dirInfo = (
                     Parent => $markerName,
                     DataPt => $segDataPt,
-                    DataPos => $segPos,
+                    DataPos => -4, # (relative to Base)
                     DirStart => 4,
                     Base => $segPos + 4,
                     Multi => 1, # the MP Attribute IFD will be MPF1
@@ -4627,7 +4693,7 @@ sub ProcessJPEG($$)
                 my %dirInfo = (
                     Parent => $markerName,
                     DataPt => $segDataPt,
-                    DataPos => $segPos,
+                    DataPos => -6, # (relative to Base)
                     DirStart => 6,
                     Base => $segPos + 6,
                 );
@@ -4642,7 +4708,7 @@ sub ProcessJPEG($$)
                 my %dirInfo = (
                     Parent => $markerName,
                     DataPt => $segDataPt,
-                    DataPos => $segPos,
+                    DataPos => -6, # (relative to Base)
                     DirStart => 6,
                     Base => $segPos + 6,
                 );
@@ -4712,7 +4778,7 @@ sub ProcessJPEG($$)
                 my %dirInfo = (
                     Parent => $markerName,
                     DataPt => $segDataPt,
-                    DataPos => $segPos,
+                    DataPos => -6, # (relative to Base)
                     DirStart => 6,
                     Base => $segPos + 6,
                 );
@@ -4725,7 +4791,7 @@ sub ProcessJPEG($$)
                 my %dirInfo = (
                     Parent => $markerName,
                     DataPt => $segDataPt,
-                    DataPos => $segPos,
+                    DataPos => -6, # (relative to Base)
                     DirStart => 6,
                     Base => $segPos + 6,
                 );
@@ -4858,6 +4924,19 @@ sub ProcessJPEG($$)
             $dumpType = 'Comment';
             $$segDataPt =~ s/\0+$//;    # some dumb softwares add null terminators
             $self->FoundTag('Comment', $$segDataPt);
+        } elsif ($marker == 0x64) {         # CME (J2C comment and extension)
+            $dumpType = 'Comment';
+            if ($length > 2) {
+                my $reg = unpack('n', $$segDataPt); # get registration value
+                my $val = substr($$segDataPt, 2);
+                $val = $self->Decode($val, 'Latin') if $reg == 1;
+                # (actually an extension for $reg==65535, but store as binary comment)
+                $self->FoundTag('Comment', ($reg==0 or $reg==65535) ? \$val : $val);
+            }
+        } elsif ($marker == 0x51) {         # SIZ (J2C)
+            my ($w, $h) = unpack('x2N2', $$segDataPt);
+            $self->FoundTag('ImageWidth', $w);
+            $self->FoundTag('ImageHeight', $h);            
         } elsif (($marker & 0xf0) != 0xe0) {
             undef $dumpType;    # only dump unknown APP segments
         }
@@ -5018,21 +5097,26 @@ sub DoProcessTIFF($$;$)
                 $fileType = 'RAW';
             }
             $tagTablePtr = GetTagTable('Image::ExifTool::PanasonicRaw::Main');
-        } elsif ($identifier == 0x2b and $fileType eq 'TIFF') {
-            # this looks like a BigTIFF image
-            $raf->Seek(0);
-            require Image::ExifTool::BigTIFF;
-            return 1 if Image::ExifTool::BigTIFF::ProcessBTF($self, $dirInfo);
-        } elsif (Get8u($dataPt, 2) == 0xbc and $byteOrder eq 'II' and $fileType eq 'TIFF') {
-            $fileType = 'HDP';  # Windows HD Photo file
-            # check version number
-            my $ver = Get8u($dataPt, 3);
-            if ($ver > 1) {
-                $self->Error("Windows HD Photo version $ver files not yet supported");
-                return 1;
+        } elsif ($fileType eq 'TIFF') {
+            if ($identifier == 0x2b) {
+                # this looks like a BigTIFF image
+                $raf->Seek(0);
+                require Image::ExifTool::BigTIFF;
+                return 1 if Image::ExifTool::BigTIFF::ProcessBTF($self, $dirInfo);
+            } elsif ($identifier == 0x4f52 or $identifier == 0x5352) {
+                # Olympus ORF image (set FileType now because base type is 'ORF')
+                $self->SetFileType($fileType = 'ORF');
+            } elsif ($identifier == 0x4352) {
+                $fileType = 'DCP';
+            } elsif ($byteOrder eq 'II' and ($identifier & 0xff) == 0xbc) {
+                $fileType = 'HDP';  # Windows HD Photo file
+                # check version number
+                my $ver = Get8u($dataPt, 3);
+                if ($ver > 1) {
+                    $self->Error("Windows HD Photo version $ver files not yet supported");
+                    return 1;
+                }
             }
-        } elsif ($identifier == 0x4352 and $fileType eq 'TIFF') {
-            $fileType = 'DCP';
         }
         # we have a valid TIFF (or whatever) file
         if ($fileType and not $self->{VALUE}{FileType}) {

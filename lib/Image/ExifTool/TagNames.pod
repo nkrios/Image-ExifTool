@@ -246,8 +246,8 @@ This information is extracted from the JPEG Start Of Frame segment.
 
 EXIF stands for "Exchangeable Image File Format".  This type of information
 is formatted according to the TIFF specification, and may be found in JPG,
-TIFF, PNG, PGF, MIFF, HDP, PSP and XCF images, as well as many TIFF-based
-RAW images, and even some AVI and MOV videos.
+TIFF, PNG, JP2, PGF, MIFF, HDP, PSP and XCF images, as well as many
+TIFF-based RAW images, and even some AVI and MOV videos.
 
 The EXIF meta information is organized into different Image File Directories
 (IFD's) within an image.  The names of these IFD's correspond to the
@@ -776,14 +776,14 @@ official EXIF 2.3 specification.
 The tags listed below are part of the International Press Telecommunications
 Council (IPTC) and the Newspaper Association of America (NAA) Information
 Interchange Model (IIM).  This is an older meta information format, slowly
-being phased out in favor of XMP.  (In fact, the newer IPTCCore
-specification actually uses XMP format!)  IPTC information may be embedded
-in JPG, TIFF, PNG, MIFF, PS, PDF, PSD, XCF and DNG images.
+being phased out in favor of XMP -- the newer IPTCCore specification uses
+XMP format.  IPTC information may be embedded in JPG, TIFF, PNG, MIFF, PS,
+PDF, PSD, XCF and DNG images.
 
 IPTC information is separated into different records, each of which has its
 own set of tags.  See
 L<http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf> for the
-official specification.
+official IPTC IIM specification.
 
 This specification dictates a length for ASCII (C<string> or C<digits>) and
 binary (C<undef>) values.  These lengths are given in square brackets after
@@ -1045,6 +1045,7 @@ See L<http://www.adobe.com/devnet/xmp/> for the official XMP specification.
   DICOM                                         XMP DICOM
   digiKam                                       XMP digiKam
   exif                                          XMP exif
+  extensis                                      XMP extensis
   iptcCore                                      XMP iptcCore
   iptcExt                                       XMP iptcExt
   lr                                            XMP Lightroom
@@ -1092,9 +1093,11 @@ to themselves instead of speaking out for the rest of the world to hear.)
   Caption                                       string/
   Categories                                    string/
   Datetime                                      date/
+  DPP                                           lang-alt
   Keywords                                      string/+
   Notes                                         string/
   Rating                                        real/
+  Rawrppused                                    boolean
   RPP                                           lang-alt
   Tagged                                        boolean/
 
@@ -1572,6 +1575,21 @@ EXIF schema for EXIF tags.
   Names                                         string+
   Rows                                          integer
   Values                                        rational+
+
+=head3 XMP extensis Tags
+
+Tags used by Extensis Portfolio.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  Approved                                      boolean
+  ApprovedBy                                    string
+  ClientName                                    string
+  JobName                                       string
+  JobStatus                                     string
+  RoutedTo                                      string
+  RoutingNotes                                  string
+  WorkToDo                                      string
 
 =head3 XMP iptcCore Tags
 
@@ -2279,10 +2297,14 @@ namespace prefixes are found, they are translated to the newer "xmp",
   Tag Name                                      Writable
   --------                                      --------
   Advisory                                      string+
+  Author                                        string/
   BaseURL                                       string
   CreateDate                                    date
   CreatorTool                                   string
+  Description                                   lang-alt/
+  Format                                        string/
   Identifier                                    string/+
+  Keywords                                      string/
   Label                                         string
   MetadataDate                                  date
   ModifyDate                                    date
@@ -2299,6 +2321,7 @@ namespace prefixes are found, they are translated to the newer "xmp",
   ThumbnailHeight                               integer_+
   ThumbnailImage                                string/_+
   ThumbnailWidth                                integer_+
+  Title                                         lang-alt/
 
 =head3 XMP PageInfo Struct
 
@@ -2724,6 +2747,7 @@ XMP Media Management schema tags.
   RenditionOfVersionID                          string_
   RenditionParams                               string
   SaveID                                        integer
+  Subject                                       string/+
   VersionID                                     string
   Versions                                      Version Struct+
   VersionsComments                              string_+
@@ -5942,7 +5966,8 @@ M550, as well as various cameras marketed by other manufacturers.
      20    DateTimeOriginal                     string[20]
      52    ISO                                  int16u
      87    FirmwareVersion                      string[16]
-    168    SerialNumber                         string[12]
+    168    UnknownNumber                        string[12]
+    196    UnknownNumber                        string[12]
 
 =head3 Kodak Type10 Tags
 
@@ -8051,7 +8076,7 @@ the maker notes of NEF images.
    Index   Tag Name                             Writable
    -----   --------                             --------
       0    ExposureAdj                          int16s
-     18    ExposureAdj2                         double~
+     18    ExposureAdj2                         double
      36    ActiveD-Lighting                     int8u
      37    ActiveD-LightingMode                 int8u
 
@@ -9766,7 +9791,8 @@ This information is found in Sanyo MP4 videos.
 
 =head2 Sigma Tags
 
-These tags are used in Sigma/Foveon cameras.
+These tags are used in Sigma/Foveon cameras.  Many tags are not consistent
+between different models.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -9806,12 +9832,17 @@ These tags are used in Sigma/Foveon cameras.
   0x001b   PreviewImageLength                   int32u*
            LuminanceNoiseReduction              string
   0x001c   PreviewImageSize                     int16u[2]
+           PreviewImageStart                    int32u*
   0x001d   MakerNoteVersion                     undef
+           PreviewImageLength                   int32u*
   0x001f   AFPoint                              string
+           MakerNoteVersion                     undef
   0x0022   FileFormat                           string
   0x0024   Calibration                          string
+  0x0026   FileFormat                           string
   0x002c   ColorMode                            int32u
   0x0030   LensApertureRange                    string
+           Calibration                          string
   0x0031   FNumber                              rational64u
   0x0032   ExposureTime                         rational64u
   0x0033   ExposureTime2                        string
@@ -9822,6 +9853,15 @@ These tags are used in Sigma/Foveon cameras.
   0x003b   Firmware                             string
   0x003c   WhiteBalance                         string
   0x003d   PictureMode                          string
+  0x0048   LensApertureRange                    string
+  0x0049   FNumber                              rational64u
+  0x004a   ExposureTime                         rational64u
+  0x004b   ExposureTime2                        string
+  0x004d   ExposureCompensation                 rational64s
+  0x0055   SensorTemperature                    string
+  0x0056   FlashExposureComp                    rational64s
+  0x0057   Firmware                             string
+  0x0058   WhiteBalance                         string
 
 =head2 Sony Tags
 
@@ -11601,9 +11641,7 @@ currently writes only EXIF, IPTC and XMP tags in these images.
   'cgrp'   ColorGroup                           N
   'chck'   DigitalSignature                     N
   'cmap'   ComponentMapping                     N
-  'colr'   ICC_Profile                          ICC_Profile
-           Colorspace                           N
-           ColorSpecification                   N
+  'colr'   ColorSpecification                   Jpeg2000 ColorSpec
   'comp'   Composition                          N
   'copt'   CompositionOptions                   N
   'cref'   Cross-Reference                      N
@@ -11639,11 +11677,25 @@ currently writes only EXIF, IPTC and XMP tags in these images.
   'ulst'   UUIDList                             N
   'url '   URL                                  N
   'uuid'   UUID-EXIF                            EXIF
+           UUID-EXIF2                           EXIF
            UUID-IPTC                            IPTC
+           UUID-IPTC2                           IPTC
            UUID-XMP                             XMP
            UUID-GeoJP2                          EXIF
+           UUID-Photoshop                       Photoshop
            UUID-Unknown                         N
   'xml '   XML                                  XMP
+
+=head3 Jpeg2000 ColorSpec Tags
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    ColorSpecMethod                      N
+      1    ColorSpecPrecedence                  N
+      2    ColorSpecApproximation               N
+      3    ICC_Profile                          ICC_Profile
+           ColorSpace                           N
+           ColorSpecData                        N
 
 =head3 Jpeg2000 FileType Tags
 
@@ -12385,7 +12437,7 @@ decode any tags found in the image.
   'border-color'       BorderColor              N
   'class'              Class                    N
   'colors'             Colors                   N
-  'colorspace'         Colorspace               N
+  'colorspace'         ColorSpace               N
   'columns'            ImageWidth               N
   'compression'        Compression              N
   'delay'              Delay                    N
@@ -12692,13 +12744,13 @@ Additional document permissions imposed by digital signatures.
   'BeginPhotoshop'     PhotoshopData            Photoshop
   'BoundingBox'        BoundingBox              N
   'Copyright'          Copyright                string
-  'CreationDate'       CreateDate               string~
+  'CreationDate'       CreateDate               string
   'Creator'            Creator                  string
   'EmbeddedFileName'   EmbeddedFileName         N
   'For'                For                      string
   'ImageData'          ImageData                N
   'Keywords'           Keywords                 string
-  'ModDate'            ModifyDate               string~
+  'ModDate'            ModifyDate               string
   'Pages'              Pages                    N
   'Routing'            Routing                  string
   'Subject'            Subject                  string
@@ -12996,10 +13048,22 @@ This information is found in iTunes Cover Flow data files.
       7    ImageWidth                           N
       8    ImageHeight                          N
 
+=head2 Ogg Tags
+
+ExifTool extracts the following types of information from Ogg files.  See
+L<http://www.xiph.org/vorbis/doc/> for the Ogg specification.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'FLAC'   FLAC                                 FLAC
+  'ID3'    ID3                                  ID3
+  'theora' Theora                               Theora
+  'vorbis' Vorbis                               Vorbis
+
 =head2 Vorbis Tags
 
-ExifTool extracts the following Vorbis information from Ogg files.  As well
-as this, ExifTool also extracts FLAC and ID3 information from Ogg files.
+Information extracted from Ogg Vorbis files.  See
+L<http://www.xiph.org/vorbis/doc/> for the Vorbis specification.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -13025,15 +13089,18 @@ any tag found, even if not listed here.
 
   Tag ID                  Tag Name              Writable
   ------                  --------              --------
+  'ACTOR'                 Actor                 N
   'ALBUM'                 Album                 N
   'ARTIST'                Artist                N+
   'COMMENT'               Comment               N
+  'COMPOSER'              Composer              N
   'CONTACT'               Contact               N+
   'COPYRIGHT'             Copyright             N
   'COVERART'              CoverArt              N
   'COVERARTMIME'          CoverArtMIMEType      N
   'DATE'                  Date                  N
   'DESCRIPTION'           Description           N
+  'DIRECTOR'              Director              N
   'ENCODED_BY'            EncodedBy             N
   'ENCODED_USING'         EncodedUsing          N
   'GENRE'                 Genre                 N
@@ -13042,6 +13109,7 @@ any tag found, even if not listed here.
   'LOCATION'              Location              N
   'ORGANIZATION'          Organization          N
   'PERFORMER'             Performer             N+
+  'PRODUCER'              Producer              N
   'REPLAYGAIN_ALBUM_GAIN' ReplayGainAlbumGain   N
   'REPLAYGAIN_ALBUM_PEAK' ReplayGainAlbumPeak   N
   'REPLAYGAIN_TRACK_GAIN' ReplayGainTrackGain   N
@@ -13090,6 +13158,34 @@ FLAC is big-endian, so bit 0 is the high-order bit in this table.
       6    PictureIndexedColors                 N
       7    PictureLength                        N
       8    Picture                              N
+
+=head2 Theora Tags
+
+Information extracted from Ogg Theora video files.  See
+L<http://www.theora.org/doc/Theora.pdf> for the Theora specification.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0080   Identification                       Theora Identification
+  0x0081   Comments                             Vorbis Comments
+
+=head3 Theora Identification Tags
+
+Tags extracted from the Theora identification header.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      0    TheoraVersion                        N
+      7    ImageWidth                           N
+     10    ImageHeight                          N
+     13    XOffset                              N
+     14    YOffset                              N
+     15    FrameRate                            N
+     23    PixelAspectRatio                     N
+     29    ColorSpace                           N
+     30    NominalVideoBitrate                  N
+     33    Quality                              N
+     34    PixelFormat                          N
 
 =head2 APE Tags
 
@@ -13350,6 +13446,14 @@ image files.  Exiftool extracts meta information from the UserData atom
 (including some proprietary manufacturer-specific information), as well as
 extracting various audio, video and image parameters.  Tags with a question
 mark after their name are not extracted unless the Unknown option is set.
+
+According to the specification, many QuickTime date/time tags should be
+stored as UTC.  Unfortunately, digital cameras will often store local time
+values instead, presumably because they don't know the time zone.  For this
+reason, by default ExifTool does not assume a time zone for these values.
+However, if the QuickTimeUTC option is set via the API or the ExifTool
+configuration file, then ExifTool will assume these values are properly
+stored as UTC, and will convert them to local time when extracting.
 
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
@@ -13859,6 +13963,7 @@ Metadata directory found in MOV videos from some Kodak cameras.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
+  'CMbo'   CameraByteOrder                      N
   'Cmbo'   CameraByteOrder                      N
   'DcME'   DcME                                 QuickTime DcME
 
@@ -16236,6 +16341,11 @@ in two types of RIFF C<LIST> chunks: C<INFO> and C<exif>, and information
 about the audio content is stored in the C<fmt > chunk.  As well as this
 information, some video information and proprietary manufacturer-specific
 information is also extracted.
+
+Large AVI videos may be a concatenation of two or more RIFF chunks.
+For these files, information is extracted from subsequent RIFF
+chunks as sub-documents, but the Duration is calculated for the full
+video.
 
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
@@ -20217,6 +20327,15 @@ Information extracted from ELF (Unix) executable files and SO libraries.
      16    ObjectFileType                       N
      18    CPUType                              N
 
+=head3 EXE CHM Tags
+
+Tags extracted from Microsoft Compiled HTML files.
+
+   Index   Tag Name                             Writable
+   -----   --------                             --------
+      1    CHMVersion                           N
+      5    LanguageCode                         N
+
 =head2 LNK Tags
 
 Information extracted from MS Shell Link (Windows shortcut) files.
@@ -20481,10 +20600,11 @@ information from the original image.
 
 The following tags are extracted from ZIP archives.  ExifTool also extracts
 additional meta information from compressed documents inside some ZIP-based
-files such Office Open XML (DOCX, PPTX and XLSX), Open Document (ODP, ODS
-and ODT), iWork (KEY, PAGES, NUMBERS), and Capture One Enhanced Image
-Package (EIP).  The ExifTool family 3 groups may be used to organize the
-output by embedded document number (ie. the exiftool C<-g3> option).
+files such Office Open XML (DOCX, PPTX and XLSX), Open Document (ODB, ODC,
+ODF, ODG, ODI, ODP, ODS and ODT), iWork (KEY, PAGES, NUMBERS), and Capture
+One Enhanced Image Package (EIP).  The ExifTool family 3 groups may be used
+to organize the output by embedded document number (ie. the exiftool C<-g3>
+option).
 
    Index   Tag Name                             Writable
    -----   --------                             --------

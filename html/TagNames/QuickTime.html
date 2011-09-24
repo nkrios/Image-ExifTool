@@ -12,6 +12,14 @@ image files.  Exiftool extracts meta information from the UserData atom
 (including some proprietary manufacturer-specific information), as well as
 extracting various audio, video and image parameters.  Tags with a question
 mark after their name are not extracted unless the Unknown option is set.</p>
+
+<p>According to the specification, many QuickTime date/time tags should be
+stored as UTC.  Unfortunately, digital cameras will often store local time
+values instead, presumably because they don&#39;t know the time zone.  For this
+reason, by default ExifTool does not assume a time zone for these values.
+However, if the QuickTimeUTC option is set via the API or the ExifTool
+configuration file, then ExifTool will assume these values are properly
+stored as UTC, and will convert them to local time when extracting.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -347,7 +355,7 @@ and is used in the AvgBitrate calculation)</span></span></td></tr>
 <table class='inner sep' cellspacing=1>
 <tr class=h><th>Value</th><th>VendorID</th><th>Value</th><th>VendorID</th></tr>
 <tr><td>'FFMP'</td><td>= FFmpeg</td>
-<td class=b>'kdak'</td><td class=b>= Kodak</td>
+<td class=b>'leic'</td><td class=b>= Leica</td>
 </tr><tr><td>'GIC '</td><td>= General Imaging Co.</td>
 <td class=b>'mino'</td><td class=b>= Minolta</td>
 </tr><tr><td>'KMPI'</td><td>= Konica-Minolta</td>
@@ -362,6 +370,8 @@ and is used in the AvgBitrate calculation)</span></span></td></tr>
 <td class=b>'pr01'</td><td class=b>= Olympus (pr01)</td>
 </tr><tr><td>'fe20'</td><td>= Olympus (fe20)</td>
 <td class=b>'sany'</td><td class=b>= Sanyo</td>
+</tr><tr><td>'kdak'</td><td>= Kodak</td>
+<td class=b>&nbsp;</td><td class=b>&nbsp;</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='ItemList'>QuickTime ItemList Tags</a></h2>
@@ -957,12 +967,12 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <td class=r title='1 = 0x1'>1</td>
 <td>CreateDate</td>
 <td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
 <td>ModifyDate</td>
 <td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr class=b>
 <td class=r title='3 = 0x3'>3</td>
 <td>TimeScale</td>
@@ -1103,12 +1113,12 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <td class=r title='1 = 0x1'>1</td>
 <td>MediaCreateDate</td>
 <td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
 <td>MediaModifyDate</td>
 <td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr class=b>
 <td class=r title='3 = 0x3'>3</td>
 <td>MediaTimeScale</td>
@@ -1590,12 +1600,12 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <td class=r title='1 = 0x1'>1</td>
 <td>TrackCreateDate</td>
 <td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
 <td>TrackModifyDate</td>
 <td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr class=b>
 <td class=r title='3 = 0x3'>3</td>
 <td>TrackID</td>
@@ -2053,12 +2063,18 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>'Cmbo'</td>
+<td>'CMbo'</td>
 <td>CameraByteOrder</td>
 <td class=c>N</td>
 <td><span class=s>&#39;II&#39; = Little-endian (Intel, II)
   <br>&#39;MM&#39; = Big-endian (Motorola, MM)</span></td></tr>
 <tr class=b>
+<td>'Cmbo'</td>
+<td>CameraByteOrder</td>
+<td class=c>N</td>
+<td><span class=s>&#39;II&#39; = Little-endian (Intel, II)
+  <br>&#39;MM&#39; = Big-endian (Motorola, MM)</span></td></tr>
+<tr>
 <td>'DcME'</td>
 <td>DcME</td>
 <td class=c>-</td>
@@ -2279,7 +2295,7 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td class=r title='0 = 0x0'>0</td>
 <td>PreviewDate</td>
 <td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr class=b>
 <td class=r title='2 = 0x2'>2</td>
 <td>PreviewVersion</td>
@@ -2521,7 +2537,7 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 14, 2011</i>
+<br><i>Last revised Aug 24, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

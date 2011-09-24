@@ -23,7 +23,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.31';
+$VERSION = '1.32';
 
 sub ProcessFujiDir($$$);
 sub ProcessFaceRec($$$);
@@ -786,6 +786,7 @@ sub ProcessRAF($$)
     $raf->Seek($jpos, 0)              or return 0;
     $raf->Read($jpeg, $jlen) == $jlen or return 0;
 
+    $exifTool->SetFileType();
     $exifTool->FoundTag('RAFVersion', substr($buff, 0x3c, 4));
 
     # extract information from embedded JPEG

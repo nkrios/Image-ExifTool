@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.40';
+$VERSION = '1.41';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -2234,8 +2234,8 @@ sub ProcessCanonCustom2($$$)
                 my $tagInfo = $$newTags{$tag};
                 next unless $tagInfo;
                 my $nvHash = $exifTool->GetNewValueHash($tagInfo);
-                next unless Image::ExifTool::IsOverwriting($nvHash, $val);
-                my $newVal = Image::ExifTool::GetNewValues($nvHash);
+                next unless $exifTool->IsOverwriting($nvHash, $val);
+                my $newVal = $exifTool->GetNewValues($nvHash);
                 next unless defined $newVal;    # can't delete from a custom table
                 WriteValue($newVal, 'int32s', $num, $dataPt, $recPos);
                 $exifTool->VerboseValue("- CanonCustom:$$tagInfo{Name}", $val);
@@ -2363,8 +2363,8 @@ sub WriteCanonCustom($$$)
         next unless $tagInfo;
         my $nvHash = $exifTool->GetNewValueHash($tagInfo);
         $val = ($val & 0xff);
-        next unless Image::ExifTool::IsOverwriting($nvHash, $val);
-        my $newVal = Image::ExifTool::GetNewValues($nvHash);
+        next unless $exifTool->IsOverwriting($nvHash, $val);
+        my $newVal = $exifTool->GetNewValues($nvHash);
         next unless defined $newVal;    # can't delete from a custom table
         Set16u(($newVal & 0xff) + ($tag << 8), $dataPt, $pos);
         $exifTool->VerboseValue("- $dirName:$$tagInfo{Name}", $val);

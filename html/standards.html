@@ -212,6 +212,12 @@ really wanted to support huge metadata segments.  Either change to an existing
 JPEG would break all current JPEG reader/writers, but the change is trivial and
 could easily be implemented.</p>
 
+<p><b>An alternative solution:</b></p>
+
+<p>Define a new application marker segment which uses a 4-byte size word.  This
+technique is already used for the extended JPEG2000 codestream MCT, MCC and MIC
+marker segments.</p>
+
 <a name="MPF"></a>
 <h3>Multi-Picture Format (MPF) <a class=ref href="#ref10">[10]</a></h3>
 
@@ -266,7 +272,7 @@ inside a JPEG segment.</p>
 </ol>
 <hr>
 <i>Created Sep 17, 2009</i><br>
-<i>Last revised Aug 19, 2010</i>
+<i>Last revised Aug 16, 2011</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

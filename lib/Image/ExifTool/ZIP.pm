@@ -9,6 +9,7 @@
 #               2) http://www.cpanforum.com/threads/9046
 #               3) http://www.gzip.org/zlib/rfc-gzip.html
 #               4) http://DataCompression.info/ArchiveFormats/RAR202.txt
+#               5) https://jira.atlassian.com/browse/CONF-21706
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::ZIP;
@@ -17,12 +18,17 @@ use strict;
 use vars qw($VERSION $warnString);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub WarnProc($) { $warnString = $_[0]; }
 
 # file types for recognized Open Document "mimetype" values
 my %openDocType = (
+    'application/vnd.oasis.opendocument.database'     => 'ODB', #5
+    'application/vnd.oasis.opendocument.chart'        => 'ODC', #5
+    'application/vnd.oasis.opendocument.formula'      => 'ODF', #5
+    'application/vnd.oasis.opendocument.graphics'     => 'ODG', #5
+    'application/vnd.oasis.opendocument.image'        => 'ODI', #5
     'application/vnd.oasis.opendocument.presentation' => 'ODP',
     'application/vnd.oasis.opendocument.spreadsheet'  => 'ODS',
     'application/vnd.oasis.opendocument.text'         => 'ODT',
@@ -36,10 +42,11 @@ my %openDocType = (
     NOTES => q{
         The following tags are extracted from ZIP archives.  ExifTool also extracts
         additional meta information from compressed documents inside some ZIP-based
-        files such Office Open XML (DOCX, PPTX and XLSX), Open Document (ODP, ODS
-        and ODT), iWork (KEY, PAGES, NUMBERS), and Capture One Enhanced Image
-        Package (EIP).  The ExifTool family 3 groups may be used to organize the
-        output by embedded document number (ie. the exiftool C<-g3> option).
+        files such Office Open XML (DOCX, PPTX and XLSX), Open Document (ODB, ODC,
+        ODF, ODG, ODI, ODP, ODS and ODT), iWork (KEY, PAGES, NUMBERS), and Capture
+        One Enhanced Image Package (EIP).  The ExifTool family 3 groups may be used
+        to organize the output by embedded document number (ie. the exiftool C<-g3>
+        option).
     },
     2 => 'ZipRequiredVersion',
     3 => {
@@ -565,7 +572,7 @@ This module is used by Image::ExifTool
 
 This module contains definitions required by Image::ExifTool to extract meta
 information from ZIP, GZIP and RAR archives.  This includes ZIP-based file
-types like DOCX, PPTX, XLSX, ODP, ODS, ODT and EIP.
+types like DOCX, PPTX, XLSX, ODB, ODC, ODF, ODG, ODI, ODP, ODS, ODT and EIP.
 
 =head1 AUTHOR
 

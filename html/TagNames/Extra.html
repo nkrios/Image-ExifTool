@@ -51,7 +51,8 @@ automates the handling of this tag in the MWG module -- see the
 <tr>
 <td>ExifByteOrder</td>
 <td class=c>Y</td>
-<td><span class=s><span class=n>(only writable for newly created EXIF segments)</span>
+<td><span class=s><span class=n>(represents the byte order of EXIF information.  May be written to set the
+byte order only for newly created EXIF segments)</span>
   <br>&#39;II&#39; = Little-endian (Intel, II)
   <br>&#39;MM&#39; = Big-endian (Motorola, MM)</span></td></tr>
 <tr class=b>
@@ -61,10 +62,11 @@ automates the handling of this tag in the MWG module -- see the
 <tr>
 <td>ExifUnicodeByteOrder</td>
 <td class=c>Y</td>
-<td><span class=s><span class=n>(the EXIF specification is particularly vague about the byte ordering for
-Unicode text, and different applications use different conventions.  By
-default ExifTool writes Unicode text in EXIF byte order, but this write-only
-tag may be used to force a specific byte order)</span>
+<td><span class=s><span class=n>(specifies the byte order to use when writing EXIF Unicode text.  The EXIF
+specification is particularly vague about this byte ordering, and different
+applications use different conventions.  By default ExifTool writes Unicode
+text in EXIF byte order, but this write-only tag may be used to force a
+specific order)</span>
   <br>&#39;II&#39; = Little-endian (Intel, II)
   <br>&#39;MM&#39; = Big-endian (Motorola, MM)</span></td></tr>
 <tr class=b>
@@ -86,7 +88,7 @@ this value should be done in octal, ie. &quot;oct($filePermissions) &amp; 0200&q
 <tr>
 <td>FileSize</td>
 <td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(print conversion uses historic prefixes: 1 kB = 1024 bytes, etc.)</span></span></td></tr>
 <tr class=b>
 <td>FileType</td>
 <td class=c>N</td>
@@ -198,7 +200,7 @@ resource-fork information as a sub-document)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 9, 2011</i>
+<br><i>Last revised Sep 21, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

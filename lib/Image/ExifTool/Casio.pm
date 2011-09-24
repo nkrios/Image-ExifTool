@@ -685,7 +685,7 @@ $VERSION = '1.32';
             0 => 'Off',
             1 => 'On',
             2 => 'Best Shot',
-            # 3 observed in MOV videos (EX-V7)
+            # 3 observed in MOV videos (EX-V7, EX-TR100)
             # (newer models write 2 numbers here - PH)
             '0 0' => 'Off', #PH
             # have seen '0 1' for EX-Z2000 which has 5 modes: Auto, Camera AS, Image AS, DEMO, Off
@@ -694,6 +694,7 @@ $VERSION = '1.32';
             '20 0' => 'High Sensitivity', #PH (EX-Z77)
             '0 3' => 'CCD Shift', #PH (guess)
             '2 3' => 'High Speed Anti-Shake', #PH (EX-FC150)
+            # have also seen: '2 0', '16 1'            
         },
     },
     0x302a => { #PH (EX-Z450)

@@ -44,8 +44,10 @@ Sony models.
 <td><span class=s>0x0 = None
   <br>0x48 = Minolta AF 2x APO (D)
   <br>0x50 = Minolta AF 2x APO II
+  <br>0x60 = Minolta AF 2x APO
   <br>0x88 = Minolta AF 1.4x APO (D)
-  <br>0x90 = Minolta AF 1.4x APO II</span></td></tr>
+  <br>0x90 = Minolta AF 1.4x APO II
+  <br>0xa0 = Minolta AF 1.4x APO</span></td></tr>
 <tr class=b>
 <td title='0x0112 = 274'>0x0112</td>
 <td>WhiteBalanceFineTune</td>
@@ -182,7 +184,8 @@ Sony models.
   <br>&#39;2 0 0 0&#39; = ARW 1.0
   <br>&#39;3 0 0 0&#39; = ARW 2.0
   <br>&#39;3 1 0 0&#39; = ARW 2.1
-  <br>&#39;3 2 0 0&#39; = ARW 2.2</span></td></tr>
+  <br>&#39;3 2 0 0&#39; = ARW 2.2
+  <br>&#39;3 3 0 0&#39; = ARW 2.3</span></td></tr>
 <tr>
 <td title='0xb001 = 45057'>0xb001</td>
 <td>SonyModelID</td>
@@ -198,17 +201,21 @@ Sony models.
   <br>263 = DSLR-A380/A390
   <br>264 = DSLR-A330
   <br>265 = DSLR-A230
-  <br>266 = DSLR-A290</td><td>&nbsp;&nbsp;</td>
-  <td>269 = DSLR-A850
-  <br>273 = DSLR-A550
-  <br>274 = DSLR-A500
+  <br>266 = DSLR-A290
+  <br>269 = DSLR-A850
+  <br>273 = DSLR-A550</td><td>&nbsp;&nbsp;</td>
+  <td>274 = DSLR-A500
   <br>275 = DSLR-A450
   <br>278 = NEX-5
   <br>279 = NEX-3
   <br>280 = SLT-A33
   <br>281 = SLT-A55V
   <br>282 = DSLR-A560
-  <br>283 = DSLR-A580</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>283 = DSLR-A580
+  <br>284 = NEX-C3
+  <br>286 = SLT-A65V
+  <br>287 = SLT-A77V
+  <br>288 = NEX-5N</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr class=b>
 <td title='0xb020 = 45088'>0xb020</td>
@@ -549,6 +556,7 @@ original version of the lens has the same LensType.</p>
 </tr><tr><td>60</td><td>= Carl Zeiss Distagon T* 24mm F2 SSM</td>
 </tr><tr><td>61</td><td>= Sony 85mm F2.8 SAM (SAL-85F28)</td>
 </tr><tr><td>62</td><td>= Sony DT 35mm F1.8 SAM (SAL-35F18)</td>
+</tr><tr><td>63</td><td>= Sony DT 16-50mm F2.8 SSM (SAL-1650)</td>
 </tr><tr><td>128</td><td>= Tamron or Sigma Lens (128)</td>
 </tr><tr><td>128.1</td><td>= Tamron 18-200mm F3.5-6.3</td>
 </tr><tr><td>128.2</td><td>= Tamron 28-300mm F3.5-6.3</td>
@@ -558,6 +566,8 @@ original version of the lens has the same LensType.</p>
 </tr><tr><td>128.6</td><td>= Sigma AF 50-150mm F2.8 EX DC APO HSM II</td>
 </tr><tr><td>128.7</td><td>= Sigma 10-20mm F3.5 EX DC HSM</td>
 </tr><tr><td>128.8</td><td>= Sigma 70-200mm F2.8 II EX DG APO MACRO HSM</td>
+</tr><tr><td>128.9</td><td>= Sigma 10mm F2.8 EX DC HSM Fisheye</td>
+</tr><tr><td>128.10</td><td>= Sigma 50mm F1.4 EX DG HSM</td>
 </tr><tr><td>129</td><td>= Tamron Lens (129)</td>
 </tr><tr><td>129.1</td><td>= Tamron 200-400mm F5.6 LD</td>
 </tr><tr><td>129.2</td><td>= Tamron 70-300mm F4-5.6 LD</td>
@@ -611,6 +621,7 @@ original version of the lens has the same LensType.</p>
 </tr><tr><td>2561.5</td><td>= Tokina AT-X AF 300mm F4</td>
 </tr><tr><td>2561.6</td><td>= Tokina AT-X AF 400mm F5.6 SD</td>
 </tr><tr><td>2561.7</td><td>= Tokina AF 730 II 75-300mm F4.5-5.6</td>
+</tr><tr><td>2561.8</td><td>= Sigma 800mm F5.6 APO</td>
 </tr><tr><td>2562</td><td>= Minolta AF 50mm F1.4 [New]</td>
 </tr><tr><td>2563</td><td>= Minolta AF 300mm F2.8 APO or Sigma Lens</td>
 </tr><tr><td>2563.1</td><td>= Sigma AF 50-500mm F4-6.3 EX DG APO</td>
@@ -626,7 +637,8 @@ original version of the lens has the same LensType.</p>
 </tr><tr><td>2578.1</td><td>= Sigma 8mm F4 EX [DG] Fisheye</td>
 </tr><tr><td>2578.2</td><td>= Sigma 14mm F3.5</td>
 </tr><tr><td>2578.3</td><td>= Sigma 15mm F2.8 Fisheye</td>
-</tr><tr><td>2579</td><td>= Minolta/Sony AF 20mm F2.8</td>
+</tr><tr><td>2579</td><td>= Minolta/Sony AF 20mm F2.8 or Tokina Lens</td>
+</tr><tr><td>2579.1</td><td>= Tokina AT-X Pro DX 11-16mm F2.8</td>
 </tr><tr><td>2581</td><td>= Minolta AF 100mm F2.8 Macro [New] or Sigma or Tamron Lens</td>
 </tr><tr><td>2581.1</td><td>= Sigma AF 90mm F2.8 Macro</td>
 </tr><tr><td>2581.2</td><td>= Sigma AF 105mm F2.8 EX [DG] Macro</td>
@@ -638,6 +650,7 @@ original version of the lens has the same LensType.</p>
 </tr><tr><td>2588</td><td>= Minolta AF 70-210mm F3.5-4.5</td>
 </tr><tr><td>2589</td><td>= Minolta AF 80-200mm F2.8 APO or Tokina Lens</td>
 </tr><tr><td>2589.1</td><td>= Tokina 80-200mm F2.8</td>
+</tr><tr><td>2590</td><td>= Minolta AF 200mm F2.8 G APO + Minolta AF 1.4x APO</td>
 </tr><tr><td>2591</td><td>= Minolta AF 35mm F1.4</td>
 </tr><tr><td>2592</td><td>= Minolta AF 85mm F1.4 G (D)</td>
 </tr><tr><td>2593</td><td>= Minolta AF 200mm F2.8 G APO</td>
@@ -645,6 +658,7 @@ original version of the lens has the same LensType.</p>
 </tr><tr><td>2596</td><td>= Minolta AF 28mm F2</td>
 </tr><tr><td>2597</td><td>= Minolta AF 35mm F2 [New]</td>
 </tr><tr><td>2598</td><td>= Minolta AF 100mm F2</td>
+</tr><tr><td>2601</td><td>= Minolta AF 200mm F2.8 G APO + Minolta AF 2x APO</td>
 </tr><tr><td>2604</td><td>= Minolta AF 80-200mm F4.5-5.6</td>
 </tr><tr><td>2605</td><td>= Minolta AF 35-80mm F4-5.6</td>
 </tr><tr><td>2606</td><td>= Minolta AF 100-300mm F4.5-5.6</td>
@@ -680,6 +694,7 @@ original version of the lens has the same LensType.</p>
 </tr><tr><td>4574.3</td><td>= Tokina 300mm F2.8 x2</td>
 </tr><tr><td>4575</td><td>= 1.4x Teleconverter</td>
 </tr><tr><td>4585</td><td>= Tamron SP AF 300mm F2.8 LD IF</td>
+</tr><tr><td>4587</td><td>= Tamron AF 70-210mm f/2.8 SP LD</td>
 </tr><tr><td>6553</td><td>= T-Mount or Other Lens or no lens</td>
 </tr><tr><td>6553.1</td><td>= Arax MC 35mm F2.8 Tilt+Shift</td>
 </tr><tr><td>6553.2</td><td>= Arax MC 80mm F2.8 Tilt+Shift</td>
@@ -722,6 +737,7 @@ original version of the lens has the same LensType.</p>
 </tr><tr><td>25611.5</td><td>= Tokina AT-X AF 300mm F4</td>
 </tr><tr><td>25611.6</td><td>= Tokina AT-X AF 400mm F5.6 SD</td>
 </tr><tr><td>25611.7</td><td>= Tokina AF 730 II 75-300mm F4.5-5.6</td>
+</tr><tr><td>25611.8</td><td>= Sigma 800mm F5.6 APO</td>
 </tr><tr><td>25621</td><td>= Minolta AF 50mm F1.4 [New]</td>
 </tr><tr><td>25631</td><td>= Minolta AF 300mm F2.8 APO or Sigma Lens</td>
 </tr><tr><td>25631.1</td><td>= Sigma AF 50-500mm F4-6.3 EX DG APO</td>
@@ -737,7 +753,8 @@ original version of the lens has the same LensType.</p>
 </tr><tr><td>25781.1</td><td>= Sigma 8mm F4 EX [DG] Fisheye</td>
 </tr><tr><td>25781.2</td><td>= Sigma 14mm F3.5</td>
 </tr><tr><td>25781.3</td><td>= Sigma 15mm F2.8 Fisheye</td>
-</tr><tr><td>25791</td><td>= Minolta/Sony AF 20mm F2.8</td>
+</tr><tr><td>25791</td><td>= Minolta/Sony AF 20mm F2.8 or Tokina Lens</td>
+</tr><tr><td>25791.1</td><td>= Tokina AT-X Pro DX 11-16mm F2.8</td>
 </tr><tr><td>25811</td><td>= Minolta AF 100mm F2.8 Macro [New] or Sigma or Tamron Lens</td>
 </tr><tr><td>25811.1</td><td>= Sigma AF 90mm F2.8 Macro</td>
 </tr><tr><td>25811.2</td><td>= Sigma AF 105mm F2.8 EX [DG] Macro</td>
@@ -749,6 +766,7 @@ original version of the lens has the same LensType.</p>
 </tr><tr><td>25881</td><td>= Minolta AF 70-210mm F3.5-4.5</td>
 </tr><tr><td>25891</td><td>= Minolta AF 80-200mm F2.8 APO or Tokina Lens</td>
 </tr><tr><td>25891.1</td><td>= Tokina 80-200mm F2.8</td>
+</tr><tr><td>25901</td><td>= Minolta AF 200mm F2.8 G APO + Minolta AF 1.4x APO</td>
 </tr><tr><td>25911</td><td>= Minolta AF 35mm F1.4</td>
 </tr><tr><td>25921</td><td>= Minolta AF 85mm F1.4 G (D)</td>
 </tr><tr><td>25931</td><td>= Minolta AF 200mm F2.8 G APO</td>
@@ -756,6 +774,7 @@ original version of the lens has the same LensType.</p>
 </tr><tr><td>25961</td><td>= Minolta AF 28mm F2</td>
 </tr><tr><td>25971</td><td>= Minolta AF 35mm F2 [New]</td>
 </tr><tr><td>25981</td><td>= Minolta AF 100mm F2</td>
+</tr><tr><td>26011</td><td>= Minolta AF 200mm F2.8 G APO + Minolta AF 2x APO</td>
 </tr><tr><td>26041</td><td>= Minolta AF 80-200mm F4.5-5.6</td>
 </tr><tr><td>26051</td><td>= Minolta AF 35-80mm F4-5.6</td>
 </tr><tr><td>26061</td><td>= Minolta AF 100-300mm F4.5-5.6</td>
@@ -791,6 +810,7 @@ original version of the lens has the same LensType.</p>
 </tr><tr><td>45741.3</td><td>= Tokina 300mm F2.8 x2</td>
 </tr><tr><td>45751</td><td>= 1.4x Teleconverter</td>
 </tr><tr><td>45851</td><td>= Tamron SP AF 300mm F2.8 LD IF</td>
+</tr><tr><td>45871</td><td>= Tamron AF 70-210mm f/2.8 SP LD</td>
 </tr><tr><td>65535</td><td>= T-Mount or Other Lens or no lens</td>
 </tr><tr><td>65535.1</td><td>= Arax MC 35mm F2.8 Tilt+Shift</td>
 </tr><tr><td>65535.2</td><td>= Arax MC 80mm F2.8 Tilt+Shift</td>
@@ -1666,7 +1686,7 @@ the JPEG image from a PMP file)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 28, 2011</i>
+<br><i>Last revised Sep 21, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

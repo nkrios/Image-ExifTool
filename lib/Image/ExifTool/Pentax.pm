@@ -38,6 +38,7 @@
 #              23) Akos Szalkai (https://rt.cpan.org/Ticket/Display.html?id=43743)
 #              24) Albert Bogner private communication
 #              25) Niels Kristian Bech Jensen private communication
+#              26) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3444.0.html
 #              JD) Jens Duttke private communication
 #
 # Notes:        See POD documentation at the bottom of this file
@@ -50,7 +51,7 @@ use vars qw($VERSION %pentaxLensTypes);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.32';
+$VERSION = '2.35';
 
 sub CryptShutterCount($$);
 sub PrintFilter($$$);
@@ -254,7 +255,11 @@ sub PrintFilter($$$);
     '8 4' => 'Sigma 50mm F1.4 EX DG HSM', #Artur private communication
     '8 12' => 'Sigma 70-300mm F4-5.6 DG OS', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3382.0.html
     '8 14' => 'Sigma 17-70mm F2.8-4.0 DC Macro OS HSM', #(Hubert Meier)
+    '8 16' => 'Sigma 70-200mm F2.8 EX DG Macro HSM II', #26
+    '8 17' => 'Sigma 50-500mm F4.5-6.3 DG OS HSM', #(Heike Herrmann)
     '8 18' => 'Sigma 8-16mm F4.5-5.6 DC HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2998.0.html
+    '8 21' => 'Sigma 17-50mm F2.8 EX DC OS HSM', #26
+    '8 22' => 'Sigma 85mm F1.4 EX DG HSM', #26
     '8 215' => 'smc PENTAX-DA 18-135mm F3.5-5.6 ED AL [IF] DC WR', #PH
     '8 226' => 'smc PENTAX-DA* 55mm F1.4 SDM', #JD
     '8 227' => 'smc PENTAX DA* 60-250mm F4 [IF] SDM', #JD
@@ -268,6 +273,7 @@ sub PrintFilter($$$);
     '8 255.2' => 'Sigma APO 150-500mm F5-6.3 DG OS HSM', #JD
     '8 255.3' => 'Sigma 50-150mm F2.8 II APO EX DC HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2997.0.html
     '8 255.3' => 'Sigma 4.5mm F2.8 EX DC HSM Circular Fisheye', #PH
+    '8 255.4' => 'Sigma 50-200mm F4-5.6 DC OS', #26
     '11 4' => 'smc PENTAX-FA 645 45-85mm F4.5', #PH
     '11 8' => 'smc PENTAX-FA 645 80-160mm F4.5', #PH
     '11 11' => 'smc PENTAX-FA 645 35mm F3.5 AL [IF]', #PH
@@ -395,7 +401,7 @@ my %pentaxCities = (
     1 => 'Honolulu',
     2 => 'Anchorage',
     3 => 'Vancouver',
-    4 => 'San Fransisco',
+    4 => 'San Francisco',
     5 => 'Los Angeles',
     6 => 'Calgary',
     7 => 'Denver',
@@ -500,6 +506,8 @@ my %digitalFilter = (
         17 => 'Starburst',
         18 => 'Posterization',
         19 => 'Sketch Filter',
+        20 => 'Shading', # (Q)
+        21 => 'Invert Color', # (Q)
         254 => 'Custom Filter',
     },
 );
@@ -521,7 +529,7 @@ my %filterSettings = (
     12 => ['ColorRange', '%+d'],    # ExtractColor [x2] (-2-+2)
     13 => ['FilterEffect',  { 0=>'Off',1=>'Red',2=>'Green',3=>'Blue',4=>'Infrared'}], # Monochrome
     14 => ['ToningBA', '%+d'],      # Monochrome (-3-+3)
-    15 => ['InvertColor',   { 0=>'Off',1=>'On' }], # Custom
+    15 => ['InvertColor',   { 0=>'Off',1=>'On' }], # Custom/Invert Color
     16 => ['Slim', '%+d'],          # Slim (-8-+8)
     17 => ['EffectDensity', { 1=>'Sparse',2=>'Normal',3=>'Dense' }], # Starburst
     18 => ['Size',          { 1=>'Small',2=>'Medium',3=>'Large' }], # Starburst
@@ -529,8 +537,8 @@ my %filterSettings = (
     20 => ['Fisheye',       { 1=>'Weak',2=>'Medium',3=>'Strong' }], # Fisheye
     21 => ['DistortionType', '%d'], # Custom (1-3)
     22 => ['DistortionLevel',{0=>'Off',1=>'Weak',2=>'Medium',3=>'Strong' }], #Custom
-    23 => ['ShadingType', '%d'],    # Custom (1-6)
-    24 => ['ShadingLevel', '%+d'],  # Custom (-3-+3)
+    23 => ['ShadingType', '%d'],    # Custom/Shading (1-6)
+    24 => ['ShadingLevel', '%+d'],  # Custom/Shading (-3-+3)
     25 => ['Shading', '%d'],        # Toy Camera (1-3)
     26 => ['Blur',  '%d'],          # Toy Camera (1-3)
     27 => ['ToneBreak',     { 0=>'Off',1=>'Red',2=>'Green',3=>'Blue',4=>'Yellow'}], # Toy Camera/Custom
@@ -1527,6 +1535,7 @@ my %binaryDataAttrs = (
             6 => 'Muted', # (645D)
             7 => 'Reversal Film', # (645D)
             8 => 'Bleach Bypass', # (K-5)
+            9 => 'Radiant', # (Q)
         },
     },
     0x0050 => { #PH
@@ -1603,6 +1612,7 @@ my %binaryDataAttrs = (
         PrintConv => {
             '0 0 0 0' => 'Off',
             '1 0 0 0' => 'On',
+            # '0 2 0 0' - seen for Pentax Q
         },
     },
     0x006b => { #PH (K-5)
@@ -1780,6 +1790,7 @@ my %binaryDataAttrs = (
             '1 1' => 'Weak',
             '1 2' => 'Normal',
             '1 3' => 'Strong',
+            # '2 4' - seen for Pentax Q
         },
     },
     0x007a => { #PH
@@ -2109,6 +2120,7 @@ my %binaryDataAttrs = (
         Format => 'int8u',
         Count => 10,
     },
+    # 0x0237 - possibly related to smart effect setting? (Q)
     0x03fe => { #PH
         Name => 'DataDump',
         Writable => 0,
@@ -2168,8 +2180,9 @@ my %binaryDataAttrs = (
             0 => 'Off',
             1 => 'On',
             4 => 'Off (4)', # (K20D, K200D, K-7, K-5)
-            5 => 'On (5)', #(guess) (K20D)
-            # (got 5 for K-5 with HDR [auto-align off only], Composition Adjust, and movie with SR off!)
+            5 => 'On but Disabled', # (K20D, K-5)
+            # (can be 5 "On but Disabled" for K-5 with HDR [auto-align off only],
+            # Composition Adjust, DriveMode = Self-timer or Remote, and movie with SR off!)
             6 => 'On (Video)', # (K-7)
             7 => 'On (7)', #(NC) (K20D, K200D, K-m, K-5)
             15 => 'On (15)', # (K20D (with Tamron 10-20mm @ 10mm))
@@ -2789,8 +2802,10 @@ my %binaryDataAttrs = (
             83 => 'No Flash',
             91 => 'Night Scene',
             99 => 'Surf & Snow',
+            # 104 - seen for Pentax Q
             107 => 'Text',
             115 => 'Sunset',
+            # 116 - seen for Pentax Q (vivid?)
             123 => 'Kids',
             131 => 'Pet',
             139 => 'Candlelight',
@@ -4123,6 +4138,7 @@ my %binaryDataAttrs = (
         PrintConv => '"$val C"',
         PrintConvInv => '$val=~s/ ?c$//i; $val',
     },
+    # 0x18,0x1a,0x1c,0x1e = int16u[4] BlackPoint - PH
 );
 
 # currently unknown info

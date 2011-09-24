@@ -21,7 +21,7 @@ use vars qw($VERSION $AUTOLOAD $lastFetched);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.29';
+$VERSION = '1.30';
 
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
@@ -1715,6 +1715,7 @@ sub ReadPDF($$)
         $capture->{newline} = $/;
         $capture->{mainFree} = $mainFree = { };
     }
+XRef:
     while (@xrefOffsets) {
         my $offset = shift @xrefOffsets;
         my $type = shift @xrefOffsets;
@@ -1726,19 +1727,22 @@ sub ReadPDF($$)
         }
         # Note: care must be taken because ReadLine may read more than we want if
         # the newline sequence for this table is different than the rest of the file
-        unless ($raf->ReadLine($buff)) {
-            %loaded or return -6;
-            $exifTool->Warn('Bad offset for secondary xref table');
-            next;
+        for (;;) {
+            unless ($raf->ReadLine($buff)) {
+                %loaded or return -6;
+                $exifTool->Warn('Bad offset for secondary xref table');
+                next XRef;
+            }
+            last if $buff =~/\S/;   # skip blank lines
         }
         my $loadXRefStream;
-        if ($buff =~ s/^xref\s+//s) {
+        if ($buff =~ s/^\s*xref\s+//s) {
             # load xref table
             for (;;) {
                 # read another line if necessary (skipping blank lines)
                 $raf->ReadLine($buff) or return -6 until $buff =~ /\S/;
                 last if $buff =~ s/^\s*trailer\s+//s;
-                $buff =~ s/\s*(\d+)\s+(\d+)\s+//s or return -4;
+                $buff =~ s/^\s*(\d+)\s+(\d+)\s+//s or return -4;
                 my ($start, $num) = ($1, $2);
                 $raf->Seek(-length($buff), 1) or return -4;
                 my $i;
@@ -1765,7 +1769,7 @@ sub ReadPDF($$)
                 $buff = '';
             }
             undef $mainFree;    # only do this for the last xref table
-        } elsif ($buff =~ s/^(\d+)\s+(\d+)\s+obj//s) {
+        } elsif ($buff =~ s/^\s*(\d+)\s+(\d+)\s+obj//s) {
             # this is a PDF-1.5 cross-reference stream dictionary
             $loadXRefStream = 1;
         } else {

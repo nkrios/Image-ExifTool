@@ -14,19 +14,18 @@ sub ShiftTime($$$;$);
 
 #------------------------------------------------------------------------------
 # apply shift to value in new value hash
-# Inputs: 0) shift type, 1) shift string, 2) raw date/time value, 3) new value hash ref
+# Inputs: 0) ExifTool ref, 1) shift type, 2) shift string, 3) raw date/time value,
+#         4) new value hash ref
 # Returns: error string or undef on success and updates value in new value hash
-sub ApplyShift($$$;$)
+sub ApplyShift($$$$;$)
 {
-    my ($func, $shift, $val, $nvHash) = @_;
+    my ($self, $func, $shift, $val, $nvHash) = @_;
 
     # get shift direction from first character in shift string
-    $shift =~ s/^(\+|-)// or return 'Bad shift string (no sign)';
-    my $pre = $1;
+    my $pre = ($shift =~ s/^(\+|-)//) ? $1 : '+';
     my $dir = ($pre eq '+') ? 1 : -1;
     my $tagInfo = $$nvHash{TagInfo};
     my $tag = $$tagInfo{Name};
-    my $self = $$nvHash{Self};    # (used in eval)
     my $shiftOffset;
     if ($$nvHash{ShiftOffset}) {
         $shiftOffset = $$nvHash{ShiftOffset};
@@ -262,6 +261,18 @@ sub ShiftComponents($$$$$;$)
         $$toTime[7] = int($m - $$toTime[6] * 60);
     }
     return undef;   # success
+}
+
+#------------------------------------------------------------------------------
+# Shift an integer or floating-point number
+# Inputs: 0) date/time string, 1) shift string, 2) shift direction (+1 or -1)
+#         3) (unused)
+# Returns: undef and updates input value
+sub ShiftNumber($$$;$)
+{
+    my ($val, $shift, $dir) = @_;
+    $_[0] = $val + $shift * $dir;   # return shifted value
+    return undef;                   # success!
 }
 
 #------------------------------------------------------------------------------

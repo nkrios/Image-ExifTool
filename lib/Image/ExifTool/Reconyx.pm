@@ -91,7 +91,7 @@ $VERSION = '1.02';
             join ' ', @a[5,4,3,1,2,0];
         },
         PrintConv => '$self->ConvertDateTime($val)',
-        PrintConvInv => '$val',
+        PrintConvInv => '$self->InverseDateTime($val)',
     },
     0x12 => {
         Name => 'MoonPhase',

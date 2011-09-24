@@ -12,7 +12,7 @@ require Exporter;
 
 use vars qw($VERSION @ISA @EXPORT_OK);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(ReadCSV ReadJSON);
 
@@ -82,6 +82,8 @@ sub ReadCSV($$;$)
         } else {
             # the first row should be the tag names
             foreach (@vals) {
+                # terminate at first blank tag name (ie. extra comma at end of line)
+                last unless length $_;
                 /^[-\w]+(:[-\w+]+)?#?$/ or $err = "Invalid tag name '$_'", last;
                 push(@tags, $_);
             }

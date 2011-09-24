@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 sub ProcessCanonVRD($$;$);
 sub WriteCanonVRD($$;$);
@@ -1117,8 +1117,8 @@ sub WriteCanonVRD($$;$)
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     $exifTool or return 1;    # allow dummy access
     my $nvHash = $exifTool->GetNewValueHash($Image::ExifTool::Extra{CanonVRD});
-    return undef unless Image::ExifTool::IsOverwriting($nvHash);
-    my $val = Image::ExifTool::GetNewValues($nvHash);
+    return undef unless $exifTool->IsOverwriting($nvHash);
+    my $val = $exifTool->GetNewValues($nvHash);
     $val = '' unless defined $val;
     ++$exifTool->{CHANGED};
     return $val;

@@ -206,8 +206,8 @@ sub AddChunks($$)
         my $tagInfo = $$addTags{$tag};
         my $nvHash = $exifTool->GetNewValueHash($tagInfo);
         # (always create native PNG information, so don't check IsCreating())
-        next unless Image::ExifTool::IsOverwriting($nvHash) > 0;
-        my $val = Image::ExifTool::GetNewValues($nvHash);
+        next unless $exifTool->IsOverwriting($nvHash) > 0;
+        my $val = $exifTool->GetNewValues($nvHash);
         if (defined $val) {
             my $data;
             if ($$tagInfo{Table} eq \%Image::ExifTool::PNG::TextualData) {

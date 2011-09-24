@@ -705,7 +705,8 @@ available.  Extended bracket values are printed as &#39;WB-BA&#39;, &#39;WB-GM&#
   <td>5 = Monochrome
   <br>6 = Muted
   <br>7 = Reversal Film
-  <br>8 = Bleach Bypass</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>8 = Bleach Bypass
+  <br>9 = Radiant</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr>
 <td title='0x0050 = 80'>0x0050</td>
@@ -1291,7 +1292,7 @@ are left, top, width and height in a 720x480 frame, with Y downwards)</span></sp
 </tr><tr><td class=r>3</td><td>= Vancouver</td>
 <td class='r b'>28</td><td class=b>= Jerusalem</td>
 <td class=r>53</td><td>= Taipei</td>
-</tr><tr><td class=r>4</td><td>= San Fransisco</td>
+</tr><tr><td class=r>4</td><td>= San Francisco</td>
 <td class='r b'>29</td><td class=b>= Moscow</td>
 <td class=r>54</td><td>= Seoul</td>
 </tr><tr><td class=r>5</td><td>= Los Angeles</td>
@@ -1553,7 +1554,11 @@ lens model.</p>
 </tr><tr><td>'8 4'</td><td>= Sigma 50mm F1.4 EX DG HSM</td>
 </tr><tr><td>'8 12'</td><td>= Sigma 70-300mm F4-5.6 DG OS</td>
 </tr><tr><td>'8 14'</td><td>= Sigma 17-70mm F2.8-4.0 DC Macro OS HSM</td>
+</tr><tr><td>'8 16'</td><td>= Sigma 70-200mm F2.8 EX DG Macro HSM II</td>
+</tr><tr><td>'8 17'</td><td>= Sigma 50-500mm F4.5-6.3 DG OS HSM</td>
 </tr><tr><td>'8 18'</td><td>= Sigma 8-16mm F4.5-5.6 DC HSM</td>
+</tr><tr><td>'8 21'</td><td>= Sigma 17-50mm F2.8 EX DC OS HSM</td>
+</tr><tr><td>'8 22'</td><td>= Sigma 85mm F1.4 EX DG HSM</td>
 </tr><tr><td>'8 215'</td><td>= smc PENTAX-DA 18-135mm F3.5-5.6 ED AL [IF] DC WR</td>
 </tr><tr><td>'8 226'</td><td>= smc PENTAX-DA* 55mm F1.4 SDM</td>
 </tr><tr><td>'8 227'</td><td>= smc PENTAX DA* 60-250mm F4 [IF] SDM</td>
@@ -1566,6 +1571,7 @@ lens model.</p>
 </tr><tr><td>'8 255.1'</td><td>= Sigma 70-200mm F2.8 EX DG Macro HSM II</td>
 </tr><tr><td>'8 255.2'</td><td>= Sigma APO 150-500mm F5-6.3 DG OS HSM</td>
 </tr><tr><td>'8 255.3'</td><td>= Sigma 4.5mm F2.8 EX DC HSM Circular Fisheye</td>
+</tr><tr><td>'8 255.4'</td><td>= Sigma 50-200mm F4-5.6 DC OS</td>
 </tr><tr><td>'11 4'</td><td>= smc PENTAX-FA 645 45-85mm F4.5</td>
 </tr><tr><td>'11 8'</td><td>= smc PENTAX-FA 645 80-160mm F4.5</td>
 </tr><tr><td>'11 11'</td><td>= smc PENTAX-FA 645 35mm F3.5 AL [IF]</td>
@@ -1599,7 +1605,7 @@ lens model.</p>
 <td><span class=s>0 = Off
   <br>1 = On
   <br>4 = Off (4)
-  <br>5 = On (5)
+  <br>5 = On but Disabled
   <br>6 = On (Video)
   <br>7 = On (7)
   <br>15 = On (15)</span></td></tr>
@@ -3177,24 +3183,26 @@ used.</p>
 <table class='inner sep' cellspacing=1>
 <tr class=h><th>Value</th><th>DigitalFilter</th><th>Value</th><th>DigitalFilter</th></tr>
 <tr><td class=r>0</td><td>= Off</td>
-<td class='r b'>11</td><td class=b>= Retro</td>
-</tr><tr><td class=r>1</td><td>= Base Parameter Adjust</td>
 <td class='r b'>12</td><td class=b>= Pastel</td>
-</tr><tr><td class=r>2</td><td>= Soft Focus</td>
+</tr><tr><td class=r>1</td><td>= Base Parameter Adjust</td>
 <td class='r b'>13</td><td class=b>= Water Color</td>
-</tr><tr><td class=r>3</td><td>= High Contrast</td>
+</tr><tr><td class=r>2</td><td>= Soft Focus</td>
 <td class='r b'>14</td><td class=b>= HDR</td>
-</tr><tr><td class=r>4</td><td>= Color Filter</td>
+</tr><tr><td class=r>3</td><td>= High Contrast</td>
 <td class='r b'>16</td><td class=b>= Miniature</td>
-</tr><tr><td class=r>5</td><td>= Extract Color</td>
+</tr><tr><td class=r>4</td><td>= Color Filter</td>
 <td class='r b'>17</td><td class=b>= Starburst</td>
-</tr><tr><td class=r>6</td><td>= Monochrome</td>
+</tr><tr><td class=r>5</td><td>= Extract Color</td>
 <td class='r b'>18</td><td class=b>= Posterization</td>
-</tr><tr><td class=r>7</td><td>= Slim</td>
+</tr><tr><td class=r>6</td><td>= Monochrome</td>
 <td class='r b'>19</td><td class=b>= Sketch Filter</td>
+</tr><tr><td class=r>7</td><td>= Slim</td>
+<td class='r b'>20</td><td class=b>= Shading</td>
 </tr><tr><td class=r>9</td><td>= Fisheye</td>
-<td class='r b'>254</td><td class=b>= Custom Filter</td>
+<td class='r b'>21</td><td class=b>= Invert Color</td>
 </tr><tr><td class=r>10</td><td>= Toy Camera</td>
+<td class='r b'>254</td><td class=b>= Custom Filter</td>
+</tr><tr><td class=r>11</td><td>= Retro</td>
 <td class='r b'>&nbsp;</td><td class=b>&nbsp;</td>
 </tr></table></td></tr></table></blockquote>
 
@@ -3514,7 +3522,7 @@ stored as ASCII text in a format very similar to some HP models.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jun 24, 2011</i>
+<br><i>Last revised Sep 8, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

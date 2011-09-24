@@ -26,7 +26,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.28';
+$VERSION = '1.30';
 
 sub ConvertTimecode($);
 
@@ -290,6 +290,11 @@ $Image::ExifTool::RIFF::streamType = '';
         about the audio content is stored in the C<fmt > chunk.  As well as this
         information, some video information and proprietary manufacturer-specific
         information is also extracted.
+        
+        Large AVI videos may be a concatenation of two or more RIFF chunks.
+        For these files, information is extracted from subsequent RIFF
+        chunks as sub-documents, but the Duration is calculated for the full
+        video.
     },
    'fmt ' => {
         Name => 'AudioFormat',
@@ -614,6 +619,8 @@ $Image::ExifTool::RIFF::streamType = '';
         ValueConv => q{
             my @v = split ' ', $val;
             return undef unless @v == 2;
+            # the Kodak EASYSHARE Sport stores this incorrectly as a string:
+            return $val if $val =~ /^\d{4}:\d{2}:\d{2} \d{2}:\d{2}:\d{2}$/;
             # get time in seconds
             $val = 1e-7 * ($v[0] * 4294967296 + $v[1]);
             # shift from Jan 1, 1601 to Jan 1, 1970
@@ -868,19 +875,7 @@ $Image::ExifTool::RIFF::streamType = '';
             2 => 'VideoFrameRate',
             3 => 'VideoFrameCount',
         },
-        # this is annoying.  Apparently (although I couldn't verify this), FrameCount
-        # in the RIFF header includes multiple video tracks if they exist (ie. with the
-        # FujiFilm REAL 3D AVI's), but the video stream information isn't reliable for
-        # some cameras (ie. Olympus FE models), so use the video stream information
-        # only if the RIFF header duration is 2 to 3 times longer
-        RawConv => q {
-            my ($dur1, $dur2);
-            $dur1 = $val[1] / $val[0] if $val[0];
-            return $dur1 unless $val[2] and $val[3];
-            $dur2 = $val[3] / $val[2];
-            my $rat = $dur1 / $dur2;
-            return ($rat > 1.9 and $rat < 3.1) ? $dur2 : $dur1;
-        },
+        RawConv => 'Image::ExifTool::RIFF::CalcDuration($self, @val)',
         PrintConv => 'ConvertDuration($val)',
     },
     Duration2 => {
@@ -939,6 +934,59 @@ sub ConvertTimecode($)
     my $min = int($val / 60);
     $val -= $min * 60;
     return sprintf("%d:%.2d:%05.2f", $hr, $min, $val);
+}
+
+#------------------------------------------------------------------------------
+# Calculate duration of RIFF
+# Inputs: 0) ExifTool ref, 1/2) RIFF:FrameRate/Count, 2/3) VideoFrameRate/Count
+# Returns: Duration in seconds or undef
+# Notes: Sums duration of all sub-documents (concatenated AVI files)
+sub CalcDuration($@)
+{
+    my ($exifTool, @val) = @_;
+    my $totalDuration = 0;
+    my $subDoc = 0;
+    my @keyList;
+    for (;;) {
+        # this is annoying.  Apparently (although I couldn't verify this), FrameCount
+        # in the RIFF header includes multiple video tracks if they exist (ie. with the
+        # FujiFilm REAL 3D AVI's), but the video stream information isn't reliable for
+        # some cameras (ie. Olympus FE models), so use the video stream information
+        # only if the RIFF header duration is 2 to 3 times longer
+        my $dur1 = $val[1] / $val[0] if $val[0];
+        if ($val[2] and $val[3]) {
+            my $dur2 = $val[3] / $val[2];
+            my $rat = $dur1 / $dur2;
+            $dur1 = $dur2 if $rat > 1.9 and $rat < 3.1;
+        }
+        $totalDuration += $dur1 if defined $dur1;
+        last unless $subDoc++ < $$exifTool{DOC_COUNT};
+        # get tag values for next sub-document
+        my @tags = qw(FrameRate FrameCount VideoFrameRate VideoFrameCount);
+        my $rawValue = $$exifTool{VALUE};
+        my ($i, $j, $key, $keys);
+        for ($i=0; $i<@tags; ++$i) {
+            if ($subDoc == 1) {
+                # generate list of available keys for each tag
+                $keys = $keyList[$i] = [ ];
+                for ($j=0; ; ++$j) {
+                    $key = $tags[$i];
+                    $key .= " ($j)" if $j;
+                    last unless defined $$rawValue{$key};
+                    push @$keys, $key;
+                }
+            } else {
+                $keys = $keyList[$i];
+            }
+            # find key for tag in this sub-document
+            my $grp = "Doc$subDoc";
+            $grp .= ":RIFF" if $i < 2; # (tags 0 and 1 also in RIFF group)
+            $key = $exifTool->GroupMatches($grp, $keys);
+            $val[$i] = $key ? $$rawValue{$key} : undef;
+        }
+        last unless defined $val[0] and defined $val[1]; # (Require'd tags)
+    }
+    return $totalDuration;
 }
 
 #------------------------------------------------------------------------------
@@ -1110,7 +1158,7 @@ sub ProcessRIFF($$)
         }
         # RIFF chunks are padded to an even number of bytes
         my $len2 = $len + ($len & 0x01);
-        if ($$tagTablePtr{$tag} or ($verbose and $tag !~ /^(data|idx1|LIST_movi)$/)) {
+        if ($$tagTablePtr{$tag} or ($verbose and $tag !~ /^(data|idx1|LIST_movi|RIFF)$/)) {
             $raf->Read($buff, $len2) == $len2 or $err=1, last;
             $exifTool->HandleTag($tagTablePtr, $tag, $buff,
                 DataPt  => \$buff,
@@ -1119,11 +1167,17 @@ sub ProcessRIFF($$)
                 Size    => $len2,
                 Base    => $pos,
             );
+        } elsif ($tag eq 'RIFF') {
+            # don't read into RIFF chunk (ie. concatenated video file)
+            $raf->Read($buff, 4) == 4 or $err=1, last;
+            # extract information from remaining file as an embedded file
+            $$exifTool{DOC_NUM} = ++$$exifTool{DOC_COUNT}
         } else {
             $raf->Seek($len2, 1) or $err=1, last;
         }
         $pos += $len2;
     }
+    delete $$exifTool{DOC_NUM};
     $err and $exifTool->Warn('Error reading RIFF file (corrupted?)');
     return 1;
 }

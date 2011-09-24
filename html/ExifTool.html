@@ -26,13 +26,12 @@ document files.</p>
 interface listed below.  Other Image::ExifTool methods and modules should not be
 accessed directly because their interface may change with future versions.</p>
 
-<p>The ExifTool methods should never die or issue a warning to STDERR if
-called with the proper arguments (with the exception of
-<a href="#SetNewValue">SetNewValue</a> which returns an error string when
-called in list context, or sends the error to STDERR otherwise).  Error and
-warning messages that occur during processing are stored in the values of the
-Error and Warning tags, and are accessible via
-<a href="#GetValue">GetValue</a>.</p>
+<p>The ExifTool methods should never die or issue a warning to STDERR if called
+with the proper arguments (with the exception of
+<a href="#SetNewValue">SetNewValue</a> which may send an error message to
+STDERR, but only when called in scalar context).  Error and warning messages
+that occur during processing are stored in the values of the Error and Warning
+tags, and are accessible via <a href="#GetValue">GetValue</a>.</p>
 
 <table><tr><td>
 <ul>
@@ -406,7 +405,6 @@ to some functions.</p>
 </table></blockquote>
 
 <p><b>Available options:</b></p>
-
 <blockquote>
 <table class='norm'>
 <tr><th colspan=4 bgcolor='#dddddd'><font size='+1'>ExifTool Options</font></th></tr>
@@ -612,6 +610,11 @@ to some functions.</p>
     <td align='center'>Any string</td><td align=center>undef</td></tr>
 <tr><td>PrintConv</td><td><a name="PrintConv"></a>Flag to enable print conversion.  Also enables inverse print
     conversion for writing.</td><td align='center'>0 or 1</td><td align=center>1</td></tr>
+<tr><td>QuickTimeUTC</td><td><a name="QuickTimeUTC"></a>Flag set to assume that QuickTime
+    date/time values are stored as UTC, causing conversion to local time when they are
+    extracted. According to the QuickTime specification date/time values should be UTC,
+    but many digital cameras store local time instead (presumably because they don't know
+    the time zone)</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>ScanForXMP</td><td><a name="ScanForXMP"></a>Flag for scan all files (even unrecognized
     formats) for XMP information unless XMP was already found in the file.  When combined with
     the FastScan option, only unrecognized file types are scanned for XMP.  
@@ -1007,7 +1010,7 @@ the same tag name for each value, or call with a reference to the list of values
 </td></tr>
 <tr><td><b>Returns</b></td><td>Scalar context: The number of tags set, and
 errors are printed to STDERR.
-<br>List context: The number of tags set and the error string.
+<br>List context: The number of tags set, and the error string (undefined if no error).
 </td></tr>
 </table></blockquote>
 <blockquote><table class='norm'>
@@ -1038,20 +1041,21 @@ errors are printed to STDERR.
     </table></td><td align=center>0</td></tr>
 <tr><td>Replace</td><td>Replace previous new values for this tag (ie. replace the values
     set in previous calls to <a href="#SetNewValue">SetNewValue</a>). This option
-    is most commonly used to replace previously-set new values for List-type tags.</td>
+    is most commonly used to replace previously-set new values for list-type tags.</td>
     <td><table class='clear'>
     <tr><td valign='top' align=center><b>0</b>&nbsp;=</td><td>Set new value normally</td></tr>
     <tr><td valign='top' align=center><b>1</b>&nbsp;=</td><td>Reset previous new values and replace with the specifed new value</td></tr>
     <tr><td valign='top' align=center><b>2</b>&nbsp;=</td><td>Reset previous new values only</td></tr>
     </table></td><td align=center>0</td></tr>
-<tr><td>Shift</td><td>Shift the tag by the specified value.  Currently only date/time
-    tags can be shifted.  Value is added if Shift is 1, or subtracted if Shift is -1.
-    See Image::ExifTool::Shift.pl for details time shift formats.</td>
+<tr><td>Shift</td><td>Shift the tag by the specified value.  Currently only date/time tags
+    and tags with numerical values may be shifted.  Value is added if Shift is 1, or subtracted
+    if Shift is -1.  See Image::ExifTool::Shift.pl for details time shift formats.</td>
     <td><table class='clear'>
     <tr><td valign='top' align=left colspan=2><b>undef</b>&nbsp;= No shift</td></tr>
     <tr><td valign='top' align=right><b>0</b>&nbsp;=</td><td>Shift if shiftable:<br>
     Positive if AddValue set, or<br>
-    Negative if DelValue set</td></tr>
+    Negative if DelValue set and<br>
+    tag is date/time</td></tr>
     <tr><td valign='top' align=right><b>1</b>&nbsp;=</td><td>Positive shift</td></tr>
     <tr><td valign='top' align=right><b>-1</b>&nbsp;=</td><td>Negative shift</td></tr>
     </table></td><td align=center>undef</td></tr>
@@ -1087,7 +1091,7 @@ $exifTool-&gt;<b>SetNewValue</b>('Keywords', $word, DelValue =&gt; 1);
 </pre></td></tr></table></blockquote>
 
 <blockquote><table class='box'><tr><td><pre>
-<span class=com># set keywords (a List-type tag) with two new values</span>
+<span class=com># set keywords (a list-type tag) with two new values</span>
 $exifTool-&gt;<b>SetNewValue</b>(Keywords =&gt; 'word1');
 $exifTool-&gt;<b>SetNewValue</b>(Keywords =&gt; 'word2');
 <span class=com># equivalent, but set both in one call using an array reference</span>
@@ -1146,11 +1150,6 @@ example above to exclude specific groups from a mass delete. However, this
 technique may not be used to exclude individual tags.  Instead, use
 <a href="#SetNewValuesFromFile">SetNewValuesFromFile</a> to recover the values
 of individual tags after deleting a group.</p>
-<p>Setting a new value generates a cyclical reference which will prevent memory
-from being reclaimed when the ExifTool object goes out of scope (due to Perl's
-garbage collection technique).  To avoid this problem, call
-<a href="#SetNewValue">SetNewValue</a> with no additional arguments to clear new
-values before the ExifTool object goes out of scope.</p>
 <p>The following ExifTool options are effective in the call to
 <a href="#SetNewValue">SetNewValue</a>:</p>
 <blockquote>
@@ -1702,15 +1701,16 @@ the specific IFD).
 ASF, CanonVRD, Composite, DICOM, DNG, DV, DjVu, Ducky, EXE, EXIF, ExifTool,
 FLAC, File, Flash, FlashPix, Font, FotoStation, GIF, GIMP, GeoTiff, H264,
 HTML, ICC_Profile, ID3, IPTC, ITC, JFIF, JPEG, Jpeg2000, LNK, Leaf, M2TS,
-MIE, MIFF, MNG, MPC, MPEG, MPF, MXF, MakerNotes, Matroska, Meta, PDF, PICT,
-PNG, PSP, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF,
-RIFF, RSRC, RTF, Rawzor, Real, SVG, SigmaRaw, Stim, Vorbis, XML, XMP, ZIP
+MIE, MIFF, MNG, MPC, MPEG, MPF, MXF, MakerNotes, Matroska, Meta, Ogg, PDF,
+PICT, PNG, PSP, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime,
+RAF, RIFF, RSRC, RTF, Rawzor, Real, SVG, SigmaRaw, Stim, Theora, Vorbis,
+XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, CIFF, Canon,
-CanonCustom, CanonRaw, CanonVRD, Casio, Chapter#, Composite, DICOM, DNG, DV,
-DjVu, DjVu-Meta, Ducky, EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File,
-Flash, FlashPix, Font, FotoStation, FujiFilm, GE, GIF, GIMP, GPS, GeoTiff,
+<td>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, CIFF, Canon, CanonCustom,
+CanonRaw, CanonVRD, Casio, Chapter#, Composite, DICOM, DNG, DV, DjVu,
+DjVu-Meta, Ducky, EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File, Flash,
+FlashPix, Font, FotoStation, FujiFilm, GE, GIF, GIMP, GPS, GeoTiff,
 GlobParamIFD, GraphConv, H264, HP, HTML, HTML-dc, HTML-ncc, HTML-office,
 HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
 ICC-meta, ICC-view, ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v1_Enh,
@@ -1722,19 +1722,20 @@ MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient,
 MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MNG, MPC,
 MPEG, MPF0, MPImage, MXF, MakerNotes, MakerUnknown, Matroska, MetaIFD,
 Microsoft, Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom,
-NikonScan, Olympus, PDF, PICT, PNG, PSP, Panasonic, Pentax, PhotoMechanic,
-Photoshop, PictureInfo, PostScript, PreviewIFD, PrintIM, ProfileIFD,
-QuickTime, RAF, RAF2, RIFF, RMETA, RSRC, RTF, Rawzor, Real, Real-CONT,
-Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Reconyx,
-Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Samsung, Sanyo,
-Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD, System, Track#,
-Version0, Vorbis, XML, XMP, XMP-DICOM, XMP-MP, XMP-MP1, XMP-PixelLive,
-XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-cell, XMP-crs, XMP-dc, XMP-dex,
-XMP-digiKam, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
-XMP-microsoft, XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs, XMP-pdf, XMP-pdfx,
-XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur,
-XMP-rdf, XMP-swf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
-XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
+NikonScan, Ocad, Ogg, Olympus, PDF, PICT, PNG, PSP, Panasonic, Pentax,
+PhotoMechanic, Photoshop, PictureInfo, PostScript, PreviewIFD, PrintIM,
+ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, RSRC, RTF, Rawzor, Real,
+Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
+Reconyx, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Samsung,
+Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD, System,
+Theora, Track#, Version0, Vorbis, XML, XMP, XMP-DICOM, XMP-MP, XMP-MP1,
+XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-cell, XMP-crs,
+XMP-dc, XMP-dex, XMP-digiKam, XMP-exif, XMP-extensis, XMP-iptcCore,
+XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-mwg-coll, XMP-mwg-kw,
+XMP-mwg-rs, XMP-pdf, XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus,
+XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-swf, XMP-tiff, XMP-x, XMP-xmp,
+XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights,
+XMP-xmpTPg, ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,

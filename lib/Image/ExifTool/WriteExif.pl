@@ -542,6 +542,11 @@ my %writeTable = (
     },
     0xa302 => {             # CFAPattern
         Writable => 'undef',
+        RawConvInv => q{
+            my @a = split ' ', $val;
+            return $val if @a <= 2; # also accept binary data for backward compatibility
+            return pack(GetByteOrder() eq 'II' ? 'v2C*' : 'n2C*', @a);
+        },
         PrintConvInv => 'Image::ExifTool::Exif::GetCFAPattern($val)',
     },
     0xa401 => 'int16u',     # CustomRendered
@@ -983,7 +988,9 @@ my %writeTable = (
     # (avoid creating these tags unless there is no other option)
     0xfde8 => {
         Name => 'OwnerName',
+        Condition => '$$self{TIFF_TYPE} ne "DCR"', # (used for another purpose in Kodak DCR images)
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Owner's Name: $val"},
@@ -995,14 +1002,18 @@ my %writeTable = (
     },
     0xfde9 => {
         Name => 'SerialNumber',
+        Condition => '$$self{TIFF_TYPE} ne "DCR"', # (used for another purpose in Kodak DCR SubIFD)
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Serial Number: $val"},
     },
     0xfdea => {
         Name => 'Lens',
+        Condition => '$$self{TIFF_TYPE} ne "DCR"', # (used for another purpose in Kodak DCR SubIFD)
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Lens: $val"},
@@ -1010,6 +1021,7 @@ my %writeTable = (
     0xfe4c => {
         Name => 'RawFile',
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Raw File: $val"},
@@ -1017,6 +1029,7 @@ my %writeTable = (
     0xfe4d => {
         Name => 'Converter',
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Converter: $val"},
@@ -1024,6 +1037,7 @@ my %writeTable = (
     0xfe4e => {
         Name => 'WhiteBalance',
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"White Balance: $val"},
@@ -1031,6 +1045,7 @@ my %writeTable = (
     0xfe51 => {
         Name => 'Exposure',
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Exposure: $val"},
@@ -1038,6 +1053,7 @@ my %writeTable = (
     0xfe52 => {
         Name => 'Shadows',
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Shadows: $val"},
@@ -1045,6 +1061,7 @@ my %writeTable = (
     0xfe53 => {
         Name => 'Brightness',
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Brightness: $val"},
@@ -1052,6 +1069,7 @@ my %writeTable = (
     0xfe54 => {
         Name => 'Contrast',
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Contrast: $val"},
@@ -1059,6 +1077,7 @@ my %writeTable = (
     0xfe55 => {
         Name => 'Saturation',
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Saturation: $val"},
@@ -1066,6 +1085,7 @@ my %writeTable = (
     0xfe56 => {
         Name => 'Sharpness',
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Sharpness: $val"},
@@ -1073,6 +1093,7 @@ my %writeTable = (
     0xfe57 => {
         Name => 'Smoothness',
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Smoothness: $val"},
@@ -1080,6 +1101,7 @@ my %writeTable = (
     0xfe58 => {
         Name => 'MoireFilter',
         Avoid => 1,
+        PSRaw => 1,
         Writable => 'string',
         ValueConv => '$val=~s/.*: //;$val',
         ValueConvInv => q{"Moire Filter: $val"},
@@ -1102,8 +1124,8 @@ sub ConvertLensInfo($)
 
 #------------------------------------------------------------------------------
 # Get binary CFA Pattern from a text string
-# Inputs: CFA pattern string (ie. '[Blue,Green][Green,Red]')
-# Returns: Binary CFA data or prints warning and returns undef on error
+# Inputs: Print-converted CFA pattern (ie. '[Blue,Green][Green,Red]')
+# Returns: CFA pattern as a string of numbers
 sub GetCFAPattern($)
 {
     my $val = shift;
@@ -1112,7 +1134,7 @@ sub GetCFAPattern($)
     my @cols = split /,/, $rows[0];
     @cols or warn("Colors not separated by ','\n"), return undef;
     my $ny = @cols;
-    my $rtnVal = Set16u(scalar(@rows)) . Set16u(scalar(@cols));
+    my @a = (scalar(@rows), scalar(@cols));
     my %cfaLookup = (red=>0, green=>1, blue=>2, cyan=>3, magenta=>4, yellow=>5, white=>6);
     my $row;
     foreach $row (@rows) {
@@ -1122,10 +1144,10 @@ sub GetCFAPattern($)
             tr/ \]\[//d;    # remove remaining brackets and any spaces
             my $c = $cfaLookup{lc($_)};
             defined $c or warn("Unknown color '$_'\n"), return undef;
-            $rtnVal .= Set8u($c);
+            push @a, $c;
         }
     }
-    return $rtnVal;
+    return "@a";
 }
 
 #------------------------------------------------------------------------------
@@ -1180,7 +1202,7 @@ sub InsertWritableProperties($$;$)
             foreach $tagInfo (@infoList) {
                 if (ref $writeInfo) {
                     my $key;
-                    foreach $key (%$writeInfo) {
+                    foreach $key (keys %$writeInfo) {
                         $$tagInfo{$key} = $$writeInfo{$key} unless defined $$tagInfo{$key};
                     }
                 } else {
@@ -1643,10 +1665,12 @@ sub WriteExif($$$)
                 next unless $wrongDir;
                 # delete stuff from the wrong directory if setting somewhere else
                 $nvHash = $exifTool->GetNewValueHash($tagInfo, $wrongDir);
-                next unless Image::ExifTool::IsOverwriting($nvHash);
+                # don't cross delete if not overwriting
+                next unless $exifTool->IsOverwriting($nvHash);
                 # don't cross delete if specifically deleting from the other directory
-                my $val = Image::ExifTool::GetNewValues($nvHash);
-                next if not defined $val and $nvHash->{WantGroup} and
+                # (Note: don't call GetValue() here because it shouldn't be called
+                #  if IsOverwriting returns < 0 -- ie. when shifting)
+                next if not defined $$nvHash{Value} and $nvHash->{WantGroup} and
                         lc($nvHash->{WantGroup}) eq lc($wrongDir);
                 # remove this tag if found in this IFD
                 $xDelete{$tagID} = 1;
@@ -2042,7 +2066,7 @@ DropTag:                    ++$index;
                                 my $proc = $$newInfo{IsOverwriting};
                                 $isOverwriting = &$proc($exifTool, $nvHash, $val, \$newVal);
                             } else {
-                                $isOverwriting = Image::ExifTool::IsOverwriting($nvHash);
+                                $isOverwriting = $exifTool->IsOverwriting($nvHash);
                             }
                         } else {
                             next if $xDelete{$newID};       # don't create if cross deleting
@@ -2095,11 +2119,11 @@ DropTag:                    ++$index;
                             my $proc = $$newInfo{IsOverwriting};
                             $isOverwriting = &$proc($exifTool, $nvHash, $val, \$newVal);
                         } else {
-                            $isOverwriting = Image::ExifTool::IsOverwriting($nvHash, $val);
+                            $isOverwriting = $exifTool->IsOverwriting($nvHash, $val);
                         }
                     }
                     if ($isOverwriting) {
-                        $newVal = Image::ExifTool::GetNewValues($nvHash) unless defined $newVal;
+                        $newVal = $exifTool->GetNewValues($nvHash) unless defined $newVal;
                         # value undefined if deleting this tag
                         # (also delete tag if cross-deleting and this isn't a date/time shift)
                         if (not defined $newVal or ($xDelete{$newID} and not defined $$nvHash{Shift})) {
@@ -2219,6 +2243,10 @@ NoOverwrite:            next if $isNew > 0;
                     # use specified write format
                     $newFormName = $$newInfo{Writable};
                     $newFormat = $formatNumber{$newFormName};
+                } elsif ($$addDirs{$newID} and $newInfo ne $$addDirs{$newID}) {
+                    # this can happen if we are trying to add a directory that doesn't exist
+                    # in this type of file (ie. try adding a SubIFD tag to an A100 image)
+                    $isNew = -1;
                 }
             }
             if ($isNew < 0) {

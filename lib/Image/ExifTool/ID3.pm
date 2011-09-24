@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.28';
+$VERSION = '1.29';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -25,10 +25,10 @@ sub ConvertID3v1Text($$);
 # audio formats that we process after an ID3v2 header (in order)
 my @audioFormats = qw(APE MPC FLAC OGG MP3);
 
-# audio formats where the processing proc is in a different module
+# audio formats where the processing proc is in a differently-named module
 my %audioModule = (
     MP3 => 'ID3',
-    OGG => 'Vorbis',
+    OGG => 'Ogg',
 );
 
 # picture types for 'PIC' and 'APIC' tags

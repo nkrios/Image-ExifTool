@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 sub ProcessFotoStation($$);
 
@@ -191,8 +191,8 @@ sub ProcessFotoStation($$)
                 $newVal = $exifTool->WriteDirectory(\%subdirInfo, $subTable);
             } else {
                 my $nvHash = $exifTool->GetNewValueHash($tagInfo);
-                if (Image::ExifTool::IsOverwriting($nvHash) > 0) {
-                    $newVal = Image::ExifTool::GetNewValues($nvHash);
+                if ($exifTool->IsOverwriting($nvHash) > 0) {
+                    $newVal = $exifTool->GetNewValues($nvHash);
                     $newVal = '' unless defined $newVal;
                     if ($verbose > 1) {
                         my $n = length $newVal;

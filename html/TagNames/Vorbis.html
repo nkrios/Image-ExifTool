@@ -7,8 +7,8 @@
 </head>
 <body>
 <h2 class=top>Vorbis Tags</h2>
-<p>ExifTool extracts the following Vorbis information from Ogg files.  As well
-as this, ExifTool also extracts FLAC and ID3 information from Ogg files.</p>
+<p>Information extracted from Ogg Vorbis files.  See
+<a href="http://www.xiph.org/vorbis/doc/">http://www.xiph.org/vorbis/doc/</a> for the Vorbis specification.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -74,18 +74,28 @@ any tag found, even if not listed here.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td>'ACTOR'</td>
+<td>Actor</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'ALBUM'</td>
 <td>Album</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'ARTIST'</td>
 <td>Artist</td>
 <td class=c title=' + = List'>N+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'COMMENT'</td>
 <td>Comment</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'COMPOSER'</td>
+<td>Composer</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -119,44 +129,54 @@ any tag found, even if not listed here.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'DIRECTOR'</td>
+<td>Director</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'ENCODED_BY'</td>
 <td>EncodedBy</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'ENCODED_USING'</td>
 <td>EncodedUsing</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'GENRE'</td>
 <td>Genre</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'ISRC'</td>
 <td>ISRCNumber</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'LICENSE'</td>
 <td>License</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'LOCATION'</td>
 <td>Location</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'ORGANIZATION'</td>
 <td>Organization</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'PERFORMER'</td>
 <td>Performer</td>
 <td class=c title=' + = List'>N+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'PRODUCER'</td>
+<td>Producer</td>
+<td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>'REPLAYGAIN_ALBUM_GAIN'</td>
@@ -202,7 +222,7 @@ any tag found, even if not listed here.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 13, 2009</i>
+<br><i>Last revised Jul 13, 2011</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

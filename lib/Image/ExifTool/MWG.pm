@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 # enable MWG strict mode by default
 # (causes non-standard EXIF, IPTC and XMP to be ignored)
@@ -380,7 +380,7 @@ unless ($Image::ExifTool::documentOnly) {
                                      'Image::ExifTool::Composite');
 }
 
-# modify EXIF:Artist to behave as a List-type tag
+# modify EXIF:Artist to behave as a list-type tag
 {
     my $artist = $Image::ExifTool::Exif::Main{0x13b};
     $$artist{List} = 1;

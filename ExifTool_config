@@ -74,6 +74,7 @@
             Writable => 'int16u',
             WriteGroup => 'IFD0',
         },
+        # add more user-defined EXIF tags here...
     },
     # IPTC tags are added to a specific record type (ie. application record):
     # (Note: IPTC tags ID's are limited to the range 0-255)
@@ -82,10 +83,12 @@
             Name => 'NewIPTCTag',
             Format => 'string[0,16]',
         },
+        # add more user-defined IPTC ApplicationRecord tags here...
     },
     # XMP tags may be added to existing namespaces:
     'Image::ExifTool::XMP::xmp' => {
         NewXMPxmpTag => { Groups => { 2 => 'Author' } },
+        # add more user-defined XMP-xmp tags here...
     },
     # new XMP namespaces (ie. xxx) must be added to the Main XMP table:
     'Image::ExifTool::XMP::Main' => {

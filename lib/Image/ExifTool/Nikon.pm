@@ -52,7 +52,7 @@ use vars qw($VERSION %nikonLensIDs);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.49';
+$VERSION = '2.51';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
@@ -253,12 +253,14 @@ sub ProcessNikonCaptureEditVersions($$$);
     'A5 40 3C 8E 2C 3C A7 0E' => 'AF-S Nikkor 28-300mm f/3.5-5.6G ED VR',
     'A6 48 8E 8E 24 24 A8 0E' => 'AF-S VR Nikkor 300mm f/2.8G IF-ED II',
     'A7 4B 62 62 2C 2C A9 0E' => 'AF-S DX Micro Nikkor 85mm f/3.5G ED VR',
+    'A8 48 80 98 30 30 AA 0E' => 'AF-S VR Zoom-Nikkor 200-400mm f/4G IF-ED II', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3218.msg15495.html#msg15495
     'A9 54 80 80 18 18 AB 0E' => 'AF-S Nikkor 200mm f/2G ED VR II',
     'AA 3C 37 6E 30 30 AC 0E' => 'AF-S Nikkor 24-120mm f/4G ED VR',
     'AC 38 53 8E 34 3C AE 0E' => 'AF-S DX VR Nikkor 55-300mm 4.5-5.6G ED',
     'AE 54 62 62 0C 0C B0 06' => 'AF-S Nikkor 85mm f/1.4G',
     'AF 54 44 44 0C 0C B1 06' => 'AF-S Nikkor 35mm f/1.4G',
     'B0 4C 50 50 14 14 B2 06' => 'AF-S Nikkor 50mm f/1.8G',
+    'B1 48 48 48 24 24 B3 06' => 'AF-S DX Micro Nikkor 40mm f/2.8G', #27
     '01 00 00 00 00 00 02 00' => 'TC-16A',
     '01 00 00 00 00 00 08 00' => 'TC-16A',
     '00 00 00 00 00 00 F1 0C' => 'TC-14E [II] or Sigma APO Tele Converter 1.4x EX DG or Kenko Teleplus PRO 300 DG 1.4x',
@@ -283,7 +285,7 @@ sub ProcessNikonCaptureEditVersions($$$);
     'E3 54 50 50 24 24 35 02' => 'Sigma Macro 50mm F2.8 EX DG', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3215.0.html
     '79 48 5C 5C 24 24 1C 06' => 'Sigma Macro 70mm F2.8 EX DG', #JD
     '9B 54 62 62 0C 0C 4B 06' => 'Sigma 85mm F1.4 EX DG HSM',
-    '02 48 65 65 24 24 02 00' => 'Sigma 90mm F2.8 Macro',
+    '02 48 65 65 24 24 02 00' => 'Sigma Macro 90mm F2.8',
     '32 54 6A 6A 24 24 35 02.2' => 'Sigma Macro 105mm F2.8 EX DG', #JD
     'E5 54 6A 6A 24 24 35 02' => 'Sigma Macro 105mm F2.8 EX DG',
     '48 48 76 76 24 24 4B 06' => 'Sigma 150mm F2.8 EX DG APO Macro HSM',
@@ -407,6 +409,7 @@ sub ProcessNikonCaptureEditVersions($$$);
     '00 40 2D 88 2C 40 62 06' => 'Tamron AF 18-250mm f/3.5-6.3 Di II LD Aspherical (IF) Macro (A18)',
     '00 40 2D 88 2C 40 00 06' => 'Tamron AF 18-250mm f/3.5-6.3 Di II LD Aspherical (IF) Macro (A18NII)', #JD
     'F5 40 2C 8A 2C 40 40 0E' => 'Tamron AF 18-270mm f/3.5-6.3 Di II VC LD Aspherical (IF) Macro (B003)',
+    'F0 3F 2D 8A 2C 40 DF 0E' => 'Tamron AF 18-270mm F/3.5-6.3 Di II VC PZD (B008)',
     '07 40 2F 44 2C 34 03 02' => 'Tamron AF 19-35mm f/3.5-4.5 (A10)',
     '07 40 30 45 2D 35 03 02' => 'Tamron AF 19-35mm f/3.5-4.5 (A10)',
     '00 49 30 48 22 2B 00 02' => 'Tamron SP AF 20-40mm f/2.7-3.5 (166D)',
@@ -498,6 +501,7 @@ sub ProcessNikonCaptureEditVersions($$$);
     '07 3E 30 43 2D 35 03 00' => 'Soligor AF Zoom 19-35mm 1:3.5-4.5 MC',
     '03 43 5C 81 35 35 02 00' => 'Soligor AF C/D Zoom UMCS 70-210mm 1:4.5',
     '12 4A 5C 81 31 3D 09 00' => 'Soligor AF C/D Auto Zoom+Macro 70-210mm 1:4-5.6 UMCS',
+    '12 36 69 97 35 42 09 00' => 'Soligor AF Zoom 100-400mm 1:4.5-6.7 MC',
 #
     '00 00 00 00 00 00 00 01' => 'Manual Lens No CPU',
 #
@@ -745,6 +749,7 @@ my %binaryDataAttrs = (
             Flags => [ 'Unknown', 'Binary', 'Drop' ],
         },
     ],
+    # 0x0015 - string[8]: "AUTO   "
     # D70 Image boundary?? top x,y bot-right x,y
     0x0016 => { #2
         Name => 'ImageBoundary',
@@ -1341,6 +1346,9 @@ my %binaryDataAttrs = (
         #                  PORTRAIT CLOSE-UP,PORTRAIT COUPLE,PORTRAIT-FIGURE
         # Landscape Assist:LANDSCAPE,SCENIC VIEW,ARCHITECTURE,GROUP RIGHT,GROUP LEFT
         # Sports Assist:   SPORTS,SPORT SPECTATOR,SPORT COMPOSITE
+        # P7100 has test modes: - PH
+        #  CREATIVE MONOCHROME,PAINTING,CROSS PROCESS,SOFT,NOSTALGIC SEPIA,
+        #  HIGH KEY,LOW KEY,SELECTIVE COLOR,ZOOM EXPOSURE EXP.,DEFOCUS DURING
         Name => 'SceneAssist',
         Writable => 'string',
     },
@@ -1439,7 +1447,7 @@ my %binaryDataAttrs = (
             6 => 'High',
         },
     },
-    # 0x00b2 (string: 'Normal', 0xc3's, 0xff's or 0x20's)
+    # 0x00b2 (string: "NORMAL  ", 0xc3's, 0xff's or 0x20's)
     0x00b3 => { #14
         Name => 'ToningEffect',
         Writable => 'string',

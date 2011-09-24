@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 # MIFF chunks
 %Image::ExifTool::MIFF::Main = (
@@ -31,7 +31,7 @@ $VERSION = '1.05';
    'matt-color' => 'MattColor',
     class => 'Class',
     colors => 'Colors',
-    colorspace => 'Colorspace',
+    colorspace => 'ColorSpace',
     columns => 'ImageWidth',
     compression => 'Compression',
     delay => 'Delay',

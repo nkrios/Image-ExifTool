@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -33,6 +33,7 @@ my %ricohLensIDs = (
     'RL2' => 'Ricoh Lens S10 24-70mm F2.5-4.4 VC',
     'RL3' => 'Ricoh Lens P10 28-300mm F3.5-5.6 VC',
     'RL5' => 'GR Lens A12 28mm F2.5',
+    'RL8' => 'Mount A12',
 );
 
 %Image::ExifTool::Ricoh::Main = (

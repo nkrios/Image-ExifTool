@@ -283,6 +283,7 @@ under the same terms as Perl itself.
 =head1 SEE ALSO
 
 L<Image::ExifTool::TagNames/FLAC Tags>,
+L<Image::ExifTool::TagNames/Ogg Tags>,
 L<Image::ExifTool(3pm)|Image::ExifTool>
 
 =cut

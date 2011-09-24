@@ -430,8 +430,8 @@ sub WriteCanonRaw($$$)
                     $oldVal = $value;
                 }
                 my $nvHash = $exifTool->GetNewValueHash($tagInfo);
-                if (Image::ExifTool::IsOverwriting($nvHash, $oldVal)) {
-                    my $newVal = Image::ExifTool::GetNewValues($nvHash);
+                if ($exifTool->IsOverwriting($nvHash, $oldVal)) {
+                    my $newVal = $exifTool->GetNewValues($nvHash);
                     my $verboseVal;
                     $verboseVal = $newVal if $verbose > 1;
                     # convert to specified format if necessary

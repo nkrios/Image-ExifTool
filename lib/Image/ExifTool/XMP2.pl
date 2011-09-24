@@ -12,6 +12,7 @@
 #                  --> changed to http://wiki.creativecommons.org/Companion_File_metadata_specification (2007/12/21)
 #               6) http://www.optimasc.com/products/fileid/xmp-extensions.pdf
 #               9) http://www.w3.org/TR/SVG11/
+#               11) http://www.extensis.com/en/support/kb_article.jsp?articleNumber=6102211
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::XMP;
@@ -820,6 +821,22 @@ my %plusImageSupplier = (
     TITLE     => { Name => 'Title',    Avoid => 1 },
 );
 
+# Extensis Portfolio tags (extensis) (ref 11)
+%Image::ExifTool::XMP::extensis = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-extensis', 2 => 'Image' },
+    NAMESPACE => 'extensis',
+    NOTES => 'Tags used by Extensis Portfolio.',
+    Approved     => { Writable => 'boolean' },
+    ApprovedBy   => { },
+    ClientName   => { },
+    JobName      => { },
+    JobStatus    => { },
+    RoutedTo     => { },
+    RoutingNotes => { },
+    WorkToDo     => { },
+);
+
 # ACDSee schema (acdsee) (ref PH)
 %Image::ExifTool::XMP::acdsee = (
     %xmpTableDefaults,
@@ -841,10 +858,17 @@ my %plusImageSupplier = (
     notes      => { Avoid => 1 },
     rating     => { Avoid => 1, Writable => 'real' }, # integer?
     tagged     => { Avoid => 1, Writable => 'boolean' },
+    rawrppused => { Writable => 'boolean' },
     rpp => {
         Name => 'RPP',
         Writable => 'lang-alt',
         Notes => 'raw processing settings in XML format',
+        Binary => 1,
+    },
+    dpp => {
+        Name => 'DPP',
+        Writable => 'lang-alt',
+        Notes => 'newer version of XML raw processing settings',
         Binary => 1,
     },
 );

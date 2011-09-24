@@ -27,7 +27,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.51';
+$VERSION = '1.52';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -90,11 +90,13 @@ my %binaryDataAttrs = (
         Writable => 'int32u',
         PrintHex => 1,
         PrintConv => {
-            0 => 'None',
-            72 => 'Minolta AF 2x APO (D)',
-            80 => 'Minolta AF 2x APO II',
-            136 => 'Minolta AF 1.4x APO (D)',
-            144 => 'Minolta AF 1.4x APO II',
+            0x00 => 'None',
+            0x48 => 'Minolta AF 2x APO (D)',
+            0x50 => 'Minolta AF 2x APO II',
+            0x60 => 'Minolta AF 2x APO',#Wolfram (http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3521.0.html)
+            0x88 => 'Minolta AF 1.4x APO (D)',
+            0x90 => 'Minolta AF 1.4x APO II',
+            0xa0 => 'Minolta AF 1.4x APO',#Wolfram
         },
     },
     0x0112 => { #JD
@@ -296,12 +298,13 @@ my %binaryDataAttrs = (
             '2 0 0 0' => 'ARW 1.0',
             '3 0 0 0' => 'ARW 2.0',
             '3 1 0 0' => 'ARW 2.1',
-            '3 2 0 0' => 'ARW 2.2', # (NEX-5)
+            '3 2 0 0' => 'ARW 2.2', #PH (NEX-5)
+            '3 3 0 0' => 'ARW 2.3', #PH (SLT-A65,SLT-A77)
             # what about cRAW images?
         },
     },
     0xb001 => { # ref http://forums.dpreview.com/forums/read.asp?forum=1037&message=33609644
-        # (ARW and SR2 images only)
+        # (ARW and SR2 images only until the SLT-A65V started writing them to JPEG too)
         Name => 'SonyModelID',
         Writable => 'int16u',
         PrintConvColumns => 2,
@@ -327,6 +330,10 @@ my %binaryDataAttrs = (
             281 => 'SLT-A55V', #PH
             282 => 'DSLR-A560', #PH
             283 => 'DSLR-A580', # (http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2881.0.html)
+            284 => 'NEX-C3', #PH
+            286 => 'SLT-A65V', #PH
+            287 => 'SLT-A77V', #PH
+            288 => 'NEX-5N', #PH
         },
     },
     0xb020 => { #2

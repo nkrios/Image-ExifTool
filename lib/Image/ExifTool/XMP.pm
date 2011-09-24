@@ -23,6 +23,7 @@
 #               8) http://partners.adobe.com/public/developer/en/xmp/sdk/XMPspecification.pdf
 #               9) http://www.w3.org/TR/SVG11/
 #               10) http://www.adobe.com/devnet/xmp/pdfs/XMPSpecificationPart2.pdf (Oct 2008)
+#               11) http://www.extensis.com/en/support/kb_article.jsp?articleNumber=6102211
 #
 # Notes:      - Property qualifiers are handled as if they were separate
 #               properties (with no associated namespace).
@@ -45,7 +46,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.39';
+$VERSION = '2.40';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -104,7 +105,6 @@ my %xmpNS = (
     rdf       => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
     rdfs      => 'http://www.w3.org/2000/01/rdf-schema#',
     stDim     => 'http://ns.adobe.com/xap/1.0/sType/Dimensions#',
-    stArea    => 'http://ns.adobe.com/xap/1.0/sType/Area#',
     stEvt     => 'http://ns.adobe.com/xap/1.0/sType/ResourceEvent#',
     stFnt     => 'http://ns.adobe.com/xap/1.0/sType/Font#',
     stJob     => 'http://ns.adobe.com/xap/1.0/sType/Job#',
@@ -149,6 +149,8 @@ my %xmpNS = (
    'mwg-rs'   => 'http://www.metadataworkinggroup.com/schemas/regions/',
    'mwg-kw'   => 'http://www.metadataworkinggroup.com/schemas/keywords/',
    'mwg-coll' => 'http://www.metadataworkinggroup.com/schemas/collections/',
+    stArea    => 'http://ns.adobe.com/xmp/sType/Area#',
+    extensis  => 'http://ns.extensis.com/extensis/1.0/',
 );
 
 # build reverse namespace lookup
@@ -580,6 +582,10 @@ my %sLocationDetails = (
         Name => 'mwg-coll',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::mwg_coll' },
     },
+    extensis => {
+        Name => 'extensis',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::extensis' },
+    }
 );
 
 #
@@ -660,7 +666,7 @@ my %sLocationDetails = (
         namespace prefixes are found, they are translated to the newer "xmp",
         "xmpBJ", "xmpMM" and "xmpRights" prefixes for use in family 1 group names.
     },
-    Advisory    => { List => 'Bag' }, # (deprecated)
+    Advisory    => { List => 'Bag', Notes => 'deprecated' },
     BaseURL     => { },
     # (date/time tags not as reliable as EXIF)
     CreateDate  => { Groups => { 2 => 'Time' }, %dateTimeInfo, Priority => 0 },
@@ -683,6 +689,11 @@ my %sLocationDetails = (
     PageInfoWidth   => { Name => 'PageImageWidth',  Flat => 1 },
     PageInfoFormat  => { Name => 'PageImageFormat', Flat => 1 },
     PageInfoImage   => { Name => 'PageImage',       Flat => 1 },
+    Title       => { Avoid => 1, Notes => 'non-standard', Writable => 'lang-alt' }, #11
+    Author      => { Avoid => 1, Notes => 'non-standard', Groups => { 2 => 'Author' } }, #11
+    Keywords    => { Avoid => 1, Notes => 'non-standard' }, #11
+    Description => { Avoid => 1, Notes => 'non-standard', Writable => 'lang-alt' }, #11
+    Format      => { Avoid => 1, Notes => 'non-standard' }, #11
 );
 
 # XMP Rights Management schema properties (xmpRights, xapRights)
@@ -758,6 +769,7 @@ my %sPantryItem = (
     LastURL         => { }, # (deprecated)
     RenditionOf     => { Struct => \%sResourceRef }, # (deprecated)
     SaveID          => { Writable => 'integer' }, # (deprecated)
+    subject         => { List => 'Seq', Avoid => 1, Notes => 'undocumented' },
 );
 
 # XMP Basic Job Ticket schema properties (xmpBJ, xapBJ)
@@ -2817,7 +2829,7 @@ NoLoop:
     # convert rational and date values to a more sensible format
     my $fmt = $$tagInfo{Writable};
     my $new = $$tagInfo{WasAdded};
-    if (($fmt or $new)) {
+    if ($fmt or $new) {
         unless (($new or $fmt eq 'rational') and ConvertRational($val)) {
             $val = ConvertXMPDate($val, $new) if $new or $fmt eq 'date';
         }

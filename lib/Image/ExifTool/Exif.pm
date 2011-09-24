@@ -49,7 +49,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.23';
+$VERSION = '3.26';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -707,6 +707,7 @@ my %sampleFormat = (
             DataMember => 'A100DataOffset',
             RawConv => '$$self{A100DataOffset} = $val',
             IsOffset => 1,
+            Protected => 2,
         },
     ],
     0x14c => {
@@ -1776,6 +1777,7 @@ my %sampleFormat = (
     },
     0xa302 => {
         Name => 'CFAPattern',
+        RawConv => 'Image::ExifTool::Exif::DecodeCFAPattern($self, $val)',
         PrintConv => 'Image::ExifTool::Exif::PrintCFAPattern($val)',
     },
     0xa401 => {
@@ -2773,7 +2775,7 @@ my %sampleFormat = (
             my @a = split / /, $val[0];
             my @b = split / /, $val[1];
             return '?' unless @a==2 and @b==$a[0]*$a[1];
-            return Set16u($a[0]) . Set16u($a[1]) . pack('C*', @b);
+            return "$a[0] $a[1] @b";
         },
         PrintConv => 'Image::ExifTool::Exif::PrintCFAPattern($val)',
     },
@@ -3137,28 +3139,50 @@ sub PrintExposureTime($)
 }
 
 #------------------------------------------------------------------------------
+# Decode raw CFAPattern value
+# Inputs: 0) ExifTool ref, 1) binary value
+# Returns: string of numbers
+sub DecodeCFAPattern($$)
+{
+    my ($self, $val) = @_;
+    # some panasonic cameras (SV-AS3, SV-AS30) write this in ascii (very odd)
+    if ($val =~ /^[0-6]+$/) {
+        $self->Warn('Incorrectly formatted CFAPattern', 1);
+        $val =~ tr/0-6/\x00-\x06/;
+    }
+    return $val unless length($val) >= 4;
+    my @a = unpack(GetByteOrder() eq 'II' ? 'v2C*' : 'n2C*', $val);
+    my $end = 2 + $a[0] * $a[1];
+    if ($end > @a) {
+        # try swapping byte order (I have seen this order different than in EXIF)
+        my ($x, $y) = unpack('n2',pack('v2',$a[0],$a[1]));
+        if (@a < 2 + $x * $y) {
+            $self->Warn('Invalid CFAPattern', 1);
+        } else {
+            ($a[0], $a[1]) = ($x, $y);
+            # (can't technically be wrong because the order isn't well defined by the EXIF spec)
+            # $self->Warn('Wrong byte order for CFAPattern');
+        }
+    }
+    return "@a";
+}
+
+#------------------------------------------------------------------------------
 # Print CFA Pattern
 sub PrintCFAPattern($)
 {
     my $val = shift;
-    return '<truncated data>' unless length $val > 4;
-    # some panasonic cameras (SV-AS3, SV-AS30) write this in ascii (very odd)
-    $val =~ /^[0-6]+$/ and $val =~ tr/0-6/\x00-\x06/;
-    my ($nx, $ny) = (Get16u(\$val, 0), Get16u(\$val, 2));
-    return '<zero pattern size>' unless $nx and $ny;
-    my $end = 4 + $nx * $ny;
-    if ($end > length $val) {
-        # try swapping byte order (I have seen this order different than in EXIF)
-        ($nx, $ny) = unpack('n2',pack('v2',$nx,$ny));
-        $end = 4 + $nx * $ny;
-        return '<invalid pattern size>' if $end > length $val;
-    }
+    my @a = split ' ', $val;
+    return '<truncated data>' unless @a >= 2;
+    return '<zero pattern size>' unless $a[0] and $a[1];
+    my $end = 2 + $a[0] * $a[1];
+    return '<invalid pattern size>' if $end > @a;
     my @cfaColor = qw(Red Green Blue Cyan Magenta Yellow White);
-    my ($pos, $rtnVal) = (4, '[');
+    my ($pos, $rtnVal) = (2, '[');
     for (;;) {
-        $rtnVal .= $cfaColor[Get8u(\$val,$pos)] || 'Unknown';
+        $rtnVal .= $cfaColor[$a[$pos]] || 'Unknown';
         last if ++$pos >= $end;
-        ($pos - 4) % $ny and $rtnVal .= ',', next;
+        ($pos - 2) % $a[1] and $rtnVal .= ',', next;
         $rtnVal .= '][';
     }
     return $rtnVal . ']';
@@ -3296,7 +3320,9 @@ sub PrintLensID($$@)
     return join(' or ', @user) if @user;
     return join(' or ', @best) if @best;
     return join(' or ', @matches) if @matches;
-    return $$printConv{$lensType};
+    $lens = $$printConv{$lensType};
+    return $lensModel if $lensModel and $lens =~ / or /; # (ie. Sony NEX-5N)
+    return $lens;
 }
 
 #------------------------------------------------------------------------------
@@ -3612,14 +3638,16 @@ sub ProcessExif($$$)
                              $raf->Read($buff,$size) == $size))
                     {
                         $exifTool->Warn("Error reading value for $name entry $index", $inMakerNotes);
-                        return 0 unless $inMakerNotes;
+                        return 0 unless $inMakerNotes or $htmlDump;
                         ++$warnCount;
                         $buff = '' unless defined $buff;
                         $readSize = length $buff;
+                        $valueDataLen = -1; # flag bad value
+                    } else {
+                        $valueDataLen = length $buff;
                     }
                     $valueDataPt = \$buff;
                     $valueDataPos = $valuePtr + $dataPos;
-                    $valueDataLen = length $buff;
                     $valuePtr = 0;
                 } else {
                     my ($tagStr, $tmpInfo);
@@ -3686,7 +3714,9 @@ sub ProcessExif($$$)
         my ($val, $subdir, $wrongFormat);
         if ($tagID > 0xf000 and $tagTablePtr eq \%Image::ExifTool::Exif::Main) {
             my $oldInfo = $$tagTablePtr{$tagID};
-            if (not $oldInfo or (ref $oldInfo eq 'HASH' and $$oldInfo{Condition})) {
+            if (not $oldInfo or (ref $oldInfo eq 'HASH' and $$oldInfo{Condition} and
+                not $$oldInfo{PSRaw}))
+            {
                 # handle special case of Photoshop RAW tags (0xfde8-0xfe58)
                 # --> generate tags from the value if possible
                 $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$count,$readSize);
@@ -3698,7 +3728,9 @@ sub ProcessExif($$$)
                     if ($tag) {
                         $tagInfo = {
                             Name => $tag,
+                            Condition => '$$self{TIFF_TYPE} ne "DCR"',
                             ValueConv => '$_=$val;s/.*: //;$_', # remove descr
+                            PSRaw => 1, # (just as flag to avoid adding this again)
                         };
                         Image::ExifTool::AddTagToTable($tagTablePtr, $tagID, $tagInfo);
                         # generate conditional list if a conditional tag already existed
@@ -3788,7 +3820,7 @@ sub ProcessExif($$$)
                 }
                 $colName .= ' <span class=V>(err)</span>' if $wrongFormat;
                 if ($valueDataLen < 0 or not defined $tval) {
-                    $tval = '<bad offset>';
+                    $tval = '<bad offset/size>';
                 } else {
                     $tval = substr($tval,0,28) . '[...]' if length($tval) > 32;
                     if ($formatStr =~ /^(string|undef|binary)/) {

@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -748,9 +748,15 @@ sub WriteKodakIFD($$$);
         Format => 'string[16]',
         Notes => 'Kodak only',
     },
-    0xa8 => { # (not confirmed)
-        Name => 'SerialNumber',
-        Condition => '$$self{Make} =~ /Kodak/i',
+    0xa8 => {
+        Name => 'UnknownNumber', # (was SerialNumber, but not unique for all cameras. ie C1013)
+        Condition => '$$self{Make} =~ /Kodak/i and $$valPt =~ /^([A-Z0-9]{1,11}\0|[A-Z0-9]{12})/i',
+        Format => 'string[12]',
+        Notes => 'Kodak only',
+    },
+    0xc4 => {
+        Name => 'UnknownNumber', # (confirmed NOT to be serial number for Easyshare Mini - PH)
+        Condition => '$$self{Make} =~ /Kodak/i and $$valPt =~ /^([A-Z0-9]{1,11}\0|[A-Z0-9]{12})/i',
         Format => 'string[12]',
         Notes => 'Kodak only',
     },

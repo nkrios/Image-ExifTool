@@ -1,7 +1,7 @@
 # Before "make install", this script should be runnable with "make test".
 # After "make install" it should work as "perl t/Writer.t".
 
-BEGIN { $| = 1; print "1..42\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..44\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -735,6 +735,36 @@ my $testOK;
     } else {
         print 'not ';
     }
+    print "ok $testnum\n";
+}
+
+# test 43: Test increment feature EXIF
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    my @writeInfo = (
+        [ExposureTime => '1.5', Shift => 1],
+        [SerialNumber => '-9', Shift => -1], # (two negatives make a positive)
+        [MeteringMode => '1', Shift => 0, AddValue => 1],
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/Canon.jpg', 1);
+    print "ok $testnum\n";
+}
+
+# test 44: Test increment feature with XMP
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $testfile = "t/${testname}_${testnum}_failed.xmp";
+    unlink $testfile;
+    my @writeInfo = (
+        ['XMP:ApertureValue' => '-0.1', Shift => 1], # increment
+        ['XMP:FNumber' => '28/10', DelValue => 1], # conditional delete
+        ['XMP:DateTimeOriginal' => '3', Shift => 0, AddValue => 1], # shift
+    );
+    print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum, 't/images/XMP.xmp', 1);
     print "ok $testnum\n";
 }
 

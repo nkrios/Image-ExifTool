@@ -332,7 +332,7 @@ numerical.
                   behaviour for a flattened tag which is itself not a list
                   element (ie. a member of list of structures).  Note that in
                   ExifTool an XMP lang-alt tag (Writable="lang-alt") is NOT a
-                  List-type tag (unless it is a list of lang-alt lists, which is
+                  list-type tag (unless it is a list of lang-alt lists, which is
                   uncommon).
 
                   'MakerNotes' - set if this tag is maker note data.

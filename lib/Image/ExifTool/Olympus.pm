@@ -33,7 +33,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.79';
+$VERSION = '1.81';
 
 sub PrintLensInfo($$$);
 
@@ -56,10 +56,14 @@ my %olympusLensTypes = (
     '0 5 16' => 'Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6', #11
     '0 6 0'  => 'Olympus Zuiko Digital ED 50-200mm F2.8-3.5',
     '0 6 1'  => 'Olympus Zuiko Digital ED 8mm F3.5 Fisheye', #9
+    '0 6 16' => 'Olympus M.Zuiko Digital ED 40-150mm F4.0-5.6', #PH
     '0 7 0'  => 'Olympus Zuiko Digital 11-22mm F2.8-3.5',
     '0 7 1'  => 'Olympus Zuiko Digital 18-180mm F3.5-6.3', #6
+    '0 7 16' => 'Olumpus M.Zuiko Digital ED 12mm F2.0', #PH
     '0 8 1'  => 'Olympus Zuiko Digital 70-300mm F4.0-5.6', #7 (seen as release 1 - PH)
+    '0 8 16' => 'Olympus M.Zuiko Digital ED 75-300mm F4.8-6.7', #PH
     '0 9 16' => 'Olympus M.Zuiko Digital 14-42mm F3.5-5.6 II', #PH (E-PL2)
+    '0 19 16'=> 'Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6 II R', #PH
     '0 21 0' => 'Olympus Zuiko Digital ED 7-14mm F4.0',
     '0 23 0' => 'Olympus Zuiko Digital Pro ED 35-100mm F2.0', #7
     '0 24 0' => 'Olympus Zuiko Digital 14-45mm F3.5-5.6',
@@ -107,18 +111,23 @@ my %olympusLensTypes = (
 
 # ArtFilter and MagicFilter values (ref PH)
 my %filters = (
-    '0'    => 'Off',
-    '1' => 'Soft Focus',
-    '2' => 'Pop Art',
-    '3' => 'Pale & Light Color',
-    '4' => 'Light Tone',
-    '5' => 'Pin Hole',
-    '6' => 'Grainy Film',
-    '9' => 'Diorama',
-    '10' => 'Cross Process',
-    '12' => 'Fish Eye',
-    '13' => 'Drawing',
-    # Punk? Sparkle?
+    0    => 'Off',
+    1 => 'Soft Focus', # (XZ-1)
+    2 => 'Pop Art', # (SZ-10 magic filter 1)
+    3 => 'Pale & Light Color',
+    4 => 'Light Tone',
+    5 => 'Pin Hole', # (SZ-10 magic filter 2)
+    6 => 'Grainy Film',
+    9 => 'Diorama',
+    10 => 'Cross Process',
+    12 => 'Fish Eye', # (SZ-10 magic filter 3)
+    13 => 'Drawing', # (SZ-10 magic filter 4)
+    14 => 'Gentle Sepia', # (E-5)
+    20 => 'Dramatic Tone', # (XZ-1)
+    21 => 'Punk', # (SZ-10 magic filter 6)
+    22 => 'Soft Focus 2', # (SZ-10 magic filter 5)
+    23 => 'Sparkle', # (SZ-10 magic filter 7)
+    24 => 'Watercolor', # (SZ-10 magic filter 8)
 );
 
 # tag information for WAV "Index" tags
@@ -1886,7 +1895,8 @@ my %indexInfo = (
     0x52c => { #PH
         Name => 'MagicFilter',
         Writable => 'int16u',
-        Count => 4, # (2nd number is 0 or 1280, 3rd/4th are 0)
+        Count => 4, # (2nd number is 0, 1280 or 1792, 3rd/4th are 0)
+        # (1792 observed for E-5 Gentle Sepia and XZ-1 Dramatic Tone)
         PrintConv => [ \%filters ],
     },
     0x600 => { #PH/4

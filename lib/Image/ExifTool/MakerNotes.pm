@@ -20,7 +20,7 @@ sub ProcessGE2($$$);
 sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.67';
+$VERSION = '1.69';
 
 my $debug;          # set to 1 to enable debugging code
 
@@ -828,6 +828,7 @@ my $debug;          # set to 1 to enable debugging code
 my $tagInfo;
 foreach $tagInfo (@Image::ExifTool::MakerNotes::Main) {
     $$tagInfo{Writable} = 'undef';
+    $$tagInfo{Format} = 'undef', # (make sure we don't convert this when reading)
     $$tagInfo{WriteGroup} = 'ExifIFD';
     $$tagInfo{Groups} = { 1 => 'MakerNotes' };
     next unless $$tagInfo{SubDirectory};

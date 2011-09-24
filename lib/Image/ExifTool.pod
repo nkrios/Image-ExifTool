@@ -65,34 +65,35 @@ supported by ExifTool (r = read, w = write, c = create):
 
   File Types
   ------------+-------------+-------------+-------------+------------
-  3FR   r     | DVB   r     | M4A/V r     | PBM   r/w   | RWL   r/w
-  3G2   r     | DYLIB r     | MEF   r/w   | PDF   r/w   | RWZ   r
-  3GP   r     | EIP   r     | MIE   r/w/c | PEF   r/w   | RM    r
-  ACR   r     | EPS   r/w   | MIFF  r     | PFA   r     | SO    r
-  AFM   r     | ERF   r/w   | MKA   r     | PFB   r     | SR2   r/w
-  AI    r/w   | EXE   r     | MKS   r     | PFM   r     | SRF   r
-  AIFF  r     | EXIF  r/w/c | MKV   r     | PGF   r     | SRW   r/w
-  APE   r     | F4A/V r     | MNG   r/w   | PGM   r/w   | SVG   r
-  ARW   r/w   | FLA   r     | MOS   r/w   | PICT  r     | SWF   r
-  ASF   r     | FLAC  r     | MOV   r     | PMP   r     | THM   r/w
-  AVI   r     | FLV   r     | MP3   r     | PNG   r/w   | TIFF  r/w
-  BMP   r     | FPX   r     | MP4   r     | PPM   r/w   | TTC   r
-  BTF   r     | GIF   r/w   | MPC   r     | PPT   r     | TTF   r
-  COS   r     | GZ    r     | MPG   r     | PPTX  r     | VRD   r/w/c
-  CR2   r/w   | HDP   r/w   | MPO   r/w   | PS    r/w   | VSD   r
-  CRW   r/w   | HTML  r     | MQV   r     | PSB   r/w   | WAV   r
-  CS1   r/w   | ICC   r/w/c | MRW   r/w   | PSD   r/w   | WDP   r/w
-  DCM   r     | IIQ   r/w   | MXF   r     | PSP   r     | WEBP  r
-  DCP   r/w   | IND   r/w   | NEF   r/w   | QTIF  r     | WEBM  r
-  DCR   r     | ITC   r     | NRW   r/w   | RA    r     | WMA   r
-  DFONT r     | JNG   r/w   | NUMBERS r   | RAF   r/w   | WMV   r
-  DIVX  r     | JP2   r/w   | ODP   r     | RAM   r     | X3F   r/w
-  DJVU  r     | JPEG  r/w   | ODS   r     | RAR   r     | XCF   r
-  DLL   r     | K25   r     | ODT   r     | RAW   r/w   | XLS   r
-  DNG   r/w   | KDC   r     | OGG   r     | RIFF  r     | XLSX  r
-  DOC   r     | KEY   r     | ORF   r/w   | RSRC  r     | XMP   r/w/c
-  DOCX  r     | LNK   r     | OTF   r     | RTF   r     | ZIP   r
-  DV    r     | M2TS  r     | PAGES r     | RW2   r/w   |
+  3FR   r     | DVB   r     | M4A/V r     | PBM   r/w   | RWZ   r
+  3G2   r     | DYLIB r     | MEF   r/w   | PDF   r/w   | RM    r
+  3GP   r     | EIP   r     | MIE   r/w/c | PEF   r/w   | SO    r
+  ACR   r     | EPS   r/w   | MIFF  r     | PFA   r     | SR2   r/w
+  AFM   r     | ERF   r/w   | MKA   r     | PFB   r     | SRF   r
+  AI    r/w   | EXE   r     | MKS   r     | PFM   r     | SRW   r/w
+  AIFF  r     | EXIF  r/w/c | MKV   r     | PGF   r     | SVG   r
+  APE   r     | F4A/V r     | MNG   r/w   | PGM   r/w   | SWF   r
+  ARW   r/w   | FLA   r     | MOS   r/w   | PICT  r     | THM   r/w
+  ASF   r     | FLAC  r     | MOV   r     | PMP   r     | TIFF  r/w
+  AVI   r     | FLV   r     | MP3   r     | PNG   r/w   | TTC   r
+  BMP   r     | FPX   r     | MP4   r     | PPM   r/w   | TTF   r
+  BTF   r     | GIF   r/w   | MPC   r     | PPT   r     | VRD   r/w/c
+  CHM   r     | GZ    r     | MPG   r     | PPTX  r     | VSD   r
+  COS   r     | HDP   r/w   | MPO   r/w   | PS    r/w   | WAV   r
+  CR2   r/w   | HTML  r     | MQV   r     | PSB   r/w   | WDP   r/w
+  CRW   r/w   | ICC   r/w/c | MRW   r/w   | PSD   r/w   | WEBP  r
+  CS1   r/w   | IIQ   r/w   | MXF   r     | PSP   r     | WEBM  r
+  DCM   r     | IND   r/w   | NEF   r/w   | QTIF  r     | WMA   r
+  DCP   r/w   | ITC   r     | NRW   r/w   | RA    r     | WMV   r
+  DCR   r     | J2C   r     | NUMBERS r   | RAF   r/w   | X3F   r/w
+  DFONT r     | JNG   r/w   | ODP   r     | RAM   r     | XCF   r
+  DIVX  r     | JP2   r/w   | ODS   r     | RAR   r     | XLS   r
+  DJVU  r     | JPEG  r/w   | ODT   r     | RAW   r/w   | XLSX  r
+  DLL   r     | K25   r     | OGG   r     | RIFF  r     | XMP   r/w/c
+  DNG   r/w   | KDC   r     | OGV   r     | RSRC  r     | ZIP   r
+  DOC   r     | KEY   r     | ORF   r/w   | RTF   r     |
+  DOCX  r     | LNK   r     | OTF   r     | RW2   r/w   |
+  DV    r     | M2TS  r     | PAGES r     | RWL   r/w   |
 
   Meta Information
   ----------------------+----------------------+---------------------
@@ -145,11 +146,11 @@ not be accessed directly because their interface may change with future
 versions.
 
 None of these methods should ever die or issue warnings to STDERR if called
-with the proper arguments (with the exception of L</SetNewValue> which
-returns an error string when called in list context, or sends the error to
-STDERR otherwise).  Error and warning messages that occur during processing
-are stored in the values of the Error and Warning tags, and are accessible
-via the L</GetValue> method.
+with the proper arguments (with the exception of L</SetNewValue> which may
+send an error message to STDERR, but only when called in scalar context). 
+Error and warning messages that occur during processing are stored in the
+values of the Error and Warning tags, and are accessible via the
+L</GetValue> method.
 
 =head2 new
 
@@ -675,6 +676,14 @@ by the value of the Charset option at processing time.  Default is undef.
 Flag to enable automatic print conversion.  Also enables inverse
 print conversion for writing.  Default is 1.
 
+=item QuickTimeUTC
+
+Flag set to assume that QuickTime date/time values are stored as UTC,
+causing conversion to local time when they are extracted.  According to the
+QuickTime specification date/time values should be UTC, but many digital
+cameras store local time instead (presumably because they don't know the
+time zone), so the default is 0.
+
 =item ScanForXMP
 
 Flag for scan all files (even unrecognized formats) for XMP information
@@ -1088,7 +1097,7 @@ name for each value, or call with a reference to the list of values.
     # delete a specific keyword
     $exifTool->SetNewValue('Keywords', $word, DelValue => 1);
 
-    # set keywords (a List-type tag) with two new values
+    # set keywords (a list-type tag) with two new values
     $exifTool->SetNewValue(Keywords => 'word1');
     $exifTool->SetNewValue(Keywords => 'word2');
     # equivalent, but set both in one call using an array reference
@@ -1200,19 +1209,20 @@ names indicating 'unsafe' and 'protected' tags.  Default is 0.
 
 Flag to replace the previous new values for this tag (ie. replace the values
 set in previous calls to L</SetNewValue>).  This option is most commonly
-used to replace previously-set new values for List-type tags.  Valid values
-are 0 (set new value normally -- adds to new values for List-type tags), 1
+used to replace previously-set new values for list-type tags.  Valid values
+are 0 (set new value normally -- adds to new values for list-type tags), 1
 (reset previous new values for this tag and replace with the specified new
 value) or 2 (reset previous new values only).
 
 =item Shift
 
-Shift the tag by the specified value.  Currently only date/time tags can be
-shifted.  Undefined for no shift, 1 for a positive shift, or -1 for a
-negative shift.  If 0, the shift is applied only if the tag is shiftable,
-and the shift is positive if AddValue is set, or negative if DelValue is
-set.  Default is undef.  See
-L<Image::ExifTool::Shift.pl|Image::ExifTool::Shift.pl> for more information.
+Shift the tag by the specified value.  Currently only date/time tags and
+tags with numerical values may be shifted.  Undefined for no shift, 1 for a
+positive shift, or -1 for a negative shift.  A value of 0 causes a positive
+shift to be applied if the tag is shiftable and AddValue is set, or a
+negative shift for date/time tags only if DelValue is set. Default is undef.
+See L<Image::ExifTool::Shift.pl|Image::ExifTool::Shift.pl> for more
+information.
 
 =item Type
 
@@ -1225,22 +1235,16 @@ ValueConv.
 =item Return Values:
 
 In scalar context, returns the number of tags set and error messages are
-printed to STDERR.  In list context, returns the number of tags set and the
-error string.
+printed to STDERR.  In list context, returns the number of tags set, and the
+error string (which is undefined if there was no error).
 
-=item Notes:
+=item Note:
 
 When deleting groups of tags, the Replace option may be used as in the last
 example above to exclude specific groups from a mass delete.  However, this
 technique may not be used to exclude individual tags.  Instead, use
 L</SetNewValuesFromFile> to recover the values of individual tags after
 deleting a group.
-
-Setting a new value generates a cyclical reference which will prevent memory
-from being reclaimed when the ExifTool object goes out of scope (due to
-Perl's garbage collection technique).  To avoid this problem, call
-L</SetNewValue> with no additional arguments to clear new values before the
-ExifTool object goes out of scope.
 
 =back
 
@@ -1862,9 +1866,10 @@ AFCP, AIFF, APE, APP0, APP12, APP13, APP14, APP15, APP4, APP5, APP6, APP8,
 ASF, CanonVRD, Composite, DICOM, DNG, DV, DjVu, Ducky, EXE, EXIF, ExifTool,
 FLAC, File, Flash, FlashPix, Font, FotoStation, GIF, GIMP, GeoTiff, H264,
 HTML, ICC_Profile, ID3, IPTC, ITC, JFIF, JPEG, Jpeg2000, LNK, Leaf, M2TS,
-MIE, MIFF, MNG, MPC, MPEG, MPF, MXF, MakerNotes, Matroska, Meta, PDF, PICT,
-PNG, PSP, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF,
-RIFF, RSRC, RTF, Rawzor, Real, SVG, SigmaRaw, Stim, Vorbis, XML, XMP, ZIP
+MIE, MIFF, MNG, MPC, MPEG, MPF, MXF, MakerNotes, Matroska, Meta, Ogg, PDF,
+PICT, PNG, PSP, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime,
+RAF, RIFF, RSRC, RTF, Rawzor, Real, SVG, SigmaRaw, Stim, Theora, Vorbis,
+XML, XMP, ZIP
 
 =item Family 1 (Specific Location):
 
@@ -1883,19 +1888,20 @@ MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient,
 MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MNG, MPC,
 MPEG, MPF0, MPImage, MXF, MakerNotes, MakerUnknown, Matroska, MetaIFD,
 Microsoft, Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom,
-NikonScan, Olympus, PDF, PICT, PNG, PSP, Panasonic, Pentax, PhotoMechanic,
-Photoshop, PictureInfo, PostScript, PreviewIFD, PrintIM, ProfileIFD,
-QuickTime, RAF, RAF2, RIFF, RMETA, RSRC, RTF, Rawzor, Real, Real-CONT,
-Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Reconyx,
-Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Samsung, Sanyo,
-Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD, System, Track#,
-Version0, Vorbis, XML, XMP, XMP-DICOM, XMP-MP, XMP-MP1, XMP-PixelLive,
-XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-cell, XMP-crs, XMP-dc, XMP-dex,
-XMP-digiKam, XMP-exif, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
-XMP-microsoft, XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs, XMP-pdf, XMP-pdfx,
-XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur,
-XMP-rdf, XMP-swf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
-XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
+NikonScan, Ocad, Ogg, Olympus, PDF, PICT, PNG, PSP, Panasonic, Pentax,
+PhotoMechanic, Photoshop, PictureInfo, PostScript, PreviewIFD, PrintIM,
+ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, RSRC, RTF, Rawzor, Real,
+Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
+Reconyx, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Samsung,
+Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD, System,
+Theora, Track#, Version0, Vorbis, XML, XMP, XMP-DICOM, XMP-MP, XMP-MP1,
+XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-cell, XMP-crs,
+XMP-dc, XMP-dex, XMP-digiKam, XMP-exif, XMP-extensis, XMP-iptcCore,
+XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-mwg-coll, XMP-mwg-kw,
+XMP-mwg-rs, XMP-pdf, XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus,
+XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-swf, XMP-tiff, XMP-x, XMP-xmp,
+XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights,
+XMP-xmpTPg, ZIP
 
 =item Family 2 (Category):
 
@@ -2021,7 +2027,8 @@ writing, the inverse conversions are performed.  See the L</Charset> option
 for a list of valid character sets.
 
 More specific details are given below about how character coding is handled
-for EXIF, IPTC, XMP, PNG, ID3, PDF and MIE information:
+for EXIF, IPTC, XMP, PNG, ID3, PDF, Photoshop, QuickTime, MIE and Vorbis
+information:
 
 =head2 EXIF
 
@@ -2052,8 +2059,11 @@ L</Charset> option.  When writing, the inverse conversions are performed.
 No conversion is done if the internal (IPTC) and external (ExifTool)
 character sets are the same.  Note that ISO 2022 character set shifting is
 not supported.  Instead, a warning is issued and the string is not converted
-if an ISO 2022 shift code is found.  See L<http://www.iptc.org/IIM/> for the
-official IPTC specification.
+if an ISO 2022 shift code is encountered.  See L<http://www.iptc.org/IIM/>
+for the official IPTC specification.
+
+(Note: Here, "IPTC" Refers to the older IPTC IIM format.  The more recent
+IPTC Core and Extension specifications actually use the XMP format.)
 
 =head2 XMP
 
@@ -2096,6 +2106,19 @@ character set specified by the L</Charset> option.  When writing, ExifTool
 encodes input text from the specified character set as Unicode only if the
 string contains special characters, otherwise PDFDocEncoding is used.
 
+=head2 Photoshop
+
+Some Photoshop resource names are stored as Pascal strings with unknown
+encoding.  By default, ExifTool assumes MacRoman encoding and converts this
+to UTF-8, but the internal and external character sets may be specified with
+L</CharsetPhotoshop> and L</Charset> options respectively.
+
+=head2 QuickTime
+
+QuickTime text strings may be stored in a variety of poorly document
+formats.  ExifTool does its best to decode these according to the
+L</Charset> option setting.
+
 =head2 MIE
 
 MIE strings are stored as either UTF-8 or ISO 8859-1. When reading, UTF-8
@@ -2104,6 +2127,11 @@ strings are never converted.  When writing, input strings are converted from
 the specified character set to UTF-8.  The resulting strings are stored as
 UTF-8 if they contain multi-byte UTF-8 character sequences, otherwise they
 are stored as ISO 8859-1.
+
+=head2 Vorbis
+
+Vorbis comments are stored as UTF-8, and are converted to the character set
+specified by the L</Charset> option.
 
 =head1 AUTHOR
 

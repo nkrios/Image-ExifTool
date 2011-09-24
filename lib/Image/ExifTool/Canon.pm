@@ -77,7 +77,7 @@ sub ProcessSerialData($$$);
 sub ProcessFilters($$$);
 sub SwapWords($);
 
-$VERSION = '2.74';
+$VERSION = '2.78';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -325,6 +325,7 @@ $VERSION = '2.74';
     # Note: LensType 488 (0x1e8) is reported as 232 (0xe8) in 7D CameraSettings
     488 => 'Canon EF-S 15-85mm f/3.5-5.6 IS USM', #PH
     489 => 'Canon EF 70-300mm f/4-5.6L IS USM', #Gerald Kapounek
+    490 => 'Canon EF 8-15mm f/4L USM', #Klaus Reinfeld
 );
 
 # Canon model ID numbers (PH)
@@ -450,7 +451,7 @@ $VERSION = '2.74';
     0x2770000 => 'PowerShot SD940 IS / Digital IXUS 120 IS / IXY Digital 220 IS',
     0x2800000 => 'PowerShot A495',
     0x2810000 => 'PowerShot A490',
-    0x2820000 => 'PowerShot A3100 IS',
+    0x2820000 => 'PowerShot A3100 IS / A3150 IS', # (different cameras, same ID)
     0x2830000 => 'PowerShot A3000 IS',
     0x2840000 => 'PowerShot SD1400 IS / IXUS 130 / IXY 400F',
     0x2850000 => 'PowerShot SD1300 IS / IXUS 105 / IXY 200F',
@@ -464,7 +465,7 @@ $VERSION = '2.74';
     0x2950000 => 'PowerShot S95',
     0x2980000 => 'PowerShot A3300 IS',
     0x2990000 => 'PowerShot A3200 IS',
-    0x3000000 => 'PowerShot ELPH 500 HS / IXUS 310 HS / IXY 31 S',
+    0x3000000 => 'PowerShot ELPH 500 HS / IXUS 310 HS / IXY 31S',
     0x3010000 => 'PowerShot Pro90 IS',
     0x3010001 => 'PowerShot A800',
     0x3020000 => 'PowerShot ELPH 100 HS / IXUS 115 HS / IXY 210F',
@@ -473,6 +474,12 @@ $VERSION = '2.74';
     0x3050000 => 'PowerShot A2200',
     0x3060000 => 'PowerShot A1200',
     0x3070000 => 'PowerShot SX220 HS',
+    0x3090000 => 'PowerShot SX150 IS',
+    0x3100000 => 'PowerShot ELPH 510 HS / IXUS 1100 HS / IXY 51S',
+    0x3110000 => 'PowerShot S100 (new)', # IXUS/IXY??
+    0x3130000 => 'PowerShot SX40 HS', # IXUS/IXY??
+    0x3120000 => 'PowerShot ELPH 310 HS / IXUS 230 HS / IXY 600F',
+    0x3140000 => 'PowerShot ELPH 500 HS / IXUS 320 HS / IXY 32S', # (duplicate PowerShot model???)
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
     0x4007d673 => 'DC19/DC21/DC22',
@@ -487,6 +494,7 @@ $VERSION = '2.74';
     0x4007d77d => 'MD255/ZR950',
     0x4007d81c => 'HF11',
     0x4007d878 => 'HV30',
+    0x4007d87c => 'XH A1S',
     0x4007d87e => 'DC301/DC310/DC311/DC320/DC330',
     0x4007d87f => 'FS100',
     0x4007d880 => 'HF10', #29 (iVIS/VIXIA)
@@ -494,14 +502,14 @@ $VERSION = '2.74';
     0x4007d925 => 'HF21', # (LEGRIA)
     0x4007d926 => 'HF S11', # (LEGRIA)
     0x4007d978 => 'HV40', # (LEGRIA)
-    0x4007d987 => 'DC410/DC420',
+    0x4007d987 => 'DC410/DC411/DC420',
     0x4007d988 => 'FS19/FS20/FS21/FS22/FS200', # (LEGRIA)
     0x4007d989 => 'HF20/HF200', # (LEGRIA)
     0x4007d98a => 'HF S10/S100', # (LEGRIA/VIXIA)
-    0x4007da8e => 'HF R16/R17/R18/R100/R106', # (LEGRIA/VIXIA)
+    0x4007da8e => 'HF R10/R16/R17/R18/R100/R106', # (LEGRIA/VIXIA)
     0x4007da8f => 'HF M30/M31/M36/M300/M306', # (LEGRIA/VIXIA)
     0x4007da90 => 'HF S20/S21/S200', # (LEGRIA/VIXIA)
-    0x4007da92 => 'FS36/FS37/FS305/FS306/FS307',
+    0x4007da92 => 'FS31/FS36/FS37/FS300/FS305/FS306/FS307',
     # NOTE: some pre-production models may have a model name of
     # "Canon EOS Kxxx", where "xxx" is the last 3 digits of the model ID below.
     # This has been observed for the 1DSmkIII/K215 and 400D/K236.
@@ -1356,7 +1364,7 @@ my %binaryDataAttrs = (
     0x4001 => [ #13
         {   # (int16u[582]) - 20D and 350D
             Condition => '$count == 582',
-            Name => 'ColorData1',
+            Name => 'ColorData1', # (Canon: WBPacket)
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Canon::ColorData1',
             },
@@ -1430,11 +1438,11 @@ my %binaryDataAttrs = (
         Flags => [ 'Unknown', 'Binary', 'Drop' ],
     },
     0x4008 => { #PH guess (1DmkIII)
-        Name => 'BlackLevel', # (BasePictStyleOfUser)
+        Name => 'BlackLevel', # (Canon: BasePictStyleOfUser)
         Unknown => 1,
     },
     0x4010 => { #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2933.0.html
-        Name => 'CustomPictureStyleFileName',
+        Name => 'CustomPictureStyleFileName', # (Canon: PictStyleCaption)
         Writable => 'string',
     },
     0x4013 => { #PH
@@ -1444,8 +1452,9 @@ my %binaryDataAttrs = (
             TagTable => 'Image::ExifTool::Canon::AFMicroAdj',
         },
     },
+    # 0x4014 (similar to 0x83?)
     0x4015 => {
-        Name => 'VignettingCorr',
+        Name => 'VignettingCorr', # (Canon: LensPacket)
         Condition => '$$valPt !~ /^\0\0\0\0/', # (data may be all zeros for 60D)
         SubDirectory => {
             # (the size word is at byte 2 in this structure)
@@ -1454,7 +1463,7 @@ my %binaryDataAttrs = (
         },
     },
     0x4016 => {
-        Name => 'VignettingCorr2',
+        Name => 'VignettingCorr2', # (Canon: ImageCorrectActual)
         SubDirectory => {
             # (the size word is actually 4 bytes, but it doesn't matter if little-endian)
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
@@ -1462,7 +1471,7 @@ my %binaryDataAttrs = (
         },
     },
     0x4018 => { #PH
-        Name => 'LightingOpt',
+        Name => 'LightingOpt', # (Canon: ImageCorrect)
         SubDirectory => {
             Validate => 'Image::ExifTool::Canon::Validate($dirData,$subdirStart,$size)',
             TagTable => 'Image::ExifTool::Canon::LightingOpt',

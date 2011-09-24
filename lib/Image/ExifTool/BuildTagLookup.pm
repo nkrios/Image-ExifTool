@@ -32,7 +32,7 @@ use Image::ExifTool::XMP;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.28';
+$VERSION = '2.34';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -171,8 +171,8 @@ question.
     EXIF => q{
 EXIF stands for "Exchangeable Image File Format".  This type of information
 is formatted according to the TIFF specification, and may be found in JPG,
-TIFF, PNG, PGF, MIFF, HDP, PSP and XCF images, as well as many TIFF-based
-RAW images, and even some AVI and MOV videos.
+TIFF, PNG, JP2, PGF, MIFF, HDP, PSP and XCF images, as well as many
+TIFF-based RAW images, and even some AVI and MOV videos.
 
 The EXIF meta information is organized into different Image File Directories
 (IFD's) within an image.  The names of these IFD's correspond to the
@@ -275,14 +275,14 @@ See L<http://www.adobe.com/devnet/xmp/> for the official XMP specification.
 The tags listed below are part of the International Press Telecommunications
 Council (IPTC) and the Newspaper Association of America (NAA) Information
 Interchange Model (IIM).  This is an older meta information format, slowly
-being phased out in favor of XMP.  (In fact, the newer IPTCCore
-specification actually uses XMP format!)  IPTC information may be embedded
-in JPG, TIFF, PNG, MIFF, PS, PDF, PSD, XCF and DNG images.
+being phased out in favor of XMP -- the newer IPTCCore specification uses
+XMP format.  IPTC information may be embedded in JPG, TIFF, PNG, MIFF, PS,
+PDF, PSD, XCF and DNG images.
 
 IPTC information is separated into different records, each of which has its
 own set of tags.  See
 L<http://www.iptc.org/std/IIM/4.1/specification/IIMV4.1.pdf> for the
-official specification.
+official IPTC IIM specification.
 
 This specification dictates a length for ASCII (C<string> or C<digits>) and
 binary (C<undef>) values.  These lengths are given in square brackets after
@@ -359,7 +359,8 @@ These tags are used in Panasonic/Leica cameras.
 These tags are used in Pentax/Asahi cameras.
 },
     Sigma => q{
-These tags are used in Sigma/Foveon cameras.
+These tags are used in Sigma/Foveon cameras.  Many tags are not consistent
+between different models.
 },
     Sony => q{
 The maker notes in images from most recent Sony camera models contain a
@@ -714,6 +715,11 @@ TagID:  foreach $tagID (@keys) {
                         $short ne 'PostScript')
                     {
                         warn "$short $name is not shiftable!\n";
+                    }
+                    if ($writable and (not $$tagInfo{PrintConvInv} or
+                        $$tagInfo{PrintConvInv} !~ /InverseDateTime/))
+                    {
+                        warn "$short $name missing InverseDateTime PrintConvInv\n";
                     }
                 } elsif ($name =~ /DateTime(?!Stamp)/ and (not $$tagInfo{Groups}{2} or
                     $$tagInfo{Groups}{2} ne 'Time') and $short ne 'DICOM') {
@@ -1328,10 +1334,23 @@ sub WriteTagLookup($$)
 sub NumbersFirst
 {
     my $rtnVal;
-    my $bNum = ($b =~ /^-?[0-9]+(\.\d*)?$/);
-    if ($a =~ /^-?[0-9]+(\.\d*)?$/) {
-        $rtnVal = ($bNum ? $a <=> $b : -$numbersFirst);
-    } elsif ($bNum) {
+    my ($bNum, $bDec);
+    ($bNum, $bDec) = ($1, $3) if $b =~ /^(-?[0-9]+)(\.(\d*))?$/;
+    if ($a =~ /^(-?[0-9]+)(\.(\d*))?$/) {
+        if (defined $bNum) {
+            # compare integer part as a number
+            $rtnVal = $1 <=> $bNum;
+            unless ($rtnVal) {
+                my $aDec = $3 || 0;
+                $bDec or $bDec = 0;
+                # compare decimal part as an integer too
+                # (so that "1.10" comes after "1.9")
+                $rtnVal = $aDec <=> $bDec;
+            }
+        } else {
+            $rtnVal = -$numbersFirst;
+        }
+    } elsif (defined $bNum) {
         $rtnVal = $numbersFirst;
     } else {
         my ($a2, $b2) = ($a, $b);
@@ -1466,6 +1485,7 @@ sub GetTableOrder()
         Unknown => 'SonyIDC',
         DNG     => 'Unknown',
         PrintIM => 'ICC_Profile',
+        Vorbis  => 'Ogg',
         ID3     => 'PostScript',
         MinoltaRaw => 'KyoceraRaw',
         KyoceraRaw => 'CanonRaw',

@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.42';
+$VERSION = '1.43';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -181,6 +181,7 @@ my %fileFormat = (
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
+        PrintConvInv => 'Image::ExifTool::IPTC::InverseDateOrTime($val)',
     },
     80 => {
         Name => 'TimeSent',
@@ -189,6 +190,7 @@ my %fileFormat = (
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
+        PrintConvInv => 'Image::ExifTool::IPTC::InverseDateOrTime($val)',
     },
     90 => {
         Name => 'CodedCharacterSet',
@@ -316,6 +318,7 @@ my %fileFormat = (
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
+        PrintConvInv => 'Image::ExifTool::IPTC::InverseDateOrTime($val)',
     },
     35 => {
         Name => 'ReleaseTime',
@@ -324,6 +327,7 @@ my %fileFormat = (
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
+        PrintConvInv => 'Image::ExifTool::IPTC::InverseDateOrTime($val)',
     },
     37 => {
         Name => 'ExpirationDate',
@@ -332,6 +336,7 @@ my %fileFormat = (
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
+        PrintConvInv => 'Image::ExifTool::IPTC::InverseDateOrTime($val)',
     },
     38 => {
         Name => 'ExpirationTime',
@@ -340,6 +345,7 @@ my %fileFormat = (
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
+        PrintConvInv => 'Image::ExifTool::IPTC::InverseDateOrTime($val)',
     },
     40 => {
         Name => 'SpecialInstructions',
@@ -369,6 +375,7 @@ my %fileFormat = (
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
+        PrintConvInv => 'Image::ExifTool::IPTC::InverseDateOrTime($val)',
     },
     50 => {
         Name => 'ReferenceNumber',
@@ -382,6 +389,7 @@ my %fileFormat = (
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
+        PrintConvInv => 'Image::ExifTool::IPTC::InverseDateOrTime($val)',
     },
     60 => {
         Name => 'TimeCreated',
@@ -390,6 +398,7 @@ my %fileFormat = (
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
+        PrintConvInv => 'Image::ExifTool::IPTC::InverseDateOrTime($val)',
     },
     62 => {
         Name => 'DigitalCreationDate',
@@ -398,6 +407,7 @@ my %fileFormat = (
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcDate($val)',
+        PrintConvInv => 'Image::ExifTool::IPTC::InverseDateOrTime($val)',
     },
     63 => {
         Name => 'DigitalCreationTime',
@@ -406,6 +416,7 @@ my %fileFormat = (
         Shift => 'Time',
         ValueConv => 'Image::ExifTool::Exif::ExifTime($val)',
         ValueConvInv => 'Image::ExifTool::IPTC::IptcTime($val)',
+        PrintConvInv => 'Image::ExifTool::IPTC::InverseDateOrTime($val)',
     },
     65 => {
         Name => 'OriginatingProgram',

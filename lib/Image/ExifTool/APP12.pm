@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess);
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 sub ProcessAPP12($$$);
 sub ProcessDucky($$$);
@@ -173,7 +173,7 @@ sub WriteDucky($$$)
             my $nvHash = $exifTool->GetNewValueHash($tagInfo);
             my $isNew;
             if (defined $val) {
-                if (Image::ExifTool::IsOverwriting($nvHash, $val)) {
+                if ($exifTool->IsOverwriting($nvHash, $val)) {
                     $exifTool->VerboseValue("- Ducky:$$tagInfo{Name}", $val);
                     $isNew = 1;
                 }
@@ -182,7 +182,7 @@ sub WriteDucky($$$)
                 $isNew = 1;
             }
             if ($isNew) {
-                $val = Image::ExifTool::GetNewValues($nvHash);
+                $val = $exifTool->GetNewValues($nvHash);
                 ++$exifTool->{CHANGED};
                 next unless defined $val;   # next if tag is being deleted
                 $exifTool->VerboseValue("+ Ducky:$$tagInfo{Name}", $val);

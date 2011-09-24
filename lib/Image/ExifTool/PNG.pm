@@ -26,7 +26,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.24';
+$VERSION = '1.25';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -661,9 +661,9 @@ sub FoundPNG($$$$;$$$$)
                     # (also handle case of tEXt tags written with lowercase first letter)
                     delete $exifTool->{ADD_PNG}->{ucfirst($id)};
                     my $nvHash = $exifTool->GetNewValueHash($tagInfo);
-                    $isOverwriting = Image::ExifTool::IsOverwriting($nvHash);
+                    $isOverwriting = $exifTool->IsOverwriting($nvHash);
                     if (defined $deflateErr) {
-                        $newVal = Image::ExifTool::GetNewValues($nvHash);
+                        $newVal = $exifTool->GetNewValues($nvHash);
                         # can only write tag now if always overwriting
                         if ($isOverwriting > 0) {
                             $val = '<deflate error>';
@@ -673,10 +673,10 @@ sub FoundPNG($$$$;$$$$)
                         }
                     } else {
                         if ($isOverwriting < 0) {
-                            $isOverwriting = Image::ExifTool::IsOverwriting($nvHash, $val);
+                            $isOverwriting = $exifTool->IsOverwriting($nvHash, $val);
                         }
                         # (must get new value after IsOverwriting() in case it was shifted)
-                        $newVal = Image::ExifTool::GetNewValues($nvHash);
+                        $newVal = $exifTool->GetNewValues($nvHash);
                     }
                 }
                 if ($isOverwriting) {

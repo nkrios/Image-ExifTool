@@ -198,7 +198,7 @@ my %ignorePrintConv = ( OTHER => 1, BITMASK => 1, Notes => 1 );
 #           WriteGroup - group name where information is being written (correct case)
 #           WantGroup - group name as specified in call to function (case insensitive)
 #           Next - pointer to next new value hash (if more than one)
-#           Self - ExifTool object reference
+#           IsNVH - Flag indicating this is a new value hash
 #           Shift - shift value
 #           MAKER_NOTE_FIXUP - pointer to fixup if necessary for a maker note value
 sub SetNewValue($;$$%)
@@ -214,13 +214,6 @@ sub SetNewValue($;$$%)
     my $numSet = 0;
 
     unless (defined $tag) {
-        # remove any existing set values
-        if ($$self{NEW_VALUE}) {
-            # remove circular references for garbage collection
-            foreach (keys %{$$self{NEW_VALUE}}) {
-                delete $$self{NEW_VALUE}{$_}{Self};
-            }
-        }
         delete $self->{NEW_VALUE};
         $self->{DEL_GROUP} = { };
         return 1;
@@ -601,12 +594,16 @@ sub SetNewValue($;$$%)
         $tag = $tagInfo->{Name};    # get proper case for tag name
         my $shift = $options{Shift};
         if (defined $shift) {
-            # (can't currently shift List-type tags)
-            if ($tagInfo->{Shift} and not $tagInfo->{List}) {
+            # (can't currently shift list-type tags)
+            if (not $tagInfo->{List}) {
                 unless ($shift) {
                     # set shift according to AddValue/DelValue
                     $shift = 1 if $options{AddValue};
-                    $shift = -1 if $options{DelValue};
+                    if ($options{DelValue}) {
+                        # can shift a date/time with -=, but this is
+                        # a conditional delete operation for other tags
+                        $shift = -1 if $$tagInfo{Shift} and $$tagInfo{Shift} eq 'Time';
+                    }
                 }
                 if ($shift and (not defined $value or not length $value)) {
                     # (now allow -= to be used for shiftable tag - v8.05)
@@ -630,13 +627,21 @@ sub SetNewValue($;$$%)
                 next;
             }
             if ($shift) {
-                # add '+' or '-' prefix to indicate shift direction
-                $val = ($shift > 0 ? '+' : '-') . $val;
-                # check the shift for validity
-                require 'Image/ExifTool/Shift.pl';
-                my $err2 = CheckShift($tagInfo->{Shift}, $val);
-                if ($err2) {
-                    $err = "$err2 for $wgrp1:$tag";
+                if ($$tagInfo{Shift} and $$tagInfo{Shift} eq 'Time') {
+                    # add '+' or '-' prefix to indicate shift direction
+                    $val = ($shift > 0 ? '+' : '-') . $val;
+                    # check the shift for validity
+                    require 'Image/ExifTool/Shift.pl';
+                    my $err2 = CheckShift($tagInfo->{Shift}, $val);
+                    if ($err2) {
+                        $err = "$err2 for $wgrp1:$tag";
+                        $verbose > 2 and print $out "$err\n";
+                        next;
+                    }
+                } elsif (IsFloat($val)) {
+                    $val *= $shift;
+                } else {
+                    $err = "Shift value for $wgrp1:$tag is not a number";
                     $verbose > 2 and print $out "$err\n";
                     next;
                 }
@@ -826,6 +831,7 @@ WriteAlso:
                     Protected => $protected | 0x02,
                     AddValue => $options{AddValue},
                     DelValue => $options{DelValue},
+                    Replace => $options{Replace}, # handle lists properly
                     CreateGroups => $createGroups,
                     SetTags => \%alsoWrote, # remember tags already written
                 );
@@ -913,31 +919,32 @@ sub SetNewValuesFromFile($$;@)
     # ! option to decide how it is handled here. !
     # +------------------------------------------+
     $srcExifTool->Options(
-        Binary      => 1,
-        Charset     => $$options{Charset},
-        CharsetID3  => $$options{CharsetID3},
-        CharsetIPTC => $$options{CharsetIPTC},
-        CharsetPhotoshop => $$options{CharsetPhotoshop},
-        Composite   => $$options{Composite},
-        CoordFormat => $$options{CoordFormat} || '%d %d %.8f', # copy coordinates at high resolution unless otherwise specified
-        DateFormat  => $$options{DateFormat},
-        Duplicates  => 1,
-        Escape      => $$options{Escape},
+        Binary          => 1,
+        Charset         => $$options{Charset},
+        CharsetID3      => $$options{CharsetID3},
+        CharsetIPTC     => $$options{CharsetIPTC},
+        CharsetPhotoshop=> $$options{CharsetPhotoshop},
+        Composite       => $$options{Composite},
+        CoordFormat     => $$options{CoordFormat} || '%d %d %.8f', # copy coordinates at high resolution unless otherwise specified
+        DateFormat      => $$options{DateFormat},
+        Duplicates      => 1,
+        Escape          => $$options{Escape},
         ExtractEmbedded => $$options{ExtractEmbedded},
-        FastScan    => $$options{FastScan},
-        FixBase     => $$options{FixBase},
-        IgnoreMinorErrors => $$options{IgnoreMinorErrors},
-        Lang        => $$options{Lang},
-        LargeFileSupport => $$options{LargeFileSupport},
-        List        => 1,
-        MakerNotes  => 1,
+        FastScan        => $$options{FastScan},
+        FixBase         => $$options{FixBase},
+        IgnoreMinorErrors=>$$options{IgnoreMinorErrors},
+        Lang            => $$options{Lang},
+        LargeFileSupport=> $$options{LargeFileSupport},
+        List            => 1,
+        MakerNotes      => 1,
         MissingTagValue => $$options{MissingTagValue},
-        Password    => $$options{Password},
-        PrintConv   => $$options{PrintConv},
-        ScanForXMP  => $$options{ScanForXMP},
-        StrictDate  => 1,
-        Struct      => ($$options{Struct} or not defined $$options{Struct}) ? 1 : 0,
-        Unknown     => $$options{Unknown},
+        Password        => $$options{Password},
+        PrintConv       => $$options{PrintConv},
+        QuickTimeUTC    => $$options{QuickTimeUTC},
+        ScanForXMP      => $$options{ScanForXMP},
+        StrictDate      => 1,
+        Struct          => ($$options{Struct} or not defined $$options{Struct}) ? 1 : 0,
+        Unknown         => $$options{Unknown},
     );
     my $printConv = $$options{PrintConv};
     if ($opts{Type}) {
@@ -1021,7 +1028,7 @@ sub SetNewValuesFromFile($$;@)
             # translate '+' and '-' to appropriate SetNewValue option
             if ($opt) {
                 $$opts{{ '+' => 'AddValue', '-' => 'DelValue' }->{$opt}} = 1;
-                $$opts{Shift} = 0;  # shift if this is a date/time tag
+                $$opts{Shift} = 0;  # shift if shiftable
             }
             ($dstGrp, $dstTag) = ($1, $2) if $dstTag =~ /(.*):(.+)/;
             # ValueConv may be specified separately on the destination with '#'
@@ -1193,19 +1200,22 @@ sub SetNewValuesFromFile($$;@)
 # Get new value(s) for tag
 # Inputs: 0) ExifTool object reference, 1) tag name or tagInfo hash ref
 #         2) optional pointer to return new value hash reference (not part of public API)
-#    or   0) new value hash reference (not part of public API)
+#    or   0) ExifTool ref, 1) new value hash reference (not part of public API)
 # Returns: List of new Raw values (list may be empty if tag is being deleted)
 # Notes: 1) Preferentially returns new value from Extra table if writable Extra tag exists
 # 2) Must call AFTER IsOverwriting() returns 1 to get proper value for shifted times
 # 3) Tag name is case sensitive and may be prefixed by family 0 or 1 group name
-sub GetNewValues($;$$)
+# 4) Value may have been modified by CHECK_PROC routine after ValueConv
+sub GetNewValues($$;$)
 {
     local $_;
+    my $self = shift;
+    my $tag = shift;
     my $nvHash;
-    if (ref $_[0] eq 'HASH') {
-        $nvHash = shift;
+    if ((ref $tag eq 'HASH' and $$tag{IsNVH}) or not defined $tag) {
+        $nvHash = $tag;
     } else {
-        my ($self, $tag, $newValueHashPt) = @_;
+        my $newValueHashPt = shift;
         if ($self->{NEW_VALUE}) {
             my ($group, $tagInfo);
             if (ref $tag) {
@@ -1243,54 +1253,59 @@ GNV_TagInfo:    foreach $tagInfo (@tagInfoList) {
         # return new value hash if requested
         $newValueHashPt and $$newValueHashPt = $nvHash;
     }
-    if ($nvHash and $nvHash->{Value}) {
-        my $vals = $nvHash->{Value};
-        # do inverse raw conversion if necessary
-        if ($nvHash->{TagInfo}{RawConvInv}) {
-            my @copyVals = @$vals;  # modify a copy of the values
-            $vals = \@copyVals;
-            my $tagInfo = $$nvHash{TagInfo};
-            my $conv = $$tagInfo{RawConvInv};
-            my $self = $nvHash->{Self};
-            my ($val, $checkProc);
-            my $table = $tagInfo->{Table};
-            $checkProc = $$table{CHECK_PROC} if $table;
-            local $SIG{'__WARN__'} = \&SetWarning;
-            undef $evalWarning;
-            foreach $val (@$vals) {
-                if (ref($conv) eq 'CODE') {
-                    $val = &$conv($val, $self);
-                } else {
-                    #### eval RawConvInv ($self, $val, $taginfo)
-                    $val = eval $conv;
-                    $@ and $evalWarning = $@;
-                }
-                if ($evalWarning) {
-                    # an empty warning ("\n") ignores tag with no error
-                    if ($evalWarning ne "\n") {
-                        my $err = CleanWarning() . " in $$tagInfo{Name} (RawConvInv)";
-                        $self->Warn($err);
-                    }
-                    @$vals = ();
-                    last;
-                }
-                # must check value now
-                next unless $checkProc;
+    unless ($nvHash and $nvHash->{Value}) {
+        return () if wantarray;  # return empty list
+        return undef;
+    }
+    my $vals = $nvHash->{Value};
+    # do inverse raw conversion if necessary
+    # - must also check after doing a Shift
+    if ($$nvHash{TagInfo}{RawConvInv} or $$nvHash{Shift}) {
+        my @copyVals = @$vals;  # modify a copy of the values
+        $vals = \@copyVals;
+        my $tagInfo = $$nvHash{TagInfo};
+        my $conv = $$tagInfo{RawConvInv};
+        my $table = $$tagInfo{Table};
+        my ($val, $checkProc);
+        $checkProc = $$table{CHECK_PROC} if $$nvHash{Shift} and $table;
+        local $SIG{'__WARN__'} = \&SetWarning;
+        undef $evalWarning;
+        foreach $val (@$vals) {
+            # must check value now if it was shifted
+            if ($checkProc) {
                 my $err = &$checkProc($self, $tagInfo, \$val);
                 if ($err or not defined $val) {
                     $err or $err = 'Error generating raw value';
-                    $self->Warn("$err for $$tagInfo{Name}");
+                    $self->WarnOnce("$err for $$tagInfo{Name}");
                     @$vals = ();
                     last;
                 }
+                next unless $conv;
+            } else {
+                last unless $conv;
+            }
+            # do inverse raw conversion
+            if (ref($conv) eq 'CODE') {
+                $val = &$conv($val, $self);
+            } else {
+                #### eval RawConvInv ($self, $val, $taginfo)
+                $val = eval $conv;
+                $@ and $evalWarning = $@;
+            }
+            if ($evalWarning) {
+                # an empty warning ("\n") ignores tag with no error
+                if ($evalWarning ne "\n") {
+                    my $err = CleanWarning() . " in $$tagInfo{Name} (RawConvInv)";
+                    $self->WarnOnce($err);
+                }
+                @$vals = ();
+                last;
             }
         }
-        # return our value(s)
-        return @$vals if wantarray;
-        return $$vals[0];
     }
-    return () if wantarray;  # return empty list
-    return undef;
+    # return our value(s)
+    return @$vals if wantarray;
+    return $$vals[0];
 }
 
 #------------------------------------------------------------------------------
@@ -1389,7 +1404,6 @@ sub RestoreNewValues($)
     if ($savedValues) {
         $newValues or $newValues = $self->{NEW_VALUE} = { };
         foreach $key (keys %$savedValues) {
-            $$savedValues{$key}{Self} = $self;  # restore Self reference
             if ($$newValues{$key}) {
                 # add saved values to end of list
                 my $nvHash = LastInList($$newValues{$key});
@@ -1421,13 +1435,13 @@ sub SetFileModifyDate($$;$)
     my $nvHash;
     my $val = $self->GetNewValues('FileModifyDate', \$nvHash);
     return 0 unless defined $val;
-    my $isOverwriting = IsOverwriting($nvHash);
+    my $isOverwriting = $self->IsOverwriting($nvHash);
     return 0 unless $isOverwriting;
     if ($isOverwriting < 0) {  # are we shifting time?
         # use original time of this file if not specified
         $originalTime = -M $file unless defined $originalTime;
         return 0 unless defined $originalTime;
-        return 0 unless IsOverwriting($nvHash, $^T - $originalTime*(24*3600));
+        return 0 unless $self->IsOverwriting($nvHash, $^T - $originalTime*(24*3600));
         $val = $nvHash->{Value}[0]; # get shifted value
     }
     unless (utime($val, $val, $file)) {
@@ -1453,9 +1467,9 @@ sub SetFileName($$;$)
     # determine the new file name
     unless (defined $newName) {
         my $filename = $self->GetNewValues('FileName', \$nvHash);
-        $doName = 1 if defined $filename and IsOverwriting($nvHash, $file);
+        $doName = 1 if defined $filename and $self->IsOverwriting($nvHash, $file);
         my $dir = $self->GetNewValues('Directory', \$nvHash);
-        $doDir = 1 if defined $dir and IsOverwriting($nvHash, $file);
+        $doDir = 1 if defined $dir and $self->IsOverwriting($nvHash, $file);
         return 0 unless $doName or $doDir;  # nothing to do
         if ($doName) {
             $newName = GetNewFileName($file, $filename);
@@ -1540,7 +1554,7 @@ sub WriteInfo($$;$$)
     # (do this now in case we are modifying file in place and shifting date)
     my ($nvHash, $originalTime);
     my $fileModifyDate =  $self->GetNewValues('FileModifyDate', \$nvHash);
-    if (defined $fileModifyDate and IsOverwriting($nvHash) < 0 and
+    if (defined $fileModifyDate and $self->IsOverwriting($nvHash) < 0 and
         defined $infile and ref $infile ne 'SCALAR')
     {
         $originalTime = -M $infile;
@@ -1566,7 +1580,7 @@ sub WriteInfo($$;$$)
             if (ref $infile) {
                 $outfile = $newFileName;
                 # can't delete original
-            } elsif (IsOverwriting($nvHash, $infile)) {
+            } elsif ($self->IsOverwriting($nvHash, $infile)) {
                 $outfile = GetNewFileName($infile, $newFileName);
                 $eraseIn = 1; # delete original
             }
@@ -2548,14 +2562,14 @@ PAT:    foreach $pattern (@patterns) {
 
 #------------------------------------------------------------------------------
 # Return true if we are deleting or overwriting the specified tag
-# Inputs: 0) new value hash reference
-#         1) optional tag value (before RawConv) if deleting specific values
+# Inputs: 0) ExifTool object ref, 1) new value hash reference
+#         2) optional tag value (before RawConv) if deleting specific values
 # Returns: >0 - tag should be overwritten
 #          =0 - the tag should be preserved
 #          <0 - not sure, we need the value to know
-sub IsOverwriting($;$)
+sub IsOverwriting($$;$)
 {
-    my ($nvHash, $val) = @_;
+    my ($self, $nvHash, $val) = @_;
     return 0 unless $nvHash;
     # overwrite regardless if no DelValues specified
     return 1 unless $$nvHash{DelValue};
@@ -2571,9 +2585,8 @@ sub IsOverwriting($;$)
         local $SIG{'__WARN__'} = \&SetWarning;
         undef $evalWarning;
         if (ref $conv eq 'CODE') {
-            $val = &$conv($val, $$nvHash{Self});
+            $val = &$conv($val, $self);
         } else {
-            my $self = $$nvHash{Self};
             my $tag = $$tagInfo{Name};
             #### eval RawConv ($self, $val, $tag, $tagInfo)
             $val = eval $conv;
@@ -2581,14 +2594,25 @@ sub IsOverwriting($;$)
         }
         return -1 unless defined $val;
     }
-    # apply time shift if necessary
+    # apply time/number shift if necessary
     if (defined $shift) {
+        my $shiftType = $$tagInfo{Shift};
+        unless ($shiftType and $shiftType eq 'Time') {
+            unless (IsFloat($val)) {
+                $self->Warn("Can't shift $$tagInfo{Name} (not a number)");
+                return 0;
+            }
+            $shiftType = 'Number';  # allow any number to be shifted
+        }
         require 'Image/ExifTool/Shift.pl';
-        my $err = ApplyShift($$tagInfo{Shift}, $shift, $val, $nvHash);
+        my $err = $self->ApplyShift($shiftType, $shift, $val, $nvHash);
         if ($err) {
-            $nvHash->{Self}->Warn("$err when shifting $$tagInfo{Name}");
+            $self->Warn("$err when shifting $$tagInfo{Name}");
             return 0;
         }
+        # ensure that the shifted value is valid and reformat if necessary
+        my $checkVal = $self->GetNewValues($nvHash);
+        return 0 unless defined $checkVal;
         # don't bother overwriting if value is the same
         return 0 if $val eq $$nvHash{Value}[0];
         return 1;
@@ -2662,7 +2686,6 @@ sub GetNewValueHash($$;$$)
         } else {
             # save a copy of this new value hash
             my %copy = %$nvHash;
-            delete $copy{Self};     # break circular reference
             # make copy of Value and DelValue lists
             my $key;
             foreach $key (keys %copy) {
@@ -2681,7 +2704,7 @@ sub GetNewValueHash($$;$$)
         $nvHash = {
             TagInfo => $tagInfo,
             WriteGroup => $writeGroup,
-            Self => $self,
+            IsNVH => 1, # set flag so we can recognize a new value hash
         };
         # add entry to our NEW_VALUE hash
         if ($self->{NEW_VALUE}{$tagInfo}) {
@@ -2743,7 +2766,6 @@ sub RemoveNewValueHash($$$)
 {
     my ($self, $nvHash, $tagInfo) = @_;
     my $firstHash = $self->{NEW_VALUE}{$tagInfo};
-    delete $$nvHash{Self};      # break circular reference
     if ($nvHash eq $firstHash) {
         # remove first entry from linked list
         if ($nvHash->{Next}) {
@@ -3095,7 +3117,7 @@ sub WriteDirectory($$$;$)
     my $blockName = $dirName;
     $blockName = 'EXIF' if $blockName eq 'IFD0';
     my $tagInfo = $Image::ExifTool::Extra{$blockName} || $$dirInfo{TagInfo};
-    while ($tagInfo and ($nvHash = $self->{NEW_VALUE}{$tagInfo}) and IsOverwriting($nvHash)) {
+    while ($tagInfo and ($nvHash = $self->{NEW_VALUE}{$tagInfo}) and $self->IsOverwriting($nvHash)) {
         # protect against writing EXIF to wrong file types, etc
         if ($blockName eq 'EXIF') {
             unless ($blockExifTypes{$$self{FILE_TYPE}}) {
@@ -3111,7 +3133,7 @@ sub WriteDirectory($$$;$)
             }
         }
         my $verb = 'Writing';
-        my $newVal = GetNewValues($nvHash);
+        my $newVal = $self->GetNewValues($nvHash);
         unless (defined $newVal and length $newVal) {
             $verb = 'Deleting';
             $newVal = '';
@@ -3598,6 +3620,21 @@ sub UnpackUTF8($)
 }
 
 #------------------------------------------------------------------------------
+# Return current time in EXIF format
+# Inputs: 0) flag to include timezone (0 to disable, undef or 1 to include)
+# Returns: time string
+sub TimeNow(;$)
+{
+    my $tzFlag = shift;
+    my $time = time();
+    my @tm = localtime $time;
+    my $tz = ($tzFlag or not defined $tzFlag) ? TimeZoneString(\@tm, $time) : '';
+    return sprintf("%4d:%.2d:%.2d %.2d:%.2d:%.2d%s",
+                   $tm[5]+1900, $tm[4]+1, $tm[3],
+                   $tm[2], $tm[1], $tm[0], $tz);
+}
+
+#------------------------------------------------------------------------------
 # Inverse date/time print conversion (reformat to YYYY:mm:dd HH:MM:SS[.ss][+-HH:MM|Z])
 # Inputs: 0) ExifTool object ref, 1) Date/Time string, 2) timezone flag:
 #               0     - remove timezone and sub-seconds if they exist
@@ -3617,6 +3654,8 @@ sub InverseDateTime($$;$$)
         $tz = 'Z';
     } else {
         $tz = '';
+        # allow special value of 'now'
+        return TimeNow($tzFlag) if lc($val) eq 'now';
     }
     # strip of sub seconds
     my $fs = $val =~ /(\.\d+)$/ ? $1 : '';
@@ -3845,6 +3884,7 @@ my %writeValueProc = (
 #         2) optional number of values (1 or string length if not specified)
 #         3) optional data reference, 4) value offset
 # Returns: packed value (and sets value in data) or undef on error
+# Notes: May modify input value to round for integer formats
 sub WriteValue($$;$$$$)
 {
     my ($val, $format, $count, $dataPt, $offset) = @_;
@@ -3864,7 +3904,12 @@ sub WriteValue($$;$$$$)
             return undef unless defined $val;
             # validate numerical formats
             if ($format =~ /^int/) {
-                return undef unless IsInt($val) or IsHex($val);
+                unless (IsInt($val) or IsHex($val)) {
+                    return undef unless IsFloat($val);
+                    # round to nearest integer
+                    $val = int($val + ($val < 0 ? -0.5 : 0.5));
+                    $_[0] = $val;
+                }
             } elsif (not IsFloat($val)) {
                 return undef unless $format =~ /^rational/ and ($val eq 'inf' or
                     $val eq 'undef' or IsRational($val));
@@ -4652,7 +4697,7 @@ sub WriteJPEG($$)
                     # rewrite EXIF as if this were a TIFF file in memory
                     my %dirInfo = (
                         DataPt   => $segDataPt,
-                        DataPos  => $segPos,
+                        DataPos  => -6, # (remember: relative to Base!)
                         DirStart => 6,
                         Base     => $segPos + 6,
                         Parent   => $markerName,
@@ -4841,7 +4886,7 @@ sub WriteJPEG($$)
                     # rewrite Meta IFD as if this were a TIFF file in memory
                     my %dirInfo = (
                         DataPt   => $segDataPt,
-                        DataPos  => $segPos,
+                        DataPos  => -6, # (remember: relative to Base!)
                         DirStart => 6,
                         Base     => $segPos + 6,
                         Parent   => $markerName,
@@ -4945,8 +4990,8 @@ sub WriteJPEG($$)
                     unless ($$delGroup{File} and $$delGroup{File} != 2) {
                         my $tagInfo = $Image::ExifTool::Extra{Comment};
                         my $nvHash = $self->GetNewValueHash($tagInfo);
-                        if (IsOverwriting($nvHash, $segData) or $$delGroup{File}) {
-                            $newComment = GetNewValues($nvHash);
+                        if ($self->IsOverwriting($nvHash, $segData) or $$delGroup{File}) {
+                            $newComment = $self->GetNewValues($nvHash);
                         } else {
                             delete $$editDirs{COM}; # we aren't editing COM after all
                             last;
@@ -5232,8 +5277,8 @@ sub WriteBinaryData($$$)
         my $val = ReadValue($dataPt, $entry, $format, $count, $dirLen-$entry);
         next unless defined $val;
         my $nvHash = $self->GetNewValueHash($tagInfo);
-        next unless IsOverwriting($nvHash, $val);
-        my $newVal = GetNewValues($nvHash);
+        next unless $self->IsOverwriting($nvHash, $val);
+        my $newVal = $self->GetNewValues($nvHash);
         next unless defined $newVal;    # can't delete from a binary table
         # only write masked bits if specified
         my $mask = $$tagInfo{Mask};

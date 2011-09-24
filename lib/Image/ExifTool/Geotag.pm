@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.24';
+$VERSION = '1.26';
 
 sub SetGeoValues($$;$);
 
@@ -278,6 +278,7 @@ sub LoadTrackLog($$;$)
             $secs = (($9 * 60) + $10) * 60 + $11;
             $secs += $12 if $12;    # add fractional seconds
             if (defined $15) {
+                next if $13 > 31 or $14 > 12 or $15 > 99;   # validate day/month/year
                 # optional date is available in PMGNTRK sentence
                 my $year = $15 + ($15 >= 70 ? 1900 : 2000);
                 $date = Time::Local::timegm(0,0,0,$13,$14-1,$year-1900);
@@ -289,6 +290,7 @@ sub LoadTrackLog($$;$)
             #  $GPRMC,092204.999,A,4250.5589,S,14718.5084,E,0.00,89.68,211200,,*25
             #  $GPRMC,hhmmss.sss,A/V,ddmm.mmmm,N/S,ddmmm.mmmm,E/W,spd(knots),dir(deg),DDMMYY,,*cs
             /^\$GPRMC,(\d{2})(\d{2})(\d+)(\.\d+)?,A,(\d+)(\d{2}\.\d+),([NS]),(\d+)(\d{2}\.\d+),([EW]),[^,]*,[^,]*,(\d{2})(\d{2})(\d+)/ or next;
+            next if $11 > 31 or $12 > 12 or $13 > 99;   # validate day/month/year
             $fix{lat} = ($5 + $6/60) * ($7 eq 'N' ? 1 : -1);
             $fix{lon} = ($8 + $9/60) * ($10 eq 'E' ? 1 : -1);
             my $year = $13 + ($13 >= 70 ? 1900 : 2000);

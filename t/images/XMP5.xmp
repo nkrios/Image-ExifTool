@@ -63,7 +63,7 @@
   xmlns:mwg-rs='http://www.metadataworkinggroup.com/schemas/regions/'
   xmlns:myXMPns='http://ns.exiftool.ca/t/XMP.t'
   xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
-  xmlns:stArea='http://ns.adobe.com/xap/1.0/sType/Area#'
+  xmlns:stArea='http://ns.adobe.com/xmp/sType/Area#'
   xmlns:xmpRights='http://ns.adobe.com/xap/1.0/rights/'>
   <mwg-rs:Regions rdf:parseType='Resource'>
    <mwg-rs:RegionList>

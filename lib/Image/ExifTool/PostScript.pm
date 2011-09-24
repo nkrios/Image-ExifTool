@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.33';
+$VERSION = '1.34';
 
 sub WritePS($$);
 sub ProcessPS($$;$);
@@ -38,6 +38,7 @@ sub ProcessPS($$;$);
         Groups => { 2 => 'Time' },
         Writable => 'string',
         PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$self->InverseDateTime($val)',
     },
     Creator     => { Priority => 0, Writable => 'string' },
     ImageData   => { Priority => 0 },
@@ -49,6 +50,7 @@ sub ProcessPS($$;$);
         Groups => { 2 => 'Time' },
         Writable => 'string',
         PrintConv => '$self->ConvertDateTime($val)',
+        PrintConvInv => '$self->InverseDateTime($val)',
     },
     Pages       => { Priority => 0 },
     Routing     => { Priority => 0, Writable => 'string' }, #2

@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.22';
+$VERSION = '1.23';
 
 sub ProcessICC($$);
 sub ProcessICC_Profile($$$);
@@ -715,8 +715,8 @@ sub WriteICC_Profile($$;$)
     # (don't write AsShotICCProfile or CurrentICCProfile here)
     return undef unless $dirName eq 'ICC_Profile';
     my $nvHash = $exifTool->GetNewValueHash($Image::ExifTool::Extra{$dirName});
-    return undef unless Image::ExifTool::IsOverwriting($nvHash);
-    my $val = Image::ExifTool::GetNewValues($nvHash);
+    return undef unless $exifTool->IsOverwriting($nvHash);
+    my $val = $exifTool->GetNewValues($nvHash);
     $val = '' unless defined $val;
     ++$exifTool->{CHANGED};
     return $val;
