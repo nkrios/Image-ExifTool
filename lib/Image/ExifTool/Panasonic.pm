@@ -29,7 +29,7 @@ use vars qw($VERSION %leicaLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.60';
+$VERSION = '1.61';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -1668,7 +1668,7 @@ sub ProcessLeicaTrailer($;$)
             # rebuild maker notes (creates $exifTool->{MAKER_NOTE_FIXUP})
             my $val = Image::ExifTool::Exif::RebuildMakerNotes($exifTool, $tagTablePtr, \%dirInfo);
             unless (defined $val) {
-                $exifTool->Warn('Error rebuilding maker notes (may be corrupt)');
+                $exifTool->Warn('Error rebuilding maker notes (may be corrupt)') if $len > 4;
                 $val = $buff,
             }
             my $key = $exifTool->FoundTag($tagInfo, $val);
@@ -1698,7 +1698,7 @@ Panasonic and Leica maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

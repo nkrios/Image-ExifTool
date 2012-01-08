@@ -26,7 +26,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.30';
+$VERSION = '1.32';
 
 sub ConvertTimecode($);
 
@@ -366,6 +366,11 @@ $Image::ExifTool::RIFF::streamType = '';
             Name => 'PentaxJunk', # (Optio RS1000)
             Condition => '$$valPt =~ /^IIII\x01\0/',
             SubDirectory => { TagTable => 'Image::ExifTool::Pentax::Junk' },
+        },
+        {
+            Name => 'PentaxJunk2', # (Optio RZ18)
+            Condition => '$$valPt =~ /^PENTDigital Camera/',
+            SubDirectory => { TagTable => 'Image::ExifTool::Pentax::Junk2' },
         },
         {
             Name => 'TextJunk',
@@ -1147,6 +1152,17 @@ sub ProcessRIFF($$)
             $len -= 4;  # already read 4 bytes (the LIST type)
         }
         $exifTool->VPrint(0, "RIFF '$tag' chunk ($len bytes of data):\n");
+        if ($len <= 0) {
+            if ($len < 0) {
+                $exifTool->Warn('Invalid chunk length');
+            } elsif ($tag eq "\0\0\0\0") {
+                # avoid reading through corupted files filled with nulls because it takes forever
+                $exifTool->Warn('Encountered empty null chunk. Processing aborted');
+            } else {
+                next;
+            }
+            last;
+        }
         # stop when we hit the audio data or AVI index or AVI movie data
         # --> no more because Adobe Bridge stores XMP after this!!
         # (so now we only do this on the FastScan option)
@@ -1202,7 +1218,7 @@ including Windows WAV audio and AVI video files.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

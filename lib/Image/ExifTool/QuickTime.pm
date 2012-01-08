@@ -22,6 +22,7 @@
 #               12) QuickTime file format specification 2010-05-03
 #               13) http://www.adobe.com/devnet/flv/pdf/video_file_format_spec_v10.pdf
 #               14) http://standards.iso.org/ittf/PubliclyAvailableStandards/c051533_ISO_IEC_14496-12_2008.zip
+#               15) http://getid3.sourceforge.net/source/module.audio-video.quicktime.phps
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::QuickTime;
@@ -31,7 +32,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.50';
+$VERSION = '1.54';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -957,6 +958,22 @@ my %ftypLookup = (
             ByteOrder => 'LittleEndian',
         },
     },
+    Xtra => { #PH (microsoft)
+        Name => 'Xtra',
+        SubDirectory => { TagTable => 'Image::ExifTool::Microsoft::Xtra' },
+    },
+    hinv => 'HintVersion', #PH (guess)
+    thmb => { #PH (Pentax Q)
+        Name => 'MakerNotePentax5',
+        Condition => '$$valPt =~ /^PENTAX \0II/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::Main',
+            Start => 10,
+            Base => '$start - 10',
+            ByteOrder => 'LittleEndian',
+        },
+    },
+    # ducp - 4 bytes, all zero (Samsung ST96)
 );
 
 # User-specific media data atoms (ref 11)
@@ -1242,6 +1259,7 @@ my %ftypLookup = (
     },
     disk => {
         Name => 'DiskNumber',
+        Format => 'undef',  # (necessary to prevent decoding as string!)
         ValueConv => 'length($val) >= 6 ? join(" of ",unpack("x2nn",$val)) : \$val',
     },
     pgap => { #10
@@ -1257,6 +1275,7 @@ my %ftypLookup = (
     },
     trkn => {
         Name => 'TrackNumber',
+        Format => 'undef',  # (necessary to prevent decoding as string!)
         ValueConv => 'length($val) >= 6 ? join(" of ",unpack("x2nn",$val)) : \$val',
     },
 #
@@ -1372,6 +1391,7 @@ my %ftypLookup = (
             10 => 'TV Show',
             11 => 'Booklet',
             14 => 'Ringtone',
+            21 => 'Podcast', #15
         },
     },
     titl => 'Title',
@@ -1387,6 +1407,11 @@ my %ftypLookup = (
         Format => 'int32u',
     },
     yrrc => 'Year', #(ffmpeg source)
+    itnu => { #PH (iTunes 10.5)
+        Name => 'iTunesU',
+        Description => 'iTunes U',
+        PrintConv => { 0 => 'No', 1 => 'Yes' },
+    },
 );
 
 # item list keys (ref PH)
@@ -1478,6 +1503,8 @@ my %ftypLookup = (
         Format => 'int8u',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
+    'rating.user'  => 'UserRating', # (Canon ELPH 510 HS)
+    'Encoded_With' => 'EncodedWith',
 );
 
 # iTunes info ('----') atoms
@@ -1488,7 +1515,8 @@ my %ftypLookup = (
     # I can't find any source for decoding 'data'.
     # 'mean' is normally 'com.apple.iTunes'
     # 'name' values: 'tool', 'iTunNORM' (volume normalization),
-    #   'iTunSMPB', 'iTunes_CDDB_IDs', 'iTunes_CDDB_TrackNumber'
+    #   'iTunSMPB', 'iTunes_CDDB_IDs', 'iTunes_CDDB_TrackNumber',
+    #   'Encoding Params'
     mean => {
         Name => 'Mean',
         Unknown => 1,
@@ -1576,6 +1604,7 @@ my %ftypLookup = (
     },
     payt => {
         Name => 'PayloadType',
+        Format => 'undef',  # (necessary to prevent decoding as string!)
         ValueConv => 'unpack("N",$val) . " " . substr($val, 5)',
         PrintConv => '$val=~s/ /, /;$val',
     },
@@ -1799,6 +1828,7 @@ my %ftypLookup = (
             Name => 'VideoFrameRate',
             Notes => 'average rate calculated from time-to-sample table for video media',
             Condition => '$$self{HandlerType} and $$self{HandlerType} eq "vide"',
+            Format => 'undef',  # (necessary to prevent decoding as string!)
             # (must be RawConv so appropriate MediaTS is used in calculation)
             RawConv => 'Image::ExifTool::QuickTime::CalcSampleRate($self, \$val)',
             PrintConv => 'int($val * 1000 + 0.5) / 1000',
@@ -1967,6 +1997,7 @@ my %ftypLookup = (
     NOTES => 'MP4 data reference box.',
     'url ' => {
         Name => 'URL',
+        Format => 'undef',  # (necessary to prevent decoding as string!)
         RawConv => q{
             # ignore if self-contained (flags bit 0 set)
             return undef if unpack("N",$val) & 0x01;
@@ -1975,6 +2006,7 @@ my %ftypLookup = (
     },
     'urn ' => {
         Name => 'URN',
+        Format => 'undef',  # (necessary to prevent decoding as string!)
         RawConv => q{
             return undef if unpack("N",$val) & 0x01;
             $_ = substr($val,4); s/\0.*//s; $_;
@@ -2349,7 +2381,7 @@ sub ProcessKeys($$$)
                 }
             }
         }
-        my $newInfo;
+        my ($newInfo, $msg);
         if ($tagInfo) {
             $newInfo = {
                 Name      => $$tagInfo{Name},
@@ -2364,12 +2396,14 @@ sub ProcessKeys($$$)
             my $name = $tag;
             $name =~ s/\.(.)/\U$1/g;
             $newInfo = { Name => ucfirst($name) };
+            $msg = ' (Unknown)';
         }
         # substitute this tag in the ItemList table with the given index
         delete $$infoTable{$index};
         if ($newInfo) {
+            $msg or $msg = '';
             Image::ExifTool::AddTagToTable($infoTable, $index, $newInfo);
-            $out and printf $out "%sAdded ItemList Tag 0x%.4x = $tag\n", $exifTool->{INDENT}, $index;
+            $out and printf $out "%sAdded ItemList Tag 0x%.4x = $tag$msg\n", $exifTool->{INDENT}, $index;
         }
         $pos += $len;
         ++$index;
@@ -2388,6 +2422,7 @@ sub ProcessMOV($$;$)
     my $dataPt = $$dirInfo{DataPt};
     my $verbose = $exifTool->Options('Verbose');
     my $dataPos = $$dirInfo{Base} || 0;
+    my $charsetQuickTime = $exifTool->Options('CharsetQuickTime');
     my ($buff, $tag, $size, $track);
 
     # more convenient to package data as a RandomAccess file
@@ -2634,9 +2669,9 @@ sub ProcessMOV($$;$)
                                 require Image::ExifTool::Font;
                                 $lang = $Image::ExifTool::Font::ttLang{Macintosh}{$lang};
                             }
-                            # the spec says only "Macintosh text encoding", so
-                            # I can only assume that it is the most common one
-                            $str = $exifTool->Decode($str, 'MacRoman');
+                            # the spec says only "Macintosh text encoding", but
+                            # allow this to be configured by the user
+                            $str = $exifTool->Decode($str, $charsetQuickTime);
                         } else {
                             # convert language code to ASCII (ignore read-only bit)
                             $lang = UnpackLang($lang);
@@ -2649,10 +2684,22 @@ sub ProcessMOV($$;$)
                         $pos += $len;
                     }
                 } else {
-                    if ($$tagInfo{Format}) {
-                        $val = ReadValue(\$val, 0, $$tagInfo{Format}, $$tagInfo{Count}, length($val));
+                    my $format = $$tagInfo{Format};
+                    if ($format) {
+                        $val = ReadValue(\$val, 0, $format, $$tagInfo{Count}, length($val));
                     }
-                    $exifTool->FoundTag($tagInfo, $val);
+                    my $key = $exifTool->FoundTag($tagInfo, $val);
+                    # decode if necessary (NOTE: must be done after RawConv)
+                    if ((not $format or $format =~ /^string/) and
+                        not $$tagInfo{Unknown} and not $$tagInfo{Binary} and
+                        defined $$exifTool{VALUE}{$key})
+                    {
+                        my $vp = \$$exifTool{VALUE}{$key};
+                        if (not ref $$vp and length($$vp) <= 65536 and $$vp =~ /[\x80-\xff]/) {
+                            # the encoding of this is not specified, so use CharsetQuickTime
+                            $$vp = $exifTool->Decode($$vp, $charsetQuickTime);
+                        }
+                    }
                 }
             }
         } else {
@@ -2695,7 +2742,7 @@ information from QuickTime and MP4 video, and M4A audio files.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

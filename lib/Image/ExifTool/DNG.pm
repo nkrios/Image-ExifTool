@@ -17,7 +17,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::MakerNotes;
 use Image::ExifTool::CanonRaw;
 
-$VERSION = '1.16';
+$VERSION = '1.18';
 
 sub ProcessOriginalRaw($$$);
 sub ProcessAdobeData($$$);
@@ -168,8 +168,9 @@ sub ProcessOriginalRaw($$$)
             $pos + $hdrLen > $end and $err = '', last;
             my $tag = $$tagInfo{Name};
             # only extract this information if requested (because it takes time)
-            if ($exifTool->{OPTIONS}->{Binary} or
-                $exifTool->{REQ_TAG_LOOKUP}->{lc($tag)})
+            my $lcTag = lc $tag;
+            if (($exifTool->{OPTIONS}{Binary} and not $exifTool->{EXCL_TAG_LOOKUP}{$lcTag}) or
+                $exifTool->{REQ_TAG_LOOKUP}{$lcTag})
             {
                 unless (eval 'require Compress::Zlib') {
                     $err = 'Install Compress::Zlib to extract compressed images';
@@ -754,7 +755,7 @@ sub ProcessAdobeMakN($$$)
         $exifTool->ProcessDirectory(\%subdirInfo, $subTable, $$subdir{ProcessProc});
         # extract maker notes as a block if specified
         if ($exifTool->Options('MakerNotes') or
-            $exifTool->{REQ_TAG_LOOKUP}->{lc($$tagInfo{Name})})
+            $exifTool->{REQ_TAG_LOOKUP}{lc($$tagInfo{Name})})
         {
             my $val;
             if ($$tagInfo{MakerNotes}) {
@@ -764,7 +765,9 @@ sub ProcessAdobeMakN($$$)
                 $subdirInfo{DirLen}   = $dirLen;
                 # rebuild the maker notes to identify all offsets that require fixing up
                 $val = Image::ExifTool::Exif::RebuildMakerNotes($exifTool, $subTable, \%subdirInfo);
-                defined $val or $exifTool->Warn('Error rebuilding maker notes (may be corrupt)');
+                if (not defined $val and $dirLen > 4) {
+                    $exifTool->Warn('Error rebuilding maker notes (may be corrupt)');
+                }
             } else {
                 # extract this directory as a block if specified
                 return 1 unless $$tagInfo{Writable};
@@ -810,7 +813,7 @@ information in DNG (Digital Negative) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

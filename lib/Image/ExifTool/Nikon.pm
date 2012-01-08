@@ -48,11 +48,11 @@
 package Image::ExifTool::Nikon;
 
 use strict;
-use vars qw($VERSION %nikonLensIDs);
+use vars qw($VERSION %nikonLensIDs %nikonTextEncoding);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.51';
+$VERSION = '2.56';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
@@ -312,6 +312,7 @@ sub ProcessNikonCaptureEditVersions($$$);
     '26 40 27 3F 2C 34 1C 02' => 'Sigma 15-30mm F3.5-4.5 EX DG Aspherical DF',
     '48 48 2B 44 24 30 4B 06' => 'Sigma 17-35mm F2.8-4 EX DG  Aspherical HSM',
     '26 54 2B 44 24 30 1C 02' => 'Sigma 17-35mm F2.8-4 EX Aspherical',
+    '9D 48 2B 50 24 24 4B 0E' => 'Sigma 17-50mm F2.8 EX DC OS HSM',
     '7A 47 2B 5C 24 34 4B 06' => 'Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF HSM',
     '7A 48 2B 5C 24 34 4B 06' => 'Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF HSM',
     '7F 48 2B 5C 24 34 1C 06' => 'Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF',
@@ -402,6 +403,7 @@ sub ProcessNikonCaptureEditVersions($$$);
     '07 46 2B 44 24 30 03 02' => 'Tamron SP AF 17-35mm f/2.8-4 Di LD Aspherical (IF) (A05)',
     '00 53 2B 50 24 24 00 06' => 'Tamron SP AF 17-50mm f/2.8 XR Di II LD Aspherical (IF) (A16)', #PH
     '00 54 2B 50 24 24 00 06' => 'Tamron SP AF 17-50mm f/2.8 XR Di II LD Aspherical (IF) (A16NII)',
+    'FB 54 2B 50 24 24 84 06' => 'Tamron SP AF 17-50mm f/2.8 XR Di II LD Aspherical (IF) (A16NII)', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3787.0.html
     'F3 54 2B 50 24 24 84 0E' => 'Tamron SP AF 17-50mm f/2.8 XR Di II VC LD Aspherical (IF) (B005)',
     '00 3F 2D 80 2B 40 00 06' => 'Tamron AF 18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF) (A14)',
     '00 3F 2D 80 2C 40 00 06' => 'Tamron AF 18-200mm f/3.5-6.3 XR Di II LD Aspherical (IF) Macro (A14)',
@@ -512,6 +514,15 @@ sub ProcessNikonCaptureEditVersions($$$);
     '00 48 68 68 24 24 00 00' => 'Series E 100mm f/2.8',
     '00 4C 6A 6A 20 20 00 00' => 'Nikkor 105mm f/2.5 AiS',
     '00 48 80 80 30 30 00 00' => 'Nikkor 200mm f/4 AiS',
+);
+
+# text encoding used in LocationInfo (ref PH)
+%nikonTextEncoding = (
+    0 => 'n/a',
+    1 => 'UTF8',
+    # UTF16 is a guess here: it could also be Unicode or JIS,
+    # but I chose UTF16 due to the similarity with the QuickTime stringEncoding
+    2 => 'UTF16',
 );
 
 # flash firmware decoding (ref JD)
@@ -908,6 +919,10 @@ my %binaryDataAttrs = (
             ByteOrder => 'BigEndian', #(NC)
         },
     },
+    0x0039 => {
+        Name => 'LocationInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::LocationInfo' },
+    },
     0x0080 => { Name => 'ImageAdjustment',  Writable => 'string' },
     0x0081 => { Name => 'ToneComp',         Writable => 'string' }, #2
     0x0082 => { Name => 'AuxiliaryLens',    Writable => 'string' },
@@ -1220,7 +1235,7 @@ my %binaryDataAttrs = (
     0x0097 => [ #4
         # (NOTE: these are byte-swapped by NX when byte order changes)
         {
-            Condition => '$$valPt =~ /^0100/', # (D100)
+            Condition => '$$valPt =~ /^0100/', # (D100 and Coolpix models)
             Name => 'ColorBalance0100',
             SubDirectory => {
                 Start => '$valuePtr + 72',
@@ -1236,7 +1251,7 @@ my %binaryDataAttrs = (
             },
         },
         {
-            Condition => '$$valPt =~ /^0103/', # (D70)
+            Condition => '$$valPt =~ /^0103/', # (D70/D70s)
             Name => 'ColorBalance0103',
             # D70:  at file offset 'tag-value + base + 20', 4 16 bits numbers,
             # v[0]/v[1] , v[2]/v[3] are the red/blue multipliers.
@@ -1257,19 +1272,19 @@ my %binaryDataAttrs = (
                 DirOffset => 14,
             },
         },
-        {
-            Condition => '$$valPt =~ /^0209/', # (D3)
+        {   # (D3/D3X/D300/D700=0209,D300S=0212,D3S=0214)
+            Condition => '$$valPt =~ /^02(09|12|14)/',
             Name => 'ColorBalance0209',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::ColorBalance4',
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 WriteProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 DecryptStart => 284,
-                DecryptLen => 18, # don't need to decrypt it all
+                DecryptLen => 18, # 324 bytes encrypted, but don't need to decrypt it all
                 DirOffset => 10,
             },
         },
-        {   # (D2X=0204,D2Hs=0206,D200=0207,D40=0208)
+        {   # (D2X/D2Xs=0204,D2Hs=0206,D200=0207,D40/D40X/D80=0208,D60=0210)
             Condition => '$$valPt =~ /^02(\d{2})/ and $1 < 11',
             Name => 'ColorBalance02',
             SubDirectory => {
@@ -1277,11 +1292,47 @@ my %binaryDataAttrs = (
                 ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 WriteProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
                 DecryptStart => 284,
-                DecryptLen => 14, # 324 bytes encrypted, but don't need to decrypt it all
+                DecryptLen => 14, # don't need to decrypt it all
                 DirOffset => 6,
             },
         },
-        {   # (D90/D5000=0211,D300S=0212,D3000=0213,D3S=0214,D3100=0215,D7000/D5100=0216)
+        {
+            Condition => '$$valPt =~ /^0211/', # (D90/D5000)
+            Name => 'ColorBalance0211',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::ColorBalance4',
+                ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                WriteProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                DecryptStart => 284,
+                DecryptLen => 24, # don't need to decrypt it all
+                DirOffset => 16,
+            },
+        },
+        {
+            Condition => '$$valPt =~ /^0213/', # (D3000)
+            Name => 'ColorBalance0213',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::ColorBalance2',
+                ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                WriteProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                DecryptStart => 284,
+                DecryptLen => 18, # don't need to decrypt it all
+                DirOffset => 10,
+            },
+        },
+        {   # (D3100=0215,D7000/D5100=0216)
+            Condition => '$$valPt =~ /^021[56]/',
+            Name => 'ColorBalance0215',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::ColorBalance4',
+                ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                WriteProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                DecryptStart => 284,
+                DecryptLen => 12, # don't need to decrypt it all
+                DirOffset => 4,
+            },
+        },
+        {   # (1J1/1V1=0400)
             Name => 'ColorBalanceUnknown',
             Writable => 0,
         },
@@ -1322,6 +1373,16 @@ my %binaryDataAttrs = (
             },
         },
         {
+            Condition => '$$valPt =~ /^0400/', # 1J1, 1V1
+            Name => 'LensData0400',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::LensData0400',
+                ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                WriteProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                DecryptStart => 4,
+            },
+        },
+        {   # (1J1/1V1=0400)
             Name => 'LensDataUnknown',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::LensDataUnknown',
@@ -2812,6 +2873,22 @@ my %nikonFocalConversions = (
     },
 );
 
+# Nikon lens data version 0400 (note: needs decrypting) (ref PH)
+%Image::ExifTool::Nikon::LensData0400 = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'Tags extracted from the encrypted lens data of Nikon 1 models.',
+    0x00 => {
+        Name => 'LensDataVersion',
+        Format => 'string[4]',
+        Writable => 0,
+    },
+    0x18a => { #PH
+        Name => 'LensModel',
+        Format => 'string[64]',
+    },
+);
+
 # Unknown Nikon lens data (note: data may need decrypting after byte 4)
 %Image::ExifTool::Nikon::LensDataUnknown = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -4294,6 +4371,39 @@ my %nikonFocalConversions = (
     },
 );
 
+# location information (ref PH)
+%Image::ExifTool::Nikon::LocationInfo = (
+    %binaryDataAttrs,
+    DATAMEMBER => [ 4 ],
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Location' },
+    NOTES => 'Tags written by some Nikon GPS-equipped cameras like the AW100.',
+    0 => {
+        Name => 'LocationInfoVersion',
+        Format => 'undef[4]',
+    },
+    4 => {
+        Name => 'TextEncoding',
+        DataMember => 'TextEncoding',
+        RawConv => q{
+            $$self{TextEncoding} = $Image::ExifTool::Nikon::nikonTextEncoding{$val} if $val;
+            return $val;
+        },
+        PrintConv => \%Image::ExifTool::Nikon::nikonTextEncoding,
+    },
+    # the following tag names chosen to correspond with XMP::iptcCore
+    5 => {
+        Name => 'CountryCode',
+        Format => 'string[3]',
+    },
+    # 8 - value: 6 (what is this for?)
+    9 => {
+        Name => 'Location',
+        Format => 'undef[70]',
+        RawConv    => '$$self{TextEncoding} ? $self->Decode($val,$$self{TextEncoding},"MM") : $val',
+        RawConvInv => '$$self{TextEncoding} ? $self->Encode($val,$$self{TextEncoding},"MM") : $val',
+    },
+);
+
 # tags in Nikon QuickTime videos (PH - observations with Coolpix S3)
 # (similar information in Kodak,Minolta,Nikon,Olympus,Pentax and Sanyo videos)
 %Image::ExifTool::Nikon::MOV = (
@@ -4606,6 +4716,8 @@ my %nikonFocalConversions = (
         Groups => { 2 => 'Video' },
         PrintConv => 'int($val * 1000 + 0.5) / 1000',
     },
+    # 0x17 - rational62u: same value as FrameRate
+    # 0x18 - int16u: 1
     # 0x21 - int16u: 1, 2
     0x22 => {
         Name => 'FrameWidth',
@@ -4615,7 +4727,7 @@ my %nikonFocalConversions = (
         Name => 'FrameHeight',
         Groups => { 2 => 'Video' },
     },
-    # 0x24 - int16u: 2
+    # 0x24 - int16u: 1, 2
     # 0x31 - int16u: 1, 2
     0x32 => { #(guess)
         Name => 'AudioChannels',
@@ -4629,6 +4741,136 @@ my %nikonFocalConversions = (
         Name => 'AudioSampleRate',
         Groups => { 2 => 'Audio' },
     },
+    # 0x1001 - int16s: 0
+    # 0x1011 - int32u: 0
+    # 0x1012 - int32u: 0
+#
+# 0x110**** tags correspond to 0x**** tags in Exif::Main
+#
+    0x1108822 => {
+        Name => 'ExposureProgram',
+        PrintConv => {
+            0 => 'Not Defined',
+            1 => 'Manual',
+            2 => 'Program AE',
+            3 => 'Aperture-priority AE',
+            4 => 'Shutter speed priority AE',
+            5 => 'Creative (Slow speed)',
+            6 => 'Action (High speed)',
+            7 => 'Portrait',
+            8 => 'Landscape',
+          # 9 => 'Bulb', # (non-standard Canon value)
+        },
+    },
+    0x1109204 => {
+        Name => 'ExposureCompensation',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+    },
+    0x1109207 => {
+        Name => 'MeteringMode',
+        PrintConv => {
+            0 => 'Unknown',
+            1 => 'Average',
+            2 => 'Center-weighted average',
+            3 => 'Spot',
+            4 => 'Multi-spot',
+            5 => 'Multi-segment',
+            6 => 'Partial',
+            255 => 'Other',
+        },
+    },
+    0x110a434 => 'LensModel',
+#
+# 0x120**** tags correspond to 0x**** tags in GPS::Main
+#
+    0x1200000 => {
+        Name => 'GPSVersionID',
+        Groups => { 2 => 'Location' },
+        PrintConv => '$val =~ tr/ /./; $val',
+    },
+    0x1200001 => {
+        Name => 'GPSLatitudeRef',
+        Groups => { 2 => 'Location' },
+        PrintConv => {
+            N => 'North',
+            S => 'South',
+        },
+    },
+    0x1200002 => {
+        Name => 'GPSLatitude',
+        Groups => { 2 => 'Location' },
+        ValueConv => q{
+            require Image::ExifTool::GPS;
+            Image::ExifTool::GPS::ToDegrees($val);
+        },
+        PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1)',
+    },
+    0x1200003 => {
+        Name => 'GPSLongitudeRef',
+        Groups => { 2 => 'Location' },
+        PrintConv => {
+            E => 'East',
+            W => 'West',
+        },
+    },
+    0x1200004 => {
+        Name => 'GPSLongitude',
+        Groups => { 2 => 'Location' },
+        ValueConv => q{
+            require Image::ExifTool::GPS;
+            Image::ExifTool::GPS::ToDegrees($val);
+        },
+        PrintConv => 'Image::ExifTool::GPS::ToDMS($self, $val, 1)',
+    },
+    0x1200005 => {
+        Name => 'GPSAltitudeRef',
+        Groups => { 2 => 'Location' },
+        PrintConv => {
+            0 => 'Above Sea Level',
+            1 => 'Below Sea Level',
+        },
+    },
+    0x1200006 => {
+        Name => 'GPSAltitude',
+        Groups => { 2 => 'Location' },
+        PrintConv => '$val =~ /^(inf|undef)$/ ? $val : "$val m"',
+    },
+    0x1200007 => {
+        Name => 'GPSTimeStamp',
+        Groups => { 2 => 'Time' },
+        ValueConv => q{
+            require Image::ExifTool::GPS;
+            Image::ExifTool::GPS::ConvertTimeStamp($val);
+        },
+    },
+    0x1200008 => {
+        Name => 'GPSSatellites',
+        Groups => { 2 => 'Location' },
+    },
+    0x1200010 => {
+        Name => 'GPSImgDirectionRef',
+        Groups => { 2 => 'Location' },
+        PrintConv => {
+            M => 'Magnetic North',
+            T => 'True North',
+        },
+    },
+    0x1200011 => {
+        Name => 'GPSImgDirection',
+        Groups => { 2 => 'Location' },
+    },
+    0x1200012 => {
+        Name => 'GPSMapDatum',
+        Groups => { 2 => 'Location' },
+    },
+    0x120001d => {
+        Name => 'GPSDateStamp',
+        Groups => { 2 => 'Time' },
+        ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
+    },
+#
+# 0x200**** tags correspond to 0x**** tags in Nikon::Main
+#
     0x2000001 => {
         Name => 'MakerNoteVersion',
         PrintConv => '$_=$val;s/^(\d{2})/$1\./;s/^0//;$_',
@@ -4651,9 +4893,18 @@ my %nikonFocalConversions = (
         Name => 'WorldTime',
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::WorldTime' },
     },
-    0x2000032 => {
+    0x200002c => {
         Name => 'UnknownInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::UnknownInfo' },
+    },
+    # 0x200002d - int16u[3]: "512 0 0"
+    0x2000032 => {
+        Name => 'UnknownInfo2',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::UnknownInfo' },
+    },
+    0x2000039 => {
+        Name => 'LocationInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::Nikon::LocationInfo' },
     },
     0x2000083 => {
         Name => 'LensType',
@@ -4674,6 +4925,7 @@ my %nikonFocalConversions = (
         # short focal, long focal, aperture at short focal, aperture at long focal
         PrintConv => \&Image::ExifTool::Exif::PrintLensInfo,
     },
+    0x20000ab => { Name => 'VariProgram', Writable => 'string' }, #2 (scene mode for DSLR's - PH)
 );
 
 # Nikon composite tags
@@ -5260,7 +5512,7 @@ Nikon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

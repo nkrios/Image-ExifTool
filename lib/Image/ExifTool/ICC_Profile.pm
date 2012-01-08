@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 sub ProcessICC($$);
 sub ProcessICC_Profile($$$);
@@ -783,14 +783,15 @@ sub ProcessICC_Profile($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
-    my $dirStart = $$dirInfo{DirStart};
+    my $dirStart = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen};
     my $verbose = $exifTool->Options('Verbose');
 
     return 0 if $dirLen < 4;
 
     # extract binary ICC_Profile data block if binary mode or requested
-    if ($exifTool->{OPTIONS}->{Binary} or $exifTool->{REQ_TAG_LOOKUP}->{icc_profile} and
+    if ((($exifTool->{OPTIONS}{Binary} and not $exifTool->{EXCL_TAG_LOOKUP}{icc_profile}) or
+        $exifTool->{REQ_TAG_LOOKUP}{icc_profile}) and
         # (don't extract from AsShotICCProfile or CurrentICCProfile)
         (not $$dirInfo{Name} or $$dirInfo{Name} eq 'ICC_Profile'))
     {
@@ -973,7 +974,7 @@ data created on one device into another device's native color space.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

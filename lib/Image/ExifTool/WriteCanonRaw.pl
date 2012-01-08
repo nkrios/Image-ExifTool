@@ -4,6 +4,7 @@
 # Description:  Write Canon RAW (CRW and CR2) meta information
 #
 # Revisions:    01/25/2005 - P. Harvey Created
+#               09/16/2010 - PH Added ability to write XMP in CRW images
 #------------------------------------------------------------------------------
 package Image::ExifTool::CanonRaw;
 
@@ -622,7 +623,7 @@ files, and would lead to far fewer problems with corrupted metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

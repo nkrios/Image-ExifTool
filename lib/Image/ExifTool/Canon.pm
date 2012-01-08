@@ -77,7 +77,7 @@ sub ProcessSerialData($$$);
 sub ProcessFilters($$$);
 sub SwapWords($);
 
-$VERSION = '2.78';
+$VERSION = '2.80';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -166,6 +166,7 @@ $VERSION = '2.78';
     50 => 'Canon EF-S 18-200mm f/3.5-5.6 IS',
     51 => 'Canon EF-S 18-135mm f/3.5-5.6 IS', #PH
     52 => 'Canon EF-S 18-55mm f/3.5-5.6 IS II', #PH
+    53 => 'Canon EF-S 18-55mm f/3.5-5.6 III', #Jon Charnas
     94 => 'Canon TS-E 17mm f/4L', #42
     95 => 'Canon TS-E 24.0mm f/3.5 L II', #43
     124 => 'Canon MP-E 65mm f/2.8 1-5x Macro Photo', #9
@@ -195,7 +196,8 @@ $VERSION = '2.78';
     137.5 => 'Sigma 18-125mm f/3.8-5.6 DC OS HSM', #PH
     137.6 => 'Sigma 17-70mm f/2.8-4 DC Macro OS HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2819.0.html
     137.7 => 'Sigma 17-50mm f/2.8 OS HSM', #PH (from Exiv2)
-    137.8 => 'Tamron AF 18-270mm f/3.5-6.3 Di II VC PZD', #(model B008)http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3090.0.html
+    137.8 => 'Sigma 18-200mm f/3.5-6.3 II DC OS HSM', #PH
+    137.9 => 'Tamron AF 18-270mm f/3.5-6.3 Di II VC PZD', #(model B008)http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3090.0.html
     138 => 'Canon EF 28-80mm f/2.8-4L', #32
     139 => 'Canon EF 400mm f/2.8L',
     140 => 'Canon EF 500mm f/4.5L', #32
@@ -326,6 +328,7 @@ $VERSION = '2.78';
     488 => 'Canon EF-S 15-85mm f/3.5-5.6 IS USM', #PH
     489 => 'Canon EF 70-300mm f/4-5.6L IS USM', #Gerald Kapounek
     490 => 'Canon EF 8-15mm f/4L USM', #Klaus Reinfeld
+    491 => 'Canon EF 300mm f/2.8L IS II USM', #42
 );
 
 # Canon model ID numbers (PH)
@@ -527,18 +530,26 @@ $VERSION = '2.78';
     0x80000213 => 'EOS 5D',
     0x80000215 => 'EOS-1Ds Mark III',
     0x80000218 => 'EOS 5D Mark II',
+    0x80000219 => 'WFT-E1',
     0x80000232 => 'EOS-1D Mark II N',
     0x80000234 => 'EOS 30D',
-    0x80000236 => 'EOS Digital Rebel XTi / 400D / Kiss Digital X', # and K236
+    0x80000236 => 'EOS Digital Rebel XTi / 400D / Kiss Digital X',
+    0x80000241 => 'WFT-E2',
+    0x80000246 => 'WFT-E3',
     0x80000250 => 'EOS 7D',
     0x80000252 => 'EOS Rebel T1i / 500D / Kiss X3',
     0x80000254 => 'EOS Rebel XS / 1000D / Kiss F',
     0x80000261 => 'EOS 50D',
+    0x80000269 => 'EOS-1D X',
     0x80000270 => 'EOS Rebel T2i / 550D / Kiss X4',
+    0x80000271 => 'WFT-E4',
+    0x80000273 => 'WFT-E5',
     0x80000281 => 'EOS-1D Mark IV',
     0x80000286 => 'EOS Rebel T3i / 600D / Kiss X5',
     0x80000287 => 'EOS 60D',
     0x80000288 => 'EOS Rebel T3 / 1100D / Kiss X50',
+    0x80000297 => 'WFT-E2 II',
+    0x80000298 => 'WFT-E4 II',
 );
 
 my %canonQuality = (
@@ -6061,10 +6072,11 @@ my %ciLongFocal = (
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     1 => {
-        Name => 'AFMicroAdjActive',
+        Name => 'AFMicroAdjMode',
         PrintConv => {
-            0 => 'No',
-            1 => 'Yes',
+            0 => 'Disable',
+            1 => 'Adjust all by the same amount',
+            2 => 'Adjust by lens',
         },
     },
     2 => {
@@ -6975,7 +6987,7 @@ Canon maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

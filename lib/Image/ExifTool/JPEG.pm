@@ -11,7 +11,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 sub ProcessScalado($$$);
 sub ProcessOcad($$$);
@@ -497,7 +497,7 @@ sub ProcessOcad($$$)
     for (;;) {
         last unless $$dataPt =~ /\$(\w+):([^\0\$]+)/g;
         my ($tag, $val) = ($1, $2);
-        $val =~ s/(^\s+|\s+$)//g;   # remove leading/trailing spaces
+        $val =~ s/^\s+//; $val =~ s/\s+$//;     # remove leading/trailing spaces
         unless ($$tagTablePtr{$tag}) {
             Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => "Ocad_$tag" });
         }
@@ -555,7 +555,7 @@ segments are included in the Image::ExifTool module itself.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

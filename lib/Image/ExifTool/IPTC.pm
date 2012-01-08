@@ -14,7 +14,7 @@ package Image::ExifTool::IPTC;
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 
-$VERSION = '1.43';
+$VERSION = '1.44';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -1082,11 +1082,31 @@ sub ProcessIPTC($$$)
             $exifTool->Warn(sprintf('Bad IPTC data tag (marker 0x%x)',$id));
             last;
         }
+        $pos += 5;      # step to after field header
+        # handle extended IPTC entry if necessary
+        if ($len & 0x8000) {
+            my $n = $len & 0x7fff; # get num bytes in length field
+            if ($pos + $n > $dirEnd or $n > 8) {
+                $exifTool->VPrint(0, "Invalid extended IPTC entry (dataset $rec:$tag, len $len)\n");
+                $success = 0;
+                last;
+            }
+            # determine length (a big-endian, variable sized int)
+            for ($len = 0; $n; ++$pos, --$n) {
+                $len = $len * 256 + ord(substr($$dataPt, $pos, 1));
+            }
+        }
+        if ($pos + $len > $dirEnd) {
+            $exifTool->VPrint(0, "Invalid IPTC entry (dataset $rec:$tag, len $len)\n");
+            $success = 0;
+            last;
+        }
         if (not defined $lastRec or $lastRec != $rec) {
             my $tableInfo = $tagTablePtr->{$rec};
             unless ($tableInfo) {
-                $exifTool->Warn("Unrecognized IPTC record $rec, subsequent records ignored");
-                last;   # stop now because we're probably reading garbage
+                $exifTool->WarnOnce("Unrecognized IPTC record $rec (ignored)");
+                $pos += $len;
+                next;   # ignore this entry
             }
             my $tableName = $tableInfo->{SubDirectory}->{TagTable};
             unless ($tableName) {
@@ -1097,25 +1117,6 @@ sub ProcessIPTC($$$)
             $recordPtr = Image::ExifTool::GetTagTable($tableName);
             $exifTool->VPrint(0,$$exifTool{INDENT},"-- $recordName record --\n");
             $lastRec = $rec;
-        }
-        $pos += 5;      # step to after field header
-        # handle extended IPTC entry if necessary
-        if ($len & 0x8000) {
-            my $n = $len & 0x7fff; # get num bytes in length field
-            if ($pos + $n > $dirEnd or $n > 8) {
-                $exifTool->VPrint(0, "Invalid extended IPTC entry (tag $tag)\n");
-                $success = 0;
-                last;
-            }
-            # determine length (a big-endian, variable sized int)
-            for ($len = 0; $n; ++$pos, --$n) {
-                $len = $len * 256 + ord(substr($$dataPt, $pos, 1));
-            }
-        }
-        if ($pos + $len > $dirEnd) {
-            $exifTool->VPrint(0, "Invalid IPTC entry (tag $tag, len $len)\n");
-            $success = 0;
-            last;
         }
         my $val = substr($$dataPt, $pos, $len);
 
@@ -1200,7 +1201,7 @@ image files.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

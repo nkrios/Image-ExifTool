@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 sub ProcessJpeg2000Box($$$);
 
@@ -509,6 +509,9 @@ sub CreateNewBoxes($$)
                 DirName => $$subdir{DirName} || $dirName,
                 Parent => 'JP2',
             );
+            # remove "UUID-" from start of directory name to allow appropriate
+            # directories to be written as a block
+            $dirInfo{DirName} =~ s/^UUID-//;
             my $newdir = $exifTool->WriteDirectory(\%dirInfo, $tagTable, $$subdir{WriteProc});
             if (defined $newdir and length $newdir) {
                 my $boxhdr = pack('N', length($newdir) + 24) . 'uuid' . $uuid{$dirName};
@@ -669,6 +672,8 @@ sub ProcessJpeg2000Box($$$)
                 OutFile => $outfile,
                 Base => $base + $dataPos + $subdirStart,
             );
+            # remove "UUID-" prefix to allow appropriate directories to be written as a block
+            $subdirInfo{DirName} =~ s/^UUID-//;
             my $subTable = GetTagTable($$subdir{TagTable}) || $tagTablePtr;
             if ($outfile) {
                 # remove this directory from our create list
@@ -789,7 +794,7 @@ files.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

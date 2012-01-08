@@ -331,7 +331,11 @@ my %writeTable = (
     0x8298 => {             # Copyright
         Writable => 'string',
         WriteGroup => 'IFD0',
-        RawConvInv => q{
+        RawConvInv => sub {
+            my ($val, $self) = @_;
+            # encode if necessary
+            my $enc = $self->Options('CharsetEXIF');
+            $val = $self->Encode($val,$enc) if $enc and $val !~ /\0/;
             if ($val =~ /(.*?)\s*[\n\r]+\s*(.*)/s) {
                 return $1 . "\0" unless length $2;
                 # photographer copyright set to ' ' if it doesn't exist, according to spec.
@@ -1526,12 +1530,15 @@ sub WriteExif($$$)
     my $verbose = $exifTool->Options('Verbose');
     my $out = $exifTool->Options('TextOut');
     my ($nextIfdPos, %offsetData, $inMakerNotes);
-    my (@offsetInfo, %xDelete);
+    my (@offsetInfo, %xDelete, $strEnc);
     my $deleteAll = 0;
     my $newData = '';   # initialize buffer to receive new directory data
     my @imageData;      # image data blocks to copy later if requested
     my $name = $$dirInfo{Name};
     $name = $dirName unless $name and $dirName eq 'MakerNotes' and $name !~ /^MakerNote/;
+
+    # set encoding for strings
+    $strEnc = $exifTool->Options('CharsetEXIF') if $$tagTablePtr{GROUPS}{0} eq 'EXIF';
 
     # allow multiple IFD's in IFD0-IFD1-IFD2... chain
     $$dirInfo{Multi} = 1 if $dirName =~ /^(IFD0|SubIFD)$/ and not defined $$dirInfo{Multi};
@@ -1614,7 +1621,7 @@ sub WriteExif($$$)
         }
 
         # loop through new values and accumulate all information for this IFD
-        my (%set, $tagInfo);
+        my (%set, %mayDelete, $tagInfo);
         my $wrongDir = $crossDelete{$dirName};
         foreach $tagInfo ($exifTool->GetNewTagInfoList($tagTablePtr)) {
             my $tagID = $$tagInfo{TagID};
@@ -1647,6 +1654,9 @@ sub WriteExif($$$)
                             }
                         }
                         $curInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID, \$val, $fmt, $cnt);
+                    } else {
+                        # may want to delete this, but we need to see the value first
+                        $mayDelete{$tagID} = 1;
                     }
                 }
                 # don't set this tag unless valid for the current condition
@@ -1738,10 +1748,7 @@ sub WriteExif($$$)
             # get a hash of directories we will be writing in this one
             $addDirs = $exifTool->GetAddDirHash($tagTablePtr, $dirName);
             # make a union of tags & dirs (can set whole dirs, like MakerNotes)
-            my %allTags = %set;
-            foreach (keys %$addDirs) {
-                $allTags{$_} = $$addDirs{$_};
-            }
+            my %allTags = ( %set, %$addDirs );
             # make sorted list of new tags to be added
             @newTags = sort { $a <=> $b } keys(%allTags);
         }
@@ -1792,7 +1799,7 @@ Entry:  for (;;) {
                             $$dirInfo{Name} and $$dirInfo{Name} eq 'SubIFD3')
                         {
                             $dirBuff .= substr($$dataPt, $entry, 12);
-                            goto WroteIt;
+                            goto WroteIt; # GOTO!
                         }
                         # don't write out null directory entry
                         if ($oldFormat==0 and $index and $oldCount==0) {
@@ -1845,7 +1852,7 @@ WroteIt:                    ++$index;
                                     my $tagStr = $oldInfo ? $$oldInfo{Name} : sprintf("tag 0x%x",$oldID);
                                     return undef if $exifTool->Error("Bad $name offset for $tagStr", $inMakerNotes);
                                 }
-                                goto DropTag;
+                                goto DropTag; # GOTO!
                             }
                         }
                         # offset shouldn't point into TIFF or IFD header
@@ -1925,11 +1932,11 @@ WroteIt:                    ++$index;
                                 }
                                 unless ($success) {
                                     return undef if $exifTool->Error("Error reading value for $name entry $index", $inMakerNotes);
-                                    goto DropTag;
+                                    goto DropTag; # GOTO!
                                 }
                             } elsif (not $invalidPreview) {
                                 return undef if $exifTool->Error("Bad $name offset for $tagStr", $inMakerNotes);
-                                goto DropTag;
+                                goto DropTag; # GOTO!
                             }
                             if ($invalidPreview) {
                                 # set value for invalid preview
@@ -1970,6 +1977,21 @@ WroteIt:                    ++$index;
                         my $unk = $exifTool->Options(Unknown => 1);
                         $oldInfo = $exifTool->GetTagInfo($tagTablePtr, $oldID, \$oldValue, $oldFormName, $oldCount);
                         $exifTool->Options(Unknown => $unk);
+                        # now that we have the value, we can resolve the Condition to finally
+                        # determine whether we want to delete this tag or not
+                        if ($mayDelete{$oldID} and $oldInfo and (not @newTags or $newTags[0] != $oldID)) {
+                            my $nvHash = $exifTool->GetNewValueHash($oldInfo, $dirName);
+                            if (not $nvHash and $wrongDir) {
+                                # delete from wrong directory if necessary
+                                $nvHash = $exifTool->GetNewValueHash($oldInfo, $wrongDir);
+                                $nvHash and $xDelete{$oldID} = 1;
+                            }
+                            if ($nvHash) {
+                                # we want to delete this tag after all, so insert it into our list
+                                $set{$oldID} = $oldInfo;
+                                unshift @newTags, $oldID;
+                            }
+                        }
                     }
                     # make sure we are handling the 'ifd' format properly
                     if (($oldFormat == 13 or $oldFormat == 18) and
@@ -1985,7 +2007,7 @@ WroteIt:                    ++$index;
                             not $intFormat{$oldFormName})
                         {
                             $exifTool->Error("Invalid format ($oldFormName) for $name $$oldInfo{Name}", $inMakerNotes);
-                            goto DropTag;
+                            goto DropTag; # GOTO!
                         }
                         if ($$oldInfo{Drop} and $$exifTool{DROP_TAGS}) {
                             # don't rewrite this tag
@@ -2128,7 +2150,8 @@ DropTag:                    ++$index;
                         # (also delete tag if cross-deleting and this isn't a date/time shift)
                         if (not defined $newVal or ($xDelete{$newID} and not defined $$nvHash{Shift})) {
                             if ($$newInfo{RawConvInv} and defined $$nvHash{Value}) {
-                                goto NoOverwrite;   # error in RawConvInv, so rewrite existing tag
+                                # error in RawConvInv, so rewrite existing tag
+                                goto NoOverwrite; # GOTO!
                             }
                             unless ($isNew) {
                                 ++$exifTool->{CHANGED};
@@ -2145,7 +2168,7 @@ DropTag:                    ++$index;
                         $newValue = WriteValue($newVal, $newFormName, $newCount);
                         unless (defined $newValue) {
                             $exifTool->Warn("Error writing $dirName:$$newInfo{Name}");
-                            goto NoOverwrite;
+                            goto NoOverwrite; # GOTO!
                         }
                         if (length $newValue) {
                             # limit maximum value length in JPEG images
@@ -2155,11 +2178,15 @@ DropTag:                    ++$index;
                             {
                                 my $name = $$newInfo{MakerNotes} ? 'MakerNotes' : $$newInfo{Name};
                                 $exifTool->Warn("$name too large to write in JPEG segment");
-                                goto NoOverwrite;
+                                goto NoOverwrite; # GOTO!
+                            }
+                            # re-code if necessary
+                            if ($strEnc and $newFormName eq 'string') {
+                                $newValue = $exifTool->Encode($newValue, $strEnc);
                             }
                         } else {
                             $exifTool->Warn("Can't write zero length $$newInfo{Name} in $tagTablePtr->{GROUPS}{1}");
-                            goto NoOverwrite;
+                            goto NoOverwrite; # GOTO!
                         }
                         if ($isNew >= 0) {
                             $newCount = length($newValue) / $formatSize[$newFormat];
@@ -2869,7 +2896,8 @@ NoOverwrite:            next if $isNew > 0;
         }
         if ($ignoreCount) {
             my $y = $ignoreCount > 1 ? 'ies' : 'y';
-            $exifTool->Warn("Removed $ignoreCount invalid entr$y from $name", 1);
+            my $verb = $$dirInfo{FixBase} ? 'Ignored' : 'Removed';
+            $exifTool->Warn("$verb $ignoreCount invalid entr$y from $name", 1);
         }
         if ($fixCount) {
             my $s = $fixCount > 1 ? 's' : '';
@@ -3450,7 +3478,7 @@ This file contains routines to write EXIF metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

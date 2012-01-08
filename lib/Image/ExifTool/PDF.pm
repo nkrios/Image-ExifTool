@@ -21,12 +21,13 @@ use vars qw($VERSION $AUTOLOAD $lastFetched);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.30';
+$VERSION = '1.31';
 
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
 sub ReadToNested($;$);
 sub ProcessDict($$$$;$$);
+sub ProcessAcroForm($$$$;$$);
 sub ReadPDFValue($);
 sub CheckPDF($$$);
 
@@ -135,6 +136,9 @@ my $pdfVer;         # version of PDF file being processed
     Perms => {
         SubDirectory => { TagTable => 'Image::ExifTool::PDF::Perms' },
     },
+    AcroForm => {
+        SubDirectory => { TagTable => 'Image::ExifTool::PDF::AcroForm' },
+    },
     Lang       => 'Language',
     PageLayout => { },
     PageMode   => { },
@@ -189,6 +193,19 @@ my $pdfVer;         # version of PDF file being processed
     },
     UR3 => {
         SubDirectory => { TagTable => 'Image::ExifTool::PDF::Signature' },
+    },
+);
+
+# tags in PDF Perms directory
+%Image::ExifTool::PDF::AcroForm = (
+    PROCESS_PROC => \&ProcessAcroForm,
+    _has_xfa => {
+        Name => 'HasXFA',
+        Notes => q{
+            this tag is defined if a document contains form fields, and is true if it
+            uses XML Forms Architecture; not a real Tag ID
+        },
+        PrintConv => { 'true' => 'Yes', 'false' => 'No' },
     },
 );
 
@@ -357,33 +374,42 @@ my $pdfVer;         # version of PDF file being processed
     GROUPS => { 2 => 'Document' },
     Annots => {
         Name => 'AnnotationUsageRights',
-        Notes => 'UR3 signatures only',
+        Notes => q{
+            possible values are Create, Delete, Modify, Copy, Import and Export;
+            additional values for UR3 signatures are Online and SummaryView
+        },
         List => 1,
     },
     Document => {
         Name => 'DocumentUsageRights',
-        Notes => 'UR3 signatures only',
+        Notes => 'only possible value is FullSave',
         List => 1,
     },
     Form => {
         Name => 'FormUsageRights',
-        Notes => 'UR3 signatures only',
+        Notes => q{
+            possible values are FillIn, Import, Export, SubmitStandalone and
+            SpawnTemplate; additional values for UR3 signatures are BarcodePlaintext and
+            Online
+        },
+        List => 1,
+    },
+    FormEX => {
+        Name => 'FormExtraUsageRights',
+        Notes => 'UR signatures only; only possible value is BarcodePlaintext',
         List => 1,
     },
     Signature => {
         Name => 'SignatureUsageRights',
-        Notes => 'UR3 signatures only',
+        Notes => 'only possible value is Modify',
         List => 1,
     },
     EF => {
         Name => 'EmbeddedFileUsageRights',
-        Notes => 'UR3 signatures only',
+        Notes => 'possible values are Create, Delete, Modify and Import',
         List => 1,
     },
-    Msg => {
-        Name => 'UsageRightsMessage',
-        Notes => 'UR3 signatures only',
-    },
+    Msg => 'UsageRightsMessage',
     P => {
         Name => 'ModificationPermissions',
         Notes => q{
@@ -394,7 +420,7 @@ my $pdfVer;         # version of PDF file being processed
             1 => 'No changes permitted',
             2 => 'Fill forms, Create page templates, Sign',
             3 => 'Fill forms, Create page templates, Sign, Create/Delete/Edit annotations',
-            'true' => 'Restrict al applications to reader permissions',
+            'true' => 'Restrict all applications to reader permissions',
             'false' => 'Do not restrict applications to reader permissions',
         },
     },
@@ -1359,6 +1385,16 @@ sub NewPDFTag($$)
 }
 
 #------------------------------------------------------------------------------
+# Process AcroForm dictionary to set HasXMLFormsArchitecture flag
+# Inputs: Same as ProcessDict
+sub ProcessAcroForm($$$$;$$)
+{
+    my ($exifTool, $tagTablePtr, $dict, $xref, $nesting, $type) = @_;
+    $exifTool->HandleTag($tagTablePtr, '_has_xfa', $$dict{XFA} ? 'true' : 'false');
+    ProcessDict($exifTool, $tagTablePtr, $dict, $xref, $nesting, $type);
+}
+
+#------------------------------------------------------------------------------
 # Process PDF dictionary extract tag values
 # Inputs: 0) ExifTool object reference, 1) tag table reference
 #         2) dictionary reference, 3) cross-reference table reference,
@@ -1741,7 +1777,7 @@ XRef:
             for (;;) {
                 # read another line if necessary (skipping blank lines)
                 $raf->ReadLine($buff) or return -6 until $buff =~ /\S/;
-                last if $buff =~ s/^\s*trailer\s+//s;
+                last if $buff =~ s/^\s*trailer([\s<[(])/$1/s;
                 $buff =~ s/^\s*(\d+)\s+(\d+)\s+//s or return -4;
                 my ($start, $num) = ($1, $2);
                 $raf->Seek(-length($buff), 1) or return -4;
@@ -1919,7 +1955,7 @@ including AESV2 (AES-128) and AESV3 (AES-256).
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -32,6 +32,11 @@
 #              22) http://www.mi-fo.de/forum/index.php?act=attach&type=post&id=6024
 #              23) Marcin Krol private communication
 #              24) http://cpanforum.com/threads/12291
+#              25) Joseph Roost private communication, from one or more of
+#                   - A100 brochure, 2006-07
+#                   - Alpha Lenses Accessories brochure, 2007-09 (JP)
+#                   - Alpha Lenses brochure, 2010-09
+#                   - A77 brochure, 2011-08
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -42,7 +47,7 @@ use vars qw($VERSION %minoltaLensTypes %minoltaColorMode %sonyColorMode %minolta
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.80';
+$VERSION = '1.83';
 
 # lens ID numbers (ref 3)
 # ("New" and "II" appear in brackets if original version also has this LensType)
@@ -76,68 +81,76 @@ $VERSION = '1.80';
     18 => 'Minolta AF 28-80mm F3.5-5.6 II',
     19 => 'Minolta AF 35mm F1.4 G', # G added (ref 18), but not New as per ref 13
     20 => 'Minolta/Sony 135mm F2.8 [T4.5] STF',
+    # 20 => 'Sony 135mm F2.8 [T4.5] STF (SAL135F28)', (ref 25)
     22 => 'Minolta AF 35-80mm F4-5.6 II', # II added (ref 13)
     23 => 'Minolta AF 200mm F4 Macro APO G',
     24 => 'Minolta/Sony AF 24-105mm F3.5-4.5 (D) or Sigma or Tamron Lens',
+    # 24 => 'Sony 24-105mm F3.5-4.5 (SAL24105)', (ref 25)
     24.1 => 'Sigma 18-50mm F2.8',
     24.2 => 'Sigma 17-70mm F2.8-4.5 (D)',
-    24.3 => 'Sigma 20-40mm F2.8 EX DG Aspherical IF', #JD
+    24.3 => 'Sigma 20-40mm F2.8 EX DG Aspherical IF', #JD/22
     24.4 => 'Sigma 18-200mm F3.5-6.3 DC', #22
-    24.5 => 'Sigma 20-40mm F2.8 EX DG Aspherical IF', #22
-    24.6 => 'Tamron SP AF 28-75mm F2.8 XR Di (IF) Macro', #JD
+    24.5 => 'Tamron SP AF 28-75mm F2.8 XR Di (IF) Macro', #JD
     25 => 'Minolta AF 100-300mm F4.5-5.6 APO (D) or Sigma Lens',
     25.1 => 'Sigma 100-300mm F4 EX (APO (D) or D IF)', #JD
     25.2 => 'Sigma 70mm F2.8 EX DG Macro', #JD
     25.3 => 'Sigma 20mm F1.8 EX DG Aspherical RF', #19
     25.4 => 'Sigma 30mm F1.4 DG EX', #21
+    25.5 => 'Sigma 24mm F1.8 EX DG ASP Macro', #Florian Knorn
     27 => 'Minolta AF 85mm F1.4 G (D)', # added (D) (ref 13)
     28 => 'Minolta/Sony AF 100mm F2.8 Macro (D) or Tamron Lens',
-    # 28 => 'Sony 100mm F2.8 Macro (SAL-100M28)' (ref 18)
+    # 28 => 'Sony 100mm F2.8 Macro (SAL100M28)', (ref 18/25)
     28.1 => 'Tamron SP AF 90mm F2.8 Di Macro', #JD
     29 => 'Minolta/Sony AF 75-300mm F4.5-5.6 (D)', # Sony added (ref 13)
+    # 29 => 'Sony 75-300mm F4.5-5.6 (SAL75300)', (ref 25)
     30 => 'Minolta AF 28-80mm F3.5-5.6 (D) or Sigma Lens',
     30.1 => 'Sigma AF 10-20mm F4-5.6 EX DC', #JD
     30.2 => 'Sigma AF 12-24mm F4.5-5.6 EX DG',
     30.3 => 'Sigma 28-70mm EX DG F2.8', #16
     30.4 => 'Sigma 55-200mm F4-5.6 DC', #JD
     31 => 'Minolta/Sony AF 50mm F2.8 Macro (D) or F3.5',
+    # 31 => 'Sony 50mm F2.8 Macro (SAL50M28)', (ref 25)
     31.1 => 'Minolta/Sony AF 50mm F3.5 Macro',
     32 => 'Minolta/Sony AF 300mm F2.8 G or 1.5x Teleconverter', #13/18
-    # 32 => 'Minolta AF 300mm F2.8 G (D) SSM' (ref 13)
-    # 32 => 'Sony 300mm F2.8 G (SAL-300F28G)' (ref 18)
+    # 32 => 'Minolta AF 300mm F2.8 G (D) SSM', (ref 13)
+    # 32 => 'Sony 300mm F2.8 G (SAL300F28G)', (ref 18/25)
     33 => 'Minolta/Sony AF 70-200mm F2.8 G',
+    # 33 => 'Sony 70-200mm F2.8 G (SAL70200G)', (ref 25)
     # 33 => 'Minolta AF 70-200mm F2.8 G (D) SSM' (ref 13)
     35 => 'Minolta AF 85mm F1.4 G (D) Limited',
     36 => 'Minolta AF 28-100mm F3.5-5.6 (D)',
     38 => 'Minolta AF 17-35mm F2.8-4 (D)', # (Konica Minolta, ref 13)
     39 => 'Minolta AF 28-75mm F2.8 (D)', # (Konica Minolta, ref 13)
-    40 => 'Minolta/Sony AF DT 18-70mm F3.5-5.6 (D) or 18-200m F3.5-6.3', # (Konica Minolta, ref 13)
-    40.1 => 'Sony AF DT 18-200mm F3.5-6.3', #11
+    40 => 'Minolta/Sony AF DT 18-70mm F3.5-5.6 (D)', # (Konica Minolta, ref 13)
+    # 40 => 'Sony DT 18-70mm F3.5-5.6 (SAL1870)', (ref 25)
+    #40.1 => 'Sony AF DT 18-200mm F3.5-6.3', #11 (anomaly? - PH)
     41 => 'Minolta/Sony AF DT 11-18mm F4.5-5.6 (D) or Tamron Lens', # (Konica Minolta, ref 13)
+    # 41 => 'Sony DT 11-18mm F4.5-5.6 (SAL1118)', (ref 25)
     41.1 => 'Tamron SP AF 11-18mm F4.5-5.6 Di II LD Aspherical IF', #JD
     42 => 'Minolta/Sony AF DT 18-200mm F3.5-6.3 (D)', # Sony added (ref 13) (Konica Minolta, ref 13)
-    43 => 'Sony 35mm F1.4 G (SAL-35F14G)', # changed from Minolta to Sony (ref 13/18) (but ref 11 shows both!)
-    44 => 'Sony 50mm F1.4 (SAL-50F14)', # changed from Minolta to Sony (ref 13/18)
-    45 => 'Carl Zeiss Planar T* 85mm F1.4 ZA',
-    46 => 'Carl Zeiss Vario-Sonnar T* DT 16-80mm F3.5-4.5 ZA',
-    47 => 'Carl Zeiss Sonnar T* 135mm F1.8 ZA',
-    48 => 'Carl Zeiss Vario-Sonnar T* 24-70mm F2.8 ZA SSM (SAL-2470Z)', #11
-    49 => 'Sony AF DT 55-200mm F4-5.6', #JD
-    50 => 'Sony AF DT 18-250mm F3.5-6.3', #11
-    51 => 'Sony AF DT 16-105mm F3.5-5.6 or 55-200mm F4-5.5', #11
-    51.1 => 'Sony AF DT 55-200mm F4-5.5', #11
-    52 => 'Sony 70-300mm F4.5-5.6 G SSM', #JD
-    53 => 'Sony AF 70-400mm F4-5.6 G SSM (SAL-70400G)', #17 (/w correction by Stephen Bishop)
-    54 => 'Carl Zeiss Vario-Sonnar T* 16-35mm F2.8 ZA SSM (SAL-1635Z)', #17
-    55 => 'Sony DT 18-55mm F3.5-5.6 SAM (SAL-1855)', #PH
-    56 => 'Sony AF DT 55-200mm F4-5.6 SAM', #22
-    57 => 'Sony AF DT 50mm F1.8 SAM', #22
-    58 => 'Sony AF DT 30mm F2.8 SAM Macro', #22
-    59 => 'Sony 28-75/2.8 SAM', #21
-    60 => 'Carl Zeiss Distagon T* 24mm F2 SSM', #17
-    61 => 'Sony 85mm F2.8 SAM (SAL-85F28)', #17
-    62 => 'Sony DT 35mm F1.8 SAM (SAL-35F18)', #PH
-    63 => 'Sony DT 16-50mm F2.8 SSM (SAL-1650)', #17
+    # 42 => 'Sony DT 18-200mm F3.5-6.3 (SAL18200)', (ref 25)
+    43 => 'Sony 35mm F1.4 G (SAL35F14G)', # changed from Minolta to Sony (ref 13/18/25) (but ref 11 shows both!)
+    44 => 'Sony 50mm F1.4 (SAL50F14)', # changed from Minolta to Sony (ref 13/18/25)
+    45 => 'Carl Zeiss Planar T* 85mm F1.4 ZA (SAL85F14Z)', #25
+    46 => 'Carl Zeiss Vario-Sonnar T* DT 16-80mm F3.5-4.5 ZA (SAL1680Z)', #25
+    47 => 'Carl Zeiss Sonnar T* 135mm F1.8 ZA (SAL135F18Z)', #25
+    48 => 'Carl Zeiss Vario-Sonnar T* 24-70mm F2.8 ZA SSM (SAL2470Z)', #11/25
+    49 => 'Sony DT 55-200mm F4-5.6 (SAL55200)', #JD/25
+    50 => 'Sony DT 18-250mm F3.5-6.3 (SAL18250)', #11/25
+    51 => 'Sony DT 16-105mm F3.5-5.6 (SAL16105)', #11/25
+    #51.1 => 'Sony AF DT 55-200mm F4-5.5', #11 (anomaly? - PH)
+    52 => 'Sony 70-300mm F4.5-5.6 G SSM (SAL70300G)', #JD/25
+    53 => 'Sony 70-400mm F4-5.6 G SSM (SAL70400G)', #17(/w correction by Stephen Bishop)/25
+    54 => 'Carl Zeiss Vario-Sonnar T* 16-35mm F2.8 ZA SSM (SAL1635Z)', #17/25
+    55 => 'Sony DT 18-55mm F3.5-5.6 SAM (SAL1855)', #PH/25
+    56 => 'Sony DT 55-200mm F4-5.6 SAM (SAL55200-2)', #22/25
+    57 => 'Sony DT 50mm F1.8 SAM (SAL50F18)', #22/25
+    58 => 'Sony DT 30mm F2.8 Macro SAM (SAL30M28)', #22/25
+    59 => 'Sony 28-75 F2.8 SAM (SAL2875)', #21/25
+    60 => 'Carl Zeiss Distagon T* 24mm F2 ZA SSM (SAL24F20Z)', #17/25
+    61 => 'Sony 85mm F2.8 SAM (SAL85F28)', #17/25
+    62 => 'Sony DT 35mm F1.8 SAM (SAL35F18)', #PH/25
+    63 => 'Sony DT 16-50mm F2.8 SSM (SAL1650)', #17/25
     128 => 'Tamron or Sigma Lens (128)',
     128.1 => 'Tamron 18-200mm F3.5-6.3',
     128.2 => 'Tamron 28-300mm F3.5-6.3',
@@ -193,7 +206,7 @@ $VERSION = '1.80';
     25551.3 => 'Sigma 75-200mm F2.8-3.5', #22
     25561 => 'Minolta AF 135mm F2.8',
     25571 => 'Minolta/Sony AF 28mm F2.8', # Sony added (ref 18)
-    # 25571 => 'Sony 28mm F2.8 (SAL-28F28)' (ref 18)
+    # 25571 => 'Sony 28mm F2.8 (SAL28F28)', (ref 18/25)
     25581 => 'Minolta AF 24-50mm F4',
     25601 => 'Minolta AF 100-200mm F4.5',
     25611 => 'Minolta AF 75-300mm F4.5-5.6 or Sigma Lens', #13
@@ -216,12 +229,14 @@ $VERSION = '1.80';
     25651 => 'Minolta AF 600mm F4',
     25661 => 'Minolta AF 24mm F2.8',
     25721 => 'Minolta/Sony AF 500mm F8 Reflex',
+    # 25721 => 'Sony 500mm F8 Reflex (SAL500F80)', (ref 25)
     25781 => 'Minolta/Sony AF 16mm F2.8 Fisheye or Sigma Lens', # Sony added (ref 13/18)
-    # 25781 => 'Sony 16mm F2.8 Fisheye (SAL-16F28)' (ref 18)
+    # 25781 => 'Sony 16mm F2.8 Fisheye (SAL16F28)', (ref 18/25)
     25781.1 => 'Sigma 8mm F4 EX [DG] Fisheye',
     25781.2 => 'Sigma 14mm F3.5',
     25781.3 => 'Sigma 15mm F2.8 Fisheye', #JD (writes 16mm to EXIF)
     25791 => 'Minolta/Sony AF 20mm F2.8 or Tokina Lens', # Sony added (ref 11)
+    # 25791 => 'Sony 20mm F2.8 (SAL20F28)', (ref 25)
     25791.1 => 'Tokina AT-X Pro DX 11-16mm F2.8', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3593.0.html
     25811 => 'Minolta AF 100mm F2.8 Macro [New] or Sigma or Tamron Lens', # not Sony (ref 13/18)
     25811.1 => 'Sigma AF 90mm F2.8 Macro', #JD
@@ -280,7 +295,7 @@ $VERSION = '1.80';
     45851 => 'Tamron SP AF 300mm F2.8 LD IF', #11
     45871 => 'Tamron AF 70-210mm f/2.8 SP LD', #Fabio Suprani
     # all M42-type lenses give a value of 65535 (and FocalLength=0, FNumber=1)
-    65535 => 'T-Mount or Other Lens or no lens', #JD
+    65535 => 'E-Mount, T-Mount, Other Lens or no lens', #JD/25
     65535.1 => 'Arax MC 35mm F2.8 Tilt+Shift', #JD
     65535.2 => 'Arax MC 80mm F2.8 Tilt+Shift', #JD
     65535.3 => 'Zenitar MF 16mm F2.8 Fisheye M42', #JD
@@ -2032,6 +2047,14 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
     },
     0x418 => { Name => 'WB_RBPresetShade',                 Format => 'int16u[2]' },
     0x424 => { Name => 'WB_RBPresetCustom',                Format => 'int16u[2]' },
+    0x49bb => { # (http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3688.0.html)
+        Name => 'FocusDistance',
+        ValueConv => '2**(($val-126)/16)',
+        ValueConvInv => 'log($val)/log(2)*16+126',
+        PrintConv => '$val > 266 ? "inf" : sprintf("%.2f m", $val)',
+        PrintConvInv => '$val=~s/ ?m//; $val=~/inf/i ? 267 : $val',
+    },
+    # 0x49c6 - gives focal length using same formula as 0x49bb
     0x49dc => {
         Name => 'InternalSerialNumber',
         Format => 'string[12]',
@@ -2210,7 +2233,7 @@ and write Minolta RAW (MRW) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

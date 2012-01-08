@@ -797,7 +797,7 @@ sub WriteXMP($$;$)
                     my $tg = $exifTool->GetGroup($tagInfo, 1) . ':' . $$tagInfo{Name};
                     my $wrn = lc($path) eq lc($matches[0]) ? 'tag ID case' : 'list type';
                     if ($err) {
-                        $exifTool->Warn("Incorrect $wrn for $tg conflicts with existing tag");
+                        $exifTool->Warn("Incorrect $wrn for existing $tg (not changed)");
                     } else {
                         # fix the incorrect property paths for all values of this tag
                         foreach $match (@matches) {
@@ -1009,6 +1009,17 @@ sub WriteXMP($$;$)
                 $subIdx = '10';
             }
             substr($path, $pos, $len) = $idx . $subIdx;
+        }
+        # make sure any empty structures are deleted
+        # (ExifTool shouldn't write these, but other software may)
+        if (defined $$tagInfo{Flat}) {
+            my $p = $path;
+            while ($p =~ s/\/[^\/]+$//) {
+                next unless $capture{$p};
+                # it is an error if this property has a value
+                $exifTool->Error("Improperly structured XMP ($p)",1) if $capture{$p}[0] =~ /\S/;
+                delete $capture{$p};    # delete the (hopefully) empty structure
+            }
         }
     }
     # remove the ExifTool members we created
@@ -1268,7 +1279,7 @@ This file contains routines to write XMP metadata.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

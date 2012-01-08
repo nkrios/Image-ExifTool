@@ -232,11 +232,15 @@ leads to duplicated information when the image is rewritten.</p>
 
 <p><b>Samsung SRW:</b> Yet another TIFF-based RAW image with no proper file
 identifier.  In these images the thumbnail is stored inside a SubIFD of IFD1
-instead of directly in IFD1 (dumb, dumb...).</p>
+instead of directly in IFD1 (dumb, dumb...).  Also, the NX200 (firmware
+NX200_011181) uses a base offset for the X/YResolution values that is different
+from the PreviewImageStart pointer, both in the MakerNotes PreviewIFD.  (Note
+that the NX100 uses the same base for both, so this is certainly a firmware bug
+for the NX200.)</p>
 
 <hr>
 <i>Created Mar. 25, 2005</i>
-<br><i>Last revised Jan. 27, 2011</i>
+<br><i>Last revised Nov. 30, 2011</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

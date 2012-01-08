@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.26';
+$VERSION = '1.27';
 
 sub SetGeoValues($$;$);
 
@@ -62,6 +62,7 @@ my $secPerDay = 24 * 3600;      # a useful constant
 #       Times  - list of sorted Unix times (keys of Points hash)
 #       NoDate - flag if some points have no date (ie. referenced to 1970:01:01)
 #       IsDate - flag if some points have date
+#       Has    - hash of flags for available information (track, orient)
 # - the fix information hash may contain:
 #       lat    - signed latitude (required)
 #       lon    - signed longitude (required)
@@ -73,6 +74,11 @@ my $secPerDay = 24 * 3600;      # a useful constant
 #       vdop   - vertical DOP
 #       sats   - comma-separated list of active satellites
 #       nsats  - number of active satellites
+#       track  - track heading (deg true)
+#       dir    - image direction (deg true)
+#       pitch  - pitch angle (deg)
+#       roll   - roll angle (deg)
+#       speed  - speed (knots)
 #       first  - flag set for first fix of track
 # - concatenates new data with existing track data stored in ExifTool NEW_VALUE
 #   for the Geotag tag
@@ -81,7 +87,8 @@ sub LoadTrackLog($$;$)
     local ($_, $/, *EXIFTOOL_TRKFILE);
     my ($exifTool, $val) = @_;
     my ($raf, $from, $time, $isDate, $noDate, $noDateChanged, $lastDate, $dateFlarm);
-    my ($nmeaStart, $fixSecs, @fixTimes, $canCut, $cutPDOP, $cutHDOP, $cutSats, $lastFix);
+    my ($nmeaStart, $fixSecs, @fixTimes, $lastFix, %nmea);
+    my ($canCut, $cutPDOP, $cutHDOP, $cutSats);
 
     unless (eval 'require Time::Local') {
         return 'Geotag feature requires Time::Local installed';
@@ -141,7 +148,7 @@ sub LoadTrackLog($$;$)
         if (not $format) {
             if (/^<(\?xml|gpx)\s/) { # look for XML or GPX header
                 $format = 'XML';
-            } elsif (/^\$(PMGNTRK|GP(RMC|GGA|GLL|GSA)),/) {
+            } elsif (/^\$(GP(RMC|GGA|GLL|GSA)|PMGNTRK|PTNTHPR),/) {
                 $format = 'NMEA';
                 $nmeaStart = $2 || $1;    # save type of first sentence
             } elsif (/^A(FLA|XSY|FIL)/) {
@@ -243,7 +250,7 @@ sub LoadTrackLog($$;$)
         my (%fix, $secs, $date, $nmea);
         if ($format eq 'NMEA') {
             # ignore unrecognized NMEA sentences
-            next unless /^\$(PMGNTRK|GP(RMC|GGA|GLL|GSA)),/;
+            next unless /^\$(GP(RMC|GGA|GLL|GSA)|PMGNTRK|PTNTHPR),/;
             $nmea = $2 || $1;
         }
 #
@@ -266,37 +273,21 @@ sub LoadTrackLog($$;$)
             }
             $nmea = 'B';
 #
-# Magellan eXplorist NMEA-like PMGNTRK sentence (optionally contains date)
-#
-        } elsif ($nmea eq 'PMGNTRK') {
-            # $PMGNTRK,4415.026,N,07631.091,W,00092,M,185031.06,A,,020409*65
-            # $PMGNTRK,ddmm.mmm,N/S,dddmm.mmm,E/W,alt,F/M,hhmmss.ss,A/V,trkname,DDMMYY*cs
-            /^\$PMGNTRK,(\d+)(\d{2}\.\d+),([NS]),(\d+)(\d{2}\.\d+),([EW]),(-?\d+\.?\d*),([MF]),(\d{2})(\d{2})(\d+)(\.\d+)?,A,(?:[^,]*,(\d{2})(\d{2})(\d+))?/ or next;
-            $fix{lat} = ($1 + $2/60) * ($3 eq 'N' ? 1 : -1);
-            $fix{lon} = ($4 + $5/60) * ($6 eq 'E' ? 1 : -1);
-            $fix{alt} = $8 eq 'M' ? $7 : $7 * 12 * 0.0254;
-            $secs = (($9 * 60) + $10) * 60 + $11;
-            $secs += $12 if $12;    # add fractional seconds
-            if (defined $15) {
-                next if $13 > 31 or $14 > 12 or $15 > 99;   # validate day/month/year
-                # optional date is available in PMGNTRK sentence
-                my $year = $15 + ($15 >= 70 ? 1900 : 2000);
-                $date = Time::Local::timegm(0,0,0,$13,$14-1,$year-1900);
-            }
-#
 # NMEA RMC sentence (contains date)
 #
         } elsif ($nmea eq 'RMC') {
             #  $GPRMC,092204.999,A,4250.5589,S,14718.5084,E,0.00,89.68,211200,,*25
             #  $GPRMC,hhmmss.sss,A/V,ddmm.mmmm,N/S,ddmmm.mmmm,E/W,spd(knots),dir(deg),DDMMYY,,*cs
-            /^\$GPRMC,(\d{2})(\d{2})(\d+)(\.\d+)?,A,(\d+)(\d{2}\.\d+),([NS]),(\d+)(\d{2}\.\d+),([EW]),[^,]*,[^,]*,(\d{2})(\d{2})(\d+)/ or next;
-            next if $11 > 31 or $12 > 12 or $13 > 99;   # validate day/month/year
+            /^\$GPRMC,(\d{2})(\d{2})(\d+)(\.\d+)?,A,(\d+)(\d{2}\.\d+),([NS]),(\d+)(\d{2}\.\d+),([EW]),(\d*\.?\d*),(\d*\.?\d*),(\d{2})(\d{2})(\d+)/ or next;
+            next if $13 > 31 or $14 > 12 or $15 > 99;   # validate day/month/year
             $fix{lat} = ($5 + $6/60) * ($7 eq 'N' ? 1 : -1);
             $fix{lon} = ($8 + $9/60) * ($10 eq 'E' ? 1 : -1);
-            my $year = $13 + ($13 >= 70 ? 1900 : 2000);
+            $fix{speed} = $11 if length $11;
+            $fix{track} = $12 if length $12;
+            my $year = $15 + ($15 >= 70 ? 1900 : 2000);
             $secs = (($1 * 60) + $2) * 60 + $3;
             $secs += $4 if $4;      # add fractional seconds
-            $date = Time::Local::timegm(0,0,0,$11,$12-1,$year-1900);
+            $date = Time::Local::timegm(0,0,0,$13,$14-1,$year-1900);
 #
 # NMEA GGA sentence (no date)
 #
@@ -334,10 +325,42 @@ sub LoadTrackLog($$;$)
             my @a = ($fix{sats} =~ /\d+/g);
             $fix{nsats} = scalar @a;
             $canCut = 1;
+#
+# Magellan eXplorist PMGNTRK (Proprietary MaGellaN TRacK) sentence (optional date)
+#
+        } elsif ($nmea eq 'PMGNTRK') {
+            # $PMGNTRK,4415.026,N,07631.091,W,00092,M,185031.06,A,,020409*65
+            # $PMGNTRK,ddmm.mmm,N/S,dddmm.mmm,E/W,alt,F/M,hhmmss.ss,A/V,trkname,DDMMYY*cs
+            /^\$PMGNTRK,(\d+)(\d{2}\.\d+),([NS]),(\d+)(\d{2}\.\d+),([EW]),(-?\d+\.?\d*),([MF]),(\d{2})(\d{2})(\d+)(\.\d+)?,A,(?:[^,]*,(\d{2})(\d{2})(\d+))?/ or next;
+            $fix{lat} = ($1 + $2/60) * ($3 eq 'N' ? 1 : -1);
+            $fix{lon} = ($4 + $5/60) * ($6 eq 'E' ? 1 : -1);
+            $fix{alt} = $8 eq 'M' ? $7 : $7 * 12 * 0.0254;
+            $secs = (($9 * 60) + $10) * 60 + $11;
+            $secs += $12 if $12;    # add fractional seconds
+            if (defined $15) {
+                next if $13 > 31 or $14 > 12 or $15 > 99;   # validate day/month/year
+                # optional date is available in PMGNTRK sentence
+                my $year = $15 + ($15 >= 70 ? 1900 : 2000);
+                $date = Time::Local::timegm(0,0,0,$13,$14-1,$year-1900);
+            }
+#
+# Honeywell HMR3000 PTNTHPR (Heading Pitch Roll) sentence (no date)
+# (ref http://www.gpsarea.com/uploadfile/download/introduce/hmr3000_manual.pdf)
+#
+        } elsif ($nmea eq 'PTNTHPR') {
+            # $PTNTHPR,85.9,N,-0.9,N,0.8,N*HH
+            # $PTNTHPR,heading,heading status,pitch,pitch status,roll,roll status,*cs
+            # status: L=low alarm, M=low warning, N=normal, O=high warning
+            #         P=high alarm, C=tuning analog circuit
+            # (ignore this information on any alarm status)
+            /^\$PTNTHPR,(-?[\d.]+),[MNO],(-?[\d.]+),[MNO],(-?[\d.]+),[MNO],/ or next;
+            @fix{qw(dir pitch roll)} = ($1,$2,$3);
 
         } else {
             next;   # this shouldn't happen
         }
+        # remember the NMEA formats we successfully read
+        $nmea{$nmea} = 1;
         # use last date if necessary (and appropriate)
         if (defined $secs and not defined $date and defined $lastDate) {
             # wrap to next day if necessary
@@ -492,6 +515,9 @@ sub LoadTrackLog($$;$)
     if ($numPoints) {
         # reset timestamp list to force it to be regenerated
         delete $$geotag{Times};
+        # set flags for available information
+        $$geotag{Has}{track}  = 1 if $nmea{RMC};
+        $$geotag{Has}{orient} = 1 if $nmea{PTNTHPR};
         return $geotag;     # success!
     }
     return "No track points found in GPS $from";
@@ -665,8 +691,8 @@ sub SetGeoValues($$;$)
                 my $f = $t1 == $t0 ? 0 : ($time - $t0) / ($t1 - $t0);
                 my $p0 = $$points{$t0};
                 $fix = { };
-                # loop through latitude, longitude, and altitude if available
-                foreach (qw(lat lon alt)) {
+                # interpolate valid coordinates
+                foreach (qw(lat lon alt speed track dir pitch roll)) {
                     next unless defined $$p0{$_} and defined $$p1{$_};
                     $$fix{$_} = $$p1{$_} * $f + $$p0{$_} * (1 - $f);
                 }
@@ -717,13 +743,28 @@ sub SetGeoValues($$;$)
         unless ($exif) {
             @r = $exifTool->SetNewValue(GPSDateTime => "$gpsDate $gpsTime", %opts);
         }
+        if ($$geotag{Has}{track}) {
+            @r = $exifTool->SetNewValue(GPSTrack => $$fix{track}, %opts);
+            @r = $exifTool->SetNewValue(GPSTrackRef => (defined $$fix{track} ? 'T' : undef), %opts);
+            @r = $exifTool->SetNewValue(GPSSpeed => $$fix{speed}, %opts);
+            @r = $exifTool->SetNewValue(GPSSpeedRef => (defined $$fix{speed} ? 'N' : undef), %opts);
+        }
+        if ($$geotag{Has}{orient}) {
+            @r = $exifTool->SetNewValue(GPSImgDirection => $$fix{dir}, %opts);
+            @r = $exifTool->SetNewValue(GPSImgDirectionRef => (defined $$fix{dir} ? 'T' : undef), %opts);
+            # Note: GPSPitch and GPSRoll are non-standard, and must be user-defined
+            @r = $exifTool->SetNewValue(GPSPitch => $$fix{pitch}, %opts);
+            @r = $exifTool->SetNewValue(GPSRoll => $$fix{roll}, %opts);
+        }
     } else {
         my %opts;
         $opts{Replace} = 2 if defined $val; # remove existing new values
         $opts{Group} = $writeGroup if $writeGroup;
         # reset any GPS values we might have already set
         foreach (qw(GPSLatitude GPSLatitudeRef GPSLongitude GPSLongitudeRef
-                    GPSAltitude GPSAltitudeRef GPSDateStamp GPSTimeStamp GPSDateTime))
+                    GPSAltitude GPSAltitudeRef GPSDateStamp GPSTimeStamp GPSDateTime
+                    GPSTrack GPSTrackRef GPSSpeed GPSSpeedRef
+                    GPSImgDirection GPSImgDirectionRef GPSPitch GPSRoll))
         {
             my @r = $exifTool->SetNewValue($_, undef, %opts);
         }
@@ -874,17 +915,22 @@ This module is used by Image::ExifTool
 
 This module loads GPS track logs, interpolates to determine position based
 on time, and sets new GPS values for geotagging images.  Currently supported
-formats are GPX, NMEA RMC/GGA/GLL, KML, IGC, Garmin XML and TCX, and
-Magellan PMGNTRK.
+formats are GPX, NMEA RMC/GGA/GLL, KML, IGC, Garmin XML and TCX, Magellan
+PMGNTRK, and Honeywell PTNTHPR.
 
 Methods in this module should not be called directly.  Instead, the Geotag
 feature is accessed by writing the values of the ExifTool Geotag, Geosync
 and Geotime tags (see the L<Extra Tags|Image::ExifTool::TagNames/Extra Tags>
 in the tag name documentation).
 
+=head1 NOTES
+
+To take advantage of attitude information in the PTNTHPR NMEA sentence, two
+user-defined tags, GPSPitch and GPSRoll, must be active.
+
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

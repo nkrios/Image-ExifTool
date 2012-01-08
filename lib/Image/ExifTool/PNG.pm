@@ -26,7 +26,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.25';
+$VERSION = '1.26';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -209,7 +209,7 @@ $Image::ExifTool::PNG::colorType = -1;
     },
     tXMP => {
         Name => 'XMP',
-        Notes => 'obsolete location specified by older XMP draft',
+        Notes => 'obsolete location specified by a September 2001 XMP draft',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
     },
     vpAg => { # private imagemagick chunk
@@ -425,9 +425,9 @@ my %unreg = ( Notes => 'unregistered' );
    'XML:com.adobe.xmp' => {
         Name => 'XMP',
         Notes => q{
-            unregistered, but this is the location according to the XMP specification,
-            and is where ExifTool will add a new XMP chunk if the image didn't already
-            contain XMP
+            unregistered, but this is the location according to the current XMP
+            specification (June 2002 or later), and is where ExifTool will add a new XMP
+            chunk if the image didn't already contain XMP
         },
         SubDirectory => {
             TagTable => 'Image::ExifTool::XMP::Main',
@@ -1071,7 +1071,7 @@ and JNG (JPEG Network Graphics) images.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

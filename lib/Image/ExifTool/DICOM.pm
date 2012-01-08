@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION %uid);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.11';
+$VERSION = '1.12';
 
 # DICOM VR (Value Representation) format conversions
 my %dicomFormat = (
@@ -3720,8 +3720,9 @@ sub ProcessDICM($$)
         if ($len > 1024) {
             # treat large data elements as binary data
             my $binData;
-            if ($exifTool->Options('Binary') or ($tagInfo and
-                $exifTool->{REQ_TAG_LOOKUP}->{lc($$tagInfo{Name})}))
+            my $lcTag = $tagInfo ? lc($$tagInfo{Name}) : 'unknown';
+            if ($exifTool->{REQ_TAG_LOOKUP}{$lcTag} or
+                ($exifTool->Options('Binary') and not $exifTool->{EXCL_TAG_LOOKUP}{$lcTag}))
             {
                 $binData = $buff;   # must make a copy
             } else {
@@ -3803,7 +3804,7 @@ No translation of special characters sets is done.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

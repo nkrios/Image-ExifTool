@@ -10,6 +10,7 @@
 #               3) http://www.gzip.org/zlib/rfc-gzip.html
 #               4) http://DataCompression.info/ArchiveFormats/RAR202.txt
 #               5) https://jira.atlassian.com/browse/CONF-21706
+#               6) http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/en/devnet/indesign/cs55-docs/IDML/idml-specification.pdf
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::ZIP;
@@ -18,7 +19,7 @@ use strict;
 use vars qw($VERSION $warnString);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.08';
+$VERSION = '1.10';
 
 sub WarnProc($) { $warnString = $_[0]; }
 
@@ -32,6 +33,7 @@ my %openDocType = (
     'application/vnd.oasis.opendocument.presentation' => 'ODP',
     'application/vnd.oasis.opendocument.spreadsheet'  => 'ODS',
     'application/vnd.oasis.opendocument.text'         => 'ODT',
+    'application/vnd.adobe.indesign-idml-package'     => 'IDML', #6
 );
 
 # ZIP metadata blocks
@@ -384,20 +386,22 @@ sub ProcessZIP($$)
             last;
         }
         # Archive::Zip requires a seekable IO::File object
-        my $fh = $raf->{FILE_PT};
-        if ($fh and seek($fh, 0, 0)) {
+        my $fh;
+        if ($raf->{TESTED} >= 0) {
             unless (eval 'require IO::File') {
                 # (this shouldn't happen because IO::File is a prerequisite of Archive::Zip)
                 $exifTool->Warn("Install IO::File to decode compressed ZIP information");
                 last;
             }
+            $raf->Seek(0,0);
+            $fh = $raf->{FILE_PT};
             bless $fh, 'IO::File';  # Archive::Zip expects an IO::File object
         } elsif (eval 'require IO::String') {
             # read the whole file into memory (what else can I do?)
             $raf->Slurp();
             $fh = new IO::String ${$raf->{BUFF_PT}};
         } else {
-            my $type = $fh ? 'pipe or socket' : 'scalar reference';
+            my $type = $raf->{FILE_PT} ? 'pipe or socket' : 'scalar reference';
             $exifTool->Warn("Install IO::String to decode compressed ZIP information from a $type");
             last;
         }
@@ -406,6 +410,15 @@ sub ProcessZIP($$)
         # catch all warnings! (Archive::Zip is bad for this)
         local $SIG{'__WARN__'} = \&WarnProc;
         my $status = $zip->readFromFileHandle($fh);
+        if ($status eq '4' and $raf->{TESTED} >= 0 and eval 'require IO::String') {
+            # try again, reading it ourself this time in an attempt to avoid
+            # a failed test with Perl 5.6.2 GNU/Linux 2.6.32-5-686 i686-linux-64int-ld
+            $raf->Seek(0,0);
+            $raf->Slurp();
+            $fh = new IO::String ${$raf->{BUFF_PT}};
+            $zip = new Archive::Zip;
+            $status = $zip->readFromFileHandle($fh);
+        }
         if ($status) {
             undef $zip;
             my %err = ( 1=>'Stream end error', 3=>'Format error', 4=>'IO error' );
@@ -451,29 +464,33 @@ sub ProcessZIP($$)
             last;
         }
 
-        # check for an Open Document file
+        # check for an Open Document or IDML file
         my $mType = $zip->memberNamed('mimetype');
         if ($mType) {
             ($mime, $status) = $zip->contents($mType);
-            unless ($status) {
-                chomp $mime;
-                if ($openDocType{$mime}) {
-                    $exifTool->SetFileType($openDocType{$mime}, $mime);
-                    # extract Open Document metadata from "meta.xml"
-                    my $meta = $zip->memberNamed('meta.xml');
-                    if ($meta) {
-                        ($buff, $status) = $zip->contents($meta);
-                        unless ($status) {
-                            my %dirInfo = (
-                                DataPt => \$buff,
-                                DirLen => length $buff,
-                                DataLen => length $buff,
-                            );
-                            my $xmpTable = GetTagTable('Image::ExifTool::XMP::Main');
-                            $exifTool->ProcessDirectory(\%dirInfo, $xmpTable);
-                        }
+            if (not $status and $mime =~ /([\x21-\xfe]+)/s) {
+                # clean up MIME type just in case (note that MIME is case insensitive)
+                $mime = lc $1;
+                $exifTool->SetFileType($openDocType{$mime} || 'ZIP', $mime);
+                $exifTool->Warn('Unrecognized MIMEType') unless $openDocType{$mime};
+                # extract Open Document metadata from "meta.xml"
+                my $meta = $zip->memberNamed('meta.xml');
+                # IDML files have metadata in a different place (ref 6)
+                $meta or $meta = $zip->memberNamed('META-INF/metadata.xml');
+                if ($meta) {
+                    ($buff, $status) = $zip->contents($meta);
+                    unless ($status) {
+                        my %dirInfo = (
+                            DataPt => \$buff,
+                            DirLen => length $buff,
+                            DataLen => length $buff,
+                        );
+                        my $xmpTable = GetTagTable('Image::ExifTool::XMP::Main');
+                        $exifTool->ProcessDirectory(\%dirInfo, $xmpTable);
                     }
-                    # extract preview image(s) from "Thumbnails" directory
+                }
+                if ($openDocType{$mime} or $meta) {
+                    # extract preview image(s) from "Thumbnails" directory if they exist
                     my $type;
                     my %tag = ( jpg => 'PreviewImage', png => 'PreviewPNG' );
                     foreach $type ('jpg', 'png') {
@@ -482,8 +499,9 @@ sub ProcessZIP($$)
                         ($buff, $status) = $zip->contents($thumb);
                         $exifTool->FoundTag($tag{$type}, $buff) unless $status;
                     }
-                    last;
+                    last;   # all done since we recognized the MIME type or found metadata
                 }
+                # continue on to list ZIP contents...
             }
         }
 
@@ -576,7 +594,7 @@ types like DOCX, PPTX, XLSX, ODB, ODC, ODF, ODG, ODI, ODP, ODS, ODT and EIP.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

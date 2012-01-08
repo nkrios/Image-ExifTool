@@ -140,15 +140,15 @@ except that the <code>-v3</code> option must be used to see the warnings when
 copying.</p>
 
 <p><b>Programmers:</b> Structured information is written and read as Perl HASH
-references via the ExifTool API, but they may also be written as serialized
-strings.  The following two techniques are equivalent:</p>
+references via the ExifTool API, but it may also be written as a serialized
+string.  The following two techniques are equivalent:</p>
 
 <blockquote><table class='box'><tr><td>
-<pre># as a serialized string
-<span class=code>$exifTool-&gt;SetNewValue('XMP:Flash' =&gt; '{mode=on,fired=true,return=not}');
+<pre># as a HASH reference
+<span class=code>$exifTool-&gt;SetNewValue('XMP:Flash' =&gt; { mode=>'on', fired=>'true', return=>'not' });
 </span>
-# as a HASH reference
-<span class=code>$exifTool-&gt;SetNewValue('XMP:Flash' =&gt; { mode=>'on', fired=>'true', return=>'not' });</span></pre>
+# as a serialized string
+<span class=code>$exifTool-&gt;SetNewValue('XMP:Flash' =&gt; '{mode=on,fired=true,return=not}');</span></pre>
 </td></tr></table></blockquote>
 
 <a name='Copying'></a>
@@ -174,10 +174,10 @@ example command that copies the hierarchical keywords using this technique:</p>
 <pre class=code>exiftool -tagsfromfile src.jpg --struct "-hierarchicalkeywords*" dst.jpg</pre>
 </td></tr></table></blockquote>
 
-<p class=lt>(Note: Copying as flattened tags, as in the command above, was the
-default behaviour with ExifTool 8.43 and earlier.  But copying as structures has
-been the default since the ability to write structured information was introduced
-in version 8.44.)</p>
+<p class=lt>(Note: This method of copying as flattened tags was the default
+behaviour with ExifTool 8.43 and earlier.  But copying as structures has been
+the default since the ability to write structured information was introduced in
+version 8.44.)</p>
 
 <a name='Deleting'></a>
 <h2>Deleting / Replacing</h2>

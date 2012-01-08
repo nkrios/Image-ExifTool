@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 # Information decoded from Mac OS resources
 %Image::ExifTool::RSRC::Main = (
@@ -22,9 +22,9 @@ $VERSION = '1.02';
     NOTES => q{
         Tags extracted from Mac OS resource files and DFONT files.  These tags may
         also be extracted from the resource fork of any file in OS X, either by
-        adding "/rsrc" to the filename to process the resource fork alone, or by
-        using the ExtractEmbedded (-ee) option to process the resource fork as a
-        sub-document of the main file.
+        adding "/..namedfork/rsrc" to the filename to process the resource fork
+        alone, or by using the ExtractEmbedded (-ee) option to process the resource
+        fork as a sub-document of the main file.
     },
     '8BIM' => {
         Name => 'PhotoshopInfo',
@@ -204,7 +204,7 @@ resource files.
 
 =head1 AUTHOR
 
-Copyright 2003-2011, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
