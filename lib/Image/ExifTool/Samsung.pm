@@ -21,6 +21,7 @@ $VERSION = '1.13';
 
 sub WriteSTMN($$$);
 sub ProcessINFO($$$);
+sub ProcessSamsungIFD($$$);
 
 %samsungLensTypes = (
     0 => 'Built-in or Manual Lens', #PH (EX1, WB2000)
@@ -53,6 +54,7 @@ my %formatMinMax = (
     FORMAT => 'int32u',
     FIRST_ENTRY => 0,
     IS_OFFSET => [ 2 ],   # tag 2 is 'IsOffset'
+    IS_SUBDIR => [ 11 ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     NOTES => q{
         Tags found in the binary "STMN" format maker notes written by a number of
@@ -75,6 +77,31 @@ my %formatMinMax = (
         DataTag => 'PreviewImage',
         Protected => 2,
     },
+    11 => {
+        Name => 'SamsungIFD',
+        # Note: this is not always an IFD.  In many models the string
+        # "Park Byeongchan" is found at this location
+        Condition => '$$valPt =~ /^[^\0]\0\0\0/',
+        Format => 'undef[$size - 44]',
+        SubDirectory => { TagTable => 'Image::ExifTool::Samsung::IFD' },
+    },
+);
+
+%Image::ExifTool::Samsung::IFD = (
+    PROCESS_PROC => \&ProcessSamsungIFD,
+    NOTES => q{
+        This is a standard-format IFD found in the Type1 maker notes of some Samsung
+        models, except that the entry count is a 4-byte integer and the offsets are
+        relative to the end of the IFD.  Currently, no tags in this IFD are known,
+        so the Unknown (-u) or Verbose (-v) option must be used to see this
+        information.
+    },
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    # 0x0001 - undef[4000|4100]: starts with "MN_PRV" (or all zeros)
+    # 0x0002 - undef[7000]     : starts with "Kim Miae"
+    # 0x0003 - undef[5000]     : starts with "Lee BK"
+    # 0x0004 - undef[500|2000] : starts with "IPCD"   (or all zeros)
+    # 0x0006 - undef[100|200]  : starts with "MN_ADS" (or all zeros)
 );
 
 # Samsung maker notes (ref PH)
@@ -640,6 +667,40 @@ sub ProcessINFO($$$)
         $pos += 8;
     }
     return 1;
+}
+
+#------------------------------------------------------------------------------
+# Inputs: 0) ExifTool object ref, 1) source dirInfo ref, 2) tag table ref
+# Returns: true on success
+sub ProcessSamsungIFD($$$)
+{
+    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my $len = $$dirInfo{DataLen};
+    my $pos = $$dirInfo{DirStart};
+    return 0 unless $pos + 4 < $len;
+    my $dataPt = $$dirInfo{DataPt};
+    my $buff = substr($$dataPt, $pos, 4);
+    # this is not an IFD for many models
+    # (the string "Park Byeongchan" is often found here)
+    return 0 unless $buff =~ s/^([^\0])\0\0\0/$1\0$1\0/s;
+    my $numEntries = ord $1;
+    if ($$exifTool{HTML_DUMP}) {
+        my $pt = $$dirInfo{DirStart} + $$dirInfo{DataPos} + $$dirInfo{Base};
+        $exifTool->HDump($pt-44, 44, "MakerNotes header", 'Samsung Type1');
+        $exifTool->HDump($pt, 4, "MakerNotes entries", "Format: int32u\nEntry count: $numEntries");
+        $$dirInfo{NoDumpEntryCount} = 1;
+    }
+    substr($$dataPt, $pos, 4) = $buff;      # insert bogus 2-byte entry count
+    # offset base is at end of IFD
+    my $shift = $$dirInfo{DirStart} + 4 + $numEntries * 12 + 4;
+    $$dirInfo{Base} += $shift;
+    $$dirInfo{DataPos} -= $shift;
+    $$dirInfo{DirStart} += 2;       # start at bogus entry count
+    $$dirInfo{ZeroOffsetOK} = 1;    # disable check for zero offset
+    delete $$exifTool{NO_UNKNOWN};  # (set for BinaryData, but not for EXIF IFD's)
+    my $rtn = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
+    substr($$dataPt, $pos + 2, 1) = "\0";   # remove bogus count
+    return $rtn;
 }
 
 #------------------------------------------------------------------------------

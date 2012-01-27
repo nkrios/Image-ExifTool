@@ -1,8 +1,8 @@
-  ExifToolVersion = 8.67
+  ExifToolVersion = 8.75
   FileName = Olympus_7_failed.jpg
   Directory = t
   FileSize = 7335
-  FileModifyDate = 1318441439
+  FileModifyDate = 1326111630
   FilePermissions = 33188
   FileType = JPEG
   MIMEType = image/jpeg
@@ -32,7 +32,7 @@ JPEG APP1 (7080 bytes):
   | 10) ExifOffset (SubDirectory) -->
   |     - Tag 0x8769 (4 bytes, int32u[1])
   | + [ExifIFD directory with 31 entries]
-  | | 0)  ExposureTime = 4.e-03 (1/250)
+  | | 0)  ExposureTime = 0.004 (1/250)
   | |     - Tag 0x829a (8 bytes, rational64u[1])
   | | 1)  FNumber = 16 (160/10)
   | |     - Tag 0x829d (8 bytes, rational64u[1])
@@ -195,7 +195,7 @@ JPEG APP1 (7080 bytes):
   | | | |     - Tag 0x0310 (2 bytes, int16u[1])
   | | | | 6)  BlackLevel2 = 63 63 63 63
   | | | |     - Tag 0x0600 (8 bytes, int16u[4])
-  | | | | 7)  Olympus_ImageProcessing_0x0800 = -4.17476473376155e-03 -2.54684069659561e[snip]
+  | | | | 7)  Olympus_ImageProcessing_0x0800 = -0.00417476473376155 -0.0002546840696595[snip]
   | | | |     - Tag 0x0800 (36 bytes, float[9])
   | | | | 8)  Olympus_ImageProcessing_0x0801 = 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
   | | | |     - Tag 0x0801 (32 bytes, int16u[16])

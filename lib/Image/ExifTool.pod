@@ -505,8 +505,11 @@ unless Compress::Zlib is installed.  Default is 0.
 
 Format for printing GPS coordinates.  This is a printf format string with
 specifiers for degrees, minutes and seconds in that order, however minutes
-and seconds may be omitted.  For example, the following table gives the
-output for the same coordinate using various formats:
+and seconds may be omitted.  If the hemisphere is known, a reference
+direction (N, S, E or W) is appended to each printed coordinate, but adding
+a C<+> to the format specifier (ie. C<%+.6f>) prints a signed coordinate
+instead.  For example, the following table gives the output for the same
+coordinate using various formats:
 
       CoordFormat        Example Output
   -------------------  ------------------
@@ -707,12 +710,21 @@ option, only unrecognized file types are scanned for XMP.  Default is 0.
 Specifies order to sort tags in returned list:
 
   Input  - Sort in same order as input tag arguments (default)
-  Alpha  - Sort alphabetically
   File   - Sort in order that tags were found in the file
+  Tag    - Sort alphabetically by tag name
+  Descr  - Sort by tag description (for current Lang setting)
   Group# - Sort by tag group, where # is zero or more family
            numbers separated by colons. If # is not specified,
            Group0 is assumed.  See GetGroup for a description
            of group families.
+
+=item Sort2
+
+Secondary sort order used for tags within each group when Sort is 'Group':
+
+  File   - Sort in order tags were found in the file (default)
+  Tag    - Sort alphabetically by tag name
+  Descr  - Sort by tag description (for current Lang setting)
 
 =item StrictDate
 
@@ -948,7 +960,9 @@ Get a sorted list of tags from the specified information hash or tag list.
 
 1) [optional] Information hash reference or tag list reference,
 
-2) [optional] Sort order ('File', 'Input', 'Alpha' or 'Group#').
+2) [optional] Sort order ('Input', 'File', 'Tag', 'Descr' or 'Group#').
+
+3) [optional] Secondary sort order ('File', 'Tag' or 'Descr').
 
 If the information hash or tag list reference is not provided, then the list
 of found tags from the last call to L</ImageInfo>, L</ExtractInfo> or
@@ -976,7 +990,9 @@ L</ExtractInfo> or L</GetInfo> for this object.
 
 0) ExifTool object reference
 
-1) [optional] Sort order ('File', 'Input', 'Alpha' or 'Group#')
+1) [optional] Sort order ('Input', 'File', 'Tag', 'Descr' or 'Group#')
+
+2) [optional] Secondary sort order ('File', 'Tag' or 'Descr')
 
 If sort order is not specified, the sort order from the ExifTool options is
 used.

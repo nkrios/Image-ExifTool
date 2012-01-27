@@ -27,7 +27,7 @@ use vars qw($VERSION $RELEASE @ISA @EXPORT_OK %EXPORT_TAGS $AUTOLOAD @fileTypes
             %mimeType $swapBytes $swapWords $currentByteOrder %unpackStd
             %jpegMarker);
 
-$VERSION = '8.75';
+$VERSION = '8.77';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -870,7 +870,15 @@ sub DummyWriteProc { return 1; }
     FileType    => { },
     FileModifyDate => {
         Description => 'File Modification Date/Time',
-        Notes => 'the filesystem modification time',
+        Notes => q{
+            the filesystem modification time.  Note that although ExifTool can not write
+            the filesystem creation time directly, in OS X the creation time is pushed
+            backwards by writing an earlier modification time.  This provides a
+            mechanism to indirectly set the creation time:  1) Rewrite the file to set
+            the filesystem creation and modification times to the current time, 2) Set
+            FileModifyDate to the desired creation time, then 3) Restore FileModifyDate
+            to its original value.  This trick does not work in Windows
+        },
         Groups => { 1 => 'System', 2 => 'Time' },
         Writable => 1,
         # all pseudo-tags must be protected so -tagsfromfile fails with
@@ -887,7 +895,7 @@ sub DummyWriteProc { return 1; }
         Notes => q{
             r=read, w=write and x=execute permissions for the file owner, group and
             others.  The ValueConv value is an octal number so bit test operations on
-            this value should be done in octal, ie. "oct($filePermissions) & 0200"
+            this value should be done in octal, ie. 'oct($filePermissions#) & 0200'
         },
         ValueConv => 'sprintf("%.3o", $val & 0777)',
         PrintConv => sub {
@@ -1423,7 +1431,8 @@ sub ClearOptions($)
     #   QuickTimeUTC=> undef,   # assume that QuickTime date/time tags are stored as UTC
     #   SavePath    => undef,   # (undocumented) save family 5 location path
     #   ScanForXMP  => undef,   # flag to scan for XMP information in all files
-        Sort        => 'Input', # order to sort found tags (Input, File, Alpha, Group#)
+        Sort        => 'Input', # order to sort found tags (Input, File, Tag, Descr, Group#)
+    #   Sort2       => undef,   # secondary sort order for tags in a group (File, Tag, Descr)
     #   StrictDate  => undef,   # flag to return undef for invalid date conversions
     #   Struct      => undef,   # return structures as hash references
         TextOut     => \*STDOUT,# file for Verbose/HtmlDump output
@@ -1797,12 +1806,10 @@ sub GetInfo($;@)
     if ($self->{IO_TAG_LIST}) {
         # use file order by default if no tags specified
         # (no such thing as 'Input' order in this case)
-        my $sortOrder = $self->{OPTIONS}{Sort};
-        unless (@$reqTags or ($sortOrder and $sortOrder ne 'Input')) {
-            $sortOrder = 'File';
-        }
+        my $sort = $self->{OPTIONS}{Sort};
+        $sort = 'File' unless @$reqTags or ($sort and $sort ne 'Input');
         # return tags in specified sort order
-        @{$self->{IO_TAG_LIST}} = $self->GetTagList($rtnTags, $sortOrder);
+        @{$self->{IO_TAG_LIST}} = $self->GetTagList($rtnTags, $sort, $self->{OPTIONS}{Sort2});
     }
 
     # restore original options
@@ -1845,11 +1852,12 @@ sub CombineInfo($;@)
 # Inputs: 0) ExifTool object reference
 #         1) [optional] reference to info hash or tag list ref (default is found tags)
 #         2) [optional] sort order ('File', 'Input', ...)
+#         3) [optional] secondary sort order
 # Returns: List of tags in specified order
-sub GetTagList($;$$)
+sub GetTagList($;$$$)
 {
     local $_;
-    my ($self, $info, $sortOrder) = @_;
+    my ($self, $info, $sort, $sort2) = @_;
 
     my $foundTags;
     if (ref $info eq 'HASH') {
@@ -1868,17 +1876,17 @@ sub GetTagList($;$$)
             $$fileOrder{$_} = 999;
         }
     } else {
-        $sortOrder = $info if $info and not $sortOrder;
+        $sort = $info if $info and not $sort;
         $foundTags = $self->{FOUND_TAGS} || $self->SetFoundTags() or return undef;
     }
-    $sortOrder or $sortOrder = $self->{OPTIONS}{Sort};
+    $sort or $sort = $self->{OPTIONS}{Sort};
 
     # return original list if no sort order specified
-    return @$foundTags unless $sortOrder and $sortOrder ne 'Input';
+    return @$foundTags unless $sort and $sort ne 'Input';
 
-    if ($sortOrder eq 'Alpha') {
+    if ($sort eq 'Tag' or $sort eq 'Alpha') {
         return sort @$foundTags;
-    } elsif ($sortOrder =~ /^Group(\d*(:\d+)*)/) {
+    } elsif ($sort =~ /^Group(\d*(:\d+)*)/) {
         my $family = $1 || 0;
         # want to maintain a basic file order with the groups
         # ordered in the way they appear in the file
@@ -1891,8 +1899,21 @@ sub GetTagList($;$$)
             $num or $num = $groupCount{$group} = ++$numGroups;
             $groupOrder{$tag} = $num;
         }
+        $sort2 or $sort2 = $self->{OPTIONS}{Sort2};
+        if ($sort2) {
+            if ($sort2 eq 'Tag' or $sort2 eq 'Alpha') {
+                return sort { $groupOrder{$a} <=> $groupOrder{$b} or $a cmp $b } @$foundTags;
+            } elsif ($sort2 eq 'Descr') {
+                my $desc = $self->GetDescriptions($foundTags);
+                return sort { $groupOrder{$a} <=> $groupOrder{$b} or
+                              $$desc{$a} cmp $$desc{$b} } @$foundTags;
+            }
+        }
         return sort { $groupOrder{$a} <=> $groupOrder{$b} or
                       $$fileOrder{$a} <=> $$fileOrder{$b} } @$foundTags;
+    } elsif ($sort eq 'Descr') {
+        my $desc = $self->GetDescriptions($foundTags);
+        return sort { $$desc{$a} cmp $$desc{$b} } @$foundTags;
     } else {
         return sort { $$fileOrder{$a} <=> $$fileOrder{$b} } @$foundTags;
     }
@@ -1901,14 +1922,15 @@ sub GetTagList($;$$)
 #------------------------------------------------------------------------------
 # Get list of found tags in specified sort order
 # Inputs: 0) ExifTool object reference, 1) sort order ('File', 'Input', ...)
+#         2) secondary sort order
 # Returns: List of tag keys in specified order
 # Notes: If not specified, sort order is taken from OPTIONS
-sub GetFoundTags($;$)
+sub GetFoundTags($;$$)
 {
     local $_;
-    my ($self, $sortOrder) = @_;
+    my ($self, $sort, $sort2) = @_;
     my $foundTags = $self->{FOUND_TAGS} || $self->SetFoundTags() or return undef;
-    return $self->GetTagList($foundTags, $sortOrder);
+    return $self->GetTagList($foundTags, $sort, $sort2);
 }
 
 #------------------------------------------------------------------------------
@@ -3888,6 +3910,23 @@ sub MakeDescription($;$)
     # add TagID to description
     $desc .= ' ' . $tagID if defined $tagID;
     return $desc;
+}
+
+#------------------------------------------------------------------------------
+# Get descriptions for all tags in an array
+# Inputs: 0) ExifTool ref, 1) reference to list of tag keys
+# Returns: reference to hash lookup for descriptions
+# Note: Returned descriptions are NOT escaped by ESCAPE_PROC
+sub GetDescriptions($$)
+{
+    local $_;
+    my ($self, $tags) = @_;
+    my %desc;
+    my $oldEscape = $$self{ESCAPE_PROC};
+    delete $$self{ESCAPE_PROC};
+    $desc{$_} = $self->GetDescription($_) foreach @$tags;
+    $$self{ESCAPE_PROC} = $oldEscape;
+    return \%desc;
 }
 
 #------------------------------------------------------------------------------
@@ -6407,6 +6446,7 @@ sub ProcessBinaryData($$$)
             my %subdirInfo = (
                 DataPt   => $dataPt,
                 DataPos  => $dataPos,
+                DataLen  => length $$dataPt,
                 DirStart => $entry + $offset,
                 DirLen   => $len,
                 Base     => $subdirBase,
@@ -6450,12 +6490,13 @@ until ($Image::ExifTool::noConfig) {
     eval "require '$file'"; # load the config file
     # print warning (minus "Compilation failed" part)
     $@ and $_=$@, s/Compilation failed.*//s, warn $_;
-    if (@Image::ExifTool::UserDefined::Lenses) {
-        foreach (@Image::ExifTool::UserDefined::Lenses) {
-            $Image::ExifTool::userLens{$_} = 1;
-        }
-    }
     last;
+}
+# read user-defined lenses (may have been defined by script instead of config file)
+if (@Image::ExifTool::UserDefined::Lenses) {
+    foreach (@Image::ExifTool::UserDefined::Lenses) {
+        $Image::ExifTool::userLens{$_} = 1;
+    }
 }
 
 #------------------------------------------------------------------------------

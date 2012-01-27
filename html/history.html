@@ -12,10 +12,44 @@
 
 <p>RSS feed: <a href="http://owl.phy.queensu.ca/~phil/exiftool/rss.xml">http://owl.phy.queensu.ca/~phil/exiftool/rss.xml</a></p>
 
-<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-8.75.tar.gz">Version 8.75</a>. (Other versions are
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-8.77.tar.gz">Version 8.77</a>. (Other versions are
 considered development releases, and are not uploaded to <a href="http://search.cpan.org/dist/Image-ExifTool/">CPAN</a>.)</p>
 
 <!-- *********************************************************************** -->
+
+<a name='v8.77'><b>Jan. 27, 2012 - Version 8.77</b></a> <span class=grn>(production release)</span>
+<ul>
+<li>Added some new and updated some existing Sony/Minolta LensType values
+<li>Added a new Canon LensType
+<li>Added two missing Minolta Teleconverter values
+<li>Decode Olympus ArtFilterEffect
+<li>Enhanced -c (CoordFormat) option to allow signed coordinate output
+<li>Changed -sort option to always sort -json and -X outputs by tag name
+<li>Minor change to an Olympus LensType name (thanks Niels Kristian Bech Jensen)
+<li>Fixed problem geotagging orientation information from PTNTHPR sentence
+<li>Fixed decoding of negative Pentax EffectiveLV values
+<li>Fixed typo in an Olympus LensType
+</ul>
+
+<a name='v8.76'><b>Jan. 18, 2012 - Version 8.76</b></a>
+<ul>
+<li>Added -sort option to sort output by tag name or description
+<li>Added support for FujiFilm RAF version 1.03 images and downgraded RAF
+    version error to a warning
+<li>Added a number of new Minolta/Sony LensType's
+<li>Added a new CanonModelID
+<li>Decode FocusPosition for Sony A850 and calculate Composite FocusDistance
+<li>Decode IFD found in some Samsung Type1 maker notes
+<li>Patched Olympus test to fix failure on some platforms
+<li>Patched -json output to filter out invalid UTF-8 characters
+<li>API Changes:
+    <ul>
+    <li>Added Sort2 option and 'Descr' setting for Sort option
+    <li>Added secondary sort option to GetFoundTags() and GetTagList()
+    <li>Changed name of Sort 'Alpha' setting to 'Tag' (but 'Alpha' still works
+        for backward compatibility)
+    </ul>
+</ul>
 
 <a name='v8.75'><b>Jan. 8, 2012 - Version 8.75</b></a> <span class=grn>(production release)</span>
 <ul>

@@ -49,7 +49,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.31';
+$VERSION = '3.33';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -3318,6 +3318,11 @@ sub PrintLensID($$@)
         }
         my ($sf, $lf, $sa, $la) = GetLensInfo($lens);
         next unless $sf;
+        # adjust focal length and aperture if teleconverter is attached (Minolta)
+        if ($lens =~ / \+ .*? (\d+(\.\d+)?)x( |$)/) {
+            $sf *= $1;  $lf *= $1;
+            $sa *= $1;  $la *= $1;
+        }
         # see if we can rule out this lens using FocalLength and MaxAperture
         if ($focalLength) {
             next if $focalLength < $sf - 0.5;
@@ -3546,8 +3551,10 @@ sub ProcessExif($$$)
             my $hdrLen = $dirStart + $dataPos + $base - $makerAddr;
             $exifTool->HDump($makerAddr, $hdrLen, "MakerNotes header", $longName) if $hdrLen > 0;
         }
-        $exifTool->HDump($dirStart + $dataPos + $base, 2, "$longName entries",
-                 "Entry count: $numEntries");
+        unless ($$dirInfo{NoDumpEntryCount}) {
+            $exifTool->HDump($dirStart + $dataPos + $base, 2, "$longName entries",
+                             "Entry count: $numEntries");
+        }
         my $tip;
         if ($bytesFromEnd >= 4) {
             my $nxt = ($name =~ /^(.*?)(\d+)$/) ? $1 . ($2 + 1) : 'Next IFD';
@@ -3628,7 +3635,7 @@ sub ProcessExif($$$)
             }
             my $suspect;
             # offset shouldn't point into TIFF header
-            $valuePtr < 8 and $suspect = $warnCount;
+            $valuePtr < 8 and not $$dirInfo{ZeroOffsetOK} and $suspect = $warnCount;
             # convert offset to pointer in $$dataPt
             if ($$dirInfo{EntryBased} or (ref $$tagTablePtr{$tagID} eq 'HASH' and
                 $tagTablePtr->{$tagID}{EntryBased}))
@@ -3971,8 +3978,10 @@ sub ProcessExif($$$)
                     }
                     # convert back to relative to $subdirDataPt
                     $newStart -= $subdirDataPos;
-                    # must adjust directory size if start changed
-                    $size -= $newStart - $subdirStart unless $$subdir{BadOffset};
+                    # adjust directory size if necessary
+                    unless ($$tagInfo{SubIFD} or $$subdir{BadOffset}) {
+                        $size -= $newStart - $subdirStart;
+                    }
                     $subdirStart = $newStart;
                 }
                 # this is a pain, but some maker notes are always a specific

@@ -12,7 +12,7 @@
 use strict;
 require 5.004;
 
-my $version = '8.75';
+my $version = '8.77';
 
 # add our 'lib' directory to the include list BEFORE 'use Image::ExifTool'
 my $exeDir;
@@ -66,21 +66,19 @@ END {
     Cleanup();
 }
 
-# declare all static variables
+# declare all static file-scope variables
 my @commonArgs;     # arguments common to all commands
 my @csvFiles;       # list of files when reading with CSV option
 my @csvTags;        # order of tags for first file with CSV option (lower case)
 my @delFiles;       # list of files to delete
 my @dynamicFiles;   # list of -tagsFromFile files with dynamic names and -TAG<=FMT pairs
 my @exclude;        # list of excluded tags
-my @fileOrder;      # tags to use for ordering of input files
 my @files;          # list of files and directories to scan
 my @moreArgs;       # more arguments to process after -stay_open -@
 my @newValues;      # list of new tag values to set
 my @tags;           # list of tags to extract
 my %csvTags;        # lookup for all found tags with CSV option (lower case keys)
 my %database;       # lookup for database information based on file name
-my %excludeGrp;     # hash of tags excluded by group
 my %filterExt;      # lookup for filtered extensions
 my %ignore;         # directory names to ignore
 my %preserveTime;   # preserved timestamps for files
@@ -88,9 +86,7 @@ my %printFmt;       # the contents of the print format file
 my %setTags;        # hash of list references for tags to set from files
 my %setTagsList;    # list of other tag lists for multiple -tagsFromFile from the same file
 my %warnedOnce;     # lookup for once-only warnings
-my $addGeotime;     # automatically added geotime argument
 my $allGroup;       # show group name for all tags
-my $allInGroup;     # flag to show all tags in a group
 my $argFormat;      # use exiftool argument-format output
 my $binaryOutput;   # flag for binary output (undef or 1, or 0 for binary XML/PHP)
 my $binaryStdout;   # flag set if we output binary to stdout
@@ -114,11 +110,9 @@ my $csvAdd;         # flag to add CSV information to existing lists
 my $csvSaveCount;   # save counter for last CSV file loaded
 my $deleteOrig;     # 0=restore original files, 1=delete originals, 2=delete w/o asking
 my $disableOutput;  # flag to disable normal output
-my $doGlob;         # flag set to do filename wildcard expansion
 my $doSetFileName;  # flag set if FileName may be written
 my $doUnzip;        # flag to extract info from .gz and .bz2 files
 my $escapeHTML;     # flag to escape printed values for html
-my $escapeXML;      # flag to escape printed values for xml
 my $evalWarning;    # warning from eval
 my $executeID;      # -execute ID number
 my $fileHeader;     # header to print to output file (or console, once)
@@ -148,7 +142,6 @@ my $rtnVal;         # command return value (0=success)
 my $saveCount;      # count the number of times we will/did call SaveNewValues()
 my $scanWritable;   # flag to process only writable file types
 my $seqFileNum;     # sequential file number used for %C
-my $setTagsFile;    # filename for last TagsFromFile option
 my $showGroup;      # number of group to show (may be zero or '')
 my $showTagID;      # non-zero to show tag ID's
 my $srcFmt;         # source file name format string
@@ -160,7 +153,6 @@ my $textOut;        # extension for text output file (or undef for no output)
 my $textOverwrite;  # flag to overwrite existing text output file
 my $tmpFile;        # temporary file to delete on exit
 my $tmpText;        # temporary text file
-my $useMWG;         # flag set if we are using any MWG tag
 my $utf8;           # flag set if we are using UTF-8 encoding
 my $validFile;      # flag indicating we processed a valid file
 my $verbose;        # verbose setting
@@ -295,7 +287,7 @@ if ($stayOpen >= 2 and not $quiet) {
 
 $rtnVal = 0 unless defined $rtnVal;
 
-# initialize all static variables
+# initialize necessary static file-scope variables
 # (not done: @commonArgs, @moreArgs, $critical, $binaryStdout, $helped,
 #  $interrupted, $mainTool, $pause, $rtnVal, $stayOpen, $stayOpenBuff, $stayOpenFile)
 undef @csvFiles;
@@ -303,13 +295,11 @@ undef @csvTags;
 undef @delFiles;
 undef @dynamicFiles;
 undef @exclude;
-undef @fileOrder;
 undef @files;
 undef @newValues;
 undef @tags;
 undef %csvTags;
 undef %database;
-undef %excludeGrp;
 undef %filterExt;
 undef %ignore;
 undef %printFmt;
@@ -317,9 +307,7 @@ undef %preserveTime;
 undef %setTags;
 undef %setTagsList;
 undef %warnedOnce;
-undef $addGeotime;
 undef $allGroup;
-undef $allInGroup;
 undef $argFormat;
 undef $binaryOutput;
 undef $comma;
@@ -328,11 +316,9 @@ undef $csv;
 undef $csvAdd;
 undef $deleteOrig;
 undef $disableOutput;
-undef $doGlob;
 undef $doSetFileName;
 undef $doUnzip;
 undef $escapeHTML;
-undef $escapeXML;
 undef $evalWarning;
 undef $executeID;
 undef $fileHeader;
@@ -347,7 +333,6 @@ undef $outOpt;
 undef $preserveTime;
 undef $recurse;
 undef $scanWritable;
-undef $setTagsFile;
 undef $showGroup;
 undef $showTagID;
 undef $srcFmt;
@@ -356,7 +341,6 @@ undef $textOut;
 undef $textOverwrite;
 undef $tmpFile;
 undef $tmpText;
-undef $useMWG;
 undef $validFile;
 undef $verbose;
 
@@ -387,6 +371,20 @@ $tabFormat = 0;
 $utf8 = 1;
 $xml = 0;
 
+# define local variables used only in this command loop
+my @fileOrder;      # tags to use for ordering of input files
+my %excludeGrp;     # hash of tags excluded by group
+my $addGeotime;     # automatically added geotime argument
+my $allInGroup;     # flag to show all tags in a group
+my $doGlob;         # flag set to do filename wildcard expansion
+my $escapeXML;      # flag to escape printed values for xml
+my $setTagsFile;    # filename for last TagsFromFile option
+my $sortOpt;        # sort option is used
+my $useMWG;         # flag set if we are using any MWG tag
+
+my ($argsLeft, @nextPass);
+my $pass = 0;
+
 # for Windows, use globbing for wildcard expansion if available - MK/20061010
 if ($^O eq 'MSWin32' and eval 'require File::Glob') {
     # override the core glob forcing case insensitivity
@@ -399,10 +397,6 @@ $mainTool = new Image::ExifTool;        # create ExifTool object
 # don't extract duplicates by default unless set by UserDefined::Options
 $mainTool->Options(Duplicates => 0) unless %Image::ExifTool::UserDefined::Options
     and defined $Image::ExifTool::UserDefined::Options{Duplicates};
-
-# local variables
-my ($argsLeft, @nextPass);
-my $pass = 0;
 
 # parse command-line options in 2 passes...
 # pass 1: set all of our ExifTool options
@@ -755,6 +749,7 @@ for (;;) {
             $json = 1;
             $html = $xml = 0;
             $mainTool->Options(Duplicates => 1);
+            require Image::ExifTool::XMP;   # for FixUTF8()
         }
         next;
     }
@@ -831,6 +826,7 @@ for (;;) {
         $mainTool->Options(ListSplit => $listSplit);
         next;
     }
+    /^sort$/i and $sortOpt = 1, next;
     /^srcfile$/i and $srcFmt = shift || Warn("Expecting FMT for -srcfile option\n"), next;
     if ($a eq 'stay_open') {
         my $arg = shift;
@@ -924,7 +920,7 @@ for (;;) {
     if (/^[^<]+(<?)=(.*)/s) {
         my $val = $2;
         if ($1 and length($val) and ($val eq '@' or not defined FilenameSPrintf($val))) {
-            # save new values before a dynamic value
+            # save count of new values before a dynamic value
             push @newValues, { SaveCount => ++$saveCount };
         }
         push @newValues, $_;
@@ -1042,6 +1038,13 @@ if ($escapeHTML or $json) {
     $mainTool->Options(Escape => 'HTML') if $escapeHTML and not $xml;
 } elsif ($escapeXML and not $xml) {
     $mainTool->Options(Escape => 'XML');
+}
+
+# set sort option
+if ($sortOpt) {
+    # (note that -csv sorts alphabetically by default anyway if more than 1 file)
+    my $sort = ($outFormat > 0 or $xml or $json or $csv) ? 'Tag' : 'Descr';
+    $mainTool->Options(Sort => $sort, Sort2 => $sort);
 }
 
 # set up for RDF/XML, JSON and PHP output formats
@@ -1268,7 +1271,7 @@ if ($binaryOutput) {
 
 # sort by groups to look nicer depending on options
 if (defined $showGroup and not (@tags and $allGroup)) {
-    $mainTool->Options(Sort => "Group$showGroup"),
+    $mainTool->Options(Sort => "Group$showGroup");
 }
 
 if (defined $textOut) {
@@ -2473,12 +2476,14 @@ sub EscapeJSON($;$)
     # escape special characters
     $str =~ s/(["\t\n\r\\])/\\$jsonChar{$1}/sg;
     if ($json < 2) { # JSON
-        # escape other JSON control characters with \u
+        # escape other control characters with \u
         $str =~ s/([\0-\x1f])/sprintf("\\u%.4X",ord $1)/sge;
+        # JSON strings must be valid UTF8
+        Image::ExifTool::XMP::FixUTF8(\$str) if $utf8;
     } else { # PHP
         # must escape "$" too for PHP
         $str =~ s/\$/\\\$/sg;
-        # escape other PHP control characters with \x
+        # escape other control characters with \x
         $str =~ s/([\0-\x1f])/sprintf("\\x%.2X",ord $1)/sge;
     }
     return '"' . $str . '"';    # return the quoted string
@@ -3138,17 +3143,17 @@ when one is expected.
 =head1 DESCRIPTION
 
 A command-line interface to L<Image::ExifTool|Image::ExifTool>, used for
-reading and writing meta information in image, audio and video files.
-I<FILE> is one or more source file names, directory names, or C<-> for the
-standard input.  When reading, information from source files is output in
-readable form to the console (or written to output text files with B<-w>).
+reading and writing meta information in a variety of file types.  I<FILE> is
+one or more source file names, directory names, or C<-> for the standard
+input.  Information is read from source files and printed in readable form
+to the console (or written to output text files with B<-w>).
 
-To write, copy or delete information, tag values are assigned using the
--I<TAG>=[I<VALUE>] syntax, or with the B<-tagsFromFile> or B<-geotag>
-options.  By default the original files are preserved with C<_original>
-appended to their names -- be sure to verify that the new files are OK
-before erasing the originals.  Once in write mode, exiftool will ignore any
-read-specific options.
+To write or delete information, tag values are assigned using the
+-I<TAG>=[I<VALUE>] syntax, or the B<-geotag> option.  To copy or move
+information, the B<-tagsFromFile> feature is used.  By default the original
+files are preserved with C<_original> appended to their names -- be sure to
+verify that the new files are OK before erasing the originals.  Once in
+write mode, exiftool will ignore any read-specific options.
 
 Note:  If I<FILE> is a directory name then only supported file types in the
 directory are processed (in write mode only writable types are processed).
@@ -3258,6 +3263,7 @@ L<Input-output text formatting|/Input-output text formatting>
   -s[NUM]     (-short)             Short output format
   -S          (-veryShort)         Very short output format
   -sep STR    (-separator)         Set separator string for list items
+  -sort                            Sort output alphabetically
   -struct                          Enable output of structured information
   -t          (-tab)               Output in tab-delimited list format
   -T          (-table)             Output in tabular format
@@ -3580,7 +3586,11 @@ Notes:
 1) To avoid loss of precision, the default coordinate format is different
 when copying tags using the B<-tagsFromFile> option.
 
-2) This print formatting may be disabled with the B<-n> option to extract
+2) If the hemisphere is known, a reference direction (N, S, E or W) is
+appended to each printed coordinate, but adding a C<+> to the format
+specifier (ie. C<%+.6f>) prints a signed coordinate instead.
+
+3) This print formatting may be disabled with the B<-n> option to extract
 coordinates as signed decimal degrees.
 
 =item B<-charset> [[I<TYPE>=]I<CHARSET>]
@@ -3655,8 +3665,8 @@ Special feature:  B<-csv>+=I<CSVFILE> may be used to add items to existing
 lists. This affects only list-type tags.  Also applies to the B<-j> option.
 
 Note that this option is fundamentally different than all other output
-format options because it causes information from all input files to be
-buffered in memory before the output is written, which may result in
+format options because it requires information from all input files to be
+buffered in memory before the output is written.  This may result in
 excessive memory usage when processing a very large number of files with a
 single command.
 
@@ -3892,6 +3902,15 @@ default is ", ".  When writing, this option causes values assigned to
 list-type tags to be split into individual items at each substring matching
 the specified separator.  Space characters in the separator string match
 zero or more whitespace characters.
+
+=item B<-sort>
+
+Sort output by tag description, or by tag name if the B<-s> option is used.
+Tags are sorted within each group when combined with the B<-g> or B<-G>
+option.  When sorting by description, the sort order will depend on the
+B<-lang> option setting.  Without the B<-sort> option, tags appear in the
+order they were specified on the command line, or if not specified, the
+order they were extracted from the file.
 
 =item B<-struct>, B<--struct>
 

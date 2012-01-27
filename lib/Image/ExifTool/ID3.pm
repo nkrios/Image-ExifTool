@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.31';
+$VERSION = '1.32';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -449,7 +449,7 @@ my %id3v2_common = (
         Name => 'Picture',
         Groups => { 2 => 'Image' },
         Binary => 1,
-        Notes => 'the 3 tags below are also extracted from this PIC frame',
+        Notes => 'the 3 tags below are also extracted from this APIC frame',
     },
     'APIC-1' => { Name => 'PictureMimeType',    Groups => { 2 => 'Image' } },
     'APIC-2' => {

@@ -18,7 +18,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 sub SetGeoValues($$;$);
 
@@ -148,7 +148,9 @@ sub LoadTrackLog($$;$)
         if (not $format) {
             if (/^<(\?xml|gpx)\s/) { # look for XML or GPX header
                 $format = 'XML';
-            } elsif (/^\$(GP(RMC|GGA|GLL|GSA)|PMGNTRK|PTNTHPR),/) {
+            # check for NMEA sentence
+            # (must ONLY start with ones that have timestamps! ie. not GSA or PTNTHPR!)
+            } elsif (/^\$(GP(RMC|GGA|GLL)|PMGNTRK),/) {
                 $format = 'NMEA';
                 $nmeaStart = $2 || $1;    # save type of first sentence
             } elsif (/^A(FLA|XSY|FIL)/) {
@@ -691,10 +693,28 @@ sub SetGeoValues($$;$)
                 my $f = $t1 == $t0 ? 0 : ($time - $t0) / ($t1 - $t0);
                 my $p0 = $$points{$t0};
                 $fix = { };
-                # interpolate valid coordinates
-                foreach (qw(lat lon alt speed track dir pitch roll)) {
+                # interpolate non-cyclical values
+                foreach (qw(lat alt speed pitch)) {
                     next unless defined $$p0{$_} and defined $$p1{$_};
                     $$fix{$_} = $$p1{$_} * $f + $$p0{$_} * (1 - $f);
+                }
+                # interpolate cyclical values
+                foreach (qw(lon track dir roll)) {
+                    next unless defined $$p0{$_} and defined $$p1{$_};
+                    my ($a0, $a1) = ($$p0{$_}, $$p1{$_});
+                    # interpolate inside the acute angle
+                    if (abs($a1 - $a0) <= 180) {
+                        # simple interpolation
+                        $$fix{$_} = $a1 * $f + $a0 * (1 - $f);
+                    } else {
+                        # the acute angle spans the maximum angle, so add
+                        # 360 degrees to the smaller angle before interpolating
+                        $a0 < $a1 ? $a0 += 360 : $a1 += 360;
+                        $$fix{$_} = $a1 * $f + $a0 * (1 - $f);
+                        # longitude and roll ranges are -180 to 180, others are 0 to 360
+                        my $max = ($_ eq 'lon' or $_ eq 'roll') ? 180 : 360;
+                        $$fix{$_} -= 360 if $$fix{$_} >= $max;
+                    }
                 }
             }
         }
@@ -731,18 +751,6 @@ sub SetGeoValues($$;$)
         @r = $exifTool->SetNewValue(GPSLongitude => $$fix{lon}, %opts);
         @r = $exifTool->SetNewValue(GPSAltitude => $gpsAlt, %opts);
         @r = $exifTool->SetNewValue(GPSAltitudeRef => $gpsAltRef, %opts);
-        unless ($xmp) {
-            @r = $exifTool->SetNewValue(GPSLatitudeRef => ($$fix{lat} > 0 ? 'N' : 'S'), %opts);
-            @r = $exifTool->SetNewValue(GPSLongitudeRef => ($$fix{lon} > 0 ? 'E' : 'W'), %opts);
-            @r = $exifTool->SetNewValue(GPSDateStamp => $gpsDate, %opts);
-            @r = $exifTool->SetNewValue(GPSTimeStamp => $gpsTime, %opts);
-            # set options to edit XMP:GPSDateTime only if it already exists
-            $opts{EditOnly} = 1;
-            $opts{Group} = 'XMP';
-        }
-        unless ($exif) {
-            @r = $exifTool->SetNewValue(GPSDateTime => "$gpsDate $gpsTime", %opts);
-        }
         if ($$geotag{Has}{track}) {
             @r = $exifTool->SetNewValue(GPSTrack => $$fix{track}, %opts);
             @r = $exifTool->SetNewValue(GPSTrackRef => (defined $$fix{track} ? 'T' : undef), %opts);
@@ -755,6 +763,18 @@ sub SetGeoValues($$;$)
             # Note: GPSPitch and GPSRoll are non-standard, and must be user-defined
             @r = $exifTool->SetNewValue(GPSPitch => $$fix{pitch}, %opts);
             @r = $exifTool->SetNewValue(GPSRoll => $$fix{roll}, %opts);
+        }
+        unless ($xmp) {
+            @r = $exifTool->SetNewValue(GPSLatitudeRef => ($$fix{lat} > 0 ? 'N' : 'S'), %opts);
+            @r = $exifTool->SetNewValue(GPSLongitudeRef => ($$fix{lon} > 0 ? 'E' : 'W'), %opts);
+            @r = $exifTool->SetNewValue(GPSDateStamp => $gpsDate, %opts);
+            @r = $exifTool->SetNewValue(GPSTimeStamp => $gpsTime, %opts);
+            # set options to edit XMP:GPSDateTime only if it already exists
+            $opts{EditOnly} = 1;
+            $opts{Group} = 'XMP';
+        }
+        unless ($exif) {
+            @r = $exifTool->SetNewValue(GPSDateTime => "$gpsDate $gpsTime", %opts);
         }
     } else {
         my %opts;

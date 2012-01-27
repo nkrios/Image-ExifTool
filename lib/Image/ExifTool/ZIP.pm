@@ -19,7 +19,7 @@ use strict;
 use vars qw($VERSION $warnString);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 sub WarnProc($) { $warnString = $_[0]; }
 
@@ -410,7 +410,9 @@ sub ProcessZIP($$)
         # catch all warnings! (Archive::Zip is bad for this)
         local $SIG{'__WARN__'} = \&WarnProc;
         my $status = $zip->readFromFileHandle($fh);
-        if ($status eq '4' and $raf->{TESTED} >= 0 and eval 'require IO::String') {
+        if ($status eq '4' and $raf->{TESTED} >= 0 and eval 'require IO::String' and
+            $raf->Seek(0,2) and $raf->Tell() < 100000000)
+        {
             # try again, reading it ourself this time in an attempt to avoid
             # a failed test with Perl 5.6.2 GNU/Linux 2.6.32-5-686 i686-linux-64int-ld
             $raf->Seek(0,0);

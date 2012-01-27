@@ -477,8 +477,11 @@ to some functions.</p>
     <td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>CoordFormat</td><td><a name="CoordFormat"></a>Specify output format for GPS coordinates.</td>
     <td>A printf-style format string with specifiers for degrees, minutes and
-    seconds in that order, however minutes and seconds may be omitted. The
-    default for reading is equivalent to a format string of
+    seconds in that order, however minutes and seconds may be omitted.  If the
+    hemisphere is known, a reference direction (N, S, E or W) is appended to
+    each printed coordinate, but adding a '<code>+</code>' to the format
+    specifier (ie. <code>'%+.6f'</code>) prints a signed coordinate instead.
+    The default for reading is equivalent to a format string of
     <code>q{%d&nbsp;deg&nbsp;%d'&nbsp;%.2f"}</code>, but to avoid a loss
     of precision the default for copying tags with
     <a href="#SetNewValuesFromFile">SetNewValuesFromFile</a> is
@@ -622,21 +625,28 @@ to some functions.</p>
     date/time values are stored as UTC, causing conversion to local time when they are
     extracted. According to the QuickTime specification date/time values should be UTC,
     but many digital cameras store local time instead (presumably because they don't know
-    the time zone)</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
+    the time zone).</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>ScanForXMP</td><td><a name="ScanForXMP"></a>Flag for scan all files (even unrecognized
     formats) for XMP information unless XMP was already found in the file.  When combined with
     the FastScan option, only unrecognized file types are scanned for XMP.  
     </td><td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Sort</td><td>Specifies order to sort tags in the returned tag list.</td>
     <td><a name="Sort"></a><table class='clear'>
-    <tr><td valign='top' align=center><b>Input</b></td><td>Sort in same order as input tag arguments</td></tr>
-    <tr><td valign='top' align=center><b>Alpha</b></td><td>Sort alphabetically</td></tr>
-    <tr><td valign='top' align=center><b>File</b></td><td>Sort in order that tags were found in the file</td></tr>
-    <tr valign=top><td valign='top' align=center><b>Group#</b></td><td>Sort by tag group,
+    <tr><td valign=top align=right><b>Input</b>&nbsp;=</td><td>Sort in same order as input tag arguments</td></tr>
+    <tr><td valign=top align=right><b>File</b>&nbsp;=</td><td>Sort in order that tags were found in the file</td></tr>
+    <tr><td valign=top align=right><b>Tag</b>&nbsp;=</td><td>Sort alphabetically by tag name</td></tr>
+    <tr><td valign=top align=right><b>Descr</b>&nbsp;=</td><td>Sort by tag description (with current Lang setting)</td></tr>
+    <tr valign=top><td valign=top align=right><b>Group#</b>&nbsp;=</td><td>Sort by tag group,
         where # is zero or more family numbers separated by colons. If # is not specified,
         Group0 is assumed.  See <a href="#GetGroup">GetGroup</a> for a description of group
         families.</td></tr>
     </table></td><td align=center>'Input'</td></tr>
+<tr><td>Sort2</td><td>Secondary sort order used for tags within each group when Sort is 'Group'.</td>
+    <td><a name="Sort2"></a><table class='clear'>
+    <tr><td valign=top align=right><b>File</b>&nbsp;=</td><td>Sort in order that tags were found in the file</td></tr>
+    <tr><td valign=top align=right><b>Tag</b>&nbsp;=</td><td>Sort alphabetically by tag name</td></tr>
+    <tr><td valign=top align=right><b>Descr</b>&nbsp;=</td><td>Sort by tag description (with current Lang setting)</td></tr>
+    </table></td><td align=center>'File'</td></tr>
 <tr><td>StrictDate</td><td><a name="StrictDate"></a>Flag to return undefined value for any date which can't be
     converted when the DateFormat option is used.</td>
     <td align='center'>0 or 1</td><td align=center>0</td></tr>
@@ -865,10 +875,11 @@ is the only option that is in effect for this function.</p>
 <hr><h2><a name="GetTagList">GetTagList</a></h2>
 <p>Get a sorted list of tags from the specified information hash or tag list.</p>
 <blockquote><table class='norm'>
-<tr><td><b>Prototype</b></td><td>GetTagList($;$$)</td></tr>
+<tr><td><b>Prototype</b></td><td>GetTagList($;$$$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
     <br><b>1)</b> [<i>optional</i>] Reference to info hash or tag list
-    <br><b>2)</b> [<i>optional</i>] Sort order ('File', 'Input', 'Alpha' or 'Group#')
+    <br><b>2)</b> [<i>optional</i>] Sort order ('Input', 'File', 'Tag', 'Descr' or 'Group#')
+    <br><b>3)</b> [<i>optional</i>] Secondary sort order ('File', 'Tag' or 'Descr')
 </td></tr>
 <tr><td><b>Returns</b></td><td>List of tag keys in specified order</td></tr>
 </table></blockquote>
@@ -889,9 +900,10 @@ tags for the information obtained from the most recent call to
 <a href="#ImageInfo">ImageInfo</a>, <a href="#ExtractInfo">ExtractInfo</a>
 or <a href="#GetInfo">GetInfo</a> for this object.</p>
 <blockquote><table class='norm'>
-<tr><td><b>Prototype</b></td><td>GetFoundTags($;$)</td></tr>
+<tr><td><b>Prototype</b></td><td>GetFoundTags($;$$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
-    <br><b>1)</b> [<i>optional</i>] Sort order ('File', 'Input', 'Alpha' or 'Group#')
+    <br><b>1)</b> [<i>optional</i>] Sort order ('Input', 'File', 'Tag', 'Descr' or 'Group#')
+    <br><b>2)</b> [<i>optional</i>] Secondary sort order ('File', 'Tag' or 'Descr')
 </td></tr>
 <tr><td><b>Returns</b></td><td>List of tag keys in the specified order</td></tr>
 </table></blockquote>

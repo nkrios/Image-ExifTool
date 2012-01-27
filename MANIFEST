@@ -434,6 +434,7 @@ t/Geotag_3.out
 t/Geotag_5.out
 t/Geotag_6.out
 t/Geotag_7.out
+t/Geotag_8.out
 t/HTML.t
 t/HTML_2.out
 t/IPTC.t
@@ -735,6 +736,7 @@ t/images/Geotag.gpx
 t/images/Geotag.igc
 t/images/Geotag.log
 t/images/Geotag.xml
+t/images/Geotag2.log
 t/images/HTML.html
 t/images/IPTC.jpg
 t/images/ITC.itc

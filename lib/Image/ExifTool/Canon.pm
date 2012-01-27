@@ -62,6 +62,7 @@
 #              47) http://www.exiv2.org/
 #              48) Tomasz A. Kawecki private communication (550D, firmware 1.0.6, 1.0.8)
 #              49) http://www.listware.net/201101/digikam-users/49795-digikam-users-re-lens-recognition.html
+#              50) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3833.0.html
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -77,7 +78,7 @@ sub ProcessSerialData($$$);
 sub ProcessFilters($$$);
 sub SwapWords($);
 
-$VERSION = '2.80';
+$VERSION = '2.82';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -198,6 +199,7 @@ $VERSION = '2.80';
     137.7 => 'Sigma 17-50mm f/2.8 OS HSM', #PH (from Exiv2)
     137.8 => 'Sigma 18-200mm f/3.5-6.3 II DC OS HSM', #PH
     137.9 => 'Tamron AF 18-270mm f/3.5-6.3 Di II VC PZD', #(model B008)http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3090.0.html
+   '137.10' => 'Sigma 8-16mm f/4.5-5.6 DC HSM', #50-Zwielicht
     138 => 'Canon EF 28-80mm f/2.8-4L', #32
     139 => 'Canon EF 400mm f/2.8L',
     140 => 'Canon EF 500mm f/4.5L', #32
@@ -477,6 +479,7 @@ $VERSION = '2.80';
     0x3050000 => 'PowerShot A2200',
     0x3060000 => 'PowerShot A1200',
     0x3070000 => 'PowerShot SX220 HS',
+    0x3080000 => 'PowerShot G1 X', 
     0x3090000 => 'PowerShot SX150 IS',
     0x3100000 => 'PowerShot ELPH 510 HS / IXUS 1100 HS / IXY 51S',
     0x3110000 => 'PowerShot S100 (new)', # IXUS/IXY??
@@ -1269,9 +1272,32 @@ my %binaryDataAttrs = (
     ],
     0x97 => { #PH
         Name => 'DustRemovalData',
-        # some interesting stuff is stored in here, like LensType and InternalSerialNumber...
         Writable => 'undef',
         Flags => [ 'Binary', 'Protected' ],
+        # some interesting stuff is stored in here (maybe also InternalSerialNumber)...
+        # 0x00: Version
+        # 0x01: LensInfo
+        # 0x02: AVValue
+        # 0x03: POValue
+        # 0x04: DustCount
+        # 0x06: FocalLength
+        # 0x08: LensID
+        # 0x0a: Width
+        # 0x0c: Height
+        # 0x0e: RAW_Width
+        # 0x10: RAW_Height
+        # 0x12: PixelPitch [um]
+        # 0x14: LpfDistance [mm]
+        # 0x16: TopOffset
+        # 0x17: BottomOffset
+        # 0x18: LeftOffset
+        # 0x19: RightOffset
+        # 0x1a: Year
+        # 0x1b: Month
+        # 0x1c: Day
+        # 0x1d: Hour
+        # 0x1e: Minutes
+        # 0x1f: BrightDiff
     },
     0x98 => { #PH
         Name => 'CropInfo',

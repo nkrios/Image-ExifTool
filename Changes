@@ -5,8 +5,38 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 8.75. (Other versions are
+Note: The most recent production release is Version 8.77. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+Jan. 27, 2012 - Version 8.77 (production release)
+
+  - Added some new and updated some existing Sony/Minolta LensType values
+  - Added a new Canon LensType
+  - Added two missing Minolta Teleconverter values
+  - Decode Olympus ArtFilterEffect
+  - Enhanced -c (CoordFormat) option to allow signed coordinate output
+  - Changed -sort option to always sort -json and -X outputs by tag name
+  - Minor change to an Olympus LensType name (thanks Niels Kristian Bech Jensen)
+  - Fixed problem geotagging orientation information from PTNTHPR sentence
+  - Fixed decoding of negative Pentax EffectiveLV values
+  - Fixed typo in an Olympus LensType
+
+Jan. 18, 2012 - Version 8.76
+
+  - Added -sort option to sort output by tag name or description
+  - Added support for FujiFilm RAF version 1.03 images and downgraded RAF
+    version error to a warning
+  - Added a number of new Minolta/Sony LensType's
+  - Added a new CanonModelID
+  - Decode FocusPosition for Sony A850 and calculate Composite FocusDistance
+  - Decode IFD found in some Samsung Type1 maker notes
+  - Patched Olympus test to fix failure on some platforms
+  - Patched -json output to filter out invalid UTF-8 characters
+  - API Changes:
+      - Added Sort2 option and 'Descr' setting for Sort option
+      - Added secondary sort option to GetFoundTags() and GetTagList()
+      - Changed name of Sort 'Alpha' setting to 'Tag' (but 'Alpha' still works
+        for backward compatibility)
 
 Jan. 8, 2012 - Version 8.75 (production release)
 

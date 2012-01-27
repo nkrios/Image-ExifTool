@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.35';
+$VERSION = '1.36';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -151,6 +151,9 @@ my %offOn = ( 0 => 'Off', 1 => 'On' );
         these tags, units may be added in brackets immediately following the value
         (ie. C<55(mi/h)>).  If no units are specified, the default units are
         written.
+
+        See L<http://owl.phy.queensu.ca/~phil/exiftool/MIE1.1-20070121.pdf> for the
+        official MIE specification.
     },
    '0Type' => {
         Name => 'SubfileType',

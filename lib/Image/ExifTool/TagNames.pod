@@ -8482,6 +8482,7 @@ any information found here will be extracted, even if the tag is not listed.
   0x0529   ArtFilter                            int16u[4]
   0x052c   MagicFilter                          int16u[4]
   0x052d   PictureModeEffect                    int16s[3]
+  0x052f   ArtFilterEffect                      int16u[20]
   0x0600   DriveMode                            int16u[n]~
   0x0601   PanoramaMode                         int16u~
   0x0603   ImageQuality2                        int16u
@@ -9062,6 +9063,7 @@ These tags are used in Pentax/Asahi cameras.
   0x0028   CPUFirmwareVersion                   undef
   0x0029   FrameNumber                          int32u
   0x002d   EffectiveLV                          int16u
+           EffectiveLV                          int32u
   0x0032   ImageEditing                         undef[4]
   0x0033   PictureMode                          int8u[3]
   0x0034   DriveMode                            int8u[4]
@@ -9784,6 +9786,19 @@ Samsung models.
       0    MakerNoteVersion                     undef[8]
       2    PreviewImageStart                    int32u*
       3    PreviewImageLength                   int32u*
+     11    SamsungIFD                           Samsung IFD
+
+=head3 Samsung IFD Tags
+
+This is a standard-format IFD found in the Type1 maker notes of some Samsung
+models, except that the entry count is a 4-byte integer and the offsets are
+relative to the end of the IFD.  Currently, no tags in this IFD are known,
+so the Unknown (-u) or Verbose (-v) option must be used to see this
+information.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  [no tags known]
 
 =head3 Samsung Type2 Tags
 
@@ -10032,6 +10047,7 @@ Sony models.
   ------   --------                             --------
   0x0010   CameraInfoA55                        Sony CameraInfoA55
            CameraInfoUnknown                    Sony CameraInfoUnknown
+  0x0020   FocusInfo                            Sony FocusInfo
   0x0102   Quality                              int32u
   0x0104   FlashExposureComp                    rational64s
   0x0105   Teleconverter                        int32u
@@ -10101,6 +10117,12 @@ Sony models.
   Index1   Tag Name                             Writable
   ------   --------                             --------
   [no tags known]
+
+=head3 Sony FocusInfo Tags
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+   2491    FocusPosition                        int8u
 
 =head3 Sony CameraSettings Tags
 
@@ -12003,6 +12025,9 @@ the file.
 these tags, units may be added in brackets immediately following the value
 (ie. C<55(mi/h)>).  If no units are specified, the default units are
 written.
+
+See L<http://owl.phy.queensu.ca/~phil/exiftool/MIE1.1-20070121.pdf> for the
+official MIE specification.
 
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
@@ -21669,6 +21694,8 @@ information is extracted.
   FlashType            FlashBits                N
   FocalLength35efl     FocalLength              N
                        ScaleFactor35efl
+  FocusDistance        Sony:FocusPosition       N
+                       FocalLength
   GPSAltitude          QuickTime:GPSCoordinates N
   GPSAltitudeRef       QuickTime:GPSCoordinates N
   GPSAltitude          GPS:GPSAltitude          N

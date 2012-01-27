@@ -28,7 +28,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.54';
+$VERSION = '1.55';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -76,6 +76,13 @@ my %binaryDataAttrs = (
             SubDirectory => { TagTable => 'Image::ExifTool::Sony::CameraInfoUnknown' },
         }
     ],
+    0x0020 => { #PH
+        Name => 'FocusInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Sony::FocusInfo',
+            ByteOrder => 'BigEndian',
+        },
+    },
     0x0102 => { #5/JD
         Name => 'Quality',
         Writable => 'int32u',
@@ -100,17 +107,7 @@ my %binaryDataAttrs = (
         Name => 'Teleconverter',
         Writable => 'int32u',
         PrintHex => 1,
-        PrintConv => {
-            0x00 => 'None',
-            0x48 => 'Minolta AF 2x APO (D)',
-            # 0x48 => 'Sony 2x Teleconverter (SAL20TC)', (ref 12)
-            0x50 => 'Minolta AF 2x APO II',
-            0x60 => 'Minolta AF 2x APO',#Wolfram (http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3521.0.html)
-            0x88 => 'Minolta AF 1.4x APO (D)',
-            # 0x88 => 'Sony 1.4x Teleconverter (SAL14TC)', (ref 12)
-            0x90 => 'Minolta AF 1.4x APO II',
-            0xa0 => 'Minolta AF 1.4x APO',#Wolfram
-        },
+        PrintConv => \%Image::ExifTool::Minolta::minoltaTeleconverters,
     },
     0x0112 => { #JD
         Name => 'WhiteBalanceFineTune',
@@ -837,6 +834,17 @@ my %binaryDataAttrs = (
 %Image::ExifTool::Sony::CameraInfoUnknown = (
     %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+);
+
+# focus information ("WBInfo" for the A100 in Minolta.pm) (ref PH)
+%Image::ExifTool::Sony::FocusInfo = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0x09bb => {
+        Condition => '$$self{Model} eq "DSLR-A850"',
+        Notes => 'A850 only',
+        Name => 'FocusPosition',  # 128 = infinity -- see Composite:FocusDistance below
+    },
 );
 
 # Camera settings (ref PH) (decoded mainly from A200)
@@ -1770,15 +1778,32 @@ my %binaryDataAttrs = (
     },
 );
 
+# Composite Sony tags
+%Image::ExifTool::Sony::Composite = (
+    GROUPS => { 2 => 'Camera' },
+    FocusDistance => {
+        Require => {
+            0 => 'Sony:FocusPosition',
+            1 => 'FocalLength',
+        },
+        Notes => 'distance in metres = FocusPosition * FocalLength / 1000',
+        ValueConv => '$val >= 128 ? "inf" : $val * $val[1] / 1000',
+        PrintConv => '$val eq "inf" ? $val : "$val m"',
+    },
+);
+
+# add our composite tags
+Image::ExifTool::AddCompositeTags('Image::ExifTool::Sony');
+
 # fill in Sony LensType lookup based on Minolta values
 {
     my $minoltaTypes = \%Image::ExifTool::Minolta::minoltaLensTypes;
     %sonyLensTypes = %$minoltaTypes;
-    my $notes = $$minoltaTypes{Notes};
-    delete $$minoltaTypes{Notes};
+    delete $$minoltaTypes{Notes};   # (temporarily)
     my $id;
+    # 5-digit lens ID's are missing the last digit (usually "1") in the metadata for
+    # some Sony models, so generate corresponding 4-digit entries for these cameras
     foreach $id (sort { $a <=> $b } keys %$minoltaTypes) {
-        # higher numbered lenses are missing last digit of ID for some Sony models
         next if $id < 10000;
         my $sid = int($id/10);
         my $i;
@@ -1798,7 +1823,7 @@ my %binaryDataAttrs = (
         }
         $sonyLensTypes{$sid} = $lens;
     }
-    $$minoltaTypes{Notes} = $sonyLensTypes{Notes} = $notes;
+    $$minoltaTypes{Notes} = $sonyLensTypes{Notes}; # (restore original Notes)
 }
 
 #------------------------------------------------------------------------------
@@ -1895,7 +1920,7 @@ sub ProcessPMP($$)
 }
 
 #------------------------------------------------------------------------------
-# Decrypt Sony data (ref 1)
+# Decrypt/Encrypt Sony data (ref 1) (reversible encryption)
 # Inputs: 0) data reference, 1) start offset, 2) data length, 3) decryption key
 # Returns: nothing (original data buffer is updated with decrypted data)
 # Notes: data length should be a multiple of 4

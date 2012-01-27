@@ -105,11 +105,11 @@ my %ricohLensIDs = (
         },
         {
             Name => 'RicohSubdirIFD',
-            # the GR Digital 4 writes an int32u pointer in AVI videos -- doh!
+            # the CX6 and GR Digital 4 write an int32u pointer in AVI videos -- doh!
             Condition => '$self->{Model} !~ /^Caplio RR1\b/',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Ricoh::Subdir',
-                Start => '$val + 20',
+                Start => '$val + 20', # (skip over "[Ricoh Camera Info]\0" header)
                 ByteOrder => 'BigEndian',
             },
         },

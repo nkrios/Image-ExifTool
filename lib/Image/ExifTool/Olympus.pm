@@ -33,7 +33,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.83';
+$VERSION = '1.84';
 
 sub PrintLensInfo($$$);
 
@@ -53,13 +53,13 @@ my %olympusLensTypes = (
     '0 4 16' => 'Olympus M.Zuiko Digital ED 9-18mm F4.0-5.6', #11
     '0 5 0'  => 'Olympus Zuiko Digital 14-54mm F2.8-3.5',
     '0 5 1'  => 'Olympus Zuiko Digital Pro ED 90-250mm F2.8', #9
-    '0 5 16' => 'Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6', #11
+    '0 5 16' => 'Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6 L', #11 (E-PL1)
     '0 6 0'  => 'Olympus Zuiko Digital ED 50-200mm F2.8-3.5',
     '0 6 1'  => 'Olympus Zuiko Digital ED 8mm F3.5 Fisheye', #9
     '0 6 16' => 'Olympus M.Zuiko Digital ED 40-150mm F4.0-5.6', #PH
     '0 7 0'  => 'Olympus Zuiko Digital 11-22mm F2.8-3.5',
     '0 7 1'  => 'Olympus Zuiko Digital 18-180mm F3.5-6.3', #6
-    '0 7 16' => 'Olumpus M.Zuiko Digital ED 12mm F2.0', #PH
+    '0 7 16' => 'Olympus M.Zuiko Digital ED 12mm F2.0', #PH
     '0 8 1'  => 'Olympus Zuiko Digital 70-300mm F4.0-5.6', #7 (seen as release 1 - PH)
     '0 8 16' => 'Olympus M.Zuiko Digital ED 75-300mm F4.8-6.7', #PH
     '0 9 16' => 'Olympus M.Zuiko Digital 14-42mm F3.5-5.6 II', #PH (E-PL2)
@@ -390,7 +390,7 @@ my %olympusCameraTypes = (
 
 # ArtFilter and MagicFilter values (ref PH)
 my %filters = (
-    0    => 'Off',
+    0 => 'Off',
     1 => 'Soft Focus', # (XZ-1)
     2 => 'Pop Art', # (SZ-10 magic filter 1)
     3 => 'Pale & Light Color',
@@ -2215,6 +2215,24 @@ my %indexInfo = (
            '0 -1 1' => 'Standard',
            '1 -1 1' => 'High',
         },
+    },
+    0x52f => { #PH
+        Name => 'ArtFilterEffect',
+        Writable => 'int16u',
+        Count => 20,
+        PrintHex => 1,
+        PrintConvColumns => 2,
+        PrintConv => [
+            \%filters, undef, undef, undef,
+            {   # there are 5 available art filter effects for the E-PL3...
+                0x0000 => 'No Effect',
+                0x8010 => 'Star Light',
+                0x8020 => 'Pin Hole',
+                0x8030 => 'Frame',
+                0x8040 => 'Soft Focus',
+                0x8050 => 'White Edge',
+            },
+        ],
     },
     0x600 => { #PH/4
         Name => 'DriveMode',

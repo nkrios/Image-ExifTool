@@ -86,7 +86,13 @@ specific order)</span>
 <td>FileModifyDate</td>
 <td class=c title=' ! = Unsafe'>Y!</td>
 <td class=c>System</td>
-<td><span class=s><span class=n>(the filesystem modification time)</span></span></td></tr>
+<td><span class=s><span class=n>(the filesystem modification time.  Note that although ExifTool can not write
+the filesystem creation time directly, in OS X the creation time is pushed
+backwards by writing an earlier modification time.  This provides a
+mechanism to indirectly set the creation time:  1) Rewrite the file to set
+the filesystem creation and modification times to the current time, 2) Set
+FileModifyDate to the desired creation time, then 3) Restore FileModifyDate
+to its original value.  This trick does not work in Windows)</span></span></td></tr>
 <tr>
 <td>FileName</td>
 <td class=c title=' ! = Unsafe'>Y!</td>
@@ -100,7 +106,7 @@ writing the FileName and Directory tags)</span></span></td></tr>
 <td class=c>System</td>
 <td><span class=s><span class=n>(r=read, w=write and x=execute permissions for the file owner, group and
 others.  The ValueConv value is an octal number so bit test operations on
-this value should be done in octal, ie. &quot;oct($filePermissions) &amp; 0200&quot;)</span></span></td></tr>
+this value should be done in octal, ie. &#39;oct($filePermissions#) &amp; 0200&#39;)</span></span></td></tr>
 <tr>
 <td>FileSequence</td>
 <td class=c>N</td>
@@ -245,7 +251,7 @@ resource-fork information as a sub-document)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 3, 2012</i>
+<br><i>Last revised Jan 18, 2012</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

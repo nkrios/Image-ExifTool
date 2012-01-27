@@ -23,7 +23,7 @@ require Exporter;
 use Image::ExifTool qw(ImageInfo);
 
 use vars qw($VERSION @ISA @EXPORT);
-$VERSION = '1.18';
+$VERSION = '1.19';
 @ISA = qw(Exporter);
 @EXPORT = qw(check writeCheck writeInfo testCompare binaryCompare testVerbose);
 
@@ -153,7 +153,10 @@ sub closeEnough($$)
         last unless defined $tok1 and defined $tok2;
         next if $tok1 eq $tok2;
         # can't compare any more if either line was truncated (ie. ends with '[...]' or '[snip]')
-        return $lenChanged if $tok1 =~ /\[(\.{3}|snip)\]$/ or $tok2 =~ /\[(\.{3}|snip)\]$/;
+        if ($tok1 =~ /\[(\.{3}|snip)\]$/ or $tok2 =~ /\[(\.{3}|snip)\]$/) {
+            return 1 if $tok1=~ /^[-+]?\d+\./ or $tok2=~/^[-+]?\d+\./;  # check for float
+            return $lenChanged
+        }
         # account for different timezones
         if ($tok1 =~ /^(\d{2}:\d{2}:\d{2})(Z|[-+]\d{2}:\d{2})$/i) {
             my $time = $1;  # remove timezone

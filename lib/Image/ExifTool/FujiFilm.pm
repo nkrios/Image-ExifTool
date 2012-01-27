@@ -23,15 +23,16 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.33';
+$VERSION = '1.34';
 
 sub ProcessFujiDir($$$);
 sub ProcessFaceRec($$$);
 
 # the following RAF version numbers have been tested for writing:
 my %testedRAF = (
-    '0100' => 'E550, E900, S5600, S6000fd, S6500fd, HS10/HS11, S200EXR, X100 (all Ver1.00)',
-    '0102' => 'S100FS Ver1.02',
+    '0100' => 'E550, E900, S5600, S6000fd, S6500fd, HS10/HS11, S200EXR, X100, X-S1 Ver1.00',
+    '0102' => 'S100FS, X10 Ver1.02',
+    '0103' => 'IS Pro Ver1.03',
     '0104' => 'S5Pro Ver1.04',
     '0106' => 'S5Pro Ver1.06',
     '0111' => 'S5Pro Ver1.11',
@@ -756,7 +757,7 @@ sub WriteRAF($$)
     }
     # check to make sure this version of RAF has been tested
     unless ($testedRAF{$ver}) {
-        $exifTool->Error("RAF version $ver not yet tested", 1) and return 1;
+        $exifTool->Warn("RAF version $ver not yet tested", 1);
     }
     # read the embedded JPEG
     unless ($raf->Seek($jpos, 0) and $raf->Read($jpeg, $jlen) == $jlen) {

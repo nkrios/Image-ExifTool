@@ -51,7 +51,7 @@ use vars qw($VERSION %pentaxLensTypes);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.37';
+$VERSION = '2.38';
 
 sub CryptShutterCount($$);
 sub PrintFilter($$$);
@@ -1286,15 +1286,26 @@ my %binaryDataAttrs = (
         Writable => 'int32u',
     },
     # 0x002b - definitely exposure related somehow - PH
-    0x002d => { #PH
+    0x002d => [{ #PH
         Name => 'EffectiveLV',
+        Condition => '$format eq "int16u"',
         Notes => 'camera-calculated light value, but includes exposure compensation',
         Writable => 'int16u',
+        Format => 'int16s', # (negative values are valid even though Pentax writes int16u)
         ValueConv => '$val/1024',
         ValueConvInv => '$val * 1024',
         PrintConv => 'sprintf("%.1f",$val)',
         PrintConvInv => '$val',
-    },
+    },{
+        Name => 'EffectiveLV',
+        Condition => '$format eq "int32u"',
+        Writable => 'int32u',
+        Format => 'int32s',
+        ValueConv => '$val/1024',
+        ValueConvInv => '$val * 1024',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    }],
     0x0032 => { #13
         Name => 'ImageEditing',
         Writable => 'undef',
@@ -3485,7 +3496,7 @@ my %binaryDataAttrs = (
             ValueConvInv => '$val * 100',
             PrintConv => 'sprintf("%.2f V", $val)',
             PrintConvInv => '$val =~ s/\s*V$//',
-            # For my K-5:          Min (0%) Max (100%) Meas
+            # For my K-5:          Min (0%) Max (100%) At Meas
             # BodyBatteryVoltage1  6.24 V   7.75 V     7.66 V
             # BodyBatteryVoltage2  5.98 V   7.43 V     7.34 V
             # BodyBatteryVoltage3  6.41 V   7.93 V     7.84 V

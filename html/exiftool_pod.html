@@ -79,16 +79,16 @@ when one is expected.</p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
 <p>A command-line interface to <a href="ExifTool.html">Image::ExifTool</a>, used for
-reading and writing meta information in image, audio and video files.
-<em>FILE</em> is one or more source file names, directory names, or <code>-</code> for the
-standard input.  When reading, information from source files is output in
-readable form to the console (or written to output text files with <strong>-w</strong>).</p>
-<p>To write, copy or delete information, tag values are assigned using the
--<em>TAG</em>=[<em>VALUE</em>] syntax, or with the <strong>-tagsFromFile</strong> or <strong>-geotag</strong>
-options.  By default the original files are preserved with <code>_original</code>
-appended to their names -- be sure to verify that the new files are OK
-before erasing the originals.  Once in write mode, exiftool will ignore any
-read-specific options.</p>
+reading and writing meta information in a variety of file types.  <em>FILE</em> is
+one or more source file names, directory names, or <code>-</code> for the standard
+input.  Information is read from source files and printed in readable form
+to the console (or written to output text files with <strong>-w</strong>).</p>
+<p>To write or delete information, tag values are assigned using the
+-<em>TAG</em>=[<em>VALUE</em>] syntax, or the <strong>-geotag</strong> option.  To copy or move
+information, the <strong>-tagsFromFile</strong> feature is used.  By default the original
+files are preserved with <code>_original</code> appended to their names -- be sure to
+verify that the new files are OK before erasing the originals.  Once in
+write mode, exiftool will ignore any read-specific options.</p>
 <p>Note:  If <em>FILE</em> is a directory name then only supported file types in the
 directory are processed (in write mode only writable types are processed).
 However, files may be specified by name, or the <strong>-ext</strong> option may be used
@@ -196,6 +196,7 @@ appear after source file names on the exiftool command line.</p>
   -s[NUM]     (-short)             Short output format
   -S          (-veryShort)         Very short output format
   -sep STR    (-separator)         Set separator string for list items
+  -sort                            Sort output alphabetically
   -struct                          Enable output of structured information
   -t          (-tab)               Output in tab-delimited list format
   -T          (-table)             Output in tabular format
@@ -567,7 +568,12 @@ various formats:
 when copying tags using the <strong>-tagsFromFile</strong> option.</p>
 </dd>
 <dd>
-<p>2) This print formatting may be disabled with the <strong>-n</strong> option to extract
+<p>2) If the hemisphere is known, a reference direction (N, S, E or W) is
+appended to each printed coordinate, but adding a <code>+</code> to the format
+specifier (ie. <code>%+.6f</code>) prints a signed coordinate instead.</p>
+</dd>
+<dd>
+<p>3) This print formatting may be disabled with the <strong>-n</strong> option to extract
 coordinates as signed decimal degrees.</p>
 </dd>
 <p></p>
@@ -659,8 +665,8 @@ lists. This affects only list-type tags.  Also applies to the <strong>-j</strong
 </dd>
 <dd>
 <p>Note that this option is fundamentally different than all other output
-format options because it causes information from all input files to be
-buffered in memory before the output is written, which may result in
+format options because it requires information from all input files to be
+buffered in memory before the output is written.  This may result in
 excessive memory usage when processing a very large number of files with a
 single command.</p>
 </dd>
@@ -962,6 +968,17 @@ default is ``, ''.  When writing, this option causes values assigned to
 list-type tags to be split into individual items at each substring matching
 the specified separator.  Space characters in the separator string match
 zero or more whitespace characters.
+</dd>
+<p></p>
+<dt><strong><a name="item__2dsort"><strong>-sort</strong></a></strong><br />
+</dt>
+<dd>
+Sort output by tag description, or by tag name if the <strong>-s</strong> option is used.
+Tags are sorted within each group when combined with the <strong>-g</strong> or <strong>-G</strong>
+option.  When sorting by description, the sort order will depend on the
+<strong>-lang</strong> option setting.  Without the <strong>-sort</strong> option, tags appear in the
+order they were specified on the command line, or if not specified, the
+order they were extracted from the file.
 </dd>
 <p></p>
 <dt><strong><a name="item__2dstruct_2c__2d_2dstruct"><strong>-struct</strong>, <strong>--struct</strong></a></strong><br />

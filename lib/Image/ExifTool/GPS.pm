@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.36';
+$VERSION = '1.37';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -406,12 +406,15 @@ sub ConvertTimeStamp($)
 sub ToDMS($$;$$)
 {
     my ($exifTool, $val, $doPrintConv, $ref) = @_;
-    my ($fmt, $num);
+    my ($fmt, $num, $sign);
 
     if ($ref) {
         if ($val < 0) {
             $val = -$val;
             $ref = {N => 'S', E => 'W'}->{$ref};
+            $sign = '-';
+        } else {
+            $sign = '+';
         }
         $ref = " $ref" unless $doPrintConv and $doPrintConv eq '2';
     } else {
@@ -420,7 +423,15 @@ sub ToDMS($$;$$)
     }
     if ($doPrintConv) {
         if ($doPrintConv eq '1') {
-            $fmt = ($exifTool->Options('CoordFormat') || q{%d deg %d' %.2f"}) . $ref;
+            $fmt = $exifTool->Options('CoordFormat');
+            if (not $fmt) {
+                $fmt = q{%d deg %d' %.2f"} . $ref;
+            } elsif ($ref) {
+                # use signed value instead of reference direction if specified
+                $fmt =~ s/%\+/$sign%/g or $fmt .= $ref;
+            } else {
+                $fmt =~ s/%\+/%/g;  # don't know sign, so don't print it
+            }
         } else {
             $fmt = "%d,%.6f$ref";   # use XMP standard format
         }

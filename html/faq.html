@@ -1262,16 +1262,16 @@ and should give an output something like this:
 [EXIF:ExifIFD]  CreateDate                      : 2003:10:31 15:44:19</pre>
 
 The <code>-G0:1</code> option causes the family 0 and 1 group names to be
-reported in square brackets for each tag.  Tags in the "File:System" groups are
-stored in the filesystem, and other tags are stored in the indicated locations
-of the file metadata.</blockquote>
+reported in square brackets for each tag.  Tags labelled "File:System" are
+stored in the filesystem, while other tags are stored in the location indicated
+inside the metadata of the file itself.</blockquote>
 
 <blockquote>ExifTool's default behaviour is to set the filesystem modification
 date/time (FileModifyDate) to the current date/time when any metadata in a file
 is changed, but the <code>-P</code> option may be used to preserve the original
-value.  <i class=lt>[On systems where a filesystem creation date is maintained,
-ExifTool also sets this to the current date/time when the file is edited, and
-the only way to preserve it is with the
+value.  <i class=lt>[Note that on systems where a filesystem creation date is
+maintained, ExifTool also sets this to the current date/time when the file is
+edited, and the only way to preserve it is with the
 <code>-overwrite_original_in_place</code> option.]</i></blockquote>
 
 <blockquote>For example, commands like the following act on common metadata
@@ -1303,7 +1303,7 @@ exiftool -alldates+=1 "-filemodifydate&lt;datetimeoriginal" c:\images
 </pre></blockquote>
 
 <hr>
-<i>Last revised Jan. 6, 2012</i>
+<i>Last revised Jan. 16, 2012</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

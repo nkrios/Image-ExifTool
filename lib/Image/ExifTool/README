@@ -233,7 +233,7 @@ numerical.
                   in trailing brackets which is a Perl expression to be
                   evaluated. The expression may access any of the previous table
                   entries through a %val hash (read-only tables), the data size
-                  via $size, or the ExifTool object via $self. For example,
+                  via $size, or the ExifTool object via $self.  For example,
                   'string[$val{3}]' defines a string with length given by the
                   table entry with tag index '3'.  An initial "var_" may be
                   added to the Format name of any BinaryData tag with a size in
@@ -257,8 +257,8 @@ numerical.
 
   Flags         : Flags to specify characteristics for this tag.  May be a
                   simple scalar flag name, a reference to a list of flag names,
-                  or a reference to a hash of flag/value pairs. If not a hash
-                  reference, the flag value is set to 1. Flags are expanded for
+                  or a reference to a hash of flag/value pairs.  If not a hash
+                  reference, the flag value is set to 1.  Flags are expanded for
                   faster access at run time into members of the tagInfo hash,
                   and may be written directly as members if desired. The
                   available flag names are:

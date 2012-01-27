@@ -1145,13 +1145,13 @@ the Make and Model are used to determine the extender model)</span>
 </tr><tr><td>'0 4 16'</td><td>= Olympus M.Zuiko Digital ED 9-18mm F4.0-5.6</td>
 </tr><tr><td>'0 5 0'</td><td>= Olympus Zuiko Digital 14-54mm F2.8-3.5</td>
 </tr><tr><td>'0 5 1'</td><td>= Olympus Zuiko Digital Pro ED 90-250mm F2.8</td>
-</tr><tr><td>'0 5 16'</td><td>= Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6</td>
+</tr><tr><td>'0 5 16'</td><td>= Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6 L</td>
 </tr><tr><td>'0 6 0'</td><td>= Olympus Zuiko Digital ED 50-200mm F2.8-3.5</td>
 </tr><tr><td>'0 6 1'</td><td>= Olympus Zuiko Digital ED 8mm F3.5 Fisheye</td>
 </tr><tr><td>'0 6 16'</td><td>= Olympus M.Zuiko Digital ED 40-150mm F4.0-5.6</td>
 </tr><tr><td>'0 7 0'</td><td>= Olympus Zuiko Digital 11-22mm F2.8-3.5</td>
 </tr><tr><td>'0 7 1'</td><td>= Olympus Zuiko Digital 18-180mm F3.5-6.3</td>
-</tr><tr><td>'0 7 16'</td><td>= Olumpus M.Zuiko Digital ED 12mm F2.0</td>
+</tr><tr><td>'0 7 16'</td><td>= Olympus M.Zuiko Digital ED 12mm F2.0</td>
 </tr><tr><td>'0 8 1'</td><td>= Olympus Zuiko Digital 70-300mm F4.0-5.6</td>
 </tr><tr><td>'0 8 16'</td><td>= Olympus M.Zuiko Digital ED 75-300mm F4.8-6.7</td>
 </tr><tr><td>'0 9 16'</td><td>= Olympus M.Zuiko Digital 14-42mm F3.5-5.6 II</td>
@@ -1666,16 +1666,51 @@ the Make and Model are used to determine the extender model)</span>
   <br>&#39;0 -1 1&#39; = Standard
   <br>&#39;1 -1 1&#39; = High</span></td></tr>
 <tr class=b>
+<td title='0x052f = 1327'>0x052f</td>
+<td>ArtFilterEffect</td>
+<td class=c>int16u[20]</td>
+<td><span class=s>[Value 0]</span><table class=cols><tr>
+  <td>0x0 = Off
+  <br>0x1 = Soft Focus
+  <br>0x2 = Pop Art
+  <br>0x3 = Pale &amp; Light Color
+  <br>0x4 = Light Tone
+  <br>0x5 = Pin Hole
+  <br>0x6 = Grainy Film
+  <br>0x9 = Diorama
+  <br>0xa = Cross Process
+  <br>0xc = Fish Eye
+  <br>0xd = Drawing</td><td>&nbsp;&nbsp;</td>
+  <td>0xe = Gentle Sepia
+  <br>0xf = Tender Light
+  <br>0x10 = Pop Art II
+  <br>0x11 = Pin Hole II
+  <br>0x12 = Pin Hole III
+  <br>0x13 = Grainy Film II
+  <br>0x14 = Dramatic Tone
+  <br>0x15 = Punk
+  <br>0x16 = Soft Focus 2
+  <br>0x17 = Sparkle
+  <br>0x18 = Watercolor</td><td>&nbsp;&nbsp;</td></tr></table>
+<span class=s>[Value 4]</span><table class=cols><tr>
+  <td>0x0 = No Effect
+  <br>0x8010 = Star Light
+  <br>0x8020 = Pin Hole</td><td>&nbsp;&nbsp;</td>
+  <td>0x8030 = Frame
+  <br>0x8040 = Soft Focus
+  <br>0x8050 = White Edge</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr>
 <td title='0x0600 = 1536'>0x0600</td>
 <td>DriveMode</td>
 <td class=c title=' ~ = Writable only with -n'>int16u[n]~</td>
 <td><span class=s><span class=n>(2 or 3 numbers: 1. Mode, 2. Shot number, 3. Mode bits)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0601 = 1537'>0x0601</td>
 <td>PanoramaMode</td>
 <td class=c title=' ~ = Writable only with -n'>int16u~</td>
 <td><span class=s><span class=n>(2 numbers: 1. Mode, 2. Shot number)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0603 = 1539'>0x0603</td>
 <td>ImageQuality2</td>
 <td class=c>int16u</td>
@@ -1684,7 +1719,7 @@ the Make and Model are used to determine the extender model)</span>
   <br>3 = SHQ
   <br>4 = RAW
   <br>5 = SQ (5)</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0604 = 1540'>0x0604</td>
 <td>ImageStabilization</td>
 <td class=c>int32u</td>
@@ -1692,29 +1727,29 @@ the Make and Model are used to determine the extender model)</span>
   <br>1 = On, Mode 1
   <br>2 = On, Mode 2
   <br>3 = On, Mode 3</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0900 = 2304'>0x0900</td>
 <td>ManometerPressure</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0901 = 2305'>0x0901</td>
 <td>ManometerReading</td>
 <td class=c>int32s[2]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0902 = 2306'>0x0902</td>
 <td>ExtendedWBDetect</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0903 = 2307'>0x0903</td>
 <td>LevelGaugeRoll</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0904 = 2308'>0x0904</td>
 <td>LevelGaugePitch</td>
 <td class=c>int16u</td>
@@ -3000,7 +3035,7 @@ like the LS-5, LS-10, LS-11.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 14, 2011</i>
+<br><i>Last revised Jan 27, 2012</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>
