@@ -661,7 +661,7 @@ sub ProcessINFO($$$)
         unless ($$tagTablePtr{$tag}) {
             my $name = "Samsung_INFO_$tag";
             $name =~ tr/-_0-9a-zA-Z//dc;
-            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => $name }) if $name;
+            AddTagToTable($tagTablePtr, $tag, { Name => $name }) if $name;
         }
         $exifTool->HandleTag($tagTablePtr, $tag, $val);
         $pos += 8;

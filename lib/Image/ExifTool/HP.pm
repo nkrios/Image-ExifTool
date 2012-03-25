@@ -182,7 +182,7 @@ sub ProcessTDHD($$$)
                 } elsif ($size > 80) {
                     $tagInfo{Binary} = 1;
                 }
-                Image::ExifTool::AddTagToTable($tagTablePtr, $tag, \%tagInfo);
+                AddTagToTable($tagTablePtr, $tag, \%tagInfo);
             }
             $exifTool->HandleTag($tagTablePtr, $tag, undef,
                 DataPt  => $dataPt,

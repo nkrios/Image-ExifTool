@@ -279,7 +279,7 @@ sub ExtractPreviews($)
         if ($grp1 =~ /(\d+)$/) {
             my $tag = "IDCPreviewImage$1";
             unless ($Image::ExifTool::Extra{$tag}) {
-                Image::ExifTool::AddTagToTable(\%Image::ExifTool::Extra, $tag, {
+                AddTagToTable(\%Image::ExifTool::Extra, $tag, {
                     Name => $tag,
                     Groups => { 0 => 'Composite', 1 => 'Composite', 2 => 'Image'},
                 });

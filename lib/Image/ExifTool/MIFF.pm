@@ -159,7 +159,7 @@ sub ProcessMIFF($$)
             my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tag);
             unless ($tagInfo) {
                 $tagInfo = { Name => $tag };
-                Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+                AddTagToTable($tagTablePtr, $tag, $tagInfo);
             }
             $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
                 Table  => $tagTablePtr,

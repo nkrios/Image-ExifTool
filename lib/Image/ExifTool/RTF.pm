@@ -292,7 +292,7 @@ sub ProcessRTF($$)
             }
             # create tagInfo for unknown tags
             if (not $tagInfo) {
-                Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => ucfirst($tag) });
+                AddTagToTable($tagTablePtr, $tag, { Name => ucfirst($tag) });
             }
             $exifTool->HandleTag($tagTablePtr, $tag, $val);
         }
@@ -331,7 +331,7 @@ sub ProcessRTF($$)
             next unless $tag;
             # create tagInfo for unknown tags
             unless ($$tagTablePtr{$tag}) {
-                Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => $tag });
+                AddTagToTable($tagTablePtr, $tag, { Name => $tag });
             }
             $exifTool->HandleTag($tagTablePtr, $tag, $val);
         }

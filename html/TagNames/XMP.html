@@ -27,14 +27,20 @@ specifies the information format:  <code>string</code> is an unformatted string,
 <code>real</code> is a floating point number, <code>rational</code> is entered as a floating
 point number but stored as two <code>integer</code> strings separated by a &#39;/&#39;
 character, <code>date</code> is a date/time string entered in the format &quot;YYYY:mm:dd
-HH:MM:SS[.ss][+/-HH:MM]&quot;, <code>boolean</code> is either &quot;True&quot; or &quot;False&quot;,
-<code>lang-alt</code> indicates that the tag supports alternate languages (see below),
-and <code>struct</code> is an XMP structure.  When reading, structures are extracted
-only if the Struct (-struct) option is used.  Otherwise the corresponding
-&quot;flattened&quot; tags, indicated by an underline (<code>_</code>) after the <b>Writable</b>
-type, are extracted.  When copying information, the Struct option is in
-effect by default.  When writing, the Struct option has no effect, and both
-structured and flattened tags may be written.  See
+HH:MM:SS[.ss][+/-HH:MM]&quot;, <code>boolean</code> is either &quot;True&quot; or &quot;False&quot;, <code>struct</code>
+indicates a structured tag, and <code>lang-alt</code> is a tag that supports alternate
+languages.</p>
+
+<p>When reading, <code>struct</code> tags are extracted only if the Struct (-struct)
+option is used.  Otherwise the corresponding &quot;flattened&quot; tags, indicated by
+an underline (<code>_</code>) after the <b>Writable</b> type, are extracted.  When
+copying, by default both structured and flattened tags are available, but
+the flattened tags are considered &quot;unsafe&quot; so they they aren&#39;t copied unless
+specified explicitly.  The Struct option may be disabled by setting Struct
+to 0 via the API or with --struct on the command line to copy only flattened
+tags, or enabled by setting Struct to 1 via the API or with -struct on the
+command line to copy only as structures.  When writing, the Struct option
+has no effect, and both structured and flattened tags may be written.  See
 <a href="../struct.html">struct.html</a> for more details.</p>
 
 <p>Individual languages for <code>lang-alt</code> tags are accessed by suffixing the tag
@@ -54,8 +60,8 @@ more than one namespace, less common namespaces are avoided when writing.
 However, any namespace may be written by specifying a family 1 group name
 for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.  When deciding on
 which tags to add to an image, using standard schemas such as
-<a href="#dc">dc</a>, <a href="#xmp">xmp</a> or <a href="#iptcCore">iptc</a> is
-recommended if possible.</p>
+<a href="#dc">dc</a>, <a href="#xmp">xmp</a>, <a href="#iptcCore">iptcCore</a>
+and <a href="#iptcExt">iptcExt</a> is recommended if possible.</p>
 
 <p>For structures, the heading of the first column is <b>Field Name</b>.  Field
 names are very similar to tag names, except they are used to identify fields
@@ -156,15 +162,15 @@ extensions from various other sources.  See
 <tr class=b>
 <td>mwg-coll</td>
 <td class=c>-</td>
-<td>--&gt; <a href='XMP.html#mwg_coll'>XMP mwg_coll Tags</a></td></tr>
+<td>--&gt; <a href='XMP.html#mwg-coll'>XMP mwg-coll Tags</a></td></tr>
 <tr>
 <td>mwg-kw</td>
 <td class=c>-</td>
-<td>--&gt; <a href='XMP.html#mwg_kw'>XMP mwg_kw Tags</a></td></tr>
+<td>--&gt; <a href='XMP.html#mwg-kw'>XMP mwg-kw Tags</a></td></tr>
 <tr class=b>
 <td>mwg-rs</td>
 <td class=c>-</td>
-<td>--&gt; <a href='XMP.html#mwg_rs'>XMP mwg_rs Tags</a></td></tr>
+<td>--&gt; <a href='XMP.html#mwg-rs'>XMP mwg-rs Tags</a></td></tr>
 <tr>
 <td>pdf</td>
 <td class=c>-</td>
@@ -2517,7 +2523,7 @@ but ExifTool shortens this for the &quot;XMP-iptcExt&quot; family 1 group name.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='mwg_coll'>XMP mwg_coll Tags</a></h2>
+<h2><a name='mwg-coll'>XMP mwg-coll Tags</a></h2>
 <p>Collections metadata defined by the MWG 2.0 specification.  See
 <a href="http://www.metadataworkinggroup.org/">http://www.metadataworkinggroup.org/</a> for the official specification.</p>
 <blockquote>
@@ -2557,9 +2563,9 @@ but ExifTool shortens this for the &quot;XMP-iptcExt&quot; family 1 group name.
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='mwg_kw'>XMP mwg_kw Tags</a></h2>
+<h2><a name='mwg-kw'>XMP mwg-kw Tags</a></h2>
 <p>Hierarchical keywords metadata defined by the MWG 2.0 specification.
-ExifTool unrolls keyword structures to an arbitrary depth of 4 to allow
+ExifTool unrolls keyword structures to an arbitrary depth of 6 to allow
 individual levels to be accessed with different tag names, and to avoid
 infinite recursion.  See <a href="http://www.metadataworkinggroup.org/">http://www.metadataworkinggroup.org/</a> for the
 official specification.</p>
@@ -2617,6 +2623,38 @@ official specification.</p>
 <td class=c title=' _ = Flattened
  + = List'>boolean_+</td>
 <td><span class=s><span class=n>(KeywordsHierarchyChildrenChildrenChildrenApplied)</span></span></td></tr>
+<tr class=b>
+<td>HierarchicalKeywords4Children</td>
+<td class=c title=' _ = Flattened
+ + = List'>struct_+</td>
+<td>--&gt; <a href='XMP.html#KeywordStruct5'>KeywordStruct5 Struct</a>
+  <br><span class='n s'>(KeywordsHierarchyChildrenChildrenChildrenChildren)</span></td></tr>
+<tr>
+<td>HierarchicalKeywords5Applied</td>
+<td class=c title=' _ = Flattened
+ + = List'>boolean_+</td>
+<td><span class=s><span class=n>(KeywordsHierarchyChildrenChildrenChildrenChildrenApplied)</span></span></td></tr>
+<tr class=b>
+<td>HierarchicalKeywords5Children</td>
+<td class=c title=' _ = Flattened
+ + = List'>struct_+</td>
+<td>--&gt; <a href='XMP.html#KeywordStruct6'>KeywordStruct6 Struct</a>
+  <br><span class='n s'>(KeywordsHierarchyChildrenChildrenChildrenChildrenChildren)</span></td></tr>
+<tr>
+<td>HierarchicalKeywords6Applied</td>
+<td class=c title=' _ = Flattened
+ + = List'>boolean_+</td>
+<td><span class=s><span class=n>(KeywordsHierarchyChildrenChildrenChildrenChildrenChildrenApplied)</span></span></td></tr>
+<tr class=b>
+<td>HierarchicalKeywords6</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td><span class=s><span class=n>(KeywordsHierarchyChildrenChildrenChildrenChildrenChildrenKeyword)</span></span></td></tr>
+<tr>
+<td>HierarchicalKeywords5</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td><span class=s><span class=n>(KeywordsHierarchyChildrenChildrenChildrenChildrenKeyword)</span></span></td></tr>
 <tr class=b>
 <td>HierarchicalKeywords4</td>
 <td class=c title=' _ = Flattened
@@ -2722,12 +2760,52 @@ official specification.</p>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>Children</td>
+<td class=c title=' + = List'>KeywordStruct5+</td>
+<td>--&gt; <a href='XMP.html#KeywordStruct5'>KeywordStruct5 Struct</a></td></tr>
+<tr>
 <td>Keyword</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='mwg_rs'>XMP mwg_rs Tags</a></h2>
+<h2><a name='KeywordStruct5'>XMP KeywordStruct5 Struct</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Field Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>Applied</td>
+<td class=c>boolean</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Children</td>
+<td class=c title=' + = List'>KeywordStruct6+</td>
+<td>--&gt; <a href='XMP.html#KeywordStruct6'>KeywordStruct6 Struct</a></td></tr>
+<tr>
+<td>Keyword</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='KeywordStruct6'>XMP KeywordStruct6 Struct</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Field Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>Applied</td>
+<td class=c>boolean</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Keyword</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='mwg-rs'>XMP mwg-rs Tags</a></h2>
 <p>Image region metadata defined by the MWG 2.0 specification.  See
 <a href="http://www.metadataworkinggroup.org/">http://www.metadataworkinggroup.org/</a> for the official specification.</p>
 <blockquote>
@@ -6725,7 +6803,7 @@ XMP module for convenience.  (see <a href="http://www.w3.org/TR/SVG11/">http://w
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 28, 2011</i>
+<br><i>Last revised Mar 22, 2012</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

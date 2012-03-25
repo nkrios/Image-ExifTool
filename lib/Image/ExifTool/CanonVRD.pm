@@ -1265,7 +1265,7 @@ sub ProcessCanonVRD($$;$)
                 Description => $desc,
                 Binary      => 1,
             };
-            Image::ExifTool::AddTagToTable($tagTablePtr, $blockType, $tagInfo);
+            AddTagToTable($tagTablePtr, $blockType, $tagInfo);
         }
         if ($$tagInfo{SubDirectory}) {
             my $subTablePtr = GetTagTable($$tagInfo{SubDirectory}{TagTable});

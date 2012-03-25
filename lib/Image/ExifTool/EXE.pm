@@ -824,7 +824,7 @@ sub ProcessPEVersion($$)
                     my $name = $tag;
                     $name =~ tr/-_a-zA-Z0-9//dc; # remove illegal characters
                     next unless length $name;
-                    Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => $name });
+                    AddTagToTable($tagTablePtr, $tag, { Name => $name });
                 }
                 # get tag value (converted to current Charset)
                 if ($valLen) {

@@ -1263,7 +1263,7 @@ sub ProcessProperties($$$)
                     $name =~ tr/-_a-zA-Z0-9//dc;    # remove illegal characters
                     next unless length $name;
                     $exifTool->VPrint(0, "$$exifTool{INDENT}\[adding $name]\n") if $verbose;
-                    Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => $name });
+                    AddTagToTable($tagTablePtr, $tag, { Name => $name });
                 }
                 next;
             }

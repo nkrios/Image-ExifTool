@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub ReadPictValue($$$;$);
 
@@ -273,7 +273,7 @@ my %structs = (
 
 # PICT image opcodes
 %Image::ExifTool::PICT::Main = (
-    PROCESS_PROC => 0,  # set this to zero to omit tags from lookup
+    VARS => { NO_LOOKUP => 1 }, # omit tags from lookup
     NOTES => q{
 The PICT format contains no true meta information, except for the possible
 exception of the LongComment opcode.  By default, only ImageWidth,

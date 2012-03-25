@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::nl;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 %Image::ExifTool::Lang::nl::Translate = (
    'AEBAutoCancel' => {
@@ -348,6 +348,7 @@ $VERSION = '1.08';
       },
     },
    'AutoFP' => {
+      Description => 'Auto FP',
       PrintConv => {
         'Off' => 'Uit',
         'On' => 'Aan',
@@ -1208,6 +1209,7 @@ $VERSION = '1.08';
     },
    'FileType' => 'Bestandtype',
    'FileVersion' => 'Fileformaat versie',
+   'Filename' => 'Bestandnaam',
    'FillOrder' => {
       Description => 'Vul volgorde',
       PrintConv => {
@@ -1687,8 +1689,10 @@ $VERSION = '1.08';
       },
     },
    'Hue' => 'Kleurtoon',
+   'ICCProfile' => 'ICC Profiel',
    'IPTC-NAA' => 'IPTC-NAA metadata',
    'ISO' => 'ISO gevoeligheid',
+   'ISOAuto' => 'ISO auto',
    'ISODisplay' => 'ISO-weergave',
    'ISOExpansion' => {
       PrintConv => {
@@ -1948,6 +1952,7 @@ $VERSION = '1.08';
       },
     },
    'MB-D10Batteries' => 'MB-D10 batterijen',
+   'MB-D10BatteryType' => 'MB-D10 batterijen',
    'MB-D80Batteries' => 'MB-D80 batterijen',
    'MIEVersion' => 'MIE versie',
    'MSStereo' => {

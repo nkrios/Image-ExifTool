@@ -12,7 +12,7 @@ package Image::ExifTool::APP12;
 
 use strict;
 use vars qw($VERSION);
-use Image::ExifTool qw(:DataAccess);
+use Image::ExifTool qw(:DataAccess :Utils);
 
 $VERSION = '1.09';
 
@@ -277,7 +277,7 @@ sub ProcessAPP12($$$)
             $tagInfo = { Name => ucfirst $tag };
             # put in Camera group if information in "Camera" section
             $$tagInfo{Groups} = { 2 => 'Camera' } if $section =~ /camera/i;
-            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+            AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
         $exifTool->FoundTag($tagInfo, $val);
     }

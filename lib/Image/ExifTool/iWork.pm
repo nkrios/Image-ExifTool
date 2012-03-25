@@ -96,7 +96,7 @@ sub FoundTag($$$$;$)
     # add any unknown tags to table
     unless ($$tagTablePtr{$tag}) {
         $exifTool->VPrint(0, "  [adding $tag]\n") if $verbose;
-        Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => ucfirst $tag });
+        AddTagToTable($tagTablePtr, $tag, { Name => ucfirst $tag });
     }
     # save the tag
     $exifTool->HandleTag($tagTablePtr, $tag, $val);

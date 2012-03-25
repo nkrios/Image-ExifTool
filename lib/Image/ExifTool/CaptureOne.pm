@@ -81,7 +81,7 @@ sub FoundCOS($$$$;$)
             $tagInfo{ValueConv} = 'Image::ExifTool::XMP::ConvertXMPDate($val,1)';
             $tagInfo{PrintConv} = '$self->ConvertDateTime($val)';
         }
-        Image::ExifTool::AddTagToTable($tagTablePtr, $tag, \%tagInfo);
+        AddTagToTable($tagTablePtr, $tag, \%tagInfo);
     }
     # convert from UTF8 to ExifTool Charset
     $val = $exifTool->Decode($val, "UTF8");

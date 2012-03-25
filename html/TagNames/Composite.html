@@ -69,8 +69,8 @@ information is extracted.
 <td>CircleOfConfusion</td>
 <td class=c>N</td>
 <td class=n>ScaleFactor35efl</td>
-<td><span class=s><span class=n>(this value may be incorrect if the image has been resized.  Calculated as
-D/1440, where D is the focal plane diagonal in mm)</span></span></td></tr>
+<td><span class=s><span class=n>(calculated as D/1440, where D is the focal plane diagonal in mm.  This value
+may be incorrect if the image has been resized)</span></span></td></tr>
 <tr class=b>
 <td>ConditionalFEC</td>
 <td class=c>N</td>
@@ -186,7 +186,7 @@ an attempt to represent the actual status of the extender.)</span>
 <td class=n>FocalLength
   <br>ScaleFactor35efl
   <br>FocusDistance</td>
-<td><span class=s><span class=n>(calculated for the long image dimension, this value may be incorrect for
+<td><span class=s><span class=n>(calculated for the long image dimension.  This value may be incorrect for
 fisheye lenses, or if the image has been resized)</span></span></td></tr>
 <tr>
 <td>FileNumber</td>
@@ -360,7 +360,8 @@ manual mode)</span>
   <br>ShortFocal
   <br>LongFocal
   <br>LensModel
-  <br>LensFocalRange</td>
+  <br>LensFocalRange
+  <br>LensSpec</td>
 <td><span class=s><span class=n>(attempt to identify the actual lens from all lenses with a given LensType.
 Applies only to LensType values with a lookup table.  May be configured
 by adding user-defined lenses)</span></span></td></tr>
@@ -595,7 +596,7 @@ resized)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 18, 2012</i>
+<br><i>Last revised Mar 8, 2012</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

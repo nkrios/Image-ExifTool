@@ -87,7 +87,7 @@ sub ProcessHDR($$)
             next unless length($name) > 1;
             $name = ucfirst $name;
             $tagInfo = { Name => $name };
-            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+            AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
         $exifTool->FoundTag($tagInfo, $val);
     }

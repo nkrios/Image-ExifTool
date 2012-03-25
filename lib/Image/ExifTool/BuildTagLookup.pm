@@ -32,7 +32,7 @@ use Image::ExifTool::XMP;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.39';
+$VERSION = '2.44';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -231,14 +231,20 @@ C<integer> is a string of digits (possibly beginning with a '+' or '-'),
 C<real> is a floating point number, C<rational> is entered as a floating
 point number but stored as two C<integer> strings separated by a '/'
 character, C<date> is a date/time string entered in the format "YYYY:mm:dd
-HH:MM:SS[.ss][+/-HH:MM]", C<boolean> is either "True" or "False",
-C<lang-alt> indicates that the tag supports alternate languages (see below),
-and C<struct> is an XMP structure.  When reading, structures are extracted
-only if the Struct (-struct) option is used.  Otherwise the corresponding
-"flattened" tags, indicated by an underline (C<_>) after the B<Writable>
-type, are extracted.  When copying information, the Struct option is in
-effect by default.  When writing, the Struct option has no effect, and both
-structured and flattened tags may be written.  See
+HH:MM:SS[.ss][+/-HH:MM]", C<boolean> is either "True" or "False", C<struct>
+indicates a structured tag, and C<lang-alt> is a tag that supports alternate
+languages.
+
+When reading, C<struct> tags are extracted only if the Struct (-struct)
+option is used.  Otherwise the corresponding "flattened" tags, indicated by
+an underline (C<_>) after the B<Writable> type, are extracted.  When
+copying, by default both structured and flattened tags are available, but
+the flattened tags are considered "unsafe" so they they aren't copied unless
+specified explicitly.  The Struct option may be disabled by setting Struct
+to 0 via the API or with --struct on the command line to copy only flattened
+tags, or enabled by setting Struct to 1 via the API or with -struct on the
+command line to copy only as structures.  When writing, the Struct option
+has no effect, and both structured and flattened tags may be written.  See
 L<http://owl.phy.queensu.ca/~phil/exiftool/struct.html> for more details.
 
 Individual languages for C<lang-alt> tags are accessed by suffixing the tag
@@ -258,8 +264,8 @@ more than one namespace, less common namespaces are avoided when writing.
 However, any namespace may be written by specifying a family 1 group name
 for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.  When deciding on
 which tags to add to an image, using standard schemas such as
-L<dc|/XMP dc Tags>, L<xmp|/XMP xmp Tags> or L<iptc|/XMP iptcCore Tags> is
-recommended if possible.
+L<dc|/XMP dc Tags>, L<xmp|/XMP xmp Tags>, L<iptcCore|/XMP iptcCore Tags>
+and L<iptcExt|/XMP iptcExt Tags> is recommended if possible.
 
 For structures, the heading of the first column is B<Field Name>.  Field
 names are very similar to tag names, except they are used to identify fields
@@ -486,7 +492,8 @@ my %shortcutNotes = (
     },
     CommonIFD0 => q{
         common metadata tags found in IFD0 of TIFF-format images.  Used to simpify
-        deletion of all metadata from these images.  See FAQ number 7 for details
+        deletion of all metadata from these images.  See
+        L<FAQ number 7|../faq.html#Q7> for details
     },
     Unsafe => q{
         "unsafe" tags in JPEG images which are normally not copied.  Defined here
@@ -593,6 +600,9 @@ sub new
         $short =~ s/::/ /;
         $short =~ s/^(.+)Tags$/\u$1/ unless $short eq 'Nikon AVITags';
         $short =~ s/^Exif\b/EXIF/;
+        # change underlines to dashes in XMP-mwg group names
+        # (we used underlines just because Perl variables can't contain dashes)
+        $short =~ s/^XMP mwg_/XMP mwg-/;
         $shortName{$tableName} = $short;    # remember short name
         $tableNum{$tableName} = $tableNum++;
     }
@@ -632,7 +642,7 @@ sub new
         $longID{$tableName} = 0;
         $longName{$tableName} = 0;
         # save all tag names
-        my ($tagID, $binaryTable, $noID, $isIPTC, $isXMP);
+        my ($tagID, $binaryTable, $noID, $hexID, $isIPTC, $isXMP);
         $isIPTC = 1 if $writeProc and $writeProc eq \&Image::ExifTool::IPTC::WriteIPTC;
         # generate flattened tag names for structure fields if this is an XMP table
         if ($$table{GROUPS} and $$table{GROUPS}{0} eq 'XMP') {
@@ -644,6 +654,7 @@ sub new
             }
         }
         $noID = 1 if $isXMP or $short =~ /^(Shortcuts|ASF.*)$/ or $$vars{NO_ID};
+        $hexID = $$vars{HEX_ID};
         my $processBinaryData = ($$table{PROCESS_PROC} and (
             $$table{PROCESS_PROC} eq \&Image::ExifTool::ProcessBinaryData or
             $$table{PROCESS_PROC} eq \&Image::ExifTool::Nikon::ProcessNikonEncrypted));
@@ -919,8 +930,16 @@ TagID:  foreach $tagID (@keys) {
                                 $_ eq 'BITMASK' and $bits = $$printConv{$_}, next;
                                 $_ eq 'OTHER' and next;
                                 my $index;
-                                if (($$tagInfo{PrintHex} or $$printConv{BITMASK}) and /^\d+$/) {
-                                    $index = sprintf('0x%x',$_);
+                                if (($$tagInfo{PrintHex} or $$printConv{BITMASK}) and /^-?\d+$/) {
+                                    if ($_ >= 0) {
+                                        $index = sprintf('0x%x', $_);
+                                    } elsif ($format and $format =~ /int(16|32)/) {
+                                        # mask off unused bits of signed integer hex value
+                                        my $mask = { 16 => 0xffff, 32 => 0xffffffff }->{$1};
+                                        $index = sprintf('0x%x', $_ & $mask);
+                                    } else {
+                                        $index = $_;
+                                    }
                                 } elsif (/^[+-]?(?=\d|\.\d)\d*(\.\d*)?$/ and not $$tagInfo{PrintString}) {
                                     $index = $_;
                                 } else {
@@ -980,6 +999,7 @@ TagID:  foreach $tagID (@keys) {
                 if ($subdir and not $$tagInfo{SeparateTable}) {
                     # subdirectories are only writable if specified explicitly
                     my $tw = $$tagInfo{Writable};
+                    $writable = 'Y' if $tw and $writable eq '1';
                     $writable = '-' . ($tw ? $writable : '');
                     $writable .= '!' if $tw and ($$tagInfo{Protected} || 0) & 0x01;
                 } else {
@@ -1049,10 +1069,10 @@ TagID:  foreach $tagID (@keys) {
                     push @writable, $writable;
                 }
 #
-# add this tag to the tag lookup unless PROCESS_PROC is 0 or shortcut or plug-in tag
+# add this tag to the tag lookup unless NO_LOOKUP is set or shortcut or plug-in tag
 #
                 next if $shortcut or $isPlugin;
-                next if defined $$table{PROCESS_PROC} and not $$table{PROCESS_PROC};
+                next if $$vars{NO_LOOKUP};
                 # count our tags
                 if ($$tagInfo{SubDirectory}) {
                     $subdirs{$lcName} or $subdirs{$lcName} = 0;
@@ -1101,14 +1121,16 @@ TagID:  foreach $tagID (@keys) {
 #
             my $tagIDstr;
             if ($tagID =~ /^\d+(\.\d+)?$/) {
-                if ($1 or $binaryTable or $isIPTC or ($short =~ /^CanonCustom/ and $tagID < 256)) {
-                    if ($tagID < 0x10000) {
-                        $tagIDstr = $tagID;
-                    } else {
-                        $tagIDstr = sprintf('0x%.8x',$tagID);
-                    }
-                } else {
+                if (defined $hexID) {
+                    $tagIDstr = $hexID ? sprintf('0x%.4x',$tagID) : $tagID;
+                } elsif (not $1 and not $binaryTable and not $isIPTC and
+                         not ($short =~ /^CanonCustom/ and $tagID < 256))
+                {
                     $tagIDstr = sprintf('0x%.4x',$tagID);
+                } elsif ($tagID < 0x10000) {
+                    $tagIDstr = $tagID;
+                } else {
+                    $tagIDstr = sprintf('0x%.8x',$tagID);
                 }
             } elsif ($short eq 'DICOM') {
                 ($tagIDstr = $tagID) =~ s/_/,/;

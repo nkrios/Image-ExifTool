@@ -50,7 +50,7 @@ ol.index { margin: 0; padding: 0 0 0 2em }
 
 <blockquote>
 ExifTool issues can be discussed on the ExifTool forum at
-<a href="http://owl.phy.queensu.ca/~phil/exiftool/forum/">http://owl.phy.queensu.ca/~phil/exiftool/forum/</a>
+<a href="http://u88.n24.queensu.ca/exiftool/forum/">http://u88.n24.queensu.ca/exiftool/forum/</a>
 </blockquote>
 
 <a name="Q2"></a>
@@ -172,7 +172,18 @@ be used (or in fact, none at all).  The first 4 consecutive digits found in the
 value are interpreted as the year, then next 2 digits are the month, and so on.
 For EXIF date/time values, all 6 date/time fields must exist
 ("<code>YYYYmmddHHMMSS</code>"), but XMP date/time values require only the year
-("<code>YYYY</code>").</blockquote>
+("<code>YYYY</code>").  This feature facilitates useful operations such as
+setting date/time tags from a date embedded in the file name.  For example, the
+command
+
+<pre>exiftool "-alldates&lt;filename" c:\images</pre>
+
+will set the common date/time tags from the file name for all images in the
+directory "<code>c:\images</code>".  This will work for any file name which
+matches the above criteria (ie. "IMG_20110927_103000.jpg").
+<i class=lt>[AllDates is a shortcut for 3 tag names: DateTimeOriginal,
+CreateDate and ModifyDate.  See the <a href="TagNames/Shortcuts.html">Shortcuts
+Tags documentation</a> for more information.]</i></blockquote>
 
 <blockquote>The <code>-d</code> option allows full control over the format of
 date/time values when reading.  However, the effect of the <code>-d</code>
@@ -702,9 +713,11 @@ file will create "out.txt" in the folder:
 exiftool -T -r -filename -aperture -ISO %1 &gt;&gt; %1\out.txt
 </pre>
 
-where "<code>&lt;tab&gt;</code>" in the "<code>echo</code>" command indicates a
-tab character.  This "<code>echo</code>" command was included to add column
-headings to the output.
+The "<code>echo</code>" command was included to add column headings to the
+output.  (The tab character in the echo command, indicated by
+"<code>&lt;tab&gt;</code>", may be generated in Mac/Linux shells with CTRL-v
+then TAB, or in a Windows cmd shell with TAB when cmd.exe is run with the
+<code>/f:off</code> option to disable tab completion.)
 </blockquote>
 
 <blockquote>Other possible export formats include RDF/XML (with the the
@@ -1269,7 +1282,7 @@ inside the metadata of the file itself.</blockquote>
 <blockquote>ExifTool's default behaviour is to set the filesystem modification
 date/time (FileModifyDate) to the current date/time when any metadata in a file
 is changed, but the <code>-P</code> option may be used to preserve the original
-value.  <i class=lt>[Note that on systems where a filesystem creation date is
+date.  <i class=lt>[Note that on systems where a filesystem creation date is
 maintained, ExifTool also sets this to the current date/time when the file is
 edited, and the only way to preserve it is with the
 <code>-overwrite_original_in_place</code> option.]</i></blockquote>
@@ -1303,7 +1316,7 @@ exiftool -alldates+=1 "-filemodifydate&lt;datetimeoriginal" c:\images
 </pre></blockquote>
 
 <hr>
-<i>Last revised Jan. 16, 2012</i>
+<i>Last revised Feb. 17, 2012</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

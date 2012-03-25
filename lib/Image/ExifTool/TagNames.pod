@@ -100,9 +100,11 @@ This table lists information extracted by ExifTool from JPEG images.
                FPXR                             FlashPix
                PreviewImage                     N
   'APP5'       RMETA                            Ricoh RMETA
+               PreviewImage                     N
   'APP6'       EPPIM                            JPEG EPPIM
                NITF                             JPEG NITF
                HP_TDHD                          HP TDHD
+  'APP7'       Qualcomm                         Qualcomm
   'APP8'       SPIFF                            JPEG SPIFF
   'APP10'      Comment                          N
   'APP12'      PictureInfo                      APP12 PictureInfo
@@ -214,6 +216,9 @@ has an idea about what this means, please let me know.
 =head3 JPEG Adobe Tags
 
 The "Adobe" APP14 segment stores image encoding information for DCT filters.
+This segment may be copied or deleted as a block using the Extra "Adobe"
+tag, but note that it is not deleted by default when deleting all metadata
+because it may affect the appearance of the image.
 
   Index2   Tag Name                             Writable
   ------   --------                             --------
@@ -992,14 +997,20 @@ C<integer> is a string of digits (possibly beginning with a '+' or '-'),
 C<real> is a floating point number, C<rational> is entered as a floating
 point number but stored as two C<integer> strings separated by a '/'
 character, C<date> is a date/time string entered in the format "YYYY:mm:dd
-HH:MM:SS[.ss][+/-HH:MM]", C<boolean> is either "True" or "False",
-C<lang-alt> indicates that the tag supports alternate languages (see below),
-and C<struct> is an XMP structure.  When reading, structures are extracted
-only if the Struct (-struct) option is used.  Otherwise the corresponding
-"flattened" tags, indicated by an underline (C<_>) after the B<Writable>
-type, are extracted.  When copying information, the Struct option is in
-effect by default.  When writing, the Struct option has no effect, and both
-structured and flattened tags may be written.  See
+HH:MM:SS[.ss][+/-HH:MM]", C<boolean> is either "True" or "False", C<struct>
+indicates a structured tag, and C<lang-alt> is a tag that supports alternate
+languages.
+
+When reading, C<struct> tags are extracted only if the Struct (-struct)
+option is used.  Otherwise the corresponding "flattened" tags, indicated by
+an underline (C<_>) after the B<Writable> type, are extracted.  When
+copying, by default both structured and flattened tags are available, but
+the flattened tags are considered "unsafe" so they they aren't copied unless
+specified explicitly.  The Struct option may be disabled by setting Struct
+to 0 via the API or with --struct on the command line to copy only flattened
+tags, or enabled by setting Struct to 1 via the API or with -struct on the
+command line to copy only as structures.  When writing, the Struct option
+has no effect, and both structured and flattened tags may be written.  See
 L<http://owl.phy.queensu.ca/~phil/exiftool/struct.html> for more details.
 
 Individual languages for C<lang-alt> tags are accessed by suffixing the tag
@@ -1019,8 +1030,8 @@ more than one namespace, less common namespaces are avoided when writing.
 However, any namespace may be written by specifying a family 1 group name
 for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.  When deciding on
 which tags to add to an image, using standard schemas such as
-L<dc|/XMP dc Tags>, L<xmp|/XMP xmp Tags> or L<iptc|/XMP iptcCore Tags> is
-recommended if possible.
+L<dc|/XMP dc Tags>, L<xmp|/XMP xmp Tags>, L<iptcCore|/XMP iptcCore Tags>
+and L<iptcExt|/XMP iptcExt Tags> is recommended if possible.
 
 For structures, the heading of the first column is B<Field Name>.  Field
 names are very similar to tag names, except they are used to identify fields
@@ -1058,9 +1069,9 @@ L<http://www.adobe.com/devnet/xmp/> for the official XMP specification.
   microsoft                                     Microsoft XMP
   MP                                            Microsoft MP
   MP1                                           Microsoft MP1
-  mwg-coll                                      XMP mwg_coll
-  mwg-kw                                        XMP mwg_kw
-  mwg-rs                                        XMP mwg_rs
+  mwg-coll                                      XMP mwg-coll
+  mwg-kw                                        XMP mwg-kw
+  mwg-rs                                        XMP mwg-rs
   pdf                                           XMP pdf
   pdfx                                          XMP pdfx
   photomech                                     PhotoMechanic XMP
@@ -1732,7 +1743,7 @@ iView MediaPro schema tags.
   Status                                        string
   UserFields                                    string+
 
-=head3 XMP mwg_coll Tags
+=head3 XMP mwg-coll Tags
 
 Collections metadata defined by the MWG 2.0 specification.  See
 L<http://www.metadataworkinggroup.org/> for the official specification.
@@ -1750,10 +1761,10 @@ L<http://www.metadataworkinggroup.org/> for the official specification.
   CollectionName                                string
   CollectionURI                                 string
 
-=head3 XMP mwg_kw Tags
+=head3 XMP mwg-kw Tags
 
 Hierarchical keywords metadata defined by the MWG 2.0 specification.
-ExifTool unrolls keyword structures to an arbitrary depth of 4 to allow
+ExifTool unrolls keyword structures to an arbitrary depth of 6 to allow
 individual levels to be accessed with different tag names, and to avoid
 infinite recursion.  See L<http://www.metadataworkinggroup.org/> for the
 official specification.
@@ -1769,6 +1780,12 @@ official specification.
   HierarchicalKeywords3Applied                  boolean_+
   HierarchicalKeywords3Children                 KeywordStruct4 Struct_+
   HierarchicalKeywords4Applied                  boolean_+
+  HierarchicalKeywords4Children                 KeywordStruct5 Struct_+
+  HierarchicalKeywords5Applied                  boolean_+
+  HierarchicalKeywords5Children                 KeywordStruct6 Struct_+
+  HierarchicalKeywords6Applied                  boolean_+
+  HierarchicalKeywords6                         string_+
+  HierarchicalKeywords5                         string_+
   HierarchicalKeywords4                         string_+
   HierarchicalKeywords3                         string_+
   HierarchicalKeywords2                         string_+
@@ -1809,9 +1826,25 @@ official specification.
   Field Name                                    Writable
   ----------                                    --------
   Applied                                       boolean
+  Children                                      KeywordStruct5 Struct+
   Keyword                                       string
 
-=head3 XMP mwg_rs Tags
+=head3 XMP KeywordStruct5 Struct
+
+  Field Name                                    Writable
+  ----------                                    --------
+  Applied                                       boolean
+  Children                                      KeywordStruct6 Struct+
+  Keyword                                       string
+
+=head3 XMP KeywordStruct6 Struct
+
+  Field Name                                    Writable
+  ----------                                    --------
+  Applied                                       boolean
+  Keyword                                       string
+
+=head3 XMP mwg-rs Tags
 
 Image region metadata defined by the MWG 2.0 specification.  See
 L<http://www.metadataworkinggroup.org/> for the official specification.
@@ -4210,6 +4243,8 @@ Unknown CameraInfo tags are divided into 3 tables based on format size.
     466    CameraTemperature                    int32s
     503    CameraTemperature                    int32s
     506    CameraTemperature                    int32s
+    520    CameraTemperature                    int32s
+    524    CameraTemperature                    int32s
 
 =head3 Canon CameraInfoUnknown16 Tags
 
@@ -5128,6 +5163,8 @@ well as newer tags and values added by later models.
   0x0407   ViewInfoDuringExposure               int32s
   0x0408   LCDIlluminationDuringBulb            int32s
   0x0409   InfoButtonWhenShooting               int32s
+  0x040a   ViewfinderWarnings                   int32s
+  0x040b   LVShootingAreaDisplay                int32s
   0x0501   USMLensElectronicMF                  int32s
   0x0502   AIServoTrackingSensitivity           int32s
   0x0503   AIServoImagePriority                 int32s
@@ -5171,6 +5208,7 @@ well as newer tags and values added by later models.
   0x070c   CustomControls                       int32s
   0x070d   StartMovieShooting                   int32s
   0x070e   FlashButtonFunction                  int32s
+  0x070f   MultiFunctionLock                    int32s
   0x080b   FocusingScreen                       int32s
   0x080c   TimerLength                          int32s[4]
   0x080d   ShortReleaseTimeLag                  int32s
@@ -5178,6 +5216,7 @@ well as newer tags and values added by later models.
   0x080f   AddOriginalDecisionData              int32s
   0x0810   LiveViewExposureSimulation           int32s
   0x0811   LCDDisplayAtPowerOn                  int32s
+  0x0813   DefaultEraseOption                   int32s
 
 =head2 CanonVRD Tags
 
@@ -5452,7 +5491,7 @@ Tags added in DPP version 2.0 and later.
   0x3015   ColorMode                            int16u
   0x3016   Enhancement                          int16u
   0x3017   ColorFilter                          int16u
-  0x301b   UnknownMode?                         int16u
+  0x301b   ArtMode                              int16u
   0x301c   SequenceNumber                       int16u
   0x301d   BracketSequence                      int16u[2]
   0x3020   ImageStabilization                   int16u
@@ -5461,6 +5500,7 @@ Tags added in DPP version 2.0 and later.
   0x3030   SpecialEffectLevel                   int16u
   0x3031   SpecialEffectSetting                 int16u
   0x3103   DriveMode                            int16u
+  0x310b   ArtModeParameters                    int8u[3]
   0x4001   CaptureFrameRate                     int16u[n]
   0x4003   VideoQuality                         int16u
 
@@ -6181,9 +6221,62 @@ models such as the P880 and Z1015IS.
   0xfa29   WB_RGBLevelsDaylight                 N
   0xfa2a   WB_RGBLevelsShade                    N
 
+=head3 Kodak Free Tags
+
+Information stored in the "free" atom of Kodak MP4 videos. (VERY bad form
+for Kodak to store useful information in an atom intended for unused space!)
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'AprV'   ApertureValue                        N
+  'BrtV'   BrightnessValue                      N
+  'Expc'   ExposureCompensation                 N
+  'Expo'   ExposureTime                         N
+  'FL35'   FocalLengthIn35mmFormat              N
+  'FNum'   FNumber                              N
+  'FoLn'   FocalLength                          N
+  'ISOS'   ISO                                  N
+  'SVer'   FirmwareVersion                      N
+  'Scrn'   PreviewInfo                          Kodak Scrn
+  'Seri'   SerialNumber                         N
+  'StSV'   ShutterSpeedValue                    N
+
+=head3 Kodak Scrn Tags
+
+  Index2   Tag Name                             Writable
+  ------   --------                             --------
+      0    PreviewImageWidth                    N
+      1    PreviewImageHeight                   N
+      2    PreviewImageLength                   N
+      4    PreviewImage                         N
+
+=head3 Kodak DcMD Tags
+
+Metadata directory found in MOV and MP4 videos from some Kodak cameras.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'CMbo'   CameraByteOrder                      N
+  'Cmbo'   CameraByteOrder                      N
+  'DcEM'   DcEM                                 Kodak DcEM
+  'DcME'   DcME                                 Kodak DcME
+
+=head3 Kodak DcEM Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  [no tags known]
+
+=head3 Kodak DcME Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  [no tags known]
+
 =head3 Kodak MOV Tags
 
-This information is found in Kodak MOV videos from models such as the P880.
+This information is found in the TAGS atom of MOV videos from Kodak models
+such as the P880.
 
   Index1   Tag Name                             Writable
   ------   --------                             --------
@@ -6666,7 +6759,7 @@ Camera settings information for the Sony DSLR-A100.
      13    LocalAFAreaPoint                     int16u
      14    AFAreaMode                           int16u
      15    FlashMode                            int16u
-     16    FlashExposureCompSetting             int16u
+     16    FlashExposureCompSet                 int16u
      18    MeteringMode                         int16u
      19    ISOSetting                           int16u
      20    ZoneMatchingMode                     int16u
@@ -8420,7 +8513,7 @@ any information found here will be extracted, even if the tag is not listed.
   0x0206   MaxApertureAtMaxFocal                int16u
   0x0207   MinFocalLength                       int16u
   0x0208   MaxFocalLength                       int16u
-  0x020a   MaxApertureAtCurrentFocal            int16u
+  0x020a   MaxAperture                          int16u
   0x020b   LensProperties                       int16u
   0x0301   Extender                             int8u[6]
   0x0302   ExtenderSerialNumber                 string[32]
@@ -8789,233 +8882,6 @@ like the LS-5, LS-10, LS-11.
     662    Index15                              N
     672    Index16                              N
 
-=head2 Panasonic Tags
-
-These tags are used in Panasonic/Leica cameras.
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0001   ImageQuality                         int16u
-  0x0002   FirmwareVersion                      undef
-  0x0003   WhiteBalance                         int16u
-  0x0007   FocusMode                            int16u
-  0x000f   AFAreaMode                           int8u[2]
-  0x001a   ImageStabilization                   int16u
-  0x001c   MacroMode                            int16u
-  0x001f   ShootingMode                         int16u
-  0x0020   Audio                                int16u
-  0x0021   DataDump                             N
-  0x0023   WhiteBalanceBias                     int16s
-  0x0024   FlashBias                            int16s
-  0x0025   InternalSerialNumber                 undef[16]
-  0x0026   PanasonicExifVersion                 undef
-  0x0028   ColorEffect                          int16u
-  0x0029   TimeSincePowerOn                     int32u
-  0x002a   BurstMode                            int16u
-  0x002b   SequenceNumber                       int32u
-  0x002c   ContrastMode                         int16u
-  0x002d   NoiseReduction                       int16u
-  0x002e   SelfTimer                            int16u
-  0x0030   Rotation                             int16u
-  0x0031   AFAssistLamp                         int16u
-  0x0032   ColorMode                            int16u
-  0x0033   BabyAge                              string
-  0x0034   OpticalZoomMode                      int16u
-  0x0035   ConversionLens                       int16u
-  0x0036   TravelDay                            int16u
-  0x0039   Contrast                             int16u
-  0x003a   WorldTimeLocation                    int16u
-  0x003b   TextStamp                            int16u
-  0x003c   ProgramISO                           int16u
-  0x003d   AdvancedSceneMode                    int16u
-  0x003e   TextStamp                            int16u
-  0x003f   FacesDetected                        int16u
-  0x0040   Saturation                           int16u
-  0x0041   Sharpness                            int16u
-  0x0042   FilmMode                             int16u
-  0x0046   WBAdjustAB                           int16u
-  0x0047   WBAdjustGM                           int16u
-  0x004b   PanasonicImageWidth                  int32u
-  0x004c   PanasonicImageHeight                 int32u
-  0x004d   AFPointPosition                      rational64u[2]
-  0x004e   FaceDetInfo                          Panasonic FaceDetInfo
-  0x0051   LensType                             string
-  0x0052   LensSerialNumber                     string
-  0x0053   AccessoryType                        string
-  0x0059   Transform                            undef[4]
-  0x005d   IntelligentExposure                  int16u
-  0x0061   FaceRecInfo                          Panasonic FaceRecInfo
-  0x0062   FlashWarning                         int16u
-  0x0063   RecognizedFaceFlags?                 undef[4]
-  0x0065   Title                                undef
-  0x0066   BabyName                             undef
-  0x0067   Location                             undef
-  0x0069   Country                              undef
-  0x006b   State                                undef
-  0x006d   City                                 undef
-  0x006f   Landmark                             undef
-  0x0070   IntelligentResolution                int8u
-  0x0079   IntelligentD-Range                   int16u
-  0x0e00   PrintIM                              PrintIM
-  0x8000   MakerNoteVersion                     undef
-  0x8001   SceneMode                            int16u
-  0x8004   WBRedLevel                           int16u
-  0x8005   WBGreenLevel                         int16u
-  0x8006   WBBlueLevel                          int16u
-  0x8007   FlashFired                           int16u
-  0x8008   TextStamp                            int16u
-  0x8009   TextStamp                            int16u
-  0x8010   BabyAge                              string
-  0x8012   Transform                            undef[4]
-
-=head3 Panasonic FaceDetInfo Tags
-
-Face detection position information.
-
-  Index2   Tag Name                             Writable
-  ------   --------                             --------
-      0    NumFacePositions                     int16u
-      1    Face1Position                        int16u[4]
-      5    Face2Position                        int16u[4]
-      9    Face3Position                        int16u[4]
-     13    Face4Position                        int16u[4]
-     17    Face5Position                        int16u[4]
-
-=head3 Panasonic FaceRecInfo Tags
-
-Tags written by cameras with facial recognition.  These cameras not only
-detect faces in an image, but also recognize specific people based a
-user-supplied set of known faces.
-
-  Index1   Tag Name                             Writable
-  ------   --------                             --------
-      0    FacesRecognized                      int16u
-      4    RecognizedFace1Name                  string[20]
-     24    RecognizedFace1Position              int16u[4]
-     32    RecognizedFace1Age                   string[20]
-     52    RecognizedFace2Name                  string[20]
-     72    RecognizedFace2Position              int16u[4]
-     80    RecognizedFace2Age                   string[20]
-    100    RecognizedFace3Name                  string[20]
-    120    RecognizedFace3Position              int16u[4]
-    128    RecognizedFace3Age                   string[20]
-
-=head3 Panasonic Leica2 Tags
-
-These tags are used by the Leica M8.
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0300   Quality                              int16u
-  0x0302   UserProfile                          int32u
-  0x0303   SerialNumber                         int32u
-  0x0304   WhiteBalance                         int16u
-  0x0310   LensType                             int32u
-  0x0311   ExternalSensorBrightnessValue        rational64s
-  0x0312   MeasuredLV                           rational64s
-  0x0313   ApproximateFNumber                   rational64u
-  0x0320   CameraTemperature                    int32s
-  0x0321   ColorTemperature                     int32u
-  0x0322   WBRedLevel                           rational64u
-  0x0323   WBGreenLevel                         rational64u
-  0x0324   WBBlueLevel                          rational64u
-  0x0325   UV-IRFilterCorrection                int32u
-  0x0330   CCDVersion                           int32u
-  0x0331   CCDBoardVersion                      int32u
-  0x0332   ControllerBoardVersion               int32u
-  0x0333   M16CVersion                          int32u
-  0x0340   ImageIDNumber                        int32u
-
-=head3 Panasonic Leica3 Tags
-
-These tags are used by the Leica R8 and R9 digital backs.
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x000d   WB_RGBLevels                         int16u[3]
-
-=head3 Panasonic Leica4 Tags
-
-This information is written by the M9.
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x3000   Subdir3000                           Panasonic Subdir
-  0x3100   Subdir3100                           Panasonic Subdir
-  0x3400   Subdir3400                           Panasonic Subdir
-  0x3900   Subdir3900                           Panasonic Subdir
-
-=head3 Panasonic Subdir Tags
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x300a   Contrast                             int32u
-  0x300b   Sharpening                           int32u
-  0x300d   Saturation                           int32u
-  0x3033   WhiteBalance                         int32u
-  0x3034   JPEGQuality                          int32u
-  0x3036   WB_RGBLevels                         rational64u[3]
-  0x3038   UserProfile                          string
-  0x303a   JPEGSize                             int32u
-  0x3103   SerialNumber                         string
-  0x3109   FirmwareVersion                      string
-  0x312a   BaseISO                              int32u
-  0x312b   SensorWidth                          int32u
-  0x312c   SensorHeight                         int32u
-  0x312d   SensorBitDepth                       int32u
-  0x3402   CameraTemperature                    int32s
-  0x3405   LensType                             int32u
-  0x3406   ApproximateFNumber                   rational64u
-  0x3407   MeasuredLV                           int32s
-  0x3408   ExternalSensorBrightnessValue        int32s
-  0x3901   Data1                                Panasonic Data1
-  0x3902   Data2                                Panasonic Data2
-
-=head3 Panasonic Data1 Tags
-
-  Index1   Tag Name                             Writable
-  ------   --------                             --------
-     22    LensType                             int32u[0.25]
-
-=head3 Panasonic Data2 Tags
-
-  Index1   Tag Name                             Writable
-  ------   --------                             --------
-  [no tags known]
-
-=head3 Panasonic Leica5 Tags
-
-This information is written by the X1.
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0407   OriginalFileName                     string
-  0x0408   OriginalDirectory                    string
-  0x040d   ExposureMode                         int8u[4]
-  0x0412   FilmMode                             string
-  0x0413   WB_RGBLevels                         rational64u[3]
-
-=head3 Panasonic Leica6 Tags
-
-This information is written by the S2 (as a trailer in JPEG images).
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  0x0300   PreviewImage                         undef
-  0x0301   UnknownBlock?                        N
-  0x0303   LensType                             string
-
-=head3 Panasonic Type2 Tags
-
-This type of maker notes is used by models such as the NV-DS65, PV-D2002,
-PV-DC3000, PV-DV203, PV-DV401, PV-DV702, PV-L2001, PV-SD4090, PV-SD5000 and
-iPalm.
-
-  Index2   Tag Name                             Writable
-  ------   --------                             --------
-      0    MakerNoteType                        N
-      3    Gain                                 N
-
 =head2 Pentax Tags
 
 These tags are used in Pentax/Asahi cameras.
@@ -9073,7 +8939,7 @@ These tags are used in Pentax/Asahi cameras.
   0x0039   RawImageSize                         int16u[2]~
   0x003c   AFPointsInFocus                      N
   0x003e   PreviewImageBorders                  int8u[4]
-  0x003f   LensType                             int8u[2]
+  0x003f   LensRec                              Pentax LensRec
   0x0040   SensitivityAdjust                    int16u
   0x0041   ImageEditCount                       int16u
   0x0047   CameraTemperature                    int8s
@@ -9118,6 +8984,7 @@ These tags are used in Pentax/Asahi cameras.
                                                 Pentax LensInfo2
                                                 Pentax LensInfo3
                                                 Pentax LensInfo4
+                                                Pentax LensInfo5
   0x0208   FlashInfo                            Pentax FlashInfo
            FlashInfoUnknown                     Pentax FlashInfoUnknown
   0x0209   AEMeteringSegments                   int8u[n]
@@ -9156,6 +9023,15 @@ These tags are used in Pentax/Asahi cameras.
   0x0402   ToneCurve                            Y~
   0x0403   ToneCurves                           Y~
   0x0e00   PrintIM                              PrintIM
+
+=head3 Pentax LensRec Tags
+
+This record stores the LensType, plus one or two unknown bytes for some
+models.
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+      0    LensType                             int8u[2]
 
 =head3 Pentax SRInfo Tags
 
@@ -9271,7 +9147,7 @@ Pentax lens information structure for models such as the K10D and K20D.
 
   Index1   Tag Name                             Writable
   ------   --------                             --------
-      0    LensType                             N
+      0    LensType                             int8u[4]
       4    LensData                             Pentax LensData
 
 =head3 Pentax LensData Tags
@@ -9308,7 +9184,7 @@ Pentax lens information structure for 645D.
 
   Index1   Tag Name                             Writable
   ------   --------                             --------
-      1    LensType                             N
+      1    LensType                             int8u[4]
      13    LensData                             Pentax LensData
 
 =head3 Pentax LensInfo4 Tags
@@ -9317,8 +9193,17 @@ Pentax lens information structure for models such as the K-5 and K-r.
 
   Index1   Tag Name                             Writable
   ------   --------                             --------
-      1    LensType                             N
+      1    LensType                             int8u[4]
      12    LensData                             Pentax LensData
+
+=head3 Pentax LensInfo5 Tags
+
+Pentax lens information structure for the K-01.
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+      1    LensType                             int8u[5]
+     15    LensData                             Pentax LensData
 
 =head3 Pentax FlashInfo Tags
 
@@ -9589,6 +9474,15 @@ Tags extracted from the maker notes of Optio S1 AVI videos.
   ------   --------                             --------
   0x0000   MakerNoteVersion                     undef[4]
 
+=head3 Pentax PXTH Tags
+
+Tags found in the PXTH atom of MOV videos from the K-01.
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+      0    PreviewImageLength                   N
+      4    PreviewImage                         N
+
 =head3 Pentax MOV Tags
 
 This information is found in Pentax MOV videos.
@@ -9634,6 +9528,247 @@ Pentax-specific RIFF tags found in AVI videos.
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
   'hymn'   MakerNotes                           Pentax
+
+=head2 Panasonic Tags
+
+These tags are used in Panasonic/Leica cameras.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0001   ImageQuality                         int16u
+  0x0002   FirmwareVersion                      undef
+  0x0003   WhiteBalance                         int16u
+  0x0007   FocusMode                            int16u
+  0x000f   AFAreaMode                           int8u[2]
+  0x001a   ImageStabilization                   int16u
+  0x001c   MacroMode                            int16u
+  0x001f   ShootingMode                         int16u
+  0x0020   Audio                                int16u
+  0x0021   DataDump                             N
+  0x0023   WhiteBalanceBias                     int16s
+  0x0024   FlashBias                            int16s
+  0x0025   InternalSerialNumber                 undef[16]
+  0x0026   PanasonicExifVersion                 undef
+  0x0028   ColorEffect                          int16u
+  0x0029   TimeSincePowerOn                     int32u
+  0x002a   BurstMode                            int16u
+  0x002b   SequenceNumber                       int32u
+  0x002c   ContrastMode                         int16u
+  0x002d   NoiseReduction                       int16u
+  0x002e   SelfTimer                            int16u
+  0x0030   Rotation                             int16u
+  0x0031   AFAssistLamp                         int16u
+  0x0032   ColorMode                            int16u
+  0x0033   BabyAge                              string
+  0x0034   OpticalZoomMode                      int16u
+  0x0035   ConversionLens                       int16u
+  0x0036   TravelDay                            int16u
+  0x0039   Contrast                             int16u
+  0x003a   WorldTimeLocation                    int16u
+  0x003b   TextStamp                            int16u
+  0x003c   ProgramISO                           int16u
+  0x003d   AdvancedSceneMode                    int16u
+  0x003e   TextStamp                            int16u
+  0x003f   FacesDetected                        int16u
+  0x0040   Saturation                           int16u
+  0x0041   Sharpness                            int16u
+  0x0042   FilmMode                             int16u
+  0x0044   ColorTempKelvin                      int16u
+  0x0046   WBAdjustAB                           int16u
+  0x0047   WBAdjustGM                           int16u
+  0x004b   PanasonicImageWidth                  int32u
+  0x004c   PanasonicImageHeight                 int32u
+  0x004d   AFPointPosition                      rational64u[2]
+  0x004e   FaceDetInfo                          Panasonic FaceDetInfo
+  0x0051   LensType                             string
+  0x0052   LensSerialNumber                     string
+  0x0053   AccessoryType                        string
+  0x0059   Transform                            undef[4]
+  0x005d   IntelligentExposure                  int16u
+  0x0061   FaceRecInfo                          Panasonic FaceRecInfo
+  0x0062   FlashWarning                         int16u
+  0x0063   RecognizedFaceFlags?                 undef[4]
+  0x0065   Title                                undef
+  0x0066   BabyName                             undef
+  0x0067   Location                             undef
+  0x0069   Country                              undef
+  0x006b   State                                undef
+  0x006d   City                                 undef
+  0x006f   Landmark                             undef
+  0x0070   IntelligentResolution                int8u
+  0x0079   IntelligentD-Range                   int16u
+  0x0e00   PrintIM                              PrintIM
+  0x8000   MakerNoteVersion                     undef
+  0x8001   SceneMode                            int16u
+  0x8004   WBRedLevel                           int16u
+  0x8005   WBGreenLevel                         int16u
+  0x8006   WBBlueLevel                          int16u
+  0x8007   FlashFired                           int16u
+  0x8008   TextStamp                            int16u
+  0x8009   TextStamp                            int16u
+  0x8010   BabyAge                              string
+  0x8012   Transform                            undef[4]
+
+=head3 Panasonic FaceDetInfo Tags
+
+Face detection position information.
+
+  Index2   Tag Name                             Writable
+  ------   --------                             --------
+      0    NumFacePositions                     int16u
+      1    Face1Position                        int16u[4]
+      5    Face2Position                        int16u[4]
+      9    Face3Position                        int16u[4]
+     13    Face4Position                        int16u[4]
+     17    Face5Position                        int16u[4]
+
+=head3 Panasonic FaceRecInfo Tags
+
+Tags written by cameras with facial recognition.  These cameras not only
+detect faces in an image, but also recognize specific people based a
+user-supplied set of known faces.
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+      0    FacesRecognized                      int16u
+      4    RecognizedFace1Name                  string[20]
+     24    RecognizedFace1Position              int16u[4]
+     32    RecognizedFace1Age                   string[20]
+     52    RecognizedFace2Name                  string[20]
+     72    RecognizedFace2Position              int16u[4]
+     80    RecognizedFace2Age                   string[20]
+    100    RecognizedFace3Name                  string[20]
+    120    RecognizedFace3Position              int16u[4]
+    128    RecognizedFace3Age                   string[20]
+
+=head3 Panasonic Leica2 Tags
+
+These tags are used by the Leica M8.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0300   Quality                              int16u
+  0x0302   UserProfile                          int32u
+  0x0303   SerialNumber                         int32u
+  0x0304   WhiteBalance                         int16u
+  0x0310   LensType                             int32u
+  0x0311   ExternalSensorBrightnessValue        rational64s
+  0x0312   MeasuredLV                           rational64s
+  0x0313   ApproximateFNumber                   rational64u
+  0x0320   CameraTemperature                    int32s
+  0x0321   ColorTemperature                     int32u
+  0x0322   WBRedLevel                           rational64u
+  0x0323   WBGreenLevel                         rational64u
+  0x0324   WBBlueLevel                          rational64u
+  0x0325   UV-IRFilterCorrection                int32u
+  0x0330   CCDVersion                           int32u
+  0x0331   CCDBoardVersion                      int32u
+  0x0332   ControllerBoardVersion               int32u
+  0x0333   M16CVersion                          int32u
+  0x0340   ImageIDNumber                        int32u
+
+=head3 Panasonic Leica3 Tags
+
+These tags are used by the Leica R8 and R9 digital backs.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x000d   WB_RGBLevels                         int16u[3]
+
+=head3 Panasonic Leica4 Tags
+
+This information is written by the M9.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x3000   Subdir3000                           Panasonic Subdir
+  0x3100   Subdir3100                           Panasonic Subdir
+  0x3400   Subdir3400                           Panasonic Subdir
+  0x3900   Subdir3900                           Panasonic Subdir
+
+=head3 Panasonic Subdir Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x300a   Contrast                             int32u
+  0x300b   Sharpening                           int32u
+  0x300d   Saturation                           int32u
+  0x3033   WhiteBalance                         int32u
+  0x3034   JPEGQuality                          int32u
+  0x3036   WB_RGBLevels                         rational64u[3]
+  0x3038   UserProfile                          string
+  0x303a   JPEGSize                             int32u
+  0x3103   SerialNumber                         string
+  0x3109   FirmwareVersion                      string
+  0x312a   BaseISO                              int32u
+  0x312b   SensorWidth                          int32u
+  0x312c   SensorHeight                         int32u
+  0x312d   SensorBitDepth                       int32u
+  0x3402   CameraTemperature                    int32s
+  0x3405   LensType                             int32u
+  0x3406   ApproximateFNumber                   rational64u
+  0x3407   MeasuredLV                           int32s
+  0x3408   ExternalSensorBrightnessValue        int32s
+  0x3901   Data1                                Panasonic Data1
+  0x3902   Data2                                Panasonic Data2
+
+=head3 Panasonic Data1 Tags
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+     22    LensType                             int32u[0.25]
+
+=head3 Panasonic Data2 Tags
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+  [no tags known]
+
+=head3 Panasonic Leica5 Tags
+
+This information is written by the X1.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0407   OriginalFileName                     string
+  0x0408   OriginalDirectory                    string
+  0x040d   ExposureMode                         int8u[4]
+  0x0412   FilmMode                             string
+  0x0413   WB_RGBLevels                         rational64u[3]
+
+=head3 Panasonic Leica6 Tags
+
+This information is written by the S2 (as a trailer in JPEG images).
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0300   PreviewImage                         undef
+  0x0301   UnknownBlock?                        N
+  0x0303   LensType                             string
+
+=head3 Panasonic Type2 Tags
+
+This type of maker notes is used by models such as the NV-DS65, PV-D2002,
+PV-DC3000, PV-DV203, PV-DV401, PV-DV702, PV-L2001, PV-SD4090, PV-SD5000 and
+iPalm.
+
+  Index2   Tag Name                             Writable
+  ------   --------                             --------
+      0    MakerNoteType                        N
+      3    Gain                                 N
+
+=head3 Panasonic PANA Tags
+
+Tags extracted from the PANA user data found in MP4 videos from models such
+as the DMC-FT20.
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+      4    Model                                N
+     88    ThumbnailWidth                       N
+     90    ThumbnailHeight                      N
+     92    ThumbnailImage                       N
+  16488    ExifData                             EXIF
 
 =head2 Reconyx Tags
 
@@ -10185,18 +10320,39 @@ Camera settings for the A330 and A380.
 
 =head3 Sony CameraSettings3 Tags
 
-Camera settings decoded for the SLT-A55, but they also seem to apply to some
-other models
+Camera settings initially decoded for the SLT-A55, but they also apply to
+some other models
 
   Index1   Tag Name                             Writable
   ------   --------                             --------
       2    ISOSetting                           int8u
+      3    ExposureCompensation                 int8u
+      4    DriveModeSet                         int8u
+      5    ExposureProgram                      int8u
+      7    MeteringMode                         int8u
+      9    SonyImageSize                        int8u
+     10    AspectRatio                          int8u
+     11    Quality                              int8u
      12    DynamicRangeOptimizerSetting         int8u
      13    DynamicRangeOptimizerLevel           int8u
+     14    ColorSpace                           int8u
+     15    CreativeStyleSetting                 int8u
+     22    WhiteBalanceSetting                  int8u
+     32    FlashStatus                          int8u
+     33    FlashControl                         int8u
+     35    FlashExposureCompSet                 int8u
      36    AFAreaMode                           int8u
+     37    LongExposureNoiseReduction           int8u
+     38    HighISONoiseReduction                int8u
+     40    RedEyeReduction                      int8u
      45    AutoHDR                              int8u
      46    AutoHDRLevel                         int8u
+     50    SweepPanoramaSize                    int8u
+     52    DriveModeUsed                        int8u
      53    MultiFrameNoiseReduction             int8u
+     56    3DPanoramaSize                       int8u
+    135    FlashAction                          int8u
+    268    SequenceNumber                       int8u
 
 =head3 Sony CameraSettingsUnknown Tags
 
@@ -11301,6 +11457,1204 @@ official specification.
       3    CropYOffset                          N
       7    CropYViewpointNumber2                N
       8    CropYOffset2                         N
+
+=head2 Qualcomm Tags
+
+The tags below have been observed in the JPEG APP7 "Qualcomm Camera
+Attributes" segment written by some cameras such as the HP iPAQ Voice
+Messenger.  ExifTool will extract any information found from this segment,
+even if it is not listed in this table.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  HJREnable                                     N
+  HJRMaxNumFrames                               N
+  HJR_NReductionFlat                            N
+  HJR_NReductionTexture                         N
+  HJROneToTwoOffset                             N
+  HJRTextureThreshold                           N
+  AECAggressiveness                             N
+  AECCurrentExpIndex                            N
+  AECCurrentSensorLuma                          N
+  AECEnable                                     N
+  AECExposureIndexAdjStep                       N
+  AECHighLumaRegionCount                        N
+  AECHighLumaRegionThreshold                    N
+  AECIndoorIdx                                  N
+  AECLumaTarget                                 N
+  AECLumaTolerance                              N
+  AECMode                                       N
+  AECOdoorIdx                                   N
+  AECOutdoorBrightDiscarded                     N
+  AECOutdoorBrightEnable                        N
+  AECOutdoorBrightReduction                     N
+  AECOutdoorBrightThresholdHI                   N
+  AECOutdoorBrightThresholdLO                   N
+  AECOutdoorGammaIndex                          N
+  AECSnapshotDigitalGain                        N
+  AECSnapshotExposureTimeMs                     N
+  AECSnapshotLineCount                          N
+  AECSnapshotSensorGain                         N
+  AECVfeLuma                                    N
+  AFBoundary                                    N
+  AFCollectEndStat                              N
+  AFEnable                                      N
+  AFFarEnd                                      N
+  AFFineSrchPoints                              N
+  AFFineStep                                    N
+  AFFocusTime                                   N
+  AFGrossStep                                   N
+  AFMode                                        N
+  AFNearEnd                                     N
+  AFPosDefMacro                                 N
+  AFPosDefNorm                                  N
+  AFPosition                                    N
+  AFProcess                                     N
+  AFResetLensAfterSnap                          N
+  AFStepsNearFar                                N
+  AFStepsNearInfinity                           N
+  AFTestMode                                    N
+  AFTracePositions00                            N
+  AFTracePositions10                            N
+  AFTracePositions11                            N
+  AFTracePositions12                            N
+  AFTracePositions13                            N
+  AFTracePositions14                            N
+  AFTracePositions15                            N
+  AFTracePositions16                            N
+  AFTracePositions17                            N
+  AFTracePositions18                            N
+  AFTracePositions19                            N
+  AFTracePositions01                            N
+  AFTracePositions20                            N
+  AFTracePositions21                            N
+  AFTracePositions22                            N
+  AFTracePositions23                            N
+  AFTracePositions24                            N
+  AFTracePositions25                            N
+  AFTracePositions26                            N
+  AFTracePositions27                            N
+  AFTracePositions28                            N
+  AFTracePositions29                            N
+  AFTracePositions02                            N
+  AFTracePositions30                            N
+  AFTracePositions31                            N
+  AFTracePositions32                            N
+  AFTracePositions33                            N
+  AFTracePositions34                            N
+  AFTracePositions35                            N
+  AFTracePositions36                            N
+  AFTracePositions37                            N
+  AFTracePositions38                            N
+  AFTracePositions39                            N
+  AFTracePositions03                            N
+  AFTracePositions40                            N
+  AFTracePositions41                            N
+  AFTracePositions42                            N
+  AFTracePositions43                            N
+  AFTracePositions44                            N
+  AFTracePositions45                            N
+  AFTracePositions46                            N
+  AFTracePositions47                            N
+  AFTracePositions48                            N
+  AFTracePositions49                            N
+  AFTracePositions04                            N
+  AFTracePositions05                            N
+  AFTracePositions06                            N
+  AFTracePositions07                            N
+  AFTracePositions08                            N
+  AFTracePositions09                            N
+  AFTraceStats00                                N
+  AFTraceStats10                                N
+  AFTraceStats11                                N
+  AFTraceStats12                                N
+  AFTraceStats13                                N
+  AFTraceStats14                                N
+  AFTraceStats15                                N
+  AFTraceStats16                                N
+  AFTraceStats17                                N
+  AFTraceStats18                                N
+  AFTraceStats19                                N
+  AFTraceStats01                                N
+  AFTraceStats20                                N
+  AFTraceStats21                                N
+  AFTraceStats22                                N
+  AFTraceStats23                                N
+  AFTraceStats24                                N
+  AFTraceStats25                                N
+  AFTraceStats26                                N
+  AFTraceStats27                                N
+  AFTraceStats28                                N
+  AFTraceStats29                                N
+  AFTraceStats02                                N
+  AFTraceStats30                                N
+  AFTraceStats31                                N
+  AFTraceStats32                                N
+  AFTraceStats33                                N
+  AFTraceStats34                                N
+  AFTraceStats35                                N
+  AFTraceStats36                                N
+  AFTraceStats37                                N
+  AFTraceStats38                                N
+  AFTraceStats39                                N
+  AFTraceStats03                                N
+  AFTraceStats40                                N
+  AFTraceStats41                                N
+  AFTraceStats42                                N
+  AFTraceStats43                                N
+  AFTraceStats44                                N
+  AFTraceStats45                                N
+  AFTraceStats46                                N
+  AFTraceStats47                                N
+  AFTraceStats48                                N
+  AFTraceStats49                                N
+  AFTraceStats04                                N
+  AFTraceStats05                                N
+  AFTraceStats06                                N
+  AFTraceStats07                                N
+  AFTraceStats08                                N
+  AFTraceStats09                                N
+  AFUndershootProtect                           N
+  AFVfeHorzOffset                               N
+  AFVfeHorzWidth                                N
+  AFVfeMetricMax                                N
+  AFVfeVertHeight                               N
+  AFVfeVertOffset                               N
+  AFREnable                                     N
+  AFRFaster0ExpMod                              N
+  AFRFaster0Trigger                             N
+  AFRFaster1ExpMod                              N
+  AFRFaster1Trigger                             N
+  AFRFaster2ExpMod                              N
+  AFRFaster2Trigger                             N
+  AFRFaster3ExpMod                              N
+  AFRFaster3Trigger                             N
+  AFRFaster4ExpMod                              N
+  AFRFaster4Trigger                             N
+  AFRPossibleFrameCnt                           N
+  AFRSlower0ExpMod                              N
+  AFRSlower0Trigger                             N
+  AFRSlower1ExpMod                              N
+  AFRSlower1Trigger                             N
+  AFRSlower2ExpMod                              N
+  AFRSlower2Trigger                             N
+  AFRSlower3ExpMod                              N
+  AFRSlower3Trigger                             N
+  AFRSlower4ExpMod                              N
+  AFRSlower4Trigger                             N
+  AntiBadingPixelClk                            N
+  AntiBadingPixelClkPerLine                     N
+  AntibandingEnable                             N
+  ASF3EdgeDetect                                N
+  ASF3EdgeFilterA11                             N
+  ASF3EdgeFilterA12                             N
+  ASF3EdgeFilterA13                             N
+  ASF3EdgeFilterA21                             N
+  ASF3EdgeFilterA22                             N
+  ASF3EdgeFilterA23                             N
+  ASF3EdgeFilterA31                             N
+  ASF3EdgeFilterA32                             N
+  ASF3EdgeFilterA33                             N
+  ASF3Enable                                    N
+  ASF3LowerThreshold                            N
+  ASF3NoiseFilterA11                            N
+  ASF3NoiseFilterA12                            N
+  ASF3NoiseFilterA13                            N
+  ASF3NoiseFilterA21                            N
+  ASF3NoiseFilterA22                            N
+  ASF3NoiseFilterA23                            N
+  ASF3NoiseFilterA31                            N
+  ASF3NoiseFilterA32                            N
+  ASF3NoiseFilterA33                            N
+  ASF3UpperThreshold                            N
+  ASF5BrtLoThres                                N
+  ASF5BrtShrpDegF1                              N
+  ASF5BrtShrpDegF2                              N
+  ASF5BrtSmthPercent                            N
+  ASF5BrtUpThres                                N
+  ASF5Enable                                    N
+  ASF5ExposureIndex1                            N
+  ASF5ExposureIndex2                            N
+  ASF5Filter1A11                                N
+  ASF5Filter1A12                                N
+  ASF5Filter1A13                                N
+  ASF5Filter1A14                                N
+  ASF5Filter1A15                                N
+  ASF5Filter1A21                                N
+  ASF5Filter1A22                                N
+  ASF5Filter1A23                                N
+  ASF5Filter1A24                                N
+  ASF5Filter1A25                                N
+  ASF5Filter1A31                                N
+  ASF5Filter1A32                                N
+  ASF5Filter1A33                                N
+  ASF5Filter1A34                                N
+  ASF5Filter1A35                                N
+  ASF5Filter1A41                                N
+  ASF5Filter1A42                                N
+  ASF5Filter1A43                                N
+  ASF5Filter1A44                                N
+  ASF5Filter1A45                                N
+  ASF5Filter1A51                                N
+  ASF5Filter1A52                                N
+  ASF5Filter1A53                                N
+  ASF5Filter1A54                                N
+  ASF5Filter1A55                                N
+  ASF5Filter2A11                                N
+  ASF5Filter2A12                                N
+  ASF5Filter2A13                                N
+  ASF5Filter2A14                                N
+  ASF5Filter2A15                                N
+  ASF5Filter2A21                                N
+  ASF5Filter2A22                                N
+  ASF5Filter2A23                                N
+  ASF5Filter2A24                                N
+  ASF5Filter2A25                                N
+  ASF5Filter2A31                                N
+  ASF5Filter2A32                                N
+  ASF5Filter2A33                                N
+  ASF5Filter2A34                                N
+  ASF5Filter2A35                                N
+  ASF5Filter2A41                                N
+  ASF5Filter2A42                                N
+  ASF5Filter2A43                                N
+  ASF5Filter2A44                                N
+  ASF5Filter2A45                                N
+  ASF5Filter2A51                                N
+  ASF5Filter2A52                                N
+  ASF5Filter2A53                                N
+  ASF5Filter2A54                                N
+  ASF5Filter2A55                                N
+  ASF5FilterMode                                N
+  ASF5LowLoThres                                N
+  ASF5LowShrpDegF1                              N
+  ASF5LowShrpDegF2                              N
+  ASF5LowSmthPrcnt                              N
+  ASF5LowUpThres                                N
+  ASF5LumaFilter00                              N
+  ASF5LumaFilter01                              N
+  ASF5LumaFilter02                              N
+  ASF5LumaFilter03                              N
+  ASF5LumaFilter04                              N
+  ASF5LumaFilter05                              N
+  ASF5LumaFilter06                              N
+  ASF5LumaFilter07                              N
+  ASF5LumaFilter08                              N
+  ASF5MaxExposureIndex                          N
+  ASF5NrmLoThres                                N
+  ASF5NrmShrpDegF1                              N
+  ASF5NrmShrpDegF2                              N
+  ASF5NrmSmthPrcnt                              N
+  ASF5NrmUpThres                                N
+  ASF5NrmizeFactor1                             N
+  ASF5NrmizeFactor2                             N
+  AWBAggressiveness                             N
+  AWBAgwGridDist2Thresh                         N
+  AWBAlgorithm                                  N
+  AWBAveBgRatio                                 N
+  AWBAveRgRatio                                 N
+  AWBBlueGainAdjRef1                            N
+  AWBBlueGainAdjRef2                            N
+  AWBBlueGainAdjRef3                            N
+  AWBBlueGainAdjRef4                            N
+  AWBBlueGainAdjRef5                            N
+  AWBBlueGainAdjRef6                            N
+  AWBBlueGainAdjRef7                            N
+  AWBBlueGainAdjRef8                            N
+  AWBBlueGainRef1                               N
+  AWBBlueGainRef2                               N
+  AWBBlueGainRef3                               N
+  AWBBlueGainRef4                               N
+  AWBBlueGainRef5                               N
+  AWBBlueGainRef6                               N
+  AWBBlueGainRef7                               N
+  AWBBlueGainRef8                               N
+  AWBCcBias                                     N
+  AWBCompactClusterR2                           N
+  AWBEnable                                     N
+  AWBGreenOffsetBg                              N
+  AWBGreenOffsetRg                              N
+  AWBIndoorSampleInfluence                      N
+  AWBLoVfeC1                                    N
+  AWBLoVfeC2                                    N
+  AWBLoVfeC3                                    N
+  AWBLoVfeC4                                    N
+  AWBLoVfeM1                                    N
+  AWBLoVfeM2                                    N
+  AWBLoVfeM3                                    N
+  AWBLoVfeM4                                    N
+  AWBLoVfeMaxY                                  N
+  AWBLoVfeMinY                                  N
+  AWBLowLigColCorEna                            N
+  AWBMaxBGain                                   N
+  AWBMaxGGain                                   N
+  AWBMaxRGain                                   N
+  AWBMinBGain                                   N
+  AWBMinGGain                                   N
+  AWBMinRGain                                   N
+  AWBNormVfeC1                                  N
+  AWBNormVfeC2                                  N
+  AWBNormVfeC3                                  N
+  AWBNormVfeC4                                  N
+  AWBNormVfeM1                                  N
+  AWBNormVfeM2                                  N
+  AWBNormVfeM3                                  N
+  AWBNormVfeM4                                  N
+  AWBNormVfeMaxY                                N
+  AWBNormVfeMinY                                N
+  AWBOudorVfeC1                                 N
+  AWBOudorVfeC2                                 N
+  AWBOudorVfeC3                                 N
+  AWBOudorVfeC4                                 N
+  AWBOudorVfeM1                                 N
+  AWBOudorVfeM2                                 N
+  AWBOudorVfeM3                                 N
+  AWBOudorVfeM4                                 N
+  AWBOudorVfeMaxY                               N
+  AWBOudorVfeMinY                               N
+  AWBOutdoorSampleInfluence                     N
+  AWBPrevWbBgain                                N
+  AWBPrevWbGgain                                N
+  AWBPrevWbRgain                                N
+  AWBRedGainAdjRef1                             N
+  AWBRedGainAdjRef2                             N
+  AWBRedGainAdjRef3                             N
+  AWBRedGainAdjRef4                             N
+  AWBRedGainAdjRef5                             N
+  AWBRedGainAdjRef6                             N
+  AWBRedGainAdjRef7                             N
+  AWBRedGainAdjRef8                             N
+  AWBRedGainRef1                                N
+  AWBRedGainRef2                                N
+  AWBRedGainRef3                                N
+  AWBRedGainRef4                                N
+  AWBRedGainRef5                                N
+  AWBRedGainRef6                                N
+  AWBRedGainRef7                                N
+  AWBRedGainRef8                                N
+  AWBSampleDecision                             N
+  AWBSnapshotBGain                              N
+  AWBSnapshotRGain                              N
+  BlckLvlEvenCols                               N
+  BlckLvlOddCols                                N
+  CamMclkHz                                     N
+  ChroSupChroThres1                             N
+  ChroSupChroThres2                             N
+  ChroSupLumaThres1                             N
+  ChroSupLumaThres2                             N
+  ChroSupLumaThres3                             N
+  ChroSupLumaThres4                             N
+  ChromSupress                                  N
+  ClipToAfRato                                  N
+  CurrResol                                     N
+  DayltConvChrmA_M                              N
+  DayltConvChrmA_P                              N
+  DayltConvChrmB_M                              N
+  DayltConvChrmB_P                              N
+  DayltConvChrmC_M                              N
+  DayltConvChrmC_P                              N
+  DayltConvChrmD_M                              N
+  DayltConvChrmD_P                              N
+  DayltConvChrmKCb                              N
+  DayltConvChrmKCr                              N
+  DayltConvLumaK                                N
+  DayltConvLumaV0                               N
+  DayltConvLumaV1                               N
+  DayltConvLumaV2                               N
+  DefConvChrmA_M                                N
+  DefConvChrmA_P                                N
+  DefConvChrmB_M                                N
+  DefConvChrmB_P                                N
+  DefConvChrmC_M                                N
+  DefConvChrmC_P                                N
+  DefConvChrmD_M                                N
+  DefConvChrmD_P                                N
+  DefConvChrmKCb                                N
+  DefConvChrmKCr                                N
+  DefConvLumaK                                  N
+  DefConvLumaV0                                 N
+  DefConvLumaV1                                 N
+  DefConvLumaV2                                 N
+  DefCorC0                                      N
+  DefCorC1                                      N
+  DefCorC2                                      N
+  DefCorC3                                      N
+  DefCorC4                                      N
+  DefCorC5                                      N
+  DefCorC6                                      N
+  DefCorC7                                      N
+  DefCorC8                                      N
+  DefCorK0                                      N
+  DefCorK1                                      N
+  DefCorK2                                      N
+  DefLumaGammaMode                              N
+  DefRgbGammaMode                               N
+  DefectPixCorEnable                            N
+  DefectPixMaxThresh                            N
+  DefectPixMinThresh                            N
+  DiscardFrstFrm                                N
+  FrmSkipPttrn                                  N
+  GammaEnable                                   N
+  IncandConvChrmA_M                             N
+  IncandConvChrmA_P                             N
+  IncandConvChrmB_M                             N
+  IncandConvChrmB_P                             N
+  IncandConvChrmC_M                             N
+  IncandConvChrmC_P                             N
+  IncandConvChrmD_M                             N
+  IncandConvChrmD_P                             N
+  IncandConvChrmKCb                             N
+  IncandConvChrmKCr                             N
+  IncandConvLumaK                               N
+  IncandConvLumaV0                              N
+  IncandConvLumaV1                              N
+  IncandConvLumaV2                              N
+  LADetect                                      N
+  LAEnable                                      N
+  MaxPrviewFps                                  N
+  MaxVideoFps                                   N
+  NghtshtFps                                    N
+  NightshotMode                                 N
+  OutlierDistance                               N
+  PclkInvert                                    N
+  PrviewFps                                     N
+  PrviewResol                                   N
+  R2ABlueCtbl00                                 N
+  R2ABlueCtbl10                                 N
+  R2ABlueCtbl11                                 N
+  R2ABlueCtbl12                                 N
+  R2ABlueCtbl13                                 N
+  R2ABlueCtbl14                                 N
+  R2ABlueCtbl15                                 N
+  R2ABlueCtbl16                                 N
+  R2ABlueCtbl17                                 N
+  R2ABlueCtbl18                                 N
+  R2ABlueCtbl19                                 N
+  R2ABlueCtbl01                                 N
+  R2ABlueCtbl20                                 N
+  R2ABlueCtbl21                                 N
+  R2ABlueCtbl22                                 N
+  R2ABlueCtbl23                                 N
+  R2ABlueCtbl24                                 N
+  R2ABlueCtbl25                                 N
+  R2ABlueCtbl26                                 N
+  R2ABlueCtbl27                                 N
+  R2ABlueCtbl28                                 N
+  R2ABlueCtbl29                                 N
+  R2ABlueCtbl02                                 N
+  R2ABlueCtbl30                                 N
+  R2ABlueCtbl31                                 N
+  R2ABlueCtbl03                                 N
+  R2ABlueCtbl04                                 N
+  R2ABlueCtbl05                                 N
+  R2ABlueCtbl06                                 N
+  R2ABlueCtbl07                                 N
+  R2ABlueCtbl08                                 N
+  R2ABlueCtbl09                                 N
+  R2ABlueStbl00                                 N
+  R2ABlueStbl10                                 N
+  R2ABlueStbl11                                 N
+  R2ABlueStbl12                                 N
+  R2ABlueStbl13                                 N
+  R2ABlueStbl14                                 N
+  R2ABlueStbl15                                 N
+  R2ABlueStbl16                                 N
+  R2ABlueStbl17                                 N
+  R2ABlueStbl18                                 N
+  R2ABlueStbl19                                 N
+  R2ABlueStbl01                                 N
+  R2ABlueStbl20                                 N
+  R2ABlueStbl21                                 N
+  R2ABlueStbl22                                 N
+  R2ABlueStbl23                                 N
+  R2ABlueStbl24                                 N
+  R2ABlueStbl25                                 N
+  R2ABlueStbl26                                 N
+  R2ABlueStbl27                                 N
+  R2ABlueStbl28                                 N
+  R2ABlueStbl29                                 N
+  R2ABlueStbl02                                 N
+  R2ABlueStbl30                                 N
+  R2ABlueStbl31                                 N
+  R2ABlueStbl03                                 N
+  R2ABlueStbl04                                 N
+  R2ABlueStbl05                                 N
+  R2ABlueStbl06                                 N
+  R2ABlueStbl07                                 N
+  R2ABlueStbl08                                 N
+  R2ABlueStbl09                                 N
+  R2ACx                                         N
+  R2ACy                                         N
+  R2AGreenCtbl00                                N
+  R2AGreenCtbl10                                N
+  R2AGreenCtbl11                                N
+  R2AGreenCtbl12                                N
+  R2AGreenCtbl13                                N
+  R2AGreenCtbl14                                N
+  R2AGreenCtbl15                                N
+  R2AGreenCtbl16                                N
+  R2AGreenCtbl17                                N
+  R2AGreenCtbl18                                N
+  R2AGreenCtbl19                                N
+  R2AGreenCtbl01                                N
+  R2AGreenCtbl20                                N
+  R2AGreenCtbl21                                N
+  R2AGreenCtbl22                                N
+  R2AGreenCtbl23                                N
+  R2AGreenCtbl24                                N
+  R2AGreenCtbl25                                N
+  R2AGreenCtbl26                                N
+  R2AGreenCtbl27                                N
+  R2AGreenCtbl28                                N
+  R2AGreenCtbl29                                N
+  R2AGreenCtbl02                                N
+  R2AGreenCtbl30                                N
+  R2AGreenCtbl31                                N
+  R2AGreenCtbl03                                N
+  R2AGreenCtbl04                                N
+  R2AGreenCtbl05                                N
+  R2AGreenCtbl06                                N
+  R2AGreenCtbl07                                N
+  R2AGreenCtbl08                                N
+  R2AGreenCtbl09                                N
+  R2AGreenStbl00                                N
+  R2AGreenStbl10                                N
+  R2AGreenStbl11                                N
+  R2AGreenStbl12                                N
+  R2AGreenStbl13                                N
+  R2AGreenStbl14                                N
+  R2AGreenStbl15                                N
+  R2AGreenStbl16                                N
+  R2AGreenStbl17                                N
+  R2AGreenStbl18                                N
+  R2AGreenStbl19                                N
+  R2AGreenStbl01                                N
+  R2AGreenStbl20                                N
+  R2AGreenStbl21                                N
+  R2AGreenStbl22                                N
+  R2AGreenStbl23                                N
+  R2AGreenStbl24                                N
+  R2AGreenStbl25                                N
+  R2AGreenStbl26                                N
+  R2AGreenStbl27                                N
+  R2AGreenStbl28                                N
+  R2AGreenStbl29                                N
+  R2AGreenStbl02                                N
+  R2AGreenStbl30                                N
+  R2AGreenStbl31                                N
+  R2AGreenStbl03                                N
+  R2AGreenStbl04                                N
+  R2AGreenStbl05                                N
+  R2AGreenStbl06                                N
+  R2AGreenStbl07                                N
+  R2AGreenStbl08                                N
+  R2AGreenStbl09                                N
+  R2AHeight                                     N
+  R2AIntervals                                  N
+  R2ARedCtbl00                                  N
+  R2ARedCtbl10                                  N
+  R2ARedCtbl11                                  N
+  R2ARedCtbl12                                  N
+  R2ARedCtbl13                                  N
+  R2ARedCtbl14                                  N
+  R2ARedCtbl15                                  N
+  R2ARedCtbl16                                  N
+  R2ARedCtbl17                                  N
+  R2ARedCtbl18                                  N
+  R2ARedCtbl19                                  N
+  R2ARedCtbl01                                  N
+  R2ARedCtbl20                                  N
+  R2ARedCtbl21                                  N
+  R2ARedCtbl22                                  N
+  R2ARedCtbl23                                  N
+  R2ARedCtbl24                                  N
+  R2ARedCtbl25                                  N
+  R2ARedCtbl26                                  N
+  R2ARedCtbl27                                  N
+  R2ARedCtbl28                                  N
+  R2ARedCtbl29                                  N
+  R2ARedCtbl02                                  N
+  R2ARedCtbl30                                  N
+  R2ARedCtbl31                                  N
+  R2ARedCtbl03                                  N
+  R2ARedCtbl04                                  N
+  R2ARedCtbl05                                  N
+  R2ARedCtbl06                                  N
+  R2ARedCtbl07                                  N
+  R2ARedCtbl08                                  N
+  R2ARedCtbl09                                  N
+  R2ARedStbl00                                  N
+  R2ARedStbl10                                  N
+  R2ARedStbl11                                  N
+  R2ARedStbl12                                  N
+  R2ARedStbl13                                  N
+  R2ARedStbl14                                  N
+  R2ARedStbl15                                  N
+  R2ARedStbl16                                  N
+  R2ARedStbl17                                  N
+  R2ARedStbl18                                  N
+  R2ARedStbl19                                  N
+  R2ARedStbl01                                  N
+  R2ARedStbl20                                  N
+  R2ARedStbl21                                  N
+  R2ARedStbl22                                  N
+  R2ARedStbl23                                  N
+  R2ARedStbl24                                  N
+  R2ARedStbl25                                  N
+  R2ARedStbl26                                  N
+  R2ARedStbl27                                  N
+  R2ARedStbl28                                  N
+  R2ARedStbl29                                  N
+  R2ARedStbl02                                  N
+  R2ARedStbl30                                  N
+  R2ARedStbl31                                  N
+  R2ARedStbl03                                  N
+  R2ARedStbl04                                  N
+  R2ARedStbl05                                  N
+  R2ARedStbl06                                  N
+  R2ARedStbl07                                  N
+  R2ARedStbl08                                  N
+  R2ARedStbl09                                  N
+  R2ATbl00                                      N
+  R2ATbl10                                      N
+  R2ATbl11                                      N
+  R2ATbl12                                      N
+  R2ATbl13                                      N
+  R2ATbl14                                      N
+  R2ATbl15                                      N
+  R2ATbl16                                      N
+  R2ATbl17                                      N
+  R2ATbl18                                      N
+  R2ATbl19                                      N
+  R2ATbl01                                      N
+  R2ATbl20                                      N
+  R2ATbl21                                      N
+  R2ATbl22                                      N
+  R2ATbl23                                      N
+  R2ATbl24                                      N
+  R2ATbl25                                      N
+  R2ATbl26                                      N
+  R2ATbl27                                      N
+  R2ATbl28                                      N
+  R2ATbl29                                      N
+  R2ATbl02                                      N
+  R2ATbl30                                      N
+  R2ATbl31                                      N
+  R2ATbl03                                      N
+  R2ATbl04                                      N
+  R2ATbl05                                      N
+  R2ATbl06                                      N
+  R2ATbl07                                      N
+  R2ATbl08                                      N
+  R2ATbl09                                      N
+  R2AWidth                                      N
+  R2D65BlueCtbl00                               N
+  R2D65BlueCtbl10                               N
+  R2D65BlueCtbl11                               N
+  R2D65BlueCtbl12                               N
+  R2D65BlueCtbl13                               N
+  R2D65BlueCtbl14                               N
+  R2D65BlueCtbl15                               N
+  R2D65BlueCtbl16                               N
+  R2D65BlueCtbl17                               N
+  R2D65BlueCtbl18                               N
+  R2D65BlueCtbl19                               N
+  R2D65BlueCtbl01                               N
+  R2D65BlueCtbl20                               N
+  R2D65BlueCtbl21                               N
+  R2D65BlueCtbl22                               N
+  R2D65BlueCtbl23                               N
+  R2D65BlueCtbl24                               N
+  R2D65BlueCtbl25                               N
+  R2D65BlueCtbl26                               N
+  R2D65BlueCtbl27                               N
+  R2D65BlueCtbl28                               N
+  R2D65BlueCtbl29                               N
+  R2D65BlueCtbl02                               N
+  R2D65BlueCtbl30                               N
+  R2D65BlueCtbl31                               N
+  R2D65BlueCtbl03                               N
+  R2D65BlueCtbl04                               N
+  R2D65BlueCtbl05                               N
+  R2D65BlueCtbl06                               N
+  R2D65BlueCtbl07                               N
+  R2D65BlueCtbl08                               N
+  R2D65BlueCtbl09                               N
+  R2D65BlueStbl00                               N
+  R2D65BlueStbl10                               N
+  R2D65BlueStbl11                               N
+  R2D65BlueStbl12                               N
+  R2D65BlueStbl13                               N
+  R2D65BlueStbl14                               N
+  R2D65BlueStbl15                               N
+  R2D65BlueStbl16                               N
+  R2D65BlueStbl17                               N
+  R2D65BlueStbl18                               N
+  R2D65BlueStbl19                               N
+  R2D65BlueStbl01                               N
+  R2D65BlueStbl20                               N
+  R2D65BlueStbl21                               N
+  R2D65BlueStbl22                               N
+  R2D65BlueStbl23                               N
+  R2D65BlueStbl24                               N
+  R2D65BlueStbl25                               N
+  R2D65BlueStbl26                               N
+  R2D65BlueStbl27                               N
+  R2D65BlueStbl28                               N
+  R2D65BlueStbl29                               N
+  R2D65BlueStbl02                               N
+  R2D65BlueStbl30                               N
+  R2D65BlueStbl31                               N
+  R2D65BlueStbl03                               N
+  R2D65BlueStbl04                               N
+  R2D65BlueStbl05                               N
+  R2D65BlueStbl06                               N
+  R2D65BlueStbl07                               N
+  R2D65BlueStbl08                               N
+  R2D65BlueStbl09                               N
+  R2D65Cx                                       N
+  R2D65Cy                                       N
+  R2D65GreenCtbl00                              N
+  R2D65GreenCtbl10                              N
+  R2D65GreenCtbl11                              N
+  R2D65GreenCtbl12                              N
+  R2D65GreenCtbl13                              N
+  R2D65GreenCtbl14                              N
+  R2D65GreenCtbl15                              N
+  R2D65GreenCtbl16                              N
+  R2D65GreenCtbl17                              N
+  R2D65GreenCtbl18                              N
+  R2D65GreenCtbl19                              N
+  R2D65GreenCtbl01                              N
+  R2D65GreenCtbl20                              N
+  R2D65GreenCtbl21                              N
+  R2D65GreenCtbl22                              N
+  R2D65GreenCtbl23                              N
+  R2D65GreenCtbl24                              N
+  R2D65GreenCtbl25                              N
+  R2D65GreenCtbl26                              N
+  R2D65GreenCtbl27                              N
+  R2D65GreenCtbl28                              N
+  R2D65GreenCtbl29                              N
+  R2D65GreenCtbl02                              N
+  R2D65GreenCtbl30                              N
+  R2D65GreenCtbl31                              N
+  R2D65GreenCtbl03                              N
+  R2D65GreenCtbl04                              N
+  R2D65GreenCtbl05                              N
+  R2D65GreenCtbl06                              N
+  R2D65GreenCtbl07                              N
+  R2D65GreenCtbl08                              N
+  R2D65GreenCtbl09                              N
+  R2D65GreenStbl00                              N
+  R2D65GreenStbl10                              N
+  R2D65GreenStbl11                              N
+  R2D65GreenStbl12                              N
+  R2D65GreenStbl13                              N
+  R2D65GreenStbl14                              N
+  R2D65GreenStbl15                              N
+  R2D65GreenStbl16                              N
+  R2D65GreenStbl17                              N
+  R2D65GreenStbl18                              N
+  R2D65GreenStbl19                              N
+  R2D65GreenStbl01                              N
+  R2D65GreenStbl20                              N
+  R2D65GreenStbl21                              N
+  R2D65GreenStbl22                              N
+  R2D65GreenStbl23                              N
+  R2D65GreenStbl24                              N
+  R2D65GreenStbl25                              N
+  R2D65GreenStbl26                              N
+  R2D65GreenStbl27                              N
+  R2D65GreenStbl28                              N
+  R2D65GreenStbl29                              N
+  R2D65GreenStbl02                              N
+  R2D65GreenStbl30                              N
+  R2D65GreenStbl31                              N
+  R2D65GreenStbl03                              N
+  R2D65GreenStbl04                              N
+  R2D65GreenStbl05                              N
+  R2D65GreenStbl06                              N
+  R2D65GreenStbl07                              N
+  R2D65GreenStbl08                              N
+  R2D65GreenStbl09                              N
+  R2D65Height                                   N
+  R2D65Intervals                                N
+  R2D65RedCtbl00                                N
+  R2D65RedCtbl10                                N
+  R2D65RedCtbl11                                N
+  R2D65RedCtbl12                                N
+  R2D65RedCtbl13                                N
+  R2D65RedCtbl14                                N
+  R2D65RedCtbl15                                N
+  R2D65RedCtbl16                                N
+  R2D65RedCtbl17                                N
+  R2D65RedCtbl18                                N
+  R2D65RedCtbl19                                N
+  R2D65RedCtbl01                                N
+  R2D65RedCtbl20                                N
+  R2D65RedCtbl21                                N
+  R2D65RedCtbl22                                N
+  R2D65RedCtbl23                                N
+  R2D65RedCtbl24                                N
+  R2D65RedCtbl25                                N
+  R2D65RedCtbl26                                N
+  R2D65RedCtbl27                                N
+  R2D65RedCtbl28                                N
+  R2D65RedCtbl29                                N
+  R2D65RedCtbl02                                N
+  R2D65RedCtbl30                                N
+  R2D65RedCtbl31                                N
+  R2D65RedCtbl03                                N
+  R2D65RedCtbl04                                N
+  R2D65RedCtbl05                                N
+  R2D65RedCtbl06                                N
+  R2D65RedCtbl07                                N
+  R2D65RedCtbl08                                N
+  R2D65RedCtbl09                                N
+  R2D65RedStbl00                                N
+  R2D65RedStbl10                                N
+  R2D65RedStbl11                                N
+  R2D65RedStbl12                                N
+  R2D65RedStbl13                                N
+  R2D65RedStbl14                                N
+  R2D65RedStbl15                                N
+  R2D65RedStbl16                                N
+  R2D65RedStbl17                                N
+  R2D65RedStbl18                                N
+  R2D65RedStbl19                                N
+  R2D65RedStbl01                                N
+  R2D65RedStbl20                                N
+  R2D65RedStbl21                                N
+  R2D65RedStbl22                                N
+  R2D65RedStbl23                                N
+  R2D65RedStbl24                                N
+  R2D65RedStbl25                                N
+  R2D65RedStbl26                                N
+  R2D65RedStbl27                                N
+  R2D65RedStbl28                                N
+  R2D65RedStbl29                                N
+  R2D65RedStbl02                                N
+  R2D65RedStbl30                                N
+  R2D65RedStbl31                                N
+  R2D65RedStbl03                                N
+  R2D65RedStbl04                                N
+  R2D65RedStbl05                                N
+  R2D65RedStbl06                                N
+  R2D65RedStbl07                                N
+  R2D65RedStbl08                                N
+  R2D65RedStbl09                                N
+  R2D65Tbl00                                    N
+  R2D65Tbl10                                    N
+  R2D65Tbl11                                    N
+  R2D65Tbl12                                    N
+  R2D65Tbl13                                    N
+  R2D65Tbl14                                    N
+  R2D65Tbl15                                    N
+  R2D65Tbl16                                    N
+  R2D65Tbl17                                    N
+  R2D65Tbl18                                    N
+  R2D65Tbl19                                    N
+  R2D65Tbl01                                    N
+  R2D65Tbl20                                    N
+  R2D65Tbl21                                    N
+  R2D65Tbl22                                    N
+  R2D65Tbl23                                    N
+  R2D65Tbl24                                    N
+  R2D65Tbl25                                    N
+  R2D65Tbl26                                    N
+  R2D65Tbl27                                    N
+  R2D65Tbl28                                    N
+  R2D65Tbl29                                    N
+  R2D65Tbl02                                    N
+  R2D65Tbl30                                    N
+  R2D65Tbl31                                    N
+  R2D65Tbl03                                    N
+  R2D65Tbl04                                    N
+  R2D65Tbl05                                    N
+  R2D65Tbl06                                    N
+  R2D65Tbl07                                    N
+  R2D65Tbl08                                    N
+  R2D65Tbl09                                    N
+  R2D65Width                                    N
+  R2TL84BlueCtbl00                              N
+  R2TL84BlueCtbl10                              N
+  R2TL84BlueCtbl11                              N
+  R2TL84BlueCtbl12                              N
+  R2TL84BlueCtbl13                              N
+  R2TL84BlueCtbl14                              N
+  R2TL84BlueCtbl15                              N
+  R2TL84BlueCtbl16                              N
+  R2TL84BlueCtbl17                              N
+  R2TL84BlueCtbl18                              N
+  R2TL84BlueCtbl19                              N
+  R2TL84BlueCtbl01                              N
+  R2TL84BlueCtbl20                              N
+  R2TL84BlueCtbl21                              N
+  R2TL84BlueCtbl22                              N
+  R2TL84BlueCtbl23                              N
+  R2TL84BlueCtbl24                              N
+  R2TL84BlueCtbl25                              N
+  R2TL84BlueCtbl26                              N
+  R2TL84BlueCtbl27                              N
+  R2TL84BlueCtbl28                              N
+  R2TL84BlueCtbl29                              N
+  R2TL84BlueCtbl02                              N
+  R2TL84BlueCtbl30                              N
+  R2TL84BlueCtbl31                              N
+  R2TL84BlueCtbl03                              N
+  R2TL84BlueCtbl04                              N
+  R2TL84BlueCtbl05                              N
+  R2TL84BlueCtbl06                              N
+  R2TL84BlueCtbl07                              N
+  R2TL84BlueCtbl08                              N
+  R2TL84BlueCtbl09                              N
+  R2TL84BlueStbl00                              N
+  R2TL84BlueStbl10                              N
+  R2TL84BlueStbl11                              N
+  R2TL84BlueStbl12                              N
+  R2TL84BlueStbl13                              N
+  R2TL84BlueStbl14                              N
+  R2TL84BlueStbl15                              N
+  R2TL84BlueStbl16                              N
+  R2TL84BlueStbl17                              N
+  R2TL84BlueStbl18                              N
+  R2TL84BlueStbl19                              N
+  R2TL84BlueStbl01                              N
+  R2TL84BlueStbl20                              N
+  R2TL84BlueStbl21                              N
+  R2TL84BlueStbl22                              N
+  R2TL84BlueStbl23                              N
+  R2TL84BlueStbl24                              N
+  R2TL84BlueStbl25                              N
+  R2TL84BlueStbl26                              N
+  R2TL84BlueStbl27                              N
+  R2TL84BlueStbl28                              N
+  R2TL84BlueStbl29                              N
+  R2TL84BlueStbl02                              N
+  R2TL84BlueStbl30                              N
+  R2TL84BlueStbl31                              N
+  R2TL84BlueStbl03                              N
+  R2TL84BlueStbl04                              N
+  R2TL84BlueStbl05                              N
+  R2TL84BlueStbl06                              N
+  R2TL84BlueStbl07                              N
+  R2TL84BlueStbl08                              N
+  R2TL84BlueStbl09                              N
+  R2TL84Cx                                      N
+  R2TL84Cy                                      N
+  R2TL84GreenCtbl00                             N
+  R2TL84GreenCtbl10                             N
+  R2TL84GreenCtbl11                             N
+  R2TL84GreenCtbl12                             N
+  R2TL84GreenCtbl13                             N
+  R2TL84GreenCtbl14                             N
+  R2TL84GreenCtbl15                             N
+  R2TL84GreenCtbl16                             N
+  R2TL84GreenCtbl17                             N
+  R2TL84GreenCtbl18                             N
+  R2TL84GreenCtbl19                             N
+  R2TL84GreenCtbl01                             N
+  R2TL84GreenCtbl20                             N
+  R2TL84GreenCtbl21                             N
+  R2TL84GreenCtbl22                             N
+  R2TL84GreenCtbl23                             N
+  R2TL84GreenCtbl24                             N
+  R2TL84GreenCtbl25                             N
+  R2TL84GreenCtbl26                             N
+  R2TL84GreenCtbl27                             N
+  R2TL84GreenCtbl28                             N
+  R2TL84GreenCtbl29                             N
+  R2TL84GreenCtbl02                             N
+  R2TL84GreenCtbl30                             N
+  R2TL84GreenCtbl31                             N
+  R2TL84GreenCtbl03                             N
+  R2TL84GreenCtbl04                             N
+  R2TL84GreenCtbl05                             N
+  R2TL84GreenCtbl06                             N
+  R2TL84GreenCtbl07                             N
+  R2TL84GreenCtbl08                             N
+  R2TL84GreenCtbl09                             N
+  R2TL84GreenStbl00                             N
+  R2TL84GreenStbl10                             N
+  R2TL84GreenStbl11                             N
+  R2TL84GreenStbl12                             N
+  R2TL84GreenStbl13                             N
+  R2TL84GreenStbl14                             N
+  R2TL84GreenStbl15                             N
+  R2TL84GreenStbl16                             N
+  R2TL84GreenStbl17                             N
+  R2TL84GreenStbl18                             N
+  R2TL84GreenStbl19                             N
+  R2TL84GreenStbl01                             N
+  R2TL84GreenStbl20                             N
+  R2TL84GreenStbl21                             N
+  R2TL84GreenStbl22                             N
+  R2TL84GreenStbl23                             N
+  R2TL84GreenStbl24                             N
+  R2TL84GreenStbl25                             N
+  R2TL84GreenStbl26                             N
+  R2TL84GreenStbl27                             N
+  R2TL84GreenStbl28                             N
+  R2TL84GreenStbl29                             N
+  R2TL84GreenStbl02                             N
+  R2TL84GreenStbl30                             N
+  R2TL84GreenStbl31                             N
+  R2TL84GreenStbl03                             N
+  R2TL84GreenStbl04                             N
+  R2TL84GreenStbl05                             N
+  R2TL84GreenStbl06                             N
+  R2TL84GreenStbl07                             N
+  R2TL84GreenStbl08                             N
+  R2TL84GreenStbl09                             N
+  R2TL84Height                                  N
+  R2TL84Intervals                               N
+  R2TL84RedCtbl00                               N
+  R2TL84RedCtbl10                               N
+  R2TL84RedCtbl11                               N
+  R2TL84RedCtbl12                               N
+  R2TL84RedCtbl13                               N
+  R2TL84RedCtbl14                               N
+  R2TL84RedCtbl15                               N
+  R2TL84RedCtbl16                               N
+  R2TL84RedCtbl17                               N
+  R2TL84RedCtbl18                               N
+  R2TL84RedCtbl19                               N
+  R2TL84RedCtbl01                               N
+  R2TL84RedCtbl20                               N
+  R2TL84RedCtbl21                               N
+  R2TL84RedCtbl22                               N
+  R2TL84RedCtbl23                               N
+  R2TL84RedCtbl24                               N
+  R2TL84RedCtbl25                               N
+  R2TL84RedCtbl26                               N
+  R2TL84RedCtbl27                               N
+  R2TL84RedCtbl28                               N
+  R2TL84RedCtbl29                               N
+  R2TL84RedCtbl02                               N
+  R2TL84RedCtbl30                               N
+  R2TL84RedCtbl31                               N
+  R2TL84RedCtbl03                               N
+  R2TL84RedCtbl04                               N
+  R2TL84RedCtbl05                               N
+  R2TL84RedCtbl06                               N
+  R2TL84RedCtbl07                               N
+  R2TL84RedCtbl08                               N
+  R2TL84RedCtbl09                               N
+  R2TL84RedStbl00                               N
+  R2TL84RedStbl10                               N
+  R2TL84RedStbl11                               N
+  R2TL84RedStbl12                               N
+  R2TL84RedStbl13                               N
+  R2TL84RedStbl14                               N
+  R2TL84RedStbl15                               N
+  R2TL84RedStbl16                               N
+  R2TL84RedStbl17                               N
+  R2TL84RedStbl18                               N
+  R2TL84RedStbl19                               N
+  R2TL84RedStbl01                               N
+  R2TL84RedStbl20                               N
+  R2TL84RedStbl21                               N
+  R2TL84RedStbl22                               N
+  R2TL84RedStbl23                               N
+  R2TL84RedStbl24                               N
+  R2TL84RedStbl25                               N
+  R2TL84RedStbl26                               N
+  R2TL84RedStbl27                               N
+  R2TL84RedStbl28                               N
+  R2TL84RedStbl29                               N
+  R2TL84RedStbl02                               N
+  R2TL84RedStbl30                               N
+  R2TL84RedStbl31                               N
+  R2TL84RedStbl03                               N
+  R2TL84RedStbl04                               N
+  R2TL84RedStbl05                               N
+  R2TL84RedStbl06                               N
+  R2TL84RedStbl07                               N
+  R2TL84RedStbl08                               N
+  R2TL84RedStbl09                               N
+  R2TL84Tbl00                                   N
+  R2TL84Tbl10                                   N
+  R2TL84Tbl11                                   N
+  R2TL84Tbl12                                   N
+  R2TL84Tbl13                                   N
+  R2TL84Tbl14                                   N
+  R2TL84Tbl15                                   N
+  R2TL84Tbl16                                   N
+  R2TL84Tbl17                                   N
+  R2TL84Tbl18                                   N
+  R2TL84Tbl19                                   N
+  R2TL84Tbl01                                   N
+  R2TL84Tbl20                                   N
+  R2TL84Tbl21                                   N
+  R2TL84Tbl22                                   N
+  R2TL84Tbl23                                   N
+  R2TL84Tbl24                                   N
+  R2TL84Tbl25                                   N
+  R2TL84Tbl26                                   N
+  R2TL84Tbl27                                   N
+  R2TL84Tbl28                                   N
+  R2TL84Tbl29                                   N
+  R2TL84Tbl02                                   N
+  R2TL84Tbl30                                   N
+  R2TL84Tbl31                                   N
+  R2TL84Tbl03                                   N
+  R2TL84Tbl04                                   N
+  R2TL84Tbl05                                   N
+  R2TL84Tbl06                                   N
+  R2TL84Tbl07                                   N
+  R2TL84Tbl08                                   N
+  R2TL84Tbl09                                   N
+  R2TL84Width                                   N
+  RolloffEnable                                 N
+  SensorFmt                                     N
+  SensorType                                    N
+  SensrFulHght                                  N
+  SensrFulWdth                                  N
+  SensrQtrHght                                  N
+  SensrQtrWdth                                  N
+  SnapshotResol                                 N
+  TL84ConvChrmA_M                               N
+  TL84ConvChrmA_P                               N
+  TL84ConvChrmB_M                               N
+  TL84ConvChrmB_P                               N
+  TL84ConvChrmC_M                               N
+  TL84ConvChrmC_P                               N
+  TL84ConvChrmD_M                               N
+  TL84ConvChrmD_P                               N
+  TL84ConvChrmKCb                               N
+  TL84ConvChrmKCr                               N
+  TL84ConvLumaK                                 N
+  TL84ConvLumaV0                                N
+  TL84ConvLumaV1                                N
+  TL84ConvLumaV2                                N
+  VideoFps                                      N
+  YhiYloConvChrmA_M                             N
+  YhiYloConvChrmA_P                             N
+  YhiYloConvChrmB_M                             N
+  YhiYloConvChrmB_P                             N
+  YhiYloConvChrmC_M                             N
+  YhiYloConvChrmC_P                             N
+  YhiYloConvChrmD_M                             N
+  YhiYloConvChrmD_P                             N
+  YhiYloConvChrmKCb                             N
+  YhiYloConvChrmKCr                             N
+  YhiYloConvLumaK                               N
+  YhiYloConvLumaV0                              N
+  YhiYloConvLumaV1                              N
+  YhiYloConvLumaV2                              N
+  YhiYloCorC0                                   N
+  YhiYloCorC1                                   N
+  YhiYloCorC2                                   N
+  YhiYloCorC3                                   N
+  YhiYloCorC4                                   N
+  YhiYloCorC5                                   N
+  YhiYloCorC6                                   N
+  YhiYloCorC7                                   N
+  YhiYloCorC8                                   N
+  YhiYloCorK0                                   N
+  YhiYloCorK1                                   N
+  YhiYloCorK2                                   N
 
 =head2 APP12 Tags
 
@@ -14209,14 +15563,14 @@ Frame rate information stored by some Canon video cameras.
 =head2 QuickTime Tags
 
 The QuickTime format is used for many different types of audio, video and
-image files.  Exiftool extracts meta information from the UserData atom
-(including some proprietary manufacturer-specific information), as well as
-extracting various audio, video and image parameters.  Tags with a question
+image files (most commonly, MOV and MP4 videos).  Exiftool extracts standard
+meta information a variety of audio, video and image parameters, as well as
+proprietary information written by many camera models.  Tags with a question
 mark after their name are not extracted unless the Unknown option is set.
 
 According to the specification, many QuickTime date/time tags should be
-stored as UTC.  Unfortunately, digital cameras will often store local time
-values instead, presumably because they don't know the time zone.  For this
+stored as UTC.  Unfortunately, digital cameras often store local time values
+instead (presumably because they don't know the time zone).  For this
 reason, by default ExifTool does not assume a time zone for these values.
 However, if the QuickTimeUTC option is set via the API or the ExifTool
 configuration file, then ExifTool will assume these values are properly
@@ -14225,7 +15579,8 @@ stored as UTC, and will convert them to local time when extracting.
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
   'PICT'               PreviewPICT              N
-  'free'               Free?                    N
+  'free'               KodakFree                Kodak Free
+                       Free?                    N
   'ftyp'               FileType                 QuickTime FileType
   'junk'               Junk?                    N
   'mdat'               MovieData?               N
@@ -14252,6 +15607,7 @@ stored as UTC, and will convert them to local time when extracting.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
+  'cmov'   CompressedMovie                      QuickTime CMovie
   'iods'   InitialObjectDescriptor?             N
   'meta'   Meta                                 QuickTime Meta
   'mvhd'   MovieHeader                          QuickTime MovieHeader
@@ -14259,6 +15615,12 @@ stored as UTC, and will convert them to local time when extracting.
   'udta'   UserData                             QuickTime UserData
   'uuid'   UUID-USMT                            QuickTime UserMedia
            UUID-Unknown?                        N
+
+=head3 QuickTime CMovie Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  'dcom'   Compression                          N
 
 =head3 QuickTime Meta Tags
 
@@ -14647,7 +16009,7 @@ multi-language user data tags found, even if they don't exist in this table.
   'CNFV'       FirmwareVersion                  N
   'CNMN'       Model                            N
   'CNTH'       CanonCNTH                        Canon CNTH
-  'DcMD'       DcMD                             QuickTime DcMD
+  'DcMD'       DcMD                             Kodak DcMD
   'FFMV'       FujiFilmFFMV                     FujiFilm FFMV
   'INFO'       SamsungINFO                      Samsung INFO
   'LOOP'       LoopStyle                        N
@@ -14655,6 +16017,9 @@ multi-language user data tags found, even if they don't exist in this table.
   'MMA1'       MinoltaMMA1                      Minolta MMA
   'MVTG'       FujiFilmMVTG                     EXIF
   'NCDT'       NikonNCDT                        Nikon NCDT
+  'PANA'       PanasonicPANA                    Panasonic PANA
+  'PXMN'       MakerNotePentax5b                Pentax
+  'PXTH'       PreviewImage                     Pentax PXTH
   'QVMI'       CasioQVMI                        EXIF
   'SDLN'       PlayMode                         N
   'SelO'       PlaySelection                    N
@@ -14679,7 +16044,7 @@ multi-language user data tags found, even if they don't exist in this table.
   'meta'       Meta                             QuickTime Meta
   'name'       Name                             N
   'ptv '       PrintToVideo                     QuickTime Video
-  'thmb'       MakerNotePentax5                 Pentax
+  'thmb'       MakerNotePentax5a                Pentax
   'vndr'       Vendor                           N
   "\xa9ART"    Artist                           N
   "\xa9alb"    Album                            N
@@ -14729,22 +16094,6 @@ multi-language user data tags found, even if they don't exist in this table.
   "\xa9trk"    Track                            N
   "\xa9wrt"    Composer                         N
   "\xa9xyz"    GPSCoordinates                   N
-
-=head3 QuickTime DcMD Tags
-
-Metadata directory found in MOV videos from some Kodak cameras.
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  'CMbo'   CameraByteOrder                      N
-  'Cmbo'   CameraByteOrder                      N
-  'DcME'   DcME                                 QuickTime DcME
-
-=head3 QuickTime DcME Tags
-
-  Tag ID   Tag Name                             Writable
-  ------   --------                             --------
-  [no tags known]
 
 =head3 QuickTime HintTrackInfo Tags
 
@@ -17108,12 +18457,12 @@ RealMedia Plug-in Metafile (RAM and RPM) files.
 
 =head2 RIFF Tags
 
-The RIFF container format is used various types of fines including WAV, AVI
-and WEBP.  According to the EXIF specification, Meta information is embedded
-in two types of RIFF C<LIST> chunks: C<INFO> and C<exif>, and information
-about the audio content is stored in the C<fmt > chunk.  As well as this
-information, some video information and proprietary manufacturer-specific
-information is also extracted.
+The RIFF container format is used various types of fines including WAV, AVI,
+WEBP, LA, OFR, PAC and WV.  According to the EXIF specification, Meta
+information is embedded in two types of RIFF C<LIST> chunks: C<INFO> and
+C<exif>, and information about the audio content is stored in the C<fmt >
+chunk.  As well as this information, some video information and proprietary
+manufacturer-specific information is also extracted.
 
 Large AVI videos may be a concatenation of two or more RIFF chunks.
 For these files, information is extracted from subsequent RIFF
@@ -21119,22 +22468,22 @@ Information extracted from MS Shell Link (Windows shortcut) files.
 
   Index1       Tag Name                         Writable
   ------       --------                         --------
-         20    Flags                            N
-         24    FileAttributes                   N
-         28    CreateDate                       N
-         36    AccessDate                       N
-         44    ModifyDate                       N
-         52    TargetFileSize                   N
-         56    IconIndex                        N
-         60    RunWindow                        N
-         64    HotKey                           N
-  0x00010000   ItemID                           LNK ItemID
-  0x00020000   LinkInfo                         LNK LinkInfo
-  0x00030004   Description                      N
-  0x00030008   RelativePath                     N
-  0x00030010   WorkingDirectory                 N
-  0x00030020   CommandLineArguments             N
-  0x00030040   IconFileName                     N
+  0x0014       Flags                            N
+  0x0018       FileAttributes                   N
+  0x001c       CreateDate                       N
+  0x0024       AccessDate                       N
+  0x002c       ModifyDate                       N
+  0x0034       TargetFileSize                   N
+  0x0038       IconIndex                        N
+  0x003c       RunWindow                        N
+  0x0040       HotKey                           N
+  0x10000      ItemID                           LNK ItemID
+  0x20000      LinkInfo                         LNK LinkInfo
+  0x30004      Description                      N
+  0x30008      RelativePath                     N
+  0x30010      WorkingDirectory                 N
+  0x30020      CommandLineArguments             N
+  0x30040      IconFileName                     N
   0xa0000000   UnknownData                      LNK UnknownData
   0xa0000001   EnvVarData                       LNK UnknownData
   0xa0000002   ConsoleData                      LNK ConsoleData
@@ -21312,7 +22661,7 @@ Tags extracted from PostScript font files (PFA and PFB).
 The following tags are extracted from the TrueType font "name" table found
 in OTF, TTF, TTC and DFONT files.  These tags support localized languages by
 adding a hyphen followed by a language code to the end of the tag name (ie.
-"Copyright-fr" or "Licence-en-US").  Tags with no language code use the
+"Copyright-fr" or "License-en-US").  Tags with no language code use the
 default language of "en".
 
   Tag ID   Tag Name                             Writable
@@ -21346,11 +22695,14 @@ Tags extracted from Mac OS resource files and DFONT files.  These tags may
 also be extracted from the resource fork of any file in OS X, either by
 adding "/..namedfork/rsrc" to the filename to process the resource fork
 alone, or by using the ExtractEmbedded (-ee) option to process the resource
-fork as a sub-document of the main file.
+fork as a sub-document of the main file.  When writing, ExifTool preserves
+the Mac OS resource fork by default, but it may deleted with C<-rsrc:all=>
+on the command line.
 
   Tag ID               Tag Name                 Writable
   ------               --------                 --------
   '8BIM'               PhotoshopInfo            Photoshop
+  'POST_0x01f5'        PostscriptFont           PostScript
   'STR _0xbff3'        ApplicationMissingMsg    N
   'STR _0xbff4'        CreatorApplication       N
   'STR#_0x0080'        Keywords                 N
@@ -21566,6 +22918,7 @@ without modifying the file itself.
 
   Tag Name                   Group              Writable
   --------                   -----              --------
+  Adobe                      Adobe              Y!
   CanonVRD                   CanonVRD           Y!
   Comment                    File               Y
   CurrentIPTCDigest          File               N
@@ -21746,6 +23099,7 @@ information is extracted.
                        LongFocal
                        LensModel
                        LensFocalRange
+                       LensSpec
   LensID               XMP-aux:LensID           N
                        Make
                        LensInfo

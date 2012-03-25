@@ -118,6 +118,7 @@
                 # (see the definition of this table below)
             },
         },
+        # add more user-defined XMP namespaces here...
     },
     # new PNG tags are added to the PNG::TextualData table:
     'Image::ExifTool::PNG::TextualData' => {
@@ -232,7 +233,7 @@
     NewXMPxxxTag3 => { List => 'Bag' },
     # example structured XMP tag
     NewXMPxxxStruct => {
-        # a structure with 3 fields (X, Y and Things):
+        # the "Struct" entry defines the structure fields
         Struct => {
             # optional namespace prefix and URI for structure fields
             # (required only if different than NAMESPACE above)
@@ -241,7 +242,7 @@
             STRUCT_NAME => 'MyStruct',
             # optional rdf:type property for the structure
             TYPE => 'http://x.y.z/test/xystruct',
-            # structure fields (very similar to tag definitions)
+            # structure field definitions (very similar to tag definitions)
             X => { Writable => 'integer' },
             Y => { Writable => 'integer' },
             # a nested structure...

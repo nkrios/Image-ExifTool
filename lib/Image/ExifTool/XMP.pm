@@ -46,7 +46,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.44';
+$VERSION = '2.48';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -2446,7 +2446,7 @@ sub AddFlattenedTags($$)
             # generate new flattened tag information based on structure field
             $flatInfo = { %$fieldInfo, Name => $$tagInfo{Name} . $fieldName, Flat => 0 };
             # add new flattened tag to table
-            Image::ExifTool::AddTagToTable($tagTablePtr, $flatID, $flatInfo);
+            AddTagToTable($tagTablePtr, $flatID, $flatInfo);
             ++$count;
         }
         # propagate List flag (unless set to 0 in pre-defined flattened tag)
@@ -2466,7 +2466,7 @@ sub AddFlattenedTags($$)
         $$flatInfo{RootTagInfo} = $$tagInfo{RootTagInfo} || $tagInfo;
         # recursively generate flattened tags for sub-structures
         next unless $$flatInfo{Struct};
-        length($flatID) > 150 and warn("Possible deep recursion for tag $flatID\n"), last;
+        length($flatID) > 250 and warn("Possible deep recursion for tag $flatID\n"), last;
         # reset flattened tag just in case we flattened hierarchy in the wrong order
         # because we must start from the outtermost structure to get the List flags right
         # (this should only happen when building tag tables)
@@ -2572,6 +2572,7 @@ sub PrintLensID(@)
         my $mod = { Sigma => 'SigmaRaw', Leica => 'Panasonic' }->{$mk} || $mk;
         require "Image/ExifTool/$mod.pm";
         # get the name of the lens name lookup (default "makeLensTypes")
+        # (canonLensTypes, pentaxLensTypes, nikonLensIDs, etc)
         my $convName = "Image::ExifTool::${mod}::" .
             ({ Nikon => 'nikonLensIDs' }->{$mk} || lc($mk) . 'LensTypes');
         no strict 'refs';
@@ -2583,6 +2584,10 @@ sub PrintLensID(@)
             my @a = split ' ', $info;
             $_ eq 'undef' and $_ = undef foreach @a;
             ($minf, $maxf, $maxa, $mina) = @a;
+        }
+        if ($mk eq 'Pentax' and $id =~ /^\d+$/) {
+            # for Pentax, CS4 stores an int16u, but we use 2 x int8u
+            $id = join(' ', unpack('C*', pack('n', $id)));
         }
         my $str = $$printConv{$id} || "Unknown ($id)";
         # Nikon is a special case because Adobe doesn't store the full LensID
@@ -2596,8 +2601,9 @@ sub PrintLensID(@)
             }
             $printConv = \%newConv;
         }
-        return Image::ExifTool::Exif::PrintLensID($exifTool, $str, $id, $focalLength,
-                    $maxa, undef, $minf, $maxf, $lensModel, undef, $printConv);
+        return Image::ExifTool::Exif::PrintLensID($exifTool, $str, undef, $id,
+                    $focalLength, $maxa, undef, $minf, $maxf, $lensModel, undef,
+                    undef, $printConv);
     }
     return "Unknown ($id)";
 }
@@ -2810,7 +2816,7 @@ NoLoop:
         #} elsif (grep / /, @$props) {
         #    $$tagInfo{List} = 1;
         }
-        Image::ExifTool::AddTagToTable($tagTablePtr, $tagID, $tagInfo);
+        AddTagToTable($tagTablePtr, $tagID, $tagInfo);
         $added = 1;
         last;
     }
@@ -2847,7 +2853,7 @@ NoLoop:
     $val = $exifTool->Decode($val, 'UTF8');
     # convert rational and date values to a more sensible format
     my $fmt = $$tagInfo{Writable};
-    my $new = $$tagInfo{WasAdded};
+    my $new = $$tagInfo{WasAdded} && $$exifTool{OPTIONS}{XMPAutoConv};
     if ($fmt or $new) {
         $rawVal = $val; # save raw value for verbose output
         unless (($new or $fmt eq 'rational') and ConvertRational($val)) {
@@ -3453,7 +3459,18 @@ sub ProcessXMP($$;$)
     $$exifTool{XMPParseOpts} = $$dirInfo{XMPParseOpts};
 
     # need to preserve list indices to be able to handle multi-dimensional lists
-    $$exifTool{NO_LIST} = 1 if $exifTool->Options('Struct');
+    my $keepFlat;
+    if ($exifTool->{OPTIONS}{Struct}) {
+        if ($exifTool->{OPTIONS}{Struct} eq '2') {
+            $keepFlat = 1;      # preserve flattened tags
+            # setting NO_LIST to 0 combines list items in a TAG_EXTRA "NoList" element
+            # to allow them to be re-listed later if necessary.  A "NoListDel" element
+            # is also created for tags that wouldn't have existed.
+            $$exifTool{NO_LIST} = 0;
+        } else {
+            $$exifTool{NO_LIST} = 1;
+        }
+    }
 
     # parse the XMP
     $tagTablePtr or $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
@@ -3465,7 +3482,7 @@ sub ProcessXMP($$;$)
     # restore structures if necessary
     if ($$exifTool{IsStruct}) {
         require 'Image/ExifTool/XMPStruct.pl';
-        RestoreStruct($exifTool);
+        RestoreStruct($exifTool, $keepFlat);
         delete $$exifTool{IsStruct};
     }
     # reset NO_LIST flag (must do this _after_ RestoreStruct() above)

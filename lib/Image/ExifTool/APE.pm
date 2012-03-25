@@ -82,7 +82,7 @@ sub MakeTag($$)
     # remove invalid characters in tag name and capitalize following letters
     $name =~ s/[^\w-]+(.?)/\U$1/sg;
     $name =~ s/([a-z0-9])_([a-z])/$1\U$2/g;
-    Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => $name });
+    AddTagToTable($tagTablePtr, $tag, { Name => $name });
 }
 
 #------------------------------------------------------------------------------

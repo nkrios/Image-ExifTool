@@ -12,7 +12,7 @@
 use strict;
 require 5.004;
 
-my $version = '8.77';
+my $version = '8.85';
 
 # add our 'lib' directory to the include list BEFORE 'use Image::ExifTool'
 my $exeDir;
@@ -1704,7 +1704,7 @@ sub GetImageInfo($$)
             my $tagName = GetTagName($tag);
             my $group;
             # make sure this tag has a value
-            my $val = $info->{$tag};
+            my $val = $$info{$tag};
             if (ref $val) {
                 if (defined $binaryOutput and not $binaryOutput) { # happens with -X -b or -php -b
                     # avoid extracting Protected binary tags (ie. data blocks) [insider information]
@@ -1783,9 +1783,10 @@ sub GetImageInfo($$)
                 $csvInfo{$lcTag} = $val;
                 if (defined $csvTags{$lcTag}) {
                     # overwrite with actual extracted tag name
-                    $csvTags{$lcTag} = $t if defined $val;
+                    # (note: can't check "if defined $val" here because -f may be used)
+                    $csvTags{$lcTag} = $t if defined $$info{$tag};
                 } else {
-                    # (don't save unextracted tag name)
+                    # (don't save unextracted tag name unless -f was used)
                     $csvTags{$lcTag} = defined($val) ? $t : '';
                     if (@csvFiles == 1) {
                         push @csvTags, $lcTag; # save order of tags for first file
@@ -3165,36 +3166,37 @@ supported by ExifTool (r = read, w = write, c = create):
 
   File Types
   ------------+-------------+-------------+-------------+------------
-  3FR   r     | DYLIB r     | KEY   r     | OTF   r     | RWL   r/w
-  3G2   r     | EIP   r     | LNK   r     | PAGES r     | RWZ   r
-  3GP   r     | EPS   r/w   | M2TS  r     | PBM   r/w   | RM    r
-  ACR   r     | ERF   r/w   | M4A/V r     | PDF   r/w   | SO    r
-  AFM   r     | EXE   r     | MEF   r/w   | PEF   r/w   | SR2   r/w
-  AI    r/w   | EXIF  r/w/c | MIE   r/w/c | PFA   r     | SRF   r
-  AIFF  r     | EXR   r     | MIFF  r     | PFB   r     | SRW   r/w
-  APE   r     | F4A/V r     | MKA   r     | PFM   r     | SVG   r
-  ARW   r/w   | FFF   r/w   | MKS   r     | PGF   r     | SWF   r
-  ASF   r     | FLA   r     | MKV   r     | PGM   r/w   | THM   r/w
-  AVI   r     | FLAC  r     | MNG   r/w   | PICT  r     | TIFF  r/w
-  BMP   r     | FLV   r     | MOS   r/w   | PMP   r     | TTC   r
-  BTF   r     | FPX   r     | MOV   r     | PNG   r/w   | TTF   r
-  CHM   r     | GIF   r/w   | MP3   r     | PPM   r/w   | VRD   r/w/c
-  COS   r     | GZ    r     | MP4   r     | PPT   r     | VSD   r
-  CR2   r/w   | HDP   r/w   | MPC   r     | PPTX  r     | WAV   r
-  CRW   r/w   | HDR   r     | MPG   r     | PS    r/w   | WDP   r/w
-  CS1   r/w   | HTML  r     | MPO   r/w   | PSB   r/w   | WEBP  r
-  DCM   r     | ICC   r/w/c | MQV   r     | PSD   r/w   | WEBM  r
-  DCP   r/w   | IDML  r     | MRW   r/w   | PSP   r     | WMA   r
-  DCR   r     | IIQ   r/w   | MXF   r     | QTIF  r     | WMV   r
-  DFONT r     | IND   r/w   | NEF   r/w   | RA    r     | X3F   r/w
-  DIVX  r     | INX   r     | NRW   r/w   | RAF   r/w   | XCF   r
-  DJVU  r     | ITC   r     | NUMBERS r   | RAM   r     | XLS   r
-  DLL   r     | J2C   r     | ODP   r     | RAR   r     | XLSX  r
-  DNG   r/w   | JNG   r/w   | ODS   r     | RAW   r/w   | XMP   r/w/c
-  DOC   r     | JP2   r/w   | ODT   r     | RIFF  r     | ZIP   r
-  DOCX  r     | JPEG  r/w   | OGG   r     | RSRC  r     |
-  DV    r     | K25   r     | OGV   r     | RTF   r     |
-  DVB   r     | KDC   r     | ORF   r/w   | RW2   r/w   |
+  3FR   r     | EIP   r     | LNK   r     | PAC   r     | RWZ   r
+  3G2   r     | EPS   r/w   | M2TS  r     | PAGES r     | RM    r
+  3GP   r     | ERF   r/w   | M4A/V r     | PBM   r/w   | SO    r
+  ACR   r     | EXE   r     | MEF   r/w   | PDF   r/w   | SR2   r/w
+  AFM   r     | EXIF  r/w/c | MIE   r/w/c | PEF   r/w   | SRF   r
+  AI    r/w   | EXR   r     | MIFF  r     | PFA   r     | SRW   r/w
+  AIFF  r     | F4A/V r     | MKA   r     | PFB   r     | SVG   r
+  APE   r     | FFF   r/w   | MKS   r     | PFM   r     | SWF   r
+  ARW   r/w   | FLA   r     | MKV   r     | PGF   r     | THM   r/w
+  ASF   r     | FLAC  r     | MNG   r/w   | PGM   r/w   | TIFF  r/w
+  AVI   r     | FLV   r     | MOS   r/w   | PICT  r     | TTC   r
+  BMP   r     | FPX   r     | MOV   r     | PMP   r     | TTF   r
+  BTF   r     | GIF   r/w   | MP3   r     | PNG   r/w   | VRD   r/w/c
+  CHM   r     | GZ    r     | MP4   r     | PPM   r/w   | VSD   r
+  COS   r     | HDP   r/w   | MPC   r     | PPT   r     | WAV   r
+  CR2   r/w   | HDR   r     | MPG   r     | PPTX  r     | WDP   r/w
+  CRW   r/w   | HTML  r     | MPO   r/w   | PS    r/w   | WEBP  r
+  CS1   r/w   | ICC   r/w/c | MQV   r     | PSB   r/w   | WEBM  r
+  DCM   r     | IDML  r     | MRW   r/w   | PSD   r/w   | WMA   r
+  DCP   r/w   | IIQ   r/w   | MXF   r     | PSP   r     | WMV   r
+  DCR   r     | IND   r/w   | NEF   r/w   | QTIF  r     | WV    r
+  DFONT r     | INX   r     | NRW   r/w   | RA    r     | X3F   r/w
+  DIVX  r     | ITC   r     | NUMBERS r   | RAF   r/w   | XCF   r
+  DJVU  r     | J2C   r     | ODP   r     | RAM   r     | XLS   r
+  DLL   r     | JNG   r/w   | ODS   r     | RAR   r     | XLSX  r
+  DNG   r/w   | JP2   r/w   | ODT   r     | RAW   r/w   | XMP   r/w/c
+  DOC   r     | JPEG  r/w   | OFR   r     | RIFF  r     | ZIP   r
+  DOCX  r     | K25   r     | OGG   r     | RSRC  r     |
+  DV    r     | KDC   r     | OGV   r     | RTF   r     |
+  DVB   r     | KEY   r     | ORF   r/w   | RW2   r/w   |
+  DYLIB r     | LA    r     | OTF   r     | RWL   r/w   |
 
   Meta Information
   ----------------------+----------------------+---------------------
@@ -3390,9 +3392,11 @@ valid: 1) EXIF, 2) IPTC, 3) XMP.
 The special C<All> tag may be used in this syntax only if a I<VALUE> is NOT
 given.  This causes all meta information to be deleted (or all information
 in a group if C<-GROUP:All=> is used).  Note that not all groups are
-deletable.  Use the B<-listd> option for a complete list of deletable
-groups.  Also, within an image some groups may be contained within others,
-and these groups are removed if the containing group is deleted:
+deletable, and that the JPEG APP14 "Adobe" group is not removed by default
+with C<-All=> because it may affect the appearance of the image.  Use the
+B<-listd> option for a complete list of deletable groups.  Also, within an
+image some groups may be contained within others, and these groups are
+removed if the containing group is deleted:
 
   JPEG Image:
   - Deleting EXIF or IFD0 also deletes ExifIFD, GlobParamIFD,
@@ -3523,9 +3527,8 @@ options are equivalent.
 6) The B<-a> option (allow duplicate tags) is always in effect when reading
 tags from I<SRCFILE>.
 
-7) The B<-struct> option is in effect by default when copying tags, but this
-may be disabled with B<--struct> on the command line.  See the B<-struct>
-option for details.
+7) Structured tags are copied by default when copying tags.  See the
+B<-struct> option for details.
 
 =item B<-x> I<TAG> (B<-exclude>)
 
@@ -3536,6 +3539,9 @@ a B<-tagsFromFile> option to exclude tags from being copied.
 =back
 
 =head3 Input-output text formatting
+
+Note that trailing spaces are removed from extracted values for most output
+text formats.  The exceptions are C<-b>, C<-csv>, C<-j> and C<-X>.
 
 =over 5
 
@@ -3840,10 +3846,10 @@ C<#> are output for each processed file.  Other lines beginning with C<#>
 are ignored.  For example, this format file:
 
     # this is a comment line
-    #[HEAD]# Generated by ExifTool $exifToolVersion
+    #[HEAD]-- Generated by ExifTool $exifToolVersion --
     File: $FileName - $DateTimeOriginal
     (f/$Aperture, ${ShutterSpeed}s, ISO $EXIF:ISO)
-    #[TAIL]# end
+    #[TAIL]-- end --
 
 with this command:
 
@@ -3851,12 +3857,12 @@ with this command:
 
 produces output like this:
 
-    # Generated by ExifTool 8.10
+    -- Generated by ExifTool 8.85 --
     File: a.jpg - 2003:10:31 15:44:19
     (f/5.6, 1/60s, ISO 100)
     File: b.jpg - 2006:05:23 11:57:38
     (f/8.0, 1/13s, ISO 100)
-    # end
+    -- end --
 
 When B<-ee> (B<-extractEmbedded>) is combined with B<-p>, embedded documents
 are effectively processed as separate input files.
@@ -3885,7 +3891,7 @@ or up to 3 B<-s> options for even shorter formats:
 
     -s1 or -s        - print tag names instead of descriptions
     -s2 or -s -s     - no extra spaces to column-align values
-    -s3 or -s -s -s  - print values only
+    -s3 or -s -s -s  - print values only (no tag names)
 
 Also effective when combined with B<-t>, B<-h>, B<-X> or B<-listx> options.
 
@@ -3918,11 +3924,12 @@ Output structured XMP information instead of flattening to individual tags.
 This option works well when combined with the XML (B<-X>) and JSON (B<-j>)
 output formats.  For other output formats, the structures are serialized
 into the same format as when writing structured information (see
-L<http://owl.phy.queensu.ca/~phil/exiftool/struct.html> for details).  This
-option is enabled by default when copying tags to allow the preservation of
-complex structures, but may be disabled with B<--struct>.  These options
-have no effect when assigning new values since both flattened and structured
-tags may always be used when writing.
+L<http://owl.phy.queensu.ca/~phil/exiftool/struct.html> for details).  When
+copying, structured tags are copied by default unless B<--struct> is used to
+disable this feature (although flattened tags may still be copied by
+specifying them individually unless B<-struct> is used).  These options have
+no effect when assigning new values since both flattened and structured tags
+may always be used when writing.
 
 =item B<-t> (B<-tab>)
 
@@ -4011,9 +4018,10 @@ adding a decimal point to the modifier.  For example:
 A special feature allows the copy number to be incremented for each
 processed file by using %C (upper case) instead of %c.  This allows a
 sequential number to be added to output file names, even if the names are
-different.  For %C, the number before the decimal place gives the starting
-index, and the number after the decimal place gives the field width.  The
-following examples show the output filenames when used with the command
+different.  For %C, a copy number of zero is not omitted as it is with %c. 
+The number before the decimal place gives the starting index, the number
+after the decimal place gives the field width.  The following examples show
+the output filenames when used with the command
 C<exiftool rose.jpg star.jpg jet.jpg ...>:
 
     -w %C%f.txt       # 0rose.txt, 1star.txt, 2jet.txt
@@ -4025,7 +4033,7 @@ All format codes may be modified by 'l' or 'u' to specify lower or upper
 case respectively (ie. C<%le> for a lower case file extension).  When used
 to modify %c or %C, the numbers are changed to an alphabetical base (see
 example H above).  Also, %c may be modified by 'n' to count using natural
-numbers starting from 1, instead of 0 (see example F).
+numbers starting from 1, instead of 0 (see example F above).
 
 This same I<FMT> syntax is used with the B<-o> and B<-tagsFromFile> options,
 although %c is only valid for output file names.
@@ -4129,8 +4137,8 @@ Floating point values are sorted numerically, and all other values are
 sorted alphabetically.  The sort order may be reversed by prefixing the tag
 name with a C<-> (ie. C<-fileOrder -createdate>).  A C<#> may be appended to
 the tag name to disable print conversion for the sorted values.  Note that
-this option has a large performance impact since it involves an additional
-processing pass of each file.
+the B<-fileOrder> option has a large performance impact since it involves an
+additional processing pass of each file.
 
 =item B<-i> I<DIR> (B<-ignore>)
 
@@ -4218,12 +4226,13 @@ file was successfully written.
 
 Similar to B<-overwrite_original> except that an extra step is added to
 allow the original file attributes to be preserved.  For example, on a Mac
-this causes the original file creation date, ownership, type, creator, label
-color, icon and hard links to the file to be preserved.  This is implemented
-by opening the original file in update mode and replacing its data with a
-copy of a temporary file before deleting the temporary.  The extra step
-results in slower performance, so the B<-overwrite_original> option should
-be used instead unless necessary.
+this causes the original file creation date, type, creator, label color,
+icon and hard links to the file to be preserved (but note that the Mac OS
+resource fork is always preserved unless specifically deleted with
+C<-rsrc:all=>).  This is implemented by opening the original file in update
+mode and replacing its data with a copy of a temporary file before deleting
+the temporary.  The extra step results in slower performance, so the
+B<-overwrite_original> option should be used instead unless necessary.
 
 =item B<-P> (B<-preserve>)
 
@@ -4360,7 +4369,7 @@ created by exiftool.  They have no effect on files without an C<_original>
 copy.  The B<-restore_original> option restores the specified files from
 their original copies by renaming the C<_original> files to replace the
 edited versions.  For example, the following command restores the originals
-of all .jpeg images in directory C<DIR>:
+of all JPG images in directory C<DIR>:
 
     exiftool -restore_original -ext jpg DIR
 
@@ -4415,13 +4424,11 @@ extensions (B<-listr>), all writable file extensions (B<-listwf>), all tag
 groups [in a specified family] (B<-listg>[I<NUM>]), all deletable tag groups
 (B<-listd>), or an XML database of tag details including language
 translations (B<-listx>).  The B<-list>, B<-listw> and B<-listx> options may
-be followed by an additional argument of the form C<-GROUP:All> to list all
+be followed by an additional argument of the form C<-GROUP:All> to list only
 tags in a specific group, where C<GROUP> is one or more family 0-2 group
 names (excepting EXIF IFD groups) separated by colons.  With B<-listg>,
 I<NUM> may be given to specify the group family, otherwise family 0 is
-assumed.  When combined with B<-listx>, the B<-s> option shortens the output
-by omitting the descriptions and values, and B<-f> adds a 'flags' attribute. 
-Here are some examples:
+assumed.  Here are some examples:
 
     -list               # list all tag names
     -list -EXIF:All     # list all EXIF tags
@@ -4434,6 +4441,14 @@ Here are some examples:
     -listd              # list all deletable groups
     -listx -EXIF:All    # list database of EXIF tags in XML format
     -listx -XMP:All -s  # list short XML database of XMP tags
+
+When combined with B<-listx>, the B<-s> option shortens the output by
+omitting the descriptions and values (as in the last example above), and
+B<-f> adds a 'flags' attribute if applicable.  The flags are formatted as a
+comma-separated list of the following possible values:  Avoid, Binary, List,
+Mandatory, Permanent, Protected, Unknown and Unsafe (see  the
+L<Tag Name documentation|Image::ExifTool::TagNames>).  For XMP List tags,
+the list type (Alt, Bag or Seq) is also output as a flag.
 
 Note that none of the B<-list> options require an input I<FILE>.
 

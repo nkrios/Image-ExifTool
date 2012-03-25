@@ -16,7 +16,7 @@
 #               9) Michael Reitinger private communication (DSC-TX7)
 #               10) http://www.klingebiel.com/tempest/hd/pmp.html
 #               11) Mike Battilana private communication
-#               12) Jos Roost private communication
+#               12) Jos Roost private communication (A580)
 #               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.55';
+$VERSION = '1.59';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -275,6 +275,20 @@ my %binaryDataAttrs = (
         PrintConvColumns => 3,
         PrintConv => {
             0x0 => 'Off',
+            # not sure what the high word means; have seen 0x0, 0x1, 0x2 and 0x3
+            # - values with high word zero seen in 1st (nominal exposure) image of an A580 HDR pair
+            0x01 => 'Auto (0)',
+            0x10 => '1.0 EV (0)',
+            0x11 => '1.5 EV (0)',
+            0x12 => '2.0 EV (0)',
+            0x13 => '2.5 EV (0)',
+            0x14 => '3.0 EV (0)',
+            0x15 => '3.5 EV (0)',
+            0x16 => '4.0 EV (0)',
+            0x17 => '4.5 EV (0)',
+            0x18 => '5.0 EV (0)',
+            0x19 => '5.5 EV (0)',
+            0x1a => '6.0 EV (0)',
             0x10001 => 'Auto',
             0x10010 => '1.0 EV', # (NEX-5)
             0x10011 => '1.5 EV',
@@ -287,7 +301,6 @@ my %binaryDataAttrs = (
             0x10018 => '5.0 EV',
             0x10019 => '5.5 EV',
             0x1001a => '6.0 EV', # (SLT-A55V)
-            # not sure what the high word means; have seen 0x1, 0x2 and 0x3 (A77)
             0x20001 => 'Auto (2)',
             0x20010 => '1.0 EV (2)',
             0x20011 => '1.5 EV (2)',
@@ -393,11 +406,13 @@ my %binaryDataAttrs = (
             259 => 'DSLR-A200',
             260 => 'DSLR-A350',
             261 => 'DSLR-A300',
+            262 => 'DSLR-A900 (APS-C mode)', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3994.0.html
             263 => 'DSLR-A380/A390', #PH (A390)
             264 => 'DSLR-A330',
             265 => 'DSLR-A230',
             266 => 'DSLR-A290', #PH
             269 => 'DSLR-A850',
+            270 => 'DSLR-A850 (APS-C mode)', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3994.0.html
             273 => 'DSLR-A550',
             274 => 'DSLR-A500', #PH
             275 => 'DSLR-A450', # (http://dev.exiv2.org/issues/show/0000611)
@@ -408,10 +423,13 @@ my %binaryDataAttrs = (
             282 => 'DSLR-A560', #PH
             283 => 'DSLR-A580', # (http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2881.0.html)
             284 => 'NEX-C3', #PH
+            285 => 'SLT-A35', #12
             286 => 'SLT-A65V', #PH
             287 => 'SLT-A77V', #PH
             288 => 'NEX-5N', #PH
             289 => 'NEX-7', #PH
+            290 => 'NEX-VG20E', #12
+            292 => 'SLT-A57', #12
         },
     },
     0xb020 => { #2
@@ -475,6 +493,7 @@ my %binaryDataAttrs = (
         Name => 'LensType',
         Writable => 'int32u',
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%sonyLensTypes,
     },
     0xb028 => { #2
@@ -1114,7 +1133,7 @@ my %binaryDataAttrs = (
             33 => '1/3 EV',
             50 => '1/2 EV',
         },
-    },            
+    },
 );
 
 # Camera settings (ref PH) (A330 and A380)
@@ -1254,14 +1273,14 @@ my %binaryDataAttrs = (
 
 # more Camera settings (ref PH)
 # This was decoded for the A55, but it seems to apply to the following models:
-# A33, A35, A55, A450, A500, A550, A560, A580, NEX-3, NEX-5, NEX-C3 and NEX-GV10E
+# A33, A35, A55, A450, A500, A550, A560, A580, NEX-3, NEX-5, NEX-C3 and NEX-VG10E
 %Image::ExifTool::Sony::CameraSettings3 = (
     %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     FORMAT => 'int8u',
     NOTES => q{
-        Camera settings decoded for the SLT-A55, but they also seem to apply to some
-        other models
+        Camera settings initially decoded for the SLT-A55, but they also apply to
+        some other models
     },
     0x02 => {
         Name => 'ISOSetting',
@@ -1277,10 +1296,102 @@ my %binaryDataAttrs = (
             254 => 'n/a', # get this for multi-shot noise reduction
         },
     },
-    # 0x05 - 1,2,56[hand-held twilight],80[sweep panorama]
-    # 0x06 - 17[sweep panorama],19
-    # 0x09 - 21,25[sweep panorama]
-    # 0x0a - 4,8[sweep panorama]
+    0x03 => { #12
+        Name => 'ExposureCompensation',
+        ValueConv => '($val - 128) / 24', #PH
+        ValueConvInv => 'int($val * 24 + 128.5)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    0x04 => { #12
+        Name => 'DriveModeSet',
+        # Same drivemode info is repeated in 0x0034, but with at least the following exceptions:
+        # - 0x0034 not for A550 ? - seen "0"
+        # - sweep panorama  (0x05=80): 0x0004=16 and 0x0034=213
+        # - 3D panorama     (0x05=57): 0x0004=16 and 0x0034=214
+        # - hand-held night (0x05=56): 0x0004=16 and 0x0034=211
+        # preliminary conclusion: 0x0004 is Drivemode as pre-set, but may be overruled by Scene/Panorama mode selections
+        #                         0x0034 is Divemode as actually used
+        PrintConv => {
+            16 => 'Single Frame',
+            33 => 'Continuous High', # also automatically selected for Scene mode Sports-action (0x05=52)
+            34 => 'Continuous Low',
+            48 => 'Speed Priority Continuous',
+            81 => 'Self-timer 10 sec',
+            82 => 'Self-timer 2 sec, Mirror Lock-up',
+            113 => 'Continuous Bracketing 0.3 EV',
+            117 => 'Continuous Bracketing 0.7 EV',
+            145 => 'White Balance Bracketing Low',
+            146 => 'White Balance Bracketing High',
+            192 => 'Remote Commander',
+        },
+    },
+    0x05 => { #12
+        Name => 'ExposureProgram',
+        # Camera exposure program/mode as selected with the Mode dial.
+        # For SCN a further selection is done via the menu
+        # Matches OK with 0xb023
+        PrintConv => {                          # A580 Mode Dial setting:
+             1 => 'Program AE',                 # P
+             2 => 'Aperture-priority AE',       # A
+             3 => 'Shutter speed priority AE',  # S
+             4 => 'Manual',                     # M
+            16 => 'Auto',                       # AUTO
+            17 => 'Auto No Flash',              # "flash strike-out" symbol
+            49 => 'Portrait',                   # SCN
+            50 => 'Landscape',                  # SCN
+            51 => 'Macro',                      # SCN
+            52 => 'Sports',                     # SCN
+            53 => 'Sunset',                     # SCN
+            54 => 'Night view',                 # SCN
+            55 => 'Night view/portrait',        # SCN
+            56 => 'Hand-held Twilight',         # SCN - also called "Hand-held Night shot"
+            57 => '3D Panorama',                # "Panorama" symbol
+            80 => 'Sweep Panorama',             # "Panorama" symbol
+        },
+    },
+    # 0x06 unknown (ref 12):
+    # seen on A580: mostly 19, SweepPanorama 17, SCN Macro 17, SCN Sport 18
+    # seen on A35:  32, 18, 17
+    # seen on VG10: 18, 17
+    0x07 => { #12
+        Name => 'MeteringMode',
+        PrintConv => {
+            1 => 'Multi-segment',
+            2 => 'Center-weighted average',
+            3 => 'Spot',
+        },
+    },
+    0x09 => { #12
+        Name => 'SonyImageSize',
+        # below values seen for 16MP A580; maybe different for 12MP, 14MP ?
+        PrintConv => {
+           21 => 'Large (3:2)',    # A580: 16M  (4912 x 3264 pixels)
+           22 => 'Medium (3:2)',   # A580: 8.4M (3568 x 2368 pixels)
+           23 => 'Small (3:2)',    # A580: 4.0M (2448 x 1624 pixels)
+           25 => 'Large (16:9)',   # A580: 14M  (4912 x 2760 pixels)
+           26 => 'Medium (16:9)',  # A580: 7.1M (3568 x 2000 pixels)
+           27 => 'Small (16:9)',   # A580: 3.4M (2448 x 1376 pixels)
+        },
+    },
+    0x0a => { #12
+        Name => 'AspectRatio',
+        # normally 4 for A580 3:2 ratio images
+        # seen 8 when selecting 16:9 via menu, and when selecting Panorama mode
+        PrintConv => {
+            4 => '3:2',
+            8 => '16:9',
+        },
+    },
+    0x0b => { #12
+        Name => 'Quality',
+        PrintConv => {
+            2 => 'RAW',
+            4 => 'RAW + JPEG',
+            6 => 'Fine',
+            7 => 'Standard',
+        },
+    },
     0x0c => {
         Name => 'DynamicRangeOptimizerSetting',
         PrintConv => {
@@ -1290,14 +1401,140 @@ my %binaryDataAttrs = (
         },
     },
     0x0d => 'DynamicRangeOptimizerLevel',
+    0x0e => { #12
+        Name => 'ColorSpace',
+        PrintConv => {
+            1 => 'sRGB',
+            2 => 'AdobeRGB',
+        },
+    },
+    0x0f => { #12
+        Name => 'CreativeStyleSetting',
+        PrintConv => {
+            16 => 'Standard',
+            32 => 'Vivid',
+            64 => 'Portrait',
+            80 => 'Landscape',
+            96 => 'B&W',
+            160 => 'Sunset',
+        },
+    },
+    0x16 => { #12
+        Name => 'WhiteBalanceSetting',
+        # many guessed, based on "logical system" as observed for Daylight and Shade and steps of 16 between the modes
+        PrintHex => 1,
+        PrintConvColumns => 2,
+        PrintConv => {
+            0x10 => 'Auto (-3)', #(NC)
+            0x11 => 'Auto (-2)', #(NC)
+            0x12 => 'Auto (-1)', #(NC)
+            0x13 => 'Auto (0)',
+            0x14 => 'Auto (+1)', #(NC)
+            0x15 => 'Auto (+2)', #(NC)
+            0x16 => 'Auto (+3)', #(NC)
+            0x20 => 'Daylight (-3)',
+            0x21 => 'Daylight (-2)', #(NC)
+            0x22 => 'Daylight (-1)', #(NC)
+            0x23 => 'Daylight (0)',
+            0x24 => 'Daylight (+1)',
+            0x25 => 'Daylight (+2)',
+            0x26 => 'Daylight (+3)',
+            0x30 => 'Shade (-3)', #(NC)
+            0x31 => 'Shade (-2)', #(NC)
+            0x32 => 'Shade (-1)', #(NC)
+            0x33 => 'Shade (0)',
+            0x34 => 'Shade (+1)', #(NC)
+            0x35 => 'Shade (+2)', #(NC)
+            0x36 => 'Shade (+3)',
+            0x40 => 'Cloudy (-3)', #(NC)
+            0x41 => 'Cloudy (-2)', #(NC)
+            0x42 => 'Cloudy (-1)', #(NC)
+            0x43 => 'Cloudy (0)',
+            0x44 => 'Cloudy (+1)', #(NC)
+            0x45 => 'Cloudy (+2)', #(NC)
+            0x46 => 'Cloudy (+3)', #(NC)
+            0x50 => 'Tungsten (-3)', #(NC)
+            0x51 => 'Tungsten (-2)', #(NC)
+            0x52 => 'Tungsten (-1)', #(NC)
+            0x52 => 'Tungsten (0)',
+            0x54 => 'Tungsten (+1)', #(NC)
+            0x55 => 'Tungsten (+2)', #(NC)
+            0x56 => 'Tungsten (+3)', #(NC)
+            0x60 => 'Fluorescent (-3)', #(NC)
+            0x61 => 'Fluorescent (-2)', #(NC)
+            0x62 => 'Fluorescent (-1)', #(NC)
+            0x63 => 'Fluorescent (0)',
+            0x64 => 'Fluorescent (+1)', #(NC)
+            0x65 => 'Fluorescent (+2)', #(NC)
+            0x66 => 'Fluorescent (+3)', #(NC)
+            0x70 => 'Flash (-3)', #(NC)
+            0x71 => 'Flash (-2)', #(NC)
+            0x72 => 'Flash (-1)', #(NC)
+            0x73 => 'Flash (0)',
+            0x74 => 'Flash (+1)', #(NC)
+            0x75 => 'Flash (+2)', #(NC)
+            0x76 => 'Flash (+3)', #(NC)
+            0xa3 => 'Custom (0)',
+            0xf3 => '5500 K',
+        },
+    },
+    0x20 => { #12
+        # (0x20 and 0x87 might be the other way round)
+        Name => 'FlashStatus',
+        PrintConv => {
+            1 => 'Flash OFF',
+            17 => 'Flash ON',
+            18 => 'Flash ON overruled by user',
+        },
+    },
+    0x21 => { #12
+        Name => 'FlashControl',
+        PrintConv => {
+            1 => 'ADI Flash',
+            2 => 'Pre-flash TTL',
+        },
+    },
+    0x23 => { #12
+        Name => 'FlashExposureCompSet',
+        Description => 'Flash Exposure Comp. Setting',
+        # (as pre-selected by the user, not zero if flash didn't fire)
+        ValueConv => '($val - 128) / 24', #PH
+        ValueConvInv => 'int($val * 24 + 128.5)',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
     0x24 => {
         Name => 'AFAreaMode',
         PrintConv => {
             1 => 'Wide',
             2 => 'Spot',
             3 => 'Local',
+            4 => 'Flexible', #12
             # see values of 1,2,4 for NEX-C3/5/7 which have Multi/Center/Flexible Spot modes
             # (Flexible Spot is a grid of 17x11 points for the NEX-5)
+            # AF area "flexible" (from A560/A580 usermanual):
+            # only available when in FocusCheckLiveView with Contrast-AF and using SAM or SSM lens.
+        },
+    },
+    0x25 => { #12
+        Name => 'LongExposureNoiseReduction',
+        PrintConv => {
+            1 => 'Off',
+            16 => 'On',  # (unused or dark subject)
+        },
+    },
+    0x26 => { #12
+        Name => 'HighISONoiseReduction',
+        PrintConv => {
+            16 => 'Low',
+            19 => 'Auto',
+        },
+    },
+    0x28 => { #12
+        Name => 'RedEyeReduction',
+        PrintConv => {
+            1 => 'Off',
+            16 => 'On',
         },
     },
     0x2d => {
@@ -1310,6 +1547,7 @@ my %binaryDataAttrs = (
     },
     0x2e => {
         Name => 'AutoHDRLevel',
+        PrintConvColumns => 2,
         PrintConv => {
             33 => '1 EV',
             35 => '2 EV',
@@ -1319,6 +1557,36 @@ my %binaryDataAttrs = (
             41 => '6 EV',
         },
     },
+    0x32 => { #12
+        Name => 'SweepPanoramaSize',
+        Condition => '$$self{Model} !~ /^DSLR-(A450|A500|A550)$/',
+        PrintConv => {
+            1 => 'Standard',
+            2 => 'Wide',
+        },
+    },
+    0x34 => { #12
+        Name => 'DriveModeUsed',
+        Condition => '$$self{Model} !~ /^DSLR-(A450|A500|A550)$/',
+        PrintConv => {
+            16 => 'Single Frame',
+            33 => 'Continuous High', # also automatically selected for Scene mode Sports-action (0x05=52)
+            34 => 'Continuous Low',
+            48 => 'Speed Priority Continuous',
+            81 => 'Self-timer 10 sec',
+            82 => 'Self-timer 2 sec, Mirror Lock-up',
+            113 => 'Continuous Bracketing 0.3 EV',
+            117 => 'Continuous Bracketing 0.7 EV',
+            145 => 'White Balance Bracketing Low',
+            146 => 'White Balance Bracketing High',
+            192 => 'Remote Commander',
+            209 => 'Continuous - HDR',
+            210 => 'Continuous - Multi Frame NR',
+            211 => 'Continuous - Hand-held Twilight',
+            213 => 'Continuous - Sweep Panorama',
+            214 => 'Continuous - 3D Panorama',
+        },
+    },
     0x35 => {
         Name => 'MultiFrameNoiseReduction',
         PrintConv => {
@@ -1326,6 +1594,37 @@ my %binaryDataAttrs = (
             1 => 'Off',
             16 => 'On',
             255 => 'n/a',
+        },
+    },
+    0x38 => { #12
+        Name => '3DPanoramaSize',
+        Condition => '$$self{Model} !~ /^DSLR-(A450|A500|A550)$/',
+        # 3D panorama was NOT in the initial firmware for NEX-3, 5, VG10
+        # have seen 0x0038=0 for VG10 with "0x0131 Software : NEX-VG10E Ver.01" - maybe still initial firmware ?? (ref 12)
+        PrintConv => {
+            0 => 'n/a', # just guessing here - check NEX-3/5/VG10 with newest FW if they still report 0
+            1 => 'Standard',
+            2 => 'Wide',
+            3 => '16:9',
+        },
+    },
+    0x87 => { #12
+        # (0x20 and 0x87 might be the other way round)
+        Name => 'FlashAction',
+        Condition => '$$self{Model} !~ /^DSLR-(A450|A500|A550)$/', #seen 0 for A550, so better exclude ?
+        PrintConv => {
+            1 => 'Flash did not fire',
+            2 => 'Flash fired',
+        },
+    },
+    0x10c => { #12
+        Name => 'SequenceNumber',
+        Condition => '$$self{Model} !~ /^DSLR-(A450|A500|A550)$/', #seen 18 for A550, so better exclude ?
+        # normally 0; seen 1,2,3 for bracketing, 6 for hand-held twilight, 3 for HDR, 6 for MFNR
+        PrintConv => {
+            0 => 'Single',
+            65535 => 'n/a',
+            OTHER => sub { shift }, # pass all other numbers straight through
         },
     },
 );
@@ -2355,8 +2654,8 @@ under the same terms as Perl itself.
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Thomas Bodenmann, Philippe Devaux, Jens Duttke, Marcus
-Holland-Moritz, Andrey Tverdokhleb, Rudiger Lange, Igal Milchtaich and
-Michael Reitinger for help decoding some tags.
+Holland-Moritz, Andrey Tverdokhleb, Rudiger Lange, Igal Milchtaich, Michael
+Reitinger and Jos Roost for help decoding some tags.
 
 =head1 SEE ALSO
 

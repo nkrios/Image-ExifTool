@@ -17,7 +17,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::MakerNotes;
 use Image::ExifTool::CanonRaw;
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 sub ProcessOriginalRaw($$$);
 sub ProcessAdobeData($$$);
@@ -48,7 +48,7 @@ sub WriteAdobeStuff($$$);
 );
 
 %Image::ExifTool::DNG::AdobeData = ( #PH
-    GROUPS => { 0 => 'MakerNotes', 1 => 'Adobe', 2 => 'Image' },
+    GROUPS => { 0 => 'MakerNotes', 1 => 'AdobeDNG', 2 => 'Image' },
     PROCESS_PROC => \&ProcessAdobeData,
     WRITE_PROC => \&WriteAdobeStuff,
     NOTES => q{

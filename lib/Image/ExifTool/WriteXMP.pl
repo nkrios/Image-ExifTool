@@ -295,7 +295,7 @@ sub SetPropertyPath($$;$$$$)
         # (could happen if we were just writing a structure)
         unless ($tagInfo) {
             $tagInfo = { Name => ucfirst($flatID), Flat => 1 };
-            Image::ExifTool::AddTagToTable($tagTablePtr, $flatID, $tagInfo);
+            AddTagToTable($tagTablePtr, $flatID, $tagInfo);
         }
         # set StructType flag if any containing structure has a TYPE
         $$tagInfo{StructType} = 1 if $isType;

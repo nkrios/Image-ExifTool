@@ -13,6 +13,7 @@ package Image::ExifTool::IPTC;
 
 use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
+use Image::ExifTool qw(:DataAccess :Utils);
 
 $VERSION = '1.44';
 
@@ -1124,7 +1125,7 @@ sub ProcessIPTC($$$)
         unless ($$recordPtr{$tag}) {
             # - no Format so format is auto-detected
             # - no Name so name is generated automatically with decimal tag number
-            Image::ExifTool::AddTagToTable($recordPtr, $tag, { Unknown => 1 });
+            AddTagToTable($recordPtr, $tag, { Unknown => 1 });
         }
 
         my $tagInfo = $exifTool->GetTagInfo($recordPtr, $tag);

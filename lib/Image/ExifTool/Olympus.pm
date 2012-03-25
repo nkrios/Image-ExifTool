@@ -33,7 +33,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.84';
+$VERSION = '1.86';
 
 sub PrintLensInfo($$$);
 
@@ -242,6 +242,7 @@ my %olympusCameraTypes = (
     D4424 => 'FE47,X43',
     D4426 => 'FE4030,X950',
     D4428 => 'FE5030,X965,X960',
+    D4430 => 'u7030,S7030',
     D4432 => 'SP600UZ',
     D4434 => 'SP800UZ',
     D4439 => 'FE4020,X940',
@@ -259,6 +260,7 @@ my %olympusCameraTypes = (
     D4480 => 'VG120,D705',
     D4482 => 'VR310,D720',
     D4484 => 'VR320,D725',
+    D4486 => 'VR330,D730',
     D4488 => 'VG110,D700',
     D4490 => 'SP-610UZ',
     D4492 => 'SZ-10',
@@ -267,6 +269,8 @@ my %olympusCameraTypes = (
     D4498 => 'SP-810UZ',
     D4500 => 'SZ-11',
     D4504 => 'TG-615',
+    D4529 => 'VG170',
+    D4535 => 'SP-620UZ',
     D4809 => 'C2500L',
     D4842 => 'E-10',
     D4856 => 'C-1',
@@ -1628,7 +1632,7 @@ my %indexInfo = (
         Writable => 'int16u',
     },
     0x20a => { #9
-        Name => 'MaxApertureAtCurrentFocal',
+        Name => 'MaxAperture', # (at current focal length)
         Writable => 'int16u',
         ValueConv => '$val ? sqrt(2)**($val/256) : 0',
         ValueConvInv => '$val>0 ? int(512*log($val)/log(2)+0.5) : 0',
@@ -3490,6 +3494,7 @@ my %indexInfo = (
             SG553 => 'SP-610UZ',
             SG554 => 'SZ-10',
             SG555 => 'SZ-20',
+            SG575 => 'SP-620UZ',
         },
     },
     0x28 => {

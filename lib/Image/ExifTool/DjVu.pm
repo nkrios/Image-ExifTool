@@ -294,7 +294,7 @@ sub ProcessMeta($$$)
             my $name = $$item[0];
             $name =~ tr/-_a-zA-Z0-9//dc; # remove illegal characters
             length $name or $err = 1, next;
-            Image::ExifTool::AddTagToTable($tagTablePtr, $$item[0], { Name => ucfirst($name) });
+            AddTagToTable($tagTablePtr, $$item[0], { Name => ucfirst($name) });
         }
         $exifTool->HandleTag($tagTablePtr, $$item[0], $$item[1]);
     }

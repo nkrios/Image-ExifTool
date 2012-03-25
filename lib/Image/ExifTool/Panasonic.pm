@@ -29,7 +29,7 @@ use vars qw($VERSION %leicaLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.61';
+$VERSION = '1.63';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -257,6 +257,7 @@ my %shootingMode = (
             10 => 'Black & White', #3 (Leica)
             11 => 'Manual', #PH (FZ8)
             12 => 'Shade', #PH (FS7)
+            13 => 'Kelvin', #PeterK (NC)
         },
     },
     0x07 => {
@@ -685,7 +686,10 @@ my %shootingMode = (
         },
     },
     # 0x43 - int16u: 2,3
-    # 0x44 - int16u: 0,2500
+    0x44 => {
+        Name => 'ColorTempKelvin',
+        Format => 'int16u',
+    },
     # 0x45 - int16u: 0
     0x46 => { #PH/JD
         Name => 'WBAdjustAB',
@@ -1485,6 +1489,43 @@ my %shootingMode = (
         Name => 'RecognizedFace3Age',
         Format => 'string[20]',
         RawConv => '$$self{FacesRecognized} < 3 ? undef : $val',
+    },
+);
+
+%Image::ExifTool::Panasonic::PANA = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    NOTES => q{
+        Tags extracted from the PANA user data found in MP4 videos from models such
+        as the DMC-FT20.
+    },
+    4 => {
+        Name => 'Model',
+        Description => 'Camera Model Name',
+        Format => 'string[16]',
+    },
+    0x58 => {
+        Name => 'ThumbnailWidth',
+        Format => 'int16u',
+    },
+    0x5a => {
+        Name => 'ThumbnailHeight',
+        Format => 'int16u',
+    },
+    0x5c => {
+        Name => 'ThumbnailImage',
+        Format => 'undef[16384]',
+        RawConv => '$val=~/^\xff\xd8\xff/ ? $val : undef',
+        ValueConv => '$val=~s/\0*$//; \$val',   # remove trailing zeros
+    },
+    0x4068 => {
+        Name => 'ExifData',
+        Condition => '$$valPt =~ /^\xff\xd8\xff\xe1..Exif\0\0/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Exif::Main',
+            ProcessProc => \&Image::ExifTool::ProcessTIFF,
+            Start => 12,
+        },
     },
 );
 

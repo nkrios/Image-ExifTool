@@ -1031,11 +1031,25 @@ my %sRegionStruct = (
     Extensions  => { Struct => \%sExtensions },
     seeAlso => { Namespace => 'rdfs', Resource => 1 },
 );
+my %sKeywordStruct6 = (
+    STRUCT_NAME => 'KeywordStruct6',
+    NAMESPACE   => 'mwg-kw',
+    Keyword   => { },
+    Applied   => { Writable => 'boolean' },
+);
+my %sKeywordStruct5 = (
+    STRUCT_NAME => 'KeywordStruct5',
+    NAMESPACE   => 'mwg-kw',
+    Keyword   => { },
+    Applied   => { Writable => 'boolean' },
+    Children  => { Struct => \%sKeywordStruct6, List => 'Bag' },
+);
 my %sKeywordStruct4 = (
     STRUCT_NAME => 'KeywordStruct4',
     NAMESPACE   => 'mwg-kw',
     Keyword   => { },
     Applied   => { Writable => 'boolean' },
+    Children  => { Struct => \%sKeywordStruct5, List => 'Bag' },
 );
 my %sKeywordStruct3 = (
     STRUCT_NAME => 'KeywordStruct3',
@@ -1105,12 +1119,12 @@ my %sKeywordStruct1 = (
     NAMESPACE => 'mwg-kw',
     NOTES => q{
         Hierarchical keywords metadata defined by the MWG 2.0 specification. 
-        ExifTool unrolls keyword structures to an arbitrary depth of 4 to allow
+        ExifTool unrolls keyword structures to an arbitrary depth of 6 to allow
         individual levels to be accessed with different tag names, and to avoid
         infinite recursion.  See L<http://www.metadataworkinggroup.org/> for the
         official specification.
     },
-    # arbitrarily define only the first 4 levels of the keyword hierarchy
+    # arbitrarily define only the first 6 levels of the keyword hierarchy
     Keywords => {
         Name => 'KeywordInfo',
         Struct => {
@@ -1129,8 +1143,14 @@ my %sKeywordStruct1 = (
     KeywordsHierarchyChildrenChildrenKeyword  => { Name => 'HierarchicalKeywords3', Flat => 1 },
     KeywordsHierarchyChildrenChildrenApplied  => { Name => 'HierarchicalKeywords3Applied', Flat => 1 },
     KeywordsHierarchyChildrenChildrenChildren => { Name => 'HierarchicalKeywords3Children', Flat => 1 },
-    KeywordsHierarchyChildrenChildrenChildrenKeyword => { Name => 'HierarchicalKeywords4', Flat => 1 },
-    KeywordsHierarchyChildrenChildrenChildrenApplied => { Name => 'HierarchicalKeywords4Applied', Flat => 1 },
+    KeywordsHierarchyChildrenChildrenChildrenKeyword  => { Name => 'HierarchicalKeywords4', Flat => 1 },
+    KeywordsHierarchyChildrenChildrenChildrenApplied  => { Name => 'HierarchicalKeywords4Applied', Flat => 1 },
+    KeywordsHierarchyChildrenChildrenChildrenChildren => { Name => 'HierarchicalKeywords4Children', Flat => 1 },
+    KeywordsHierarchyChildrenChildrenChildrenChildrenKeyword  => { Name => 'HierarchicalKeywords5', Flat => 1 },
+    KeywordsHierarchyChildrenChildrenChildrenChildrenApplied  => { Name => 'HierarchicalKeywords5Applied', Flat => 1 },
+    KeywordsHierarchyChildrenChildrenChildrenChildrenChildren => { Name => 'HierarchicalKeywords5Children', Flat => 1 },
+    KeywordsHierarchyChildrenChildrenChildrenChildrenChildrenKeyword => { Name => 'HierarchicalKeywords6', Flat => 1 },
+    KeywordsHierarchyChildrenChildrenChildrenChildrenChildrenApplied => { Name => 'HierarchicalKeywords6Applied', Flat => 1 },
 );
 
 # MWG 2.0 collections schema tags

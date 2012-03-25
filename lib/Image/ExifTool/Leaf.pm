@@ -447,7 +447,7 @@ sub ProcessLeaf($$$)
                 # make tags in main table unknown because they tend to be binary
                 $$tagInfo{Unknown} = 1 if $tagTablePtr eq \%Image::ExifTool::Leaf::Main;
             }
-            $tagInfo and Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+            $tagInfo and AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
         if ($verbose) {
             $exifTool->VerboseInfo($tag, $tagInfo,

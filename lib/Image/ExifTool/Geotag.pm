@@ -18,9 +18,12 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.28';
+$VERSION = '1.31';
+
+sub JITTER() { return 2 }       # maximum time jitter
 
 sub SetGeoValues($$;$);
+sub PrintFix($@);
 
 # XML tags that we recognize (keys are forced to lower case)
 my %xmlTag = (
@@ -51,6 +54,17 @@ my %xmlTag = (
     placemark   => '',          # KML
 );
 
+# fix information keys which must be interpolated around a circle
+my %cyclical = (lon => 1, track => 1, dir => 1, roll => 1);
+
+# fix information keys for each of our general categories
+my %fixInfoKeys = (
+   'pos'   => [ 'lat', 'lon' ],
+    track  => [ 'track', 'speed' ],
+    alt    => [ 'alt' ],
+    orient => [ 'dir', 'pitch', 'roll' ],
+);
+
 my $secPerDay = 24 * 3600;      # a useful constant
 
 #------------------------------------------------------------------------------
@@ -62,7 +76,7 @@ my $secPerDay = 24 * 3600;      # a useful constant
 #       Times  - list of sorted Unix times (keys of Points hash)
 #       NoDate - flag if some points have no date (ie. referenced to 1970:01:01)
 #       IsDate - flag if some points have date
-#       Has    - hash of flags for available information (track, orient)
+#       Has    - hash of flags for available information (track, orient, alt)
 # - the fix information hash may contain:
 #       lat    - signed latitude (required)
 #       lon    - signed longitude (required)
@@ -95,6 +109,9 @@ sub LoadTrackLog($$;$)
     }
     # add data to existing track
     my $geotag = $exifTool->GetNewValues('Geotag') || { };
+    # get lookup for available information types
+    my $has = $$geotag{Has};
+    $has or $has = $$geotag{Has} = { 'pos' => 1 };
     my $format = '';
     # is $val track log data?
     if ($val =~ /^(\xef\xbb\xbf)?<(\?xml|gpx)\s/) {
@@ -237,6 +254,7 @@ sub LoadTrackLog($$;$)
                         undef $$fix{alt} if defined $$fix{alt} and $$fix{alt} !~ /^[+-]?\d+\.?\d*/;
                         $isDate = 1;
                         $canCut= 1 if defined $$fix{pdop} or defined $$fix{hdop} or defined $$fix{nsats};
+                        $$has{alt} = 1 if $$fix{alt};   # set "has altitude" flag if appropriate
                         $$points{$time} = $fix;
                         push @fixTimes, $time;  # save times of all fixes in order
                         $fix = { };
@@ -270,7 +288,7 @@ sub LoadTrackLog($$;$)
             $secs = (($1 * 60) + $2) * 60 + $3;
             # wrap to next day if necessary
             if ($dateFlarm) {
-                $dateFlarm += $secPerDay if $secs < $lastSecs;
+                $dateFlarm += $secPerDay if $secs < $lastSecs - JITTER();
                 $date = $dateFlarm;
             }
             $nmea = 'B';
@@ -366,7 +384,7 @@ sub LoadTrackLog($$;$)
         # use last date if necessary (and appropriate)
         if (defined $secs and not defined $date and defined $lastDate) {
             # wrap to next day if necessary
-            if ($secs < $lastSecs) {
+            if ($secs < $lastSecs - JITTER()) {
                 $lastSecs -= $secPerDay;
                 $lastDate += $secPerDay;
             }
@@ -386,7 +404,7 @@ sub LoadTrackLog($$;$)
             $lastSecs = $secs;
         }
 #
-# Add NMEA fix to our lookup
+# Add NMEA/IGC fix to our lookup
 # (this is much more complicated than it needs to be because
 #  the stupid NMEA format provides no end-of-fix indication)
 #
@@ -502,14 +520,7 @@ sub LoadTrackLog($$;$)
         if ($numPoints and $verbose > 1) {
             print $out '  GPS track start: ' . Image::ExifTool::ConvertUnixTime($fixTimes[0]) . " UTC\n";
             if ($verbose > 3) {
-                foreach $time (@fixTimes) {
-                    $fix = $$points{$time} or next;
-                    print $out '    ',Image::ExifTool::ConvertUnixTime($time),' UTC -';
-                    foreach (sort keys %$fix) {
-                        print $out " $_=$$fix{$_}" unless $_ eq 'time';
-                    }
-                    print $out "\n";
-                }
+                print $out PrintFix($points, $_) foreach @fixTimes;
             }
             print $out '  GPS track end:   ' . Image::ExifTool::ConvertUnixTime($fixTimes[-1]) . " UTC\n";
         }
@@ -518,8 +529,9 @@ sub LoadTrackLog($$;$)
         # reset timestamp list to force it to be regenerated
         delete $$geotag{Times};
         # set flags for available information
-        $$geotag{Has}{track}  = 1 if $nmea{RMC};
-        $$geotag{Has}{orient} = 1 if $nmea{PTNTHPR};
+        $$has{alt} = 1 if $nmea{GGA} or $nmea{PMGNTRK} or $nmea{B}; # alt
+        $$has{track} = 1 if $nmea{RMC};                             # track, speed
+        $$has{orient} = 1 if $nmea{PTNTHPR};                        # dir, pitch, roll
         return $geotag;     # success!
     }
     return "No track points found in GPS $from";
@@ -562,6 +574,61 @@ sub ApplySyncCorr($$)
 }
 
 #------------------------------------------------------------------------------
+# Scan outwards for a fix containing the requested parameter
+# Inputs: 0) name of fix parameter, 1) reference to list of fix times,
+#         2) reference to fix points hash, 3) index of starting time,
+#         4) direction to scan (-1 or +1), 5) maximum time difference
+# Returns: 0) time for fix containing requested information (or undef)
+#          1) the corresponding fix, 2) the value of the requested fix parameter
+sub ScanOutwards($$$$$$)
+{
+    my ($key, $times, $points, $i, $dir, $maxSecs) = @_;
+    my $t0 = $$times[$i];
+    for (;;) {
+        $i += $dir;
+        last if $i < 0 or $i >= scalar @$times;
+        my $t = $$times[$i];
+        last if abs($t - $t0) > $maxSecs;   # don't look too far
+        my $p = $$points{$t};
+        my $v = $$p{$key};
+        return($t,$p,$v) if defined $v;
+    }
+    return();
+}
+
+#------------------------------------------------------------------------------
+# Find nearest fix containing the specified parameter
+# Inputs: 0) ExifTool ref, 1) name of fix parameter, 2) reference to list of fix times,
+#         3) reference to fix points hash, 4) index of starting time,
+#         5) direction to scan (-1, +1 or undef), 6) maximum time difference
+# Returns: reference to fix hash or undef
+sub FindFix($$$$$$$)
+{
+    my ($exifTool, $key, $times, $points, $i, $dir, $maxSecs) = @_;
+    my ($t,$p);
+    if ($dir) {
+        ($t,$p) = ScanOutwards($key, $times, $points, $i, $dir, $maxSecs);
+    } else {
+        my ($t1, $p1) = ScanOutwards($key, $times, $points, $i, -1, $maxSecs);
+        my ($t2, $p2) = ScanOutwards($key, $times, $points, $i, 1, $maxSecs);
+        if (defined $t1) {
+            if (defined $t2) {
+                # both surrounding points are valid, so take the closest one
+                ($t, $p) = ($t - $t1 < $t2 - $t) ? ($t1, $p1) : ($t2, $p2);
+            } else {
+                ($t, $p) = ($t1, $p1);
+            }
+        } elsif (defined $t2) {
+            ($t, $p) = ($t2, $p2);
+        }
+    }
+    if (defined $p and $$exifTool{OPTIONS}{Verbose} > 2) {
+        $exifTool->VPrint(2, "  Taking $key from fix:\n", PrintFix($points, $t))
+    }
+    return $p;
+}
+
+#------------------------------------------------------------------------------
 # Set new geotagging values according to date/time
 # Inputs: 0) ExifTool object ref, 1) date/time value (or undef to delete tags)
 #         2) optional write group
@@ -572,7 +639,8 @@ sub SetGeoValues($$;$)
     local $_;
     my ($exifTool, $val, $writeGroup) = @_;
     my $geotag = $exifTool->GetNewValues('Geotag');
-    my ($fix, $time, $fsec, $noDate, $secondTry);
+    my $verbose = $exifTool->Options('Verbose');
+    my ($fix, $time, $fsec, $noDate, $secondTry, $iExt, $iDir);
 
     # remove date if none of our fixes had date information
     $val =~ s/^\S+\s+// if $val and $geotag and not $$geotag{IsDate};
@@ -584,7 +652,9 @@ sub SetGeoValues($$;$)
     defined $geoMaxIntSecs or $geoMaxIntSecs = 1800;
     defined $geoMaxExtSecs or $geoMaxExtSecs = 1800;
 
+    my $times = $$geotag{Times};
     my $points = $$geotag{Points};
+    my $has = $$geotag{Has};
     my $err = '';
     # loop to try date/time value first, then time-only value
     while (defined $val) {
@@ -592,7 +662,6 @@ sub SetGeoValues($$;$)
             $err = 'No GPS track loaded';
             last;
         }
-        my $times = $$geotag{Times};
         unless ($times) {
             # generate sorted timestamp list for binary search
             my @times = sort { $a <=> $b } keys %$points;
@@ -648,6 +717,10 @@ sub SetGeoValues($$;$)
             my $out = $exifTool->Options('TextOut');
             my $str = "$fsec UTC";
             $str .= sprintf(" (incl. Geosync offset of %+.3f sec)", $sync) if defined $sync;
+            unless ($tz) {
+                my $tzs = Image::ExifTool::TimeZoneString([$sec,$min,$hr,$day,$mon-1,$year-1900],$time);
+                $str .= " (local timezone is $tzs)";
+            }
             print $out '  Geotime value:   ' . Image::ExifTool::ConvertUnixTime(int $time) . "$str\n";
         }
         # interpolate GPS track at $time
@@ -656,12 +729,18 @@ sub SetGeoValues($$;$)
                 $err or $err = 'Time is too far before track';
             } else {
                 $fix = $$points{$$times[0]};
+                $iExt = 0;  $iDir = 1;
+                $exifTool->VPrint(2, "  Taking pos from fix:\n",
+                    PrintFix($points, $$times[0])) if $verbose > 2;
             }
         } elsif ($time > $$times[-1]) {
             if ($time > $$times[-1] + $geoMaxExtSecs) {
                 $err or $err = 'Time is too far beyond track';
             } else {
                 $fix = $$points{$$times[-1]};
+                $iExt = $#$times;  $iDir = -1;
+                $exifTool->VPrint(2, "  Taking pos from fix:\n",
+                    PrintFix($points, $$times[-1])) if $verbose > 2;
             }
         } else {
             # find nearest 2 points in time
@@ -683,37 +762,79 @@ sub SetGeoValues($$;$)
             # don't interpolate if fixes are too far apart
             if ($t1 - $t0 > $maxSecs) {
                 # treat as an extrapolation -- use nearest fix if close enough
-                my $tn = ($time - $t0 < $t1 - $time) ? $t0 : $t1;
+                my $tn;
+                if ($time - $t0 < $t1 - $time) {
+                    $tn = $t0;
+                    $iExt = $i0;
+                } else {
+                    $tn = $t1;
+                    $iExt = $i1;
+                }
                 if (abs($time - $tn) > $geoMaxExtSecs) {
                     $err or $err = 'Time is too far from nearest GPS fix';
                 } else {
                     $fix = $$points{$tn};
+                    $exifTool->VPrint(2, "  Taking pos from fix:\n",
+                        PrintFix($points, $tn)) if $verbose > 2;
                 }
             } else {
-                my $f = $t1 == $t0 ? 0 : ($time - $t0) / ($t1 - $t0);
+                my $f0 = $t1 == $t0 ? 0 : ($time - $t0) / ($t1 - $t0);
                 my $p0 = $$points{$t0};
+                $exifTool->VPrint(2, "  Interpolating pos between fixes (f=$f0):\n",
+                    PrintFix($points, $t0, $t1)) if $verbose > 2;
                 $fix = { };
-                # interpolate non-cyclical values
-                foreach (qw(lat alt speed pitch)) {
-                    next unless defined $$p0{$_} and defined $$p1{$_};
-                    $$fix{$_} = $$p1{$_} * $f + $$p0{$_} * (1 - $f);
-                }
-                # interpolate cyclical values
-                foreach (qw(lon track dir roll)) {
-                    next unless defined $$p0{$_} and defined $$p1{$_};
-                    my ($a0, $a1) = ($$p0{$_}, $$p1{$_});
-                    # interpolate inside the acute angle
-                    if (abs($a1 - $a0) <= 180) {
-                        # simple interpolation
-                        $$fix{$_} = $a1 * $f + $a0 * (1 - $f);
-                    } else {
-                        # the acute angle spans the maximum angle, so add
-                        # 360 degrees to the smaller angle before interpolating
-                        $a0 < $a1 ? $a0 += 360 : $a1 += 360;
-                        $$fix{$_} = $a1 * $f + $a0 * (1 - $f);
-                        # longitude and roll ranges are -180 to 180, others are 0 to 360
-                        my $max = ($_ eq 'lon' or $_ eq 'roll') ? 180 : 360;
-                        $$fix{$_} -= 360 if $$fix{$_} >= $max;
+                # loop through available fix information categories
+                # (pos, track, alt, orient)
+                my ($category, $key);
+Category:       foreach $category (qw{pos track alt orient}) {
+                    next unless $$has{$category};
+                    my ($f, $p0b, $p1b, $f0b);
+                    # loop through specific fix information keys
+                    # (lat, lon, alt, track, speed, dir, pitch, roll)
+                    foreach $key (@{$fixInfoKeys{$category}}) {
+                        my $v0 = $$p0{$key};
+                        my $v1 = $$p1{$key};
+                        if (defined $v0 and defined $v1) {
+                            $f = $f0;
+                        } elsif (defined $f0b) {
+                            $v0 = $$p0b{$key};
+                            $v1 = $$p1b{$key};
+                            next unless defined $v0 and defined $v1;
+                            $f = $f0b;
+                        } else {
+                            # scan outwards looking for fixes with the required information
+                            # (NOTE: SHOULD EVENTUALLY DO THIS FOR EXTRAPOLATION TOO!)
+                            my ($t0b, $t1b);
+                            if (defined $v0) {
+                                $t0b = $t0;  $p0b = $p0;
+                            } else {
+                                ($t0b,$p0b,$v0) = ScanOutwards($key,$times,$points,$i0,-1,$maxSecs);
+                                next Category unless defined $t0b;
+                            }
+                            if (defined $v1) {
+                                $t1b = $t1;  $p1b = $p1;
+                            } else {
+                                ($t1b,$p1b,$v1) = ScanOutwards($key,$times,$points,$i1,1,$maxSecs);
+                                next Category unless defined $t1b;
+                            }
+                            # re-calculate the interpolation factor
+                            $f = $f0b = $t1b == $t0b ? 0 : ($time - $t0b) / ($t1b - $t0b);
+                            $exifTool->VPrint(2, "  Interpolating $category between fixes (f=$f):\n",
+                                PrintFix($points, $t0b, $t1b)) if $verbose > 2;
+                        }
+                        # must interpolate cyclical values differently
+                        if ($cyclical{$key} and abs($v1 - $v0) > 180) {
+                            # the acute angle spans the discontinuity, so add
+                            # 360 degrees to the smaller angle before interpolating
+                            $v0 < $v1 ? $v0 += 360 : $v1 += 360;
+                            $$fix{$key} = $v1 * $f + $v0 * (1 - $f);
+                            # longitude and roll ranges are -180 to 180, others are 0 to 360
+                            my $max = ($key eq 'lon' or $key eq 'roll') ? 180 : 360;
+                            $$fix{$key} -= 360 if $$fix{$key} >= $max;
+                        } else {
+                            # simple linear interpolation
+                            $$fix{$key} = $v1 * $f + $v0 * (1 - $f);
+                        }
                     }
                 }
             }
@@ -737,6 +858,12 @@ sub SetGeoValues($$;$)
         if (defined $$fix{alt}) {
             $gpsAlt = abs $$fix{alt};
             $gpsAltRef = ($$fix{alt} < 0 ? 1 : 0);
+        } elsif ($$has{alt} and defined $iExt) {
+            my $tFix = FindFix($exifTool,'alt',$times,$points,$iExt,$iDir,$geoMaxExtSecs);
+            if ($tFix) {
+                $gpsAlt = abs $$tFix{alt};
+                $gpsAltRef = ($$tFix{alt} < 0 ? 1 : 0);
+            }
         }
         # set new GPS tag values (EXIF, or XMP if write group is 'xmp')
         my ($xmp, $exif, @r);
@@ -751,18 +878,28 @@ sub SetGeoValues($$;$)
         @r = $exifTool->SetNewValue(GPSLongitude => $$fix{lon}, %opts);
         @r = $exifTool->SetNewValue(GPSAltitude => $gpsAlt, %opts);
         @r = $exifTool->SetNewValue(GPSAltitudeRef => $gpsAltRef, %opts);
-        if ($$geotag{Has}{track}) {
-            @r = $exifTool->SetNewValue(GPSTrack => $$fix{track}, %opts);
-            @r = $exifTool->SetNewValue(GPSTrackRef => (defined $$fix{track} ? 'T' : undef), %opts);
-            @r = $exifTool->SetNewValue(GPSSpeed => $$fix{speed}, %opts);
-            @r = $exifTool->SetNewValue(GPSSpeedRef => (defined $$fix{speed} ? 'N' : undef), %opts);
+        if ($$has{track}) {
+            my $tFix = $fix;
+            if (not defined $$fix{track} and defined $iExt) {
+                my $p = FindFix($exifTool,'track',$times,$points,$iExt,$iDir,$geoMaxExtSecs);
+                $tFix = $p if $p;
+            }
+            @r = $exifTool->SetNewValue(GPSTrack => $$tFix{track}, %opts);
+            @r = $exifTool->SetNewValue(GPSTrackRef => (defined $$tFix{track} ? 'T' : undef), %opts);
+            @r = $exifTool->SetNewValue(GPSSpeed => $$tFix{speed}, %opts);
+            @r = $exifTool->SetNewValue(GPSSpeedRef => (defined $$tFix{speed} ? 'N' : undef), %opts);
         }
-        if ($$geotag{Has}{orient}) {
-            @r = $exifTool->SetNewValue(GPSImgDirection => $$fix{dir}, %opts);
-            @r = $exifTool->SetNewValue(GPSImgDirectionRef => (defined $$fix{dir} ? 'T' : undef), %opts);
+        if ($$has{orient}) {
+            my $tFix = $fix;
+            if (not defined $$fix{dir} and defined $iExt) {
+                my $p = FindFix($exifTool,'dir',$times,$points,$iExt,$iDir,$geoMaxExtSecs);
+                $tFix = $p if $p;
+            }
+            @r = $exifTool->SetNewValue(GPSImgDirection => $$tFix{dir}, %opts);
+            @r = $exifTool->SetNewValue(GPSImgDirectionRef => (defined $$tFix{dir} ? 'T' : undef), %opts);
             # Note: GPSPitch and GPSRoll are non-standard, and must be user-defined
-            @r = $exifTool->SetNewValue(GPSPitch => $$fix{pitch}, %opts);
-            @r = $exifTool->SetNewValue(GPSRoll => $$fix{roll}, %opts);
+            @r = $exifTool->SetNewValue(GPSPitch => $$tFix{pitch}, %opts);
+            @r = $exifTool->SetNewValue(GPSRoll => $$tFix{roll}, %opts);
         }
         unless ($xmp) {
             @r = $exifTool->SetNewValue(GPSLatitudeRef => ($$fix{lat} > 0 ? 'N' : 'S'), %opts);
@@ -916,6 +1053,29 @@ sub ConvertGeosync($$)
         $$sync{Offset} = $val =~ /^\s*-/ ? -$secs : $secs;
     }
     return $sync;
+}
+
+#------------------------------------------------------------------------------
+# Print fix information
+# Inputs: 0) lookup for all fix points, 1-n) list of fix times
+# Returns: fix string (including leading indent and trailing newline)
+sub PrintFix($@)
+{
+    local $_;
+    my $points = shift;
+    my $str = '';
+    while (@_) {
+        my $time = shift;
+        $str .= '    ' . Image::ExifTool::ConvertUnixTime($time) . ' UTC -';
+        my $fix = $$points{$time};
+        if ($fix) {
+            foreach (sort keys %$fix) {
+                $str .= " $_=$$fix{$_}" unless $_ eq 'time';
+            }
+        }
+        $str .= "\n";
+    }
+    return $str;
 }
 
 #------------------------------------------------------------------------------

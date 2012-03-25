@@ -73,6 +73,7 @@ my %jpegMap = (
     RMETA        => 'APP5',
     Ducky        => 'APP12',
     Photoshop    => 'APP13',
+    Adobe        => 'APP14',
     IPTC         => 'Photoshop',
     MakerNotes   => ['ExifIFD', 'CIFF'], # (first parent is the default)
     CanonVRD     => 'MakerNotes', # (so VRDOffset will get updated)
@@ -92,11 +93,13 @@ my %dirMap = (
 # 1) these names must either exist in %dirMap, or be translated in InitWriteDirs())
 # 2) any dependencies must be added to %excludeGroups
 my @delGroups = qw(
-    AFCP CanonVRD CIFF Ducky EXIF ExifIFD File FlashPix FotoStation GlobParamIFD
-    GPS ICC_Profile IFD0 IFD1 InteropIFD IPTC JFIF MakerNotes Meta MetaIFD MIE
-    NikonCapture PDF PDF-update PhotoMechanic Photoshop PNG PrintIM RMETA RSRC
-    SubIFD Trailer XML XML-* XMP XMP-*
+    Adobe AFCP CanonVRD CIFF Ducky EXIF ExifIFD File FlashPix FotoStation
+    GlobParamIFD GPS ICC_Profile IFD0 IFD1 InteropIFD IPTC JFIF MakerNotes Meta
+    MetaIFD MIE NikonCapture PDF PDF-update PhotoMechanic Photoshop PNG PrintIM
+    RMETA RSRC SubIFD Trailer XML XML-* XMP XMP-*
 );
+# groups we don't delete when deleting all information
+my $protectedGroups = '(IFD1|SubIFD|InteropIFD|GlobParamIFD|PDF-update|Adobe)';
 # other group names of new tag values to remove when deleting an entire group
 my %removeGroups = (
     IFD0    => [ 'EXIF', 'MakerNotes' ],
@@ -127,10 +130,13 @@ my %excludeGroups = (
 );
 # group names to translate for writing
 my %translateWriteGroup = (
-    EXIF => 'ExifIFD',
-    Meta => 'MetaIFD',
-    File => 'Comment',
-    MIE  => 'MIE',
+    EXIF  => 'ExifIFD',
+    Meta  => 'MetaIFD',
+    File  => 'Comment',
+    # any entry in this table causes the write group to be set from the
+    # tag information instead of whatever the user specified...
+    MIE   => 'MIE',
+    APP14 => 'APP14',
 );
 # names of valid EXIF and Meta directories:
 my %exifDirs = (
@@ -181,6 +187,7 @@ my %ignorePrintConv = ( OTHER => 1, BITMASK => 1, Notes => 1 );
 #           EditOnly => true to only edit existing tags (don't create new tag)
 #           EditGroup => true to only edit existing groups (don't create new group)
 #           Shift => undef, 0, +1 or -1 - shift value if possible
+#           NoFlat => treat flattened tags as 'unsafe'
 #           NoShortcut => true to prevent looking up shortcut tags
 #           ProtectSaved => protect existing new values with a save count greater than this
 #           CreateGroups => [internal use] createGroups hash ref from related tags
@@ -213,6 +220,7 @@ sub SetNewValue($;$$%)
     my $protected = $options{Protected} || 0;
     my $listOnly = $options{ListOnly};
     my $setTags = $options{SetTags};
+    my $noFlat = $options{NoFlat};
     my $numSet = 0;
 
     unless (defined $tag) {
@@ -293,8 +301,8 @@ sub SetNewValue($;$$%)
                     # and allow any XMP family 1 group to be deleted
                     push @del, uc($wantGroup) if $wantGroup =~ /^(MIE\d+|XM[LP]-[-\w]+)$/i;
                 } else {
-                    # push all groups plus '*', except IFD1 and a few others
-                    push @del, (grep !/^(IFD1|SubIFD|InteropIFD|GlobParamIFD|PDF-update)$/, @delGroups), '*';
+                    # push all groups plus '*', except the protected groups
+                    push @del, (grep !/^$protectedGroups$/, @delGroups), '*';
                 }
                 if (@del) {
                     ++$numSet;
@@ -503,8 +511,10 @@ sub SetNewValue($;$$%)
             }
         }
         # don't write tag if protected
-        if ($tagInfo->{Protected}) {
-            my $prot = $tagInfo->{Protected} & ~$protected;
+        my $prot = $$tagInfo{Protected};
+        $prot = 1 if $noFlat and defined $$tagInfo{Flat};
+        if ($prot) {
+            $prot &= ~$protected;
             if ($prot) {
                 my %lkup = ( 1=>'unsafe', 2=>'protected', 3=>'unsafe and protected');
                 $wasProtected = $lkup{$prot};
@@ -924,6 +934,10 @@ sub SetNewValuesFromFile($$;@)
     $srcExifTool->{FILE_SEQUENCE} = $self->{FILE_SEQUENCE}++;
     # set options for our extraction tool
     my $options = $self->{OPTIONS};
+    # copy both structured and flattened tags by default (but flattened tags are "unsafe")
+    my $structOpt = defined $$options{Struct} ? $$options{Struct} : 2;
+    # copy structures only if no tags specified (since flattened tags are "unsafe")
+    $structOpt = 1 if $structOpt eq '2' and not @setTags;
     # +------------------------------------------+
     # ! DON'T FORGET!!  Must consider each new   !
     # ! option to decide how it is handled here. !
@@ -954,8 +968,9 @@ sub SetNewValuesFromFile($$;@)
         QuickTimeUTC    => $$options{QuickTimeUTC},
         ScanForXMP      => $$options{ScanForXMP},
         StrictDate      => 1,
-        Struct          => ($$options{Struct} or not defined $$options{Struct}) ? 1 : 0,
+        Struct          => $structOpt,
         Unknown         => $$options{Unknown},
+        XMPAutoConv     => $$options{XMPAutoConv},
     );
     my $printConv = $$options{PrintConv};
     if ($opts{Type}) {
@@ -1192,8 +1207,16 @@ sub SetNewValuesFromFile($$;@)
                 $dstTag = $tag;
                 $noWarn = 1;
             }
-            # allow protected tags to be copied if specified explicitly
-            $$opts{Protected} = ($$set[2] eq '*' ? undef : 1);
+            if ($$set[2] eq '*') {
+                # don't copy protected tags when copying all
+                delete $$opts{Protected};
+                # don't copy flattened tags if copying structures too when copying all
+                $$opts{NoFlat} = $structOpt eq '2' ? 1 : 0;
+            } else {
+                # allow protected tags to be copied if specified explicitly
+                $$opts{Protected} = 1;
+                delete $$opts{NoFlat};
+            }
             # set value(s) for this tag
             my ($rtn, $wrn) = $self->SetNewValue($dstTag, $val, %$opts);
             if ($wrn and not $noWarn) {
@@ -1372,12 +1395,8 @@ sub SaveNewValues($)
     # initialize hash for saving overwritten new values
     $self->{SAVE_NEW_VALUE} = { };
     # make a copy of the delete group hash
-    if ($self->{DEL_GROUP}) {
-        my %delGrp = %{$self->{DEL_GROUP}};
-        $self->{SAVE_DEL_GROUP} = \%delGrp;
-    } else {
-        delete $self->{SAVE_DEL_GROUP};
-    }
+    my %delGrp = %{$self->{DEL_GROUP}};
+    $self->{SAVE_DEL_GROUP} = \%delGrp;
     return $saveCount;
 }
 
@@ -1431,12 +1450,8 @@ sub RestoreNewValues($)
         $self->{SAVE_NEW_VALUE} = { };  # reset saved new values
     }
     # 3) restore delete groups
-    if ($self->{SAVE_DEL_GROUP}) {
-        my %delGrp = %{$self->{SAVE_DEL_GROUP}};
-        $self->{DEL_GROUP} = \%delGrp;
-    } else {
-        delete $self->{DEL_GROUP};
-    }
+    my %delGrp = %{$self->{SAVE_DEL_GROUP}};
+    $self->{DEL_GROUP} = \%delGrp;
 }
 
 #------------------------------------------------------------------------------
@@ -1892,7 +1907,7 @@ sub WriteInfo($$;$$)
         if ($rtnVal > 0) {
             # copy Mac OS resource fork if it exists
             if ($^O eq 'darwin' and -s "$infile/..namedfork/rsrc") {
-                if ($$self{DEL_GROUP} and $$self{DEL_GROUP}{RSRC}) {
+                if ($$self{DEL_GROUP}{RSRC}) {
                     $self->VPrint(0,"Deleting Mac OS resource fork\n");
                     ++$$self{CHANGED};
                 } else {
@@ -3190,15 +3205,19 @@ sub WriteDirectory($$$;$)
         my $addr = $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base}||0) + $$self{BASE};
         # (Phase One P25 IIQ files have ICC_Profile duplicated in IFD0 and IFD1)
         if ($self->{PROCESSED}{$addr} and ($dirName ne 'ICC_Profile' or $$self{TIFF_TYPE} ne 'IIQ')) {
-            if ($self->Error("$dirName pointer references previous $self->{PROCESSED}{$addr} directory", 1)) {
+            if (defined $$dirInfo{DirLen} and not $$dirInfo{DirLen} and $dirName ne $self->{PROCESSED}{$addr}) {
+                # it is hypothetically possible to have 2 different directories
+                # with the same address if one has a length of zero
+            } elsif ($self->Error("$dirName pointer references previous $self->{PROCESSED}{$addr} directory", 1)) {
                 return undef;
             } else {
                 $self->Warn("Deleting duplicate $dirName directory");
                 $out and print $out "  Deleting $dirName\n";
                 return '';  # delete the duplicate directory
             }
+        } else {
+            $self->{PROCESSED}{$addr} = $dirName;
         }
-        $self->{PROCESSED}{$addr} = $dirName;
     }
     my $oldDir = $self->{DIR_NAME};
     my $isRewriting = ($$dirInfo{DirLen} or (defined $dataPt and length $$dataPt) or $$dirInfo{RAF});
@@ -4275,6 +4294,8 @@ sub WriteJPEG($$)
                     $s =~ /^Ducky/          and $dirName = 'Ducky';
                 } elsif ($marker == 0xed) {
                     $s =~ /^$psAPP13hdr/    and $dirName = 'Photoshop';
+                } elsif ($marker == 0xee) {
+                    $s =~ /^Adobe/          and $dirName = 'Adobe';
                 }
                 # initialize doneDir as a flag that the directory exists
                 # (unless we are deleting it anyway)
@@ -4473,6 +4494,24 @@ sub WriteJPEG($$)
                         Write($outfile, $app12hdr, 'Ducky', $buff) or $err = 1;
                     } else {
                         $self->Warn("Ducky APP12 segment too large! ($size bytes)");
+                    }
+                }
+            }
+            # then APP14 Adobe segment
+            last if $dirCount{Adobe};
+            if (exists $$addDirs{Adobe} and not defined $doneDir{Adobe}) {
+                $doneDir{Adobe} = 1;
+                my $buff = $self->GetNewValues('Adobe');
+                if ($buff) {
+                    $verbose and print $out "Creating APP14:\n  Creating Adobe segment\n";
+                    my $size = length($buff);
+                    if ($size <= $maxSegmentLen) {
+                        # write the new segment with appropriate header
+                        my $app14hdr = "\xff\xee" . pack('n', $size + 2);
+                        Write($outfile, $app14hdr, $buff) or $err = 1;
+                        ++$self->{CHANGED};
+                    } else {
+                        $self->Warn("Adobe APP14 segment too large! ($size bytes)");
                     }
                 }
             }
@@ -5072,6 +5111,15 @@ sub WriteJPEG($$)
                     undef $combinedSegData;
                     undef $$segDataPt;
                     next Marker;
+                }
+            } elsif ($marker == 0xee) {         # APP14 (Adobe)
+                if ($$segDataPt =~ /^Adobe/) {
+                    $segType = 'Adobe';
+                    # delete it and replace it later if editing
+                    if ($$delGroup{Adobe} or $$editDirs{Adobe}) {
+                        $del = 1;
+                        undef $doneDir{Adobe};  # so we can add it back again above
+                    }
                 }
             } elsif ($marker == 0xfe) {         # COM (JPEG comment)
                 my $newComment;

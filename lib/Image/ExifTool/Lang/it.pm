@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::it;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 %Image::ExifTool::Lang::it::Translate = (
    'AEMeteringMode' => {
@@ -41,6 +41,7 @@ $VERSION = '1.08';
         'Yes' => 'Si',
       },
     },
+   'AFMode' => 'Modo AF',
    'AFPoint' => {
       Description => 'Punto AF',
       PrintConv => {
@@ -709,6 +710,7 @@ $VERSION = '1.08';
     },
    'FileType' => 'Tipo File',
    'FileVersion' => 'Versione Formato File',
+   'Filename' => 'Nome File',
    'FillOrder' => {
       PrintConv => {
         'Normal' => 'Normale',
@@ -1049,6 +1051,7 @@ $VERSION = '1.08';
     },
    'Hue' => 'Tonalità',
    'HueAdjustment' => 'Regolazione Hue',
+   'ICCProfile' => 'Profili ICC',
    'IPTC-NAA' => 'Metadati IPTC-NAA',
    'IPTCBitsPerSample' => 'Numero di Bits per Campione',
    'IPTCImageHeight' => 'Numero di linee',
@@ -1477,6 +1480,7 @@ $VERSION = '1.08';
         'Planar' => 'Formato planare',
       },
     },
+   'Preview' => 'Anteprima Puntatore IFD',
    'Preview0' => 'Anteprima 0 ',
    'Preview1' => 'Anteprima 1 ',
    'Preview2' => 'Anteprima 2',
@@ -1581,6 +1585,7 @@ $VERSION = '1.08';
         'Normal' => 'Normale',
       },
     },
+   'QuickAdjust' => 'Regolazione Rapida',
    'RAFVersion' => 'Versione RAF',
    'RasterizedCaption' => 'Didascalia Rasterizzata',
    'Rating' => 'Valutazione',

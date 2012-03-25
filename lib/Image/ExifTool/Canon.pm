@@ -78,7 +78,7 @@ sub ProcessSerialData($$$);
 sub ProcessFilters($$$);
 sub SwapWords($);
 
-$VERSION = '2.82';
+$VERSION = '2.86';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -131,6 +131,7 @@ $VERSION = '2.82';
     26.3 => 'Tamron SP AF 180mm f/3.5 Di Macro', #15
     26.4 => 'Carl Zeiss Planar T* 50mm f/1.4', #PH
     27 => 'Canon EF 35-80mm f/4-5.6', #32
+    # 27 => 'Carl Zeiss Distagon T* 28mm f/2 ZF', #PH (must be with an adapter, because the ZF version is a Nikon mount)
     28 => 'Canon EF 80-200mm f/4.5-5.6 or Tamron Lens', #32
     28.1 => 'Tamron SP AF 28-105mm f/2.8 LD Aspherical IF', #15
     28.2 => 'Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical [IF] Macro', #4
@@ -142,9 +143,13 @@ $VERSION = '2.82';
     31.1 => 'Tamron SP AF 300mm f/2.8 LD IF', #15
     32 => 'Canon EF 24mm f/2.8 or Sigma Lens', #10
     32.1 => 'Sigma 15mm f/2.8 EX Fisheye', #11
-    33 => 'Voigtlander or Zeiss Lens',
+    33 => 'Voigtlander or Carl Zeiss Lens',
     33.1 => 'Voigtlander Ultron 40mm f/2 SLII Aspherical', #45
-    33.2 => 'Zeiss Distagon 35mm T* f/2 ZE', #PH
+    33.2 => 'Carl Zeiss Distagon T* 15mm f/2.8 ZE', #PH
+    33.3 => 'Carl Zeiss Distagon T* 18mm f/3.5 ZE', #PH
+    33.4 => 'Carl Zeiss Distagon T* 21mm f/2.8 ZE', #PH
+    33.5 => 'Carl Zeiss Distagon T* 28mm f/2 ZE', #PH
+    33.6 => 'Carl Zeiss Distagon T* 35mm f/2 ZE', #PH
     35 => 'Canon EF 35-80mm f/4-5.6', #32
     36 => 'Canon EF 38-76mm f/4.5-5.6', #32
     37 => 'Canon EF 35-80mm f/4-5.6 or Tamron Lens', #32
@@ -200,6 +205,8 @@ $VERSION = '2.82';
     137.8 => 'Sigma 18-200mm f/3.5-6.3 II DC OS HSM', #PH
     137.9 => 'Tamron AF 18-270mm f/3.5-6.3 Di II VC PZD', #(model B008)http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3090.0.html
    '137.10' => 'Sigma 8-16mm f/4.5-5.6 DC HSM', #50-Zwielicht
+   '137.11' => 'Tamron SP 17-50mm f/2.8 XR Di II VC', #50 (model B005)
+   '137.12' => 'Tamron SP 60mm f/2 Macro Di II', #50 (model G005)
     138 => 'Canon EF 28-80mm f/2.8-4L', #32
     139 => 'Canon EF 400mm f/2.8L',
     140 => 'Canon EF 500mm f/4.5L', #32
@@ -235,6 +242,7 @@ $VERSION = '2.82';
     160.1 => 'Tamron AF 19-35mm f/3.5-4.5', #44
     160.2 => 'Tokina AT-X 124 AF 12-24mm f/4 DX', #49 (not sure about specific model - PH)
     160.3 => 'Tokina AT-X 107 AF DX 10-17mm f/3.5-4.5 Fisheye', #PH (http://osdir.com/ml/digikam-devel/2011-04/msg00275.html)
+    160.4 => 'Tokina AF 11-16mm f/2.8 AT-X Pro DX', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3967.0.html
     161 => 'Canon EF 28-70mm f/2.8L or Sigma or Tamron Lens',
     161.1 => 'Sigma 24-70mm f/2.8 EX',
     161.2 => 'Sigma 28-70mm f/2.8 EX', #PH (http://www.breezesys.com/forum/showthread.php?t=3718)
@@ -482,12 +490,23 @@ $VERSION = '2.82';
     0x3080000 => 'PowerShot G1 X', 
     0x3090000 => 'PowerShot SX150 IS',
     0x3100000 => 'PowerShot ELPH 510 HS / IXUS 1100 HS / IXY 51S',
-    0x3110000 => 'PowerShot S100 (new)', # IXUS/IXY??
-    0x3130000 => 'PowerShot SX40 HS', # IXUS/IXY??
+    0x3110000 => 'PowerShot S100 (new)',
+    0x3130000 => 'PowerShot SX40 HS',
     0x3120000 => 'PowerShot ELPH 310 HS / IXUS 230 HS / IXY 600F',
     0x3140000 => 'PowerShot ELPH 500 HS / IXUS 320 HS / IXY 32S', # (duplicate PowerShot model???)
+    0x3190000 => 'PowerShot ELPH 110 HS / IXUS 125 HS / IXY 220F',
+    0x3200000 => 'PowerShot D20',
+    0x3210000 => 'PowerShot A4000 IS',
+    0x3220000 => 'PowerShot SX260 HS',
+    0x3250000 => 'PowerShot ELPH 520 HS / IXUS 500 HS / IXY 3',
+    0x3260000 => 'PowerShot A3400 IS',
+    0x3270000 => 'PowerShot A2400 IS',
+    0x3280000 => 'PowerShot A2300',
+    # ??? => 'PowerShot ELPH 530 HS / IXUS 510 HS / IXY 1',
+    # ??? => 'PowerShot ELPH 320 HS / IXUS 240 HS / IXY 420F',
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
+
     0x4007d673 => 'DC19/DC21/DC22',
     0x4007d674 => 'XH A1',
     0x4007d675 => 'HV10',
@@ -516,6 +535,7 @@ $VERSION = '2.82';
     0x4007da8f => 'HF M30/M31/M36/M300/M306', # (LEGRIA/VIXIA)
     0x4007da90 => 'HF S20/S21/S200', # (LEGRIA/VIXIA)
     0x4007da92 => 'FS31/FS36/FS37/FS300/FS305/FS306/FS307',
+
     # NOTE: some pre-production models may have a model name of
     # "Canon EOS Kxxx", where "xxx" is the last 3 digits of the model ID below.
     # This has been observed for the 1DSmkIII/K215 and 400D/K236.
@@ -548,6 +568,7 @@ $VERSION = '2.82';
     0x80000271 => 'WFT-E4',
     0x80000273 => 'WFT-E5',
     0x80000281 => 'EOS-1D Mark IV',
+    0x80000285 => 'EOS 5D Mark III',
     0x80000286 => 'EOS Rebel T3i / 600D / Kiss X5',
     0x80000287 => 'EOS 60D',
     0x80000288 => 'EOS Rebel T3 / 1100D / Kiss X50',
@@ -1794,6 +1815,7 @@ my %binaryDataAttrs = (
         Notes => 'this value is incorrect for EOS 7D images with lenses of type 256 or greater',
         SeparateTable => 1,
         DataMember => 'LensType',
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     23 => {
@@ -2438,6 +2460,7 @@ my %ciLongFocal = (
         Format => 'int16uRev', # value is little-endian
         SeparateTable => 1,
         RawConv => '$val ? $val : undef', # don't use if value is zero
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0x0e => {
@@ -2552,6 +2575,7 @@ my %ciLongFocal = (
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
         RawConv => '$val ? $val : undef', # don't use if value is zero
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0x11 => { %ciShortFocal }, #9
@@ -2628,6 +2652,7 @@ my %ciLongFocal = (
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
         RawConv => '$val ? $val : undef', # don't use if value is zero
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0x11 => { %ciShortFocal },
@@ -2723,6 +2748,7 @@ my %ciLongFocal = (
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0x113 => { %ciShortFocal },
@@ -2890,6 +2916,7 @@ my %ciLongFocal = (
         Condition => '$$self{CanonFirmA}',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0x14f => {
@@ -2897,6 +2924,7 @@ my %ciLongFocal = (
         Condition => '$$self{CanonFirmB}',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0x150 => {
@@ -2992,6 +3020,7 @@ my %ciLongFocal = (
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
         RawConv => '$val ? $val : undef', # don't use if value is zero
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0x17 => { %ciCameraTemperature }, #PH
@@ -3049,6 +3078,7 @@ my %ciLongFocal = (
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0xa4 => { #PH
@@ -3240,6 +3270,7 @@ my %ciLongFocal = (
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0xe8 => { %ciShortFocal },
@@ -3421,6 +3452,7 @@ my %ciLongFocal = (
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0xf0 => { %ciShortFocal },
@@ -3511,6 +3543,7 @@ my %ciLongFocal = (
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0xd8 => { %ciShortFocal }, #15
@@ -3630,6 +3663,7 @@ my %ciLongFocal = (
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0xec => { %ciShortFocal },
@@ -3737,6 +3771,7 @@ my %ciLongFocal = (
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0xea => { %ciShortFocal },
@@ -3827,6 +3862,7 @@ my %ciLongFocal = (
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0x107 => { #PH
@@ -3943,6 +3979,7 @@ my %ciLongFocal = (
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0xf8 => { %ciShortFocal },
@@ -4039,6 +4076,7 @@ my %ciLongFocal = (
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0x101 => { %ciShortFocal }, # (500D + 9)
@@ -4135,6 +4173,7 @@ my %ciLongFocal = (
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0xec => { %ciShortFocal }, # (60D + 2)
@@ -4222,6 +4261,7 @@ my %ciLongFocal = (
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
     0xe4 => { %ciShortFocal }, #PH
@@ -4401,6 +4441,12 @@ my %ciLongFocal = (
     PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => 'Unknown CameraInfo tags are divided into 3 tables based on format size.',
+    # This tag may be uncommented, and is useful for generating
+    # lists of models in the "Notes" below...
+    # 0 => {
+    #     Name => 'CameraInfoCount',
+    #     ValueConv => '$$self{CameraInfoCount}',
+    # },
     71 => { # [-1] <-- index relative to CameraInfoCount
         Name => 'CameraTemperature',
         Condition => '$$self{CameraInfoCount} == 72',
@@ -4439,7 +4485,7 @@ my %ciLongFocal = (
     466 => { # [-3]
         Name => 'CameraTemperature',
         Condition => '$$self{CameraInfoCount} == 469',
-        Notes => 'A1200, A2200, A3200, A3300, 100HS, 300HS and 500HS',
+        Notes => '100HS, 300HS, 500HS, A1200, A2200, A3200 and A3300',
         PrintConv => '"$val C"',
         PrintConvInv => '$val=~s/ ?C//; $val',
     },
@@ -4454,6 +4500,20 @@ my %ciLongFocal = (
         Name => 'CameraTemperature',
         Condition => '$$self{CameraInfoCount} == 509',
         Notes => 'SX230HS',
+        PrintConv => '"$val C"',
+        PrintConvInv => '$val=~s/ ?C//; $val',
+    },
+    520 => { # [-3]
+        Name => 'CameraTemperature',
+        Condition => '$$self{CameraInfoCount} == 523',
+        Notes => '310HS, 510HS, G1X, S100 (new), SX40HS and SX150',
+        PrintConv => '"$val C"',
+        PrintConvInv => '$val=~s/ ?C//; $val',
+    },
+    524 => { # [-3]
+        Name => 'CameraTemperature',
+        Condition => '$$self{CameraInfoCount} == 527',
+        Notes => '110HS, 520HS, A2300, A2400, A3400, A4000, D20 and SX260HS',
         PrintConv => '"$val C"',
         PrintConvInv => '$val=~s/ ?C//; $val',
     },

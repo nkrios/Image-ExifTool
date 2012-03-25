@@ -90,6 +90,7 @@ html/TagNames/PhotoMechanic.html
 html/TagNames/Photoshop.html
 html/TagNames/PostScript.html
 html/TagNames/PrintIM.html
+html/TagNames/Qualcomm.html
 html/TagNames/QuickTime.html
 html/TagNames/RIFF.html
 html/TagNames/RSRC.html
@@ -233,6 +234,7 @@ lib/Image/ExifTool/Lang/de.pm
 lib/Image/ExifTool/Lang/en_ca.pm
 lib/Image/ExifTool/Lang/en_gb.pm
 lib/Image/ExifTool/Lang/es.pm
+lib/Image/ExifTool/Lang/fi.pm
 lib/Image/ExifTool/Lang/fr.pm
 lib/Image/ExifTool/Lang/it.pm
 lib/Image/ExifTool/Lang/ja.pm
@@ -280,6 +282,7 @@ lib/Image/ExifTool/PhotoMechanic.pm
 lib/Image/ExifTool/Photoshop.pm
 lib/Image/ExifTool/PostScript.pm
 lib/Image/ExifTool/PrintIM.pm
+lib/Image/ExifTool/Qualcomm.pm
 lib/Image/ExifTool/QuickTime.pm
 lib/Image/ExifTool/README
 lib/Image/ExifTool/RIFF.pm
@@ -473,6 +476,7 @@ t/Lang_14.out
 t/Lang_15.out
 t/Lang_16.out
 t/Lang_17.out
+t/Lang_18.out
 t/Lang_2.out
 t/Lang_3.out
 t/Lang_4.out
@@ -675,6 +679,7 @@ t/XMP_34.out
 t/XMP_36.out
 t/XMP_37.out
 t/XMP_39.out
+t/XMP_40.out
 t/XMP_5.out
 t/XMP_6.out
 t/XMP_7.out

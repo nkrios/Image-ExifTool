@@ -28,10 +28,12 @@ is an explanation of the meaning of each special key:
 
   PROCESS_PROC : Reference to a function used to process the directory for this
   table.  If PROCESS_PROC is not given, \&Image::ExifTool::Exif::ProcessExif is
-  assumed.  If PROCESS_PROC is set to 0, the tags are not added to the lookup.
-  The process proc returns 1 on success or 0 on failure, and takes 3 arguments:
-  0) reference to the ExifTool object, 1) reference to a directory information
-  hash (with the following entries:), 2) reference to the tag table hash.
+  assumed (except for QuickTime atoms for which
+  \&Image::ExifTool::QuickTime::ProcessMOV is the default).  If PROCESS_PROC is
+  set to 0, the tags are not added to the lookup. The process proc returns 1 on
+  success or 0 on failure, and takes 3 arguments: 0) reference to the ExifTool
+  object, 1) reference to a directory information hash (with the following
+  entries:), 2) reference to the tag table hash.
 
     Name        - Tag name for this SubDirectory entry (for verbose messages)
     Base        - Base offset for pointers from start of file
@@ -172,6 +174,10 @@ is an explanation of the meaning of each special key:
                   ProcessBinaryData.
 
     NO_ID         Avoid printing "Tag ID" column in tag name documentation.
+
+    HEX_ID        Print tag ID in hexadecimal (with 4 hex digits or more).
+
+    NO_LOOKUP     Do not add tags to TagLookup.pm lookup tables.
 
     CAPTURE       Used by PDF module to name dictionaries to capture when
                   writing.

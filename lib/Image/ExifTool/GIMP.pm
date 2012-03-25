@@ -160,7 +160,7 @@ sub ProcessParasites($$$)
             $name = ucfirst $name;
             $name =~ s/([a-z])-([a-z])/$1\u$2/g;
             $name = "GIMP-$name" unless length($name) > 1;
-            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => $name, Unknown => 1 });
+            AddTagToTable($tagTablePtr, $tag, { Name => $name, Unknown => 1 });
         }
         $exifTool->HandleTag($tagTablePtr, $tag, undef,
             DataPt => $dataPt,

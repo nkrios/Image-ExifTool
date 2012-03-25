@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.32';
+$VERSION = '1.33';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -676,7 +676,7 @@ sub ProcessPrivate($$$)
         $tag =~ tr{/ }{_}d; # translate '/' to '_' and remove spaces
         $tag = 'private' unless $tag =~ /^[-\w]{1,24}$/;
         unless ($$tagTablePtr{$tag}) {
-            Image::ExifTool::AddTagToTable($tagTablePtr, $tag,
+            AddTagToTable($tagTablePtr, $tag,
                 { Name => ucfirst($tag), Binary => 1 });
         }
     }
@@ -830,7 +830,7 @@ sub ProcessID3v2($$$)
             $id = 'unknown' unless length $id;
             unless ($$tagTablePtr{$id}) {
                 $tagInfo = { Name => "ID3_$id", Binary => 1 };
-                Image::ExifTool::AddTagToTable($tagTablePtr, $id, $tagInfo);
+                AddTagToTable($tagTablePtr, $id, $tagInfo);
             }
         }
         # decode v2.3 and v2.4 flags
@@ -1223,7 +1223,8 @@ sub ProcessMP3($$)
             $rtnVal = 1 if Image::ExifTool::MPEG::ParseMPEGAudioVideo($exifTool, \$buff);
         } else {
             # look for audio frame sync in first $scanLen bytes
-            $rtnVal = 1 if Image::ExifTool::MPEG::ParseMPEGAudio($exifTool, \$buff);
+            # (set MP3 flag to 1 so this will fail unless layer 3 audio)
+            $rtnVal = 1 if Image::ExifTool::MPEG::ParseMPEGAudio($exifTool, \$buff, 1);
         }
     }
     return $rtnVal;

@@ -25,9 +25,9 @@ use vars qw($VERSION $RELEASE @ISA @EXPORT_OK %EXPORT_TAGS $AUTOLOAD @fileTypes
             $psAPP13hdr $psAPP13old @loadAllTables %UserDefined $evalWarning
             %noWriteFile %magicNumber @langs $defaultLang %langName %charsetName
             %mimeType $swapBytes $swapWords $currentByteOrder %unpackStd
-            %jpegMarker);
+            %jpegMarker %specialTags);
 
-$VERSION = '8.77';
+$VERSION = '8.85';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -42,7 +42,7 @@ $RELEASE = '';
         Get16s Get32u Get32s Get64u GetFloat GetDouble GetFixed32s Write
         WriteValue Tell Set8u Set8s Set16u Set32u
     )],
-    Utils => [qw(GetTagTable TagTableKeys GetTagInfoList)],
+    Utils => [qw(GetTagTable TagTableKeys GetTagInfoList AddTagToTable)],
     Vars  => [qw(%allTables @tableOrder @fileTypes)],
 );
 @EXPORT_OK = qw(Open);
@@ -131,7 +131,7 @@ sub ParseArguments($;@); #(defined in attempt to avoid mod_perl problem)
 );
 
 # alphabetical list of current Lang modules
-@langs = qw(cs de en en_ca en_gb es fr it ja ko nl pl ru sv tr zh_cn zh_tw);
+@langs = qw(cs de en en_ca en_gb es fi fr it ja ko nl pl ru sv tr zh_cn zh_tw);
 
 $defaultLang = 'en';    # default language
 
@@ -143,6 +143,7 @@ $defaultLang = 'en';    # default language
     en_ca => 'Canadian English',
     en_gb => 'British English',
     es => 'Spanish (Español)',
+    fi => 'Finnish (Suomi)',
     fr => 'French (Français)',
     it => 'Italian (Italiano)',
     ja => 'Japanese (日本語)',
@@ -284,6 +285,7 @@ my %fileTypeLookup = (
     KDC  => ['TIFF', 'Kodak Digital Camera RAW'],
     KEY  => ['ZIP',  'Apple Keynote presentation'],
     KTH  => ['ZIP',  'Apple Keynote Theme'],
+    LA   => ['RIFF', 'Lossless Audio'],
     LNK  => ['LNK',  'Windows shortcut'],
     M2T  =>  'M2TS',
     M2TS => ['M2TS', 'MPEG-2 Transport Stream'],
@@ -327,10 +329,12 @@ my %fileTypeLookup = (
     ODP  => ['ZIP',  'Open Document Presentation'],
     ODS  => ['ZIP',  'Open Document Spreadsheet'],
     ODT  => ['ZIP',  'Open Document Text file'],
+    OFR  => ['RIFF', 'OptimFROG audio'],
     OGG  => ['OGG',  'Ogg Vorbis audio file'],
     OGV  => ['OGG',  'Ogg Video file'],
     ORF  => ['ORF',  'Olympus RAW format'],
     OTF  => ['Font', 'Open Type Font'],
+    PAC  => ['RIFF', 'Lossless Predictive Audio Compression'],
     PAGES => ['ZIP', 'Apple Pages document'],
     PBM  => ['PPM',  'Portable BitMap'],
     PCT  =>  'PICT',
@@ -416,6 +420,7 @@ my %fileTypeLookup = (
     WMA  => ['ASF',  'Windows Media Audio'],
     WMF  => ['WMF',  'Windows Metafile Format'],
     WMV  => ['ASF',  'Windows Media Video'],
+    WV   => ['RIFF', 'WavePack lossless audio'],
     X3F  => ['X3F',  'Sigma RAW format'],
     XCF  => ['XCF',  'GIMP native image format'],
     XHTML=> ['HTML', 'Extensible HyperText Markup Language'],
@@ -445,8 +450,8 @@ my %fileDescription = (
 );
 
 # MIME types for applicable file types above
-# (missing entries default to 'application/unknown', but note that
-#  other mime types may be specified by some modules, ie. QuickTime.pm)
+# (missing entries default to 'application/unknown', but note that other MIME
+#  types may be specified by some modules, ie. QuickTime.pm and RIFF.pm)
 %mimeType = (
    '3FR' => 'image/x-hasselblad-3fr',
     AI   => 'application/vnd.adobe.illustrator',
@@ -454,7 +459,6 @@ my %fileDescription = (
     APE  => 'audio/x-monkeys-audio',
     ASF  => 'video/x-ms-asf',
     ARW  => 'image/x-sony-arw',
-    AVI  => 'video/x-msvideo',
     BMP  => 'image/bmp',
     BTF  => 'image/x-tiff-big', #(NC) (ref http://www.asmail.be/msg0055371937.html)
     BZ2  => 'application/bzip2',
@@ -586,10 +590,8 @@ my %fileDescription = (
     TTC  => 'application/x-font-ttf',
     TTF  => 'application/x-font-ttf',
     VSD  => 'application/x-visio',
-    WAV  => 'audio/x-wav',
     WDP  => 'image/vnd.ms-photo',
     WEBM => 'video/webm',
-    WEBP => 'image/webp',
     WMA  => 'audio/x-ms-wma',
     WMF  => 'application/x-wmf',
     WMV  => 'video/x-ms-wmv',
@@ -722,7 +724,7 @@ my %moduleName = (
     RAR  => 'Rar!\x1a\x07\0',
     RAW  => '(.{25}ARECOYK|II|MM)',
     Real => '(\.RMF|\.ra\xfd|pnm://|rtsp://|http://)',
-    RIFF => 'RIFF',
+    RIFF => '(RIFF|LA0[234]|OFR |LPAC|wvpk)', # RIFF plus other variants
     RSRC => '(....)?\0\0\x01\0',
     RTF  => '[\n\r]*\\{[\n\r]*\\\\rtf',
     # (don't be too restrictive for RW2/RWL -- how does magic number change for big-endian?)
@@ -766,18 +768,20 @@ my %moduleName = (
 );
 
 # default group priority for writing
-my @defaultWriteGroups = qw(EXIF IPTC XMP MakerNotes Photoshop ICC_Profile CanonVRD);
+# (NOTE: tags in groups not specified here will not be written unless
+#  overridden by the module or specified when writing)
+my @defaultWriteGroups = qw(EXIF IPTC XMP MakerNotes Photoshop ICC_Profile CanonVRD Adobe);
 
 # group hash for ExifTool-generated tags
 my %allGroupsExifTool = ( 0 => 'ExifTool', 1 => 'ExifTool', 2 => 'ExifTool' );
 
 # special tag names (not used for tag info)
-my %specialTags = (
-    TABLE_NAME=>1, SHORT_NAME=>1, PROCESS_PROC=>1, WRITE_PROC=>1, CHECK_PROC=>1,
-    GROUPS=>1, FORMAT=>1, FIRST_ENTRY=>1, TAG_PREFIX=>1, PRINT_CONV=>1,
-    WRITABLE=>1, TABLE_DESC=>1, NOTES=>1, IS_OFFSET=>1, EXTRACT_UNKNOWN=>1,
-    NAMESPACE=>1, PREFERRED=>1, SRC_TABLE=>1, PRIORITY=>1, WRITE_GROUP=>1,
-    LANG_INFO=>1, VARS=>1, DATAMEMBER=>1, IS_SUBDIR=>1, SET_GROUP1=>1,
+%specialTags = (
+    TABLE_NAME     =>1, SHORT_NAME =>1, PROCESS_PROC =>1, WRITE_PROC =>1, CHECK_PROC =>1,
+    GROUPS         =>1, FORMAT     =>1, FIRST_ENTRY  =>1, TAG_PREFIX =>1, PRINT_CONV =>1,
+    WRITABLE       =>1, TABLE_DESC =>1, NOTES        =>1, IS_OFFSET  =>1, IS_SUBDIR  =>1, 
+    EXTRACT_UNKNOWN=>1, NAMESPACE  =>1, PREFERRED    =>1, SRC_TABLE  =>1, PRIORITY   =>1,
+    WRITE_GROUP    =>1, LANG_INFO  =>1, VARS         =>1, DATAMEMBER =>1, SET_GROUP1 =>1,
 );
 
 # headers for various segment types
@@ -863,7 +867,9 @@ sub DummyWriteProc { return 1; }
         Notes => q{
             [Mac OS only] size of the file's resource fork if it contains data.  If this
             tag is generated the ExtractEmbedded option may be used to extract
-            resource-fork information as a sub-document
+            resource-fork information as a sub-document.  When writing, the resource
+            fork is preserved by default, but it may be deleted with C<-rsrc:all=> on
+            the command line
         },
         PrintConv => \&ConvertFileSize,
     },
@@ -877,7 +883,9 @@ sub DummyWriteProc { return 1; }
             mechanism to indirectly set the creation time:  1) Rewrite the file to set
             the filesystem creation and modification times to the current time, 2) Set
             FileModifyDate to the desired creation time, then 3) Restore FileModifyDate
-            to its original value.  This trick does not work in Windows
+            to its original value.  This trick does not work in Windows.  Also note that
+            ExifTool can not handle filesystem dates before 1970 due to limitations of
+            the standard C libraries
         },
         Groups => { 1 => 'System', 2 => 'Time' },
         Writable => 1,
@@ -953,13 +961,22 @@ sub DummyWriteProc { return 1; }
             return 'Invalid CanonVRD data';
         },
     },
+    Adobe => {
+        Notes => q{
+            the JPEG APP14 Adobe segment.  Extracted only if specified. See the
+            L<JPEG Adobe Tags|JPEG.html#Adobe> for more information
+        },
+        Groups => { 0 => 'APP14', 1 => 'Adobe' },
+        WriteGroup => 'Adobe',
+        Flags => ['Writable' ,'Protected', 'Binary'],
+    },
     CurrentIPTCDigest => {
         Notes => q{
             MD5 digest of existing IPTC data.  All zeros if IPTC exists but Digest::MD5
             is not installed.  Only calculated for IPTC in the standard location as
             specified by the L<MWG|http://www.metadataworkinggroup.org/>.  ExifTool
             automates the handling of this tag in the MWG module -- see the
-            L<MWG Tag Name documentation|MWG.html> for details
+            L<MWG Composite Tags|MWG.html> for details
         },
         ValueConv => 'unpack("H*", $val)',
     },
@@ -1438,6 +1455,7 @@ sub ClearOptions($)
         TextOut     => \*STDOUT,# file for Verbose/HtmlDump output
         Unknown     => 0,       # flag to get values of unknown tags (0-2)
         Verbose     => 0,       # print verbose messages (0-5, higher # = more verbose)
+        XMPAutoConv => 1,       # automatic conversion of unknown XMP tag values
     };
     # keep necessary member variables in sync with options
     delete $$self{CUR_LANG};
@@ -1750,7 +1768,7 @@ sub GetInfo($;@)
     }
 
     # override specified tags with ValueConv value if necessary
-    if (@$byValue and $conv ne 'ValueConv') {
+    if (@$byValue) {
         # first determine the number of times each non-ValueConv value is used
         my %nonVal;
         $nonVal{$_} = ($nonVal{$_} || 0) + 1 foreach @$rtnTags;
@@ -2676,7 +2694,7 @@ sub Init($)
     delete $self->{DOC_NUM};        # current embedded document number
     $self->{DOC_COUNT}  = 0;        # count of embedded documents processed
     $self->{BASE}       = 0;        # base for offsets from start of file
-    $self->{FILE_ORDER} = { };      # * hash of tag order in file
+    $self->{FILE_ORDER} = { };      # * hash of tag order in file ('*' = based on tag key)
     $self->{VALUE}      = { };      # * hash of raw tag values
     $self->{BOTH}       = { };      # * hash for Value/PrintConv values of Require'd tags
     $self->{TAG_INFO}   = { };      # * hash of tag information
@@ -2714,7 +2732,7 @@ sub Init($)
 sub Open(*$;$)
 {
     my ($glob, $file, $mode) = @_;
-    $file =~ s/^(\s)/.\/$1/;            # protect leading whitespace
+    $file =~ s/^([\s&])/.\/$1/;     # protect leading whitespace or ampersand
     if ($mode) {
         # add leading space to protect against leading characters like '>'
         # in file name, and trailing "\0" to protect trailing spaces
@@ -2911,7 +2929,7 @@ sub SetFoundTags($)
             } else {
                 $tag = $reqTag;
             }
-            $byValue = 1 if $tag =~ s/#$//;
+            $byValue = 1 if $tag =~ s/#$// and $$options{PrintConv};
             if (defined $tagHash->{$reqTag} and not $doDups) {
                 $matches[0] = $tag;
             } elsif ($tag =~ /^(\*|all)$/i) {
@@ -2966,7 +2984,7 @@ sub SetFoundTags($)
                 }
             } elsif (not @matches) {
                 # put entry in return list even without value (value is undef)
-                $matches[0] = "$tag (0)";
+                $matches[0] = $byValue ? "$tag #(0)" : "$tag (0)";
                 # bogus file order entry to avoid warning if sorting in file order
                 $self->{FILE_ORDER}{$matches[0]} = 999;
             }
@@ -4041,6 +4059,9 @@ sub GetTimeZone(;$$)
         # adjust for the +/- one day difference
         $min += ($$tm[3] - $$gm[3]) * 24 * 60;
     }
+    # MirBSD patch to round to the nearest 30 minutes because
+    # it includes leap seconds in localtime but not gmtime
+    $min = int($min / 30 + ($min > 0 ? 0.5 : -0.5)) * 30 if $^O eq 'mirbsd';
     return $min;
 }
 
@@ -4749,7 +4770,7 @@ sub ProcessJPEG($$)
             } else {
                 # Hmmm.  Could be XMP, let's see
                 my $processed;
-                if ($$segDataPt =~ /^http/ or $$segDataPt =~ /<exif:/) {
+                if ($$segDataPt =~ /^http/ or $$segDataPt =~ /^XMP\0/ or $$segDataPt =~ /<exif:/) {
                     $dumpType = 'XMP';
                     # also try to parse XMP with a non-standard header
                     # (note: this non-standard XMP is ignored when writing)
@@ -4770,7 +4791,7 @@ sub ProcessJPEG($$)
                     }
                 }
                 if ($verbose and not $processed) {
-                    $self->Warn("Ignored EXIF block length $length (bad header)");
+                    $self->Warn("Ignored APP1 segment length $length (unknown header)");
                 }
             }
         } elsif ($marker == 0xe2) {         # APP2 (ICC Profile, FPXR, MPF, PreviewImage)
@@ -4849,12 +4870,13 @@ sub ProcessJPEG($$)
                 # extract the MPF information (it is in standard TIFF format)
                 my $tagTablePtr = GetTagTable('Image::ExifTool::MPF::Main');
                 $self->ProcessTIFF(\%dirInfo, $tagTablePtr);
-            } elsif ($$segDataPt =~ /^\xff\xd8\xff\xdb/) {
-                $preview = $$segDataPt;
-                $dumpType = 'Samsung Preview';
+            } elsif ($$segDataPt =~ /^(|QVGA\0|BGTH)\xff\xd8\xff\xdb/) {
+                # Samsung="", BenQ DC C1220="QVGA\0", Digilife DDC-690="BGTH"
+                $dumpType = 'Preview Image';
+                $preview = substr($$segDataPt, length($1));
             } elsif ($preview) {
+                $dumpType = 'Preview Image';
                 $preview .= $$segDataPt;
-                $dumpType = 'Samsung Preview';
             }
             if ($preview and $nextMarker ne $marker) {
                 $self->FoundTag('PreviewImage', $preview);
@@ -4894,11 +4916,10 @@ sub ProcessJPEG($$)
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Stim::Main');
                 $self->ProcessTIFF(\%dirInfo, $tagTablePtr);
             } elsif ($$segDataPt =~ /^\xff\xd8\xff\xdb/) {
+                $dumpType = 'PreviewImage'; # (Samsung, HP, BenQ)
                 $preview = $$segDataPt;
-                $dumpType = 'Samsung/HP Preview';
             }
-            # Samsung continues the preview in APP4
-            if ($preview and $nextMarker ne 0xe4) {
+            if ($preview and $nextMarker ne 0xe4) { # this preview continues in APP4
                 $self->FoundTag('PreviewImage', $preview);
                 undef $preview;
             }
@@ -4938,12 +4959,13 @@ sub ProcessJPEG($$)
                 $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
             } elsif ($preview) {
                 # continued Samsung S1060 preview from APP3
+                $dumpType = 'PreviewImage';
                 $preview .= $$segDataPt;
-                # (not sure if next part would be APP5 or APP4 again, but assume APP4)
-                if ($nextMarker ne $marker) {
-                    $self->FoundTag('PreviewImage', $preview);
-                    undef $preview;
-                }
+            }
+            # BenQ DC E1050 continues preview in APP5
+            if ($preview and $nextMarker ne 0xe5) {
+                $self->FoundTag('PreviewImage', $preview);
+                undef $preview;
             }
         } elsif ($marker == 0xe5) {         # APP5 (Ricoh "RMETA")
             if ($$segDataPt =~ /^RMETA\0/) {
@@ -4957,6 +4979,11 @@ sub ProcessJPEG($$)
                 );
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Ricoh::RMETA');
                 $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
+            } elsif ($preview) {
+                $dumpType = 'PreviewImage';
+                $preview .= $$segDataPt;
+                $self->FoundTag('PreviewImage', $preview);
+                undef $preview;
             }
         } elsif ($marker == 0xe6) {         # APP6 (Toshiba EPPIM, NITF, HP_TDHD)
             if ($$segDataPt =~ /^EPPIM\0/) {
@@ -4994,6 +5021,19 @@ sub ProcessJPEG($$)
                     DataPos  => $segPos,
                     DirStart => 12, # (ignore first TDHD element because size includes 12-byte tag header)
                     DirLen   => $length - 12,
+                );
+                $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
+            }
+        } elsif ($marker == 0xe7) {
+            if ($$segDataPt =~ /^\x1aQualcomm Camera Attributes/) {
+                # found in HP iPAQ_VoiceMessenger
+                $dumpType = 'Qualcomm';
+                my $tagTablePtr = GetTagTable('Image::ExifTool::Qualcomm::Main');
+                my %dirInfo = (
+                    DataPt   => $segDataPt,
+                    DataPos  => $segPos,
+                    DirStart => 27, # (skip header)
+                    DirLen   => $length - 27,
                 );
                 $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
             }
@@ -5076,6 +5116,10 @@ sub ProcessJPEG($$)
             }
         } elsif ($marker == 0xee) {         # APP14 (Adobe)
             if ($$segDataPt =~ /^Adobe/) {
+                # extract as a block if requested, or if copying tags from file
+                if ($$self{REQ_TAG_LOOKUP}{adobe} or $$self{TAGS_FROM_FILE}) {
+                    $self->FoundTag('Adobe', $$segDataPt);
+                }
                 $dumpType = 'Adobe';
                 SetByteOrder('MM');
                 my $tagTablePtr = GetTagTable('Image::ExifTool::JPEG::Adobe');
@@ -5639,7 +5683,10 @@ sub ProcessDirectory($$$;$)
     # set directory name from default group0 name if not done already
     $$dirInfo{DirName} or $$dirInfo{DirName} = $tagTablePtr->{GROUPS}{0};
     # guard against cyclical recursion into the same directory
-    if (defined $$dirInfo{DirStart} and defined $$dirInfo{DataPos}) {
+    if (defined $$dirInfo{DirStart} and defined $$dirInfo{DataPos} and
+        # directories don't overlap if the length is zero
+        ($$dirInfo{DirLen} or not defined $$dirInfo{DirLen}))
+    {
         my $addr = $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base}||0);
         if ($self->{PROCESSED}{$addr}) {
             $self->Warn("$$dirInfo{DirName} pointer references previous $self->{PROCESSED}{$addr} directory");
@@ -5938,7 +5985,7 @@ sub FoundTag($$$)
 {
     local $_;
     my ($self, $tagInfo, $value) = @_;
-    my $tag;
+    my ($tag, $noListDel);
 
     if (ref $tagInfo eq 'HASH') {
         $tag = $$tagInfo{Name} or warn("No tag name\n"), return undef;
@@ -5951,12 +5998,12 @@ sub FoundTag($$$)
         $tagInfo or $tagInfo = { Name => $tag, Groups => \%allGroupsExifTool };
         $self->{OPTIONS}{Verbose} and $self->VerboseInfo(undef, $tagInfo, Value => $value);
     }
-    my $rawValueHash = $self->{VALUE};
+    my $valueHash = $self->{VALUE};
     if ($$tagInfo{RawConv}) {
         # initialize @val for use in Composite RawConv expressions
         my @val;
         if (ref $value eq 'HASH') {
-            foreach (keys %$value) { $val[$_] = $$rawValueHash{$$value{$_}}; }
+            foreach (keys %$value) { $val[$_] = $$valueHash{$$value{$_}}; }
         }
         my $conv = $$tagInfo{RawConv};
         local $SIG{'__WARN__'} = \&SetWarning;
@@ -5980,15 +6027,25 @@ sub FoundTag($$$)
         $priority = 0 if not defined $priority and $$tagInfo{Avoid};
     }
     # handle duplicate tag names
-    if (defined $$rawValueHash{$tag}) {
+    if (defined $$valueHash{$tag}) {
         # add to list if there is an active list for this tag
         if ($self->{LIST_TAGS}{$tagInfo}) {
             $tag = $self->{LIST_TAGS}{$tagInfo};  # use key from previous list tag
-            if (ref $$rawValueHash{$tag} ne 'ARRAY') {
-                $$rawValueHash{$tag} = [ $$rawValueHash{$tag} ];
+            if (defined $$self{NO_LIST}) {
+                # accumulate list in TAG_EXTRA "NoList" element
+                if (defined $self->{TAG_EXTRA}{$tag}{NoList}) {
+                    push @{$self->{TAG_EXTRA}{$tag}{NoList}}, $value;
+                } else {
+                    $self->{TAG_EXTRA}{$tag}{NoList} = [ $$valueHash{$tag}, $value ];
+                }
+                $noListDel = 1; # set flag to delete this tag if re-listed
+            } else {
+                if (ref $$valueHash{$tag} ne 'ARRAY') {
+                    $$valueHash{$tag} = [ $$valueHash{$tag} ];
+                }
+                push @{$$valueHash{$tag}}, $value;
+                return $tag;    # return without creating a new entry
             }
-            push @{$$rawValueHash{$tag}}, $value;
-            return $tag;    # return without creating a new entry
         }
         # get next available tag key
         my $nextInd = $self->{DUPL_TAG}{$tag} = ($self->{DUPL_TAG}{$tag} || 0) + 1;
@@ -6018,11 +6075,11 @@ sub FoundTag($$$)
         } else {
             $priority = 1;  # the normal default
         }
-        if ($priority >= $oldPriority and not $self->{DOC_NUM}) {
+        if ($priority >= $oldPriority and not $self->{DOC_NUM} and not $noListDel) {
             # move existing tag out of the way since this tag is higher priority
             $self->{MOVED_KEY} = $nextTag;  # used in BuildCompositeTags()
             $self->{PRIORITY}{$nextTag} = $self->{PRIORITY}{$tag};
-            $$rawValueHash{$nextTag} = $$rawValueHash{$tag};
+            $$valueHash{$nextTag} = $$valueHash{$tag};
             $self->{FILE_ORDER}{$nextTag} = $self->{FILE_ORDER}{$tag};
             my $oldInfo = $self->{TAG_INFO}{$nextTag} = $self->{TAG_INFO}{$tag};
             if ($self->{TAG_EXTRA}{$tag}) {
@@ -6035,6 +6092,7 @@ sub FoundTag($$$)
             $tag = $nextTag;        # don't override the existing tag
         }
         $self->{PRIORITY}{$tag} = $priority;
+        $self->{TAG_EXTRA}{$tag}{NoListDel} = 1 if $noListDel;
     } elsif ($priority) {
         # set tag priority (only if exists and non-zero)
         $self->{PRIORITY}{$tag} = $priority;
@@ -6042,7 +6100,7 @@ sub FoundTag($$$)
 
     # save the raw value, file order, tagInfo ref, group1 name,
     # and tag key for lists if necessary
-    $$rawValueHash{$tag} = $value;
+    $$valueHash{$tag} = $value;
     $self->{FILE_ORDER}{$tag} = ++$self->{NUM_FOUND};
     $self->{TAG_INFO}{$tag} = $tagInfo;
     # set dynamic groups 1 and 3 if necessary
@@ -6058,7 +6116,10 @@ sub FoundTag($$$)
     $self->{TAG_EXTRA}{$tag}{G5} = $self->MetadataPath() if $self->{OPTIONS}{SavePath};
 
     # remember this tagInfo if we will be accumulating values in a list
-    $self->{LIST_TAGS}{$tagInfo} = $tag if $$tagInfo{List} and not $$self{NO_LIST};
+    # (but don't override earlier list if this may be deleted by NoListDel flag)
+    if ($$tagInfo{List} and not $$self{NO_LIST} and not $noListDel) {
+        $self->{LIST_TAGS}{$tagInfo} = $tag;
+    }
 
     return $tag;
 }
@@ -6429,7 +6490,7 @@ sub ProcessBinaryData($$$)
                 $len = $count * $formatSize{$format};
                 $len = $more if $len > $more;
             } else {
-                $len = $more;
+                $len = $more;   # directory size is all of remaining data
                 if ($$subTablePtr{PROCESS_PROC} and
                     $$subTablePtr{PROCESS_PROC} eq \&ProcessBinaryData)
                 {
@@ -6443,15 +6504,16 @@ sub ProcessBinaryData($$$)
                 my $start = $entry + $offset + $dataPos;
                 $subdirBase = eval($$subdir{Base}) + $base;
             }
+            my $start = $$subdir{Start} || 0;
             my %subdirInfo = (
                 DataPt   => $dataPt,
                 DataPos  => $dataPos,
                 DataLen  => length $$dataPt,
-                DirStart => $entry + $offset,
-                DirLen   => $len,
+                DirStart => $entry + $offset + $start,
+                DirLen   => $len - $start,
                 Base     => $subdirBase,
             );
-            $self->ProcessDirectory(\%subdirInfo, $subTablePtr);
+            $self->ProcessDirectory(\%subdirInfo, $subTablePtr, $$subdir{ProcessProc});
             next;
         }
         if ($$tagInfo{IsOffset} and $$tagInfo{IsOffset} ne '3') {

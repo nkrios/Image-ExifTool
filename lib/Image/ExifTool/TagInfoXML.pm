@@ -15,7 +15,7 @@ use vars qw($VERSION @ISA);
 use Image::ExifTool qw(:Utils :Vars);
 use Image::ExifTool::XMP;
 
-$VERSION = '1.15';
+$VERSION = '1.16';
 @ISA = qw(Exporter);
 
 # set this to a language code to generate Lang module with 'MISSING' entries
@@ -33,6 +33,7 @@ my %credits = (
     cs   => 'Jens Duttke and Petr MichE<aacute>lek',
     de   => 'Jens Duttke and Herbert Kauer',
     es   => 'Jens Duttke and Santiago del BrE<iacute>o GonzE<aacute>lez',
+    fi   => 'Jens Duttke and Jarkko ME<auml>kineva',
     fr   => 'Jens Duttke, Bernard Guillotin, Jean Glasser, Jean Piquemal and Harry Nizard',
     it   => 'Jens Duttke, Ferdinando Agovino and Emilio Dati',
     ja   => 'Jens Duttke and Kazunari Nishina',

@@ -26,7 +26,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.26';
+$VERSION = '1.27';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -425,9 +425,9 @@ my %unreg = ( Notes => 'unregistered' );
    'XML:com.adobe.xmp' => {
         Name => 'XMP',
         Notes => q{
-            unregistered, but this is the location according to the current XMP
-            specification (June 2002 or later), and is where ExifTool will add a new XMP
-            chunk if the image didn't already contain XMP
+            unregistered, but this is the location according to the June 2002 or later
+            XMP specification, and is where ExifTool will add a new XMP chunk if the
+            image didn't already contain XMP
         },
         SubDirectory => {
             TagTable => 'Image::ExifTool::XMP::Main',
@@ -714,7 +714,7 @@ sub FoundPNG($$$$;$$$$)
         $$tagInfo{LangCode} = $lang if $lang;
         # make unknown profiles binary data type
         $$tagInfo{Binary} = 1 if $tag =~ /^Raw profile type /;
-        Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+        AddTagToTable($tagTablePtr, $tag, $tagInfo);
     }
 #
 # store this tag information

@@ -126,6 +126,7 @@
                 <span class='com'># (see the definition of this table below)</span>
             },
         },
+        <span class='com'># add more user-defined XMP namespaces here...</span>
     },
     <span class='com'># new PNG tags are added to the PNG::TextualData table:</span>
     'Image::ExifTool::PNG::TextualData' =&gt; {
@@ -240,7 +241,7 @@
     NewXMPxxxTag3 =&gt; { List =&gt; 'Bag' },
     <span class='com'># example structured XMP tag</span>
     NewXMPxxxStruct => {
-        <span class='com'># a structure with 3 fields (X, Y and Things):</span>
+        <span class='com'># the "Struct" entry defines the structure fields</span>
         Struct =&gt; {
             <span class='com'># optional namespace prefix and URI for structure fields
             # (required only if different than NAMESPACE above)</span>

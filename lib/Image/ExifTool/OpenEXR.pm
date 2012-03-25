@@ -198,7 +198,7 @@ sub ProcessEXR($$)
                 }
             }
             $tagInfo = { Name => $name, WasAdded => 1 };
-            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+            AddTagToTable($tagTablePtr, $tag, $tagInfo);
             $exifTool->VPrint(0, $exifTool->{INDENT}, "[adding $tag]\n");
         }
         my ($val, $success);

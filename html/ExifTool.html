@@ -224,10 +224,9 @@ function arguments are interpreted.</p>
 <blockquote><table class='norm'>
 <tr><td valign='top'><b>ExifTool&nbsp;ref</b></td><td>
 <a href="#ImageInfo">ImageInfo</a> may be called with an ExifTool object if
-desired.  The advantage of using the object-oriented form of this function is
-that after <a href="#ImageInfo">ImageInfo</a> returns, you may use the
-object-oriented functions below to obtain additional information if required.
-Must be the first argument if used.
+desired.  Advantages of using the object-oriented form are that options may be
+set before calling <a href="#ImageInfo">ImageInfo</a>, and the object may be
+used afterward to access member functions.  Must be the first argument if used.
 
 </td></tr><tr><td valign='top'><b>SCALAR</b></td><td>
 The first scalar argument is taken to be the file name unless an earlier
@@ -391,9 +390,10 @@ The following functions require an ExifTool object as the first argument
 options for an ExifTool object.  Options set this way are in effect for
 all function calls but may be overridden by options passed as arguments
 to some functions.</p>
-<p>The initial default options are obtained from values in the
-%Image::ExifTool::UserDefined::Options hash if it exists.  See the
-.ExifTool_config file in the full ExifTool distribution for details.</p>
+<p>The default option values may be changed by defining a
+%Image::ExifTool::UserDefined::Options hash.  See the
+<a href="config.html">ExifTool_config file</a> in the full ExifTool
+distribution for examples.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>Options($$;@)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
@@ -532,14 +532,17 @@ to some functions.</p>
     <td align='center'>undef</td></tr>
 <tr><td>GeoMaxIntSecs</td>
     <td><a name="GeoMaxIntSecs"></a>Maximum interpolation time in seconds for
-    geotagging.  Geotagging fails if the Geotime value lies between two fixes in
-    the same track which are separated by a number of seconds greater than this.</td>
+    geotagging.  Geotagging is treated as an extrapolation if the Geotime value
+    lies between two fixes in the same track which are separated by a number of
+    seconds greater than this. Otherwise, the coordinates are calculated as a
+    linear interpolation between the two nearest fixes.</td>
     <td align='center'>A floating point number</td>
     <td align='center'>1800</td></tr>
 <tr><td>GeoMaxExtSecs</td>
     <td><a name="GeoMaxExtSecs"></a>Maximum extrapolation time in seconds for
     geotagging.  Geotagging fails if the Geotime value lies outside a GPS track
-    by a number of seconds greater than this.</td>
+    by a number of seconds greater than this.  Otherwise, the coordinates of the
+    nearest fix are taken.</td>
     <td align='center'>A floating point number</td>
     <td align='center'>1800</td></tr>
 <tr><td>GeoMaxHDOP</td>
@@ -650,17 +653,17 @@ to some functions.</p>
 <tr><td>StrictDate</td><td><a name="StrictDate"></a>Flag to return undefined value for any date which can't be
     converted when the DateFormat option is used.</td>
     <td align='center'>0 or 1</td><td align=center>0</td></tr>
-<tr><td>Struct</td><td><a name="Struct"></a>Flag to return XMP structures as HASH references instead of flattening
-    into individual tags.  If not defined, tags are flattened when reading (with
-    <a href="#ExtractInfo">ExtractInfo</a>), and structured when copying (with
-    <a href="#SetNewValuesFromFile">SetNewValuesFromFile</a>). This setting has no effect
+<tr><td>Struct</td><td>Flag to return XMP structures as HASH references
+    instead of flattening into individual tags.  This setting has no effect
     when writing since both flattened or structured tags may always be written.
     See the <a href="struct.html">Structured Information documentation</a> for
     more details about structured information.</td>
-    <td><table class='clear'>
-    <tr><td valign='top' align=right><b>undef</b>&nbsp;=</td><td>Read flat tags, copy struct</td></tr>
-    <tr><td valign='top' align=right><b>0</b>&nbsp;=</td><td>Read and copy flat tags</td></tr>
-    <tr><td valign='top' align=right><b>1</b>&nbsp;=</td><td>Read and copy structures</td></tr>
+    <td><a name="Struct"></a><table class='clear'>
+    <tr><td valign='top' align=right><b>undef</b>&nbsp;=</td><td>Same as 0 for reading and 2 for copying</td></tr>
+    <tr><td valign='top' align=right><b>0</b>&nbsp;=</td><td>Read/copy flattened tags</td></tr>
+    <tr><td valign='top' align=right><b>1</b>&nbsp;=</td><td>Read/copy structures</td></tr>
+    <tr><td valign='top' align=right><b>2</b>&nbsp;=</td><td>Read/copy both flattened and structured tags,
+    but flag flattened tags as "unsafe" for copying</td></tr>
     </table></td><td align=center>undef</td></tr>
 <tr><td>TextOut</td><td><a name="TextOut"></a>Output file for Verbose and HtmlDump options.</td>
     <td align='center'>File reference</td><td align=center>\*STDOUT</td></tr>
@@ -681,6 +684,10 @@ to some functions.</p>
     <tr><td valign='top' align=center><b>4</b>&nbsp;=</td><td>Remove length limit on dump of tag values</td></tr>
     <tr><td valign='top' align=center><b>5</b>&nbsp;=</td><td>Remove length limit on dump of JPEG segments</td></tr>
     </table></td><td align=center>0</td></tr>
+<tr><td>XMPAutoConv</td><td><a name="DisableXMPAutoConv"></a>Flag to enable automatic
+    conversion for unknown XMP tags with values that look like rational numbers or dates.</td>
+    <td align=center>0 or 1</td>
+    <td align=center>1</td></tr>
 </table></blockquote>
 
 <p><b>Examples:</b></p>
@@ -1053,6 +1060,7 @@ errors are printed to STDERR.
     If not specified, tag is written to highest priority group as specified
     by <a href="#SetNewGroups">SetNewGroups</a>.  Case is not significant</td>
     <td align=center>Any family 0 or 1 group name</td><td align=center>undef</td></tr>
+<tr><td>NoFlat</td><td>Treat flattened tags as 'unsafe'</td><td align=center>0 or 1</td><td align=center>0</td></tr>
 <tr><td>NoShortcut</td><td>Disables default behaviour of looking up tag in
     shortcuts if not found otherwise.</td><td align=center>0 or 1</td><td align=center>0</td></tr>
 <tr><td>Protected</td><td>Allow protected tags to be written</td>
@@ -1178,6 +1186,10 @@ example above to exclude specific groups from a mass delete. However, this
 technique may not be used to exclude individual tags.  Instead, use
 <a href="#SetNewValuesFromFile">SetNewValuesFromFile</a> to recover the values
 of individual tags after deleting a group.</p>
+<p>When deleting all tags from a JPEG image, the APP14 "Adobe" information is
+not deleted by default because doing so may affect the appearance of the image.
+However, this information may be deleted by specifying it explicitly, either by
+group (with '<code>Adobe:*</code>') or as a block (with '<code>Adobe</code>').</p>
 <p>The following ExifTool options are effective in the call to
 <a href="#SetNewValue">SetNewValue</a>:</p>
 <blockquote>
@@ -1736,35 +1748,35 @@ QuickTime, RAF, RIFF, RSRC, RTF, Radiance, Rawzor, Real, SVG, SigmaRaw,
 Stim, Theora, Vorbis, XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, CIFF, Canon, CanonCustom,
-CanonRaw, CanonVRD, Casio, Chapter#, Composite, DICOM, DNG, DV, DjVu,
-DjVu-Meta, Ducky, EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File, Flash,
-FlashPix, Font, FotoStation, FujiFilm, FujiIFD, GE, GIF, GIMP, GPS, GeoTiff,
-GlobParamIFD, GraphConv, H264, HP, HTML, HTML-dc, HTML-ncc, HTML-office,
-HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt, ICC-header, ICC-meas,
-ICC-meta, ICC-view, ICC_Profile, ICC_Profile#, ID3, ID3v1, ID3v1_Enh,
-ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC, InteropIFD, JFIF,
-JPEG, JVC, Jpeg2000, KDC_IFD, Kodak, KodakBordersIFD, KodakEffectsIFD,
-KodakIFD, KyoceraRaw, LNK, Leaf, LeafSubIFD, Leica, M2TS, MAC, MIE-Audio,
-MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo,
-MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta, MIE-Orient,
-MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video, MIFF, MNG, MPC,
-MPEG, MPF0, MPImage, MXF, MakerNotes, MakerUnknown, Matroska, MetaIFD,
-Microsoft, Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom,
-NikonScan, Ocad, Ogg, Olympus, OpenEXR, PDF, PICT, PNG, PSP, Panasonic,
-Pentax, PhotoMechanic, Photoshop, PictureInfo, PostScript, PreviewIFD,
-PrintIM, ProfileIFD, QuickTime, RAF, RAF2, RIFF, RMETA, RSRC, RTF, Radiance,
-Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5,
-Real-RJMD, Reconyx, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG,
-Samsung, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD,
-System, Theora, Track#, Version0, Vorbis, XML, XMP, XMP-DICOM, XMP-MP,
-XMP-MP1, XMP-PixelLive, XMP-acdsee, XMP-album, XMP-aux, XMP-cc, XMP-cell,
-XMP-crs, XMP-dc, XMP-dex, XMP-digiKam, XMP-exif, XMP-extensis, XMP-iptcCore,
-XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft, XMP-mwg-coll, XMP-mwg-kw,
-XMP-mwg-rs, XMP-pdf, XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus,
-XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-swf, XMP-tiff, XMP-x, XMP-xmp,
-XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights,
-XMP-xmpTPg, ZIP
+<td>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, AdobeDNG, CIFF, Canon,
+CanonCustom, CanonRaw, CanonVRD, Casio, Chapter#, Composite, DICOM, DNG, DV,
+DjVu, DjVu-Meta, Ducky, EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File,
+Flash, FlashPix, Font, FotoStation, FujiFilm, FujiIFD, GE, GIF, GIMP, GPS,
+GeoTiff, GlobParamIFD, GraphConv, H264, HP, HTML, HTML-dc, HTML-ncc,
+HTML-office, HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt,
+ICC-header, ICC-meas, ICC-meta, ICC-view, ICC_Profile, ICC_Profile#, ID3,
+ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC,
+InteropIFD, JFIF, JPEG, JVC, Jpeg2000, KDC_IFD, Kodak, KodakBordersIFD,
+KodakEffectsIFD, KodakIFD, KyoceraRaw, LNK, Leaf, LeafSubIFD, Leica, M2TS,
+MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash,
+MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
+MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
+MIFF, MNG, MPC, MPEG, MPF0, MPImage, MXF, MakerNotes, MakerUnknown,
+Matroska, MetaIFD, Microsoft, Minolta, MinoltaRaw, NITF, Nikon,
+NikonCapture, NikonCustom, NikonScan, Ocad, Ogg, Olympus, OpenEXR, PDF,
+PICT, PNG, PSP, Panasonic, Pentax, PhotoMechanic, Photoshop, PictureInfo,
+PostScript, PreviewIFD, PrintIM, ProfileIFD, Qualcomm, QuickTime, RAF, RAF2,
+RIFF, RMETA, RSRC, RTF, Radiance, Rawzor, Real, Real-CONT, Real-MDPR,
+Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD, Reconyx, Ricoh, SPIFF,
+SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Samsung, Sanyo, Scalado, Sigma,
+SigmaRaw, Sony, SonyIDC, Stim, SubIFD, System, Theora, Track#, Version0,
+Vorbis, XML, XMP, XMP-DICOM, XMP-MP, XMP-MP1, XMP-PixelLive, XMP-acdsee,
+XMP-album, XMP-aux, XMP-cc, XMP-cell, XMP-crs, XMP-dc, XMP-dex, XMP-digiKam,
+XMP-exif, XMP-extensis, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
+XMP-microsoft, XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs, XMP-pdf, XMP-pdfx,
+XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur,
+XMP-rdf, XMP-swf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
+XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,

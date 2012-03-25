@@ -26,12 +26,27 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.32';
+$VERSION = '1.33';
 
 sub ConvertTimecode($);
 
-# type of current stream
-$Image::ExifTool::RIFF::streamType = '';
+# recognized RIFF variants
+my %riffType = (
+    'WAVE' => 'WAV', 'AVI ' => 'AVI', 'WEBP' => 'WEBP',
+    'LA02' => 'LA',  'LA03' => 'LA',  'LA04' => 'LA',
+    'OFR ' => 'OFR', 'LPAC' => 'PAC', 'wvpk' => 'WV',
+);
+
+# MIME types of recognized RIFF-format files
+my %riffMimeType = (
+    WAV  => 'audio/x-wav',
+    AVI  => 'video/x-msvideo',
+    WEBP => 'image/webp',
+    LA   => 'audio/x-nspaudio',
+    OFR  => 'audio/x-ofr',
+    PAC  => 'audio/x-lpac',
+    WV   => 'audio/x-wavpack',
+);
 
 %Image::ExifTool::RIFF::audioEncoding = ( #2
     Notes => 'These "TwoCC" audio encoding codes are used in RIFF and ASF files.',
@@ -284,18 +299,19 @@ $Image::ExifTool::RIFF::streamType = '';
 %Image::ExifTool::RIFF::Main = (
     PROCESS_PROC => \&Image::ExifTool::RIFF::ProcessChunks,
     NOTES => q{
-        The RIFF container format is used various types of fines including WAV, AVI
-        and WEBP.  According to the EXIF specification, Meta information is embedded
-        in two types of RIFF C<LIST> chunks: C<INFO> and C<exif>, and information
-        about the audio content is stored in the C<fmt > chunk.  As well as this
-        information, some video information and proprietary manufacturer-specific
-        information is also extracted.
+        The RIFF container format is used various types of fines including WAV, AVI,
+        WEBP, LA, OFR, PAC and WV.  According to the EXIF specification, Meta
+        information is embedded in two types of RIFF C<LIST> chunks: C<INFO> and
+        C<exif>, and information about the audio content is stored in the C<fmt >
+        chunk.  As well as this information, some video information and proprietary
+        manufacturer-specific information is also extracted.
         
         Large AVI videos may be a concatenation of two or more RIFF chunks.
         For these files, information is extracted from subsequent RIFF
         chunks as sub-documents, but the Duration is calculated for the full
         video.
     },
+    # (not 100% sure that the concatination technique mentioned above is valid - PH)
    'fmt ' => {
         Name => 'AudioFormat',
         SubDirectory => { TagTable => 'Image::ExifTool::RIFF::AudioFormat' },
@@ -726,12 +742,12 @@ $Image::ExifTool::RIFF::streamType = '';
     strf => [
         {
             Name => 'AudioFormat',
-            Condition => '$Image::ExifTool::RIFF::streamType eq "auds"',
+            Condition => '$$self{RIFFStreamType} eq "auds"',
             SubDirectory => { TagTable => 'Image::ExifTool::RIFF::AudioFormat' },
         },
         {
             Name => 'VideoFormat',
-            Condition => '$Image::ExifTool::RIFF::streamType eq "vids"',
+            Condition => '$$self{RIFFStreamType} eq "vids"',
             SubDirectory => { TagTable => 'Image::ExifTool::BMP::Main' },
         },
     ],
@@ -764,7 +780,7 @@ $Image::ExifTool::RIFF::streamType = '';
     0 => {
         Name => 'StreamType',
         Format => 'string[4]',
-        RawConv => '$Image::ExifTool::RIFF::streamType = $val',
+        RawConv => '$$self{RIFFStreamType} = $val',
         PrintConv => {
             auds => 'Audio',
             mids => 'MIDI',
@@ -775,12 +791,12 @@ $Image::ExifTool::RIFF::streamType = '';
     1 => [
         {
             Name => 'AudioCodec',
-            Condition => '$Image::ExifTool::RIFF::streamType eq "auds"',
+            Condition => '$$self{RIFFStreamType} eq "auds"',
             Format => 'string[4]',
         },
         {
             Name => 'VideoCodec',
-            Condition => '$Image::ExifTool::RIFF::streamType eq "vids"',
+            Condition => '$$self{RIFFStreamType} eq "vids"',
             Format => 'string[4]',
         },
         {
@@ -795,14 +811,14 @@ $Image::ExifTool::RIFF::streamType = '';
     5 => [
         {
             Name => 'AudioSampleRate',
-            Condition => '$Image::ExifTool::RIFF::streamType eq "auds"',
+            Condition => '$$self{RIFFStreamType} eq "auds"',
             Format => 'rational64u',
             ValueConv => '$val ? 1/$val : 0',
             PrintConv => 'int($val * 100 + 0.5) / 100',
         },
         {
             Name => 'VideoFrameRate',
-            Condition => '$Image::ExifTool::RIFF::streamType eq "vids"',
+            Condition => '$$self{RIFFStreamType} eq "vids"',
             Format => 'rational64u',
             # (must use RawConv because raw value used in Composite tag)
             RawConv => '$val ? 1/$val : undef',
@@ -819,11 +835,11 @@ $Image::ExifTool::RIFF::streamType = '';
     8 => [
         {
             Name => 'AudioSampleCount',
-            Condition => '$Image::ExifTool::RIFF::streamType eq "auds"',
+            Condition => '$$self{RIFFStreamType} eq "auds"',
         },
         {
             Name => 'VideoFrameCount',
-            Condition => '$Image::ExifTool::RIFF::streamType eq "vids"',
+            Condition => '$$self{RIFFStreamType} eq "vids"',
         },
         {
             Name => 'StreamSampleCount',
@@ -895,7 +911,11 @@ $Image::ExifTool::RIFF::streamType = '';
             2 => 'FrameCount',
             3 => 'VideoFrameCount',
         },
-        RawConv => '($val[0] and not ($val[2] or $val[3])) ? $val[1] / $val[0] : undef',
+        # (can't calculate duration like this for compressed audio types)
+        RawConv => q{
+            return undef if $$self{VALUE}{FileType} =~ /^(LA|OFR|PAC|WV)$/;
+            return ($val[0] and not ($val[2] or $val[3])) ? $val[1] / $val[0] : undef;
+        },
         PrintConv => 'ConvertDuration($val)',
     },
 );
@@ -1121,15 +1141,23 @@ sub ProcessRIFF($$)
 {
     my ($exifTool, $dirInfo) = @_;
     my $raf = $$dirInfo{RAF};
-    my ($buff, $err);
-    my %types = ( 'WAVE' => 'WAV', 'AVI ' => 'AVI', 'WEBP' => 'WEBP' );
+    my ($buff, $buf2, $type, $mime, $err);
     my $verbose = $exifTool->Options('Verbose');
 
     # verify this is a valid RIFF file
     return 0 unless $raf->Read($buff, 12) == 12;
-    return 0 unless $buff =~ /^RIFF....(.{4})/s;
-    $exifTool->SetFileType($types{$1}); # set type to 'WAV', 'AVI', 'WEBP' or 'RIFF'
-    $Image::ExifTool::RIFF::streamType = '';    # initialize stream type
+    if ($buff =~ /^RIFF....(.{4})/s) {
+        $type = $riffType{$1};
+    } else {
+        # minimal support for a few obscure lossless audio formats...
+        return 0 unless $buff =~ /^(LA0[234]|OFR |LPAC|wvpk)/ and $raf->Read($buf2, 1024);
+        $type = $riffType{$1};
+        $buff .= $buf2;
+        return 0 unless $buff =~ /WAVE(.{4})?fmt /sg and $raf->Seek(pos($buff) - 4, 0);
+    }
+    $mime = $riffMimeType{$type} if $type;
+    $exifTool->SetFileType($type, $mime);
+    $$exifTool{RIFFStreamType} = '';    # initialize stream type
     SetByteOrder('II');
     my $tagTablePtr = GetTagTable('Image::ExifTool::RIFF::Main');
     my $pos = 12;

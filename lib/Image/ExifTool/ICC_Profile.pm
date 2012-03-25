@@ -672,7 +672,7 @@ sub ProcessMetadata($$$)
             $name =~ s/\s+(.)/\u$1/g;
             $name =~ tr/-_a-zA-Z0-9//dc;
             next unless length $name;
-            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, { Name => $name });
+            AddTagToTable($tagTablePtr, $tag, { Name => $name });
         }
         $exifTool->HandleTag($tagTablePtr, $tag, $val);
     }
@@ -847,7 +847,7 @@ sub ProcessICC_Profile($$$)
         # if the tagID's aren't numeric, so we must do this manually:
         if (not $tagInfo and $exifTool->{OPTIONS}->{Unknown}) {
             $tagInfo = { Unknown => 1 };
-            Image::ExifTool::AddTagToTable($tagTablePtr, $tagID, $tagInfo);
+            AddTagToTable($tagTablePtr, $tagID, $tagInfo);
         }
         next unless defined $tagInfo;
 

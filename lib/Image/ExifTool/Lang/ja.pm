@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::ja;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 %Image::ExifTool::Lang::ja::Translate = (
    'AEAperture' => 'AE絞り',
@@ -766,7 +766,12 @@ $VERSION = '1.18';
       },
     },
    'BestQualityScale' => '高品質スケール',
-   'BestShotMode' => 'ベストショットモード',
+   'BestShotMode' => {
+      Description => 'ベストショットモード',
+      PrintConv => {
+        'Off' => 'オフ',
+      },
+    },
    'BitDepth' => 'ビット深度',
    'BitsPerComponent' => 'コンポーネントあたりビット',
    'BitsPerExtendedRunLength' => '拡張ランレングスあたりのビット',
@@ -1117,6 +1122,7 @@ $VERSION = '1.18';
    'ColorMode' => {
       Description => 'カラーモード',
       PrintConv => {
+        'Adobe RGB' => '夕日',
         'Autumn Leaves' => '紅葉',
         'B & W' => '白黒',
         'B&W' => '白黒',
@@ -1173,6 +1179,7 @@ $VERSION = '1.18';
    'ColorSpace' => {
       Description => '色空間',
       PrintConv => {
+        'ICC Profile' => 'ICCプロフィール',
         'Monochrome' => 'モノトーン',
         'Uncalibrated' => '未調整',
       },
@@ -1376,6 +1383,7 @@ $VERSION = '1.18';
    'Country-PrimaryLocationName' => '国',
    'CreateDate' => 'デジタルデータ作成日時',
    'CreationDate' => '作成日時',
+   'CreativeStyle' => 'クリエイティブスタイル',
    'Creator' => '製作者',
    'CreatorAddress' => 'クリエーター　-　住所',
    'CreatorCity' => 'クリエーター　-　街',
@@ -1409,6 +1417,8 @@ $VERSION = '1.18';
     },
    'Custom1' => 'カスタム1',
    'Custom2' => 'カスタム2',
+   'Custom3' => 'カスタム3',
+   'Custom4' => 'カスタム4',
    'CustomRendered' => {
       Description => 'カスタム画像処理',
       PrintConv => {
@@ -1553,6 +1563,7 @@ $VERSION = '1.18';
       },
     },
    'DistortionCorrection' => {
+      Description => '歪曲修正',
       PrintConv => {
         'Off' => 'オフ',
         'On' => 'オン',
@@ -1774,6 +1785,7 @@ $VERSION = '1.18';
    'EpsonImageHeight' => 'エプソン画像高',
    'EpsonImageWidth' => 'エプソン画像幅',
    'EpsonSoftware' => 'エプソンソフトウェア',
+   'Equipment' => 'イクイップメントIFDポインター',
    'EquipmentVersion' => 'イクイップメントバージョン',
    'ExcursionTolerance' => '振幅許容範囲',
    'ExifCameraInfo' => 'Exifカメラ情報',
@@ -1846,6 +1858,7 @@ $VERSION = '1.18';
         'Program-shift' => 'プログラムシフト',
         'Shutter Priority' => 'シャッター優先',
         'Shutter speed priority AE' => 'シャッター優先',
+        'n/a' => '未設定',
       },
     },
    'ExposureModeInManual' => {
@@ -1954,6 +1967,7 @@ $VERSION = '1.18';
    'Face6Position' => '顔6位置',
    'Face7Position' => '顔7位置',
    'Face8Position' => '顔8位置',
+   'Face9Position' => '顔9位置',
    'FaceDetect' => {
       Description => '顔認識',
       PrintConv => {
@@ -2018,6 +2032,7 @@ $VERSION = '1.18';
     },
    'FileType' => 'ファイルタイプ',
    'FileVersion' => 'ファイル形式バージョン',
+   'Filename' => 'ファイル名',
    'FillFlashAutoReduction' => {
       Description => '日中シンクロ・ストロボ露出自動低減制御',
       PrintConv => {
@@ -2308,6 +2323,7 @@ $VERSION = '1.18';
       },
     },
    'FlashOutput' => 'フラッシュ出力',
+   'FlashRemoteControl' => 'フラッシュリモートコントロール',
    'FlashSerialNumber' => 'フラッシュシリアル番号',
    'FlashSetting' => 'フラッシュ設定',
    'FlashShutterSpeed' => 'フラッシュシャッター速度',
@@ -2503,9 +2519,11 @@ $VERSION = '1.18';
    'FolderName' => 'フォルダ名',
    'ForwardMatrix1' => '前行列1',
    'ForwardMatrix2' => '前行列2',
+   'FrameHeight' => 'フレーム高',
    'FrameNumber' => 'フレーム番号',
    'FrameRate' => 'フレームレート',
    'FrameSize' => 'フレームサイズ',
+   'FrameWidth' => 'フレーム幅',
    'FreeByteCounts' => 'フリーバイト数',
    'FreeMemoryCardImages' => 'フリーメモリーカードイメージ',
    'FreeOffsets' => 'フリーオフセット',
@@ -2534,6 +2552,7 @@ $VERSION = '1.18';
       },
     },
    'GEMInfo' => 'GEM情報',
+   'GEModel' => 'モデル',
    'GIFVersion' => 'GIFバージョン',
    'GPSAltitude' => '高度',
    'GPSAltitudeRef' => {
@@ -2676,6 +2695,7 @@ $VERSION = '1.18';
    'GeoTiffDirectory' => 'ジオキーディレクトリタグ',
    'GeoTiffDoubleParams' => 'ジオダブル設定タグ',
    'Gradation' => 'グラデーション',
+   'GrayPoint' => 'グレーポイント',
    'GrayResponseCurve' => 'グレー反応曲線',
    'GrayResponseUnit' => {
       Description => 'グレー反応単位',
@@ -2687,6 +2707,7 @@ $VERSION = '1.18';
         '1e-06' => '単位の数は100-1000を表す',
       },
     },
+   'GrayScale' => 'グレースケール',
    'GrayTRC' => '灰色調増殖曲線',
    'GreenMatrixColumn' => '緑色マトリックス列',
    'GreenTRC' => '緑色調増殖曲線',
@@ -2749,6 +2770,7 @@ $VERSION = '1.18';
    'Hue' => '色相',
    'HueAdjustment' => '色相調整',
    'HueSetting' => '色相設定',
+   'ICCProfile' => 'ICCプロフィール',
    'ICC_Profile' => 'ICC入力色プロフィール',
    'IPTC-NAA' => 'IPTC-NAAメタデータ',
    'IPTCBitsPerSample' => 'サンプルあたりビット数',
@@ -2761,6 +2783,7 @@ $VERSION = '1.18';
    'IPTCPixelWidth' => 'スキャン方向ピクセルサイズ',
    'ISO' => 'ISOスピードレート',
    'ISO2' => 'ISO（2）',
+   'ISOAuto' => 'ISOオート',
    'ISODisplay' => 'ISO表示',
    'ISOExpansion' => {
       Description => 'ISO感度拡張',
@@ -2883,6 +2906,7 @@ $VERSION = '1.18';
         'Square' => '正方形',
       },
     },
+   'ImageProcessing' => 'イメージ処理',
    'ImageProcessingVersion' => '画像処理バージョン',
    'ImageQuality' => {
       Description => '画像品質',
@@ -2955,6 +2979,7 @@ $VERSION = '1.18';
    'InkSet' => 'インクセット',
    'Instructions' => '詳細',
    'IntellectualGenre' => 'インテリジャンル',
+   'IntelligentAuto' => 'インテリジェントオート',
    'IntensityStereo' => {
       PrintConv => {
         'Off' => 'オフ',
@@ -3196,6 +3221,7 @@ $VERSION = '1.18';
         'Auto' => 'オート',
         'Off' => 'オフ',
         'On' => 'オン',
+        'n/a' => '未設定',
       },
     },
    'LongFocal' => '最長焦点',
@@ -3214,6 +3240,7 @@ $VERSION = '1.18';
       },
     },
    'MB-D10Batteries' => 'MB-D10電源タイプ',
+   'MB-D10BatteryType' => 'MB-D10電源タイプ',
    'MB-D80Batteries' => 'MB-D80バッテリー',
    'MIEVersion' => 'MIEバージョン',
    'MIMEType' => 'MIMEタイプ',
@@ -3232,6 +3259,7 @@ $VERSION = '1.18';
         'Off' => 'オフ',
         'On' => 'オン',
         'Super Macro' => 'スーパーマクロ',
+        'n/a' => '未設定',
       },
     },
    'MacroMode' => {
@@ -3588,6 +3616,7 @@ $VERSION = '1.18';
       },
     },
    'MyColorMode' => {
+      Description => 'マイカラーモード',
       PrintConv => {
         'B&W' => '白黒',
         'Color Accent' => 'カラーアクセント',
@@ -3622,6 +3651,7 @@ $VERSION = '1.18';
         'Uncompressed' => '非圧縮',
       },
     },
+   'NEFLinearizationTable' => '線形化表',
    'NamedColor2' => '色名称2',
    'NativeDisplayInfo' => 'ネイティブディスプレイ情報',
    'NewsPhotoVersion' => '報道写真レコードバージョン',
@@ -3740,6 +3770,7 @@ $VERSION = '1.18';
    'PentaxImageSize' => 'ペンタックスイメージサイズ',
    'PentaxModelID' => 'ペンタックスモデル',
    'PentaxVersion' => 'ペンタックスバージョン',
+   'People' => '人々',
    'PhaseDetectAF' => {
       Description => 'オートフォーカス',
       PrintConv => {
@@ -4017,6 +4048,7 @@ $VERSION = '1.18';
     },
    'PreCaptureFrames' => 'プレキャプチャーフレーム',
    'Predictor' => '指標',
+   'Preview' => 'プレビューIFDポインター',
    'Preview0' => 'プレビュー0',
    'Preview1' => 'プレビュー1',
    'Preview2' => 'プレビュー2',
@@ -4151,6 +4183,7 @@ $VERSION = '1.18';
         'Premium' => 'プレミアム',
         'RAW + JPEG' => 'RAW+JPEG',
         'Standard' => 'スタンダード',
+        'n/a' => '未設定',
       },
     },
    'QualityMode' => {
@@ -4162,6 +4195,7 @@ $VERSION = '1.18';
       },
     },
    'QuantizationMethod' => '量子化方法',
+   'QuickAdjust' => 'クイック調整',
    'QuickControlDialInMeter' => {
       Description => '測光タイマー中のサブ電子ダイヤル',
       PrintConv => {
@@ -4268,8 +4302,10 @@ $VERSION = '1.18';
    'RawDevWhiteBalanceValue' => 'ホワイトバランス値',
    'RawImageCenter' => 'RAWイメージセンター',
    'RawImageDigest' => 'RAWイメージ要約',
+   'RawImageHeight' => 'イメージ高さ',
    'RawImageSegmentation' => 'RAWイメージ部分番号',
    'RawImageSize' => 'RAWイメージサイズ',
+   'RawImageWidth' => 'イメージ幅',
    'RawInfoVersion' => 'RAW情報バージョン',
    'RawJpgQuality' => {
       Description => 'RAW JPEG　品質',
@@ -4698,6 +4734,7 @@ $VERSION = '1.18';
    'SensorTemperature' => 'センサー温度',
    'SensorTopBorder' => 'イメージ上部',
    'SensorWidth' => 'センサー幅',
+   'Sequence' => 'シーケンス',
    'SequenceNumber' => 'シーケンス番号',
    'SequenceShotInterval' => 'シーケンスショットインターバル',
    'SequentialShot' => {
@@ -5153,6 +5190,7 @@ $VERSION = '1.18';
    'TimeSincePowerOn' => '電源オン経過時間',
    'TimeStamp' => 'タイムスタンプ',
    'TimeStamp1' => 'タイムスタンプ1',
+   'TimeZone' => 'タイムゾーン',
    'TimeZoneOffset' => 'タイムゾーンオフセット',
    'TimerFunctionButton' => {
       Description => 'ファンクションボタン',
@@ -5721,6 +5759,7 @@ $VERSION = '1.18';
         'On' => 'オン',
       },
     },
+   'Zoom' => 'ズーム',
    'ZoomSourceWidth' => 'ズームソース幅',
    'ZoomStepCount' => 'ズームステップ数',
    'ZoomTargetWidth' => 'ズームターゲット幅',

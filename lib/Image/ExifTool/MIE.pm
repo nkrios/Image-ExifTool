@@ -1518,7 +1518,7 @@ sub ProcessMIEGroup($$$)
                 Writable => 0,
                 PrintConv => 'length($val) > 60 ? substr($val,0,55) . "[...]" : $val',
             };
-            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+            AddTagToTable($tagTablePtr, $tag, $tagInfo);
             last;
         }
 

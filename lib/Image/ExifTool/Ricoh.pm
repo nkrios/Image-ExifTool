@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -168,10 +168,10 @@ my %ricohLensIDs = (
         OffsetPair => 30,   # associated byte count tagID
         DataTag => 'PreviewImage',
         Protected => 2,
-        # prevent preview from being written to raw images
+        # prevent preview from being written to MakerNotes of DNG images
         RawConvInv => q{
             return $val if $$self{FILE_TYPE} eq "JPEG";
-            warn "Can't write PreviewImage to $$self{TIFF_TYPE} file\n";
+            warn "\n"; # suppress warning
             return undef;
         },
     },
@@ -183,7 +183,7 @@ my %ricohLensIDs = (
         Protected => 2,
         RawConvInv => q{
             return $val if $$self{FILE_TYPE} eq "JPEG";
-            warn "\n"; # suppress warning (already issued for PreviewImageStart)
+            warn "\n"; # suppress warning
             return undef;
         },
     },
@@ -571,7 +571,7 @@ sub ProcessRicohText($$$)
                 PrintConv => 'length($val) > 60 ? substr($val,0,55) . "[...]" : $val',
             };
             # add tag information to table
-            Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+            AddTagToTable($tagTablePtr, $tag, $tagInfo);
         }
         $exifTool->FoundTag($tagInfo, $val);
     }
@@ -648,7 +648,7 @@ sub ProcessRicohRMETA($$$)
             } else {
                 # create tagInfo hash
                 $tagInfo = { Name => $name, PrintConv => { } };
-                Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+                AddTagToTable($tagTablePtr, $tag, $tagInfo);
             }
             # use string value directly if no numerical value
             $num = $val unless defined $num;

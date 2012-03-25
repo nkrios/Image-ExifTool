@@ -803,7 +803,7 @@ sub ProcessXtra($$$)
               # $name =~ tr/-_A-Za-z0-9//dc;
                 if ($name =~ /^[-\w+]$/) {
                     $tagInfo = { Name => ucfirst($name) };
-                    Image::ExifTool::AddTagToTable($tagTablePtr, $tag, $tagInfo);
+                    AddTagToTable($tagTablePtr, $tag, $tagInfo);
                 }
             }
             $exifTool->HandleTag($tagTablePtr, $tag, $val,
