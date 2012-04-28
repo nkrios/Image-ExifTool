@@ -140,12 +140,6 @@ $VERSION = '1.21';
    'AFInfo2' => 'Infos AF',
    'AFInfo2Version' => 'Version des infos AF',
    'AFIntegrationTime' => 'Temps d\'intégration AF',
-   'AFMicroAdjActive' => {
-      PrintConv => {
-        'No' => 'Non',
-        'Yes' => 'Oui',
-      },
-    },
    'AFMicroadjustment' => {
       Description => 'Micro-ajustement de l\'AF',
       PrintConv => {

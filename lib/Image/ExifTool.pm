@@ -27,7 +27,7 @@ use vars qw($VERSION $RELEASE @ISA @EXPORT_OK %EXPORT_TAGS $AUTOLOAD @fileTypes
             %mimeType $swapBytes $swapWords $currentByteOrder %unpackStd
             %jpegMarker %specialTags);
 
-$VERSION = '8.85';
+$VERSION = '8.90';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -4783,6 +4783,7 @@ sub ProcessJPEG($$)
                         DataLen  => $length,
                         DirStart => $start,
                         DirLen   => $length - $start,
+                        DirName  => $start ? 'XMP' : 'XML',
                         Parent   => $markerName,
                     );
                     $processed = $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
@@ -6327,8 +6328,10 @@ sub ProcessBinaryData($$$)
     # prepare list of tag numbers to extract
     my @tags;
     if ($unknown > 1 and defined $$tagTablePtr{FIRST_ENTRY}) {
+        # don't create a stupid number of tags if data is huge
+        my $sizeLimit = $size < 65536 ? $size : 65536;
         # scan through entire binary table
-        @tags = ($$tagTablePtr{FIRST_ENTRY}..(int($size/$increment) - 1));
+        @tags = ($$tagTablePtr{FIRST_ENTRY}..(int($sizeLimit/$increment) - 1));
         # add in floating point tag ID's if they exist
         my @ftags = grep /\./, TagTableKeys($tagTablePtr);
         @tags = sort { $a <=> $b } @tags, @ftags if @ftags;
@@ -6393,9 +6396,12 @@ sub ProcessBinaryData($$$)
                 $count = eval $count;
                 $@ and warn("Format $$tagInfo{Name}: $@"), next;
                 next if $count < 0;
-                # allow a variable-length of any format type (with base $count = 1)
+                # allow a variable-length value of any format
+                # (note: the next incremental index points to data immediately after
+                #  this value, regardless of the size of this value, even if it is zero)
                 if ($format =~ s/^var_//) {
-                    $varSize += ($count - 1) * ($formatSize{$format} || 1);
+                    $varSize += $count * ($formatSize{$format} || 1) - $increment;
+                    $wasVar = 1;
                     # save variable size data if required for writing
                     if ($$dirInfo{VarFormatData}) {
                         push @{$$dirInfo{VarFormatData}}, $index, $varSize;

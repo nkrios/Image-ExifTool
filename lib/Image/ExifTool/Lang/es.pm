@@ -14,11 +14,6 @@ use vars qw($VERSION);
 $VERSION = '1.08';
 
 %Image::ExifTool::Lang::es::Translate = (
-   'AFMicroAdjActive' => {
-      PrintConv => {
-        'Yes' => 'Si',
-      },
-    },
    'AFMode' => 'Modo AF',
    'ARMIdentifier' => 'Identificador ARM',
    'ARMVersion' => 'Versión ARM',
@@ -689,8 +684,8 @@ $VERSION = '1.08';
    'GPSLatitudeRef' => {
       Description => 'Latitud Norte o Sur',
       PrintConv => {
-        'North' => 'Latitud Norte',
-        'South' => 'Latitud Sur',
+        'North' => 'Latitud norte',
+        'South' => 'Latitud sur',
       },
     },
    'GPSLongitude' => 'Longitud',

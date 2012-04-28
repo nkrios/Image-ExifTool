@@ -1181,7 +1181,7 @@ $VERSION = '1.06';
       Description => 'Jednotka X a Y rozlišení',
       PrintConv => {
         'None' => 'Žádná',
-        'cm' => 'pixely/cm',
+        'cm' => 'Pixely/cm',
         'inches' => 'Palce',
       },
     },

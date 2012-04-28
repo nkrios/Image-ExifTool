@@ -4,8 +4,74 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 8.85. (Other versions are
+Note: The most recent production release is Version 8.90. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+Apr. 28, 2012 - Version 8.90 (production release)
+
+  - Added ability to fix double-UTF-encoded embedded XMP
+  - Added a warning for invalid XMP
+  - Added a new Minolta/Sony LensType (thanks Matthias)
+  - Added a new values for some Canon tags
+  - Decode ColorBalance information for a few more Nikon models
+  - Ignore trailing whitespace when writing converted values
+  - Enhanced the -z option to avoid writing the 2424 bytes of padding in XMP
+  - Improved decoding of some Sony MakerNotes tags (thanks Jos Roost)
+  - Improved "best guess" for fixing corrupted makernote offsets of some Sony
+    models
+
+Apr. 21, 2012 - Version 8.89
+
+  - Added new Nikon and Ricoh LensID's
+  - Added a new Olympus CameraType
+  - Added new Canon LensType, EasyMode and CanonModelID values
+  - Added new Pentax PictureMode and PentaxModelID values
+  - Added support for IDimager XMP tags
+  - Added a number of new XMP-crs tags used by LR4
+  - Decode a few more QuickTime tags
+  - More improvements decoding Minolta/Sony CameraSettings (thanks Jos Roost)
+  - Enhanced -ext option to allow files with any extension to be processed
+  - Increased maximum number of SubIFD's to accommodate some DNG 1.4 images
+  - Lowered priority of JPEG APP12 PictureInfo tags when reading
+  - Created mechanism to allow self-referential XMP structures
+
+Apr. 15, 2012 - Version 8.88
+
+  - Added a new Canon LensType (thanks Gerald Erdmann)
+  - Decode a number of new Olympus tags and values
+  - Decode a few more QuickTime tags
+  - Many more improvements and additions to Sony decoding (thanks Jos Roost)
+  - Changed Ricoh InternalSerialNumber to also convert numerical value
+  - Removed the ability to create IFD1 in TIFF-format images (you shouldn't
+    really do this anyway)
+  - Fixed incorrect IFD number in some error messages when writing
+
+Apr. 9, 2012 - Version 8.87
+
+  - Added a new PentaxModelID
+  - Added new values for some Panasonic tags
+  - Added a couple of new Canon LensTypes
+  - Decode a few more Sony tags and values (thanks Jos Roost)
+  - Decode more CanonVRD tags
+  - Decode makernotes from Pentax WG-2 GPS MOV videos
+  - Changed Panasonic AdvancedSceneMode to a Composite tag
+  - Fixed problem introduced in 8.70 where excluding groups from deletion didn't
+    work when copying back tags in the same command
+  - Fixed problem repairing incorrect makernotes offsets in JPEG images from
+    Sony SLT and NEX cameras
+
+Apr. 3, 2012 - Version 8.86
+
+  - Added a few new values for some Panasonic tags
+  - Added a new CanonModelID and a new Canon LensType
+  - Added a new Nikon LensID
+  - Decode more Sony CameraSettings3 information (thanks Jos Roost)
+  - Decode another Canon 5D tag
+  - Decode some new CanonVRD DLO tags
+  - Changed decoding of CanonVRD VRDVersion tag
+  - Changed formatting of a Pentax LensType for consistency with other lenses
+  - Patched decoding of Reconyx:DateTimeOriginal to accomodate values written
+    with an incorrect byte order by some models
 
 Mar. 25, 2012 - Version 8.85 (production release)
 

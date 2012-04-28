@@ -32,7 +32,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.57';
+$VERSION = '1.60';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -261,8 +261,15 @@ my %graphicsMode = (
             Unknown => 1,
             Binary => 1,
         },
+        # (also Samsung WB750 uncompressed thumbnail data starting with "SDIC\0")
     ],
-    skip => { Unknown => 1, Binary => 1 },
+    skip => [
+        {
+            Condition => '$$valPt =~ /^\0.{3}(CNDB|CNCV|CNMN|CNFV|CNTH|CNDM)/s',
+            SubDirectory => { TagTable => 'Image::ExifTool::Canon::Skip' },
+        },
+        { Name => 'Skip', Unknown => 1, Binary => 1 },
+    ],
     wide => { Unknown => 1, Binary => 1 },
     ftyp => { #MP4
         Name => 'FileType',
@@ -587,6 +594,10 @@ my %graphicsMode = (
         Name => 'TrackRef',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::TrackRef' },
     },
+    tapt => {
+        Name => 'TrackAperture',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::TrackAperture' },
+    },
     uuid => [
         { #11 (MP4 files) (also found in QuickTime::Movie)
             Name => 'UUID-USMT',
@@ -603,8 +614,6 @@ my %graphicsMode = (
         },
     ],
     # edts - edits --> contains elst (edit list)
-    # tapt - TrackApertureModeDimensionsAID --> contains clef (TrackCleanApertureDimensionsAID),
-    #        prof (TrackProductionApertureDimensionsAID), enof (TrackEncodedPixelsDimensionsAID)
     # clip - clipping --> contains crgn (clip region)
     # matt - track matt --> contains kmat (compressed matt)
     # load - track loading settings
@@ -927,6 +936,13 @@ my %graphicsMode = (
         Name => 'PanasonicPANA',
         SubDirectory => { TagTable => 'Image::ExifTool::Panasonic::PANA' },
     },
+    PENT => { #PH
+        Name => 'PentaxPENT',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::PENT',
+            ByteOrder => 'LittleEndian',
+        },
+    },
     MMA0 => { #PH (DiMage 7Hi)
         Name => 'MinoltaMMA0',
         SubDirectory => { TagTable => 'Image::ExifTool::Minolta::MMA' },
@@ -975,19 +991,30 @@ my %graphicsMode = (
         SubDirectory => { TagTable => 'Image::ExifTool::Microsoft::Xtra' },
     },
     hinv => 'HintVersion', #PH (guess)
-    thmb => { #PH (Pentax Q)
-        Name => 'MakerNotePentax5a',
-        Condition => '$$valPt =~ /^PENTAX \0II/',
-        SubDirectory => {
-            TagTable => 'Image::ExifTool::Pentax::Main',
-            ProcessProc => \&Image::ExifTool::Exif::ProcessExif, # (because ProcessMOV is default)
-            Start => 10,
-            Base => '$start - 10',
-            ByteOrder => 'LittleEndian',
+    thmb => [
+        { #PH (Pentax Q)
+            Name => 'MakerNotePentax5a',
+            Condition => '$$valPt =~ /^PENTAX \0II/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Pentax::Main',
+                ProcessProc => \&Image::ExifTool::Exif::ProcessExif, # (because ProcessMOV is default)
+                Start => 10,
+                Base => '$start - 10',
+                ByteOrder => 'LittleEndian',
+            },
+        },{ #PH (TG-810)
+            Name => 'OlympusThumbnail',
+            Condition => '$$valPt =~ /^.{4}\xff\xd8\xff\xdb/s',
+            SubDirectory => { TagTable => 'Image::ExifTool::Olympus::thmb' },
         },
+    ],
+    scrn => { #PH (TG-810)
+        Name => 'OlympusPreview',
+        Condition => '$$valPt =~ /^.{4}\xff\xd8\xff\xdb/s',
+        SubDirectory => { TagTable => 'Image::ExifTool::Olympus::scrn' },
     },
     PXTH => { #PH (Pentax K-01)
-        Name => 'PreviewImage',
+        Name => 'PentaxPreview',
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::PXTH' },
     },
     PXMN => { #PH (Pentax K-01)
@@ -1001,7 +1028,7 @@ my %graphicsMode = (
             ByteOrder => 'BigEndian',
         },
     },
-    # ducp - 4 bytes, all zero (Samsung ST96)
+    # ducp - 4 bytes, all zero (Samsung ST96,WB750)
 );
 
 # User-specific media data atoms (ref 11)
@@ -1076,6 +1103,13 @@ my %graphicsMode = (
     VPRF => {
         Name => 'VideoProfile',
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::VideoProf' },
+    },
+    OLYM => { #PH
+        Name => 'OlympusOLYM',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Olympus::OLYM',
+            ByteOrder => 'BigEndian',
+        },
     },
 );
 
@@ -1254,7 +1288,36 @@ my %graphicsMode = (
     PROCESS_PROC => \&ProcessMOV,
     GROUPS => { 2 => 'Video' },
     chap => { Name => 'ChapterList', Format => 'int32u' },
-    # also: tmcd, sync, scpt, ssrc, iTunesInfo
+    tmcd => { Name => 'TimeCode', Format => 'int32u' },
+    # also: sync, scpt, ssrc, iTunesInfo
+);
+
+# track aperture mode dimensions atoms
+# (ref https://developer.apple.com/library/mac/#documentation/QuickTime/QTFF/QTFFChap2/qtff2.html)
+%Image::ExifTool::QuickTime::TrackAperture = (
+    PROCESS_PROC => \&ProcessMOV,
+    GROUPS => { 2 => 'Video' },
+    clef => {
+        Name => 'CleanApertureDimensions',
+        Format => 'fixed32u',
+        Count => 3,
+        ValueConv => '$val =~ s/^.*? //; $val', # remove flags word
+        PrintConv => '$val =~ tr/ /x/; $val',
+    },
+    prof => {
+        Name => 'ProductionApertureDimensions',
+        Format => 'fixed32u',
+        Count => 3,
+        ValueConv => '$val =~ s/^.*? //; $val',
+        PrintConv => '$val =~ tr/ /x/; $val',
+    },
+    enof => {
+        Name => 'EncodedPixelsDimensions',
+        Format => 'fixed32u',
+        Count => 3,
+        ValueConv => '$val =~ s/^.*? //; $val',
+        PrintConv => '$val =~ tr/ /x/; $val',
+    },
 );
 
 # item list atoms
@@ -1975,6 +2038,63 @@ my %graphicsMode = (
         Name => 'Text',
         Flags => ['Binary','Unknown'],
     },
+    tmcd => {
+        Name => 'TimeCode',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::TimeCode' },
+    },
+);
+
+# TimeCode header
+%Image::ExifTool::QuickTime::TimeCode = (
+    PROCESS_PROC => \&ProcessMOV,
+    tcmi => {
+        Name => 'TCMediaInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::TCMediaInfo' },
+    },
+);
+
+# TimeCode media info (ref 12)
+%Image::ExifTool::QuickTime::TCMediaInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 2 => 'Video' },
+    4 => {
+        Name => 'TextFont',
+        Format => 'int16u',
+        PrintConv => { 0 => 'System' },
+    },
+    6 => {
+        Name => 'TextFace',
+        Format => 'int16u',
+        PrintConv => { 
+            0 => 'Plain',
+            BITMASK => {
+                0 => 'Bold',
+                1 => 'Italic',
+                2 => 'Underline',
+                3 => 'Outline',
+                4 => 'Shadow',
+                5 => 'Condense',
+                6 => 'Extend',
+            },
+        },
+    },
+    8 => {
+        Name => 'TextSize',
+        Format => 'int16u',
+    },
+    10 => {
+        Name => 'TextColor',
+        Format => 'int16u[3]',
+    },
+    16 => {
+        Name => 'BackgroundColor',
+        Format => 'int16u[3]',
+    },
+    22 => {
+        Name => 'FontName',
+        Format => 'pstring',
+        ValueConv => '$self->Decode($val, $self->Options("CharsetQuickTime"))',
+    },
 );
 
 # Generic media info (ref http://sourceforge.jp/cvs/view/ntvrec/ntvrec/libqtime/gmin.h?view=co)
@@ -2048,6 +2168,7 @@ my %graphicsMode = (
             sdsm => 'Scene Description', #3
             soun => 'Audio Track',
             text => 'Text', #PH (but what type? subtitle?)
+            tmcd => 'Time Code', #PH
            'url '=> 'URL', #3
             vide => 'Video Track',
         },

@@ -52,7 +52,7 @@ use vars qw($VERSION %nikonLensIDs %nikonTextEncoding);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.58';
+$VERSION = '2.61';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
@@ -279,6 +279,7 @@ sub ProcessNikonCaptureEditVersions($$$);
     '02 46 37 37 25 25 02 00' => 'Sigma 24mm F2.8 Super Wide II Macro',
     '26 58 3C 3C 14 14 1C 02' => 'Sigma 28mm F1.8 EX DG Aspherical Macro',
     '48 54 3E 3E 0C 0C 4B 06' => 'Sigma 30mm F1.4 EX DC HSM',
+    '02 48 50 50 24 24 02 00' => 'Sigma Macro 50mm F2.8', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4027.0.html
     'F8 54 3E 3E 0C 0C 4B 06' => 'Sigma 30mm F1.4 EX DC HSM', #JD
     'DE 54 50 50 0C 0C 4B 06' => 'Sigma 50mm F1.4 EX DG HSM',
     '32 54 50 50 24 24 35 02' => 'Sigma Macro 50mm F2.8 EX DG',
@@ -505,6 +506,8 @@ sub ProcessNikonCaptureEditVersions($$$);
     '03 43 5C 81 35 35 02 00' => 'Soligor AF C/D Zoom UMCS 70-210mm 1:4.5',
     '12 4A 5C 81 31 3D 09 00' => 'Soligor AF C/D Auto Zoom+Macro 70-210mm 1:4-5.6 UMCS',
     '12 36 69 97 35 42 09 00' => 'Soligor AF Zoom 100-400mm 1:4.5-6.7 MC',
+#
+    '00 00 48 48 53 53 00 01' => 'Loreo 40mm F11-22 3D Lens in a Cap 9005', #PH
 #
     '00 00 00 00 00 00 00 01' => 'Manual Lens No CPU',
 #
@@ -1321,8 +1324,8 @@ my %binaryDataAttrs = (
                 DirOffset => 10,
             },
         },
-        {   # (D3100=0215,D7000/D5100=0216)
-            Condition => '$$valPt =~ /^021[56]/',
+        {   # (D3100=0215,D7000/D5100=0216,D4/D800/D3200=0217)
+            Condition => '$$valPt =~ /^021[567]/',
             Name => 'ColorBalance0215',
             SubDirectory => {
                 TagTable => 'Image::ExifTool::Nikon::ColorBalance4',

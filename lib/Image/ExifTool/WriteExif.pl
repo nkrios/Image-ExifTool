@@ -2921,7 +2921,9 @@ NoOverwrite:            next if $isNew > 0;
         }
         my $isNextIFD = ($$dirInfo{Multi} and ($nextIfdOffset or
                         # account for the case where we will create the next IFD
-                        ($dirName eq 'IFD0' and $exifTool->{ADD_DIRS}{'IFD1'})));
+                        # (IFD1 only, but not in TIFF-format images)
+                        ($dirName eq 'IFD0' and $$exifTool{ADD_DIRS}{'IFD1'} and
+                         $$exifTool{FILE_TYPE} ne 'TIFF')));
         # calculate number of entries in new directory
         my $newEntries = length($dirBuff) / 12;
         # delete entire directory if we deleted a tag and only mandatory tags remain or we
@@ -3034,6 +3036,8 @@ NoOverwrite:            next if $isNew > 0;
         # increment IFD name
         my $ifdNum = $dirName =~ s/(\d+)$// ? $1 : 0;
         $dirName .= $ifdNum + 1;
+        $name =~ s/\d+$//;
+        $name .= $ifdNum + 1;
         $$exifTool{DIR_NAME} = $$exifTool{PATH}[-1] = $dirName;
         next unless $nextIfdOffset;
 

@@ -78,10 +78,12 @@ sub ProcessSerialData($$$);
 sub ProcessFilters($$$);
 sub SwapWords($);
 
-$VERSION = '2.86';
+$VERSION = '2.91';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
+# --> have relaxed this for new lenses because Canon has been
+#     consistent about keeping "USM" in the model name
 %canonLensTypes = ( #4
      Notes => q{
         Decimal values differentiate lenses which would otherwise have the same
@@ -132,6 +134,7 @@ $VERSION = '2.86';
     26.4 => 'Carl Zeiss Planar T* 50mm f/1.4', #PH
     27 => 'Canon EF 35-80mm f/4-5.6', #32
     # 27 => 'Carl Zeiss Distagon T* 28mm f/2 ZF', #PH (must be with an adapter, because the ZF version is a Nikon mount)
+    # 27 => 'EMF adapter for Canon EOS digital cameras', #50 (reports LongFocal of 65535)
     28 => 'Canon EF 80-200mm f/4.5-5.6 or Tamron Lens', #32
     28.1 => 'Tamron SP AF 28-105mm f/2.8 LD Aspherical IF', #15
     28.2 => 'Tamron SP AF 28-75mm f/2.8 XR Di LD Aspherical [IF] Macro', #4
@@ -207,6 +210,7 @@ $VERSION = '2.86';
    '137.10' => 'Sigma 8-16mm f/4.5-5.6 DC HSM', #50-Zwielicht
    '137.11' => 'Tamron SP 17-50mm f/2.8 XR Di II VC', #50 (model B005)
    '137.12' => 'Tamron SP 60mm f/2 Macro Di II', #50 (model G005)
+   '137.13' => 'Sigma 10-20mm f/3.5 EX DC HSM', #Gerald Erdmann
     138 => 'Canon EF 28-80mm f/2.8-4L', #32
     139 => 'Canon EF 400mm f/2.8L',
     140 => 'Canon EF 500mm f/4.5L', #32
@@ -270,6 +274,7 @@ $VERSION = '2.86';
     173.2 => 'Sigma APO Macro 150mm f/2.8 EX DG HSM', #14
     174 => 'Canon EF 135mm f/2L or Sigma Lens', #9
     174.1 => 'Sigma 70-200mm f/2.8 EX DG APO OS HSM', #PH (probably version II of this lens)
+    174.2 => 'Sigma 50-500mm f/4.5-6.3 APO DG OS HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4031.0.html
     175 => 'Canon EF 400mm f/2.8L', #32
     176 => 'Canon EF 24-85mm f/3.5-4.5 USM',
     177 => 'Canon EF 300mm f/4L IS', #9
@@ -278,7 +283,8 @@ $VERSION = '2.86';
     180 => 'Canon EF 35mm f/1.4L', #9
     181 => 'Canon EF 100-400mm f/4.5-5.6L IS + 1.4x', #15
     182 => 'Canon EF 100-400mm f/4.5-5.6L IS + 2x',
-    183 => 'Canon EF 100-400mm f/4.5-5.6L IS',
+    183 => 'Canon EF 100-400mm f/4.5-5.6L IS or Sigma Lens',
+    183.1 => 'Sigma 150mm f/2.8 EX DG OS HSM APO Macro', #50
     184 => 'Canon EF 400mm f/2.8L + 2x', #15
     185 => 'Canon EF 600mm f/4L IS', #32
     186 => 'Canon EF 70-200mm f/4L', #9
@@ -333,6 +339,8 @@ $VERSION = '2.86';
     249 => 'Canon EF 800mm f/5.6L IS', #35
     250 => 'Canon EF 24 f/1.4L II', #41
     251 => 'Canon EF 70-200mm f/2.8L IS II USM',
+    252 => 'Canon EF 70-200mm f/2.8L IS II USM + 1.4x', #50 (1.4x Mk II)
+    253 => 'Canon EF 70-200mm f/2.8L IS II USM + 2x', #PH (NC)
     254 => 'Canon EF 100mm f/2.8L Macro IS USM', #42
     # Note: LensType 488 (0x1e8) is reported as 232 (0xe8) in 7D CameraSettings
     488 => 'Canon EF-S 15-85mm f/3.5-5.6 IS USM', #PH
@@ -494,16 +502,17 @@ $VERSION = '2.86';
     0x3130000 => 'PowerShot SX40 HS',
     0x3120000 => 'PowerShot ELPH 310 HS / IXUS 230 HS / IXY 600F',
     0x3140000 => 'PowerShot ELPH 500 HS / IXUS 320 HS / IXY 32S', # (duplicate PowerShot model???)
+    0x3160000 => 'PowerShot A1300',
+    0x3180000 => 'PowerShot ELPH 320 HS / IXUS 240 HS / IXY 420F',
     0x3190000 => 'PowerShot ELPH 110 HS / IXUS 125 HS / IXY 220F',
     0x3200000 => 'PowerShot D20',
     0x3210000 => 'PowerShot A4000 IS',
     0x3220000 => 'PowerShot SX260 HS',
+    0x3240000 => 'PowerShot ELPH 530 HS / IXUS 510 HS / IXY 1',
     0x3250000 => 'PowerShot ELPH 520 HS / IXUS 500 HS / IXY 3',
     0x3260000 => 'PowerShot A3400 IS',
     0x3270000 => 'PowerShot A2400 IS',
     0x3280000 => 'PowerShot A2300',
-    # ??? => 'PowerShot ELPH 530 HS / IXUS 510 HS / IXY 1',
-    # ??? => 'PowerShot ELPH 320 HS / IXUS 240 HS / IXY 420F',
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
 
@@ -1614,6 +1623,7 @@ my %binaryDataAttrs = (
             4 => 'Continuous, Low', #PH
             5 => 'Continuous, High', #PH
             6 => 'Silent Single', #PH
+            # 11 - seen for SX260
             # 32-34 - Self-timer?
         },
     },
@@ -1707,7 +1717,15 @@ my %binaryDataAttrs = (
             50 => 'Best Image Selection', #PH
             51 => 'High Dynamic Range', #PH (S95)
             52 => 'Handheld Night Scene', #PH
+            53 => 'Movie Digest', #PH
+            54 => 'Live View Control', #PH
+            55 => 'Discreet', #PH
+            56 => 'Blur Reduction', #PH
+            57 => 'Monochrome', #PH (SX260 B&W,Sepia,Blue tone)
+            58 => 'Fisheye', #PH (IXUS240)
             59 => 'Scene Intelligent Auto', #PH (T3i)
+            60 => 'High Speed Burst HQ', #PH
+            62 => 'Soft Focus', #PH (SX260)
             257 => 'Spotlight', #PH
             258 => 'Night 2', #PH
             259 => 'Night+',
@@ -1906,9 +1924,15 @@ my %binaryDataAttrs = (
         PrintConv => {
             0 => 'Off',
             1 => 'On',
-            2 => 'On, Shot Only', #15 (panning for SX10IS)
-            3 => 'On, Panning', #PH (A570IS)
-            4 => 'On, Video', #PH (SX30IS)
+            2 => 'Shoot Only', #15
+            3 => 'Panning', # (A570IS)
+            4 => 'Dynamic', # (SX30IS) (was 'On, Video')
+            # (don't know what bit 0x100 indicates)
+            256 => 'Off (2)',
+            257 => 'On (2)',
+            258 => 'Shoot Only (2)',
+            259 => 'Panning (2)',
+            260 => 'Dynamic (2)',
         },
     },
     35 => { #PH
@@ -3089,8 +3113,13 @@ my %ciLongFocal = (
         Name => 'ShortOwnerName',
         Format => 'string[16]',
     },
+    0xcc => { #PH (NC)
+        Name => 'DirectoryIndex',
+        Groups => { 2 => 'Image' },
+        Format => 'int32u',
+    },
     0xd0 => {
-        Name => 'ImageNumber',
+        Name => 'FileIndex',
         Format => 'int16u',
         Groups => { 2 => 'Image' },
         ValueConv => '$val + 1',
@@ -6320,6 +6349,13 @@ my %ciLongFocal = (
             return \$val;
         },
     },
+);
+
+# 'skip' atom of Canon MOV videos (ref PH)
+%Image::ExifTool::Canon::Skip = (
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Canon', 2 => 'Video' },
+    NOTES => 'Information found in the "skip" atom of Canon MOV videos.',
+    CNDB => { Name => 'Unknown_CNDB', Unknown => 1, Binary => 1 },
 );
 
 # Canon composite tags

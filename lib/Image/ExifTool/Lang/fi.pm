@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::fi;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 %Image::ExifTool::Lang::fi::Translate = (
    'AEAperture' => 'AE-aukko',
@@ -485,22 +485,27 @@ $VERSION = '1.00';
         'Chrome' => 'Kellastunut',
         'Clear' => 'Selkeä',
         'Deep' => 'Syvä',
+        'Evening' => 'Ilta',
         'Landscape' => 'Maisema',
         'Light' => 'Valoisa',
         'Natural' => 'Luonnollinen',
-        'Natural color' => 'Vakio',
+        'Natural color' => 'Luonnonvalo',
+        'Natural sRGB' => 'Luonnollinen sRGB',
+        'Natural+ sRGB' => 'Luonnollinen+ sRGB',
         'Neutral' => 'Neutraali',
+        'Night Portrait' => 'Yön muotokuva',
+        'Night Scene' => 'Yönäkymä',
         'Night View' => 'Iltanäkymä',
         'Night View/Portrait' => 'Yönäkymä',
         'Normal' => 'Normaali',
         'Off' => 'Pois',
-        'Portrait' => 'Neutraali',
-        'Sepia' => 'Yönäkymä',
-        'Solarization' => 'Maisema',
+        'Portrait' => 'Muotokuva',
+        'Sepia' => 'Seepia',
+        'Solarization' => 'Solarisaatio',
         'Standard' => 'Vakio',
         'Sunset' => 'Auringonlasku',
         'Vivid' => 'Heleät värit',
-        'Vivid color' => 'Muotokuva',
+        'Vivid color' => 'Heleä väri',
       },
     },
    'ColorMoireReduction' => 'Värimoareen vaimennus',

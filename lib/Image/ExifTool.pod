@@ -640,9 +640,9 @@ errors/warnings are denoted by '[minor]' at the start of the message.
 =item Lang
 
 Localized language for exiftool tag descriptions, etc.  Available languages
-are given by the Image::ExifTool::Lang module names (ie. 'fr').  If the
-specified language isn't available, the option is not changed.  May be set
-to undef to select the built-in default language.  Default is 'en'.
+are given by the Image::ExifTool::Lang module names (ie. 'fr', 'zh_cn').  If
+the specified language isn't available, the option is not changed.  May be
+set to undef to select the built-in default language.  Default is 'en'.
 
 =item LargeFileSupport
 

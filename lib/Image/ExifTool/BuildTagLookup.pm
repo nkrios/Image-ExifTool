@@ -32,7 +32,7 @@ use Image::ExifTool::XMP;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.44';
+$VERSION = '2.47';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -374,13 +374,6 @@ These tags are used in Pentax/Asahi cameras.
 These tags are used in Sigma/Foveon cameras.  Many tags are not consistent
 between different models.
 },
-    Sony => q{
-The maker notes in images from most recent Sony camera models contain a
-wealth of information, but for some models very little has been decoded. 
-Use the ExifTool Unknown (-u) or Verbose (-v) options to see information
-about the unknown tags.  Also see the Minolta tags which are used by some
-Sony models.
-},
     CanonRaw => q{
 These tags apply to CRW-format Canon RAW files and information in the APP0
 "CIFF" segment of JPEG images.  When writing CanonRaw/CIFF information, the
@@ -676,7 +669,7 @@ sub new
         $defFormat = 'int8u' if not $defFormat and $binaryTable;
 
 TagID:  foreach $tagID (@keys) {
-            my ($tagInfo, @tagNames, $subdir, $format, @values);
+            my ($tagInfo, @tagNames, $subdir, @values);
             my (@infoArray, @require, @writeGroup, @writable);
             if ($shortcut) {
                 # must build a dummy tagInfo list since Shortcuts is not a normal table
@@ -694,9 +687,9 @@ TagID:  foreach $tagID (@keys) {
             } else {
                 @infoArray = GetTagInfoList($table,$tagID);
             }
-            $format = $defFormat;
             foreach $tagInfo (@infoArray) {
                 my $name = $$tagInfo{Name};
+                my $format = $$tagInfo{Format};
                 # validate Name
                 warn "Warning: Invalid tag name $short '$name'\n" if $name !~ /^[-\w]+$/;
                 # accumulate information for consistency check of BinaryData tables
@@ -704,15 +697,29 @@ TagID:  foreach $tagID (@keys) {
                     $isOffset{$tagID} = $name if $$tagInfo{IsOffset};
                     $hasSubdir{$tagID} = $name if $$tagInfo{SubDirectory};
                     # require DATAMEMBER for writable var-format tags, Hook and DataMember tags
-                    if ($$tagInfo{Format} and $$tagInfo{Format} =~ /^var_/) {
+                    if ($format and $format =~ /^var_/) {
                         $datamember{$tagID} = $name;
                         unless (defined $$tagInfo{Writable} and not $$tagInfo{Writable}) {
                             warn "Warning: Var-format tag is writable - $short $name\n"
+                        }
+                        # also need DATAMEMBER for tags used in length of var-sized value
+                        while ($format =~ /\$val\{(.*?)\}/g) {
+                            my $id = $1;
+                            $id = hex($id) if $id =~ /^0x/; # convert from hex if necessary
+                            $datamember{$id} = $$table{$id}{Name} if ref $$table{$id} eq 'HASH';
+                            unless ($datamember{$id}) {
+                                warn "Warning: Unknown ID ($id) used in Format - $short $name\n";
+                            }
                         }
                     } elsif ($$tagInfo{Hook} or ($$tagInfo{RawConv} and
                              $$tagInfo{RawConv} =~ /\$self(->)?\{\w+\}\s*=(?!~)/))
                     {
                         $datamember{$tagID} = $name;
+                    }
+                    if ($format and $format =~ /\$val\{/ and
+                        ($$tagInfo{Writable} or not defined $$tagInfo{Writable}))
+                    {
+                        warn "Warning: \$var{} used in Format of writable tag - $short $name\n"
                     }
                 }
                 if ($$tagInfo{Hidden}) {
@@ -724,7 +731,7 @@ TagID:  foreach $tagID (@keys) {
                     $writable = $$tagInfo{Writable};
                     # validate Writable
                     unless ($formatOK{$writable} or  ($writable =~ /(.*)\[/ and $formatOK{$1})) {
-                        warn "Warning: Unknown Writable ($writable) for $short $name\n",
+                        warn "Warning: Unknown Writable ($writable) - $short $name\n",
                     }
                 } elsif (not $$tagInfo{SubDirectory}) {
                     $writable = $$table{WRITABLE};
@@ -812,14 +819,15 @@ TagID:  foreach $tagID (@keys) {
                     $writeGroup = $$table{WRITE_GROUP} if $writable;
                     $writeGroup = '-' unless $writeGroup;
                 }
-                if (defined $$tagInfo{Format}) {
-                    $format = $$tagInfo{Format};
+                if (defined $format) {
                     # validate Format
                     unless ($formatOK{$format} or $short eq 'PICT' or
                         ($format =~ /^(var_)?(.*)\[/ and $formatOK{$2}))
                     {
                         warn "Warning: Unknown Format ($format) for $short $name\n";
                     }
+                } else {
+                    $format = $defFormat;
                 }
                 if ($subdir) {
                     my $subTable = $$subdir{TagTable} || $tableName;
@@ -924,7 +932,7 @@ TagID:  foreach $tagID (@keys) {
                             $caseInsensitive = 0;
                             my @pk = sort NumbersFirst keys %$printConv;
                             my $n = scalar @values;
-                            my ($bits, $cols, $i);
+                            my ($bits, $i);
                             foreach (@pk) {
                                 next if $_ eq '';
                                 $_ eq 'BITMASK' and $bits = $$printConv{$_}, next;
@@ -964,7 +972,20 @@ TagID:  foreach $tagID (@keys) {
                                 }
                             }
                             # organize values into columns if specified
-                            if (defined($cols = $$tagInfo{PrintConvColumns})) {
+                            my $cols = $$tagInfo{PrintConvColumns};
+                            if (not $cols and scalar(@values) - $n >= 6) {
+                                # do columns if more than 6 short entries
+                                my $maxLen = 0;
+                                for ($i=$n; $i<@values; ++$i) {
+                                    next unless $maxLen < length $values[$i];
+                                    $maxLen = length $values[$i];
+                                }
+                                my $num = scalar(@values) - $n;
+                                $cols = int(50 / ($maxLen + 2)); # (50 chars max width)
+                                # have 3 rows minimum
+                                --$cols while $cols and $num / $cols < 3;
+                            }
+                            if ($cols) {
                                 my @new = splice @values, $n;
                                 my $v = '[!HTML]<table class=cols><tr>';
                                 my $rows = int((scalar(@new) + $cols - 1) / $cols);

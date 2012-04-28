@@ -220,12 +220,6 @@ $VERSION = '1.23';
    'AFInfo2' => 'AF-Informationen',
    'AFInfo2Version' => 'AF-Info-Version',
    'AFIntegrationTime' => 'AF-Messzeit',
-   'AFMicroAdjActive' => {
-      PrintConv => {
-        'No' => 'Nein',
-        'Yes' => 'Ja',
-      },
-    },
    'AFMicroadjustment' => {
       Description => 'AF Feinabstimmung',
       PrintConv => {
@@ -2544,7 +2538,7 @@ $VERSION = '1.23';
    'GPSDestLatitudeRef' => {
       Description => 'Referenz für die Breite des Zieles',
       PrintConv => {
-        'North' => 'Nordliche Breite',
+        'North' => 'Nördliche Breite',
         'South' => 'Südliche Breite',
       },
     },

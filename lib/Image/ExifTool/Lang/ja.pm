@@ -220,12 +220,6 @@ $VERSION = '1.19';
    'AFInfo2' => 'AF情報',
    'AFInfo2Version' => 'AF情報バージョン',
    'AFIntegrationTime' => 'AF集積時間',
-   'AFMicroAdjActive' => {
-      PrintConv => {
-        'No' => 'いいえ',
-        'Yes' => 'はい',
-      },
-    },
    'AFMicroadjustment' => {
       Description => 'AFマイクロアジャストメント',
       PrintConv => {
@@ -1130,10 +1124,13 @@ $VERSION = '1.19';
         'Chrome' => 'クローム',
         'Clear' => 'クリアー',
         'Deep' => 'ディープ',
+        'Evening' => '夕焼け',
         'Landscape' => '風景',
         'Light' => 'ライト',
         'Natural' => 'ナチュラル',
         'Natural color' => 'ナチュラルカラー',
+        'Natural sRGB' => 'ナチュラル sRGB',
+        'Natural+ sRGB' => 'ナチュラル+ sRGB',
         'Neutral' => 'ニュートラル',
         'Night Portrait' => '人物夜景',
         'Night Scene' => '夜景',

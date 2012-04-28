@@ -2570,7 +2570,9 @@ sub ReverseLookup($$)
             $val = hex($val);   # convert hex value
         }
     } else {
-        my $qval = quotemeta $val;
+        my $qval = $val;
+        $qval =~ s/\s+$//;      # remove trailing whitespace
+        $qval = quotemeta $qval;
         my @patterns = (
             "^$qval\$",         # exact match
             "^(?i)$qval\$",     # case-insensitive

@@ -119,12 +119,6 @@ $VERSION = '1.09';
         'On' => 'Aan',
       },
     },
-   'AFMicroAdjActive' => {
-      PrintConv => {
-        'No' => 'Nee',
-        'Yes' => 'Ja',
-      },
-    },
    'AFPoint' => {
       PrintConv => {
         'None' => 'Geen',

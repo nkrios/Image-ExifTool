@@ -46,7 +46,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.48';
+$VERSION = '2.51';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -59,7 +59,7 @@ sub SaveBlankInfo($$$;$);
 sub ProcessBlankInfo($$$;$);
 sub ValidateXMP($;$);
 sub UnescapeChar($$);
-sub AddFlattenedTags($$);
+sub AddFlattenedTags($$;$);
 sub FormatXMPDate($);
 sub ConvertRational($);
 
@@ -151,6 +151,7 @@ my %xmpNS = (
    'mwg-coll' => 'http://www.metadataworkinggroup.com/schemas/collections/',
     stArea    => 'http://ns.adobe.com/xmp/sType/Area#',
     extensis  => 'http://ns.extensis.com/extensis/1.0/',
+    ics       => 'http://ns.idimager.com/ics/1.0/',
 );
 
 # build reverse namespace lookup
@@ -464,7 +465,7 @@ my %sLocationDetails = (
         Name => 'crs',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::crs' },
     },
-    # crss - it would be difficult to add the ability to write this
+    # crss - it would be tedious to add the ability to write this
     aux => {
         Name => 'aux',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::aux' },
@@ -587,11 +588,15 @@ my %sLocationDetails = (
     extensis => {
         Name => 'extensis',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::extensis' },
-    }
+    },
+    ics => {
+        Name => 'ics',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::ics' },
+    },
 );
 
 #
-# Tag tables for all XMP schemas:
+# Tag tables for all XMP namespaces:
 #
 # Writable - only need to define this for writable tags if not plain text
 #            (boolean, integer, rational, real, date or lang-alt)
@@ -634,13 +639,13 @@ my %sLocationDetails = (
     xmptk => { Name => 'XMPToolkit', Protected => 1 },
 );
 
-# Dublin Core schema properties (dc)
+# Dublin Core namespace properties (dc)
 %Image::ExifTool::XMP::dc = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-dc', 2 => 'Other' },
     NAMESPACE   => 'dc',
     TABLE_DESC => 'XMP Dublin Core',
-    NOTES => 'Dublin Core schema tags.',
+    NOTES => 'Dublin Core namespace tags.',
     contributor => { Groups => { 2 => 'Author' }, List => 'Bag' },
     coverage    => { },
     creator     => { Groups => { 2 => 'Author' }, List => 'Seq' },
@@ -658,13 +663,13 @@ my %sLocationDetails = (
     type        => { Groups => { 2 => 'Image'  }, List => 'Bag' },
 );
 
-# XMP Basic schema properties (xmp, xap)
+# XMP namespace properties (xmp, xap)
 %Image::ExifTool::XMP::xmp = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-xmp', 2 => 'Image' },
     NAMESPACE   => 'xmp',
     NOTES => q{
-        XMP Basic schema tags.  If the older "xap", "xapBJ", "xapMM" or "xapRights"
+        XMP namespace tags.  If the older "xap", "xapBJ", "xapMM" or "xapRights"
         namespace prefixes are found, they are translated to the newer "xmp",
         "xmpBJ", "xmpMM" and "xmpRights" prefixes for use in family 1 group names.
     },
@@ -698,12 +703,12 @@ my %sLocationDetails = (
     Format      => { Avoid => 1, Notes => 'non-standard' }, #11
 );
 
-# XMP Rights Management schema properties (xmpRights, xapRights)
+# XMP Rights Management namespace properties (xmpRights, xapRights)
 %Image::ExifTool::XMP::xmpRights = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-xmpRights', 2 => 'Author' },
     NAMESPACE   => 'xmpRights',
-    NOTES => 'XMP Rights Management schema tags.',
+    NOTES => 'XMP Rights Management namespace tags.',
     Certificate     => { },
     Marked          => { Writable => 'boolean' },
     Owner           => { List => 'Bag' },
@@ -711,12 +716,12 @@ my %sLocationDetails = (
     WebStatement    => { },
 );
 
-# XMP Note schema properties (xmpNote)
+# XMP Note namespace properties (xmpNote)
 %Image::ExifTool::XMP::xmpNote = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-xmpNote' },
     NAMESPACE   => 'xmpNote',
-    NOTES => 'XMP Note schema tags.',
+    NOTES => 'XMP Note namespace tags.',
     HasExtendedXMP => { Writable => 'boolean', Protected => 2 },
 );
 
@@ -742,13 +747,13 @@ my %sPantryItem = (
     InstanceID => { Namespace => 'xmpMM' },
 );
 
-# XMP Media Management schema properties (xmpMM, xapMM)
+# XMP Media Management namespace properties (xmpMM, xapMM)
 %Image::ExifTool::XMP::xmpMM = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-xmpMM', 2 => 'Other' },
     NAMESPACE   => 'xmpMM',
     TABLE_DESC => 'XMP Media Management',
-    NOTES => 'XMP Media Management schema tags.',
+    NOTES => 'XMP Media Management namespace tags.',
     DerivedFrom     => { Struct => \%sResourceRef },
     DocumentID      => { },
     History         => { Struct => \%sResourceEvent, List => 'Seq' },
@@ -774,13 +779,13 @@ my %sPantryItem = (
     subject         => { List => 'Seq', Avoid => 1, Notes => 'undocumented' },
 );
 
-# XMP Basic Job Ticket schema properties (xmpBJ, xapBJ)
+# XMP Basic Job Ticket namespace properties (xmpBJ, xapBJ)
 %Image::ExifTool::XMP::xmpBJ = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-xmpBJ', 2 => 'Other' },
     NAMESPACE   => 'xmpBJ',
     TABLE_DESC => 'XMP Basic Job Ticket',
-    NOTES => 'XMP Basic Job Ticket schema tags.',
+    NOTES => 'XMP Basic Job Ticket namespace tags.',
     # Note: JobRef is a List of structures.  To accomplish this, we set the XMP
     # List=>'Bag', but since SubDirectory is defined, this tag isn't writable
     # directly.  Then we need to set List=>1 for the members so the Writer logic
@@ -788,13 +793,13 @@ my %sPantryItem = (
     JobRef => { Struct => \%sJobRef, List => 'Bag' },
 );
 
-# XMP Paged-Text schema properties (xmpTPg)
+# XMP Paged-Text namespace properties (xmpTPg)
 %Image::ExifTool::XMP::xmpTPg = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-xmpTPg', 2 => 'Image' },
     NAMESPACE   => 'xmpTPg',
     TABLE_DESC => 'XMP Paged-Text',
-    NOTES => 'XMP Paged-Text schema tags.',
+    NOTES => 'XMP Paged-Text namespace tags.',
     MaxPageSize         => { Struct => \%sDimensions },
     NPages              => { Writable => 'integer' },
     Fonts               => { Struct => \%sFont, List => 'Bag' },
@@ -824,14 +829,14 @@ my %sPantryItem = (
     PlateNames          => { List => 'Seq' },
 );
 
-# PDF schema properties (pdf)
+# PDF namespace properties (pdf)
 %Image::ExifTool::XMP::pdf = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-pdf', 2 => 'Image' },
     NAMESPACE   => 'pdf',
     TABLE_DESC => 'XMP PDF',
     NOTES => q{
-        Adobe PDF schema tags.  The official XMP specification defines only
+        Adobe PDF namespace tags.  The official XMP specification defines only
         Keywords, PDFVersion, Producer and Trapped.  The other tags are included
         because they have been observed in PDF files, but some are avoided when
         writing due to name conflicts with other XMP namespaces.
@@ -855,7 +860,7 @@ my %sPantryItem = (
     Producer    => { Groups => { 2 => 'Author' } },
 );
 
-# PDF extension schema properties (pdfx)
+# PDF extension namespace properties (pdfx)
 %Image::ExifTool::XMP::pdfx = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-pdfx', 2 => 'Document' },
@@ -867,13 +872,13 @@ my %sPantryItem = (
     },
 );
 
-# Photoshop schema properties (photoshop)
+# Photoshop namespace properties (photoshop)
 %Image::ExifTool::XMP::photoshop = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-photoshop', 2 => 'Image' },
     NAMESPACE   => 'photoshop',
     TABLE_DESC => 'XMP Photoshop',
-    NOTES => 'Adobe Photoshop schema tags.',
+    NOTES => 'Adobe Photoshop namespace tags.',
     AuthorsPosition => { Groups => { 2 => 'Author' } },
     CaptionWriter   => { Groups => { 2 => 'Author' } },
     Category        => { },
@@ -947,13 +952,13 @@ my %sPantryItem = (
     },
 );
 
-# Photoshop Camera Raw Schema properties (crs) - (ref 8,PH)
+# Photoshop Camera Raw namespace properties (crs) - (ref 8,PH)
 %Image::ExifTool::XMP::crs = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-crs', 2 => 'Image' },
     NAMESPACE   => 'crs',
-    TABLE_DESC => 'Photoshop Camera Raw Schema',
-    NOTES => 'Photoshop Camera Raw Schema tags.',
+    TABLE_DESC => 'Photoshop Camera Raw namespace',
+    NOTES => 'Photoshop Camera Raw namespace tags.',
     AlreadyApplied  => { Writable => 'boolean' }, #PH (written by LightRoom beta 4.1)
     AutoBrightness  => { Writable => 'boolean' },
     AutoContrast    => { Writable => 'boolean' },
@@ -1304,16 +1309,34 @@ my %sPantryItem = (
     GrainAmount                          => { Writable => 'integer' },
     GrainSize                            => { Writable => 'integer' },
     GrainFrequency                       => { Writable => 'integer' },
+    # new tags written by LR4
+    AutoLateralCA                        => { Writable => 'integer' },
+    Exposure2012                         => { Writable => 'real' },
+    Contrast2012                         => { Writable => 'integer' },
+    Highlights2012                       => { Writable => 'integer' },
+    Shadows2012                          => { Writable => 'integer' },
+    Whites2012                           => { Writable => 'integer' },
+    Blacks2012                           => { Writable => 'integer' },
+    Clarity2012                          => { Writable => 'integer' },
+    PostCropVignetteHighlightContrast    => { Writable => 'integer' },
+    ToneCurveName2012                    => { },
+    ToneCurveRed                         => { List => 'Seq' },
+    ToneCurveGreen                       => { List => 'Seq' },
+    ToneCurveBlue                        => { List => 'Seq' },
+    ToneCurvePV2012                      => { List => 'Seq' },
+    ToneCurvePV2012Red                   => { List => 'Seq' },
+    ToneCurvePV2012Green                 => { List => 'Seq' },
+    ToneCurvePV2012Blue                  => { List => 'Seq' },
 );
 
-# Tiff schema properties (tiff)
+# Tiff namespace properties (tiff)
 %Image::ExifTool::XMP::tiff = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-tiff', 2 => 'Image' },
     NAMESPACE   => 'tiff',
     PRIORITY => 0, # not as reliable as actual TIFF tags
     TABLE_DESC => 'XMP TIFF',
-    NOTES => 'EXIF schema for TIFF tags.',
+    NOTES => 'EXIF namespace for TIFF tags.',
     ImageWidth    => { Writable => 'integer' },
     ImageLength   => { Writable => 'integer', Name => 'ImageHeight' },
     BitsPerSample => { Writable => 'integer', List => 'Seq', AutoSplit => 1 },
@@ -1387,13 +1410,13 @@ my %sPantryItem = (
     NativeDigest => { }, #PH
 );
 
-# Exif schema properties (exif)
+# Exif namespace properties (exif)
 %Image::ExifTool::XMP::exif = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-exif', 2 => 'Image' },
     NAMESPACE   => 'exif',
     PRIORITY => 0, # not as reliable as actual EXIF tags
-    NOTES => 'EXIF schema for EXIF tags.',
+    NOTES => 'EXIF namespace for EXIF tags.',
     ExifVersion     => { },
     FlashpixVersion => { },
     ColorSpace => {
@@ -1833,12 +1856,12 @@ my %sPantryItem = (
     NativeDigest => { }, #PH
 );
 
-# Auxiliary schema properties (aux) - not fully documented (ref PH)
+# Auxiliary namespace properties (aux) - not fully documented (ref PH)
 %Image::ExifTool::XMP::aux = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-aux', 2 => 'Camera' },
     NAMESPACE   => 'aux',
-    NOTES => 'Photoshop Auxiliary schema tags.',
+    NOTES => 'Photoshop Auxiliary namespace tags.',
     Firmware        => { }, #7
     FlashCompensation => { Writable => 'rational' }, #7
     ImageNumber     => { }, #7
@@ -1885,14 +1908,14 @@ my %sPantryItem = (
     ApproximateFocusDistance => { Writable => 'rational' }, #PH (LR3)
 );
 
-# IPTC Core schema properties (Iptc4xmpCore) (ref 4)
+# IPTC Core namespace properties (Iptc4xmpCore) (ref 4)
 %Image::ExifTool::XMP::iptcCore = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-iptcCore', 2 => 'Author' },
     NAMESPACE   => 'Iptc4xmpCore',
     TABLE_DESC => 'XMP IPTC Core',
     NOTES => q{
-        IPTC Core schema tags.  The actual IPTC Core namespace prefix is
+        IPTC Core namespace tags.  The actual IPTC Core namespace prefix is
         "Iptc4xmpCore", which is the prefix recorded in the file, but ExifTool
         shortens this for the "XMP-iptcCore" family 1 group name. (see
         L<http://www.iptc.org/IPTC4XMP/>)
@@ -1926,16 +1949,16 @@ my %sPantryItem = (
     SubjectCode         => { Groups => { 2 => 'Other' }, List => 'Bag' },
 );
 
-# IPTC Extension schema properties (Iptc4xmpExt) (ref 4)
+# IPTC Extension namespace properties (Iptc4xmpExt) (ref 4)
 %Image::ExifTool::XMP::iptcExt = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-iptcExt', 2 => 'Author' },
     NAMESPACE   => 'Iptc4xmpExt',
     TABLE_DESC => 'XMP IPTC Extension',
     NOTES => q{
-        IPTC Extension schema tags.  The actual namespace prefix is "Iptc4xmpExt",
-        but ExifTool shortens this for the "XMP-iptcExt" family 1 group name.
-        (see L<http://www.iptc.org/IPTC4XMP/>)
+        IPTC Extension namespace tags.  The actual namespace prefix is
+        "Iptc4xmpExt", but ExifTool shortens this for the "XMP-iptcExt" family 1
+        group name. (see L<http://www.iptc.org/IPTC4XMP/>)
     },
     AddlModelInfo   => { Name => 'AdditionalModelInformation' },
     ArtworkOrObject => {
@@ -2003,24 +2026,24 @@ my %sPantryItem = (
     MaxAvailWidth   => { Writable => 'integer' },
 );
 
-# Adobe Lightroom schema properties (lr) (ref PH)
+# Adobe Lightroom namespace properties (lr) (ref PH)
 %Image::ExifTool::XMP::Lightroom = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-lr', 2 => 'Image' },
     NAMESPACE   => 'lr',
     TABLE_DESC => 'XMP Adobe Lightroom',
-    NOTES => 'Adobe Lightroom "lr" schema tags.',
+    NOTES => 'Adobe Lightroom "lr" namespace tags.',
     privateRTKInfo => { },
     hierarchicalSubject => { List => 'Bag' },
 );
 
-# Adobe Album schema properties (album) (ref PH)
+# Adobe Album namespace properties (album) (ref PH)
 %Image::ExifTool::XMP::Album = (
     %xmpTableDefaults,
     GROUPS => { 1 => 'XMP-album', 2 => 'Image' },
     NAMESPACE   => 'album',
     TABLE_DESC => 'XMP Adobe Album',
-    NOTES => 'Adobe Album schema tags.',
+    NOTES => 'Adobe Album namespace tags.',
     Notes => { },
 );
 
@@ -2386,14 +2409,15 @@ sub RegisterNamespace($)
 
 #------------------------------------------------------------------------------
 # Generate flattened tags and add to table
-# Inputs: 0) tag table ref, 1) tag ID for Struct tag in table
+# Inputs: 0) tag table ref, 1) tag ID for Struct tag in table,
+#         2) flag to not expand sub-structures
 # Returns: number of tags added (not counting those just initialized)
 # Notes: Must have verified that $$tagTablePtr{$tagID}{Struct} exists before calling this routine
 # - makes sure that the tagInfo Struct is a HASH reference
-sub AddFlattenedTags($$)
+sub AddFlattenedTags($$;$)
 {
     local $_;
-    my ($tagTablePtr, $tagID) = @_;
+    my ($tagTablePtr, $tagID, $noSubStruct) = @_;
     my $tagInfo = $$tagTablePtr{$tagID};
 
     $$tagInfo{Flattened} and return 0;  # only generate flattened tags once
@@ -2420,6 +2444,7 @@ sub AddFlattenedTags($$)
         next if $specialStruct{$field};
         my $fieldInfo = $$strTable{$field};
         next if $$fieldInfo{LangCode};  # don't flatten lang-alt tags
+        next if $$fieldInfo{Struct} and $noSubStruct;   # don't expand sub-structures if specified
         # build a tag ID for the corresponding flattened tag
         my $fieldName = ucfirst($field);
         my $flatID = $tagID . $fieldName;
@@ -2471,7 +2496,7 @@ sub AddFlattenedTags($$)
         # because we must start from the outtermost structure to get the List flags right
         # (this should only happen when building tag tables)
         delete $$flatInfo{Flattened};
-        $count += AddFlattenedTags($tagTablePtr, $flatID);
+        $count += AddFlattenedTags($tagTablePtr, $flatID, $$flatInfo{NoSubStruct});
     }
     return $count;
 }
@@ -3205,7 +3230,7 @@ sub ProcessXMP($$;$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
-    my ($dirStart, $dirLen, $dataLen);
+    my ($dirStart, $dirLen, $dataLen, $double);
     my ($buff, $fmt, $hasXMP, $isXML, $isRDF, $isSVG);
     my $rtnVal = 0;
     my $bom = 0;
@@ -3225,12 +3250,14 @@ sub ProcessXMP($$;$)
         $dirStart = $$dirInfo{DirStart} || 0;
         $dirLen = $$dirInfo{DirLen} || (length($$dataPt) - $dirStart);
         $dataLen = $$dirInfo{DataLen} || length($$dataPt);
+        # check leading BOM (may indicate double-encoded UTF)
+        pos($$dataPt) = $dirStart;
+        $double = $1 if $$dataPt =~ /\G((\0\0)?\xfe\xff|\xff\xfe(\0\0)?|\xef\xbb\xbf)\0*<\0*\?\0*x\0*p\0*a\0*c\0*k\0*e\0*t/g;
     } else {
-        my $type;
+        my ($type, $buf2, $buf3);
         # read information from XMP file
         my $raf = $$dirInfo{RAF} or return 0;
         $raf->Read($buff, 256) or return 0;
-        my ($buf2, $buf3, $double);
         ($buf2 = $buff) =~ tr/\0//d;    # cheap conversion to UTF-8
         # remove leading comments if they exist (ie. ImageIngester)
         while ($buf2 =~ /^\s*<!--/) {
@@ -3342,38 +3369,46 @@ sub ProcessXMP($$;$)
             $size = pos($buff) - 3;     # (discard ']]>' and after)
             $buff = substr($buff, 0, $size);
         } else {
+            # read the entire file
             $raf->Seek(0, 2) or return 0;
             $size = $raf->Tell() or return 0;
             $raf->Seek(0, 0) or return 0;
             $raf->Read($buff, $size) == $size or return 0;
-            # decode the first layer of double-encoded UTF text
-            if ($double) {
-                $buff = substr($buff, length $double);  # remove leading BOM
-                Image::ExifTool::SetWarning(undef);     # clear old warning
-                local $SIG{'__WARN__'} = \&Image::ExifTool::SetWarning;
-                my $tmp;
-                # assume that character data has been re-encoded in UTF, so re-pack
-                # as characters and look for warnings indicating a false assumption
-                if ($double eq "\xef\xbb\xbf") {
-                    require Image::ExifTool::Charset;
-                    my $uni = Image::ExifTool::Charset::Decompose(undef,$buff,'UTF8');
-                    $tmp = pack('C*', @$uni);
-                } else {
-                    my $fmt = ($double eq "\xfe\xff") ? 'n' : 'v';
-                    $tmp = pack('C*', unpack("$fmt*",$buff));
-                }
-                if (Image::ExifTool::GetWarning()) {
-                    $exifTool->Warn('Superfluous BOM at start of XMP');
-                } else {
-                    $exifTool->Warn('XMP is double UTF-encoded');
-                    $buff = $tmp;   # use the decoded XMP
-                }
-                $size = length $buff;
-            }
         }
         $dataPt = \$buff;
         $dirStart = 0;
         $dirLen = $dataLen = $size;
+    }
+
+    # decode the first layer of double-encoded UTF text (if necessary)
+    if ($double) {
+        my ($buf2, $fmt);
+        $buff = substr($$dataPt, $dirStart + length $double); # remove leading BOM
+        Image::ExifTool::SetWarning(undef); # clear old warning
+        local $SIG{'__WARN__'} = \&Image::ExifTool::SetWarning;
+        # assume that character data has been re-encoded in UTF, so re-pack
+        # as characters and look for warnings indicating a false assumption
+        if ($double eq "\xef\xbb\xbf") {
+            require Image::ExifTool::Charset;
+            my $uni = Image::ExifTool::Charset::Decompose(undef,$buff,'UTF8');
+            $buf2 = pack('C*', @$uni);
+        } else {
+            if (length($double) == 2) {
+                $fmt = ($double eq "\xfe\xff") ? 'n' : 'v';
+            } else {
+                $fmt = ($double eq "\0\0\xfe\xff") ? 'N' : 'V';
+            }
+            $buf2 = pack('C*', unpack("$fmt*",$buff));
+        }
+        if (Image::ExifTool::GetWarning()) {
+            $exifTool->Warn('Superfluous BOM at start of XMP');
+            $dataPt = \$buff;   # use XMP with the BOM removed
+        } else {
+            $exifTool->Warn('XMP is double UTF-encoded');
+            $dataPt = \$buf2;   # use the decoded XMP
+        }
+        $dirStart = 0;
+        $dirLen = $dataLen = length $$dataPt;
     }
 
     # extract XMP as a block if specified
@@ -3474,7 +3509,12 @@ sub ProcessXMP($$;$)
 
     # parse the XMP
     $tagTablePtr or $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
-    $rtnVal = 1 if ParseXMPElement($exifTool, $tagTablePtr, $dataPt, $dirStart, $dirEnd);
+    if (ParseXMPElement($exifTool, $tagTablePtr, $dataPt, $dirStart, $dirEnd)) {
+        $rtnVal = 1;
+    } elsif ($$dirInfo{DirName} and $$dirInfo{DirName} eq 'XMP') {
+        # if DirName was 'XMP' we expect well-formed XMP, so set Warning since it wasn't
+        $exifTool->Warn('Invalid XMP');
+    }
 
     # return DataPt if successful in case we want it for writing
     $$dirInfo{DataPt} = $dataPt if $rtnVal and $$dirInfo{RAF};

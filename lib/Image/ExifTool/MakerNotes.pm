@@ -20,7 +20,7 @@ sub ProcessGE2($$$);
 sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.71';
+$VERSION = '1.73';
 
 my $debug;          # set to 1 to enable debugging code
 
@@ -901,8 +901,10 @@ sub GetMakerNoteOffset($)
     } elsif ($make =~ /^(Panasonic|JVC)\b/) {
         push @offsets, 0;
     } elsif ($make =~ /^SONY/) {
-        # DSLR and "PREMI" models use an offset of 4
-        if ($model =~ /DSLR/ or $$exifTool{OlympusCAMER}) {
+        # earlier DSLR and "PREMI" models use an offset of 4
+        if ($model =~ /^(DSLR-.*|SLT-A(33|35|55V)|NEX-(3|5|C3|VG10E))$/ or
+            $$exifTool{OlympusCAMER})
+        {
             push @offsets, 4;
         } else {
             push @offsets, 0;
@@ -1109,8 +1111,9 @@ sub FixBase($$)
         if ($$dirInfo{FixBase} and $$dirInfo{FixBase} == 2) {
             return 0 if $diff >=0 and $diff <= 24;
         }
-        # (used for testing to extract differences)
+        # ******** (used for testing to extract differences) ********
         # $exifTool->FoundTag('Diff', $diff);
+        # $exifTool->FoundTag('MakeDiff',$makeDiff);
     }
 #
 # handle entry-based offsets

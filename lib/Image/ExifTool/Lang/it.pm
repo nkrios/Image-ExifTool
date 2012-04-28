@@ -36,11 +36,6 @@ $VERSION = '1.09';
       },
     },
    'AFInfo' => 'Modo AF',
-   'AFMicroAdjActive' => {
-      PrintConv => {
-        'Yes' => 'Si',
-      },
-    },
    'AFMode' => 'Modo AF',
    'AFPoint' => {
       Description => 'Punto AF',

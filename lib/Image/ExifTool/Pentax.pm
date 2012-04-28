@@ -51,7 +51,7 @@ use vars qw($VERSION %pentaxLensTypes);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.40';
+$VERSION = '2.44';
 
 sub CryptShutterCount($$);
 sub PrintFilter($$$);
@@ -241,7 +241,7 @@ sub PrintFilter($$$);
     '7 224' => 'smc PENTAX-DA 15mm F4 ED AL Limited', #JD
     '7 225' => 'Samsung D-XENON 18-250mm F3.5-6.3', #8/PH
     '7 226' => 'smc PENTAX-DA* 55mm F1.4 SDM (SDM unused)', #PH (NC)
-    '7 227' => 'smc PENTAX DA* 60-250mm F4 [IF] SDM (SDM unused)', #PH (NC)
+    '7 227' => 'smc PENTAX-DA* 60-250mm F4 [IF] SDM (SDM unused)', #PH (NC)
     '7 229' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #JD
     '7 230' => 'Tamron AF 17-50mm F2.8 XR Di-II LD (Model A16)', #JD
     '7 231' => 'smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]', #JD
@@ -266,7 +266,7 @@ sub PrintFilter($$$);
     '8 22' => 'Sigma 85mm F1.4 EX DG HSM', #26
     '8 215' => 'smc PENTAX-DA 18-135mm F3.5-5.6 ED AL [IF] DC WR', #PH
     '8 226' => 'smc PENTAX-DA* 55mm F1.4 SDM', #JD
-    '8 227' => 'smc PENTAX DA* 60-250mm F4 [IF] SDM', #JD
+    '8 227' => 'smc PENTAX-DA* 60-250mm F4 [IF] SDM', #JD
     '8 232' => 'smc PENTAX-DA 17-70mm F4 AL [IF] SDM', #JD
     '8 234' => 'smc PENTAX-DA* 300mm F4 ED [IF] SDM', #19
     '8 235' => 'smc PENTAX-DA* 200mm F2.8 ED [IF] SDM', #JD
@@ -402,6 +402,8 @@ my %pentaxModelID = (
     0x12ee4 => 'Q',
     0x12ef8 => 'K-01',
     0x12f0c => 'Optio RZ18',
+    0x12f16 => 'Optio VS20',
+    0x12f2a => 'Optio WG-2 GPS',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -813,6 +815,8 @@ my %binaryDataAttrs = (
             60 => 'Kids', #13
             61 => 'Blur Reduction', #13
             65 => 'Half-length Portrait', #JD
+            80 => 'Miniature', #PH (VS20)
+            83 => 'Fisheye', #PH (VS20)
             221 => 'P', #PH (Optio 555)
             255=> 'PICT', #PH (Optio 555)
         }],
@@ -1944,21 +1948,32 @@ my %binaryDataAttrs = (
         PrintConv => 'join(" ",map({sprintf("%.5f",$_)} split(" ",$val)))',
         PrintConvInv => '"$val"',
     },
-    0x0205 => { #19
+    0x0205 => [{ #19
         Name => 'CameraSettings',
-        Condition => '$$self{PentaxModelID} and $$self{PentaxModelID} != 0x12ef8',
-        Notes => 'not yet decoded for the K-01',
+        # size: *istD/*istDs/K100D/K110D=16, K-m/K2000=14, K-7/K-x=19,
+        #       K200D/K20D/K-5/645D=20, K-r=21, K10D=22, K-01=25
+        Condition => '$count < 25', # (not valid for the K-01)
         SubDirectory => {
             TagTable => 'Image::ExifTool::Pentax::CameraSettings',
             ByteOrder => 'BigEndian',
         },
-    },
-    0x0206 => { #PH
+    },{
+        Name => 'CameraSettingsUnknown',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::CameraSettingsUnknown',
+            ByteOrder => 'BigEndian',
+        },
+    }],
+    0x0206 => [{ #PH
         Name => 'AEInfo',
-        Condition => '$$self{PentaxModelID} and $$self{PentaxModelID} != 0x12ef8',
-        Notes => 'not yet decoded for the K-01',
+        # size: *istD/*istDs/K100D/K110D=14, K10D/K200D/K20D=16, K-m/K2000=20,
+        #        K-7/K-x=24, K-5/K-r/645D=25, K-01=21,
+        Condition => '$count != 21',
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::AEInfo' },
-    },
+    },{
+        Name => 'AEInfoUnknown',
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::AEInfoUnknown' },
+    }],
     0x0207 => [ #PH
         {
             Name => 'LensInfo',
@@ -2401,7 +2416,7 @@ my %binaryDataAttrs = (
     %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     PRIORITY => 0,
-    NOTES => 'Shot information written by Pentax DSLR cameras.',
+    NOTES => 'Camera settings information written by Pentax DSLR cameras.',
     0 => {
         Name => 'PictureMode2',
         PrintConv => {
@@ -2817,6 +2832,13 @@ my %binaryDataAttrs = (
     },
 );
 
+# unknown camera settings (K-01)
+%Image::ExifTool::Pentax::CameraSettingsUnknown = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'This information has not yet been decoded for models such as the K-01.',
+);
+
 # auto-exposure information (ref PH)
 %Image::ExifTool::Pentax::AEInfo = (
     %binaryDataAttrs,
@@ -2988,6 +3010,13 @@ my %binaryDataAttrs = (
         PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
         PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
+);
+
+# unknown auto-exposure information (K-01)
+%Image::ExifTool::Pentax::AEInfoUnknown = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'This information has not yet been decoded for models such as the K-01.',
 );
 
 # lens type
@@ -4494,7 +4523,7 @@ my %binaryDataAttrs = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     FIRST_ENTRY => 0,
-    NOTES => 'This information is found in Pentax MOV videos.',
+    NOTES => 'This information is found in MOV videos from cameras such as the Optio WP.',
     0x00 => {
         Name => 'Make',
         Format => 'string[24]',
@@ -4556,7 +4585,7 @@ my %binaryDataAttrs = (
 
 # Pentax metadata in S1 AVI maker notes (PH)
 %Image::ExifTool::Pentax::S1 = (
-    NOTES => 'Tags extracted from the maker notes of Optio S1 AVI videos.',
+    NOTES => 'Tags extracted from the maker notes of AVI videos from the Optio S1.',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x0000 => { #5
         Name => 'MakerNoteVersion',
@@ -4576,7 +4605,7 @@ my %binaryDataAttrs = (
     },
 );
 
-# PreviewImage information found in PXTH atom of K-10 MOV videos
+# PreviewImage information found in PXTH atom of K-01 MOV videos
 %Image::ExifTool::Pentax::PXTH = (
     NOTES => 'Tags found in the PXTH atom of MOV videos from the K-01.',
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -4588,7 +4617,175 @@ my %binaryDataAttrs = (
     0x04 => {
         Name => 'PreviewImage',
         Format => 'undef[$val{0}]',
-        Notes => '640-pixel-wide JPEG preview',
+        Notes => '640-pixel-wide JPEG preview', # (360 pixels high, may depend on aspect ratio)
+        RawConv => '$self->ValidateImage(\$val,$tag)',
+    },
+);
+
+# information in PENT atom of MOV videos from the Optio WG-2 GPS
+%Image::ExifTool::Pentax::PENT = (
+    NOTES => 'Tags found in the PENT atom of MOV videos from the Optio WG-2 GPS.',
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => {
+        Name => 'Make',
+        Format => 'string[24]',
+    },
+    0x1a => {
+        Name => 'Model',
+        Description => 'Camera Model Name',
+        Format => 'string[24]',
+    },
+    0x38 => { # (NC)
+        Name => 'ExposureTime',
+        Format => 'int32u',
+        ValueConv => '$val ? 10 / $val : 0',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x3c => {
+        Name => 'FNumber',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x44 => { # (NC)
+        Name => 'ExposureCompensation',
+        Format => 'rational64s',
+        PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
+    },
+    0x54 => { # (NC)
+        Name => 'FocalLength',
+        Format => 'int32u',
+        PrintConv => '"$val mm"',
+    },
+    0x71 => {
+        Name => 'DateTime1',
+        Format => 'string[24]',
+        Groups => { 2 => 'Time' },
+    },
+    0x8b => {
+        Name => 'DateTime2',
+        Format => 'string[24]',
+        Groups => { 2 => 'Time' },
+    },
+    0xa7 => { # (NC)
+        Name => 'ISO',
+        Format => 'int32u',
+    },
+    0xc7 => {
+        Name => 'GPSVersionID',
+        Format => 'undef[8]',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+        DataMember => 'GPSVersionID',
+        RawConv => '$$self{GPSVersionID} = ($val=~s/GPS_// ? join(" ",unpack("C*",$val)) : undef)',
+        PrintConv => '$val =~ tr/ /./; $val',
+    },
+    0xcf => {
+        Name => 'GPSLatitudeRef',
+        Condition => '$$self{GPSVersionID} and require Image::ExifTool::GPS',
+        Format => 'string[2]',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+        PrintConv => {
+            N => 'North',
+            S => 'South',
+        },
+    },
+    0xd1 => {
+        Name => 'GPSLatitude',
+        Condition => '$$self{GPSVersionID}',
+        Format => 'rational64u[3]',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+        ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
+        PrintConv    => 'Image::ExifTool::GPS::ToDMS($self, $val, 1)',
+    },
+    0xe9 => {
+        Name => 'GPSLongitudeRef',
+        Condition => '$$self{GPSVersionID}',
+        Format => 'string[2]',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+        PrintConv => {
+            E => 'East',
+            W => 'West',
+        },
+    },
+    0xeb => {
+        Name => 'GPSLongitude',
+        Condition => '$$self{GPSVersionID}',
+        Format => 'rational64u[3]',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+        ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
+        PrintConv    => 'Image::ExifTool::GPS::ToDMS($self, $val, 1)',
+    },
+    0x103 => {
+        Name => 'GPSAltitudeRef',
+        Condition => '$$self{GPSVersionID}',
+        Format => 'int8u',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+        PrintConv => {
+            0 => 'Above Sea Level',
+            1 => 'Below Sea Level',
+        },
+    },
+    0x104 => {
+        Name => 'GPSAltitude',
+        Condition => '$$self{GPSVersionID}',
+        Format => 'rational64u',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+        PrintConv => '$val =~ /^(inf|undef)$/ ? $val : "$val m"',
+    },
+    0x11c => {
+        Name => 'GPSTimeStamp',
+        Condition => '$$self{GPSVersionID}',
+        Groups => { 1 => 'GPS', 2 => 'Time' },
+        Format => 'rational64u[3]',
+        ValueConv => 'Image::ExifTool::GPS::ConvertTimeStamp($val)',
+    },
+    0x134 => {
+        Name => 'GPSSatellites',
+        Condition => '$$self{GPSVersionID}',
+        Format => 'string[3]',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+    },
+    0x137 => {
+        Name => 'GPSStatus',
+        Condition => '$$self{GPSVersionID}',
+        Format => 'string[2]',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+        PrintConv => {
+            A => 'Measurement Active',
+            V => 'Measurement Void',
+        },
+    },
+    0x139 => {
+        Name => 'GPSMeasureMode',
+        Condition => '$$self{GPSVersionID}',
+        Format => 'string[2]',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+        PrintConv => {
+            2 => '2-Dimensional Measurement',
+            3 => '3-Dimensional Measurement',
+        },
+    },
+    0x13b => {
+        Name => 'GPSMapDatum',
+        Condition => '$$self{GPSVersionID}',
+        Format => 'string[7]',
+        Groups => { 1 => 'GPS', 2 => 'Location' },
+    },
+    0x142 => {
+        Name => 'GPSDateStamp',
+        Condition => '$$self{GPSVersionID}',
+        Groups => { 1 => 'GPS', 2 => 'Time' },
+        Format => 'string[11]',
+        ValueConv => 'Image::ExifTool::Exif::ExifDate($val)',
+    },
+    0x173 => { # (NC)
+        Name => 'AudioCodecID',
+        Format => 'string[4]',
+    },
+    0x7d3 => {
+        Name => 'PreviewImage',
+        Format => 'undef[$size-0x7d3]',
+        Notes => '640x480 JPEG preview image', # (black borders pad to 480 pixels high)
         RawConv => '$self->ValidateImage(\$val,$tag)',
     },
 );
@@ -4599,7 +4796,7 @@ my %binaryDataAttrs = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     FIRST_ENTRY => 0,
-    NOTES => 'This information is found in Pentax Optio RZ18 AVI videos.',
+    NOTES => 'This information is found in AVI videos from the Optio RZ18.',
     0x12 => {
         Name => 'Make',
         Format => 'string[24]',
