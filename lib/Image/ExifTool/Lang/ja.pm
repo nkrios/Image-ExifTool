@@ -3221,7 +3221,6 @@ $VERSION = '1.19';
         'n/a' => '未設定',
       },
     },
-   'LongFocal' => '最長焦点',
    'LookupTable' => 'ルックアップテーブル',
    'LoopStyle' => {
       PrintConv => {
@@ -4911,7 +4910,6 @@ $VERSION = '1.19';
       },
     },
    'ShortDocumentID' => '短文書ID',
-   'ShortFocal' => '最短焦点',
    'ShortOwnerName' => '短いオーナー名',
    'ShortReleaseTimeLag' => {
       Description => 'レリーズタイムラグ最速化',
@@ -5498,8 +5496,6 @@ $VERSION = '1.19';
       },
     },
    'WBAdjTemperature' => 'ホワイトバランス調整、色温度',
-   'WBAdjustAB' => 'ホワイトバランス調整A/B',
-   'WBAdjustGM' => 'ホワイトバランス調整G/M',
    'WBBlueLevel' => 'ホワイトバランス青レベル',
    'WBBracketMode' => {
       Description => 'ホワイトバランスブラケットモード',
@@ -5534,7 +5530,6 @@ $VERSION = '1.19';
    'WBRedLevel' => 'ホワイトバランス赤レベル',
    'WBShiftAB' => 'WB AB補正',
    'WBShiftGM' => 'WB GM補正',
-   'WBShiftMG' => 'WB GM補正',
    'WB_GBRGLevels' => 'WB GBRG レベル',
    'WB_GRBGLevels' => 'WB GRBG レベル',
    'WB_GRGBLevels' => 'WB GRGB レベル',

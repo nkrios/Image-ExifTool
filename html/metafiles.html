@@ -108,8 +108,16 @@ have them.  For this, the advanced (ie. tricky and confusing to use)
 
 <pre>exiftool -ext <i>EXT</i> -tagsfromfile @ -srcfile %d%f.xmp -r <i>DIR</i></pre>
 
-<p>Any of these forms may be used to process files stored in a directory other
-than the directory containing the images.  For instance,</p>
+<p>The <code>-srcfile</code> option also allows multiple files to be specified,
+in which case the first existing file is processed.  This feature allows a
+sidecar file to be used only if it already exists. For example, this command
+writes to a sidecar XMP file if it exists, or the original file otherwise:</p>
+
+<pre>exiftool -ext <i>EXT</i> -artist="Phil" -srcfile %d%f.xmp -srcfile @ <i>DIR</i></pre>
+
+<p>Any of these commands may be used to process sidecar files stored in a
+directory other than that of the original images by specifying a directory name
+instead of "<code>%d</code>" in the filename format string.  For example,</p>
 
 <pre>exiftool -ext <i>EXT</i> -o <i>DSTDIR</i>/%f.xmp -r <i>SRCDIR</i></pre>
 
@@ -242,7 +250,7 @@ which may be useful if disk space is at a premium.</p>
 
 <hr>
 <i>Created Nov 12, 2008</i><br>
-<i>Last revised Feb. 17, 2011</i>
+<i>Last revised Jun 18, 2012</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

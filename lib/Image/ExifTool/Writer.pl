@@ -299,7 +299,7 @@ sub SetNewValue($;$$%)
                     }
                     # allow MIE groups to be deleted by number,
                     # and allow any XMP family 1 group to be deleted
-                    push @del, uc($wantGroup) if $wantGroup =~ /^(MIE\d+|XM[LP]-[-\w]+)$/i;
+                    push @del, uc($wantGroup) if $wantGroup =~ /^(MIE\d+|XM[LP]-[-\w]*\w)$/i;
                 } else {
                     # push all groups plus '*', except the protected groups
                     push @del, (grep !/^$protectedGroups$/, @delGroups), '*';
@@ -961,6 +961,7 @@ sub SetNewValuesFromFile($$;@)
         Lang            => $$options{Lang},
         LargeFileSupport=> $$options{LargeFileSupport},
         List            => 1,
+        ListSep         => $$options{ListSep},
         MakerNotes      => 1,
         MissingTagValue => $$options{MissingTagValue},
         Password        => $$options{Password},
@@ -2358,7 +2359,7 @@ sub InsertTagValues($$$;$)
 {
     my ($self, $foundTags, $line, $opt) = @_;
     my $rtnStr = '';
-    while ($line =~ /(.*?)\$(\{?)([-\w]+|\$|\/)(.*)/s) {
+    while ($line =~ /(.*?)\$(\{?)([-\w]*\w|\$|\/)(.*)/s) {
         my (@tags, $pre, $var, $bra, $val, $tg, @vals, $type);
         ($pre, $bra, $var, $line) = ($1, $2, $3, $4);
         # "$$" represents a "$" symbol, and "$/" is a newline
@@ -2369,7 +2370,7 @@ sub InsertTagValues($$$;$)
             next;
         }
         # allow multiple group names
-        while ($line =~ /^:([-\w]+)(.*)/s) {
+        while ($line =~ /^:([-\w]*\w)(.*)/s) {
             my $group = $var;
             ($var, $line) = ($1, $2);
             $var = "$group:$var";
@@ -3695,6 +3696,20 @@ sub TimeNow(;$)
     return sprintf("%4d:%.2d:%.2d %.2d:%.2d:%.2d%s",
                    $tm[5]+1900, $tm[4]+1, $tm[3],
                    $tm[2], $tm[1], $tm[0], $tz);
+}
+
+#------------------------------------------------------------------------------
+# Generate a new, random GUID
+# Inputs: <none>
+# Returns: GUID string
+my $guidCount;
+sub NewGUID()
+{
+    my @tm = localtime time;
+    $guidCount = 0 unless defined $guidCount and ++$guidCount < 0x100;
+    return sprintf('%.4d%.2d%.2d%.2d%.2d%.2d%.2X%.4X%.4X%.4X%.4X',
+                   $tm[5]+1900, $tm[4]+1, $tm[3], $tm[2], $tm[1], $tm[0], $guidCount,
+                   $$ & 0xffff, rand(0x10000), rand(0x10000), rand(0x10000));
 }
 
 #------------------------------------------------------------------------------
@@ -5130,7 +5145,9 @@ sub WriteJPEG($$)
                     unless ($$delGroup{File} and $$delGroup{File} != 2) {
                         my $tagInfo = $Image::ExifTool::Extra{Comment};
                         my $nvHash = $self->GetNewValueHash($tagInfo);
-                        if ($self->IsOverwriting($nvHash, $segData) or $$delGroup{File}) {
+                        my $val = $segData;
+                        $val =~ s/\0+$//;   # allow for stupid software that adds NULL terminator
+                        if ($self->IsOverwriting($nvHash, $val) or $$delGroup{File}) {
                             $newComment = $self->GetNewValues($nvHash);
                         } else {
                             delete $$editDirs{COM}; # we aren't editing COM after all

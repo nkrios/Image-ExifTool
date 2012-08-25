@@ -5,6 +5,10 @@
 #
 # Revisions:    2009/04/01 - P. Harvey Created
 #               2009/09/27 - PH Added Geosync feature
+#               2009/06/25 - PH Read Garmin TCX track logs
+#               2009/09/11 - PH Read ITC GPS track logs
+#               2012/01/08 - PH Extract orientation information from PTNTHPR
+#               2012/05/08 - PH Read Winplus Beacon .TXT files
 #
 # References:   1) http://www.topografix.com/GPX/1/1/
 #               2) http://www.gpsinformation.org/dale/nmea.htm#GSA
@@ -18,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.31';
+$VERSION = '1.33';
 
 sub JITTER() { return 2 }       # maximum time jitter
 
@@ -46,6 +50,9 @@ my %xmlTag = (
     sat         => 'nsats',     # GPX
     when        => 'time',      # KML
     coordinates => 'coords',    # KML
+    course      => 'dir',       # (written by Arduino)
+    pitch       => 'pitch',     # (written by Arduino)
+    roll        => 'roll',      # (written by Arduino)
     # XML containers (fix is reset at the opening tag of these properties)
     wpt         => '',          # GPX
     trkpt       => '',          # GPX
@@ -64,6 +71,8 @@ my %fixInfoKeys = (
     alt    => [ 'alt' ],
     orient => [ 'dir', 'pitch', 'roll' ],
 );
+
+my %isOrient = ( dir => 1, pitch => 1, roll => 1 ); # test for orientation key
 
 my $secPerDay = 24 * 3600;      # a useful constant
 
@@ -163,7 +172,7 @@ sub LoadTrackLog($$;$)
         $raf->ReadLine($_) or last;
         # determine file format
         if (not $format) {
-            if (/^<(\?xml|gpx)\s/) { # look for XML or GPX header
+            if (/^<(\?xml|gpx)[\s>]/) { # look for XML or GPX header
                 $format = 'XML';
             # check for NMEA sentence
             # (must ONLY start with ones that have timestamps! ie. not GSA or PTNTHPR!)
@@ -182,7 +191,9 @@ sub LoadTrackLog($$;$)
                 next;
             } elsif ($nmeaStart and /^B/) {
                 # parse IGC fixes without a date
-                $format = 'IGC';                
+                $format = 'IGC';
+            } elsif (/^TP,D,/) {
+                $format = 'Winplus';
             } else {
                 # search only first 50 lines of file for a valid fix
                 last if ++$skipped > 50;
@@ -200,7 +211,10 @@ sub LoadTrackLog($$;$)
                 # (note: ignore namespace prefixes if they exist)
                 if ($arg =~ /^(\w+:)?(\w+)=(['"])(.*?)\3/g) {
                     my $tag = $xmlTag{lc $2};
-                    $$fix{$tag} = $4 if $tag;
+                    if ($tag) {
+                        $$fix{$tag} = $4;
+                        $$has{orient} = 1 if $isOrient{$tag};
+                    }
                 }
                 # loop through XML elements
                 while ($arg =~ m{([^<>]*)<(/)?(\w+:)?(\w+)(>|$)}g) {
@@ -227,6 +241,7 @@ sub LoadTrackLog($$;$)
                                 @$fix{'lon','lat','alt'} = split ',', $1;
                             } else {
                                 $$fix{$tag} = $1;
+                                $$has{orient} = 1 if $isOrient{$tag};
                             }
                         }
                         next;
@@ -266,6 +281,20 @@ sub LoadTrackLog($$;$)
             $$fix{'time'} = "$1T$2Z" if $td and not $$fix{'time'} and
                 /[\s>](\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2}:\d{2}(\.\d+)?)/;
             next;
+#
+# Winplus Beacon text file
+#
+        } elsif ($format eq 'Winplus') {
+            /^TP,D,\s*([-+]?\d+\.\d*),\s*([-+]?\d+\.\d*),\s*(\d+)\/(\d+)\/(\d{4}),\s*(\d+):(\d+):(\d+)/ or next;
+            $$fix{lat} = $1;
+            $$fix{lon} = $2;
+            $time = Time::Local::timegm($8,$7,$6,$4,$3-1,$5-1900);
+            $isDate = 1;
+            $$points{$time} = $fix;
+            push @fixTimes, $time;
+            $fix = { };
+            ++$numPoints;
+            next;
         }
         my (%fix, $secs, $date, $nmea);
         if ($format eq 'NMEA') {
@@ -276,7 +305,7 @@ sub LoadTrackLog($$;$)
 #
 # IGC (flarm) (ref 4)
 #
-        if ( $format eq 'IGC' ) {
+        if ($format eq 'IGC') {
             # B0939564531208N00557021EA007670089100207
             # BHHMMSSDDMMmmmNDDDMMmmmEAaaaaaAAAAAxxyy
             #    HH     MM     SS     DD     MM     mmm          DDD    MM     mmm                aaaaa AAAAA
@@ -1096,7 +1125,7 @@ This module is used by Image::ExifTool
 This module loads GPS track logs, interpolates to determine position based
 on time, and sets new GPS values for geotagging images.  Currently supported
 formats are GPX, NMEA RMC/GGA/GLL, KML, IGC, Garmin XML and TCX, Magellan
-PMGNTRK, and Honeywell PTNTHPR.
+PMGNTRK, Honeywell PTNTHPR, and Winplus Beacon text files.
 
 Methods in this module should not be called directly.  Instead, the Geotag
 feature is accessed by writing the values of the ExifTool Geotag, Geosync

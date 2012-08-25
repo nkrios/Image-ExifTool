@@ -27,7 +27,7 @@ use vars qw($VERSION $RELEASE @ISA @EXPORT_OK %EXPORT_TAGS $AUTOLOAD @fileTypes
             %mimeType $swapBytes $swapWords $currentByteOrder %unpackStd
             %jpegMarker %specialTags);
 
-$VERSION = '8.90';
+$VERSION = '9.01';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -109,6 +109,7 @@ sub SetPreferredByteOrder($);
 sub CopyBlock($$$);
 sub CopyFileAttrs($$);
 sub TimeNow(;$);
+sub NewGUID();
 
 # other subroutine definitions
 sub DoEscape($$);
@@ -120,8 +121,8 @@ sub ParseArguments($;@); #(defined in attempt to avoid mod_perl problem)
 # unless tweaked in BuildTagLookup::GetTableOrder().
 @loadAllTables = qw(
     PhotoMechanic Exif GeoTiff CanonRaw KyoceraRaw MinoltaRaw PanasonicRaw
-    SigmaRaw JPEG GIMP Jpeg2000 GIF BMP BMP::OS2 PICT PNG MNG DjVu OpenEXR
-    Radiance PGF MIFF PSP PDF PostScript Photoshop::Header FujiFilm::RAF
+    SigmaRaw JPEG GIMP Jpeg2000 GIF BMP BMP::OS2 PICT PNG MNG DjVu OpenEXR MIFF
+    PGF PSP PhotoCD Radiance PDF PostScript Photoshop::Header FujiFilm::RAF
     FujiFilm::IFD Sony::SRF2 Sony::SR2SubIFD Sony::PMP ITC ID3 Vorbis Ogg APE
     APE::NewHeader APE::OldHeader MPC MPEG::Audio MPEG::Video MPEG::Xing M2TS
     QuickTime QuickTime::ImageFile Matroska MXF DV Flash Flash::FLV Real::Media
@@ -164,11 +165,12 @@ $defaultLang = 'en';    # default language
                 BMP PPM RIFF AIFF ASF MOV MPEG Real SWF PSP FLV OGG FLAC APE MPC
                 MKV MXF DV PMP IND PGF ICC ITC HTML VRD RTF XCF QTIF FPX PICT
                 ZIP GZIP RAR BZ2 TAR RWZ EXE EXR HDR CHM LNK WMF DEX RAW Font
-                RSRC M2TS PHP MP3 DICM);
+                RSRC M2TS PHP MP3 DICM PCD);
 
 # file types that we can write (edit)
 my @writeTypes = qw(JPEG TIFF GIF CRW MRW ORF RAF RAW PNG MIE PSD XMP PPM
                     EPS X3F PS PDF ICC VRD JP2 EXIF AI AIT IND);
+my %writeTypes; # lookup for writable file types (hash filled if required)
 
 # file extensions that we can't write for various base types
 %noWriteFile = (
@@ -337,6 +339,7 @@ my %fileTypeLookup = (
     PAC  => ['RIFF', 'Lossless Predictive Audio Compression'],
     PAGES => ['ZIP', 'Apple Pages document'],
     PBM  => ['PPM',  'Portable BitMap'],
+    PCD  => ['PCD',  'Kodak Photo CD Image Pac'],
     PCT  =>  'PICT',
     PDF  => ['PDF',  'Adobe Portable Document Format'],
     PEF  => ['TIFF', 'Pentax (RAW) Electronic Format'],
@@ -548,6 +551,7 @@ my %fileDescription = (
     PGF  => 'image/pgf',
     PGM  => 'image/x-portable-graymap',
     PHP  => 'application/x-httpd-php',
+    PCD  => 'image/x-photo-cd',
     PICT => 'image/pict',
     PLIST=> 'application/xml',
     PNG  => 'image/png',
@@ -642,6 +646,7 @@ my %moduleName = (
     MRW  => 'MinoltaRaw',
     OGG  => 'Ogg',
     ORF  => 'Olympus',
+    PCD  => 'PhotoCD',
     PHP  => 0,
   # PLIST=> 'XML',
     PMP  => 'Sony',
@@ -709,6 +714,7 @@ my %moduleName = (
     MXF  => '\x06\x0e\x2b\x34\x02\x05\x01\x01\x0d\x01\x02', # (not tested if extension recognized)
     OGG  => '(OggS|ID3)',
     ORF  => '(II|MM)',
+  # PCD  =>  signature is at byte 2048
     PDF  => '%PDF-\d+\.\d+',
     PGF  => 'PGF',
     PHP  => '<\?php\s',
@@ -833,6 +839,10 @@ sub DummyWriteProc { return 1; }
     },
     Directory => {
         Groups => { 1 => 'System' },
+        Notes => q{
+            may be written to move the file to a specified directory. New directories
+            are created as necessary
+        },
         Writable => 1,
         Protected => 1,
         # translate backslashes in directory names and add trailing '/'
@@ -932,13 +942,14 @@ sub DummyWriteProc { return 1; }
             return 'Invalid EXIF data';
         },
     },
-    ICC_Profile => {
-        Notes => 'the full ICC_Profile data block',
-        Groups => { 0 => 'ICC_Profile', 1 => 'ICC_Profile' },
-        Flags => ['Writable' ,'Protected', 'Binary'],
+    IPTC => {
+        Notes => 'the full IPTC data block',
+        Groups => { 0 => 'IPTC', 1 => 'IPTC' },
+        Flags => ['Writable', 'Protected', 'Binary'],
+        Priority => 0,  # so main IPTC (which hopefully comes first) takes priority
         WriteCheck => q{
-            require Image::ExifTool::ICC_Profile;
-            return Image::ExifTool::ICC_Profile::ValidateICC(\$val);
+            return undef if $val =~ /^(\x1c|\0+$)/;
+            return 'Invalid IPTC data';
         },
     },
     XMP => {
@@ -949,6 +960,15 @@ sub DummyWriteProc { return 1; }
         WriteCheck => q{
             require Image::ExifTool::XMP;
             return Image::ExifTool::XMP::CheckXMP($self, $tagInfo, \$val);
+        },
+    },
+    ICC_Profile => {
+        Notes => 'the full ICC_Profile data block',
+        Groups => { 0 => 'ICC_Profile', 1 => 'ICC_Profile' },
+        Flags => ['Writable' ,'Protected', 'Binary'],
+        WriteCheck => q{
+            require Image::ExifTool::ICC_Profile;
+            return Image::ExifTool::ICC_Profile::ValidateICC(\$val);
         },
     },
     CanonVRD => {
@@ -1038,6 +1058,17 @@ sub DummyWriteProc { return 1; }
         },
         PrintConv => '$self->ConvertDateTime($val)',
     },
+    NewGUID => {
+        Groups => { 0 => 'ExifTool', 1 => 'ExifTool', 2 => 'Other' },
+        Notes => q{
+            generates a new, random GUID with format
+            YYYYmmdd-HHMM-SSNN-PPPP-RRRRRRRRRRRR, where Y=year, m=month, d=day, H=hour,
+            M=minute, S=second, N=file sequence number in hex, P=process ID in hex, and
+            R=random hex number; without dashes with the -n option.  Not generated
+            unless specifically requested
+        },
+        PrintConv => '$val =~ s/(.{8})(.{4})(.{4})(.{4})/$1-$2-$3-$4-/; $val',
+    },
     ID3Size     => { },
     Geotag => {
         Writable => 1,
@@ -1046,8 +1077,8 @@ sub DummyWriteProc { return 1; }
         Notes => q{
             this write-only tag is used to define the GPS track log data or track log
             file name.  Currently supported track log formats are GPX, NMEA RMC/GGA/GLL,
-            KML, IGC, Garmin XML and TCX, Magellan PMGNTRK, and Honeywell PTNTHPR.  See
-            L<geotag.html|../geotag.html> for details
+            KML, IGC, Garmin XML and TCX, Magellan PMGNTRK, Honeywell PTNTHPR, and
+            Winplus Beacon text files.  See L<geotag.html|../geotag.html> for details
         },
         DelCheck => q{
             require Image::ExifTool::Geotag;
@@ -1070,12 +1101,11 @@ sub DummyWriteProc { return 1; }
         Notes => q{
             this write-only tag is used to define a date/time for interpolating a
             position in the GPS track specified by the Geotag tag.  Writing this tag
-            causes the following 8 tags to be written:  GPSLatitude, GPSLatitudeRef,
-            GPSLongitude, GPSLongitudeRef, GPSAltitude, GPSAltitudeRef, GPSDateStamp and
-            GPSTimeStamp.  The local system timezone is assumed if the date/time value
-            does not contain a timezone.  May be deleted to delete associated GPS tags.
-            A group name of 'EXIF' or 'XMP' may be specified to write or delete only
-            EXIF or XMP GPS tags.  The value of Geotag must be assigned before this tag
+            causes GPS information to be written into the EXIF or XMP of the target
+            files.  The local system timezone is assumed if the date/time value does not
+            contain a timezone.  May be deleted to delete associated GPS tags.  A group
+            name of 'EXIF' or 'XMP' may be specified to write or delete only EXIF or XMP
+            GPS tags.  The Geotag tag must be assigned before this tag
         },
         DelCheck => q{
             require Image::ExifTool::Geotag;
@@ -1521,10 +1551,12 @@ sub ExtractInfo($;@)
         delete $self->{MAKER_NOTE_BYTE_ORDER};
 
         # return our version number
+        my $tff = $self->{TAGS_FROM_FILE};
         $self->FoundTag('ExifToolVersion', "$VERSION$RELEASE");
-        $self->FoundTag('Now', TimeNow()) if $self->{REQ_TAG_LOOKUP}{now} or $self->{TAGS_FROM_FILE};
+        $self->FoundTag('Now', TimeNow()) if $self->{REQ_TAG_LOOKUP}{now} or $tff;
+        $self->FoundTag('NewGUID', NewGUID()) if $self->{REQ_TAG_LOOKUP}{newguid} or $tff;
         # generate sequence number if necessary
-        if ($self->{REQ_TAG_LOOKUP}{filesequence} or $self->{TAGS_FROM_FILE}) {
+        if ($self->{REQ_TAG_LOOKUP}{filesequence} or $tff) {
             $self->FoundTag('FileSequence', $$self{FILE_SEQUENCE});
         }
         ++$$self{FILE_SEQUENCE};        # count files read
@@ -1631,7 +1663,7 @@ sub ExtractInfo($;@)
                 $self->Warn("Skipped unknown $skip byte header");
             }
             # save file type in member variable
-            $self->{FILE_TYPE} = $self->{PATH}[0] = $type;
+            $self->{FILE_TYPE} = $type;
             $dirInfo{Parent} = ($type eq 'TIFF') ? $tiffType : $type;
             my $module = $moduleName{$type};
             $module = $type unless defined $module;
@@ -1646,10 +1678,16 @@ sub ExtractInfo($;@)
                 $self->Warn('Unsupported file type');
                 last;
             }
+            push @{$$self{PATH}}, $type;    # save file type in metadata PATH
+
             # process the file
             no strict 'refs';
-            &$func($self, \%dirInfo) and last;
+            my $result = &$func($self, \%dirInfo);
             use strict 'refs';
+
+            pop @{$$self{PATH}};
+
+            last if $result;    # all done if successful
 
             # seek back to try again from the same position in the file
             $raf->Seek($pos, 0) or $seekErr = 1, last;
@@ -2655,7 +2693,10 @@ sub CanWrite($)
         my $ext = GetFileExtension($file) || uc($file);
         return grep(/^$ext$/, @{$noWriteFile{$type}}) ? 0 : 1 if $ext;
     }
-    return scalar(grep /^$type$/, @writeTypes);
+    unless (%writeTypes) {
+        $writeTypes{$_} = 1 foreach @writeTypes;
+    }
+    return $writeTypes{$type};
 }
 
 #------------------------------------------------------------------------------
@@ -3460,6 +3501,9 @@ sub RoundFloat($$)
 {
     my ($val, $sig) = @_;
     $val == 0 and return 0;
+    # handle integers specially (to avoid rounding problems with "10 ** $exp"
+    # which caused failed tests with Perl 5.16 on MSWin32-x64-multi-thread)
+    return $val if $val == int($val) and abs($val) < "1e$sig";
     my $sign = $val < 0 ? ($val=-$val, -1) : 1;
     my $log = log($val) / log(10);
     my $exp = int($log) - $sig + ($log > 0 ? 1 : 0);
@@ -3985,6 +4029,14 @@ sub ConvertDateTime($$)
 {
     my ($self, $date) = @_;
     my $dateFormat = $self->{OPTIONS}{DateFormat};
+    my $shift = $self->{OPTIONS}{GlobalTimeShift};
+    if ($shift) {
+        my $dir = ($shift =~ s/^([-+])// and $1 eq '-') ? -1 : 1;
+        require 'Image/ExifTool/Shift.pl';
+        my $offset = $$self{GLOBAL_TIME_OFFSET};
+        $offset or $offset = $$self{GLOBAL_TIME_OFFSET} = { };
+        ShiftTime($date, $shift, $dir, $offset);
+    }
     # only convert date if a format was specified and the date is recognizable
     if ($dateFormat) {
         # a few cameras use incorrect date/time formatting:
@@ -3993,7 +4045,7 @@ sub ConvertDateTime($$)
         # - single-digit seconds with leading space (HP scanners)
         $date =~ s/[-+]\d{2}:\d{2}$//;  # remove timezone if it exists
         my @a = ($date =~ /\d+/g);      # be very flexible about date/time format
-        if (@a and $a[0] > 1900 and $a[0] < 3000 and eval 'require POSIX') {
+        if (@a and $a[0] >= 1000 and $a[0] < 3000 and eval 'require POSIX') {
             $date = POSIX::strftime($dateFormat, $a[5]||0, $a[4]||0, $a[3]||0,
                                                  $a[2]||1, ($a[1]||1)-1, $a[0]-1900);
         } elsif ($self->{OPTIONS}{StrictDate}) {
@@ -4275,9 +4327,9 @@ sub ProcessTrailers($$)
         my $result = &$proc($self, $dirInfo);
         use strict 'refs';
 
-        # restore PATH
-        pop @$path;
-        pop @$path;
+        # restore PATH (pop last 2 items)
+        splice @$path, -2;
+
         # check result
         if ($outfile) {
             if ($result > 0) {

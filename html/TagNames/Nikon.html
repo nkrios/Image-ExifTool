@@ -450,11 +450,11 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>11 = Warm Tone
   <br>12 = Color Custom
   <br>13 = Image Overlay
-  <br>14 = Red Intensifier</td><td>&nbsp;&nbsp;</td>
-  <td>15 = Green Intensifier
+  <br>14 = Red Intensifier
+  <br>15 = Green Intensifier
   <br>16 = Blue Intensifier
-  <br>17 = Cross Screen
-  <br>18 = Quick Retouch
+  <br>17 = Cross Screen</td><td>&nbsp;&nbsp;</td>
+  <td>18 = Quick Retouch
   <br>19 = NEF Processing
   <br>23 = Distortion Control
   <br>25 = Fisheye
@@ -462,7 +462,13 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>29 = Perspective Control
   <br>30 = Color Outline
   <br>31 = Soft Filter
-  <br>33 = Miniature Effect</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>32 = Resize
+  <br>33 = Miniature Effect
+  <br>34 = Skin Softening
+  <br>35 = Selected Frame
+  <br>37 = Color Sketch
+  <br>38 = Selective Color
+  <br>40 = Drawing</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr class=b>
 <td title='0x00a0 = 160'>0x00a0</td>
@@ -2572,7 +2578,8 @@ D200.</p>
 <td class=c>int32u</td>
 <td><span class=s>0 = Off
   <br>1 = Multiple Exposure
-  <br>2 = Image Overlay</span></td></tr>
+  <br>2 = Image Overlay
+  <br>3 = HDR</span></td></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
 <td>MultiExposureShots</td>
@@ -3622,7 +3629,7 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'00 48 3C 6A 24 24 00 02'</td><td>= Tamron SP AF 28-105mm f/2.8 LD Aspherical IF (176D)</td>
 </tr><tr><td>'00 48 50 50 18 18 00 00'</td><td>= Nikkor H 50mm f/2</td>
 </tr><tr><td>'00 48 50 72 24 24 00 06'</td><td>= Tokina AT-X 535 PRO DX (AF 50-135mm f/2.8)</td>
-</tr><tr><td>'00 48 5C 8E 30 3C 00 06'</td><td>= Tamron AF 70-300mm f/4-5.6 Di LD Macro 1:2 (A17)</td>
+</tr><tr><td>'00 48 5C 8E 30 3C 00 06'</td><td>= Tamron AF 70-300mm f/4-5.6 Di LD Macro 1:2 (A17NII)</td>
 </tr><tr><td>'00 48 68 68 24 24 00 00'</td><td>= Series E 100mm f/2.8</td>
 </tr><tr><td>'00 48 80 80 30 30 00 00'</td><td>= Nikkor 200mm f/4 AiS</td>
 </tr><tr><td>'00 49 30 48 22 2B 00 02'</td><td>= Tamron SP AF 20-40mm f/2.7-3.5 (166D)</td>
@@ -3974,10 +3981,14 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'A9 54 80 80 18 18 AB 0E'</td><td>= AF-S Nikkor 200mm f/2G ED VR II</td>
 </tr><tr><td>'AA 3C 37 6E 30 30 AC 0E'</td><td>= AF-S Nikkor 24-120mm f/4G ED VR</td>
 </tr><tr><td>'AC 38 53 8E 34 3C AE 0E'</td><td>= AF-S DX VR Nikkor 55-300mm 4.5-5.6G ED</td>
+</tr><tr><td>'AD 3C 2D 8E 2C 3C AF 0E'</td><td>= AF-S DX Nikkor 18-300mm 3.5-5.6G ED VR</td>
 </tr><tr><td>'AE 54 62 62 0C 0C B0 06'</td><td>= AF-S Nikkor 85mm f/1.4G</td>
 </tr><tr><td>'AF 54 44 44 0C 0C B1 06'</td><td>= AF-S Nikkor 35mm f/1.4G</td>
 </tr><tr><td>'B0 4C 50 50 14 14 B2 06'</td><td>= AF-S Nikkor 50mm f/1.8G</td>
 </tr><tr><td>'B1 48 48 48 24 24 B3 06'</td><td>= AF-S DX Micro Nikkor 40mm f/2.8G</td>
+</tr><tr><td>'B3 4C 62 62 14 14 B5 06'</td><td>= AF-S Nikkor 85mm f/1.8G</td>
+</tr><tr><td>'B4 40 37 62 2C 34 B6 0E'</td><td>= AF-S VR Zoom-Nikkor 24-85mm f/3.5-4.5G IF-ED</td>
+</tr><tr><td>'B5 4C 3C 3C 14 14 B7 06'</td><td>= AF-S Nikkor 28mm f/1.8G</td>
 </tr><tr><td>'B6 48 37 56 24 24 1C 02'</td><td>= Sigma 24-60mm F2.8 EX DG</td>
 </tr><tr><td>'CD 3D 2D 70 2E 3C 4B 0E'</td><td>= Sigma 18-125mm F3.8-5.6 DC OS HSM</td>
 </tr><tr><td>'CE 34 76 A0 38 40 4B 0E'</td><td>= Sigma 150-500mm F5-6.3 DG OS APO HSM</td>
@@ -4003,6 +4014,7 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'F5 48 76 76 24 24 4B 06'</td><td>= Sigma 150mm F2.8 EX DG APO Macro HSM</td>
 </tr><tr><td>'F6 3F 18 37 2C 34 84 06'</td><td>= Tamron SP AF 10-24mm f/3.5-4.5 Di II LD Aspherical (IF) (B001)</td>
 </tr><tr><td>'F6 48 2D 50 24 24 4B 06'</td><td>= Sigma 18-50mm F2.8 EX DC Macro</td>
+</tr><tr><td>'F7 53 5C 80 24 24 40 06'</td><td>= Tamron SP AF 70-200mm F/2.8 Di LD (IF) Macro (A001)</td>
 </tr><tr><td>'F7 53 5C 80 24 24 84 06'</td><td>= Tamron SP AF 70-200mm f/2.8 Di LD (IF) Macro (A001)</td>
 </tr><tr><td>'F8 54 3E 3E 0C 0C 4B 06'</td><td>= Sigma 30mm F1.4 EX DC HSM</td>
 </tr><tr><td>'F8 54 64 64 24 24 DF 06'</td><td>= Tamron SP AF 90mm f/2.8 Di Macro 1:1 (272NII)</td>
@@ -4021,7 +4033,7 @@ ExifTool to choose in these cases (see the
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 17, 2012</i>
+<br><i>Last revised Aug 25, 2012</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

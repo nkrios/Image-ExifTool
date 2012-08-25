@@ -50,7 +50,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.42';
+$VERSION = '3.45';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -1186,7 +1186,7 @@ my %sampleFormat = (
     0x835e => 'UIC3Tag', #23
     0x835f => 'UIC4Tag', #23
     0x83bb => { #12
-        Name => 'IPTC-NAA', # (writable directory!)
+        Name => 'IPTC-NAA', # (writable directory! -- but see note below)
         # this should actually be written as 'undef' (see
         # http://www.awaresystems.be/imaging/tiff/tifftags/iptc.html),
         # but Photoshop writes it as int32u and Nikon Capture won't read
@@ -1199,6 +1199,9 @@ my %sampleFormat = (
             DirName => 'IPTC',
             TagTable => 'Image::ExifTool::IPTC::Main',
         },
+        # Note: This directory may be written as a block via the IPTC-NAA tag,
+        # but this technique is not recommended.  Instead, it is better to
+        # write the Extra IPTC tag and let ExifTool decide where it should go.
     },
     0x847e => 'IntergraphPacketData', #3
     0x847f => 'IntergraphFlagRegisters', #3
@@ -1504,6 +1507,8 @@ my %sampleFormat = (
         ValueConv => '2 ** ($val / 2)',
         PrintConv => 'sprintf("%.1f",$val)',
     },
+    # Wikipedia: BrightnessValue = Bv = Av + Tv - Sv
+    # ExifTool:  LightValue = LV = Av + Tv - Sv + 5 (5 is the Sv for ISO 100 in Exif usage)
     0x9203 => 'BrightnessValue',
     0x9204 => {
         Name => 'ExposureCompensation',
@@ -2498,7 +2503,7 @@ my %sampleFormat = (
         PrintConv => 'Image::ExifTool::Exif::PrintFNumber($val)',
     },
     LightValue => {
-        Notes => 'calculated LV -- similar to exposure value but includes ISO speed',
+        Notes => 'calculated LV -- similar to exposure value but normalized to ISO 100',
         Require => {
             0 => 'Aperture',
             1 => 'ShutterSpeed',
@@ -2849,8 +2854,8 @@ my %sampleFormat = (
             1 => 'FocalLength',
             2 => 'MaxAperture',
             3 => 'MaxApertureValue',
-            4 => 'ShortFocal',
-            5 => 'LongFocal',
+            4 => 'MinFocalLength',
+            5 => 'MaxFocalLength',
             6 => 'LensModel',
             7 => 'LensFocalRange',
             8 => 'LensSpec',
@@ -3285,7 +3290,7 @@ sub GetLensInfo($;$)
 # Attempt to identify the specific lens if multiple lenses have the same LensType
 # Inputs: 0) ExifTool object ref, 1) LensType print value, 2) LensSpec print value
 #         3) LensType numerical value, 4) FocalLength, 5) MaxAperture,
-#         6) MaxApertureValue, 7) ShortFocal, 8) LongFocal, 9) LensModel,
+#         6) MaxApertureValue, 7) MinFocalLength, 8) MaxFocalLength, 9) LensModel,
 #         10) LensFocalRange, 11) LensSpec, 12) optional PrintConv hash ref
 sub PrintLensID($$@)
 {
@@ -3315,7 +3320,8 @@ sub PrintLensID($$@)
         ($shortFocal, $longFocal) = ($1, $2 || $1);
     }
     if ($shortFocal and $longFocal) {
-        # Canon includes makernote information which allows better lens identification
+        # Canon (and some other makes) include makernote information
+        # which allows better lens identification
         require Image::ExifTool::Canon;
         return Image::ExifTool::Canon::PrintLensID($printConv, $lensType,
                     $shortFocal, $longFocal, $maxAperture, $lensModel);
@@ -3333,10 +3339,7 @@ sub PrintLensID($$@)
     # attempt to determine actual lens
     my (@matches, @best, @user, $diff);
     foreach $lens (@lenses) {
-        if ($Image::ExifTool::userLens{$lens}) {
-            push @user, $lens;
-            next;
-        }
+        push @user, $lens if $Image::ExifTool::userLens{$lens};
         # sf = short focal
         # lf = long focal
         # sa = max aperture at short focal
@@ -3393,7 +3396,17 @@ sub PrintLensID($$@)
         }
         push @matches, $lens;
     }
-    return join(' or ', @user) if @user;
+    if (@user) {
+        # choose the best match if we have more than one
+        if (@user > 1) {
+            my ($try, @good);
+            foreach $try (\@best, \@matches) {
+                $Image::ExifTool::userLens{$_} and push @good, $_ foreach @$try;
+                return join(' or ', @good) if @good;
+            }
+        }
+        return join(' or ', @user);
+    }
     return join(' or ', @best) if @best;
     return join(' or ', @matches) if @matches;
     $lens = $$printConv{$lensType};
@@ -4138,6 +4151,9 @@ sub ProcessExif($$$)
                     $exifTool->Warn("Invalid $tagStr data");
                     $invalid = 1;
                 } else {
+                    if (not $subdirInfo{DirName} and $inMakerNotes) {
+                        $subdirInfo{DirName} = $$tagInfo{Name};
+                    }
                     # process the subdirectory
                     $ok = $exifTool->ProcessDirectory(\%subdirInfo, $newTagTable, $$subdir{ProcessProc});
                 }

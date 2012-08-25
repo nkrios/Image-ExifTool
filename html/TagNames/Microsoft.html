@@ -105,24 +105,86 @@ values of 1,25,50,75 and 99 respectively)</span></span></td></tr>
 <tr>
 <td>RegionInfoMP</td>
 <td class=c>struct</td>
-<td>--&gt; <a href='RegionInfoMP.html'>RegionInfoMP Tags</a>
+<td>--&gt; <a href='Microsoft.html#RegionInfo'>Microsoft RegionInfo Struct</a>
   <br><span class='n s'>(called RegionInfo by the spec)</span></td></tr>
 <tr class=b>
-<td>RegionInfoMPRegions</td>
+<td>RegionInfoDateRegionsValid</td>
+<td class=c title=' _ = Flattened'>date_</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>RegionInfoRegions</td>
 <td class=c title=' _ = Flattened
  + = List'>struct_+</td>
-<td>--&gt; <a href='Regions.html'>Regions Tags</a>
-  <br><span class='n s'>(RegionInfoRegions)</span></td></tr>
-<tr>
+<td>--&gt; <a href='Microsoft.html#Regions'>Microsoft Regions Struct</a></td></tr>
+<tr class=b>
 <td>RegionPersonDisplayName</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RegionInfoRegionsPersonDisplayName)</span></span></td></tr>
+<tr>
+<td>RegionPersonEmailDigest</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td><span class=s><span class=n>(RegionInfoRegionsPersonEmailDigest)</span></span></td></tr>
+<tr class=b>
+<td>RegionPersonLiveIdCID</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td><span class=s><span class=n>(RegionInfoRegionsPersonLiveIdCID)</span></span></td></tr>
+<tr>
+<td>RegionPersonSourceID</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td><span class=s><span class=n>(RegionInfoRegionsPersonSourceID)</span></span></td></tr>
 <tr class=b>
 <td>RegionRectangle</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RegionInfoRegionsRectangle)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='RegionInfo'>Microsoft RegionInfo Struct</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Field Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>DateRegionsValid</td>
+<td class=c>date</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Regions</td>
+<td class=c title=' + = List'>Microsoft Regions+</td>
+<td>--&gt; <a href='Microsoft.html#Regions'>Microsoft Regions Struct</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Regions'>Microsoft Regions Struct</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Field Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>PersonDisplayName</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>PersonEmailDigest</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>PersonLiveIdCID</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>PersonSourceID</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Rectangle</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Stitch'>Microsoft Stitch Tags</a></h2>
@@ -186,7 +248,7 @@ are not shown because some are unruly GUID&#39;s.</p>
 <tr class=h><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>Absract</td>
+<td>Abstract</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -1998,7 +2060,7 @@ are not shown because some are unruly GUID&#39;s.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 6, 2011</i>
+<br><i>Last revised Aug 25, 2012</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

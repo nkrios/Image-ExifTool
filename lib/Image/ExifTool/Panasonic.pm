@@ -29,7 +29,7 @@ use vars qw($VERSION %leicaLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.65';
+$VERSION = '1.67';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -114,8 +114,8 @@ sub WhiteBalanceConv($;$$);
     51 => 'Super-Elmar-M 21mm f/3.4 Asph',  # ? (ref 16, frameSelectorBits=1)
     '51 2' => 'Super-Elmar-M 14mm f/3.8 Asph', # ? (ref 16)
     52 => 'Super-Elmar-M 18mm f/3.8 ASPH.', # ? (ref PH/11)
-    53 => 'Apo-Telyt-M 135mm f/3.4',        # ? (ref 16)
-
+    '53 2' => 'Apo-Telyt-M 135mm f/3.4', #16
+    '53 3' => 'Apo-Summicron-M 50mm f/2 Asph', #16
 );
 
 # M9 frame selector bits for each lens
@@ -486,6 +486,7 @@ my %shootingMode = (
                 3 => '+1',
                 4 => '+2',
                 # Note: Other Contrast tags will be "Normal" in any of these modes:
+                # 5 - seen for Portrait (FX80)
                 7 => 'Nature (Color Film)', # (GF1,G2; GF3 "Miniature")
                 9 => 'Expressive', #(GF3)
                 12 => 'Smooth (Color Film) or Pure (My Color)', #(GF1,G2 "Smooth Color")
@@ -633,7 +634,7 @@ my %shootingMode = (
         Name => 'ProgramISO', # (maybe should rename this ISOSetting?)
         Writable => 'int16u',
         PrintConv => {
-            OTHER => sub { return shift },
+            OTHER => sub { shift },
             65534 => 'Intelligent ISO', #PH (FS7)
             65535 => 'n/a',
         },
@@ -691,13 +692,13 @@ my %shootingMode = (
     },
     # 0x45 - int16u: 0
     0x46 => { #PH/JD
-        Name => 'WBAdjustAB',
+        Name => 'WBShiftAB',
         Format => 'int16s',
         Writable => 'int16u',
         Notes => 'positive is a shift toward blue',
     },
     0x47 => { #PH/JD
-        Name => 'WBAdjustGM',
+        Name => 'WBShiftGM',
         Format => 'int16s',
         Writable => 'int16u',
         Notes => 'positive is a shift toward green',
@@ -868,6 +869,15 @@ my %shootingMode = (
         },
     },
     # 0x7a,0x7b: 0
+    0x86 => { #http://dev.exiv2.org/issues/825
+        Name => 'ManometerPressure',
+        Writable => 'int16u',
+        RawConv => '$val==65535 ? undef : $val',
+        ValueConv => '$val / 10',
+        ValueConvInv => '$val * 10',
+        PrintConv => 'sprintf("%.1f kPa",$val)',
+        PrintConvInv => '$val=~s/ ?kPa//i; $val',
+    },
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -1311,9 +1321,29 @@ my %shootingMode = (
             '3 0 0 0' => 'Manual',
         },
     },
-    # 0x0411 - saturation or sharpness
+    0x0410 => {
+        Name => 'ShotInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::Panasonic::ShotInfo' },
+    },
+    # 0x0410 - int8u[16]: first byte is FileNumber 
+    # 0x0411 - int8u[4]: first number is FilmMode (1=Standard,2=Vivid,3=Natural,4=BW Natural,5=BW High Contrast)
     0x0412 => { Name => 'FilmMode',         Writable => 'string' },
     0x0413 => { Name => 'WB_RGBLevels',     Writable => 'rational64u', Count => 3 },
+);
+
+# Leica type5 ShotInfo (ref PH) (X2)
+%Image::ExifTool::Panasonic::ShotInfo = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    WRITE_PROC => \&Image::ExifTool::WriteBinaryData,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
+    TAG_PREFIX => 'Leica_ShotInfo',
+    FIRST_ENTRY => 0,
+    WRITABLE => 1,
+    0 => {
+        Name => 'FileIndex',
+        Format => 'int16u',
+    },
 );
 
 # Leica type6 maker notes (ref PH) (S2)

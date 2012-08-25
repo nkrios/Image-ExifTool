@@ -20,7 +20,7 @@ sub ProcessGE2($$$);
 sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.73';
+$VERSION = '1.75';
 
 my $debug;          # set to 1 to enable debugging code
 
@@ -502,8 +502,8 @@ my $debug;          # set to 1 to enable debugging code
         },
     },
     {
-        Name => 'MakerNoteLeica4', # used by the M9
-        # (M9 starts with "LEICA0\x03\0")
+        Name => 'MakerNoteLeica4', # used by the M9/M-Monochrom
+        # (M9 and M Monochrom start with "LEICA0\x03\0")
         Condition => '$$self{Make} =~ /^Leica Camera AG/ and $$valPt =~ /^LEICA0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Leica4',
@@ -513,9 +513,10 @@ my $debug;          # set to 1 to enable debugging code
         },
     },
     {
-        Name => 'MakerNoteLeica5', # used by the X1
+        Name => 'MakerNoteLeica5', # used by the X1/X2
         # (X1 starts with "LEICA\0\x01\0", Make is "LEICA CAMERA AG")
-        Condition => '$$valPt =~ /^LEICA\0\x01\0/',
+        # (X2 starts with "LEICA\0\x05\0", Make is "LEICA CAMERA AG")
+        Condition => '$$valPt =~ /^LEICA\0[\x01\x05]\0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Leica5',
             Start => '$valuePtr + 8',
@@ -1323,11 +1324,19 @@ IFD_TRY: for ($offset=$firstTry; $offset<=$lastTry; $offset+=2) {
                 my $entry = $pos + 2 + 12 * $index;
                 my $format = Get16u($dataPt, $entry+2);
                 my $count = Get32u($dataPt, $entry+4);
-                # allow everything to be zero if not first entry
-                # because some manufacturers pad with null entries
-                next unless $format or $count or $index == 0;
-                # patch for Canon EOS 40D firmware 1.0.4 bug: allow zero format for last entry
-                next if $format==0 and $index==$num-1 and $$exifTool{Model}=~/EOS 40D/;
+                unless ($format) {
+                    # patch for buggy Samsung NX200 JPEG MakerNotes entry count
+                    if ($num == 23 and $index == 21 and $$exifTool{Make} eq 'SAMSUNG') {
+                        Set16u(21, $dataPt, $pos);  # really 21 IFD entries!
+                        $exifTool->Warn('Fixed incorrect Makernote entry count', 1);
+                        last;
+                    }
+                    # allow everything to be zero if not first entry
+                    # because some manufacturers pad with null entries
+                    next unless $count or $index == 0;
+                    # patch for Canon EOS 40D firmware 1.0.4 bug: allow zero format for last entry
+                    next if $index==$num-1 and $$exifTool{Model}=~/EOS 40D/;
+                }
                 # patch for Sony cameras like the DSC-P10 that have invalid MakerNote entries
                 next if $num == 12 and $$exifTool{Make} eq 'SONY' and $index >= 8;
                 # (would like to verify tag ID, but some manufactures don't

@@ -53,7 +53,9 @@ options:</p>
 <ol start=3><li>The "<b>PrintConv</b>" value is the final human-readable value
 which has been converted for display.  Often, the "PrintConv" conversion will
 translate numbers into words for better readability.  The <code>-lang</code>
-option is used to specify the language for this conversion.</li></ol>
+(Lang) option is used to specify the language for this conversion, and the
+<code>-c</code> and <code>-d</code> (CoordFormat and DateFormat) options specify
+this formatting for GPS coordinates and date/time values.</li></ol>
 
 <ol start=2><li>The "<b>ValueConv</b>" value is a numerical value, suitable for
 use in calculations.  Typically, this value is converted to standard units (ie.
@@ -93,24 +95,26 @@ presented in a simple text format.</li></ol>
 which have helped to influence the overall development:</p>
 
 <ol>
-<li>Keep Image::ExifTool as independent as possible from other libraries to make
-    it portable and easy to install.  (Portable to a wide range of systems
-    and Perl versions.)</li>
+<li>Make <a href="ExifTool.html">Image::ExifTool</a> as independent as possible
+    from other libraries to make it portable and easy to install.  (Portable to
+    a wide range of systems and Perl versions.)</li>
 <li>Keep the interface simple for simple tasks (sometimes at the expense of making
     it more complicated for complex tasks).</li>
+<li>The <a href="ExifTool.html#Methods">API functions</a> should be isolated from
+    the details of the metadata formats (otherwise the interface turns into a giant
+    hairball, like the metadata).</li>
 <li>Maintain flexibility to allow users the freedom to do what they want.</li>
 <li>Design the code to be efficient for batch processing, even if it increases the
     initial overhead.</li>
-<li>For writing, remember 3 things: 1) data integrity, 2) data integrity, and 3)
-    data integrity.  If you can't do it right, don't do it at all.</li>
-<li>When processing, recognize file types by their structure, not by their extension
-    (if at all possible).</li>
+<li>When writing files, remember 3 things: 1) data integrity, 2) data integrity, and
+    3) data integrity.  If you can't do it right, don't do it at all.</li>
+<li>If possible, recognize file types by their structure, not by their extension.</li>
 <li>Maintain backward compatibility when making changes to the ExifTool API or
     command line application.</li>
 </ol>
 
 <hr>
-<i>Last revised Nov. 20, 2011</i>
+<i>Last revised June 21, 2012</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

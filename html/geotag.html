@@ -53,6 +53,7 @@ must be <a href="#Orient">user-defined</a>.</i></blockquote>
 <li>Garmin XML and TCX</li>
 <li>Magellan eXplorist PMGNTRK</li>
 <li>Honeywell PTNTHPR (see <a href="#Orient">Orientation</a>)</li>
+<li>Winplus Beacon .TXT</li>
 </ul>
 
 <a name="Implementation"></a>
@@ -104,7 +105,7 @@ file name.</i></blockquote>
 <p>The <code>Geosync</code> tag is needed only when the image timestamps are not
 properly synchronized with GPS time, and must be set before <code>Geotime</code>
 to be effective.  The value written to the <code>Geosync</code> tag may take a
-number of different forms, but the basic form is that of a simple time
+number of different forms, but the basic format is that of a simple time
 difference which is added to <code>Geotime</code> before interpolating the GPS
 position in the track log.  This time difference may be of the form "SS",
 "MM:SS", "HH:MM:SS" or "DD HH:MM:SS" (where SS=seconds, MM=minutes, HH=hours and
@@ -121,6 +122,12 @@ below for more details.</p>
 seconds when written to <code>Geosync</code>.  This is different from of other
 date/time shift values where a single value is normally taken as hours.</i>
 </blockquote>
+
+<p>The <code>Geosync</code> value may also be specified using 3 different
+formats which provide a GPS time and a corresponding camera clock time.  While
+these formats may be used for a simple (constant) time synchronization offset,
+they are necessary when performing a clock drift correction (with multiple
+synchronization points), and are described below.</p>
 
 <p><b>Camera clock drift correction:</b></p>
 
@@ -154,12 +161,12 @@ other.</li>
 <li>If neither the GPS nor the image timestamps contain a date, this
 synchronization point may only be used for constant time offset (ie. no time
 drift correction will be applied).</li>
-<li>Both the GPS and the image times are assumed to be local unless another timezone
-is specified.</li>
+<li>Both the GPS and the image times are assumed to be local unless another
+timezone is specified.</li>
 <li>Both the GPS and the image time values may contain decimal seconds.</li>
-<li>A linear time drift correction is applied based on the closest two
-synchronization points if more than one <code>Geosync</code> value is
-written.</li>
+<li>The applied value of the time drift correction is calculated from a
+piecewise linear interpolation/extrapolation between the synchronization points
+if more than one <code>Geosync</code> value is defined.</li>
 <li>When extracting from file, timestamps are taken from the first available of
 the following tags:
 <ul>
@@ -396,12 +403,13 @@ current date/time when the file is rewritten.</blockquote>
 <a name="TR3"></a>
 <p>3. <b>"Warning: Time is too far before track in File:Geotime (ValueConvInv)"</b></p>
 
-<blockquote>If you see a warning like this, you may have a time synchronization
-problem.</blockquote>
+<blockquote>If you see a warning like this, you may have a time zone problem,
+or a time synchronization issue.  Keep in mind that GPS times are in UTC, but
+the camera times are typically in your local time zone.</blockquote>
 
-<blockquote>Try adding the <code>-v2</code> option to your command to output
-verbose information.  You should see messages like this if the GPS track log was
-loaded successfully:
+<blockquote>To see more details about what ExifTool is doing, try adding the
+<code>-v2</code> option to your command.  You should then see messages like
+this if the GPS track log was loaded successfully:
 
 <pre>Loaded 372 points from GPS track log file 'my_track.log'
   GPS track start: 2009:03:30 19:45:25 UTC
@@ -636,7 +644,7 @@ file from a collection of geotagged images:</p>
 
 <hr>
 <i>Created Apr. 2, 2009</i><br>
-<i>Last revised Mar. 6, 2012</i>
+<i>Last revised July 24, 2012</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

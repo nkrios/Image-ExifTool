@@ -387,6 +387,23 @@ you can always generate inconsistencies like this if you really want to by
 specifically writing contradictory information to different groups.)
 </blockquote>
 
+<blockquote>Certain types of meta information (such as EXIF, IPTC, XMP and
+ICC_Profile) may also be <b>copied as a block</b>. This technique copies all
+meta information, even if ExifTool doesn't have the ability to write some
+individual tags contained in the block. For all block types except EXIF, the
+metadata is copied byte-for-byte from the original image.  With EXIF however,
+the metadata may be restructured to ensure that it is self-contained.  Also note
+that EXIF may not be written as a block to TIFF-based file formats.  Beware that
+<b>any existing metadata</b> of this type in the distination file <b>will be
+overwritten</b> by the new block.
+
+<pre><span class='blk'># copy EXIF as a block between same-named JPG files in different directories</span>
+exiftool -tagsfromfile SRCDIR/%f.%e -ext jpg DSTDIR
+
+<span class='blk'># copy XMP as a block from one file to another</span>
+exiftool -tagsfromfile src.jpg -xmp dst.cr2
+</pre></blockquote>
+
 <a name="Q10"></a>
 <p>10. <b>"How does ExifTool handle coded character sets?"</b></p>
 
@@ -423,7 +440,7 @@ specified for some metadata types:
 Valid <code>CHARSET</code> values are (with aliases given in brackets):
 
 <blockquote><table class=clear>
-<tr><td>UTF8</td><td>(cp65001, UTF-8)</td><td>Thai</td><td>(cp874)</td></tr>
+<tr><td>UTF8</td><td>(cp65001, UTF&#8209;8)</td><td>Thai</td><td>(cp874)</td></tr>
 <tr><td>Latin</td><td>(cp1252, Latin1)</td><td>MacRoman</td><td>(cp10000, Mac, Roman)</td></tr>
 <tr><td>Latin2</td><td>(cp1250)</td><td>MacLatin2</td><td>(cp10029)</td></tr>
 <tr><td>Cyrillic</td><td>(cp1251,&nbsp;Russian)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td>MacCyrillic</td><td>(cp10007)</td></tr>
@@ -470,8 +487,8 @@ be specified by setting the ExifUnicodeByteOrder tag (see the
 <a href="TagNames/Extra.html">Extra Tags</a> documentation).</blockquote>
 
 <blockquote>The EXIF "XP" tags (XPTitle, XPComment, etc) are always stored
-internally as little-endian Unicode, and are read and written using the
-specified external character set.</blockquote>
+internally as little-endian Unicode (UCS&#8209;2), and are read and written
+using the specified external character set.</blockquote>
 
 <blockquote><b>IPTC</b><span class='sm'><sup>&dagger;</sup></span>: The
 value of the IPTC:CodedCharacterSet tag determines how the internal IPTC string
@@ -498,10 +515,10 @@ internal IPTC encoding to UTF&#8209;8:
 <pre>exiftool -tagsfromfile @ -iptc:all -codedcharacterset= a.jpg
 </pre>or this command changes it back from UTF&#8209;8 to Windows Latin2 (cp1250):
 <pre>exiftool -tagsfromfile @ -iptc:all -codedcharacterset= -charset iptc=latin2 a.jpg
-</pre>Note that unless UTF&#8209;8 is used, applications have no reliable
-way to determine the IPTC character encoding.  For this reason, it is
-recommended that CodedCharacterSet be set to "<code>UTF8</code>" when creating
-new IPTC.</blockquote>
+</pre>Note that unless CodedCharacterSet indicates UTF&#8209;8, applications
+have no reliable way to determine the IPTC character encoding.  For this reason,
+it is recommended that CodedCharacterSet be set to "<code>UTF8</code>" when
+creating new IPTC.</blockquote>
 
 <blockquote class='sm'><sup>&dagger;</sup> <span class=lt>Refers to the older
 <a href="http://www.iptc.org/site/News_Exchange_Formats/IIM/">IPTC IIM</a> format.
@@ -581,11 +598,11 @@ and are converted to the character set specified by <code>-charset</code> or
 
 <blockquote class=prog>
 <b>Programmers</b>: ExifTool returns all values as byte strings of encoded
-characters. Perl wide characters are not used.  The encoding is UTF-8 by
-default, but valid UTF-8 can not be guaranteed for all values, so the caller
-must validate the encoding if necessary.  The encodings described above
-are set by the various <a href="ExifTool.html#Charset">Charset options</a>
-of the API.</blockquote>
+characters. Perl wide characters are not used.  The encoding is UTF&#8209;8 by
+default, but valid UTF&#8209;8 can not be guaranteed for all values, so the
+caller must validate the encoding if necessary.  The encodings described above
+are set by the various <a href="ExifTool.html#Charset">Charset options</a> of
+the API.</blockquote>
 
 <a name="Q11"></a>
 <p>11. <b>"My user-defined tags don't work"</b></p>
@@ -868,9 +885,9 @@ here <code>-F</code> would be equivalent to <code>-F-340</code>). See the
 documentation</a> for details.</blockquote>
 
 <blockquote>When writing, <code>-F</code> applies a permanent
-correction to the maker notes.  Note that some Makernote information may be lost
+correction to the maker notes.  Note that <u>some Makernote information may be lost
 permanently if the proper correction is not applied when writing images with
-this problem.</blockquote>
+this problem</u>.</blockquote>
 
 <blockquote>Any error that occurs while writing will prevent the file from being
 written.  However, most Makernote errors are designated as <b>minor</b>, which
@@ -880,8 +897,8 @@ allows them to be ignored by using the <code>-m</code> option.  For example:
 </pre>
 
 Using <code>-m</code> will downgrade the minor error to a warning, allowing the
-file to be written, but some Makernote information may be lost when ignoring
-certain types of errors like this.
+file to be written, but <u>some Makernote information may be lost when
+ignoring certain types of errors like this</u>.
 </blockquote>
 
 <a name="Q16"></a>
@@ -1125,8 +1142,8 @@ from the original image to the same locations in the new image.  The
 for unsafe EXIF tags in JPEG images which are not normally copied.</blockquote>
 
 <blockquote>After repairing an image like this you should be able to write to it
-without errors, but note that some metadata from the original image may have
-been lost in the process.</blockquote>
+without errors, but note that <u>some metadata from the original image may have
+been lost in the process</u>.</blockquote>
 
 <blockquote><b>Note</b>: ExifTool will not modify the JPEG image data, so if the
 image itself is corrupted (ie. if you get a message saying "Not a valid JPEG"),
@@ -1171,6 +1188,8 @@ line:
 <pre>exiftool -comment="line 1
 line 2" image.jpg
 </pre>
+<p>(Also, in Bourne shells the character sequence <code>$'\n'</code>
+may be used for a newline.)</p>
 <p>C shells (press "<code>\</code>" then <i>RETURN</i> inside a quoted string)</p>
 <pre>exiftool -comment="line 1\
 line 2" image.jpg
@@ -1228,7 +1247,7 @@ the file (NOT to "test"):
 <p>23a. <b>"Why do I get '<code>0 image files updated</code>' when writing?"</b>, or<br>
 23b. <b>"ExifTool doesn't write some tags to a file"</b></p>
 
-<blockquote>There are two reasons why this may happen:
+<blockquote>There are a few reasons why this may happen:
 
 <ol><li>The value of the tag is not being set correctly.</li></ol>
 
@@ -1263,7 +1282,13 @@ alternative.</blockquote>
 <blockquote>Also note that MakerNotes tags can not be created or deleted
 individually, so they can only be written if they already exist in a
 file.  The entire MakerNotes must be created or deleted as a block (see
-<a href="#Q8">FAQ number 8</a> for details).</blockquote>
+<a href="#Q8">FAQ number 8</a> for details).
+
+<ol start="3"><li>A time value is being shifted but the specified tag doesn't
+exist.</li></ol>
+
+For example, <code>-datetimeoriginal+=1</code> will have no effect unless
+the DateTimeOriginal tag exists in the image.</blockquote>
 
 <a name="Q24"></a>
 <p>24. <b>"When I write a file the date/time gets reset to today's date"</b></p>
@@ -1324,7 +1349,7 @@ exiftool -alldates+=1 "-filemodifydate&lt;datetimeoriginal" c:\images
 </pre></blockquote>
 
 <hr>
-<i>Last revised Apr. 10, 2012</i>
+<i>Last revised May 27, 2012</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.44';
+$VERSION = '1.47';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -32,6 +32,17 @@ sub WriteIPTC($$$);
 sub CheckIPTC($$$);
 sub PrintCodedCharset($);
 sub PrintInvCodedCharset($);
+
+# standard IPTC locations
+# (MWG specifies locations only for JPEG, TIFF and PSD -- the rest are ExifTool-defined)
+my %isStandardIPTC = (
+    'JPEG-APP13-Photoshop-IPTC' => 1,
+    'TIFF-IFD0-IPTC'            => 1,
+    'PSD-IPTC'                  => 1,
+    'MIE-IPTC'                  => 1,
+    'EPS-Photoshop-IPTC'        => 1,
+    'PS-Photoshop-IPTC'         => 1,
+);
 
 my %fileFormat = (
     0 => 'No ObjectData',
@@ -359,7 +370,7 @@ my %fileFormat = (
             '' => '',
             '01' => 'Object Kill',
             '02' => 'Object Replace',
-            '03' => 'Ojbect Append',
+            '03' => 'Object Append',
             '04' => 'Object Reference',
         },
     },
@@ -1008,7 +1019,7 @@ sub TranslateCodedString($$$$)
 sub IsStandardIPTC($)
 {
     my $path = shift;
-    return $path =~ /^(JPEG-APP13-Photoshop-IPTC|TIFF-IFD0-IPTC|PSD-IPTC|MIE-IPTC)$/
+    return $isStandardIPTC{$path};
 }
 
 #------------------------------------------------------------------------------
@@ -1069,6 +1080,16 @@ sub ProcessIPTC($$$)
         $pos = 0;
         $dirEnd = $pos + $dirLen;
         # NOTE: MUST NOT access $dirInfo DataPt, DirStart or DataLen after this!
+    }
+    # extract IPTC as a block if specified
+    if ($exifTool->{REQ_TAG_LOOKUP}{iptc} or ($exifTool->{OPTIONS}{Binary} and
+        not $exifTool->{EXCL_TAG_LOOKUP}{iptc}))
+    {
+        if ($pos or $dirLen != length($$dataPt)) {
+            $exifTool->FoundTag('IPTC', substr($$dataPt, $pos, $dirLen));
+        } else {
+            $exifTool->FoundTag('IPTC', $$dataPt);
+        }
     }
     while ($pos + 5 <= $dirEnd) {
         my $buff = substr($$dataPt, $pos, 5);

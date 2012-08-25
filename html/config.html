@@ -150,13 +150,14 @@
     },
     <span class='com'># Composite tags are added to the Composite table:</span>
     'Image::ExifTool::Composite' =&gt; {
-        <span class='com'># Composite tags are unique: The Require/Desire elements list tags
-        # that must/may exist, and the keys of these hashes are used as
-        # indices in the @val array of the ValueConv expression to derive
-        # the composite tag value.  All Require'd tags must exist for the
-        # Composite tag to be evaluated.  If no Require'd tags are specified,
-        # then at least one of the Desire'd tags must exist.  See the
-        # Composite table in Image::ExifTool::Exif for more examples.</span>
+        <span class='com'># Composite tags are unique:  The Require/Desire elements specify
+        # tags that must/may exist, and the keys of these hashes are used
+        # as indices in the @val array of the ValueConv expression to
+        # derive the composite tag value.  All Require'd tags must exist
+        # for the Composite tag to be evaluated.  If no Require'd tags are
+        # specified, then at least one of the Desire'd tags must exist.
+        # See the Composite table in Image::ExifTool::Exif for more
+        # examples, and lib/Image/ExifTool/README for all of the details.</span>
         BaseName =&gt; {
             Require =&gt; {
                 0 =&gt; 'FileName',
@@ -164,7 +165,7 @@
             <span class='com'># remove the extension from FileName</span>
             ValueConv =&gt; 'my $name=$val[0]; $name=~s/\..*?$//; $name',
         },
-        <span class='com'># the following examples demonstrate simplifications which may be
+        <span class='com'># the next few examples demonstrate simplifications which may be
         # used if only one tag is Require'd or Desire'd:
         # 1) the Require lookup may be replaced with a simple tag name
         # 2) "$val" may be used to represent "$val[0]" in the expression</span>
@@ -177,6 +178,7 @@
             Require =&gt; 'ScaleFactor35efl',
             Groups =&gt; { 2 =&gt; 'Camera' },
             ValueConv =&gt; 'sqrt(24*24+36*36) / ($val * 1750)',
+            <span class='com'># an optional PrintConv may be used to format the value</span>
             PrintConv =&gt; 'sprintf("%.3f mm",$val)',
         },
         <span class='com'># generate a description for this file type</span>
@@ -184,8 +186,8 @@
             Require =&gt; 'FileType',
             ValueConv =&gt; 'GetFileType($val,1) || $val',
         },
-        <span class='com'># calculate actual image size based on resolution</span>
-        ActualImageSize => {
+        <span class='com'># calculate physical image size based on resolution</span>
+        PhysicalImageSize => {
             Require => {
                 0 => 'ImageWidth',
                 1 => 'ImageHeight',
@@ -194,6 +196,7 @@
                 4 => 'ResolutionUnit',
             },
             ValueConv => '$val[0]/$val[2] . " " . $val[1]/$val[3]',
+            <span class='com'># (the @prt array contains print-formatted values)</span>
             PrintConv => 'sprintf("%.1fx%.1f $prt[4]", split(" ",$val))',
         },
         <span class='com'># [advanced] select largest JPEG preview image</span>

@@ -53,7 +53,8 @@ automates the handling of this tag in the MWG module -- see the
 <td>Directory</td>
 <td class=c title=' ! = Unsafe'>Y!</td>
 <td class=c>System</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(may be written to move the file to a specified directory. New directories
+are created as necessary)</span></span></td></tr>
 <tr class=b>
 <td>EXIF</td>
 <td class=c title=' ! = Unsafe'>Y!</td>
@@ -149,20 +150,19 @@ and extraction of synchronization times from image files. See the
 <td class=c>-</td>
 <td><span class=s><span class=n>(this write-only tag is used to define the GPS track log data or track log
 file name.  Currently supported track log formats are GPX, NMEA RMC/GGA/GLL,
-KML, IGC, Garmin XML and TCX, Magellan PMGNTRK, and Honeywell PTNTHPR.  See
-<a href="../geotag.html">geotag.html</a> for details)</span></span></td></tr>
+KML, IGC, Garmin XML and TCX, Magellan PMGNTRK, Honeywell PTNTHPR, and
+Winplus Beacon text files.  See <a href="../geotag.html">geotag.html</a> for details)</span></span></td></tr>
 <tr>
 <td>Geotime</td>
 <td class=c>Y</td>
 <td class=c>-</td>
 <td><span class=s><span class=n>(this write-only tag is used to define a date/time for interpolating a
 position in the GPS track specified by the Geotag tag.  Writing this tag
-causes the following 8 tags to be written:  GPSLatitude, GPSLatitudeRef,
-GPSLongitude, GPSLongitudeRef, GPSAltitude, GPSAltitudeRef, GPSDateStamp and
-GPSTimeStamp.  The local system timezone is assumed if the date/time value
-does not contain a timezone.  May be deleted to delete associated GPS tags.
-A group name of &#39;EXIF&#39; or &#39;XMP&#39; may be specified to write or delete only
-EXIF or XMP GPS tags.  The value of Geotag must be assigned before this tag)</span></span></td></tr>
+causes GPS information to be written into the EXIF or XMP of the target
+files.  The local system timezone is assumed if the date/time value does not
+contain a timezone.  May be deleted to delete associated GPS tags.  A group
+name of &#39;EXIF&#39; or &#39;XMP&#39; may be specified to write or delete only EXIF or XMP
+GPS tags.  The Geotag tag must be assigned before this tag)</span></span></td></tr>
 <tr class=b>
 <td>ICC_Profile</td>
 <td class=c title=' ! = Unsafe'>Y!</td>
@@ -174,16 +174,21 @@ EXIF or XMP GPS tags.  The value of Geotag must be assigned before this tag)</sp
 <td class=c>File</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>IPTC</td>
+<td class=c title=' ! = Unsafe'>Y!</td>
+<td class=c>IPTC</td>
+<td><span class=s><span class=n>(the full IPTC data block)</span></span></td></tr>
+<tr>
 <td>ImageHeight</td>
 <td class=c>N</td>
 <td class=c>File</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ImageWidth</td>
 <td class=c>N</td>
 <td class=c>File</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>JPEGDigest</td>
 <td class=c>N</td>
 <td class=c>File</td>
@@ -192,16 +197,25 @@ sub-sampling values to generate the value of this tag.  The result is
 compared to known values in an attempt to deduce the originating software
 based only on the JPEG image data.  For performance reasons, this tag is
 generated only if specifically requested)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>MIMEType</td>
 <td class=c>N</td>
 <td class=c>File</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>MaxVal</td>
 <td class=c>N</td>
 <td class=c>File</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>NewGUID</td>
+<td class=c>N</td>
+<td class=c>ExifTool</td>
+<td><span class=s><span class=n>(generates a new, random GUID with format
+YYYYmmdd-HHMM-SSNN-PPPP-RRRRRRRRRRRR, where Y=year, m=month, d=day, H=hour,
+M=minute, S=second, N=file sequence number in hex, P=process ID in hex, and
+R=random hex number; without dashes with the -n option.  Not generated
+unless specifically requested)</span></span></td></tr>
 <tr>
 <td>Now</td>
 <td class=c>N</td>
@@ -261,7 +275,7 @@ the command line)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 23, 2012</i>
+<br><i>Last revised Jun 30, 2012</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>
