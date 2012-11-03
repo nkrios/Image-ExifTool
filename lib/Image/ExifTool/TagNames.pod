@@ -369,6 +369,8 @@ official EXIF 2.3 specification.
            PreviewImageStart         IFD0       int32u*
            JpgFromRawStart           SubIFD     int32u*
            JpgFromRawStart           IFD2       int32u*
+           OtherImageStart           SubIFD1    int32u*
+           OtherImageStart           SubIFD2    int32u*
            OtherImageStart           -          N
   0x0202   ThumbnailLength           IFD1       int32u*
            ThumbnailLength           IFD0       int32u*
@@ -377,6 +379,8 @@ official EXIF 2.3 specification.
            PreviewImageLength        IFD0       int32u*
            JpgFromRawLength          SubIFD     int32u*
            JpgFromRawLength          IFD2       int32u*
+           OtherImageLength          SubIFD1    int32u*
+           OtherImageLength          SubIFD2    int32u*
            OtherImageLength          -          N
   0x0203   JPEGRestartInterval       -          N
   0x0205   JPEGLosslessPredictors    -          N
@@ -1051,8 +1055,10 @@ L<http://www.adobe.com/devnet/xmp/> for the official XMP specification.
 
   Namespace                                     Writable
   ---------                                     --------
+  aas                                           XMP aas
   acdsee                                        XMP acdsee
   album                                         XMP Album
+  apple-fi                                      XMP apple_fi
   aux                                           XMP aux
   cc                                            XMP cc
   cell                                          XMP cell
@@ -1098,6 +1104,36 @@ L<http://www.adobe.com/devnet/xmp/> for the official XMP specification.
   xmpRights                                     XMP xmpRights
   xmpTPg                                        XMP xmpTPg
 
+=head3 XMP aas Tags
+
+Apple Adjustment Settings used by iPhone/iPad.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  AffineA                                       real
+  AffineB                                       real
+  AffineC                                       real
+  AffineD                                       real
+  AffineX                                       real
+  AffineY                                       real
+  CropH                                         integer/
+  CropW                                         integer/
+  CropX                                         integer/
+  CropY                                         integer/
+  Curve0x                                       real
+  Curve0y                                       real
+  Curve1x                                       real
+  Curve1y                                       real
+  Curve2x                                       real
+  Curve2y                                       real
+  Curve3x                                       real
+  Curve3y                                       real
+  Curve4x                                       real
+  Curve4y                                       real
+  Highlights                                    real/
+  Shadows                                       real/
+  Vibrance                                      real/
+
 =head3 XMP acdsee Tags
 
 ACD Systems ACDSee namespace tags.
@@ -1129,6 +1165,18 @@ Adobe Album namespace tags.
   Tag Name                                      Writable
   --------                                      --------
   Notes                                         string
+
+=head3 XMP apple_fi Tags
+
+Face information tags written by the Apple iPhone 5 inside the mwg-rs
+RegionExtensions.
+
+  Tag Name                                      Writable
+  --------                                      --------
+  AngleInfoRoll                                 integer
+  ConfidenceLevel                               integer
+  FaceID                                        integer
+  TimeStamp                                     integer
 
 =head3 XMP aux Tags
 
@@ -3446,6 +3494,7 @@ This information is found in the PSD file header.
            CanonCameraInfo500D                  Canon CameraInfo500D
            CanonCameraInfo550D                  Canon CameraInfo550D
            CanonCameraInfo600D                  Canon CameraInfo600D
+           CanonCameraInfo650D                  Canon CameraInfo650D
            CanonCameraInfo1000D                 Canon CameraInfo1000D
            CanonCameraInfo1100D                 Canon CameraInfo600D
            CanonCameraInfoPowerShot             Canon CameraInfoPowerShot
@@ -4262,6 +4311,31 @@ CameraInfo tags for the EOS 600D and 1100D.
     487    DirectoryIndex                       int32u
     763    PictureStyleInfo                     Canon PSInfo2
 
+=head3 Canon CameraInfo650D Tags
+
+CameraInfo tags for the EOS 650D.
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+      3    FNumber                              int8u
+      4    ExposureTime                         int8u
+      6    ISO                                  int8u
+     27    CameraTemperature                    int8u
+     32    FocalLength                          int16uRev
+    125    CameraOrientation                    int8u
+    140    FocusDistanceUpper                   int16uRev
+    142    FocusDistanceLower                   int16uRev
+    188    WhiteBalance                         int16u
+    192    ColorTemperature                     int16u
+    244    PictureStyle                         int8u
+    295    LensType                             int16uRev
+    297    MinFocalLength                       int16uRev
+    299    MaxFocalLength                       int16uRev
+    539    FirmwareVersion                      N
+    624    FileIndex                            int32u
+    636    DirectoryIndex                       int32u
+    912    PictureStyleInfo                     Canon PSInfo2
+
 =head3 Canon CameraInfo1000D Tags
 
 CameraInfo tags for the EOS 1000D.
@@ -4428,8 +4502,8 @@ apparently downwards for PowerShot models.
 =head3 Canon AFInfo2 Tags
 
 Newer version of the AFInfo record containing much of the same information
-(and coordinate confusion) as the older version.  In this record, values of
-9 and 45 have been observed for NumAFPoints.
+(and coordinate confusion) as the older version.  In this record, NumAFPoints
+may be 7, 9, 11, 19, 31, 45 or 61, depending on the camera model.
 
   Sequence Tag Name                             Writable
   -------- --------                             --------
@@ -7217,6 +7291,7 @@ DiMAGE X and Xt.
   0x002b   DistortInfo                          Nikon DistortInfo
   0x002c   UnknownInfo                          Nikon UnknownInfo
   0x0032   UnknownInfo2                         Nikon UnknownInfo2
+  0x0035   HDRInfo                              Nikon HDRInfo
   0x0039   LocationInfo                         Nikon LocationInfo
   0x0080   ImageAdjustment                      string
   0x0081   ToneComp                             string
@@ -7282,7 +7357,7 @@ DiMAGE X and Xt.
   0x00a8   FlashInfo0100                        Nikon FlashInfo0100
            FlashInfo0102                        Nikon FlashInfo0102
            FlashInfo0103                        Nikon FlashInfo0103
-           FlashInfo0104                        Nikon FlashInfo0103
+           FlashInfo0105                        Nikon FlashInfo0105
            FlashInfoUnknown                     Nikon FlashInfoUnknown
   0x00a9   ImageOptimization                    string
   0x00aa   Saturation                           string
@@ -7407,6 +7482,14 @@ DiMAGE X and Xt.
   Index4   Tag Name                             Writable
   ------   --------                             --------
       0    UnknownInfo2Version?                 N
+
+=head3 Nikon HDRInfo Tags
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+      4    HDR                                  int8u
+      5    HDRLevel                             int8u
+      6    HDRSmoothing                         int8u
 
 =head3 Nikon LocationInfo Tags
 
@@ -7808,6 +7891,20 @@ These tags are used by the D3 (firmware 2.x), D3X, D3S, D90, D300 (firmware
            FlashGroupBCompensation              int8s
      21    FlashGroupCOutput                    int8u
            FlashGroupCCompensation              int8s
+
+=head3 Nikon FlashInfo0105 Tags
+
+These tags are used by the D4, D600, D800 and D3200.
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+      0    FlashInfoVersion                     N
+      4    FlashSource                          int8u
+      6    ExternalFlashFirmware                int8u[2]
+      8    ExternalFlashFlags                   int8u
+    9.1    FlashCommanderMode                   int8u & 0x80
+    9.2    FlashControlMode                     int8u & 0x7f
+     27    FlashCompensation                    int8s
 
 =head3 Nikon FlashInfoUnknown Tags
 
@@ -10610,6 +10707,7 @@ between different models.
   0x0056   FlashExposureComp                    rational64s
   0x0057   Firmware                             string
   0x0058   WhiteBalance                         string
+  0x0059   DigitalFilter                        string
 
 =head2 Sony Tags
 
@@ -10656,7 +10754,12 @@ MakerNotes.
   0x2012   LateralChromaticAberration           int32u
   0x2013   DistortionCorrection                 int32u
   0x2014   WBShiftAB_GM                         int32s[2]
+  0x2016   AutoPortraitFramed                   N
   0x3000   ShotInfo                             Sony ShotInfo
+  0x9400   Tag9400                              Sony Tag9400
+  0x9402   Tag9402                              Sony Tag9402
+  0x9403   Tag9403                              Sony Tag9403
+  0x940e   Tag940e                              Sony Tag940e
   0xb000   FileFormat                           int8u[4]
   0xb001   SonyModelID                          int16u
   0xb020   ColorReproduction                    string
@@ -10685,6 +10788,7 @@ MakerNotes.
   0xb04e   FocusMode                            int16u
            LongExposureNoiseReduction           int16u
   0xb04f   DynamicRangeOptimizer                int16u
+  0xb050   HighISONoiseReduction2               N
   0xb052   IntelligentAuto                      int16u
   0xb054   WhiteBalance                         int16u
 
@@ -10712,7 +10816,8 @@ Camera information for other DSLR and NEX models.
   ------   --------                             --------
       0    LensSpec                             undef[8]
     304    AFMicroAdjValue                      int8u
-    305    AFMicroAdjMode                       int8u
+    305    AFMicroAdjMode                       int8u & 0x80
+  305.1    AFMicroAdjRegisteredLenses           int8u & 0x7f
 
 =head3 Sony FocusInfo Tags
 
@@ -10777,6 +10882,11 @@ A580, A33, A35, A55, NEX-3/5/C3 and VG10E.
      32    LiveViewAFMethod                     int8u
      38    FNumber                              int8u
      39    ExposureTime                         int8u
+     42    ExposureCompensation2                N
+     44    FlashExposureCompSet2                N
+     46    Orientation2                         int8u
+     48    FlashAction2                         int8u
+     50    FocusMode2                           int8u
 
 =head3 Sony FaceInfo Tags
 
@@ -11045,6 +11155,41 @@ rotation -- the width is always the longer dimension.
     185    Face6Position                        int16u[4]
     222    Face7Position                        int16u[4]
     259    Face8Position                        int16u[4]
+
+=head3 Sony Tag9400 Tags
+
+Data for tags 0x2010 and 0x94xx is encrypted by a simple substitution
+cipher, but is decrypted by ExifTool.
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0008   SequenceImageNumber                  int32u
+  0x000c   SequenceFileNumber                   int32u
+  0x0010   ReleaseMode2                         int8u
+  0x001a   ShotNumberSincePowerUp               int32u
+  0x0022   ReleaseMode3                         int8u
+  0x0028   CameraOrientation                    int8u
+  0x0029   Quality2                             int8u
+
+=head3 Sony Tag9402 Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0004   AmbientTemperature                   int8s
+  0x0017   AFMode                               int8u
+
+=head3 Sony Tag9403 Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x0005   CameraTemperature                    int8s
+
+=head3 Sony Tag940e Tags
+
+  Tag ID   Tag Name                             Writable
+  ------   --------                             --------
+  0x017d   AFMicroAdj                           int8s
+  0x017e   ExposureProgram                      int8u
 
 =head3 Sony Ericsson Tags
 
@@ -11591,11 +11736,13 @@ Lens distortion correction information.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0004   DistortionParamB                     int16s
+  0x0002   DistortionParam02                    int16s
+  0x0004   DistortionParam04                    int16s
   0x0005   DistortionScale                      int16s
     7.1    DistortionCorrection                 int16s & 0x0f
-  0x0008   DistortionParamA                     int16s
-  0x000b   DistortionParamC                     int16s
+  0x0008   DistortionParam08                    int16s
+  0x0009   DistortionParam09                    int16s
+  0x000b   DistortionParam11                    int16s
   0x000c   DistortionN?                         int16s
 
 =head2 SigmaRaw Tags
@@ -15749,13 +15896,20 @@ ID3 version 2.3 tags
 
 =head3 ID3 Private Tags
 
-ID3 private (PRIV) tags.
+ID3 private (PRIV) tags.  ExifTool will decode any private tags found, even
+if they do not appear in this table.
 
-  Tag ID               Tag Name                 Writable
-  ------               --------                 --------
-  'AverageLevel'       AverageLevel             N
-  'PeakValue'          PeakValue                N
-  'XMP'                XMP                      XMP
+  Tag Name                                      Writable
+  --------                                      --------
+  AverageLevel                                  N
+  PeakValue                                     N
+  WM_MediaClassPrimaryID                        N
+  WM_MediaClassSecondaryID                      N
+  WM_Provider                                   N
+  WM_CollectionGroupID                          N
+  WM_CollectionID                               N
+  WM_ContentID                                  N
+  XMP                                           XMP
 
 =head3 ID3 v2_4 Tags
 
@@ -23673,6 +23827,7 @@ without modifying the file itself.
   ExifByteOrder              File               Y
   ExifToolVersion            ExifTool           N
   ExifUnicodeByteOrder       -                  Y
+  FileAccessDate             System             N
   FileModifyDate             System             Y!
   FileName                   System             Y!
   FilePermissions            System             N
@@ -23878,7 +24033,7 @@ information is extracted.
                        MPImageLength
                        MPImageType
   OriginalDecisionData OriginalDecisionDataOffset Y!
-  OtherImage           OtherImageStart          N
+  OtherImage           OtherImageStart          Y
                        OtherImageLength
   PreviewImage         PreviewImageStart        Y
                        PreviewImageLength

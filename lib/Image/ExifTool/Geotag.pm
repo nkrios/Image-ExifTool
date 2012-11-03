@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.33';
+$VERSION = '1.34';
 
 sub JITTER() { return 2 }       # maximum time jitter
 
@@ -677,6 +677,8 @@ sub SetGeoValues($$;$)
     # maximum time (sec) from nearest GPS fix when position is still considered valid
     my $geoMaxIntSecs = $exifTool->Options('GeoMaxIntSecs');
     my $geoMaxExtSecs = $exifTool->Options('GeoMaxExtSecs');
+    my $noInterpolate = $exifTool->Options('GeoNoInterpolate');
+
     # use 30 minutes for a default
     defined $geoMaxIntSecs or $geoMaxIntSecs = 1800;
     defined $geoMaxExtSecs or $geoMaxExtSecs = 1800;
@@ -789,7 +791,7 @@ sub SetGeoValues($$;$)
             # check to see if we are extrapolating before the first entry in a track
             my $maxSecs = $$p1{first} ? $geoMaxExtSecs : $geoMaxIntSecs;
             # don't interpolate if fixes are too far apart
-            if ($t1 - $t0 > $maxSecs) {
+            if ($t1 - $t0 > $maxSecs or $noInterpolate) {
                 # treat as an extrapolation -- use nearest fix if close enough
                 my $tn;
                 if ($time - $t0 < $t1 - $time) {

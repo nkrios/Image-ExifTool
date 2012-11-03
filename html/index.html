@@ -40,7 +40,7 @@ table.dl td     { padding: .4em .8em }
 <body>
 <h1><a name="top">ExifTool by Phil Harvey</a></h1>
 <h2 class='tight red'><b>Read</b>, <b>Write</b> and <b>Edit</b> Meta Information!</h2>
-
+<p><b>NEW!</b> --> <a href="fix_corrupted_nef.html">Utility to fix Nikon D4/D600/D800/D800E NEF images corrupted by Nikon Transfer 1</a></p>
 <div class='wide'><table class='links'><tr>
 <th><a href="install.html" class='wt'>&nbsp;Installing&nbsp;</a></th>
 <th><a href="TagNames/index.html" class='wt'>&nbsp;Tag&nbsp;Names&nbsp;</a></th>
@@ -74,9 +74,9 @@ table.dl td     { padding: .4em .8em }
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-9.01.tar.gz">
-Download        Version 9.01</a> (3.3 MB) -
-<a href="history.html">August 25, 2012</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-9.04.tar.gz">
+Download        Version 9.04</a> (3.4 MB) -
+<a href="history.html">Nov. 3, 2012</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -122,8 +122,8 @@ distribution above.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-9.01.zip">
-         exiftool-9.01.zip</a> (3.3 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-9.04.zip">
+         exiftool-9.04.zip</a> (3.3 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -134,8 +134,8 @@ of Windows (including Windows 7).</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 Mac OS X Package:
-<a href="ExifTool-9.01.dmg">
-         ExifTool-9.01.dmg</a> (2.2 MB)</b></td></tr></table></blockquote>
+<a href="ExifTool-9.04.dmg">
+         ExifTool-9.04.dmg</a> (2.2 MB)</b></td></tr></table></blockquote>
 
 <p><b>The OS X package</b> installs the ExifTool command-line application and
 libraries in /usr/bin. After installing, type "<code>exiftool</code>" in a
@@ -1027,6 +1027,8 @@ binary data.  The simple script above does not handle this case.</p>
 <li><a href="http://code.google.com/p/tinyexif/">TinyExif</a>: Simple Windows GUI for ExifTool written in Python using the Qt4 toolkit</li>
 <li><a href="http://gui2-for-exiftool.weebly.com/">GUI2 for ExifTool</a>: An ExifTool GUI with built-in editor and browser</li>
 <li><a href="http://www.kula-shaker.ru/autojpegtrunk-english">AutoJpegTrunk</a>: Tool to remove all metadata from JPEG images</li>
+<li><a href="http://www.advancedrenamer.com/">AdvancedRenamer</a>: Rename files and folders from metadata</li>
+<li><a href="http://www.proxel.se/exif.html">Proxel EXIF Tool</a>: Photoshop plugin based on ExifTool</li>
 </ul>
 
 <p><b><a name="related_mac">Mac OS X</a></b></p>
@@ -1056,8 +1058,8 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="http://kde-apps.org/content/show.php?content=30971">rawimage:</a> A kfile plugin and thumbnail image handler for RAW formats</li>
 <!-- apparently abandonded: <li><a href="http://sagittarius.berlios.de/">Sagittarius</a>: Linux XMP metadata editor</li> -->
 <li><a href="http://beam.at/aenima">Photo related scripts</a>: Includes EXIFInfo script to provide statistics from EXIF data</li>
-<li><a href="http://kornelix.squarespace.com/fotoxx/">Fotoxx</a>: Open source Linux program for photo editing and collection management</li>
 <li><a href="http://hugin.sourceforge.net/">Hugin</a>: Panorama photo stitcher</li>
+<li><a href="https://savannah.nongnu.org/projects/fotopreprocessor/">FotoPreProcessor</a>: PyQt4-based frontend for exiftool to graphically edit metadata</li>
 </ul>
 
 <p><b><a name="related_multi">Multi-Platform</a></b></p>
@@ -1065,7 +1067,6 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="http://basepath.com/ImageIngester/">ImageIngester</a>: Windows and Mac OS X image workflow automator</li>
 <li><a href="http://www.carto.net/projects/photoTools/gpsPhoto/">gpsPhoto</a>: Geotag your images from a GPS (GPX) track log</li>
 <li><a href="https://puszcza.gnu.org.ua/projects/renrot/">renrot</a>: Perl utility to perform various processing tasks on images</li>
-<li><a href="http://www.proxel.se/exif.html">Proxel EXIF Tool</a>: Photoshop plugin based on ExifTool</li>
 <li><a href="http://code.google.com/p/gpicsync/">GPicSync</a>: Windows/Linux utility to geocode photos from a GPX track log and create KML files</li>
 <li><a href="http://flickfleck.googlecode.com/">FlickFleck</a>: Tool to transfer images from memory card, rotate, rename, and organize by date</li>
 <!-- broken: <li><a href="http://muellerware.org/hg/gpx2exif/">gpx2exif</a>: Python script to geocode photos and produce KML files from a GPS track log</li> -->
@@ -1074,6 +1075,7 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="http://www.xnview.com/en/xnview.html">XnView</a>: View and convert graphic files</li>
 <li><a href="http://sourceforge.net/projects/mapivi/">Mapivi</a>: Open-source and cross-platform picture manager</li>
 <li><a href="http://www.resourcespace.org/">ResourceSpace</a>: Open source digital asset management system</li>
+<li><a href="fix_corrupted_nef.html">fix_corrupted_nef</a>: Utility to fix Nikon D4/D600/D800/D800E NEF images corrupted by Nikon Transfer 1</li>
 </ul>
 
 <p><b><a name="related_online">Online</a></b></p>
@@ -1088,6 +1090,7 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <li><a href="http://regex.info/blog/lightroom-goodies/metadata-wrangler/">Metadata Wrangler</a>: Strip selected metadata components from images as they are exported</li>
 <li><a href="http://chaoliu12.wordpress.com/fullmetaexport-lightroom-plugin/">FullMetaExport</a>: Export JPEG images from Lightroom with full metadata</li>
 <li><a href="http://www.essl.de/wp/2012/05/24/lenstagger-now-with-analog-camera-film-support/">LensTagger</a>:  Add EXIF information like aperture and focal length for manual lenses</li>
+<li><a href="http://tim.jagenberg.info/projects/deaspect/">DeAspect:</a> Remove aspect ratio information from DNG, CR2 and ORF images to restore full image</li>
 </ul>
 
 <p><b><a name="related_prog">Programming</a></b></p>
@@ -1141,7 +1144,6 @@ information:</p>
 <h3><a name="videos">How-To Videos</a></h3>
 <ul>
 <li><a href="http://www.youtube.com/watch?v=K9PAD7GqUag">Using the ExifTool on Linux to read/write Exif Tags to your photo collection</a></li>
-<li><a href="http://www.youtube.com/watch?v=HLYuHkhin9w">ExifTool: convert XMP to IPTC (WINDOWS)</a></li>
 <li><a href="http://www.youtube.com/watch?v=WchknYwbFJY">Working with jpg Metadata Comments - Exiftool - BASH - Linux Command Line</a></li>
 </ul>
 

@@ -129,13 +129,8 @@ sub nearEnough($$)
                ($line2 eq "$1$Image::ExifTool::VERSION$Image::ExifTool::RELEASE$2" or
                 $line2 eq "$1$Image::ExifTool::VERSION$2");
 
-    # allow different FileModifyDate's
-    return 1 if $line1 =~ /File\s?Modif.*Date/ and
-                $line2 =~ /File\s?Modif.*Date/;
-
-    # allow different FilePermission's
-    return 1 if $line1 =~ /File\s?Permissions/ and
-                $line2 =~ /File\s?Permissions/;
+    # allow different FileModifyDate, FileAccessDate and FilePermissions
+    return 1 if $line1 =~ /(File\s?(Modif.*Date|Access\s?Date|Permissions))/ and $line2 =~ /$1/;
 
     # allow CurrentIPTCDigest to be zero if Digest::MD5 isn't installed
     return 1 if $line1 =~ /Current IPTC Digest/ and

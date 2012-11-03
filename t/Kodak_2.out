@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.02
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.02
 [File, System, Image] FileName - File Name: Kodak.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 3.3 kB
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2006:06:05 13:12:56-04:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2012:09:04 19:23:42-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg

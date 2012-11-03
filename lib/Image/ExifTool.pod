@@ -613,6 +613,11 @@ ignored if the PDOP is greater than this.  Default is undef.
 Minimum number of satellites for geotagging.  GPS fixes are ignored if the
 number of acquired satellites is less than this.  Default is undef.
 
+=item GoNoInterpolate
+
+Disable interpolation for geotagging.  With this flag set to 1, geotagging
+uses the nearest fix instead of interpolating between fixes.  Default is 0.
+
 =item GlobalTimeShift
 
 Time shift to apply to all extracted date/time PrintConv values.  Does not
@@ -715,6 +720,12 @@ causing conversion to local time when they are extracted.  According to the
 QuickTime specification date/time values should be UTC, but many digital
 cameras store local time instead (presumably because they don't know the
 time zone), so the default is 0.
+
+=item RequestAll
+
+Flag to request all tags to be extracted.  This causes some tags to be
+generated which normally would not be unless specifically requested (by
+passing the tag name to ImageInfo or ExtractInfo).  Default is 0.
 
 =item ScanForXMP
 
@@ -1102,11 +1113,13 @@ ListSep, PrintConv and StrictDate.
 
 1) Tag key
 
-2) [optional] Value type, 'PrintConv', 'ValueConv', 'Both' or 'Raw'
+2) [optional] Value type: 'PrintConv', 'ValueConv', 'Both', 'Raw' or
+'Rational'
 
 The default value type is 'PrintConv' if the PrintConv option is set,
 otherwise the default is 'ValueConv'.  A value type of 'Both' returns both
-ValueConv and PrintConv values as a list.
+ValueConv and PrintConv values as a list.  'Rational' returns the raw
+rational value as a string fraction for rational types.
 
 =item Return Values:
 
@@ -1118,7 +1131,9 @@ binary data, or hash references if the L</Struct> option is set.
 
 Note: It is possible for L</GetValue> to return an undefined ValueConv or
 PrintConv value (or an empty list in list context) even if the tag exists,
-since it is possible for these conversions to yield undefined values.
+since it is possible for these conversions to yield undefined values.  And
+the Rational value will be undefined for any non-rational tag.  The Raw
+value should always exist if the tag exists.
 
 =back
 
@@ -1505,7 +1520,7 @@ Save state of new values to be later restored by L</RestoreNewValues>.
 
 =item Return Value:
 
-Count of the number of times this routine has been called since the last
+Count of the number of times this routine has been called (N) since the last
 time the new values were reset.
 
 =back

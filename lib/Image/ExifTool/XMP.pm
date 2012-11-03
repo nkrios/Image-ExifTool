@@ -46,7 +46,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.54';
+$VERSION = '2.56';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -76,7 +76,7 @@ my %stdXlatNS = (
     'prismusagerights' => 'pur',
 );
 
-# translate ExifTool namespaces to standard XMP namespace prefixes
+# translate ExifTool XMP family 1 group names to standard XMP namespace prefixes
 my %xmpNS = (
     # shorten ugly namespace prefixes
     'iptcCore' => 'Iptc4xmpCore',
@@ -87,8 +87,8 @@ my %xmpNS = (
     # 'pur' => 'prismusagerights',
 );
 
-# Lookup to translate our namespace prefixes into URI's.  This list need
-# not be complete, but it must contain an entry for each namespace prefix
+# Lookup to translate standard XMP namespace prefixes into URI's.  This list
+# need not be complete, but it must contain an entry for each namespace prefix
 # (NAMESPACE) for writable tags in the XMP tables or in structures
 %nsURI = (
     aux       => 'http://ns.adobe.com/exif/1.0/aux/',
@@ -147,6 +147,7 @@ my %xmpNS = (
     digiKam   => 'http://www.digikam.org/ns/1.0/',
     swf       => 'http://ns.adobe.com/swf/1.0',
     cell      => 'http://developer.sonyericsson.com/cell/1.0/',
+    aas       => 'http://ns.apple.com/adjustment-settings/1.0/',
    'mwg-rs'   => 'http://www.metadataworkinggroup.com/schemas/regions/',
    'mwg-kw'   => 'http://www.metadataworkinggroup.com/schemas/keywords/',
    'mwg-coll' => 'http://www.metadataworkinggroup.com/schemas/collections/',
@@ -154,6 +155,7 @@ my %xmpNS = (
     extensis  => 'http://ns.extensis.com/extensis/1.0/',
     ics       => 'http://ns.idimager.com/ics/1.0/',
     fpv       => 'http://ns.fastpictureviewer.com/fpv/1.0/',
+   'apple-fi' => 'http://ns.apple.com/faceinfo/1.0/',
 );
 
 # build reverse namespace lookup
@@ -579,6 +581,10 @@ my %sLocationDetails = (
         Name => 'cell',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::cell' },
     },
+    aas => {
+        Name => 'aas',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::aas' },
+    },
    'mwg-rs' => {
         Name => 'mwg-rs',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::mwg_rs' },
@@ -602,6 +608,10 @@ my %sLocationDetails = (
     fpv => {
         Name => 'fpv',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::fpv' },
+    },
+   'apple-fi' => {
+        Name => 'apple-fi',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::apple_fi' },
     },
 );
 
@@ -2703,7 +2713,7 @@ sub FoundXMP($$$$;$)
 {
     local $_;
     my ($exifTool, $tagTablePtr, $props, $val, $attrs) = @_;
-    my ($lang, @structProps, $rawVal);
+    my ($lang, @structProps, $rawVal, $rational);
     my ($tag, $ns) = GetXMPTagID($props, $exifTool->{OPTIONS}{Struct} ? \@structProps : undef);
     return 0 unless $tag;   # ignore things that aren't valid tags
 
@@ -2907,14 +2917,18 @@ NoLoop:
     my $new = $$tagInfo{WasAdded} && $$exifTool{OPTIONS}{XMPAutoConv};
     if ($fmt or $new) {
         $rawVal = $val; # save raw value for verbose output
-        unless (($new or $fmt eq 'rational') and ConvertRational($val)) {
+        if (($new or $fmt eq 'rational') and ConvertRational($val)) {
+            $rational = $rawVal;
+        } else {
             $val = ConvertXMPDate($val, $new) if $new or $fmt eq 'date';
         }
         # protect against large binary data in unknown tags
         $$tagInfo{Binary} = 1 if $new and length($val) > 65536;
     }
     # store the value for this tag
-    my $key = $exifTool->FoundTag($tagInfo, $val);
+    my $key = $exifTool->FoundTag($tagInfo, $val) or return 0;
+    # save original components of rational numbers (used when copying)
+    $$exifTool{RATIONAL}{$key} = $rational if defined $rational;
     # save structure/list information if necessary
     if (@structProps and (@structProps > 1 or defined $structProps[0][1])) {
         $exifTool->{TAG_EXTRA}{$key}{Struct} = \@structProps;
@@ -3353,12 +3367,12 @@ sub ProcessXMP($$;$)
             }
             if ($buff =~ /^\0\0/) {
                 $fmt = 'N';     # UTF-32 MM with or without BOM
-            } elsif ($buff =~ /^..\0\0/) {
+            } elsif ($buff =~ /^..\0\0/s) {
                 $fmt = 'V';     # UTF-32 II with or without BOM
             } elsif (not $fmt) {
                 if ($buff =~ /^\0/) {
                     $fmt = 'n'; # UTF-16 MM without BOM
-                } elsif ($buff =~ /^.\0/) {
+                } elsif ($buff =~ /^.\0/s) {
                     $fmt = 'v'; # UTF-16 II without BOM
                 }
             }
@@ -3470,7 +3484,7 @@ sub ProcessXMP($$;$)
         $begin = join "\0", split //, $begin;
         # must reset pos because it was killed by previous unsuccessful //g match
         pos($$dataPt) = $dirStart;
-        if ($$dataPt =~ /\G(\0)?\Q$begin\E\0./g) {
+        if ($$dataPt =~ /\G(\0)?\Q$begin\E\0./sg) {
             # validate byte ordering by checking for U+FEFF character
             if ($1) {
                 # should be big-endian since we had a leading \0
@@ -3482,7 +3496,7 @@ sub ProcessXMP($$;$)
             # check for UTF-32 encoding (with three \0's between characters)
             $begin =~ s/\0/\0\0\0/g;
             pos($$dataPt) = $dirStart;
-            if ($$dataPt !~ /\G(\0\0\0)?\Q$begin\E\0\0\0./g) {
+            if ($$dataPt !~ /\G(\0\0\0)?\Q$begin\E\0\0\0./sg) {
                 $fmt = 0;   # set format to zero as indication we didn't find encoded XMP
             } elsif ($1) {
                 # should be big-endian

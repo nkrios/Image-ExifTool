@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION %uid);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.13';
+$VERSION = '1.14';
 
 # DICOM VR (Value Representation) format conversions
 my %dicomFormat = (
@@ -3749,7 +3749,7 @@ sub ProcessDICM($$)
                 $val = sprintf('%.4X,%.4X', $g, $e);
             } elsif ($vr eq 'UI') {
                 # add PrintConv to translate registered UID's
-                $val =~ s/\0.*//; # truncate at null
+                $val =~ s/\0.*//s; # truncate at null
                 $$tagInfo{PrintConv} = \%uid if $uid{$val} and $tagInfo;
             }
         }

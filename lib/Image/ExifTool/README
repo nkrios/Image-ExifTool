@@ -676,7 +676,7 @@ numerical.
                   error is reported.
 
   WriteCheck    : If given, specifies a scalar which is evaluated as a Perl
-                  expression for a one-time validatation the value being
+                  expression for a one-time validatation the Raw value being
                   written.  The expression has access to 3 variables: $val is
                   the value to be written, $self is the ExifTool object, and
                   $tagInfo is the tag information hash reference.  It returns an

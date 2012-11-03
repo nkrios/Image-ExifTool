@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.33';
+$VERSION = '1.34';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -590,7 +590,11 @@ my %id3v2_common = (
 %Image::ExifTool::ID3::Private = (
     PROCESS_PROC => \&Image::ExifTool::ID3::ProcessPrivate,
     GROUPS => { 1 => 'ID3', 2 => 'Audio' },
-    NOTES => 'ID3 private (PRIV) tags.',
+    VARS => { NO_ID => 1 },
+    NOTES => q{
+        ID3 private (PRIV) tags.  ExifTool will decode any private tags found, even
+        if they do not appear in this table.
+    },
     XMP => {
         SubDirectory => {
             DirName => 'XMP',
@@ -603,6 +607,62 @@ my %id3v2_common = (
     AverageLevel => {
         ValueConv => 'length($val)==4 ? unpack("V",$val) : \$val',
     },
+    # Windows Media attributes ("/" in tag ID is converted to "_" by ProcessPrivate)
+    WM_WMContentID => {
+        Name => 'WM_ContentID',
+        ValueConv => 'require Image::ExifTool::ASF; Image::ExifTool::ASF::GetGUID($val)',
+    },
+    WM_WMCollectionID => {
+        Name => 'WM_CollectionID',
+        ValueConv => 'require Image::ExifTool::ASF; Image::ExifTool::ASF::GetGUID($val)',
+    },
+    WM_WMCollectionGroupID => {
+        Name => 'WM_CollectionGroupID',
+        ValueConv => 'require Image::ExifTool::ASF; Image::ExifTool::ASF::GetGUID($val)',
+    },
+    WM_MediaClassPrimaryID => {
+        ValueConv => 'require Image::ExifTool::ASF; Image::ExifTool::ASF::GetGUID($val)',
+    },
+    WM_MediaClassSecondaryID => {
+        ValueConv => 'require Image::ExifTool::ASF; Image::ExifTool::ASF::GetGUID($val)',
+    },
+    WM_Provider => {
+        ValueConv => '$self->Decode($val,"UCS2","II")', #PH (NC)
+    },
+    # there are lots more WM tags that could be decoded if I had samples or documentation - PH
+    # WM/AlbumArtist
+    # WM/AlbumTitle
+    # WM/Category
+    # WM/Composer
+    # WM/Conductor
+    # WM/ContentDistributor
+    # WM/ContentGroupDescription
+    # WM/EncodingTime
+    # WM/Genre
+    # WM/GenreID
+    # WM/InitialKey
+    # WM/Language
+    # WM/Lyrics
+    # WM/MCDI
+    # WM/MediaClassPrimaryID
+    # WM/MediaClassSecondaryID
+    # WM/Mood
+    # WM/ParentalRating
+    # WM/Period
+    # WM/ProtectionType
+    # WM/Provider
+    # WM/ProviderRating
+    # WM/ProviderStyle
+    # WM/Publisher
+    # WM/SubscriptionContentID
+    # WM/SubTitle
+    # WM/TrackNumber
+    # WM/UniqueFileIdentifier
+    # WM/WMCollectionGroupID
+    # WM/WMCollectionID
+    # WM/WMContentID
+    # WM/Writer
+    # WM/Year
 );
 
 # ID3 Composite tags
@@ -665,7 +725,7 @@ sub ProcessPrivate($$$)
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my ($tag, $start);
-    if ($$dataPt =~ /^(.*?)\0/) {
+    if ($$dataPt =~ /^(.*?)\0/s) {
         $tag = $1;
         $start = length($tag) + 1;
     } else {
@@ -740,7 +800,7 @@ sub DecodeString($$;$)
         for (;;) {
             my $v;
             # split string at null terminators on word boundaries
-            if ($val =~ s/((..)*?)\0\0//) {
+            if ($val =~ s/((..)*?)\0\0//s) {
                 $v = $1;
             } else {
                 last unless length $val > 1;
@@ -921,19 +981,19 @@ sub ProcessID3v2($$$)
             my $enc = unpack('C', $val);
             my $url;
             if ($enc == 1 or $enc == 2) {
-                ($val, $url) = ($val =~ /^(.(?:..)*?)\0\0(.*)/);
+                ($val, $url) = ($val =~ /^(.(?:..)*?)\0\0(.*)/s);
             } else {
-                ($val, $url) = ($val =~ /^(..*?)\0(.*)/);
+                ($val, $url) = ($val =~ /^(..*?)\0(.*)/s);
             }
             unless (defined $val and defined $url) {
                 $exifTool->Warn("Invalid $id frame value");
                 next;
             }
             $val = DecodeString($exifTool, $val);
-            $url =~ s/\0.*//;
+            $url =~ s/\0.*//s;
             $val = length($val) ? "($val) $url" : $url;
         } elsif ($id =~ /^W/) {
-            $val =~ s/\0.*//;   # truncate at null
+            $val =~ s/\0.*//s;  # truncate at null
         } elsif ($id =~ /^(COM|COMM|ULT|USLT)$/) {
             $valLen > 4 or $exifTool->Warn("Short $id frame"), next;
             $lang = substr($val,1,3);
@@ -994,7 +1054,7 @@ sub ProcessID3v2($$$)
                 $val .= sprintf("%+.1f%% %s", 100 * $rel / ((1<<$bits)-1), $$elem[0]);
             }
         } elsif ($id eq 'RVA2') {
-            my ($pos, $id) = $val=~/^([^\0]*)\0/ ? (length($1)+1, $1) : (1, '');
+            my ($pos, $id) = $val=~/^([^\0]*)\0/s ? (length($1)+1, $1) : (1, '');
             my @vals;
             while ($pos + 4 <= $valLen) {
                 my $type = Get8u(\$val, $pos);

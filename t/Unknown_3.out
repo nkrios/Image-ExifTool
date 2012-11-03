@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.16
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.02
 [File, System, Image] FileName - File Name: Unknown_3_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 7.0 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:03:19 11:37:02-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2012:09:04 19:25:42-04:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2012:09:04 19:25:42-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -20,7 +21,7 @@
 [EXIF, IFD0, Image] 282 - X Resolution: 72
 [EXIF, IFD0, Image] 283 - Y Resolution: 72
 [EXIF, IFD0, Image] 296 - Resolution Unit: inches
-[EXIF, IFD0, Image] 305 - Software: RO-dk4010 Ver 1.00 
+[EXIF, IFD0, Image] 305 - Software: RO-dk4010 Ver 1.00
 [EXIF, IFD0, Time] 306 - Modify Date: 2005:08:10 06:24:38
 [EXIF, IFD0, Image] 531 - Y Cb Cr Positioning: Co-sited
 [EXIF, ExifIFD, Image] 33434 - Exposure Time: 1/180

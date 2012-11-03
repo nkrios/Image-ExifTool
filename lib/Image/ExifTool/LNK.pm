@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.04';
+$VERSION = '1.05';
 
 sub ProcessItemID($$$);
 sub ProcessLinkInfo($$$);
@@ -380,7 +380,7 @@ sub ProcessLinkInfo($$$);
         Format => 'undef[64]',
         RawConv => q{
             $val = $self->Decode($val, 'UCS2');
-            $val =~ s/\0.*//;
+            $val =~ s/\0.*//s;
             return length($val) ? $val : undef;
         },
     },

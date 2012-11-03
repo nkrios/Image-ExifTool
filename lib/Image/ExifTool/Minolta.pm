@@ -40,6 +40,7 @@
 #              26) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3521.0.html
 #              27) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3833.0.html
 #              28) Michael Reitinger private communication (RX100)
+#              29) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4086.0.html
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -266,8 +267,10 @@ $VERSION = '1.96';
     61 => 'Sony 85mm F2.8 SAM (SAL85F28)', #17/25
     62 => 'Sony DT 35mm F1.8 SAM (SAL35F18)', #PH/25
     63 => 'Sony DT 16-50mm F2.8 SSM (SAL1650)', #17/25
-    64 => 'Sony 500mm F4.0 G SSM (SAL500F40G)', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4086.0.html
+    64 => 'Sony 500mm F4.0 G SSM (SAL500F40G)', #29
     65 => 'Sony DT 18-135mm F3.5-5.6 SAM (SAL-18135)', #25
+    66 => 'Sony 300mm F2.8 G SSM II (SAL-300F28G2)', #29
+    68 => 'Sony DT 55-300mm F4.5-5.6 SAM (SAL-55300)', #29
     128 => 'Tamron or Sigma Lens (128)',
     128.1 => 'Tamron 18-200mm F3.5-6.3',
     128.2 => 'Tamron 28-300mm F3.5-6.3',

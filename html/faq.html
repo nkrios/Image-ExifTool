@@ -602,7 +602,10 @@ characters. Perl wide characters are not used.  The encoding is UTF&#8209;8 by
 default, but valid UTF&#8209;8 can not be guaranteed for all values, so the
 caller must validate the encoding if necessary.  The encodings described above
 are set by the various <a href="ExifTool.html#Charset">Charset options</a> of
-the API.</blockquote>
+the API.
+<br><br> <b>Note</b>: Some settings of the system PERL_UNICODE environment
+variable may be incompatible with ExifTool's character handling.
+</blockquote>
 
 <a name="Q11"></a>
 <p>11. <b>"My user-defined tags don't work"</b></p>
@@ -814,9 +817,10 @@ command like "<code>exiftool -htmlDump a.jpg &gt; out.html</code>", then open
 <blockquote>Also, the size of an XMP record may easily shrink or grow when it is
 rewritten, even if no meta information is changed.  This is partly due to the
 fact that the XMP specification recommends a few KB of padding at the end of the
-record (ExifTool adds 2424 bytes by default), and partly due to the flexibility
-of the XMP format which allows the information to be written in various styles,
-some of which are more compact than others.
+record (ExifTool adds 2424 bytes by default, but this padding is omitted if the
+<code>-z</code> option is used), and partly due to the flexibility of the XMP
+format which allows the information to be written in various styles, some of
+which are more compact than others.
 </blockquote>
 
 <blockquote>You may also notice that the values of some "offset" tags (like
@@ -1349,7 +1353,7 @@ exiftool -alldates+=1 "-filemodifydate&lt;datetimeoriginal" c:\images
 </pre></blockquote>
 
 <hr>
-<i>Last revised May 27, 2012</i>
+<i>Last revised Nov 2, 2012</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

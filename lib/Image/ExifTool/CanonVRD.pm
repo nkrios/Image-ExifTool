@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 sub ProcessCanonVRD($$;$);
 sub WriteCanonVRD($$;$);
@@ -129,7 +129,7 @@ my %noYes = ( 0 => 'No', 1 => 'Yes' );
     },
     5 => {
         Name => 'RawCodecVersion',
-        ValueConv => '$val =~ s/\0.*//; $val',  # truncate string at null
+        ValueConv => '$val =~ s/\0.*//s; $val',  # truncate string at null
     },
     6 => {
         Name => 'CRCDevelParams',

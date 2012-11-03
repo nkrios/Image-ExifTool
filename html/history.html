@@ -11,11 +11,74 @@
 
 <p>RSS feed: <a href="http://owl.phy.queensu.ca/~phil/exiftool/rss.xml">http://owl.phy.queensu.ca/~phil/exiftool/rss.xml</a></p>
 
-<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-9.01.tar.gz">Version 9.01</a>. (Other versions are
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-9.04.tar.gz">Version 9.04</a>. (Other versions are
 considered development releases, and are not uploaded to <a href="http://search.cpan.org/dist/Image-ExifTool/">CPAN</a>.)</p>
 
 <!-- Use line width of 80 -->
 <!-- *********************************************************************** -->
+
+<a name='v9.04'><b>Nov. 3, 2012 - Version 9.04</b></a> <span class=grn>(production release)</span>
+<ul>
+<li>Added two new Sony LensType values (thanks Matthias Paul)
+<li>Added a few new Canon LensType values
+<li>Added a couple of new PentaxModelID's and decode some new K-5 II values
+<li>Added support for some new XMP tags written by the Apple iPhone 5
+<li>Added a new Olympus CameraType
+<li>Decode more Sony tags/values (thanks Jos Roost)
+<li>Decode Nikon HDRInfo (thanks Stefan)
+<li>Decode some FlashInfo tags for new Nikon models
+<li>Decode a few WM ID3 tags (some documentation on these would be nice)
+<li>Fixed bug which could cause truncated ID3v2 strings to be returned
+<li>Fixed -globalTimeShift option to also work when copying tags
+<li>Fixed decoding of Nikon AFFineTuneAdj for FirmwareVersion 1.10B (thanks
+    Michael Tapes for the samples for this and the A77)
+<li>Fixed problem where a few tags (FileSequence, NewGUID and Now) were not
+    available for use with the -p option
+<li>API Changes:
+    <ul>
+    <li>Added RequestAll and GeoNoInterpolate options
+    <li>Fixed problem in SetNewValue when setting the Raw value of some tags
+    </ul>
+</ul>
+
+<a name='v9.03'><b>Oct. 13, 2012 - Version 9.03</b></a>
+<ul>
+<li>Added new feature to provide control over directory levels in %d strings
+<li>Added ability to write OtherImage in NEF images
+<li>Added a new Pentax LensType
+<li>Added a few new CanonModelID's (thanks Laurent Clevy)
+<li>Added a new Nikon LensID (thanks Geert De Soete)
+<li>Added a few new Olympus CameraType values
+<li>Decode some new CameraInfo tags for the Canon EOS 650D
+<li>Decode a number of new Sony tags (thanks Jos Roost)
+<li>Improved decoding of some Sigma tags for the DP1/DP2 Merrill
+<li>Give priority to EXIF tags over SigmaRaw tags X3F images
+<li>Changed Samsung lens names to include "NX" (thanks Jaroslav Stepanek)
+<li>Fixed misleading verbose "TAG is not writable" messages when copying
+    list-type tags
+<li>API Changes:
+    <ul>
+    <li>Enhanced GetValue() to allow return of 'Rational' value
+    </ul>
+</ul>
+
+<a name='v9.02'><b>Sept. 6, 2012 - Version 9.02</b></a>
+<ul>
+<li>Added a new Nikon LensID (thanks Joseph Heled)
+<li>Added a new EXIF SubFileType value used in DNG images
+<li>Added write support for Apple Adjustment Settings XMP tags (XMP-aas)
+<li>Added a couple of new Samsung LensType values (thanks Jaroslav Stepanek)
+<li>Added a couple of new Canon LensType values and a new CanonModelID
+<li>Decode a number of new Sony tags (thanks Jos Roost)
+<li>Enhanced "-o -" feature to allow output file type to be specified
+<li>Extract last file access time as FileAccessDate
+<li>Allow tags to be set from files which are zero bytes in size
+<li>Made ProfileHueSatMap tags Binary if they are too long
+<li>Changed names of some PanasonicRaw DistortionInfo tags
+<li>Changed decoding for a Sony ExposureMode value
+<li>Fixed hang/crash that could occur when writing to an image with corrupted
+    Sony MoreInfo data (ie. SLT-A55V JPEG corrupted by GIMP)
+</ul>
 
 <a name='v9.01'><b>Aug. 25, 2012 - Version 9.01</b></a> <span class=grn>(production release)</span>
 <ul>

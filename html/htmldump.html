@@ -188,8 +188,12 @@ mspan[0] = "t37";
 individual blocks and reveal tool tips for extra information. (You must have
 JavaScript enabled.)</p>
 
-<p><span onmouseover="high(event,1)" onmouseout="high(event,0)">Normal data
-blocks are <a name=XA class=Y>light</a> or <a name=XA class=W>dark green</a>,
+<p>The command used to generate the output below was:</p>
+
+<blockquote><code>exiftool -htmldump t/images/FujiFilm.jpg > out.html</code></blockquote>
+
+<p>In this output, <span onmouseover="high(event,1)" onmouseout="high(event,0)">normal
+data blocks are <a name=XA class=Y>light</a> or <a name=XA class=W>dark green</a>,
 unused blocks are <a name=XB class=U>brown</a>, and double-referenced blocks
 are <a name=XC class=V>red</a> or <a name=XC class=X>pink</a>. A
 <a name=XD class=H>blue</a> tag name indicates the value is referenced by an

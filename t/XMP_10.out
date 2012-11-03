@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.55
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.02
 [File, System, Image] FileName - File Name: XMP3.xmp
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 1639 bytes
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2011:04:10 09:14:55-04:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2012:08:25 07:03:47-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: XMP
 [File, File, Image] MIMEType - MIME Type: application/rdf+xml

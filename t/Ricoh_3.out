@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.26
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.02
 [File, System, Image] FileName - File Name: Ricoh_3_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 1907 bytes
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:07:13 13:26:44-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2012:09:04 19:25:40-04:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2012:09:04 19:25:40-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg

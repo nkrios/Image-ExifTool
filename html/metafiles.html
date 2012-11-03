@@ -80,9 +80,19 @@ preserving the family 1 group.</p>
 <pre>exiftool -xmp -b <i>SRC</i>.<i>EXT</i> > <i>DST</i>.xmp</pre>
 
 <p class=a>8. Extract XMP as a block to an output text file with .xmp extension:</p>
-<p class=b>(same effect as above, but the command will fail if the XMP file exists
-and the destination file name is the same as the source)</p>
+<p class=b>(same effect as above, but the destination file name will be the same
+as the source file, and this command will fail if the XMP file exists while the
+previous command will overwrite an existing file)</p>
 <pre>exiftool -xmp -b -w xmp <i>SRC</i>.<i>EXT</i></pre>
+
+<p>9. Restore all XMP tags from an XMP sidecar file to XMP in a JPG image:</p>
+<pre>exiftool -tagsfromfile <i>SRC</i>.xmp -all:all <i>DST</i>.jpg</pre>
+
+<p class=a>10. Restore XMP as a block from an XMP sidecar file to a JPG image:</p>
+<p class=b>(same effect as above except that any non-writable XMP tags would be
+copied by this command, and the 2 kB of padding recommended by the XMP
+specification is not added when copying as a block)</p>
+<pre>exiftool -tagsfromfile <i>SRC</i>.xmp -xmp <i>DST</i>.jpg</pre>
 
 <h4>Batch Processing</h4>
 
@@ -250,7 +260,7 @@ which may be useful if disk space is at a premium.</p>
 
 <hr>
 <i>Created Nov 12, 2008</i><br>
-<i>Last revised Jun 18, 2012</i>
+<i>Last revised Oct 7, 2012</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

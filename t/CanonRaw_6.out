@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.98
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.02
 [File, System, Image] FileName - File Name: CanonRaw_6_failed.cr2
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 8.6 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2012:07:28 14:11:50-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2012:09:04 19:25:28-04:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2012:09:04 19:25:28-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: CR2
 [File, File, Image] MIMEType - MIME Type: image/x-canon-cr2

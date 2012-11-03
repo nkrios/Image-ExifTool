@@ -168,7 +168,7 @@ list.</p>
     <br><b>2-N)</b> [<i>optional</i>] list of tag names to find (or tag list reference or
     options reference, see below)
 </td></tr>
-<tr><td><b>Returns</b></td><td>Reference to hash of tag key/value pairs</td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>Reference to hash of tag key/value pairs</td></tr>
 </table></blockquote>
 
 <p><b>Examples:</b></p>
@@ -406,7 +406,7 @@ distribution for examples.</p>
     <br><b>2)</b> [<i>optional</i>] Option value if specified (may be undef to clear option)
     <br><b>3-N)</b> [<i>optional</i>] Additional parameter/value pairs
 </td></tr>
-<tr><td><b>Returns</b></td><td>Previous value of last specified parameter</td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>Previous value of last specified parameter</td></tr>
 </table></blockquote>
 
 <p><b>Available options:</b></p>
@@ -565,6 +565,12 @@ distribution for examples.</p>
     GPS fixes are ignored if the number of acquired satellites is less than this.</td>
     <td align='center'>A positive integer, or undef</td>
     <td align='center'>undef</td></tr>
+<tr><td>GeoNoInterpolate</td>
+    <td><a name="GeoNoInterpolate"></a>Disable interpolation for geotagging. 
+    With this flag set to 1, geotagging uses the nearest fix instead of
+    interpolating between fixes.</td>
+    <td align='center'>0 or 1</td>
+    <td align='center'>0</td></tr>
 <tr><td>GlobalTimeShift</td>
     <td><a name="GlobalTimeShift"></a>Time shift to apply to all extracted
     date/time PrintConv values.  Does not affect ValueConv values.</td>
@@ -639,6 +645,10 @@ distribution for examples.</p>
     extracted. According to the QuickTime specification date/time values should be UTC,
     but many digital cameras store local time instead (presumably because they don't know
     the time zone).</td><td align='center'>0 or 1</td><td align=center>0</td></tr>
+<tr><td>RequestAll</td><td><a name="RequestAll"></a>Flag to request all tags to be extracted.
+    This causes some tags to be generated which normally would not be unless specifically
+    requested (by passing the tag name to ImageInfo or ExtractInfo).
+    </td><td align='center'>0 or 1</td><td align=center>0</td></tr>
 <tr><td>ScanForXMP</td><td><a name="ScanForXMP"></a>Flag for scan all files (even unrecognized
     formats) for XMP information unless XMP was already found in the file.  When combined with
     the FastScan option, only unrecognized file types are scanned for XMP.  
@@ -754,7 +764,7 @@ the .ExifTool_config file if it exists.</p>
     <br><b>1-N)</b> Same as <a href="#ImageInfo">ImageInfo</a> except that a list of tag
     keys is not returned if an ARRAY reference is given.
 </td></tr>
-<tr><td><b>Returns</b></td><td>1 if this was a recognized file format, 0 otherwise</td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>1 if this was a recognized file format, 0 otherwise</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -780,7 +790,7 @@ This function may be called repeatedly after a single call to
     <br><b>1-N)</b> Same as <a href="#ImageInfo">ImageInfo</a> except that an image
     can not be specified
 </td></tr>
-<tr><td><b>Returns</b></td><td>Reference to information hash, the same as with
+<tr><td valign='top'><b>Returns</b></td><td>Reference to information hash, the same as with
     <a href="#ImageInfo">ImageInfo</a></td></tr>
 </table></blockquote>
 <p><b>Examples:</b></p>
@@ -820,7 +830,7 @@ again.</p>
     reference, or undef to overwrite the original file
     <br><b>3)</b> [<i>optional</i>] Destination file type
 </td></tr>
-<tr><td><b>Returns</b></td><td>1 if file was written OK, 2 if file was written
+<tr><td valign='top'><b>Returns</b></td><td>1 if file was written OK, 2 if file was written
 but no changes made, 0 on file write error.
 </td></tr>
 </table></blockquote>
@@ -879,7 +889,7 @@ IgnoreMinorErrors and Verbose.
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
     <br><b>1-N)</b> List of info hash references
 </td></tr>
-<tr><td><b>Returns</b></td><td>Reference to combined information hash</td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>Reference to combined information hash</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -899,7 +909,7 @@ is the only option that is in effect for this function.</p>
     <br><b>2)</b> [<i>optional</i>] Sort order ('Input', 'File', 'Tag', 'Descr' or 'Group#')
     <br><b>3)</b> [<i>optional</i>] Secondary sort order ('File', 'Tag' or 'Descr')
 </td></tr>
-<tr><td><b>Returns</b></td><td>List of tag keys in specified order</td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>List of tag keys in specified order</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -923,7 +933,7 @@ or <a href="#GetInfo">GetInfo</a> for this object.</p>
     <br><b>1)</b> [<i>optional</i>] Sort order ('Input', 'File', 'Tag', 'Descr' or 'Group#')
     <br><b>2)</b> [<i>optional</i>] Secondary sort order ('File', 'Tag' or 'Descr')
 </td></tr>
-<tr><td><b>Returns</b></td><td>List of tag keys in the specified order</td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>List of tag keys in the specified order</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -941,7 +951,7 @@ in the list.</p>
 <tr><td><b>Prototype</b></td><td>GetRequestedTags($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
-<tr><td><b>Returns</b></td><td>List of tag keys for requested tags
+<tr><td valign='top'><b>Returns</b></td><td>List of tag keys for requested tags
 (empty if no tags specifically requested)</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
@@ -971,12 +981,14 @@ instead.</p>
 <tr><td><b>Prototype</b></td><td>GetValue($$;$)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
     <br><b>1)</b> Tag key
-    <br><b>2)</b> [<i>optional</i>] Value type, 'PrintConv', 'ValueConv', 'Both' or 'Raw'
+    <br><b>2)</b> [<i>optional</i>] Value type, 'PrintConv', 'ValueConv', 'Both',
+    'Raw' or 'Rational'
     <br>&nbsp;<br>The default value type is 'PrintConv' if the PrintConv option
     is set, otherwise the default is 'ValueConv'.  A value type of 'Both'
-    returns both ValueConv and PrintConv values as a list.
+    returns both ValueConv and PrintConv values as a list.  'Rational' returns
+    the raw rational value as a string fraction for rational types.
 </td></tr>
-<tr><td><b>Returns</b></td><td>
+<tr><td valign='top'><b>Returns</b></td><td>
 The value of the specified tag.  If the tag represents a list of values and
 the List option is disabled then PrintConv returns a string of values,
 otherwise a reference to the list is returned in scalar context.  The list
@@ -984,8 +996,9 @@ itself is returned in list context.  Values may also be scalar references to
 binary data, or hash references if the <a href="#Struct">Struct</a> option is
 set.<br>&nbsp;<br> Note: It is possible for <a href="#GetValue">GetValue</a> to
 return an undefined ValueConv or PrintConv value (or an empty list in list
-context) even if the tag exists, since it is possible for these conversions to
-yield undefined values.
+context) even if the tag exists, since it is possible for these conversions
+to yield undefined values.  And the Rational value will be undefined for any
+non-rational tag.  The Raw value should always exist if the tag exists.
 </td></tr>
 </table></blockquote>
 <p><b>Examples:</b></p>
@@ -1047,7 +1060,7 @@ the same tag name for each value, or call with a reference to the list of values
      examples below).
  <br><b>3-N)</b> [<i>optional</i>] SetNewValue option/value pairs (see below).
 </td></tr>
-<tr><td><b>Returns</b></td><td>Scalar context: The number of tags set, and
+<tr><td valign='top'><b>Returns</b></td><td>Scalar context: The number of tags set, and
 errors are printed to STDERR.
 <br>List context: The number of tags set, and the error string (undefined if no error).
 </td></tr>
@@ -1245,7 +1258,7 @@ in a specified file.</p>
  Multiple options hash references may be passed to set different options for
  different tags.  Options apply to subsequent tags in the argument list. 
 </td></tr>
-<tr><td><b>Returns</b></td><td>A hash of information that was set
+<tr><td valign='top'><b>Returns</b></td><td>A hash of information that was set
 successfully.  May include Warning or Error entries if there were problems
 reading the input file.
 </td></tr>
@@ -1342,7 +1355,7 @@ more than one value.</p>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
  <br><b>1)</b> Tag name (case sensitive, may be prefixed by family 0 or 1 group name)
 </td></tr>
-<tr><td><b>Returns</b></td><td>List of new Raw tag values, or first value in
+<tr><td valign='top'><b>Returns</b></td><td>List of new Raw tag values, or first value in
 list when called in scalar context. The list may be empty either if the tag
 isn't being written, or if it is being deleted (ie. if
 <a href="#SetNewValue">SetNewValue</a> was called without a value).
@@ -1363,7 +1376,7 @@ my @rawVals = $exifTool-&gt;<b>GetNewValues</b>($tag);
 <tr><td><b>Prototype</b></td><td>CountNewValues($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
-<tr><td><b>Returns</b></td><td>In scalar context, returns the total number
+<tr><td valign='top'><b>Returns</b></td><td>In scalar context, returns the total number
 of tags with new values set.  In list context, also returns the number of
 "pseudo" tag values which have been set.  "Pseudo" tags are tags like FileName
 and FileModifyDate which are not contained within the file and can be changed
@@ -1384,6 +1397,8 @@ my ($numSet, $numPseudo) = $exifTool-&gt;<b>CountNewValues</b>();
 <tr><td><b>Prototype</b></td><td>SaveNewValues($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>Count of the number of times this routine has
+been called (N) since the last time the new values were reset.</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -1413,7 +1428,7 @@ See <a href="#SaveNewValues">SaveNewValues</a> above for an example.</p>
  <br><b>1)</b> File name
  <br><b>2)</b> [<i>optional</i>] Base time if applying shift (in days before $^T)
 </td></tr>
-<tr><td><b>Returns</b></td><td>1 if the time was changed, 0 if nothing was
+<tr><td valign='top'><b>Returns</b></td><td>1 if the time was changed, 0 if nothing was
 done, or -1 if there was an error setting the time.
 </td></tr>
 </table></blockquote>
@@ -1442,7 +1457,7 @@ takes precedence over any directory specified in FileName.</p>
  <br><b>1)</b> Current file name
  <br><b>2)</b> [<i>optional</i>] New file name
 </td></tr>
-<tr><td><b>Returns</b></td><td>1 if the file name or directory was changed,
+<tr><td valign='top'><b>Returns</b></td><td>1 if the file name or directory was changed,
 0 if nothing was done, or -1 if there was an error renaming the file.
 </td></tr>
 </table></blockquote>
@@ -1484,7 +1499,7 @@ $exifTool-&gt;<b>SetNewGroups</b>('XMP','EXIF','IPTC');
 <tr><td><b>Prototype</b></td><td>GetNewGroups($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
-<tr><td><b>Returns</b></td><td>List of group names in order of write
+<tr><td valign='top'><b>Returns</b></td><td>List of group names in order of write
 priority.  Highest priority first.
 </td></tr>
 </table></blockquote>
@@ -1505,7 +1520,7 @@ alternate language entries for XMP "lang-alt" tags).</p>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
     <br><b>1)</b> Tag key
 </td></tr>
-<tr><td><b>Returns</b></td><td>In scalar context, returns the tag ID or '' if
+<tr><td valign='top'><b>Returns</b></td><td>In scalar context, returns the tag ID or '' if
 there is no ID for this tag.<br>In list context, returns the tag ID (or '') and the
 language code (or undef).</td></tr>
 </table></blockquote>
@@ -1526,7 +1541,7 @@ the tag name.</p>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
     <br><b>1)</b> Tag key
 </td></tr>
-<tr><td><b>Returns</b></td><td>Tag description</td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>Tag description</td></tr>
 </table></blockquote>
 
 <hr><h2><a name="GetGroup">GetGroup</a></h2>
@@ -1652,7 +1667,7 @@ automatically by <a href="#ImageInfo">ImageInfo</a> if the Composite option is s
 <tr><td><b>Prototype</b></td><td>BuildCompositeTags($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
 </td></tr>
-<tr><td><b>Returns</b></td><td>(none)</td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>(none)</td></tr>
 </table></blockquote>
 <p><b>Notes:</b></p>
 <ol>
@@ -1690,7 +1705,7 @@ strips the embedded instance number, if it exists, from the tag key.</p>
 <tr><td><b>Prototype</b></td><td>GetTagName($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> Tag key
 </td></tr>
-<tr><td><b>Returns</b></td><td>Tag name</td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>Tag name</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>
@@ -1703,7 +1718,7 @@ $tagName = Image::ExifTool::<b>GetTagName</b>($tag);
 <tr><td><b>Prototype</b></td><td>GetShortcuts()</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td>(none)
 </td></tr>
-<tr><td><b>Returns</b></td><td>List of shortcuts</td></tr>
+<tr><td valign='top'><b>Returns</b></td><td>List of shortcuts</td></tr>
 </table></blockquote>
 
 <hr><h2><a name="GetAllTags">GetAllTags</a></h2>
@@ -1713,7 +1728,7 @@ $tagName = Image::ExifTool::<b>GetTagName</b>($tag);
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> [<i>optional</i>] Group name,
 or string of group names separated by colons
 </td></tr>
-<tr><td><b>Returns</b></td><td>A list of all available tags in alphabetical
+<tr><td valign='top'><b>Returns</b></td><td>A list of all available tags in alphabetical
 order, or all tags in a specified group or intersection of groups.  The
 group name is case insensitive, and any group in families 0-2 may be used
 except for EXIF family 1 groups (ie. the specific IFD).
@@ -1727,7 +1742,7 @@ except for EXIF family 1 groups (ie. the specific IFD).
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> [<i>optional</i>] Group name,
 or string of group names separated by colons
 </td></tr>
-<tr><td><b>Returns</b></td><td>A list of all writable tags in alphabetical
+<tr><td valign='top'><b>Returns</b></td><td>A list of all writable tags in alphabetical
 order. These are the tags for which values may be set through
 <a href="#SetNewValue">SetNewValue</a>. If a group name is given, returns
 only writable tags in specified group(s). The group name is case insensitive,
@@ -1742,7 +1757,7 @@ the specific IFD).
 <tr><td><b>Prototype</b></td><td>GetAllGroups($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td><td><b>0)</b> Group family number (0-4)
 </td></tr>
-<tr><td><b>Returns</b></td>
+<tr><td valign='top'><b>Returns</b></td>
 <td>A list of all groups in the specified family in alphabetical order</td></tr>
 </table></blockquote>
 <p>Here is a complete list of groups for each family:</p>
@@ -1813,7 +1828,7 @@ Time, Unknown, Video
 <tr><td valign='top'><b>Inputs</b></td>
 <td>None
 </td></tr>
-<tr><td><b>Returns</b></td><td>A list of deletable group names in
+<tr><td valign='top'><b>Returns</b></td><td>A list of deletable group names in
 alphabetical order.
 </td></tr>
 </table></blockquote>
@@ -1843,7 +1858,7 @@ my @delGroups = Image::ExifTool::<b>GetDelGroups</b>();
 Set to 0 to return type for recognized but unsupported files (otherwise the
 return value for unsupported files is undef).
 </td></tr>
-<tr><td><b>Returns</b></td><td>A string, based on the file extension, which
+<tr><td valign='top'><b>Returns</b></td><td>A string, based on the file extension, which
 indicates the basic format of the file.  Note that some files may be based on
 other formats (like many RAW image formats are based on TIFF).  In array
 context, may return more than one file type if the file may be based on
@@ -1865,7 +1880,7 @@ my $desc = Image::ExifTool::<b>GetFileType</b>($filename, 1);
 <tr><td><b>Prototype</b></td><td>CanWrite($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td>
 <td><b>0)</b> File name or extension</td></tr>
-<tr><td><b>Returns</b></td><td>True if ExifTool supports writing files of
+<tr><td valign='top'><b>Returns</b></td><td>True if ExifTool supports writing files of
 this type (based on the file extension).</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
@@ -1879,7 +1894,7 @@ my $writable = Image::ExifTool::<b>CanWrite</b>($filename);
 <tr><td><b>Prototype</b></td><td>CanCreate($)</td></tr>
 <tr><td valign='top'><b>Inputs</b></td>
 <td><b>0)</b> File name or extension</td></tr>
-<tr><td><b>Returns</b></td><td>True if ExifTool can create files with this
+<tr><td valign='top'><b>Returns</b></td><td>True if ExifTool can create files with this
 extension from scratch.<br>Currently, this can only be done with XMP, MIE, ICC,
 VRD and EXIF files.</td></tr>
 </table></blockquote>

@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.24
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.02
 [File, System, Image] FileName - File Name: HTML.html
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 3.3 kB
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2010:06:28 20:22:13-04:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2012:09:04 19:23:54-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: HTML
 [File, File, Image] MIMEType - MIME Type: text/html

@@ -1,12 +1,13 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.31
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.02
 [File, System, Image] FileName - File Name: InDesign_3_failed.indd
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 12 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:09:17 11:07:04-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2012:09:04 19:25:33-04:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2012:09:04 19:25:33-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: INDD
 [File, File, Image] MIMEType - MIME Type: application/x-indesign
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 8.31
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 9.02
 [XMP, XMP-rdf, Document] about - About: d5d09d4b-2831-11dc-bfa2-d89eae7bab84
 [XMP, XMP-dc, Image] format - Format: application/x-indesign
 [XMP, XMP-pdf, Author] Author - Author: Phil Harvey

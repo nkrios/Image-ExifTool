@@ -1,8 +1,9 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 8.43
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.02
 [File, System, Image] FileName - File Name: Matroska.mkv
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 507 bytes
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:05:27 11:36:42-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2010:05:28 18:24:56-04:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2012:08:25 07:03:41-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: MKV
 [File, File, Image] MIMEType - MIME Type: video/x-matroska

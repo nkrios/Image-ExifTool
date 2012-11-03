@@ -85,13 +85,21 @@ as extensions from various other sources. See
 <tr class=h><th>Namespace</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td>aas</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html#aas'>XMP aas Tags</a></td></tr>
+<tr class=b>
 <td>acdsee</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#acdsee'>XMP acdsee Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>album</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html#Album'>XMP Album Tags</a></td></tr>
+<tr class=b>
+<td>apple-fi</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html#apple_fi'>XMP apple_fi Tags</a></td></tr>
 <tr>
 <td><u>aux</u></td>
 <td class=c>-</td>
@@ -270,6 +278,107 @@ as extensions from various other sources. See
 <td>--&gt; <a href='XMP.html#xmpTPg'>XMP xmpTPg Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='aas'>XMP aas Tags</a></h2>
+<p>Apple Adjustment Settings used by iPhone/iPad.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>AffineA</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>AffineB</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>AffineC</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>AffineD</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>AffineX</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>AffineY</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CropH</td>
+<td class=c title=' / = Avoided'>integer/</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CropW</td>
+<td class=c title=' / = Avoided'>integer/</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CropX</td>
+<td class=c title=' / = Avoided'>integer/</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CropY</td>
+<td class=c title=' / = Avoided'>integer/</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Curve0x</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Curve0y</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Curve1x</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Curve1y</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Curve2x</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Curve2y</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Curve3x</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Curve3y</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Curve4x</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Curve4y</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Highlights</td>
+<td class=c title=' / = Avoided'>real/</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Shadows</td>
+<td class=c title=' / = Avoided'>real/</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Vibrance</td>
+<td class=c title=' / = Avoided'>real/</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='acdsee'>XMP acdsee Tags</a></h2>
 <p>ACD Systems ACDSee namespace tags.</p>
 
@@ -340,6 +449,32 @@ hear.)</p>
 <tr>
 <td>Notes</td>
 <td class=c>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='apple_fi'>XMP apple_fi Tags</a></h2>
+<p>Face information tags written by the Apple iPhone 5 inside the mwg-rs
+RegionExtensions.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>AngleInfoRoll</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>ConfidenceLevel</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>FaceID</td>
+<td class=c>integer</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>TimeStamp</td>
+<td class=c>integer</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -7081,7 +7216,7 @@ XMP module for convenience.  (see <a href="http://www.w3.org/TR/SVG11/">http://w
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Aug 25, 2012</i>
+<br><i>Last revised Nov 2, 2012</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

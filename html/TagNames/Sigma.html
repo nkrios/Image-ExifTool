@@ -180,22 +180,22 @@ this for PreviewImageLength)</span></span></td></tr>
 <td title='0x0022 = 34'>0x0022</td>
 <td>FileFormat</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(models other than the SD1)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
 <tr class=b>
 <td title='0x0024 = 36'>0x0024</td>
 <td>Calibration</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(models other than the SD1)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
 <tr>
 <td title='0x0026 = 38'>0x0026</td>
 <td>FileFormat</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
 <tr class=b>
 <td title='0x002c = 44'>0x002c</td>
 <td>ColorMode</td>
 <td class=c>int32u</td>
-<td><span class=s><span class=n>(models other than the SD1)</span></span><table class=cols><tr>
+<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span><table class=cols><tr>
   <td>0 = n/a
   <br>1 = Sepia
   <br>2 = B&amp;W
@@ -210,19 +210,19 @@ this for PreviewImageLength)</span></span></td></tr>
 <td>LensApertureRange
   <br>Calibration</td>
 <td class=c>string<br>string</td>
-<td><span class=s><span class=n>(Calibration for the SD1, LensApertureRange for other models.  Note that
-LensApertureRange changes with focal length, and some models report the
-maximum aperture here)</span></span></td></tr>
+<td><span class=s><span class=n>(Calibration for the SD1 and DP1/DP2 Merrill, LensApertureRange for other
+models.  Note that LensApertureRange changes with focal length, and some
+models report the maximum aperture here)</span></span></td></tr>
 <tr class=b>
 <td title='0x0031 = 49'>0x0031</td>
 <td>FNumber</td>
 <td class=c>rational64u</td>
-<td><span class=s><span class=n>(models other than the SD1)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
 <tr>
 <td title='0x0032 = 50'>0x0032</td>
 <td>ExposureTime</td>
 <td class=c>rational64u</td>
-<td><span class=s><span class=n>(models other than the SD1)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
 <tr class=b>
 <td title='0x0033 = 51'>0x0033</td>
 <td>ExposureTime2</td>
@@ -232,32 +232,32 @@ maximum aperture here)</span></span></td></tr>
 <td title='0x0034 = 52'>0x0034</td>
 <td>BurstShot</td>
 <td class=c>int32u</td>
-<td><span class=s><span class=n>(models other than the SD1)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
 <tr class=b>
 <td title='0x0035 = 53'>0x0035</td>
 <td>ExposureCompensation</td>
 <td class=c>rational64s</td>
-<td><span class=s><span class=n>(models other than the SD1)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
 <tr>
 <td title='0x0039 = 57'>0x0039</td>
 <td>SensorTemperature</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(models other than the SD1)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
 <tr class=b>
 <td title='0x003a = 58'>0x003a</td>
 <td>FlashExposureComp</td>
 <td class=c>rational64s</td>
-<td><span class=s><span class=n>(models other than the SD1)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
 <tr>
 <td title='0x003b = 59'>0x003b</td>
 <td>Firmware</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(models other than the SD1)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
 <tr class=b>
 <td title='0x003c = 60'>0x003c</td>
 <td>WhiteBalance</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(models other than the SD1)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
 <tr>
 <td title='0x003d = 61'>0x003d</td>
 <td>PictureMode</td>
@@ -267,52 +267,57 @@ maximum aperture here)</span></span></td></tr>
 <td title='0x0048 = 72'>0x0048</td>
 <td>LensApertureRange</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
 <tr>
 <td title='0x0049 = 73'>0x0049</td>
 <td>FNumber</td>
 <td class=c>rational64u</td>
-<td><span class=s><span class=n>(SD1 only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
 <tr class=b>
 <td title='0x004a = 74'>0x004a</td>
 <td>ExposureTime</td>
 <td class=c>rational64u</td>
-<td><span class=s><span class=n>(SD1 only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
 <tr>
 <td title='0x004b = 75'>0x004b</td>
 <td>ExposureTime2</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
 <tr class=b>
 <td title='0x004d = 77'>0x004d</td>
 <td>ExposureCompensation</td>
 <td class=c>rational64s</td>
-<td><span class=s><span class=n>(SD1 only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
 <tr>
 <td title='0x0055 = 85'>0x0055</td>
 <td>SensorTemperature</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
 <tr class=b>
 <td title='0x0056 = 86'>0x0056</td>
 <td>FlashExposureComp</td>
 <td class=c>rational64s</td>
-<td><span class=s><span class=n>(SD1 only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
 <tr>
 <td title='0x0057 = 87'>0x0057</td>
 <td>Firmware</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
 <tr class=b>
 <td title='0x0058 = 88'>0x0058</td>
 <td>WhiteBalance</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
+<tr>
+<td title='0x0059 = 89'>0x0059</td>
+<td>DigitalFilter</td>
+<td class=c>string</td>
+<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Sep 10, 2011</i>
+<br><i>Last revised Oct 13, 2012</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -1108,6 +1108,37 @@ my %sSubVersion = (
     r       => { Name => 'CellR' }, # (what is this? Radius?)
 );
 
+# Apple adjustment settings (ref PH)
+%Image::ExifTool::XMP::aas = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-aas', 2 => 'Image' },
+    NAMESPACE => 'aas',
+    NOTES => 'Apple Adjustment Settings used by iPhone/iPad.',
+    CropX      => { Writable => 'integer', Avoid => 1 },
+    CropY      => { Writable => 'integer', Avoid => 1 },
+    CropW      => { Writable => 'integer', Avoid => 1 },
+    CropH      => { Writable => 'integer', Avoid => 1 },
+    AffineA    => { Writable => 'real' },
+    AffineB    => { Writable => 'real' },
+    AffineC    => { Writable => 'real' },
+    AffineD    => { Writable => 'real' },
+    AffineX    => { Writable => 'real' },
+    AffineY    => { Writable => 'real' },
+    Vibrance   => { Writable => 'real', Avoid => 1 },
+    Curve0x    => { Writable => 'real' },
+    Curve0y    => { Writable => 'real' },
+    Curve1x    => { Writable => 'real' },
+    Curve1y    => { Writable => 'real' },
+    Curve2x    => { Writable => 'real' },
+    Curve2y    => { Writable => 'real' },
+    Curve3x    => { Writable => 'real' },
+    Curve3y    => { Writable => 'real' },
+    Curve4x    => { Writable => 'real' },
+    Curve4y    => { Writable => 'real' },
+    Shadows    => { Writable => 'real', Avoid => 1 },
+    Highlights => { Writable => 'real', Avoid => 1 },
+);
+
 # MWG structures
 my %sExtensions = (
     STRUCT_NAME => 'Extensions',
@@ -1268,6 +1299,25 @@ my %sKeywordStruct;
         L<http://www.fastpictureviewer.com/help/#rtfcomments>).
     },
     RichTextComment => { },
+);
+
+# Apple FaceInfo namespace properties (ref PH)
+%Image::ExifTool::XMP::apple_fi = (
+    %xmpTableDefaults,
+    GROUPS => { 1 => 'XMP-apple-fi', 2 => 'Image' },
+    NAMESPACE => 'apple-fi',
+    NOTES => q{
+        Face information tags written by the Apple iPhone 5 inside the mwg-rs
+        RegionExtensions.
+    },
+    Timestamp => {
+        Name => 'TimeStamp',
+        Writable => 'integer',
+        # (don't know how to convert this)
+    },
+    FaceID          => { Writable => 'integer' },
+    AngleInfoRoll   => { Writable => 'integer' },
+    ConfidenceLevel => { Writable => 'integer' },
 );
 
 # SVG namespace properties (ref 9)

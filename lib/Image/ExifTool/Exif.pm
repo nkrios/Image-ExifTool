@@ -50,7 +50,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.45';
+$VERSION = '3.46';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -265,6 +265,7 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
     5 => 'Transparency mask of reduced-resolution image',
     6 => 'Transparency mask of multi-page image',
     7 => 'Transparency mask of reduced-resolution multi-page image',
+    0x10001 => 'Alternate reduced-resolution image', # (DNG 1.2)
     0xffffffff => 'invalid', #(found in E5700 NEF's)
     BITMASK => {
         0 => 'Reduced resolution',
@@ -819,16 +820,16 @@ my %sampleFormat = (
             Name => 'ThumbnailOffset',
             Notes => q{
                 ThumbnailOffset in IFD1 of JPEG and some TIFF-based images, IFD0 of MRW
-                images and AVI videos, and the SubIFD in IFD1 of SRW images;
+                images and AVI and MOV videos, and the SubIFD in IFD1 of SRW images;
                 PreviewImageStart in MakerNotes and IFD0 of ARW and SR2 images;
                 JpgFromRawStart in SubIFD of NEF images and IFD2 of PEF images; and
                 OtherImageStart in everything else
             },
             # thumbnail is found in IFD1 of JPEG and TIFF images, and
-            # IFD0 of EXIF information in FujiFilm AVI (RIFF) videos
+            # IFD0 of EXIF information in FujiFilm AVI (RIFF) and MOV videos
             Condition => q{
                 $$self{DIR_NAME} eq 'IFD1' or
-                ($$self{FILE_TYPE} eq 'RIFF' and $$self{DIR_NAME} eq 'IFD0')
+                ($$self{DIR_NAME} eq 'IFD0' and $$self{FILE_TYPE} =~ /^(RIFF|MOV)$/)
             },
             IsOffset => 1,
             OffsetPair => 0x202,
@@ -849,7 +850,8 @@ my %sampleFormat = (
         {
             Name => 'ThumbnailOffset',
             # thumbnail in IFD0 of MRW images (Minolta A200)
-            Condition => '$$self{DIR_NAME} eq "IFD0" and $$self{TIFF_TYPE} eq "MRW"',
+            # and IFD0 of NRW images (Nikon Coolpix P6000,P7000,P7100)
+            Condition => '$$self{DIR_NAME} eq "IFD0" and $$self{TIFF_TYPE} =~ /^(MRW|NRW)$/',
             IsOffset => 1,
             OffsetPair => 0x202,
             # A200 uses the wrong base offset for this pointer!!
@@ -857,7 +859,7 @@ my %sampleFormat = (
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
             WriteGroup => 'IFD0',
-            WriteCondition => '$$self{FILE_TYPE} eq "MRW"',
+            WriteCondition => '$$self{FILE_TYPE} =~ /^(MRW|NRW)$/',
             Protected => 2,
         },
         {
@@ -924,6 +926,28 @@ my %sampleFormat = (
         },
         {
             Name => 'OtherImageStart',
+            Condition => '$$self{DIR_NAME} eq "SubIFD1"',
+            IsOffset => 1,
+            OffsetPair => 0x202,
+            DataTag => 'OtherImage',
+            Writable => 'int32u',
+            WriteGroup => 'SubIFD1',
+            Protected => 2,
+            Permanent => 1, # (don't add/delete this tag: makes WriteCondition unnecessary)
+       },
+        {
+            Name => 'OtherImageStart',
+            Condition => '$$self{DIR_NAME} eq "SubIFD2"',
+            IsOffset => 1,
+            OffsetPair => 0x202,
+            DataTag => 'OtherImage',
+            Writable => 'int32u',
+            WriteGroup => 'SubIFD2',
+            Protected => 2,
+            Permanent => 1, # (don't add/delete this tag: makes WriteCondition unnecessary)
+        },
+        {
+            Name => 'OtherImageStart',
             IsOffset => 1,
             OffsetPair => 0x202,
         },
@@ -933,14 +957,14 @@ my %sampleFormat = (
             Name => 'ThumbnailLength',
             Notes => q{
                 ThumbnailLength in IFD1 of JPEG and some TIFF-based images, IFD0 of MRW
-                images and AVI videos, and the SubIFD in IFD1 of SRW images;
+                images and AVI and MOV videos, and the SubIFD in IFD1 of SRW images;
                 PreviewImageLength in MakerNotes and IFD0 of ARW and SR2 images;
                 JpgFromRawLength in SubIFD of NEF images, and IFD2 of PEF images; and
                 OtherImageLength in everything else
             },
             Condition => q{
                 $$self{DIR_NAME} eq 'IFD1' or
-                ($$self{FILE_TYPE} eq 'RIFF' and $$self{DIR_NAME} eq 'IFD0')
+                ($$self{DIR_NAME} eq 'IFD0' and $$self{FILE_TYPE} =~ /^(RIFF|MOV)$/)
             },
             OffsetPair => 0x201,
             DataTag => 'ThumbnailImage',
@@ -955,12 +979,13 @@ my %sampleFormat = (
         {
             Name => 'ThumbnailLength',
             # thumbnail in IFD0 of MRW images (Minolta A200)
-            Condition => '$$self{DIR_NAME} eq "IFD0" and $$self{TIFF_TYPE} eq "MRW"',
+            # and IFD0 of NRW images (Nikon Coolpix P6000,P7000,P7100)
+            Condition => '$$self{DIR_NAME} eq "IFD0" and $$self{TIFF_TYPE} =~ /^(MRW|NRW)$/',
             OffsetPair => 0x201,
             DataTag => 'ThumbnailImage',
             Writable => 'int32u',
             WriteGroup => 'IFD0',
-            WriteCondition => '$$self{FILE_TYPE} eq "MRW"',
+            WriteCondition => '$$self{FILE_TYPE} =~ /^(MRW|NRW)$/',
             Protected => 2,
         },
         {
@@ -1017,6 +1042,26 @@ my %sampleFormat = (
             WriteGroup => 'IFD2',
             WriteCondition => '$$self{TIFF_TYPE} eq "PEF"',
             Protected => 2,
+        },
+        {
+            Name => 'OtherImageLength',
+            Condition => '$$self{DIR_NAME} eq "SubIFD1"',
+            OffsetPair => 0x201,
+            DataTag => 'OtherImage',
+            Writable => 'int32u',
+            WriteGroup => 'SubIFD1',
+            Protected => 2,
+            Permanent => 1, # (don't add/delete this tag: makes WriteCondition unnecessary)
+        },
+        {
+            Name => 'OtherImageLength',
+            Condition => '$$self{DIR_NAME} eq "SubIFD2"',
+            OffsetPair => 0x201,
+            DataTag => 'OtherImage',
+            Writable => 'int32u',
+            WriteGroup => 'SubIFD2',
+            Protected => 2,
+            Permanent => 1, # (don't add/delete this tag: makes WriteCondition unnecessary)
         },
         {
             Name => 'OtherImageLength',
@@ -2328,8 +2373,8 @@ my %sampleFormat = (
     0xc6f7 => 'NoiseReductionApplied',
     0xc6f8 => 'ProfileName',
     0xc6f9 => 'ProfileHueSatMapDims',
-    0xc6fa => 'ProfileHueSatMapData1',
-    0xc6fb => 'ProfileHueSatMapData2',
+    0xc6fa => { Name => 'ProfileHueSatMapData1', %longBin },
+    0xc6fb => { Name => 'ProfileHueSatMapData2', %longBin },
     0xc6fc => {
         Name => 'ProfileToneCurve',
         Binary => 1,
@@ -2732,6 +2777,13 @@ my %sampleFormat = (
         RawConv => 'Image::ExifTool::Exif::ExtractImage($self,$val[0],$val[1],"JpgFromRaw")',
     },
     OtherImage => {
+        Writable => 1,
+        WriteCheck => '$self->CheckImage(\$val)',
+        DelCheck => '$val = ""; return undef', # can't delete, so set to empty string
+        WriteAlso => {
+            OtherImageStart  => 'defined $val ? 0xfeedfeed : undef',
+            OtherImageLength => 'defined $val ? 0xfeedfeed : undef',
+        },
         Require => {
             0 => 'OtherImageStart',
             1 => 'OtherImageLength',
@@ -3655,7 +3707,7 @@ sub ProcessExif($$$)
         my $valueDataLen = $dataLen;
         my $valuePtr = $entry + 8;      # pointer to value within $$dataPt
         my $tagInfo = $exifTool->GetTagInfo($tagTablePtr, $tagID);
-        my ($origFormStr, $bad);
+        my ($origFormStr, $bad, $rational);
         # hack to patch incorrect count in Kodak SubIFD3 tags
         if ($count < 2 and ref $$tagTablePtr{$tagID} eq 'HASH' and $$tagTablePtr{$tagID}{FixCount}) {
             $offList or ($offList, $offHash) = GetOffList($dataPt, $dirStart, $dataPos,
@@ -3875,8 +3927,7 @@ sub ProcessExif($$$)
         }
         unless ($bad) {
             # convert according to specified format
-            $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$count,$readSize);
-
+            $val = ReadValue($valueDataPt,$valuePtr,$formatStr,$count,$readSize,\$rational);
             # re-code if necessary
             if ($strEnc and $formatStr eq 'string' and defined $val) {
                 $val = $exifTool->Decode($val, $strEnc);
@@ -3885,12 +3936,8 @@ sub ProcessExif($$$)
 
         if ($verbose) {
             my $tval = $val;
-            if ($formatStr =~ /^rational64([su])$/ and defined $tval and not $bad) {
-                # show numerator/denominator separately
-                my $f = ReadValue($valueDataPt,$valuePtr,"int32$1",$count*2,$readSize);
-                $f =~ s/(-?\d+) (-?\d+)/$1\/$2/g;
-                $tval .= " ($f)";
-            }
+            # also show as a rational
+            $tval .= " ($rational)" if defined $rational;
             if ($htmlDump) {
                 my ($tagName, $colName);
                 if ($tagID == 0x927c and $dirName eq 'ExifIFD') {
@@ -4232,9 +4279,11 @@ sub ProcessExif($$$)
         }
         # save the value of this tag
         $tagKey = $exifTool->FoundTag($tagInfo, $val);
-        # set the group 1 name for tags in specified tables
-        if (defined $tagKey and $$tagTablePtr{SET_GROUP1}) {
-            $exifTool->SetGroup($tagKey, $dirName);
+        if (defined $tagKey) {
+            # set the group 1 name for tags in specified tables
+            $exifTool->SetGroup($tagKey, $dirName) if $$tagTablePtr{SET_GROUP1};
+            # save original components of rational numbers (used when copying)
+            $$exifTool{RATIONAL}{$tagKey} = $rational if defined $rational;
         }
     }
 

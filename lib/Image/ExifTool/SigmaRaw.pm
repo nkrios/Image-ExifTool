@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION %sigmaLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 sub ProcessX3FHeader($$$);
 sub ProcessX3FDirectory($$$);
@@ -131,6 +131,7 @@ sub ProcessX3FProperties($$$);
 %Image::ExifTool::SigmaRaw::Properties = (
     PROCESS_PROC => \&ProcessX3FProperties,
     GROUPS => { 2 => 'Camera' },
+    PRIORITY => 0,  # (because these aren't writable like the EXIF ones)
     AEMODE => {
         Name => 'MeteringMode',
         PrintConv => {

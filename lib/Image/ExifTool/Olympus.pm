@@ -35,7 +35,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '1.92';
+$VERSION = '1.94';
 
 sub PrintLensInfo($$$);
 
@@ -284,10 +284,13 @@ my %olympusCameraTypes = (
     D4520 => 'SZ-31MR',
     D4521 => 'SH-25MR',
     D4529 => 'VG170',
+    D4531 => 'XZ-2',
     D4535 => 'SP-620UZ',
     D4536 => 'TG-320',
     D4537 => 'VR340,D750',
     D4541 => 'SZ-12',
+    D4545 => 'VH410',
+    D4562 => 'SP-820UZ',
     D4809 => 'C2500L',
     D4842 => 'E-10',
     D4856 => 'C-1',
@@ -316,6 +319,7 @@ my %olympusCameraTypes = (
     S0038 => 'E-PL3',
     S0039 => 'E-PM1',
     S0040 => 'E-PL1s',
+    S0042 => 'E-PL5',
     SR45 => 'D220',
     SR55 => 'D320L',
     SR83 => 'D340L',
@@ -3931,7 +3935,7 @@ sub ExtenderStatus($$$)
     # (other extenders don't seem to affect the reported max aperture)
     return 1 if "$info[0] $info[1]" ne '0 4';
     # get the maximum aperture for this lens (in $1)
-    $lensType =~ / F(\d+(.\d+)?)/ or return 1;
+    $lensType =~ / F(\d+(\.\d+)?)/ or return 1;
     # If the maximum aperture at the maximum focal length is greater than the
     # known max/max aperture of the lens, then the extender must be attached
     return ($maxAperture - $1 > 0.2) ? 1 : 2;

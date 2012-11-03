@@ -65,6 +65,7 @@ official EXIF 2.3 specification.
   <br>0x5 = Transparency mask of reduced-resolution image
   <br>0x6 = Transparency mask of multi-page image
   <br>0x7 = Transparency mask of reduced-resolution multi-page image
+  <br>0x10001 = Alternate reduced-resolution image
   <br>0xffffffff = invalid
   <br>Bit 0 = Reduced resolution
   <br>Bit 1 = Single page
@@ -652,11 +653,13 @@ JpgFromRawLength in SubIFD2 of DNG images)</span></span></td></tr>
   <br>PreviewImageStart
   <br>JpgFromRawStart
   <br>JpgFromRawStart
+  <br>OtherImageStart
+  <br>OtherImageStart
   <br>OtherImageStart</td>
-<td class=c title=' * = Protected'>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>N</td>
-<td class=c>IFD1<br>IFD0<br>SubIFD<br>MakerNotes<br>IFD0<br>SubIFD<br>IFD2<br>-</td>
+<td class=c title=' * = Protected'>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>N</td>
+<td class=c>IFD1<br>IFD0<br>SubIFD<br>MakerNotes<br>IFD0<br>SubIFD<br>IFD2<br>SubIFD1<br>SubIFD2<br>-</td>
 <td><span class=s><span class=n>(ThumbnailOffset in IFD1 of JPEG and some TIFF-based images, IFD0 of MRW
-images and AVI videos, and the SubIFD in IFD1 of SRW images;
+images and AVI and MOV videos, and the SubIFD in IFD1 of SRW images;
 PreviewImageStart in MakerNotes and IFD0 of ARW and SR2 images;
 JpgFromRawStart in SubIFD of NEF images and IFD2 of PEF images; and
 OtherImageStart in everything else)</span></span></td></tr>
@@ -669,11 +672,13 @@ OtherImageStart in everything else)</span></span></td></tr>
   <br>PreviewImageLength
   <br>JpgFromRawLength
   <br>JpgFromRawLength
+  <br>OtherImageLength
+  <br>OtherImageLength
   <br>OtherImageLength</td>
-<td class=c title=' * = Protected'>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>N</td>
-<td class=c>IFD1<br>IFD0<br>SubIFD<br>MakerNotes<br>IFD0<br>SubIFD<br>IFD2<br>-</td>
+<td class=c title=' * = Protected'>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>int32u*<br>N</td>
+<td class=c>IFD1<br>IFD0<br>SubIFD<br>MakerNotes<br>IFD0<br>SubIFD<br>IFD2<br>SubIFD1<br>SubIFD2<br>-</td>
 <td><span class=s><span class=n>(ThumbnailLength in IFD1 of JPEG and some TIFF-based images, IFD0 of MRW
-images and AVI videos, and the SubIFD in IFD1 of SRW images;
+images and AVI and MOV videos, and the SubIFD in IFD1 of SRW images;
 PreviewImageLength in MakerNotes and IFD0 of ARW and SR2 images;
 JpgFromRawLength in SubIFD of NEF images, and IFD2 of PEF images; and
 OtherImageLength in everything else)</span></span></td></tr>
@@ -3135,7 +3140,7 @@ these unless they already exist in the file)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 6, 2012</i>
+<br><i>Last revised Oct 13, 2012</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

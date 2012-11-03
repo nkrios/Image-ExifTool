@@ -52,7 +52,7 @@ use vars qw($VERSION %pentaxLensTypes);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.47';
+$VERSION = '2.49';
 
 sub CryptShutterCount($$);
 sub PrintFilter($$$);
@@ -75,6 +75,7 @@ sub PrintFilter($$$);
     '2 0' => 'A Series Lens', #7 (from smc PENTAX-A 400mm F5.6)
     '3 0' => 'Sigma', # (includes 'Sigma 30mm F1.4 EX DC' - PH)
     # (and 'Sigma 105mm F2.8 EX DG Macro', ref 24)
+    # (and 'Sigma 18-50mm F2.8 EX Macro')
     '3 17' => 'smc PENTAX-FA SOFT 85mm F2.8',
     '3 18' => 'smc PENTAX-F 1.7X AF ADAPTER',
     '3 19' => 'smc PENTAX-F 24-50mm F4',
@@ -143,7 +144,7 @@ sub PrintFilter($$$);
     '3 255.6' => 'Sigma 24-60mm F2.8 EX DG', #PH
     '3 255.7' => 'Sigma 70-300mm F4-5.6 Macro', #JD
     '3 255.8' => 'Sigma 55-200mm F4-5.6 DC', #JD
-    '3 255.9' => 'Sigma 18-50mm F2.8 EX DC', #JD
+    '3 255.9' => 'Sigma 18-50mm F2.8 EX DC', #JD (also Macro version - PH)
     '4 1' => 'smc PENTAX-FA SOFT 28mm F2.8',
     '4 2' => 'smc PENTAX-FA 80-320mm F4.5-5.6',
     '4 3' => 'smc PENTAX-FA 43mm F1.9 Limited',
@@ -230,6 +231,7 @@ sub PrintFilter($$$);
     '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
     '7 58' => 'smc PENTAX-D FA Macro 100mm F2.8 WR', #PH - this bit of information cost me $600 ;)
     '7 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #(Anton Bondar)
+    '7 212' => 'smc Pentax-DA 50mm F1.8', #PH
     '7 213' => 'smc PENTAX-DA 40mm F2.8 XS', #PH
     '7 214' => 'smc PENTAX-DA 35mm F2.4 AL', #PH
     '7 216' => 'smc PENTAX-DA L 55-300mm F4-5.8 ED', #PH
@@ -413,6 +415,8 @@ my %pentaxModelID = (
     0x12f48 => 'Optio LS465',
     0x12f52 => 'K-30',
     0x12f5c => 'X-5',
+    0x12f70 => 'K-5 II',
+    0x12f71 => 'K-5 II s', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4515.0.html
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -906,7 +910,7 @@ my %binaryDataAttrs = (
         Name => 'AFPointSelected',
         Writable => 'int16u',
         PrintConvColumns => 2,
-        PrintConv => {
+        PrintConv => [{
             # 0 - Contrast-detect AF? - PH (K-5)
             0xffff => 'Auto',
             0xfffe => 'Fixed Center',
@@ -926,6 +930,9 @@ my %binaryDataAttrs = (
             10 => 'Bottom',
             11 => 'Lower-right',
         },
+        # (second number exists for K-5II(s) is usually 0, but is 1 for AF.C with
+        # AFPointMode=='Select' and extended tracking focus points are enabled in the settings)
+        ],
     },
     0x000f => { #PH
         Name => 'AFPointsInFocus',
@@ -2307,6 +2314,7 @@ my %binaryDataAttrs = (
             6 => 'On (Video)', # (K-7)
             7 => 'On (7)', #(NC) (K20D, K200D, K-m, K-5)
             15 => 'On (15)', # (K20D (with Tamron 10-20mm @ 10mm))
+            135 => 'On (135)', #(K-5IIs)
         },
     },
     2 => {

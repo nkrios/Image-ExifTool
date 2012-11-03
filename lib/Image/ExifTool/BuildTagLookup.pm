@@ -32,7 +32,7 @@ use Image::ExifTool::XMP;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.50';
+$VERSION = '2.51';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -731,8 +731,11 @@ TagID:  foreach $tagID (@keys) {
                     }
                 }
                 if ($$tagInfo{Hidden}) {
-                    warn "Warning: Hidden tag in list - $short $name\n" if @infoArray > 1;
-                    next TagID;
+                    if ($tagInfo == $infoArray[0]) {
+                        next TagID; # hide all tags with this ID if first tag in list is hidden
+                    } else {
+                        next;       # only hide this tag
+                    }
                 }
                 my $writable;
                 if (defined $$tagInfo{Writable}) {

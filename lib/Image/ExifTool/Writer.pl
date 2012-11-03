@@ -232,19 +232,24 @@ sub SetNewValue($;$$%)
     # allow value to be scalar or list reference
     if (ref $value) {
         if (ref $value eq 'ARRAY') {
-            # (since value is an ARRAY, it will have more than one entry)
-            # set all list-type tags first
-            my $replace = $options{Replace};
-            foreach (@$value) {
-                my ($n, $e) = SetNewValue($self, $tag, $_, %options, ListOnly => 1);
-                $err = $e if $e;
-                $numSet += $n;
-                delete $options{Replace}; # don't replace earlier values in list
+            # value is an ARRAY so it may have more than one entry
+            # - set values both separately and as a combined string if there are more than one
+            if (@$value > 1) {
+                # set all list-type tags first
+                my $replace = $options{Replace};
+                foreach (@$value) {
+                    my ($n, $e) = SetNewValue($self, $tag, $_, %options, ListOnly => 1);
+                    $err = $e if $e;
+                    $numSet += $n;
+                    delete $options{Replace}; # don't replace earlier values in list
+                }
+                # and now set only non-list tags
+                $value = join $self->{OPTIONS}{ListSep}, @$value;
+                $options{Replace} = $replace;
+                $listOnly = $options{ListOnly} = 0;
+            } else {
+                $value = $$value[0];
             }
-            # and now set only non-list tags
-            $value = join $self->{OPTIONS}{ListSep}, @$value;
-            $options{Replace} = $replace;
-            $listOnly = $options{ListOnly} = 0;
         } elsif (ref $value eq 'SCALAR') {
             $value = $$value;
         }
@@ -260,6 +265,8 @@ sub SetNewValue($;$$%)
     }
     # allow trailing '#' for ValueConv value
     $options{Type} = 'ValueConv' if $tag =~ s/#$//;
+    my $convType = $options{Type} || ($$self{OPTIONS}{PrintConv} ? 'PrintConv' : 'ValueConv');
+
     # ignore leading family number if 0 or 1 specified
     if ($options{Group} and $options{Group} =~ /^(\d+)(.*)/ and $1 < 2) {
         $options{Group} = $2;
@@ -401,17 +408,19 @@ sub SetNewValue($;$$%)
                     }
                 }
             }
-            if (not TagExists($tag)) {
-                $err = "Tag '$origTag' does not exist";
-                $err .= ' or has a bad language code' if $origTag =~ /-/;
-            } elsif ($langCode) {
-                $err = "Tag '$tag' does not support alternate languages";
-            } elsif ($wantGroup) {
-                $err = "Sorry, $wantGroup:$origTag doesn't exist or isn't writable";
-            } else {
-                $err = "Sorry, $origTag is not writable";
+            unless ($listOnly) {
+                if (not TagExists($tag)) {
+                    $err = "Tag '$origTag' does not exist";
+                    $err .= ' or has a bad language code' if $origTag =~ /-/;
+                } elsif ($langCode) {
+                    $err = "Tag '$tag' does not support alternate languages";
+                } elsif ($wantGroup) {
+                    $err = "Sorry, $wantGroup:$origTag doesn't exist or isn't writable";
+                } else {
+                    $err = "Sorry, $origTag is not writable";
+                }
+                $verbose > 2 and print $out "$err\n";
             }
-            $verbose > 2 and print $out "$err\n";
         }
         # all done
         return ($numSet, $err) if wantarray;
@@ -703,7 +712,7 @@ sub SetNewValue($;$$%)
         # save ValueConv setting for use in ConvInv()
         unless ($noConv) {
             # set default conversion type used by ConvInv() and CHECK_PROC routines
-            $$self{ConvType} = $options{Type} || ($$self{OPTIONS}{PrintConv} ? 'PrintConv' : 'ValueConv');
+            $$self{ConvType} = $convType;
             my $e;
             ($val,$e) = $self->ConvInv($val,$tagInfo,$tag,$wgrp1,$$self{ConvType},$wantGroup);
             if (defined $e) {
@@ -881,13 +890,17 @@ WriteAlso:
         my $pre = $wantGroup ? ($ifdName || $wantGroup) . ':' : '';
         if ($wasProtected) {
             $err = "Tag '$pre$tag' is $wasProtected for writing";
-        } elsif ($foundMatch) {
-            $err = "Sorry, $pre$tag is not writable";
-        } else {
-            $err = "Tag '$pre$tag' does not exist";
+        } elsif (not $listOnly) {
+            if ($foundMatch) {
+                $err = "Sorry, $pre$tag is not writable";
+            } else {
+                $err = "Tag '$pre$tag' does not exist";
+            }
         }
-        $verbose > 2 and print $out "$err\n";
-        warn "$err\n" unless wantarray;
+        if ($err) {
+            $verbose > 2 and print $out "$err\n";
+            warn "$err\n" unless wantarray;
+        }
     } elsif ($$self{CHECK_WARN}) {
         $err = $$self{CHECK_WARN};
         $verbose > 2 and print $out "$err\n";
@@ -957,6 +970,7 @@ sub SetNewValuesFromFile($$;@)
         ExtractEmbedded => $$options{ExtractEmbedded},
         FastScan        => $$options{FastScan},
         FixBase         => $$options{FixBase},
+        GlobalTimeShift => $$options{GlobalTimeShift},
         IgnoreMinorErrors=>$$options{IgnoreMinorErrors},
         Lang            => $$options{Lang},
         LargeFileSupport=> $$options{LargeFileSupport},
@@ -967,6 +981,7 @@ sub SetNewValuesFromFile($$;@)
         Password        => $$options{Password},
         PrintConv       => $$options{PrintConv},
         QuickTimeUTC    => $$options{QuickTimeUTC},
+        RequestAll      => 1,
         ScanForXMP      => $$options{ScanForXMP},
         StrictDate      => 1,
         Struct          => $structOpt,
@@ -2159,7 +2174,9 @@ sub Sanitize($$)
 #         3) tag name, 4) group 1 name, 5) conversion type (or undef),
 #         6) [optional] want group
 # Returns: 0) converted value, 1) error string (or undef on success)
-# Notes: Uses ExifTool "ConvType" member to specify conversion type
+# Notes:
+# - uses ExifTool "ConvType" member when conversion type is undef
+# - conversion types other than 'ValueConv' and 'PrintConv' are treated as 'Raw'
 sub ConvInv($$$$$;$$)
 {
     my ($self, $val, $tagInfo, $tag, $wgrp1, $convType, $wantGroup) = @_;
@@ -2177,7 +2194,7 @@ Conv: for (;;) {
                 }
             }
             $type = $convType || $$self{ConvType} || 'PrintConv';
-        } elsif ($type ne 'ValueConv') {
+        } elsif ($type eq 'PrintConv') {
             $type = 'ValueConv';
         } else {
             # split raw value if necessary
@@ -3959,7 +3976,9 @@ my %writeValueProc = (
 #------------------------------------------------------------------------------
 # write binary data value (with current byte ordering)
 # Inputs: 0) value, 1) format string
-#         2) optional number of values (1 or string length if not specified)
+#         2) number of values:
+#               undef = 1 for numerical types, or data length for string/undef types
+#                  -1 = number of space-delimited values in the input string
 #         3) optional data reference, 4) value offset
 # Returns: packed value (and sets value in data) or undef on error
 # Notes: May modify input value to round for integer formats
@@ -4341,6 +4360,7 @@ sub WriteJPEG($$)
         my $segJunk;
         $raf->ReadLine($segJunk) or $segJunk = '';
         # remove the 0xff but write the rest of the junk up to this point
+        # (this will handle the data after the first 7 bytes of SOF segments)
         chomp($segJunk);
         Write($outfile, $segJunk) if length $segJunk;
         # JPEG markers can be padded with unlimited 0xff's

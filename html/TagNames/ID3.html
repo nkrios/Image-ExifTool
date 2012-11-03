@@ -948,24 +948,46 @@ complete list of available ID3v2 tags.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Private'>ID3 Private Tags</a></h2>
-<p>ID3 private (PRIV) tags.</p>
+<p>ID3 private (PRIV) tags.  ExifTool will decode any private tags found, even
+if they do not appear in this table.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<tr class=h><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td>'AverageLevel'</td>
 <td>AverageLevel</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>'PeakValue'</td>
 <td>PeakValue</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>'XMP'</td>
+<td>WM_MediaClassPrimaryID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>WM_MediaClassSecondaryID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>WM_Provider</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>WM_CollectionGroupID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>WM_CollectionID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>WM_ContentID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>XMP</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
@@ -1343,7 +1365,7 @@ complete list of available ID3v2 tags.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 20, 2012</i>
+<br><i>Last revised Nov 2, 2012</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -17,7 +17,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::RIFF;
 
-$VERSION = '1.18';
+$VERSION = '1.19';
 
 sub ProcessMetadata($$$);
 sub ProcessContentDescription($$$);
@@ -642,7 +642,7 @@ sub ProcessPicture($$$)
     my $n = $dirLen - 5 - $picLen;
     return 0 if $n & 0x01 or $n < 4;
     my $str = substr($$dataPt, $dirStart+5, $n);
-    if ($str =~ /^((?:..)*?)\0\0((?:..)*?)\0\0/) {
+    if ($str =~ /^((?:..)*?)\0\0((?:..)*?)\0\0/s) {
         my ($mime, $desc) = ($1, $2);
         $exifTool->HandleTag($tagTablePtr, 1, $exifTool->Decode($mime,'UCS2','II'));
         $exifTool->HandleTag($tagTablePtr, 2, $exifTool->Decode($desc,'UCS2','II')) if length $desc;

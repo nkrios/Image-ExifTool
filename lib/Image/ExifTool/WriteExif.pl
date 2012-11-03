@@ -3311,7 +3311,7 @@ NoOverwrite:            next if $isNew > 0;
                             # read and validate
                             undef $buff unless $r->Seek($offset+$base+$dataPos,0) and
                                                $r->Read($buff,$size) == $size and
-                                               $buff =~ /^.\xd8\xff[\xc4\xdb\xe0-\xef]/;
+                                               $buff =~ /^.\xd8\xff[\xc4\xdb\xe0-\xef]/s;
                             $r->Seek($tell, 0) or $exifTool->Error('Seek error'), return undef;
                         }
                         # set flag if we must load PreviewImage
