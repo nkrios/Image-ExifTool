@@ -4,6 +4,11 @@
 <head>
   <title>FileName and Directory tags</title>
 <link rel=stylesheet type='text/css' href='style.css' title='Style'>
+<style type="text/css">
+<!--
+.prog    { padding: 0.5em; border: 1px solid gray; background: #fee }
+-->
+</style>
 </head>
 <body>
 <h2 class='up'>Writing "FileName" and "Directory" tags</h2>
@@ -19,7 +24,8 @@ directory is created if it didn't already exist.</p>
 <p>Writing the <b>FileName</b> tag renames a file.  If the new <b>FileName</b>
 has a directory specification (ie. contains a '<code>/</code>' character), then
 the file is also moved to the specified directory (see
-<a href="#ex6">example 6</a> below).  Existing files will not be overwritten.</p>
+<a href="#ex6">example 6</a> below).  Existing files will not be overwritten
+(but see "Warning" below).</p>
 
 <p>The <code>%d</code>, <code>%f</code>, <code>%e</code> file name format codes
 may be used to represent the directory, name and extension of the original file
@@ -62,6 +68,17 @@ date formatting will fail and the file will not be renamed or moved.</p>
 <p>In a Windows batch file, all <code>%</code> characters must be escaped as
 <code>%%</code>.  This can result in extreme format codes like
 <code>%%%%f</code> when using the <code>-d</code> option.</p>
+
+<blockquote class=prog><b class=red>Warning:</b>
+Writing <b>illegal file names</b> in Windows can have unpredictable results and
+may result in <b>data loss</b>.  Illegal characters in Windows file names are:
+<pre class=code>    / \ ? * : | " &lt; &gt;</pre>
+Any tag used in generating a file name which may contain these characters must
+first be filtered via a <a href="config.html">user-defined tag</a>.  Here is an
+example of a conversion that translates illegal characters to underlines for use
+in a user-defined Composite tag:
+<pre class=code>    ValueConv =&gt; '$val =~ tr{/\?*:|"&gt;&lt;}{_}; $val',</pre>
+</blockquote>
 
 <h2>Examples</h2>
 

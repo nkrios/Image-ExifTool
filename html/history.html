@@ -11,11 +11,95 @@
 
 <p>RSS feed: <a href="http://owl.phy.queensu.ca/~phil/exiftool/rss.xml">http://owl.phy.queensu.ca/~phil/exiftool/rss.xml</a></p>
 
-<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-9.04.tar.gz">Version 9.04</a>. (Other versions are
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-9.11.tar.gz">Version 9.11</a>. (Other versions are
 considered development releases, and are not uploaded to <a href="http://search.cpan.org/dist/Image-ExifTool/">CPAN</a>.)</p>
 
 <!-- Use line width of 80 -->
 <!-- *********************************************************************** -->
+
+<a name='v9.11'><b>Jan. 2, 2013 - Version 9.11</b></a> <span class=grn>(production release)</span>
+<ul>
+<li>Improved decoding of some Sony tags
+<li>Changed 3 tag names to avoid a leading digit to fix XML validation problem
+<li>Fixed bug introduced in 9.04 that could double-encipher some Sony MakerNote
+    information when writing (affected files are fixed by writing any tag with
+    ExifTool 9.11)
+</ul>
+
+<a name='v9.10'><b>Dec. 29, 2012 - Version 9.10</b></a>
+<ul>
+<li>Added write support for a few new XMP-crs and XMP-photomech tags
+<li>Added a new Samsung LensType (thanks Jaroslav Stepanek)
+<li>Added a new Pentax LensType (thanks Helmut Sch&uuml;tz)
+<li>Added a new Canon LensType
+<li>Decode Sony A99 FocusMode (thanks Michael Tapes for the samples)
+<li>Tolerate (but warn about) up to 4 bytes of garbage at start of EXIF segment
+<li>Changed -P option to also preserve FileCreateDate on Windows (requires
+    Win32API::File::Time)
+<li>Changed "[minor]" warning messages to capitalize the "M" (ie. "[Minor]") if
+    processing is affected when the warning is ignored
+<li>Patched to avoid problem of slow processing with some corrupted EXIF
+</ul>
+
+<a name='v9.09'><b>Dec. 15, 2012 - Version 9.09</b></a>
+<ul>
+<li>Added a few new Google XMP GPano tags
+<li>Added a new Olympus CameraType
+<li>Added a couple of new Minolta LensTypes
+<li>Added two new Nikon LensID's (thanks David P&uuml;schel and Robert
+    Rottmerhusen)
+<li>Decode Nikon D7000 AFPointsUsed and make this tag writable
+<li>Decode a new Olympus tag (thanks Christoph Anton Mitterer)
+<li>Renamed one of the FujiFilm RAF RawImageWidth/Height pairs to
+    RawImageFullWidth/Height
+<li>Changed -stay_open when combined with -q to flush output after each command
+    (as already done without -q) (requires IO::Handle)
+<li>Fixed problem shifting FileCreateDate when writing other "real" tags in the
+    same command
+</ul>
+
+<a name='v9.08'><b>Nov. 26, 2012 - Version 9.08</b></a>
+<ul>
+<li>Fixed bug introduced in 9.07 that broke writing of FileModifyDate
+</ul>
+
+<a name='v9.07'><b>Nov. 24, 2012 - Version 9.07</b></a>
+<ul>
+<li>Added ability to read/write FileCreateDate (Windows only)
+<li>Added ability to read FileInodeChangeDate (non-Windows only)
+<li>Added support for new tags in DNG 1.4 specification
+<li>Added support for Google Photosphere GPano XMP tags
+<li>Added a couple of new Olympus filter effects
+<li>Changed a Panasonic LensType (thanks Olaf Ulrich)
+<li>API Changes:
+    <ul>
+    <li>Enhanced SetFileModifyDate() to write FileCreateDate (Windows only)
+    </ul>
+</ul>
+
+<a name='v9.06'><b>Nov. 17, 2012 - Version 9.06</b></a>
+<ul>
+<li>Added support for Nikon maker notes in images from any camera make (as
+    written by Capture NX2)
+<li>Added support for FujiFilm X-E1 RAF images
+<li>Added a new Olympus CameraType
+<li>Added a new PentaxModelID and a new Pentax LensType
+<li>Extract FileCreateDate (Windows) and FileInodeChangeDate (other systems)
+<li>Fixed bug decoding UTF-16 ID3 synchronized lyrics
+</ul>
+
+<a name='v9.05'><b>Nov. 10, 2012 - Version 9.05</b></a>
+<ul>
+<li>Added ability to read APE metadata from MP3 audio files
+<li>Decode ID3 synchronized lyrics/text information
+<li>Decode maker notes in Leica V-LUX40 MP4 videos
+<li>Decode Sony A99 AFPointSelected (thanks Michael Tapes for the samples)
+<li>Improved decoding of some Sony tags (thanks Jos Roost)
+<li>API Changes:
+    <ul>
+    <li>Removed GeoNoInterpolate option (just set GeoMaxIntSecs to 0 instead)
+    </ul>
+</ul>
 
 <a name='v9.04'><b>Nov. 3, 2012 - Version 9.04</b></a> <span class=grn>(production release)</span>
 <ul>
@@ -28,7 +112,7 @@ considered development releases, and are not uploaded to <a href="http://search.
 <li>Decode Nikon HDRInfo (thanks Stefan)
 <li>Decode some FlashInfo tags for new Nikon models
 <li>Decode a few WM ID3 tags (some documentation on these would be nice)
-<li>Fixed bug which could cause truncated ID3v2 strings to be returned
+<li>Fixed bug which could cause truncated/garbage ID3v2 strings to be returned
 <li>Fixed -globalTimeShift option to also work when copying tags
 <li>Fixed decoding of Nikon AFFineTuneAdj for FirmwareVersion 1.10B (thanks
     Michael Tapes for the samples for this and the A77)

@@ -1860,7 +1860,7 @@ following features are rated for each format with a score of 0 to 10:
  11) Compressed meta information supported.
  12) Relocatable data elements (ie. no fixed offsets).
  13) Binary meta information (+7) with variable byte order (+3).
- 14) Mandatory tags not required (an unecessary complication).
+ 14) Mandatory tags not required (an unnecessary complication).
  15) Append information to end of file without editing.
 
                           Feature number                   Total
@@ -2535,7 +2535,7 @@ tag name.  For example:
 
 =head1 AUTHOR
 
-Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.  The MIE format itself is also

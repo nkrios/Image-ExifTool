@@ -28,7 +28,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.74';
+$VERSION = '1.77';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -595,6 +595,48 @@ my %unknownCipherData = (
         Notes => '"Yes" if this image was created by the Auto Portrait Framing feature',
         PrintConv => { 0 => 'No', 1 => 'Yes' },
     },
+    # 0x2017 - int32u: flash mode. 0=off, 1=fired, 2=red-eye (PH NEX-6) (also in A99, RX1, NEX-5R)
+    0x201b => { #PH (A99, also written by RX1, NEX-5R, NEX-6)
+        Name => 'FocusMode',
+        Condition => '$$self{Model} !~ /^DSC-/', # (doesn't seem to apply to RX1)
+        Writable => 'int8u',
+        Priority => 0,
+        PrintConv => {
+            0 => 'Manual',
+            2 => 'AF-A',
+            3 => 'AF-C',
+            4 => 'AF-S',
+            6 => 'DMF', # "Direct Manual Focus"
+            7 => 'AF-D', # "Depth Map Assist Continuous AF"
+        },
+    },
+    0x201e => { #PH (A99) (also exists but not confirmed for RX1 and NEX-5R/6)
+        Name => 'AFPointSelected',
+        Writable => 'int8u',
+        PrintConvColumns => 2,
+        PrintConv => {
+            0 => 'Auto', # (NC)
+            1 => 'Center',
+            2 => 'Top',
+            3 => 'Upper-right',
+            4 => 'Right',
+            5 => 'Lower-right',
+            6 => 'Bottom',
+            7 => 'Lower-left',
+            8 => 'Left',
+            9 => 'Upper-left',
+            10 => 'Far Right',
+            11 => 'Far Left',
+            12 => 'Upper-middle',
+            13 => 'Near Right',
+            14 => 'Lower-middle',
+            15 => 'Near Left',
+            16 => 'Upper Far Right',
+            17 => 'Lower Far Right',
+            18 => 'Lower Far Left',
+            19 => 'Upper Far Left',
+        },
+    },
     0x3000 => {
         Name => 'ShotInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Sony::ShotInfo' },
@@ -609,7 +651,10 @@ my %unknownCipherData = (
         Name => 'Tag9400',
         # - first byte must be 0x07, 0x09 or 0x0a (e)
         # (the Condition acts on the enciphered data)
-        Condition => '$$valPt =~ /^[\x07\x09\x0a]/',
+        Condition => q{
+            $$valPt =~ /^[\x07\x09\x0a]/ or
+           ($$valPt =~ /^[\x5e\xe7\x04]/ and $$self{DoubleCipher} = 1)
+        },
         SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag9400' },
     },{
         Name => 'Sony_0x9400',
@@ -695,7 +740,7 @@ my %unknownCipherData = (
         Name => 'Tag9402',
         # only valid for some models:
         # - first byte must be 0x0f or 0x10 (enciphered 0x8a or 0x70)
-        Condition => '$$valPt =~ /^[\x8a\x70]/',
+        Condition => '$$self{DoubleCipher} ? $$valPt =~ /^[\x7e\x46]/ : $$valPt =~ /^[\x8a\x70]/',
         SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag9402' },
     },{
         Name => 'Sony_0x9402',
@@ -1077,8 +1122,8 @@ my %unknownCipherData = (
         Writable => 'int16u',
         RawConv => '$val == 65535 ? undef : $val',
         PrintConv => {
-            0 => 'Normal',
-            2 => 'Burst',
+            0 => 'Normal', # (ie. shutter button)
+            2 => 'Continuous',
             5 => 'Exposure Bracketing',
             6 => 'White Balance Bracketing', # (HX5)
             65535 => 'n/a', #PH (A100)
@@ -2985,7 +3030,8 @@ my %faceInfo = (
         },
     },
     0x38 => { #12
-        Name => '3DPanoramaSize',
+        Name => 'PanoramaSize3D',
+        Description => '3D Panorama Size',
         Condition => '$$self{Model} !~ /^DSLR-(A450|A500|A550)$/',
         PrintConv => {
             0 => 'n/a',
@@ -3461,8 +3507,8 @@ my %faceInfo = (
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     NOTES => q{
-        Data for tags 0x2010 and 0x94xx is encrypted by a simple substitution
-        cipher, but is decrypted by ExifTool.
+        Data for tags 0x94xx and 0x2010 is encrypted by a simple substitution
+        cipher, but the deciphered values are listed below.
     },
     # 0x0000-0x0007:   7 1 1 1 0 0 0 0 (e) for DSC-HX9V
     #                 10 1 1 1 0 0 0 0 (e) for SLT or NEX (also RX100)
@@ -3484,13 +3530,12 @@ my %faceInfo = (
     0x0010 => {
         Name => 'ReleaseMode2',
         PrintConv => {
-            0 => 'Single Frame',
-            1 => 'Burst', # (RX100 "Continuous - Self-timer")
-            2 => 'Continuous - Bracketing', # (RX100)
-            3 => 'Continuous - WB Bracketing', # (HX9V) (RX100)
+            0 => 'Normal',
+            1 => 'Continuous', # (RX100 "Continuous - Self-timer")
+            2 => 'Continuous - Exposure Bracketing', # (RX100)
+            3 => 'Continuous - White Balance Bracketing', # (HX9V) (RX100)
             5 => 'Continuous - Burst', # (HX9V)
             6 => 'Single Frame - Capture During Movie', #PH (RX100)
-            # 6 - ReleaseMode3 is Single Frame' (CX130E,CX560E - PH)
             7 => 'Continuous - Sweep Panorama',
             8 => 'Continuous - Anti-Motion Blur, Hand-held Twilight', # (HX9V)
             9 => 'Continuous - HDR',
@@ -3498,11 +3543,11 @@ my %faceInfo = (
             13 => 'Continuous - 3D Sweep Panorama', #PH/12
             16 => 'Continuous - 3D Image', # (HX9V)
             # 17 - ReleaseMode3 is 'Continuous - Burst' (WX7 - PH)
-            19 => 'Continuous - Speed Priority', #PH (RX100)
+            19 => 'Continuous - Speed/Advance Priority', #PH/12 (RX100)
             20 => 'Continuous - Multi Frame NR',
-            26 => 'Continuous Shooting', #PH (RX100)
-            28 => 'Self-portrait', #PH (RX100)
-            29 => 'Speed Priority Continuous',
+            26 => 'Continuous Shooting', #PH (RX100) (? can't locate this sample or recreate this)
+            28 => 'Smile Shutter', #PH (RX100)
+            29 => 'Continuous - Tele-zoom Advance Priority',
         },
     },
 #    0x0013 => {
@@ -3535,15 +3580,15 @@ my %faceInfo = (
 #        },
 #    },
     0x0022 => {
-        Name => 'ReleaseMode3',
+        Name => 'SequenceLength',
         PrintConv => {
-            0 => 'Burst', # (RX100 too)
-            1 => 'Single Frame',
-            2 => 'Continuous - 2 shots', # (Background defocus, 3D Image)
-            3 => 'Continuous - 3 shots', # (HDR, WB Bracketing) (RX100, also continuous bracket)
-            5 => 'Continuous - 5 shots', # (PH; RX100)
-            6 => 'Continuous - 6 shots', # (Multi Frame NR, Anti Motion blur, Hand-held Twilight)
-            10 => 'Continuous - Burst', # (HX9V)
+            0 => 'Continuous', # (RX100 too)
+            1 => '1 shot',
+            2 => '2 shots', # (Background defocus, 3D Image)
+            3 => '3 shots', # (HDR, WB Bracketing) (RX100, also continuous bracket)
+            5 => '5 shots', # (PH; RX100)
+            6 => '6 shots', # (Multi Frame NR, Anti Motion blur, Hand-held Twilight)
+            10 => '10 shots', # (HX9V Burst)
             100 => 'Continuous - iSweep Panorama', # (HX9V)
             200 => 'Continuous - Sweep Panorama',
         },
@@ -3592,16 +3637,16 @@ my %faceInfo = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     DATAMEMBER => [ 0x02 ],
     0x02 => {
-        Name => 'SomeFlag',
-        DataMember => 'SomeFlag',
+        Name => 'TempTest1',
+        DataMember => 'TempTest1',
         Hidden => 1,
-        RawConv => '$$self{SomeFlag}=$val; undef',
+        RawConv => '$$self{TempTest1}=$val; $$self{OPTIONS}{Unknown}<2 ? undef : $val',
     },
     0x04 => {
-        Name => 'AmbientTemperature', # (guess -- closer to ambient than Tag9403 0x05)
+        Name => 'AmbientTemperature',
         # this (and many other values) are only valid if 0x02 is 255 (why?)
-        Condition => '$$self{SomeFlag} == 255',
-        Format => 'int8s', #(NC -- wait for winter)
+        Condition => '$$self{TempTest1} == 255',
+        Format => 'int8s', # (verified for negative temperature)
         PrintConv => '"$val C"',
         PrintConvInv => '$val=~s/ ?C//; $val',
     },
@@ -3632,19 +3677,17 @@ my %faceInfo = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     DATAMEMBER => [ 0x04 ],
     0x04 => {
-        # seen values 0,2,3,18,32,49,148 - maybe relates to temperature scale?
-        # (is temperature not in Celcius?)
-        # temperature is invalid if this is zero, and I see higher temperatures
-        # for higher values of this tag
-        Name => 'TempScale',
-        DataMember => 'TempScale',
+        # seen values 0,2,3,18,32,49,50,83,148
+        # CameraTemperature is value for all values except 0,148
+        Name => 'TempTest2',
+        DataMember => 'TempTest2',
         Hidden => 1,
-        RawConv => '$$self{TempScale}=$val; undef',
+        RawConv => '$$self{TempTest2}=$val; $$self{OPTIONS}{Unknown}<2 ? undef : $val',
     },
     0x05 => {
         Name => 'CameraTemperature', # (maybe SensorTemperature? - heats up when taking movies)
-        Condition => '$$self{TempScale} and $$self{TempScale} < 50',
-        Format => 'int8s', # signed int untested -- wait for winter
+        Condition => '$$self{TempTest2} and $$self{TempTest2} < 100',
+        Format => 'int8s', # signed int untested -- need colder temperatures
         PrintConv => '"$val C"',
         PrintConvInv => '$val=~s/ ?C//; $val',
     },
@@ -3679,7 +3722,7 @@ my %faceInfo = (
             43 => 'Cont. Priority AE',
         },
     },
-    0x017d => { #PH (verified only for SLT-A77V; likely valid for other SLT models - ref 12)
+    0x017d => { #PH (verified for the A77/A99; likely valid for other SLT models - ref 12)
         # (different from AFMicroAdjValue because it is 0 when the adjustment is off)
         Name => 'AFMicroAdj',
         Condition => '$$self{Model} =~ /^SLT-/',
@@ -4151,7 +4194,7 @@ my @lensFeatures = (
     #  Mask   {  Bits     Name    Bits     Name  } Prefix flag
     # ------    ------    -----  ------    -----   -----------
     [ 0x4000, { 0x4000 => 'PZ'                   }, 1 ],
-    [ 0x0300, { 0x0100 => 'DT',  0x0300 => 'E'   }, 1 ], # (will come before preceeding prefix)
+    [ 0x0300, { 0x0100 => 'DT',  0x0300 => 'E'   }, 1 ], # (will come before preceding prefix)
     [ 0x000c, { 0x0004 => 'ZA',  0x0008 => 'G'   } ],
     [ 0x00e0, { 0x0020 => 'STF', 0x0040 => 'Reflex', 0x0060 => 'Macro', 0x0080 => 'Fisheye' } ],
     [ 0x0003, { 0x0001 => 'SSM', 0x0002 => 'SAM' } ],
@@ -4495,8 +4538,10 @@ sub Decipher($;$)
 # Process Sony 0x94xx cipherdata directory
 # Inputs: 0) ExifTool object ref, 1) directory information ref, 2) tag table ref
 # Returns: 1 on success
-# Notes: dirInfo may contain VarFormatData (reference to empty list) to return
-#        details about any variable-length-format tags in the table (used when writing)
+# Notes:
+# 1) dirInfo may contain VarFormatData (reference to empty list) to return
+#    details about any variable-length-format tags in the table (used when writing)
+# 2) A bug in ExifTool 9.04-9.10 could have double-enciphered these blocks
 sub ProcessEnciphered($$$)
 {
     my ($exifTool, $dirInfo, $tagTablePtr) = @_;
@@ -4511,9 +4556,14 @@ sub ProcessEnciphered($$$)
         DirStart => 0,
     );
     Decipher(\$data);
+    if ($$exifTool{DoubleCipher}) {
+        Decipher(\$data);
+        $exifTool->WarnOnce('Some Sony metadata is double-enciphered. Write any tag to fix',1);
+    }
     if ($exifTool->Options('Verbose') > 2) {
         my $tagInfo = $$dirInfo{TagInfo} || { Name => 'data' };
-        $exifTool->VerboseDir("Deciphered $$tagInfo{Name}");
+        my $str = $$exifTool{DoubleCipher} ? 'ouble-d' : '';
+        $exifTool->VerboseDir("D${str}eciphered $$tagInfo{Name}");
         $exifTool->VerboseDump(\$data,
             Prefix  => $exifTool->{INDENT} . '  ',
             DataPos => $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base} || 0),
@@ -4534,15 +4584,27 @@ sub WriteEnciphered($$$)
     my $dirStart = $$dirInfo{DirStart} || 0;
     my $dirLen = $$dirInfo{DirLen} || (length($$dataPt) - $dirStart);
     my $data = substr($$dataPt, $dirStart, $dirLen);
+    my $changed = $$exifTool{CHANGED};
     Decipher(\$data);
+    # fix double-enciphered data (due to bug in ExifTool 9.04-9.10)
+    if ($$exifTool{DoubleCipher}) {
+        Decipher(\$data);
+        ++$$exifTool{CHANGED};
+        $exifTool->WarnOnce('Fixed double-enciphered Sony metadata',1);
+    }
     my %dirInfo = (
         %$dirInfo,
         DataPt => \$data,
         DataPos => $$dirInfo{DataPos} + $dirStart,
         DirStart => 0,
     );
-    $data = $exifTool->WriteBinaryData($dirInfo, $tagTablePtr);
-    Decipher(\$data,1) if defined $data;    # re-encipher
+    $data = $exifTool->WriteBinaryData(\%dirInfo, $tagTablePtr);
+    if ($changed == $$exifTool{CHANGED}) {
+        # nothing changed, so recover original data
+        $data = substr($$dataPt, $dirStart, $dirLen);
+    } elsif (defined $data) {
+        Decipher(\$data,1);     # re-encipher
+    }
     return $data;
 }
 
@@ -4837,7 +4899,7 @@ Minolta.
 
 =head1 AUTHOR
 
-Copyright 2003-2012, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

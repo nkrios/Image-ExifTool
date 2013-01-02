@@ -23,7 +23,7 @@ pre  { color: #800; margin-left: 4em }
 <br><a href="#Troubleshooting">Troubleshooting</a>
 <br><a href="#Tips">Tips</a>
 <hr>
-<a href="#Reverse">Reverse Geotagging</a>
+<a href="#Inverse">Inverse Geotagging</a>
 <br>&nbsp; - <a href="#GPX">Creating GPX log</a>
 <br>&nbsp; - <a href="#KML">Creating KML file</a>
 </div>
@@ -305,8 +305,10 @@ for details about how to use the config file.)</p>
     <td>Maximum interpolation time in seconds for geotagging.  Geotagging is
     treated as an extrapolation if the Geotime value lies between two fixes in
     the same track which are separated by a number of seconds greater than this.
-    Otherwise, the coordinates are calculated as a linear interpolation between
-    the two nearest fixes.</td>
+     Otherwise, the coordinates are calculated as a linear interpolation between
+    the nearest fixes on either side of the Geotime value.  Set to 0 to disable
+    interpolation and use the coordinates of the nearest fix instead (provided
+    it is within GeoMaxExtSecs, otherwise geotagging fails).</td>
     <td align='center'>A&nbsp;floating&nbsp;point&nbsp;number</td>
     <td align='center'>1800</td></tr>
 <tr><td>GeoMaxExtSecs</td>
@@ -484,8 +486,8 @@ is in the current directory, that the images were downloaded to the
 in the same timezone.</blockquote>
 
 <hr>
-<a name="Reverse"></a>
-<h2>Reverse Geotagging</h2>
+<a name="Inverse"></a>
+<h2>Inverse Geotagging</h2>
 
 <p>The <code>-p</code> option may be used to output files in any number of formats.
 This section gives examples for creating GPX and KML output files from a set of
@@ -644,7 +646,7 @@ file from a collection of geotagged images:</p>
 
 <hr>
 <i>Created Apr. 2, 2009</i><br>
-<i>Last revised July 24, 2012</i>
+<i>Last revised Nov. 4, 2012</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

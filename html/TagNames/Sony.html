@@ -302,6 +302,44 @@ toward magenta)</span></span></td></tr>
   <br>0 = No
   <br>1 = Yes</span></td></tr>
 <tr class=b>
+<td title='0x201b = 8219'>0x201b</td>
+<td>FocusMode</td>
+<td class=c>int8u</td>
+<td><table class=cols><tr>
+  <td>0 = Manual
+  <br>2 = AF-A
+  <br>3 = AF-C</td><td>&nbsp;&nbsp;</td>
+  <td>4 = AF-S
+  <br>6 = DMF
+  <br>7 = AF-D</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr>
+<td title='0x201e = 8222'>0x201e</td>
+<td>AFPointSelected</td>
+<td class=c>int8u</td>
+<td><table class=cols><tr>
+  <td>0 = Auto
+  <br>1 = Center
+  <br>2 = Top
+  <br>3 = Upper-right
+  <br>4 = Right
+  <br>5 = Lower-right
+  <br>6 = Bottom
+  <br>7 = Lower-left
+  <br>8 = Left
+  <br>9 = Upper-left</td><td>&nbsp;&nbsp;</td>
+  <td>10 = Far Right
+  <br>11 = Far Left
+  <br>12 = Upper-middle
+  <br>13 = Near Right
+  <br>14 = Lower-middle
+  <br>15 = Near Left
+  <br>16 = Upper Far Right
+  <br>17 = Lower Far Right
+  <br>18 = Lower Far Left
+  <br>19 = Upper Far Left</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr class=b>
 <td title='0x3000 = 12288'>0x3000</td>
 <td>ShotInfo</td>
 <td class=c>-</td>
@@ -620,7 +658,7 @@ OSS, STF, Reflex, Macro and Fisheye)</span></span></td></tr>
 <td>ReleaseMode</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Normal
-  <br>2 = Burst
+  <br>2 = Continuous
   <br>5 = Exposure Bracketing
   <br>6 = White Balance Bracketing
   <br>65535 = n/a</span></td></tr>
@@ -712,6 +750,7 @@ brackets if the original version of the lens has the same LensType.</p>
 </tr><tr><td>1</td><td>= Minolta AF 80-200mm F2.8 HS-APO G</td>
 </tr><tr><td>2</td><td>= Minolta AF 28-70mm F2.8 G</td>
 </tr><tr><td>3</td><td>= Minolta AF 28-80mm F4-5.6</td>
+</tr><tr><td>4</td><td>= Minolta AF 85mm F1.4G</td>
 </tr><tr><td>5</td><td>= Minolta AF 35-70mm F3.5-4.5 [II]</td>
 </tr><tr><td>6</td><td>= Minolta AF 24-85mm F3.5-4.5 [New]</td>
 </tr><tr><td>7</td><td>= Minolta AF 100-300mm F4.5-5.6 APO [New] or 100-400mm or Sigma Lens</td>
@@ -737,7 +776,8 @@ brackets if the original version of the lens has the same LensType.</p>
 </tr><tr><td>24.2</td><td>= Sigma 17-70mm F2.8-4.5 (D)</td>
 </tr><tr><td>24.3</td><td>= Sigma 20-40mm F2.8 EX DG Aspherical IF</td>
 </tr><tr><td>24.4</td><td>= Sigma 18-200mm F3.5-6.3 DC</td>
-</tr><tr><td>24.5</td><td>= Tamron SP AF 28-75mm F2.8 XR Di (IF) Macro</td>
+</tr><tr><td>24.5</td><td>= Sigma DC 18-125mm F4-5,6 D</td>
+</tr><tr><td>24.6</td><td>= Tamron SP AF 28-75mm F2.8 XR Di (IF) Macro</td>
 </tr><tr><td>25</td><td>= Minolta AF 100-300mm F4.5-5.6 APO (D) or Sigma Lens</td>
 </tr><tr><td>25.1</td><td>= Sigma 100-300mm F4 EX (APO (D) or D IF)</td>
 </tr><tr><td>25.2</td><td>= Sigma 70mm F2.8 EX DG Macro</td>
@@ -2660,7 +2700,7 @@ A560, A580, NEX-3, NEX-5, NEX-C3 and NEX-VG10E.</p>
   <br>2 = Contrast AF</span></td></tr>
 <tr>
 <td class=r title='56 = 0x38'>56</td>
-<td>3DPanoramaSize</td>
+<td>PanoramaSize3D</td>
 <td class=c>int8u</td>
 <td><span class=s>0 = n/a
   <br>1 = Standard
@@ -3120,8 +3160,8 @@ the full-sized unrotated image, with increasing Y downwards)</span></span></td><
 </table></td></tr></table></blockquote>
 
 <h2><a name='Tag9400'>Sony Tag9400 Tags</a></h2>
-<p>Data for tags 0x2010 and 0x94xx is encrypted by a simple substitution
-cipher, but is decrypted by ExifTool.</p>
+<p>Data for tags 0x94xx and 0x2010 is encrypted by a simple substitution
+cipher, but the deciphered values are listed below.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -3141,10 +3181,10 @@ cipher, but is decrypted by ExifTool.</p>
 <td title='0x0010 = 16'>0x0010</td>
 <td>ReleaseMode2</td>
 <td class=c>int8u</td>
-<td><span class=s>0 = Single Frame
-  <br>1 = Burst
-  <br>2 = Continuous - Bracketing
-  <br>3 = Continuous - WB Bracketing
+<td><span class=s>0 = Normal
+  <br>1 = Continuous
+  <br>2 = Continuous - Exposure Bracketing
+  <br>3 = Continuous - White Balance Bracketing
   <br>5 = Continuous - Burst
   <br>6 = Single Frame - Capture During Movie
   <br>7 = Continuous - Sweep Panorama
@@ -3153,11 +3193,11 @@ cipher, but is decrypted by ExifTool.</p>
   <br>10 = Continuous - Background defocus
   <br>13 = Continuous - 3D Sweep Panorama
   <br>16 = Continuous - 3D Image
-  <br>19 = Continuous - Speed Priority
+  <br>19 = Continuous - Speed/Advance Priority
   <br>20 = Continuous - Multi Frame NR
   <br>26 = Continuous Shooting
-  <br>28 = Self-portrait
-  <br>29 = Speed Priority Continuous</span></td></tr>
+  <br>28 = Smile Shutter
+  <br>29 = Continuous - Tele-zoom Advance Priority</span></td></tr>
 <tr class=b>
 <td title='0x001a = 26'>0x001a</td>
 <td>ShotNumberSincePowerUp</td>
@@ -3165,16 +3205,16 @@ cipher, but is decrypted by ExifTool.</p>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0x0022 = 34'>0x0022</td>
-<td>ReleaseMode3</td>
+<td>SequenceLength</td>
 <td class=c>int8u</td>
 <td><table class=cols><tr>
-  <td>0 = Burst
-  <br>1 = Single Frame
-  <br>2 = Continuous - 2 shots
-  <br>3 = Continuous - 3 shots
-  <br>5 = Continuous - 5 shots
-  <br>6 = Continuous - 6 shots
-  <br>10 = Continuous - Burst
+  <td>0 = Continuous
+  <br>1 = 1 shot
+  <br>2 = 2 shots
+  <br>3 = 3 shots
+  <br>5 = 5 shots
+  <br>6 = 6 shots
+  <br>10 = 10 shots
   <br>100 = Continuous - iSweep Panorama
   <br>200 = Continuous - Sweep Panorama</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
@@ -3547,7 +3587,7 @@ the JPEG image from a PMP file)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 3, 2012</i>
+<br><i>Last revised Jan 2, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

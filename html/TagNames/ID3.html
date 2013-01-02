@@ -348,9 +348,9 @@ complete list of available ID3v2 tags.</p>
 <td>&nbsp;</td></tr>
 <tr>
 <td>'SLT'</td>
-<td>SynchronizedLyricText</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td>SynLyrics</td>
+<td class=c>-</td>
+<td>--&gt; <a href='ID3.html#SynLyrics'>ID3 SynLyrics Tags</a></td></tr>
 <tr class=b>
 <td>'TAL'</td>
 <td>Album</td>
@@ -632,6 +632,39 @@ complete list of available ID3v2 tags.</p>
 <td class=r>20</td><td>= Publisher Logo</td>
 </tr></table></td></tr></table></blockquote>
 
+<h2><a name='SynLyrics'>ID3 SynLyrics Tags</a></h2>
+<p>The following tags are extracted from synchronized lyrics/text frames.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>SynchronizedLyricsDescription</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>SynchronizedLyricsText</td>
+<td class=c title=' + = List'>N+</td>
+<td><span class=s><span class=n>(each list item has a leading time stamp in square brackets.  Time stamps may
+be in seconds with format [MM:SS.ss], or MPEG frames with format [FFFF],
+depending on how this information was stored)</span></span></td></tr>
+<tr>
+<td>SynchronizedLyricsType</td>
+<td class=c>N</td>
+<td><table class=cols><tr>
+  <td>0 = Other
+  <br>1 = Lyrics
+  <br>2 = Text Transcription
+  <br>3 = Movement/part Name
+  <br>4 = Events
+  <br>5 = Chord
+  <br>6 = Trivia/&quot;pop-up&quot; Information
+  <br>7 = Web Page URL
+  <br>8 = Image URL</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='v2_3'>ID3 v2_3 Tags</a></h2>
 <p>ID3 version 2.3 tags</p>
 <blockquote>
@@ -686,9 +719,9 @@ complete list of available ID3v2 tags.</p>
 <td>--&gt; <a href='ID3.html#Private'>ID3 Private Tags</a></td></tr>
 <tr class=b>
 <td>'SYLT'</td>
-<td>SynchronizedLyricText</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td>SynLyrics</td>
+<td class=c>-</td>
+<td>--&gt; <a href='ID3.html#SynLyrics'>ID3 SynLyrics Tags</a></td></tr>
 <tr>
 <td>'TALB'</td>
 <td>Album</td>
@@ -1057,9 +1090,9 @@ if they do not appear in this table.</p>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>'SYLT'</td>
-<td>SynchronizedLyricText</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
+<td>SynLyrics</td>
+<td class=c>-</td>
+<td>--&gt; <a href='ID3.html#SynLyrics'>ID3 SynLyrics Tags</a></td></tr>
 <tr>
 <td>'TALB'</td>
 <td>Album</td>
@@ -1365,7 +1398,7 @@ if they do not appear in this table.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 2, 2012</i>
+<br><i>Last revised Nov 6, 2012</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>
