@@ -4,8 +4,13 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 9.11. (Other versions are
+Note: The most recent production release is Version 9.12. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+Jan. 2, 2013 - Version 9.12 (production release)
+
+  - Fixed problem introduced in 9.10 preserving file modification date/time when
+    some options are used
 
 Jan. 2, 2013 - Version 9.11 (production release)
 
