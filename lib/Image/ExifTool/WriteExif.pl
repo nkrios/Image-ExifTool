@@ -396,6 +396,7 @@ my %writeTable = (
     0x9000 => {             # ExifVersion
         Writable => 'undef',
         Mandatory => 1,
+        PrintConvInv => '$val=~tr/.//d; $val=~/^\d{4}$/ ? $val : undef',
     },
     0x9003 => {             # DateTimeOriginal
         Writable => 'string',
@@ -520,6 +521,7 @@ my %writeTable = (
     0xa000 => {             # FlashpixVersion
         Writable => 'undef',
         Mandatory => 1,
+        PrintConvInv => '$val=~tr/.//d; $val=~/^\d{4}$/ ? $val : undef',
     },
     0xa001 => {             # ColorSpace
         Writable => 'int16u',
@@ -2158,7 +2160,7 @@ Entry:  for (;;) {
                     if ($isNew > 0) {
                         # don't create new entry unless requested
                         if ($nvHash) {
-                            next unless Image::ExifTool::IsCreating($nvHash);
+                            next unless $$nvHash{IsCreating};
                             if ($$newInfo{IsOverwriting}) {
                                 my $proc = $$newInfo{IsOverwriting};
                                 $isOverwriting = &$proc($exifTool, $nvHash, $val, \$newVal);
@@ -3389,6 +3391,10 @@ NoOverwrite:            next if $isNew > 0;
                             if ($$tagInfo{IsOffset} and $$tagInfo{IsOffset} eq '2') {
                                 $exifTool->{PREVIEW_INFO}{NoBaseShift} = 1;
                             }
+                            if ($offset >= 0 and $offset+$size <= $dataLen) {
+                                # set flag indicating this preview wasn't in a trailer
+                                $exifTool->{PREVIEW_INFO}{WasContained} = 1;
+                            }
                             $buff = '';
                         } elsif ($$exifTool{TIFF_TYPE} eq 'ARW' and $$exifTool{Model}  eq 'DSLR-A100') {
                             # the A100 double-references the same preview, so ignore the
@@ -3505,8 +3511,9 @@ NoOverwrite:            next if $isNew > 0;
                 }
                 $fixup->SetMarkerPointers(\$newData, 'PreviewImage', $newPos);
                 $newData .= $$pt;
+                # set flag to delete old preview unless it was contained in the EXIF
+                $exifTool->{DEL_PREVIEW} = 1 unless $exifTool->{PREVIEW_INFO}{WasContained};       
                 delete $exifTool->{PREVIEW_INFO};   # done with our preview data
-                $exifTool->{DEL_PREVIEW} = 1;       # set flag to delete old preview
             } else {
                 # Doesn't fit, or we still don't know, so save fixup information
                 # and put the preview at the end of the file
