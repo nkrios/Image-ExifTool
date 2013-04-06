@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.07
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.21
 [File, System, Image] FileName - File Name: Pentax_3_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 2.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2012:11:20 07:49:47-05:00
-[File, System, Time] FileAccessDate - File Access Date/Time: 2012:11:20 07:49:47-05:00
-[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2012:11:20 07:49:47-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2013:02:25 11:32:56-05:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2013:02:25 11:32:56-05:00
+[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2013:02:25 11:32:56-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -109,7 +109,7 @@
 [MakerNotes, Pentax, Camera] 2 - SR Half Press Time: 1.53 s
 [MakerNotes, Pentax, Camera] 3 - SR Focal Length: 10 mm
 [MakerNotes, Pentax, Camera] 93 - Shutter Count: 1648
-[MakerNotes, Pentax, Camera] 98 - Pentax 0x0062: 1
+[MakerNotes, Pentax, Camera] 98 - Raw Development Process: 1 (K10D,K200D,K2000,K-m)
 [MakerNotes, Pentax, Camera] 512 - Black Point: 0 0 0 0
 [MakerNotes, Pentax, Camera] 513 - White Point: 13568 8192 8192 9088
 [MakerNotes, Pentax, Camera] 0 - Picture Mode 2: Aperture Priority

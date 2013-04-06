@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.07
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.21
 [File, System, Image] FileName - File Name: Writer_10_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 6.8 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2012:11:20 07:49:52-05:00
-[File, System, Time] FileAccessDate - File Access Date/Time: 2012:11:20 07:49:52-05:00
-[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2012:11:20 07:49:52-05:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2013:02:25 11:33:01-05:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2013:02:25 11:33:01-05:00
+[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2013:02:25 11:33:01-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -120,6 +120,7 @@
 [MakerNotes, Pentax, Camera] 2 - SR Half Press Time: 1.53 s
 [MakerNotes, Pentax, Camera] 3 - SR Focal Length: 10 mm
 [MakerNotes, Pentax, Camera] 93 - Shutter Count: 1648
+[MakerNotes, Pentax, Camera] 98 - Raw Development Process: 1 (K10D,K200D,K2000,K-m)
 [MakerNotes, Pentax, Camera] 512 - Black Point: 0 0 0 0
 [MakerNotes, Pentax, Camera] 513 - White Point: 13568 8192 8192 9088
 [MakerNotes, Pentax, Camera] 0 - Picture Mode 2: Aperture Priority
@@ -210,7 +211,7 @@
 [MakerNotes, Pentax, Image] 16 - WB Shift AB: 0
 [MakerNotes, Pentax, Image] 17 - WB Shift GM: 0
 [PrintIM, PrintIM, Printing] PrintIMVersion - PrintIM Version: 0300
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 9.07
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 9.21
 [XMP, XMP-dc, Time] date - Date: 2008:03:02
 [XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -
 [XMP, XMP-exif, Camera] FlashFired - Flash Fired: False

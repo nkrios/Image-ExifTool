@@ -19,11 +19,14 @@ These tags are used in Panasonic/Leica cameras.
 <td title='0x0001 = 1'>0x0001</td>
 <td>ImageQuality</td>
 <td class=c>int16u</td>
-<td><span class=s>2 = High
-  <br>3 = Normal
-  <br>6 = Very High
+<td><table class=cols><tr>
+  <td>1 = TIFF
+  <br>2 = High
+  <br>3 = Normal</td><td>&nbsp;&nbsp;</td>
+  <td>6 = Very High
   <br>7 = Raw
-  <br>9 = Motion Picture</span></td></tr>
+  <br>9 = Motion Picture</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr class=b>
 <td title='0x0002 = 2'>0x0002</td>
 <td>FirmwareVersion</td>
@@ -70,7 +73,7 @@ reference number and not the actual firmware version)</span></span></td></tr>
   <br>&#39;1 1&#39; = 5-area
   <br>&#39;16 0&#39; = 1-area
   <br>&#39;16 16&#39; = 1-area (high speed)
-  <br>&#39;32 0&#39; = Auto or Face Detect
+  <br>&#39;32 0&#39; = Tracking
   <br>&#39;32 1&#39; = 3-area (left)?
   <br>&#39;32 2&#39; = 3-area (center)?
   <br>&#39;32 3&#39; = 3-area (right)?
@@ -120,9 +123,9 @@ reference number and not the actual firmware version)</span></span></td></tr>
   <br>22 = Food
   <br>23 = Baby
   <br>24 = Soft Skin
-  <br>25 = Candlelight</td><td>&nbsp;&nbsp;</td>
-  <td>26 = Starry Night
-  <br>27 = High Sensitivity
+  <br>25 = Candlelight
+  <br>26 = Starry Night</td><td>&nbsp;&nbsp;</td>
+  <td>27 = High Sensitivity
   <br>28 = Panorama Assist
   <br>29 = Underwater
   <br>30 = Beach
@@ -144,6 +147,9 @@ reference number and not the actual firmware version)</span></span></td></tr>
   <br>55 = Handheld Night Shot
   <br>57 = 3D
   <br>59 = Creative Control
+  <br>62 = Panorama
+  <br>63 = Glass Through
+  <br>64 = HDR
   <br>66 = Digital Filter</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr>
@@ -204,7 +210,7 @@ written to memory card)</span></span></td></tr>
 <td><span class=s><span class=n>(decoding may be different for some models)</span>
   <br>0 = Off
   <br>1 = On
-  <br>2 = Infinite
+  <br>2 = Auto Exposure Bracketing (AEB)
   <br>4 = Unlimited</span></td></tr>
 <tr class=b>
 <td title='0x002b = 43'>0x002b</td>
@@ -273,7 +279,8 @@ L10 and LC80)</span></span><table class=cols><tr>
 <td class=c>int16u</td>
 <td><span class=s>1 = Off
   <br>2 = 10 s
-  <br>3 = 2 s</span></td></tr>
+  <br>3 = 2 s
+  <br>4 = 10 s / 3 pictures</span></td></tr>
 <tr class=b>
 <td title='0x0030 = 48'>0x0030</td>
 <td>Rotation</td>
@@ -402,41 +409,48 @@ L10 and LC80)</span></span><table class=cols><tr>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(positive is a shift toward green)</span></span></td></tr>
 <tr class=b>
+<td title='0x0048 = 72'>0x0048</td>
+<td>FlashCurtain</td>
+<td class=c>int16u</td>
+<td><span class=s>0 = n/a
+  <br>1 = 1st
+  <br>2 = 2nd</span></td></tr>
+<tr>
 <td title='0x004b = 75'>0x004b</td>
 <td>PanasonicImageWidth</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x004c = 76'>0x004c</td>
 <td>PanasonicImageHeight</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x004d = 77'>0x004d</td>
 <td>AFPointPosition</td>
 <td class=c>rational64u[2]</td>
 <td><span class=s><span class=n>(X Y coordinates of primary AF area center, in the range 0.0 to 1.0)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x004e = 78'>0x004e</td>
 <td>FaceDetInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Panasonic.html#FaceDetInfo'>Panasonic FaceDetInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0051 = 81'>0x0051</td>
 <td>LensType</td>
-<td class=c>string</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td title='0x0052 = 82'>0x0052</td>
-<td>LensSerialNumber</td>
-<td class=c>string</td>
+<td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td title='0x0053 = 83'>0x0053</td>
-<td>AccessoryType</td>
-<td class=c>string</td>
+<td title='0x0052 = 82'>0x0052</td>
+<td>LensSerialNumber</td>
+<td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td title='0x0053 = 83'>0x0053</td>
+<td>AccessoryType</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td title='0x0059 = 89'>0x0059</td>
 <td>Transform</td>
 <td class=c>undef[4]</td>
@@ -446,7 +460,7 @@ L10 and LC80)</span></span><table class=cols><tr>
   <br>&#39;0 0&#39; = Off
   <br>&#39;1 1&#39; = Stretch Low
   <br>&#39;3 2&#39; = Stretch High</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x005d = 93'>0x005d</td>
 <td>IntelligentExposure</td>
 <td class=c>int16u</td>
@@ -455,58 +469,58 @@ L10 and LC80)</span></span><table class=cols><tr>
   <br>1 = Low
   <br>2 = Standard
   <br>3 = High</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0061 = 97'>0x0061</td>
 <td>FaceRecInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Panasonic.html#FaceRecInfo'>Panasonic FaceRecInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0062 = 98'>0x0062</td>
 <td>FlashWarning</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = No
   <br>1 = Yes (flash required but disabled)</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0063 = 99'>0x0063</td>
 <td>RecognizedFaceFlags?</td>
 <td class=c>undef[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0065 = 101'>0x0065</td>
 <td>Title</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0066 = 102'>0x0066</td>
 <td>BabyName</td>
 <td class=c>undef</td>
 <td><span class=s><span class=n>(or pet name)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0067 = 103'>0x0067</td>
 <td>Location</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0069 = 105'>0x0069</td>
 <td>Country</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x006b = 107'>0x006b</td>
 <td>State</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x006d = 109'>0x006d</td>
 <td>City</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x006f = 111'>0x006f</td>
 <td>Landmark</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0070 = 112'>0x0070</td>
 <td>IntelligentResolution</td>
 <td class=c>int8u</td>
@@ -515,7 +529,7 @@ L10 and LC80)</span></span><table class=cols><tr>
   <br>2 = Standard
   <br>3 = High
   <br>4 = Extended</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0079 = 121'>0x0079</td>
 <td>IntelligentD-Range</td>
 <td class=c>int16u</td>
@@ -523,11 +537,24 @@ L10 and LC80)</span></span><table class=cols><tr>
   <br>1 = Low
   <br>2 = Standard
   <br>3 = High</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0086 = 134'>0x0086</td>
 <td>ManometerPressure</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td title='0x0089 = 137'>0x0089</td>
+<td>PhotoStyle</td>
+<td class=c>int16u</td>
+<td><table class=cols><tr>
+  <td>0 = Auto
+  <br>1 = Standard or Custom
+  <br>2 = Vivid
+  <br>3 = Natural</td><td>&nbsp;&nbsp;</td>
+  <td>4 = Monochrome
+  <br>5 = Scenery
+  <br>6 = Portrait</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr class=b>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
@@ -567,10 +594,10 @@ L10 and LC80)</span></span><table class=cols><tr>
   <br>21 = Night Scenery
   <br>22 = Food
   <br>23 = Baby
-  <br>24 = Soft Skin</td><td>&nbsp;&nbsp;</td>
-  <td>25 = Candlelight
-  <br>26 = Starry Night
-  <br>27 = High Sensitivity
+  <br>24 = Soft Skin
+  <br>25 = Candlelight
+  <br>26 = Starry Night</td><td>&nbsp;&nbsp;</td>
+  <td>27 = High Sensitivity
   <br>28 = Panorama Assist
   <br>29 = Underwater
   <br>30 = Beach
@@ -592,6 +619,9 @@ L10 and LC80)</span></span><table class=cols><tr>
   <br>55 = Handheld Night Shot
   <br>57 = 3D
   <br>59 = Creative Control
+  <br>62 = Panorama
+  <br>63 = Glass Through
+  <br>64 = HDR
   <br>66 = Digital Filter</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr>
@@ -1212,7 +1242,7 @@ on the M9, or the focal length of some multi-focal lenses.</p>
 <tr>
 <td title='0x0303 = 771'>0x0303</td>
 <td>LensType</td>
-<td class=c>string</td>
+<td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1320,7 +1350,7 @@ as the DMC-FT20.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 24, 2012</i>
+<br><i>Last revised Apr 2, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

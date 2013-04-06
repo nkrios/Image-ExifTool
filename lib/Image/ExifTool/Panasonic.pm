@@ -19,6 +19,7 @@
 #              14) Carl Bretteville private communication (M9)
 #              15) Zdenek Mihula private communication (TZ8)
 #              16) Olaf Ulrich private communication
+#              17) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4922.0.html
 #              JD) Jens Duttke private communication (TZ3,FZ30,FZ50)
 #------------------------------------------------------------------------------
 
@@ -29,7 +30,7 @@ use vars qw($VERSION %leicaLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.69';
+$VERSION = '1.71';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -214,6 +215,9 @@ my %shootingMode = (
     55 => 'Handheld Night Shot', #PH (FZ47)
     57 => '3D', #PH (3D1)
     59 => 'Creative Control', #PH (FZ47)
+    62 => 'Panorama', #17
+    63 => 'Glass Through', #17
+    64 => 'HDR', #17
     66 => 'Digital Filter', #PH (GF5 "Impressive Art", "Cross Process", "Color Select", "Star")
 );
 
@@ -226,6 +230,7 @@ my %shootingMode = (
         Name => 'ImageQuality',
         Writable => 'int16u',
         PrintConv => {
+            1 => 'TIFF', #PH (FZ20)
             2 => 'High',
             3 => 'Normal',
             # 5 - seen this for 1920x1080, 30fps SZ7 video - PH
@@ -303,7 +308,9 @@ my %shootingMode = (
                 '16'    => 'Normal?', # (only mode for DMC-LC20)
                 '16 0'  => '1-area', # (FZ8)
                 '16 16' => '1-area (high speed)', # (FZ8)
-                '32 0'  => 'Auto or Face Detect', # (Face Detect for FS7, Auto is DMC-L1 guess)
+                # '32 0' is Face Detect for FS7, and Face Detect or Focus Tracking
+                # for the DMC-FZ200 (ref 17), and Auto is DMC-L1 guess,
+                '32 0'  => 'Tracking',
                 '32 1'  => '3-area (left)?', # (DMC-L1 guess)
                 '32 2'  => '3-area (center)?', # (DMC-L1 guess)
                 '32 3'  => '3-area (right)?', # (DMC-L1 guess)
@@ -318,7 +325,7 @@ my %shootingMode = (
             2 => 'On, Mode 1',
             3 => 'Off',
             4 => 'On, Mode 2',
-            # GF1 also has a mode 3
+            # GF1 also has a "Mode 3"
         },
     },
     0x1c => {
@@ -365,6 +372,10 @@ my %shootingMode = (
         Name => 'FlashBias',
         Format => 'int16s',
         Writable => 'int16s',
+        ValueConv => '$val / 3', #17 (older models may not have factor of 3? - PH)
+        ValueConvInv => '$val * 3',
+        PrintConv => 'Image::ExifTool::Exif::PrintFraction($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
     },
     0x25 => { #PH
         Name => 'InternalSerialNumber',
@@ -442,7 +453,7 @@ my %shootingMode = (
         PrintConv => {
             0 => 'Off',
             1 => 'On', #PH (TZ5) [was "Low/High Quality" from ref 4]
-            2 => 'Infinite',
+            2 => 'Auto Exposure Bracketing (AEB)', #17
             4 => 'Unlimited', #PH (TZ5)
         },
     },
@@ -543,6 +554,7 @@ my %shootingMode = (
             1 => 'Off',
             2 => '10 s',
             3 => '2 s',
+            4 => '10 s / 3 pictures', #17
         },
     },
     # 0x2f - values: 1 (LZ6,FX10K)
@@ -704,6 +716,15 @@ my %shootingMode = (
         Writable => 'int16u',
         Notes => 'positive is a shift toward green',
     },
+    0x48 => { #17
+        Name => 'FlashCurtain',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'n/a',
+            1 => '1st',
+            2 => '2nd',
+        },
+    },
     # 0x48 - int16u: 0
     # 0x49 - int16u: 2
     # 0x4a - int16u: 0
@@ -738,14 +759,17 @@ my %shootingMode = (
     0x51 => {
         Name => 'LensType',
         Writable => 'string',
+        ValueConv => '$val=~s/ +$//; $val', # trim trailing spaces
     },
     0x52 => { #7 (DMC-L1)
         Name => 'LensSerialNumber',
         Writable => 'string',
+        ValueConv => '$val=~s/ +$//; $val', # trim trailing spaces
     },
     0x53 => { #7 (DMC-L1)
         Name => 'AccessoryType',
         Writable => 'string',
+        ValueConv => '$val=~s/ +$//; $val', # trim trailing spaces
     },
     # 0x54 - string[14]: "0000000"
     # 0x55 - int16u: 1
@@ -878,6 +902,19 @@ my %shootingMode = (
         ValueConvInv => '$val * 10',
         PrintConv => 'sprintf("%.1f kPa",$val)',
         PrintConvInv => '$val=~s/ ?kPa//i; $val',
+    },
+    0x0089 => {
+        Name => 'PhotoStyle',
+        Writable => 'int16u',
+        PrintConv => {
+            0 => 'Auto',
+            1 => 'Standard or Custom',
+            2 => 'Vivid',
+            3 => 'Natural',
+            4 => 'Monochrome',
+            5 => 'Scenery',
+            6 => 'Portrait',
+        },
     },
     0x0e00 => {
         Name => 'PrintIM',
@@ -1377,6 +1414,7 @@ my %shootingMode = (
     0x303 => {
         Name => 'LensType',
         Writable => 'string',
+        ValueConv => '$val=~s/ +$//; $val', # trim trailing spaces
     },
     # 0x340 - same as 0x302
 );
@@ -1685,7 +1723,7 @@ sub ProcessLeicaTrailer($;$)
     delete $$exifTool{LeicaTrailer} if $trailPos;   # done after this
     unless ($len > 0) {
         $exifTool->Warn('Missing Leica MakerNote trailer', 1) if $trailPos;
-        undef $$exifTool{LeicaTrailer};
+        delete $$exifTool{LeicaTrailer};
         return undef;
     }
     my $oldPos = $raf->Tell();

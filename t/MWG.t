@@ -7,6 +7,7 @@ END {print "not ok 1\n" unless $loaded;}
 # test 1: Load the module(s)
 use Image::ExifTool 'ImageInfo';
 use Image::ExifTool::MWG;
+Image::ExifTool::MWG::Load();
 $loaded = 1;
 print "ok 1\n";
 

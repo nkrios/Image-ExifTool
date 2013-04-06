@@ -24,7 +24,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.38';
+$VERSION = '1.41';
 
 sub ProcessFujiDir($$$);
 sub ProcessFaceRec($$$);
@@ -279,6 +279,7 @@ my %faceCategories = (
             0x19 => 'Pro Focus', #7
             0x1b => 'Dog Face Detection', #7
             0x1c => 'Cat Face Detection', #7
+            0x40 => 'Advanced Filter',
             0x100 => 'Aperture-priority AE',
             0x200 => 'Shutter speed priority AE',
             0x300 => 'Manual',
@@ -588,10 +589,25 @@ my %faceCategories = (
     0 => {
         Name => 'RawImageWidth',
         Format => 'int32u',
+        RawConv => '$val < 10000 ? $$self{FujiWidth} = $val : undef', #5
         ValueConv => '$$self{FujiLayout} ? ($val / 2) : $val',
     },
-    4 => {
+    4 => [
+        {
+            Name => 'RawImageWidth',
+            Condition => 'not $$self{FujiWidth}',
+            Format => 'int32u',
+            ValueConv => '$$self{FujiLayout} ? ($val / 2) : $val',
+        },
+        {
+            Name => 'RawImageHeight',
+            Format => 'int32u',
+            ValueConv => '$$self{FujiLayout} ? ($val * 2) : $val',
+        },
+    ],
+    8 => {
         Name => 'RawImageHeight',
+        Condition => 'not $$self{FujiWidth}',
         Format => 'int32u',
         ValueConv => '$$self{FujiLayout} ? ($val * 2) : $val',
     },
@@ -643,6 +659,40 @@ my %faceCategories = (
     0 => {
         Name => 'MovieStreamName',
         Format => 'string[34]',
+    },
+);
+
+# tags in FujiFilm QuickTime videos (ref PH)
+# (similar information in Kodak,Minolta,Nikon,Olympus,Pentax and Sanyo videos)
+%Image::ExifTool::FujiFilm::MOV = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    NOTES => 'This information is found in MOV videos from some FujiFilm cameras.',
+    0x00 => {
+        Name => 'Make',
+        Format => 'string[24]',
+    },
+    0x18 => {
+        Name => 'Model',
+        Description => 'Camera Model Name',
+        Format => 'string[16]',
+    },
+    0x2e => { # (NC)
+        Name => 'ExposureTime',
+        Format => 'int32u',
+        ValueConv => '$val ? 1 / $val : 0',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+    },
+    0x32 => {
+        Name => 'FNumber',
+        Format => 'rational64u',
+        PrintConv => 'sprintf("%.1f",$val)',
+    },
+    0x3a => { # (NC)
+        Name => 'ExposureCompensation',
+        Format => 'rational64s',
+        PrintConv => '$val ? sprintf("%+.1f", $val) : 0',
     },
 );
 

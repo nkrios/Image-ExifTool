@@ -11,8 +11,8 @@
 The values of the composite tags are <b>Derived From</b> the values of other
 tags.  These are convenience tags which are calculated after all other
 information is extracted.  User-defined Composite tags, useful for
-custom-formatting of tag values, may created in the ExifTool configuration
-file.
+custom-formatting of tag values, may created in the <a href="../config.html">ExifTool configuration
+file</a>.
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -66,6 +66,16 @@ file.
   <br>WB_RBLevels
   <br>WBBlueLevel
   <br>WBGreenLevel</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CDDBDiscPlayTime</td>
+<td class=c>N</td>
+<td class=n>CDDB1Info</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CDDBDiscTracks</td>
+<td class=c>N</td>
+<td class=n>CDDB1Info</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>CFAPattern</td>
@@ -245,11 +255,10 @@ manual mode)</span>
 <td class=n>QuickTime:GPSCoordinates</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>GPSAltitudeRef</td>
+<td>GPSAltitude</td>
 <td class=c>N</td>
-<td class=n>QuickTime:GPSCoordinates</td>
-<td><span class=s>0 = Above Sea Level
-  <br>1 = Below Sea Level</span></td></tr>
+<td class=n>QuickTime:LocationInformation</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
 <td>GPSAltitude</td>
 <td class=c>N</td>
@@ -258,6 +267,18 @@ manual mode)</span>
   <br>XMP:GPSAltitude
   <br>XMP:GPSAltitudeRef</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>GPSAltitudeRef</td>
+<td class=c>N</td>
+<td class=n>QuickTime:GPSCoordinates</td>
+<td><span class=s>0 = Above Sea Level
+  <br>1 = Below Sea Level</span></td></tr>
+<tr class=b>
+<td>GPSAltitudeRef</td>
+<td class=c>N</td>
+<td class=n>QuickTime:LocationInformation</td>
+<td><span class=s>0 = Above Sea Level
+  <br>1 = Below Sea Level</span></td></tr>
 <tr>
 <td>GPSDateTime</td>
 <td class=c>N</td>
@@ -270,11 +291,10 @@ manual mode)</span>
 <td class=n>QuickTime:GPSCoordinates</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>GPSLatitudeRef</td>
+<td>GPSLatitude</td>
 <td class=c>N</td>
-<td class=n>XMP:GPSLatitude</td>
-<td><span class=s>&#39;N&#39; = North
-  <br>&#39;S&#39; = South</span></td></tr>
+<td class=n>QuickTime:LocationInformation</td>
+<td>&nbsp;</td></tr>
 <tr class=b>
 <td>GPSLatitude</td>
 <td class=c>N</td>
@@ -282,22 +302,33 @@ manual mode)</span>
   <br>GPS:GPSLatitudeRef</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>GPSLatitudeRef</td>
+<td class=c>N</td>
+<td class=n>XMP:GPSLatitude</td>
+<td><span class=s>&#39;N&#39; = North
+  <br>&#39;S&#39; = South</span></td></tr>
+<tr class=b>
 <td>GPSLongitude</td>
 <td class=c>N</td>
 <td class=n>QuickTime:GPSCoordinates</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
-<td>GPSLongitudeRef</td>
-<td class=c>N</td>
-<td class=n>XMP:GPSLongitude</td>
-<td><span class=s>&#39;E&#39; = East
-  <br>&#39;W&#39; = West</span></td></tr>
 <tr>
+<td>GPSLongitude</td>
+<td class=c>N</td>
+<td class=n>QuickTime:LocationInformation</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>GPSLongitude</td>
 <td class=c>N</td>
 <td class=n>GPS:GPSLongitude
   <br>GPS:GPSLongitudeRef</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>GPSLongitudeRef</td>
+<td class=c>N</td>
+<td class=n>XMP:GPSLongitude</td>
+<td><span class=s>&#39;E&#39; = East
+  <br>&#39;W&#39; = West</span></td></tr>
 <tr class=b>
 <td>GPSPosition</td>
 <td class=c>N</td>
@@ -460,15 +491,15 @@ option may be used to extract information from these embedded images.)</span></s
   <br>PreviewImageLength (1)</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>PreviewImage</td>
+<td class=c>N</td>
+<td class=n>ScreenNail</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>PreviewImageSize</td>
 <td class=c>N</td>
 <td class=n>PreviewImageWidth
   <br>PreviewImageHeight</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>PreviewImage</td>
-<td class=c>N</td>
-<td class=n>ScreenNail</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>RedBalance</td>
@@ -622,7 +653,7 @@ resized)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 16, 2012</i>
+<br><i>Last revised Feb 27, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

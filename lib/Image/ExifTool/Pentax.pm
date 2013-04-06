@@ -40,6 +40,7 @@
 #              25) Niels Kristian Bech Jensen private communication
 #              26) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3444.0.html
 #              27) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3833.0.html
+#              28) Klaus Homeister http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4803.0.html
 #              JD) Jens Duttke private communication
 #
 # Notes:        See POD documentation at the bottom of this file
@@ -52,7 +53,7 @@ use vars qw($VERSION %pentaxLensTypes);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.52';
+$VERSION = '2.58';
 
 sub CryptShutterCount($$);
 sub PrintFilter($$$);
@@ -70,12 +71,23 @@ sub PrintFilter($$$);
         LensType, and are used by the Composite LensID tag when attempting to
         identify the specific lens model.
     },
+    OTHER => sub {
+        my ($val, $inv, $conv) = @_;
+        return undef if $inv;
+        # *istD may report a series number of 4 for series 7 lenses
+        $val =~ s/^4 /7 / and $$conv{$val} and return $$conv{$val} . " ($_[0])";
+        # cameras that don't recognize SDM lenses (ie. older K10 firmware)
+        # may report series 7 instead of 8
+        $val =~ s/^7 /8 / and $$conv{$val} and return $$conv{$val} . " ? ($_[0])";
+        return undef;
+    },
     '0 0' => 'M-42 or No Lens', #17
     '1 0' => 'K or M Lens',
     '2 0' => 'A Series Lens', #7 (from smc PENTAX-A 400mm F5.6)
     '3 0' => 'Sigma', # (includes 'Sigma 30mm F1.4 EX DC' - PH)
     # (and 'Sigma 105mm F2.8 EX DG Macro', ref 24)
     # (and 'Sigma 18-50mm F2.8 EX Macro')
+    # (and 'Sigma 180mm F4.5 EX DG Macro')
     '3 17' => 'smc PENTAX-FA SOFT 85mm F2.8',
     '3 18' => 'smc PENTAX-F 1.7X AF ADAPTER',
     '3 19' => 'smc PENTAX-F 24-50mm F4',
@@ -97,6 +109,7 @@ sub PrintFilter($$$);
     '3 27.1' => 'Tokina AT-X Pro AF 28-70mm F2.6-2.8', #JD
     '3 28' => 'smc PENTAX-F 35-70mm F3.5-4.5 or Tokina Lens',
     '3 28.1' => 'Tokina 19-35mm F3.5-4.5 AF', #12
+    '3 28.2' => 'Tokina AT-X AF 400mm F5.6', #25
     '3 29' => 'PENTAX-F 28-80mm F3.5-4.5 or Sigma or Tokina Lens',
     '3 29.1' => 'Sigma AF 18-125mm F3.5-5.6 DC', #11
     '3 29.2' => 'Tokina AT-X PRO 28-70mm F2.6-2.8', #22
@@ -181,12 +194,15 @@ sub PrintFilter($$$);
     '4 49' => 'Tamron SP AF 28-75mm F2.8 XR Di (A09)',
     '4 51' => 'smc PENTAX-D FA 50mm F2.8 Macro',
     '4 52' => 'smc PENTAX-D FA 100mm F2.8 Macro',
+    '4 56' => 'Samsung D-XENON 100mm F2.8 Macro', #Alan Robinson
     '4 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #JD
+    '4 214' => 'smc PENTAX-DA 35mm F2.4 AL', #PH
     '4 229' => 'smc PENTAX-DA 18-55mm F3.5-5.6 AL II', #JD
     '4 230' => 'Tamron SP AF 17-50mm F2.8 XR Di II', #20
     '4 231' => 'smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]', #21
     '4 237' => 'Samsung/Schneider D-XENOGON 10-17mm F3.5-4.5', #JD
     '4 239' => 'Samsung D-XENON 12-24mm F4 ED AL [IF]', #23
+    '4 242' => 'smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)', #Pietu Pohjalainen
     '4 243' => 'smc PENTAX-DA 70mm F2.4 Limited', #JD
     '4 244' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #9
     '4 245' => 'Schneider D-XENON 50-200mm F4-5.6', #15
@@ -231,7 +247,7 @@ sub PrintFilter($$$);
     '7 0' => 'smc PENTAX-DA 21mm F3.2 AL Limited', #13
     '7 58' => 'smc PENTAX-D FA Macro 100mm F2.8 WR', #PH - this bit of information cost me $600 ;)
     '7 75' => 'Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)', #(Anton Bondar)
-    '7 212' => 'smc Pentax-DA 50mm F1.8', #PH
+    '7 212' => 'smc PENTAX-DA 50mm F1.8', #PH
     '7 213' => 'smc PENTAX-DA 40mm F2.8 XS', #PH
     '7 214' => 'smc PENTAX-DA 35mm F2.4 AL', #PH
     '7 216' => 'smc PENTAX-DA L 55-300mm F4-5.8 ED', #PH
@@ -271,7 +287,8 @@ sub PrintFilter($$$);
     '8 22' => 'Sigma 85mm F1.4 EX DG HSM', #26
     '8 23' => 'Sigma 70-200mm F2.8 APO EX DG OS HSM', #27
     '8 27' => 'Sigma 18-200mm F3.5-6.3 II DC HSM', #27
-    '8 210' => 'smc Pentax-DA 18-270mm F3.5-6.3 ED SDM', #Helmut Schutz
+    '8 28' => 'Sigma 18-250mm F3.5-6.3 DC Macro HSM', #27
+    '8 210' => 'smc PENTAX-DA 18-270mm F3.5-6.3 ED SDM', #Helmut Schutz
     '8 215' => 'smc PENTAX-DA 18-135mm F3.5-5.6 ED AL [IF] DC WR', #PH
     '8 226' => 'smc PENTAX-DA* 55mm F1.4 SDM', #JD
     '8 227' => 'smc PENTAX-DA* 60-250mm F4 [IF] SDM', #JD
@@ -288,9 +305,17 @@ sub PrintFilter($$$);
     '8 255.4' => 'Sigma 50-200mm F4-5.6 DC OS', #26
     '9 0' => '645 Manual Lens', #PH (NC)
     '10 0' => '645 A Series Lens', #PH
+    '11 1' => 'smc PENTAX-FA 645 75mm F2.8', #PH
+    '11 2' => 'smc PENTAX-FA 645 45mm F2.8', #PH
+    '11 3' => 'smc PENTAX-FA* 645 300mm F4 ED [IF]', #PH
     '11 4' => 'smc PENTAX-FA 645 45-85mm F4.5', #PH
+    '11 5' => 'smc PENTAX-FA 645 400mm F5.6 ED [IF]', #PH
+    '11 7' => 'smc PENTAX-FA 645 Macro 120mm F4', #PH
     '11 8' => 'smc PENTAX-FA 645 80-160mm F4.5', #PH
+    '11 9' => 'smc PENTAX-FA 645 200mm F4 [IF]', #PH
+    '11 10' => 'smc PENTAX-FA 645 150mm F2.8 [IF]', #PH
     '11 11' => 'smc PENTAX-FA 645 35mm F3.5 AL [IF]', #PH
+    '11 14' => 'smc PENTAX-FA 645 55-110mm F5.6', #PH
     '11 16' => 'smc PENTAX-FA 645 33-55mm F4.5 AL', #PH
     '11 17' => 'smc PENTAX-FA 645 150-300mm F5.6 ED [IF]', #PH
     '13 18' => 'smc PENTAX-D FA 645 55mm F2.8 AL [IF] SDM AW', #PH
@@ -421,6 +446,7 @@ my %pentaxModelID = (
     0x12f66 => 'Q10',
     0x12f70 => 'K-5 II',
     0x12f71 => 'K-5 II s', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4515.0.html
+    0x12f84 => 'MX-1',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -624,6 +650,47 @@ my %lensCode = (
     Unknown => 1,
     PrintConv => 'sprintf("0x%.2x", $val)',
     PrintConvInv => 'hex($val)',
+);
+
+# conversions for tags 0x0053-0x005a
+my %colorTemp = (
+    Writable => 'undef',
+    Count => 4,
+    ValueConv => sub {
+        my $val = shift;
+        return $val unless length $val == 4;
+        my @a = unpack 'nCC', $val;
+        $a[0] = 53190 - $a[0];
+        $a[1] = ($a[2] & 0x0f); $a[1] -= 16 if $a[1] >= 8;
+        $a[2] = ($a[2] >> 4);   $a[2] -= 16 if $a[2] >= 8;
+        return "@a";
+    },
+    ValueConvInv => sub {
+        my $val = shift;
+        my @a = split ' ', $val;
+        return undef unless @a == 3;
+        return pack 'nCC', 53190 - $a[0], 0, ($a[1] & 0x0f) + (($a[2] & 0x0f) << 4);
+    },
+    PrintConv => sub {
+        $_ = shift;
+        s/ ([1-9])/ +$1/g;
+        s/ 0/  0/g;
+        return $_;
+    },
+    PrintConvInv => '$val',
+);
+
+# conversions for KelvinWB tags
+my %kelvinWB = (
+    Format => 'int16u[4]',
+    ValueConv => sub {
+        my @a = split ' ', shift;
+        (53190 - $a[0]) . ' ' . $a[1] . ' ' . ($a[2] / 8192) . ' ' . ($a[3] / 8192);
+    },
+    ValueConvInv => sub {
+        my @a = split ' ', shift;
+        (53190 - $a[0]) . ' ' . $a[1] . ' ' . int($a[2]*8192+0.5) . ' ' . int($a[3]*8192+0.5);
+    },
 );
 
 # common attributes for writable BinaryData directories
@@ -1390,7 +1457,7 @@ my %binaryDataAttrs = (
             '0 16' => 'Pet',
             '0 17' => 'Candlelight',
             '0 18' => 'Museum',
-            '0 19' => 'Food', #(n/c)
+            '0 19' => 'Food',
             '0 20' => 'Stage Lighting',
             '0 21' => 'Night Snap',
             '0 23' => 'Blue Sky', # (Q)
@@ -1434,7 +1501,7 @@ my %binaryDataAttrs = (
             '20 22' => 'Blur Control', #PH (Q)
             '254 0' => 'Video', #PH (K-7,K-5)
             '255 0' => 'Video (Auto Aperture)', #PH (K-5)
-            '255 4' => 'Video (4)', #PH (K-x)
+            '255 4' => 'Video (4)', #PH (K-x,K-01)
         },{
             # EV step size (ref 19)
             0 => '1/2 EV steps',
@@ -1446,12 +1513,11 @@ my %binaryDataAttrs = (
         Writable => 'int8u',
         Count => 4,
         PrintConv => [{
-            0 => 'Single-frame',
+            0 => 'Single-frame', # (also Interval Shooting for K-01 - PH)
             1 => 'Continuous', # (K-5 Hi)
             2 => 'Continuous (Lo)', #PH (K-5)
             3 => 'Burst', #PH (K20D)
             255 => 'Video', #PH (K-x)
-            # (K20D also has an Interval mode that needs decoding)
         },{
             0 => 'No Timer',
             1 => 'Self-timer (12 s)',
@@ -1467,6 +1533,7 @@ my %binaryDataAttrs = (
         },{
             0x00 => 'Single Exposure',
             0x01 => 'Multiple Exposure',
+            0x0f => 'Interval Movie', #PH (K-01)
             0x10 => 'HDR', #PH (645D)
             0x20 => 'HDR Strong 1', #PH (NC) (K-5)
             0x30 => 'HDR Strong 2', #PH (K-5)
@@ -1483,7 +1550,7 @@ my %binaryDataAttrs = (
         # values for various models (not sure why this is in 2um increments):
         #  11894 7962 (K10D,K-m)   12012 7987 (*istDS,K100D,K110D)   12012 8019 (*istD),
         #  12061 7988 (K-5)        12053 8005 (K-r,K-x)              14352 9535 (K20D,K-7)
-        #  22315 16711 (645)
+        #  22315 16711 (645)       12080 8008 (K-01)
         ValueConv => 'my @a=split(" ",$val); $_/=500 foreach @a; join(" ",@a)',
         ValueConvInv => 'my @a=split(" ",$val); $_*=500 foreach @a; join(" ",@a)',
         PrintConv => 'sprintf("%.3f x %.3f mm", split(" ",$val))',
@@ -1610,6 +1677,18 @@ my %binaryDataAttrs = (
         ValueConvInv => '53190 - $val',
     },
     # 0x0053-0x005a - not in JPEG images - PH
+    0x0053 => { #28
+        Name => 'ColorTempDaylight',
+        %colorTemp,
+        Notes => '0x0053-0x005a are 3 numbers: Kelvin, shift AB, shift GM',
+    },
+    0x0054 => { Name => 'ColorTempShade',        %colorTemp }, #28
+    0x0055 => { Name => 'ColorTempCloudy',       %colorTemp }, #28
+    0x0056 => { Name => 'ColorTempTungsten',     %colorTemp }, #28
+    0x0057 => { Name => 'ColorTempFluorescentD', %colorTemp }, #28
+    0x0058 => { Name => 'ColorTempFluorescentN', %colorTemp }, #28
+    0x0059 => { Name => 'ColorTempFluorescentW', %colorTemp }, #28
+    0x005a => { Name => 'ColorTempFlash',        %colorTemp }, #28
     0x005c => { #PH
         Name => 'ShakeReductionInfo',
         Format => 'undef', # (written as int8u) - do this just to save time converting the value
@@ -1644,7 +1723,24 @@ my %binaryDataAttrs = (
         Format => 'undef', # (written as int8u)
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::FaceInfo' },
     },
-    # 0x0062 - int16u: 1 (K10D,K200D,K-m,K2000), 3 (K20D), 4 (K-7), 5 (K-x), 6 (645D), 7 (K-r), 8 (K-5)
+    0x0062 => { # (http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4803.0.html)
+        Name => 'RawDevelopmentProcess',
+        Condition => '$$self{Make} =~ /^PENTAX/', # rules out Kodak, which also use this tag
+        Writable => 'int16u',
+        PrintConv => {
+            1 => '1 (K10D,K200D,K2000,K-m)',
+            3 => '3 (K20D)',
+            4 => '4 (K-7)',
+            5 => '5 (K-x)',
+            6 => '6 (645D)',
+            7 => '7 (K-r)',
+            8 => '8 (K-5,K-5II,K-5IIs)',
+            9 => '9 (Q)',
+            10 => '10 (K-01,K-30)',
+            11 => '11 (Q10)',
+            12 => '12 (MX-1)',
+        },
+    },
     0x0067 => { #PH (K-5)
         Name => 'Hue',
         Writable => 'int16u',
@@ -1668,15 +1764,22 @@ my %binaryDataAttrs = (
         Format => 'undef', # (written as int8u)
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::AWBInfo' },
     },
-    0x0069 => { #PH (K20D; K-5 highlights only)
+    0x0069 => { #PH (K20D, K-5, K-01 highlights only)
         Name => 'DynamicRangeExpansion',
+        Notes => q{
+            called highlight correction by Pentax for the K20D, K-5, K-01 and maybe
+            other models
+        },
         Writable => 'undef',
         Format => 'int8u',
         Count => 4,
         PrintConv => {
             '0 0 0 0' => 'Off',
+            '0 1 0 0' => 'Off (enabled)', # (not yet observed)
+            '0 2 0 0' => 'Off (auto)', # (K-01)
             '1 0 0 0' => 'On',
-            # '0 2 0 0' - seen for Pentax Q, Q10 and K-01
+            '1 1 0 0' => 'On (enabled)', # (K-01)
+            '1 2 0 0' => 'On (auto)', # (K-01)
         },
     },
     0x006b => { #PH (K-5)
@@ -1842,7 +1945,7 @@ my %binaryDataAttrs = (
     },
     # 0x0078 - int16u[2]: '0 0' (K-5,K-7,K-r,K-x)
     0x0079 => { #PH
-        Name => 'ShadowCompensation',
+        Name => 'ShadowCorrection',
         Writable => 'int8u',
         Count => -1,
         PrintConvColumns => 2,
@@ -1854,7 +1957,7 @@ my %binaryDataAttrs = (
             '1 1' => 'Weak',
             '1 2' => 'Normal',
             '1 3' => 'Strong',
-            # '2 4' - seen for Pentax Q, Q10 and K-01
+            '2 4' => 'Auto', # (K-01)
         },
     },
     0x007a => { #PH
@@ -1998,11 +2101,22 @@ my %binaryDataAttrs = (
     0x0206 => [{ #PH
         Name => 'AEInfo',
         # size: *istD/*istDs/K100D/K110D=14, K10D/K200D/K20D=16, K-m/K2000=20,
-        #        K-7/K-x=24, K-5/K-r/645D=25, K-01=21,
-        Condition => '$count != 21',
+        #        K-7/K-x=24, K-5/K-r/645D=25
+        Condition => '$count <= 25 and $count != 21',
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::AEInfo' },
     },{
+        Name => 'AEInfo2',
+        # size: K-01=21
+        Condition => '$count == 21',
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::AEInfo2' },
+    },{
+        Name => 'AEInfo3',
+        # size: K-30=48
+        Condition => '$count == 48',
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::AEInfo3' },
+    },{
         Name => 'AEInfoUnknown',
+        # size: Q/Q10=34
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::AEInfoUnknown' },
     }],
     0x0207 => [ #PH
@@ -2134,7 +2248,7 @@ my %binaryDataAttrs = (
             ByteOrder => 'BigEndian', # have seen makernotes changed to little-endian in DNG!
         },
     },
-    # 0x021a - undef[1068] (K-5)
+    # 0x021a - undef[1068] (K-5) - ToneMode/Saturation mapping matrices (ref 28)
     0x021b => { #19
         Name => 'SaturationInfo',
         Flags => [ 'Unknown', 'Binary' ],
@@ -2169,7 +2283,10 @@ my %binaryDataAttrs = (
         Writable => 0,
         Notes => 'found in K10D, K20D and K2000D PEF images',
     },
-    # 0x0221 - undef[138] (K-5)
+    0x0221 => { #28
+        Name => 'KelvinWB',
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::KelvinWB' },
+    },
     0x0222 => { #PH
         Name => 'ColorInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::ColorInfo' },
@@ -2177,6 +2294,7 @@ my %binaryDataAttrs = (
     # 0x0223 - undef[198] (K-5 PEF/DNG only)
     0x0224 => { #19
         Name => 'EVStepInfo',
+        Drop => 200, # drop if larger than 200 bytes (40 kB in Pentax Q and Q10)
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::EVStepInfo' },
     },
     0x0226 => { #PH
@@ -2210,7 +2328,11 @@ my %binaryDataAttrs = (
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::LevelInfo' },
     },
     # 0x022c - undef[46] (K-5)
-    # 0x022d - undef[100] (K-5, Q)
+    0x022d => { #28
+        Name => 'WBLevels',
+        Condition => '$count == 100', # (just to be safe, but no other counts observed)
+        SubDirectory => { TagTable => 'Image::ExifTool::Pentax::WBLevels' },
+    },
     0x022e => { #PH (K-5 AVI videos)
         Name => 'Artist',
         Groups => { 2 => 'Author' },
@@ -2254,6 +2376,9 @@ my %binaryDataAttrs = (
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::LensInfoQ' },
     },
     # 0x023a - undef[10] (Q)
+    # 0x023b - undef[9] (K-01)
+    #  01a700500000000000, 91a700500000000000, 41a700500000000000, 002700500000000000
+    #  c00500400000000000, 400500500000000000, 4004ff420100000000, 4087ff480000000000
     0x03fe => { #PH
         Name => 'DataDump',
         Writable => 0,
@@ -2278,7 +2403,12 @@ my %binaryDataAttrs = (
         PrintConv => '\$val',
     },
     # 0x0404 - undef[2086] (K-5)
-    # 0x0405 - undef[24200] (K-5 PEF/DNG only), undef[28672] (Q DNG)
+    0x0405 => { #PH - undef[24200] (K-5 PEF/DNG only), undef[28672] (Q DNG)
+        Name => 'UnknownBlock',
+        Writable => 'undef',
+        Notes => 'large unknown data block in PEF/DNG images but not JPG images',
+        Flags => [ 'Unknown', 'Binary', 'Drop' ],
+    },
     # 0x0406 - undef[4116] (K-5)
     # 0x0407 - undef[3072] (Q DNG)
     # 0x0408 - undef[1024] (Q DNG)
@@ -2320,8 +2450,10 @@ my %binaryDataAttrs = (
             # Composition Adjust, DriveMode = Self-timer or Remote, and movie with SR off!)
             6 => 'On (Video)', # (K-7)
             7 => 'On (7)', #(NC) (K20D, K200D, K-m, K-5)
-            15 => 'On (15)', # (K20D (with Tamron 10-20mm @ 10mm))
-            135 => 'On (135)', #(K-5IIs)
+            15 => 'On (15)', # (K20D with Tamron 10-20mm @ 10mm)
+            39 => 'On (mode 2)', # (K-01) (on during capture and live view)
+            135 => 'On (135)', # (K-5IIs)
+            167 => 'On (mode 1)', # (K-01) (on during capture only)
         },
     },
     2 => {
@@ -2876,7 +3008,8 @@ my %binaryDataAttrs = (
     %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     DATAMEMBER => [ 8 ],
-    # instead of /8, should these be PentaxEV(), as in CameraSettings? - PH
+    NOTES => 'Auto-exposure information for most Pentax models.',
+    # instead of /8, should these be PentaxEv(), as in CameraSettings? - PH
     0 => {
         Name => 'AEExposureTime',
         Notes => 'val = 24 * 2**((32-raw)/8)',
@@ -3045,11 +3178,190 @@ my %binaryDataAttrs = (
     },
 );
 
-# unknown auto-exposure information (K-01)
+# auto-exposure information for the K-01 (ref PH)
+%Image::ExifTool::Pentax::AEInfo2 = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'Auto-exposure information for the K-01.',
+    # instead of /8, should these be PentaxEv(), as in CameraSettings? - PH
+    2 => {
+        Name => 'AEExposureTime',
+        Notes => 'val = 24 * 2**((32-raw)/8)',
+        ValueConv => '24*exp(-($val-32)*log(2)/8)',
+        ValueConvInv => '-log($val/24)*8/log(2)+32',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    3 => {
+        Name => 'AEAperture',
+        Notes => 'val = 2**((raw-68)/16)',
+        ValueConv => 'exp(($val-68)*log(2)/16)',
+        ValueConvInv => 'log($val)*16/log(2)+68',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    4 => {
+        Name => 'AE_ISO',
+        Notes => 'val = 100 * 2**((raw-32)/8)',
+        ValueConv => '100*exp(($val-32)*log(2)/8)',
+        ValueConvInv => 'log($val/100)*8/log(2)+32',
+        PrintConv => 'int($val + 0.5)',
+        PrintConvInv => '$val',
+    },
+    5 => {
+        Name => 'AEXv',
+        # this is the negative of exposure compensation, not including bracketing
+        Notes => 'val = (raw-64)/8',
+        ValueConv => '($val-64)/8',
+        ValueConvInv => '$val * 8 + 64',
+    },
+    6 => {
+        Name => 'AEBXv',
+        # this is the negative of auto exposure bracketing compensation
+        Format => 'int8s',
+        Notes => 'val = raw / 8',
+        ValueConv => '$val / 8',
+        ValueConvInv => '$val * 8',
+    },
+    8 => {
+        Name => 'AEError',
+        Format => 'int8s',
+        # this is usually zero except in M exposure mode, but it can be non-zero
+        # in other modes (ie. if you hit an aperture limit in Tv mode)
+        ValueConv => '-($val-64)/8', # (negate to make overexposed positive)
+        ValueConvInv => '-$val * 8 + 64',
+    },
+    15 => {
+        Name => 'SceneMode',
+        PrintConvColumns => 2,
+        PrintConv => {
+            0 => 'Off',
+            1 => 'HDR',
+            4 => 'Auto PICT',
+            5 => 'Portrait',
+            6 => 'Landscape',
+            7 => 'Macro',
+            8 => 'Sport',
+            9 => 'Night Scene Portrait',
+            10 => 'No Flash',
+            11 => 'Night Scene',
+            12 => 'Surf & Snow',
+            14 => 'Sunset',
+            15 => 'Kids',
+            16 => 'Pet',
+            17 => 'Candlelight',
+            18 => 'Museum',
+            20 => 'Food',
+            21 => 'Stage Lighting',
+            22 => 'Night Snap',
+            25 => 'Night Scene HDR',
+            26 => 'Blue Sky',
+            27 => 'Forest',
+            29 => 'Backlight Silhouette',
+        },
+    },
+    16 => {
+        Name => 'AEMaxAperture',
+        Notes => 'val = 2**((raw-68)/16)',
+        ValueConv => 'exp(($val-68)*log(2)/16)',
+        ValueConvInv => 'log($val)*16/log(2)+68',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    17 => {
+        Name => 'AEMaxAperture2',
+        Notes => 'val = 2**((raw-68)/16)',
+        ValueConv => 'exp(($val-68)*log(2)/16)',
+        ValueConvInv => 'log($val)*16/log(2)+68',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    18 => {
+        Name => 'AEMinAperture',
+        Notes => 'val = 2**((raw-68)/16)',
+        ValueConv => 'exp(($val-68)*log(2)/16)',
+        ValueConvInv => 'log($val)*16/log(2)+68',
+        PrintConv => 'sprintf("%.0f",$val)',
+        PrintConvInv => '$val',
+    },
+    19 => {
+        Name => 'AEMinExposureTime',
+        Notes => 'val = 24 * 2**((32-raw)/8)',
+        ValueConv => '24*exp(-($val-32)*log(2)/8)',
+        ValueConvInv => '-log($val/24)*8/log(2)+32',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+);
+
+# auto-exposure information for the K-30 (ref PH)
+%Image::ExifTool::Pentax::AEInfo3 = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'Auto-exposure information for the K-30',
+    # instead of /8, should these be PentaxEv(), as in CameraSettings? - PH
+    16 => {
+        Name => 'AEExposureTime',
+        Notes => 'val = 24 * 2**((32-raw)/8)',
+        ValueConv => '24*exp(-($val-32)*log(2)/8)',
+        ValueConvInv => '-log($val/24)*8/log(2)+32',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+    17 => {
+        Name => 'AEAperture',
+        Notes => 'val = 2**((raw-68)/16)',
+        ValueConv => 'exp(($val-68)*log(2)/16)',
+        ValueConvInv => 'log($val)*16/log(2)+68',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    18 => {
+        Name => 'AE_ISO',
+        Notes => 'val = 100 * 2**((raw-32)/8)',
+        ValueConv => '100*exp(($val-32)*log(2)/8)',
+        ValueConvInv => 'log($val/100)*8/log(2)+32',
+        PrintConv => 'int($val + 0.5)',
+        PrintConvInv => '$val',
+    },
+    28 => {
+        Name => 'AEMaxAperture',
+        Notes => 'val = 2**((raw-68)/16)',
+        ValueConv => 'exp(($val-68)*log(2)/16)',
+        ValueConvInv => 'log($val)*16/log(2)+68',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    29 => {
+        Name => 'AEMaxAperture2',
+        Notes => 'val = 2**((raw-68)/16)',
+        ValueConv => 'exp(($val-68)*log(2)/16)',
+        ValueConvInv => 'log($val)*16/log(2)+68',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    30 => {
+        Name => 'AEMinAperture',
+        Notes => 'val = 2**((raw-68)/16)',
+        ValueConv => 'exp(($val-68)*log(2)/16)',
+        ValueConvInv => 'log($val)*16/log(2)+68',
+        PrintConv => 'sprintf("%.0f",$val)',
+        PrintConvInv => '$val',
+    },
+    31 => {
+        Name => 'AEMinExposureTime',
+        Notes => 'val = 24 * 2**((32-raw)/8)',
+        ValueConv => '24*exp(-($val-32)*log(2)/8)',
+        ValueConvInv => '-log($val/24)*8/log(2)+32',
+        PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
+        PrintConvInv => 'Image::ExifTool::Exif::ConvertFraction($val)',
+    },
+);
+
+# unknown auto-exposure information (Q, Q10)
 %Image::ExifTool::Pentax::AEInfoUnknown = (
     %binaryDataAttrs,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
-    NOTES => 'This information has not yet been decoded for models such as the K-01.',
 );
 
 # lens type
@@ -3356,6 +3668,7 @@ my %binaryDataAttrs = (
         Name => 'LC12',
         %lensCode,
     },
+    # 14 - related to live view for K-5 (normally 3, but 1 or 5 in LV mode)
     14.1 => { # LC13 = AVmin (open aperture value) [MaxAperture=(2**((AVmin-1)/32))]
         Name => 'MaxAperture',
         Condition => '$$self{Model} ne "K-5"',
@@ -3828,6 +4141,31 @@ my %binaryDataAttrs = (
             20 => 'Mid-right',
         },
     },
+);
+
+# Kevin white balance information (ref 28, topic 4834)
+%Image::ExifTool::Pentax::KelvinWB = (
+    %binaryDataAttrs,
+    FORMAT => 'int16u',
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'White balance Blue/Red gains as a function of color temperature.',
+    1  => { Name => 'KelvinWB_Daylight', %kelvinWB },
+    5  => { Name => 'KelvinWB_01', %kelvinWB },
+    9  => { Name => 'KelvinWB_02', %kelvinWB },
+    13 => { Name => 'KelvinWB_03', %kelvinWB },
+    17 => { Name => 'KelvinWB_04', %kelvinWB },
+    21 => { Name => 'KelvinWB_05', %kelvinWB },
+    25 => { Name => 'KelvinWB_06', %kelvinWB },
+    29 => { Name => 'KelvinWB_07', %kelvinWB },
+    33 => { Name => 'KelvinWB_08', %kelvinWB },
+    37 => { Name => 'KelvinWB_09', %kelvinWB },
+    41 => { Name => 'KelvinWB_10', %kelvinWB },
+    45 => { Name => 'KelvinWB_11', %kelvinWB },
+    49 => { Name => 'KelvinWB_12', %kelvinWB },
+    53 => { Name => 'KelvinWB_13', %kelvinWB },
+    57 => { Name => 'KelvinWB_14', %kelvinWB },
+    61 => { Name => 'KelvinWB_15', %kelvinWB },
+    65 => { Name => 'KelvinWB_16', %kelvinWB },
 );
 
 # color information - PH
@@ -4336,6 +4674,69 @@ my %binaryDataAttrs = (
     },
 );
 
+# white balance RGGB levels (ref 28)
+%Image::ExifTool::Pentax::WBLevels = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    # 0 - 11 (number of entries in this table)
+    # 1 - 0
+    2 => {
+        Name => 'WB_RGGBLevelsDaylight',
+        Format => 'int16u[4]',
+    },
+    # 10 - 1
+    11 => {
+        Name => 'WB_RGGBLevelsShade',
+        Format => 'int16u[4]',
+    },
+    # 19 - 2
+    20 => {
+        Name => 'WB_RGGBLevelsCloudy',
+        Format => 'int16u[4]',
+    },
+    # 28 - 3
+    29 => {
+        Name => 'WB_RGGBLevelsTungsten',
+        Format => 'int16u[4]',
+    },
+    # 37 - 4
+    38 => {
+        Name => 'WB_RGGBLevelsFluorescentD',
+        Format => 'int16u[4]',
+    },
+    # 46 - 5
+    47 => {
+        Name => 'WB_RGGBLevelsFluorescentN',
+        Format => 'int16u[4]',
+    },
+    # 55 - 6
+    56 => {
+        Name => 'WB_RGGBLevelsFluorescentW',
+        Format => 'int16u[4]',
+    },
+    # 64 - 7
+    65 => {
+        Name => 'WB_RGGBLevelsFlash',
+        Format => 'int16u[4]',
+    },
+    # 73 - 8
+    74 => {
+        Name => 'WB_RGGBLevelsFluorescentL',
+        Format => 'int16u[4]',
+    },
+    # 82 - 0xfe
+    83 => {
+        Name => 'WB_RGGBLevelsUnknown',
+        Format => 'int16u[4]',
+        Unknown => 1,
+    },
+    # 91 - 0xff
+    92 => {
+        Name => 'WB_RGGBLevelsUserSelected',
+        Format => 'int16u[4]',
+    },
+);
+
 # lens information for Penax Q (ref PH)
 # (306 bytes long, I wonder if this contains vignetting information too?)
 %Image::ExifTool::Pentax::LensInfoQ = (
@@ -4360,7 +4761,7 @@ my %binaryDataAttrs = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
         A number of additional temperature readings are extracted from this 256-byte
-        binary-data block in images from the K-5.  It is not currently known where
+        binary-data block in images from the K-5.  It is currently not known where
         the corresponding temperature sensors are located in the camera.
     },
     # (it would be nice to know where these temperature sensors are located,

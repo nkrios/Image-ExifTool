@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 # Information decoded from Mac OS resources
 %Image::ExifTool::RSRC::Main = (
@@ -89,6 +89,7 @@ sub ProcessRSRC($$)
     $exifTool->SetFileType('RSRC') unless $$exifTool{IN_RESOURCE};
     my $verbose = $exifTool->Options('Verbose');
     my $tagTablePtr = GetTagTable('Image::ExifTool::RSRC::Main');
+    $exifTool->VerboseDir('RSRC', $numTypes+1);
 
     # parse resource type list
     for ($i=0; $i<=$numTypes; ++$i) {

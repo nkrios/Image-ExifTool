@@ -649,7 +649,12 @@
 </tr><tr><td class=r>0x3350000</td><td>= PowerShot SX160 IS</td>
 </tr><tr><td class=r>0x3360000</td><td>= PowerShot S110 (new)</td>
 </tr><tr><td class=r>0x3370000</td><td>= PowerShot SX500 IS</td>
+</tr><tr><td class=r>0x3380000</td><td>= PowerShot N</td>
 </tr><tr><td class=r>0x3390000</td><td>= IXUS 245 HS / IXY 430F</td>
+</tr><tr><td class=r>0x3400000</td><td>= PowerShot SX280 HS</td>
+</tr><tr><td class=r>0x3430000</td><td>= PowerShot A2600</td>
+</tr><tr><td class=r>0x3460000</td><td>= PowerShot ELPH 130 IS / IXUS 140 / IXY 110F</td>
+</tr><tr><td class=r>0x3490000</td><td>= PowerShot ELPH 330 HS / IXUS 255 HS / IXY 610F</td>
 </tr><tr><td class=r>0x4040000</td><td>= PowerShot G1</td>
 </tr><tr><td class=r>0x6040000</td><td>= PowerShot S100 / Digital IXUS / IXY Digital</td>
 </tr><tr><td class=r>0x4007d673</td><td>= DC19/DC21/DC22</td>
@@ -717,7 +722,9 @@
 </tr><tr><td class=r>0x80000298</td><td>= WFT-E4 II</td>
 </tr><tr><td class=r>0x80000301</td><td>= EOS Rebel T4i / 650D / Kiss X6i</td>
 </tr><tr><td class=r>0x80000302</td><td>= 6D</td>
+</tr><tr><td class=r>0x80000326</td><td>= EOS Rebel T5i / 700D / Kiss X7i</td>
 </tr><tr><td class=r>0x80000331</td><td>= EOS M</td>
+</tr><tr><td class=r>0x80000346</td><td>= EOS Rebel SL1 / 100D / Kiss X7</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='CameraSettings'>Canon CameraSettings Tags</a></h2>
@@ -1396,10 +1403,15 @@ attempting to identify the specific lens model.</p>
 </tr><tr><td>489</td><td>= Canon EF 70-300mm f/4-5.6L IS USM</td>
 </tr><tr><td>490</td><td>= Canon EF 8-15mm f/4L USM</td>
 </tr><tr><td>491</td><td>= Canon EF 300mm f/2.8L IS II USM</td>
+</tr><tr><td>492</td><td>= Canon EF 400mm f/2.8L IS II USM</td>
+</tr><tr><td>493</td><td>= Canon EF 24-105mm f/4L IS USM</td>
 </tr><tr><td>494</td><td>= Canon EF 600mm f/4.0L IS II USM</td>
 </tr><tr><td>495</td><td>= Canon EF 24-70mm f/2.8L II USM</td>
+</tr><tr><td>496</td><td>= Canon EF 200-400mm f/4L IS USM</td>
 </tr><tr><td>502</td><td>= Canon EF 28mm f/2.8 IS USM</td>
 </tr><tr><td>503</td><td>= Canon EF 24mm f/2.8 IS USM</td>
+</tr><tr><td>504</td><td>= Canon EF 24-70mm f/4L IS USM</td>
+</tr><tr><td>505</td><td>= Canon EF 35mm f/2 IS USM</td>
 </tr><tr><td>4142</td><td>= Canon EF-S 18-135mm f/3.5-5.6 IS STM</td>
 </tr><tr><td>4143</td><td>= Canon EF-M 18-55mm f/3.5-5.6 IS STM</td>
 </tr><tr><td>4144</td><td>= Canon EF 40mm f/2.8 STM</td>
@@ -2484,8 +2496,8 @@ camera.</p>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfo1DmkIV'>Canon CameraInfo1DmkIV Tags</a></h2>
-<p>CameraInfo tags for the 1DmkIV.  Indices shown are for firmware versions
-1.0.x, but they may be different for other firmware versions.</p>
+<p>CameraInfo tags for the EOS 1D Mark IV.  Indices shown are for firmware
+versions 1.0.x, but they may be different for other firmware versions.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -2607,7 +2619,7 @@ camera.</p>
 
 <h2><a name='CameraInfo1DX'>Canon CameraInfo1DX Tags</a></h2>
 <p>CameraInfo tags for the EOS 1D X.  Indices shown are for firmware version
-6.5.1, but they may be different for other firmware versions.</p>
+1.0.2, but they may be different for other firmware versions.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -2634,74 +2646,74 @@ camera.</p>
 <td class=c>int8u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='32 = 0x20'>32</td>
+<td class=r title='35 = 0x23'>35</td>
 <td>FocalLength</td>
 <td class=c>int16uRev</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='122 = 0x7a'>122</td>
+<td class=r title='125 = 0x7d'>125</td>
 <td>CameraOrientation</td>
 <td class=c>int8u</td>
 <td><span class=s>0 = Horizontal (normal)
   <br>1 = Rotate 90 CW
   <br>2 = Rotate 270 CW</span></td></tr>
 <tr>
-<td class=r title='137 = 0x89'>137</td>
+<td class=r title='140 = 0x8c'>140</td>
 <td>FocusDistanceUpper</td>
 <td class=c>int16uRev</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='139 = 0x8b'>139</td>
+<td class=r title='142 = 0x8e'>142</td>
 <td>FocusDistanceLower</td>
 <td class=c>int16uRev</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='181 = 0xb5'>181</td>
+<td class=r title='188 = 0xbc'>188</td>
 <td>WhiteBalance</td>
 <td class=c>int16u</td>
 <td>--&gt; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance Values</a></td></tr>
 <tr class=b>
-<td class=r title='185 = 0xb9'>185</td>
+<td class=r title='192 = 0xc0'>192</td>
 <td>ColorTemperature</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='237 = 0xed'>237</td>
+<td class=r title='244 = 0xf4'>244</td>
 <td>PictureStyle</td>
 <td class=c>int8u</td>
 <td>--&gt; <a href='Canon.html#PictureStyle'>Canon PictureStyle Values</a></td></tr>
 <tr class=b>
-<td class=r title='416 = 0x1a0'>416</td>
+<td class=r title='423 = 0x1a7'>423</td>
 <td>LensType</td>
 <td class=c>int16uRev</td>
 <td>--&gt; <a href='Canon.html#LensType'>Canon LensType Values</a></td></tr>
 <tr>
-<td class=r title='418 = 0x1a2'>418</td>
+<td class=r title='425 = 0x1a9'>425</td>
 <td>MinFocalLength</td>
 <td class=c>int16uRev</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='420 = 0x1a4'>420</td>
+<td class=r title='427 = 0x1ab'>427</td>
 <td>MaxFocalLength</td>
 <td class=c>int16uRev</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='625 = 0x271'>625</td>
+<td class=r title='640 = 0x280'>640</td>
 <td>FirmwareVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='713 = 0x2c9'>713</td>
+<td class=r title='720 = 0x2d0'>720</td>
 <td>FileIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='725 = 0x2d5'>725</td>
+<td class=r title='732 = 0x2dc'>732</td>
 <td>DirectoryIndex</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='1005 = 0x3ed'>1005</td>
+<td class=r title='1012 = 0x3f4'>1012</td>
 <td>PictureStyleInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#PSInfo2'>Canon PSInfo2 Tags</a></td></tr>
@@ -7708,8 +7720,8 @@ option is used.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='VignettingCorr'>Canon VignettingCorr Tags</a></h2>
-<p>This information is found in images from the 1DmkIV, 5DmkII, 7D, 50D, 500D
-and 550D.</p>
+<p>This information is found in images from the 1DmkIV, 5DmkII, 7D, 50D, 60D,
+500D and 550D.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -7718,6 +7730,18 @@ and 550D.</p>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
 <td>PeripheralLighting</td>
+<td class=c>int16s</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4</td>
+<td>ChromaticAberrationCorr</td>
+<td class=c>int16s</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr>
+<td class=r title='5 = 0x5'>5</td>
+<td>ChromaticAberrationCorr</td>
 <td class=c>int16s</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
@@ -7747,6 +7771,12 @@ and 550D.</p>
 <tr>
 <td class=r title='5 = 0x5'>5</td>
 <td>PeripheralLightingSetting</td>
+<td class=c>int32s</td>
+<td><span class=s>0 = Off
+  <br>1 = On</span></td></tr>
+<tr class=b>
+<td class=r title='6 = 0x6'>6</td>
+<td>ChromaticAberrationSetting</td>
 <td class=c>int32s</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
@@ -7877,7 +7907,7 @@ cameras such as the PowerShot S95.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 21, 2012</i>
+<br><i>Last revised Mar 22, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

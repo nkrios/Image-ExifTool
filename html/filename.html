@@ -74,10 +74,12 @@ Writing <b>illegal file names</b> in Windows can have unpredictable results and
 may result in <b>data loss</b>.  Illegal characters in Windows file names are:
 <pre class=code>    / \ ? * : | " &lt; &gt;</pre>
 Any tag used in generating a file name which may contain these characters must
-first be filtered via a <a href="config.html">user-defined tag</a>.  Here is an
-example of a conversion that translates illegal characters to underlines for use
-in a user-defined Composite tag:
-<pre class=code>    ValueConv =&gt; '$val =~ tr{/\?*:|"&gt;&lt;}{_}; $val',</pre>
+first be filtered to remove or translate these characters.  A special feature
+allows these characters to be removed from a tag value by adding a semicolon
+inside the braces after a tag name.  For example:
+<pre class=code>    exiftool "-filename&lt;${model;}.%e" c:\images</pre>
+See the <code>-p</code> option in the <a href="exiftool_pod.html">application
+documentation</a> for more details.
 </blockquote>
 
 <h2>Examples</h2>

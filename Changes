@@ -4,14 +4,208 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 9.12. (Other versions are
+Note: The most recent production release is Version 9.25. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+Apr. 6, 2013 - Version 9.25 (production release)
+
+  - Added read support for FLIR thermal image metadata
+  - Added write support for DNG version 1.4 images
+  - Added a new Pentax DriveMode value and a new Pentax LensType
+  - Added two new Olympus CameraType values
+  - Added print conversion for XMP Flash tags to provide alternate language
+    support
+  - Decode a few more Nikon and Pentax tags
+  - Decode more Sony tags (thanks Jos Roost)
+  - Decode more Panasonic tags and changed decoding of others
+  - Enhanced -j and -php options to work with -D, -H and -l
+  - Improved German translations (thanks Herbert Kauer)
+  - Patched decoding of QuickTime date/time tags to accommodate Samsung and Sony
+    cameras that use an incorrect time zero of 1970 instead of 1904.  This patch
+    will only work for videos produced before 2036, so hopefully Samsung and
+    Sony will fix this problem at their end before then (care to place a wager?)
+  - Fixed issues when using "-wm cg" and writing metadata as a block
+  - Fixed possible "division by zero" error when reading undefined XMP rational
+
+Mar. 23, 2013 - Version 9.24
+
+  - Added ability to overwrite plus append output files (-w+!)
+  - Added support for Sigma X3F version 3.0 images
+  - Added a few new values for some Pentax tags
+  - Added a few new CanonModelID's
+  - Decode Nikon D5100 and D5200 custom settings plus a few other Nikon tags
+  - Allow the value for missing tags extracted with the -f option to be
+    configured via the API MissingTagValue setting (default is still "-")
+  - Improved decoding of Sony LensSpec (again, thanks Jos Roost)
+  - Fixed bug reading QuickTime extended-size atoms
+
+Mar. 10, 2013 - Version 9.23
+
+  - Added -W (-tagOut) and -Wext (-tagOutExt) options to allow multiple tags
+    to be extracted to separate output files from a single source file
+  - Added append feature to -w (-w+)
+  - Added ability to extract SoundFile from Ricoh RMETA
+  - Added more SonyModelID and Sony LensType values and improved Sony LensType
+    decoding (thanks Jos Roost)
+  - Added a new Olympus LensType (thanks Niels Kristian Bech Jensen)
+  - Added another Pentax LensType
+  - Decode more Nikon flash information (thanks Alyda Gilmore for the samples)
+  - Decode Pentax Kelvin white balance tags (thanks Klaus Homeister)
+  - Extract PDF embedded image color space
+  - Improved Spanish translations (thanks Emilio Sancha)
+  - More patches to avoid "APP1 segment too large" errors when copying all tags
+    from some RAW images
+
+Mar. 2, 2013 - Version 9.22
+
+  - Fixed problem extracting metadata from encrypted embedded JPEG images in PDF
+    files and added the ability to extract JPEG 2000 information too
+
+Mar. 2, 2013 - Version 9.21
+
+  - Added ability to extract embedded images and their metadata from PDF files
+  - Added read support for binary-format PLIST files
+  - Added support for Sigma DP3 Merrill maker notes
+  - Added a few new Sigma LensType values
+  - Added a new FujiFilm PictureMode value
+  - Decode a number of new Pentax tags (thanks Klaus Homeister)
+  - Decode more Sony tags (thanks Jos Roost)
+  - Decode some new Nikon D800 tags (thanks Alyda Gilmore for the samples)
+  - Decode a number of new tags in 3GP videos
+  - Decode Pentax CameraType
+  - Made a few more DNG tags writable (but protected)
+  - Fixed problem reading XREF table of some PDF files
+  - API Changes:
+      - The CombineInfo() routine is now deprecated because it is likely that
+        nobody ever used it.  If anyone actually uses this, please let me know
+
+Feb. 20, 2013 - Version 9.20
+
+  - NOTICE: This release fixes a problem in the 9.19 Windows version that could
+    cause ExifTool to crash when writing metadata to some files  (it seems that
+    one of the files in the 9.19 Windows package was corrupted)
+  - Added a new PentaxModelID
+  - Added write support for a few Getty Images XMP tags
+  - Decode Sony AFAreaModeSetting (thanks Jos Roost)
+
+Feb. 20, 2013 - Version 9.19
+
+  - Added read support for Phase One IIQ maker notes
+  - Added a couple of new Minolta Teleconverter values
+  - Patched problem which could result in runtime warning when extracting
+    information from a file with an incorrectly formatted PreviewImage pointer
+  - Improved handling of unknown maker notes when writing to reduce the chance
+    of corruption (fixes problem of corrupted SilverFast maker notes)
+  - Fixed bug in HtmlDump where unused bytes at end of MakerNotes were not shown
+    if they came at the end of a TIFF-format file
+
+Feb. 16, 2013 - Version 9.18
+
+  - Decode more AF information for Sony SLT models (thanks Andy Johnson for the
+    samples)
+  - Recognize CameraInfo and ColorData information from newer Canon 1DX firmware
+  - Organized support files in full Perl distribution into separate directories
+  - Improved German and Spanish translations (thanks Herbert Kauer and Emilio
+    Sancha)
+  - Fixed inconsistency where a priority tag could be hidden by a same-named tag
+    in the same group when using the -j or -X option combined with -g or -G
+  - Fixed problem in standard tests that could cause ExifTool test 25 to fail
+
+Feb. 9, 2013 - Version 9.17
+
+  - Added PLIST and MODD to the list of supported file extensions
+  - Added track name to UserData tags within QuickTime tracks
+  - Added a new Pentax LensType (thanks Pietu Pohjalainen)
+  - Added a new Canon LensType
+  - Decode binary data in PLIST and MODD files
+  - Decode new Canon 1DX CustomFunctions
+  - Issue a minor warning and ignore duplicate PDF Info dictionaries unless the
+    -m option is used
+  - Improved date/time parsing when writing to allow single-digit fields
+  - Improved decoding/naming of a few Sony tags (thanks Jos Roost)
+  - Improved German translations (thanks Herbert Kauer)
+  - Changed a few PLIST tag names
+  - Fixed decoding of Olympus CameraType for some models
+  - Fixed problem calculating AvgBitrate for some video files
+  - Fixed problem writing Canon:LensSerialNumber
+
+Feb. 2, 2013 - Version 9.16
+
+  - Added support for DarwinCore XMP tags
+  - Added support for CinemaDNG tags
+  - Added basic support for parsing XML PLIST information, and use this to
+    extract tags from QuickTime iTunesInfo Data
+  - Added a new Pentax lens (thanks Niels Kristian Bech Jensen)
+  - Added some new Sony E-mount lenses (thanks Jos Roost)
+  - Added a new NEFBitDepth value (thanks Jos Roost)
+  - Added a new CanonModelID
+  - Decode a few more Sony tags (thanks Jos Roost)
+  - Improved decoding of QuickTime iTunesInfo tags
+  - Improved Spanish translations (thanks Emilio Sancha)
+  - Improved handling of errors in Perl expression of new formatting feature
+  - Improved -p option to also handle structures
+  - Changed a number of Sigma lens names for Olympus to conform with official
+    Sigma model names (thanks Niels Kristian Bech Jensen)
+  - Moved the MWG XMP tags documentation to the MWG page
+  - Patched to allow reading GPX track logs with no version number
+  - Fixed problem reading an ID3 POPM frame with a missing counter
+  - Fixed bug which could cause "uninitialized value" runtime warning when
+    reading Nikon maker notes with an empty RetouchHistory
+  - API Changes:
+      - Compatibility Notice: The MWG Composite tags are no longer automatically
+        loaded just by using the MWG module.  Image::ExifTool::MWG::Load() must
+        now be called explicitly to load these tags
+
+Jan. 27, 2013 - Version 9.15
+
+  - Added advanced formatting feature to -p and -tagsFromFile options
+  - Added -echo3 and -echo4 options
+  - Added a few more Olympus LensType values, removed one, changed some lens
+    names for consistency (all thanks Niels Kristian Bech Jensen), and use
+    hexadecimal instead of decimal for numerical LensType values
+  - Added a number of new Sony E-mount lenses
+  - Added a new Tamron lens for Sony (thanks Marcin Krol)
+  - Trim trailing spaces from Panasonic LensType strings
+  - Fixed bug which could cause "Can't call method GetMarkerPointers" runtime
+    warning when writing certain types of corrupted images
+  - Fixed problem copying PrevewImage from some corrupted files
+  - Fixed problem identifying a Sigma lens for Nikon at some focal lengths 
+  - API Changes:
+      - Added AddUserDefinedTags() method
+      - Added formatting feature for tag values in SetNewValuesFromFile()
+
+Jan. 18, 2013 - Version 9.14
+
+  - Added -wm (-writeMode) option to provide control over tag write/create mode
+  - Added ability to use wildcards in target tag names when writing
+  - Added ability to read/write Jpeg2000 XML tag as a block
+  - Added ability to delete MPF segment (with -MPF:All=)
+  - Added a number of new Olympus lenses (thanks Niels Kristian Bech Jensen)
+  - Added a new Nikon LensID (thanks Robert Rottmerhusen)
+  - Added a number of new Pentax LensType's (thanks Alan Robinson for one)
+  - Added a few new CanonModelID's and Canon LensType's
+  - Decode ID3v2 POPM and OWNE frames
+  - Decode new Canon 6D CustomFunctions
+  - Improved calculation of ScaleFactor35efl for Canon cameras
+  - Changed priority of PDF Info tags so tags from most recent Info dictionary
+    take precedence (to partially accomodate the questionable Acrobat Pro
+    incremental update technique)
+  - Changed some verbose warnings when attempting to write "unsafe" tags
+  - Changed behaviour so that "unsafe" tags are not copied for any tag specified
+    using a wildcard (previously this was the behaviour for a tag name of 'all'
+    or '*', but not names like 'gps*')
+  - Fixed bug where a Composite tag could sometimes not be generated when the
+    -struct option was used if the tag was derived from an XMP List-type tag
+  - Fixed problem conditionally deleting GIF Comment and MIE tags
+  - Fixed decoding of RawImageWidth/Height from FujiFilm X-E1 RAF images
+  - API Changes:
+      - Added WriteMode option
 
 Jan. 10, 2013 - Version 9.13 (production release)
 
   - Added basic validation of ExifVersion and FlashpixVersion tags when writing
-  - Fixed problem where MPF PreviewImage was lost when editing metadata in Nikon
-    D4, D600 or D800 images
+  - Fixed problem where MPF PreviewImage was lost when editing metadata in JPEG
+    images from the Nikon D4, D600 or D800
 
 Jan. 2, 2013 - Version 9.12 (production release)
 
@@ -2613,7 +2807,7 @@ May 26, 2008 - Version 7.28
     tags from a file containing a PreviewImage
   - Fixed problems decoding some Sony ARW images
   - Fixed problem writing some makernote values in sub-IFD's
-  - Fixed "APP1 segment to large" problem where PreviewImage was not dropped
+  - Fixed "APP1 segment too large" problem where PreviewImage was not dropped
     as it should have been when copying all tags from some RAW images
 
 May 24, 2008 - Version 7.27 - "GIF+XMP"

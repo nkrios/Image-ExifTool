@@ -453,6 +453,14 @@ $VERSION = '1.06';
    'InteropIndex' => '互通性鑑定',
    'InteropOffset' => '互用標記',
    'InteropVersion' => '互通性版本',
+   'JPEGQuality' => {
+      Description => '影像品質',
+      PrintConv => {
+        'Extra Fine' => '超精細',
+        'Fine' => '精細',
+        'Standard' => '標準品質',
+      },
+    },
    'Keyword' => '關鍵字',
    'Keywords' => '關鍵字',
    'Lens' => '鏡頭',

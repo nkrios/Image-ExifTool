@@ -217,6 +217,8 @@ my %jpgFromRawMap = (
     PROCESS_PROC => \&ProcessDistortionInfo,
     WRITE_PROC => \&WriteDistortionInfo,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    # (don't make this family 0 MakerNotes because we don't want it to be a deletable group)
+    GROUPS => { 0 => 'PanasonicRaw', 1 => 'PanasonicRaw', 2 => 'Image'},
     WRITABLE => 1,
     FORMAT => 'int16s',
     FIRST_ENTRY => 0,

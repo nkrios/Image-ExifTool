@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.43';
+$VERSION = '1.45';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -1273,10 +1273,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         {
             Name => 'ISOExpansion',
             Notes => 'other models',
-            PrintConv => {
-                0 => 'Off',
-                1 => 'On',
-            },
+            PrintConv => \%offOn,
         },
     ],
     0x0104 => {
@@ -1581,11 +1578,11 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x040a => { # new for 5DmkIII
         Name => 'ViewfinderWarnings',
         PrintConv => { BITMASK => { # (NC)
-            0 => 'Monochrome',
-            1 => 'WB corrected',
-            2 => 'One-touch image quality',
-            3 => 'ISO expansion',
-            4 => 'Spot metering',
+            0 => 'Monochrome',              # (have seen for: 5DmkII, 6D)
+            1 => 'WB corrected',            # (have seen for: 5DmkII, 6D)
+            2 => 'One-touch image quality', # (have seen for: 5DmkII; doesn't exist for 6D)
+            3 => 'ISO expansion',           # (have seen for: 5DmkII)
+            4 => 'Spot metering',           # (have seen for: 5DmkII, 6D)
         }},
     },
     0x040b => { # new for 5DmkIII
@@ -1607,11 +1604,11 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0502 => {
         Name => 'AIServoTrackingSensitivity',
         PrintConv => {
-           -2 => 'Slow',
-           -1 => 'Medium Slow',
+           -2 => 'Slow',        # (Locked on -2 for 6D)
+           -1 => 'Medium Slow', # (Locked on -1 for 6D)
             0 => 'Standard',
-            1 => 'Medium Fast',
-            2 => 'Fast',
+            1 => 'Medium Fast', # (Responsive +1 for 6D)
+            2 => 'Fast',        # (Responsive +2 for 6D)
         },
     },
     0x0503 => {
@@ -1752,8 +1749,8 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x050e => [
         {
             Name => 'AFAssistBeam',
-            Condition => '$$self{Model} =~ /\b1D Mark IV\b/',
-            Notes => '1D Mark IV',
+            Condition => '$$self{Model} =~ /\b(1D Mark IV|6D)\b/',
+            Notes => '1D Mark IV and 6D',
             PrintConv => {
                 0 => 'Emits',
                 1 => 'Does not emit',
@@ -1864,6 +1861,25 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
         PrintConv => {
             0 => 'Off',
             1 => 'AF point selection',
+        },
+    },
+    0x0518 => { # new for 6D
+        Name => 'AccelerationTracking',
+    },
+    0x0519 => { # new for 6D
+        Name => 'AIServoFirstImagePriority',
+        PrintConv => { # (NC)
+            -1 => 'Release priority',
+            0 => 'Equal priority',
+            1 => 'Focus priority',
+        },
+    },
+    0x051a => { # new for 6D
+        Name => 'AIServoSecondImagePriority',
+        PrintConv => { # (NC)
+            -1 => 'Shooting speed priority',
+            0 => 'Equal priority',
+            1 => 'Focus priority',
         },
     },
     #### 3b) Drive
@@ -2078,12 +2094,16 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     },
     0x0709 => {
         Name => 'LockMicrophoneButton',
-        PrintConv => {
+        PrintConv => [{
             # called "sound" in 1DmkIII manual, and "memo" in 1DmkIV manual
             0 => 'Protect (hold:record memo)',
             1 => 'Record memo (protect:disable)',
             2 => 'Play memo (hold:record memo)', # new with 1DmkIV
-        },
+            3 => 'Rating (protect/memo:disable)', # new with 1DX
+        }],
+        # (not sure what the 2nd number is -- new for 1DX.  Seen a value of 31.
+        # Memo quality may be set to 48kHz or 8kHz through another option that
+        # doesn't seem to be stored separately -- is this it?)
     },
     0x070a => {
         Name => 'ButtonFunctionControlOff',
@@ -2151,6 +2171,25 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
                 0 => 'Eg-A',
                 1 => 'Eg-D',
                 2 => 'Eg-S',
+            },
+        },
+        {
+            Name => 'FocusingScreen',
+            Condition => '$$self{Model} =~ /\b6D\b/',
+            Notes => '6D',
+            PrintConv => {
+                0 => 'Eg-A II',
+                1 => 'Eg-D',
+                2 => 'Eg-S',
+            },
+        },
+        {
+            Name => 'FocusingScreen',
+            Condition => '$$self{Model} =~ /\b1D X\b/',
+            Notes => '1DX',
+            PrintConv => {
+                0 => 'Ec-CV',
+                1 => 'Ec-A,B,D,H,I,L',
             },
         },
         {

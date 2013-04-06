@@ -23,7 +23,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.31';
+$VERSION = '1.32';
 
 sub ProcessKodakIFD($$$);
 sub ProcessKodakText($$$);
@@ -754,12 +754,14 @@ sub WriteKodakIFD($$$);
         Condition => '$$self{Make} =~ /Kodak/i and $$valPt =~ /^([A-Z0-9]{1,11}\0|[A-Z0-9]{12})/i',
         Format => 'string[12]',
         Notes => 'Kodak only',
+        Writable => 0,
     },
     0xc4 => {
         Name => 'UnknownNumber', # (confirmed NOT to be serial number for Easyshare Mini - PH)
         Condition => '$$self{Make} =~ /Kodak/i and $$valPt =~ /^([A-Z0-9]{1,11}\0|[A-Z0-9]{12})/i',
         Format => 'string[12]',
         Notes => 'Kodak only',
+        Writable => 0,
     },
 );
 

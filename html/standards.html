@@ -15,7 +15,7 @@ a.ref   { text-decoration: none; font-size: x-small;
 <div class='index'>
 <a href="#TIFF">TIFF 6.0</a>
 <br><a href="#DNG">DNG 1.3</a>
-<br><a href="#EXIF">EXIF 2.2</a>
+<br><a href="#EXIF">EXIF 2.3</a>
 <br><a href="#PhotoInfo">OffsetSchema</a>
 <br><a href="#JPEG">JPEG</a>
 <br><a href="#MPF">MPF</a>
@@ -222,21 +222,22 @@ marker segments.</p>
 <h3>Multi-Picture Format (MPF) <a class=ref href="#ref9">[9]</a></h3>
 
 <p>In February 2009 CIPA<a class=ref href="#ref10">[10]</a> released a
-"Multi-Picture Format" standard for storing large images in JPEG files.  Again,
-there is a significant problem with this standard:  To avoid the JPEG segment
-size limitation it uses offsets relative to the start of the MPF header (in the
-new MPF APP2 segment) to reference image data after the JPEG EOI. These offsets
-are quickly broken if any data after the MPF segment changes length.  This first
-problem could have been avoided if offsets had been specified relative to the
-end of file, but it is too late for this now that the specification is public. 
-Another problem is that information after the JPEG EOI is often discarded by
-software when the file is edited.</p>
+"Multi-Picture Format" standard for storing large images in JPEG files.  This
+format is yet another attempt to bypass the JPEG segment-size limit (see above)
+to store large preview images.  But again, there is a significant problem with
+this standard:  Pointers in the new APP2 MPF segment use offsets relative to the
+start of the MPF header in this segment to reference image data after the JPEG
+EOI.  Unfortunately, these offsets are quickly broken if any data after the MPF
+segment changes length.  This problem could have been avoided if offsets had
+been specified relative to the end of file, but it is too late for this now that
+the specification is public.  However, another problem is that information after
+the JPEG EOI is often discarded by software when the file is edited.</p>
 
 <p><b>A possible work-around:</b></p>
 
 <p>Enforce the rule that the MPF APP2 segment must come after all other APP
 segments.  (It would have been smart if this was specified in the CIPA standard,
-but sadly this isn't the case.)  If this is done, then metadata in the remaining
+but sadly this wasn't the case.)  If this is done, then metadata in the remaining
 APP segments (EXIF, IPTC, XMP, etc) can safely be edited without breaking the
 MPF offsets.  I suggest that all metadata editors employ this strategy,
 regardless of the segment order specified in the standard (which says that the
@@ -270,7 +271,7 @@ inside a JPEG segment.</p>
 </ol>
 <hr>
 <i>Created Sep 17, 2009</i><br>
-<i>Last revised Mar 28, 2012</i>
+<i>Last revised Jan 8, 2013</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

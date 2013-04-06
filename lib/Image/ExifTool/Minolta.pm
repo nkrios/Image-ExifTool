@@ -52,7 +52,7 @@ use vars qw($VERSION %minoltaLensTypes %minoltaTeleconverters %minoltaColorMode
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.96';
+$VERSION = '2.02';
 
 # Full list of product codes for Sony-compatible Minolta lenses
 # (ref http://www.kb.sony.com/selfservice/documentLink.do?externalId=C1000570)
@@ -264,15 +264,17 @@ $VERSION = '1.96';
     57.1 => 'Tamron SP AF 60mm F2 Di II LD [IF] Macro 1:1', # model G005 (ref http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3858.0.html)
     57.2 => 'Tamron 18-270mm F3.5-6.3 Di II PZD', #27
     58 => 'Sony DT 30mm F2.8 Macro SAM (SAL30M28)', #22/25
-    59 => 'Sony 28-75 F2.8 SAM (SAL2875)', #21/25
+    59 => 'Sony 28-75mm F2.8 SAM (SAL2875)', #21/25
     60 => 'Carl Zeiss Distagon T* 24mm F2 ZA SSM (SAL24F20Z)', #17/25
     61 => 'Sony 85mm F2.8 SAM (SAL85F28)', #17/25
     62 => 'Sony DT 35mm F1.8 SAM (SAL35F18)', #PH/25
     63 => 'Sony DT 16-50mm F2.8 SSM (SAL1650)', #17/25
     64 => 'Sony 500mm F4.0 G SSM (SAL500F40G)', #29
-    65 => 'Sony DT 18-135mm F3.5-5.6 SAM (SAL-18135)', #25
-    66 => 'Sony 300mm F2.8 G SSM II (SAL-300F28G2)', #29
-    68 => 'Sony DT 55-300mm F4.5-5.6 SAM (SAL-55300)', #29
+    65 => 'Sony DT 18-135mm F3.5-5.6 SAM (SAL18135)', #25
+    66 => 'Sony 300mm F2.8 G SSM II (SAL300F28G2)', #29
+    68 => 'Sony DT 55-300mm F4.5-5.6 SAM (SAL55300)', #29
+    69 => 'Sony 70-400mm F4-5.6 G SSM II (SAL70400G2)', #25
+    70 => 'Carl Zeiss Planar T* 50mm F1.4 ZA SSM (SAL50F14Z)', #25
     128 => 'Tamron or Sigma Lens (128)',
     128.1 => 'Tamron 18-200mm F3.5-6.3',
     128.2 => 'Tamron 28-300mm F3.5-6.3',
@@ -298,10 +300,11 @@ $VERSION = '1.96';
     138 => 'Soligor 19-35mm F3.5-4.5', #11
     142 => 'Voigtlander 70-300mm F4.5-5.6', #JD
     146 => 'Voigtlander Macro APO-Lanthar 125mm F2.5 SL', #JD
+    194 => 'Tamron SP AF 17-50mm F2.8 XR Di II LD Aspherical [IF]', #23
     255 => 'Tamron Lens (255)',
     255.1 => 'Tamron SP AF 17-50mm F2.8 XR Di II LD Aspherical',
     255.2 => 'Tamron AF 18-250mm F3.5-6.3 XR Di II LD', #JD
-    255.3 => 'Tamron AF 55-200mm F4-5.6 Di II',
+    255.3 => 'Tamron AF 55-200mm F4-5.6 Di II LD Macro', # (added "LD Macro", ref 23)
     255.4 => 'Tamron AF 70-300mm F4-5.6 Di LD MACRO 1:2',
     255.5 => 'Tamron SP AF 200-500mm F5.0-6.3 Di LD IF',
     255.6 => 'Tamron SP AF 10-24mm F3.5-4.5 Di II LD Aspherical IF', #22
@@ -431,17 +434,34 @@ $VERSION = '1.96';
     45871 => 'Tamron AF 70-210mm F2.8 SP LD', #Fabio Suprani
     # all M42-type lenses give a value of 65535 (and FocalLength=0, FNumber=1)
     65535 => 'E-Mount, T-Mount, Other Lens or no lens', #JD/25
-    65535.1 => 'Arax MC 35mm F2.8 Tilt+Shift', #JD
-    65535.2 => 'Arax MC 80mm F2.8 Tilt+Shift', #JD
-    65535.3 => 'Zenitar MF 16mm F2.8 Fisheye M42', #JD
-    65535.4 => 'Samyang 500mm Mirror F8.0', #19
-    65535.5 => 'Pentacon Auto 135mm F2.8', #19
-    65535.6 => 'Pentacon Auto 29mm F2.8', #19
-    65535.7 => 'Helios 44-2 58mm F2.0', #19
+    65535.1  => 'Sony E 16mm F2.8', #PH (SEL16F28)
+    65535.2  => 'Sony E 20mm F2.8', #PH (NC) (SEL20F28)
+    65535.3  => 'Sony E 24mm F1.8 ZA', #PH (SEL24F18Z)
+    65535.4  => 'Sony E 30mm F3.5 Macro', #25 (SEL30M35)
+    65535.5  => 'Sony E 35mm F1.8 OSS', #25 (SEL35F18)
+    65535.6  => 'Sony E 50mm F1.8 OSS', #PH (SEL50F18)
+    65535.7  => 'Sony E 10-18mm F4 OSS', #PH (SEL1018)
+    65535.8  => 'Sony E PZ 16-50mm F3.5-5.6 OSS', #PH (SELP1650)
+    65535.9  => 'Sony E 18-55mm F3.5-5.6 OSS', #PH (SEL1855)
+   '65535.10'=> 'Sony E 18-200mm F3.5-6.3 OSS', #PH (SEL18200) (also "LE" and "PZ" models, SEL18200LE and SELP18200)
+   '65535.11' => 'Sony E 55-210mm F4.5-6.3 OSS', #PH (SEL55210)
+    # <-- insert new Sony lenses here and bump down 3rd party lens ID's -->
+   '65535.12' => 'Sigma 19mm F2.8 EX DN', #25
+   '65535.13' => 'Sigma 30mm F2.8 EX DN', #25
+   '65535.14' => 'Tamron 18-200mm F3.5-6.3 Di III VC', #25
+   '65535.15' => 'Arax MC 35mm F2.8 Tilt+Shift', #JD
+   '65535.16' => 'Arax MC 80mm F2.8 Tilt+Shift', #JD
+   '65535.17' => 'Zenitar MF 16mm F2.8 Fisheye M42', #JD
+   '65535.18' => 'Samyang 500mm Mirror F8.0', #19
+   '65535.19' => 'Pentacon Auto 135mm F2.8', #19
+   '65535.20' => 'Pentacon Auto 29mm F2.8', #19
+   '65535.21' => 'Helios 44-2 58mm F2.0', #19
 );
 
 %minoltaTeleconverters = (
     0x00 => 'None',
+    0x04 => 'Minolta/Sony AF 1.4x APO (D) (0x04)', # (Andy Johnson, A77 APO and APO D)
+    0x05 => 'Minolta/Sony AF 2x APO (D) (0x05)', # (Andy Johnson, A77 APO D)
     0x48 => 'Minolta/Sony AF 2x APO (D)',
     # 0x48 => 'Sony 2x Teleconverter (SAL20TC)', (ref 25)
     0x50 => 'Minolta AF 2x APO II',
@@ -483,7 +503,7 @@ $VERSION = '1.96';
     13 => 'Clear', #25 (NC)
     14 => 'Deep', #25
     15 => 'Light', #25 (NC)
-    16 => 'Autumn', #25 (NC)
+    16 => 'Autumn Leaves', #25 (NC)
     17 => 'Sepia', #25
     100 => 'Neutral', #JD
     101 => 'Clear', #JD

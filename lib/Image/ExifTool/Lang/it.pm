@@ -1682,8 +1682,15 @@ $VERSION = '1.10';
    'CreationDate' => 'Data di creazione',
    'CreativeStyle' => {
       PrintConv => {
+        'Autumn Leaves' => 'Foglie d\'autunno',
+        'B&W' => 'B/N',
+        'Clear' => 'Trasparente',
+        'Deep' => 'Cupa',
         'Landscape' => 'Orizzontale',
         'Light' => 'Chiara',
+        'Neutral' => 'Neutra',
+        'Night View/Portrait' => 'Rit. notturno',
+        'Portrait' => 'Verticale',
         'Sepia' => 'Seppia',
         'Sunset' => 'Tramonto',
         'Vivid' => 'Vivace',
@@ -3962,6 +3969,14 @@ $VERSION = '1.10';
       },
     },
    'JPEGQTables' => 'Tabelle JPEGQ',
+   'JPEGQuality' => {
+      Description => 'Qualità',
+      PrintConv => {
+        'Extra Fine' => 'Extra fine',
+        'Standard' => 'Normale',
+        'n/a' => 'n/d',
+      },
+    },
    'JPEGRestartInterval' => 'Intervallo riavvio JPEG',
    'JPEGTables' => 'Tabelle JPEG',
    'JobID' => 'ID processo',
@@ -6778,7 +6793,7 @@ $VERSION = '1.10';
       },
     },
    'Shadow' => 'Ombra',
-   'ShadowCompensation' => {
+   'ShadowCorrection' => {
       PrintConv => {
         'Normal' => 'Normale',
         'Off' => 'Spento',

@@ -2457,6 +2457,171 @@
   <br>0x1 = Yes</span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='SettingsD800'>NikonCustom SettingsD800 Tags</a></h2>
+<p>Custom settings for the D800.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='12 = 0xc'>12.1</td>
+<td>AutoBracketingSet</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xe0]
+  <br>0x0 = AE &amp; Flash
+  <br>0x20 = AE Only
+  <br>0x40 = Flash Only
+  <br>0x60 = WB Bracketing
+  <br>0x80 = Active D-Lighting</span></td></tr>
+<tr class=b>
+<td class=r title='12 = 0xc'>12.2</td>
+<td>AutoBracketOrder</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x10]
+  <br>0x0 = 0,-,+
+  <br>0x10 = -,0,+</span></td></tr>
+<tr>
+<td class=r title='12 = 0xc'>12.3</td>
+<td>AutoBracketingMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x0c]
+  <br>0x0 = Flash/Speed
+  <br>0x4 = Flash/Speed/Aperture
+  <br>0x8 = Flash/Aperture
+  <br>0xc = Flash Only</span></td></tr>
+<tr class=b>
+<td class=r title='22 = 0x16'>22.1</td>
+<td>FlashSyncSpeed</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xf0]</span><table class=cols><tr>
+  <td>0x0 = 1/320 s (auto FP)
+  <br>0x10 = 1/250 s (auto FP)
+  <br>0x20 = 1/250 s
+  <br>0x30 = 1/200 s
+  <br>0x40 = 1/160 s
+  <br>0x50 = 1/125 s
+  <br>0x60 = 1/100 s
+  <br>0x70 = 1/80 s
+  <br>0x80 = 1/60 s</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr>
+<td class=r title='22 = 0x16'>22.2</td>
+<td>FlashShutterSpeed</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x0f]</span><table class=cols><tr>
+  <td>0x0 = 1/60 s
+  <br>0x1 = 1/30 s
+  <br>0x2 = 1/15 s
+  <br>0x3 = 1/8 s
+  <br>0x4 = 1/4 s
+  <br>0x5 = 1/2 s</td><td>&nbsp;&nbsp;</td>
+  <td>0x6 = 1 s
+  <br>0x7 = 2 s
+  <br>0x8 = 4 s
+  <br>0x9 = 8 s
+  <br>0xa = 15 s
+  <br>0xb = 30 s</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr class=b>
+<td class=r title='23 = 0x17'>23.1</td>
+<td>FlashControlBuilt-in</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xc0]
+  <br>0x0 = TTL
+  <br>0x40 = Manual
+  <br>0x80 = Repeating Flash
+  <br>0xc0 = Commander Mode</span></td></tr>
+<tr>
+<td class=r title='23 = 0x17'>23.2</td>
+<td>ManualFlashOutput</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1f]</span></td></tr>
+<tr class=b>
+<td class=r title='24 = 0x18'>24.1</td>
+<td>RepeatingFlashOutput</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x70]</span></td></tr>
+<tr>
+<td class=r title='24 = 0x18'>24.2</td>
+<td>RepeatingFlashCount</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x0f]</span></td></tr>
+<tr class=b>
+<td class=r title='25 = 0x19'>25.1</td>
+<td>RepeatingFlashRate</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xf0]</span></td></tr>
+<tr>
+<td class=r title='25 = 0x19'>25.2</td>
+<td>CommanderChannel</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x03]</span></td></tr>
+<tr class=b>
+<td class=r title='27 = 0x1b'>27.1</td>
+<td>CommanderInternalFlash</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xc0]
+  <br>0x0 = TTL
+  <br>0x40 = Manual
+  <br>0x80 = Off</span></td></tr>
+<tr>
+<td class=r title='27 = 0x1b'>27.2</td>
+<td>CommanderInternalManualOutput</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1f]</span></td></tr>
+<tr class=b>
+<td class=r title='28 = 0x1c'>28.1</td>
+<td>CommanderGroupAMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xc0]
+  <br>0x0 = TTL
+  <br>0x40 = Auto Aperture
+  <br>0x80 = Manual
+  <br>0xc0 = Off</span></td></tr>
+<tr>
+<td class=r title='28 = 0x1c'>28.2</td>
+<td>CommanderGroupAManualOutput</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1f]</span></td></tr>
+<tr class=b>
+<td class=r title='29 = 0x1d'>29.1</td>
+<td>CommanderGroupBMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xc0]
+  <br>0x0 = TTL
+  <br>0x40 = Auto Aperture
+  <br>0x80 = Manual
+  <br>0xc0 = Off</span></td></tr>
+<tr>
+<td class=r title='29 = 0x1d'>29.2</td>
+<td>CommanderGroupBManualOutput</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1f]</span></td></tr>
+<tr class=b>
+<td class=r title='30 = 0x1e'>30.1</td>
+<td>ModelingFlash</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x20]
+  <br>0x0 = On
+  <br>0x20 = Off</span></td></tr>
+<tr>
+<td class=r title='30 = 0x1e'>30.2</td>
+<td>CommanderInternalTTLComp</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1f]</span></td></tr>
+<tr class=b>
+<td class=r title='31 = 0x1f'>31.1</td>
+<td>CommanderGroupA_TTL-AAComp</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1f]</span></td></tr>
+<tr>
+<td class=r title='32 = 0x20'>32.1</td>
+<td>CommanderGroupB_TTL-AAComp</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1f]</span></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='SettingsD5000'>NikonCustom SettingsD5000 Tags</a></h2>
 <p>Custom settings for the D5000.</p>
 <blockquote>
@@ -2671,6 +2836,423 @@
   <br>0x20 = Wide Area
   <br>0x40 = Normal Area
   <br>0x60 = Subject Tracking</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SettingsD5100'>NikonCustom SettingsD5100 Tags</a></h2>
+<p>Custom settings for the D5100.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0.1</td>
+<td>AF-CPrioritySelection</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x80]
+  <br>0x0 = Release
+  <br>0x80 = Focus</span></td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1.1</td>
+<td>AFAssist</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x01]
+  <br>0x0 = On
+  <br>0x1 = Off</span></td></tr>
+<tr>
+<td class=r title='3 = 0x3'>3.1</td>
+<td>Beep</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xc0]
+  <br>0x0 = Off
+  <br>0x40 = Low
+  <br>0x80 = High</span></td></tr>
+<tr class=b>
+<td class=r title='3 = 0x3'>3.2</td>
+<td>NoMemoryCard</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x20]
+  <br>0x0 = Release Locked
+  <br>0x20 = Enable Release</span></td></tr>
+<tr>
+<td class=r title='3 = 0x3'>3.3</td>
+<td>ISODisplay</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x08]
+  <br>0x0 = On
+  <br>0x8 = Off</span></td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4.1</td>
+<td>FileNumberSequence</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x08]
+  <br>0x0 = On
+  <br>0x8 = Off</span></td></tr>
+<tr>
+<td class=r title='5 = 0x5'>5.1</td>
+<td>RangeFinder</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x10]
+  <br>0x0 = Off
+  <br>0x10 = On</span></td></tr>
+<tr class=b>
+<td class=r title='5 = 0x5'>5.2</td>
+<td>ReverseIndicators</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x80]
+  <br>0x0 = + 0 -
+  <br>0x80 = - 0 +</span></td></tr>
+<tr>
+<td class=r title='6 = 0x6'>6.1</td>
+<td>EVStepSize</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x40]
+  <br>0x0 = 1/3 EV
+  <br>0x40 = 1/2 EV</span></td></tr>
+<tr class=b>
+<td class=r title='10 = 0xa'>10.1</td>
+<td>ExposureDelayMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x40]
+  <br>0x0 = Off
+  <br>0x40 = On</span></td></tr>
+<tr>
+<td class=r title='12 = 0xc'>12.1</td>
+<td>AutoBracketSet</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xc0]
+  <br>0x0 = Exposure
+  <br>0x40 = WB Bracketing
+  <br>0x80 = Active D-Lighting</span></td></tr>
+<tr class=b>
+<td class=r title='13 = 0xd'>13.1</td>
+<td>TimerFunctionButton</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x38]</span><table class=cols><tr>
+  <td>0x0 = Self-timer
+  <br>0x8 = Release Mode
+  <br>0x10 = Image Quality/Size
+  <br>0x18 = ISO
+  <br>0x20 = White Balance
+  <br>0x28 = Active D-Lighting
+  <br>0x30 = + NEF (RAW)
+  <br>0x38 = Auto Bracketing</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr>
+<td class=r title='16 = 0x10'>16.1</td>
+<td>AELockButton</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x38]
+  <br>0x0 = AE/AF Lock
+  <br>0x8 = AE Lock Only
+  <br>0x10 = AF Lock Only
+  <br>0x18 = AE Lock (hold)
+  <br>0x20 = AF-ON</span></td></tr>
+<tr class=b>
+<td class=r title='17 = 0x11'>17.1</td>
+<td>ShutterReleaseButtonAE-L</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x02]
+  <br>0x0 = Off
+  <br>0x2 = On</span></td></tr>
+<tr>
+<td class=r title='17 = 0x11'>17.2</td>
+<td>CommandDialsReverseRotation</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x80]
+  <br>0x0 = No
+  <br>0x80 = Yes</span></td></tr>
+<tr class=b>
+<td class=r title='18 = 0x12'>18.1</td>
+<td>MeteringTime</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x70]
+  <br>0x0 = 4 s
+  <br>0x10 = 8 s
+  <br>0x20 = 20 s
+  <br>0x30 = 1 min
+  <br>0x40 = 30 min</span></td></tr>
+<tr>
+<td class=r title='18 = 0x12'>18.2</td>
+<td>RemoteOnDuration</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x03]
+  <br>0x0 = 1 min
+  <br>0x1 = 5 min
+  <br>0x2 = 10 min
+  <br>0x3 = 20 min</span></td></tr>
+<tr class=b>
+<td class=r title='19 = 0x13'>19.1</td>
+<td>SelfTimerTime</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xc0]
+  <br>0x0 = 2 s
+  <br>0x40 = 5 s
+  <br>0x80 = 10 s
+  <br>0xc0 = 20 s</span></td></tr>
+<tr>
+<td class=r title='19 = 0x13'>19.2</td>
+<td>SelfTimerShotCount</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x0f]</span></td></tr>
+<tr class=b>
+<td class=r title='20 = 0x14'>20.1</td>
+<td>ImageReviewTime</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xe0]
+  <br>0x0 = 4 s
+  <br>0x20 = 8 s
+  <br>0x40 = 20 s
+  <br>0x60 = 1 min
+  <br>0x80 = 10 min</span></td></tr>
+<tr>
+<td class=r title='20 = 0x14'>20.2</td>
+<td>LiveViewMonitorOffTime</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1c]</span><table class=cols><tr>
+  <td>0x0 = 3 min
+  <br>0x4 = 5 min
+  <br>0x8 = 10 min</td><td>&nbsp;&nbsp;</td>
+  <td>0xc = 15 min
+  <br>0x10 = 20 min
+  <br>0x14 = 30 min</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr class=b>
+<td class=r title='21 = 0x15'>21.1</td>
+<td>PlaybackMenusTime</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xe0]
+  <br>0x0 = 8 s
+  <br>0x20 = 12 s
+  <br>0x40 = 20 s
+  <br>0x60 = 1 min
+  <br>0x80 = 10 min</span></td></tr>
+<tr>
+<td class=r title='23 = 0x17'>23.1</td>
+<td>ManualFlashOutput</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1f]</span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SettingsD5200'>NikonCustom SettingsD5200 Tags</a></h2>
+<p>Custom settings for the D5200.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0.1</td>
+<td>AF-CPrioritySelection</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x80]
+  <br>0x0 = Release
+  <br>0x80 = Focus</span></td></tr>
+<tr class=b>
+<td class=r title='0 = 0x0'>0.2</td>
+<td>NumberOfFocusPoints</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x10]
+  <br>0x0 = 39 Points
+  <br>0x10 = 11 Points</span></td></tr>
+<tr>
+<td class=r title='1 = 0x1'>1.1</td>
+<td>AFAssist</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x01]
+  <br>0x0 = On
+  <br>0x1 = Off</span></td></tr>
+<tr class=b>
+<td class=r title='3 = 0x3'>3.1</td>
+<td>Beep</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xc0]
+  <br>0x0 = Off
+  <br>0x40 = Low
+  <br>0x80 = High</span></td></tr>
+<tr>
+<td class=r title='3 = 0x3'>3.2</td>
+<td>NoMemoryCard</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x20]
+  <br>0x0 = Release Locked
+  <br>0x20 = Enable Release</span></td></tr>
+<tr class=b>
+<td class=r title='3 = 0x3'>3.3</td>
+<td>ISODisplay</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x08]
+  <br>0x0 = On
+  <br>0x8 = Off</span></td></tr>
+<tr>
+<td class=r title='4 = 0x4'>4.1</td>
+<td>FileNumberSequence</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x08]
+  <br>0x0 = On
+  <br>0x8 = Off</span></td></tr>
+<tr class=b>
+<td class=r title='5 = 0x5'>5.1</td>
+<td>RangeFinder</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x04]
+  <br>0x0 = Off
+  <br>0x4 = On</span></td></tr>
+<tr>
+<td class=r title='5 = 0x5'>5.2</td>
+<td>ReverseExposureCompDial</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x10]
+  <br>0x0 = No
+  <br>0x10 = Yes</span></td></tr>
+<tr class=b>
+<td class=r title='5 = 0x5'>5.3</td>
+<td>ReverseShutterSpeedAperture</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x08]
+  <br>0x0 = No
+  <br>0x8 = Yes</span></td></tr>
+<tr>
+<td class=r title='5 = 0x5'>5.4</td>
+<td>ReverseIndicators</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x80]
+  <br>0x0 = + 0 -
+  <br>0x80 = - 0 +</span></td></tr>
+<tr class=b>
+<td class=r title='6 = 0x6'>6.1</td>
+<td>EVStepSize</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x40]
+  <br>0x0 = 1/3 EV
+  <br>0x40 = 1/2 EV</span></td></tr>
+<tr>
+<td class=r title='10 = 0xa'>10.1</td>
+<td>ExposureDelayMode</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x40]
+  <br>0x0 = Off
+  <br>0x40 = On</span></td></tr>
+<tr class=b>
+<td class=r title='12 = 0xc'>12.1</td>
+<td>AutoBracketSet</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xc0]
+  <br>0x0 = Exposure
+  <br>0x40 = WB Bracketing
+  <br>0x80 = Active D-Lighting</span></td></tr>
+<tr>
+<td class=r title='13 = 0xd'>13.1</td>
+<td>FunctionButton</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1f]</span><table class=cols><tr>
+  <td>0x3 = AE/AF Lock
+  <br>0x4 = AE Lock Only
+  <br>0x6 = AE Lock (hold)
+  <br>0x7 = AF Lock Only
+  <br>0x8 = AF-ON
+  <br>0x10 = + NEF (RAW)
+  <br>0x12 = Active D-Lighting
+  <br>0x19 = Live View
+  <br>0x1a = Image Quality
+  <br>0x1b = ISO
+  <br>0x1c = White Balance
+  <br>0x1d = HDR
+  <br>0x1e = Auto Bracketing
+  <br>0x1f = AF-area Mode</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr class=b>
+<td class=r title='16 = 0x10'>16.1</td>
+<td>AELockButton</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x0f]
+  <br>0x3 = AE/AF Lock
+  <br>0x4 = AE Lock Only
+  <br>0x6 = AE Lock (hold)
+  <br>0x7 = AF Lock Only
+  <br>0x8 = AF-ON</span></td></tr>
+<tr>
+<td class=r title='17 = 0x11'>17.1</td>
+<td>ShutterReleaseButtonAE-L</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x02]
+  <br>0x0 = Off
+  <br>0x2 = On</span></td></tr>
+<tr class=b>
+<td class=r title='18 = 0x12'>18.1</td>
+<td>StandbyTimer</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xe0]
+  <br>0x0 = 4 s
+  <br>0x20 = 8 s
+  <br>0x40 = 20 s
+  <br>0x60 = 1 min
+  <br>0x80 = 30 min</span></td></tr>
+<tr>
+<td class=r title='18 = 0x12'>18.2</td>
+<td>RemoteOnDuration</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x03]
+  <br>0x0 = 1 min
+  <br>0x1 = 5 min
+  <br>0x2 = 10 min
+  <br>0x3 = 15 min</span></td></tr>
+<tr class=b>
+<td class=r title='19 = 0x13'>19.1</td>
+<td>SelfTimerTime</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xc0]
+  <br>0x0 = 2 s
+  <br>0x40 = 5 s
+  <br>0x80 = 10 s
+  <br>0xc0 = 20 s</span></td></tr>
+<tr>
+<td class=r title='19 = 0x13'>19.2</td>
+<td>SelfTimerShotCount</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x0f]</span></td></tr>
+<tr class=b>
+<td class=r title='20 = 0x14'>20.1</td>
+<td>ImageReviewTime</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xe0]
+  <br>0x20 = 4 s
+  <br>0x40 = 8 s
+  <br>0x80 = 20 s
+  <br>0xa0 = 1 min
+  <br>0xe0 = 10 min</span></td></tr>
+<tr>
+<td class=r title='20 = 0x14'>20.2</td>
+<td>LiveViewMonitorOffTime</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1c]
+  <br>0x4 = 5 min
+  <br>0x8 = 10 min
+  <br>0xc = 15 min
+  <br>0x10 = 20 min
+  <br>0x14 = 30 min</span></td></tr>
+<tr class=b>
+<td class=r title='21 = 0x15'>21.1</td>
+<td>PlaybackMenusTime</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xe0]
+  <br>0x20 = 8 s
+  <br>0x80 = 20 s
+  <br>0xa0 = 1 min
+  <br>0xc0 = 5 min
+  <br>0xe0 = 10 min</span></td></tr>
+<tr>
+<td class=r title='23 = 0x17'>23.1</td>
+<td>InternalFlash</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0xc0]
+  <br>0x0 = TTL
+  <br>0x40 = Manual</span></td></tr>
+<tr class=b>
+<td class=r title='23 = 0x17'>23.2</td>
+<td>ManualFlashOutput</td>
+<td class=c>int8u</td>
+<td><span class=s>[Mask 0x1f]</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SettingsD7000'>NikonCustom SettingsD7000 Tags</a></h2>
@@ -3247,7 +3829,7 @@
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 26, 2011</i>
+<br><i>Last revised Mar 23, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

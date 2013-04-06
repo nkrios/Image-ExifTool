@@ -40,6 +40,7 @@ ol.index { margin: 0; padding: 0 0 0 2em }
 <li><a href="#Q22">Order of operations</a></li>
 <li><a href="#Q23">"0 image files updated"</a></li>
 <li><a href="#Q24">Date/time gets reset to today</a></li>
+<li><a href="#Q25">Image validation</a></li>
 </ol>
 </div>
 
@@ -172,7 +173,9 @@ date/time values when writing, and will attempt to reformat any values into the
 standard format unless the <code>-n</code> option is used.  Any separators may
 be used (or in fact, none at all).  The first 4 consecutive digits found in the
 value are interpreted as the year, then next 2 digits are the month, and so on.
-For EXIF date/time values, all 6 date/time fields must exist
+<i class=lt>[The year must be 4 digits.  Other fields are expected to be 2
+digits, but a single digit is allowed if the subsequent character is a
+non-digit.]</i>  For EXIF date/time values, all 6 date/time fields must exist
 ("<code>YYYYmmddHHMMSS</code>"), but XMP date/time values require only the year
 ("<code>YYYY</code>").  This feature facilitates useful operations such as
 setting date/time tags from a date embedded in the file name.  For example, the
@@ -578,10 +581,11 @@ encoding and converts this to UTF&#8209;8, but the internal and external
 character sets may be specified with <code>-charset Photoshop=CHARSET</code>
 and <code>-charset CHARSET</code> respectively.</blockquote>
 
-<blockquote><b>QuickTime</b>: QuickTime text strings may be stored in a variety
-of poorly document formats.  ExifTool does its best to decode these according to
-the <code>-charset</code> option setting.  For some QuickTime strings, ExifTool
-assumes a default encoding of MacRoman, but this may be changed with
+<blockquote><b>QuickTime</b>: QuickTime text strings may be stored in a
+variety of poorly documented formats, and ExifTool does its best to decode
+these according to the <code>-charset</code> option setting.  For some
+QuickTime strings where the internal encoding is not known, ExifTool assumes
+a default encoding of MacRoman, but this may be changed with
 "<code>-charset QuickTime=CHARSET</code>".</blockquote>
 
 <blockquote><b>AIFF</b>: AIFF strings are assumed to be stored in MacRoman, and
@@ -878,8 +882,8 @@ coordinate styles to the proper format for the specific tag used.
 doesn't properly update offsets in the MakerNotes when rewriting an image. These
 offsets are used as pointers to reference tag values and structures within the
 metadata, and errors like this may lead to missing or incorrect values for some
-makernote tags.  In many cases, ExifTool will detect this type of problem and
-issue a warning like this:
+MakerNotes tags.  In many cases, ExifTool will detect this type of problem and
+issue a warning like this when reading (or an error when writing):
 
 <pre>Warning: [minor] Possibly incorrect maker notes offsets (fix by -340?)
 </pre>
@@ -888,29 +892,51 @@ issue a warning like this:
 option must be used to see them all, since by default only one warning is
 displayed per file.]</i> </blockquote>
 
-<blockquote> If this warning occurs, you can use the <code>-F</code> option to
-attempt to fix the problem.  If no value is specified with <code>-F</code>, the
-suggested fix is applied (ie. in this example a value of "-340" is suggested, so
-here <code>-F</code> would be equivalent to <code>-F-340</code>). See the
-<a href="exiftool_pod.html#item__2df_5boffset_5d__28_2dfixbase_29">-F option
-documentation</a> for details.</blockquote>
+<blockquote>This is a particularly insidious problem that is sometimes difficult
+for ExifTool to correct automagically, so it requires some operator
+intervention.  If this warning occurs, you have a few alternatives:</blockquote>
 
-<blockquote>When writing, <code>-F</code> applies a permanent
-correction to the maker notes.  Note that <u>some Makernote information may be lost
-permanently if the proper correction is not applied when writing images with
-this problem</u>.</blockquote>
+<blockquote>1) Use the <code>-F</code> option to allow ExifTool to attempt to
+fix the incorrect offsets.  If ExifTool was correct in its diagnosis, then this
+option will fix the incorrect offsets.  This is usually the appropriate choice
+if this problem was caused by editing the image with other
+software.</blockquote>
 
-<blockquote>Any error that occurs while writing will prevent the file from being
-written.  However, most Makernote errors are designated as <b>minor</b>, which
-allows them to be ignored by using the <code>-m</code> option.  For example:
+<blockquote>2) Use the <code>-m</code> option to ignore the warning (or downgrade
+the error to a warning when writing).  This causes ExifTool to honour the
+existing maker note offsets, and may be the correct choice if images straight
+out of the camera have this problem.</blockquote>
+
+<blockquote>Often, the first choice (<code>-F</code>) is the right thing to do,
+but this depends on many factors, so it is best to try both methods then compare
+the resulting maker note information to see which works best for your
+situation.</blockquote>
+
+<blockquote>When writing, <code>-F</code> applies a permanent correction to the
+maker notes.  Note that <u>some MakerNote information may be lost permanently
+if the proper correction is not applied when writing images with this
+problem</u>.</blockquote>
+
+<blockquote>3) The third alternative is to adjust the maker note offsets by a
+specific amount.  This is done by appending an integer to the <code>-F</code>
+option. For example, with the warning above (where ExifTool suggests "fix by
+-340?"), <code>-F</code> would be equivalent to <code>-F-340</code>.  See the
+<a href="exiftool_pod.html#f_offset_fixbase">-F option documentation</a> for
+more details.  This advanced feature may require some technical knowledge about
+the structure of EXIF information (and here, ExifTool's <code>-htmlDump</code>
+feature may be very useful for visualizing this structure).</blockquote>
+
+<blockquote>Other types of MakerNote errors may also prevent the file from
+being written.  However, most MakerNote errors are designated as <b>minor</b>,
+which allows them to be ignored by using the <code>-m</code> option.  For
+example:
 
 <pre>Error: [minor] Bad format (65535) for MakerNotes entry 17
 </pre>
 
 Using <code>-m</code> will downgrade the minor error to a warning, allowing the
-file to be written, but <u>some Makernote information may be lost when
-ignoring certain types of errors like this</u>.
-</blockquote>
+file to be written, but <u>some MakerNote information may be lost when ignoring
+certain types of errors like this</u>. </blockquote>
 
 <a name="Q16"></a>
 <p>16. <b>"Why doesn't ExifTool rename my AVI files?"</b></p>
@@ -1093,9 +1119,28 @@ code pages.</blockquote>
 display numeric values (<code>-n</code>), escape special HTML characters
 (<code>-E</code>), and change the date/time (<code>-d</code>) and GPS coordinate
 (<code>-c</code>) formats, but sometimes more control is needed over the
-formatting of a value.  In this case, user-defined Composite tags may be used to
-define custom formatting on a per-tag basis.  Here is a basic config file
-example to illustrate the idea:
+formatting of a value...</blockquote>
+
+<blockquote>The <code>-p</code> and <code>-tagsFromFile</code> options provide
+an advanced translation feature that allows arbitrary Perl expressions to be
+used to modify tag values.  The basic syntax is this:
+
+<pre>${TAG;EXPR}</pre>
+
+where <code>TAG</code> is the tag name, and <code>EXPR</code> is a Perl
+expression acting on the default input variable (<code>$_</code>), which is
+initially the original value of the tag.  For example, the following command
+sets the FileName from Artist, translating spaces to underlines:
+
+<pre>exiftool '-filename&lt;${artist;tr/ /_/}.%e' image.jpg</pre>
+
+(Note: Use single quotes as above in Mac/Linux, or double quotes instead
+in Windows.)</blockquote>
+
+<blockquote>Another technique is to create a user-defined Composite tag to do
+the reformatting. Here is a basic config file that reformats the Artist tag to
+provide a new MyArtist tag with the same character translation as the example
+above:
 
 <pre>%Image::ExifTool::UserDefined = (
    'Image::ExifTool::Composite' => {
@@ -1108,13 +1153,11 @@ example to illustrate the idea:
 1; # end
 </pre>
 
-The above config file defines a new tag called "MyArtist" which takes its value
-from the "Artist" tag after converting spaces to underlines. So, for example,
-an Artist value of "Phil Harvey" yields a corresponding MyArtist value of
-"Phil_Harvey".  The ValueConv string may be any valid Perl expression, and is
-evaluated to obtain the value for the new tag.  In this expression,
-<code>$val</code> represents the ValueConv value of the Require'd tag.
-</blockquote>
+With this config file, an Artist value of "Phil Harvey" yields a corresponding
+MyArtist value of "Phil_Harvey".  The ValueConv string may be any valid Perl
+expression, and is evaluated to obtain the value for the new tag.  In this
+expression, <code>$val</code> represents the ValueConv value of the Require'd
+tag. </blockquote>
 
 <blockquote>To activate the config file, it must be named
 "<code>.ExifTool_config</code>" and placed either in your home directory or in
@@ -1122,11 +1165,6 @@ the same directory as the exiftool application. Note that the file name begins
 with a "<code>.</code>", so if you are in Windows or on a Mac you may need to
 rename the file from the command line since the GUI might not like file names
 beginning with a "<code>.</code>".</blockquote>
-
-<blockquote>Often user-defined Composite tags are used to reformat values for
-writing with a command-line argument like "<code>-DSTTAG&lt;MyArtist</code>"
-(where <code>DSTTAG</code> is the name of any writable tag, even the original
-Artist tag or the FileName).</blockquote>
 
 <blockquote>User-defined Composite tags have many other features, including the
 ability to combine the values of multiple tags.  See the
@@ -1143,7 +1181,8 @@ lib/Image/ExifTool/Exif.pm source code.
 <a name="Q20"></a>
 <p>20. <b>"ExifTool won't write an image due to errors"</b></p>
 
-<blockquote>Minor errors may be ignored using the <code>-m</code> option, but
+<blockquote>Minor errors may be ignored using the <code>-m</code> option
+(<a href="#Q15">FAQ 15</a> discusses this with respect to MakerNote errors), but
 sometimes there are more serious errors which can't be ignored.  ExifTool may be
 used to fix metadata problems in JPEG images by deleting all metadata and
 rebuilding it from scratch.  The command looks like this:
@@ -1153,7 +1192,7 @@ rebuilding it from scratch.  The command looks like this:
 
 where "<code>bad.jpg</code>" is the name of the image that requires fixing. This
 command deletes all metadata then copies all writable tags that can be extracted
-from the original image to the same locations in the new image.  The
+from the original image to the same locations in the updated image.  The
 "<code>Unsafe</code>" tag is a <a href="TagNames/Shortcuts.html">shortcut</a>
 for unsafe EXIF tags in JPEG images which are not normally copied.</blockquote>
 
@@ -1330,12 +1369,11 @@ reported in square brackets for each tag.  Tags labelled "File:System" are
 stored in the filesystem, while other tags are stored in the location indicated
 inside the metadata of the file itself.</blockquote>
 
-<blockquote>ExifTool's default behaviour is to set all filesystem times to the
-current date/time when any metadata in a file is changed, but the
-<code>-P</code> option may be used to preserve the original FileModifyDate.
-FileAccessDate represents the time the file was last accessed, and is set to the
-current date/time whenever any software (including ExifTool) accesses the file.
-</blockquote>
+<blockquote>ExifTool's <b>default behaviour is to set all filesystem times to
+the current date/time when writing</b>, but the <code>-P</code> option may be
+used to preserve the original FileModifyDate. FileAccessDate represents the time
+the file was last accessed, and is set to the current date/time whenever any
+software (including ExifTool) accesses the file.</blockquote>
 
 <blockquote>On systems where a filesystem creation date is maintained, ExifTool
 also sets this to the current date/time when the file is edited.  On Windows the
@@ -1345,8 +1383,8 @@ Mac/Linux FileInodeChangeDate is available instead of FileCreateDate, and the
 only way to preserve the file creation date is with the
 <code>-overwrite_original_in_place</code> option.</blockquote>
 
-<blockquote>For example, commands like the following act on common metadata
-tags, setting the filesystem modification date/time to the current date/time:
+<blockquote>For example, commands like this act on common metadata tags, setting
+the filesystem modification date/time to the current date/time:
 
 <pre><span class='blk'># common metadata date/time tags are incremented by 1 hour, while
 # FileModifyDate is set to the current date/time</span>
@@ -1373,8 +1411,17 @@ exiftool -alldates+=1 -filemodifydate+=1 c:\images
 exiftool -alldates+=1 "-filemodifydate&lt;datetimeoriginal" c:\images
 </pre></blockquote>
 
+<a name="Q25"></a>
+<p>25. <b>"Can ExifTool be used as an image validator?"</b></p>
+
+<blockquote>ExifTool is <u>not</u> designed as an image validator.  It does issue
+warnings about some of the more important problems in the metadata when
+reading, and will often catch more problems when writing, but it does not
+attempt to do a full validation.  If you are looking for a validator,
+try <a href="http://jhove.sourceforge.net">JHOVE</a>.</blockquote>
+
 <hr>
-<i>Last revised Dec 21, 2012</i>
+<i>Last revised Mar 19, 2013</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

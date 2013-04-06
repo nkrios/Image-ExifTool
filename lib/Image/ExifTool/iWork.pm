@@ -16,7 +16,7 @@ use Image::ExifTool::ZIP;
 
 $VERSION = '1.02';
 
-# test for recognized iWork document extensions and outter XML elements
+# test for recognized iWork document extensions and outer XML elements
 my %iWorkType = (
     # file extensions
     NUMBERS => 'Apple Numbers',
@@ -26,7 +26,7 @@ my %iWorkType = (
     NMBTEMPLATE => 'Apple Numbers Template',
     # we don't support double extensions --
     # "PAGES.TEMPLATE" => 'Apple Pages Template',
-    # outter XML elements
+    # outer XML elements
     'ls:document' => 'Apple Numbers',
     'sl:document' => 'Apple Pages',
     'key:presentation' => 'Apple Keynote',

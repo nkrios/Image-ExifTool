@@ -693,6 +693,15 @@ $VERSION = '1.07';
    'InteropOffset' => '互用指针',
    'InteropVersion' => '互用版本',
    'JFIFVersion' => 'JFIF 版本',
+   'JPEGQuality' => {
+      Description => '图像质量',
+      PrintConv => {
+        'Extra Fine' => '超精细',
+        'Fine' => '精细',
+        'Standard' => '标准画质',
+        'n/a' => '未设置',
+      },
+    },
    'Keyword' => '关键词',
    'Keywords' => '关键字',
    'Lens' => '镜头',

@@ -105,7 +105,7 @@ sub ProcessMPC($$)
         my %dirInfo = ( DataPt => \$buff, DataPos => $pos );
         $exifTool->ProcessDirectory(\%dirInfo, $tagTablePtr);
     } else {
-        $exifTool->Warn('Audio info not currently extracted from this version MPC file');
+        $exifTool->Warn('Audio info currently not extracted from this version MPC file');
     }
 
     # process APE trailer if it exists

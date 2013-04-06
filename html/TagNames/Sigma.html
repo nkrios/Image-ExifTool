@@ -7,10 +7,10 @@
 </head>
 <body>
 <h2 class=top>Sigma Tags</h2>
-<p>
-These tags are used in Sigma/Foveon cameras.  Many tags are not consistent
-between different models.
-</p>
+<p>These tags are written by Sigma/Foveon cameras.  In the early days Sigma was
+a class leader by releasing their maker note specification to the public,
+but since then they have deviated from this standard and newer camera models
+are less than consistent about their metadata formats.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -163,39 +163,62 @@ this for PreviewImageLength)</span></span></td></tr>
 <td>PreviewImageSize
   <br>PreviewImageStart</td>
 <td class=c title=' * = Protected'>int16u[2]<br>int32u*</td>
-<td><span class=s><span class=n>(PreviewImageStart for the SD1, PreviewImageSize for other models)</span></span></td></tr>
+<td><span class=s><span class=n>(PreviewImageStart for the SD1 and Merrill models, and PreviewImageSize for
+others)</span></span></td></tr>
 <tr>
 <td title='0x001d = 29'>0x001d</td>
 <td>MakerNoteVersion
   <br>PreviewImageLength</td>
 <td class=c title=' * = Protected'>undef<br>int32u*</td>
-<td><span class=s><span class=n>(PreviewImageLength for the SD1, MakerNoteVersion for other models)</span></span></td></tr>
+<td><span class=s><span class=n>(PreviewImageLength for the SD1 and Merrill models, and MakerNoteVersion for
+others)</span></span></td></tr>
 <tr class=b>
+<td title='0x001e = 30'>0x001e</td>
+<td>PreviewImageSize</td>
+<td class=c>int16u[2]</td>
+<td><span class=s><span class=n>(only valid for some models)</span></span></td></tr>
+<tr>
 <td title='0x001f = 31'>0x001f</td>
 <td>AFPoint
   <br>MakerNoteVersion</td>
 <td class=c>string<br>undef</td>
-<td><span class=s><span class=n>(MakerNoteVersion for the SD1, AFPoint for other models)</span></span></td></tr>
-<tr>
+<td><span class=s><span class=n>(MakerNoteVersion for the SD1 and Merrill models, and AFPoint for others)</span></span></td></tr>
+<tr class=b>
 <td title='0x0022 = 34'>0x0022</td>
 <td>FileFormat</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
-<tr class=b>
+<td><span class=s><span class=n>(models other than the SD1 and Merrill models)</span></span></td></tr>
+<tr>
 <td title='0x0024 = 36'>0x0024</td>
 <td>Calibration</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
-<tr>
+<td><span class=s><span class=n>(models other than the SD1 and Merrill models)</span></span></td></tr>
+<tr class=b>
 <td title='0x0026 = 38'>0x0026</td>
 <td>FileFormat</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
+<tr>
+<td title='0x0027 = 39'>0x0027</td>
+<td>LensType</td>
+<td class=c>string</td>
+<td>--&gt; <a href='Sigma.html#LensType'>Sigma LensType Values</a>
+  <br><span class='n s'>(SD1 and Merrill models only)</span></td></tr>
+<tr class=b>
+<td title='0x002a = 42'>0x002a</td>
+<td>LensFocalRange</td>
+<td class=c>rational64u[2]</td>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
+<tr>
+<td title='0x002b = 43'>0x002b</td>
+<td>LensMaxApertureRange</td>
+<td class=c>rational64u[2]</td>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
 <tr class=b>
 <td title='0x002c = 44'>0x002c</td>
 <td>ColorMode</td>
 <td class=c>int32u</td>
-<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span><table class=cols><tr>
+<td><span class=s><span class=n>(not valid for some models)</span></span><table class=cols><tr>
   <td>0 = n/a
   <br>1 = Sepia
   <br>2 = B&amp;W
@@ -210,54 +233,54 @@ this for PreviewImageLength)</span></span></td></tr>
 <td>LensApertureRange
   <br>Calibration</td>
 <td class=c>string<br>string</td>
-<td><span class=s><span class=n>(Calibration for the SD1 and DP1/DP2 Merrill, LensApertureRange for other
-models.  Note that LensApertureRange changes with focal length, and some
+<td><span class=s><span class=n>(Calibration for the SD1 and Merrill models, and LensApertureRange for
+others. Note that LensApertureRange changes with focal length, and some
 models report the maximum aperture here)</span></span></td></tr>
 <tr class=b>
 <td title='0x0031 = 49'>0x0031</td>
 <td>FNumber</td>
 <td class=c>rational64u</td>
-<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and Merrill models)</span></span></td></tr>
 <tr>
 <td title='0x0032 = 50'>0x0032</td>
 <td>ExposureTime</td>
 <td class=c>rational64u</td>
-<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and Merrill models)</span></span></td></tr>
 <tr class=b>
 <td title='0x0033 = 51'>0x0033</td>
 <td>ExposureTime2</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(models other than the SD1, SD9 and SD15)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1, SD9, SD15 and Merrill models)</span></span></td></tr>
 <tr>
 <td title='0x0034 = 52'>0x0034</td>
 <td>BurstShot</td>
 <td class=c>int32u</td>
-<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and Merrill models)</span></span></td></tr>
 <tr class=b>
 <td title='0x0035 = 53'>0x0035</td>
 <td>ExposureCompensation</td>
 <td class=c>rational64s</td>
-<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and Merrill models)</span></span></td></tr>
 <tr>
 <td title='0x0039 = 57'>0x0039</td>
 <td>SensorTemperature</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and Merrill models)</span></span></td></tr>
 <tr class=b>
 <td title='0x003a = 58'>0x003a</td>
 <td>FlashExposureComp</td>
 <td class=c>rational64s</td>
-<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and Merrill models)</span></span></td></tr>
 <tr>
 <td title='0x003b = 59'>0x003b</td>
 <td>Firmware</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and Merrill models)</span></span></td></tr>
 <tr class=b>
 <td title='0x003c = 60'>0x003c</td>
 <td>WhiteBalance</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(models other than the SD1 and DP1/DP2 Merrill)</span></span></td></tr>
+<td><span class=s><span class=n>(models other than the SD1 and Merrill models)</span></span></td></tr>
 <tr>
 <td title='0x003d = 61'>0x003d</td>
 <td>PictureMode</td>
@@ -267,57 +290,83 @@ models report the maximum aperture here)</span></span></td></tr>
 <td title='0x0048 = 72'>0x0048</td>
 <td>LensApertureRange</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
 <tr>
 <td title='0x0049 = 73'>0x0049</td>
 <td>FNumber</td>
 <td class=c>rational64u</td>
-<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
 <tr class=b>
 <td title='0x004a = 74'>0x004a</td>
 <td>ExposureTime</td>
 <td class=c>rational64u</td>
-<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
 <tr>
 <td title='0x004b = 75'>0x004b</td>
 <td>ExposureTime2</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
 <tr class=b>
 <td title='0x004d = 77'>0x004d</td>
 <td>ExposureCompensation</td>
 <td class=c>rational64s</td>
-<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
 <tr>
 <td title='0x0055 = 85'>0x0055</td>
 <td>SensorTemperature</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
 <tr class=b>
 <td title='0x0056 = 86'>0x0056</td>
 <td>FlashExposureComp</td>
 <td class=c>rational64s</td>
-<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
 <tr>
 <td title='0x0057 = 87'>0x0057</td>
 <td>Firmware</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
 <tr class=b>
 <td title='0x0058 = 88'>0x0058</td>
 <td>WhiteBalance</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
 <tr>
 <td title='0x0059 = 89'>0x0059</td>
 <td>DigitalFilter</td>
 <td class=c>string</td>
-<td><span class=s><span class=n>(SD1 and DP1/DP2 Merrill only)</span></span></td></tr>
+<td><span class=s><span class=n>(SD1 and Merrill models only)</span></span></td></tr>
 </table></td></tr></table></blockquote>
+
+<h2><a name='LensType'>Sigma LensType Values</a></h2>
+<p>Decimal values have been added to differentiate lenses which would otherwise
+have the same LensType, and are used by the Composite LensID tag when
+attempting to identify the specific lens model.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class='inner sep' cellspacing=1>
+<tr class=h><th>Value</th><th>LensType</th><th>Value</th><th>LensType</th></tr>
+<tr><td>16</td><td>= Sigma 18-50mm F3.5-5.6 DC</td>
+<td class=b>169</td><td class=b>= Sigma 18-50mm F2.8 EX DC</td>
+</tr><tr><td>129</td><td>= Sigma 14mm F2.8 EX Aspherical</td>
+<td class=b>581</td><td class=b>= Sigma 18-50mm F2.8 EX DC Macro</td>
+</tr><tr><td>131</td><td>= Sigma 17-70mm F2.8-4.5 DC Macro</td>
+<td class=b>583</td><td class=b>= Sigma 17-50mm F2.8 EX DC OS</td>
+</tr><tr><td>145</td><td>= Sigma Lens (145)</td>
+<td class=b>1003</td><td class=b>= Sigma 19mm F2.8</td>
+</tr><tr><td>145.1</td><td>= Sigma 15-30mm F3.5-4.5 EX DG Aspherical</td>
+<td class=b>1004</td><td class=b>= Sigma 30mm F2.8</td>
+</tr><tr><td>145.2</td><td>= Sigma 18-50mm F2.8 EX DG</td>
+<td class=b>1005</td><td class=b>= Sigma 50mm F2.8 Macro</td>
+</tr><tr><td>145.3</td><td>= Sigma 20-40mm F2.8 EX DG</td>
+<td class=b>8900</td><td class=b>= Sigma 70-300mm F4-5.6 DG OS</td>
+</tr><tr><td>165</td><td>= Sigma 70-200mm F2.8 EX</td>
+<td class=b>'A100'</td><td class=b>= Sigma 24-70mm F2.8 DG Macro</td>
+</tr></table></td></tr></table></blockquote>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 13, 2012</i>
+<br><i>Last revised Feb 22, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

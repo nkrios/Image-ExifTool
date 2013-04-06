@@ -27,7 +27,7 @@ use vars qw($VERSION $RELEASE @ISA @EXPORT_OK %EXPORT_TAGS $AUTOLOAD @fileTypes
             %mimeType $swapBytes $swapWords $currentByteOrder %unpackStd
             %jpegMarker %specialTags);
 
-$VERSION = '9.13';
+$VERSION = '9.25';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -35,6 +35,7 @@ $RELEASE = '';
     Public => [qw(
         ImageInfo GetTagName GetShortcuts GetAllTags GetWritableTags
         GetAllGroups GetDeleteGroups GetFileType CanWrite CanCreate
+        AddUserDefinedTags
     )],
     # exports not part of the public API, but used by ExifTool modules:
     DataAccess => [qw(
@@ -72,11 +73,11 @@ sub GetWritableTags(;$);
 sub GetAllGroups($);
 sub GetNewGroups($);
 sub GetDeleteGroups();
+sub AddUserDefinedTags($%);
 # non-public routines below
 sub InsertTagValues($$$;$);
 sub IsWritable($);
 sub GetNewFileName($$);
-sub NextTagKey($$);
 sub LoadAllTables();
 sub GetNewTagInfoList($;$);
 sub GetNewTagInfoHash($@);
@@ -165,8 +166,8 @@ $defaultLang = 'en';    # default language
 @fileTypes = qw(JPEG CRW TIFF GIF MRW RAF X3F JP2 PNG MIE MIFF PS PDF PSD XMP
                 BMP PPM RIFF AIFF ASF MOV MPEG Real SWF PSP FLV OGG FLAC APE MPC
                 MKV MXF DV PMP IND PGF ICC ITC HTML VRD RTF XCF QTIF FPX PICT
-                ZIP GZIP RAR BZ2 TAR RWZ EXE EXR HDR CHM LNK WMF DEX RAW Font
-                RSRC M2TS PHP MP3 DICM PCD);
+                ZIP GZIP PLIST RAR BZ2 TAR RWZ EXE EXR HDR CHM LNK WMF DEX RAW
+                Font RSRC M2TS PHP MP3 DICM PCD);
 
 # file types that we can write (edit)
 my @writeTypes = qw(JPEG TIFF GIF CRW MRW ORF RAF RAW PNG MIE PSD XMP PPM
@@ -305,7 +306,7 @@ my %fileTypeLookup = (
     MKS  => ['MKV',  'Matroska Subtitle'],
     MKV  => ['MKV',  'Matroska Video'],
     MNG  => ['PNG',  'Multiple-image Network Graphics'],
-  # MODD => ['PLIST','Sony Picture Motion Metadata'],
+    MODD => ['PLIST','Sony Picture Motion metadata'],
     MOS  => ['TIFF', 'Creo Leaf Mosaic'],
     MOV  => ['MOV',  'Apple QuickTime movie'],
     MP3  => ['MP3',  'MPEG-1 Layer 3 audio'],
@@ -356,7 +357,7 @@ my %fileTypeLookup = (
     PHPS =>  'PHP',
     PHTML=>  'PHP',
     PICT => ['PICT', 'Apple PICTure'],
-  # PLIST=> ['PLIST','Apple Property List'],
+    PLIST=> ['PLIST','Apple Property List'],
     PMP  => ['PMP',  'Sony DSC-F1 Cyber-Shot PMP'], # should stand for Proprietery Metadata Package ;)
     PNG  => ['PNG',  'Portable Network Graphics'],
     POT  => ['FPX',  'Microsoft PowerPoint Template'],
@@ -444,7 +445,6 @@ my %fileTypeLookup = (
 # descriptions for file types not found in above file extension lookup
 my %fileDescription = (
     DICOM => 'Digital Imaging and Communications in Medicine',
-    PLIST => 'Property List',
     XML   => 'Extensible Markup Language',
     'DJVU (multi-page)' => 'DjVu multi-page image',
     'Win32 EXE' => 'Windows 32-bit Executable',
@@ -516,6 +516,7 @@ my %fileDescription = (
     LNK  => 'application/octet-stream',
     M2T  => 'video/mpeg',
     M2TS => 'video/m2ts',
+    M4P  => 'audio/m4p',
     MEF  => 'image/x-mamiya-mef',
     MIE  => 'application/x-mie',
     MIFF => 'application/x-magick-image',
@@ -554,7 +555,7 @@ my %fileDescription = (
     PHP  => 'application/x-httpd-php',
     PCD  => 'image/x-photo-cd',
     PICT => 'image/pict',
-    PLIST=> 'application/xml',
+    PLIST=> 'application/xml', # (binary PLIST format is 'application/x-plist', recognized at run time)
     PNG  => 'image/png',
     POT  => 'application/vnd.ms-powerpoint',
     POTM => 'application/vnd.ms-powerpoint.template.macroEnabled',
@@ -640,7 +641,6 @@ my %moduleName = (
     HDR  => 'Radiance',
     JP2  => 'Jpeg2000',
     JPEG => '',
-  # MODD => 'XML',
     MOV  => 'QuickTime',
     MKV  => 'Matroska',
     MP3  => 'ID3',
@@ -649,7 +649,6 @@ my %moduleName = (
     ORF  => 'Olympus',
     PCD  => 'PhotoCD',
     PHP  => 0,
-  # PLIST=> 'XML',
     PMP  => 'Sony',
     PS   => 'PostScript',
     PSD  => 'Photoshop',
@@ -720,6 +719,7 @@ my %moduleName = (
     PGF  => 'PGF',
     PHP  => '<\?php\s',
     PICT => '(.{10}|.{522})(\x11\x01|\x00\x11)',
+    PLIST=> '(bplist0|\s*<|\xfe\xff\x00)',
     PMP  => '.{8}\0{3}\x7c.{112}\xff\xd8\xff\xdb',
     PNG  => '(\x89P|\x8aM|\x8bJ)NG\r\n\x1a\n',
     PPM  => 'P[1-6]\s+',
@@ -786,7 +786,7 @@ my %allGroupsExifTool = ( 0 => 'ExifTool', 1 => 'ExifTool', 2 => 'ExifTool' );
 %specialTags = (
     TABLE_NAME     =>1, SHORT_NAME =>1, PROCESS_PROC =>1, WRITE_PROC =>1, CHECK_PROC =>1,
     GROUPS         =>1, FORMAT     =>1, FIRST_ENTRY  =>1, TAG_PREFIX =>1, PRINT_CONV =>1,
-    WRITABLE       =>1, TABLE_DESC =>1, NOTES        =>1, IS_OFFSET  =>1, IS_SUBDIR  =>1, 
+    WRITABLE       =>1, TABLE_DESC =>1, NOTES        =>1, IS_OFFSET  =>1, IS_SUBDIR  =>1,
     EXTRACT_UNKNOWN=>1, NAMESPACE  =>1, PREFERRED    =>1, SRC_TABLE  =>1, PRIORITY   =>1,
     WRITE_GROUP    =>1, LANG_INFO  =>1, VARS         =>1, DATAMEMBER =>1, SET_GROUP1 =>1,
 );
@@ -879,7 +879,7 @@ sub DummyWriteProc { return 1; }
     ResourceForkSize => {
         Groups => { 1 => 'System' },
         Notes => q{
-            [Mac OS only] size of the file's resource fork if it contains data.  If this
+            size of the file's resource fork if it contains data.  Mac OS only.  If this
             tag is generated the ExtractEmbedded option may be used to extract
             resource-fork information as a sub-document.  When writing, the resource
             fork is preserved by default, but it may be deleted with C<-rsrc:all=> on
@@ -1530,6 +1530,7 @@ sub ClearOptions($)
         TextOut     => \*STDOUT,# file for Verbose/HtmlDump output
         Unknown     => 0,       # flag to get values of unknown tags (0-2)
         Verbose     => 0,       # print verbose messages (0-5, higher # = more verbose)
+        WriteMode   => 'wcg',   # enable all write modes by default
         XMPAutoConv => 1,       # automatic conversion of unknown XMP tag values
     };
     # keep necessary member variables in sync with options
@@ -1556,7 +1557,7 @@ sub ExtractInfo($;@)
     local $_;
     my $self = shift;
     my $options = $self->{OPTIONS};     # pointer to current options
-    my (%saveOptions, $reEntry, $rsize);
+    my (%saveOptions, $reEntry, $rsize, $type);
 
     # check for internal ReEntry option to allow recursive calls to ExtractInfo
     if (ref $_[1] eq 'HASH' and $_[1]{ReEntry} and
@@ -1577,15 +1578,15 @@ sub ExtractInfo($;@)
     } else {
         if (defined $_[0] or $options->{HtmlDump}) {
             %saveOptions = %$options;       # save original options
-    
+
             # require duplicates for html dump
             $self->Options(Duplicates => 1) if $options->{HtmlDump};
-    
+
             if (defined $_[0]) {
                 # only initialize filename if called with arguments
                 $self->{FILENAME} = undef;  # name of file (or '' if we didn't open it)
                 $self->{RAF} = undef;       # RandomAccess object reference
-    
+
                 $self->ParseArguments(@_);  # initialize from our arguments
             }
         }
@@ -1692,7 +1693,7 @@ sub ExtractInfo($;@)
         my $pos = $raf->Tell(); # get file position so we can rewind
         my %dirInfo = ( RAF => $raf, Base => $pos );
         # loop through list of file types to test
-        my ($type, $buff, $seekErr);
+        my ($buff, $seekErr);
         # read first 1024 bytes of file for testing
         $raf->Read($buff, 1024) or $buff = '';
         $raf->Seek($pos, 0) or $seekErr = 1;
@@ -1752,7 +1753,7 @@ sub ExtractInfo($;@)
             require Image::ExifTool::XMP;
             Image::ExifTool::XMP::ScanForXMP($self, $raf) and $type = '';
         }
-        unless (defined $type) {
+        if (not defined $type and not $$self{DOC_NUM}) {
             # if we were given a single image with a known type there
             # must be a format error since we couldn't read it, otherwise
             # it is likely we don't support images of this type
@@ -1769,8 +1770,9 @@ sub ExtractInfo($;@)
         }
         # extract binary EXIF data block only if requested
         if (defined $self->{EXIF_DATA} and length $$self{EXIF_DATA} > 16 and
-            ($self->{REQ_TAG_LOOKUP}{exif} or ($self->{OPTIONS}{Binary} and
-            not $self->{EXCL_TAG_LOOKUP}{exif})))
+            ($self->{REQ_TAG_LOOKUP}{exif} or
+            # (not extracted normally, so check TAGS_FROM_FILE)
+            ($self->{TAGS_FROM_FILE} and not $self->{EXCL_TAG_LOOKUP}{exif})))
         {
             $self->FoundTag('EXIF', $self->{EXIF_DATA});
         }
@@ -1818,7 +1820,9 @@ sub ExtractInfo($;@)
         $$self{$_} = $$reEntry{$_} foreach keys %$reEntry;
     }
 
-    return exists $self->{VALUE}{Error} ? 0 : 1;
+    # ($type may be undef without an Error when processing sub-documents)
+    return 0 if not defined $type or exists $self->{VALUE}{Error};
+    return 1;
 }
 
 #------------------------------------------------------------------------------
@@ -2165,6 +2169,7 @@ sub GetValue($$;$)
             } else {
                 $value = \@valList;
             }
+            return wantarray ? () : undef unless @$value;
         }
         # initialize array so we can iterate over values in list
         if (ref $value eq 'ARRAY') {
@@ -2582,12 +2587,14 @@ COMPOSITE_TAG:
                             push @deferredTags, $tag;
                             next COMPOSITE_TAG;
                         }
-                        my ($i, $key, @keys);
-                        for ($i=0; ; ++$i) {
-                            $key = $name;
-                            $key .= " ($i)" if $i;
-                            last unless defined $$rawValue{$key};
-                            push @keys, $key;
+                        # (CAREFUL! keys may not be sequential if one was deleted)
+                        my ($i, @keys);
+                        my $key = $name;
+                        my $last = ($$self{DUPL_TAG}{$name} || 0);
+                        for ($i=0;;) {
+                            push @keys, $key if defined $$rawValue{$key};
+                            last if ++$i > $last;
+                            $key = "$name ($i)";
                         }
                         # find first matching tag
                         $key = $self->GroupMatches($reqGroup, \@keys);
@@ -2816,6 +2823,21 @@ sub Init($)
     }
     # make sure our TextOut is a file reference
     $self->{OPTIONS}{TextOut} = \*STDOUT unless ref $self->{OPTIONS}{TextOut};
+}
+
+#------------------------------------------------------------------------------
+# Get tag key for next existing tag
+# Inputs: 0) ExifTool ref, 1) tag key or case-sensitive tag name
+# Returns: Key of next existing tag, or undef if no more
+# Notes: This routine is provided for iterating through duplicate tags in the
+#        ValueConv of Composite tags.
+sub NextTagKey($$)
+{
+    my ($self, $tag) = @_;
+    my $i = ($tag =~ s/ \((\d+)\)$//) ? $1 + 1 : 1;
+    $tag = "$tag ($i)";
+    return $tag if defined $$self{VALUE}{$tag};
+    return undef;
 }
 
 #------------------------------------------------------------------------------
@@ -3081,7 +3103,7 @@ sub SetFoundTags($)
                 # put entry in return list even without value (value is undef)
                 $matches[0] = $byValue ? "$tag #(0)" : "$tag (0)";
                 # bogus file order entry to avoid warning if sorting in file order
-                $self->{FILE_ORDER}{$matches[0]} = 999;
+                $self->{FILE_ORDER}{$matches[0]} = 9999;
             }
             # save indices of tags extracted by value
             push @byValue, scalar(@$rtnTags) .. (scalar(@$rtnTags)+scalar(@matches)-1) if $byValue;
@@ -3213,7 +3235,7 @@ GR_TAG: foreach $tag (@$rtnTags) {
         $rtnTags = \@tags;
         last;
     }
-    $self->{FOUND_TAGS} = $rtnTags;     # save found tags 
+    $self->{FOUND_TAGS} = $rtnTags;     # save found tags
 
     # return reference to found tag keys (and list of indices of tags to extract by value)
     return wantarray ? ($rtnTags, \@byValue, \@wildTags) : $rtnTags;
@@ -3438,7 +3460,7 @@ sub AddCompositeTags($;$)
         my ($t, $n, $type);
         while ($Image::ExifTool::Composite{$tag} and not $overwrite) {
             $n ? $n += 1 : ($n = 2, $t = $tag);
-            $tag = "${t}_$n";
+            $tag = "${t}-$n";
             $$tagInfo{NewTagID} = $tag; # save new ID so we can use it in TagLookup
         }
         # convert scalar Require/Desire entries
@@ -4088,7 +4110,7 @@ sub Printable($;$)
         # limit to 2048 characters if verbose < 5
         $maxLen = 2048 if $maxLen > 2048 and $verbose < 5;
     }
-    
+
     # limit length if necessary
     $outStr = substr($outStr,0,$maxLen-6) . '[snip]' if length($outStr) > $maxLen;
     return $outStr;
@@ -4517,13 +4539,14 @@ sub ProcessJPEG($$)
     my $raf = $$dirInfo{RAF};
     my $htmlDump = $self->{HTML_DUMP};
     my %dumpParms = ( Out => $out );
-    my ($success, @iccChunk, $iccChunkCount, $iccChunksTotal, $wantTrailer, $trailInfo);
+    my ($success, $wantTrailer, $trailInfo);
+    my (@iccChunk, $iccChunkCount, $iccChunksTotal, @flirChunk, $flirCount, $flirTotal);
     my ($preview, $scalado, @dqt, $subSampling, $dumpEnd, %extendedXMP);
 
     # check to be sure this is a valid JPG (or J2C) file
     return 0 unless $raf->Read($s, 2) == 2 and $s =~ /^\xff[\xd8\x4f]/;
     $dumpParms{MaxLen} = 128 if $verbose < 4;
-    unless ($self->{VALUE}{FileType}) {
+    if (not $$self{VALUE}{FileType} or ($$self{DOC_NUM} and $$self{OPTIONS}{ExtractEmbedded})) {
         $self->SetFileType();               # set FileType tag
         $$self{LOW_PRIORITY_DIR}{IFD1} = 1; # lower priority of IFD1 tags
     }
@@ -4601,11 +4624,11 @@ sub ProcessJPEG($$)
             # extract some useful information
             my ($p, $h, $w, $n) = unpack('Cn2C', $$segDataPt);
             my $sof = GetTagTable('Image::ExifTool::JPEG::SOF');
-            $self->FoundTag($$sof{ImageWidth}, $w);
-            $self->FoundTag($$sof{ImageHeight}, $h);
-            $self->FoundTag($$sof{EncodingProcess}, $marker - 0xc0);
-            $self->FoundTag($$sof{BitsPerSample}, $p);
-            $self->FoundTag($$sof{ColorComponents}, $n);
+            $self->HandleTag($sof, 'ImageWidth', $w);
+            $self->HandleTag($sof, 'ImageHeight', $h);
+            $self->HandleTag($sof, 'EncodingProcess', $marker - 0xc0);
+            $self->HandleTag($sof, 'BitsPerSample', $p);
+            $self->HandleTag($sof, 'ColorComponents', $n);
             next unless $n == 3 and $length >= 15;
             my ($i, $hmin, $hmax, $vmin, $vmax);
             # loop through all components to determine sampling frequency
@@ -4842,9 +4865,11 @@ sub ProcessJPEG($$)
                     $start = $$self{PreviewImageStart};
                     $plen = $$self{PreviewImageLength};
                 }
-                if ($start and $plen and
+                if ($start and $plen and IsInt($start) and IsInt($plen) and
                     $start + $plen > $self->{EXIF_POS} + length($self->{EXIF_DATA}) and
-                    $self->{REQ_TAG_LOOKUP}{previewimage})
+                    ($self->{REQ_TAG_LOOKUP}{previewimage} or
+                    # (extracted normally, so check Binary option)
+                    ($self->{OPTIONS}{Binary} and not $self->{EXCL_TAG_LOOKUP}{previewimage})))
                 {
                     $$self{PreviewImageStart} = $start;
                     $$self{PreviewImageLength} = $plen;
@@ -4900,6 +4925,48 @@ sub ProcessJPEG($$)
                     Parent   => $markerName,
                 );
                 $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
+            } elsif ($$segDataPt =~ /^FLIR\0/ and $length >= 8) {
+                $dumpType = 'FLIR';
+                # must concatenate FLIR chunks (note: handle the case where
+                # some software erroneously writes zeros for the chunk counts)
+                my $chunkNum = Get8u($segDataPt, 6);
+                my $chunksTot = Get8u($segDataPt, 7) + 1; # (note the "+ 1"!)
+                $verbose and printf $out "$$self{INDENT}FLIR chunk %d of %d\n",
+                                    $chunkNum + 1, $chunksTot;
+                if (defined $flirTotal) {
+                    # abort parsing FLIR if the total chunk count is inconsistent
+                    undef $flirCount if $chunksTot != $flirTotal;
+                } else {
+                    $flirCount = 0;
+                    $flirTotal = $chunksTot;
+                }
+                if (defined $flirCount) {
+                    if (defined $flirChunk[$chunkNum]) {
+                        $self->WarnOnce('Duplicate FLIR chunk number(s)');
+                        $flirChunk[$chunkNum] .= substr($$segDataPt, 8);
+                    } else {
+                        $flirChunk[$chunkNum] = substr($$segDataPt, 8);
+                    }
+                    # process the FLIR information if we have all of the chunks
+                    if (++$flirCount >= $flirTotal) {
+                        my $flir = '';
+                        defined $_ and $flir .= $_ foreach @flirChunk;
+                        undef @flirChunk;   # free memory
+                        my $tagTablePtr = GetTagTable('Image::ExifTool::FLIR::APP1');
+                        my %dirInfo = (
+                            DataPt   => \$flir,
+                            DataPos  => $segPos + 8,
+                            DataLen  => length($flir),
+                            DirStart => 0,
+                            DirLen   => length($flir),
+                            Parent   => $markerName,
+                        );
+                        $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
+                        undef $flirCount;   # prevent reprocessing
+                    }
+                } else {
+                    $self->WarnOnce('Invalid or extraneous FLIR chunk(s)');
+                }
             } else {
                 # Hmmm.  Could be XMP, let's see
                 my $processed;
@@ -4932,7 +4999,7 @@ sub ProcessJPEG($$)
             if ($$segDataPt =~ /^ICC_PROFILE\0/ and $length >= 14) {
                 $dumpType = 'ICC_Profile';
                 # must concatenate profile chunks (note: handle the case where
-                # some software erroneiously writes zeros for the chunk counts)
+                # some software erroneously writes zeros for the chunk counts)
                 my $chunkNum = Get8u($segDataPt, 12);
                 my $chunksTot = Get8u($segDataPt, 13);
                 $verbose and print $out "$$self{INDENT}ICC_Profile chunk $chunkNum of $chunksTot\n";
@@ -5251,7 +5318,10 @@ sub ProcessJPEG($$)
         } elsif ($marker == 0xee) {         # APP14 (Adobe)
             if ($$segDataPt =~ /^Adobe/) {
                 # extract as a block if requested, or if copying tags from file
-                if ($$self{REQ_TAG_LOOKUP}{adobe} or $$self{TAGS_FROM_FILE}) {
+                if ($$self{REQ_TAG_LOOKUP}{adobe} or
+                    # (not extracted normally, so check TAGS_FROM_FILE)
+                    ($$self{TAGS_FROM_FILE} and not $$self{EXCL_TAG_LOOKUP}{adobe}))
+                {
                     $self->FoundTag('Adobe', $$segDataPt);
                 }
                 $dumpType = 'Adobe';
@@ -5287,7 +5357,7 @@ sub ProcessJPEG($$)
         } elsif ($marker == 0x51) {         # SIZ (J2C)
             my ($w, $h) = unpack('x2N2', $$segDataPt);
             $self->FoundTag('ImageWidth', $w);
-            $self->FoundTag('ImageHeight', $h);            
+            $self->FoundTag('ImageHeight', $h);
         } elsif (($marker & 0xf0) != 0xe0) {
             undef $dumpType;    # only dump unknown APP segments
         }
@@ -5310,6 +5380,7 @@ sub ProcessJPEG($$)
     }
     # issue necessary warnings
     $self->Warn('Incomplete ICC_Profile record', 1) if defined $iccChunkCount;
+    $self->Warn('Incomplete FLIR record', 1) if defined $flirCount;
     $self->Warn('Error reading PreviewImage', 1) if $$self{PreviewError};
     $self->Warn('Invalid extended XMP') if %extendedXMP;
     $success or $self->Warn('JPEG format error');
@@ -5585,7 +5656,7 @@ sub DoProcessTIFF($$;$)
             if ($$self{TIFF_TYPE} eq 'ARW' and not $err) {
                 # write any required ARW trailer and patch other ARW quirks
                 require Image::ExifTool::Sony;
-                my $errStr = Image::ExifTool::Sony::FinishARW($self, $dirInfo, \$newData, 
+                my $errStr = Image::ExifTool::Sony::FinishARW($self, $dirInfo, \$newData,
                                                               $dirInfo{ImageData});
                 $errStr and $self->Error($errStr);
                 delete $dirInfo{ImageData}; # (was copied by FinishARW)
@@ -5675,10 +5746,10 @@ sub DoProcessTIFF($$;$)
     # check DNG version
     if ($$self{DNGVersion}) {
         my $ver = $$self{DNGVersion};
-        # currently support up to DNG version 1.2
-        unless ($ver =~ /^(\d+) (\d+)/ and "$1.$2" <= 1.3) {
+        # currently support up to DNG version 1.4
+        unless ($ver =~ /^(\d+) (\d+)/ and "$1.$2" <= 1.4) {
             $ver =~ tr/ /./;
-            $self->Error("DNG Version $ver not yet supported", 1);
+            $self->Error("DNG Version $ver not yet tested", 1);
         }
     }
     return $err ? -1 : 1;
@@ -5779,19 +5850,9 @@ sub GetTagTable($)
         if (%UserDefined and $UserDefined{$tableName}) {
             my $tagID;
             foreach $tagID (TagTableKeys($UserDefined{$tableName})) {
-                my $tagInfo = $UserDefined{$tableName}{$tagID};
-                if (ref $tagInfo eq 'HASH') {
-                    $$tagInfo{Name} or $$tagInfo{Name} = ucfirst($tagID);
-                } else {
-                    $tagInfo = { Name => $tagInfo };
-                }
-                if ($$table{WRITABLE} and not defined $$tagInfo{Writable} and
-                    not $$tagInfo{SubDirectory})
-                {
-                    $$tagInfo{Writable} = $$table{WRITABLE};
-                }
+                next if $specialTags{$tagID};
                 delete $$table{$tagID}; # replace any existing entry
-                AddTagToTable($table, $tagID, $tagInfo);
+                AddTagToTable($table, $tagID, $UserDefined{$tableName}{$tagID}, 1);
             }
         }
         # remember order we loaded the tables in
@@ -5968,13 +6029,16 @@ sub GetTagInfo($$$;$$$)
 #------------------------------------------------------------------------------
 # Add new tag to table (must use this routine to add new tags to a table)
 # Inputs: 0) reference to tag table, 1) tag ID
-#         2) [optional] reference to tag information hash
+#         2) [optional] reference to tag information hash or simply tag name
+#         3) [optional] flag to avoid adding prefix when generating tag name
 # Notes: - will not overwrite existing entry in table
 # - info need contain no entries when this routine is called
-sub AddTagToTable($$;$)
+sub AddTagToTable($$;$$)
 {
-    my ($tagTablePtr, $tagID, $tagInfo) = @_;
-    $tagInfo or $tagInfo = { };
+    my ($tagTablePtr, $tagID, $tagInfo, $noPrefix) = @_;
+
+    # generate tag info hash if necessary
+    $tagInfo = $tagInfo ? { Name => $tagInfo } : { } unless ref $tagInfo eq 'HASH';
 
     # define necessary entries in information hash
     if ($$tagInfo{Groups}) {
@@ -6001,7 +6065,7 @@ sub AddTagToTable($$;$)
         $name = ucfirst $name;          # start with uppercase
         # make sure name is a reasonable length
         my $prefix = $$tagTablePtr{TAG_PREFIX};
-        if ($prefix) {
+        if ($prefix and not $noPrefix) {
             # make description to prevent tagID from getting mangled by MakeDescription()
             $$tagInfo{Description} = MakeDescription($prefix, $name);
             $name = "${prefix}_$name";
@@ -6078,7 +6142,7 @@ sub HandleTag($$$$;%)
             if ($$subdir{Start}) {
                 my $valuePtr = 0;
                 #### eval Start ($valuePtr)
-                my $off = eval $$subdir{Start};                
+                my $off = eval $$subdir{Start};
                 $subdirStart += $off;
                 $subdirLen -= $off;
             }
@@ -6215,6 +6279,7 @@ sub FoundTag($$$)
         }
         if ($priority >= $oldPriority and not $self->{DOC_NUM} and not $noListDel) {
             # move existing tag out of the way since this tag is higher priority
+            # (NOTE: any new members added here must also be added to DeleteTag())
             $self->{MOVED_KEY} = $nextTag;  # used in BuildCompositeTags()
             $self->{PRIORITY}{$nextTag} = $self->{PRIORITY}{$tag};
             $$valueHash{$nextTag} = $$valueHash{$tag};
@@ -6226,6 +6291,7 @@ sub FoundTag($$$)
                     delete $self->{$_}{$tag};
                 }
             }
+            delete $self->{BOTH}{$tag};
             # update tag key for list if necessary
             $self->{LIST_TAGS}{$oldInfo} = $nextTag if $self->{LIST_TAGS}{$oldInfo};
         } else {
@@ -6292,6 +6358,9 @@ sub DeleteTag($$)
     delete $self->{FILE_ORDER}{$tag};
     delete $self->{TAG_INFO}{$tag};
     delete $self->{TAG_EXTRA}{$tag};
+    delete $self->{PRIORITY}{$tag};
+    delete $self->{RATIONAL}{$tag};
+    delete $self->{BOTH}{$tag};
 }
 
 #------------------------------------------------------------------------------
@@ -6322,7 +6391,7 @@ sub DoEscape($$)
 sub SetFileType($;$$)
 {
     my ($self, $fileType, $mimeType) = @_;
-    unless ($self->{VALUE}{FileType}) {
+    unless ($self->{VALUE}{FileType} and not $$self{DOC_NUM}) {
         my $baseType = $self->{FILE_TYPE};
         $fileType or $fileType = $baseType;
         $mimeType or $mimeType = $mimeType{$fileType};
@@ -6342,7 +6411,8 @@ sub OverrideFileType($$)
     my ($self, $fileType) = @_;
     if (defined $$self{VALUE}{FileType} and $fileType ne $$self{VALUE}{FileType}) {
         $$self{VALUE}{FileType} = $fileType;
-        $$self{VALUE}{MIMEType} = $mimeType{$fileType} || 'application/unknown';
+        # only override MIME type if unique for the derived file type
+        $$self{VALUE}{MIMEType} = $mimeType{$fileType} if $mimeType{$fileType};
         if ($$self{OPTIONS}{Verbose}) {
             $self->VPrint(0,"$$self{INDENT}FileType [override] = $fileType\n");
             $self->VPrint(0,"$$self{INDENT}MIMEType [override] = $$self{VALUE}{MIMEType}\n");

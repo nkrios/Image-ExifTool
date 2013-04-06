@@ -38,6 +38,7 @@
 #              25) Vesa Kivisto private communication (7D)
 #              26) Jeremy Brown private communication
 #              27) Gregg Lee private communication
+#              28) http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/en/devnet/cinemadng/pdfs/CinemaDNG_Format_Specification_v1_1.pdf
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -50,7 +51,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.47';
+$VERSION = '3.51';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -1544,12 +1545,14 @@ my %sampleFormat = (
     0x9102 => 'CompressedBitsPerPixel',
     0x9201 => {
         Name => 'ShutterSpeedValue',
+        Notes => 'displayed in seconds, but stored as an APEX value',
         Format => 'rational64s', # Leica M8 patch (incorrectly written as rational64u)
         ValueConv => 'abs($val)<100 ? 2**(-$val) : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },
     0x9202 => {
         Name => 'ApertureValue',
+        Notes => 'displayed as an F number, but stored as an APEX value',
         ValueConv => '2 ** ($val / 2)',
         PrintConv => 'sprintf("%.1f",$val)',
     },
@@ -1564,6 +1567,7 @@ my %sampleFormat = (
     },
     0x9205 => {
         Name => 'MaxApertureValue',
+        Notes => 'displayed as an F number, but stored as an APEX value',
         Groups => { 2 => 'Camera' },
         ValueConv => '2 ** ($val / 2)',
         PrintConv => 'sprintf("%.1f",$val)',
@@ -1659,7 +1663,6 @@ my %sampleFormat = (
             8 => 'Color sequential linear',
         },
     },
-    0x9213 => 'ImageHistory',
     0x923a => 'CIP3DataFile', #20
     0x923b => 'CIP3Sheet', #20
     0x923c => 'CIP3Side', #20
@@ -2126,10 +2129,12 @@ my %sampleFormat = (
         # must set Writable here so this tag will be saved with MakerNotes option
         Writable => 'undef',
         WriteGroup => 'IFD0',
+        # (don't make Binary/Protected because we can't copy individual PrintIM tags anyway)
         Description => 'Print Image Matching',
         SubDirectory => {
             TagTable => 'Image::ExifTool::PrintIM::Main',
         },
+        PrintConvInv => '$val =~ /^PrintIM/ ? $val : undef',    # quick validation
     },
     0xc580 => { #20
         Name => 'USPTOOriginalContentType',
@@ -2453,12 +2458,76 @@ my %sampleFormat = (
         Binary => 1,
     },
     0xc761 => 'NoiseProfile', # DNG 1.3
+    0xc763 => { #28
+        Name => 'TimeCodes',
+        ValueConv => q{
+            my @a = split ' ', $val;
+            my @v;
+            push @v, join('.', map { sprintf('%.2x',$_) } splice(@a,0,8)) while @a >= 8;
+            join ' ', @v;
+        },
+        # Note: Currently ignore the flags:
+        #   byte 0 0x80 - color frame
+        #   byte 0 0x40 - drop frame
+        #   byte 1 0x80 - field phase
+        PrintConv => q{
+            my @a = map hex, split /[. ]+/, $val;
+            my @v;
+            while (@a >= 8) {
+                my $str = sprintf("%.2x:%.2x:%.2x.%.2x", $a[3]&0x3f,
+                                 $a[2]&0x7f, $a[1]&0x7f, $a[0]&0x3f);
+                if ($a[3] & 0x80) { # date+timezone exist if BGF2 is set
+                    my $tz = $a[7] & 0x3f;
+                    my $bz = sprintf('%.2x', $tz);
+                    $bz = 100 if $bz =~ /[a-f]/i; # not BCD
+                    if ($bz < 26) {
+                        $tz = ($bz < 13 ? 0 : 26) - $bz;
+                    } elsif ($bz == 32) {
+                        $tz = 12.75;
+                    } elsif ($bz >= 28 and $bz <= 31) {
+                        $tz = 0;    # UTC
+                    } elsif ($bz < 100) {
+                        undef $tz;  # undefined or user-defined
+                    } elsif ($tz < 0x20) {
+                        $tz = (($tz < 0x10 ? 10 : 20) - $tz) - 0.5;
+                    } else {
+                        $tz = (($tz < 0x30 ? 53 : 63) - $tz) + 0.5;
+                    }
+                    if ($a[7] & 0x80) { # MJD format (/w UTC time)
+                        my ($h,$m,$s,$f) = split /[:.]/, $str;
+                        my $jday = sprintf('%x%.2x%.2x', reverse @a[4..6]);
+                        $str = ConvertUnixTime(($jday - 40587) * 24 * 3600
+                                 + ((($h+$tz) * 60) + $m) * 60 + $s) . ".$f";
+                        $str =~ s/^(\d+):(\d+):(\d+) /$1-$2-${3}T/;
+                    } else { # YYMMDD (Note: CinemaDNG 1.1 example seems wrong)
+                        my $yr = sprintf('%.2x',$a[6]) + 1900;
+                        $yr += 100 if $yr < 1970;
+                        $str = sprintf('%d-%.2x-%.2xT%s',$yr,$a[5],$a[4],$str);
+                    }
+                    $str .= TimeZoneString($tz*60) if defined $tz;
+                }
+                push @v, $str;
+                splice @a, 0, 8;
+            }
+            join ' ', @v;
+        },
+    },
+    0xc764 => { #28
+        Name => 'FrameRate',
+        PrintConv => 'int($val * 1000 + 0.5) / 1000',
+    },
+    0xc772 => { #28
+        Name => 'TStop',
+        PrintConv => 'join("-", map { sprintf("%.2f",$_) } split " ", $val)',
+    },
+    0xc789 => 'ReelName', #28
     0xc791 => 'OriginalDefaultFinalSize', # DNG 1.4
     0xc792 => { # DNG 1.4
         Name => 'OriginalBestQualitySize',
         Notes => 'called OriginalBestQualityFinalSize by the DNG spec',
     },
     0xc793 => 'OriginalDefaultCropSize', # DNG 1.4
+    0xc7a1 => 'CameraLabel', #28
     0xc7a3 => { # DNG 1.4
         Name => 'ProfileHueSatMapEncoding',
         PrintConv => {
@@ -2632,7 +2701,7 @@ my %sampleFormat = (
            14 => 'ImageWidth',
            15 => 'ImageHeight',
         },
-        ValueConv => 'Image::ExifTool::Exif::CalcScaleFactor35efl(@val)',
+        ValueConv => 'Image::ExifTool::Exif::CalcScaleFactor35efl($self, @val)',
         PrintConv => 'sprintf("%.1f", $val)',
     },
     CircleOfConfusion => {
@@ -3017,18 +3086,20 @@ sub CalculateLV($$$)
 
 #------------------------------------------------------------------------------
 # Calculate scale factor for 35mm effective focal length (ref 26/PH)
-# Inputs: 0) Focal length
-#         1) Focal length in 35mm format
-#         2) Canon digital zoom factor
-#         3) Focal plane diagonal size (in mm)
-#         4) Sensor size (X and Y in mm)
-#         5/6) Focal plane X/Y size (in mm)
-#         7) focal plane resolution units (1=None,2=inches,3=cm,4=mm,5=um)
-#         8/9) Focal plane X/Y resolution
-#         10/11,12/13...) Image width/height in order of precedence (first valid pair is used)
+# Inputs: 0) ExifTool object ref
+#         1) Focal length
+#         2) Focal length in 35mm format
+#         3) Canon digital zoom factor
+#         4) Focal plane diagonal size (in mm)
+#         5) Sensor size (X and Y in mm)
+#         6/7) Focal plane X/Y size (in mm)
+#         8) focal plane resolution units (1=None,2=inches,3=cm,4=mm,5=um)
+#         9/10) Focal plane X/Y resolution
+#         11/12,13/14...) Image width/height in order of precedence (first valid pair is used)
 # Returns: 35mm conversion factor (or undefined if it can't be calculated)
 sub CalcScaleFactor35efl
 {
+    my $exifTool = shift;
     my $res = $_[7];    # save resolution units (in case they have been converted to string)
     my $sensXY = $_[4];
     Image::ExifTool::ToFloat(@_);
@@ -3040,6 +3111,15 @@ sub CalcScaleFactor35efl
     my $digz = shift || 1;
     my $diag = shift;
     my $sens = shift;
+    # calculate Canon sensor size using a dedicated algorithm
+    if ($$exifTool{Make} eq 'Canon') {
+        require Image::ExifTool::Canon;
+        my $canonDiag = Image::ExifTool::Canon::CalcSensorDiag(
+            $exifTool->{RATIONAL}{FocalPlaneXResolution},
+            $exifTool->{RATIONAL}{FocalPlaneYResolution},
+        );
+        $diag = $canonDiag if $canonDiag;
+    }
     unless ($diag and Image::ExifTool::IsFloat($diag)) {
         if ($sens and $sensXY =~ / (\d+(\.?\d*)?)$/) {
             $diag = sqrt($sens * $sens + $1 * $1);
@@ -3405,7 +3485,7 @@ sub PrintLensID($$@)
     }
     # use MaxApertureValue if MaxAperture is not available
     $maxAperture = $maxApertureValue unless $maxAperture;
-    if ($lensFocalRange and $lensFocalRange =~ /^(\d+)(?: to (\d+))?$/) {
+    if ($lensFocalRange and $lensFocalRange =~ /^(\d+)(?: (?:to )?(\d+))?$/) {
         ($shortFocal, $longFocal) = ($1, $2 || $1);
     }
     if ($shortFocal and $longFocal) {
@@ -3848,7 +3928,7 @@ sub ProcessExif($$$)
                         my $newBase = eval $$tagInfo{ChangeBase};
                         $valuePtr += $newBase;
                     }
-                    $tagStr or $tagStr = sprintf("tag 0x%x",$tagID);
+                    $tagStr or $tagStr = sprintf("tag 0x%.4x",$tagID);
                     # allow PreviewImage to run outside EXIF data
                     if ($tagStr eq 'PreviewImage' and $exifTool->{RAF}) {
                         my $pos = $exifTool->{RAF}->Tell();
@@ -3865,10 +3945,12 @@ sub ProcessExif($$$)
                         if ($exifTool->Options('FastScan')) {
                             $exifTool->Warn('Ignored Leica MakerNote trailer');
                         } else {
+                            require Image::ExifTool::Fixup;
                             $$exifTool{LeicaTrailer} = {
                                 TagInfo => $tagInfo || $tmpInfo,
                                 Offset  => $base + $valuePtr + $dataPos,
                                 Size    => $size,
+                                Fixup   => new Image::ExifTool::Fixup,
                             };
                         }
                     } else {
@@ -4426,6 +4508,8 @@ under the same terms as Perl itself.
 =item L<http://community.roxen.com/developers/idocs/rfc/rfc3949.html>
 
 =item L<http://tools.ietf.org/html/draft-ietf-fax-tiff-fx-extension1-01>
+
+=item L<http://wwwimages.adobe.com/www.adobe.com/content/dam/Adobe/en/devnet/cinemadng/pdfs/CinemaDNG_Format_Specification_v1_1.pdf>
 
 =back
 

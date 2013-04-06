@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.35';
+$VERSION = '1.36';
 
 sub JITTER() { return 2 }       # maximum time jitter
 
@@ -123,7 +123,7 @@ sub LoadTrackLog($$;$)
     $has or $has = $$geotag{Has} = { 'pos' => 1 };
     my $format = '';
     # is $val track log data?
-    if ($val =~ /^(\xef\xbb\xbf)?<(\?xml|gpx)\s/) {
+    if ($val =~ /^(\xef\xbb\xbf)?<(\?xml|gpx)[\s>]/) {
         $format = 'XML';
         $/ = '>';   # set input record separator to '>' for XML/GPX data
     } elsif ($val =~ /(\x0d\x0a|\x0d|\x0a)/) {
@@ -137,7 +137,7 @@ sub LoadTrackLog($$;$)
             return "Empty track file '$val'";
         }
         # look for XML or GPX header (might as well allow UTF-8 BOM)
-        if (/^(\xef\xbb\xbf)?<(\?xml|gpx)\s/) {
+        if (/^(\xef\xbb\xbf)?<(\?xml|gpx)[\s>]/) {
             $format = 'XML';
             $/ = '>';   # set input record separator to '>' for XML/GPX data
         } elsif (/(\x0d\x0a|\x0d|\x0a)/) {
@@ -947,6 +947,7 @@ Category:       foreach $category (qw{pos track alt orient}) {
         my %opts;
         $opts{Replace} = 2 if defined $val; # remove existing new values
         $opts{Group} = $writeGroup if $writeGroup;
+
         # reset any GPS values we might have already set
         foreach (qw(GPSLatitude GPSLatitudeRef GPSLongitude GPSLongitudeRef
                     GPSAltitude GPSAltitudeRef GPSDateStamp GPSTimeStamp GPSDateTime

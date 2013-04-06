@@ -3725,7 +3725,7 @@ sub ProcessDICM($$)
             my $binData;
             my $lcTag = $tagInfo ? lc($$tagInfo{Name}) : 'unknown';
             if ($exifTool->{REQ_TAG_LOOKUP}{$lcTag} or
-                ($exifTool->Options('Binary') and not $exifTool->{EXCL_TAG_LOOKUP}{$lcTag}))
+                ($exifTool->{OPTIONS}{Binary} and not $exifTool->{EXCL_TAG_LOOKUP}{$lcTag}))
             {
                 $binData = $buff;   # must make a copy
             } else {

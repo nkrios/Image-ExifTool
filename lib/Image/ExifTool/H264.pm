@@ -95,7 +95,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
         Combine => 1,   # the next tag (0x19) contains the rest of the date
         # first byte is timezone information:
         #   0x80 - unused
-        #   0x40 - DST flag (not currently decoded)
+        #   0x40 - DST flag (currently not decoded)
         #   0x20 - TimeZoneSign
         #   0x1e - TimeZoneValue
         #   0x01 - half-hour flag
@@ -909,7 +909,7 @@ sub ProcessSEI($$)
 
     # look for our 16-byte UUID
     # - plus "MDPM" for "ModifiedDVPackMeta"
-    # - plus "GA94" for closed-caption data (not currently decoded)
+    # - plus "GA94" for closed-caption data (currently not decoded)
     return 0 unless $size > 20 and substr($$dataPt, $pos, 20) eq
         "\x17\xee\x8c\x60\xf8\x4d\x11\xd9\x8c\xd6\x08\0\x20\x0c\x9a\x66MDPM";
 

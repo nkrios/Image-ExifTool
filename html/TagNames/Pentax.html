@@ -635,6 +635,7 @@ available.  Extended bracket values are printed as &#39;WB-BA&#39;, &#39;WB-GM&#
   <br>[Value 3]</span><table class=cols><tr>
   <td>0 = Single Exposure
   <br>1 = Multiple Exposure
+  <br>15 = Interval Movie
   <br>16 = HDR
   <br>32 = HDR Strong 1</td><td>&nbsp;&nbsp;</td>
   <td>48 = HDR Strong 2
@@ -744,6 +745,46 @@ available.  Extended bracket values are printed as &#39;WB-BA&#39;, &#39;WB-GM&#
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td title='0x0053 = 83'>0x0053</td>
+<td>ColorTempDaylight</td>
+<td class=c>undef[4]</td>
+<td><span class=s><span class=n>(0x0053-0x005a are 3 numbers: Kelvin, shift AB, shift GM)</span></span></td></tr>
+<tr>
+<td title='0x0054 = 84'>0x0054</td>
+<td>ColorTempShade</td>
+<td class=c>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0055 = 85'>0x0055</td>
+<td>ColorTempCloudy</td>
+<td class=c>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0056 = 86'>0x0056</td>
+<td>ColorTempTungsten</td>
+<td class=c>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0057 = 87'>0x0057</td>
+<td>ColorTempFluorescentD</td>
+<td class=c>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0058 = 88'>0x0058</td>
+<td>ColorTempFluorescentN</td>
+<td class=c>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0059 = 89'>0x0059</td>
+<td>ColorTempFluorescentW</td>
+<td class=c>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x005a = 90'>0x005a</td>
+<td>ColorTempFlash</td>
+<td class=c>undef[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td title='0x005c = 92'>0x005c</td>
 <td>ShakeReductionInfo</td>
 <td class=c>-</td>
@@ -760,6 +801,23 @@ for live view or video recording)</span></span></td></tr>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#FaceInfo'>Pentax FaceInfo Tags</a></td></tr>
 <tr>
+<td title='0x0062 = 98'>0x0062</td>
+<td>RawDevelopmentProcess</td>
+<td class=c>int16u</td>
+<td><table class=cols><tr>
+  <td>1 = 1 (K10D,K200D,K2000,K-m)
+  <br>3 = 3 (K20D)
+  <br>4 = 4 (K-7)
+  <br>5 = 5 (K-x)
+  <br>6 = 6 (645D)
+  <br>7 = 7 (K-r)
+  <br>8 = 8 (K-5,K-5II,K-5IIs)
+  <br>9 = 9 (Q)
+  <br>10 = 10 (K-01,K-30)
+  <br>11 = 11 (Q10)
+  <br>12 = 12 (MX-1)</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr class=b>
 <td title='0x0067 = 103'>0x0067</td>
 <td>Hue</td>
 <td class=c>int16u</td>
@@ -775,23 +833,30 @@ for live view or video recording)</span></span></td></tr>
   <br>8 = 4
   <br>65535 = None</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x0068 = 104'>0x0068</td>
 <td>AWBInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#AWBInfo'>Pentax AWBInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0069 = 105'>0x0069</td>
 <td>DynamicRangeExpansion</td>
 <td class=c>undef[4]</td>
-<td><span class=s>&#39;0 0 0 0&#39; = Off
-  <br>&#39;1 0 0 0&#39; = On</span></td></tr>
-<tr class=b>
+<td><span class=s><span class=n>(called highlight correction by Pentax for the K20D, K-5, K-01 and maybe
+other models)</span></span><table class=cols><tr>
+  <td>&#39;0 0 0 0&#39; = Off
+  <br>&#39;0 1 0 0&#39; = Off (enabled)
+  <br>&#39;0 2 0 0&#39; = Off (auto)
+  <br>&#39;1 0 0 0&#39; = On
+  <br>&#39;1 1 0 0&#39; = On (enabled)
+  <br>&#39;1 2 0 0&#39; = On (auto)</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr>
 <td title='0x006b = 107'>0x006b</td>
 <td>TimeInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#TimeInfo'>Pentax TimeInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x006c = 108'>0x006c</td>
 <td>HighLowKeyAdj</td>
 <td class=c>int16s[2]</td>
@@ -806,7 +871,7 @@ for live view or video recording)</span></span></td></tr>
   <br>&#39;3 0&#39; = 3
   <br>&#39;4 0&#39; = 4</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x006d = 109'>0x006d</td>
 <td>ContrastHighlight</td>
 <td class=c>int16s[2]</td>
@@ -821,7 +886,7 @@ for live view or video recording)</span></span></td></tr>
   <br>&#39;3 0&#39; = 3
   <br>&#39;4 0&#39; = 4</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr>
+<tr class=b>
 <td title='0x006e = 110'>0x006e</td>
 <td>ContrastShadow</td>
 <td class=c>int16s[2]</td>
@@ -836,13 +901,13 @@ for live view or video recording)</span></span></td></tr>
   <br>&#39;3 0&#39; = 3
   <br>&#39;4 0&#39; = 4</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x006f = 111'>0x006f</td>
 <td>ContrastHighlightShadowAdj</td>
 <td class=c>int8u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0070 = 112'>0x0070</td>
 <td>FineSharpness</td>
 <td class=c>int8u[n]</td>
@@ -852,7 +917,7 @@ for live view or video recording)</span></span></td></tr>
   <br>[Value 1]
   <br>0 = Normal
   <br>2 = Extra fine</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0071 = 113'>0x0071</td>
 <td>HighISONoiseReduction</td>
 <td class=c>int8u</td>
@@ -874,12 +939,12 @@ for live view or video recording)</span></span></td></tr>
   <br>56 = ISO&gt;800
   <br>64 = ISO&gt;1600
   <br>72 = ISO&gt;3200</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0072 = 114'>0x0072</td>
 <td>AFAdjustment</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0073 = 115'>0x0073</td>
 <td>MonochromeFilterEffect</td>
 <td class=c>int16u</td>
@@ -894,7 +959,7 @@ for live view or video recording)</span></span></td></tr>
   <br>8 = Infrared
   <br>65535 = None</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr>
+<tr class=b>
 <td title='0x0074 = 116'>0x0074</td>
 <td>MonochromeToning</td>
 <td class=c>int16u</td>
@@ -910,36 +975,37 @@ for live view or video recording)</span></span></td></tr>
   <br>8 = 4
   <br>65535 = None</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x0076 = 118'>0x0076</td>
 <td>FaceDetect</td>
 <td class=c>int8u[2]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0077 = 119'>0x0077</td>
 <td>FaceDetectFrameSize</td>
 <td class=c>int16u[2]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0079 = 121'>0x0079</td>
-<td>ShadowCompensation</td>
+<td>ShadowCorrection</td>
 <td class=c>int8u[n]</td>
 <td><table class=cols><tr>
   <td>0 = Off
   <br>1 = On
-  <br>&#39;0 0&#39; = Off</td><td>&nbsp;&nbsp;</td>
-  <td>&#39;1 1&#39; = Weak
-  <br>&#39;1 2&#39; = Normal
-  <br>&#39;1 3&#39; = Strong</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>&#39;0 0&#39; = Off
+  <br>&#39;1 1&#39; = Weak</td><td>&nbsp;&nbsp;</td>
+  <td>&#39;1 2&#39; = Normal
+  <br>&#39;1 3&#39; = Strong
+  <br>&#39;2 4&#39; = Auto</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr>
+<tr class=b>
 <td title='0x007a = 122'>0x007a</td>
 <td>ISOAutoParameters</td>
 <td class=c>int8u[2]</td>
 <td><span class=s>&#39;1 0&#39; = Slow
   <br>&#39;2 0&#39; = Standard
   <br>&#39;3 0&#39; = Fast</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x007b = 123'>0x007b</td>
 <td>CrossProcess</td>
 <td class=c>int8u</td>
@@ -953,12 +1019,12 @@ for live view or video recording)</span></span></td></tr>
   <br>34 = Favorite 2
   <br>35 = Favorite 3</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr>
+<tr class=b>
 <td title='0x007d = 125'>0x007d</td>
 <td>LensCorr</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#LensCorr'>Pentax LensCorr Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x007f = 127'>0x007f</td>
 <td>BleachBypassToning</td>
 <td class=c>int16u</td>
@@ -973,7 +1039,7 @@ for live view or video recording)</span></span></td></tr>
   <br>8 = Cyan
   <br>65535 = Off</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr>
+<tr class=b>
 <td title='0x0080 = 128'>0x0080</td>
 <td>AspectRatio</td>
 <td class=c>Y</td>
@@ -981,7 +1047,7 @@ for live view or video recording)</span></span></td></tr>
   <br>1 = 3:2
   <br>2 = 16:9
   <br>3 = 1:1</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0082 = 130'>0x0082</td>
 <td>BlurControl</td>
 <td class=c>int8u[4]</td>
@@ -990,52 +1056,56 @@ for live view or video recording)</span></span></td></tr>
   <br>1 = Low
   <br>2 = Medium
   <br>3 = High</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0088 = 136'>0x0088</td>
 <td>NeutralDensityFilter</td>
 <td class=c>int8u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x008b = 139'>0x008b</td>
 <td>ISO</td>
 <td class=c>int32u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0200 = 512'>0x0200</td>
 <td>BlackPoint</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0201 = 513'>0x0201</td>
 <td>WhitePoint</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0203 = 515'>0x0203</td>
 <td>ColorMatrixA</td>
 <td class=c>int16s[9]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0204 = 516'>0x0204</td>
 <td>ColorMatrixB</td>
 <td class=c>int16s[9]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0205 = 517'>0x0205</td>
 <td>CameraSettings
   <br>CameraSettingsUnknown</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='Pentax.html#CameraSettings'>Pentax CameraSettings Tags</a>
   <br>--&gt; <a href='Pentax.html#CameraSettingsUnknown'>Pentax CameraSettingsUnknown Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0206 = 518'>0x0206</td>
 <td>AEInfo
+  <br>AEInfo2
+  <br>AEInfo3
   <br>AEInfoUnknown</td>
-<td class=c>-<br>-</td>
+<td class=c>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='Pentax.html#AEInfo'>Pentax AEInfo Tags</a>
+  <br>--&gt; <a href='Pentax.html#AEInfo2'>Pentax AEInfo2 Tags</a>
+  <br>--&gt; <a href='Pentax.html#AEInfo3'>Pentax AEInfo3 Tags</a>
   <br>--&gt; <a href='Pentax.html#AEInfoUnknown'>Pentax AEInfoUnknown Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0207 = 519'>0x0207</td>
 <td>LensInfo</td>
 <td class=c>-</td>
@@ -1044,94 +1114,99 @@ for live view or video recording)</span></span></td></tr>
   <br>--&gt; <a href='Pentax.html#LensInfo3'>Pentax LensInfo3 Tags</a>
   <br>--&gt; <a href='Pentax.html#LensInfo4'>Pentax LensInfo4 Tags</a>
   <br>--&gt; <a href='Pentax.html#LensInfo5'>Pentax LensInfo5 Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0208 = 520'>0x0208</td>
 <td>FlashInfo
   <br>FlashInfoUnknown</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='Pentax.html#FlashInfo'>Pentax FlashInfo Tags</a>
   <br>--&gt; <a href='Pentax.html#FlashInfoUnknown'>Pentax FlashInfoUnknown Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0209 = 521'>0x0209</td>
 <td>AEMeteringSegments</td>
 <td class=c>int8u[n]</td>
 <td><span class=s><span class=n>(measurements from each of the 16 AE metering segments for models such as the
 K10D, and 77 metering segments for models such as the K-5, converted to LV)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x020a = 522'>0x020a</td>
 <td>FlashMeteringSegments</td>
 <td class=c>int8u[n]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x020b = 523'>0x020b</td>
 <td>SlaveFlashMeteringSegments</td>
 <td class=c>int8u[n]</td>
 <td><span class=s><span class=n>(used in wireless control mode)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x020d = 525'>0x020d</td>
 <td>WB_RGGBLevelsDaylight</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x020e = 526'>0x020e</td>
 <td>WB_RGGBLevelsShade</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x020f = 527'>0x020f</td>
 <td>WB_RGGBLevelsCloudy</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0210 = 528'>0x0210</td>
 <td>WB_RGGBLevelsTungsten</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0211 = 529'>0x0211</td>
 <td>WB_RGGBLevelsFluorescentD</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0212 = 530'>0x0212</td>
 <td>WB_RGGBLevelsFluorescentN</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0213 = 531'>0x0213</td>
 <td>WB_RGGBLevelsFluorescentW</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0214 = 532'>0x0214</td>
 <td>WB_RGGBLevelsFlash</td>
 <td class=c>int16u[4]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0215 = 533'>0x0215</td>
 <td>CameraInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#CameraInfo'>Pentax CameraInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0216 = 534'>0x0216</td>
 <td>BatteryInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#BatteryInfo'>Pentax BatteryInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x021b = 539'>0x021b</td>
 <td>SaturationInfo?</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(only in PEF and DNG images)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x021f = 543'>0x021f</td>
 <td>AFInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#AFInfo'>Pentax AFInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0220 = 544'>0x0220</td>
 <td>HuffmanTable?</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(found in K10D, K20D and K2000D PEF images)</span></span></td></tr>
+<tr class=b>
+<td title='0x0221 = 545'>0x0221</td>
+<td>KelvinWB</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Pentax.html#KelvinWB'>Pentax KelvinWB Tags</a></td></tr>
 <tr>
 <td title='0x0222 = 546'>0x0222</td>
 <td>ColorInfo</td>
@@ -1173,58 +1248,68 @@ K10D, and 77 metering segments for models such as the K-5, converted to LV)</spa
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#LevelInfo'>Pentax LevelInfo Tags</a></td></tr>
 <tr>
+<td title='0x022d = 557'>0x022d</td>
+<td>WBLevels</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Pentax.html#WBLevels'>Pentax WBLevels Tags</a></td></tr>
+<tr class=b>
 <td title='0x022e = 558'>0x022e</td>
 <td>Artist</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x022f = 559'>0x022f</td>
 <td>Copyright</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0230 = 560'>0x0230</td>
 <td>FirmwareVersion</td>
 <td class=c>string</td>
 <td><span class=s><span class=n>(only in AVI videos)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0231 = 561'>0x0231</td>
 <td>ContrastDetectAFArea</td>
 <td class=c>int16u[4]</td>
 <td><span class=s><span class=n>(AF area of the most recent contrast-detect focus operation. Coordinates
 are left, top, width and height in a 720x480 frame, with Y downwards)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0235 = 565'>0x0235</td>
 <td>CrossProcessParams</td>
 <td class=c>undef[10]</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0239 = 569'>0x0239</td>
 <td>LensInfoQ</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#LensInfoQ'>Pentax LensInfoQ Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x03fe = 1022'>0x03fe</td>
 <td>DataDump</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x03ff = 1023'>0x03ff</td>
 <td>TempInfoK5
   <br>UnknownInfo</td>
 <td class=c>-<br>-</td>
 <td>--&gt; <a href='Pentax.html#TempInfoK5'>Pentax TempInfoK5 Tags</a>
   <br>--&gt; <a href='Pentax.html#UnknownInfo'>Pentax UnknownInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0402 = 1026'>0x0402</td>
 <td>ToneCurve</td>
 <td class=c title=' ~ = Writable only with -n'>Y~</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0403 = 1027'>0x0403</td>
 <td>ToneCurves</td>
 <td class=c title=' ~ = Writable only with -n'>Y~</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0405 = 1029'>0x0405</td>
+<td>UnknownBlock?</td>
+<td class=c>undef</td>
+<td><span class=s><span class=n>(large unknown data block in PEF/DNG images but not JPG images)</span></span></td></tr>
 <tr>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
@@ -1238,119 +1323,122 @@ are left, top, width and height in a 720x480 frame, with Y downwards)</span></sp
 <table class='inner sep' cellspacing=1>
 <tr class=h><th>Value</th><th>PentaxModelID</th><th>Value</th><th>PentaxModelID</th><th>Value</th><th>PentaxModelID</th></tr>
 <tr><td class=r>0xd</td><td>= Optio 330/430</td>
-<td class='r b'>0x12b80</td><td class=b>= Samsung GX-1L</td>
-<td class=r>0x12d4a</td><td>= Optio M60</td>
-</tr><tr><td class=r>0x12926</td><td>= Optio 230</td>
 <td class='r b'>0x12b9c</td><td class=b>= K100D</td>
-<td class=r>0x12d68</td><td>= Optio E60/M90</td>
-</tr><tr><td class=r>0x12958</td><td>= Optio 330GS</td>
-<td class='r b'>0x12b9d</td><td class=b>= K110D</td>
 <td class=r>0x12d72</td><td>= K2000</td>
-</tr><tr><td class=r>0x12962</td><td>= Optio 450/550</td>
-<td class='r b'>0x12ba2</td><td class=b>= K100D Super</td>
+</tr><tr><td class=r>0x12926</td><td>= Optio 230</td>
+<td class='r b'>0x12b9d</td><td class=b>= K110D</td>
 <td class=r>0x12d73</td><td>= K-m</td>
-</tr><tr><td class=r>0x1296c</td><td>= Optio S</td>
-<td class='r b'>0x12bb0</td><td class=b>= Optio T10/T20</td>
+</tr><tr><td class=r>0x12958</td><td>= Optio 330GS</td>
+<td class='r b'>0x12ba2</td><td class=b>= K100D Super</td>
 <td class=r>0x12d86</td><td>= Optio P70</td>
-</tr><tr><td class=r>0x12971</td><td>= Optio S V1.01</td>
-<td class='r b'>0x12be2</td><td class=b>= Optio W10</td>
+</tr><tr><td class=r>0x12962</td><td>= Optio 450/550</td>
+<td class='r b'>0x12bb0</td><td class=b>= Optio T10/T20</td>
 <td class=r>0x12d90</td><td>= Optio L70</td>
-</tr><tr><td class=r>0x12994</td><td>= *ist D</td>
-<td class='r b'>0x12bf6</td><td class=b>= Optio M10</td>
+</tr><tr><td class=r>0x1296c</td><td>= Optio S</td>
+<td class='r b'>0x12be2</td><td class=b>= Optio W10</td>
 <td class=r>0x12d9a</td><td>= Optio E70</td>
-</tr><tr><td class=r>0x129b2</td><td>= Optio 33L</td>
-<td class='r b'>0x12c1e</td><td class=b>= K10D</td>
+</tr><tr><td class=r>0x12971</td><td>= Optio S V1.01</td>
+<td class='r b'>0x12bf6</td><td class=b>= Optio M10</td>
 <td class=r>0x12dae</td><td>= X70</td>
-</tr><tr><td class=r>0x129bc</td><td>= Optio 33LF</td>
-<td class='r b'>0x12c20</td><td class=b>= Samsung GX10</td>
+</tr><tr><td class=r>0x12994</td><td>= *ist D</td>
+<td class='r b'>0x12c1e</td><td class=b>= K10D</td>
 <td class=r>0x12db8</td><td>= K-7</td>
-</tr><tr><td class=r>0x129c6</td><td>= Optio 33WR/43WR/555</td>
-<td class='r b'>0x12c28</td><td class=b>= Optio S7</td>
+</tr><tr><td class=r>0x129b2</td><td>= Optio 33L</td>
+<td class='r b'>0x12c20</td><td class=b>= Samsung GX10</td>
 <td class=r>0x12dcc</td><td>= Optio W80</td>
-</tr><tr><td class=r>0x129d5</td><td>= Optio S4</td>
-<td class='r b'>0x12c2d</td><td class=b>= Optio L20</td>
+</tr><tr><td class=r>0x129bc</td><td>= Optio 33LF</td>
+<td class='r b'>0x12c28</td><td class=b>= Optio S7</td>
 <td class=r>0x12dea</td><td>= Optio P80</td>
-</tr><tr><td class=r>0x12a02</td><td>= Optio MX</td>
-<td class='r b'>0x12c32</td><td class=b>= Optio M20</td>
+</tr><tr><td class=r>0x129c6</td><td>= Optio 33WR/43WR/555</td>
+<td class='r b'>0x12c2d</td><td class=b>= Optio L20</td>
 <td class=r>0x12df4</td><td>= Optio WS80</td>
-</tr><tr><td class=r>0x12a0c</td><td>= Optio S40</td>
-<td class='r b'>0x12c3c</td><td class=b>= Optio W20</td>
+</tr><tr><td class=r>0x129d5</td><td>= Optio S4</td>
+<td class='r b'>0x12c32</td><td class=b>= Optio M20</td>
 <td class=r>0x12dfe</td><td>= K-x</td>
-</tr><tr><td class=r>0x12a16</td><td>= Optio S4i</td>
-<td class='r b'>0x12c46</td><td class=b>= Optio A20</td>
+</tr><tr><td class=r>0x12a02</td><td>= Optio MX</td>
+<td class='r b'>0x12c3c</td><td class=b>= Optio W20</td>
 <td class=r>0x12e08</td><td>= 645D</td>
-</tr><tr><td class=r>0x12a34</td><td>= Optio 30</td>
-<td class='r b'>0x12c78</td><td class=b>= Optio E30</td>
+</tr><tr><td class=r>0x12a0c</td><td>= Optio S40</td>
+<td class='r b'>0x12c46</td><td class=b>= Optio A20</td>
 <td class=r>0x12e12</td><td>= Optio E80</td>
-</tr><tr><td class=r>0x12a52</td><td>= Optio S30</td>
-<td class='r b'>0x12c7d</td><td class=b>= Optio E35</td>
+</tr><tr><td class=r>0x12a16</td><td>= Optio S4i</td>
+<td class='r b'>0x12c78</td><td class=b>= Optio E30</td>
 <td class=r>0x12e30</td><td>= Optio W90</td>
-</tr><tr><td class=r>0x12a66</td><td>= Optio 750Z</td>
-<td class='r b'>0x12c82</td><td class=b>= Optio T30</td>
+</tr><tr><td class=r>0x12a34</td><td>= Optio 30</td>
+<td class='r b'>0x12c7d</td><td class=b>= Optio E35</td>
 <td class=r>0x12e3a</td><td>= Optio I-10</td>
-</tr><tr><td class=r>0x12a70</td><td>= Optio SV</td>
-<td class='r b'>0x12c8c</td><td class=b>= Optio M30</td>
+</tr><tr><td class=r>0x12a52</td><td>= Optio S30</td>
+<td class='r b'>0x12c82</td><td class=b>= Optio T30</td>
 <td class=r>0x12e44</td><td>= Optio H90</td>
-</tr><tr><td class=r>0x12a75</td><td>= Optio SVi</td>
-<td class='r b'>0x12c91</td><td class=b>= Optio L30</td>
+</tr><tr><td class=r>0x12a66</td><td>= Optio 750Z</td>
+<td class='r b'>0x12c8c</td><td class=b>= Optio M30</td>
 <td class=r>0x12e4e</td><td>= Optio E90</td>
-</tr><tr><td class=r>0x12a7a</td><td>= Optio X</td>
-<td class='r b'>0x12c96</td><td class=b>= Optio W30</td>
+</tr><tr><td class=r>0x12a70</td><td>= Optio SV</td>
+<td class='r b'>0x12c91</td><td class=b>= Optio L30</td>
 <td class=r>0x12e58</td><td>= X90</td>
-</tr><tr><td class=r>0x12a8e</td><td>= Optio S5i</td>
-<td class='r b'>0x12ca0</td><td class=b>= Optio A30</td>
+</tr><tr><td class=r>0x12a75</td><td>= Optio SVi</td>
+<td class='r b'>0x12c96</td><td class=b>= Optio W30</td>
 <td class=r>0x12e6c</td><td>= K-r</td>
-</tr><tr><td class=r>0x12a98</td><td>= Optio S50</td>
-<td class='r b'>0x12cb4</td><td class=b>= Optio E40</td>
+</tr><tr><td class=r>0x12a7a</td><td>= Optio X</td>
+<td class='r b'>0x12ca0</td><td class=b>= Optio A30</td>
 <td class=r>0x12e76</td><td>= K-5</td>
-</tr><tr><td class=r>0x12aa2</td><td>= *ist DS</td>
-<td class='r b'>0x12cbe</td><td class=b>= Optio M40</td>
+</tr><tr><td class=r>0x12a8e</td><td>= Optio S5i</td>
+<td class='r b'>0x12cb4</td><td class=b>= Optio E40</td>
 <td class=r>0x12e8a</td><td>= Optio RS1000 / RS1500</td>
-</tr><tr><td class=r>0x12ab6</td><td>= Optio MX4</td>
-<td class='r b'>0x12cc3</td><td class=b>= Optio L40</td>
+</tr><tr><td class=r>0x12a98</td><td>= Optio S50</td>
+<td class='r b'>0x12cbe</td><td class=b>= Optio M40</td>
 <td class=r>0x12e94</td><td>= Optio RZ10</td>
-</tr><tr><td class=r>0x12ac0</td><td>= Optio S5n</td>
-<td class='r b'>0x12cc5</td><td class=b>= Optio L36</td>
+</tr><tr><td class=r>0x12aa2</td><td>= *ist DS</td>
+<td class='r b'>0x12cc3</td><td class=b>= Optio L40</td>
 <td class=r>0x12e9e</td><td>= Optio LS1000</td>
-</tr><tr><td class=r>0x12aca</td><td>= Optio WP</td>
-<td class='r b'>0x12cc8</td><td class=b>= Optio Z10</td>
+</tr><tr><td class=r>0x12ab6</td><td>= Optio MX4</td>
+<td class='r b'>0x12cc5</td><td class=b>= Optio L36</td>
 <td class=r>0x12ebc</td><td>= Optio WG-1 GPS</td>
-</tr><tr><td class=r>0x12afc</td><td>= Optio S55</td>
-<td class='r b'>0x12cd2</td><td class=b>= K20D</td>
+</tr><tr><td class=r>0x12ac0</td><td>= Optio S5n</td>
+<td class='r b'>0x12cc8</td><td class=b>= Optio Z10</td>
 <td class=r>0x12ed0</td><td>= Optio S1</td>
-</tr><tr><td class=r>0x12b10</td><td>= Optio S5z</td>
-<td class='r b'>0x12cd4</td><td class=b>= Samsung GX20</td>
+</tr><tr><td class=r>0x12aca</td><td>= Optio WP</td>
+<td class='r b'>0x12cd2</td><td class=b>= K20D</td>
 <td class=r>0x12ee4</td><td>= Q</td>
-</tr><tr><td class=r>0x12b1a</td><td>= *ist DL</td>
-<td class='r b'>0x12cdc</td><td class=b>= Optio S10</td>
+</tr><tr><td class=r>0x12afc</td><td>= Optio S55</td>
+<td class='r b'>0x12cd4</td><td class=b>= Samsung GX20</td>
 <td class=r>0x12ef8</td><td>= K-01</td>
-</tr><tr><td class=r>0x12b24</td><td>= Optio S60</td>
-<td class='r b'>0x12ce6</td><td class=b>= Optio A40</td>
+</tr><tr><td class=r>0x12b10</td><td>= Optio S5z</td>
+<td class='r b'>0x12cdc</td><td class=b>= Optio S10</td>
 <td class=r>0x12f0c</td><td>= Optio RZ18</td>
-</tr><tr><td class=r>0x12b2e</td><td>= Optio S45</td>
-<td class='r b'>0x12cf0</td><td class=b>= Optio V10</td>
+</tr><tr><td class=r>0x12b1a</td><td>= *ist DL</td>
+<td class='r b'>0x12ce6</td><td class=b>= Optio A40</td>
 <td class=r>0x12f16</td><td>= Optio VS20</td>
-</tr><tr><td class=r>0x12b38</td><td>= Optio S6</td>
-<td class='r b'>0x12cfa</td><td class=b>= K200D</td>
+</tr><tr><td class=r>0x12b24</td><td>= Optio S60</td>
+<td class='r b'>0x12cf0</td><td class=b>= Optio V10</td>
 <td class=r>0x12f2a</td><td>= Optio WG-2 GPS</td>
-</tr><tr><td class=r>0x12b4c</td><td>= Optio WPi</td>
-<td class='r b'>0x12d04</td><td class=b>= Optio S12</td>
+</tr><tr><td class=r>0x12b2e</td><td>= Optio S45</td>
+<td class='r b'>0x12cfa</td><td class=b>= K200D</td>
 <td class=r>0x12f48</td><td>= Optio LS465</td>
-</tr><tr><td class=r>0x12b56</td><td>= BenQ DC X600</td>
-<td class='r b'>0x12d0e</td><td class=b>= Optio E50</td>
+</tr><tr><td class=r>0x12b38</td><td>= Optio S6</td>
+<td class='r b'>0x12d04</td><td class=b>= Optio S12</td>
 <td class=r>0x12f52</td><td>= K-30</td>
-</tr><tr><td class=r>0x12b60</td><td>= *ist DS2</td>
-<td class='r b'>0x12d18</td><td class=b>= Optio M50</td>
+</tr><tr><td class=r>0x12b4c</td><td>= Optio WPi</td>
+<td class='r b'>0x12d0e</td><td class=b>= Optio E50</td>
 <td class=r>0x12f5c</td><td>= X-5</td>
-</tr><tr><td class=r>0x12b62</td><td>= Samsung GX-1S</td>
-<td class='r b'>0x12d22</td><td class=b>= Optio L50</td>
+</tr><tr><td class=r>0x12b56</td><td>= BenQ DC X600</td>
+<td class='r b'>0x12d18</td><td class=b>= Optio M50</td>
 <td class=r>0x12f66</td><td>= Q10</td>
-</tr><tr><td class=r>0x12b6a</td><td>= Optio A10</td>
-<td class='r b'>0x12d2c</td><td class=b>= Optio V20</td>
+</tr><tr><td class=r>0x12b60</td><td>= *ist DS2</td>
+<td class='r b'>0x12d22</td><td class=b>= Optio L50</td>
 <td class=r>0x12f70</td><td>= K-5 II</td>
-</tr><tr><td class=r>0x12b7e</td><td>= *ist DL2</td>
-<td class='r b'>0x12d40</td><td class=b>= Optio W60</td>
+</tr><tr><td class=r>0x12b62</td><td>= Samsung GX-1S</td>
+<td class='r b'>0x12d2c</td><td class=b>= Optio V20</td>
 <td class=r>0x12f71</td><td>= K-5 II s</td>
+</tr><tr><td class=r>0x12b6a</td><td>= Optio A10</td>
+<td class='r b'>0x12d40</td><td class=b>= Optio W60</td>
+<td class=r>0x12f84</td><td>= MX-1</td>
+</tr><tr><td class=r>0x12b7e</td><td>= *ist DL2</td>
+<td class='r b'>0x12d4a</td><td class=b>= Optio M60</td>
+<td class=r>&nbsp;</td><td>&nbsp;</td>
+</tr><tr><td class=r>0x12b80</td><td>= Samsung GX-1L</td>
+<td class='r b'>0x12d68</td><td class=b>= Optio E60/M90</td>
+<td class=r>&nbsp;</td><td>&nbsp;</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='City'>Pentax City Values</a></h2>
@@ -1486,6 +1574,7 @@ identify the specific lens model.</p>
 </tr><tr><td>'3 27.1'</td><td>= Tokina AT-X Pro AF 28-70mm F2.6-2.8</td>
 </tr><tr><td>'3 28'</td><td>= smc PENTAX-F 35-70mm F3.5-4.5 or Tokina Lens</td>
 </tr><tr><td>'3 28.1'</td><td>= Tokina 19-35mm F3.5-4.5 AF</td>
+</tr><tr><td>'3 28.2'</td><td>= Tokina AT-X AF 400mm F5.6</td>
 </tr><tr><td>'3 29'</td><td>= PENTAX-F 28-80mm F3.5-4.5 or Sigma or Tokina Lens</td>
 </tr><tr><td>'3 29.1'</td><td>= Sigma AF 18-125mm F3.5-5.6 DC</td>
 </tr><tr><td>'3 29.2'</td><td>= Tokina AT-X PRO 28-70mm F2.6-2.8</td>
@@ -1570,12 +1659,15 @@ identify the specific lens model.</p>
 </tr><tr><td>'4 49'</td><td>= Tamron SP AF 28-75mm F2.8 XR Di (A09)</td>
 </tr><tr><td>'4 51'</td><td>= smc PENTAX-D FA 50mm F2.8 Macro</td>
 </tr><tr><td>'4 52'</td><td>= smc PENTAX-D FA 100mm F2.8 Macro</td>
+</tr><tr><td>'4 56'</td><td>= Samsung D-XENON 100mm F2.8 Macro</td>
 </tr><tr><td>'4 75'</td><td>= Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)</td>
+</tr><tr><td>'4 214'</td><td>= smc PENTAX-DA 35mm F2.4 AL</td>
 </tr><tr><td>'4 229'</td><td>= smc PENTAX-DA 18-55mm F3.5-5.6 AL II</td>
 </tr><tr><td>'4 230'</td><td>= Tamron SP AF 17-50mm F2.8 XR Di II</td>
 </tr><tr><td>'4 231'</td><td>= smc PENTAX-DA 18-250mm F3.5-6.3 ED AL [IF]</td>
 </tr><tr><td>'4 237'</td><td>= Samsung/Schneider D-XENOGON 10-17mm F3.5-4.5</td>
 </tr><tr><td>'4 239'</td><td>= Samsung D-XENON 12-24mm F4 ED AL [IF]</td>
+</tr><tr><td>'4 242'</td><td>= smc PENTAX-DA* 16-50mm F2.8 ED AL [IF] SDM (SDM unused)</td>
 </tr><tr><td>'4 243'</td><td>= smc PENTAX-DA 70mm F2.4 Limited</td>
 </tr><tr><td>'4 244'</td><td>= smc PENTAX-DA 21mm F3.2 AL Limited</td>
 </tr><tr><td>'4 245'</td><td>= Schneider D-XENON 50-200mm F4-5.6</td>
@@ -1620,7 +1712,7 @@ identify the specific lens model.</p>
 </tr><tr><td>'7 0'</td><td>= smc PENTAX-DA 21mm F3.2 AL Limited</td>
 </tr><tr><td>'7 58'</td><td>= smc PENTAX-D FA Macro 100mm F2.8 WR</td>
 </tr><tr><td>'7 75'</td><td>= Tamron SP AF 70-200mm F2.8 Di LD [IF] Macro (A001)</td>
-</tr><tr><td>'7 212'</td><td>= smc Pentax-DA 50mm F1.8</td>
+</tr><tr><td>'7 212'</td><td>= smc PENTAX-DA 50mm F1.8</td>
 </tr><tr><td>'7 213'</td><td>= smc PENTAX-DA 40mm F2.8 XS</td>
 </tr><tr><td>'7 214'</td><td>= smc PENTAX-DA 35mm F2.4 AL</td>
 </tr><tr><td>'7 216'</td><td>= smc PENTAX-DA L 55-300mm F4-5.8 ED</td>
@@ -1660,7 +1752,8 @@ identify the specific lens model.</p>
 </tr><tr><td>'8 22'</td><td>= Sigma 85mm F1.4 EX DG HSM</td>
 </tr><tr><td>'8 23'</td><td>= Sigma 70-200mm F2.8 APO EX DG OS HSM</td>
 </tr><tr><td>'8 27'</td><td>= Sigma 18-200mm F3.5-6.3 II DC HSM</td>
-</tr><tr><td>'8 210'</td><td>= smc Pentax-DA 18-270mm F3.5-6.3 ED SDM</td>
+</tr><tr><td>'8 28'</td><td>= Sigma 18-250mm F3.5-6.3 DC Macro HSM</td>
+</tr><tr><td>'8 210'</td><td>= smc PENTAX-DA 18-270mm F3.5-6.3 ED SDM</td>
 </tr><tr><td>'8 215'</td><td>= smc PENTAX-DA 18-135mm F3.5-5.6 ED AL [IF] DC WR</td>
 </tr><tr><td>'8 226'</td><td>= smc PENTAX-DA* 55mm F1.4 SDM</td>
 </tr><tr><td>'8 227'</td><td>= smc PENTAX-DA* 60-250mm F4 [IF] SDM</td>
@@ -1676,9 +1769,17 @@ identify the specific lens model.</p>
 </tr><tr><td>'8 255.4'</td><td>= Sigma 50-200mm F4-5.6 DC OS</td>
 </tr><tr><td>'9 0'</td><td>= 645 Manual Lens</td>
 </tr><tr><td>'10 0'</td><td>= 645 A Series Lens</td>
+</tr><tr><td>'11 1'</td><td>= smc PENTAX-FA 645 75mm F2.8</td>
+</tr><tr><td>'11 2'</td><td>= smc PENTAX-FA 645 45mm F2.8</td>
+</tr><tr><td>'11 3'</td><td>= smc PENTAX-FA* 645 300mm F4 ED [IF]</td>
 </tr><tr><td>'11 4'</td><td>= smc PENTAX-FA 645 45-85mm F4.5</td>
+</tr><tr><td>'11 5'</td><td>= smc PENTAX-FA 645 400mm F5.6 ED [IF]</td>
+</tr><tr><td>'11 7'</td><td>= smc PENTAX-FA 645 Macro 120mm F4</td>
 </tr><tr><td>'11 8'</td><td>= smc PENTAX-FA 645 80-160mm F4.5</td>
+</tr><tr><td>'11 9'</td><td>= smc PENTAX-FA 645 200mm F4 [IF]</td>
+</tr><tr><td>'11 10'</td><td>= smc PENTAX-FA 645 150mm F2.8 [IF]</td>
 </tr><tr><td>'11 11'</td><td>= smc PENTAX-FA 645 35mm F3.5 AL [IF]</td>
+</tr><tr><td>'11 14'</td><td>= smc PENTAX-FA 645 55-110mm F5.6</td>
 </tr><tr><td>'11 16'</td><td>= smc PENTAX-FA 645 33-55mm F4.5 AL</td>
 </tr><tr><td>'11 17'</td><td>= smc PENTAX-FA 645 150-300mm F5.6 ED [IF]</td>
 </tr><tr><td>'13 18'</td><td>= smc PENTAX-D FA 645 55mm F2.8 AL [IF] SDM AW</td>
@@ -1714,11 +1815,13 @@ identify the specific lens model.</p>
   <td>0 = Off
   <br>1 = On
   <br>4 = Off (4)
-  <br>5 = On but Disabled</td><td>&nbsp;&nbsp;</td>
-  <td>6 = On (Video)
-  <br>7 = On (7)
+  <br>5 = On but Disabled
+  <br>6 = On (Video)</td><td>&nbsp;&nbsp;</td>
+  <td>7 = On (7)
   <br>15 = On (15)
-  <br>135 = On (135)</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>39 = On (mode 2)
+  <br>135 = On (135)
+  <br>167 = On (mode 1)</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
@@ -2174,6 +2277,7 @@ Remote or Self-timer, and Internal/ExternalFlashMode is not &quot;On, Wireless&q
 </table></td></tr></table></blockquote>
 
 <h2><a name='AEInfo'>Pentax AEInfo Tags</a></h2>
+<p>Auto-exposure information for most Pentax models.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -2288,8 +2392,139 @@ or if flash was on but did not fire.  Both this tag and 0x004d report the
 setting even if the flash is off)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='AEInfo2'>Pentax AEInfo2 Tags</a></h2>
+<p>Auto-exposure information for the K-01.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>AEExposureTime</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 24 * 2**((32-raw)/8))</span></span></td></tr>
+<tr class=b>
+<td class=r title='3 = 0x3'>3</td>
+<td>AEAperture</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 2**((raw-68)/16))</span></span></td></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>AE_ISO</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 100 * 2**((raw-32)/8))</span></span></td></tr>
+<tr class=b>
+<td class=r title='5 = 0x5'>5</td>
+<td>AEXv</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = (raw-64)/8)</span></span></td></tr>
+<tr>
+<td class=r title='6 = 0x6'>6</td>
+<td>AEBXv</td>
+<td class=c>int8s</td>
+<td><span class=s><span class=n>(val = raw / 8)</span></span></td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>AEError</td>
+<td class=c>int8s</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='15 = 0xf'>15</td>
+<td>SceneMode</td>
+<td class=c>int8u</td>
+<td><table class=cols><tr>
+  <td>0 = Off
+  <br>1 = HDR
+  <br>4 = Auto PICT
+  <br>5 = Portrait
+  <br>6 = Landscape
+  <br>7 = Macro
+  <br>8 = Sport
+  <br>9 = Night Scene Portrait
+  <br>10 = No Flash
+  <br>11 = Night Scene
+  <br>12 = Surf &amp; Snow
+  <br>14 = Sunset</td><td>&nbsp;&nbsp;</td>
+  <td>15 = Kids
+  <br>16 = Pet
+  <br>17 = Candlelight
+  <br>18 = Museum
+  <br>20 = Food
+  <br>21 = Stage Lighting
+  <br>22 = Night Snap
+  <br>25 = Night Scene HDR
+  <br>26 = Blue Sky
+  <br>27 = Forest
+  <br>29 = Backlight Silhouette</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr class=b>
+<td class=r title='16 = 0x10'>16</td>
+<td>AEMaxAperture</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 2**((raw-68)/16))</span></span></td></tr>
+<tr>
+<td class=r title='17 = 0x11'>17</td>
+<td>AEMaxAperture2</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 2**((raw-68)/16))</span></span></td></tr>
+<tr class=b>
+<td class=r title='18 = 0x12'>18</td>
+<td>AEMinAperture</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 2**((raw-68)/16))</span></span></td></tr>
+<tr>
+<td class=r title='19 = 0x13'>19</td>
+<td>AEMinExposureTime</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 24 * 2**((32-raw)/8))</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AEInfo3'>Pentax AEInfo3 Tags</a></h2>
+<p>Auto-exposure information for the K-30</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>AEExposureTime</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 24 * 2**((32-raw)/8))</span></span></td></tr>
+<tr class=b>
+<td class=r title='17 = 0x11'>17</td>
+<td>AEAperture</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 2**((raw-68)/16))</span></span></td></tr>
+<tr>
+<td class=r title='18 = 0x12'>18</td>
+<td>AE_ISO</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 100 * 2**((raw-32)/8))</span></span></td></tr>
+<tr class=b>
+<td class=r title='28 = 0x1c'>28</td>
+<td>AEMaxAperture</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 2**((raw-68)/16))</span></span></td></tr>
+<tr>
+<td class=r title='29 = 0x1d'>29</td>
+<td>AEMaxAperture2</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 2**((raw-68)/16))</span></span></td></tr>
+<tr class=b>
+<td class=r title='30 = 0x1e'>30</td>
+<td>AEMinAperture</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 2**((raw-68)/16))</span></span></td></tr>
+<tr>
+<td class=r title='31 = 0x1f'>31</td>
+<td>AEMinExposureTime</td>
+<td class=c>int8u</td>
+<td><span class=s><span class=n>(val = 24 * 2**((32-raw)/8))</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='AEInfoUnknown'>Pentax AEInfoUnknown Tags</a></h2>
-<p>This information has not yet been decoded for models such as the K-01.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -2834,6 +3069,100 @@ selected, in which case the selected AFPoint is the first reported)</span></span
   <br>19 = Center (vertical)
   <br>20 = Mid-right</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='KelvinWB'>Pentax KelvinWB Tags</a></h2>
+<p>White balance Blue/Red gains as a function of color temperature.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index2</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='1 = 0x1'>1</td>
+<td>KelvinWB_Daylight</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='5 = 0x5'>5</td>
+<td>KelvinWB_01</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='9 = 0x9'>9</td>
+<td>KelvinWB_02</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='13 = 0xd'>13</td>
+<td>KelvinWB_03</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='17 = 0x11'>17</td>
+<td>KelvinWB_04</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='21 = 0x15'>21</td>
+<td>KelvinWB_05</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='25 = 0x19'>25</td>
+<td>KelvinWB_06</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='29 = 0x1d'>29</td>
+<td>KelvinWB_07</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='33 = 0x21'>33</td>
+<td>KelvinWB_08</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='37 = 0x25'>37</td>
+<td>KelvinWB_09</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='41 = 0x29'>41</td>
+<td>KelvinWB_10</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='45 = 0x2d'>45</td>
+<td>KelvinWB_11</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='49 = 0x31'>49</td>
+<td>KelvinWB_12</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='53 = 0x35'>53</td>
+<td>KelvinWB_13</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='57 = 0x39'>57</td>
+<td>KelvinWB_14</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='61 = 0x3d'>61</td>
+<td>KelvinWB_15</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='65 = 0x41'>65</td>
+<td>KelvinWB_16</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ColorInfo'>Pentax ColorInfo Tags</a></h2>
@@ -3439,6 +3768,69 @@ used.</p>
 <td><span class=s><span class=n>(steps clockwise, 1/8 degree per step)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='WBLevels'>Pentax WBLevels Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>WB_RGGBLevelsDaylight</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='11 = 0xb'>11</td>
+<td>WB_RGGBLevelsShade</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='20 = 0x14'>20</td>
+<td>WB_RGGBLevelsCloudy</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='29 = 0x1d'>29</td>
+<td>WB_RGGBLevelsTungsten</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='38 = 0x26'>38</td>
+<td>WB_RGGBLevelsFluorescentD</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='47 = 0x2f'>47</td>
+<td>WB_RGGBLevelsFluorescentN</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='56 = 0x38'>56</td>
+<td>WB_RGGBLevelsFluorescentW</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='65 = 0x41'>65</td>
+<td>WB_RGGBLevelsFlash</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='74 = 0x4a'>74</td>
+<td>WB_RGGBLevelsFluorescentL</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='83 = 0x53'>83</td>
+<td>WB_RGGBLevelsUnknown?</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='92 = 0x5c'>92</td>
+<td>WB_RGGBLevelsUserSelected</td>
+<td class=c>int16u[4]</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='LensInfoQ'>Pentax LensInfoQ Tags</a></h2>
 <p>More lens information stored by the Pentax Q.</p>
 <blockquote>
@@ -3460,7 +3852,7 @@ used.</p>
 
 <h2><a name='TempInfoK5'>Pentax TempInfoK5 Tags</a></h2>
 <p>A number of additional temperature readings are extracted from this 256-byte
-binary-data block in images from the K-5.  It is not currently known where
+binary-data block in images from the K-5.  It is currently not known where
 the corresponding temperature sensors are located in the camera.</p>
 <blockquote>
 <table class=frame><tr><td>
@@ -3929,7 +4321,7 @@ stored as ASCII text in a format very similar to some HP models.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 2, 2013</i>
+<br><i>Last revised Apr 5, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

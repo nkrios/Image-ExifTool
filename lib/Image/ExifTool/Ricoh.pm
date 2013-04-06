@@ -16,7 +16,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.23';
+$VERSION = '1.24';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -165,7 +165,7 @@ my %ricohLensIDs = (
     },
     28 => {
         Name => 'PreviewImageStart',
-        Format => 'int16u',
+        Format => 'int16u', # ha!  (only the lower 16 bits, even if > 0xffff)
         Flags => 'IsOffset',
         OffsetPair => 30,   # associated byte count tagID
         DataTag => 'PreviewImage',
@@ -252,7 +252,7 @@ my %ricohLensIDs = (
 );
 
 # Ricoh subdirectory tags (ref PH)
-# NOTE: this subdir is not currently writable because the offsets would require
+# NOTE: this subdir is currently not writable because the offsets would require
 # special code to handle the funny start location and base offset
 %Image::ExifTool::Ricoh::Subdir = (
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -488,6 +488,10 @@ my %ricohLensIDs = (
         15 => 'NW',
         16 => 'NNW',
     } },
+    _audio => {
+        Name => 'SoundFile',
+        Notes => 'audio data recorded in JPEG images by the G700SE',
+    },
 );
 
 # information stored in Ricoh AVI images (ref PH)
@@ -584,9 +588,7 @@ sub ProcessRicohText($$$)
 
 #------------------------------------------------------------------------------
 # Process Ricoh APP5 RMETA information
-# Inputs: 0) ExifTool object reference
-#         1) Reference to directory information hash
-#         2) Pointer to tag table for this directory
+# Inputs: 0) ExifTool ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success, otherwise returns 0 and sets a Warning
 sub ProcessRicohRMETA($$$)
 {
@@ -594,12 +596,33 @@ sub ProcessRicohRMETA($$$)
     my $dataPt = $$dirInfo{DataPt};
     my $dirStart = $$dirInfo{DirStart};
     my $dataLen = length($$dataPt);
+    my $dirLen = $dataLen - $dirStart;
     my $verbose = $exifTool->Options('Verbose');
 
     $exifTool->VerboseDir('Ricoh RMETA') if $verbose;
-    $dataLen > 6 or $exifTool->Warn('Truncated Ricoh RMETA data'), return 0;
+    $dirLen > 6 or $exifTool->Warn('Truncated Ricoh RMETA data', 1), return 0;
     my $byteOrder = substr($$dataPt, $dirStart, 2);
-    SetByteOrder($byteOrder) or $exifTool->Warn('Bad Ricoh RMETA data'), return 0;
+    SetByteOrder($byteOrder) or $exifTool->Warn('Bad Ricoh RMETA data', 1), return 0;
+    my $rmetaType = Get16u($dataPt, $dirStart+4);
+    if ($rmetaType != 0) {
+        # not sure how to recognize audio, so do it by brute force and assume
+        # all subsequent RMETA segments are part of the audio data
+        $dirLen < 14 and $exifTool->Warn('Short Ricoh RMETA block', 1), return 0;
+        my $audioLen = Get16u($dataPt, $dirStart+12);
+        $audioLen + 14 > $dirLen and $exifTool->Warn('Truncated Ricoh RMETA audio data', 1), return 0;
+        my $buff = substr($$dataPt, $dirStart + 14, $audioLen);
+        my $val = $$exifTool{VALUE}{SoundFile};
+        if ($val) {
+            $$val .= $buff;
+        } elsif ($audioLen >= 4 and substr($buff, 0, 4) eq 'RIFF') {
+            $exifTool->HandleTag($tagTablePtr, '_audio', \$buff);
+        } else {
+            $exifTool->Warn('Unknown Ricoh RMETA type', 1);
+            return 0;
+        }
+        return 1;
+    }
+    # standard RMETA tag directory
     my (@tags, @vals, @nums, $valPos);
     my $pos = $dirStart + 6;
     while ($pos <= $dataLen - 4) {
@@ -609,7 +632,7 @@ sub ProcessRicohRMETA($$$)
         $pos += 4;
         $size -= 2;
         if ($size < 0 or $pos + $size > $dataLen) {
-            $exifTool->Warn('Corrupted Ricoh RMETA data');
+            $exifTool->Warn('Corrupted Ricoh RMETA data', 1);
             last;
         }
         if ($type eq 1) {
@@ -633,16 +656,16 @@ sub ProcessRicohRMETA($$$)
         $pos += $size;
     }
     if (@tags or @vals) {
-        if (@tags != @vals) {
+        if (@tags < @vals) {
             my ($nt, $nv) = (scalar(@tags), scalar(@vals));
-            $exifTool->Warn("Number of tags ($nt) and values ($nv) differs in Ricoh RMETA");
+            $exifTool->Warn("Fewer tags ($nt) than values ($nv) in Ricoh RMETA", 1);
         }
         # find next tag in null-delimited list
         # unpack numerical values from block of int16u values
         my ($tag, $name, $val);
         foreach $tag (@tags) {
             $val = shift @vals;
-            last unless defined $val;
+            $val = '' unless defined $val;
             ($name = $tag) =~ s/\b([a-z])/\U$1/gs;  # make capitalize all words
             $name =~ s/ (\w)/\U$1/g;                # remove special characters
             $name = 'RMETA_Unknown' unless length($name);

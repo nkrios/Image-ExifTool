@@ -1,10 +1,10 @@
-  ExifToolVersion = 9.09
+  ExifToolVersion = 9.18
   FileName = Canon.jpg
   Directory = t/images
   FileSize = 2697
   FileModifyDate = 1159902631
-  FileAccessDate = 1355791141
-  FileInodeChangeDate = 1355575268
+  FileAccessDate = 1360933201
+  FileInodeChangeDate = 1360674136
   FilePermissions = 33188
   FileType = JPEG
   MIMEType = image/jpeg
@@ -579,6 +579,11 @@ JPEG DQT (130 bytes):
     [snip 18 bytes]
 JPEG SOF0 (15 bytes):
     0a1a: 08 00 08 00 08 03 01 22 00 02 11 01 03 11 01    [.......".......]
+  ImageWidth = 8
+  ImageHeight = 8
+  EncodingProcess = 0
+  BitsPerSample = 8
+  ColorComponents = 3
 JPEG DHT (73 bytes):
     0a2d: 00 01 01 00 00 00 00 00 00 00 00 00 00 00 00 00 [................]
     0a3d: 00 00 06 01 01 00 00 00 00 00 00 00 00 00 00 00 [................]

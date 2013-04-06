@@ -23,14 +23,14 @@ my $charset;
 
 #------------------------------------------------------------------------------
 # Read CSV file
-# Inputs: 0) CSV file name, 1) database hash ref, 2) flag to delete "-" tags
+# Inputs: 0) CSV file name, 1) database hash ref, 2) missing tag value
 # Returns: undef on success, or error string
 # Notes: There are various flavours of CSV, but here we assume that only
 #        double quotes are escaped, and they are escaped by doubling them
 sub ReadCSV($$;$)
 {
     local ($_, $/);
-    my ($file, $database, $delDash) = @_;
+    my ($file, $database, $missingValue) = @_;
     my ($buff, @tags, $found, $err);
 
     open CSVFILE, $file or return "Error opening CSV file '$file'";
@@ -71,8 +71,9 @@ sub ReadCSV($$;$)
             # save values for each tag
             for ($i=0; $i<@vals and $i<@tags; ++$i) {
                 next unless length $vals[$i];   # ignore empty entries
-                # delete tag if value (set value to undef) is '-' and -f option is used
-                $fileInfo{$tags[$i]} = ($vals[$i] eq '-' and $delDash) ? undef : $vals[$i];
+                # delete tag (set value to undef) if value is same as missing tag
+                $fileInfo{$tags[$i]} =
+                    (defined $missingValue and $vals[$i] eq $missingValue) ? undef : $vals[$i];
             }
             # figure out the file name to use
             if ($fileInfo{SourceFile}) {
@@ -213,7 +214,7 @@ Tok: for (;;) {
 sub ReadJSON($$;$$)
 {
     local $_;
-    my ($file, $database, $delDash, $chset) = @_;
+    my ($file, $database, $missingValue, $chset) = @_;
 
     # initialize character set for converting "\uHHHH" chars
     $charset = $chset || 'UTF8';
@@ -228,8 +229,8 @@ sub ReadJSON($$;$$)
     my ($info, $found);
     foreach $info (@$obj) {
         next unless ref $info eq 'HASH' and $$info{SourceFile};
-        if ($delDash) {
-            $$info{$_} eq '-' and $$info{$_} = undef foreach keys %$info;
+        if (defined $missingValue) {
+            $$info{$_} eq $missingValue and $$info{$_} = undef foreach keys %$info;
         }
         $$database{$$info{SourceFile}} = $info;
         $found = 1;
@@ -277,8 +278,8 @@ Read CSV or JSON file into a database hash.
 
 1) Hash reference for database object.
 
-2) Optional flag to set '-' values to undef in the database.  (Used for
-deleting tags.)
+2) Optional string used to represent an undefined (missing) tag value. 
+(Used for deleting tags.)
 
 3) [ReadJSON only] Optional character set for converting Unicode escape
 sequences in strings.  Defaults to "UTF8".  See the ExifTool Charset option

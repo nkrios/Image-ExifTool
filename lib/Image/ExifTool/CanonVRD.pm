@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.18';
+$VERSION = '1.20';
 
 sub ProcessCanonVRD($$;$);
 sub WriteCanonVRD($$;$);
@@ -1010,7 +1010,7 @@ sub ProcessEditData($$$)
     my $out = $exifTool->Options('TextOut');
     my $oldChanged = $$exifTool{CHANGED};
 
-    $exifTool->VerboseDir('VRD Edit Data', 0, $dirLen);
+    $exifTool->VerboseDir('VRD Edit Data', 0, $dirLen) unless $outfile;
 
     # loop through all records in the edit data
     my ($recNum, $recLen, $err);
@@ -1269,8 +1269,8 @@ sub ProcessCanonVRD($$;$)
         $exifTool->Warn('Bad CanonVRD trailer');
         return 0;
     }
-    # extract CanonVRD block if Binary option set, or if requested
-    if (($exifTool->{OPTIONS}{Binary} and not $exifTool->{EXCL_TAG_LOOKUP}{canonvrd}) or
+    # extract CanonVRD block if copying tags, or if requested
+    if (($exifTool->{TAGS_FROM_FILE} and not $exifTool->{EXCL_TAG_LOOKUP}{canonvrd}) or
         $exifTool->{REQ_TAG_LOOKUP}{canonvrd})
     {
         $exifTool->FoundTag('CanonVRD', $header . $buff . $footer);

@@ -32,7 +32,7 @@ use Image::ExifTool::XMP;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.54';
+$VERSION = '2.58';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -51,6 +51,51 @@ my $docType = q{<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 };
 
 my $homePage = 'http://owl.phy.queensu.ca/~phil/exiftool';
+
+# tweak the ordering of tables in the documentation
+my %tweakOrder = (
+  # this    => comes after this
+  # -------    -----------------
+    JPEG    => '-',     # JPEG comes first
+    IPTC    => 'Exif',  # put IPTC after EXIF,
+    GPS     => 'XMP',   # etc...
+    GeoTiff => 'GPS',
+    CanonVRD=> 'CanonCustom',
+    FLIR    => 'Casio',
+    FujiFilm => 'FLIR',
+    Kodak   => 'JVC',
+   'Kodak::IFD' => 'Kodak::Unknown',
+   'Kodak::TextualInfo' => 'Kodak::IFD',
+   'Kodak::Processing' => 'Kodak::TextualInfo',
+    Leaf    => 'Kodak',
+    Minolta => 'Leaf',
+    Pentax  => 'Panasonic',
+    SonyIDC => 'Sony',
+    Unknown => 'SonyIDC',
+    DNG     => 'Unknown',
+    PrintIM => 'ICC_Profile',
+    Vorbis  => 'Ogg',
+    ID3     => 'PostScript',
+    MinoltaRaw => 'KyoceraRaw',
+    KyoceraRaw => 'CanonRaw',
+    SigmaRaw => 'PanasonicRaw',
+    Olympus => 'NikonCapture',
+    PhotoMechanic => 'FotoStation',
+    Microsoft     => 'PhotoMechanic',
+   'Microsoft::MP'=> 'Microsoft::MP1',
+    GIMP    => 'Microsoft',
+   'Nikon::CameraSettingsD300' => 'Nikon::ShotInfoD300b',
+   'Pentax::LensData' => 'Pentax::LensInfo2',
+   'Sony::SRF2' => 'Sony::SRF',
+   'Samsung::PictureWizard' => 'Samsung::Type2', # (necessary because Samsung doesn't have a main table)
+   'Samsung::INFO' => 'Samsung::PictureWizard', # (ditto)
+   'Samsung::MP4' => 'Samsung::INFO', # (ditto)
+   'Samsung::Thumbnail' => 'Samsung::MP4', # (ditto)
+    DarwinCore => 'AFCP',
+   'MWG::Regions' => 'MWG::Composite',
+   'MWG::Keywords' => 'MWG::Regions',
+   'MWG::Collections' => 'MWG::Keywords',
+);
 
 # list of all recognized Format strings
 # (not a complete list, but this is all we use so far)
@@ -186,7 +231,7 @@ other tags which are not part of the EXIF specification, but may co-exist
 with EXIF tags in some images.  Tags which are part of the EXIF 2.3
 specification have an underlined B<Tag Name> in the HTML version of this
 documentation.  See
-L<http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-008-2010_E.pdf> for the
+L<http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-008-2012_E.pdf> for the
 official EXIF 2.3 specification.
 },
     GPS => q{
@@ -275,7 +320,7 @@ details.
 
 ExifTool will extract XMP information even if it is not listed in these
 tables, but other tags are not writable unless added as user-defined tags in
-the ExifTool config file.  For example, the C<pdfx> namespace doesn't have a
+the L<ExifTool config file|../config.html>.  For example, the C<pdfx> namespace doesn't have a
 predefined set of tag names because it is used to store application-defined
 PDF information, so although this information will be extracted, it is only
 writable if the corresponding user-defined tags have been created.
@@ -373,10 +418,6 @@ These tags are used in Panasonic/Leica cameras.
     Pentax => q{
 These tags are used in Pentax/Asahi cameras.
 },
-    Sigma => q{
-These tags are used in Sigma/Foveon cameras.  Many tags are not consistent
-between different models.
-},
     CanonRaw => q{
 These tags apply to CRW-format Canon RAW files and information in the APP0
 "CIFF" segment of JPEG images.  When writing CanonRaw/CIFF information, the
@@ -448,8 +489,8 @@ be written without modifying the file itself.
 The values of the composite tags are B<Derived From> the values of other
 tags.  These are convenience tags which are calculated after all other
 information is extracted.  User-defined Composite tags, useful for
-custom-formatting of tag values, may created in the ExifTool configuration
-file.
+custom-formatting of tag values, may created in the L<ExifTool configuration
+file|../config.html>.
 },
     Shortcuts => q{
 Shortcut tags are convenience tags that represent one or more other tag
@@ -460,6 +501,14 @@ The shortcut tags below have been pre-defined, but user-defined shortcuts
 may be added via the %Image::ExifTool::UserDefined::Shortcuts lookup in the
 ~/.ExifTool_config file.  See the Image::ExifTool::Shortcuts documentation
 for more details.
+},
+    MWG => q{
+The Metadata Working Group (MWG) recommends techniques to allow certain
+overlapping EXIF, IPTC and XMP tags to be reconciled when reading, and
+synchronized when writing.  The MWG Composite tags below are designed to aid
+in the implementation of these recommendations.  As well, the MWG defines
+new XMP tags which are listed in the subsequent tables below.  See
+L<http://www.metadataworkinggroup.org/> for the official MWG specification.
 },
     PodTrailer => q{
 ~head1 NOTES
@@ -592,7 +641,6 @@ sub new
     # add Shortcuts after other tables
     push @tableNames, 'Image::ExifTool::Shortcuts::Main';
     # add plug-in modules last
-    $Image::ExifTool::documentOnly = 1; # (don't really load them)
     foreach (@pluginTables) {
         push @tableNames, $_;
         $isPlugin{$_} = 1;
@@ -711,6 +759,13 @@ TagID:  foreach $tagID (@keys) {
                 }
                 # accumulate information for consistency check of BinaryData tables
                 if ($processBinaryData and $$table{WRITABLE}) {
+                    # can't currently write tag if Condition accesses $valPt
+                    if ($$tagInfo{Condition} and not $$tagInfo{SubDirectory} and
+                        $$tagInfo{Condition} =~ /\$valPt/ and
+                        ($$tagInfo{Writable} or not defined $$tagInfo{Writable}))
+                    {
+                        warn "Warning: Tag not writable due to Condition - $short $name\n";
+                    }
                     $isOffset{$tagID} = $name if $$tagInfo{IsOffset};
                     $hasSubdir{$tagID} = $name if $$tagInfo{SubDirectory};
                     # require DATAMEMBER for writable var-format tags, Hook and DataMember tags
@@ -1045,6 +1100,7 @@ TagID:  foreach $tagID (@keys) {
                     $writable = 'Y' if $tw and $writable eq '1';
                     $writable = '-' . ($tw ? $writable : '');
                     $writable .= '!' if $tw and ($$tagInfo{Protected} || 0) & 0x01;
+                    $writable .= '+' if $$tagInfo{List};
                 } else {
                     # not writable if we can't do the inverse conversions
                     my $noPrintConvInv;
@@ -1446,7 +1502,7 @@ sub NumbersFirst
 }
 
 #------------------------------------------------------------------------------
-# Convert pod documentation to pod
+# Convert our pod-like documentation to pod
 # (funny, I know, but the pod headings must be hidden to prevent confusing
 #  the pod parser)
 # Inputs: 0-N) documentation strings
@@ -1457,11 +1513,12 @@ sub Doc2Pod($;@)
     $doc .= shift while @_;
     $doc =~ s/\n~/\n=/g;
     $doc =~ s/L<[^>]+?\|(http[^>]+)>/L<$1>/g; # POD doesn't support text for http links
+    $doc =~ s/L<([^>]+?)\|[^>]+\.html>/$1/g;  # remove relative HTML links
     return $doc;
 }
 
 #------------------------------------------------------------------------------
-# Convert pod documentation to html
+# Convert our pod-like documentation to html
 # Inputs: 0) string
 sub Doc2Html($)
 {
@@ -1483,17 +1540,43 @@ sub Doc2Html($)
     # (a relative POD link turns into a relative HTML link)
     $doc =~ s{L&lt;([^&]+?)\|/\w+ ([^/&|]+) Tags&gt;}{<a href="#$2">$1</a>}sg;
     # L<sample config file|../config.html> --> <a href="../config.html">sample config file</a>
-    # (these should only be used for Notes which do not propagate to TagNames.pod)
     $doc =~ s/L&lt;([^&]+?)\|(.+?)&gt;/<a href="$2">$1<\/a>/sg;
     # L<http://some.web.site/> --> <a href="http://some.web.site">http://some.web.site</a>
-    $doc =~ s/L&lt;(.*?)&gt;/<a href="$1">$1<\/a>/sg;
+    $doc =~ s/L&lt;(http.*?)&gt;/<a href="$1">$1<\/a>/sg;
     return $doc;
 }
 
 #------------------------------------------------------------------------------
+# Tweak order of tables
+# Inputs: 0) table list ref, 1) reference to tweak hash
+sub TweakOrder($$)
+{
+    my ($sortedTables, $tweakOrder) = @_;
+    my @tweak = sort keys %$tweakOrder;
+    while (@tweak) {
+        my $table = shift @tweak;
+        my $first = $$tweakOrder{$table};
+        if ($$tweakOrder{$first}) {
+            push @tweak, $table;    # must defer this till later
+            next;
+        }
+        delete $$tweakOrder{$table}; # because the table won't move again
+        my @moving = grep /^Image::ExifTool::$table\b/, @$sortedTables;
+        my @notMoving = grep !/^Image::ExifTool::$table\b/, @$sortedTables;
+        my @after;
+        while (@notMoving) {
+            last if $notMoving[-1] =~ /^Image::ExifTool::$first\b/;
+            unshift @after, pop @notMoving;
+        }
+        @$sortedTables = (@notMoving, @moving, @after);
+    }
+}
+
+#------------------------------------------------------------------------------
 # Get the order that we want to print the tables in the documentation
+# Inputs: 0-N) Extra tables to add at end
 # Returns: tables in the order we want
-sub GetTableOrder()
+sub GetTableOrder(@)
 {
     my %gotTable;
     my @tableNames = @tableOrder;
@@ -1560,62 +1643,12 @@ sub GetTableOrder()
             splice(@sortedTables, $pos, 0, @{$fixOrder{$_}});
         }
     }
+    # add the extra tables
+    push @sortedTables, @_;
     # tweak the table order
-    my %tweakOrder = (
-      # this    => comes after this
-      # -------    -----------------
-        JPEG    => '-',     # JPEG comes first
-        IPTC    => 'Exif',  # put IPTC after EXIF,
-        GPS     => 'XMP',   # etc...
-        GeoTiff => 'GPS',
-        CanonVRD=> 'CanonCustom',
-        Kodak   => 'JVC',
-       'Kodak::IFD' => 'Kodak::Unknown',
-       'Kodak::TextualInfo' => 'Kodak::IFD',
-       'Kodak::Processing' => 'Kodak::TextualInfo',
-        Leaf    => 'Kodak',
-        Minolta => 'Leaf',
-        SonyIDC => 'Sony',
-        Unknown => 'SonyIDC',
-        DNG     => 'Unknown',
-        PrintIM => 'ICC_Profile',
-        Vorbis  => 'Ogg',
-        ID3     => 'PostScript',
-        MinoltaRaw => 'KyoceraRaw',
-        KyoceraRaw => 'CanonRaw',
-        SigmaRaw => 'PanasonicRaw',
-        Olympus => 'NikonCapture',
-        PhotoMechanic => 'FotoStation',
-        Microsoft     => 'PhotoMechanic',
-       'Microsoft::MP'=> 'Microsoft::MP1',
-        GIMP    => 'Microsoft',
-       'Nikon::CameraSettingsD300' => 'Nikon::ShotInfoD300b',
-       'Pentax::LensData' => 'Pentax::LensInfo2',
-       'Sony::SRF2' => 'Sony::SRF',
-       'Samsung::PictureWizard' => 'Samsung::Type2', # (necessary because Samsung doesn't have a main table)
-       'Samsung::INFO' => 'Samsung::PictureWizard', # (ditto)
-       'Samsung::MP4' => 'Samsung::INFO', # (ditto)
-       'Samsung::Thumbnail' => 'Samsung::MP4', # (ditto)
-    );
-    my @tweak = sort keys %tweakOrder;
-    while (@tweak) {
-        my $table = shift @tweak;
-        my $first = $tweakOrder{$table};
-        if ($tweakOrder{$first}) {
-            push @tweak, $table;    # must defer this till later
-            next;
-        }
-        delete $tweakOrder{$table}; # because the table won't move again
-        my @moving = grep /^Image::ExifTool::$table\b/, @sortedTables;
-        my @notMoving = grep !/^Image::ExifTool::$table\b/, @sortedTables;
-        my @after;
-        while (@notMoving) {
-            last if $notMoving[-1] =~ /^Image::ExifTool::$first\b/;
-            unshift @after, pop @notMoving;
-        }
-        @sortedTables = (@notMoving, @moving, @after);
-    }
-    return @sortedTables
+    TweakOrder(\@sortedTables, \%tweakOrder);
+
+    return @sortedTables;
 }
 
 #------------------------------------------------------------------------------
@@ -1773,11 +1806,10 @@ sub WriteTagNames($$)
     print HTMLFILE "<table width='100%' class=inner cellspacing=1><tr class=h>\n";
     print HTMLFILE "<th colspan=$columns><span class=l>Tag Table Index</span></th></tr>\n";
     print HTMLFILE "<tr class=b><td width='$percent%'>\n";
-    # write the index
-    my @tableNames = GetTableOrder();
-    # add shortcuts last
-    push @tableNames, 'Image::ExifTool::Shortcuts::Main';
-    push @tableNames, @pluginTables;
+
+    # get the full table list, adding shortcuts and plug-in tables to the end
+    my @tableNames = GetTableOrder('Image::ExifTool::Shortcuts::Main', @pluginTables);
+
     # get list of headings and add any missing ones
     my $heading = 'xxx';
     my (@tableIndexNames, @headings);
@@ -1818,6 +1850,7 @@ sub WriteTagNames($$)
     }
     print HTMLFILE "\n</td></tr></table></td></tr></table></blockquote>\n";
     print HTMLFILE '<p>',Doc2Html($docs{ExifTool2}),"</p>\n";
+
     # write all the tag tables
     while (@tableNames or @sepTables or @structs) {
         while (@sepTables) {
@@ -1924,7 +1957,7 @@ sub WriteTagNames($$)
         my ($hid, $showGrp);
         # widths of the different columns in the POD documentation
         my ($wID,$wTag,$wReq,$wGrp) = (8,36,24,10);
-        my ($composite, $derived, $notes, $prefix);
+        my ($composite, $derived, $notes, $longTags, $wasLong, $prefix);
         if ($short eq 'Shortcuts') {
             $derived = '<th>Refers To</th>';
             $composite = 2;
@@ -1934,6 +1967,7 @@ sub WriteTagNames($$)
         } else {
             my $table = GetTagTable($tableName);
             $notes = $$table{NOTES};
+            $longTags = $$table{VARS}{LONG_TAGS} if $$table{VARS};
             if ($$table{GROUPS}{0} eq 'Composite') {
                 $composite = 1;
                 $derived = '<th>Derived From</th>';
@@ -1967,7 +2001,7 @@ sub WriteTagNames($$)
             $wID = $podIdLen;
             my $longTag = $self->{LONG_NAME}->{$tableName};
             if ($wTag < $longTag) {
-                warn "Notice: Long tags in $tableName table\n";
+                $wasLong = 1;
                 if ($wID - $longTag + $wTag >= 6) { # don't let ID column get too narrow
                     $wID -= $longTag - $wTag;
                     $wTag = $longTag;
@@ -2044,7 +2078,11 @@ sub WriteTagNames($$)
                     } else {
                         # put tag name on next line if ID is too long
                         $idStr = "  $tagIDstr\n   " . (' ' x $w);
-                        warn "Notice: Split $$tagNames[0] line\n";
+                        if ($longTags) {
+                            --$longTags;
+                        } else {
+                            warn "Notice: Split $$tagNames[0] line\n";
+                        }
                     }
                 }
                 $idStr = sprintf "  %-${w}s ", $tagIDstr unless defined $idStr;
@@ -2270,6 +2308,10 @@ sub WriteTagNames($$)
                 print HTMLFILE '&nbsp;';
             }
             print HTMLFILE "</td></tr>\n";
+        }
+        warn "$longTags unaccounted-for long tags in $tableName\n" if $longTags;
+        if ($wasLong and not defined $longTags) {
+            warn "Notice: Long tags in $tableName table\n";
         }
         unless ($infoCount) {
             printf PODFILE "  [no tags known]\n";

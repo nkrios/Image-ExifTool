@@ -28,7 +28,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.77';
+$VERSION = '1.85';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -41,6 +41,7 @@ sub ConvLensSpec($);
 sub ConvInvLensSpec($);
 sub PrintLensSpec($);
 sub PrintInvLensSpec($);
+sub MakeTiffHeader($$$$;$);
 
 # (%sonyLensTypes is filled in based on Minolta LensType's)
 
@@ -152,6 +153,86 @@ my %whiteBalanceSetting = (
     0x76 => 'Flash (+3)', #(NC)
     0xa3 => 'Custom',
     0xf3 => 'Color Temperature/Color Filter',
+);
+
+# AF points for cameras with 15-point AF (ref 12)
+my %afPoint15 = (
+    0 => 'Upper-left',
+    1 => 'Left',
+    2 => 'Lower-left',
+    3 => 'Far Left',
+    4 => 'Top (horizontal)',
+    5 => 'Near Right',
+    6 => 'Center (horizontal)',
+    7 => 'Near Left',
+    8 => 'Bottom (horizontal)',
+    9 => 'Top (vertical)',
+    10 => 'Center (vertical)',
+    11 => 'Bottom (vertical)',
+    12 => 'Far Right',
+    13 => 'Upper-right',
+    14 => 'Right',
+    15 => 'Lower-right',
+    16 => 'Upper-middle',
+    17 => 'Lower-middle',
+);
+
+# AF points for cameras with 19-point AF (ref PH)
+# (verified for A77 firmware 1.07)
+my %afPoint19 = (
+    0 => 'Upper Far Left',
+    1 => 'Upper-left (horizontal)',
+    2 => 'Far Left (horizontal)',
+    3 => 'Left (horizontal)',
+    4 => 'Lower Far Left',
+    5 => 'Lower-left (horizontal)',
+    6 => 'Upper-left (vertical)',
+    7 => 'Left (vertical)',
+    8 => 'Lower-left (vertical)',
+    9 => 'Far Left (vertical)',
+    10 => 'Top (horizontal)',
+    11 => 'Near Right',
+    12 => 'Center (horizontal)',
+    13 => 'Near Left',
+    14 => 'Bottom (horizontal)',
+    15 => 'Top (vertical)',
+    16 => 'Upper-middle',
+    17 => 'Center (vertical)',
+    18 => 'Lower-middle',
+    19 => 'Bottom (vertical)',
+    20 => 'Upper Far Right',
+    21 => 'Upper-right (horizontal)',
+    22 => 'Far Right (horizontal)',
+    23 => 'Right (horizontal)',
+    24 => 'Lower Far Right',
+    25 => 'Lower-right (horizontal)',
+    26 => 'Far Right (vertical)',
+    27 => 'Upper-right (vertical)',
+    28 => 'Right (vertical)',
+    29 => 'Lower-right (vertical)',
+);
+
+# ReleaseMode values in Tags 2010 and 94xx (ref 12)
+my %sonyReleaseMode2 = (
+    0 => 'Normal',
+    1 => 'Continuous', # (RX100 "Continuous - Self-timer")
+    2 => 'Continuous - Exposure Bracketing', # (RX100)
+    3 => 'Continuous - White Balance Bracketing', # (HX9V) (RX100)
+    5 => 'Continuous - Burst', # (HX9V)
+    6 => 'Single Frame - Capture During Movie', #PH (RX100)
+    7 => 'Continuous - Sweep Panorama',
+    8 => 'Continuous - Anti-Motion Blur, Hand-held Twilight', # (HX9V)
+    9 => 'Continuous - HDR',
+    10 => 'Continuous - Background defocus', # (HX9V)
+    13 => 'Continuous - 3D Sweep Panorama', #PH/12
+    16 => 'Continuous - 3D Image', # (HX9V)
+    # 17 - ReleaseMode3 is 'Continuous - Burst' (WX7 - PH)
+    19 => 'Continuous - Speed/Advance Priority', #PH/12 (RX100)
+    20 => 'Continuous - Multi Frame NR',
+    26 => 'Continuous Low', #PH (A77)
+    27 => 'Continuous - High Sensitivity',  # seen for DSC-WX60 and WX300
+    28 => 'Smile Shutter', #PH (RX100)
+    29 => 'Continuous - Tele-zoom Advance Priority',
 );
 
 my %binaryDataAttrs = (
@@ -592,6 +673,7 @@ my %unknownCipherData = (
     # 0x2015 - int16u: 65535, also for 'normal' HDR images; 0 for HDR-paint and high-contrast-BW effect images
     0x2016 => { #PH (RX100)
         Name => 'AutoPortraitFramed',
+        Writable => 'int16u',
         Notes => '"Yes" if this image was created by the Auto Portrait Framing feature',
         PrintConv => { 0 => 'No', 1 => 'Yes' },
     },
@@ -610,8 +692,48 @@ my %unknownCipherData = (
             7 => 'AF-D', # "Depth Map Assist Continuous AF"
         },
     },
+    0x201c => [ #12
+        {
+            Name => 'AFAreaModeSetting',
+            Condition => '$$self{Model} =~ /^SLT-/',
+            Notes => 'SLT models',
+            Writable => 'int8u',
+            # (the actual AFAreaMode used may be different because
+            # the camera overrides this to use Wide mode when tracking)
+            PrintConv => {
+                0 => 'Wide',
+                4 => 'Local',
+                8 => 'Zone', #PH
+                9 => 'Spot',
+            },
+        },{
+            Name => 'AFAreaModeSetting',
+            Condition => '$$self{Model} =~ /^NEX-/',
+            Notes => 'NEX models',
+            Writable => 'int8u',
+            PrintConv => {
+                0 => 'Multi',
+                1 => 'Center',
+                3 => 'Flexible Spot',
+            },
+        },
+    ],
+    0x201d => { #12
+        Name => 'FlexibleSpotPosition',
+        Condition => '$$self{Model} =~ /^NEX-/',
+        Writable => 'int16u',
+        Count => 2,
+        # position in an 11x9 grid. Values are (ref 12, NC in brackets)
+        # X = 135,165,196,227,(258),289,320,281,412,442/443
+        # Y = (70?),104,(138),(172),206,240,274,308,342,(376?)
+        Notes => q{
+            X and Y coordinages of the AF point.  Valid only when AFAreaMode is Flexible
+            Spot
+        },
+    },
     0x201e => { #PH (A99) (also exists but not confirmed for RX1 and NEX-5R/6)
         Name => 'AFPointSelected',
+        Condition => '$$self{Model} !~ /^DSC-/', # (doesn't seem to apply to RX1)
         Writable => 'int8u',
         PrintConvColumns => 2,
         PrintConv => {
@@ -643,19 +765,32 @@ my %unknownCipherData = (
     },
     # 0x3000: data block that includes DateTimeOriginal string
 #
-# at least some data for tags 0x2010 and 0x94xx is encrypted - PH
-# (This is certainly true for at least parts of 0x2010, 0x9400, 0x9402 and 0x9403,
+# at least some data for tags 0x2010, 0x9050 and 0x94xx is encrypted - PH
+# (This is certainly true for at least parts of 0x2010, 0x9050, 0x9400, 0x9402 and 0x9403,
 # but hasn't been verified for other tags -- just to be thorough, decipher all of them)
 #
-    0x9400 => [{
-        Name => 'Tag9400',
+    0x9050 => {
+        Name => 'Tag9050',
+        # 944 bytes for A37, A57, A99, NEX-F3, NEX-5R, NEX-6, DSC-RX1, DSC-RX100
+        # 3072 bytes for A65, A77, NEX-5N, NEX-7, NEX-VG20 (ref 12)
+        SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag9050' },
+    },
+    0x9400 => [
+    {
+        Name => 'Tag9400a',
         # - first byte must be 0x07, 0x09 or 0x0a (e)
+        #   or 0x0c (e) for latest models like NEX-3N, SLT-A58, DSC-WX60 and WX300
         # (the Condition acts on the enciphered data)
         Condition => q{
             $$valPt =~ /^[\x07\x09\x0a]/ or
            ($$valPt =~ /^[\x5e\xe7\x04]/ and $$self{DoubleCipher} = 1)
         },
-        SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag9400' },
+        SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag9400a' },
+    },{
+        Name => 'Tag9400b',
+        # - first byte 0x0c (e) for the NEX-3N, SLT-A58 and DSC-WX60 and WX300
+        Condition => '$$valPt =~ /^\x0c/',
+        SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag9400b' },
     },{
         Name => 'Sony_0x9400',
         %unknownCipherData,
@@ -763,10 +898,17 @@ my %unknownCipherData = (
         Name => 'Sony_0x9405',
         %unknownCipherData,
     },
-    0x9406 => {
+    0x9406 => [{
+        Name => 'Tag9406',
+        # - first byte must be 0x01 or 0x02 (enciphered 0x01 or 0x08) and
+        #   third byte must be 0x02 or 0x03 (enciphered 0x08 or 0x1b) - ref 12
+        # (applies to most SLT and NEX models, but no DSC models)
+        Condition => '$$valPt =~ /^[\x01\x08].[\x08\x1b]/s',
+        SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag9406' },
+    },{
         Name => 'Sony_0x9406',
         %unknownCipherData,
-    },
+    }],
     0x9407 => {
         Name => 'Sony_0x9407',
         %unknownCipherData,
@@ -779,10 +921,14 @@ my %unknownCipherData = (
         Name => 'Sony_0x9409',
         %unknownCipherData,
     },
-    0x940a => {
+    0x940a => [{
+        Name => 'Tag940a',
+        Condition => '$$self{Model} =~ /^SLT-/',
+        SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag940a' },
+    },{
         Name => 'Sony_0x940a',
         %unknownCipherData,
-    },
+    }],
     0x940b => {
         Name => 'Sony_0x940b',
         %unknownCipherData,
@@ -797,11 +943,20 @@ my %unknownCipherData = (
     },
     0x940e => [{
         Name => 'Tag940e',
+        Condition => '$$self{Model} =~ /^SLT-/',
         SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag940e' },
+    },{
+        Name => 'Sony_0x940e',
+        %unknownCipherData,
     }],
+    0x940f => {
+        Name => 'Sony_0x940f',
+        %unknownCipherData,
+    },
     0x9411 => {
         Name => 'Sony_0x9411',
         %unknownCipherData,
+        # 0x02 - int32u?: 1,3,5,7,9 (A77)
     },
     0xb000 => { #8
         Name => 'FileFormat',
@@ -850,30 +1005,55 @@ my %unknownCipherData = (
             278 => 'NEX-5', #PH
             279 => 'NEX-3', #PH
             280 => 'SLT-A33', #PH
-            281 => 'SLT-A55V', #PH
+            281 => 'SLT-A55 / SLT-A55V', #PH (A55 NC)
             282 => 'DSLR-A560', #PH
             283 => 'DSLR-A580', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2881.0.html
             284 => 'NEX-C3', #PH
             285 => 'SLT-A35', #12
-            286 => 'SLT-A65V', #PH
-            287 => 'SLT-A77V', #PH
+            286 => 'SLT-A65 / SLT-A65V', #PH
+            287 => 'SLT-A77 / SLT-A77V', #PH
             288 => 'NEX-5N', #PH
             289 => 'NEX-7', #PH
             290 => 'NEX-VG20E', #12
             291 => 'SLT-A37', #12
             292 => 'SLT-A57', #12
             293 => 'NEX-F3', #PH
-            294 => 'SLT-A99V', #12
+            294 => 'SLT-A99 / SLT-A99V', #12
             295 => 'NEX-6', #12
             296 => 'NEX-5R', #12
             297 => 'DSC-RX100', #PH
             298 => 'DSC-RX1', #12
+            299 => 'NEX-VG900', #12
+            303 => 'SLT-A58', #12
+            305 => 'NEX-3N', #PH
         },
     },
     0xb020 => { #2
-        Name => 'ColorReproduction',
-        # observed values: None, Standard, Vivid, Real, AdobeRGB - PH
+        Name => 'CreativeStyle',
         Writable => 'string',
+        # (all of these values have been observed, ref 12 and PH)
+        # - this PrintConv is included to make these strings consistent with
+        #   other CreativeStyle tags, and to facilitate the language translations
+        # - these values are always English, regardless of the camera language settings
+        PrintConv => {
+            OTHER => sub { shift }, # pass other values straight through
+            None        => 'None',
+            AdobeRGB    => 'Adobe RGB',
+            Real        => 'Real',
+            Standard    => 'Standard',
+            Vivid       => 'Vivid',
+            Portrait    => 'Portrait',
+            Landscape   => 'Landscape',
+            Sunset      => 'Sunset',
+            Nightview   => 'Night View/Portrait',
+            BW          => 'B&W',
+            Neutral     => 'Neutral',
+            Clear       => 'Clear',
+            Deep        => 'Deep',
+            Light       => 'Light',
+            Autumnleaves=> 'Autumn Leaves',
+            Sepia       => 'Sepia',
+        },
     },
     0xb021 => { #2
         Name => 'ColorTemperature',
@@ -1007,15 +1187,15 @@ my %unknownCipherData = (
         RawConv => '$val == 65535 ? undef : $val',
         PrintConvColumns => 2,
         PrintConv => {
-            0 => 'Program', # (RX100 'Program','Sunset' - PH)
+            0 => 'Program AE', # (RX100 'Program','Sunset' - PH)
             1 => 'Portrait', #PH (HX1)
             2 => 'Beach', #9
             3 => 'Sports', #9
             4 => 'Snow', #9
             5 => 'Landscape',
             6 => 'Auto', # (RX100 'Intelligent Auto' - PH)
-            7 => 'Aperture Priority',
-            8 => 'Shutter Priority',
+            7 => 'Aperture-priority AE',
+            8 => 'Shutter speed priority AE',
             9 => 'Night Scene / Twilight',#2/9
             10 => 'Hi-Speed Shutter', #9
             11 => 'Twilight Portrait', #9 (RX100 'Night Portrait' - PH)
@@ -1028,7 +1208,7 @@ my %unknownCipherData = (
             20 => 'Advanced Sports Shooting', #9
             29 => 'Underwater', #9
             33 => 'Food', #9
-            34 => 'Panorama', #PH (HX1)
+            34 => 'Sweep Panorama', #PH (HX1)
             35 => 'Handheld Night Shot', #PH (HX1/TX1, also called "Hand-held Twilight")
             36 => 'Anti Motion Blur', #PH (TX1)
             37 => 'Pet', #9
@@ -1055,7 +1235,7 @@ my %unknownCipherData = (
         },
     },
     0xb043 => { #9
-        Name => 'AFMode',
+        Name => 'AFAreaMode',
         Writable => 'int16u',
         Condition => '$$self{Model} !~ /^DSC-[HR]X/', #12
         RawConv => '$val == 65535 ? undef : $val',
@@ -1069,8 +1249,8 @@ my %unknownCipherData = (
             3 => 'Spot', # ('Flexible Spot' for the HX9V, ref 12)
             4 => 'Flexible Spot', # (T200)
             6 => 'Touch',
-            14 => 'Manual Focus', # (T200) ("Tracking Focus" for HX9V, ref 12)
-            15 => 'Face Detected', # (not set when in face detect mode and no faces detected)
+            14 => 'Tracking', #12 (HX9V) ("Manual" for the T200?, ref 9)
+            15 => 'Face Tracking', # (not set when in face detect mode and no faces detected)
             # 255 - 'n/a' for the HX9V (ref 12)
             65535 => 'n/a', #PH (A100)
         },
@@ -1088,11 +1268,11 @@ my %unknownCipherData = (
     # 0xb045 - int16u: 0
     # 0xb046 - int16u: 0
     0xb047 => { #2
-        Name => 'Quality',
+        Name => 'JPEGQuality',
         Writable => 'int16u',
         RawConv => '$val == 65535 ? undef : $val',
         PrintConv => {
-            0 => 'Normal',
+            0 => 'Standard',
             1 => 'Fine',
             2 => 'Extra Fine', #12
             65535 => 'n/a', #PH (A100)
@@ -1104,6 +1284,9 @@ my %unknownCipherData = (
         RawConv => '($val == -1 and $$self{Model} =~ /DSLR-A100\b/) ? undef : $val',
         PrintConv => {
             -32768 => 'Low',
+            -6 => '-6/3', #12 (NC)
+            -5 => '-5/3', #12 (NC)
+            -4 => '-4/3', #12 (NC)
             -3 => '-3/3',
             -2 => '-2/3',
             -1 => '-1/3', # (for the A100, -1 is effectively 'n/a' - PH)
@@ -1111,8 +1294,9 @@ my %unknownCipherData = (
             1 => '+1/3',
             2 => '+2/3',
             3 => '+3/3',
-            # 4 - seen for R1, normal flash - PH
-            # 5 - seen for R1, slow sync flash - PH
+            4 => '+4/3', #12 (NC)
+            5 => '+5/3', #12 (NC)
+            6 => '+6/3', #12
             128 => 'n/a', #12 (HX9V)
             32767 => 'High',
         },
@@ -1193,10 +1377,14 @@ my %unknownCipherData = (
     },
     0xb050 => { #PH (RX100)
         Name => 'HighISONoiseReduction2',
+        Condition => '$$self{Model} =~ /^DSC-/',
+        Notes => 'DSC models only',
+        Writable => 'int16u',
         PrintConv => {
             0 => 'Normal',
             1 => 'High',
             2 => 'Low',
+            3 => 'Off', #12
             # it seems that all SLT and NEX models give n/a here (ref 12)
             65535 => 'n/a',
         },
@@ -1365,24 +1553,7 @@ my %unknownCipherData = (
         Notes => 'the AF sensor used for focusing. Not valid for Contrast AF',
         PrintConvColumns => 2,
         PrintConv => {
-            0 => 'Upper-left',
-            1 => 'Left',
-            2 => 'Lower-left',
-            3 => 'Far Left',
-            4 => 'Top (horizontal)',
-            5 => 'Near Right',
-            6 => 'Center (horizontal)',
-            7 => 'Near Left',
-            8 => 'Bottom (horizontal)',
-            9 => 'Top (vertical)',
-            10 => 'Center (vertical)',
-            11 => 'Bottom (vertical)',
-            12 => 'Far Right',
-            13 => 'Upper-right',
-            14 => 'Right',
-            15 => 'Lower-right',
-            16 => 'Upper-middle',
-            17 => 'Lower-middle',
+            %afPoint15,
             255 => '(none)', #PH (A55, guess; also A35 with non-AF lens, ref 12)
         },
     },
@@ -1556,7 +1727,7 @@ my %unknownCipherData = (
             12 => 'Clear', #7
             13 => 'Deep', #7
             14 => 'Light', #7
-            15 => 'Autumn', #7
+            15 => 'Autumn Leaves', #7
             16 => 'Sepia', #7
         },
     },
@@ -1605,25 +1776,7 @@ my %unknownCipherData = (
             return \ "Binary data 7404 bytes" unless $exifTool->Options('Binary');
             my @dat = unpack('v*', $val);
             # TIFF header for a 16-bit RGB 10dpi 40x30 image
-            $val = "\x49\x49\x2a\0\x08\0\0\0\x0e\0" .   # 14 menu entries:
-                "\xfe\x00\x04\0\x01\0\0\0\x00\0\0\0" .  # SubfileType = 0
-                "\x00\x01\x04\0\x01\0\0\0\x28\0\0\0" .  # ImageWidth = 40
-                "\x01\x01\x04\0\x01\0\0\0\x1e\0\0\0" .  # ImageHeight = 30
-                "\x02\x01\x03\0\x03\0\0\0\xb6\0\0\0" .  # BitsPerSample
-                "\x03\x01\x03\0\x01\0\0\0\x01\0\0\0" .  # Compression = 1
-                "\x06\x01\x03\0\x01\0\0\0\x02\0\0\0" .  # PhotometricInterpretation = 2
-                "\x11\x01\x04\0\x01\0\0\0\xcc\0\0\0" .  # StripOffsets = 204
-                "\x15\x01\x03\0\x01\0\0\0\x03\0\0\0" .  # SamplesPerPixel = 3
-                "\x16\x01\x04\0\x01\0\0\0\x1e\0\0\0" .  # RowsPerStrip = 30
-                "\x17\x01\x04\0\x01\0\0\0\x20\x1c\0\0". # StripByteCounts = 7200
-                "\x1a\x01\x05\0\x01\0\0\0\xbc\0\0\0" .  # XResolution
-                "\x1b\x01\x05\0\x01\0\0\0\xc4\0\0\0" .  # YResolution
-                "\x1c\x01\x03\0\x01\0\0\0\x01\0\0\0" .  # PlanarConfiguration = 1
-                "\x28\x01\x03\0\x01\0\0\0\x02\0\0\0" .  # ResolutionUnit = 2
-                "\0\0\0\0" .            # (no IFD1)
-                "\x10\0\x10\0\x10\0" .  # BitsPerSample = 16x16x16
-                "\x64\0\0\0\x0a\0\0\0". # XResolution = 10
-                "\x64\0\0\0\x0a\0\0\0"; # YResolution = 10
+            $val = MakeTiffHeader(40,30,3,16,10);
             # re-order data to RGB pixels
             my ($i, @val);
             for ($i=0; $i<40*30; ++$i) {
@@ -1789,6 +1942,7 @@ my %unknownCipherData = (
             18 => 'AF-C',
             19 => 'AF-A',
             32 => 'Manual',
+            48 => 'DMF', # (NC) (seen for NEX-5)
         },
     },
     0x15 => {
@@ -1894,7 +2048,9 @@ my %unknownCipherData = (
         Condition => '$$self{Model} !~ /^(NEX-(3|5)|DSLR-(A450|A500|A550)$)/',
         Format => 'int16s',
         ValueConv => '$val / 8',
+        ValueConvInv => '$val * 8',
         PrintConv => '$val ? sprintf("%+.1f",$val) : $val',
+        PrintConvInv => '$val',
     },
     0x2c => {
         Name => 'FlashExposureCompSet2',
@@ -1902,7 +2058,9 @@ my %unknownCipherData = (
         Condition => '$$self{Model} !~ /^(NEX-(3|5)|DSLR-(A450|A500|A550)$)/',
         Format => 'int16s',
         ValueConv => '$val / 8',
+        ValueConvInv => '$val * 8',
         PrintConv => '$val ? sprintf("%+.1f",$val) : $val',
+        PrintConvInv => '$val',
     },
     0x2e => { # seen some A55 images where this does not match the other Orientation tags
         Name => 'Orientation2',
@@ -2147,7 +2305,7 @@ my %faceInfo = (
             12 => 'Clear', #7
             13 => 'Deep', #7
             14 => 'Light', #7
-            15 => 'Autumn', #7
+            15 => 'Autumn Leaves', #7
             16 => 'Sepia', #7
         },
     },
@@ -2735,6 +2893,7 @@ my %faceInfo = (
             18 => 'AF-C',
             19 => 'AF-A',
             32 => 'Manual',
+            48 => 'DMF', # (NC) (seen for NEX-5)
         },
     },
     0x07 => { #12
@@ -3495,10 +3654,8 @@ my %faceInfo = (
     },
 );
 
-# Tag9400 information (ref 12) (PH tested with RX100)
-# (decoding based on limited number of SLT-A37/A57/A65/A77, NEX-F3/5R, and DSC-HX9V images)
-# Note: "(e)" in a comment indicates an enciphered value, all other values are deciphered
-%Image::ExifTool::Sony::Tag9400 = (
+# Tag9050 information (ref 12)
+%Image::ExifTool::Sony::Tag9050 = (
     PROCESS_PROC => \&ProcessEnciphered,
     WRITE_PROC => \&WriteEnciphered,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
@@ -3507,11 +3664,60 @@ my %faceInfo = (
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     NOTES => q{
-        Data for tags 0x94xx and 0x2010 is encrypted by a simple substitution
-        cipher, but the deciphered values are listed below.
+        Data for tags 0x9050, 0x94xx and 0x2010 is encrypted by a simple
+        substitution cipher, but the deciphered values are listed below.
     },
-    # 0x0000-0x0007:   7 1 1 1 0 0 0 0 (e) for DSC-HX9V
-    #                 10 1 1 1 0 0 0 0 (e) for SLT or NEX (also RX100)
+    0x0000 => {
+        Condition => '$$self{Model} !~ /^(NEX-|DSC-)\b/',
+        Name => 'MaxAperture',
+        # seen values from 17 - 48
+        ValueConv => '2 ** (($val/8 - 1.06) / 2)',
+        ValueConvInv => 'int((log($val) * 2 / log(2) + 1) * 8 + 0.5)',
+        PrintConv => 'sprintf("%.1f",$val)',
+        PrintConvInv => '$val',
+    },
+    0x0001 => {
+        Condition => '$$self{Model} !~ /^(NEX-|DSC-)\b/',
+        Name => 'MinAperture',
+        # seen values from 80 - 95
+        ValueConv => '2 ** (($val/8 - 1.06) / 2)',
+        ValueConvInv => 'int((log($val) * 2 / log(2) + 1) * 8 + 0.5)',
+        PrintConv => 'sprintf("%.0f",$val)',
+        PrintConvInv => '$val',
+    },
+#    0x0002 and 0x0004 (int16u) for SLT:
+#           appears to be difference between used FNumber and MaxAperture, 256 being +1 APEX or stop
+#           however, not always valid e.g. bracketing, Shutter-prio e.a.
+#           difference between 0x0002 and 0x0004 mostly 0.0, 0.1 or 0.2 stops.
+    0x0031 => { #12  not DSC-RX
+        Condition => '$$self{Model} !~ /^(DSC-(RX1|RX100))\b/',
+        Name => 'FlashStatus',
+        PrintConv => {
+            0 => 'No Flash present',                   # seen for SLT-A99 and NEX-5N, 5R
+            64 => 'Built-in Flash present',            # seen for SLT-A37, A57, A65, A77 and NEX-F3, 6, 7
+            65 => 'Built-in Flash present and fired',  # seen for SLT-A37, A57, A65, A77 and NEX-F3, 6, 7
+            128 => 'External Flash present',           # seen for NEX-5N
+            129 => 'External Flash present and fired', # seen for NEX-5N, A99V
+        },
+    },
+    # 0x0032 - increments for each image (PH, A77)
+);
+
+# (decoding based on limited number of SLT-A37/A57/A65/A77, NEX-F3/5R, and DSC-HX9V images)
+# Note: "(e)" in a comment indicates an enciphered value, all other values are deciphered
+# 0x0000-0x0007:    7 1 1 1 0 0 0 0 (e) for several DSC models, e.g. DSC-HX9V
+#                   9 1 1 1 0 0 0 0 (e) for several DSC models
+#                  10 1 1 1 0 0 0 0 (e) for most SLT, NEX, DSC-RX100, DSC-RX1
+#                  12 1 1 1 0 0 0 0 (e) for NEX-3N, SLT-A58, DSC-WX60, DSC-WX300
+#                 208 1 1 0 0 0 0 0 (e) H90, W650: tag9400 decoding appears not valid
+%Image::ExifTool::Sony::Tag9400a = (
+    PROCESS_PROC => \&ProcessEnciphered,
+    WRITE_PROC => \&WriteEnciphered,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    FORMAT => 'int8u',
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     0x0008 => { #PH
         Name => 'SequenceImageNumber',
         Notes => 'number of images captured in burst sequence',
@@ -3529,56 +3735,19 @@ my %faceInfo = (
     },
     0x0010 => {
         Name => 'ReleaseMode2',
-        PrintConv => {
-            0 => 'Normal',
-            1 => 'Continuous', # (RX100 "Continuous - Self-timer")
-            2 => 'Continuous - Exposure Bracketing', # (RX100)
-            3 => 'Continuous - White Balance Bracketing', # (HX9V) (RX100)
-            5 => 'Continuous - Burst', # (HX9V)
-            6 => 'Single Frame - Capture During Movie', #PH (RX100)
-            7 => 'Continuous - Sweep Panorama',
-            8 => 'Continuous - Anti-Motion Blur, Hand-held Twilight', # (HX9V)
-            9 => 'Continuous - HDR',
-            10 => 'Continuous - Background defocus', # (HX9V)
-            13 => 'Continuous - 3D Sweep Panorama', #PH/12
-            16 => 'Continuous - 3D Image', # (HX9V)
-            # 17 - ReleaseMode3 is 'Continuous - Burst' (WX7 - PH)
-            19 => 'Continuous - Speed/Advance Priority', #PH/12 (RX100)
-            20 => 'Continuous - Multi Frame NR',
-            26 => 'Continuous Shooting', #PH (RX100) (? can't locate this sample or recreate this)
-            28 => 'Smile Shutter', #PH (RX100)
-            29 => 'Continuous - Tele-zoom Advance Priority',
-        },
+        PrintConv => \%sonyReleaseMode2,
     },
-#    0x0013 => {
-#        Name => 'FlashAction_JR',
-#        PrintConv => {
-#            0 => 'Did not fire',
-#            1 => 'Fired',
-#        },
-#    },
-#    # 0x0015:   8 DSC-HX9V
-#    #          27 SLT, NEX
+#    0x0012 - Digital Zoom used 0=no, 1=yes (but not for A65V, A77V)
+#    0x0013 - Flash fired 0=no, 1=yes
     0x001a => { #PH
         Name => 'ShotNumberSincePowerUp',
         Format => 'int32u',
     },
-    # 0x001e - increments by 4 each shutter release press since power up?,
-    #          bit 0x02 has some meaning (RX100 - PH)
-#    0x001f : 0=most pictures, 1='Self-timer/Self-portrait', 2='Self-portrait (2 people)',
+#    0x001e - increments by 4 each shutter release press since power up?,
+#             bit 0x02 has some meaning (RX100 - PH)
+#    0x001f - 0=most pictures, 1='Self-timer/Self-portrait', 2='Self-portrait (2 people)',
 #             3='Continuous Self-timer', 26='Sweep Panorama' (PH; RX100)
-#    0x0021 => {
-## Usually matches "0xb026 Image Stabilization" and "0xb04b Anti Blur", but seen some exceptions:
-## seen "Off" for Panorama: makes sense as Stabilization would otherwise try to counter the sweeping panorama motion
-## seen "Off" for Selftimer: makes sense, as presumably camera is on a tripod/support for these images
-## seen "On"  for HDR, MFNR: makes sense, as Stabilization will help aligning/overlaying the images
-#        Name => 'ImageStabilization_JR',
-#        PrintConv => {
-#            0 => 'On',
-#            64 => 'On (Continuous)', # HX9V with Smile Shutter on (RX100 smile shutter, not IS - PH)
-#            128 => 'Off', # (RX100 Sweep panorama/self-timer/self-portrait, not IS - PH)
-#        },
-#    },
+#    0x0021 - maybe related to Image Stabilization or Smile Shutter ?
     0x0022 => {
         Name => 'SequenceLength',
         PrintConv => {
@@ -3586,6 +3755,7 @@ my %faceInfo = (
             1 => '1 shot',
             2 => '2 shots', # (Background defocus, 3D Image)
             3 => '3 shots', # (HDR, WB Bracketing) (RX100, also continuous bracket)
+            4 => '4 shots', # seen for DSC-WX300 in Superior-Auto Anti-Motion-Blur
             5 => '5 shots', # (PH; RX100)
             6 => '6 shots', # (Multi Frame NR, Anti Motion blur, Hand-held Twilight)
             10 => '10 shots', # (HX9V Burst)
@@ -3598,6 +3768,7 @@ my %faceInfo = (
         Name => 'CameraOrientation', # (also RX100 - PH)
         PrintConv => {
             1 => 'Horizontal (normal)',
+            3 => 'Rotate 180',
             6 => 'Rotate 90 CW',
             8 => 'Rotate 270 CW',
         },
@@ -3611,20 +3782,79 @@ my %faceInfo = (
             3 => 'JPEG + MPO', # 3D images
         },
     },
+#    0x002b - FacesDetected_OK  0=no, 1=yes  appears valid for SLT, but not for NEX and DSC-HX9V
 #    0x0030 - long exposure noise reduction used 0=no, 1=yes (PH; RX100)
 #    0x0031 - smile shutter used 0=no, 1=yes (PH; RX100)
-## 0x0034 and 0x0038: different offset for HX9V and SLT/NEX, but similar numbers, non-zero when flash fired
-#    0x0034 => {
-#        Name => 'FlashNumbers_JR',
-#        Condition => '$$self{Model} =~ /^DSC-HX9V$/',
-#        Format => 'int8u[4]',
-#    },
-#    0x0038 => {
-#        Name => 'FlashNumbers_JR',
-#        Condition => '$$self{Model} !~ /^DSC-HX9V$/',
-#        Format => 'int8u[4]',
-#    },
+#    0x0033 - 0 for DSC-HX9V, 8 for SLT, NEX
+#    0x0034 and 0x0038 - different offset for HX9V and SLT/NEX, but similar numbers, non-zero when flash fired
 );
+
+%Image::ExifTool::Sony::Tag9400b = (
+    PROCESS_PROC => \&ProcessEnciphered,
+    WRITE_PROC => \&WriteEnciphered,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    FORMAT => 'int8u',
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    0x0008 => { #PH
+        Name => 'SequenceImageNumber',
+        Notes => 'number of images captured in burst sequence',
+        # (not shutter count because it increments for auto portrait framing)
+        Format => 'int32u',
+        ValueConv => '$val + 1',
+        ValueConvInv => '$val - 1',
+    },
+    0x000c => { #PH
+        Name => 'SequenceFileNumber',
+        Notes => 'file number in burst sequence',
+        Format => 'int32u',
+        ValueConv => '$val + 1', #12
+        ValueConvInv => '$val - 1',
+    },
+    0x0010 => {
+        Name => 'ReleaseMode2',
+        PrintConv => \%sonyReleaseMode2,
+    },
+    0x0016 => { #PH
+        Name => 'ShotNumberSincePowerUp',
+        Format => 'int32u',
+    },
+    0x001e => {
+        Name => 'SequenceLength',
+        PrintConv => {
+            0 => 'Continuous',
+            1 => '1 shot',
+            2 => '2 shots',
+            3 => '3 shots',
+            4 => '4 shots',
+            5 => '5 shots',
+            6 => '6 shots',
+            10 => '10 shots',
+            100 => 'Continuous - iSweep Panorama',
+            200 => 'Continuous - Sweep Panorama',
+        },
+    },
+    0x0024 => {
+        Name => 'CameraOrientation',
+        PrintConv => {
+            1 => 'Horizontal (normal)',
+            3 => 'Rotate 180',
+            6 => 'Rotate 90 CW',
+            8 => 'Rotate 270 CW',
+        },
+    },
+    0x0025 => {
+        Name => 'Quality2',
+        PrintConv => {
+            0 => 'JPEG',
+            1 => 'RAW',
+            2 => 'RAW + JPEG',
+            3 => 'JPEG + MPO', # 3D images
+        },
+    },
+);
+
 
 # PH (RX100)
 %Image::ExifTool::Sony::Tag9402 = (
@@ -3651,14 +3881,14 @@ my %faceInfo = (
         PrintConvInv => '$val=~s/ ?C//; $val',
     },
     0x17 => {
-        Name => 'AFMode',
+        Name => 'AFAreaMode',
         PrintConv => {
             0 => 'Multi',
             1 => 'Center',
             3 => 'Flexible Spot',
             # 10 - seen for WX100
             14 => 'Tracking',
-            15 => 'Smile Shutter',
+            15 => 'Face Tracking',
             255 => 'Manual',
         },
     },
@@ -3695,8 +3925,32 @@ my %faceInfo = (
     # 0x18 - maybe another temperature?
 );
 
-# PH (A77)
-%Image::ExifTool::Sony::Tag940e = (
+# Tag9406 (ref 12)
+%Image::ExifTool::Sony::Tag9406 = (
+    PROCESS_PROC => \&ProcessEnciphered,
+    WRITE_PROC => \&WriteEnciphered,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    FORMAT => 'int8u',
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+#    0x0000: 1 for A37, A57, A65, A77, NEX-5N, 7, F3, VG20
+#            2 for A99, NEX-5R, NEX-6
+#    0x0001+0x0002: Int16u, seen 580 - 770: similar to "BatteryUnknown" ??
+#    0x0005+0x0006: Int16u, seen  73 - 117: maybe Fahrenheit ? (but considerably higher than "AmbientTemperature")
+#    0x0007: seen values from 8 - 105, decreasing in sequences of images: BatteryLevel
+    0x0007 => {
+        Name => 'BatteryLevel',
+        PrintConv => '"$val%"',
+        PrintConvInv => '$val=~s/\s*\%//; $val',
+    },
+#    0x0009-0x001a: looks like 9 Int16u values
+#    0x0022: 0 or 1 for A99, NEX-5R, 6
+#    0x0025: 0 or 1 for other SLT and NEX (0x0022, 0x0023, 0x0024 = 255)
+);
+
+# Tag940a (ref PH, decoded mainly from A77)
+%Image::ExifTool::Sony::Tag940a = (
     PROCESS_PROC => \&ProcessEnciphered,
     WRITE_PROC => \&WriteEnciphered,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
@@ -3704,32 +3958,189 @@ my %faceInfo = (
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'These tags are currently extracted for SLT models only.',
+    # 0x00 - 10(A65,A77,NEX-5N,7,VG20E), 11(A37,A57,A99,NEX-5R,6,F3,RX1,RX100),
+    #        9(HX9V), 4,68,86,110(panoramas) - ref 12
+    0x04 => {
+        Name => 'AFPointsSelected',
+        Format => 'int32u',
+        PrintConvColumns => 2,
+        PrintConv => {
+            # verified for A77 firmware 1.03 and 1.07 and A99 firmware 1.00,
+            # but there were inconsistencies with my A77 firmware 1.04 samples - PH
+            0 => '(none)',
+            0x00007801 => 'Center Zone',
+            0x0001821c => 'Right Zone',
+            0x000605c0 => 'Left Zone',
+            0x7fffffff => '(all)',
+            # 0xffffffff - 'n/a' - RX1 and NEX models always give this
+            # (on Wide AFAreaMode, outer focus points are dropped
+            #  at progressively higher digital zoom ratios, ref 12)
+            BITMASK => {
+                0 => 'Center',          # (1.04 gave this for Upper-middle and Near Left)
+                1 => 'Top',             # (1.04 didn't give this value)
+                2 => 'Upper-right',     # (1.04 OK)
+                3 => 'Right',           # (1.04 didn't give this value)
+                4 => 'Lower-right',     # (1.04 gave this for Bottom)
+                5 => 'Bottom',          # (1.04 gave this for Lower-middle)
+                6 => 'Lower-left',      # (1.04 gave this for Left and Lower Far Left)
+                7 => 'Left',            # (1.04 gave this for Far Left)
+                8 => 'Upper-left',      # (1.04 OK)
+                9 => 'Far Right',       # (1.04 gave this for Upper Far Right and Right)
+                10 => 'Far Left',       # (1.04 didn't give this value)
+                11 => 'Upper-middle',   # (1.04 gave this for Top)
+                12 => 'Near Right',     # (1.04 gave this for Center)
+                13 => 'Lower-middle',   # (1.04 gave this for Lower-left and Near Right)
+                14 => 'Near Left',      # (1.04 didn't give this value)
+                15 => 'Upper Far Right',# (1.04 didn't give this value)
+                16 => 'Lower Far Right',# (1.04 OK, but gave this for Far Right and Lower-right too)
+                17 => 'Lower Far Left', # (1.04 didn't give this value)
+                18 => 'Upper Far Left', # (1.04 OK)
+                # higher bits may be used in panorama images - ref 12
+            },
+        },
+    },
+    # 0x0a - int16u: 0,1,2,3
+);
+
+# Tag940e (SLT models only) (ref PH, decoded mainly from A77)
+%Image::ExifTool::Sony::Tag940e = (
+    PROCESS_PROC => \&ProcessEnciphered,
+    WRITE_PROC => \&WriteEnciphered,
+    CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
+    FORMAT => 'int8u',
+    WRITABLE => 1,
+    FIRST_ENTRY => 0,
+    PRIORITY => 0,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'These tags are currently extracted for SLT models only.',
+    0x07 => [ # the active AF sensor
+        {
+            Name => 'AFPoint',
+            Condition => '$$self{Model} =~ /^SLT-A(37|57|65)/',
+            Notes => 'A37, A57 and A65',
+            PrintConvColumns => 2,
+            PrintConv => \%afPoint15,
+        },{
+            Name => 'AFPoint',
+            Condition => '$$self{Model} =~ /^SLT-A(77|99)/',
+            Notes => 'A77 and A99',
+            PrintConvColumns => 2,
+            PrintConv => \%afPoint19,
+        },
+    ],
+    0x08 => [ # the AF sensor in focus at focus time (shutter release half press)
+        {
+            Name => 'AFPointInFocus',
+            Condition => '$$self{Model} =~ /^SLT-A(37|57|65)/',
+            Notes => 'A37, A57 and A65',
+            PrintConvColumns => 2,
+            PrintConv => {
+                %afPoint15,
+                255 => '(none)',
+            },
+        },{
+            Name => 'AFPointInFocus',
+            Condition => '$$self{Model} =~ /^SLT-A(77|99)/',
+            Notes => 'A77 and A99',
+            PrintConvColumns => 2,
+            PrintConv => {
+                %afPoint19,
+                255 => '(none)',
+            },
+        },
+    ],
+    0x09 => [ # the AF sensor in focus at shutter release (shutter release full press)
+        {
+            Name => 'AFPointAtShutterRelease',
+            Condition => '$$self{Model} =~ /^SLT-A(37|57|65)/',
+            Notes => 'A37, A57 and A65',
+            PrintConvColumns => 2,
+            PrintConv => {
+                %afPoint15,
+                30 => '(out of focus)',
+            },
+        },{
+            Name => 'AFPointAtShutterRelease',
+            Condition => '$$self{Model} =~ /^SLT-A(77|99)/',
+            Notes => 'A77 and A99',
+            PrintConvColumns => 2,
+            PrintConv => {
+                %afPoint19,
+                30 => '(out of focus)',
+            },
+        },
+    ],
+    0x0a => {
+        Name => 'AFAreaMode',
+        PrintConv => {
+            0 => 'Wide',
+            1 => 'Spot',
+            2 => 'Local',
+            3 => 'Zone',
+        },
+    },
+    0x0b => [
+        {
+            Name => 'FocusMode',
+            Condition => '$$self{Model} =~ /^SLT-A99/',
+            Notes => 'A99',
+            PrintConv => {
+                0 => 'Manual',
+                2 => 'AF-A',
+                3 => 'AF-C',
+                4 => 'AF-S',
+                6 => 'DMF',
+                7 => 'AF-D', # (unique to A99)
+            },
+        },
+        {
+            Name => 'FocusMode',
+            Notes => 'other models', # (verified for A77 only)
+            PrintConvColumns => 2,
+            # validated for A77 firmware 1.03, 1.04 and 1.07
+            # - not confirmed for A37,A57 and A65 which also write this tag
+            PrintConv => {
+                0 => 'Manual',
+                2 => 'AF-S', # <-- different from A99!
+                3 => 'AF-C',
+                4 => 'AF-A', # <-- different from A99!
+                6 => 'DMF',
+            },
+        },
+    ],
+    0x017d => { #PH (verified for the A77/A99; likely valid for other SLT models - ref 12)
+        # (different from AFMicroAdjValue because it is 0 when the adjustment is off)
+        Name => 'AFMicroAdj',
+        Format => 'int8s',
+    },
     0x017e => { #12
         Name => 'ExposureProgram',
-        Condition => '$$self{Model} =~ /^SLT-/',
         Priority => 0,
         PrintConv => {
             0 => 'Program AE',
             1 => 'Aperture-priority AE',
             2 => 'Shutter speed priority AE',
             3 => 'Manual',
-            5 => 'Auto',
-            7 => 'Auto+',
+            4 => 'Auto',                 # seen for NEX-VG900
+            5 => 'iAuto',
+            6 => 'Superior Auto',        # seen for DSC-WX60,WX300
+            7 => 'iAuto+',
             8 => 'Portrait',
+            9 => 'Landscape',            # seen for DSC-WX300
             12 => 'Sunset',
+            17 => 'Handheld Night Shot', # seen for DSC-WX60
             29 => 'Macro',
             33 => 'Sweep Panorama',
+            36 => 'Background Defocus',  # seen for DSC-WX60
             43 => 'Cont. Priority AE',
         },
     },
-    0x017d => { #PH (verified for the A77/A99; likely valid for other SLT models - ref 12)
-        # (different from AFMicroAdjValue because it is 0 when the adjustment is off)
-        Name => 'AFMicroAdj',
-        Condition => '$$self{Model} =~ /^SLT-/',
-        Format => 'int8s',
-    },
     # 0xf38,0x1208,0x14d8,0x158c,0x1640,(and more) - 0 if AFMicroAdj is On, 1 if Off
     # 0x1ab6 - 0x80 if AFMicroAdj is On, 0 if Off
+    # tags also related to AFPoint (PH, A77):
+    #   0x11ec, 0x122a, 0x1408, 0x1446, 0x14bc, 0x1f86,
+    #   0x14fa, 0x1570, 0x1572, 0x15ae, 0x1f48
 );
 
 %Image::ExifTool::Sony::FaceInfo1 = (
@@ -4159,6 +4570,44 @@ Image::ExifTool::AddCompositeTags('Image::ExifTool::Sony');
 }
 
 #------------------------------------------------------------------------------
+# Make TIFF header for raw data
+# Inputs: 0) width, 1) height, 2) num colour components, 3) bits, 4) resolution
+# Returns: TIFF header
+# Notes: Multi-byte data must be little-endian
+sub MakeTiffHeader($$$$;$)
+{
+    my ($w, $h, $cols, $bits, $res) = @_;
+    $res or $res = 72;
+    my $saveOrder = GetByteOrder();
+    SetByteOrder('II');
+    my $hdr =
+    "\x49\x49\x2a\0\x08\0\0\0\x0e\0" .          # 0x00 14 menu entries:
+    "\xfe\x00\x04\0\x01\0\0\0\x00\0\0\0" .      # 0x0a SubfileType = 0
+    "\x00\x01\x04\0\x01\0\0\0" . Set32u($w) .   # 0x16 ImageWidth
+    "\x01\x01\x04\0\x01\0\0\0" . Set32u($h) .   # 0x22 ImageHeight
+    "\x02\x01\x03\0" . Set32u($cols) .          # 0x2e BitsPerSample
+    Set32u($cols == 1 ? $bits : 0xb6) .
+    "\x03\x01\x03\0\x01\0\0\0\x01\0\0\0" .      # 0x3a Compression = 1
+    "\x06\x01\x03\0\x01\0\0\0" .                # 0x46 PhotometricInterpretation
+    Set32u($cols == 1 ? 1 : 2) .
+    "\x11\x01\x04\0\x01\0\0\0\xcc\0\0\0" .      # 0x52 StripOffsets = 0xcc
+    "\x15\x01\x03\0\x01\0\0\0" . Set32u($cols) .# 0x5e SamplesPerPixel
+    "\x16\x01\x04\0\x01\0\0\0" . Set32u($h) .   # 0x6a RowsPerStrip
+    "\x17\x01\x04\0\x01\0\0\0" .                # 0x76 StripByteCounts
+    Set32u($w * $h * $cols * int(($bits+7)/8)) .
+    "\x1a\x01\x05\0\x01\0\0\0\xbc\0\0\0" .      # 0x82 XResolution
+    "\x1b\x01\x05\0\x01\0\0\0\xc4\0\0\0" .      # 0x8e YResolution
+    "\x1c\x01\x03\0\x01\0\0\0\x01\0\0\0" .      # 0x9a PlanarConfiguration = 1
+    "\x28\x01\x03\0\x01\0\0\0\x02\0\0\0" .      # 0xa6 ResolutionUnit = 2
+    "\0\0\0\0" .                                # 0xb2 (no IFD1)
+    (Set16u($bits) x 3) .                       # 0xb6 BitsPerSample value
+    Set32u($res) . "\x01\0\0\0" .               # 0xbc XResolution = 72
+    Set32u($res) . "\x01\0\0\0";                # 0xc4 YResolution = 72
+    SetByteOrder($saveOrder);                   # 0xcc (data goes here)
+    return $hdr;
+}
+
+#------------------------------------------------------------------------------
 # LensSpec value conversions
 # Inputs: 0) value
 # Returns: converted value
@@ -4199,6 +4648,8 @@ my @lensFeatures = (
     [ 0x00e0, { 0x0020 => 'STF', 0x0040 => 'Reflex', 0x0060 => 'Macro', 0x0080 => 'Fisheye' } ],
     [ 0x0003, { 0x0001 => 'SSM', 0x0002 => 'SAM' } ],
     [ 0x8000, { 0x8000 => 'OSS' } ],
+    [ 0x2000, { 0x2000 => 'LE' } ], #12
+    [ 0x0800, { 0x0800 => 'II' } ], #12
 );
 sub PrintLensSpec($)
 {
@@ -4231,7 +4682,7 @@ sub PrintLensSpec($)
 sub PrintInvLensSpec($)
 {
     my $val = shift;
-    return $1 if $val =~ /Unknown ?\((.*)\)/i;
+    return $1 if $val =~ /Unknown \((.*)\)/i;
     my ($sf, $lf, $sa, $la) = Image::ExifTool::Exif::GetLensInfo($val);
     $sf or return undef;
     # fixed focal length and aperture have zero for 2nd number

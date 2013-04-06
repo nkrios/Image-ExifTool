@@ -821,7 +821,7 @@ experimental, and is only enabled with the Verbose or Unknown options.
         Format => 'int16u',
     },
     0x00a1 => [
-        # this list for documentation only [not currently extracted]
+        # this list for documentation only [currently not extracted]
         {
             # (not actually a full Photohop IRB record it appears, but it does start
             #  with '8BIM', and does contain resolution information at offset 0x0a)

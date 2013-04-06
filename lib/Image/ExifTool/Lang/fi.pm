@@ -477,7 +477,6 @@ $VERSION = '1.01';
    'ColorMode' => {
       Description => 'Värimuoto',
       PrintConv => {
-        'Adobe RGB' => 'Auringonlasku',
         'Autumn Leaves' => 'Syksyn lehdet',
         'B & W' => 'M & V',
         'B&W' => 'M&V',
@@ -589,7 +588,24 @@ $VERSION = '1.01';
    'Country-PrimaryLocationName' => 'Maa',
    'CreateDate' => 'Digitaalisen datan luonnin päiväys ja aika',
    'CreationDate' => 'Luontipäivä',
-   'CreativeStyle' => 'Luova tyyli',
+   'CreativeStyle' => {
+      Description => 'Luova tyyli',
+      PrintConv => {
+        'Autumn Leaves' => 'Syksyn lehdet',
+        'B&W' => 'M&V',
+        'Clear' => 'Selkeä',
+        'Deep' => 'Syvä',
+        'Landscape' => 'Maisema',
+        'Light' => 'Valoisa',
+        'Neutral' => 'Neutraali',
+        'Night View/Portrait' => 'Yönäkymä',
+        'Portrait' => 'Muotokuva',
+        'Sepia' => 'Seepia',
+        'Standard' => 'Vakio',
+        'Sunset' => 'Auringonlasku',
+        'Vivid' => 'Heleät värit',
+      },
+    },
    'CreatorAddress' => 'Tekijä - Osoite',
    'CreatorCity' => 'Tekijä - Kaupunki',
    'CreatorCountry' => 'Tekijä - Maa',
@@ -1472,7 +1488,15 @@ $VERSION = '1.01';
    'JPEGPointTransforms' => 'JPEG:n pistemuunnot',
    'JPEGProc' => 'JPEG-proc',
    'JPEGQTables' => 'JPEG:n Q-taulukot',
-   'JPEGQuality' => 'JPEG-laatu',
+   'JPEGQuality' => {
+      Description => 'JPEG-laatu',
+      PrintConv => {
+        'Extra Fine' => 'Erityishieno',
+        'Fine' => 'Hieno',
+        'Standard' => 'Normaali',
+        'n/a' => 'Ei asetettu',
+      },
+    },
    'JPEGRestartInterval' => 'JPEG:n uudelleenaloitusväli',
    'JPEGTables' => 'JPEG-taulukot',
    'JobID' => 'Työn ID',
@@ -2821,7 +2845,8 @@ under the same terms as Perl itself.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Jens Duttke and Jarkko ME<auml>kineva for providing this translation.
+Thanks to Jens Duttke and Jarkko ME<auml>kineva for providing this
+translation.
 
 =head1 SEE ALSO
 

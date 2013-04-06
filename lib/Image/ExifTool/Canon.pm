@@ -80,7 +80,7 @@ sub ProcessSerialData($$$);
 sub ProcessFilters($$$);
 sub SwapWords($);
 
-$VERSION = '3.03';
+$VERSION = '3.08';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -354,10 +354,15 @@ $VERSION = '3.03';
     489 => 'Canon EF 70-300mm f/4-5.6L IS USM', #Gerald Kapounek
     490 => 'Canon EF 8-15mm f/4L USM', #Klaus Reinfeld
     491 => 'Canon EF 300mm f/2.8L IS II USM', #42
+    492 => 'Canon EF 400mm f/2.8L IS II USM', #PH
+    493 => 'Canon EF 24-105mm f/4L IS USM', #PH
     494 => 'Canon EF 600mm f/4.0L IS II USM', #PH
     495 => 'Canon EF 24-70mm f/2.8L II USM', #PH
-    503 => 'Canon EF 24mm f/2.8 IS USM', #PH
+    496 => 'Canon EF 200-400mm f/4L IS USM', #PH
     502 => 'Canon EF 28mm f/2.8 IS USM', #PH
+    503 => 'Canon EF 24mm f/2.8 IS USM', #PH
+    504 => 'Canon EF 24-70mm f/4L IS USM', #PH
+    505 => 'Canon EF 35mm f/2 IS USM', #PH
     4142 => 'Canon EF-S 18-135mm f/3.5-5.6 IS STM',
     4143 => 'Canon EF-M 18-55mm f/3.5-5.6 IS STM',
     4144 => 'Canon EF 40mm f/2.8 STM', #50
@@ -535,7 +540,13 @@ $VERSION = '3.03';
     0x3350000 => 'PowerShot SX160 IS',
     0x3360000 => 'PowerShot S110 (new)',
     0x3370000 => 'PowerShot SX500 IS',
+    0x3380000 => 'PowerShot N',
     0x3390000 => 'IXUS 245 HS / IXY 430F', # (apparently no PowerShot equivalent)
+    0x3400000 => 'PowerShot SX280 HS',
+    0x3430000 => 'PowerShot A2600',
+    0x3460000 => 'PowerShot ELPH 130 IS / IXUS 140 / IXY 110F',
+    0x3490000 => 'PowerShot ELPH 330 HS / IXUS 255 HS / IXY 610F',
+    # ? => 'PowerShot ELPH 115 IS / IXUS 132 / IXY 90F',
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
 
@@ -610,7 +621,9 @@ $VERSION = '3.03';
     0x80000298 => 'WFT-E4 II',
     0x80000301 => 'EOS Rebel T4i / 650D / Kiss X6i',
     0x80000302 => '6D', #25
+    0x80000326 => 'EOS Rebel T5i / 700D / Kiss X7i',
     0x80000331 => 'EOS M',
+    0x80000346 => 'EOS Rebel SL1 / 100D / Kiss X7',
 );
 
 my %canonQuality = (
@@ -1478,8 +1491,8 @@ my %binaryDataAttrs = (
             Name => 'ColorData6',
             SubDirectory => { TagTable => 'Image::ExifTool::Canon::ColorData6' },
         },
-        {   # (int16u[1312]) - 1DX, 5DmkIII, 650D
-            Condition => '$count == 1312',
+        {   # (int16u[1312]) - 1DX, 5DmkIII, 650D (1312) or 1DX firmware 1.x (1316)
+            Condition => '$count == 1312 or $count == 1316',
             Name => 'ColorData7',
             SubDirectory => { TagTable => 'Image::ExifTool::Canon::ColorData7' },
         },
@@ -2860,8 +2873,8 @@ my %ciMaxFocal = (
     IS_SUBDIR => [ 0x368 ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
-        CameraInfo tags for the 1DmkIV.  Indices shown are for firmware versions
-        1.0.x, but they may be different for other firmware versions.
+        CameraInfo tags for the EOS 1D Mark IV.  Indices shown are for firmware
+        versions 1.0.x, but they may be different for other firmware versions.
     },
     0x00 => {
         Name => 'FirmwareVersionLookAhead',
@@ -2980,23 +2993,25 @@ my %ciMaxFocal = (
     FORMAT => 'int8u',
     FIRST_ENTRY => 0,
     PRIORITY => 0,
-    DATAMEMBER => [ 0x00, 0x1a4 ],
-    IS_SUBDIR => [ 0x3ed ],
+    DATAMEMBER => [ 0x00, 0x1b, 0x8e, 0x1ab ],
+    IS_SUBDIR => [ 0x3f4 ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
         CameraInfo tags for the EOS 1D X.  Indices shown are for firmware version
-        6.5.1, but they may be different for other firmware versions.
+        1.0.2, but they may be different for other firmware versions.
     },
     0x00 => {
         Name => 'FirmwareVersionLookAhead',
         Hidden => 1,
         # look ahead to check location of FirmwareVersion string
-        Format => 'undef[0x27f]',
+        Format => 'undef[0x286]',
         RawConv => q{
             my $t = substr($val, 0x271, 6); # 1 = firmware 5.7.1
             $t =~ /^\d+\.\d+\.\d+/ and $$self{CanonFirm} = 1, return undef;
             $t = substr($val, 0x279, 6);    # 2 = firmware 6.5.1
             $t =~ /^\d+\.\d+\.\d+/ and $$self{CanonFirm} = 2, return undef;
+            $t = substr($val, 0x280, 6);    # 3 = firmware 0.0.8/1.0.2/1.1.1
+            $t =~ /^\d+\.\d+\.\d+/ and $$self{CanonFirm} = 3, return undef;
             $self->Warn('Unrecognized CameraInfo1DX firmware version');
             $$self{CanonFirm} = 0;
             return undef;   # not a real tag
@@ -3005,9 +3020,11 @@ my %ciMaxFocal = (
     0x03 => { %ciFNumber },
     0x04 => { %ciExposureTime },
     0x06 => { %ciISO },
-    0x1b => { %ciCameraTemperature },
-    0x20 => { %ciFocalLength },
-    0x7a => {
+    0x1b => { %ciCameraTemperature,
+        Hook => '$varSize -= 3 if $$self{CanonFirm} < 3',
+    },
+    0x23 => { %ciFocalLength },
+    0x7d => {
         Name => 'CameraOrientation',
         PrintConv => {
             0 => 'Horizontal (normal)',
@@ -3015,64 +3032,64 @@ my %ciMaxFocal = (
             2 => 'Rotate 270 CW',
         },
     },
-    0x89 => {
+    0x8c => {
         Name => 'FocusDistanceUpper',
         %focusDistanceByteSwap,
     },
-    0x8b => {
+    0x8e => {
         Name => 'FocusDistanceLower',
         %focusDistanceByteSwap,
+        Hook => '$varSize -= 4 if $$self{CanonFirm} < 3',
     },
-    0xb5 => {
+    0xbc => {
         Name => 'WhiteBalance',
         Format => 'int16u',
         SeparateTable => 1,
         PrintConv => \%canonWhiteBalance,
     },
-    0xb9 => {
+    0xc0 => {
         Name => 'ColorTemperature',
         Format => 'int16u',
     },
-    0xed => {
+    0xf4 => {
         Name => 'PictureStyle',
         Format => 'int8u',
         Flags => ['PrintHex','SeparateTable'],
         PrintConv => \%pictureStyles,
     },
-    0x1a0 => {
+    0x1a7 => {
         Name => 'LensType',
         Format => 'int16uRev', # value is big-endian
         SeparateTable => 1,
         ValueConvInv => 'int($val)', # (must truncate decimal part)
         PrintConv => \%canonLensTypes,
     },
-    0x1a2 => { %ciMinFocal },
-    0x1a4 => { %ciMaxFocal,
-        # decrement $varSize for missing 8 bytes after this tag with firmware 5.7.1
-        # (and add large offset to effectively abort processing if unknown firmware)
+    0x1a9 => { %ciMinFocal },
+    0x1ab => { %ciMaxFocal,
+        # add another offset of -8 for firmware 5.7.1, and a large offset
+        # to effectively abort processing for unknown firmware
         Hook => '$varSize += ($$self{CanonFirm} ? -8 : 0x10000) if $$self{CanonFirm} < 2',
     },
-    0x271 => {
+    0x280 => {
         Name => 'FirmwareVersion',
         Format => 'string[6]',
         Writable => 0,
-        RawConv => '$val=~/^\d+\.\d+\.\d+\s*$/ ? $val : undef',
     },
-    0x2c9 => {
+    0x2d0 => {
         Name => 'FileIndex',
         Groups => { 2 => 'Image' },
         Format => 'int32u',
         ValueConv => '$val + 1',
         ValueConvInv => '$val - 1',
     },
-    0x2d5 => { #(NC)
+    0x2dc => { #(NC)
         Name => 'DirectoryIndex',
         Groups => { 2 => 'Image' },
         Format => 'int32u',
         ValueConv => '$val - 1',
         ValueConvInv => '$val + 1',
     },
-    0x3ed => {
+    0x3f4 => {
         Name => 'PictureStyleInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Canon::PSInfo2' },
     },
@@ -5404,9 +5421,9 @@ my %ciMaxFocal = (
             14 => 'Kabul',          # [+4:30]
             15 => 'Dubai',          # [+4]
             16 => 'Tehran',         # [+3:30]
-            17 => 'Moscow',         # [+4]
+            17 => 'Moscow',         # [+4] (+03:00,DST+0) (! changed to +4 permanent DST in 2011)
             18 => 'Cairo',          # [+2]
-            19 => 'Paris',          # [+1] (+02:00,DST+1)
+            19 => 'Paris',          # [+1] (+01:10,DST+0; +02:00,DST+1)
             20 => 'London',         # [0]  (+00:00,DST+0)
             21 => 'Azores',         # [-1]
             22 => 'Fernando de Noronha', # [-2]
@@ -6622,12 +6639,20 @@ my %ciMaxFocal = (
     FIRST_ENTRY => 1,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     NOTES => q{
-        This information is found in images from the 1DmkIV, 5DmkII, 7D, 50D, 500D
-        and 550D.
+        This information is found in images from the 1DmkIV, 5DmkII, 7D, 50D, 60D,
+        500D and 550D.
     },
     # 0 => 'PeripheralLightingVersion', value = 0x1000
     2 => {
         Name => 'PeripheralLighting',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    4 => {
+        Name => 'ChromaticAberrationCorr',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
+    5 => {
+        Name => 'ChromaticAberrationCorr',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
     6 => 'PeripheralLightingValue',
@@ -6649,6 +6674,10 @@ my %ciMaxFocal = (
         Name => 'PeripheralLightingSetting',
         PrintConv => { 0 => 'Off', 1 => 'On' },
     },
+    6 => {
+        Name => 'ChromaticAberrationSetting',
+        PrintConv => { 0 => 'Off', 1 => 'On' },
+    },
 );
 
 # Auto Lighting Optimizater information (MakerNotes tag 0x4018) (ref PH)
@@ -6667,6 +6696,7 @@ my %ciMaxFocal = (
             3 => 'Off',
         },
     },
+    # 6 - related to ChromaticAberrationSetting ?
 );
 
 # Lens information (MakerNotes tag 0x4019) (ref 20)
@@ -6680,8 +6710,8 @@ my %ciMaxFocal = (
             apparently this is an internal serial number because it doesn't correspond
             to the one printed on the lens
         },
-        Condition => '$$valPt !~ /^\0\0\0\0/', # (rules out 550D and older lenses)
         Format => 'undef[5]',
+        RawConv => '$val=~/^\0\0\0\0/ ? undef : $val', # (rules out 550D and older lenses)
         ValueConv => 'unpack("H*", $val)',
         ValueConvInv => 'pack("H*", $val)',
     },
@@ -6970,6 +7000,39 @@ sub LensWithTC($$)
         }
     }
     return $lens;
+}
+
+#------------------------------------------------------------------------------
+# Attempt to calculate sensor size for Canon cameras
+# Inputs: 0/1) rational values for FocalPlaneX/YResolution
+# Returns: Sensor diagonal size in mm, or undef
+# Notes: This algorithm is fairly reliable, but has been found to give incorrect
+#        values for some firmware versions of the EOS 20D, A310, SD40 and IXUS 65
+# (ref http://wyw.dcweb.cn/download.asp?path=&file=jhead-2.96-ccdwidth_hack.zip)
+sub CalcSensorDiag($$)
+{
+    my ($xres, $yres) = @_;
+    # most Canon cameras store the sensor size in the denominator
+    if ($xres and $yres) {
+        # assumptions: 1) numerators are image width/height * 1000
+        # 2) denominators are sensor width/height in inches * 1000
+        my @xres = split /[ \/]/, $xres;
+        my @yres = split /[ \/]/, $yres;
+        # verify assumptions as best we can:
+            # numerators are always divisible by 1000
+        if ($xres[0] % 1000 == 0 and $yres[0] % 1000 == 0 and
+            # at least 640x480 pixels (DC models - PH)
+            $xres[0] >= 640000 and $yres[0] >= 480000 and
+            # ... but not too big!
+            $xres[0] < 10000000 and $yres[0] < 10000000 and
+            # minimum sensor size is 0.061 inches (DC models - PH)
+            $xres[1] >= 61 and $xres[1] < 1500 and
+            $yres[1] >= 61 and $yres[1] < 1000)
+        {
+            return sqrt($xres[1]*$xres[1] + $yres[1]*$yres[1]) * 0.0254;
+        }
+    }
+    return undef;
 }
 
 #------------------------------------------------------------------------------

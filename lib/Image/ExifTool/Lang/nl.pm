@@ -1852,6 +1852,14 @@ $VERSION = '1.09';
    'InteropOffset' => 'Interoperabiliteit-tag',
    'InteropVersion' => 'Interoperabiliteits versie',
    'JFIFVersion' => 'JFIF versie',
+   'JPEGQuality' => {
+      Description => 'Beeldkwaliteit',
+      PrintConv => {
+        'Extra Fine' => 'Extra fijn',
+        'Fine' => 'Fijn',
+        'Standard' => 'Normaal',
+      },
+    },
    'JobID' => 'ID van baan',
    'Keyword' => 'Trefwoorden',
    'Keywords' => 'Trefwoord',

@@ -91,8 +91,8 @@ for the <code>-geotag</code> option,  but note that here the filename may need
 to be quoted -- see the <a href="#Examples">examples</a> below).  This allows
 batch processing of images spanning different tracks with a single command.</p>
 
-<p>Deleting the <code>Geotag</code> tag causes the associated GPS tags to be
-deleted from an image.</p>
+<p>Deleting the <code>Geotag</code> tag (with <code>-geotag=</code>) causes the
+GPS tags written by the <code>-geotag</code> feature to be deleted.</p>
 
 <blockquote class=lt><i>Programmers:  You may write either a GPS log file name
 or the GPS log data as the value for <code>Geotag</code>.  If the value contains
@@ -586,9 +586,16 @@ file from a collection of geotagged images:</p>
 # Usage:        exiftool -p kml.fmt FILE [...] > out.kml
 #
 # Revisions:    2010/02/05 - P. Harvey created
+#               2013/02/05 - PH Fixed camera icon to work with new Google Earth
 #
 # Notes:     1) All input files must contain GPSLatitude and GPSLongitude.
-#            2) The -fileOrder option may be used to control the order of the
+#            2) For Google Earth to be able to find the images, the input
+#               images must be specified using relative paths, and "out.kml"
+#               must stay in the same directory as where the command was run.
+#            3) Google Earth is picky about the case of the image file extension,
+#               and may not be able to display the image if an upper-case
+#               extension is used.
+#            4) The -fileOrder option may be used to control the order of the
 #               generated placemarks.
 #------------------------------------------------------------------------------
 #[HEAD]&lt;?xml version="1.0" encoding="UTF-8"?&gt;
@@ -597,27 +604,10 @@ file from a collection of geotagged images:</p>
 #[HEAD]    &lt;name&gt;My Photos&lt;/name&gt;
 #[HEAD]    &lt;open&gt;1&lt;/open&gt;
 #[HEAD]    &lt;Style id="Photo"&gt;
-#[HEAD]      &lt;geomScale&gt;.75&lt;/geomScale&gt;
 #[HEAD]      &lt;IconStyle&gt;
-#[HEAD]        &lt;color&gt;ffffffff&lt;/color&gt;
 #[HEAD]        &lt;Icon&gt;
-#[HEAD]          &lt;href&gt;root://icons/palette-4.png&lt;/href&gt;
-#[HEAD]          &lt;x&gt;192&lt;/x&gt;
-#[HEAD]          &lt;y&gt;96&lt;/y&gt;
-#[HEAD]          &lt;w&gt;32&lt;/w&gt;
-#[HEAD]          &lt;h&gt;32&lt;/h&gt;
-#[HEAD]        &lt;/Icon&gt;
-#[HEAD]      &lt;/IconStyle&gt;
-#[HEAD]    &lt;/Style&gt;
-#[HEAD]    &lt;Style id="View"&gt;
-#[HEAD]      &lt;IconStyle&gt;
-#[HEAD]        &lt;color&gt;ffffffff&lt;/color&gt;
-#[HEAD]        &lt;Icon&gt;
-#[HEAD]          &lt;href&gt;root://icons/palette-3.png&lt;/href&gt;
-#[HEAD]          &lt;x&gt;160&lt;/x&gt;
-#[HEAD]          &lt;y&gt;128&lt;/y&gt;
-#[HEAD]          &lt;w&gt;32&lt;/w&gt;
-#[HEAD]          &lt;h&gt;32&lt;/h&gt;
+#[HEAD]          &lt;href&gt;http://maps.google.com/mapfiles/kml/pal4/icon38.png&lt;/href&gt;
+#[HEAD]          &lt;scale&gt;1.0&lt;/scale&gt;
 #[HEAD]        &lt;/Icon&gt;
 #[HEAD]      &lt;/IconStyle&gt;
 #[HEAD]    &lt;/Style&gt;
@@ -646,7 +636,7 @@ file from a collection of geotagged images:</p>
 
 <hr>
 <i>Created Apr. 2, 2009</i><br>
-<i>Last revised Nov. 4, 2012</i>
+<i>Last revised Feb. 7, 2013</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

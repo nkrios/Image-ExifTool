@@ -851,6 +851,11 @@ $VERSION = '1.06';
    'InteropOffset' => 'Značka součinnosti',
    'InteropVersion' => 'Verze kompatibility',
    'JFIFVersion' => 'JFIF verze',
+   'JPEGQuality' => {
+      PrintConv => {
+        'Standard' => 'Normální',
+      },
+    },
    'Keyword' => 'Klíčová slova',
    'Keywords' => 'Klíčová slova',
    'LeafData' => 'Leaf data',

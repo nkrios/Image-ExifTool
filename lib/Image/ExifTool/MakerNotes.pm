@@ -20,7 +20,7 @@ sub ProcessGE2($$$);
 sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.76';
+$VERSION = '1.78';
 
 my $debug;          # set to 1 to enable debugging code
 
@@ -76,6 +76,16 @@ my $debug;          # set to 1 to enable debugging code
             Start => '$valuePtr + 6',
             ByteOrder => 'Unknown',
             FixBase => 1, # necessary for AVI and MOV videos
+        },
+    },
+    {
+        Name => 'MakerNoteFLIR',
+        # (starts with IFD, Make is 'FLIR Systems AB' or 'FLIR Systems')
+        Condition => '$$self{Make} =~ /^FLIR Systems/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::FLIR::Main',
+            Start => '$valuePtr',
+            ByteOrder => 'Unknown',
         },
     },
     {
@@ -651,9 +661,8 @@ my $debug;          # set to 1 to enable debugging code
             return 1;
         },
         NotIFD => 1,
-        Binary => 1,
+        SubDirectory => { TagTable => 'Image::ExifTool::PhaseOne::Main' },
         PutFirst => 1, # place immediately after TIFF header
-        Notes => 'the raw image data in PhaseOne IIQ images',
     },
     {
         Name => 'MakerNoteReconyx',
@@ -824,6 +833,13 @@ my $debug;          # set to 1 to enable debugging code
         # show as binary if it is too long
         ValueConv => 'length($val) > 64 ? \$val : $val',
         ValueConvInv => '$val',
+    },
+    {
+        Name => 'MakerNoteUnknownBinary',
+        # "LSI1\0" - SilverFast
+        Condition => '$$valPt =~ /^LSI1\0/',
+        Notes => 'unknown binary maker notes',
+        Binary => 1,
     },
     {
         Name => 'MakerNoteUnknown',

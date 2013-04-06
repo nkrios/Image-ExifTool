@@ -183,7 +183,7 @@ value.</p>
     <tr valign='top'><td>Data</td><td>-</td><td>data for PreviewImage to be written (may either be data
     for the old or new image, or 'LOAD_PREVIEW' to indicate that the data must be loaded from outside
     the EXIF segment)</td></tr>
-    <tr><td>Fixup</td><td>-</td><td>fixup for PreviewImage pointers when writing JPEG images</td></tr>
+    <tr><td>Fixup</td><td>-</td><td>[mandatory] fixup for PreviewImage pointers when writing JPEG images</td></tr>
     <tr valign='top'><td>IsShort</td><td>-</td><td>flag indicates PreviewImage pointers
     are 2-byte (instead of 4-byte) integers</td></tr>
     <tr valign='top'><td>IsTrailer</td><td>-</td><td>flag indicates image should always be written as a JPEG
@@ -230,7 +230,8 @@ information may include:
 
 <tr><td>TAG_INFO</td><td>Hash of tagInfo hash references, keyed by tag key</td></tr>
 
-<tr><td>TAGS_FROM_FILE</td><td>Flag used during extraction when called from SetNewValuesFromFile()</td></tr>
+<tr><td>TAGS_FROM_FILE</td><td>Flag used during extraction when called from SetNewValuesFromFile().
+    Test this flag when extracting tags that are not normally extracted.</td></tr>
 
 <tr><td>TIFF_END</td><td>Location of end of regular TIFF file set by WriteExif()</td></tr>
 

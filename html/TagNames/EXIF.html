@@ -23,7 +23,7 @@ other tags which are not part of the EXIF specification, but may co-exist
 with EXIF tags in some images.  Tags which are part of the EXIF 2.3
 specification have an underlined <b>Tag Name</b> in the HTML version of this
 documentation.  See
-<a href="http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-008-2010_E.pdf">http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-008-2010_E.pdf</a> for the
+<a href="http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-008-2012_E.pdf">http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-008-2012_E.pdf</a> for the
 official EXIF 2.3 specification.
 </p>
 <blockquote>
@@ -1444,13 +1444,13 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
 <td><u>ShutterSpeedValue</u></td>
 <td class=c>rational64s</td>
 <td class=c>ExifIFD</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(displayed in seconds, but stored as an APEX value)</span></span></td></tr>
 <tr class=b>
 <td title='0x9202 = 37378'>0x9202</td>
 <td><u>ApertureValue</u></td>
 <td class=c>rational64u</td>
 <td class=c>ExifIFD</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(displayed as an F number, but stored as an APEX value)</span></span></td></tr>
 <tr>
 <td title='0x9203 = 37379'>0x9203</td>
 <td><u>BrightnessValue</u></td>
@@ -1468,7 +1468,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
 <td><u>MaxApertureValue</u></td>
 <td class=c>rational64u</td>
 <td class=c>ExifIFD</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(displayed as an F number, but stored as an APEX value)</span></span></td></tr>
 <tr class=b>
 <td title='0x9206 = 37382'>0x9206</td>
 <td><u>SubjectDistance</u></td>
@@ -1633,6 +1633,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNoteCanon
   <br>MakerNoteCasio
   <br>MakerNoteCasio2
+  <br>MakerNoteFLIR
   <br>MakerNoteFujiFilm
   <br>MakerNoteGE
   <br>MakerNoteGE2
@@ -1698,13 +1699,15 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>MakerNoteSonyEricsson
   <br>MakerNoteSonySRF
   <br>MakerNoteUnknownText
+  <br>MakerNoteUnknownBinary
   <br><u>MakerNoteUnknown</u></td>
-<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
-<td class=c>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
+<td class=c>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef<br>undef</td>
+<td class=c>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD<br>ExifIFD</td>
 <td>--&gt; <a href='Nikon.html'>Nikon Tags</a>
   <br>--&gt; <a href='Canon.html'>Canon Tags</a>
   <br>--&gt; <a href='Casio.html'>Casio Tags</a>
   <br>--&gt; <a href='Casio.html#Type2'>Casio Type2 Tags</a>
+  <br>--&gt; <a href='FLIR.html'>FLIR Tags</a>
   <br>--&gt; <a href='FujiFilm.html'>FujiFilm Tags</a>
   <br>--&gt; <a href='GE.html'>GE Tags</a>
   <br>--&gt; <a href='FujiFilm.html'>FujiFilm Tags</a>
@@ -1752,7 +1755,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>--&gt; <a href='Pentax.html#Type4'>Pentax Type4 Tags</a>
   <br>--&gt; <a href='Pentax.html'>Pentax Tags</a>
   <br>--&gt; <a href='Pentax.html#S1'>Pentax S1 Tags</a>
-  <br><span class=n>(the raw image data in PhaseOne IIQ images)</span>
+  <br>--&gt; <a href='PhaseOne.html'>PhaseOne Tags</a>
   <br>--&gt; <a href='Reconyx.html'>Reconyx Tags</a>
   <br>--&gt; <a href='Ricoh.html'>Ricoh Tags</a>
   <br>--&gt; <a href='Ricoh.html#Text'>Ricoh Text Tags</a>
@@ -1770,6 +1773,7 @@ hours, 2. If present, the time zone offset of ModifyDate)</span></span></td></tr
   <br>--&gt; <a href='Sony.html#Ericsson'>Sony Ericsson Tags</a>
   <br>--&gt; <a href='Sony.html#SRF'>Sony SRF Tags</a>
   <br><span class=n>(unknown text-based maker notes)</span>
+  <br><span class=n>(unknown binary maker notes)</span>
   <br>--&gt; <a href='Unknown.html'>Unknown Tags</a></td></tr>
 <tr>
 <td title='0x9286 = 37510'>0x9286</td>
@@ -2465,14 +2469,14 @@ unnecessary clutter)</span></span><table class=cols><tr>
 <tr class=b>
 <td title='0xc61b = 50715'>0xc61b</td>
 <td>BlackLevelDeltaH</td>
-<td class=c>N</td>
-<td class=c>-</td>
+<td class=c title=' ! = Unsafe'>rational64s[n]!</td>
+<td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td title='0xc61c = 50716'>0xc61c</td>
 <td>BlackLevelDeltaV</td>
-<td class=c>N</td>
-<td class=c>-</td>
+<td class=c title=' ! = Unsafe'>rational64s[n]!</td>
+<td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0xc61d = 50717'>0xc61d</td>
@@ -2917,8 +2921,32 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <tr>
 <td title='0xc761 = 51041'>0xc761</td>
 <td>NoiseProfile</td>
-<td class=c>N</td>
-<td class=c>-</td>
+<td class=c title=' ! = Unsafe'>double[n]!</td>
+<td class=c>SubIFD</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0xc763 = 51043'>0xc763</td>
+<td>TimeCodes</td>
+<td class=c>int8u[n]</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0xc764 = 51044'>0xc764</td>
+<td>FrameRate</td>
+<td class=c>rational64s</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0xc772 = 51058'>0xc772</td>
+<td>TStop</td>
+<td class=c>rational64u[n]</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0xc789 = 51081'>0xc789</td>
+<td>ReelName</td>
+<td class=c>string</td>
+<td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td title='0xc791 = 51089'>0xc791</td>
@@ -2939,63 +2967,69 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td title='0xc7a1 = 51105'>0xc7a1</td>
+<td>CameraLabel</td>
+<td class=c>string</td>
+<td class=c>IFD0</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td title='0xc7a3 = 51107'>0xc7a3</td>
 <td>ProfileHueSatMapEncoding</td>
 <td class=c title=' ! = Unsafe'>int32u!</td>
 <td class=c>IFD0</td>
 <td><span class=s>0 = Linear
   <br>1 = sRGB</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0xc7a4 = 51108'>0xc7a4</td>
 <td>ProfileLookTableEncoding</td>
 <td class=c title=' ! = Unsafe'>int32u!</td>
 <td class=c>IFD0</td>
 <td><span class=s>0 = Linear
   <br>1 = sRGB</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xc7a5 = 51109'>0xc7a5</td>
 <td>BaselineExposureOffset</td>
 <td class=c title=' ! = Unsafe'>rational64u!</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0xc7a6 = 51110'>0xc7a6</td>
 <td>DefaultBlackRender</td>
 <td class=c title=' ! = Unsafe'>int32u!</td>
 <td class=c>IFD0</td>
 <td><span class=s>0 = Auto
   <br>1 = None</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xc7a7 = 51111'>0xc7a7</td>
 <td>NewRawImageDigest</td>
 <td class=c title=' ! = Unsafe'>int8u[16]!</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0xc7a8 = 51112'>0xc7a8</td>
 <td>RawToPreviewGain</td>
 <td class=c title=' ! = Unsafe'>double!</td>
 <td class=c>IFD0</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0xc7b5 = 51125'>0xc7b5</td>
 <td>DefaultUserCrop</td>
 <td class=c title=' ! = Unsafe'>rational64u[4]!</td>
 <td class=c>SubIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0xea1c = 59932'>0xea1c</td>
 <td>Padding</td>
 <td class=c>undef</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0xea1d = 59933'>0xea1d</td>
 <td>OffsetSchema</td>
 <td class=c>int32s</td>
 <td class=c>ExifIFD</td>
 <td><span class=s><span class=n>(Microsoft&#39;s ill-conceived maker note offset difference)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0xfde8 = 65000'>0xfde8</td>
 <td>OwnerName</td>
 <td class=c title=' / = Avoided'>string/</td>
@@ -3003,86 +3037,86 @@ one; 2. Pixel width of segments except last; 3. Pixel width of last segment)</sp
 <td><span class=s><span class=n>(tags 0xfde8-0xfdea and 0xfe4c-0xfe58 are generated by Photoshop Camera RAW.
 Some names are the same as other EXIF tags, but ExifTool will avoid writing
 these unless they already exist in the file)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0xfde9 = 65001'>0xfde9</td>
 <td>SerialNumber</td>
 <td class=c title=' / = Avoided'>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0xfdea = 65002'>0xfdea</td>
 <td>Lens</td>
 <td class=c title=' / = Avoided'>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0xfe00 = 65024'>0xfe00</td>
 <td>KDC_IFD</td>
 <td class=c>-</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Kodak.html#KDC_IFD'>Kodak KDC_IFD Tags</a>
   <br><span class='n s'>(used in some Kodak KDC images)</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0xfe4c = 65100'>0xfe4c</td>
 <td>RawFile</td>
 <td class=c title=' / = Avoided'>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0xfe4d = 65101'>0xfe4d</td>
 <td>Converter</td>
 <td class=c title=' / = Avoided'>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0xfe4e = 65102'>0xfe4e</td>
 <td>WhiteBalance</td>
 <td class=c title=' / = Avoided'>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0xfe51 = 65105'>0xfe51</td>
 <td>Exposure</td>
 <td class=c title=' / = Avoided'>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0xfe52 = 65106'>0xfe52</td>
 <td>Shadows</td>
 <td class=c title=' / = Avoided'>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0xfe53 = 65107'>0xfe53</td>
 <td>Brightness</td>
 <td class=c title=' / = Avoided'>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0xfe54 = 65108'>0xfe54</td>
 <td>Contrast</td>
 <td class=c title=' / = Avoided'>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0xfe55 = 65109'>0xfe55</td>
 <td>Saturation</td>
 <td class=c title=' / = Avoided'>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0xfe56 = 65110'>0xfe56</td>
 <td>Sharpness</td>
 <td class=c title=' / = Avoided'>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0xfe57 = 65111'>0xfe57</td>
 <td>Smoothness</td>
 <td class=c title=' / = Avoided'>string/</td>
 <td class=c>ExifIFD</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0xfe58 = 65112'>0xfe58</td>
 <td>MoireFilter</td>
 <td class=c title=' / = Avoided'>string/</td>
@@ -3204,7 +3238,7 @@ these unless they already exist in the file)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 19, 2012</i>
+<br><i>Last revised Apr 1, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

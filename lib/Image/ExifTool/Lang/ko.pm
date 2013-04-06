@@ -1348,6 +1348,14 @@ $VERSION = '1.06';
    'InteropIndex' => '상호운용성 증명',
    'InteropOffset' => '상호 운용성 태그',
    'InteropVersion' => '상호 운용성 버전',
+   'JPEGQuality' => {
+      Description => '화질',
+      PrintConv => {
+        'Extra Fine' => '엑스트라 파인',
+        'Fine' => '파인',
+        'Standard' => '표준화질',
+      },
+    },
    'Keyword' => '키워드',
    'Keywords' => '키워드',
    'LCDIllumination' => {

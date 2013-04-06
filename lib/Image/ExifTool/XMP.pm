@@ -46,7 +46,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.58';
+$VERSION = '2.64';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -74,6 +74,7 @@ my %stdXlatNS = (
     'photomechanic'=> 'photomech',
     'MicrosoftPhoto' => 'microsoft',
     'prismusagerights' => 'pur',
+    'GettyImagesGIFT' => 'getty',
 );
 
 # translate ExifTool XMP family 1 group names to standard XMP namespace prefixes
@@ -83,13 +84,16 @@ my %xmpNS = (
     'iptcExt' => 'Iptc4xmpExt',
     'photomechanic'=> 'photomech',
     'microsoft' => 'MicrosoftPhoto',
+    'gettyImages' => 'GettyImagesGIFT',
     # (prism changed their spec to now use 'pur')
     # 'pur' => 'prismusagerights',
 );
 
 # Lookup to translate standard XMP namespace prefixes into URI's.  This list
 # need not be complete, but it must contain an entry for each namespace prefix
-# (NAMESPACE) for writable tags in the XMP tables or in structures
+# (NAMESPACE) for writable tags in the XMP tables or in structures that doesn't
+# define a URI.  Also, the namespace must be defined here for non-standard
+# namespace prefixes to be recognized.
 %nsURI = (
     aux       => 'http://ns.adobe.com/exif/1.0/aux/',
     album     => 'http://ns.adobe.com/album/1.0/',
@@ -157,6 +161,8 @@ my %xmpNS = (
     fpv       => 'http://ns.fastpictureviewer.com/fpv/1.0/',
    'apple-fi' => 'http://ns.apple.com/faceinfo/1.0/',
     GPano     => 'http://ns.google.com/photos/1.0/panorama/',
+    dwc       => 'http://rs.tdwg.org/dwc/index.htm',
+    GettyImagesGIFT => 'http://xmp.gettyimages.com/gift/1.0/',
 );
 
 # build reverse namespace lookup
@@ -200,6 +206,20 @@ my %longConv = (
     Shift => 'Time',
     PrintConv => '$self->ConvertDateTime($val)',
     PrintConvInv => '$self->InverseDateTime($val,undef,1)',
+);
+
+# this conversion allows alternate language support for designated boolean tags
+my %boolConv = (
+    PrintConv => {
+        OTHER => sub { # (inverse conversion is the same)
+            my $val = shift;
+            return 'False' if lc $val eq 'false';
+            return 'True' if lc $val eq 'true';
+            return $val;
+        },
+        True => 'True',
+        False => 'False',
+    },
 );
 
 # XMP namespaces which we don't want to contribute to generated EXIF tag names
@@ -294,6 +314,7 @@ my %sThumbnail = (
     width       => { Writable => 'integer' },
    'format'     => { },
     image       => {
+        Avoid => 1,
         ValueConv => 'Image::ExifTool::XMP::DecodeBase64($val)',
         ValueConvInv => 'Image::ExifTool::XMP::EncodeBase64($val)',
     },
@@ -377,42 +398,49 @@ my %sOECF = (
 my %sCorrectionMask = (
     STRUCT_NAME => 'CorrectionMask',
     NAMESPACE   => 'crs',
-    What         => { },
-    MaskValue    => { Writable => 'real' },
-    Radius       => { Writable => 'real' },
-    Flow         => { Writable => 'real' },
-    CenterWeight => { Writable => 'real' },
+    # disable List behaviour of flattened Gradient/PaintBasedCorrections
+    # because these are nested in lists and the flattened tags can't
+    # do justice to this complex structure
+    What         => { List => 0 },
+    MaskValue    => { Writable => 'real', List => 0, FlatName => 'Value' },
+    Radius       => { Writable => 'real', List => 0 },
+    Flow         => { Writable => 'real', List => 0 },
+    CenterWeight => { Writable => 'real', List => 0 },
     Dabs         => { List => 'Seq' },
-    ZeroX        => { Writable => 'real' },
-    ZeroY        => { Writable => 'real' },
-    FullX        => { Writable => 'real' },
-    FullY        => { Writable => 'real' },
+    ZeroX        => { Writable => 'real', List => 0 },
+    ZeroY        => { Writable => 'real', List => 0 },
+    FullX        => { Writable => 'real', List => 0 },
+    FullY        => { Writable => 'real', List => 0 },
 );
 my %sCorrection = (
     STRUCT_NAME => 'Correction',
     NAMESPACE   => 'crs',
-    What => { },
-    CorrectionAmount => { Writable => 'real' },
-    CorrectionActive => { Writable => 'boolean' },
-    LocalExposure    => { Writable => 'real' },
-    LocalSaturation  => { Writable => 'real' },
-    LocalContrast    => { Writable => 'real' },
-    LocalClarity     => { Writable => 'real' },
-    LocalSharpness   => { Writable => 'real' },
-    LocalBrightness  => { Writable => 'real' },
-    LocalToningHue   => { Writable => 'real' },
-    LocalToningSaturation => { Writable => 'real' },
-    LocalExposure2012     => { Writable => 'real' },
-    LocalContrast2012     => { Writable => 'real' },
-    LocalHighlights2012   => { Writable => 'real' },
-    LocalShadows2012      => { Writable => 'real' },
-    LocalClarity2012      => { Writable => 'real' },
-    LocalLuminanceNoise   => { Writable => 'real' },
-    LocalMoire       => { Writable => 'real' },
-    LocalDefringe    => { Writable => 'real' },
-    LocalTemperature => { Writable => 'real' },
-    LocalTint        => { Writable => 'real' },
-    CorrectionMasks  => { Struct => \%sCorrectionMask, List => 'Seq' },
+    What => { List => 0 },
+    CorrectionAmount => { FlatName => 'Amount',     Writable => 'real', List => 0 },
+    CorrectionActive => { FlatName => 'Active',     Writable => 'boolean', List => 0 },
+    LocalExposure    => { FlatName => 'Exposure',   Writable => 'real', List => 0 },
+    LocalSaturation  => { FlatName => 'Saturation', Writable => 'real', List => 0 },
+    LocalContrast    => { FlatName => 'Contrast',   Writable => 'real', List => 0 },
+    LocalClarity     => { FlatName => 'Clarity',    Writable => 'real', List => 0 },
+    LocalSharpness   => { FlatName => 'Sharpness',  Writable => 'real', List => 0 },
+    LocalBrightness  => { FlatName => 'Brightness', Writable => 'real', List => 0 },
+    LocalToningHue   => { FlatName => 'Hue',        Writable => 'real', List => 0 },
+    LocalToningSaturation => { FlatName => 'Saturation',        Writable => 'real', List => 0 },
+    LocalExposure2012     => { FlatName => 'Exposure2012',      Writable => 'real', List => 0 },
+    LocalContrast2012     => { FlatName => 'Contrast2012',      Writable => 'real', List => 0 },
+    LocalHighlights2012   => { FlatName => 'Highlights2012',    Writable => 'real', List => 0 },
+    LocalShadows2012      => { FlatName => 'Shadows2012',       Writable => 'real', List => 0 },
+    LocalClarity2012      => { FlatName => 'Clarity2012',       Writable => 'real', List => 0 },
+    LocalLuminanceNoise   => { FlatName => 'LuminanceNoise',    Writable => 'real', List => 0 },
+    LocalMoire       => { FlatName => 'Moire',      Writable => 'real', List => 0 },
+    LocalDefringe    => { FlatName => 'Defringe',   Writable => 'real', List => 0 },
+    LocalTemperature => { FlatName => 'Temperature',Writable => 'real', List => 0 },
+    LocalTint        => { FlatName => 'Tint',       Writable => 'real', List => 0 },
+    CorrectionMasks  => {
+        FlatName => 'Mask',
+        Struct => \%sCorrectionMask,
+        List => 'Seq',
+    },
 );
 
 # IPTC Extension 1.0 structures
@@ -598,15 +626,15 @@ my %sLocationDetails = (
     },
    'mwg-rs' => {
         Name => 'mwg-rs',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::mwg_rs' },
+        SubDirectory => { TagTable => 'Image::ExifTool::MWG::Regions' },
     },
    'mwg-kw' => {
         Name => 'mwg-kw',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::mwg_kw' },
+        SubDirectory => { TagTable => 'Image::ExifTool::MWG::Keywords' },
     },
    'mwg-coll' => {
         Name => 'mwg-coll',
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::mwg_coll' },
+        SubDirectory => { TagTable => 'Image::ExifTool::MWG::Collections' },
     },
     extensis => {
         Name => 'extensis',
@@ -627,6 +655,14 @@ my %sLocationDetails = (
     GPano => {
         Name => 'GPano',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::GPano' },
+    },
+    dwc => {
+        Name => 'dwc',
+        SubDirectory => { TagTable => 'Image::ExifTool::DarwinCore::Main' },
+    },
+    getty => {
+        Name => 'getty',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::GettyImages' },
     },
 );
 
@@ -719,18 +755,18 @@ my %sLocationDetails = (
     ModifyDate  => { Groups => { 2 => 'Time' }, %dateTimeInfo, Priority => 0 },
     Nickname    => { },
     Rating      => { Writable => 'real', Notes => 'a value from 0 to 5, or -1 for "rejected"' },
-    Thumbnails  => { Struct => \%sThumbnail, List => 'Alt' },
-    ThumbnailsHeight => { Name => 'ThumbnailHeight', Flat => 1 },
-    ThumbnailsWidth  => { Name => 'ThumbnailWidth',  Flat => 1 },
-    ThumbnailsFormat => { Name => 'ThumbnailFormat', Flat => 1 },
-    ThumbnailsImage  => { Name => 'ThumbnailImage',  Flat => 1, Avoid => 1 },
+    Thumbnails  => {
+        FlatName => 'Thumbnail',
+        Struct => \%sThumbnail,
+        List => 'Alt',
+    },
     # the following written by Adobe InDesign, not part of XMP spec:
-    PageInfo        => { Struct => \%sPageInfo, List => 'Seq' },
-    PageInfoPageNumber=>{Name => 'PageImagePageNumber', Flat => 1 },
-    PageInfoHeight  => { Name => 'PageImageHeight', Flat => 1 },
-    PageInfoWidth   => { Name => 'PageImageWidth',  Flat => 1 },
-    PageInfoFormat  => { Name => 'PageImageFormat', Flat => 1 },
-    PageInfoImage   => { Name => 'PageImage',       Flat => 1 },
+    PageInfo        => {
+        FlatName => 'PageImage',
+        Struct => \%sPageInfo,
+        List => 'Seq',
+    },
+    PageInfoImage => { Name => 'PageImage', Flat => 1 },
     Title       => { Avoid => 1, Notes => 'non-standard', Writable => 'lang-alt' }, #11
     Author      => { Avoid => 1, Notes => 'non-standard', Groups => { 2 => 'Author' } }, #11
     Keywords    => { Avoid => 1, Notes => 'non-standard' }, #11
@@ -837,30 +873,18 @@ my %sPantryItem = (
     NOTES => 'XMP Paged-Text namespace tags.',
     MaxPageSize         => { Struct => \%sDimensions },
     NPages              => { Writable => 'integer' },
-    Fonts               => { Struct => \%sFont, List => 'Bag' },
-    FontsFontName       => { Flat => 1, Name => 'FontName' },
-    FontsFontFamily     => { Flat => 1, Name => 'FontFamily' },
-    FontsFontFace       => { Flat => 1, Name => 'FontFace' },
-    FontsFontType       => { Flat => 1, Name => 'FontType' },
-    FontsVersionString  => { Flat => 1, Name => 'FontVersion' },
-    FontsComposite      => { Flat => 1, Name => 'FontComposite' },
-    FontsFontFileName   => { Flat => 1, Name => 'FontFileName' },
-    FontsChildFontFiles => { Flat => 1, Name => 'ChildFontFiles' },
-    Colorants           => { Struct => \%sColorant, List => 'Seq' },
-    ColorantsSwatchName => { Flat => 1, Name => 'ColorantSwatchName' },
-    ColorantsMode       => { Flat => 1, Name => 'ColorantMode' },
-    ColorantsType       => { Flat => 1, Name => 'ColorantType' },
-    ColorantsCyan       => { Flat => 1, Name => 'ColorantCyan' },
-    ColorantsMagenta    => { Flat => 1, Name => 'ColorantMagenta' },
-    ColorantsYellow     => { Flat => 1, Name => 'ColorantYellow' },
-    ColorantsBlack      => { Flat => 1, Name => 'ColorantBlack' },
-    ColorantsRed        => { Flat => 1, Name => 'ColorantRed' },
-    ColorantsGreen      => { Flat => 1, Name => 'ColorantGreen' },
-    ColorantsBlue       => { Flat => 1, Name => 'ColorantBlue' },
-    ColorantsL          => { Flat => 1, Name => 'ColorantL' },
-    ColorantsA          => { Flat => 1, Name => 'ColorantA' },
-    ColorantsB          => { Flat => 1, Name => 'ColorantB' },
-    ColorantsTint       => { Flat => 1, Name => 'ColorantTint' },
+    Fonts               => {
+        FlatName => '',
+        Struct => \%sFont,
+        List => 'Bag',
+    },
+    FontsVersionString  => { Name => 'FontVersion',     Flat => 1 },
+    FontsComposite      => { Name => 'FontComposite',   Flat => 1 },
+    Colorants           => {
+        FlatName => 'Colorant',
+        Struct => \%sColorant,
+        List => 'Seq',
+    },
     PlateNames          => { List => 'Seq' },
 );
 
@@ -936,6 +960,7 @@ my %sPantryItem = (
     Credit          => { Groups => { 2 => 'Author' } },
     DateCreated     => { Groups => { 2 => 'Time' }, %dateTimeInfo },
     DocumentAncestors => {
+        FlatName => 'Document',
         List => 'bag',
         Struct => {
             STRUCT_NAME => 'Ancestor',
@@ -943,7 +968,6 @@ my %sPantryItem = (
             AncestorID => { },
         },
     },
-    DocumentAncestorsAncestorID => { Name => 'DocumentAncestorID', Flat => 1 },
     Headline        => { },
     History         => { }, #PH (CS3)
     ICCProfile      => { Name => 'ICCProfileName' }, #PH
@@ -958,6 +982,7 @@ my %sPantryItem = (
     # IPTC Standard Photo Metadata docs (2008rev2 and July 2009rev1) - PH
     SupplementalCategories  => { List => 'Bag' },
     TextLayers => {
+        FlatName => 'Text',
         List => 'seq',
         Struct => {
             STRUCT_NAME => 'Layer',
@@ -966,8 +991,6 @@ my %sPantryItem = (
             LayerText => { },
         },
     },
-    TextLayersLayerName => { Flat => 1, Name => 'TextLayerName' },
-    TextLayersLayerText => { Flat => 1, Name => 'TextLayerText' },
     TransmissionReference   => { },
     Urgency         => {
         Writable => 'integer',
@@ -1144,262 +1167,32 @@ my %sPantryItem = (
     # disable List behaviour of flattened Gradient/PaintBasedCorrections
     # because these are nested in lists and the flattened tags can't
     # do justice to this complex structure
-    GradientBasedCorrections => { Struct => \%sCorrection, List => 'Seq' },
-    GradientBasedCorrectionsWhat => {
-        Name => 'GradientBasedCorrWhat',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsCorrectionAmount => {
-        Name => 'GradientBasedCorrAmount',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsCorrectionActive => {
-        Name => 'GradientBasedCorrActive',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalExposure => {
-        Name => 'GradientBasedCorrExposure',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalSaturation => {
-        Name => 'GradientBasedCorrSaturation',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalContrast => {
-        Name => 'GradientBasedCorrContrast',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalClarity => {
-        Name => 'GradientBasedCorrClarity',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalSharpness => {
-        Name => 'GradientBasedCorrSharpness',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalBrightness => {
-        Name => 'GradientBasedCorrBrightness',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalToningHue => {
-        Name => 'GradientBasedCorrHue',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalToningSaturation => {
-        Name => 'GradientBasedCorrSaturation',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalExposure2012 => {
-        Name => 'GradientBasedCorrExposure2012',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalContrast2012 => {
-        Name => 'GradientBasedCorrContrast2012',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalHighlights2012 => {
-        Name => 'GradientBasedCorrHighlights2012',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalShadows2012 => {
-        Name => 'GradientBasedCorrShadows2012',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalClarity2012 => {
-        Name => 'GradientBasedCorrClarity2012',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalLuminanceNoise => {
-        Name => 'GradientBasedCorrLuminanceNoise',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalMoire => {
-        Name => 'GradientBasedCorrMoire',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalDefringe => {
-        Name => 'GradientBasedCorrDefringe',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalTemperature => {
-        Name => 'GradientBasedCorrTemperature',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsLocalTint => {
-        Name => 'GradientBasedCorrTint',
-        Flat => 1, List => 0,
+    GradientBasedCorrections => {
+        FlatName => 'GradientBasedCorr',
+        Struct => \%sCorrection,
+        List => 'Seq',
     },
     GradientBasedCorrectionsCorrectionMasks => {
         Name => 'GradientBasedCorrMasks',
+        FlatName => 'GradientBasedCorrMask',
         Flat => 1
-    },
-    GradientBasedCorrectionsCorrectionMasksWhat => {
-        Name => 'GradientBasedCorrMaskWhat',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsCorrectionMasksMaskValue => {
-        Name => 'GradientBasedCorrMaskValue',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsCorrectionMasksRadius => {
-        Name => 'GradientBasedCorrMaskRadius',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsCorrectionMasksFlow => {
-        Name => 'GradientBasedCorrMaskFlow',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsCorrectionMasksCenterWeight => {
-        Name => 'GradientBasedCorrMaskCenterWeight',
-        Flat => 1, List => 0,
     },
     GradientBasedCorrectionsCorrectionMasksDabs => {
         Name => 'GradientBasedCorrMaskDabs',
         Flat => 1, List => 0,
     },
-    GradientBasedCorrectionsCorrectionMasksZeroX => {
-        Name => 'GradientBasedCorrMaskZeroX',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsCorrectionMasksZeroY => {
-        Name => 'GradientBasedCorrMaskZeroY',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsCorrectionMasksFullX => {
-        Name => 'GradientBasedCorrMaskFullX',
-        Flat => 1, List => 0,
-    },
-    GradientBasedCorrectionsCorrectionMasksFullY => {
-        Name => 'GradientBasedCorrMaskFullY',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrections => { Struct => \%sCorrection, List => 'Seq' },
-    PaintBasedCorrectionsWhat => {
-        Name => 'PaintCorrectionWhat',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsCorrectionAmount => {
-        Name => 'PaintCorrectionAmount',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsCorrectionActive => {
-        Name => 'PaintCorrectionActive',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalExposure => {
-        Name => 'PaintCorrectionExposure',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalSaturation => {
-        Name => 'PaintCorrectionSaturation',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalContrast => {
-        Name => 'PaintCorrectionContrast',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalClarity => {
-        Name => 'PaintCorrectionClarity',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalSharpness => {
-        Name => 'PaintCorrectionSharpness',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalBrightness => {
-        Name => 'PaintCorrectionBrightness',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalToningHue => {
-        Name => 'PaintCorrectionHue',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalToningSaturation => {
-        Name => 'PaintCorrectionSaturation',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalExposure2012 => {
-        Name => 'PaintCorrectionExposure2012',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalContrast2012 => {
-        Name => 'PaintCorrectionContrast2012',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalHighlights2012 => {
-        Name => 'PaintCorrectionHighlights2012',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalShadows2012 => {
-        Name => 'PaintCorrectionShadows2012',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalLuminanceNoise => {
-        Name => 'PaintCorrectionLuminanceNoise',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalMoire => {
-        Name => 'PaintCorrectionMoire',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalDefringe => {
-        Name => 'PaintCorrectionDefringe',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalTemperature => {
-        Name => 'PaintCorrectionTemperature',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalTint => {
-        Name => 'PaintCorrectionTint',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsLocalClarity2012 => {
-        Name => 'PaintCorrectionClarity2012',
-        Flat => 1, List => 0,
+    PaintBasedCorrections => {
+        FlatName => 'PaintCorrection',
+        Struct => \%sCorrection,
+        List => 'Seq',
     },
     PaintBasedCorrectionsCorrectionMasks => {
         Name => 'PaintBasedCorrectionMasks',
+        FlatName => 'PaintCorrectionMask',
         Flat => 1,
-    },
-    PaintBasedCorrectionsCorrectionMasksWhat => {
-        Name => 'PaintCorrectionMaskWhat',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsCorrectionMasksMaskValue => {
-        Name => 'PaintCorrectionMaskValue',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsCorrectionMasksRadius => {
-        Name => 'PaintCorrectionMaskRadius',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsCorrectionMasksFlow => {
-        Name => 'PaintCorrectionMaskFlow',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsCorrectionMasksCenterWeight => {
-        Name => 'PaintCorrectionMaskCenterWeight',
-        Flat => 1, List => 0,
     },
     PaintBasedCorrectionsCorrectionMasksDabs => {
         Name => 'PaintCorrectionMaskDabs',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsCorrectionMasksZeroX => {
-        Name => 'PaintCorrectionMaskZeroX',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsCorrectionMasksZeroY => {
-        Name => 'PaintCorrectionMaskZeroY',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsCorrectionMasksFullX => {
-        Name => 'PaintCorrectionMaskFullX',
-        Flat => 1, List => 0,
-    },
-    PaintBasedCorrectionsCorrectionMasksFullY => {
-        Name => 'PaintCorrectionMaskFullY',
         Flat => 1, List => 0,
     },
     # new tags written by LR 3 (thanks Wolfgang Guelcker)
@@ -1523,8 +1316,15 @@ my %sPantryItem = (
         %dateTimeInfo,
     },
     ImageDescription => { Writable => 'lang-alt' },
-    Make      => { Groups => { 2 => 'Camera' } },
-    Model     => { Groups => { 2 => 'Camera' }, Description => 'Camera Model Name' },
+    Make => {
+        Groups => { 2 => 'Camera' },
+        RawConv => '$$self{Make} ? $val : $$self{Make} = $val',
+    },
+    Model => {
+        Groups => { 2 => 'Camera' },
+        Description => 'Camera Model Name',
+        RawConv => '$$self{Model} ? $val : $$self{Model} = $val',
+    },
     Software  => { },
     Artist    => { Groups => { 2 => 'Author' } },
     Copyright => { Groups => { 2 => 'Author' }, Writable => 'lang-alt' },
@@ -1616,13 +1416,10 @@ my %sPantryItem = (
     },
     OECF => {
         Name => 'Opto-ElectricConvFactor',
+        FlatName => 'OECF',
         Groups => { 2 => 'Camera' },
         Struct => \%sOECF,
     },
-    OECFColumns => { Flat => 1 },
-    OECFRows    => { Flat => 1 },
-    OECFNames   => { Flat => 1 },
-    OECFValues  => { Flat => 1 },
     ShutterSpeedValue => {
         Writable => 'rational',
         ValueConv => 'abs($val)<100 ? 1/(2**$val) : 0',
@@ -1681,7 +1478,7 @@ my %sPantryItem = (
         Struct => {
             STRUCT_NAME => 'Flash',
             NAMESPACE   => 'exif',
-            Fired       => { Writable => 'boolean' },
+            Fired       => { Writable => 'boolean', %boolConv },
             Return => {
                 Writable => 'integer',
                 PrintConv => {
@@ -1699,8 +1496,8 @@ my %sPantryItem = (
                     3 => 'Auto',
                 },
             },
-            Function    => { Writable => 'boolean' },
-            RedEyeMode  => { Writable => 'boolean' },
+            Function    => { Writable => 'boolean', %boolConv },
+            RedEyeMode  => { Writable => 'boolean', %boolConv },
         },
     },
     FocalLength=> {
@@ -2443,7 +2240,7 @@ sub DecodeBase64($)
 }
 
 #------------------------------------------------------------------------------
-# Generate a name for this XMP tag
+# Generate a tag ID for this XMP tag
 # Inputs: 0) tag property name list ref, 1) array ref for receiving structure property list
 #         2) array for receiving namespace list
 # Returns: tagID and outtermost interesting namespace (or '' if no namespace)
@@ -2571,6 +2368,9 @@ sub AddFlattenedTags($;$$)
         # do not add flattened tags to variable-namespace structures
         next if exists $$strTable{NAMESPACE} and not defined $$strTable{NAMESPACE};
 
+        # get prefix for flattened tag names
+        my $flat = (defined $$tagInfo{FlatName} ? $$tagInfo{FlatName} : $$tagInfo{Name});
+
         # get family 2 group name for this structure tag
         my ($tagG2, $field);
         $tagG2 = $$tagInfo{Groups}{2} if $$tagInfo{Groups};
@@ -2583,6 +2383,7 @@ sub AddFlattenedTags($;$$)
             next if $$fieldInfo{Struct} and $noSubStruct;   # don't expand sub-structures if specified
             # build a tag ID for the corresponding flattened tag
             my $fieldName = ucfirst($field);
+            my $flatField = $$fieldInfo{FlatName} || $fieldName;
             my $flatID = $tagID . $fieldName;
             my $flatInfo = $$tagTablePtr{$flatID};
             if ($flatInfo) {
@@ -2605,7 +2406,8 @@ sub AddFlattenedTags($;$$)
                 delete $$flatInfo{List} if $$flatInfo{List};
             } else {
                 # generate new flattened tag information based on structure field
-                $flatInfo = { %$fieldInfo, Name => $$tagInfo{Name} . $fieldName, Flat => 0 };
+                my $flatName = $flat . $flatField;
+                $flatInfo = { %$fieldInfo, Name => $flatName, Flat => 0 };
                 # add new flattened tag to table
                 AddTagToTable($tagTablePtr, $flatID, $flatInfo);
                 ++$count;
@@ -2794,7 +2596,7 @@ sub ConvertRational($)
 {
     my $val = $_[0];
     $val =~ m{^(-?\d+)/(-?\d+)$} or return undef;
-    if ($2) {
+    if ($2 != 0) {
         $_[0] = $1 / $2; # calculate quotient
     } elsif ($1) {
         $_[0] = 'inf';
@@ -2892,7 +2694,8 @@ NoLoop:
                 $ti = $$tagTablePtr{$t} or next;
                 next unless ref $ti eq 'HASH';
                 my $strTable = $$ti{Struct} or next;
-                $name = $$ti{Name} . ucfirst($t2);
+                my $flat = (defined $$ti{FlatName} ? $$ti{FlatName} : $$ti{Name});
+                $name = $flat . ucfirst($t2);
                 # don't continue if structure is known but field is not
                 last if $$strTable{NAMESPACE} or not exists $$strTable{NAMESPACE};
                 # this is a variable-namespace structure, so we must:
@@ -2919,7 +2722,7 @@ NoLoop:
                 if (not $sti or $$sti{Flat}) {
                     # again, we must initialize flattened tags if necessary
                     # (but don't bother to recursively apply full logic to
-                    #  allow nest variable-namespace strucures until someone
+                    #  allow nested variable-namespace strucures until someone
                     #  actually wants to do such a silly thing)
                     my $t3 = '';
                     for ($j=$i+1; $j<@tagList; ++$j) {
@@ -2934,7 +2737,7 @@ NoLoop:
                 }
                 $tagInfo = {
                     %$sti,
-                    Name     => $$ti{Name} . $$sti{Name},
+                    Name => $flat . $$sti{Name},
                     WasAdded => 1,
                 };
                 # be careful not to copy elements we shouldn't...
@@ -3443,7 +3246,7 @@ sub ProcessXMP($$;$)
                 } elsif ($buf2 =~ /<x(mp)?:x[ma]pmeta/) {
                     $hasXMP = 1;
                 } else {
-                    # identify SVG images by DOCTYPE if available
+                    # identify SVG images and PLIST files by DOCTYPE if available
                     if ($buf2 =~ /<!DOCTYPE\s+(\w+)/) {
                         if ($1 eq 'svg') {
                             $isSVG = 1;
@@ -3456,6 +3259,8 @@ sub ProcessXMP($$;$)
                         $isSVG = 1;
                     } elsif ($buf2 =~ /<rdf:RDF/) {
                         $isRDF = 1;
+                    } elsif ($buf2 =~ /<plist[\s>]/) {
+                        $type = 'PLIST';
                     }
                     if ($isSVG and $exifTool->{XMP_CAPTURE}) {
                         $exifTool->Error("ExifTool does not yet support writing of SVG images");
@@ -3479,7 +3284,14 @@ sub ProcessXMP($$;$)
             }
         }
         my $size;
-        unless ($type) {
+        if ($type) {
+            if ($type eq 'PLIST') {
+                my $ext = $$exifTool{FILE_EXT};
+                $type = $ext if $ext and $ext eq 'MODD';
+                $tagTablePtr = GetTagTable('Image::ExifTool::PLIST::Main');
+                $$dirInfo{XMPParseOpts}{FoundProc} = \&Image::ExifTool::PLIST::FoundTag;
+            }
+        } else {
             if ($isSVG) {
                 $type = 'SVG';
             } elsif ($isXML and not $hasXMP and not $isRDF) {
@@ -3553,13 +3365,16 @@ sub ProcessXMP($$;$)
     }
 
     # extract XMP as a block if specified
-    if (($exifTool->{REQ_TAG_LOOKUP}{xmp} or ($exifTool->{OPTIONS}{Binary} and
+    if (($exifTool->{REQ_TAG_LOOKUP}{xmp} or ($exifTool->{TAGS_FROM_FILE} and
         not $exifTool->{EXCL_TAG_LOOKUP}{xmp})) and not $isSVG)
     {
         $exifTool->FoundTag('XMP', substr($$dataPt, $dirStart, $dirLen));
     }
+
+    $tagTablePtr or $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
     if ($exifTool->Options('Verbose') and not $exifTool->{XMP_CAPTURE}) {
-        $exifTool->VerboseDir($isSVG ? 'SVG' : 'XMP', 0, $dirLen);
+        my $dirType = $isSVG ? 'SVG' : $$tagTablePtr{GROUPS}{1};
+        $exifTool->VerboseDir($dirType, 0, $dirLen);
     }
 #
 # convert UTF-16 or UTF-32 encoded XMP to UTF-8 if necessary
@@ -3649,7 +3464,6 @@ sub ProcessXMP($$;$)
     }
 
     # parse the XMP
-    $tagTablePtr or $tagTablePtr = GetTagTable('Image::ExifTool::XMP::Main');
     if (ParseXMPElement($exifTool, $tagTablePtr, $dataPt, $dirStart, $dirEnd)) {
         $rtnVal = 1;
     } elsif ($$dirInfo{DirName} and $$dirInfo{DirName} eq 'XMP') {
@@ -3668,6 +3482,7 @@ sub ProcessXMP($$;$)
     }
     # reset NO_LIST flag (must do this _after_ RestoreStruct() above)
     delete $$exifTool{NO_LIST};
+    delete $$exifTool{XMPParseOpts};
 
     undef %curNS;
     return $rtnVal;

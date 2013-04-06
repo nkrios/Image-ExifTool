@@ -2523,6 +2523,13 @@ $VERSION = '1.21';
    'JPEGPointTransforms' => 'Transformations de point JPEG',
    'JPEGProc' => 'Proc JPEG',
    'JPEGQTables' => 'Tableaux Q JPEG',
+   'JPEGQuality' => {
+      Description => 'Qualité',
+      PrintConv => {
+        'Extra Fine' => 'Extra fine',
+        'Standard' => 'Normale',
+      },
+    },
    'JPEGRestartInterval' => 'Intervalle de redémarrage JPEG',
    'JPEGTables' => 'Tableaux JPEG',
    'JobID' => 'ID de la tâche',

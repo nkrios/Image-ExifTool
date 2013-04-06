@@ -6,11 +6,24 @@
 <link rel=stylesheet type='text/css' href='style.css' title='Style'>
 <style type="text/css">
 <!--
-li   { margin-top: .5em }
+li      { margin-top: .5em }
+.attn   { padding: 0.5em; border: 1px solid gray; background: #fee }
 -->
 </style></head>
 <body>
 <h1 class='up'>Installing ExifTool</h1>
+
+<blockquote class=attn><b class=red>Note:</b> ExifTool <b>does <u>not</u> need
+to be installed</b> to run.  Just download and extract either the full Perl
+distribution on Mac/Linux, or the Windows EXE version on Windows, and run it
+directly.  <i class=lt>[But note that if you move the Perl "exiftool"
+application, you must also move its "lib" directory to the same location. This
+doesn't apply to the Windows version which unpacks the libraries into a
+temporary directory.]</i><br><br>However, the benefits of installation are:
+<ul><li>Makes ExifTool available to all users.</li>
+<li>Saves typing on the command line (by placing "exiftool" in your PATH).</li>
+<li>Installs the ExifTool documentation and API libraries (full Perl version only).</li>
+</ul></blockquote>
 
 <p>See the appropriate section below with instructions for installing or
 uninstalling ExifTool on your specific platform:</p>
