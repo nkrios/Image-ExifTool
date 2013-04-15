@@ -32,7 +32,7 @@ use Image::ExifTool::XMP;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.58';
+$VERSION = '2.60';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -59,6 +59,7 @@ my %tweakOrder = (
     JPEG    => '-',     # JPEG comes first
     IPTC    => 'Exif',  # put IPTC after EXIF,
     GPS     => 'XMP',   # etc...
+    Composite => 'Extra',
     GeoTiff => 'GPS',
     CanonVRD=> 'CanonCustom',
     FLIR    => 'Casio',
@@ -205,8 +206,8 @@ right hand side of an equals sign (C<=>) respectively.  The human-readable
 values are used by default when reading and writing, but the
 computer-readable values may be accessed by disabling the value conversion
 with the -n option on the command line, by setting the ValueConv option to 0
-in the API, or or on a per-tag basis by appending a number symbol (C<#>) to
-the tag name.
+in the API, or or on a per-tag basis by adding a hash (C<#>) after the tag
+name.
 
 B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual

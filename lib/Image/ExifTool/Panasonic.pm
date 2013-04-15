@@ -30,7 +30,7 @@ use vars qw($VERSION %leicaLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.71';
+$VERSION = '1.72';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -489,7 +489,7 @@ my %shootingMode = (
         },{
             Name => 'ContrastMode',
             Condition => '$$self{Model} =~ /^DMC-(GF\d+|G2)$/',
-            Notes => 'these values are used by the G2, GF1, GF2, GF3 and GF5',
+            Notes => 'these values are used by the G2, GF1, GF2, GF3, GF5 and GF6',
             Writable => 'int16u',
             PrintConv => { # (decoded for GF1 unless otherwise noted)
                 0 => '-2',
@@ -498,7 +498,7 @@ my %shootingMode = (
                 3 => '+1',
                 4 => '+2',
                 # Note: Other Contrast tags will be "Normal" in any of these modes:
-                # 5 - seen for Portrait (FX80)
+                5 => 'Normal 2', # 5 - seen for Portrait (FX80) and Normal (GF6)
                 7 => 'Nature (Color Film)', # (GF1,G2; GF3 "Miniature")
                 9 => 'Expressive', #(GF3)
                 12 => 'Smooth (Color Film) or Pure (My Color)', #(GF1,G2 "Smooth Color")
@@ -518,6 +518,16 @@ my %shootingMode = (
                 47 => 'Dynamic Mono', #(GF5)
                 50 => 'Impressive Art', #(GF5)
                 51 => 'Cross Process', #(GF5)
+                107 => 'Expressive 2', #(GF6)
+                122 => 'Dynamic Monochrome', #(GF6)
+                # more new modes for GF6:
+                # ? => 'Old Days',
+                # ? => 'Toy Pop',
+                # ? => 'Bleach Bypass',
+                # ? => 'Fantasy',
+                # ? => 'Star Filter',
+                # ? => 'One Point Color',
+                # ? => 'Sunshine',
             },
         },{
             Name => 'ContrastMode',

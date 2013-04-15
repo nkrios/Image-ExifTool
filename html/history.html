@@ -11,15 +11,38 @@
 
 <p>RSS feed: <a href="http://owl.phy.queensu.ca/~phil/exiftool/rss.xml">http://owl.phy.queensu.ca/~phil/exiftool/rss.xml</a></p>
 
-<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-9.25.tar.gz">Version 9.25</a>. (Other versions are
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-9.27.tar.gz">Version 9.27</a>. (Other versions are
 considered development releases, and are not uploaded to <a href="http://search.cpan.org/dist/Image-ExifTool/">CPAN</a>.)</p>
 
 <!-- Use line width of 80 -->
 <!-- *********************************************************************** -->
 
+<a name='v9.27'><b>Apr. 15, 2013 - Version 9.27</b></a> <span class=grn>(production release)</span>
+<ul>
+<li>Fixed "ARRAY ref" runtime error introduced in 9.25 that could occur when
+    using the -X option
+<li>Fixed runtime warning which could occur when conditionally deleting XMP
+    structure
+</ul>
+
+<a name='v9.26'><b>Apr. 13, 2013 - Version 9.26</b></a>
+<ul>
+<li>Added read support for FLIR FFF and FPF images and decode more FLIR tags
+<li>Added some new Pentax LensType's and Nikon LensID's
+<li>Added a few new Panasonic ContrastMode values
+<li>Decode a number of Canon 6D tags
+<li>Allow CanonRaw tags to be written using "CIFF" as a group name
+<li>Improved decoding of Canon ColorData information for newer EOS models
+<li>Improved decoding of a number of Sony tags (thanks Jos Roost)
+<li>Removed index number from duplicate Composite TagID's in XML output
+<li>Fixed byte-order problem for a few Nikon D5200 and D7100 tags
+<li>Fixed incompatibility with old-style (pre-8.46) XMP user-defined structure
+    definitions
+</ul>
+
 <a name='v9.25'><b>Apr. 6, 2013 - Version 9.25</b></a> <span class=grn>(production release)</span>
 <ul>
-<li>Added read support for FLIR thermal image metadata
+<li>Added read support for FLIR thermal image metadata in JPEG images
 <li>Added write support for DNG version 1.4 images
 <li>Added a new Pentax DriveMode value and a new Pentax LensType
 <li>Added two new Olympus CameraType values

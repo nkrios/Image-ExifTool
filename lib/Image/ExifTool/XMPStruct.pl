@@ -362,7 +362,7 @@ sub DeleteStruct($$$$$)
                             my $a2 = $$capture{$p2}[1];
                             next unless $$a2{'xml:lang'} and $$a2{'xml:lang'} eq $$attr{'xml:lang'};
                         }
-                        if ($$capture{$p2}[0] eq $cap{$p}[0]) {
+                        if ($$capture{$p2} and $$capture{$p2}[0] eq $cap{$p}[0]) {
                             # ($1 contains root path for this structure)
                             $match{$1} = ($match{$1} || 0) + 1;
                         }

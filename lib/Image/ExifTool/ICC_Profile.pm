@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.25';
+$VERSION = '1.26';
 
 sub ProcessICC($$);
 sub ProcessICC_Profile($$$);
@@ -831,6 +831,7 @@ sub ProcessICC_Profile($$$)
         DirStart => $dirStart,
         DirLen   => 128,
         Parent   => $$dirInfo{DirName},
+        DirName  => 'Header',
     );
     my $newTagTable = GetTagTable('Image::ExifTool::ICC_Profile::Header');
     $exifTool->ProcessDirectory(\%subdirInfo, $newTagTable);
@@ -930,6 +931,7 @@ sub ProcessICC_Profile($$$)
                 DataLen  => $$dirInfo{DataLen},
                 DirStart => $valuePtr,
                 DirLen   => $size,
+                DirName  => $name,
                 Parent   => $$dirInfo{DirName},
             );
             my $type = substr($$dataPt, $valuePtr, 4);

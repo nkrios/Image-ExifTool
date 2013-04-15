@@ -28,7 +28,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '1.85';
+$VERSION = '1.86';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -685,9 +685,9 @@ my %unknownCipherData = (
         Priority => 0,
         PrintConv => {
             0 => 'Manual',
-            2 => 'AF-A',
+            2 => 'AF-S',
             3 => 'AF-C',
-            4 => 'AF-S',
+            4 => 'AF-A',
             6 => 'DMF', # "Direct Manual Focus"
             7 => 'AF-D', # "Depth Map Assist Continuous AF"
         },
@@ -942,9 +942,9 @@ my %unknownCipherData = (
         %unknownCipherData,
     },
     0x940e => [{
-        Name => 'Tag940e',
+        Name => 'AFInfo',
         Condition => '$$self{Model} =~ /^SLT-/',
-        SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag940e' },
+        SubDirectory => { TagTable => 'Image::ExifTool::Sony::AFInfo' },
     },{
         Name => 'Sony_0x940e',
         %unknownCipherData,
@@ -4003,8 +4003,8 @@ my %faceInfo = (
     # 0x0a - int16u: 0,1,2,3
 );
 
-# Tag940e (SLT models only) (ref PH, decoded mainly from A77)
-%Image::ExifTool::Sony::Tag940e = (
+# AFInfo (SLT models only) (ref PH, decoded mainly from A77)
+%Image::ExifTool::Sony::AFInfo = (
     PROCESS_PROC => \&ProcessEnciphered,
     WRITE_PROC => \&WriteEnciphered,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
@@ -4013,18 +4013,35 @@ my %faceInfo = (
     FIRST_ENTRY => 0,
     PRIORITY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    DATAMEMBER => [ 0x02 ],
     NOTES => 'These tags are currently extracted for SLT models only.',
+    # first 4 bytes (deciphered) (ref 12):
+    # (perhaps 0x02 indicates the 15- or 19-point AF?)
+    #   2 1 1 0  for A65V
+    #   2 1 2 0  for A77V
+    #   0 1 1 0  for A37, A57, A58
+    #   0 1 2 0  for A99V
+    #   0 0 0 0  for NEX
+    #   0 2 0 0  for a NEX-6 image with A-mount lens via Phase-AF E-A adapter
+    0x02 => {
+        Name => 'AFType',
+        RawConv => '$$self{AFType} = $val',
+        PrintConv => {
+            1 => '15-point',
+            2 => '19-point',
+        },
+    },
     0x07 => [ # the active AF sensor
         {
             Name => 'AFPoint',
-            Condition => '$$self{Model} =~ /^SLT-A(37|57|65)/',
-            Notes => 'A37, A57 and A65',
+            Condition => '$$self{AFType} == 1',
+            Notes => 'models with 15-point AF',
             PrintConvColumns => 2,
             PrintConv => \%afPoint15,
         },{
             Name => 'AFPoint',
-            Condition => '$$self{Model} =~ /^SLT-A(77|99)/',
-            Notes => 'A77 and A99',
+            Condition => '$$self{AFType} == 2',
+            Notes => 'models with 19-point AF',
             PrintConvColumns => 2,
             PrintConv => \%afPoint19,
         },
@@ -4032,8 +4049,8 @@ my %faceInfo = (
     0x08 => [ # the AF sensor in focus at focus time (shutter release half press)
         {
             Name => 'AFPointInFocus',
-            Condition => '$$self{Model} =~ /^SLT-A(37|57|65)/',
-            Notes => 'A37, A57 and A65',
+            Condition => '$$self{AFType} == 1',
+            Notes => 'models with 15-point AF',
             PrintConvColumns => 2,
             PrintConv => {
                 %afPoint15,
@@ -4041,8 +4058,8 @@ my %faceInfo = (
             },
         },{
             Name => 'AFPointInFocus',
-            Condition => '$$self{Model} =~ /^SLT-A(77|99)/',
-            Notes => 'A77 and A99',
+            Condition => '$$self{AFType} == 2',
+            Notes => 'models with 19-point AF',
             PrintConvColumns => 2,
             PrintConv => {
                 %afPoint19,
@@ -4053,8 +4070,8 @@ my %faceInfo = (
     0x09 => [ # the AF sensor in focus at shutter release (shutter release full press)
         {
             Name => 'AFPointAtShutterRelease',
-            Condition => '$$self{Model} =~ /^SLT-A(37|57|65)/',
-            Notes => 'A37, A57 and A65',
+            Condition => '$$self{AFType} == 1',
+            Notes => 'models with 15-point AF',
             PrintConvColumns => 2,
             PrintConv => {
                 %afPoint15,
@@ -4062,8 +4079,8 @@ my %faceInfo = (
             },
         },{
             Name => 'AFPointAtShutterRelease',
-            Condition => '$$self{Model} =~ /^SLT-A(77|99)/',
-            Notes => 'A77 and A99',
+            Condition => '$$self{AFType} == 2',
+            Notes => 'models with 19-point AF',
             PrintConvColumns => 2,
             PrintConv => {
                 %afPoint19,
@@ -4080,35 +4097,21 @@ my %faceInfo = (
             3 => 'Zone',
         },
     },
-    0x0b => [
-        {
-            Name => 'FocusMode',
-            Condition => '$$self{Model} =~ /^SLT-A99/',
-            Notes => 'A99',
-            PrintConv => {
-                0 => 'Manual',
-                2 => 'AF-A',
-                3 => 'AF-C',
-                4 => 'AF-S',
-                6 => 'DMF',
-                7 => 'AF-D', # (unique to A99)
-            },
+    0x0b => {
+        Name => 'FocusMode',
+        PrintConvColumns => 2,
+        # validated for A77 firmware 1.03, 1.04 and 1.07 and A99
+        # - not confirmed for A37,A57 and A65 which also write this tag
+        PrintConv => {
+            0 => 'Manual',
+            2 => 'AF-S',
+            3 => 'AF-C',
+            4 => 'AF-A',
+            6 => 'DMF',
+            7 => 'AF-D', # (unique to A99)
         },
-        {
-            Name => 'FocusMode',
-            Notes => 'other models', # (verified for A77 only)
-            PrintConvColumns => 2,
-            # validated for A77 firmware 1.03, 1.04 and 1.07
-            # - not confirmed for A37,A57 and A65 which also write this tag
-            PrintConv => {
-                0 => 'Manual',
-                2 => 'AF-S', # <-- different from A99!
-                3 => 'AF-C',
-                4 => 'AF-A', # <-- different from A99!
-                6 => 'DMF',
-            },
-        },
-    ],
+    },
+    # 0x014c start 56 Blocks of 164 bytes each for NEX with A-mount lens and Phase-AF adapter (ref 12)
     0x017d => { #PH (verified for the A77/A99; likely valid for other SLT models - ref 12)
         # (different from AFMicroAdjValue because it is 0 when the adjustment is off)
         Name => 'AFMicroAdj',
@@ -4136,6 +4139,7 @@ my %faceInfo = (
             43 => 'Cont. Priority AE',
         },
     },
+    # 0x01b8 start 65 Blocks of 180 bytes each for SLT (ref 12)
     # 0xf38,0x1208,0x14d8,0x158c,0x1640,(and more) - 0 if AFMicroAdj is On, 1 if Off
     # 0x1ab6 - 0x80 if AFMicroAdj is On, 0 if Off
     # tags also related to AFPoint (PH, A77):

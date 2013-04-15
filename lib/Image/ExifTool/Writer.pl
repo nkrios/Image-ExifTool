@@ -130,6 +130,10 @@ my %excludeGroups = (
     PhotoMechanic=> [ 'Trailer' ],
     MIE          => [ 'Trailer' ],
 );
+# translate (lower case) wanted group when writing for tags where group name may change
+my %translateWantGroup = (
+    ciff  => 'canonraw',
+);
 # group names to translate for writing
 my %translateWriteGroup = (
     EXIF  => 'ExifIFD',
@@ -490,6 +494,7 @@ sub SetNewValue($;$$%)
         my ($writeGroup, $priority);
         if ($wantGroup) {
             my $lcWant = lc($wantGroup);
+            $lcWant = $translateWantGroup{$lcWant} if $translateWantGroup{$lcWant};
             # only set tag in specified group
             $writeGroup = $self->GetGroup($tagInfo, 0);
             unless (lc($writeGroup) eq $lcWant) {

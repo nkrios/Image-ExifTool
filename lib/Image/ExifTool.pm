@@ -27,7 +27,7 @@ use vars qw($VERSION $RELEASE @ISA @EXPORT_OK %EXPORT_TAGS $AUTOLOAD @fileTypes
             %mimeType $swapBytes $swapWords $currentByteOrder %unpackStd
             %jpegMarker %specialTags);
 
-$VERSION = '9.25';
+$VERSION = '9.27';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -130,7 +130,7 @@ sub ReadValue($$$$$;$);
     QuickTime QuickTime::ImageFile Matroska MXF DV Flash Flash::FLV Real::Media
     Real::Audio Real::Metafile RIFF AIFF ASF DICOM MIE HTML XMP::SVG EXE
     EXE::PEVersion EXE::PEString EXE::MachO EXE::PEF EXE::ELF EXE::CHM LNK Font
-    RSRC Rawzor ZIP ZIP::GZIP ZIP::RAR RTF OOXML iWork
+    RSRC Rawzor ZIP ZIP::GZIP ZIP::RAR RTF OOXML iWork FLIR::FPF
 );
 
 # alphabetical list of current Lang modules
@@ -165,9 +165,9 @@ $defaultLang = 'en';    # default language
 # 2) Put types with weak file signatures at end of list to avoid false matches
 @fileTypes = qw(JPEG CRW TIFF GIF MRW RAF X3F JP2 PNG MIE MIFF PS PDF PSD XMP
                 BMP PPM RIFF AIFF ASF MOV MPEG Real SWF PSP FLV OGG FLAC APE MPC
-                MKV MXF DV PMP IND PGF ICC ITC HTML VRD RTF XCF QTIF FPX PICT
-                ZIP GZIP PLIST RAR BZ2 TAR RWZ EXE EXR HDR CHM LNK WMF DEX RAW
-                Font RSRC M2TS PHP MP3 DICM PCD);
+                MKV MXF DV PMP IND PGF ICC ITC FLIR FPF HTML VRD RTF XCF QTIF
+                FPX PICT ZIP GZIP PLIST RAR BZ2 TAR RWZ EXE EXR HDR CHM LNK WMF
+                DEX RAW Font RSRC M2TS PHP MP3 DICM PCD);
 
 # file types that we can write (edit)
 my @writeTypes = qw(JPEG TIFF GIF CRW MRW ORF RAF RAW PNG MIE PSD XMP PPM
@@ -186,6 +186,8 @@ my %writeTypes; # lookup for writable file types (hash filled if required)
 my %createTypes = (XMP=>1, ICC=>1, MIE=>1, VRD=>1, EXIF=>1);
 
 # file type lookup for all recognized file extensions
+# (if extension may be more than one type, the type is a list where
+#  the writable type should come first if it exists)
 my %fileTypeLookup = (
    '3FR' => ['TIFF', 'Hasselblad RAW format'],
    '3G2' => ['MOV',  '3rd Gen. Partnership Project 2 audio/video'],
@@ -253,10 +255,12 @@ my %fileTypeLookup = (
     F4B  => ['MOV',  'Adobe Flash Player 9+ audio Book'],
     F4P  => ['MOV',  'Adobe Flash Player 9+ Protected'],
     F4V  => ['MOV',  'Adobe Flash Player 9+ Video'],
-    FFF  => ['TIFF', 'Hasselblad Flexible File Format'],
+    FFF  => [['TIFF','FLIR'], 'Hasselblad Flexible File Format'],
     FLAC => ['FLAC', 'Free Lossless Audio Codec'],
     FLA  => ['FPX',  'Macromedia/Adobe Flash project'],
+    FLIR => ['FLIR', 'FLIR File Format'],
     FLV  => ['FLV',  'Flash Video'],
+    FPF  => ['FPF',  'FLIR Public image Format'],
     FPX  => ['FPX',  'FlashPix'],
     GIF  => ['GIF',  'Compuserve Graphics Interchange Format'],
     GZ   =>  'GZIP',
@@ -636,6 +640,7 @@ my %moduleName = (
     ICC  => 'ICC_Profile',
     IND  => 'InDesign',
     FLV  => 'Flash',
+    FPF  => 'FLIR',
     FPX  => 'FlashPix',
     GZIP => 'ZIP',
     HDR  => 'Radiance',
@@ -688,9 +693,11 @@ my %moduleName = (
     EXIF => '(II\x2a\0|MM\0\x2a)',
     EXR  => '\x76\x2f\x31\x01',
     FLAC => '(fLaC|ID3)',
+    FLIR => 'FFF\0',
     FLV  => 'FLV\x01',
     Font => '((\0\x01\0\0|OTTO|true|typ1)[\0\x01]|ttcf\0[\x01\x02]\0\0|\0[\x01\x02]|' .
             '(.{6})?%!(PS-(AdobeFont-|Bitstream )|FontType1-)|Start(Comp|Master)?FontMetrics)',
+    FPF  => 'FPF Public Image Format\0',
     FPX  => '\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1',
     GIF  => 'GIF8[79]a',
     GZIP => '\x1f\x8b\x08',
@@ -2747,7 +2754,7 @@ sub CanWrite($)
 {
     local $_;
     my $file = shift or return undef;
-    my $type = GetFileType($file) or return undef;
+    my ($type) = GetFileType($file) or return undef;
     if ($noWriteFile{$type}) {
         # can't write TIFF files with certain extensions (various RAW formats)
         my $ext = GetFileExtension($file) || uc($file);
@@ -2791,6 +2798,7 @@ sub Init($)
     delete $self->{EXIF_POS};       # EXIF position in file
     delete $self->{FIRST_EXIF_POS}; # position of first EXIF in file
     delete $self->{HTML_DUMP};      # html dump information
+    delete $self->{SET_GROUP0};     # group0 name override
     delete $self->{SET_GROUP1};     # group1 name override
     delete $self->{DOC_NUM};        # current embedded document number
     $self->{DOC_COUNT}  = 0;        # count of embedded documents processed
@@ -3440,6 +3448,10 @@ sub AddCompositeTags($;$)
     }
     my $defaultGroups = $$add{GROUPS};
 
+    # MUST get the main Composite table so fetching it later doesn't override our TagID's
+    # (which may be different from the table keys if there were duplicates)
+    my $compTable = GetTagTable('Image::ExifTool::Composite');
+
     # make sure default groups are defined in families 0 and 1
     if ($defaultGroups) {
         $defaultGroups->{0} or $defaultGroups->{0} = 'Composite';
@@ -3448,7 +3460,7 @@ sub AddCompositeTags($;$)
     } else {
         $defaultGroups = $$add{GROUPS} = { 0 => 'Composite', 1 => 'Composite', 2 => 'Other' };
     }
-    SetupTagTable($add);    # generate tag Name, etc
+    SetupTagTable($add);    # generate Name, TagID, etc
     my $tagID;
     foreach $tagID (sort keys %$add) {
         next if $specialTags{$tagID};   # must skip special tags
@@ -3458,7 +3470,7 @@ sub AddCompositeTags($;$)
         $$tagInfo{Module} = $module if $$tagInfo{Writable};
         # allow Composite tags with the same name
         my ($t, $n, $type);
-        while ($Image::ExifTool::Composite{$tag} and not $overwrite) {
+        while ($$compTable{$tag} and not $overwrite) {
             $n ? $n += 1 : ($n = 2, $t = $tag);
             $tag = "${t}-$n";
             $$tagInfo{NewTagID} = $tag; # save new ID so we can use it in TagLookup
@@ -3469,11 +3481,11 @@ sub AddCompositeTags($;$)
             $$tagInfo{$type} = { 0 => $req } if ref($req) ne 'HASH';
         }
         # add this Composite tag to our main Composite table
-        $$tagInfo{Table} = \%Image::ExifTool::Composite;
-        # (use the original TagID, even if we changed it)
+        $$tagInfo{Table} = $compTable;
+        # (use the original TagID, even if we changed it, so don't do this:)
         # $$tagInfo{TagID} = $tag;
-        # save new tag ID so we can find entry in Composite table
-        $Image::ExifTool::Composite{$tag} = $tagInfo;
+        # save tag under NewTagID in Composite table
+        $$compTable{$tag} = $tagInfo;
         # set all default groups in tag
         my $groups = $$tagInfo{Groups};
         $groups or $groups = $$tagInfo{Groups} = { };
@@ -4809,12 +4821,12 @@ sub ProcessJPEG($$)
             } elsif ($$segDataPt =~ /^(II|MM).{4}HEAPJPGM/s) {
                 next if $fast and $fast > 1;    # skip processing for very fast
                 $dumpType = 'CIFF';
-                my %dirInfo = (
-                    RAF => new File::RandomAccess($segDataPt),
-                );
+                my %dirInfo = ( RAF => new File::RandomAccess($segDataPt) );
                 $self->{SET_GROUP1} = 'CIFF';
+                push @{$self->{PATH}}, 'CIFF';
                 require Image::ExifTool::CanonRaw;
                 Image::ExifTool::CanonRaw::ProcessCRW($self, \%dirInfo);
+                pop @{$self->{PATH}};
                 delete $self->{SET_GROUP1};
             } elsif ($$segDataPt =~ /^(AVI1|Ocad)/) {
                 $dumpType = $1;
@@ -4952,14 +4964,11 @@ sub ProcessJPEG($$)
                         my $flir = '';
                         defined $_ and $flir .= $_ foreach @flirChunk;
                         undef @flirChunk;   # free memory
-                        my $tagTablePtr = GetTagTable('Image::ExifTool::FLIR::APP1');
+                        my $tagTablePtr = GetTagTable('Image::ExifTool::FLIR::FFF');
                         my %dirInfo = (
                             DataPt   => \$flir,
-                            DataPos  => $segPos + 8,
-                            DataLen  => length($flir),
-                            DirStart => 0,
-                            DirLen   => length($flir),
                             Parent   => $markerName,
+                            DirName  => 'FLIR',
                         );
                         $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
                         undef $flirCount;   # prevent reprocessing
@@ -5225,7 +5234,7 @@ sub ProcessJPEG($$)
                 );
                 $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
             }
-        } elsif ($marker == 0xe7) {
+        } elsif ($marker == 0xe7) {         # APP7 (Qualcomm)
             if ($$segDataPt =~ /^\x1aQualcomm Camera Attributes/) {
                 # found in HP iPAQ_VoiceMessenger
                 $dumpType = 'Qualcomm';
@@ -5235,6 +5244,7 @@ sub ProcessJPEG($$)
                     DataPos  => $segPos,
                     DirStart => 27, # (skip header)
                     DirLen   => $length - 27,
+                    DirName  => 'Qualcomm',
                 );
                 $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
             }
@@ -5243,10 +5253,10 @@ sub ProcessJPEG($$)
             if ($$segDataPt =~ /^SPIFF\0/ and $length == 32) {
                 $dumpType = 'SPIFF';
                 my %dirInfo = (
-                    DataPt => $segDataPt,
+                    DataPt   => $segDataPt,
                     DataPos  => $segPos,
                     DirStart => 6,
-                    DirLen => $length - 6,
+                    DirLen   => $length - 6,
                 );
                 my $tagTablePtr = GetTagTable('Image::ExifTool::JPEG::SPIFF');
                 $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
@@ -5261,10 +5271,10 @@ sub ProcessJPEG($$)
             if ($$segDataPt =~ /^Ducky/) {
                 $dumpType = 'Ducky';
                 my %dirInfo = (
-                    DataPt => $segDataPt,
-                    DataPos => $segPos,
+                    DataPt   => $segDataPt,
+                    DataPos  => $segPos,
                     DirStart => 5,
-                    DirLen => $length - 5,
+                    DirLen   => $length - 5,
                 );
                 my $tagTablePtr = GetTagTable('Image::ExifTool::APP12::Ducky');
                 $self->ProcessDirectory(\%dirInfo, $tagTablePtr);
@@ -5547,7 +5557,8 @@ sub DoProcessTIFF($$;$)
             my $lookup = $fileTypeLookup{$fileType};
             $lookup = $fileTypeLookup{$lookup} unless ref $lookup or not $lookup;
             # use file extension to pre-determine type if extension is TIFF-based or type is RAW
-            my $t = (($lookup and $$lookup[0] eq 'TIFF') or $fileType =~ /RAW/) ? $fileType : undef;
+            my $baseType = $lookup ? (ref $$lookup[0] ? $$lookup[0][0] : $$lookup[0]) : '';
+            my $t = ($baseType eq 'TIFF' or $fileType =~ /RAW/) ? $fileType : undef;
             $self->SetFileType($t);
         }
     }
@@ -5876,7 +5887,12 @@ sub ProcessDirectory($$$;$)
     # use default proc from tag table or EXIF proc as fallback if no proc specified
     $proc or $proc = $$tagTablePtr{PROCESS_PROC} || \&Image::ExifTool::Exif::ProcessExif;
     # set directory name from default group0 name if not done already
-    $$dirInfo{DirName} or $$dirInfo{DirName} = $tagTablePtr->{GROUPS}{0};
+    my $dirName = $$dirInfo{DirName};
+    unless ($dirName) {
+        $dirName = $$tagTablePtr{GROUPS}{0};
+        $dirName = $$tagTablePtr{GROUPS}{1} if $dirName =~ /^APP\d+$/; # (use specific APP name)
+        $$dirInfo{DirName} = $dirName;
+    }
     # guard against cyclical recursion into the same directory
     if (defined $$dirInfo{DirStart} and defined $$dirInfo{DataPos} and
         # directories don't overlap if the length is zero
@@ -5884,18 +5900,18 @@ sub ProcessDirectory($$$;$)
     {
         my $addr = $$dirInfo{DirStart} + $$dirInfo{DataPos} + ($$dirInfo{Base}||0);
         if ($self->{PROCESSED}{$addr}) {
-            $self->Warn("$$dirInfo{DirName} pointer references previous $self->{PROCESSED}{$addr} directory");
+            $self->Warn("$dirName pointer references previous $self->{PROCESSED}{$addr} directory");
             return 0;
         }
-        $self->{PROCESSED}{$addr} = $$dirInfo{DirName};
+        $self->{PROCESSED}{$addr} = $dirName;
     }
     my $oldOrder = GetByteOrder();
     my $oldIndent = $self->{INDENT};
     my $oldDir = $self->{DIR_NAME};
     $self->{LIST_TAGS} = { };  # don't build lists across different directories
     $self->{INDENT} .= '| ';
-    $self->{DIR_NAME} = $$dirInfo{DirName};
-    push @{$self->{PATH}}, $$dirInfo{DirName};
+    $self->{DIR_NAME} = $dirName;
+    push @{$self->{PATH}}, $dirName;
 
     # process the directory
     my $rtnVal = &$proc($self, $dirInfo, $tagTablePtr);
@@ -6300,7 +6316,7 @@ sub FoundTag($$$)
         $self->{PRIORITY}{$tag} = $priority;
         $self->{TAG_EXTRA}{$tag}{NoListDel} = 1 if $noListDel;
     } elsif ($priority) {
-        # set tag priority (only if exists and non-zero)
+        # set tag priority (only if exists and is non-zero)
         $self->{PRIORITY}{$tag} = $priority;
     }
 
@@ -6309,7 +6325,8 @@ sub FoundTag($$$)
     $$valueHash{$tag} = $value;
     $self->{FILE_ORDER}{$tag} = ++$self->{NUM_FOUND};
     $self->{TAG_INFO}{$tag} = $tagInfo;
-    # set dynamic groups 1 and 3 if necessary
+    # set dynamic groups 0, 1 and 3 if necessary
+    $self->{TAG_EXTRA}{$tag}{G0} = $self->{SET_GROUP0} if $self->{SET_GROUP0};
     $self->{TAG_EXTRA}{$tag}{G1} = $self->{SET_GROUP1} if $self->{SET_GROUP1};
     if ($self->{DOC_NUM}) {
         $self->{TAG_EXTRA}{$tag}{G3} = $self->{DOC_NUM};

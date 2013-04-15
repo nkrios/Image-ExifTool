@@ -72,9 +72,9 @@ table.dl td     { padding: .4em .8em }
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-9.25.tar.gz">
-Download        Version 9.25</a> (3.4 MB) -
-<a href="history.html">Apr. 6, 2013</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-9.27.tar.gz">
+Download        Version 9.27</a> (3.5 MB) -
+<a href="history.html">Apr. 15, 2013</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -122,8 +122,8 @@ distribution above.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-9.25.zip">
-         exiftool-9.25.zip</a> (3.5 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-9.27.zip">
+         exiftool-9.27.zip</a> (3.5 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -134,8 +134,8 @@ of Windows (including Windows 7).</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 Mac OS X Package:
-<a href="ExifTool-9.25.dmg">
-         ExifTool-9.25.dmg</a> (2.3 MB)</b></td></tr></table></blockquote>
+<a href="ExifTool-9.27.dmg">
+         ExifTool-9.27.dmg</a> (2.3 MB)</b></td></tr></table></blockquote>
 
 <p><b>The OS X package</b> installs the ExifTool command-line application and
 libraries in /usr/bin. After installing, type "<code>exiftool</code>" in a
@@ -282,9 +282,11 @@ suck the last bit of metadata out of whatever image file you throw at it!"</i> -
 <tr><td><a href="TagNames/OpenEXR.html">EXR</a></td><td>R</td><td>Open EXR (Extended Range)</td></tr>
 <tr><td>F4A, F4B, F4P, F4V</td><td>R</td><td>Adobe Flash Player 9+ Audio/Video (<a href="TagNames/QuickTime.html">Quicktime</a>-based)</td></tr>
 <tr><td>FFF</td><td>R/W</td><td>Hasselblad Flexible File Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td></tr>
+<tr><td><a href="TagNames/FLIR.html#FFF">FFF</a></td><td>R</td><td>FLIR Systems thermal image File Format</td></tr>
 <tr><td>FLA</td><td>R</td><td>Macromedia/Adobe Flash project (<a href="TagNames/FlashPix.html">FPX</a>-like)</td></tr>
 <tr><td><a href="TagNames/FLAC.html">FLAC</a></td><td>R</td><td>Free Lossless Audio Codec</td></tr>
 <tr><td><a href="TagNames/Flash.html#FLV">FLV</a></td><td>R</td><td>Flash Video</td></tr>
+<tr><td><a href="TagNames/FLIR.html#FPF">FPF</a></td><td>R</td><td>FLIR Public image Format</td></tr>
 <tr><td><a href="TagNames/FlashPix.html">FPX</a></td><td>R</td><td>FlashPix image</td></tr>
 <tr><td><a href="TagNames/GIF.html">GIF</a></td><td>R/W</td><td>Compuserve Graphics Interchange Format</td></tr>
 <tr><td><a href="TagNames/ZIP.html#GZIP">GZ, GZIP</a></td><td>R</td><td>GNU ZIP compressed archive</td></tr>
@@ -404,7 +406,7 @@ of meta information in JPEG images:</p>
 <tr><td>APP1 - <a href="TagNames/EXIF.html">EXIF</a></td><td>R/W/C</td><td>Exchangeable Image File Format (including maker notes)</td></tr>
 <tr><td>APP1 - <a href="TagNames/XMP.html">XMP</a></td><td>R/W/C</td><td>Extensible Metadata Platform (multi-segment)</td></tr>
 <tr><td>APP1 - <a href="TagNames/Casio.html#QVCI">QVCI</a></td><td>R</td><td>Casio QV-7000SX QVCI information</td></tr>
-<tr><td>APP1 - <a href="TagNames/FLIR.html#APP1">FLIR</a></td><td>R</td><td>FLIR thermal imaging data (multi-segment)</td></tr>
+<tr><td>APP1 - <a href="TagNames/FLIR.html#FFF">FLIR</a></td><td>R</td><td>FLIR thermal imaging data (multi-segment)</td></tr>
 <tr><td>APP2 - <a href="TagNames/ICC_Profile.html">ICC</a></td><td>R/W/C</td><td>International Color Consortium (multi-segment)</td></tr>
 <tr><td>APP2 - <a href="TagNames/FlashPix.html">FPXR</a></td><td>R</td><td>FlashPix Ready (multi-segment)</td></tr>
 <tr><td>APP2 - <a href="TagNames/MPF.html">MPF</a></td><td>R</td><td>Multi-Picture Format</td></tr>
@@ -684,7 +686,7 @@ These groups are:</p>
 <tr><td><b>0 (Information&nbsp;Type)</b></td>
 <td>AFCP, AIFF, APE, APP0, APP1, APP12, APP13, APP14, APP15, APP4, APP5, APP6,
 APP8, ASF, CanonVRD, Composite, DICOM, DNG, DV, DjVu, Ducky, EXE, EXIF,
-ExifTool, FLAC, File, Flash, FlashPix, FLIR, Font, FotoStation, GIF, GIMP,
+ExifTool, FLAC, FLIR, File, Flash, FlashPix, Font, FotoStation, GIF, GIMP,
 GeoTiff, H264, HTML, ICC_Profile, ID3, IPTC, ITC, JFIF, JPEG, Jpeg2000, LNK,
 Leaf, M2TS, MIE, MIFF, MNG, MPC, MPEG, MPF, MXF, MakerNotes, Matroska, Meta,
 Ogg, OpenEXR, PDF, PICT, PLIST, PNG, PSP, PanasonicRaw, PhotoCD,

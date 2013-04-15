@@ -55,7 +55,7 @@ use vars qw($VERSION %nikonLensIDs %nikonTextEncoding);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.74';
+$VERSION = '2.75';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
@@ -280,6 +280,7 @@ sub PrintAFPointsInv($$;$);
     'B3 4C 62 62 14 14 B5 06' => 'AF-S Nikkor 85mm f/1.8G',
     'B4 40 37 62 2C 34 B6 0E' => 'AF-S VR Zoom-Nikkor 24-85mm f/3.5-4.5G IF-ED', #30
     'B5 4C 3C 3C 14 14 B7 06' => 'AF-S Nikkor 28mm f/1.8G', #30
+    'B7 44 60 98 34 3C B9 0E' => 'AF-S Nikkor 80-400mm f/4.5-5.6G ED VR',
     '01 00 00 00 00 00 02 00' => 'TC-16A',
     '01 00 00 00 00 00 08 00' => 'TC-16A',
     '00 00 00 00 00 00 F1 0C' => 'TC-14E [II] or Sigma APO Tele Converter 1.4x EX DG or Kenko Teleplus PRO 300 DG 1.4x',
@@ -535,6 +536,8 @@ sub PrintAFPointsInv($$;$);
 #
     '00 54 56 56 30 30 00 00' => 'Coastal Optical Systems 60mm 1:4 UV-VIS-IR Macro Apo',
 #
+    '00 40 11 11 2C 2C 00 00' => 'Samyang 8mm f/3.5 Fish-Eye',
+    '4A 40 11 11 2C 0C 4D 02' => 'Samyang 8mm f/3.5 Fish-Eye CS',
     '4A 48 24 24 24 0C 4D 02' => 'Samyang AE 14mm f/2.8 ED AS IF UMC', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3150.0.html
     '4A 60 44 44 0C 0C 4D 02' => 'Samyang 35mm f/1.4 AS UMC',
     '4A 60 62 62 0C 0C 4D 02' => 'Samyang AE 85mm f/1.4 AS IF UMC', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2888.0.html
@@ -1014,7 +1017,7 @@ my %binaryDataAttrs = (
         Name => 'ISOInfo',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::ISOInfo',
-            ByteOrder => 'BigEndian', #(NC)
+            ByteOrder => 'BigEndian',
         },
     },
     0x002a => { #23 (this tag added with D3 firmware 1.10 -- also written by Nikon utilities)
@@ -1708,15 +1711,26 @@ my %binaryDataAttrs = (
     },
     0x00b7 => { #JD
         Name => 'AFInfo2',
+        # (this structure may be byte swapped when rewritten by CaptureNX)
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::AFInfo2' },
     },
-    0x00b8 => { #PH
+    0x00b8 => [{ #PH
+        Name => 'FileInfo',
+        # unfortunately, some newer models write this as little-endian
+        # (and CaptureNX can change the byte order of the maker notes,
+        #  but leaves this structure unchanged)
+        Condition => '$$self{Model} =~ /^NIKON (D5200|D7100)$/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::FileInfo',
+            ByteOrder => 'LittleEndian',
+        },
+    },{
         Name => 'FileInfo',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Nikon::FileInfo',
             ByteOrder => 'BigEndian',
         },
-    },
+    }],
     0x00b9 => { #28
         Name => 'AFTune',
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::AFTune' },
@@ -2049,6 +2063,7 @@ my %binaryDataAttrs = (
     # MONOCHROME 06 4d 00 01 02 ff 82 80 80 ff ff 80 80 ff
     # Neutral2   03 c2 01 00 02 ff 80 7f 81 00 7f ff ff ff (custom)
     # (note that up to 9 different custom picture controls can be stored)
+    # --> bytes 44 and 45 are swapped if CaptureNX changes the byte order
     #
     48 => { #21
         Name => 'PictureControlAdjust',
@@ -2288,6 +2303,7 @@ my %binaryDataAttrs = (
         Writable => 0,
         Unknown => 1,
     },
+    # (bytes 6/7 and 8/9 are swapped if CaptureNX changes the byte order)
 );
 
 # more unknown information - PH (D7000)
@@ -2302,6 +2318,7 @@ my %binaryDataAttrs = (
         Writable => 0,
         Unknown => 1,
     },
+    # (byte 4 may be changed from 1 to 0 when rewritten by CaptureNX)
 );
 
 # Nikon AF information (ref 13)

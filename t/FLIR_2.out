@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.25
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.26
 [File, System, Image] FileName - File Name: FLIR.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 7.2 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2013:04:02 10:46:04-04:00
-[File, System, Time] FileAccessDate - File Access Date/Time: 2013:04:05 11:47:02-04:00
-[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2013:04:05 11:01:17-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2013:04:02 13:11:16-04:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2013:04:12 12:15:55-04:00
+[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2013:04:13 06:36:07-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -48,8 +48,8 @@
 [EXIF, IFD1, Image] 296 - Resolution Unit: inches
 [EXIF, IFD1, Image] 513 - Thumbnail Offset: 872
 [EXIF, IFD1, Image] 514 - Thumbnail Length: 2314
-[MakerNotes, FLIR, Camera] 1 - Image Maximum Temperature: 308
-[MakerNotes, FLIR, Camera] 2 - Image Minimum Temperature: 281
+[MakerNotes, FLIR, Camera] 1 - Image Temperature Max: 308
+[MakerNotes, FLIR, Camera] 2 - Image Temperature Min: 281
 [MakerNotes, FLIR, Camera] 3 - Emissivity: 0.80
 [APP1, FLIR, Image] 0 - Palette Colors: 224
 [APP1, FLIR, Image] 6 - Above Color: 170 128 128
@@ -70,8 +70,8 @@
 [APP1, FLIR, Camera] 48 - IR Window Temperature: 20.0 C
 [APP1, FLIR, Camera] 52 - IR Window Transmission: 1.00
 [APP1, FLIR, Camera] 60 - Relative Humidity: 50.0 %
-[APP1, FLIR, Camera] 144 - Camera Maximum Temperature: 250.0 C
-[APP1, FLIR, Camera] 148 - Camera Minimum Temperature: -0.0 C
+[APP1, FLIR, Camera] 144 - Camera Temperature Range Max: 250.0 C
+[APP1, FLIR, Camera] 148 - Camera Temperature Range Min: -0.0 C
 [APP1, FLIR, Camera] 212 - Camera Model: FLIR_i7
 [APP1, FLIR, Camera] 244 - Camera Part Number: T197600
 [APP1, FLIR, Camera] 260 - Camera Serial Number: 470023842
@@ -79,6 +79,10 @@
 [APP1, FLIR, Camera] 368 - Lens Model: FOL7
 [APP1, FLIR, Camera] 400 - Lens Part Number: 
 [APP1, FLIR, Camera] 416 - Lens Serial Number: 
+[APP1, FLIR, Camera] 492 - Filter Model: 
+[APP1, FLIR, Camera] 508 - Filter Part Number: 
+[APP1, FLIR, Camera] 540 - Filter Serial Number: 
+[APP1, FLIR, Time] 900 - Date/Time Original: 2012:02:11 14:17:08.253+01:00
 [APP1, FLIR, Image] 1 - Raw Thermal Image Width: 120
 [APP1, FLIR, Image] 2 - Raw Thermal Image Height: 120
 [APP1, FLIR, Image] 16 - Raw Thermal Image Type: PNG

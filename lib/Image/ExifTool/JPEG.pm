@@ -11,7 +11,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.16';
+$VERSION = '1.17';
 
 sub ProcessScalado($$$);
 sub ProcessOcad($$$);
@@ -59,7 +59,7 @@ sub ProcessOcad($$$);
       }, {
         Name => 'FLIR',
         Condition => '$$valPt =~ /^FLIR\0/',
-        SubDirectory => { TagTable => 'Image::ExifTool::FLIR::APP1' },
+        SubDirectory => { TagTable => 'Image::ExifTool::FLIR::FFF' },
     }],
     APP2 => [{
         Name => 'ICC_Profile',

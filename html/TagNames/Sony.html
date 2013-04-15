@@ -309,9 +309,9 @@ toward magenta)</span></span></td></tr>
 <td class=c>int8u</td>
 <td><table class=cols><tr>
   <td>0 = Manual
-  <br>2 = AF-A
+  <br>2 = AF-S
   <br>3 = AF-C</td><td>&nbsp;&nbsp;</td>
-  <td>4 = AF-S
+  <td>4 = AF-A
   <br>6 = DMF
   <br>7 = AF-D</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
@@ -399,9 +399,9 @@ Spot)</span></span></td></tr>
 <td>--&gt; <a href='Sony.html#Tag940a'>Sony Tag940a Tags</a></td></tr>
 <tr>
 <td title='0x940e = 37902'>0x940e</td>
-<td>Tag940e</td>
+<td>AFInfo</td>
 <td class=c>-</td>
-<td>--&gt; <a href='Sony.html#Tag940e'>Sony Tag940e Tags</a></td></tr>
+<td>--&gt; <a href='Sony.html#AFInfo'>Sony AFInfo Tags</a></td></tr>
 <tr class=b>
 <td title='0xb000 = 45056'>0xb000</td>
 <td>FileFormat</td>
@@ -3531,7 +3531,7 @@ substitution cipher, but the deciphered values are listed below.</p>
 </td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='Tag940e'>Sony Tag940e Tags</a></h2>
+<h2><a name='AFInfo'>Sony AFInfo Tags</a></h2>
 <p>These tags are currently extracted for SLT models only.</p>
 <blockquote>
 <table class=frame><tr><td>
@@ -3539,10 +3539,16 @@ substitution cipher, but the deciphered values are listed below.</p>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td title='0x0002 = 2'>0x0002</td>
+<td>AFType</td>
+<td class=c>int8u</td>
+<td><span class=s>1 = 15-point
+  <br>2 = 19-point</span></td></tr>
+<tr class=b>
 <td title='0x0007 = 7'>0x0007</td>
 <td>AFPoint</td>
 <td class=c>int8u</td>
-<td><span class=s><span class=n>(A37, A57 and A65)</span></span><table class=cols><tr>
+<td><span class=s><span class=n>(models with 15-point AF)</span></span><table class=cols><tr>
   <td>0 = Upper-left
   <br>1 = Left
   <br>2 = Lower-left
@@ -3561,7 +3567,7 @@ substitution cipher, but the deciphered values are listed below.</p>
   <br>15 = Lower-right
   <br>16 = Upper-middle
   <br>17 = Lower-middle</td><td>&nbsp;&nbsp;</td></tr></table>
-<span class=s><span class=n>(A77 and A99)</span></span><table class=cols><tr>
+<span class=s><span class=n>(models with 19-point AF)</span></span><table class=cols><tr>
   <td>0 = Upper Far Left
   <br>1 = Upper-left (horizontal)
   <br>2 = Far Left (horizontal)
@@ -3593,11 +3599,11 @@ substitution cipher, but the deciphered values are listed below.</p>
   <br>28 = Right (vertical)
   <br>29 = Lower-right (vertical)</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x0008 = 8'>0x0008</td>
 <td>AFPointInFocus</td>
 <td class=c>int8u</td>
-<td><span class=s><span class=n>(A37, A57 and A65)</span></span><table class=cols><tr>
+<td><span class=s><span class=n>(models with 15-point AF)</span></span><table class=cols><tr>
   <td>0 = Upper-left
   <br>1 = Left
   <br>2 = Lower-left
@@ -3617,7 +3623,7 @@ substitution cipher, but the deciphered values are listed below.</p>
   <br>16 = Upper-middle
   <br>17 = Lower-middle
   <br>255 = (none)</td><td>&nbsp;&nbsp;</td></tr></table>
-<span class=s><span class=n>(A77 and A99)</span></span><table class=cols><tr>
+<span class=s><span class=n>(models with 19-point AF)</span></span><table class=cols><tr>
   <td>0 = Upper Far Left
   <br>1 = Upper-left (horizontal)
   <br>2 = Far Left (horizontal)
@@ -3650,11 +3656,11 @@ substitution cipher, but the deciphered values are listed below.</p>
   <br>29 = Lower-right (vertical)
   <br>255 = (none)</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr>
+<tr class=b>
 <td title='0x0009 = 9'>0x0009</td>
 <td>AFPointAtShutterRelease</td>
 <td class=c>int8u</td>
-<td><span class=s><span class=n>(A37, A57 and A65)</span></span><table class=cols><tr>
+<td><span class=s><span class=n>(models with 15-point AF)</span></span><table class=cols><tr>
   <td>0 = Upper-left
   <br>1 = Left
   <br>2 = Lower-left
@@ -3674,7 +3680,7 @@ substitution cipher, but the deciphered values are listed below.</p>
   <br>16 = Upper-middle
   <br>17 = Lower-middle
   <br>30 = (out of focus)</td><td>&nbsp;&nbsp;</td></tr></table>
-<span class=s><span class=n>(A77 and A99)</span></span><table class=cols><tr>
+<span class=s><span class=n>(models with 19-point AF)</span></span><table class=cols><tr>
   <td>0 = Upper Far Left
   <br>1 = Upper-left (horizontal)
   <br>2 = Far Left (horizontal)
@@ -3707,7 +3713,7 @@ substitution cipher, but the deciphered values are listed below.</p>
   <br>29 = Lower-right (vertical)
   <br>30 = (out of focus)</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x000a = 10'>0x000a</td>
 <td>AFAreaMode</td>
 <td class=c>int8u</td>
@@ -3715,30 +3721,24 @@ substitution cipher, but the deciphered values are listed below.</p>
   <br>1 = Spot
   <br>2 = Local
   <br>3 = Zone</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x000b = 11'>0x000b</td>
 <td>FocusMode</td>
 <td class=c>int8u</td>
-<td><span class=s><span class=n>(A99)</span></span><table class=cols><tr>
-  <td>0 = Manual
-  <br>2 = AF-A
-  <br>3 = AF-C</td><td>&nbsp;&nbsp;</td>
-  <td>4 = AF-S
-  <br>6 = DMF
-  <br>7 = AF-D</td><td>&nbsp;&nbsp;</td></tr></table>
-<span class=s><span class=n>(other models)</span></span><table class=cols><tr>
+<td><table class=cols><tr>
   <td>0 = Manual
   <br>2 = AF-S
   <br>3 = AF-C</td><td>&nbsp;&nbsp;</td>
   <td>4 = AF-A
-  <br>6 = DMF</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>6 = DMF
+  <br>7 = AF-D</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x017d = 381'>0x017d</td>
 <td>AFMicroAdj</td>
 <td class=c>int8s</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x017e = 382'>0x017e</td>
 <td>ExposureProgram</td>
 <td class=c>int8u</td>
@@ -4046,7 +4046,7 @@ the JPEG image from a PMP file)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 27, 2013</i>
+<br><i>Last revised Apr 11, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

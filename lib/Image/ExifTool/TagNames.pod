@@ -64,8 +64,8 @@ right hand side of an equals sign (C<=>) respectively.  The human-readable
 values are used by default when reading and writing, but the
 computer-readable values may be accessed by disabling the value conversion
 with the -n option on the command line, by setting the ValueConv option to 0
-in the API, or or on a per-tag basis by appending a number symbol (C<#>) to
-the tag name.
+in the API, or or on a per-tag basis by adding a hash (C<#>) after the tag
+name.
 
 B<Note>: If you are familiar with common meta-information tag names, you may
 find that some ExifTool tag names are different than expected.  The usual
@@ -89,7 +89,7 @@ This table lists information extracted by ExifTool from JPEG images.
                ExtendedXMP                      XMP
                XMP                              XMP
                QVCI                             Casio QVCI
-               FLIR                             FLIR APP1
+               FLIR                             FLIR FFF
   'APP2'       ICC_Profile                      ICC_Profile
                FPXR                             FlashPix
                MPF                              MPF
@@ -3559,6 +3559,7 @@ This information is found in the PSD file header.
   0x00b6   PowerUpTime                          undef
   0x00b7   AFInfo2                              Nikon AFInfo2
   0x00b8   FileInfo                             Nikon FileInfo
+                                                Nikon FileInfo
   0x00b9   AFTune                               Nikon AFTune
   0x00bd   PictureControlData                   Nikon PictureControl
   0x0e00   PrintIM                              PrintIM
@@ -5701,6 +5702,7 @@ like the LS-5, LS-10, LS-11.
            CanonCameraInfo5D                    Canon CameraInfo5D
            CanonCameraInfo5DmkII                Canon CameraInfo5DmkII
            CanonCameraInfo5DmkIII               Canon CameraInfo5DmkIII
+           CanonCameraInfo6D                    Canon CameraInfo6D
            CanonCameraInfo7D                    Canon CameraInfo7D
            CanonCameraInfo40D                   Canon CameraInfo40D
            CanonCameraInfo50D                   Canon CameraInfo50D
@@ -6306,6 +6308,31 @@ versions 1.0.x, but they may be different for other firmware versions.
     664    DirectoryIndex                       int32u
     668    DirectoryIndex2                      int32u
     944    PictureStyleInfo                     Canon PSInfo2
+
+=head3 Canon CameraInfo6D Tags
+
+CameraInfo tags for the EOS 6D.
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+      3    FNumber                              int8u
+      4    ExposureTime                         int8u
+      6    ISO                                  int8u
+     27    CameraTemperature                    int8u
+     35    FocalLength                          int16uRev
+    131    CameraOrientation                    int8u
+    146    FocusDistanceUpper                   int16uRev
+    148    FocusDistanceLower                   int16uRev
+    194    WhiteBalance                         int16u
+    198    ColorTemperature                     int16u
+    250    PictureStyle                         int8u
+    353    LensType                             int16uRev
+    355    MinFocalLength                       int16uRev
+    357    MaxFocalLength                       int16uRev
+    598    FirmwareVersion                      N
+    682    FileIndex                            int32u
+    694    DirectoryIndex                       int32u
+    966    PictureStyleInfo                     Canon PSInfo2
 
 =head3 Canon CameraInfo7D Tags
 
@@ -7199,7 +7226,7 @@ These tags are used by the EOS 600D.
 
 =head3 Canon ColorData7 Tags
 
-These tags are used by the EOS 1DX and 5DmkIII.
+These tags are used by the EOS 1DX, 5DmkIII, 6D, 100D, 650D, 700D and M.
 
   Index2   Tag Name                             Writable
   ------   --------                             --------
@@ -7220,30 +7247,30 @@ These tags are used by the EOS 1DX and 5DmkIII.
      97    ColorTempUnknown4?                   int16s
      98    WB_RGGBLevelsUnknown5?               int16s[4]
     102    ColorTempUnknown5?                   int16s
-    103    WB_RGGBLevelsDaylight                int16s[4]
-    107    ColorTempDaylight                    int16s
-    108    WB_RGGBLevelsShade                   int16s[4]
-    112    ColorTempShade                       int16s
-    113    WB_RGGBLevelsCloudy                  int16s[4]
-    117    ColorTempCloudy                      int16s
-    118    WB_RGGBLevelsTungsten                int16s[4]
-    122    ColorTempTungsten                    int16s
-    123    WB_RGGBLevelsFluorescent             int16s[4]
-    127    ColorTempFluorescent                 int16s
-    128    WB_RGGBLevelsKelvin                  int16s[4]
-    132    ColorTempKelvin                      int16s
-    133    WB_RGGBLevelsFlash                   int16s[4]
-    137    ColorTempFlash                       int16s
-    138    WB_RGGBLevelsUnknown6?               int16s[4]
-    142    ColorTempUnknown6?                   int16s
-    143    WB_RGGBLevelsUnknown7?               int16s[4]
-    147    ColorTempUnknown7?                   int16s
-    148    WB_RGGBLevelsUnknown8?               int16s[4]
-    152    ColorTempUnknown8?                   int16s
-    153    WB_RGGBLevelsUnknown9?               int16s[4]
-    157    ColorTempUnknown9?                   int16s
-    158    WB_RGGBLevelsUnknown10?              int16s[4]
-    162    ColorTempUnknown10?                  int16s
+    103    WB_RGGBLevelsUnknown6?               int16s[4]
+    107    ColorTempUnknown6?                   int16s
+    108    WB_RGGBLevelsUnknown7?               int16s[4]
+    112    ColorTempUnknown7?                   int16s
+    113    WB_RGGBLevelsUnknown8?               int16s[4]
+    117    ColorTempUnknown8?                   int16s
+    118    WB_RGGBLevelsUnknown9?               int16s[4]
+    122    ColorTempUnknown9?                   int16s
+    123    WB_RGGBLevelsUnknown10?              int16s[4]
+    127    ColorTempUnknown10?                  int16s
+    128    WB_RGGBLevelsDaylight                int16s[4]
+    132    ColorTempDaylight                    int16s
+    133    WB_RGGBLevelsShade                   int16s[4]
+    137    ColorTempShade                       int16s
+    138    WB_RGGBLevelsCloudy                  int16s[4]
+    142    ColorTempCloudy                      int16s
+    143    WB_RGGBLevelsTungsten                int16s[4]
+    147    ColorTempTungsten                    int16s
+    148    WB_RGGBLevelsFluorescent             int16s[4]
+    152    ColorTempFluorescent                 int16s
+    153    WB_RGGBLevelsKelvin                  int16s[4]
+    157    ColorTempKelvin                      int16s
+    158    WB_RGGBLevelsFlash                   int16s[4]
+    162    ColorTempFlash                       int16s
     163    WB_RGGBLevelsUnknown11?              int16s[4]
     167    ColorTempUnknown11?                  int16s
     168    WB_RGGBLevelsUnknown12?              int16s[4]
@@ -8094,16 +8121,17 @@ imaging cameras by FLIR Systems Inc.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
-  0x0001   ImageMaximumTemperature              rational64u
-  0x0002   ImageMinimumTemperature              rational64u
-  0x0003   Emissivity                           rational64u~
+  0x0001   ImageTemperatureMax                  rational64u
+  0x0002   ImageTemperatureMin                  rational64u
+  0x0003   Emissivity                           rational64u
   0x0004   UnknownTemperature?                  rational64u
-  0x0005   UnknownMaximumTemperature?           rational64u
-  0x0006   UnknownMinimumTemperature?           rational64u
+  0x0005   CameraTemperatureRangeMax?           rational64u
+  0x0006   CameraTemperatureRangeMin?           rational64u
 
-=head3 FLIR APP1 Tags
+=head3 FLIR FFF Tags
 
-Information extracted from the FLIR APP1 segment of JPEG images.
+Information extracted from FLIR FFF images and the FLIR APP1 segment of JPEG
+images.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
@@ -8117,8 +8145,8 @@ Information extracted from the FLIR APP1 segment of JPEG images.
 
 =head3 FLIR RawData Tags
 
-The thermal data may be stored either as raw data, or in PNG format. If
-stored as raw data, ExifTool adds a TIFF header to allow the data to be
+The thermal image data may be stored either as raw data, or in PNG format.
+If stored as raw data, ExifTool adds a TIFF header to allow the data to be
 viewed as a TIFF image.  If stored in PNG format, the PNG image is extracted
 as-is.  Note that most FLIR cameras using the PNG format seem to write the
 16-bit raw image data in the wrong byte order.
@@ -8141,8 +8169,8 @@ as-is.  Note that most FLIR cameras using the PNG format seem to write the
      48    IRWindowTemperature                  N
      52    IRWindowTransmission                 N
      60    RelativeHumidity                     N
-    144    CameraMaximumTemperature             N
-    148    CameraMinimumTemperature             N
+    144    CameraTemperatureRangeMax            N
+    148    CameraTemperatureRangeMin            N
     152    UnknownTemperature1?                 N
     156    UnknownTemperature2?                 N
     160    UnknownTemperature3?                 N
@@ -8156,6 +8184,10 @@ as-is.  Note that most FLIR cameras using the PNG format seem to write the
     368    LensModel                            N
     400    LensPartNumber                       N
     416    LensSerialNumber                     N
+    492    FilterModel                          N
+    508    FilterPartNumber                     N
+    540    FilterSerialNumber                   N
+    900    DateTimeOriginal                     N
 
 =head3 FLIR PaletteInfo Tags
 
@@ -8202,6 +8234,49 @@ as-is.  Note that most FLIR cameras using the PNG format seem to write the
   Param1                                        N
   Param2                                        N
   Param3                                        N
+
+=head3 FLIR FPF Tags
+
+Tags extracted from FLIR Public image Format (FPF) files.
+
+  Index1   Tag Name                             Writable
+  ------   --------                             --------
+     32    FPFVersion                           N
+     36    ImageDataOffset                      N
+     40    ImageType                            N
+     42    ImagePixelFormat                     N
+     44    ImageWidth                           N
+     46    ImageHeight                          N
+     48    ExternalTriggerCount                 N
+     52    SequenceFrameNumber                  N
+    120    CameraModel                          N
+    152    CameraPartNumber                     N
+    184    CameraSerialNumber                   N
+    216    CameraTemperatureRangeMin            N
+    220    CameraTemperatureRangeMax            N
+    224    LensModel                            N
+    256    LensPartNumber                       N
+    288    LensSerialNumber                     N
+    320    FilterModel                          N
+    336    FilterPartNumber                     N
+    384    FilterSerialNumber                   N
+    480    Emissivity                           N
+    484    ObjectDistance                       N
+    488    ReflectedApparentTemperature         N
+    492    AtmosphericTemperature               N
+    496    RelativeHumidity                     N
+    500    ComputedAtmosphericTrans             N
+    504    EstimatedAtmosphericTrans            N
+    508    ReferenceTemperature                 N
+    512    IRWindowTemperature                  N
+    516    IRWindowTransmission                 N
+    584    DateTimeOriginal                     N
+    676    CameraScaleMin                       N
+    680    CameraScaleMax                       N
+    684    CalculatedScaleMin                   N
+    688    CalculatedScaleMax                   N
+    692    ActualScaleMin                       N
+    696    ActualScaleMax                       N
 
 =head2 FujiFilm Tags
 
@@ -11154,7 +11229,7 @@ MakerNotes.
   0x9403   Tag9403                              Sony Tag9403
   0x9406   Tag9406                              Sony Tag9406
   0x940a   Tag940a                              Sony Tag940a
-  0x940e   Tag940e                              Sony Tag940e
+  0x940e   AFInfo                               Sony AFInfo
   0xb000   FileFormat                           int8u[4]
   0xb001   SonyModelID                          int16u
   0xb020   CreativeStyle                        string
@@ -11613,12 +11688,13 @@ These tags are currently extracted for SLT models only.
   ------   --------                             --------
   0x0004   AFPointsSelected                     int32u
 
-=head3 Sony Tag940e Tags
+=head3 Sony AFInfo Tags
 
 These tags are currently extracted for SLT models only.
 
   Tag ID   Tag Name                             Writable
   ------   --------                             --------
+  0x0002   AFType                               int8u
   0x0007   AFPoint                              int8u
   0x0008   AFPointInFocus                       int8u
   0x0009   AFPointAtShutterRelease              int8u

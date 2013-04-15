@@ -78,6 +78,7 @@
   <br>CanonCameraInfo5D
   <br>CanonCameraInfo5DmkII
   <br>CanonCameraInfo5DmkIII
+  <br>CanonCameraInfo6D
   <br>CanonCameraInfo7D
   <br>CanonCameraInfo40D
   <br>CanonCameraInfo50D
@@ -94,7 +95,7 @@
   <br>CanonCameraInfoUnknown32
   <br>CanonCameraInfoUnknown16
   <br>CanonCameraInfoUnknown</td>
-<td class=c>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
+<td class=c>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='Canon.html#CameraInfo1D'>Canon CameraInfo1D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo1DmkII'>Canon CameraInfo1DmkII Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo1DmkIIN'>Canon CameraInfo1DmkIIN Tags</a>
@@ -104,6 +105,7 @@
   <br>--&gt; <a href='Canon.html#CameraInfo5D'>Canon CameraInfo5D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo5DmkII'>Canon CameraInfo5DmkII Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo5DmkIII'>Canon CameraInfo5DmkIII Tags</a>
+  <br>--&gt; <a href='Canon.html#CameraInfo6D'>Canon CameraInfo6D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo7D'>Canon CameraInfo7D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo40D'>Canon CameraInfo40D Tags</a>
   <br>--&gt; <a href='Canon.html#CameraInfo50D'>Canon CameraInfo50D Tags</a>
@@ -793,11 +795,13 @@
   <td>0 = One-shot AF
   <br>1 = AI Servo AF
   <br>2 = AI Focus AF
-  <br>3 = Manual Focus (3)</td><td>&nbsp;&nbsp;</td>
-  <td>4 = Single
-  <br>5 = Continuous
+  <br>3 = Manual Focus (3)
+  <br>4 = Single</td><td>&nbsp;&nbsp;</td>
+  <td>5 = Continuous
   <br>6 = Manual Focus (6)
-  <br>16 = Pan Focus</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>16 = Pan Focus
+  <br>256 = AF + MF
+  <br>519 = Movie Servo AF</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr>
 <td class=r title='9 = 0x9'>9</td>
@@ -3699,6 +3703,107 @@ versions 1.0.x, but they may be different for other firmware versions.</p>
 <td>--&gt; <a href='Canon.html#PSInfo2'>Canon PSInfo2 Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='CameraInfo6D'>Canon CameraInfo6D Tags</a></h2>
+<p>CameraInfo tags for the EOS 6D.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='3 = 0x3'>3</td>
+<td>FNumber</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4</td>
+<td>ExposureTime</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='6 = 0x6'>6</td>
+<td>ISO</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='27 = 0x1b'>27</td>
+<td>CameraTemperature</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='35 = 0x23'>35</td>
+<td>FocalLength</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='131 = 0x83'>131</td>
+<td>CameraOrientation</td>
+<td class=c>int8u</td>
+<td><span class=s>0 = Horizontal (normal)
+  <br>1 = Rotate 90 CW
+  <br>2 = Rotate 270 CW</span></td></tr>
+<tr>
+<td class=r title='146 = 0x92'>146</td>
+<td>FocusDistanceUpper</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='148 = 0x94'>148</td>
+<td>FocusDistanceLower</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='194 = 0xc2'>194</td>
+<td>WhiteBalance</td>
+<td class=c>int16u</td>
+<td>--&gt; <a href='Canon.html#WhiteBalance'>Canon WhiteBalance Values</a></td></tr>
+<tr class=b>
+<td class=r title='198 = 0xc6'>198</td>
+<td>ColorTemperature</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='250 = 0xfa'>250</td>
+<td>PictureStyle</td>
+<td class=c>int8u</td>
+<td>--&gt; <a href='Canon.html#PictureStyle'>Canon PictureStyle Values</a></td></tr>
+<tr class=b>
+<td class=r title='353 = 0x161'>353</td>
+<td>LensType</td>
+<td class=c>int16uRev</td>
+<td>--&gt; <a href='Canon.html#LensType'>Canon LensType Values</a></td></tr>
+<tr>
+<td class=r title='355 = 0x163'>355</td>
+<td>MinFocalLength</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='357 = 0x165'>357</td>
+<td>MaxFocalLength</td>
+<td class=c>int16uRev</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='598 = 0x256'>598</td>
+<td>FirmwareVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='682 = 0x2aa'>682</td>
+<td>FileIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='694 = 0x2b6'>694</td>
+<td>DirectoryIndex</td>
+<td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='966 = 0x3c6'>966</td>
+<td>PictureStyleInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Canon.html#PSInfo2'>Canon PSInfo2 Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='CameraInfo7D'>Canon CameraInfo7D Tags</a></h2>
 <p>CameraInfo tags for the EOS 7D.  Indices shown are for firmware versions
 1.0.x, but they may be different for other firmware versions.</p>
@@ -5305,9 +5410,12 @@ may be 7, 9, 11, 19, 31, 45 or 61, depending on the camera model.</p>
   <br>2 = Single-point AF
   <br>4 = Multi-point AF or AI AF
   <br>5 = Face Detect AF
+  <br>6 = Face + Tracking
   <br>7 = Zone AF
   <br>8 = AF Point Expansion
-  <br>9 = Spot AF</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>9 = Spot AF
+  <br>11 = Flexizone Multi
+  <br>13 = Flexizone Single</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
@@ -7338,7 +7446,7 @@ option is used.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ColorData7'>Canon ColorData7 Tags</a></h2>
-<p>These tags are used by the EOS 1DX and 5DmkIII.</p>
+<p>These tags are used by the EOS 1DX, 5DmkIII, 6D, 100D, 650D, 700D and M.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -7348,7 +7456,7 @@ option is used.</p>
 <td class=r title='0 = 0x0'>0</td>
 <td>ColorDataVersion</td>
 <td class=c>int16s</td>
-<td><span class=s>10 = 10 (1DX/5DmkIII/650D)</span></td></tr>
+<td><span class=s>10 = 10 (1DX/5DmkIII/6D/100D/650D/700D/M)</span></td></tr>
 <tr class=b>
 <td class=r title='63 = 0x3f'>63</td>
 <td>WB_RGGBLevelsAsShot</td>
@@ -7431,122 +7539,122 @@ option is used.</p>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='103 = 0x67'>103</td>
-<td>WB_RGGBLevelsDaylight</td>
-<td class=c>int16s[4]</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='107 = 0x6b'>107</td>
-<td>ColorTempDaylight</td>
-<td class=c>int16s</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='108 = 0x6c'>108</td>
-<td>WB_RGGBLevelsShade</td>
-<td class=c>int16s[4]</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='112 = 0x70'>112</td>
-<td>ColorTempShade</td>
-<td class=c>int16s</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='113 = 0x71'>113</td>
-<td>WB_RGGBLevelsCloudy</td>
-<td class=c>int16s[4]</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='117 = 0x75'>117</td>
-<td>ColorTempCloudy</td>
-<td class=c>int16s</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='118 = 0x76'>118</td>
-<td>WB_RGGBLevelsTungsten</td>
-<td class=c>int16s[4]</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='122 = 0x7a'>122</td>
-<td>ColorTempTungsten</td>
-<td class=c>int16s</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='123 = 0x7b'>123</td>
-<td>WB_RGGBLevelsFluorescent</td>
-<td class=c>int16s[4]</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='127 = 0x7f'>127</td>
-<td>ColorTempFluorescent</td>
-<td class=c>int16s</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='128 = 0x80'>128</td>
-<td>WB_RGGBLevelsKelvin</td>
-<td class=c>int16s[4]</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='132 = 0x84'>132</td>
-<td>ColorTempKelvin</td>
-<td class=c>int16s</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='133 = 0x85'>133</td>
-<td>WB_RGGBLevelsFlash</td>
-<td class=c>int16s[4]</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='137 = 0x89'>137</td>
-<td>ColorTempFlash</td>
-<td class=c>int16s</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='138 = 0x8a'>138</td>
 <td>WB_RGGBLevelsUnknown6?</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='142 = 0x8e'>142</td>
+<td class=r title='107 = 0x6b'>107</td>
 <td>ColorTempUnknown6?</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='143 = 0x8f'>143</td>
+<td class=r title='108 = 0x6c'>108</td>
 <td>WB_RGGBLevelsUnknown7?</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='147 = 0x93'>147</td>
+<td class=r title='112 = 0x70'>112</td>
 <td>ColorTempUnknown7?</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='148 = 0x94'>148</td>
+<td class=r title='113 = 0x71'>113</td>
 <td>WB_RGGBLevelsUnknown8?</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='152 = 0x98'>152</td>
+<td class=r title='117 = 0x75'>117</td>
 <td>ColorTempUnknown8?</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='153 = 0x99'>153</td>
+<td class=r title='118 = 0x76'>118</td>
 <td>WB_RGGBLevelsUnknown9?</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='157 = 0x9d'>157</td>
+<td class=r title='122 = 0x7a'>122</td>
 <td>ColorTempUnknown9?</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='158 = 0x9e'>158</td>
+<td class=r title='123 = 0x7b'>123</td>
 <td>WB_RGGBLevelsUnknown10?</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='162 = 0xa2'>162</td>
+<td class=r title='127 = 0x7f'>127</td>
 <td>ColorTempUnknown10?</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='128 = 0x80'>128</td>
+<td>WB_RGGBLevelsDaylight</td>
+<td class=c>int16s[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='132 = 0x84'>132</td>
+<td>ColorTempDaylight</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='133 = 0x85'>133</td>
+<td>WB_RGGBLevelsShade</td>
+<td class=c>int16s[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='137 = 0x89'>137</td>
+<td>ColorTempShade</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='138 = 0x8a'>138</td>
+<td>WB_RGGBLevelsCloudy</td>
+<td class=c>int16s[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='142 = 0x8e'>142</td>
+<td>ColorTempCloudy</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='143 = 0x8f'>143</td>
+<td>WB_RGGBLevelsTungsten</td>
+<td class=c>int16s[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='147 = 0x93'>147</td>
+<td>ColorTempTungsten</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='148 = 0x94'>148</td>
+<td>WB_RGGBLevelsFluorescent</td>
+<td class=c>int16s[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='152 = 0x98'>152</td>
+<td>ColorTempFluorescent</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='153 = 0x99'>153</td>
+<td>WB_RGGBLevelsKelvin</td>
+<td class=c>int16s[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='157 = 0x9d'>157</td>
+<td>ColorTempKelvin</td>
+<td class=c>int16s</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='158 = 0x9e'>158</td>
+<td>WB_RGGBLevelsFlash</td>
+<td class=c>int16s[4]</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='162 = 0xa2'>162</td>
+<td>ColorTempFlash</td>
 <td class=c>int16s</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -7907,7 +8015,7 @@ cameras such as the PowerShot S95.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 22, 2013</i>
+<br><i>Last revised Apr 9, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

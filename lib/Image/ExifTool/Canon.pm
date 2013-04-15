@@ -80,7 +80,7 @@ sub ProcessSerialData($$$);
 sub ProcessFilters($$$);
 sub SwapWords($);
 
-$VERSION = '3.08';
+$VERSION = '3.09';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -922,6 +922,11 @@ my %binaryDataAttrs = (
             SubDirectory => { TagTable => 'Image::ExifTool::Canon::CameraInfo5DmkIII' },
         },
         {
+            Name => 'CanonCameraInfo6D',
+            Condition => '$$self{Model} =~ /EOS 6D$/',
+            SubDirectory => { TagTable => 'Image::ExifTool::Canon::CameraInfo6D' },
+        },
+        {
             Name => 'CanonCameraInfo7D',
             Condition => '$$self{Model} =~ /EOS 7D$/',
             SubDirectory => { TagTable => 'Image::ExifTool::Canon::CameraInfo7D' },
@@ -1491,8 +1496,10 @@ my %binaryDataAttrs = (
             Name => 'ColorData6',
             SubDirectory => { TagTable => 'Image::ExifTool::Canon::ColorData6' },
         },
-        {   # (int16u[1312]) - 1DX, 5DmkIII, 650D (1312) or 1DX firmware 1.x (1316)
-            Condition => '$count == 1312 or $count == 1316',
+        {   # (int16u[1312|1313|1316])
+            # 1DX/5DmkIII/650D/700D/M (1312), 6D/100D (1313),
+            # 1DX firmware 1.x (1316)
+            Condition => '$count == 1312 or $count == 1313 or $count == 1316',
             Name => 'ColorData7',
             SubDirectory => { TagTable => 'Image::ExifTool::Canon::ColorData7' },
         },
@@ -1660,7 +1667,8 @@ my %binaryDataAttrs = (
             6 => 'Manual Focus (6)',
            16 => 'Pan Focus', #PH
            # 137 - Single?
-           # 519 - seen in EOS M MOV video
+           256 => 'AF + MF', #PH (NC, EOS M)
+           519 => 'Movie Servo AF', #PH (NC, EOS M)
         },
     },
     9 => { #PH
@@ -2262,6 +2270,7 @@ my %binaryDataAttrs = (
         PrintConv => {
             0 => 'n/a',
             1 => 'Camera Local Control',
+            # 2 - have seen this for EOS M studio picture
             3 => 'Computer Remote Control',
         },
     },
@@ -3548,6 +3557,86 @@ my %ciMaxFocal = (
         ValueConvInv => '$val + 1',
     },
     0x3b0 => {
+        Name => 'PictureStyleInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::Canon::PSInfo2' },
+    },
+);
+
+# Camera information for 6D (MakerNotes tag 0x0d) (ref PH)
+%Image::ExifTool::Canon::CameraInfo6D = (
+    %binaryDataAttrs,
+    FORMAT => 'int8u',
+    FIRST_ENTRY => 0,
+    PRIORITY => 0,
+    IS_SUBDIR => [ 0x3c6 ],
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => 'CameraInfo tags for the EOS 6D.',
+    0x03 => { %ciFNumber },
+    0x04 => { %ciExposureTime },
+    0x06 => { %ciISO },
+    0x1b => { %ciCameraTemperature },
+    0x23 => { %ciFocalLength },
+    0x83 => { # (5DmkIII + 6)
+        Name => 'CameraOrientation',
+        PrintConv => {
+            0 => 'Horizontal (normal)',
+            1 => 'Rotate 90 CW',
+            2 => 'Rotate 270 CW',
+        },
+    },
+    0x92 => { # (5DmkIII + 6)
+        Name => 'FocusDistanceUpper',
+        %focusDistanceByteSwap,
+    },
+    0x94 => { # (5DmkIII + 6)
+        Name => 'FocusDistanceLower',
+        %focusDistanceByteSwap,
+    },
+    0xc2 => { # (5DmkIII + 6)
+        Name => 'WhiteBalance',
+        Format => 'int16u',
+        SeparateTable => 1,
+        PrintConv => \%canonWhiteBalance,
+    },
+    0xc6 => { # (5DmkIII + 6)
+        Name => 'ColorTemperature',
+        Format => 'int16u',
+    },
+    0xfa => { # (5DmkIII + 6)
+        Name => 'PictureStyle',
+        Format => 'int8u',
+        Flags => ['PrintHex','SeparateTable'],
+        PrintConv => \%pictureStyles,
+    },
+    0x161 => { # (5DmkIII + 0x0e)
+        Name => 'LensType',
+        Format => 'int16uRev', # value is big-endian
+        SeparateTable => 1,
+        ValueConvInv => 'int($val)', # (must truncate decimal part)
+        PrintConv => \%canonLensTypes,
+    },
+    0x163 => { %ciMinFocal }, # (5DmkIII + 0x0e)
+    0x165 => { %ciMaxFocal }, # (5DmkIII + 0x0e)
+    0x256 => { # (5DmkIII + 0x1a)
+        Name => 'FirmwareVersion',
+        Format => 'string[6]',
+        Writable => 0,
+    },
+    0x2aa => { # (5DmkIII + 0x16 or 0x1e)
+        Name => 'FileIndex',
+        Groups => { 2 => 'Image' },
+        Format => 'int32u',
+        ValueConv => '$val + 1',
+        ValueConvInv => '$val - 1',
+    },
+    0x2b6 => { #(NC) (5DmkIII + 0x16 or 0x1e)
+        Name => 'DirectoryIndex',
+        Groups => { 2 => 'Image' },
+        Format => 'int32u',
+        ValueConv => '$val - 1',
+        ValueConvInv => '$val + 1',
+    },
+    0x3c6 => { # (5DmkIII + 0x16)
         Name => 'PictureStyleInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Canon::PSInfo2' },
     },
@@ -5285,10 +5374,12 @@ my %ciMaxFocal = (
             2 => 'Single-point AF',
             4 => 'Multi-point AF or AI AF', # AiAF on A570IS
             5 => 'Face Detect AF',
+            6 => 'Face + Tracking', #PH (NC, EOS M)
             7 => 'Zone AF', #46
             8 => 'AF Point Expansion', #46
             9 => 'Spot AF', #46
-            # 13 - seen this for the EOS M - PH
+            11 => 'Flexizone Multi', #PH (NC, EOS M)
+            13 => 'Flexizone Single', #PH (EOS M default)
         },
     },
     2 => {
@@ -6484,10 +6575,10 @@ my %ciMaxFocal = (
     },
 );
 
-# Color data (MakerNotes tag 0x4001, count=1312) (ref PH)
+# Color data (MakerNotes tag 0x4001, count=1312,1313,1316) (ref PH)
 %Image::ExifTool::Canon::ColorData7 = (
     %binaryDataAttrs,
-    NOTES => 'These tags are used by the EOS 1DX and 5DmkIII.',
+    NOTES => 'These tags are used by the EOS 1DX, 5DmkIII, 6D, 100D, 650D, 700D and M.',
     FORMAT => 'int16s',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -6495,49 +6586,50 @@ my %ciMaxFocal = (
     0x00 => {
         Name => 'ColorDataVersion',
         PrintConv => {
-            10 => '10 (1DX/5DmkIII/650D)',
+            10 => '10 (1DX/5DmkIII/6D/100D/650D/700D/M)',
         },
     },
+    # not really sure about the AsShot, Auto and Measured values any more - PH
     0x3f => { Name => 'WB_RGGBLevelsAsShot',     Format => 'int16s[4]' },
     0x43 => 'ColorTempAsShot',
     0x44 => { Name => 'WB_RGGBLevelsAuto',       Format => 'int16s[4]' },
     0x48 => 'ColorTempAuto',
     0x49 => { Name => 'WB_RGGBLevelsMeasured',   Format => 'int16s[4]' },
     0x4d => 'ColorTempMeasured',
-    0x4e => { Name => 'WB_RGGBLevelsUnknown',    Format => 'int16s[4]', Unknown => 1 },
-    0x52 => { Name => 'ColorTempUnknown', Unknown => 1 },
-    0x53 => { Name => 'WB_RGGBLevelsUnknown2',   Format => 'int16s[4]', Unknown => 1 },
+    0x4e => { Name => 'WB_RGGBLevelsUnknown',   Format => 'int16s[4]', Unknown => 1 },
+    0x52 => { Name => 'ColorTempUnknown',  Unknown => 1 },
+    0x53 => { Name => 'WB_RGGBLevelsUnknown2',  Format => 'int16s[4]', Unknown => 1 },
     0x57 => { Name => 'ColorTempUnknown2', Unknown => 1 },
-    0x58 => { Name => 'WB_RGGBLevelsUnknown3',   Format => 'int16s[4]', Unknown => 1 },
+    0x58 => { Name => 'WB_RGGBLevelsUnknown3',  Format => 'int16s[4]', Unknown => 1 },
     0x5c => { Name => 'ColorTempUnknown3', Unknown => 1 },
-    0x5d => { Name => 'WB_RGGBLevelsUnknown4',   Format => 'int16s[4]', Unknown => 1 },
+    0x5d => { Name => 'WB_RGGBLevelsUnknown4',  Format => 'int16s[4]', Unknown => 1 },
     0x61 => { Name => 'ColorTempUnknown4', Unknown => 1 },
-    0x62 => { Name => 'WB_RGGBLevelsUnknown5',   Format => 'int16s[4]', Unknown => 1 },
+    0x62 => { Name => 'WB_RGGBLevelsUnknown5',  Format => 'int16s[4]', Unknown => 1 },
     0x66 => { Name => 'ColorTempUnknown5', Unknown => 1 },
-    0x67 => { Name => 'WB_RGGBLevelsDaylight',   Format => 'int16s[4]' },
-    0x6b => 'ColorTempDaylight',
-    0x6c => { Name => 'WB_RGGBLevelsShade',      Format => 'int16s[4]' },
-    0x70 => 'ColorTempShade',
-    0x71 => { Name => 'WB_RGGBLevelsCloudy',     Format => 'int16s[4]' },
-    0x75 => 'ColorTempCloudy',
-    0x76 => { Name => 'WB_RGGBLevelsTungsten',   Format => 'int16s[4]' },
-    0x7a => 'ColorTempTungsten',
-    0x7b => { Name => 'WB_RGGBLevelsFluorescent',Format => 'int16s[4]' },
-    0x7f => 'ColorTempFluorescent',
-    0x80 => { Name => 'WB_RGGBLevelsKelvin',     Format => 'int16s[4]' },
-    0x84 => 'ColorTempKelvin',
-    0x85 => { Name => 'WB_RGGBLevelsFlash',      Format => 'int16s[4]' },
-    0x89 => 'ColorTempFlash',
-    0x8a => { Name => 'WB_RGGBLevelsUnknown6',   Format => 'int16s[4]', Unknown => 1 },
-    0x8e => { Name => 'ColorTempUnknown6', Unknown => 1 },
-    0x8f => { Name => 'WB_RGGBLevelsUnknown7',   Format => 'int16s[4]', Unknown => 1 },
-    0x93 => { Name => 'ColorTempUnknown7', Unknown => 1 },
-    0x94 => { Name => 'WB_RGGBLevelsUnknown8',   Format => 'int16s[4]', Unknown => 1 },
-    0x98 => { Name => 'ColorTempUnknown8', Unknown => 1 },
-    0x99 => { Name => 'WB_RGGBLevelsUnknown9',   Format => 'int16s[4]', Unknown => 1 },
-    0x9d => { Name => 'ColorTempUnknown9', Unknown => 1 },
-    0x9e => { Name => 'WB_RGGBLevelsUnknown10',  Format => 'int16s[4]', Unknown => 1 },
-    0xa2 => { Name => 'ColorTempUnknown10', Unknown => 1 },
+    0x67 => { Name => 'WB_RGGBLevelsUnknown6',  Format => 'int16s[4]', Unknown => 1 },
+    0x6b => { Name => 'ColorTempUnknown6', Unknown => 1 },
+    0x6c => { Name => 'WB_RGGBLevelsUnknown7',  Format => 'int16s[4]', Unknown => 1 },
+    0x70 => { Name => 'ColorTempUnknown7', Unknown => 1 },
+    0x71 => { Name => 'WB_RGGBLevelsUnknown8',  Format => 'int16s[4]', Unknown => 1 },
+    0x75 => { Name => 'ColorTempUnknown8', Unknown => 1 },
+    0x76 => { Name => 'WB_RGGBLevelsUnknown9',  Format => 'int16s[4]', Unknown => 1 },
+    0x7a => { Name => 'ColorTempUnknown9', Unknown => 1 },
+    0x7b => { Name => 'WB_RGGBLevelsUnknown10',  Format => 'int16s[4]', Unknown => 1 },
+    0x7f => { Name => 'ColorTempUnknown10', Unknown => 1 },
+    0x80 => { Name => 'WB_RGGBLevelsDaylight',   Format => 'int16s[4]' },
+    0x84 => 'ColorTempDaylight',
+    0x85 => { Name => 'WB_RGGBLevelsShade',      Format => 'int16s[4]' },
+    0x89 => 'ColorTempShade',
+    0x8a => { Name => 'WB_RGGBLevelsCloudy',     Format => 'int16s[4]' },
+    0x8e => 'ColorTempCloudy',
+    0x8f => { Name => 'WB_RGGBLevelsTungsten',   Format => 'int16s[4]' },
+    0x93 => 'ColorTempTungsten',
+    0x94 => { Name => 'WB_RGGBLevelsFluorescent',Format => 'int16s[4]' },
+    0x98 => 'ColorTempFluorescent',
+    0x99 => { Name => 'WB_RGGBLevelsKelvin',     Format => 'int16s[4]' },
+    0x9d => 'ColorTempKelvin',
+    0x9e => { Name => 'WB_RGGBLevelsFlash',      Format => 'int16s[4]' },
+    0xa2 => 'ColorTempFlash',
     0xa3 => { Name => 'WB_RGGBLevelsUnknown11',  Format => 'int16s[4]', Unknown => 1 },
     0xa7 => { Name => 'ColorTempUnknown11', Unknown => 1 },
     0xa8 => { Name => 'WB_RGGBLevelsUnknown12',  Format => 'int16s[4]', Unknown => 1 },

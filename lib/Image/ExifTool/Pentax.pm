@@ -53,7 +53,7 @@ use vars qw($VERSION %pentaxLensTypes);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.58';
+$VERSION = '2.59';
 
 sub CryptShutterCount($$);
 sub PrintFilter($$$);
@@ -289,6 +289,7 @@ sub PrintFilter($$$);
     '8 27' => 'Sigma 18-200mm F3.5-6.3 II DC HSM', #27
     '8 28' => 'Sigma 18-250mm F3.5-6.3 DC Macro HSM', #27
     '8 210' => 'smc PENTAX-DA 18-270mm F3.5-6.3 ED SDM', #Helmut Schutz
+    '8 211' => 'HD PENTAX-DA 560mm F5.6 ED AW', #PH
     '8 215' => 'smc PENTAX-DA 18-135mm F3.5-5.6 ED AL [IF] DC WR', #PH
     '8 226' => 'smc PENTAX-DA* 55mm F1.4 SDM', #JD
     '8 227' => 'smc PENTAX-DA* 60-250mm F4 [IF] SDM', #JD
@@ -303,6 +304,9 @@ sub PrintFilter($$$);
     '8 255.3' => 'Sigma 50-150mm F2.8 II APO EX DC HSM', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2997.0.html
     '8 255.3' => 'Sigma 4.5mm F2.8 EX DC HSM Circular Fisheye', #PH
     '8 255.4' => 'Sigma 50-200mm F4-5.6 DC OS', #26
+#
+# 645 lenses
+#
     '9 0' => '645 Manual Lens', #PH (NC)
     '10 0' => '645 A Series Lens', #PH
     '11 1' => 'smc PENTAX-FA 645 75mm F2.8', #PH
@@ -320,7 +324,13 @@ sub PrintFilter($$$);
     '11 17' => 'smc PENTAX-FA 645 150-300mm F5.6 ED [IF]', #PH
     '13 18' => 'smc PENTAX-D FA 645 55mm F2.8 AL [IF] SDM AW', #PH
     '13 19' => 'smc PENTAX-D FA 645 25mm F4 AL [IF] SDM AW', #PH
-    # Q-mount lenses
+    '13 20' => 'HD PENTAX-D FA 645 90mm F2.8 ED AW SR', #PH
+    # missing:
+    # 'smc PENTAX-DA 645 25mm F4.0 AL SDM AW [IF]' ? different than D FA version?
+    # 'smc PENTAX-FA 645 300mm F5.6 ED [IF]'
+#
+# Q-mount lenses
+#
     '21 0' => 'Pentax Q Manual Lens', #PH
     '21 1' => '01 Standard Prime 8.5mm F1.9', #PH
     '21 2' => '02 Standard Zoom 5-15mm F2.8-4.5', #PH (NC)

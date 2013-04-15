@@ -415,6 +415,7 @@ t/FLAC_2.out
 t/FLAC_3.out
 t/FLIR.t
 t/FLIR_2.out
+t/FLIR_3.out
 t/Flash.t
 t/FlashPix.t
 t/FlashPix_2.out
@@ -751,6 +752,7 @@ t/images/ExifTool.tif
 t/images/ExtendedXMP.jpg
 t/images/FLAC.flac
 t/images/FLAC.ogg
+t/images/FLIR.fpf
 t/images/FLIR.jpg
 t/images/Flash.flv
 t/images/Flash.swf

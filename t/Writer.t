@@ -712,13 +712,14 @@ my $testOK;
     print "ok $testnum\n";
 }
 
-# test 41: Test writing Kodak APP3 Meta information
+# test 41: Test writing Kodak APP3 and Canon CIFF Meta information
 {
     ++$testnum;
     my @writeInfo = (
         ['Meta:SerialNumber' => '12345'],
+        ['CIFF:OwnerName' => 'CIFF Write Test'],
     );
-    my @check = qw(SerialNumber);
+    my @check = qw(SerialNumber OwnerName);
     print 'not ' unless writeCheck(\@writeInfo, $testname, $testnum,
                                    't/images/ExifTool.jpg', \@check);
     print "ok $testnum\n";

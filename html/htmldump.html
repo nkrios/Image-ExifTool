@@ -201,8 +201,9 @@ offset in the IFD (ie. the value is longer than 4 bytes),
 <a name=XD class=F>purple</a> indicates that the actual offset differs from the
 recorded offset, and a <a name=XD class=V>red</a> name indicates an invalid
 offset.  Odd offsets are flagged with "<span class=V>(odd)</span>" because
-this is not allowed by the TIFF specification.  All data in the maker notes
-value block is <a name=XE class='W M'>underlined</a>.</span></p>
+the TIFF specification states that values must begin on a (2-byte) word
+boundary. All data in the maker notes value block is
+<a name=XE class='W M'>underlined</a>.</span></p>
 
 <p>Currently, only TIFF/EXIF and JPEG meta information is dumped.  By default,
 all offsets are relative to the start of the TIFF header (as below).  For a TIFF

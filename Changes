@@ -4,12 +4,33 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 9.25. (Other versions are
+Note: The most recent production release is Version 9.27. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+Apr. 15, 2013 - Version 9.27 (production release)
+
+  - Fixed "ARRAY ref" runtime error introduced in 9.25 that could occur when
+    using the -X option
+  - Fixed runtime warning which could occur when conditionally deleting XMP
+    structure
+
+Apr. 13, 2013 - Version 9.26
+
+  - Added read support for FLIR FFF and FPF images and decode more FLIR tags
+  - Added some new Pentax LensType's and Nikon LensID's
+  - Added a few new Panasonic ContrastMode values
+  - Decode a number of Canon 6D tags
+  - Allow CanonRaw tags to be written using "CIFF" as a group name
+  - Improved decoding of Canon ColorData information for newer EOS models
+  - Improved decoding of a number of Sony tags (thanks Jos Roost)
+  - Removed index number from duplicate Composite TagID's in XML output
+  - Fixed byte-order problem for a few Nikon D5200 and D7100 tags
+  - Fixed incompatibility with old-style (pre-8.46) XMP user-defined structure
+    definitions
 
 Apr. 6, 2013 - Version 9.25 (production release)
 
-  - Added read support for FLIR thermal image metadata
+  - Added read support for FLIR thermal image metadata in JPEG images
   - Added write support for DNG version 1.4 images
   - Added a new Pentax DriveMode value and a new Pentax LensType
   - Added two new Olympus CameraType values
