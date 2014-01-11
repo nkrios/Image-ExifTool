@@ -1,7 +1,7 @@
 # Before "make install", this script should be runnable with "make test".
 # After "make install" it should work as "perl t/Writer.t".
 
-BEGIN { $| = 1; print "1..50\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..54\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -834,7 +834,7 @@ my $testOK;
     print "ok $testnum\n";
 }
 
-# tests 48-49: More WriteMode 'cg' tests, and test AddUserDefinedTags()
+# tests 48-50: More WriteMode 'cg' tests, and test AddUserDefinedTags()
 {
     ++$testnum;
     my $testfile = "t/${testname}_${testnum}_failed.jpg";
@@ -885,6 +885,75 @@ my $testOK;
     $exifTool->SetNewValue('XMP-dc:Test' => 'B');
     writeInfo($exifTool, undef, $testfile);
     $info = $exifTool->ImageInfo($testfile, 'xmp:all');
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# test 51: Delete a unknown JPEG APP segment
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValue('APP6:*' => undef);
+    $testfile = "t/${testname}_${testnum}_failed.jpg";
+    unlink $testfile;
+    writeInfo($exifTool, 't/images/ExifTool.jpg', $testfile);
+    my $info = $exifTool->ImageInfo($testfile);
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# test 52: Delete groups by family 2 group name
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValue('Image:*');
+    $exifTool->SetNewValue('Camera:*');
+    $testfile = "t/${testname}_${testnum}_failed.xmp";
+    unlink $testfile;
+    writeInfo($exifTool, 't/images/XMP.xmp', $testfile);
+    my $info = $exifTool->ImageInfo($testfile);
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# test 53: Exclude groups when copying
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValuesFromFile('t/images/Canon.jpg', '-Exif:All', '-Canon:All');
+    $testfile = "t/${testname}_${testnum}_failed.xmp";
+    unlink $testfile;
+    writeInfo($exifTool, 't/images/Writer.jpg', $testfile);
+    my $info = $exifTool->ImageInfo($testfile);
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# test 54: Specify multiple groups when copying, excluding a single tag
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValuesFromFile('t/images/Canon.jpg', 'Exif:Time:All', '-createdate');
+    $testfile = "t/${testname}_${testnum}_failed.xmp";
+    unlink $testfile;
+    writeInfo($exifTool, 't/images/Writer.jpg', $testfile);
+    my $info = $exifTool->ImageInfo($testfile, 'exif:*', '-image:all');
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
     } else {

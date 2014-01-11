@@ -28,6 +28,7 @@ html/TagNames/AIFF.html
 html/TagNames/APE.html
 html/TagNames/APP12.html
 html/TagNames/ASF.html
+html/TagNames/Apple.html
 html/TagNames/BMP.html
 html/TagNames/Canon.html
 html/TagNames/CanonCustom.html
@@ -37,6 +38,7 @@ html/TagNames/Casio.html
 html/TagNames/Composite.html
 html/TagNames/DICOM.html
 html/TagNames/DNG.html
+html/TagNames/DPX.html
 html/TagNames/DV.html
 html/TagNames/DarwinCore.html
 html/TagNames/DjVu.html
@@ -117,6 +119,7 @@ html/TagNames/Reconyx.html
 html/TagNames/Ricoh.html
 html/TagNames/Samsung.html
 html/TagNames/Sanyo.html
+html/TagNames/Scalado.html
 html/TagNames/Shortcuts.html
 html/TagNames/Sigma.html
 html/TagNames/SigmaRaw.html
@@ -124,6 +127,7 @@ html/TagNames/Sony.html
 html/TagNames/SonyIDC.html
 html/TagNames/Stim.html
 html/TagNames/Theora.html
+html/TagNames/Torrent.html
 html/TagNames/Unknown.html
 html/TagNames/Vorbis.html
 html/TagNames/XMP.html
@@ -163,6 +167,7 @@ lib/Image/ExifTool/AIFF.pm
 lib/Image/ExifTool/APE.pm
 lib/Image/ExifTool/APP12.pm
 lib/Image/ExifTool/ASF.pm
+lib/Image/ExifTool/Apple.pm
 lib/Image/ExifTool/BMP.pm
 lib/Image/ExifTool/BZZ.pm
 lib/Image/ExifTool/BigTIFF.pm
@@ -206,6 +211,7 @@ lib/Image/ExifTool/Charset/Turkish.pm
 lib/Image/ExifTool/Charset/Vietnam.pm
 lib/Image/ExifTool/DICOM.pm
 lib/Image/ExifTool/DNG.pm
+lib/Image/ExifTool/DPX.pm
 lib/Image/ExifTool/DV.pm
 lib/Image/ExifTool/DarwinCore.pm
 lib/Image/ExifTool/DjVu.pm
@@ -311,6 +317,7 @@ lib/Image/ExifTool/Reconyx.pm
 lib/Image/ExifTool/Ricoh.pm
 lib/Image/ExifTool/Samsung.pm
 lib/Image/ExifTool/Sanyo.pm
+lib/Image/ExifTool/Scalado.pm
 lib/Image/ExifTool/Shift.pl
 lib/Image/ExifTool/Shortcuts.pm
 lib/Image/ExifTool/Sigma.pm
@@ -322,6 +329,7 @@ lib/Image/ExifTool/TagInfoXML.pm
 lib/Image/ExifTool/TagLookup.pm
 lib/Image/ExifTool/TagNames.pod
 lib/Image/ExifTool/Theora.pm
+lib/Image/ExifTool/Torrent.pm
 lib/Image/ExifTool/Unknown.pm
 lib/Image/ExifTool/Vorbis.pm
 lib/Image/ExifTool/WriteCanonRaw.pl
@@ -331,6 +339,7 @@ lib/Image/ExifTool/WritePDF.pl
 lib/Image/ExifTool/WritePNG.pl
 lib/Image/ExifTool/WritePhotoshop.pl
 lib/Image/ExifTool/WritePostScript.pl
+lib/Image/ExifTool/WriteQuickTime.pl
 lib/Image/ExifTool/WriteXMP.pl
 lib/Image/ExifTool/Writer.pl
 lib/Image/ExifTool/XMP.pm
@@ -384,6 +393,8 @@ t/DICOM_2.out
 t/DNG.t
 t/DNG_2.out
 t/DNG_3.out
+t/DPX.t
+t/DPX_2.out
 t/DV.t
 t/DV_2.out
 t/DjVu.t
@@ -458,6 +469,7 @@ t/Geotag_5.out
 t/Geotag_6.out
 t/Geotag_7.out
 t/Geotag_8.out
+t/Geotag_9.out
 t/HTML.t
 t/HTML_2.out
 t/IPTC.t
@@ -522,6 +534,7 @@ t/MWG_2.out
 t/MWG_3.out
 t/MWG_4.out
 t/MWG_5.out
+t/MWG_6.out
 t/MXF.t
 t/MXF_2.out
 t/Matroska.t
@@ -576,6 +589,7 @@ t/PNG.t
 t/PNG_2.out
 t/PNG_3.out
 t/PNG_4.out
+t/PNG_5.out
 t/PPM.t
 t/PPM_2.out
 t/PPM_3.out
@@ -604,6 +618,8 @@ t/PostScript_3.out
 t/QuickTime.t
 t/QuickTime_2.out
 t/QuickTime_3.out
+t/QuickTime_4.out
+t/QuickTime_5.out
 t/RIFF.t
 t/RIFF_2.out
 t/RIFF_3.out
@@ -633,6 +649,8 @@ t/Sony_2.out
 t/Sony_3.out
 t/Sony_5.out
 t/TestLib.pm
+t/Torrent.t
+t/Torrent_2.out
 t/Unknown.t
 t/Unknown_2.out
 t/Unknown_3.out
@@ -677,6 +695,10 @@ t/Writer_46.out
 t/Writer_47.out
 t/Writer_48.out
 t/Writer_50.out
+t/Writer_51.out
+t/Writer_52.out
+t/Writer_53.out
+t/Writer_54.out
 t/Writer_6.out
 t/Writer_7.out
 t/Writer_9.out
@@ -742,6 +764,7 @@ t/images/Casio2.jpg
 t/images/CasioQVCI.jpg
 t/images/DICOM.dcm
 t/images/DNG.dng
+t/images/DPX.dpx
 t/images/DV.dv
 t/images/DjVu.djvu
 t/images/EXE.elf
@@ -773,6 +796,7 @@ t/images/GPS.jpg
 t/images/GeoTiff.tif
 t/images/Geotag.gpx
 t/images/Geotag.igc
+t/images/Geotag.kml
 t/images/Geotag.log
 t/images/Geotag.xml
 t/images/Geotag2.log
@@ -841,6 +865,7 @@ t/images/Sigma.x3f
 t/images/SigmaDP2.x3f
 t/images/Sony.jpg
 t/images/Sony.pmp
+t/images/Torrent.torrent
 t/images/Unknown.jpg
 t/images/Vorbis.ogg
 t/images/Writer.jpg

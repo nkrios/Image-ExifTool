@@ -74,43 +74,49 @@ specification.</p>
 <td>'iCCP'</td>
 <td>ICC_Profile</td>
 <td class=c>-</td>
-<td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
+<td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a>
+  <br><span class='n s'>(this is where ExifTool will write a new ICC_Profile)</span></td></tr>
 <tr>
+<td>'iCCP-name'</td>
+<td>ProfileName</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(not a real tag ID, this tag represents the iCCP profile name)</span></span></td></tr>
+<tr class=b>
 <td>'iTXt'</td>
 <td>InternationalText</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PNG.html#TextualData'>PNG TextualData Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'oFFs'</td>
 <td>ImageOffset</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'pCAL'</td>
 <td>PixelCalibration</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'pHYs'</td>
 <td>PhysicalPixel</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PNG.html#PhysicalPixel'>PNG PhysicalPixel Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'sBIT'</td>
 <td>SignificantBits</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'sCAL'</td>
 <td>SubjectScale</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PNG.html#SubjectScale'>PNG SubjectScale Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'sPLT'</td>
 <td>SuggestedPalette</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'sRGB'</td>
 <td>SRGBRendering</td>
 <td class=c>N</td>
@@ -118,38 +124,38 @@ specification.</p>
   <br>1 = Relative Colorimetric
   <br>2 = Saturation
   <br>3 = Absolute Colorimetric</span></td></tr>
-<tr>
+<tr class=b>
 <td>'sTER'</td>
 <td>StereoImage</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PNG.html#StereoImage'>PNG StereoImage Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'tEXt'</td>
 <td>TextualData</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PNG.html#TextualData'>PNG TextualData Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'tIME'</td>
 <td>ModifyDate</td>
 <td class=c>Y</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'tRNS'</td>
 <td>Transparency</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'tXMP'</td>
 <td>XMP</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a>
   <br><span class='n s'>(obsolete location specified by a September 2001 XMP draft)</span></td></tr>
-<tr class=b>
+<tr>
 <td>'vpAg'</td>
 <td>VirtualPage</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PNG.html#VirtualPage'>PNG VirtualPage Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'zTXt'</td>
 <td>CompressedText</td>
 <td class=c>-</td>
@@ -336,73 +342,80 @@ ImageMagick.</p>
 <td class=c>string</td>
 <td><span class=s><span class=n>(unregistered)</span></span></td></tr>
 <tr class=b>
+<td>'Raw profile type 8bim'</td>
+<td>Photoshop_Profile</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a>
+  <br><span class='n s'>(unregistered)</span></td></tr>
+<tr>
 <td>'Raw profile type APP1'</td>
 <td>APP1_Profile</td>
 <td class=c>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a>
   <br>--&gt; <a href='XMP.html'>XMP Tags</a>
-  <br><span class='n s'>(unregistered)</span></td></tr>
-<tr>
+  <br><span class='n s'>(unregistered.  This is where ExifTool will create new EXIF)</span></td></tr>
+<tr class=b>
 <td>'Raw profile type exif'</td>
 <td>EXIF_Profile</td>
 <td class=c>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a>
   <br><span class='n s'>(unregistered)</span></td></tr>
-<tr class=b>
+<tr>
 <td>'Raw profile type icc'</td>
 <td>ICC_Profile</td>
 <td class=c>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a>
   <br><span class='n s'>(unregistered)</span></td></tr>
-<tr>
+<tr class=b>
 <td>'Raw profile type icm'</td>
 <td>ICC_Profile</td>
 <td class=c>-</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a>
   <br><span class='n s'>(unregistered)</span></td></tr>
-<tr class=b>
+<tr>
 <td>'Raw profile type iptc'</td>
 <td>IPTC_Profile</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Photoshop.html'>Photoshop Tags</a>
-  <br><span class='n s'>(unregistered)</span></td></tr>
-<tr>
+  <br><span class='n s'>(unregistered.  May be either IPTC IIM or Photoshop IRB format.  This is
+where ExifTool will add new IPTC, inside a Photoshop IRB container)</span></td></tr>
+<tr class=b>
 <td>'Raw profile type xmp'</td>
 <td>XMP_Profile</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a>
   <br><span class='n s'>(unregistered)</span></td></tr>
-<tr class=b>
+<tr>
 <td>'Software'</td>
 <td>Software</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'Source'</td>
 <td>Source</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'TimeStamp'</td>
 <td>TimeStamp</td>
 <td class=c>string</td>
 <td><span class=s><span class=n>(unregistered)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>'Title'</td>
 <td>Title</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'URL'</td>
 <td>URL</td>
 <td class=c>string</td>
 <td><span class=s><span class=n>(unregistered)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>'Warning'</td>
 <td>PNGWarning</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'XML:com.adobe.xmp'</td>
 <td>XMP</td>
 <td class=c>-</td>
@@ -410,12 +423,12 @@ ImageMagick.</p>
   <br><span class='n s'>(unregistered, but this is the location according to the June 2002 or later
 XMP specification, and is where ExifTool will add a new XMP chunk if the
 image didn't already contain XMP)</span></td></tr>
-<tr>
+<tr class=b>
 <td>'create-date'</td>
 <td>CreateDate</td>
 <td class=c>string</td>
 <td><span class=s><span class=n>(unregistered)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>'modify-date'</td>
 <td>ModDate</td>
 <td class=c>string</td>
@@ -509,7 +522,7 @@ image didn't already contain XMP)</span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 8, 2012</i>
+<br><i>Last revised Nov 4, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

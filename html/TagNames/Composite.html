@@ -10,9 +10,10 @@
 <p>
 The values of the composite tags are <b>Derived From</b> the values of other
 tags.  These are convenience tags which are calculated after all other
-information is extracted.  User-defined Composite tags, useful for
-custom-formatting of tag values, may created in the <a href="../config.html">ExifTool configuration
-file</a>.
+information is extracted.  Only a few of these tags are writable directly,
+the others are changed by writing the corresponding <b>Derived From</b> tags.
+User-defined Composite tags, useful for custom-formatting of tag values, may
+created in the <a href="../config.html">ExifTool configuration file</a>.
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -22,7 +23,8 @@ file</a>.
 <tr>
 <td>AdvancedSceneMode</td>
 <td class=c>N</td>
-<td class=n>SceneMode
+<td class=n>Model
+  <br>SceneMode
   <br>AdvancedSceneType</td>
 <td>--&gt; <a href='Panasonic.html#AdvancedSceneMode'>Panasonic AdvancedSceneMode Values</a></td></tr>
 <tr class=b>
@@ -418,7 +420,8 @@ manual mode)</span>
   <br>MaxFocalLength
   <br>LensModel
   <br>LensFocalRange
-  <br>LensSpec</td>
+  <br>LensSpec
+  <br>LensType2</td>
 <td><span class=s><span class=n>(attempt to identify the actual lens from all lenses with a given LensType.
 Applies only to LensType values with a lookup table.  May be configured
 by adding user-defined lenses)</span></span></td></tr>
@@ -482,6 +485,11 @@ option may be used to extract information from these embedded images.)</span></s
   <br>OtherImageLength</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>PeakSpectralSensitivity</td>
+<td class=c>N</td>
+<td class=n>FLIR:PlanckB</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>PreviewImage</td>
 <td class=c>Y</td>
 <td class=n>PreviewImageStart
@@ -490,18 +498,18 @@ option may be used to extract information from these embedded images.)</span></s
   <br>PreviewImageStart (1)
   <br>PreviewImageLength (1)</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>PreviewImage</td>
 <td class=c>N</td>
 <td class=n>ScreenNail</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>PreviewImageSize</td>
 <td class=c>N</td>
 <td class=n>PreviewImageWidth
   <br>PreviewImageHeight</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RedBalance</td>
 <td class=c>N</td>
 <td class=n>WB_RGGBLevels
@@ -516,18 +524,24 @@ option may be used to extract information from these embedded images.)</span></s
   <br>WBRedLevel
   <br>WBGreenLevel</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RedEyeReduction</td>
 <td class=c>N</td>
 <td class=n>CanonFlashMode
   <br>FlashBits</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td>Rotation</td>
 <td class=c>N</td>
 <td class=n>QuickTime:MatrixStructure
   <br>QuickTime:HandlerType</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>RunTimeSincePowerUp</td>
+<td class=c>N</td>
+<td class=n>Apple:RunTimeValue
+  <br>Apple:RunTimeScale</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td>ScaleFactor35efl</td>
@@ -653,7 +667,7 @@ resized)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 27, 2013</i>
+<br><i>Last revised Jan 9, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

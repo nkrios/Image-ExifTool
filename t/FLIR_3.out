@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.26
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.28
 [File, System, Image] FileName - File Name: FLIR.fpf
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 914 bytes
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2013:04:11 15:06:33-04:00
-[File, System, Time] FileAccessDate - File Access Date/Time: 2013:04:12 12:15:55-04:00
-[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2013:04:13 06:36:07-04:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2013:04:20 19:59:50-04:00
+[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2013:04:15 06:13:37-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: FPF
 [File, File, Image] MIMEType - MIME Type: application/unknown
@@ -35,8 +35,8 @@
 [FLIR, FLIR, Image] 500 - Computed Atmospheric Trans: 0.99
 [FLIR, FLIR, Image] 504 - Estimated Atmospheric Trans: 0.00
 [FLIR, FLIR, Image] 508 - Reference Temperature: 20.0 C
-[FLIR, FLIR, Image] 512 - IR Window Temperature: 20.0 C
-[FLIR, FLIR, Image] 516 - IR Window Transmission: 1.00
+[FLIR, FLIR, Camera] 512 - IR Window Temperature: 20.0 C
+[FLIR, FLIR, Camera] 516 - IR Window Transmission: 1.00
 [FLIR, FLIR, Time] 584 - Date/Time Original: 2013:02:22 11:19:20.891
 [FLIR, FLIR, Image] 676 - Camera Scale Min: 267.3
 [FLIR, FLIR, Image] 680 - Camera Scale Max: 277.1

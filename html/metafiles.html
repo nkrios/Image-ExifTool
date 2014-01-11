@@ -75,15 +75,23 @@ preserving the family 1 group.</p>
 <p class=a>6. Copy XMP as a block to an XMP file:</p>
 <p class=b>(writing as a block is the only way to transfer unknown or non-writable XMP tags)</p>
 <pre>exiftool -tagsfromfile <i>SRC</i>.<i>EXT</i> -xmp <i>DST</i>.xmp</pre>
+<p class=c>Note that this will not deal with extended XMP segments in JPEG
+images if they exist.</p>
 
 <p>7. Extract XMP as a block and write to output XMP file: <span class=lt>(same effect as above)</span></p>
 <pre>exiftool -xmp -b <i>SRC</i>.<i>EXT</i> > <i>DST</i>.xmp</pre>
+<p class=c>As with the previous command, this command will not copy extended XMP
+segments in JPEG images, but in this case the <code>-a</code> option may be
+added to also extract extended XMP blocks.  However, the result would be a
+non-standard XMP file that ExifTool could read but other utilities may not.</p>
 
 <p class=a>8. Extract XMP as a block to an output text file with .xmp extension:</p>
 <p class=b>(same effect as above, but the destination file name will be the same
 as the source file, and this command will fail if the XMP file exists while the
 previous command will overwrite an existing file)</p>
 <pre>exiftool -xmp -b -w xmp <i>SRC</i>.<i>EXT</i></pre>
+<p class=c>The advantage of this command is that it may be applied to multiple
+source files or entire directories.</p>
 
 <p>9. Restore all XMP tags from an XMP sidecar file to XMP in a JPG image:</p>
 <pre>exiftool -tagsfromfile <i>SRC</i>.xmp -all:all <i>DST</i>.jpg</pre>
@@ -260,7 +268,7 @@ which may be useful if disk space is at a premium.</p>
 
 <hr>
 <i>Created Nov 12, 2008</i><br>
-<i>Last revised Oct 7, 2012</i>
+<i>Last revised Dec 23, 2013</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

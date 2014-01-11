@@ -161,13 +161,19 @@ password.)</span></li>
 </ol>
 <p>You can now run exiftool by typing "<code>exiftool</code>" in a Terminal window.</p>
 
-<p class=lt>(Note: Both OS X installation techniques outlined above place
+<p class=lt><b>Notes:</b></p><ul class=lt><li>Both OS X installation techniques outlined above place
 exiftool and its lib directory in /usr/bin, while the standard Unix
 "<code>make install</code>" described below puts "<code>exiftool</code>" in
 /usr/bin and the individual libraries in /Library/Perl/#.#.#, where "#.#.#" is
 your Perl version. If both sets of libraries exist, /usr/bin/lib takes
 precedence for exiftool, but /Library/Perl/#.#.# is the default for any other
-Perl scripts.)</p>
+Perl scripts.</li>
+<li>In OS X 10.8 or later, you may see this message when you try to open the install package:
+<blockquote class=red>"ExifTool-#.##.pkg" can't be opened because it is from an
+unidentified developer.</blockquote> The solution is to set "Allow applications downloaded
+from" to "Anywhere" in the General "Security &amp; Privacy" System Preferences.
+(<a href="http://news.softpedia.com/news/Fix-OS-X-Error-Application-Can-t-Be-Opened-Because-it-Is-from-an-Unidentified-Developer-407375.shtml">Read
+here</a> for a full description.)</li></ul>
 
 <h3>Uninstalling</h3>
 <ol type='i'>

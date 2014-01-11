@@ -18,7 +18,7 @@ use vars qw($VERSION %samsungLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.17';
+$VERSION = '1.21';
 
 sub WriteSTMN($$$);
 sub ProcessINFO($$$);
@@ -39,6 +39,8 @@ sub ProcessSamsungIFD($$$);
     7 => 'Samsung NX 60mm F2.8 Macro ED OIS SSA', #1
     8 => 'Samsung NX 16mm F2.4 Pancake', #1/4
     9 => 'Samsung NX 85mm F1.4 ED SSA', #4
+    10 => 'Samsung NX 45mm F1.8', #3
+    11 => 'Samsung NX 45mm F1.8 2D/3D', #3
     12 => 'Samsung NX 12-24mm F4-5.6 ED', #4
 );
 
@@ -592,6 +594,81 @@ my %formatMinMax = (
     4 => { Name => 'ThumbnailOffset', IsOffset => 1 },
 );
 
+# Samsung MP4 @sec information (PH - from WB30F sample)
+%Image::ExifTool::Samsung::sec = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        This information is found in the @sec atom of Samsung MP4 videos from models
+        such as the WB30F.
+    },
+    0x00 => {
+        Name => 'Make',
+        Format => 'string[32]',
+        PrintConv => 'ucfirst(lc($val))',
+    },
+    0x20 => {
+        Name => 'Model',
+        Description => 'Camera Model Name',
+        Format => 'string[32]',
+    },
+    0x200 => { Name => 'ThumbnailWidth',  Format => 'int32u' },
+    0x204 => { Name => 'ThumbnailHeight', Format => 'int32u' },
+    0x208 => { Name => 'ThumbnailLength', Format => 'int32u' }, # (2 bytes too long in my sample)
+    0x20c => {
+        Name => 'ThumbnailImage',
+        Format => 'undef[$val{0x208}]',
+        Notes => 'the THM image, embedded metadata is extracted as the first sub-document',
+        RawConv => q{
+            my $pt = $self->ValidateImage(\$val, $tag);
+            if ($pt) {
+                $$self{DOC_NUM} = ++$$self{DOC_COUNT};
+                $self->ExtractInfo($pt, { ReEntry => 1 });
+                $$self{DOC_NUM} = 0;
+            }
+            return $pt;
+        },
+    },
+);
+
+# Samsung MP4 smta information (PH - from SM-C101 sample)
+%Image::ExifTool::Samsung::smta = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Video' },
+    NOTES => q{
+        This information is found in the smta atom of Samsung MP4 videos from models
+        such as the Galaxy S4.
+    },
+    svss => {
+        Name => 'SamsungSvss',
+        SubDirectory => { TagTable => 'Image::ExifTool::Samsung::svss' },
+    },
+    # swtr - 4 bytes, all zero
+    # scid - 8 bytes, all zero
+    # saut - 4 bytes, all zero
+);
+
+# Samsung MP4 svss information (PH - from SM-C101 sample)
+%Image::ExifTool::Samsung::svss = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Video' },
+    NOTES => q{
+        This information is found in the svss atom of Samsung MP4 videos from models
+        such as the Galaxy S4.
+    },
+    # junk - 10240 bytes, all zero
+);
+
+# thumbnail image information found in some MP4 videos
+%Image::ExifTool::Samsung::Thumbnail2 = (
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    FIRST_ENTRY => 0,
+    FORMAT => 'int32u',
+    1 => 'ThumbnailWidth',
+    2 => 'ThumbnailHeight',
+    3 => 'ThumbnailLength',
+    4 => { Name => 'ThumbnailOffset', IsOffset => 1 },
+);
+
 # Samsung composite tags
 %Image::ExifTool::Samsung::Composite = (
     GROUPS => { 2 => 'Image' },
@@ -623,8 +700,8 @@ Image::ExifTool::AddCompositeTags('Image::ExifTool::Samsung');
 #    (in which case the first value of the tag gives the array length)
 sub Crypt($$$@)
 {
-    my ($exifTool, $val, $tagInfo, @salt) = @_;
-    my $key = $$exifTool{EncryptionKey} or return undef;
+    my ($et, $val, $tagInfo, @salt) = @_;
+    my $key = $$et{EncryptionKey} or return undef;
     my $format = $$tagInfo{Writable} || $$tagInfo{Format} or return undef;
     return undef unless $formatMinMax{$format};
     my ($min, $max) = @{$formatMinMax{$format}};
@@ -655,12 +732,12 @@ sub Crypt($$$@)
 # Returns: 1 on success
 sub ProcessINFO($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $dataPt = $$dirInfo{DataPt};
     my $pos = $$dirInfo{DirStart};
     my $len = $$dirInfo{DirLen};
     my $end = $pos + $len;
-    $exifTool->VerboseDir('INFO', undef, $len);
+    $et->VerboseDir('INFO', undef, $len);
     while ($pos + 8 <= $end) {
         my $tag = substr($$dataPt, $pos, 4);
         my $val = Get32u($dataPt, $pos + 4);
@@ -669,7 +746,7 @@ sub ProcessINFO($$$)
             $name =~ tr/-_0-9a-zA-Z//dc;
             AddTagToTable($tagTablePtr, $tag, { Name => $name }) if $name;
         }
-        $exifTool->HandleTag($tagTablePtr, $tag, $val);
+        $et->HandleTag($tagTablePtr, $tag, $val);
         $pos += 8;
     }
     return 1;
@@ -680,7 +757,7 @@ sub ProcessINFO($$$)
 # Returns: true on success
 sub ProcessSamsungIFD($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     my $len = $$dirInfo{DataLen};
     my $pos = $$dirInfo{DirStart};
     return 0 unless $pos + 4 < $len;
@@ -690,10 +767,10 @@ sub ProcessSamsungIFD($$$)
     # (the string "Park Byeongchan" is often found here)
     return 0 unless $buff =~ s/^([^\0])\0\0\0/$1\0$1\0/s;
     my $numEntries = ord $1;
-    if ($$exifTool{HTML_DUMP}) {
+    if ($$et{HTML_DUMP}) {
         my $pt = $$dirInfo{DirStart} + $$dirInfo{DataPos} + $$dirInfo{Base};
-        $exifTool->HDump($pt-44, 44, "MakerNotes header", 'Samsung Type1');
-        $exifTool->HDump($pt, 4, "MakerNotes entries", "Format: int32u\nEntry count: $numEntries");
+        $et->HDump($pt-44, 44, "MakerNotes header", 'Samsung Type1');
+        $et->HDump($pt, 4, "MakerNotes entries", "Format: int32u\nEntry count: $numEntries");
         $$dirInfo{NoDumpEntryCount} = 1;
     }
     substr($$dataPt, $pos, 4) = $buff;      # insert bogus 2-byte entry count
@@ -703,8 +780,8 @@ sub ProcessSamsungIFD($$$)
     $$dirInfo{DataPos} -= $shift;
     $$dirInfo{DirStart} += 2;       # start at bogus entry count
     $$dirInfo{ZeroOffsetOK} = 1;    # disable check for zero offset
-    delete $$exifTool{NO_UNKNOWN};  # (set for BinaryData, but not for EXIF IFD's)
-    my $rtn = Image::ExifTool::Exif::ProcessExif($exifTool, $dirInfo, $tagTablePtr);
+    delete $$et{NO_UNKNOWN};  # (set for BinaryData, but not for EXIF IFD's)
+    my $rtn = Image::ExifTool::Exif::ProcessExif($et, $dirInfo, $tagTablePtr);
     substr($$dataPt, $pos + 2, 1) = "\0";   # remove bogus count
     return $rtn;
 }
@@ -715,12 +792,12 @@ sub ProcessSamsungIFD($$$)
 # Returns: Binary data block or undefined on error
 sub WriteSTMN($$$)
 {
-    my ($exifTool, $dirInfo, $tagTablePtr) = @_;
+    my ($et, $dirInfo, $tagTablePtr) = @_;
     # create a Fixup for the PreviewImage
     $$dirInfo{Fixup} = new Image::ExifTool::Fixup;
-    my $val = Image::ExifTool::WriteBinaryData($exifTool, $dirInfo, $tagTablePtr);
+    my $val = Image::ExifTool::WriteBinaryData($et, $dirInfo, $tagTablePtr);
     # force PreviewImage into the trailer even if it fits in EXIF segment
-    $$exifTool{PREVIEW_INFO}{IsTrailer} = 1 if $$exifTool{PREVIEW_INFO};
+    $$et{PREVIEW_INFO}{IsTrailer} = 1 if $$et{PREVIEW_INFO};
     return $val;
 }
 
@@ -743,7 +820,7 @@ Samsung maker notes in EXIF information.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

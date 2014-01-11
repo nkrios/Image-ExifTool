@@ -205,12 +205,13 @@ the TIFF specification states that values must begin on a (2-byte) word
 boundary. All data in the maker notes value block is
 <a name=XE class='W M'>underlined</a>.</span></p>
 
-<p>Currently, only TIFF/EXIF and JPEG meta information is dumped.  By default,
-all offsets are relative to the start of the TIFF header (as below).  For a TIFF
-image this is at the start of the file, but for a JPEG image it is 10 bytes
-after the start of the APP1 EXIF segment.  However, this base offset can be
-specified on the command line with "-htmlDump#" (ie. "-htmlDump0" for absolute
-offsets), or via the API with the "HtmlDumpBase" option.</p>
+<p>Currently, only TIFF/EXIF and JPEG meta information is dumped.  The leftmost
+column of the output gives the offset in hex relative to the start of the TIFF
+header (by default).  For a TIFF image this is at the start of the file, but for
+a JPEG image it is 10 bytes after the start of the APP1 EXIF segment.  However,
+this base offset can be specified on the command line with "-htmlDump#" (ie.
+"-htmlDump0" for absolute offsets), or via the API with the "HtmlDumpBase"
+option.</p>
 
 <noscript><b class=V>--&gt;
 Enable JavaScript for active highlighting and information tool tips!

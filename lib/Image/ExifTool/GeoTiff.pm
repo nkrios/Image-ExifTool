@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 # format codes for geoTiff directory entries
 my %geoTiffFormat = (
@@ -2068,11 +2068,11 @@ my %epsg_units = (
 # Notes: byte order must be set before calling this routine
 sub ProcessGeoTiff($)
 {
-    my $exifTool = shift;
-    my $dirData = $exifTool->GetValue('GeoTiffDirectory', 'ValueConv') or return;
-    my $doubleData = $exifTool->GetValue('GeoTiffDoubleParams', 'ValueConv');
-    my $asciiData = $exifTool->GetValue('GeoTiffAsciiParams', 'ValueConv');
-    my $verbose = $exifTool->Options('Verbose');
+    my $et = shift;
+    my $dirData = $et->GetValue('GeoTiffDirectory', 'ValueConv') or return;
+    my $doubleData = $et->GetValue('GeoTiffDoubleParams', 'ValueConv');
+    my $asciiData = $et->GetValue('GeoTiffAsciiParams', 'ValueConv');
+    my $verbose = $et->Options('Verbose');
 
     # restore or original EXIF byte order setting
     if (length($$dirData) >= 8 and
@@ -2084,19 +2084,19 @@ sub ProcessGeoTiff($)
         my $numEntries = Get16u($dirData,6);
 
         if ($verbose) {
-            $exifTool->{INDENT} .= '| ';
-            $exifTool->VerboseDir('GeoTiff',$numEntries);
+            $$et{INDENT} .= '| ';
+            $et->VerboseDir('GeoTiff',$numEntries);
         }
         # generate version number tag (not a real GeoTiff tag)
         my $tagTable = GetTagTable("Image::ExifTool::GeoTiff::Main");
-        my $tagInfo = $exifTool->GetTagInfo($tagTable, 1);
-        $tagInfo and $exifTool->FoundTag($tagInfo,"$version.$revision.$minorRev");
+        my $tagInfo = $et->GetTagInfo($tagTable, 1);
+        $tagInfo and $et->FoundTag($tagInfo,"$version.$revision.$minorRev");
 
         my $i;
         for ($i=0; $i<$numEntries; ++$i) {
             my $pt = 8 * ($i + 1);
             my $tag    = Get16u($dirData, $pt);
-            $tagInfo   = $exifTool->GetTagInfo($tagTable, $tag) or next;
+            $tagInfo   = $et->GetTagInfo($tagTable, $tag) or next;
             my $loc    = Get16u($dirData, $pt+2);
             my $count  = Get16u($dirData, $pt+4);
             my $offset = Get16u($dirData, $pt+6);
@@ -2116,10 +2116,10 @@ sub ProcessGeoTiff($)
                 $val = $offset;
                 $offset = $pt+6;
             } else {
-                $exifTool->Warn("Unknown GeoTiff location: $loc");
+                $et->Warn("Unknown GeoTiff location: $loc");
                 next;
             }
-            $verbose and $exifTool->VerboseInfo($tag, $tagInfo,
+            $verbose and $et->VerboseInfo($tag, $tagInfo,
                 'Table'  => $tagTable,
                 'Index'  => $i,
                 'Value'  => $val,
@@ -2129,19 +2129,19 @@ sub ProcessGeoTiff($)
                 'Count'  => $count,
                 'Size'   => $count * Image::ExifTool::FormatSize($format),
             );
-            $exifTool->FoundTag($tagInfo, $val);
+            $et->FoundTag($tagInfo, $val);
         }
         if ($verbose) {
-            $exifTool->{INDENT} =~ s/..$//;
+            $$et{INDENT} =~ s/..$//;
         }
     } else {
-        $exifTool->Warn('Bad GeoTIFF directory');
+        $et->Warn('Bad GeoTIFF directory');
     }
     # must delete these tags once we've processed this information
     # (to avoid re-processing if another EXIF directory is found)
-    $exifTool->DeleteTag('GeoTiffDirectory');
-    $exifTool->DeleteTag('GeoTiffDoubleParams');
-    $exifTool->DeleteTag('GeoTiffAsciiParams');
+    $et->DeleteTag('GeoTiffDirectory');
+    $et->DeleteTag('GeoTiffDoubleParams');
+    $et->DeleteTag('GeoTiffAsciiParams');
 }
 
 
@@ -2166,7 +2166,7 @@ coordinates.
 
 =head1 AUTHOR
 
-Copyright 2003-2013, Phil Harvey (phil at owl.phy.queensu.ca)
+Copyright 2003-2014, Phil Harvey (phil at owl.phy.queensu.ca)
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

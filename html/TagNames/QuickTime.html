@@ -13,6 +13,9 @@ meta information a variety of audio, video and image parameters, as well as
 proprietary information written by many camera models.  Tags with a question
 mark after their name are not extracted unless the Unknown option is set.</p>
 
+<p>ExifTool has the ability to write/create XMP, and edit date/time tags in
+QuickTime format files.</p>
+
 <p>According to the specification, many QuickTime date/time tags should be
 stored as UTC.  Unfortunately, digital cameras often store local time values
 instead (presumably because they don&#39;t know the time zone).  For this
@@ -20,6 +23,10 @@ reason, by default ExifTool does not assume a time zone for these values.
 However, if the QuickTimeUTC option is set via the API or the ExifTool
 configuration file, then ExifTool will assume these values are properly
 stored as UTC, and will convert them to local time when extracting.</p>
+
+<p>See
+<a href="http://developer.apple.com/mac/library/documentation/QuickTime/QTFF/QTFFChap1/qtff1.html">http://developer.apple.com/mac/library/documentation/QuickTime/QTFF/QTFFChap1/qtff1.html</a>
+for the official specification.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -31,24 +38,34 @@ stored as UTC, and will convert them to local time when extracting.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'_htc'</td>
+<td>HTCInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#HTC'>QuickTime HTC Tags</a></td></tr>
+<tr>
 <td>'free'</td>
 <td>KodakFree
   <br>Free?</td>
 <td class=c>-<br>N</td>
 <td>--&gt; <a href='Kodak.html#Free'>Kodak Free Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'ftyp'</td>
 <td>FileType</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#FileType'>QuickTime FileType Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'junk'</td>
 <td>Junk?</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'mdat'</td>
 <td>MovieData?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'mdat-offset'</td>
+<td>MovieDataOffset</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -79,6 +96,16 @@ and is used in the AvgBitrate calculation)</span></span></td></tr>
 <td class=c>-<br>N</td>
 <td>--&gt; <a href='Canon.html#Skip'>Canon Skip Tags</a></td></tr>
 <tr>
+<td>'thum'</td>
+<td>ThumbnailImage</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'udta'</td>
+<td>UserData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='FLIR.html#UserData'>FLIR UserData Tags</a></td></tr>
+<tr>
 <td>'uuid'</td>
 <td>UUID-XMP
   <br>UUID-PROF
@@ -91,6 +118,20 @@ and is used in the AvgBitrate calculation)</span></span></td></tr>
 <tr class=b>
 <td>'wide'</td>
 <td>Wide?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='HTC'>QuickTime HTC Tags</a></h2>
+<p>Tags written by some HTC camera phones.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'slmt'</td>
+<td>Unknown_slmt?</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -240,9 +281,11 @@ and is used in the AvgBitrate calculation)</span></span></td></tr>
 <tr>
 <td>'uuid'</td>
 <td>UUID-USMT
+  <br>UUID-Canon
   <br>UUID-Unknown?</td>
-<td class=c>-<br>N</td>
-<td>--&gt; <a href='QuickTime.html#UserMedia'>QuickTime UserMedia Tags</a></td></tr>
+<td class=c>-<br>-<br>N</td>
+<td>--&gt; <a href='QuickTime.html#UserMedia'>QuickTime UserMedia Tags</a>
+  <br>--&gt; <a href='Canon.html#uuid'>Canon uuid Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CMovie'>QuickTime CMovie Tags</a></h2>
@@ -350,11 +393,13 @@ and is used in the AvgBitrate calculation)</span></span></td></tr>
   <br>&#39;m7sm&#39; = MPEG-7 Stream
   <br>&#39;mdir&#39; = Metadata
   <br>&#39;mdta&#39; = Metadata Tags
-  <br>&#39;mjsm&#39; = MPEG-J</td><td>&nbsp;&nbsp;</td>
-  <td>&#39;ocsm&#39; = Object Content
-  <br>&#39;odsm&#39; = Object Descriptor
+  <br>&#39;mjsm&#39; = MPEG-J
+  <br>&#39;ocsm&#39; = Object Content</td><td>&nbsp;&nbsp;</td>
+  <td>&#39;odsm&#39; = Object Descriptor
+  <br>&#39;priv&#39; = Private
   <br>&#39;sdsm&#39; = Scene Description
   <br>&#39;soun&#39; = Audio Track
+  <br>&#39;subp&#39; = Subpicture
   <br>&#39;text&#39; = Text
   <br>&#39;tmcd&#39; = Time Code
   <br>&#39;url &#39; = URL
@@ -377,7 +422,10 @@ and is used in the AvgBitrate calculation)</span></span></td></tr>
 <table class=frame><tr><td>
 <table class='inner sep' cellspacing=1>
 <tr class=h><th>Value</th><th>VendorID</th><th>Value</th><th>VendorID</th><th>Value</th><th>VendorID</th></tr>
-<tr><td>'FFMP'</td><td>= FFmpeg</td>
+<tr><td>'AR.D'</td><td>= Parrot AR.Drone</td>
+<td class=b>'ZORA'</td><td class=b>= Zoran Corporation</td>
+<td>'niko'</td><td>= Nikon</td>
+</tr><tr><td>'FFMP'</td><td>= FFmpeg</td>
 <td class=b>'appl'</td><td class=b>= Apple</td>
 <td>'olym'</td><td>= Olympus</td>
 </tr><tr><td>'GIC '</td><td>= General Imaging Co.</td>
@@ -392,9 +440,6 @@ and is used in the AvgBitrate calculation)</span></span></td></tr>
 </tr><tr><td>'SMI '</td><td>= Sorenson Media Inc.</td>
 <td class=b>'mino'</td><td class=b>= Minolta</td>
 <td>'sany'</td><td>= Sanyo</td>
-</tr><tr><td>'ZORA'</td><td>= Zoran Corporation</td>
-<td class=b>'niko'</td><td class=b>= Nikon</td>
-<td>&nbsp;</td><td>&nbsp;</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='ItemList'>QuickTime ItemList Tags</a></h2>
@@ -500,6 +545,36 @@ added dynamically to this table after processing the Meta Keys information.</p>
 <tr>
 <td>'grup'</td>
 <td>Grouping</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'gshh'</td>
+<td>GoogleHostHeader</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'gspm'</td>
+<td>GooglePingMessage</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'gspu'</td>
+<td>GooglePingURL</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'gssd'</td>
+<td>GoogleSourceData</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'gsst'</td>
+<td>GoogleStartTime</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'gstd'</td>
+<td>GoogleTrackDuration</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -1165,12 +1240,12 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=b>
 <td class=r title='1 = 0x1'>1</td>
 <td>CreateDate</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
 <td>ModifyDate</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr class=b>
 <td class=r title='3 = 0x3'>3</td>
@@ -1316,12 +1391,12 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=b>
 <td class=r title='1 = 0x1'>1</td>
 <td>MediaCreateDate</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
 <td>MediaModifyDate</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr class=b>
 <td class=r title='3 = 0x3'>3</td>
@@ -1562,17 +1637,17 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='10 = 0xa'>10</td>
+<td class=r title='12 = 0xc'>12</td>
 <td>TextColor</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='16 = 0x10'>16</td>
+<td class=r title='18 = 0x12'>18</td>
 <td>BackgroundColor</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='22 = 0x16'>22</td>
+<td class=r title='24 = 0x18'>24</td>
 <td>FontName</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -1723,49 +1798,229 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 </table></td></tr></table></blockquote>
 
 <h2><a name='AudioSampleDesc'>QuickTime AudioSampleDesc Tags</a></h2>
-<p>MP4 audio sample description.</p>
+<p>MP4 audio sample description.  This hybrid atom contains both data and child
+atoms.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
-<tr class=h><th>Index2</th><th>Tag Name</th>
+<tr class=h><th>ID/Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r title='2 = 0x2'>2</td>
+<td class=r title='4 = 0x4'>4</td>
 <td>AudioFormat</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='10 = 0xa'>10</td>
+<td class=r title='20 = 0x14'>20</td>
 <td>AudioVendorID</td>
 <td class=c>N</td>
 <td>--&gt; <a href='QuickTime.html#VendorID'>QuickTime VendorID Values</a></td></tr>
 <tr>
-<td class=r title='12 = 0xc'>12</td>
+<td class=r title='24 = 0x18'>24</td>
 <td>AudioChannels</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='13 = 0xd'>13</td>
+<td class=r title='26 = 0x1a'>26</td>
 <td>AudioBitsPerSample</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='16 = 0x10'>16</td>
+<td class=r title='32 = 0x20'>32</td>
 <td>AudioSampleRate</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='28 = 0x1c'>28</td>
-<td>AudioFormat</td>
+<td>'damr'</td>
+<td>DecodeConfig</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#DecodeConfig'>QuickTime DecodeConfig Tags</a></td></tr>
+<tr>
+<td>'pinf'</td>
+<td>PurchaseInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#ProtectionInfo'>QuickTime ProtectionInfo Tags</a></td></tr>
+<tr class=b>
+<td>'sinf'</td>
+<td>ProtectionInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#ProtectionInfo'>QuickTime ProtectionInfo Tags</a></td></tr>
+<tr>
+<td>'wave'</td>
+<td>Wave</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Wave'>QuickTime Wave Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='DecodeConfig'>QuickTime DecodeConfig Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>EncoderVendor</td>
 <td class=c>N</td>
-<td><span class=s><span class=n>(in Casio MOV videos)</span></span></td></tr>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4</td>
+<td>EncoderVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ProtectionInfo'>QuickTime ProtectionInfo Tags</a></h2>
+<p>Child atoms found in &quot;sinf&quot; and/or &quot;pinf&quot; atoms.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'frma'</td>
+<td>OriginalFormat</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'schi'</td>
+<td>SchemeInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#SchemeInfo'>QuickTime SchemeInfo Tags</a></td></tr>
+<tr>
+<td>'schm'</td>
+<td>SchemeType</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#SchemeType'>QuickTime SchemeType Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SchemeInfo'>QuickTime SchemeInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'cert'</td>
+<td>Certificate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'iviv'</td>
+<td>InitializationVector</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'key '</td>
+<td>KeyID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'name'</td>
+<td>UserName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'righ'</td>
+<td>Rights</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Rights'>QuickTime Rights Tags</a></td></tr>
+<tr class=b>
+<td>'user'</td>
+<td>UserID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Rights'>QuickTime Rights Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'aver'</td>
+<td>VersionRestrictions</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'medi'</td>
+<td>MediaFlags</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'mode'</td>
+<td>ModeFlags</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'plat'</td>
+<td>Platform</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'song'</td>
+<td>ItemID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'tool'</td>
+<td>ItemTool</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'tran'</td>
+<td>TransactionID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'veID'</td>
+<td>ItemVendorID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SchemeType'>QuickTime SchemeType Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>SchemeType</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>SchemeVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='10 = 0xa'>10</td>
+<td>SchemeURL</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Wave'>QuickTime Wave Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'frma'</td>
+<td>PurchaseFileFormat</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ImageDesc'>QuickTime ImageDesc Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
-<tr class=h><th>Index2</th><th>Tag Name</th>
+<tr class=h><th>ID/Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
@@ -1807,6 +2062,89 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <td>BitDepth</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td>'btrt'</td>
+<td>BitrateInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Bitrate'>QuickTime Bitrate Tags</a></td></tr>
+<tr class=b>
+<td>'clap'</td>
+<td>CleanAperture</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#CleanAperture'>QuickTime CleanAperture Tags</a></td></tr>
+<tr>
+<td>'colr'</td>
+<td>ColorRepresentation</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'fiel'</td>
+<td>VideoFieldOrder</td>
+<td class=c>N</td>
+<td><span class=s>[Value 0]
+  <br>1 = Progressive
+  <br>2 = 2:1 Interlaced</span></td></tr>
+<tr>
+<td>'gama'</td>
+<td>Gamma</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'pasp'</td>
+<td>PixelAspectRatio</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Bitrate'>QuickTime Bitrate Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index4</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>BufferSize</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>MaxBitrate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>AverageBitrate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CleanAperture'>QuickTime CleanAperture Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index8</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>CleanApertureWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>CleanApertureHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>CleanApertureOffsetX</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='3 = 0x3'>3</td>
+<td>CleanApertureOffsetY</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='HintSampleDesc'>QuickTime HintSampleDesc Tags</a></h2>
@@ -1814,11 +2152,36 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
-<tr class=h><th>Index2</th><th>Tag Name</th>
+<tr class=h><th>ID/Index</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r title='2 = 0x2'>2</td>
+<td class=r title='4 = 0x4'>4</td>
 <td>HintFormat</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='16 = 0x10'>16</td>
+<td>HintTrackVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='20 = 0x14'>20</td>
+<td>MaxPacketSize</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'snro'</td>
+<td>SequenceNumberRandomOffset</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'tims'</td>
+<td>RTPTimeScale</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'tsro'</td>
+<td>TimestampRandomOffset</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -1827,10 +2190,10 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
-<tr class=h><th>Index2</th><th>Tag Name</th>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r title='2 = 0x2'>2</td>
+<td title='0x0004 = 4'>0x0004</td>
 <td>OtherFormat</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
@@ -1892,12 +2255,12 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <tr class=b>
 <td class=r title='1 = 0x1'>1</td>
 <td>TrackCreateDate</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
 <td>TrackModifyDate</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr class=b>
 <td class=r title='3 = 0x3'>3</td>
@@ -1944,10 +2307,15 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
 <td>'chap'</td>
-<td>ChapterList</td>
+<td>ChapterListTrackID</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'mpod'</td>
+<td>ElementaryStreamTrack</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'tmcd'</td>
 <td>TimeCode</td>
 <td class=c>N</td>
@@ -1965,117 +2333,132 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td>'@sec'</td>
+<td>SamsungSec</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Samsung.html#sec'>Samsung sec Tags</a></td></tr>
+<tr class=b>
 <td>'AllF'</td>
 <td>PlayAllFrames</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'CNCV'</td>
 <td>CompressorVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'CNFV'</td>
 <td>FirmwareVersion</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'CNMN'</td>
 <td>Model</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'CNTH'</td>
 <td>CanonCNTH</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Canon.html#CNTH'>Canon CNTH Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'DcMD'</td>
 <td>KodakDcMD</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Kodak.html#DcMD'>Kodak DcMD Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'FFMV'</td>
 <td>FujiFilmFFMV</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FujiFilm.html#FFMV'>FujiFilm FFMV Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'GoPr'</td>
 <td>GoProType</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'INFO'</td>
 <td>SamsungINFO</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Samsung.html#INFO'>Samsung INFO Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'LEIC'</td>
 <td>LeicaLEIC</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Panasonic.html#PANA'>Panasonic PANA Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'LOOP'</td>
 <td>LoopStyle</td>
 <td class=c>N</td>
 <td><span class=s>1 = Normal
   <br>2 = Palindromic</span></td></tr>
-<tr class=b>
+<tr>
 <td>'MMA0'</td>
 <td>MinoltaMMA0</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Minolta.html#MMA'>Minolta MMA Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'MMA1'</td>
 <td>MinoltaMMA1</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Minolta.html#MMA'>Minolta MMA Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'MVTG'</td>
 <td>FujiFilmMVTG</td>
 <td class=c>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'NCDT'</td>
 <td>NikonNCDT</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#NCDT'>Nikon NCDT Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'PANA'</td>
 <td>PanasonicPANA</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Panasonic.html#PANA'>Panasonic PANA Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'PENT'</td>
 <td>PentaxPENT</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#PENT'>Pentax PENT Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'PXMN'</td>
 <td>MakerNotePentax5b</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html'>Pentax Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'PXTH'</td>
 <td>PentaxPreview</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Pentax.html#PXTH'>Pentax PXTH Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'QVMI'</td>
 <td>CasioQVMI</td>
 <td class=c>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
+<tr class=b>
+<td>'RMKN'</td>
+<td>RicohRMKN</td>
+<td class=c>-</td>
+<td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
 <tr>
+<td>'RTHU'</td>
+<td>PreviewImage</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'SDLN'</td>
 <td>PlayMode</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'SelO'</td>
 <td>PlaySelection</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'TAGS'</td>
 <td>FujiFilmTags
   <br>KodakTags
@@ -2105,44 +2488,69 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
   <br>--&gt; <a href='Samsung.html#MP4'>Samsung MP4 Tags</a>
   <br>--&gt; <a href='Sanyo.html#MOV'>Sanyo MOV Tags</a>
   <br>--&gt; <a href='Sanyo.html#MP4'>Sanyo MP4 Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'WLOC'</td>
 <td>WindowLocation</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'XMP_'</td>
 <td>XMP</td>
 <td class=c>-</td>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'Xtra'</td>
 <td>MicrosoftXtra</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Microsoft.html#Xtra'>Microsoft Xtra Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'albm'</td>
 <td>Album</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'albr'</td>
 <td>AlbumArtist</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td>'angl'</td>
+<td>CameraAngle</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 <tr>
+<td>'apmd'</td>
+<td>ApertureMode</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'auth'</td>
 <td>Author</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'ccid'</td>
 <td>ContentID</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'cdis'</td>
 <td>ContentDistributorID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'chpl'</td>
+<td>ChapterList</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'clfn'</td>
+<td>ClipFileName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'clid'</td>
+<td>ClipID</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -2151,13 +2559,33 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>'cmid'</td>
+<td>CameraID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'cmnm'</td>
+<td>Model</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'coll'</td>
+<td>CollectionName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>'cprt'</td>
 <td>Copyright</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'cvru'</td>
 <td>CoverURI</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'date'</td>
+<td>DateTimeOriginal</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -2196,18 +2624,28 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>'kgtt'</td>
+<td>TrackType</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'kywd'</td>
 <td>Keywords</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'loci'</td>
 <td>LocationInformation</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'lrcu'</td>
 <td>LyricsURI</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'manu'</td>
+<td>Make</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -2236,8 +2674,18 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Video'>QuickTime Video Tags</a></td></tr>
 <tr class=b>
+<td>'reel'</td>
+<td>ReelName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'rtng'</td>
 <td>Rating</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'scen'</td>
+<td>Scene</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
@@ -2246,15 +2694,38 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td class=c>-</td>
 <td>--&gt; <a href='Olympus.html#scrn'>Olympus scrn Tags</a></td></tr>
 <tr class=b>
+<td>'shot'</td>
+<td>ShotName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'slno'</td>
+<td>SerialNumber</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'smta'</td>
+<td>SamsungSmta</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Samsung.html#smta'>Samsung smta Tags</a></td></tr>
+<tr>
 <td>'thmb'</td>
 <td>MakerNotePentax5a
-  <br>OlympusThumbnail</td>
-<td class=c>-<br>-</td>
+  <br>OlympusThumbnail
+  <br>ThumbnailImage
+  <br>ThumbnailPNG
+  <br>UnknownThumbnail</td>
+<td class=c>-<br>-<br>N<br>N<br>N</td>
 <td>--&gt; <a href='Pentax.html'>Pentax Tags</a>
   <br>--&gt; <a href='Olympus.html#thmb'>Olympus thmb Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'titl'</td>
 <td>Title</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'urat'</td>
+<td>UserRating</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
@@ -2713,7 +3184,7 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <tr>
 <td class=r title='0 = 0x0'>0</td>
 <td>PreviewDate</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
 <tr class=b>
 <td class=r title='2 = 0x2'>2</td>
@@ -2961,7 +3432,7 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 27, 2013</i>
+<br><i>Last revised Jan 3, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

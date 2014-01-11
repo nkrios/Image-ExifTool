@@ -63,6 +63,7 @@ implements this policy and changes EXIF:Artist to a list-type tag.</p>
 <td class=c>Y</td>
 <td class=n>IPTC:City
   <br>XMP-photoshop:City
+  <br>XMP-iptcExt:LocationShownCity
   <br>CurrentIPTCDigest
   <br>IPTCDigest</td>
 <td>&nbsp;</td></tr>
@@ -80,6 +81,7 @@ implements this policy and changes EXIF:Artist to a list-type tag.</p>
 <td class=c>Y</td>
 <td class=n>IPTC:Country-PrimaryLocationName
   <br>XMP-photoshop:Country
+  <br>XMP-iptcExt:LocationShownCountryName
   <br>CurrentIPTCDigest
   <br>IPTCDigest</td>
 <td>&nbsp;</td></tr>
@@ -136,6 +138,7 @@ implements this policy and changes EXIF:Artist to a list-type tag.</p>
 <td class=c>Y</td>
 <td class=n>IPTC:Sub-location
   <br>XMP-iptcCore:Location
+  <br>XMP-iptcExt:LocationShownSublocation
   <br>CurrentIPTCDigest
   <br>IPTCDigest</td>
 <td>&nbsp;</td></tr>
@@ -172,6 +175,7 @@ implements this policy and changes EXIF:Artist to a list-type tag.</p>
 <td class=c>Y</td>
 <td class=n>IPTC:Province-State
   <br>XMP-photoshop:State
+  <br>XMP-iptcExt:LocationShownProvinceState
   <br>CurrentIPTCDigest
   <br>IPTCDigest</td>
 <td>&nbsp;</td></tr>
@@ -190,7 +194,7 @@ without the need to load the MWG Composite tags above.  See
 <tr>
 <td>RegionInfo</td>
 <td class=c>struct</td>
-<td>--&gt; <a href='XMP.html#RegionInfo'>RegionInfo Struct</a>
+<td>--&gt; <a href='MWG.html#RegionInfo'>MWG RegionInfo Struct</a>
   <br><span class='n s'>(called Regions by the spec)</span></td></tr>
 <tr class=b>
 <td>RegionAppliedToDimensions</td>
@@ -296,6 +300,22 @@ without the need to load the MWG Composite tags above.  See
   <br>&#39;Pet&#39; = Pet</span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='RegionInfo'>MWG RegionInfo Struct</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Field Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>AppliedToDimensions</td>
+<td class=c>Dimensions</td>
+<td>--&gt; <a href='XMP.html#Dimensions'>Dimensions Struct</a></td></tr>
+<tr class=b>
+<td>RegionList</td>
+<td class=c title=' + = List'>MWG RegionStruct+</td>
+<td>--&gt; <a href='MWG.html#RegionStruct'>MWG RegionStruct Struct</a></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='RegionStruct'>MWG RegionStruct Struct</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -366,7 +386,7 @@ accessed with different tag names, and to avoid infinite recursion.  See
 <tr>
 <td>KeywordInfo</td>
 <td class=c>struct</td>
-<td>--&gt; <a href='XMP.html#KeywordInfo'>KeywordInfo Struct</a>
+<td>--&gt; <a href='MWG.html#KeywordInfo'>MWG KeywordInfo Struct</a>
   <br><span class='n s'>(called Keywords by the spec)</span></td></tr>
 <tr class=b>
 <td>HierarchicalKeywords</td>
@@ -466,6 +486,18 @@ accessed with different tag names, and to avoid infinite recursion.  See
 <td><span class=s><span class=n>(KeywordsHierarchyKeyword)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='KeywordInfo'>MWG KeywordInfo Struct</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Field Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>Hierarchy</td>
+<td class=c title=' + = List'>MWG KeywordStruct+</td>
+<td>--&gt; <a href='MWG.html#KeywordStruct'>MWG KeywordStruct Struct</a></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='KeywordStruct'>MWG KeywordStruct Struct</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -498,7 +530,7 @@ belong to the ExifTool XMP-mwg-coll group.  See
 <tr>
 <td>Collections</td>
 <td class=c title=' + = List'>struct+</td>
-<td>--&gt; <a href='XMP.html#CollectionInfo'>CollectionInfo Struct</a></td></tr>
+<td>--&gt; <a href='MWG.html#CollectionInfo'>MWG CollectionInfo Struct</a></td></tr>
 <tr class=b>
 <td>CollectionName</td>
 <td class=c title=' _ = Flattened
@@ -511,9 +543,25 @@ belong to the ExifTool XMP-mwg-coll group.  See
 <td><span class=s><span class=n>(CollectionsCollectionURI)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='CollectionInfo'>MWG CollectionInfo Struct</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Field Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>CollectionName</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CollectionURI</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 31, 2013</i>
+<br><i>Last revised Jul 22, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

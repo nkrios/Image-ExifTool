@@ -6,6 +6,8 @@
 #
 # Usage:        exiftool -p kml.fmt FILE [...] > out.kml
 #
+# Requires:     ExifTool version 8.10 or later
+#
 # Revisions:    2010/02/05 - P. Harvey created
 #               2013/02/05 - PH Fixed camera icon to work with new Google Earth
 #

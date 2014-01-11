@@ -102,7 +102,7 @@
     <span class='com'># IPTC tags are added to a specific record type (ie. application record):
     # (Note: IPTC tag ID's are limited to the range 0-255)</span>
     'Image::ExifTool::IPTC::ApplicationRecord' =&gt; {
-        240 =&gt; {
+        160 =&gt; {
             Name =&gt; 'NewIPTCTag',
             Format =&gt; 'string[0,16]',
         },
@@ -134,7 +134,7 @@
         NewPngTag2 =&gt; { },
         NewPngTag3 =&gt; { },
     },
-    <span class='com'># add a new MIE tag (MieTag1) and group (MIE-Test) to MIE-Meta
+    <span class='com'># add a new MIE tag (NewMieTag1) and group (MIE-Test) to MIE-Meta
     # (Note: MIE group names must NOT end with a number)</span>
     'Image::ExifTool::MIE::Meta' =&gt; {
         NewMieTag1 =&gt; {
@@ -163,7 +163,7 @@
                 0 =&gt; 'FileName',
             },
             <span class='com'># remove the extension from FileName</span>
-            ValueConv =&gt; 'my $name=$val[0]; $name=~s/\..*?$//; $name',
+            ValueConv =&gt; '$val[0] =~ /(.*)\./ ? $1 : $val[0]',
         },
         <span class='com'># the next few examples demonstrate simplifications which may be
         # used if only one tag is Require'd or Desire'd:

@@ -59,7 +59,8 @@ must be <a href="#Orient">user-defined</a>.</i></blockquote>
 <a name="Implementation"></a>
 <h3>Implementation</h3>
 
-<p>Geotagging is accomplished in ExifTool through the use of three special tags:
+<p>Geotagging is accomplished in ExifTool through the use of three special
+<a href="TagNames/Extra.html">Extra tags</a>:
 <code>Geotag</code>, <code>Geosync</code> and <code>Geotime</code>.</p>
 
 <blockquote class=lt><i>Note: When writing these tags, order is important. If
@@ -69,9 +70,9 @@ and <code>Geosync</code>.</i></blockquote>
 <a name="geotag"></a>
 <h4>Geotag</h4>
 
-<p>The <code>Geotag</code> tag is used to define the GPS track log data. Setting
-the value of this tag via the exiftool application activates the geotagging
-feature.  As an example, the following command line adds GPS tags to all images
+<p>The <code>Geotag</code> tag is used to define the GPS track log data. The
+geotagging feature is activated by assigning the name of a track log file to
+this tag.  As an example, the following command line adds GPS tags to all images
 in the "/Users/Phil/Pictures" directory based on GPS positions stored in the
 track log file "track.log" in the current directory:</p>
 
@@ -86,10 +87,13 @@ above:</p>
 </pre>
 
 <p>Multiple GPS log files may be loaded simultaneously by using more than one
-<code>-geotag</code> option (or by using wildcards in the filename argument
-for the <code>-geotag</code> option,  but note that here the filename may need
-to be quoted -- see the <a href="#Examples">examples</a> below).  This allows
-batch processing of images spanning different tracks with a single command.</p>
+<code>-geotag</code> option or <code>-geotag=</code> assignment in the same
+command.  This allows batch processing of images spanning different tracks with
+a single command.  Wildcards may be used in the argument of the
+<code>-geotag</code> option, but note that the argument may then need to be
+quoted on some systems to prevent shell globbing, and that wildcards are not
+supported with the <code>-geotag=</code> syntax.  See the
+<a href="#Examples">examples</a> below.</p>
 
 <p>Deleting the <code>Geotag</code> tag (with <code>-geotag=</code>) causes the
 GPS tags written by the <code>-geotag</code> feature to be deleted.</p>
@@ -509,6 +513,8 @@ one or more geotagged images:</p>
 #
 # Usage:        exiftool -p gpx.fmt -d %Y-%m-%dT%H:%M:%SZ FILE [...] > out.gpx
 #
+# Requires:     ExifTool version 8.10 or later
+#
 # Revisions:    2010/02/05 - P. Harvey created
 #
 # Notes:     1) All input files must contain GPSLatitude and GPSLongitude.
@@ -585,6 +591,8 @@ file from a collection of geotagged images:</p>
 #
 # Usage:        exiftool -p kml.fmt FILE [...] > out.kml
 #
+# Requires:     ExifTool version 8.10 or later
+#
 # Revisions:    2010/02/05 - P. Harvey created
 #               2013/02/05 - PH Fixed camera icon to work with new Google Earth
 #
@@ -636,7 +644,7 @@ file from a collection of geotagged images:</p>
 
 <hr>
 <i>Created Apr. 2, 2009</i><br>
-<i>Last revised Feb. 7, 2013</i>
+<i>Last revised Sept. 30, 2013</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

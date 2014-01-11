@@ -128,6 +128,10 @@ These recommendations are implemented by the ExifTool
 widest range of applications, it is suggested that these MWG tags be used
 whenever possible.</blockquote>
 
+<blockquote>One final note: When writing, the <code>-v2</code> option may be
+useful because it provides details about what ExifTool is writing, and where.
+</blockquote>
+
 <a name="Q4"></a>
 <p>4. <b>"ExifTool reports more than one shutter speed or aperture value, and
 they are slightly different"</b></p>
@@ -516,16 +520,19 @@ specification</a> for more information about IPTC character coding.</blockquote>
 <blockquote>ExifTool may be used to convert IPTC values to a different internal
 encoding.  To do this, all IPTC tags must be rewritten along with the desired
 value of CodedCharacterSet.  For example, the following command changes the
-internal IPTC encoding to UTF&#8209;8:
+internal IPTC encoding to UTF&#8209;8 (from Windows Latin1 unless
+CodedCharacterSet was already "UTF8"):
 <pre>exiftool -tagsfromfile @ -iptc:all -codedcharacterset=utf8 a.jpg
+</pre>or from Windows Latin2 (cp1250) to UTF&#8209;8:
+<pre>exiftool -tagsfromfile @ -iptc:all -codedcharacterset=utf8 -charset iptc=latin2 a.jpg
 </pre>and this command changes it back from UTF&#8209;8 to Windows Latin1 (cp1252):
 <pre>exiftool -tagsfromfile @ -iptc:all -codedcharacterset= a.jpg
-</pre>or this command changes it back from UTF&#8209;8 to Windows Latin2 (cp1250):
+</pre>or to Windows Latin2:
 <pre>exiftool -tagsfromfile @ -iptc:all -codedcharacterset= -charset iptc=latin2 a.jpg
-</pre>Note that unless CodedCharacterSet indicates UTF&#8209;8, applications
-have no reliable way to determine the IPTC character encoding.  For this reason,
-it is recommended that CodedCharacterSet be set to "<code>UTF8</code>" when
-creating new IPTC.</blockquote>
+</pre>Note that unless CodedCharacterSet is UTF&#8209;8, applications have no
+reliable way to determine the IPTC character encoding.  For this reason, it is
+recommended that CodedCharacterSet be set to "<code>UTF8</code>" when creating
+new IPTC.</blockquote>
 
 <blockquote class='sm'><sup>&dagger;</sup> <span class=lt>Refers to the older
 <a href="http://www.iptc.org/site/News_Exchange_Formats/IIM/">IPTC IIM</a> format.
@@ -804,26 +811,27 @@ writing to images by specifying an input file name with the <code>-csv</code> or
 application documentation</a> for more details.</blockquote>
 
 <a name="Q13"></a>
-<p>13. <b>"Why is my file smaller after I use ExifTool to write information?"</b></p>
+<p>13a. <b>"Why is my file smaller after I use ExifTool to write information?"</b>, or
+<br>13b. <b>"Why do some Offset tags change value when I write other tags?"</b></p>
 
 <blockquote>
 There are various specific reasons why this can happen, but the general answer
 is:  When ExifTool writes an image, the meta information may be restructured in
-such a way that it takes less space than in the original file.</blockquote>
+such a way that it takes less space than in the original file, or so that some
+tags are stored at different offsets in the file.</blockquote>
 
-<blockquote>For instance, the EXIF/TIFF standard allows for blocks of
-unreferenced data to exist in an image.  Some digital cameras write JPEG or
-TIFF-based RAW files which contain large blocks of unused data, usually filled
-with binary zeros.  The reason for this could be to simplify camera algorithms
-by allowing variable-sized information to be written at fixed offsets in the
-output image. When ExifTool rewrites an image it does not copy these unused
-blocks.  This can result in a significant reduction in file size for some
-images.  <i>[The <code>-htmlDump</code> option may be used to view the file
-structure if you are interested in seeing these unused data blocks -- use a
-command like "<code>exiftool -htmlDump a.jpg &gt; out.html</code>", then open
+<blockquote>The EXIF/TIFF standard allows for blocks of unreferenced data to
+exist in an image.  Some digital cameras write JPEG or TIFF-based RAW files
+which contain large blocks of unused data, usually filled with binary zeros. 
+The reason for this could be to simplify camera algorithms by allowing
+variable-sized information to be written at fixed offsets in the output image. 
+When ExifTool rewrites an image it does not copy these unused blocks.  This can
+result in a significant reduction in file size for some images.  <i>[The
+<code>-htmlDump</code> option may be used to view the file structure if you are
+interested in seeing these unused data blocks -- use a command like
+"<code>exiftool -htmlDump a.jpg &gt; out.html</code>", then open
 <code>out.html</code> in your web browser.  Unused data blocks are
-<span class=U>brown</span> in this output.]</i>
-</blockquote>
+<span class=U>brown</span> in this output.]</i> </blockquote>
 
 <blockquote>Also, the size of an XMP record may easily shrink or grow when it is
 rewritten, even if no meta information is changed.  This is partly due to the
@@ -1421,7 +1429,7 @@ attempt to do a full validation.  If you are looking for a validator,
 try <a href="http://jhove.sourceforge.net">JHOVE</a>.</blockquote>
 
 <hr>
-<i>Last revised Mar 19, 2013</i>
+<i>Last revised Jan. 3, 2014</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

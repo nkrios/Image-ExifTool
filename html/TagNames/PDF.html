@@ -19,11 +19,11 @@ extension level 3, including support for RC4, AES-128 and AES-256
 encryption.  A Password option is provided to allow processing of
 password-protected PDF files.</p>
 
-<p>When writing PDF files, ExifTool uses an incremental update.  This has the
-advantages of being fast and reversible.  The original PDF can be easily
-recovered by deleting the <code>PDF-update</code> pseudo-group (with
-<code>-PDF-update:all=</code> on the command line).  But there are two main
-disadvantages to this technique:</p>
+<p>ExifTool may be used to write native PDF and XMP metadata to PDF files. It
+uses an incremental update technique that has the advantages of being both
+fast and reversible.  The original PDF can be easily recovered by deleting
+the <code>PDF-update</code> pseudo-group (with <code>-PDF-update:all=</code> on the command
+line).  However, there are two main disadvantages to this technique:</p>
 
 <p>1) A linearized PDF file is no longer linearized after the update, so it
 must be subsequently re-linearized if this is required.</p>
@@ -739,7 +739,7 @@ false)</span>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 4, 2013</i>
+<br><i>Last revised Oct 16, 2013</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

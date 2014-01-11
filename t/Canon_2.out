@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.07
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.41
 [File, System, Image] FileName - File Name: Canon1DmkIII.jpg
 [File, System, Image] Directory - Directory: t/images
 [File, System, Image] FileSize - File Size: 8.1 kB
 [File, System, Time] FileModifyDate - File Modification Date/Time: 2008:01:18 14:10:05-05:00
-[File, System, Time] FileAccessDate - File Access Date/Time: 2012:11:20 07:47:34-05:00
-[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2012:11:17 09:18:25-05:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2013:11:14 08:40:57-05:00
+[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2013:11:11 12:05:21-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -320,6 +320,7 @@
 [MakerNotes, Canon, Camera] 49 - Color Temp Kelvin: 5210
 [MakerNotes, Canon, Camera] 50 - WB RGGB Levels Flash: 2422 1024 1024 1295
 [MakerNotes, Canon, Camera] 54 - Color Temp Flash: 6777
+[MakerNotes, Canon, Camera] 231 - Average Black Level: 1024 1024 1024 1024
 [MakerNotes, Canon, Camera] 640 - Raw Measured RGGB: 294111 455756 464315 279659
 [MakerNotes, Canon, Camera] 16400 - Custom Picture Style File Name: 
 [MakerNotes, Canon, Camera] 1 - AF Micro Adj Mode: Disable

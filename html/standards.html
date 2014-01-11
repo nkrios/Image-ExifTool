@@ -115,6 +115,10 @@ definition is unclear in the case of zoom lenses where the maximum aperture
 varies across the zoom range.  Some manufacturers (Canon, Nikon, Sony) store the
 maximum aperture at the specific focal length, but others (Olympus, Pentax)
 store the absolute maximum aperture of the lens.</li>
+<li>EXIF is not extensible, and is missing definitions for storing some
+information that could be very useful to camera owners (ie. camera orientation,
+sensor temperature, face detection, auto-focus points, image stabilization,
+flash exposure compensation, etc).</li>
 </ol>
 
 <p><b>Simple solutions:</b></p>
@@ -143,6 +147,8 @@ this to allow UTF-16 surrogate pairs may be a good idea.</li>
 <li>Allow ApertureValue and MaxApertureValue to be stored as signed SRATIONAL.</li>
 <li>Define whether MaxApertureValue is taken at the current focal length of
 a zoom lens, or over the entire zoom range.</li>
+<li>Expand the standard to include additional useful information available from
+modern digital cameras.</li>
 </ol>
 
 <a name="PhotoInfo"></a>
@@ -271,7 +277,7 @@ inside a JPEG segment.</p>
 </ol>
 <hr>
 <i>Created Sep 17, 2009</i><br>
-<i>Last revised Jan 8, 2013</i>
+<i>Last revised Dec 7, 2013</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>
