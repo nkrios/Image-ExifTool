@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.39';
+$VERSION = '1.40';
 
 sub JITTER() { return 2 }       # maximum time jitter
 
@@ -114,7 +114,7 @@ sub LoadTrackLog($$;$)
     my ($nmeaStart, $fixSecs, @fixTimes, $lastFix, %nmea);
     my ($canCut, $cutPDOP, $cutHDOP, $cutSats);
 
-    unless (eval 'require Time::Local') {
+    unless (eval { require Time::Local }) {
         return 'Geotag feature requires Time::Local installed';
     }
     # add data to existing track
@@ -705,7 +705,7 @@ sub SetGeoValues($$;$)
             $err = 'GPS track is empty';
             last;
         }
-        unless (eval 'require Time::Local') {
+        unless (eval { require Time::Local }) {
             $err = 'Geotag feature requires Time::Local installed';
             last;
         }

@@ -87,11 +87,11 @@ when one is expected.</p>
 <p>A command-line interface to <a href="ExifTool.html">Image::ExifTool</a>, used for
 reading and writing meta information in a variety of file types.  <em>FILE</em> is
 one or more source file names, directory names, or <code>-</code> for the standard
-input.  Information is read from source files and printed in readable form
+input.  Metadata is read from source files and printed in readable form
 to the console (or written to output text files with <strong>-w</strong>).</p>
-<p>To write or delete information, tag values are assigned using the
+<p>To write or delete metadata, tag values are assigned using the
 -<em>TAG</em>=[<em>VALUE</em>] syntax, or the <strong>-geotag</strong> option.  To copy or move
-information, the <strong>-tagsFromFile</strong> feature is used.  By default the original
+metadata, the <strong>-tagsFromFile</strong> feature is used.  By default the original
 files are preserved with <code>_original</code> appended to their names -- be sure to
 verify that the new files are OK before erasing the originals.  Once in
 write mode, exiftool will ignore any read-specific options.</p>
@@ -104,38 +104,38 @@ supported by ExifTool (r = read, w = write, c = create):</p>
 <pre>
   File Types
   ------------+-------------+-------------+-------------+------------
-  3FR   r     | EIP   r     | LNK   r     | PAC   r     | RWL   r/w
-  3G2   r/w   | EPS   r/w   | M2TS  r     | PAGES r     | RWZ   r
-  3GP   r/w   | ERF   r/w   | M4A/V r/w   | PBM   r/w   | RM    r
-  ACR   r     | EXE   r     | MEF   r/w   | PCD   r     | SO    r
-  AFM   r     | EXIF  r/w/c | MIE   r/w/c | PDF   r/w   | SR2   r/w
-  AI    r/w   | EXR   r     | MIFF  r     | PEF   r/w   | SRF   r
-  AIFF  r     | F4A/V r/w   | MKA   r     | PFA   r     | SRW   r/w
-  APE   r     | FFF   r/w   | MKS   r     | PFB   r     | SVG   r
-  ARW   r/w   | FLA   r     | MKV   r     | PFM   r     | SWF   r
-  ASF   r     | FLAC  r     | MNG   r/w   | PGF   r     | THM   r/w
-  AVI   r     | FLV   r     | MODD  r     | PGM   r/w   | TIFF  r/w
-  BMP   r     | FPF   r     | MOS   r/w   | PLIST r     | TORRENT r
-  BTF   r     | FPX   r     | MOV   r/w   | PICT  r     | TTC   r
-  CHM   r     | GIF   r/w   | MP3   r     | PMP   r     | TTF   r
-  COS   r     | GZ    r     | MP4   r/w   | PNG   r/w   | VRD   r/w/c
-  CR2   r/w   | HDP   r/w   | MPC   r     | PPM   r/w   | VSD   r
-  CRW   r/w   | HDR   r     | MPG   r     | PPT   r     | WAV   r
-  CS1   r/w   | HTML  r     | MPO   r/w   | PPTX  r     | WDP   r/w
-  DCM   r     | ICC   r/w/c | MQV   r/w   | PS    r/w   | WEBP  r
-  DCP   r/w   | IDML  r     | MRW   r/w   | PSB   r/w   | WEBM  r
-  DCR   r     | IIQ   r/w   | MXF   r     | PSD   r/w   | WMA   r
-  DFONT r     | IND   r/w   | NEF   r/w   | PSP   r     | WMV   r
-  DIVX  r     | INX   r     | NRW   r/w   | QTIF  r/w   | WV    r
-  DJVU  r     | ITC   r     | NUMBERS r   | RA    r     | X3F   r/w
-  DLL   r     | J2C   r     | ODP   r     | RAF   r/w   | XCF   r
-  DNG   r/w   | JNG   r/w   | ODS   r     | RAM   r     | XLS   r
-  DOC   r     | JP2   r/w   | ODT   r     | RAR   r     | XLSX  r
-  DOCX  r     | JPEG  r/w   | OFR   r     | RAW   r/w   | XMP   r/w/c
-  DPX   r     | K25   r     | OGG   r     | RIFF  r     | ZIP   r
-  DV    r     | KDC   r     | OGV   r     | RSRC  r     |
-  DVB   r/w   | KEY   r     | ORF   r/w   | RTF   r     |
-  DYLIB r     | LA    r     | OTF   r     | RW2   r/w   |</pre>
+  3FR   r     | EIP   r     | LA    r     | OTF   r     | RW2   r/w
+  3G2   r/w   | EPS   r/w   | LNK   r     | PAC   r     | RWL   r/w
+  3GP   r/w   | ERF   r/w   | M2TS  r     | PAGES r     | RWZ   r
+  ACR   r     | EXE   r     | M4A/V r/w   | PBM   r/w   | RM    r
+  AFM   r     | EXIF  r/w/c | MEF   r/w   | PCD   r     | SO    r
+  AI    r/w   | EXR   r     | MIE   r/w/c | PDF   r/w   | SR2   r/w
+  AIFF  r     | EXV   r/w/c | MIFF  r     | PEF   r/w   | SRF   r
+  APE   r     | F4A/V r/w   | MKA   r     | PFA   r     | SRW   r/w
+  ARW   r/w   | FFF   r/w   | MKS   r     | PFB   r     | SVG   r
+  ASF   r     | FLA   r     | MKV   r     | PFM   r     | SWF   r
+  AVI   r     | FLAC  r     | MNG   r/w   | PGF   r     | THM   r/w
+  BMP   r     | FLV   r     | MODD  r     | PGM   r/w   | TIFF  r/w
+  BTF   r     | FPF   r     | MOS   r/w   | PLIST r     | TORRENT r
+  CHM   r     | FPX   r     | MOV   r/w   | PICT  r     | TTC   r
+  COS   r     | GIF   r/w   | MP3   r     | PMP   r     | TTF   r
+  CR2   r/w   | GZ    r     | MP4   r/w   | PNG   r/w   | VRD   r/w/c
+  CRW   r/w   | HDP   r/w   | MPC   r     | PPM   r/w   | VSD   r
+  CS1   r/w   | HDR   r     | MPG   r     | PPT   r     | WAV   r
+  DCM   r     | HTML  r     | MPO   r/w   | PPTX  r     | WDP   r/w
+  DCP   r/w   | ICC   r/w/c | MQV   r/w   | PS    r/w   | WEBP  r
+  DCR   r     | IDML  r     | MRW   r/w   | PSB   r/w   | WEBM  r
+  DFONT r     | IIQ   r/w   | MXF   r     | PSD   r/w   | WMA   r
+  DIVX  r     | IND   r/w   | NEF   r/w   | PSP   r     | WMV   r
+  DJVU  r     | INX   r     | NRW   r/w   | QTIF  r/w   | WV    r
+  DLL   r     | ITC   r     | NUMBERS r   | RA    r     | X3F   r/w
+  DNG   r/w   | J2C   r     | ODP   r     | RAF   r/w   | XCF   r
+  DOC   r     | JNG   r/w   | ODS   r     | RAM   r     | XLS   r
+  DOCX  r     | JP2   r/w   | ODT   r     | RAR   r     | XLSX  r
+  DPX   r     | JPEG  r/w   | OFR   r     | RAW   r/w   | XMP   r/w/c
+  DV    r     | K25   r     | OGG   r     | RIFF  r     | ZIP   r
+  DVB   r/w   | KDC   r     | OGV   r     | RSRC  r     |
+  DYLIB r     | KEY   r     | ORF   r/w   | RTF   r     |</pre>
 <pre>
   Meta Information
   ----------------------+----------------------+---------------------
@@ -144,15 +144,16 @@ supported by ExifTool (r = read, w = write, c = create):</p>
   IPTC           r/w/c  |  Kodak Meta     r/w  |  Adobe APP14    r
   XMP            r/w/c  |  FotoStation    r/w  |  MPF            r
   MakerNotes     r/w/c  |  PhotoMechanic  r/w  |  Stim           r
-  Photoshop IRB  r/w/c  |  JPEG 2000      r    |  APE            r
-  ICC Profile    r/w/c  |  DICOM          r    |  Vorbis         r
-  MIE            r/w/c  |  Flash          r    |  SPIFF          r
-  JFIF           r/w/c  |  FlashPix       r    |  DjVu           r
-  Ducky APP12    r/w/c  |  QuickTime      r    |  M2TS           r
-  PDF            r/w/c  |  Matroska       r    |  PE/COFF        r
-  PNG            r/w/c  |  GeoTIFF        r    |  AVCHD          r
-  Canon VRD      r/w/c  |  PrintIM        r    |  ZIP            r
-  Nikon Capture  r/w/c  |  ID3            r    |  (and more)</pre>
+  Photoshop IRB  r/w/c  |  JPEG 2000      r    |  DPX            r
+  ICC Profile    r/w/c  |  DICOM          r    |  APE            r
+  MIE            r/w/c  |  Flash          r    |  Vorbis         r
+  JFIF           r/w/c  |  FlashPix       r    |  SPIFF          r
+  Ducky APP12    r/w/c  |  QuickTime      r    |  DjVu           r
+  PDF            r/w/c  |  Matroska       r    |  M2TS           r
+  PNG            r/w/c  |  MXF            r    |  PE/COFF        r
+  Canon VRD      r/w/c  |  PrintIM        r    |  AVCHD          r
+  Nikon Capture  r/w/c  |  FLAC           r    |  ZIP            r
+  GeoTIFF        r/w/c  |  ID3            r    |  (and more)</pre>
 <p>
 </p>
 <hr />
@@ -338,10 +339,12 @@ shell globbing), and is often used when deleting all metadata (ie. <code>-All=</
 or an entire group (ie. <code>-GROUP:All=</code>, see note 4 below).  Note that not
 all groups are deletable, and that the JPEG APP14 &quot;Adobe&quot; group is not
 removed by default with <code>-All=</code> because it may affect the appearance of the
-image.  Use the <strong>-listd</strong> option for a complete list of deletable groups,
-and see note 5 below regarding the &quot;APP&quot; groups.  Also, within an image some
-groups may be contained within others, and these groups are removed if the
-containing group is deleted:</p>
+image.  However, this will remove color space information, so the colors may
+be affected (but this may be avoided by copying back the tags defined by the
+ColorSpaceTags shortcut).  Use the <strong>-listd</strong> option for a complete list of
+deletable groups, and see note 5 below regarding the &quot;APP&quot; groups.  Also,
+within an image some groups may be contained within others, and these groups
+are removed if the containing group is deleted:</p>
 <pre>
   JPEG Image:
   - Deleting EXIF or IFD0 also deletes ExifIFD, GlobParamIFD,
@@ -525,8 +528,8 @@ descriptions.  This option is mainly used for extracting embedded images or
 other binary data, but it may also be useful for some text strings since
 control characters (such as newlines) are not replaced by '.' as they are in
 the default output.  List items are separated by a newline when extracted
-with the <strong>-b</strong> option.  May be combined with <a href="#php"><code>-php</code></a> or <a href="#x"><code>-X</code></a> to extract
-binary data in PHP or XML format.</p>
+with the <strong>-b</strong> option.  May be combined with <code>-j</code>, <a href="#php"><code>-php</code></a> or <a href="#x"><code>-X</code></a> to
+extract binary data in JSON, PHP or XML format.</p>
 </dd>
 <dt><strong><a name="fmt" class="item"><strong>-c</strong> <em>FMT</em> (<strong>-coordFormat</strong>)</a></strong></dt>
 
@@ -599,7 +602,7 @@ information about coded character sets.</p>
 <dt><strong><a name="csv_csvfile" class="item"><strong>-csv</strong>[=<em>CSVFILE</em>]</a></strong></dt>
 
 <dd>
-<p>Export information in as a CSV file, or import information if <em>CSVFILE</em> is
+<p>Export information in CSV format, or import information if <em>CSVFILE</em> is
 specified.  When importing, the CSV file must be in exactly the same format
 as the exported file.  The first row of the <em>CSVFILE</em> must be the ExifTool
 tag names (with optional group names) for each column of the file, and
@@ -617,12 +620,16 @@ examples demonstrate basic use of this option:</p>
 columns are ignored if they exist (ie. ExifTool will not attempt to write
 these tags with a CSV import).  To force a tag to be deleted, use the <strong>-f</strong>
 option and set the value to &quot;-&quot; in the CSV file (or to the MissingTagValue
-if this API option was used).</p>
+if this API option was used).  Multiple databases may be imported in a
+single command.</p>
 <p>When exporting a CSV file, the <strong>-g</strong> or <strong>-G</strong> option to add group names to
 the tag headings.  If the <strong>-a</strong> option is used to allow duplicate tag names,
 the duplicate tags are only included in the CSV output if the column
 headings are unique.  Adding the <strong>-G4</strong> option ensures a unique column
-heading for each tag.</p>
+heading for each tag.  When exporting specific tags, the CSV columns are
+arranged in the same order as the specified tags provided the column
+headings exactly match the specified tag names, otherwise the columns are
+sorted in alphabetical order.</p>
 <p>List-type tags are stored as simple strings in a CSV file, but the <strong>-sep</strong>
 option may be used to split them back into separate items when importing.</p>
 <p>Special feature:  <strong>-csv</strong>+=<em>CSVFILE</em> may be used to add items to existing
@@ -728,8 +735,10 @@ simple strings).  The <strong>-a</strong> option is implied if the <strong>-g</s
 are used, otherwise it is ignored and duplicate tags are suppressed.  Adding
 the <strong>-D</strong> or <strong>-H</strong> option changes tag values to JSON objects with &quot;val&quot; and
 &quot;id&quot; fields, and adding <strong>-l</strong> adds a &quot;desc&quot; field, and a &quot;num&quot; field if the
-numerical value is different from the converted &quot;val&quot;.  The <strong>-b</strong>, <strong>-L</strong> and
-<strong>-charset</strong> options have no effect on the JSON output.</p>
+numerical value is different from the converted &quot;val&quot;.  The <strong>-b</strong> option may
+be added to output binary data, encoded in base64 if necessary (indicated by
+&quot;base64:&quot; as the first 7 bytes of the value).  The <strong>-L</strong> and <strong>-charset</strong>
+options have no effect on the JSON output.</p>
 <p>If <em>JSONFILE</em> is specified, the file is imported and the tag definitions
 from the file are used to set tag values on a per-file basis.  The special
 &quot;SourceFile&quot; entry in each JSON object associates the information with a
@@ -828,7 +837,7 @@ are ignored.  For example, this format file:</p>
     exiftool -p test.fmt a.jpg b.jpg</pre>
 <p>produces output like this:</p>
 <pre>
-    -- Generated by ExifTool 9.46 --
+    -- Generated by ExifTool 9.53 --
     File: a.jpg - 2003:10:31 15:44:19
     (f/5.6, 1/60s, ISO 100)
     File: b.jpg - 2006:05:23 11:57:38
@@ -1561,7 +1570,7 @@ application.</p>
 
 <dd>
 <p>Print a list of all valid tag names (<strong>-list</strong>), all writable tag names
-(<strong>-listw</strong>), all supported file extensions (<strong>-listff</strong>), all recognized file
+(<strong>-listw</strong>), all supported file extensions (<strong>-listf</strong>), all recognized file
 extensions (<strong>-listr</strong>), all writable file extensions (<strong>-listwf</strong>), all tag
 groups [in a specified family] (<strong>-listg</strong>[<em>NUM</em>]), all deletable tag groups
 (<strong>-listd</strong>), or an XML database of tag details including language
@@ -1611,9 +1620,10 @@ load exiftool for each invocation.</p>
 <dt><strong><a name="api_opt_val" class="item"><strong>-api</strong> <em>OPT[=VAL]</em></a></strong></dt>
 
 <dd>
-<p>Set ExifTool API option.  <em>OPT</em> is a case-sensitive API option name.  The
-option value is set to 1 if <em>=VAL</em> is omitted.  See <a href="ExifTool.html#options">Image::ExifTool Options</a> for a list of available API options.  This
-overrides API options set via the config file.</p>
+<p>Set ExifTool API option.  <em>OPT</em> is an API option name.  The option value is
+set to 1 if <em>=VAL</em> is omitted.  See
+<a href="ExifTool.html#options">Image::ExifTool Options</a> for a list of available
+API options.  This overrides API options set via the config file.</p>
 </dd>
 <dt><strong><a name="common_args" class="item"><strong>-common_args</strong></a></strong></dt>
 

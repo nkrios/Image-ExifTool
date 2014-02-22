@@ -31,7 +31,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::Minolta;
 
-$VERSION = '2.00';
+$VERSION = '2.04';
 
 sub ProcessSRF($$$);
 sub ProcessSR2($$$);
@@ -594,7 +594,7 @@ my %unknownCipherData = (
         },
     },
     # 0x200c - int32u[3]: '0 0 0'; seen '2 1 0' for HX9V 3D-Image (in both JPG and MPO image)
-    # 0x200d - rational64u: 10/10, seen 2.5 for DSC-TX300V, 8 for DSC-HX100V
+    # 0x200d - rational64u: 10/10, seen 2.5 for DSC-TX300V, 8 for DSC-HX100V/RX10
     0x200e => { #PH (HX20V)
         Name => 'PictureEffect',
         Writable => 'int16u',
@@ -671,7 +671,7 @@ my %unknownCipherData = (
         #   a2 d3 - DSC-WX60, WX80, WX200, WX300
         #   a3 c3 - NEX-6, DSC-HX300, HX50V
         #   a4 c3 - NEX-3N/5R/5T, ILCE-3000
-        # unknown offsets or values for DSC-TX20/TX55, DSC-RX100M2, DSC-QX10/QX100
+        # unknown offsets or values for DSC-TX20/TX55/RX100M2/QX10/QX100/RX10/HX60V/HX400V, ILCE-7/7R/5000/6000
     {
         Name => 'Tag2010a', # ad
         Condition => '$$self{Model} =~ /^NEX-5N$/',
@@ -694,7 +694,7 @@ my %unknownCipherData = (
     },{
         Name => 'Tag2010e', # 9a, 9b, 9c, 9d, 9e, a1, a2, a3, a4
         Condition => q{
-            $$self{Model} =~ /^(SLT-A99V?|SLT-A58|ILCE-3000|NEX-(3N|5R|5T|6|VG900|VG30E)|DSC-(RX100|RX1|RX1R))$/ or
+            $$self{Model} =~ /^(SLT-A99V?|SLT-A58|ILCE-3000|NEX-(3N|5R|5T|6|VG900|VG30E)|DSC-(RX100|RX1|RX1R)|Stellar)$/ or
             ($$self{Model} =~ /^(DSC-(HX300|HX50V|TX30|WX60|WX80|WX200|WX300))$/ and not $$self{Panorama})
         },
         SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag2010e' },
@@ -704,7 +704,7 @@ my %unknownCipherData = (
         SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag2010f' },
     },{
         Name => 'Tag2010g', # ?
-        Condition => '$$self{Model} =~ /^(DSC-RX10|ILCE-7|ILCE-7R)\b/',
+        Condition => '$$self{Model} =~ /^(DSC-(RX10|HX60V|HX400V)|ILCE-(7R?|[56]000))\b/',
         SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag2010g' },
     },{
         Name => 'Tag_0x2010',
@@ -836,6 +836,15 @@ my %unknownCipherData = (
             19 => 'Upper Far Left',
         },
     },
+    # 0x201f - 0 0 0 0 for SLT and DSC; 4 values for NEX
+    # 0x2020 - 10 values; for SLT and NEX/ILCE with A-Mount lens: relates to (phase-detect) AFPoints
+    0x2020 => {
+        Name => 'AFInfo2',
+        SubDirectory => { TagTable => 'Image::ExifTool::Sony::AFInfo2' },
+    },
+    # 0x2021 - 0 for DSC; 0, 1 or 2 for SLT and NEX: 1=Face, 2=object-tracking ?
+    # 0x2022 - 13x 0 for SLT and NEX; 13 values for DSC
+    # 0x2023 - 0
     0x3000 => {
         Name => 'ShotInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Sony::ShotInfo' },
@@ -859,6 +868,7 @@ my %unknownCipherData = (
         Name => 'Tag9050',
         # 944 bytes for A37, A57, A99, NEX-F3, NEX-5R, NEX-6, DSC-RX1, DSC-RX100
         # 3072 bytes for A65, A77, NEX-5N, NEX-7, NEX-VG20 (ref 12)
+        Condition => '$$self{Model} !~ /^Stellar/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::Tag9050',
             ByteOrder => 'LittleEndian',
@@ -871,7 +881,7 @@ my %unknownCipherData = (
     # 0x0a (e) for SLT-A37/A57/A65V/A77V, NEX-F3/5N/5R/5T/6/7/VG20E, DSC-RX100/RX1/RX1R/HX10V/HX20V/HX30V/HX200V/TX200V/TX300V/TX66/WX50/WX100/WX150
     # 0x0c (e) for ILCE-3000, NEX-3N, SLT-A58, DSC-HX50V/HX300/RX100M2/TX30/WX60/WX80/WX200/WX300, DSC-QX10/QX100
     # 0xd0 (e) H90, W650, W690: tag9400 decoding appears not valid/different
-    # 0x23 (e) for DSC-RX10, ILCE-7/7R
+    # 0x23 (e) for DSC-RX10/HX60V/HX400V, ILCE-7/7R/5000/6000
     # first byte decoded: 40, 204, 202, 27, 58, 62 respectively
     {
         Name => 'Tag9400a',
@@ -918,7 +928,8 @@ my %unknownCipherData = (
         #   38 00 32 0e    0x09fc    (l)  SLT-A58, ILCE-3000, NEX-3N, DSC-HX300/HX50V/WX200/WX300/WX60/WX80/TX30
         #   3a 10 3a 0e    0x0a01    (m)  DSC-QX10/QX100
         #   3a 20 47 0e    0x0a01    (m)  DSC-RX100M2
-        #   43 00 66 0e    0x0a1b    (n)  ILCE-7/7R, DSC-RX10
+        #   43 00 66 0e    0x0a1b    (n)  ILCE-7/7R/5000, DSC-RX10/HX400V
+        #   44 00 9c 0e    0x0a39    (o)  ILCE-6000, DSC-HX60V
         #
         # 0x0004 - (RX100: 0 or 1. subsequent data valid only if 1 - PH)
         # 0x0007 => {
@@ -944,10 +955,11 @@ my %unknownCipherData = (
         #   0x0f      0x01     NEX-5N/7/VG20
         #   0x10      0x01     DSC-RX100 etc., ILCE-3000, NEX-3N/5R/5T/6/VG30/VG900
         #   0x11      0x01     DSC-RX100M2/QX10/QX100
-        #   0x12,0x13 0x01     DSC-RX10, ILCE-7/7R
+        #   0x12,0x13 0x01     ILCE-7/7R/5000, DSC-RX10/HX400V
+        #   0x14      0x01     ILCE-6000, DSC-HX60V
         #   var       var      SLT-A58/A99V
-        # only valid when first byte 0x0f, 0x10, 0x11, 0x12, 0x13 (enciphered 0x8a, 0x70, 0xb6, 0x69, 0x88)
-        Condition => '$$self{DoubleCipher} ? $$valPt =~ /^[\x7e\x46\x1d\x18\x3a]\x01/ : $$valPt =~ /^[\x8a\x70\xb6\x69\x88]\x01/',
+        # only valid when first byte 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14 (enciphered 0x8a, 0x70, 0xb6, 0x69, 0x88, 0x20)
+        Condition => '$$self{DoubleCipher} ? $$valPt =~ /^[\x7e\x46\x1d\x18\x3a\x95]\x01/ : $$valPt =~ /^[\x8a\x70\xb6\x69\x88\x20]\x01/',
         SubDirectory => { TagTable => 'Image::ExifTool::Sony::Tag9402' },
     },{
         Name => 'Sony_0x9402',
@@ -967,10 +979,12 @@ my %unknownCipherData = (
         %unknownCipherData,
     },
     # 0x9405 first 2 bytes:
-    # SLT, DSC-RX100/RX1, NEX, ILCE-3000  3   0  (0x1b = 27 0 enc.)
+    # DSC-H90                             0   0  (0x00 = 0 0 enc.)
+    # DSC and HDR of HX9V generation      2   0  (0x08 = 8 0 enc.)
+    # SLT, DSC-RX100/RX1, NEX, ILCE-3000  3   0  (0x1b = 27 0 enc.)  (many DSC of RX100 generation, also QX10 and QX100)
     # DSC-RX1R                            4   0  (0x40 = 64 0 enc.)
     # DSC-RX100M2                         5   0  (0x7d = 125 0 enc.)
-    # DSC-RX10, ILCE-7/7R               136 var  (0x3a = 58 var enc.)
+    # DSC-RX10/HX400V/HX60V, ILCE-7/7R/5000/6000   136 var  (0x3a = 58 var enc.)
     0x9405 => [{
         Name => 'Tag9405a',
         # first byte must be 0x1b
@@ -1116,7 +1130,7 @@ my %unknownCipherData = (
             294 => 'SLT-A99 / SLT-A99V', #12
             295 => 'NEX-6', #12
             296 => 'NEX-5R', #12
-            297 => 'DSC-RX100', #PH
+            297 => 'DSC-RX100', #PH (also used by Hasselblad Stellar, ref 12)
             298 => 'DSC-RX1', #12
             299 => 'NEX-VG900', #12
             300 => 'NEX-VG30E', #12
@@ -1129,6 +1143,8 @@ my %unknownCipherData = (
             309 => 'DSC-RX10', #12
             310 => 'DSC-RX1R', #12
             311 => 'ILCE-7R', #12
+            312 => 'ILCE-6000', #12
+            313 => 'ILCE-5000', #12
         },
     },
     0xb020 => { #2
@@ -4133,18 +4149,30 @@ my %faceInfo = (
     #   bit 5 ( 32) ON = OVF,        OFF = LiveView
     #   bit 6 ( 64) seen ON and OFF, meaning unknown
     #   bit 7 (128) seen ON and OFF, meaning unknown
-    0x0016 => {
+    # 0x0016: DSLR: seen 244,245,252,254, decoded for A580 with 32GB SD and 16GB MS cards
+    # 0x0016: NEX:  seen 61,62,  125,126,  190: bits '64' and '128' appear to relate to CameraOrientation
+    # 0x0016: SLT:  seen 64 - 78, meaning unknown
+    0x0016 => [{
         Name => 'MemoryCardConfiguration',
         Condition => '$$self{Model} =~ /^DSLR-/',
-        #  DSLR: seen 244,245,252,254, decoded for A580 with 32GB SD and 16GB MS cards
-        #  SLT:  seen 64 - 78,   NEX:  seen 62, 190
         PrintConv => {
             244 => 'MemoryStick in use, SD card present',
             245 => 'MemoryStick in use, SD slot empty',
             252 => 'SD card in use, MemoryStick present',
             254 => 'SD card in use, MemoryStick slot empty',
         },
-    },
+    },{
+        Name => 'CameraOrientation',
+        Condition => '$$self{Model} =~ /^(NEX-(3|5|5C|C3|VG10|VG10E))\b/',
+        Mask => 0xc0, # (don't know what other bits mean)
+        PrintConv => {
+            0x00 =>  'Horizontal (normal)',
+            0x40 =>  'Rotate 90 CW',
+            0x80 =>  'Rotate 270 CW',
+            0xc0 =>  'Rotate 180', # (NC)
+        },
+
+    }],
     # 0x0017: seen 0 for SLT, 255 for DSLR, variable for NEX
     0x0018 => {
         Name => 'CameraOrientation',
@@ -4165,6 +4193,43 @@ my %faceInfo = (
     # 0x001a, 0x001c appear to be 2 int16u values, meaning unknown
 );
 
+
+# more AF information (ref 12)
+%Image::ExifTool::Sony::AFInfo2 = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    0 => {
+        Name => 'AFPointsUsed',
+        Condition => '$$self{Model} =~ /^SLT-/',
+        Format => 'int32u',
+        Notes => 'SLT models only',
+        PrintConvColumns => 2,
+        PrintConv => {
+            0 => '(none)',
+            BITMASK => {
+                0 => 'Center',
+                1 => 'Top',
+                2 => 'Upper-right',
+                3 => 'Right',
+                4 => 'Lower-right',
+                5 => 'Bottom',
+                6 => 'Lower-left',
+                7 => 'Left',
+                8 => 'Upper-left',
+                9 => 'Far Right',
+                10 => 'Far Left',
+                11 => 'Upper-middle',
+                12 => 'Near Right',
+                13 => 'Lower-middle',
+                14 => 'Near Left',
+                15 => 'Upper Far Right',
+                16 => 'Lower Far Right',
+                17 => 'Lower Far Left',
+                18 => 'Upper Far Left',
+            },
+        },
+    },
+);
 
 # shot information (ref PH)
 %Image::ExifTool::Sony::ShotInfo = (
@@ -4704,7 +4769,7 @@ my %exposureProgram2010 = (
     WRITE_PROC => \&WriteEnciphered,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     FORMAT => 'int8u',
-    NOTES => 'Valid for DSC-RX10, ILCE-7/7R.',
+    NOTES => 'Valid for DSC-RX10/HX60V/HX400V, ILCE-7/7R/5000/6000.',
     WRITABLE => 1,
     FIRST_ENTRY => 0,
     PRIORITY => 0,
@@ -4856,15 +4921,15 @@ my %exposureProgram2010 = (
         PrintConv => 'sprintf("%.1f",$val)',
         PrintConvInv => '$val',
     },
-    0x004c => { # only ILCE-7/7R
+    0x004c => { # only ILCE-7/7R/5000/6000
         Name => 'ImageCount2',
-        Condition => '$$self{Model} =~ /^(ILCE-7|ILCE-7R)\b/',
+        Condition => '$$self{Model} =~ /^(ILCE-(7R?|[56]000))\b/',
         Format => 'int32u',
         RawConv => '$val & 0x00ffffff',
     },
-    0x0051 => { # only ILCE-7/7R, but hours usually different from SonyDateTime - UTC?
+    0x0051 => { # only ILCE-7/7R/5000/6000, but hours usually different from SonyDateTime - UTC?
         Name => 'SonyDateTime2',
-        Condition => '$$self{Model} =~ /^(ILCE-7|ILCE-7R)\b/',
+        Condition => '$$self{Model} =~ /^(ILCE-(7R?|[56]000))\b/',
         Groups => { 2 => 'Time' },
         Shift => 'Time',
         Format => 'undef[6]',
@@ -5112,7 +5177,7 @@ my %exposureProgram2010 = (
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
     FORMAT => 'int8u',
     WRITABLE => 1,
-    NOTES => 'Valid for DSC-RX10, ILCE-7/7R.',
+    NOTES => 'Valid for DSC-RX10/HX60V/HX400V, ILCE-7/7R/5000/6000.',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     0x0009 => { %releaseMode2 },
@@ -5203,7 +5268,7 @@ my %exposureProgram2010 = (
             0 => 'Manual',
             2 => 'AF-S',
             3 => 'AF-C',
-            # 4 => 'AF-A', # not for DSC, NEX, ILCE ...
+            4 => 'AF-A', # seen in ILCE-6000 images
             6 => 'DMF',
             # 7 => 'AF-D', # not for DSC, NEX, ILCE ...
         },
@@ -5223,7 +5288,7 @@ my %exposureProgram2010 = (
         },
     },
     # 0x24, 0x26: factor 10 for NEX and ILCE, factor 100 for DSC
-    # 0x24, 0x26, 0x28, 0x2a: inconsistent for A-mount lenses on NEX/ILCE: some correct, some 0, some incorrect ... 
+    # 0x24, 0x26, 0x28, 0x2a: inconsistent for A-mount lenses on NEX/ILCE: some correct, some 0, some incorrect ...
     # 0x28 - not valid for DSC-[HTW]X models, or DSC-RX100
 #    0x24 => { # same values as Exif FocalLength
 #        Name => 'FocalLength',
@@ -5303,6 +5368,7 @@ my %exposureProgram2010 = (
     PRIORITY => 0,
     DATAMEMBER => [ 0x0604 ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    NOTES => 'Valid for SLT, NEX, ILCE-3000 and several DSC models.',
     # 0x0602 - same as 0x0604, but has value 3 for 50mm F1.4 ZA, DT 18-135mm and for 70-400mm G II: meaning ??
     0x0603 => {
         Name => 'LensFormat',
@@ -5353,7 +5419,7 @@ my %exposureProgram2010 = (
     PRIORITY => 0,
     DATAMEMBER => [ 0x005e ],
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
-    NOTES => 'Valid for the DSC-RX10 and ILCE-7/7R.',
+    NOTES => 'Valid for the DSC-RX10/HX60V/HX400V and ILCE-7/7R/5000/6000.',
     0x000e => { # appr. same value as Exif ExposureTime, but shorter in HDR-modes
         Name => 'SonyExposureTime2',
         Format => 'int16u',
@@ -5456,7 +5522,7 @@ my %exposureProgram2010 = (
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
 #    0x0000: 1 for A37, A57, A65, A77, NEX-5N, 7, F3, VG20
-#            2 for A99, NEX-5R, NEX-6
+#            2 for A58/99V, NEX-3N/5R/5T/6/VG30/VG900, ILCE-3000/7/7R/5000/6000
 #    0x0001+0x0002: Int16u, seen 580 - 770: similar to "BatteryUnknown" ??
 #    0x0005: int8u, seen 73 - 117: maybe Fahrenheit? Higher than "AmbientTemperature", but same trend.
     0x0005 => {

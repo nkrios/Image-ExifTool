@@ -28,7 +28,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD $iptcDigestInfo);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.43';
+$VERSION = '1.44';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -197,7 +197,7 @@ my %psdMap = (
             if (lc($val) eq 'new' or lc($val) eq 'old') {
                 {
                     local $SIG{'__WARN__'} = sub { };
-                    return lc($val) if eval 'require Digest::MD5';
+                    return lc($val) if eval { require Digest::MD5 };
                 }
                 warn "Digest::MD5 must be installed\n";
                 return undef;

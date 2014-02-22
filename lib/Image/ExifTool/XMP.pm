@@ -47,7 +47,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.70';
+$VERSION = '2.74';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -56,6 +56,7 @@ sub WriteXMP($$;$);
 sub CheckXMP($$$);
 sub ParseXMPElement($$$;$$$$);
 sub DecodeBase64($);
+sub EncodeBase64($;$);
 sub SaveBlankInfo($$$;$);
 sub ProcessBlankInfo($$$;$);
 sub ValidateXMP($;$);
@@ -2336,6 +2337,7 @@ sub UnescapeChar($$)
 # Returns: 0=regular ASCII, -1=invalid UTF-8, 1=valid UTF-8 with maximum 16-bit
 #          wide characters, 2=valid UTF-8 requiring 32-bit wide characters
 # Notes: Changes current string position
+# (see http://www.fileformat.info/info/unicode/utf8.htm for help understanding this)
 sub IsUTF8($)
 {
     my $strPt = shift;
@@ -2717,9 +2719,10 @@ sub PrintLensID(@)
     local $_;
     my ($et, $id, $make, $info, $focalLength, $lensModel) = @_;
     my ($mk, $printConv);
+    my %alt = ( Pentax => 'Ricoh' );    # Pentax changed its name to Ricoh
     # missing: Olympus (no XMP:LensID written by Adobe)
     foreach $mk (qw(Canon Nikon Pentax Sony Sigma Samsung Leica)) {
-        next unless $make =~ /$mk/i;
+        next unless $make =~ /$mk/i or ($alt{$mk} and $make =~ /$alt{$mk}/i);
         # get name of module containing the lens lookup (default "Make.pm")
         my $mod = { Sigma => 'SigmaRaw', Leica => 'Panasonic' }->{$mk} || $mk;
         require "Image/ExifTool/$mod.pm";
@@ -2840,17 +2843,22 @@ sub FoundXMP($$$$;$)
         }
     }
 
-    # look up this tag in the appropriate table
-    $table or $table = 'Image::ExifTool::XMP::other';
-    $tagTablePtr = GetTagTable($table);
-    if ($$tagTablePtr{NAMESPACE}) {
+    if (not $ns and $$tagTablePtr{GROUPS}{0} ne 'XMP') {
+        # this is a simple XML table (no namespaces)
         $tagID = $tag;
     } else {
-        # add XMP namespace prefix to avoid collisions in variable-namespace tables
-        $xns = $xmpNS{$ns} || $ns;
-        $tagID = "$xns:$tag";
-        # add namespace to top-level structure property
-        $structProps[0][0] = "$xns:" . $structProps[0][0] if @structProps;
+        # look up this tag in the appropriate table
+        $table or $table = 'Image::ExifTool::XMP::other';
+        $tagTablePtr = GetTagTable($table);
+        if ($$tagTablePtr{NAMESPACE}) {
+            $tagID = $tag;
+        } else {
+            # add XMP namespace prefix to avoid collisions in variable-namespace tables
+            $xns = $xmpNS{$ns} || $ns;
+            $tagID = "$xns:$tag";
+            # add namespace to top-level structure property
+            $structProps[0][0] = "$xns:" . $structProps[0][0] if @structProps;
+        }
     }
     my $tagInfo = $et->GetTagInfo($tagTablePtr, $tagID);
 
@@ -3138,13 +3146,12 @@ sub ParseXMPElement($$$;$$$$)
         my $parseResource;
         if ($prop eq 'rdf:li') {
             # impose a reasonable maximum on the number of items in a list
-            if ($nItems > 999) {
-                my ($tg,$ns);
-                ($tg, $ns) = GetXMPTagID($propListPt) if $nItems == 1000;
+            if ($nItems == 1000) {
+                my ($tg,$ns) = GetXMPTagID($propListPt);
                 if ($isWriting) {
-                    $et->Warn("Excessive number of items for $ns:$tg. Processing may be slow.", 1) if $tg;
+                    $et->Warn("Excessive number of items for $ns:$tg. Processing may be slow.", 1);
                 } elsif (not $$et{OPTIONS}{IgnoreMinorErrors}) {
-                    $et->Warn("Excessive number of items for $ns:$tg. Extracted only the first 1000.", 2) if $tg;
+                    $et->Warn("Excessive number of items for $ns:$tg. Extracted only the first 1000.", 2);
                     last;
                 }
             }

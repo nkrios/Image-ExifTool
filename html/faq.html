@@ -41,6 +41,7 @@ ol.index { margin: 0; padding: 0 0 0 2em }
 <li><a href="#Q23">"0 image files updated"</a></li>
 <li><a href="#Q24">Date/time gets reset to today</a></li>
 <li><a href="#Q25">Image validation</a></li>
+<li><a href="#Q26">Import from database</a></li>
 </ol>
 </div>
 
@@ -468,9 +469,9 @@ Vorbis information:</blockquote>
 
 <!-- NOTE: CHANGES TO FAQ 10 MUST ALSO BE REFLECTED IN ExifTool.pod! -->
 
-<blockquote><b>EXIF</b>: Most textual information in EXIF is stored in "ASCII"
+<blockquote><b>EXIF</b>: Most textual information in EXIF is stored in ASCII
 format (called "string" in the <a href="TagNames/index.html">ExifTool tag name
-documentation</a>).  By default ExifTool does not convert these strings. 
+documentation</a>).  By default ExifTool does not convert these strings.
 However, it is not uncommon for applications to write UTF&#8209;8 or other
 encodings where ASCII is expected.  To deal with these, ExifTool allows the
 internal EXIF string encoding to be specified with
@@ -696,6 +697,9 @@ name, or to disable the config file feature.
 <a name="Q12"></a>
 <p>12. <b>"How do I export information from exiftool to a database?"</b></p>
 
+<blockquote><i>[See <a href="#Q26">FAQ number 26</a> for help with the reverse
+-- importing metadata from a database.]</i></blockquote>
+
 <blockquote>
 It is often easiest to export information formatted as  a tab-delimited or
 comma-separated list of values using the exiftool <code>-T</code> or
@@ -804,11 +808,6 @@ with an empty value for missing tags.</blockquote>
 See the <code>-p</code> option in the <a href="exiftool_pod.html">application
 documentation</a> for more information about this feature.
 </blockquote>
-
-<blockquote><b>Note</b>:  Information may be <b>imported</b> from CSV or JSON files for
-writing to images by specifying an input file name with the <code>-csv</code> or
-<code>-j</code> option.  See the <a href="exiftool_pod.html">exiftool
-application documentation</a> for more details.</blockquote>
 
 <a name="Q13"></a>
 <p>13a. <b>"Why is my file smaller after I use ExifTool to write information?"</b>, or
@@ -1428,8 +1427,56 @@ reading, and will often catch more problems when writing, but it does not
 attempt to do a full validation.  If you are looking for a validator,
 try <a href="http://jhove.sourceforge.net">JHOVE</a>.</blockquote>
 
+<a name="Q26"></a>
+<p>26. <b>"How do I import information from a database?"</b></p>
+
+<blockquote><i>[See <a href="#Q12">FAQ number 12</a> for help with the reverse
+-- exporting metadata to a database.]</i></blockquote>
+
+<blockquote>ExifTool has the ability to import metadata from CSV and JSON format
+database files for writing to output image files. For example, the following
+commands use imported metadata to write to all image files in a directory.
+
+<pre><span class='blk'># import from CSV file</span>
+exiftool -csv="c:\Users\Phil\test.csv" "c:\Users\Phil\Images"
+
+<span class='blk'># import from JSON file</span>
+exiftool -json="c:\Users\Phil\test.json" "c:\Users\Phil\Images"</pre>
+
+For the above commands, the input CSV or JSON file must have the same format as
+the output from these commands:
+
+<pre><span class='blk'># export to CSV file</span>
+exiftool -csv "c:\Users\Phil\Images" > "c:\Users\Phil\test.csv"
+
+<span class='blk'># export to JSON file</span>
+exiftool -json "c:\Users\Phil\Images" > "c:\Users\Phil\test.json"</pre>
+
+Specifically, the first row of the CSV file must contain the tag names.
+The first column must be a special "SourceFile" column, containing the names of
+the associated image files, with paths specified in the same way as on the
+command line.  The JSON file contains similar entries, but is not structured in
+row/column format.</blockquote>
+
+<blockquote>For each image file specified on the command line, all tags for the
+database entry with the corresponding SourceFile name are written (with the
+exception of the FileName and Directory tags, which are ignored).  A special
+SourceFile name of "*" may be used to match any image file.  A warning is issued
+and nothing is written if a specified file does not match any SourceFile entry
+in the database.</blockquote>
+
+<blockquote>Tag names may be prefixed by a group name to write to a specific
+group (using the same format as when <code>-G</code> or <code>-G1</code> is
+added to the export command).  Tags with empty values are ignored.  To delete a
+tag, set the tag value to "-" and use the <code>-f</code> option when
+importing.</blockquote>
+
+<blockquote>See the <code>-csv</code> or <code>-j</code> option in the
+<a href="exiftool_pod.html#input_output_text_formatting">application documentation</a>
+for more details.</blockquote>
+
 <hr>
-<i>Last revised Jan. 3, 2014</i>
+<i>Last revised Jan. 24, 2014</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

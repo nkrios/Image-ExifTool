@@ -26,6 +26,7 @@
 #              18) Tomasz Kawecki private communication
 #              19) Brad Grier private communication
 #              20) Niels Kristian Bech Jensen private communication
+#              21) Iliah Borg private communication (LibRaw)
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -35,7 +36,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '2.13';
+$VERSION = '2.16';
 
 sub PrintLensInfo($$$);
 
@@ -74,7 +75,7 @@ my %olympusLensTypes = (
     '0 10 10' => 'Olympus M.Zuiko Digital ED 12-50mm F3.5-6.3 EZ', #PH
     '0 11 10' => 'Olympus M.Zuiko Digital 45mm F1.8', #17
     '0 12 10' => 'Olympus M.Zuiko Digital ED 60mm F2.8 Macro', #20
-    '0 13 10' => 'Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6 II R', #PH
+    '0 13 10' => 'Olympus M.Zuiko Digital 14-42mm F3.5-5.6 II R', #PH/20
     '0 14 10' => 'Olympus M.Zuiko Digital ED 40-150mm F4.0-5.6 R', #19
   # '0 14 10.1' => 'Olympus M.Zuiko Digital ED 14-150mm F4.0-5.6 II', #11 (questionable & unconfirmed)
     '0 15 00' => 'Olympus Zuiko Digital ED 7-14mm F4.0',
@@ -86,7 +87,9 @@ my %olympusLensTypes = (
     '0 19 10' => 'Olympus M.Zuiko Digital ED 12-40mm F2.8 Pro', #PH
     '0 20 00' => 'Olympus Zuiko Digital 35mm F3.5 Macro', #9
   # '0 20 10' => 'Olympus M.Zuiko Digital ED 40-150mm F2.8 Pro', #PH (guess)
+    '0 21 10' => 'Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6 EZ', #20
     '0 22 00' => 'Olympus Zuiko Digital 17.5-45mm F3.5-5.6', #9
+    '0 22 10' => 'Olympus M.Zuiko Digital 25mm F1.8', #20
     '0 23 00' => 'Olympus Zuiko Digital ED 14-42mm F3.5-5.6', #PH
     '0 24 00' => 'Olympus Zuiko Digital ED 40-150mm F4.0-5.6', #PH
     '0 30 00' => 'Olympus Zuiko Digital ED 50-200mm F2.8-3.5 SWD', #7
@@ -143,7 +146,7 @@ my %olympusLensTypes = (
     '2 17 10' => 'Lumix G X Vario 35-100mm F2.8 Power OIS', #PH
     '2 18 10' => 'Lumix G Vario 14-42mm F3.5-5.6 II Asph. Mega OIS', #20
     '2 19 10' => 'Lumix G Vario 14-140mm F3.5-5.6 Asph. Power OIS', #20
-  # '2 20 10' => 'Lumix G Vario 12-32mm F3.5-5.6 Asph. Mega OIS', #20 (guess)
+    '2 20 10' => 'Lumix G Vario 12-32mm F3.5-5.6 Asph. Mega OIS', #20
     '2 21 10' => 'Leica DG Nocticron 42.5mm F1.2 Asph. Power OIS', #20
     '3 01 00' => 'Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
     '3 02 00' => 'Leica D Summilux 25mm F1.4 Asph.',
@@ -358,6 +361,7 @@ my %olympusCameraTypes = (
     S0044 => 'E-P5',
     S0045 => 'E-PL6',
     S0047 => 'E-M1',
+    S0051 => 'E-M10',
     SR45 => 'D220',
     SR55 => 'D320L',
     SR83 => 'D340L',
@@ -2542,6 +2546,12 @@ my %indexInfo = (
     },
     # 0x800 LensDistortionParams, float[9] (ref 11)
     # 0x801 LensShadingParams, int16u[16] (ref 11)
+    0x0805 => { #21
+        Name => 'SensorCalibration',
+        Notes => '2 numbers: 1. recommended maximum, 2. calibration midpoint',
+        Writable => 'int16s',
+        Count => 2,
+    },
     # 0x1010-0x1012 are the processing options used in camera or in
     # Olympus software, which 0x050a-0x050c are in-camera only (ref 6)
     0x1010 => { #PH/4

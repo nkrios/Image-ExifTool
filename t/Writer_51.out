@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.37
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.47
 [File, System, Image] FileName - File Name: Writer_51_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 24 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2013:09:12 13:45:44-04:00
-[File, System, Time] FileAccessDate - File Access Date/Time: 2013:09:12 13:45:44-04:00
-[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2013:09:12 13:45:44-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2014:01:17 09:33:44-05:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2014:01:17 09:33:44-05:00
+[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2014:01:17 09:33:44-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -226,6 +226,21 @@
 [APP5, RMETA, Image] Lit - Lit: No
 [APP5, RMETA, Image] Condition - Condition: Good
 [APP5, RMETA, Image] Azimuth - Azimuth: E
+[XML, MediaJukebox, Image] Tool_Name - Tool Name: Media Center
+[XML, MediaJukebox, Image] Tool_Version - Tool Version: 19.0.67
+[XML, MediaJukebox, Image] People - People: Santa
+[XML, MediaJukebox, Image] Places - Places: Jamaica
+[XML, MediaJukebox, Time] Date - Date: 2013:09:01 20:12:19
+[XML, MediaJukebox, Image] Album - Album: 2013-09-01
+[XML, MediaJukebox, Image] Name - Name: Glass home at night
+[APP11, JPEG-HDR, Image] ver - JPEG-HDR Version: 11
+[APP11, JPEG-HDR, Image] ln0 - Ln0: 0.122262
+[APP11, JPEG-HDR, Image] ln1 - Ln1: 2.634655
+[APP11, JPEG-HDR, Image] s2n - S2n: 2.269635e+03
+[APP11, JPEG-HDR, Image] alp - Alpha: 1.000000
+[APP11, JPEG-HDR, Image] bet - Beta: 1.000000
+[APP11, JPEG-HDR, Image] cor - Correction Method: 0
+[APP11, JPEG-HDR, Image] RatioImage - Ratio Image: (Binary data 19 bytes)
 [APP12, PictureInfo, Time] TimeDate - Date/Time Original: 1998:12:31 15:17:20
 [APP12, PictureInfo, Image] Shutter - Exposure Time: 1/155
 [APP12, PictureInfo, Image] Flash - Flash: Off

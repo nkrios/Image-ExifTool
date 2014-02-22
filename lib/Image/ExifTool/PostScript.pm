@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.36';
+$VERSION = '1.37';
 
 sub WritePS($$);
 sub ProcessPS($$;$);
@@ -545,7 +545,7 @@ sub ProcessPS($$;$)
             next;
         } elsif ($embedded and $data =~ /^%AI12_CompressedData/) {
             # the rest of the file is compressed
-            unless (eval 'require Compress::Zlib') {
+            unless (eval { require Compress::Zlib }) {
                 $et->Warn('Install Compress::Zlib to extract compressed embedded data');
                 last;
             }

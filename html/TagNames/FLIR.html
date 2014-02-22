@@ -62,6 +62,16 @@ SEQ file, even though SEQ is not listed as a supported file type.</p>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#RawData'>FLIR RawData Tags</a></td></tr>
 <tr class=b>
+<td title='0x0005 = 5'>0x0005</td>
+<td>GainDeadData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='FLIR.html#GainDeadData'>FLIR GainDeadData Tags</a></td></tr>
+<tr>
+<td title='0x0006 = 6'>0x0006</td>
+<td>CoarseData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='FLIR.html#CoarseData'>FLIR CoarseData Tags</a></td></tr>
+<tr class=b>
 <td title='0x000e = 14'>0x000e</td>
 <td>EmbeddedImage</td>
 <td class=c>-</td>
@@ -72,20 +82,30 @@ SEQ file, even though SEQ is not listed as a supported file type.</p>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#CameraInfo'>FLIR CameraInfo Tags</a></td></tr>
 <tr class=b>
+<td title='0x0021 = 33'>0x0021</td>
+<td>MeasurementInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='FLIR.html#MeasInfo'>FLIR MeasInfo Tags</a></td></tr>
+<tr>
 <td title='0x0022 = 34'>0x0022</td>
 <td>PaletteInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#PaletteInfo'>FLIR PaletteInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0023 = 35'>0x0023</td>
 <td>TextInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#TextInfo'>FLIR TextInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0024 = 36'>0x0024</td>
 <td>EmbeddedAudioFile</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0028 = 40'>0x0028</td>
+<td>PaintData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='FLIR.html#PaintData'>FLIR PaintData Tags</a></td></tr>
 <tr>
 <td title='0x002a = 42'>0x002a</td>
 <td>PiP</td>
@@ -103,7 +123,7 @@ SEQ file, even though SEQ is not listed as a supported file type.</p>
 <td>--&gt; <a href='FLIR.html#MeterLink'>FLIR MeterLink Tags</a></td></tr>
 <tr class=b>
 <td title='0x002e = 46'>0x002e</td>
-<td>ParamInfo</td>
+<td>ParameterInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#ParamInfo'>FLIR ParamInfo Tags</a></td></tr>
 </table></td></tr></table></blockquote>
@@ -133,10 +153,68 @@ as-is.  Note that most FLIR cameras using the PNG format seem to write the
 <td class=r title='16 = 0x10'>16</td>
 <td>RawThermalImageType</td>
 <td class=c>N</td>
-<td><span class=s><span class=n>(TIFF or PNG)</span></span></td></tr>
+<td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='16 = 0x10'>16.1</td>
 <td>RawThermalImage</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='GainDeadData'>FLIR GainDeadData Tags</a></h2>
+<p>Information found in FFF-format .GAN calibration image files.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index2</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='1 = 0x1'>1</td>
+<td>GainDeadMapImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='2 = 0x2'>2</td>
+<td>GainDeadMapImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>GainDeadMapImageType</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='16 = 0x10'>16.1</td>
+<td>GainDeadMapImage</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CoarseData'>FLIR CoarseData Tags</a></h2>
+<p>Information found in FFF-format .CRS correction image files.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index2</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='1 = 0x1'>1</td>
+<td>CoarseMapImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='2 = 0x2'>2</td>
+<td>CoarseMapImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>CoarseMapImageType</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='16 = 0x10'>16.1</td>
+<td>CoarseMapImage</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -161,7 +239,8 @@ as-is.  Note that most FLIR cameras using the PNG format seem to write the
 <td class=r title='16 = 0x10'>16</td>
 <td>EmbeddedImageType</td>
 <td class=c>N</td>
-<td><span class=s><span class=n>(&quot;PNG&quot; for PNG image in Y Cb Cr colors, or &quot;DAT&quot; for other image data)</span></span></td></tr>
+<td><span class=s><span class=n>(&quot;PNG&quot; for PNG image in Y Cb Cr colors, &quot;JPG&quot; for a JPEG image, or &quot;DAT&quot; for
+other image data)</span></span></td></tr>
 <tr class=b>
 <td class=r title='16 = 0x10'>16.1</td>
 <td>EmbeddedImage</td>
@@ -361,6 +440,39 @@ for details.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='MeasInfo'>FLIR MeasInfo Tags</a></h2>
+<p>Tags listed below are only for the first measurement tool, however multiple
+measurements may be added, and information is extracted for all of them.
+Tags for subsequent measurements are generated as required with the prefixes
+&quot;Meas2&quot;, &quot;Meas3&quot;, etc.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>Meas1Label</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Meas1Params</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(Spot=X,Y; Area=X1,Y1,W,H; Ellipse=XC,YC,X1,Y1,X2,Y2; Line=X1,Y1,X2,Y2)</span></span></td></tr>
+<tr>
+<td>Meas1Type</td>
+<td class=c>N</td>
+<td><table class=cols><tr>
+  <td>1 = Spot
+  <br>2 = Area
+  <br>3 = Ellipse
+  <br>4 = Line</td><td>&nbsp;&nbsp;</td>
+  <td>5 = Endpoint
+  <br>6 = Alarm
+  <br>7 = Unused
+  <br>8 = Difference</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='PaletteInfo'>FLIR PaletteInfo Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -465,6 +577,35 @@ for details.</p>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>Value3</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='PaintData'>FLIR PaintData Tags</a></h2>
+<p>Information generated by FLIR Tools &quot;Paint colors&quot; tool.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index2</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='5 = 0x5'>5</td>
+<td>PaintImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='6 = 0x6'>6</td>
+<td>PaintImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='20 = 0x14'>20</td>
+<td>PaintImageType</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='20 = 0x14'>20.1</td>
+<td>PaintImage</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -1089,7 +1230,7 @@ in FLIR MP4 videos.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 8, 2013</i>
+<br><i>Last revised Jan 14, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

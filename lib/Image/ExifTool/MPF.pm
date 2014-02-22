@@ -15,7 +15,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub ProcessMPImageList($$$);
 
@@ -219,9 +219,12 @@ sub ExtractMPImages($)
             }
             # extract information from MP images if ExtractEmbedded option used
             if ($ee) {
+                my $oldBase = $$et{BASE};
+                $$et{BASE} = $off;
                 $$et{DOC_NUM} = $i;
                 $et->ExtractInfo($val, { ReEntry => 1 });
                 delete $$et{DOC_NUM};
+                $$et{BASE} = $oldBase;
             }
         }
     }

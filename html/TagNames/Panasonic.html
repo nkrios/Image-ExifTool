@@ -225,10 +225,11 @@ same as the number printed on the camera body)</span></span></td></tr>
 <td><table class=cols><tr>
   <td>1 = Off
   <br>2 = Warm
-  <br>3 = Cool</td><td>&nbsp;&nbsp;</td>
-  <td>4 = Black &amp; White
-  <br>5 = Sepia
-  <br>6 = Happy</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>3 = Cool
+  <br>4 = Black &amp; White</td><td>&nbsp;&nbsp;</td>
+  <td>5 = Sepia
+  <br>6 = Happy
+  <br>8 = Vivid</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr class=b>
 <td title='0x0029 = 41'>0x0029</td>
@@ -240,12 +241,14 @@ written to memory card)</span></span></td></tr>
 <td title='0x002a = 42'>0x002a</td>
 <td>BurstMode</td>
 <td class=c>int16u</td>
-<td><span class=s><span class=n>(decoding may be different for some models)</span>
-  <br>0 = Off
+<td><span class=s><span class=n>(decoding may be different for some models)</span></span><table class=cols><tr>
+  <td>0 = Off
   <br>1 = On
   <br>2 = Auto Exposure Bracketing (AEB)
   <br>4 = Unlimited
-  <br>8 = White Balance Bracketing</span></td></tr>
+  <br>8 = White Balance Bracketing
+  <br>17 = On (with flash)</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr class=b>
 <td title='0x002b = 43'>0x002b</td>
 <td>SequenceNumber</td>
@@ -1593,7 +1596,7 @@ as the DMC-FT20.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 9, 2014</i>
+<br><i>Last revised Feb 12, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

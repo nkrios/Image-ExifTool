@@ -14,7 +14,7 @@ use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 
-$VERSION = '1.41';
+$VERSION = '1.42';
 
 sub ProcessMIE($$);
 sub ProcessMIEGroup($$$);
@@ -805,7 +805,7 @@ sub GetLangInfo($$)
 sub HasZlib($$)
 {
     unless (defined $hasZlib) {
-        $hasZlib = eval 'require Compress::Zlib';
+        $hasZlib = eval { require Compress::Zlib };
         unless ($hasZlib) {
             $hasZlib = 0;
             $_[0]->Warn("Install Compress::Zlib to $_[1] compressed information");
@@ -1116,7 +1116,7 @@ sub WriteMIEGroup($$$)
                         );
                         # write Compact subdirectories if we will compress the data
                         if (($compress or $optCompress or $$dirInfo{IsCompressed}) and
-                            eval 'require Compress::Zlib')
+                            eval { require Compress::Zlib })
                         {
                             $subdirInfo{Compact} = 1;
                         }

@@ -500,9 +500,9 @@ sub AddStructType($$$$;$)
 
 #------------------------------------------------------------------------------
 # Utility routine to encode data in base64
-# Inputs: 0) binary data string
+# Inputs: 0) binary data string, 1) flag to avoid inserting newlines
 # Returns:   base64-encoded string
-sub EncodeBase64($)
+sub EncodeBase64($;$)
 {
     # encode the data in 45-byte chunks
     my $chunkSize = 45;
@@ -520,6 +520,7 @@ sub EncodeBase64($)
     # convert pad characters at the end (remember to account for trailing newline)
     my $pad = 3 - ($len % 3);
     substr($str, -$pad-1, $pad) = ('=' x $pad) if $pad < 3;
+    $str =~ tr/\n//d if $_[1];  # remove newlines if specified
     return $str;
 }
 
@@ -582,7 +583,7 @@ sub LimitXMPSize($$$$$$)
     }
     $extData .= $rdfClose . $xmpClose;  # close rdf:RDF and x:xmpmeta
     # calculate GUID from MD5 of extended XMP data
-    if (eval 'require Digest::MD5') {
+    if (eval { require Digest::MD5 }) {
         $guid = uc unpack('H*', Digest::MD5::md5($extData));
         $newData =~ s/0{32}/$guid/;     # update GUID in main XMP segment
     }

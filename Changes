@@ -4,8 +4,87 @@ ExifTool Version History
 
 RSS feed: http://owl.phy.queensu.ca/~phil/exiftool/rss.xml
 
-Note: The most recent production release is Version 9.46. (Other versions are
+Note: The most recent production release is Version 9.53. (Other versions are
 considered development releases, and are not uploaded to CPAN.)
+
+Feb. 22, 2014 - Version 9.53 (production release)
+
+  - Added user-defined file types feature
+  - Added support for a few more XMP-expressionmedia tags
+  - Decode CameraTemperature from a few new Canon models
+  - Decode another Sony tag (thanks Jos Roost)
+  - Recognize the JXR extension
+  - Changed wording of IPTC "Unrecognized data" warning
+  - Patched round-off error problem in seconds of some date/time values
+  - Fixed problem creating EXV files with the -o option
+  - Fixed problem conditionally replacing Extra block-type tags
+
+Feb. 17, 2014 - Version 9.52
+
+  - Fixed bug introduced in 9.44 which resulted in incorrect maker note offsets
+    when copying maker notes from DNG images of some Pentax models
+
+Feb. 15, 2014 - Version 9.51
+
+  - Added a number of new CanonModelID values
+  - Added a new Sony/Minolta LensType (thanks Jos Roost)
+  - Added a new Panasonic BurstMode
+  - Added a new Pentax LensType
+  - Added new ColorSpaceTags shortcut
+  - Decode a number of new PanasonicRaw tags (thanks LibRaw)
+  - Decode ColorData tags for the new Canon EOS 1200D
+  - Improved Sony maker note decoding for some newer models (thanks Jos Roost)
+  - Fixed conversion of XMP:LensID for Pentax lenses on Ricoh-branded cameras
+
+Feb. 8, 2014 - Version 9.50
+
+  - Added support for Exiv2 EXV metadata files
+  - Added ability to read/write/copy GeoTiff tags as a block
+  - Added ability to combine -b with -j to write base64-encoded binary data in
+    JSON output format
+  - Added a new Nikon LensID
+  - Added a new Sony/Minolta LensType (thanks Jos Roost)
+  - Added new Extra ProcessingTime tag
+  - Added a new Olympus CameraType
+  - Added header signature to .EXIF files
+  - Decode a new Olympus tag (thanks LibRaw)
+  - Improved conversion of some Canon RecordMode values
+  - Improved decoding of tags for Hasselblad Stellar (thanks Jos Roost)
+  - Fixed -htmlDump offsets for information extracted from some embedded images
+  - Fixed hemisphere problem in Composite GPS tags derived from
+    QuickTime:LocationInformation
+  - API Changes:
+      - Option names are now case insensitive
+
+Feb. 1, 2014 - Version 9.49
+
+  - Added new Olympus and Samsung LensType values, and fixed an Olympus lens
+    name (thanks Niels Kristian Bech Jensen)
+  - Added another Polish tag translation (thanks Kacper Perschke)
+  - Added a new Panasonic ColorEffect value
+  - Decode a new FujiFilm tag (thanks LibRaw)
+  - Adjusted scaling factor for H264 ExposureTime values (thanks Francois)
+
+Jan. 25, 2014 - Version 9.48
+
+  - Added a new GeoTiff tag
+  - Added a couple of new Canon LensType values
+  - Added a few new XMP DarwinCore tags
+  - Updated Sony MakerNotes for the ILCE-5000 (thanks Jos Roost)
+  - Improved Polish translations (thanks Kacper Perschke)
+  - Fixed problem writing RicohSubdirIFD in GR images
+  - Fixed runtime error when writing PNG image with a TIFF-format EXIF profile
+
+Jan. 18, 2014 - Version 9.47
+
+  - Added read support for JPEG-HDR APP11 information
+  - Added read support for Media Jukebox APP9 information
+  - Added a new Olympus LensType (thanks Niels Kristian Bech Jensen)
+  - Added a few new Nikon LensID's (thanks Robert Rottmerhusen)
+  - Added a new Minolta/Sony LensType and fixed some Tamron lens names (thanks
+    Jos Roost)
+  - Decode more FLIR tags (thanks Tomas)
+  - Patched for quirk in Kodak PixPro AZ362 maker notes
 
 Jan. 11, 2014 - Version 9.46 (production release)
 
@@ -1066,6 +1145,7 @@ Nov. 9, 2011 - Version 8.69
   - Added ability to specify internal encoding of EXIF "ASCII" strings and
     QuickTime strings
   - Added a new DigiKam XMP tag
+  - Documented -echo option (has been an undocumented feature since 6.86)
   - Decode a number of new Sony tags
   - Decode a few new Pentax tags and added a few new values
   - Decode a few new QuickTime and ID3 tags

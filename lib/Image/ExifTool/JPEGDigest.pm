@@ -13,7 +13,7 @@ package Image::ExifTool::JPEGDigest;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 # the print conversion for the JPEGDigest tag
 my %PrintConv = ( #JD
@@ -2448,7 +2448,7 @@ sub Calculate($$$)
 {
     my ($et, $dqtList, $subSampling) = @_;
 
-    unless (eval 'require Digest::MD5') {
+    unless (eval { require Digest::MD5 }) {
         $et->Warn('Digest::MD5 must be installed to calculate JPEGDigest');
         return;
     }

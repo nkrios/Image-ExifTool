@@ -26,7 +26,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.29';
+$VERSION = '1.31';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -582,7 +582,7 @@ sub FoundPNG($$$$;$$$$)
     my ($wasCompressed, $deflateErr);
     if ($compressed and $compressed > 1) {
         if ($compressed == 2) { # Inflate/Deflate compression
-            if (eval 'require Compress::Zlib') {
+            if (eval { require Compress::Zlib }) {
                 my ($v2, $stat);
                 my $inflate = Compress::Zlib::inflateInit();
                 $inflate and ($v2, $stat) = $inflate->inflate($val);
@@ -679,7 +679,7 @@ sub FoundPNG($$$$;$$$$)
             $compressed = 1;    # pretend this is compressed since it is binary data
         }
         if ($outBuff) {
-            my $writable = $tagInfo->{Writable};
+            my $writable = $$tagInfo{Writable};
             my $isOverwriting;
             if ($writable or ($$tagTablePtr{WRITABLE} and
                 not defined $writable and not $$tagInfo{SubDirectory}))
@@ -728,7 +728,7 @@ sub FoundPNG($$$$;$$$$)
                 } elsif ($wasCompressed) {
                     # re-compress the output data
                     my $deflate;
-                    if (eval 'require Compress::Zlib') {
+                    if (eval { require Compress::Zlib }) {
                         my $deflate = Compress::Zlib::deflateInit();
                         if ($deflate) {
                             $$outBuff = $deflate->deflate($$outBuff);
@@ -750,6 +750,7 @@ sub FoundPNG($$$$;$$$$)
         $$tagInfo{LangCode} = $lang if $lang;
         # make unknown profiles binary data type
         $$tagInfo{Binary} = 1 if $tag =~ /^Raw profile type /;
+        $verbose and $et->VPrint(0, "  | [adding $tag]\n");
         AddTagToTable($tagTablePtr, $tag, $tagInfo);
     }
 #
@@ -871,13 +872,12 @@ sub ProcessProfile($$$)
             $processed = $et->ProcessDirectory(\%dirInfo, $tagTablePtr);
         }
     } elsif ($buff =~ /^(MM\0\x2a|II\x2a\0)/) {
-        # TIFF information (haven't seen this, but what the heck...)
+        # TIFF information
         return 1 if $outBuff and not $$editDirs{IFD0};
         if ($outBuff) {
             $$outBuff = $et->WriteDirectory(\%dirInfo, $tagTablePtr,
                                             \&Image::ExifTool::WriteTIFF);
-            $$outBuff = $Image::ExifTool::exifAPP1hdr . $$outBuff if $$outBuff;
-            CheckDir($et, 'IFD0', $outBuff);
+            DoneDir($et, 'IFD0', $outBuff);
         } else {
             $processed = $et->ProcessTIFF(\%dirInfo);
         }
@@ -914,8 +914,9 @@ sub ProcessPNG_Compressed($$$)
     $val = substr($val, 1); # remove compression method byte
     my $success;
     my $outBuff = $$dirInfo{OutBuff};
+    my $tagInfo = $$dirInfo{TagInfo};
     # use the PNG chunk tag instead of the embedded tag name for iCCP chunks
-    if ($$dirInfo{TagInfo} and $$dirInfo{TagInfo}->{Name} eq 'ICC_Profile') {
+    if ($tagInfo and $$tagInfo{Name} eq 'ICC_Profile') {
         $et->VerboseDir('iCCP');
         $tagTablePtr = \%Image::ExifTool::PNG::Main;
         if (length($tag) and not $outBuff) {

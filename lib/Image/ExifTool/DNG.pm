@@ -17,7 +17,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::MakerNotes;
 use Image::ExifTool::CanonRaw;
 
-$VERSION = '1.20';
+$VERSION = '1.21';
 
 sub ProcessOriginalRaw($$$);
 sub ProcessAdobeData($$$);
@@ -172,7 +172,7 @@ sub ProcessOriginalRaw($$$)
             if (($$et{OPTIONS}{Binary} and not $$et{EXCL_TAG_LOOKUP}{$lcTag}) or
                 $$et{REQ_TAG_LOOKUP}{$lcTag})
             {
-                unless (eval 'require Compress::Zlib') {
+                unless (eval { require Compress::Zlib }) {
                     $err = 'Install Compress::Zlib to extract compressed images';
                     last;
                 }

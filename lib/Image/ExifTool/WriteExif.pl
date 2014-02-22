@@ -371,6 +371,37 @@ my %writeTable = (
         Writable => 'string',
         WriteGroup => 'IFD0',
     },
+    0x87af => {             # GeoTiffDirectory
+        Writable => 'undef',
+        WriteGroup => 'IFD0',
+        # swap byte order if necessary
+        RawConvInv => q{
+            return $val if length $val < 2;
+            my $order = substr($val, -2);
+            return $val unless $order eq 'II' or $order eq 'MM';
+            $val = substr($val, 0, -2);
+            return $val if $order eq GetByteOrder();
+            return pack('v*',unpack('n*',$val));
+        },
+    },
+    0x87b0 => {             # GeoTiffDoubleParams
+        Writable => 'undef',
+        WriteGroup => 'IFD0',
+        # swap byte order if necessary
+        RawConvInv => q{
+            return $val if length $val < 2;
+            my $order = substr($val, -2);
+            return $val unless $order eq 'II' or $order eq 'MM';
+            $val = substr($val, 0, -2);
+            return $val if $order eq GetByteOrder();
+            $val =~ s/(.{4})(.{4})/$2$1/sg; # swap words
+            return pack('V*',unpack('N*',$val));
+        },
+    },
+    0x87b1 => {             # GeoTiffAsciiParams
+        Writable => 'string',
+        WriteGroup => 'IFD0',
+    },
     0x8822 => 'int16u',     # ExposureProgram
     0x8824 => 'string',     # SpectralSensitivity
     0x8827 => {             # ISO
@@ -1453,9 +1484,9 @@ sub RebuildMakerNotes($$$)
                     # (Note: this expression also appears in Exif.pm)
                     if ($$et{Model} =~ /\b(K(-[57mrx]|(10|20|100|110|200)D|2000)|GX(10|20))\b/) {
                         $hdr =~ s/^(PENTAX |SAMSUNG)\0/AOC\0/;
+                        # save fixup because AOC maker notes have absolute offsets
+                        $$et{MAKER_NOTE_FIXUP} = $makerFixup;
                     }
-                    # save fixup so we will adjust to absolute offsets when writing
-                    $$et{MAKER_NOTE_FIXUP} = $makerFixup;
                 }
                 $rtnValue = $hdr . $rtnValue;
                 # adjust fixup for shift in start position
@@ -2700,10 +2731,22 @@ NoOverwrite:            next if $isNew > 0;
                         $newValue = '';    # reset value because we regenerate it below
                         for ($i=0; $i<$readCount; ++$i) {
                             my $off = $i * $formatSize[$readFormat];
-                            my $pt = ReadValue($valueDataPt, $valuePtr + $off,
-                                               $readFormName, 1, $oldSize - $off);
-                            my $subdirStart = $pt - $dataPos;
+                            my $val = ReadValue($valueDataPt, $valuePtr + $off,
+                                                $readFormName, 1, $oldSize - $off);
+                            my $subdirStart = $val - $dataPos;
                             my $subdirBase = $base;
+                            my $hdrLen;
+                            if (defined $$subdir{Start}) {
+                                #### eval Start ($val)
+                                my $newStart = eval $$subdir{Start};
+                                unless (Image::ExifTool::IsInt($newStart)) {
+                                    $et->Error("Bad subdirectory start for $$newInfo{Name}");
+                                    next;
+                                }
+                                $newStart -= $dataPos;
+                                $hdrLen = $newStart - $subdirStart;
+                                $subdirStart = $newStart;
+                            }
                             if ($$subdir{Base}) {
                                 my $start = $subdirStart + $dataPos;
                                 #### eval Base ($start,$base)
@@ -2756,6 +2799,11 @@ NoOverwrite:            next if $isNew > 0;
                                 # WriteDirectory should have issued an error, but check just in case
                                 $et->Error("Error writing $subdirName") unless $$et{VALUE}{Error};
                                 return undef;
+                            }
+                            # add back original header if necessary (ie. Ricoh GR)
+                            if ($hdrLen and $hdrLen > 0 and $subdirStart <= $dataLen) {
+                                $subdirData = substr($$dataPt, $subdirStart - $hdrLen, $hdrLen) . $subdirData;
+                                $subdirInfo{Fixup}{Start} += $hdrLen;
                             }
                             unless (length $subdirData) {
                                 next unless $inMakerNotes;

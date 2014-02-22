@@ -21,7 +21,7 @@ use vars qw($VERSION $AUTOLOAD $lastFetched);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.36';
+$VERSION = '1.37';
 
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
@@ -1166,7 +1166,7 @@ sub DecodeStream($$)
                     return 0;
                 }
             }
-            if (eval 'require Compress::Zlib') {
+            if (eval { require Compress::Zlib }) {
                 my $inflate = Compress::Zlib::inflateInit();
                 my ($buff, $stat);
                 $inflate and ($buff, $stat) = $inflate->inflate($$dict{_stream});
@@ -1458,11 +1458,11 @@ sub DecryptInit($$$)
 
     # make sure we have the necessary libraries available
     if ($ver < 5) {
-        unless (eval 'require Digest::MD5') {
+        unless (eval { require Digest::MD5 }) {
             return "Install Digest::MD5 to process encrypted PDF";
         }
     } else {
-        unless (eval 'require Digest::SHA') {
+        unless (eval { require Digest::SHA }) {
             return "Install Digest::SHA to process AES-256 encrypted PDF";
         }
     }
@@ -1488,7 +1488,7 @@ sub DecryptInit($$$)
             $password = $et->Options('Password');
             return 'Document is password protected (use Password option)' unless defined $password;
             # make sure there is no UTF-8 flag on the password
-            if ($] >= 5.006 and (eval 'require Encode; Encode::is_utf8($password)' or $@)) {
+            if ($] >= 5.006 and (eval { require Encode; Encode::is_utf8($password) } or $@)) {
                 # repack by hand if Encode isn't available
                 $password = $@ ? pack('C*',unpack('U0C*',$password)) : Encode::encode('utf8',$password);
             }

@@ -9,6 +9,7 @@
 # References:   1) CPAN forum post by 'hardloaf' (http://www.cpanforum.com/threads/2183)
 #               2) http://www.cybercom.net/~dcoffin/dcraw/
 #               3) http://syscall.eu/#pana
+#               4) Iliah Borg private communication (LibRaw)
 #              JD) Jens Duttke private communication (TZ3,FZ30,FZ50)
 #------------------------------------------------------------------------------
 
@@ -19,7 +20,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.06';
+$VERSION = '1.07';
 
 sub ProcessJpgFromRaw($$$);
 sub WriteJpgFromRaw($$$);
@@ -62,13 +63,23 @@ my %jpgFromRawMap = (
     # 0x08: 1
     # 0x09: 1,3,4
     # 0x0a: 12
+    0x08 => { #4
+        Name => 'BlackLevel1',
+        Writable => 'int16u',
+        Notes => q{
+            summing BlackLevel1+2+3 values gives the common bias that must be added to
+            the BlackLevelRed/Green/Blue tags below
+        },
+    },
+    0x09 => { Name => 'BlackLevel2', Writable => 'int16u' }, #4
+    0x0a => { Name => 'BlackLevel3', Writable => 'int16u' }, #4
     # 0x0b: 0x860c,0x880a,0x880c
     # 0x0c: 2 (only Leica Digilux 2)
     # 0x0d: 0,1
     # 0x0e,0x0f,0x10: 4095
-    # 0x18,0x19,0x1a,0x1c,0x1d,0x1e: 0
-    # 0x1b,0x27,0x29,0x2a,0x2b,0x2c: [binary data]
-    # 0x2d: 2,3
+    0x0e => { Name => 'LinearityLimitRed',   Writable => 'int16u' }, #4
+    0x0f => { Name => 'LinearityLimitGreen', Writable => 'int16u' }, #4
+    0x10 => { Name => 'LinearityLimitBlue',  Writable => 'int16u' }, #4
     0x11 => { #JD
         Name => 'RedBalance',
         Writable => 'int16u',
@@ -86,6 +97,29 @@ my %jpgFromRawMap = (
         Name => 'ISO',
         Writable => 'int16u',
     },
+    # 0x18,0x19,0x1a: 0
+    0x18 => { #4
+        Name => 'HighISOMultiplierRed', 
+        Writable => 'int16u',
+        ValueConv => '$val / 256',
+        ValueConvInv => 'int($val * 256 + 0.5)',
+    },
+    0x19 => { #4
+        Name => 'HighISOMultiplierGreen', 
+        Writable => 'int16u',
+        ValueConv => '$val / 256',
+        ValueConvInv => 'int($val * 256 + 0.5)',
+    },
+    0x1a => { #4
+        Name => 'HighISOMultiplierBlue', 
+        Writable => 'int16u',
+        ValueConv => '$val / 256',
+        ValueConvInv => 'int($val * 256 + 0.5)',
+    },
+    # 0x1b: [binary data]
+    0x1c => { Name => 'BlackLevelRed',   Writable => 'int16u' }, #4
+    0x1d => { Name => 'BlackLevelGreen', Writable => 'int16u' }, #4
+    0x1e => { Name => 'BlackLevelBlue',  Writable => 'int16u' }, #4
     0x24 => { #2
         Name => 'WBRedLevel',
         Writable => 'int16u',
@@ -98,6 +132,8 @@ my %jpgFromRawMap = (
         Name => 'WBBlueLevel',
         Writable => 'int16u',
     },
+    # 0x27,0x29,0x2a,0x2b,0x2c: [binary data]
+    # 0x2d: 2,3
     0x2e => { #JD
         Name => 'JpgFromRaw', # (writable directory!)
         Writable => 'undef',

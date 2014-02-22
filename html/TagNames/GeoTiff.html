@@ -10,7 +10,9 @@
 <p>
 ExifTool extracts the following tags from GeoTIFF images.  See
 <a href="http://www.remotesensing.org/geotiff/spec/geotiffhome.html">http://www.remotesensing.org/geotiff/spec/geotiffhome.html</a> for the
-complete GeoTIFF specification.
+complete GeoTIFF specification.  These tags are not writable individually,
+but they may be copied en mass via the containing GeoTiffDirectory,
+GeoTiffDoubleParams and GeoTiffAsciiParams tags.
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -498,6 +500,11 @@ complete GeoTIFF specification.
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td title='0x080e = 2062'>0x080e</td>
+<td>GeogToWGS84</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td title='0x0c00 = 3072'>0x0c00</td>
 <td>ProjectedCSType</td>
 <td class=c>N</td>
@@ -1496,12 +1503,12 @@ complete GeoTIFF specification.
   <br>32760 = WGS84 UTM zone 60S
   <br>32767 = User Defined</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x0c01 = 3073'>0x0c01</td>
 <td>PCSCitation</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0c02 = 3074'>0x0c02</td>
 <td>Projection</td>
 <td class=c>N</td>
@@ -1935,7 +1942,7 @@ complete GeoTIFF specification.
   <br>19926 = Stereo 70
   <br>32767 = User Defined</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x0c03 = 3075'>0x0c03</td>
 <td>ProjCoordTrans</td>
 <td class=c>N</td>
@@ -1970,112 +1977,112 @@ complete GeoTIFF specification.
   <br>28 = Cylindrical Equal Area
   <br>32767 = User Defined</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr>
+<tr class=b>
 <td title='0x0c04 = 3076'>0x0c04</td>
 <td>ProjLinearUnits</td>
 <td class=c>N</td>
 <td>--&gt; <a href='GeoTiff.html#Units'>GeoTiff Units Values</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0c05 = 3077'>0x0c05</td>
 <td>ProjLinearUnitSize</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0c06 = 3078'>0x0c06</td>
 <td>ProjStdParallel1</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0c07 = 3079'>0x0c07</td>
 <td>ProjStdParallel2</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0c08 = 3080'>0x0c08</td>
 <td>ProjNatOriginLong</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0c09 = 3081'>0x0c09</td>
 <td>ProjNatOriginLat</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0c0a = 3082'>0x0c0a</td>
 <td>ProjFalseEasting</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0c0b = 3083'>0x0c0b</td>
 <td>ProjFalseNorthing</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0c0c = 3084'>0x0c0c</td>
 <td>ProjFalseOriginLong</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0c0d = 3085'>0x0c0d</td>
 <td>ProjFalseOriginLat</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0c0e = 3086'>0x0c0e</td>
 <td>ProjFalseOriginEasting</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0c0f = 3087'>0x0c0f</td>
 <td>ProjFalseOriginNorthing</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0c10 = 3088'>0x0c10</td>
 <td>ProjCenterLong</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0c11 = 3089'>0x0c11</td>
 <td>ProjCenterLat</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0c12 = 3090'>0x0c12</td>
 <td>ProjCenterEasting</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0c13 = 3091'>0x0c13</td>
 <td>ProjCenterNorthing</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0c14 = 3092'>0x0c14</td>
 <td>ProjScaleAtNatOrigin</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0c15 = 3093'>0x0c15</td>
 <td>ProjScaleAtCenter</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0c16 = 3094'>0x0c16</td>
 <td>ProjAzimuthAngle</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0c17 = 3095'>0x0c17</td>
 <td>ProjStraightVertPoleLong</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0c18 = 3096'>0x0c18</td>
 <td>ProjRectifiedGridAngle</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x1000 = 4096'>0x1000</td>
 <td>VerticalCSType</td>
 <td class=c>N</td>
@@ -2120,18 +2127,18 @@ complete GeoTIFF specification.
   <br>5106 = Caspian Sea
   <br>32767 = User Defined</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr>
+<tr class=b>
 <td title='0x1001 = 4097'>0x1001</td>
 <td>VerticalCitation</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x1002 = 4098'>0x1002</td>
 <td>VerticalDatum</td>
 <td class=c>N</td>
 <td><span class=s>1 = Vertical Datum Base
   <br>32767 = User Defined</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x1003 = 4099'>0x1003</td>
 <td>VerticalUnits</td>
 <td class=c>N</td>
@@ -2171,7 +2178,7 @@ complete GeoTIFF specification.
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 25, 2011</i>
+<br><i>Last revised Feb 6, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

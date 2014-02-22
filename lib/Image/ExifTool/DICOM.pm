@@ -20,7 +20,7 @@ use strict;
 use vars qw($VERSION %uid);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.17';
+$VERSION = '1.18';
 
 # DICOM VR (Value Representation) format conversions
 my %dicomFormat = (
@@ -3646,7 +3646,7 @@ sub ProcessDICM($$)
                 $group = Get16u(\$buff, 0); # must get group again
             } elsif ($1 eq '.1' and $2 and $2 eq '.99') {
                 # inflate compressed data stream
-                if (eval 'require Compress::Zlib') {
+                if (eval { require Compress::Zlib }) {
                     # must use undocumented zlib feature to disable zlib header information
                     # because DICOM deflated data doesn't have the zlib header (ref 3)
                     my $wbits = -Compress::Zlib::MAX_WBITS();

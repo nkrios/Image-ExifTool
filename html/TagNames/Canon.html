@@ -668,6 +668,12 @@
 </tr><tr><td class=r>0x3550000</td><td>= PowerShot S120</td>
 </tr><tr><td class=r>0x3560000</td><td>= PowerShot SX170 IS</td>
 </tr><tr><td class=r>0x3580000</td><td>= PowerShot SX510 HS</td>
+</tr><tr><td class=r>0x3590000</td><td>= PowerShot S200 (new)</td>
+</tr><tr><td class=r>0x3610000</td><td>= PowerShot N100</td>
+</tr><tr><td class=r>0x3640000</td><td>= PowerShot G1 X Mark II</td>
+</tr><tr><td class=r>0x3650000</td><td>= PowerShot D30</td>
+</tr><tr><td class=r>0x3660000</td><td>= PowerShot SX700 HS</td>
+</tr><tr><td class=r>0x3670000</td><td>= PowerShot SX600 HS</td>
 </tr><tr><td class=r>0x4040000</td><td>= PowerShot G1</td>
 </tr><tr><td class=r>0x6040000</td><td>= PowerShot S100 / Digital IXUS / IXY Digital</td>
 </tr><tr><td class=r>0x4007d673</td><td>= DC19/DC21/DC22</td>
@@ -739,6 +745,7 @@
 </tr><tr><td class=r>0x80000324</td><td>= EOS-1D C</td>
 </tr><tr><td class=r>0x80000325</td><td>= EOS 70D</td>
 </tr><tr><td class=r>0x80000326</td><td>= EOS Rebel T5i / 700D / Kiss X7i</td>
+</tr><tr><td class=r>0x80000327</td><td>= EOS Rebel T5 / 1200D / Kiss X70</td>
 </tr><tr><td class=r>0x80000331</td><td>= EOS M</td>
 </tr><tr><td class=r>0x80000346</td><td>= EOS Rebel SL1 / 100D / Kiss X7</td>
 </tr><tr><td class=r>0x80000355</td><td>= EOS M2</td>
@@ -826,12 +833,13 @@
 <td><table class=cols><tr>
   <td>1 = JPEG
   <br>2 = CRW+THM
-  <br>3 = AVI+THM
-  <br>4 = TIF</td><td>&nbsp;&nbsp;</td>
-  <td>5 = TIF+JPEG
-  <br>6 = CR2
-  <br>7 = CR2+JPEG
-  <br>9 = Video</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>3 = AVI+THM</td><td>&nbsp;&nbsp;</td>
+  <td>4 = TIF
+  <br>5 = TIF+JPEG
+  <br>6 = CR2</td><td>&nbsp;&nbsp;</td>
+  <td>7 = CR2+JPEG
+  <br>9 = MOV
+  <br>10 = MP4</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr class=b>
 <td class=r title='10 = 0xa'>10</td>
@@ -1390,7 +1398,8 @@ attempting to identify the specific lens model.</p>
 </tr><tr><td>210</td><td>= Canon EF 28-90mm f/4-5.6 USM</td>
 </tr><tr><td>211</td><td>= Canon EF 28-200mm f/3.5-5.6 USM</td>
 </tr><tr><td>212</td><td>= Canon EF 28-105mm f/4-5.6 USM</td>
-</tr><tr><td>213</td><td>= Canon EF 90-300mm f/4.5-5.6 USM</td>
+</tr><tr><td>213</td><td>= Canon EF 90-300mm f/4.5-5.6 USM or Tamron Lens</td>
+</tr><tr><td>213.1</td><td>= Tamron SP 150-600mm F/5-6.3 Di VC USD</td>
 </tr><tr><td>214</td><td>= Canon EF-S 18-55mm f/3.5-5.6 USM</td>
 </tr><tr><td>215</td><td>= Canon EF 55-200mm f/4.5-5.6 II USM</td>
 </tr><tr><td>224</td><td>= Canon EF 70-200mm f/2.8L IS</td>
@@ -1433,6 +1442,7 @@ attempting to identify the specific lens model.</p>
 </tr><tr><td>494</td><td>= Canon EF 600mm f/4.0L IS II USM</td>
 </tr><tr><td>495</td><td>= Canon EF 24-70mm f/2.8L II USM</td>
 </tr><tr><td>496</td><td>= Canon EF 200-400mm f/4L IS USM</td>
+</tr><tr><td>499</td><td>= Canon EF 200-400mm f/4L IS USM + 1.4x</td>
 </tr><tr><td>502</td><td>= Canon EF 28mm f/2.8 IS USM</td>
 </tr><tr><td>503</td><td>= Canon EF 24mm f/2.8 IS USM</td>
 </tr><tr><td>504</td><td>= Canon EF 24-70mm f/4L IS USM</td>
@@ -5227,45 +5237,10 @@ SD4000, SX20, SX120 and SX210)</span></span></td></tr>
 <td class=c>int32s</td>
 <td><span class=s><span class=n>(A420, A430, A530, A540, A700, SD600, SD630 and SD700)</span></span></td></tr>
 <tr class=b>
-<td class=r title='466 = 0x1d2'>466</td>
+<td class=r>-3</td>
 <td>CameraTemperature</td>
 <td class=c>int32s</td>
-<td><span class=s><span class=n>(100HS, 300HS, 500HS, A1200, A2200, A3200 and A3300)</span></span></td></tr>
-<tr>
-<td class=r title='503 = 0x1f7'>503</td>
-<td>CameraTemperature</td>
-<td class=c>int32s</td>
-<td><span class=s><span class=n>(A800)</span></span></td></tr>
-<tr class=b>
-<td class=r title='506 = 0x1fa'>506</td>
-<td>CameraTemperature</td>
-<td class=c>int32s</td>
-<td><span class=s><span class=n>(SX230HS)</span></span></td></tr>
-<tr>
-<td class=r title='520 = 0x208'>520</td>
-<td>CameraTemperature</td>
-<td class=c>int32s</td>
-<td><span class=s><span class=n>(310HS, 510HS, G1X, S100 (new), SX40HS and SX150)</span></span></td></tr>
-<tr class=b>
-<td class=r title='524 = 0x20c'>524</td>
-<td>CameraTemperature</td>
-<td class=c>int32s</td>
-<td><span class=s><span class=n>(110HS, 520HS, A2300, A2400, A3400, A4000, D20 and SX260HS)</span></span></td></tr>
-<tr>
-<td class=r title='532 = 0x214'>532</td>
-<td>CameraTemperature</td>
-<td class=c>int32s</td>
-<td><span class=s><span class=n>(S110 (new), G15, SX50, SX160IS and SX500IS)</span></span></td></tr>
-<tr class=b>
-<td class=r title='547 = 0x223'>547</td>
-<td>CameraTemperature</td>
-<td class=c>int32s</td>
-<td><span class=s><span class=n>(130IS, A1400, A2500 and A2600)</span></span></td></tr>
-<tr>
-<td class=r title='549 = 0x225'>549</td>
-<td>CameraTemperature</td>
-<td class=c>int32s</td>
-<td><span class=s><span class=n>(115IS, 130IS, SX270, SX280, 330HS and A3500)</span></span></td></tr>
+<td><span class=s><span class=n>(3 entries from end of record for most newer camera models)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CameraInfoUnknown16'>Canon CameraInfoUnknown16 Tags</a></h2>
@@ -7382,7 +7357,7 @@ option is used.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ColorData6'>Canon ColorData6 Tags</a></h2>
-<p>These tags are used by the EOS 600D.</p>
+<p>These tags are used by the EOS 600D and 1200D.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -7392,7 +7367,7 @@ option is used.</p>
 <td class=r title='0 = 0x0'>0</td>
 <td>ColorDataVersion</td>
 <td class=c>int16s</td>
-<td><span class=s>10 = 10 (600D)</span></td></tr>
+<td><span class=s>10 = 10 (600D/1200D)</span></td></tr>
 <tr class=b>
 <td class=r title='63 = 0x3f'>63</td>
 <td>WB_RGGBLevelsAsShot</td>
@@ -8316,7 +8291,7 @@ SX280.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 10, 2014</i>
+<br><i>Last revised Feb 18, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

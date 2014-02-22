@@ -17,10 +17,11 @@ sub ProcessUnknown($$$);
 sub ProcessUnknownOrPreview($$$);
 sub ProcessCanon($$$);
 sub ProcessGE2($$$);
+sub ProcessKodakPatch($$$);
 sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.87';
+$VERSION = '1.89';
 
 my $debug;          # set to 1 to enable debugging code
 
@@ -352,6 +353,24 @@ my $debug;          # set to 1 to enable debugging code
     },
     {
         Name => 'MakerNoteKodak8b',
+        # these maker notes have an extra 2 bytes after the entry count
+        # (this is handled by the patch).  Also, the IFD uses a Format 13,
+        # which is some 2-byte format (not Float, as decoded by ExifTool)
+        # - written by the PixPro AZ251, AZ361, AZ262, AZ521
+        Condition => q{
+            $$self{Make}=~/Kodak/i and
+            $$valPt =~ /^MM\0\x2a\0\0\0\x08\0.\0\0/
+        },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Type8',
+            ProcessProc => \&ProcessKodakPatch,
+            ByteOrder => 'BigEndian',
+            Start => '$valuePtr + 8',
+            Base => '$start - 8',
+        },
+    },
+    {
+        Name => 'MakerNoteKodak8c',
         # TIFF-format maker notes
         Condition => q{
             $$self{Make}=~/Kodak/i and
@@ -723,7 +742,7 @@ my $debug;          # set to 1 to enable debugging code
         # Samsung STMN maker notes WITH PreviewImage
         Condition => '$$valPt =~ /^STMN\d{3}/',
         SubDirectory => {
-            TagTable => 'Image::ExifTool::Samsung::Type1',
+            TagTable => 'Image::ExifTool::Samsung::Main',
         },
     },
     {
@@ -792,7 +811,8 @@ my $debug;          # set to 1 to enable debugging code
         Name => 'MakerNoteSony',
         # (starts with "SONY DSC \0" or "SONY CAM \0")
         # (TF1 starts with "\0\0SONY PIC\0")
-        Condition => '$$valPt=~/^SONY (DSC|CAM)/ or $$valPt=~/^\0\0SONY PIC\0/',
+        # (Hasselblad models start with "VHAB     \0")
+        Condition => '$$valPt=~/^(SONY (DSC|CAM)|\0\0SONY PIC\0|VHAB     \0)/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Sony::Main',
             Start => '$valuePtr + 12',
@@ -1481,6 +1501,23 @@ sub ProcessGE2($$$)
     # these maker notes are missing the IFD entry count, but they
     # always have 25 entries, so write the entry count manually
     Set16u(25, $dataPt, $dirStart);
+    return Image::ExifTool::Exif::ProcessExif($et, $dirInfo, $tagTablePtr);
+}
+
+#------------------------------------------------------------------------------
+# Process broken Kodak type 8b maker notes
+# Inputs: 0) ExifTool object ref, 1) DirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessKodakPatch($$$)
+{
+    my ($et, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt} or return 0;
+    my $dirStart = $$dirInfo{DirStart} || 0;
+
+    # these maker notes have 2 extra bytes after the entry count, so fix this
+    return 0 unless $$dirInfo{DirLen} > 2;
+    Set16u(Get16u($dataPt,$dirStart), $dataPt, $dirStart+2);
+    $$dirInfo{DirStart} += 2;
     return Image::ExifTool::Exif::ProcessExif($et, $dirInfo, $tagTablePtr);
 }
 

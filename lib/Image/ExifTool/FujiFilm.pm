@@ -15,7 +15,7 @@
 #                  and http://forum.photome.de/viewtopic.php?f=2&t=353&p=742#p740
 #               7) Kai Lappalainen private communication
 #               8) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,5223.0.html
-#               9) Iliah Borg private communication
+#               9) Iliah Borg private communication (LibRaw)
 #               JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.44';
+$VERSION = '1.45';
 
 sub ProcessFujiDir($$$);
 sub ProcessFaceRec($$$);
@@ -712,7 +712,8 @@ my %faceCategories = (
         OffsetPair => 0xf007,  # point to associated offsets
     },
     # 0xf009 - values: 0, 3
-    # 0xf00a-0xf00b ?
+    0xf00a => 'BlackLevel', #9
+    # 0xf00b ?
     0xf00c => 'WB_GRBLevelsStandard', #9 (GRBXGRBX; X=17 is standard illuminant A, X=21 is D65)
     0xf00d => 'WB_GRBLevelsDaylight', #9
     0xf00e => 'WB_GRBLevels',

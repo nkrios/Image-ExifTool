@@ -84,6 +84,7 @@ my %jpegMap = (
 );
 my %dirMap = (
     JPEG => \%jpegMap,
+    EXV  => \%jpegMap,
     TIFF => \%tiffMap,
     ORF  => \%tiffMap,
     RAW  => \%tiffMap,
@@ -1604,7 +1605,7 @@ sub SetFileModifyDate($$;$$)
         $val = $$nvHash{Value}[0]; # get shifted value
     }
     if ($tag eq 'FileCreateDate') {
-        unless (eval 'require Win32API::File::Time') {
+        unless (eval { require Win32API::File::Time }) {
             $self->Warn("Install Win32API::File::Time to set $tag");
             return -1;
         }
@@ -1775,7 +1776,7 @@ sub WriteInfo($$;$$)
         } elsif (UNIVERSAL::isa($inRef,'File::RandomAccess')) {
             $inRef->Seek(0);
             $raf = $inRef;
-        } elsif ($] >= 5.006 and (eval 'require Encode; Encode::is_utf8($$inRef)' or $@)) {
+        } elsif ($] >= 5.006 and (eval { require Encode; Encode::is_utf8($$inRef) } or $@)) {
             # convert image data from UTF-8 to character stream if necessary
             my $buff = $@ ? pack('C*',unpack('U0C*',$$inRef)) : Encode::encode('utf8',$$inRef);
             if (defined $outfile) {
@@ -1902,7 +1903,7 @@ sub WriteInfo($$;$$)
             $dirInfo{Parent} = $$self{FILE_TYPE} = $$self{PATH}[0] = $type;
             # determine which directories we must write for this file type
             $self->InitWriteDirs($type);
-            if ($type eq 'JPEG') {
+            if ($type eq 'JPEG' or $type eq 'EXV') {
                 $rtnVal = $self->WriteJPEG(\%dirInfo);
             } elsif ($type eq 'TIFF') {
                 # disallow writing of some TIFF-based RAW images:
@@ -2052,7 +2053,7 @@ sub WriteInfo($$;$$)
                 seek($inRef, 0, 0) and          # seek back to the start
                 print $inRef $outBuff and       # write the new data
                 ($len >= $size or               # if necessary:
-                eval 'truncate($inRef, $len)'); #  shorten output file
+                eval { truncate($inRef, $len) }); #  shorten output file
         } else {
             $$inRef = $outBuff;                 # replace original data
         }
@@ -2325,7 +2326,7 @@ sub Sanitize($$)
     $$valPt = $$$valPt if ref $$valPt eq 'SCALAR';
     # make sure the Perl UTF-8 flag is OFF for the value if perl 5.6 or greater
     # (otherwise our byte manipulations get corrupted!!)
-    if ($] >= 5.006 and (eval 'require Encode; Encode::is_utf8($$valPt)' or $@)) {
+    if ($] >= 5.006 and (eval { require Encode; Encode::is_utf8($$valPt) } or $@)) {
         # repack by hand if Encode isn't available
         $$valPt = $@ ? pack('C*',unpack('U0C*',$$valPt)) : Encode::encode('utf8',$$valPt);
     }
@@ -3412,14 +3413,13 @@ sub WriteDirectory($$$;$)
                 $self->Warn("Can't write EXIF as a block to $$self{FILE_TYPE} file");
                 last;
             }
-            unless ($writeProc eq \&Image::ExifTool::WriteTIFF) {
-                # this could happen if we called WriteDirectory for an EXIF directory
-                # without going through WriteTIFF as the WriteProc, which would be bad
-                # because the EXIF block could end up with two TIFF headers
-                $self->Warn('Internal error writing EXIF -- please report');
-                last;
-            }
+            # this can happen if we call WriteDirectory for an EXIF directory without  going
+            # through WriteTIFF as the WriteProc (which happens if conditionally replacing
+            # the EXIF block and the condition fails), but we never want to do a block write
+            # in this case because the EXIF block would end up with two TIFF headers
+            last unless $writeProc eq \&Image::ExifTool::WriteTIFF;
         }
+        last unless $self->IsOverwriting($nvHash, $dataPt ? $$dataPt : '');
         my $verb = 'Writing';
         my $newVal = $self->GetNewValues($nvHash);
         unless (defined $newVal and length $newVal) {
@@ -3974,7 +3974,7 @@ sub InverseDateTime($$;$$)
             # add/remove timezone if necessary
             if ($tzFlag) {
                 if (not $tz) {
-                    if (eval 'require Time::Local') {
+                    if (eval { require Time::Local }) {
                         # determine timezone offset for this time
                         my @args = ($a[4],$a[3],$a[2],$a[1],$a[0]-1,$yr-1900);
                         my $diff = Time::Local::timegm(@args) - TimeLocal(@args);
@@ -4201,7 +4201,7 @@ my %writeValueProc = (
 #         2) number of values:
 #               undef = 1 for numerical types, or data length for string/undef types
 #                  -1 = number of space-delimited values in the input string
-#         3) optional data reference, 4) value offset
+#         3) optional data reference, 4) value offset (may be negative for bytes from end)
 # Returns: packed value (and sets value in data) or undef on error
 # Notes: May modify input value to round for integer formats
 sub WriteValue($$;$$$$)
@@ -4477,16 +4477,25 @@ sub WriteJPEG($$)
     my ($self, $dirInfo) = @_;
     my $outfile = $$dirInfo{OutFile};
     my $raf = $$dirInfo{RAF};
-    my ($ch,$s,$length);
+    my ($ch, $s, $length,$err, %doneDir, $isEXV, $creatingEXV);
     my $verbose = $$self{OPTIONS}{Verbose};
     my $out = $$self{OPTIONS}{TextOut};
     my $rtnVal = 0;
-    my ($err, %doneDir);
     my %dumpParms = ( Out => $out );
     my ($writeBuffer, $oldOutfile); # used to buffer writing until PreviewImage position is known
 
-    # check to be sure this is a valid JPG file
-    return 0 unless $raf->Read($s,2) == 2 and $s eq "\xff\xd8";
+    # check to be sure this is a valid JPG or EXV file
+    unless ($raf->Read($s,2) == 2 and $s eq "\xff\xd8") {
+        if (defined $s and length $s) {
+            return 0 unless $s eq "\xff\x01" and $raf->Read($s,5) == 5 and $s eq 'Exiv2';
+        } else {
+            return 0 unless $$self{FILE_TYPE} eq 'EXV';
+            $s = 'Exiv2';
+            $creatingEXV = 1;
+        }
+        Write($outfile,"\xff\x01") or $err = 1;
+        $isEXV = 1;
+    }
     $dumpParms{MaxLen} = 128 unless $verbose > 3;
 
     delete $$self{PREVIEW_INFO};   # reset preview information
@@ -4574,8 +4583,10 @@ sub WriteJPEG($$)
         push @dirOrder, $dirName;
     }
     unless ($marker and $marker == 0xda) {
-        $self->Error('Corrupted JPEG image');
-        return 1;
+        $isEXV or $self->Error('Corrupted JPEG image'), return 1;
+        $marker and $marker ne 0xd9 and $self->Error('Corrupted EXV file'), return 1;
+        push @dirOrder, 'EOI';
+        $dirCount{EOI} = 1;
     }
     $raf->Seek($pos, 0) or $self->Error('Seek error'), return 1;
 #
@@ -4595,9 +4606,17 @@ sub WriteJPEG($$)
         Write($outfile, $segJunk) if length $segJunk;
         # JPEG markers can be padded with unlimited 0xff's
         for (;;) {
-            $raf->Read($ch, 1) or $self->Error('Format error'), return 1;
-            $marker = ord($ch);
-            last unless $marker == 0xff;
+            if ($raf->Read($ch, 1)) {
+                $marker = ord($ch);
+                last unless $marker == 0xff;
+            } elsif ($creatingEXV) {
+                # create EXV from scratch
+                $marker = 0xd9; # EOI
+                last;
+            } else {
+                $self->Error('Format error');
+                return 1;
+            }
         }
         # read the segment data
         my $segData;
@@ -4605,8 +4624,10 @@ sub WriteJPEG($$)
         if (($marker & 0xf0) == 0xc0 and ($marker == 0xc0 or $marker & 0x03)) {
             last unless $raf->Read($segData, 7) == 7;
         # read data for all markers except stand-alone
-        # markers 0x00, 0x01 and 0xd0-0xd7 (NULL, TEM, RST0-RST7)
-        } elsif ($marker!=0x00 and $marker!=0x01 and ($marker<0xd0 or $marker>0xd7)) {
+        # markers 0x00, 0x01 and 0xd0-0xd7 (NULL, TEM, EOI, RST0-RST7)
+        } elsif ($marker!=0x00 and $marker!=0x01 and $marker!=0xd9 and
+            ($marker<0xd0 or $marker>0xd7))
+        {
             # read record length word
             last unless $raf->Read($s, 2) == 2;
             my $len = unpack('n',$s);   # get data length
@@ -4988,6 +5009,12 @@ sub WriteJPEG($$)
                 undef $trailInfo;
             }
             last;   # all done parsing file
+
+        } elsif ($marker==0xd9 and $isEXV) {
+            # write EXV EOI
+            Write($outfile, "\xff\xd9") or $err = 1;
+            $rtnVal = 1;
+            last;
 
         } elsif ($marker==0x00 or $marker==0x01 or ($marker>=0xd0 and $marker<=0xd7)) {
             $verbose and $marker and print $out "JPEG $markerName:\n";
@@ -5470,6 +5497,10 @@ sub WriteJPEG($$)
     }
     # set return value to -1 if we only had a write error
     $rtnVal = -1 if $rtnVal and $err;
+    if ($creatingEXV and $rtnVal > 0 and not $$self{CHANGED}) {
+        $self->Error('Nothing written');
+        $rtnVal = -1;
+    }
     return $rtnVal;
 }
 

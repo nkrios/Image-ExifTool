@@ -10,6 +10,7 @@
 #               3) http://www.workswell.cz/manuals/flir/hardware/A3xx_and_A6xx_models/Streaming_format_ThermoVision.pdf
 #               4) http://support.flir.com/DocDownload/Assets/62/English/1557488%24A.pdf
 #               5) http://code.google.com/p/dvelib/source/browse/trunk/flirPublicFormat/fpfConverter/Fpfimg.h?spec=svn3&r=3
+#               6) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,5538.0.html
 #               JD) Jens Duttke private communication
 #
 # Glossary:     FLIR = Forward Looking Infra Red
@@ -22,10 +23,12 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 sub ProcessFLIR($$;$);
 sub ProcessFLIRText($$$);
+sub ProcessMeasInfo($$$);
+sub GetImageType($$$);
 
 my %temperatureInfo = (
     Writable => 'rational64u',
@@ -103,8 +106,14 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
     # 2 = GainMap (ref 3)
     # 3 = OffsMap (ref 3)
     # 4 = DeadMap (ref 3)
-    # 5 = GainDeadMap (ref 3)
-    # 6 = CoarseMap (ref 3)
+    0x05 => { #6
+        Name => 'GainDeadData',
+        SubDirectory => { TagTable => 'Image::ExifTool::FLIR::GainDeadData' },
+    }, 
+    0x06 => { #6
+        Name => 'CoarseData',
+        SubDirectory => { TagTable => 'Image::ExifTool::FLIR::CoarseData' },
+    },       
     # 7 = ImageMap (ref 3)
     0x0e => {
         Name => 'EmbeddedImage',
@@ -114,7 +123,10 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
         Name => 'CameraInfo', # (BasicData - ref 3)
         SubDirectory => { TagTable => 'Image::ExifTool::FLIR::CameraInfo' },
     },
-    # 0x21 - ToolInfo (spot tool, line tool, area tool) (Measure - ref 3)
+    0x21 => { #6
+        Name => 'MeasurementInfo',
+        SubDirectory => { TagTable => 'Image::ExifTool::FLIR::MeasInfo' },
+    },
     0x22 => {
         Name => 'PaletteInfo', # (ColorPal - ref 3)
         SubDirectory => { TagTable => 'Image::ExifTool::FLIR::PaletteInfo' },
@@ -133,6 +145,10 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
         },
     },
     # 0x27: 01 00 08 00 10 00 00 00
+    0x28 => {
+        Name => 'PaintData',
+        SubDirectory => { TagTable => 'Image::ExifTool::FLIR::PaintData' },
+    },       
     0x2a => {
         Name => 'PiP',
         SubDirectory => {
@@ -152,7 +168,7 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
         },
     },
     0x2e => {
-        Name => 'ParamInfo',
+        Name => 'ParameterInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::FLIR::ParamInfo' },
     },
 );
@@ -199,36 +215,105 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
     # 0x0e-0x0f: 0
     16 => {
         Name => 'RawThermalImageType',
-        # this is actually the location of the image, but extract the
-        # image type as a separate tag because it may be useful
         Format => 'undef[$size-0x20]',
-        Notes => 'TIFF or PNG',
-        RawConv => sub {
-            my ($val, $self) = @_;
-            my ($w, $h) = @$self{'RawThermalImageWidth','RawThermalImageHeight'};
-            my $type = 'DAT';
-            # add TIFF header only if this looks like 16-bit raw data
-            # (note: MakeTiffHeader currently works only for little-endian,
-            #  and I haven't seen any big-endian samples, but check anwyay)
-            if ($val =~ /^\x89PNG\r\n\x1a\n/) {
-                $type = 'PNG';
-            } elsif (length $val != $w * $h * 2) {
-                $self->Warn('Unrecognized FLIR raw data format');
-            } elsif (GetByteOrder() eq 'II') {
-                require Image::ExifTool::Sony;
-                $val = Image::ExifTool::Sony::MakeTiffHeader($w,$h,1,16) . $val;
-                $type = 'TIFF';
-            } else {
-                $self->Warn("Don't yet support big-endian TIFF RawThermalImage");
-            }
-            # save image data
-            $$self{RawThermalImage} = $val;
-            return $type;
-        },
+        RawConv => 'Image::ExifTool::FLIR::GetImageType($self, $val, "RawThermalImage")',
     },
     16.1 => {
         Name => 'RawThermalImage',
         RawConv => '\$$self{RawThermalImage}',
+    },
+);
+
+# GainDeadMap record (ref 6) (see RawData above)
+%Image::ExifTool::FLIR::GainDeadData = (
+    GROUPS => { 0 => 'APP1', 2 => 'Image' },
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    NOTES => 'Information found in FFF-format .GAN calibration image files.',
+    0x00 => {
+        Name => 'GainDeadMapByteOrder',
+        Hidden => 1,
+        RawConv => 'ToggleByteOrder() if $val >= 0x0100; undef',
+    },
+    0x01 => {
+        Name => 'GainDeadMapImageWidth',
+        RawConv => '$$self{GainDeadMapImageWidth} = $val',
+    },
+    0x02 => {
+        Name => 'GainDeadMapImageHeight',
+        RawConv => '$$self{GainDeadMapImageHeight} = $val',
+    },
+    16 => {
+        Name => 'GainDeadMapImageType',
+        Format => 'undef[$size-0x20]',
+        RawConv => 'Image::ExifTool::FLIR::GetImageType($self, $val, "GainDeadMapImage")',
+    },
+    16.1 => {
+        Name => 'GainDeadMapImage',
+        RawConv => '\$$self{GainDeadMapImage}',
+    },
+);
+
+# CoarseMap record (ref 6) (see RawData above)
+%Image::ExifTool::FLIR::CoarseData = (
+    GROUPS => { 0 => 'APP1', 2 => 'Image' },
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    NOTES => 'Information found in FFF-format .CRS correction image files.',
+    0x00 => {
+        Name => 'CoarseMapByteOrder',
+        Hidden => 1,
+        RawConv => 'ToggleByteOrder() if $val >= 0x0100; undef',
+    },
+    0x01 => {
+        Name => 'CoarseMapImageWidth',
+        RawConv => '$$self{CoarseMapImageWidth} = $val',
+    },
+    0x02 => {
+        Name => 'CoarseMapImageHeight',
+        RawConv => '$$self{CoarseMapImageHeight} = $val',
+    },
+    16 => {
+        Name => 'CoarseMapImageType',
+        Format => 'undef[$size-0x20]',
+        RawConv => 'Image::ExifTool::FLIR::GetImageType($self, $val, "CoarseMapImage")',
+    },
+    16.1 => {
+        Name => 'CoarseMapImage',
+        RawConv => '\$$self{CoarseMapImage}',
+    },
+);
+
+# "Paint colors" record (ref PH)
+%Image::ExifTool::FLIR::PaintData = (
+    GROUPS => { 0 => 'APP1', 2 => 'Image' },
+    PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
+    FORMAT => 'int16u',
+    FIRST_ENTRY => 0,
+    NOTES => 'Information generated by FLIR Tools "Paint colors" tool.',
+    0x01 => {
+        Name => 'PaintByteOrder',
+        Hidden => 1,
+        RawConv => 'ToggleByteOrder() if $val >= 0x0100; undef',
+    },
+    0x05 => {
+        Name => 'PaintImageWidth',
+        RawConv => '$$self{PaintImageWidth} = $val',
+    },
+    0x06 => {
+        Name => 'PaintImageHeight',
+        RawConv => '$$self{PaintImageHeight} = $val',
+    },
+    20 => {
+        Name => 'PaintImageType',
+        Format => 'undef[$size-0x28]',
+        RawConv => 'Image::ExifTool::FLIR::GetImageType($self, $val, "PaintImage")',
+    },
+    20.1 => {
+        Name => 'PaintImage',
+        RawConv => '\$$self{PaintImage}',
     },
 );
 
@@ -251,8 +336,11 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
     16 => {
         Name => 'EmbeddedImageType',
         Format => 'undef[4]',
-        RawConv => '$val =~ /^.PNG/s ? "PNG" : "DAT"',
-        Notes => '"PNG" for PNG image in Y Cb Cr colors, or "DAT" for other image data',
+        RawConv => '$val =~ /^\x89PNG/s ? "PNG" : ($val =~ /^\xff\xd8\xff/ ? "JPG" : "DAT")',
+        Notes => q{
+            "PNG" for PNG image in Y Cb Cr colors, "JPG" for a JPEG image, or "DAT" for
+            other image data
+        },
     },
     16.1 => {
         Name => 'EmbeddedImage',
@@ -355,6 +443,36 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
     0x390 => { Name => 'FocusStepCount', Format => 'int16u' },
     0x45c => { Name => 'FocusDistance',  Format => 'float', PrintConv => 'sprintf("%.1f m",$val)' },
     # 0x43c - string: either "Live" or the file name
+);
+
+# FLIR measurement tools record (ref 6)
+%Image::ExifTool::FLIR::MeasInfo = (
+    GROUPS => { 0 => 'APP1', 2 => 'Image' },
+    PROCESS_PROC => \&ProcessMeasInfo,
+    FORMAT => 'int16u',
+    VARS => { NO_ID => 1 },
+    NOTES => q{
+        Tags listed below are only for the first measurement tool, however multiple
+        measurements may be added, and information is extracted for all of them. 
+        Tags for subsequent measurements are generated as required with the prefixes
+        "Meas2", "Meas3", etc.
+    },
+    Meas1Type => {
+        PrintConv => {
+            1 => 'Spot',
+            2 => 'Area',
+            3 => 'Ellipse',
+            4 => 'Line',
+            5 => 'Endpoint', #PH (NC, FLIR Tools v2.0 for Mac generates an empty one of these after each Line)
+            6 => 'Alarm', #PH seen params: "0 1 0 1 9142 0 9142 0" (called "Isotherm" by Mac version)
+            7 => 'Unused', #PH (NC) (or maybe "Free"?)
+            8 => 'Difference',
+        },
+    },
+    Meas1Params => {
+        Notes => 'Spot=X,Y; Area=X1,Y1,W,H; Ellipse=XC,YC,X1,Y1,X2,Y2; Line=X1,Y1,X2,Y2',
+    },
+    Meas1Label => { },
 );
 
 # FLIR palette record (ref PH/JD)
@@ -1015,6 +1133,37 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
 Image::ExifTool::AddCompositeTags('Image::ExifTool::FLIR');
 
 #------------------------------------------------------------------------------
+# Get image type from raw image data
+# Inputs: 0) ExifTool ref, 1) image data, 2) tag name
+# Returns: image type (PNG, JPG, TIFF or undef)
+# - image itself is stored in $$et{$tag}
+sub GetImageType($$$)
+{
+    my ($et, $val, $tag) = @_;
+    my ($w, $h) = @$et{"${tag}Width","${tag}Height"};
+    my $type = 'DAT';
+    # add TIFF header only if this looks like 16-bit raw data
+    # (note: MakeTiffHeader currently works only for little-endian,
+    #  and I haven't seen any big-endian samples, but check anwyay)
+    if ($val =~ /^\x89PNG\r\n\x1a\n/) {
+        $type = 'PNG';
+    } elsif ($val =~ /^\xff\xd8\xff/) { # (haven't seen this, but just in case - PH)
+        $type = 'JPG';
+    } elsif (length $val != $w * $h * 2) {
+        $et->Warn("Unrecognized FLIR $tag data format");
+    } elsif (GetByteOrder() eq 'II') {
+        require Image::ExifTool::Sony;
+        $val = Image::ExifTool::Sony::MakeTiffHeader($w,$h,1,16) . $val;
+        $type = 'TIFF';
+    } else {
+        $et->Warn("Don't yet support big-endian TIFF $tag");
+    }
+    # save image data
+    $$et{$tag} = $val;
+    return $type;
+}
+
+#------------------------------------------------------------------------------
 # Unescape FLIR Unicode character
 # Inputs: 0) escaped character code
 # Returns: UTF8 character
@@ -1065,6 +1214,69 @@ sub ProcessFLIRText($$$)
         $et->HandleTag($tagTablePtr, $tag, $val);
     }
 
+    return 1;
+}
+
+#------------------------------------------------------------------------------
+# Process FLIR measurement tool record (ref 6)
+# Inputs: 0) ExifTool ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+# (code-driven decoding isn't pretty, but sometimes it is necessary)
+sub ProcessMeasInfo($$$)
+{
+    my ($et, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    my $dirStart = $$dirInfo{DirStart} || 0;
+    my $dataPos = $$dirInfo{DataPos};
+    my $dirEnd = $dirStart + $$dirInfo{DirLen};
+    my $verbose = $et->Options('Verbose');
+
+    my $pos = $dirStart + 12;
+    return 0 if $pos > $dirEnd;
+    ToggleByteOrder() if Get16u($dataPt, $dirStart) >= 0x100;
+    my ($i, $t, $p);
+    for ($i=1; ; ++$i) {
+        last if $pos + 2 > $dirEnd;
+        my $recLen = Get16u($dataPt, $pos);
+        last if $recLen < 0x28 or $pos + $recLen > $dirEnd;
+        my $pre = 'Meas' . $i;
+        $et->VerboseDir("MeasInfo $i", undef, $recLen);
+        if ($verbose > 2) {
+            Image::ExifTool::HexDump($dataPt, $recLen,
+                Start=>$pos, Prefix=>$$et{INDENT}, DataPos=>$dataPos);
+        }
+        my $coordLen = Get16u($dataPt, $pos+4);
+        # generate tag table entries for this tool if necessary
+        foreach $t ('Type', 'Params', 'Label') {
+            my $tag = $pre . $t;
+            last if $$tagTablePtr{$tag};
+            my $tagInfo = { Name => $tag };
+            $$tagInfo{PrintConv} = $$tagTablePtr{"Meas1$t"}{PrintConv};
+            AddTagToTable($tagTablePtr, $tag, $tagInfo);
+        }
+        # extract measurement tool type
+        $et->HandleTag($tagTablePtr, "${pre}Type", undef, 
+            DataPt=>$dataPt, DataPos=>$dataPos, Start=>$pos+0x0a, Size=>2);
+        last if $pos + 0x24 + $coordLen > $dirEnd;
+        # extract measurement parameters
+        $et->HandleTag($tagTablePtr, "${pre}Params", undef, 
+            DataPt=>$dataPt, DataPos=>$dataPos, Start=>$pos+0x24, Size=>$coordLen);
+        my @uni;
+        # extract label (sometimes-null-terminated Unicode)
+        for ($p=0x24+$coordLen; $p<$recLen-1; $p+=2) {
+            my $ch = Get16u($dataPt, $p+$pos);
+            # FLIR Tools v2.0 for Mac doesn't properly null-terminate these strings,
+            # so end the string at any funny character
+            last if $ch < 0x20 or $ch > 0x7f;
+            push @uni, $ch;
+        }
+        # convert to the ExifTool character set
+        require Image::ExifTool::Charset;
+        my $val = Image::ExifTool::Charset::Recompose($et, \@uni);
+        $et->HandleTag($tagTablePtr, "${pre}Label", $val,
+            DataPt=>$dataPt, DataPos=>$dataPos, Start=>$pos+0x24+$coordLen, Size=>2*scalar(@uni));
+        $pos += $recLen;    # step to next record
+    }
     return 1;
 }
 
@@ -1222,7 +1434,14 @@ under the same terms as Perl itself.
 
 =item L<http://code.google.com/p/dvelib/source/browse/trunk/flirPublicFormat/fpfConverter/Fpfimg.h?spec=svn3&r=3>
 
+=item L<http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,5538.0.html>
+
 =back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Tomas for his hard work in decoding much of this information, and
+to Jens Duttke for getting me started on this format.
 
 =head1 SEE ALSO
 

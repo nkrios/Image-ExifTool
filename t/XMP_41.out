@@ -1,14 +1,14 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.16
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.48
 [File, System, Image] FileName - File Name: XMP_41_failed.xmp
 [File, System, Image] Directory - Directory: t
-[File, System, Image] FileSize - File Size: 9.5 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2013:01:30 08:38:09-05:00
-[File, System, Time] FileAccessDate - File Access Date/Time: 2013:01:30 08:38:09-05:00
-[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2013:01:30 08:38:09-05:00
+[File, System, Image] FileSize - File Size: 9.8 kB
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2014:01:23 08:34:51-05:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2014:01:23 08:34:51-05:00
+[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2014:01:23 08:34:51-05:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: XMP
 [File, File, Image] MIMEType - MIME Type: application/rdf+xml
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 9.16
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 9.48
 [XMP, XMP-dwc, Time] EventDay - Event Day: 2013
 [XMP, XMP-dwc, Time] EventEarliestDate - Event Earliest Date: 2013
 [XMP, XMP-dwc, Time] EventEndDayOfYear - Event End Day Of Year: 2013
@@ -38,6 +38,7 @@
 [XMP, XMP-dwc, Other] GeologicalContextLatestAgeOrHighestStage - Latest Age Or Highest Stage: 2013
 [XMP, XMP-dwc, Other] GeologicalContextLatestEonOrHighestEonothem - Latest Eon Or Highest Eonothem: 2013
 [XMP, XMP-dwc, Other] GeologicalContextLatestEpochOrHighestSeries - Latest Epoch Or Highest Series: 2013
+[XMP, XMP-dwc, Other] GeologicalContextLatestEraOrHighestErathem - Latest Era Or Highest Erathem: 2013
 [XMP, XMP-dwc, Other] GeologicalContextLatestPeriodOrHighestSystem - Latest Period Or Highest System: 2013
 [XMP, XMP-dwc, Other] GeologicalContextLithostratigraphicTerms - Lithostratigraphic Terms: 2013
 [XMP, XMP-dwc, Other] GeologicalContextLowestBiostratigraphicZone - Lowest Biostratigraphic Zone: 2013
@@ -47,6 +48,7 @@
 [XMP, XMP-dwc, Other] IdentificationIdentificationQualifier - Identification Qualifier: 2013
 [XMP, XMP-dwc, Other] IdentificationIdentificationReferences - Identification References: 2013
 [XMP, XMP-dwc, Other] IdentificationIdentificationRemarks - Identification Remarks: 2013
+[XMP, XMP-dwc, Other] IdentificationIdentificationVerificationStatus - Identification Verification Status: 2013
 [XMP, XMP-dwc, Other] IdentificationIdentifiedBy - Identified By: 2013
 [XMP, XMP-dwc, Other] IdentificationTypeStatus - Type Status: 2013
 [XMP, XMP-dwc, Other] MeasurementOrFactMeasurementAccuracy - Measurement Accuracy: 2013
@@ -111,10 +113,12 @@
 [XMP, XMP-dwc, Other] TaxonNameAccordingToID - Taxon Name According To ID: 2013
 [XMP, XMP-dwc, Other] TaxonNamePublishedIn - Taxon Name Published In: 2013
 [XMP, XMP-dwc, Other] TaxonNamePublishedInID - Taxon Name Published In ID: 2013
+[XMP, XMP-dwc, Other] TaxonNamePublishedInYear - Taxon Name Published In Year: 2013
 [XMP, XMP-dwc, Other] TaxonNomenclaturalCode - Taxon Nomenclatural Code: 2013
 [XMP, XMP-dwc, Other] TaxonNomenclaturalStatus - Taxon Nomenclatural Status: 2013
 [XMP, XMP-dwc, Other] TaxonOrder - Taxon Order: 2013
 [XMP, XMP-dwc, Other] TaxonOriginalNameUsage - Taxon Original Name Usage: 2013
+[XMP, XMP-dwc, Other] TaxonOriginalNameUsageID - Taxon Original Name Usage ID: 2013
 [XMP, XMP-dwc, Other] TaxonParentNameUsage - Taxon Parent Name Usage: 2013
 [XMP, XMP-dwc, Other] TaxonParentNameUsageID - Taxon Parent Name Usage ID: 2013
 [XMP, XMP-dwc, Other] TaxonPhylum - Taxon Phylum: 2013
@@ -147,6 +151,7 @@
 [XMP, XMP-dwc, Location] dctermsLocationGeoreferenceSources - DC Georeference Sources: 2013
 [XMP, XMP-dwc, Location] dctermsLocationGeoreferenceVerificationStatus - DC Georeference Verification Status: 2013
 [XMP, XMP-dwc, Location] dctermsLocationGeoreferencedBy - DC Georeferenced By: 2013
+[XMP, XMP-dwc, Location] dctermsLocationGeoreferencedDate - DC Georeferenced Date: 2013
 [XMP, XMP-dwc, Location] dctermsLocationHigherGeography - DC Higher Geography: 2013
 [XMP, XMP-dwc, Location] dctermsLocationHigherGeographyID - DC Higher Geography ID: 2013
 [XMP, XMP-dwc, Location] dctermsLocationIsland - DC Island: 2013

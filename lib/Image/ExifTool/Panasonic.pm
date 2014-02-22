@@ -32,7 +32,7 @@ use vars qw($VERSION %leicaLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.81';
+$VERSION = '1.83';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -440,6 +440,7 @@ my %shootingMode = (
             4 => 'Black & White',
             5 => 'Sepia',
             6 => 'Happy', #PH (FX70) (yes, really. you wouldn't want sad colors now would you?)
+            8 => 'Vivid', #PH (SZ3)
         },
     },
     0x29 => { #JD
@@ -488,6 +489,7 @@ my %shootingMode = (
             2 => 'Auto Exposure Bracketing (AEB)', #17
             4 => 'Unlimited', #PH (TZ5)
             8 => 'White Balance Bracketing', #18
+            17 => 'On (with flash)', #forum5597
         },
     },
     0x2b => { #4

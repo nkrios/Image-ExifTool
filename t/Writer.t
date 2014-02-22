@@ -1,7 +1,7 @@
 # Before "make install", this script should be runnable with "make test".
 # After "make install" it should work as "perl t/Writer.t".
 
-BEGIN { $| = 1; print "1..54\n"; $Image::ExifTool::noConfig = 1; }
+BEGIN { $| = 1; print "1..56\n"; $Image::ExifTool::noConfig = 1; }
 END {print "not ok 1\n" unless $loaded;}
 
 # test 1: Load the module(s)
@@ -956,6 +956,38 @@ my $testOK;
     my $info = $exifTool->ImageInfo($testfile, 'exif:*', '-image:all');
     if (check($exifTool, $info, $testname, $testnum)) {
         unlink $testfile;
+    } else {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+}
+
+# test 55-56: Create and edit EXV file
+{
+    ++$testnum;
+    my $exifTool = new Image::ExifTool;
+    $exifTool->SetNewValue(Artist => 'me');
+    $exifTool->SetNewValue(Keywords => ['one','two']);
+    $testfile = "t/${testname}_${testnum}_failed.exv";
+    unlink $testfile;
+    writeInfo($exifTool, undef, $testfile);
+    my $info = $exifTool->ImageInfo($testfile, 'exif:*', 'iptc:*', 'xmp:*');
+    unless (check($exifTool, $info, $testname, $testnum)) {
+        print 'not ';
+    }
+    print "ok $testnum\n";
+
+    ++$testnum;
+    $exifTool->SetNewValue();
+    $exifTool->SetNewValue(Artist);
+    $exifTool->SetNewValue(Title => 'Test');
+    my $testfile2 = "t/${testname}_${testnum}_failed.exv";
+    unlink $testfile2;
+    writeInfo($exifTool, $testfile, $testfile2);
+    $info = $exifTool->ImageInfo($testfile2, 'exif:*', 'iptc:*', 'xmp:*');
+    if (check($exifTool, $info, $testname, $testnum)) {
+        unlink $testfile;
+        unlink $testfile2;
     } else {
         print 'not ';
     }

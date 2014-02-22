@@ -215,7 +215,7 @@ sub IptcTime($)
         } else {
             # use local system timezone by default 
             my (@tm, $time);
-            if ($date and $date =~ /^(\d{4}):(\d{2}):(\d{2})\s*$/ and eval 'require Time::Local') {
+            if ($date and $date =~ /^(\d{4}):(\d{2}):(\d{2})\s*$/ and eval { require Time::Local }) {
                 # we were given a date too, so determine the local timezone
                 # offset at the specified date/time
                 my @d = ($3,$2-1,$1-1900);
@@ -603,9 +603,9 @@ sub DoWriteIPTC($$$)
     }
     # make sure the rest of the data is zero
     if ($tail < $dirEnd) {
-        my $trailer = substr($$dataPt, $tail, $dirEnd-$tail);
-        if ($trailer =~ /[^\0]/) {
-            return undef if $et->Warn('Unrecognized data in IPTC trailer', 2);
+        my $pad = substr($$dataPt, $tail, $dirEnd-$tail);
+        if ($pad =~ /[^\0]/) {
+            return undef if $et->Warn('Unrecognized data in IPTC padding', 2);
         }
     }
     return $newData;
@@ -634,7 +634,7 @@ sub WriteIPTC($$$)
         my $new = grep /^new$/, @values;
         my $old = grep /^old$/, @values;
         last unless $new or $old;
-        unless (eval 'require Digest::MD5') {
+        unless (eval { require Digest::MD5 }) {
             $et->Warn('Digest::MD5 must be installed to calculate IPTC digest');
             last;
         }

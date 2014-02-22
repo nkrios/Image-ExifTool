@@ -15,7 +15,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD %iptcCharset);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.49';
+$VERSION = '1.51';
 
 %iptcCharset = (
     "\x1b%G"  => 'UTF8',
@@ -42,6 +42,7 @@ my %isStandardIPTC = (
     'MIE-IPTC'                  => 1,
     'EPS-Photoshop-IPTC'        => 1,
     'PS-Photoshop-IPTC'         => 1,
+    'EXV-APP13-Photoshop-IPTC'  => 1,
 );
 
 my %fileFormat = (
@@ -1045,7 +1046,7 @@ sub ProcessIPTC($$$)
         my $path = $et->MetadataPath();
         if (IsStandardIPTC($path)) {
             my $md5;
-            if (eval 'require Digest::MD5') {
+            if (eval { require Digest::MD5 }) {
                 if ($pos or $dirLen != length($$dataPt)) {
                     $md5 = Digest::MD5::md5(substr $$dataPt, $pos, $dirLen);
                 } else {

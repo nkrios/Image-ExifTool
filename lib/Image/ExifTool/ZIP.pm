@@ -19,7 +19,7 @@ use strict;
 use vars qw($VERSION $warnString);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 sub WarnProc($) { $warnString = $_[0]; }
 
@@ -379,7 +379,7 @@ sub ProcessZIP($$)
 
     # use Archive::Zip if avilable
     for (;;) {
-        unless (eval 'require Archive::Zip' and eval 'require IO::File') {
+        unless (eval { require Archive::Zip } and eval { require IO::File }) {
             if ($$et{FILE_EXT} and $$et{FILE_EXT} ne 'ZIP') {
                 $et->Warn("Install Archive::Zip to decode compressed ZIP information");
             }
@@ -388,7 +388,7 @@ sub ProcessZIP($$)
         # Archive::Zip requires a seekable IO::File object
         my $fh;
         if ($raf->{TESTED} >= 0) {
-            unless (eval 'require IO::File') {
+            unless (eval { require IO::File }) {
                 # (this shouldn't happen because IO::File is a prerequisite of Archive::Zip)
                 $et->Warn("Install IO::File to decode compressed ZIP information");
                 last;
@@ -396,7 +396,7 @@ sub ProcessZIP($$)
             $raf->Seek(0,0);
             $fh = $raf->{FILE_PT};
             bless $fh, 'IO::File';  # Archive::Zip expects an IO::File object
-        } elsif (eval 'require IO::String') {
+        } elsif (eval { require IO::String }) {
             # read the whole file into memory (what else can I do?)
             $raf->Slurp();
             $fh = new IO::String ${$raf->{BUFF_PT}};
@@ -410,7 +410,7 @@ sub ProcessZIP($$)
         # catch all warnings! (Archive::Zip is bad for this)
         local $SIG{'__WARN__'} = \&WarnProc;
         my $status = $zip->readFromFileHandle($fh);
-        if ($status eq '4' and $raf->{TESTED} >= 0 and eval 'require IO::String' and
+        if ($status eq '4' and $raf->{TESTED} >= 0 and eval { require IO::String } and
             $raf->Seek(0,2) and $raf->Tell() < 100000000)
         {
             # try again, reading it ourself this time in an attempt to avoid

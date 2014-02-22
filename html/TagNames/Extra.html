@@ -141,9 +141,10 @@ this value should be done in octal, ie. &#39;oct($filePermissions#) &amp; 0200&#
 <td>FileSequence</td>
 <td class=c>N</td>
 <td class=c>ExifTool</td>
-<td><span class=s><span class=n>(sequence number for each processed file when extracting or copying
-information, beginning at 0 for the first file.  Not generated unless
-specifically requested)</span></span></td></tr>
+<td><span class=s><span class=n>(sequence number for each source file when extracting or copying information,
+including files that fail the -if condition of the command-line application,
+beginning at 0 for the first file.  Not generated unless specifically
+requested)</span></span></td></tr>
 <tr class=b>
 <td>FileSize</td>
 <td class=c>N</td>
@@ -261,11 +262,17 @@ unless specifically requested)</span></span></td></tr>
 <td class=c>File</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>ProcessingTime</td>
+<td class=c>N</td>
+<td class=c>ExifTool</td>
+<td><span class=s><span class=n>(the clock time in seconds taken by ExifTool to extract information from this
+file.  Not generated unless specifically requested.  Requires Time::HiRes)</span></span></td></tr>
+<tr>
 <td>RAFVersion</td>
 <td class=c>N</td>
 <td class=c>File</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ResourceForkSize</td>
 <td class=c>N</td>
 <td class=c>System</td>
@@ -274,7 +281,7 @@ tag is generated the ExtractEmbedded option may be used to extract
 resource-fork information as a sub-document.  When writing, the resource
 fork is preserved by default, but it may be deleted with <code>-rsrc:all=</code> on
 the command line)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>Warning</td>
 <td class=c>N</td>
 <td class=c>ExifTool</td>
@@ -283,18 +290,18 @@ Use the -a or Duplicates option to see all warnings if more than one
 occurred. Minor warnings may be ignored with the -m or IgnoreMinorErrors
 option.  Minor warnings with a capital &quot;M&quot; in the &quot;[Minor]&quot; designation
 indicate that the processing is affected by ignoring the warning)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>XMP</td>
 <td class=c title=' ! = Unsafe'>Y!</td>
 <td class=c>XMP</td>
 <td><span class=s><span class=n>(the XMP data block, but note that extended XMP in JPEG images may be split
 into multiple blocks)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>XResolution</td>
 <td class=c>N</td>
 <td class=c>File</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>YResolution</td>
 <td class=c>N</td>
 <td class=c>File</td>
@@ -303,7 +310,7 @@ into multiple blocks)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 23, 2013</i>
+<br><i>Last revised Feb 21, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

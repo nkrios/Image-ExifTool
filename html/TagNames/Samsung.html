@@ -6,7 +6,7 @@
 <link rel=stylesheet type='text/css' href='style.css' title='Style'>
 </head>
 <body>
-<h2 class=top><a name='Type1'>Samsung Type1 Tags</a></h2>
+<h2 class=top>Samsung Tags</h2>
 <p>Tags found in the binary &quot;STMN&quot; format maker notes written by a number of
 Samsung models.</p>
 <blockquote>
@@ -37,7 +37,7 @@ Samsung models.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='IFD'>Samsung IFD Tags</a></h2>
-<p>This is a standard-format IFD found in the Type1 maker notes of some Samsung
+<p>This is a standard-format IFD found in the maker notes of some Samsung
 models, except that the entry count is a 4-byte integer and the offsets are
 relative to the end of the IFD.  Currently, no tags in this IFD are known,
 so the Unknown (-u) or Verbose (-v) option must be used to see this
@@ -109,7 +109,8 @@ information.</p>
   <br>9 = Samsung NX 85mm F1.4 ED SSA
   <br>10 = Samsung NX 45mm F1.8
   <br>11 = Samsung NX 45mm F1.8 2D/3D
-  <br>12 = Samsung NX 12-24mm F4-5.6 ED</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>12 = Samsung NX 12-24mm F4-5.6 ED
+  <br>14 = Samsung NX 10mm F3.5 Fisheye</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr>
 <td title='0xa004 = 40964'>0xa004</td>
@@ -273,6 +274,46 @@ array of X coordinates then an array of Y coordinates)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='sec'>Samsung sec Tags</a></h2>
+<p>This information is found in the @sec atom of Samsung MP4 videos from models
+such as the WB30F.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>Make</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='32 = 0x20'>32</td>
+<td>Model</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='512 = 0x200'>512</td>
+<td>ThumbnailWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='516 = 0x204'>516</td>
+<td>ThumbnailHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='520 = 0x208'>520</td>
+<td>ThumbnailLength</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='524 = 0x20c'>524</td>
+<td>ThumbnailImage</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(the THM image, embedded metadata is extracted as the first sub-document)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='INFO'>Samsung INFO Tags</a></h2>
 <p>This information is found in MP4 videos from Samsung models such as the
 SMX-C20N.</p>
@@ -371,46 +412,6 @@ WP10.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='sec'>Samsung sec Tags</a></h2>
-<p>This information is found in the @sec atom of Samsung MP4 videos from models
-such as the WB30F.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index1</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='0 = 0x0'>0</td>
-<td>Make</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='32 = 0x20'>32</td>
-<td>Model</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='512 = 0x200'>512</td>
-<td>ThumbnailWidth</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='516 = 0x204'>516</td>
-<td>ThumbnailHeight</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='520 = 0x208'>520</td>
-<td>ThumbnailLength</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='524 = 0x20c'>524</td>
-<td>ThumbnailImage</td>
-<td class=c>N</td>
-<td><span class=s><span class=n>(the THM image, embedded metadata is extracted as the first sub-document)</span></span></td></tr>
-</table></td></tr></table></blockquote>
-
 <h2><a name='smta'>Samsung smta Tags</a></h2>
 <p>This information is found in the smta atom of Samsung MP4 videos from models
 such as the Galaxy S4.</p>
@@ -439,7 +440,7 @@ such as the Galaxy S4.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 28, 2013</i>
+<br><i>Last revised Feb 3, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -12,7 +12,7 @@
 use strict;
 require 5.004;
 
-my $version = '9.46';
+my $version = '9.53';
 
 # add our 'lib' directory to the include list BEFORE 'use Image::ExifTool'
 my $exeDir;
@@ -630,7 +630,7 @@ for (;;) {
     if ($a eq 'api') {
         my $opt = shift;
         defined $opt or Error("Expected OPT[=VAL] argument for -api option\n"), $badCmd=1, next;
-        my $val = ($opt =~ s/=(.*)//) ? $1 : 1;
+        my $val = ($opt =~ s/=(.*)//s) ? $1 : 1;
         $mt->Options($opt => (length($val) ? $val : undef));
         next;
     }
@@ -1218,15 +1218,17 @@ if ($xml) {
     if ($json == 1) { # JSON
         $fileHeader = '[';
         $fileTrailer = "]\n";
-        undef $binaryOutput; # can't currently use -b with -json
     } else { # PHP
         $fileHeader = 'Array(';
         $fileTrailer = ");\n";
-        # allow binary output in a text-mode file when -php and -b used together
-        # (this works because PHP strings are simple arrays of bytes, and CR/LF
-        #  won't be messed up in the text mode output because they are converted
-        #  to escape sequences in the strings)
-        $binaryOutput = 0 if $binaryOutput;
+    }
+    # allow binary output in a text-mode file when -php/-json and -b used together
+    # (this works because PHP strings are simple arrays of bytes, and CR/LF
+    #  won't be messed up in the text mode output because they are converted
+    #  to escape sequences in the strings)
+    if ($binaryOutput) {
+        $binaryOutput = 0;
+        require Image::ExifTool::XMP if $json == 1;  # (for EncodeBase64)
     }
     $mt->Options(List => 1) unless $joinLists;
     $mt->Options(Duplicates => 0) unless defined $showGroup;
@@ -2823,12 +2825,18 @@ sub ConvertBinary($)
             $val = ConvertBinary($val) if ref $val;
         }
     } elsif (ref $obj eq 'SCALAR') {
-        # (binaryOutput flag is set to 0 for binary mode of XML/PHP output formats)
+        # (binaryOutput flag is set to 0 for binary mode of XML/PHP/JSON output formats)
         if (defined $binaryOutput) {
             $obj = $$obj;
+            # encode in base64 if necessary
+            if ($json == 1 and ($obj =~ /[^\x09\x0a\x0d\x20-\x7e\x80-\xf7]/ or 
+                                Image::ExifTool::XMP::IsUTF8(\$obj) < 0))
+            {
+                $obj = 'base64:' . Image::ExifTool::XMP::EncodeBase64($obj, 1);
+            }
         } else {
-            # (-b is not valid for JSON or HTML output)
-            my $bOpt = ($json==1 or $html) ? '' : ', use -b option to extract';
+            # (-b is not valid for HTML output)
+            my $bOpt = $html ? '' : ', use -b option to extract';
             if ($$obj =~ /^Binary data/) {
                 $obj = "($$obj$bOpt)";
             } else {
@@ -3528,12 +3536,12 @@ when one is expected.
 A command-line interface to L<Image::ExifTool|Image::ExifTool>, used for
 reading and writing meta information in a variety of file types.  I<FILE> is
 one or more source file names, directory names, or C<-> for the standard
-input.  Information is read from source files and printed in readable form
+input.  Metadata is read from source files and printed in readable form
 to the console (or written to output text files with B<-w>).
 
-To write or delete information, tag values are assigned using the
+To write or delete metadata, tag values are assigned using the
 -I<TAG>=[I<VALUE>] syntax, or the B<-geotag> option.  To copy or move
-information, the B<-tagsFromFile> feature is used.  By default the original
+metadata, the B<-tagsFromFile> feature is used.  By default the original
 files are preserved with C<_original> appended to their names -- be sure to
 verify that the new files are OK before erasing the originals.  Once in
 write mode, exiftool will ignore any read-specific options.
@@ -3548,38 +3556,38 @@ supported by ExifTool (r = read, w = write, c = create):
 
   File Types
   ------------+-------------+-------------+-------------+------------
-  3FR   r     | EIP   r     | LNK   r     | PAC   r     | RWL   r/w
-  3G2   r/w   | EPS   r/w   | M2TS  r     | PAGES r     | RWZ   r
-  3GP   r/w   | ERF   r/w   | M4A/V r/w   | PBM   r/w   | RM    r
-  ACR   r     | EXE   r     | MEF   r/w   | PCD   r     | SO    r
-  AFM   r     | EXIF  r/w/c | MIE   r/w/c | PDF   r/w   | SR2   r/w
-  AI    r/w   | EXR   r     | MIFF  r     | PEF   r/w   | SRF   r
-  AIFF  r     | F4A/V r/w   | MKA   r     | PFA   r     | SRW   r/w
-  APE   r     | FFF   r/w   | MKS   r     | PFB   r     | SVG   r
-  ARW   r/w   | FLA   r     | MKV   r     | PFM   r     | SWF   r
-  ASF   r     | FLAC  r     | MNG   r/w   | PGF   r     | THM   r/w
-  AVI   r     | FLV   r     | MODD  r     | PGM   r/w   | TIFF  r/w
-  BMP   r     | FPF   r     | MOS   r/w   | PLIST r     | TORRENT r
-  BTF   r     | FPX   r     | MOV   r/w   | PICT  r     | TTC   r
-  CHM   r     | GIF   r/w   | MP3   r     | PMP   r     | TTF   r
-  COS   r     | GZ    r     | MP4   r/w   | PNG   r/w   | VRD   r/w/c
-  CR2   r/w   | HDP   r/w   | MPC   r     | PPM   r/w   | VSD   r
-  CRW   r/w   | HDR   r     | MPG   r     | PPT   r     | WAV   r
-  CS1   r/w   | HTML  r     | MPO   r/w   | PPTX  r     | WDP   r/w
-  DCM   r     | ICC   r/w/c | MQV   r/w   | PS    r/w   | WEBP  r
-  DCP   r/w   | IDML  r     | MRW   r/w   | PSB   r/w   | WEBM  r
-  DCR   r     | IIQ   r/w   | MXF   r     | PSD   r/w   | WMA   r
-  DFONT r     | IND   r/w   | NEF   r/w   | PSP   r     | WMV   r
-  DIVX  r     | INX   r     | NRW   r/w   | QTIF  r/w   | WV    r
-  DJVU  r     | ITC   r     | NUMBERS r   | RA    r     | X3F   r/w
-  DLL   r     | J2C   r     | ODP   r     | RAF   r/w   | XCF   r
-  DNG   r/w   | JNG   r/w   | ODS   r     | RAM   r     | XLS   r
-  DOC   r     | JP2   r/w   | ODT   r     | RAR   r     | XLSX  r
-  DOCX  r     | JPEG  r/w   | OFR   r     | RAW   r/w   | XMP   r/w/c
-  DPX   r     | K25   r     | OGG   r     | RIFF  r     | ZIP   r
-  DV    r     | KDC   r     | OGV   r     | RSRC  r     |
-  DVB   r/w   | KEY   r     | ORF   r/w   | RTF   r     |
-  DYLIB r     | LA    r     | OTF   r     | RW2   r/w   |
+  3FR   r     | EIP   r     | LA    r     | OTF   r     | RW2   r/w
+  3G2   r/w   | EPS   r/w   | LNK   r     | PAC   r     | RWL   r/w
+  3GP   r/w   | ERF   r/w   | M2TS  r     | PAGES r     | RWZ   r
+  ACR   r     | EXE   r     | M4A/V r/w   | PBM   r/w   | RM    r
+  AFM   r     | EXIF  r/w/c | MEF   r/w   | PCD   r     | SO    r
+  AI    r/w   | EXR   r     | MIE   r/w/c | PDF   r/w   | SR2   r/w
+  AIFF  r     | EXV   r/w/c | MIFF  r     | PEF   r/w   | SRF   r
+  APE   r     | F4A/V r/w   | MKA   r     | PFA   r     | SRW   r/w
+  ARW   r/w   | FFF   r/w   | MKS   r     | PFB   r     | SVG   r
+  ASF   r     | FLA   r     | MKV   r     | PFM   r     | SWF   r
+  AVI   r     | FLAC  r     | MNG   r/w   | PGF   r     | THM   r/w
+  BMP   r     | FLV   r     | MODD  r     | PGM   r/w   | TIFF  r/w
+  BTF   r     | FPF   r     | MOS   r/w   | PLIST r     | TORRENT r
+  CHM   r     | FPX   r     | MOV   r/w   | PICT  r     | TTC   r
+  COS   r     | GIF   r/w   | MP3   r     | PMP   r     | TTF   r
+  CR2   r/w   | GZ    r     | MP4   r/w   | PNG   r/w   | VRD   r/w/c
+  CRW   r/w   | HDP   r/w   | MPC   r     | PPM   r/w   | VSD   r
+  CS1   r/w   | HDR   r     | MPG   r     | PPT   r     | WAV   r
+  DCM   r     | HTML  r     | MPO   r/w   | PPTX  r     | WDP   r/w
+  DCP   r/w   | ICC   r/w/c | MQV   r/w   | PS    r/w   | WEBP  r
+  DCR   r     | IDML  r     | MRW   r/w   | PSB   r/w   | WEBM  r
+  DFONT r     | IIQ   r/w   | MXF   r     | PSD   r/w   | WMA   r
+  DIVX  r     | IND   r/w   | NEF   r/w   | PSP   r     | WMV   r
+  DJVU  r     | INX   r     | NRW   r/w   | QTIF  r/w   | WV    r
+  DLL   r     | ITC   r     | NUMBERS r   | RA    r     | X3F   r/w
+  DNG   r/w   | J2C   r     | ODP   r     | RAF   r/w   | XCF   r
+  DOC   r     | JNG   r/w   | ODS   r     | RAM   r     | XLS   r
+  DOCX  r     | JP2   r/w   | ODT   r     | RAR   r     | XLSX  r
+  DPX   r     | JPEG  r/w   | OFR   r     | RAW   r/w   | XMP   r/w/c
+  DV    r     | K25   r     | OGG   r     | RIFF  r     | ZIP   r
+  DVB   r/w   | KDC   r     | OGV   r     | RSRC  r     |
+  DYLIB r     | KEY   r     | ORF   r/w   | RTF   r     |
 
   Meta Information
   ----------------------+----------------------+---------------------
@@ -3588,15 +3596,16 @@ supported by ExifTool (r = read, w = write, c = create):
   IPTC           r/w/c  |  Kodak Meta     r/w  |  Adobe APP14    r
   XMP            r/w/c  |  FotoStation    r/w  |  MPF            r
   MakerNotes     r/w/c  |  PhotoMechanic  r/w  |  Stim           r
-  Photoshop IRB  r/w/c  |  JPEG 2000      r    |  APE            r
-  ICC Profile    r/w/c  |  DICOM          r    |  Vorbis         r
-  MIE            r/w/c  |  Flash          r    |  SPIFF          r
-  JFIF           r/w/c  |  FlashPix       r    |  DjVu           r
-  Ducky APP12    r/w/c  |  QuickTime      r    |  M2TS           r
-  PDF            r/w/c  |  Matroska       r    |  PE/COFF        r
-  PNG            r/w/c  |  GeoTIFF        r    |  AVCHD          r
-  Canon VRD      r/w/c  |  PrintIM        r    |  ZIP            r
-  Nikon Capture  r/w/c  |  ID3            r    |  (and more)
+  Photoshop IRB  r/w/c  |  JPEG 2000      r    |  DPX            r
+  ICC Profile    r/w/c  |  DICOM          r    |  APE            r
+  MIE            r/w/c  |  Flash          r    |  Vorbis         r
+  JFIF           r/w/c  |  FlashPix       r    |  SPIFF          r
+  Ducky APP12    r/w/c  |  QuickTime      r    |  DjVu           r
+  PDF            r/w/c  |  Matroska       r    |  M2TS           r
+  PNG            r/w/c  |  MXF            r    |  PE/COFF        r
+  Canon VRD      r/w/c  |  PrintIM        r    |  AVCHD          r
+  Nikon Capture  r/w/c  |  FLAC           r    |  ZIP            r
+  GeoTIFF        r/w/c  |  ID3            r    |  (and more)
 
 =head1 OPTIONS
 
@@ -3790,10 +3799,12 @@ shell globbing), and is often used when deleting all metadata (ie. C<-All=>)
 or an entire group (ie. C<-GROUP:All=>, see note 4 below).  Note that not
 all groups are deletable, and that the JPEG APP14 "Adobe" group is not
 removed by default with C<-All=> because it may affect the appearance of the
-image.  Use the B<-listd> option for a complete list of deletable groups,
-and see note 5 below regarding the "APP" groups.  Also, within an image some
-groups may be contained within others, and these groups are removed if the
-containing group is deleted:
+image.  However, this will remove color space information, so the colors may
+be affected (but this may be avoided by copying back the tags defined by the
+ColorSpaceTags shortcut).  Use the B<-listd> option for a complete list of
+deletable groups, and see note 5 below regarding the "APP" groups.  Also,
+within an image some groups may be contained within others, and these groups
+are removed if the containing group is deleted:
 
   JPEG Image:
   - Deleting EXIF or IFD0 also deletes ExifIFD, GlobParamIFD,
@@ -3997,8 +4008,8 @@ descriptions.  This option is mainly used for extracting embedded images or
 other binary data, but it may also be useful for some text strings since
 control characters (such as newlines) are not replaced by '.' as they are in
 the default output.  List items are separated by a newline when extracted
-with the B<-b> option.  May be combined with C<-php> or C<-X> to extract
-binary data in PHP or XML format.
+with the B<-b> option.  May be combined with C<-j>, C<-php> or C<-X> to
+extract binary data in JSON, PHP or XML format.
 
 =item B<-c> I<FMT> (B<-coordFormat>)
 
@@ -4074,7 +4085,7 @@ information about coded character sets.
 
 =item B<-csv>[=I<CSVFILE>]
 
-Export information in as a CSV file, or import information if I<CSVFILE> is
+Export information in CSV format, or import information if I<CSVFILE> is
 specified.  When importing, the CSV file must be in exactly the same format
 as the exported file.  The first row of the I<CSVFILE> must be the ExifTool
 tag names (with optional group names) for each column of the file, and
@@ -4093,13 +4104,17 @@ Empty values are ignored when importing.  Also, FileName and Directory
 columns are ignored if they exist (ie. ExifTool will not attempt to write
 these tags with a CSV import).  To force a tag to be deleted, use the B<-f>
 option and set the value to "-" in the CSV file (or to the MissingTagValue
-if this API option was used).
+if this API option was used).  Multiple databases may be imported in a
+single command.
 
 When exporting a CSV file, the B<-g> or B<-G> option to add group names to
 the tag headings.  If the B<-a> option is used to allow duplicate tag names,
 the duplicate tags are only included in the CSV output if the column
 headings are unique.  Adding the B<-G4> option ensures a unique column
-heading for each tag.
+heading for each tag.  When exporting specific tags, the CSV columns are
+arranged in the same order as the specified tags provided the column
+headings exactly match the specified tag names, otherwise the columns are
+sorted in alphabetical order.
 
 List-type tags are stored as simple strings in a CSV file, but the B<-sep>
 option may be used to split them back into separate items when importing.
@@ -4198,8 +4213,10 @@ simple strings).  The B<-a> option is implied if the B<-g> or B<-G> options
 are used, otherwise it is ignored and duplicate tags are suppressed.  Adding
 the B<-D> or B<-H> option changes tag values to JSON objects with "val" and
 "id" fields, and adding B<-l> adds a "desc" field, and a "num" field if the
-numerical value is different from the converted "val".  The B<-b>, B<-L> and
-B<-charset> options have no effect on the JSON output.
+numerical value is different from the converted "val".  The B<-b> option may
+be added to output binary data, encoded in base64 if necessary (indicated by
+"base64:" as the first 7 bytes of the value).  The B<-L> and B<-charset>
+options have no effect on the JSON output.
 
 If I<JSONFILE> is specified, the file is imported and the tag definitions
 from the file are used to set tag values on a per-file basis.  The special
@@ -4299,7 +4316,7 @@ with this command:
 
 produces output like this:
 
-    -- Generated by ExifTool 9.46 --
+    -- Generated by ExifTool 9.53 --
     File: a.jpg - 2003:10:31 15:44:19
     (f/5.6, 1/60s, ISO 100)
     File: b.jpg - 2006:05:23 11:57:38
@@ -5039,7 +5056,7 @@ application.
 B<-listg>[I<NUM>], B<-listd>, B<-listx>
 
 Print a list of all valid tag names (B<-list>), all writable tag names
-(B<-listw>), all supported file extensions (B<-listff>), all recognized file
+(B<-listw>), all supported file extensions (B<-listf>), all recognized file
 extensions (B<-listr>), all writable file extensions (B<-listwf>), all tag
 groups [in a specified family] (B<-listg>[I<NUM>]), all deletable tag groups
 (B<-listd>), or an XML database of tag details including language
@@ -5092,10 +5109,10 @@ load exiftool for each invocation.
 
 =item B<-api> I<OPT[=VAL]>
 
-Set ExifTool API option.  I<OPT> is a case-sensitive API option name.  The
-option value is set to 1 if I<=VAL> is omitted.  See L<Image::ExifTool
-Options|Image::ExifTool/Options> for a list of available API options.  This
-overrides API options set via the config file.
+Set ExifTool API option.  I<OPT> is an API option name.  The option value is
+set to 1 if I<=VAL> is omitted.  See
+L<Image::ExifTool Options|Image::ExifTool/Options> for a list of available
+API options.  This overrides API options set via the config file.
 
 =item B<-common_args>
 

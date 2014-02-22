@@ -5,8 +5,8 @@
 #
 # Notes:        This example file shows how to define your own shortcuts and
 #               add new EXIF, IPTC, XMP, PNG, MIE and Composite tags, as well
-#               as how to specify preferred lenses for the LensID tag and
-#               define default values for ExifTool options.
+#               as how to specify preferred lenses for the LensID tag, and
+#               define new file types and default ExifTool option values.
 #
 #               Note that unknown tags may be extracted even if they aren't
 #               defined, but tags must be defined to be written.  Also note
@@ -22,10 +22,10 @@
 #               run.  Your home directory is determined by the first defined of
 #               the following environment variables:
 #
-#                   1. EXIFTOOL_HOME
-#                   2. HOME
-#                   3. HOMEDRIVE + HOMEPATH
-#                   4. (the current directory)
+#                   1.  EXIFTOOL_HOME
+#                   2.  HOME
+#                   3.  HOMEDRIVE + HOMEPATH
+#                   4.  (the current directory)
 #
 #               Alternatively, the -config option of the exiftool application
 #               may be used to load a specific configuration file (note that
@@ -73,6 +73,7 @@
     # All EXIF tags are added to the Main table, and WriteGroup is used to
     # specify where the tag is written (default is ExifIFD if not specified):
     'Image::ExifTool::Exif::Main' => {
+        # Example 1.  EXIF:NewEXIFTag
         0xd000 => {
             Name => 'NewEXIFTag',
             Writable => 'int16u',
@@ -82,10 +83,12 @@
     },
     # the Geotag feature writes these additional GPS tags if available:
     'Image::ExifTool::GPS::Main' => {
+        # Example 2.  GPS:GPSPitch
         0xd000 => {
             Name => 'GPSPitch',
             Writable => 'rational64s',
         },
+        # Example 3.  GPS:GPSRoll
         0xd001 => {
             Name => 'GPSRoll',
             Writable => 'rational64s',
@@ -94,6 +97,7 @@
     # IPTC tags are added to a specific record type (ie. application record):
     # (Note: IPTC tag ID's are limited to the range 0-255)
     'Image::ExifTool::IPTC::ApplicationRecord' => {
+        # Example 4.  IPTC:NewIPTCTag
         160 => {
             Name => 'NewIPTCTag',
             Format => 'string[0,16]',
@@ -102,16 +106,20 @@
     },
     # XMP tags may be added to existing namespaces:
     'Image::ExifTool::XMP::xmp' => {
+        # Example 5.  XMP-xmp:NewXMPxmpTag
         NewXMPxmpTag => { Groups => { 2 => 'Author' } },
         # add more user-defined XMP-xmp tags here...
     },
     # special Geotag tags for XMP-exif:
     'Image::ExifTool::XMP::exif' => {
+        # Example 6.  XMP-exif:GPSPitch
         GPSPitch => { Writable => 'rational', Groups => { 2 => 'Location' } },
+        # Example 7.  XMP-exif:GPSRoll
         GPSRoll  => { Writable => 'rational', Groups => { 2 => 'Location' } },
     },
     # new XMP namespaces (ie. xxx) must be added to the Main XMP table:
     'Image::ExifTool::XMP::Main' => {
+        # namespace definition for examples 8 to 11
         xxx => { # <-- must be the same as the NAMESPACE prefix
             SubDirectory => {
                 TagTable => 'Image::ExifTool::UserDefined::xxx',
@@ -122,17 +130,22 @@
     },
     # new PNG tags are added to the PNG::TextualData table:
     'Image::ExifTool::PNG::TextualData' => {
+        # Example 12.  PNG:NewPngTag1
         NewPngTag1 => { },
+        # Example 13.  PNG:NewPngTag2
         NewPngTag2 => { },
+        # Example 14.  PNG:NewPngTag3
         NewPngTag3 => { },
     },
     # add a new MIE tag (NewMieTag1) and group (MIE-Test) to MIE-Meta
     # (Note: MIE group names must NOT end with a number)
     'Image::ExifTool::MIE::Meta' => {
+        # Example 15.  MIE-Meta:NewMieTag1
         NewMieTag1 => {
             Writable => 'rational64u',
             Units => [ 'cm', 'in' ],
         },
+        # new MIE "Test" group for example 16
         Test => {
             SubDirectory => {
                 TagTable => 'Image::ExifTool::UserDefined::MIETest',
@@ -231,12 +244,16 @@
     NAMESPACE     => { 'xxx' => 'http://ns.myname.com/xxx/1.0/' },
     WRITABLE      => 'string',
     # replace "NewXMPxxxTag1" with your own tag name (ie. "MyTag")
+    # Example 8.  XMP-xxx:NewXMPxxxTag1
     NewXMPxxxTag1 => { Writable => 'lang-alt' },
+    # Example 9.  XMP-xxx:NewXMPxxxTag2
     NewXMPxxxTag2 => { Groups => { 2 => 'Author' } },
+    # Example 10.  XMP-xxx:NewXMPxxxTag3
     NewXMPxxxTag3 => { List => 'Bag' },
     # example structured XMP tag
     NewXMPxxxStruct => {
         # the "Struct" entry defines the structure fields
+        # Example 11.  XMP-xxx:NewXMPxxxStruct
         Struct => {
             # optional namespace prefix and URI for structure fields
             # (required only if different than NAMESPACE above)
@@ -277,6 +294,7 @@ use Image::ExifTool::MIE;
     %Image::ExifTool::MIE::tableDefaults,   # default MIE table entries
     GROUPS      => { 0 => 'MIE', 1 => 'MIE-Test', 2 => 'Document' },
     WRITE_GROUP => 'MIE-Test',
+    # Example 16.  MIE-Test:NewMieTag2
     NewMieTag2  => { },     # new user-defined tag in MIE-Test group
 );
 
@@ -285,6 +303,28 @@ use Image::ExifTool::MIE;
 @Image::ExifTool::UserDefined::Lenses = (
     'Sigma AF 10-20mm F4-5.6 EX DC',
     'Tokina AF193-2 19-35mm f/3.5-4.5',
+);
+
+# User-defined file types to recognize
+%Image::ExifTool::UserDefined::FileTypes = (
+    XXX => { # <-- the extension of the new file type
+        # BaseType specifies the format upon which this file is based.
+        # If BaseType is defined, then the file will be fully supported,
+        # and in this case the Magic pattern should not be defined
+        BaseType => 'TIFF',
+        MIMEType => 'image/x-xxx',  # (defaults to 'application/unknown')
+        Description => 'My XXX file type',
+    },
+    YYY => {
+        # without BaseType, the file will be recognized but not supported
+        Magic => '0123abcd',    # regular expression to match at start of file
+        MIMEType => 'application/test',
+        Description => 'Test imaginary file type',
+    },
+    ZZZ => {
+        # if neither BaseType nor Magic are defined, the file will be
+        # recognized by extension only
+    },
 );
 
 # Specify default ExifTool option values

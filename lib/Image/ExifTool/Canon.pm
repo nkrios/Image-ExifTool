@@ -82,7 +82,7 @@ sub ProcessSerialData($$$);
 sub ProcessFilters($$$);
 sub SwapWords($);
 
-$VERSION = '3.23';
+$VERSION = '3.27';
 
 # Note: Removed 'USM' from 'L' lenses since it is redundant - PH
 # (or is it?  Ref 32 shows 5 non-USM L-type lenses)
@@ -323,7 +323,8 @@ $VERSION = '3.23';
     210 => 'Canon EF 28-90mm f/4-5.6 USM', #32
     211 => 'Canon EF 28-200mm f/3.5-5.6 USM', #15
     212 => 'Canon EF 28-105mm f/4-5.6 USM', #15
-    213 => 'Canon EF 90-300mm f/4.5-5.6 USM',
+    213 => 'Canon EF 90-300mm f/4.5-5.6 USM or Tamron Lens',
+    213.1 => 'Tamron SP 150-600mm F/5-6.3 Di VC USD', #topic5565 (Model A011)
     214 => 'Canon EF-S 18-55mm f/3.5-5.6 USM', #PH/34
     215 => 'Canon EF 55-200mm f/4.5-5.6 II USM',
     224 => 'Canon EF 70-200mm f/2.8L IS', #11
@@ -367,6 +368,7 @@ $VERSION = '3.23';
     494 => 'Canon EF 600mm f/4.0L IS II USM', #PH
     495 => 'Canon EF 24-70mm f/2.8L II USM', #PH
     496 => 'Canon EF 200-400mm f/4L IS USM', #PH
+    499 => 'Canon EF 200-400mm f/4L IS USM + 1.4x', #50
     502 => 'Canon EF 28mm f/2.8 IS USM', #PH
     503 => 'Canon EF 24mm f/2.8 IS USM', #PH
     504 => 'Canon EF 24-70mm f/4L IS USM', #PH
@@ -567,6 +569,12 @@ $VERSION = '3.23';
     0x3550000 => 'PowerShot S120',
     0x3560000 => 'PowerShot SX170 IS',
     0x3580000 => 'PowerShot SX510 HS',
+    0x3590000 => 'PowerShot S200 (new)',
+    0x3610000 => 'PowerShot N100',
+    0x3640000 => 'PowerShot G1 X Mark II',
+    0x3650000 => 'PowerShot D30',
+    0x3660000 => 'PowerShot SX700 HS',
+    0x3670000 => 'PowerShot SX600 HS',
     0x4040000 => 'PowerShot G1',
     0x6040000 => 'PowerShot S100 / Digital IXUS / IXY Digital',
 
@@ -645,6 +653,7 @@ $VERSION = '3.23';
     0x80000324 => 'EOS-1D C', # (NC)
     0x80000325 => 'EOS 70D',
     0x80000326 => 'EOS Rebel T5i / 700D / Kiss X7i',
+    0x80000327 => 'EOS Rebel T5 / 1200D / Kiss X70',
     0x80000331 => 'EOS M',
     0x80000355 => 'EOS M2',
     0x80000346 => 'EOS Rebel SL1 / 100D / Kiss X7',
@@ -1520,8 +1529,8 @@ my %binaryDataAttrs = (
             Name => 'ColorData5',
             SubDirectory => { TagTable => 'Image::ExifTool::Canon::ColorData5' },
         },
-        {   # (int16u[1273]) - 600D
-            Condition => '$count == 1273',
+        {   # (int16u[1273|1275]) - 600D (1273), 1200D (1275)
+            Condition => '$count == 1273 or $count == 1275',
             Name => 'ColorData6',
             SubDirectory => { TagTable => 'Image::ExifTool::Canon::ColorData6' },
         },
@@ -1714,7 +1723,8 @@ my %binaryDataAttrs = (
             5 => 'TIF+JPEG', # (1D) (unconfirmed)
             6 => 'CR2', # +THM? (1D,30D,350D)
             7 => 'CR2+JPEG', # (S30)
-            9 => 'Video', # (S95 MOV)
+            9 => 'MOV', # (S95 MOV)
+            10 => 'MP4', # (SX280 MP4)
         },
     },
     10 => {
@@ -4954,62 +4964,90 @@ my %ciMaxFocal = (
         PrintConv => '"$val C"',
         PrintConvInv => '$val=~s/ ?C//; $val',
     },
-    466 => { # [-3]
+    -3 => {
         Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 469',
-        Notes => '100HS, 300HS, 500HS, A1200, A2200, A3200 and A3300',
+        Condition => '$$self{CameraInfoCount} > 400',
+        Notes => '3 entries from end of record for most newer camera models',
         PrintConv => '"$val C"',
         PrintConvInv => '$val=~s/ ?C//; $val',
     },
-    503 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 506',
-        Notes => 'A800',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    506 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 509',
-        Notes => 'SX230HS',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    520 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 523',
-        Notes => '310HS, 510HS, G1X, S100 (new), SX40HS and SX150',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    524 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 527',
-        Notes => '110HS, 520HS, A2300, A2400, A3400, A4000, D20 and SX260HS',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    532 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 535',
-        Notes => 'S110 (new), G15, SX50, SX160IS and SX500IS',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    547 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 550',
-        Notes => '130IS, A1400, A2500 and A2600',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
-    549 => { # [-3]
-        Name => 'CameraTemperature',
-        Condition => '$$self{CameraInfoCount} == 552',
-        Notes => '115IS, 130IS, SX270, SX280, 330HS and A3500',
-        PrintConv => '"$val C"',
-        PrintConvInv => '$val=~s/ ?C//; $val',
-    },
+#    466 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 469',
+#        Notes => '100HS, 300HS, 500HS, A1200, A2200, A3200 and A3300',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    503 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 506',
+#        Notes => 'A800',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    506 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 509',
+#        Notes => 'SX230HS',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    520 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 523',
+#        Notes => '310HS, 510HS, G1X, S100 (new), SX40HS and SX150',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    524 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 527',
+#        Notes => '110HS, 520HS, A2300, A2400, A3400, A4000, D20 and SX260HS',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    532 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 535',
+#        Notes => 'S110 (new), G15, SX50, SX160IS and SX500IS',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    547 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 550',
+#        Notes => '130IS, A1400, A2500 and A2600',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    549 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 552',
+#        Notes => '115IS, 130IS, SX270, SX280, 330HS and A3500',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    552 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 555',
+#        Notes => 'S200 (new)',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    850 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 853',
+#        Notes => 'N',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
+#    895 => { # [-3]
+#        Name => 'CameraTemperature',
+#        Condition => '$$self{CameraInfoCount} == 898',
+#        Notes => 'G1XmkII, N100, SX600HS and SX700HS',
+#        PrintConv => '"$val C"',
+#        PrintConvInv => '$val=~s/ ?C//; $val',
+#    },
 );
 
 # unknown Canon camera information (MakerNotes tag 0x0d) - PH
@@ -6720,10 +6758,10 @@ my %ciMaxFocal = (
     0x100=> { Name => 'CameraColorCalibration15', %cameraColorCalibration2 },
 );
 
-# Color data (MakerNotes tag 0x4001, count=1273) (ref PH)
+# Color data (MakerNotes tag 0x4001, count=1273|1275) (ref PH)
 %Image::ExifTool::Canon::ColorData6 = (
     %binaryDataAttrs,
-    NOTES => 'These tags are used by the EOS 600D.',
+    NOTES => 'These tags are used by the EOS 600D and 1200D.',
     FORMAT => 'int16s',
     FIRST_ENTRY => 0,
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
@@ -6731,7 +6769,7 @@ my %ciMaxFocal = (
     0x00 => {
         Name => 'ColorDataVersion',
         PrintConv => {
-            10 => '10 (600D)',
+            10 => '10 (600D/1200D)',
         },
     },
     0x3f => { Name => 'WB_RGGBLevelsAsShot',     Format => 'int16s[4]' },
@@ -7126,6 +7164,7 @@ my %filterConv = (
         Name => 'ThumbnailImage',
         Format => 'undef',
         Notes => 'the full THM image, embedded metadata is extracted as the first sub-document',
+        SetBase => 1,
         RawConv => q{
             $$self{DOC_NUM} = ++$$self{DOC_COUNT};
             $self->ExtractInfo(\$val, { ReEntry => 1 });

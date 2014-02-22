@@ -68,7 +68,7 @@ sub WriteProfile($$$;$)
 {
     my ($outfile, $rawType, $dataPt, $profile) = @_;
     my ($buff, $prefix, $chunk, $deflate);
-    if (eval 'require Compress::Zlib') {
+    if (eval { require Compress::Zlib }) {
         $deflate = Compress::Zlib::deflateInit();
     }
     if (not defined $profile) {
@@ -187,7 +187,7 @@ sub BuildTextChunk($$$$$)
     }
     if ($comp) {
         my $warn;
-        if (eval 'require Compress::Zlib') {
+        if (eval { require Compress::Zlib }) {
             my $deflate = Compress::Zlib::deflateInit();
             $compVal = $deflate->deflate($val) if $deflate;
             if (defined $compVal) {

@@ -19,7 +19,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.47';
+$VERSION = '1.49';
 
 # this is a special table used to define command-line shortcuts
 # (documentation Notes may be added for these via %shortcutNotes in BuildTagLookup.pm)
@@ -140,6 +140,7 @@ $VERSION = '1.47';
         'MakerNoteKodak7',
         'MakerNoteKodak8a',
         'MakerNoteKodak8b',
+        'MakerNoteKodak8c',
         'MakerNoteKodak9',
         'MakerNoteKodak10',
         'MakerNoteKodakUnknown',
@@ -200,6 +201,14 @@ $VERSION = '1.47';
         'InteropIFD:InteropVersion',
         'InteropIFD:RelatedImageWidth',
         'InteropIFD:RelatedImageHeight',
+    ],
+    # standard tags used to define the color space of an image
+    # (useful to preserve color space when deleting all meta information)
+    ColorSpaceTags => [
+        'ExifIFD:ColorSpace',
+        'ExifIFD:Gamma',
+        'InteropIFD:InteropIndex',
+        'ICC_Profile',
     ],
     # common metadata tags found in IFD0 of TIFF images
     CommonIFD0 => [

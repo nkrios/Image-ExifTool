@@ -13,6 +13,42 @@
 <p><b>Note:</b> This page gives the history of older exiftool versions.  See
 <a href="history.html">history.html</a> for the recent history.</p>
 
+<a name='v9.26'><b>Apr. 13, 2013 - Version 9.26</b></a>
+<ul>
+<li>Added read support for FLIR FFF and FPF images and decode more FLIR tags
+<li>Added some new Pentax LensType's and Nikon LensID's
+<li>Added a few new Panasonic ContrastMode values
+<li>Decode a number of Canon 6D tags
+<li>Allow CanonRaw tags to be written using "CIFF" as a group name
+<li>Improved decoding of Canon ColorData information for newer EOS models
+<li>Improved decoding of a number of Sony tags (thanks Jos Roost)
+<li>Removed index number from duplicate Composite TagID's in XML output
+<li>Fixed byte-order problem for a few Nikon D5200 and D7100 tags
+<li>Fixed incompatibility with old-style (pre-8.46) XMP user-defined structure
+    definitions
+</ul>
+
+<a name='v9.25'><b>Apr. 6, 2013 - Version 9.25</b></a> <span class=grn>(production release)</span>
+<ul>
+<li>Added read support for FLIR thermal image metadata in JPEG images
+<li>Added write support for DNG version 1.4 images
+<li>Added a new Pentax DriveMode value and a new Pentax LensType
+<li>Added two new Olympus CameraType values
+<li>Added print conversion for XMP Flash tags to provide alternate language
+    support
+<li>Decode a few more Nikon and Pentax tags
+<li>Decode more Sony tags (thanks Jos Roost)
+<li>Decode more Panasonic tags and changed decoding of others
+<li>Enhanced -j and -php options to work with -D, -H and -l
+<li>Improved German translations (thanks Herbert Kauer)
+<li>Patched decoding of QuickTime date/time tags to accommodate Samsung and Sony
+    cameras that use an incorrect time zero of 1970 instead of 1904.  This patch
+    will only work for videos produced before 2036, so hopefully Samsung and
+    Sony will fix this problem at their end before then (care to place a wager?)
+<li>Fixed issues when using "-wm cg" and writing metadata as a block
+<li>Fixed possible "division by zero" error when reading undefined XMP rational
+</ul>
+
 <a name='v9.24'><b>Mar. 23, 2013 - Version 9.24</b></a>
 <ul>
 <li>Added ability to overwrite plus append output files (-w+!)
@@ -833,6 +869,7 @@
 <li>Added ability to specify internal encoding of EXIF "ASCII" strings and
     QuickTime strings
 <li>Added a new DigiKam XMP tag
+<li>Documented -echo option (has been an undocumented feature since 6.86)
 <li>Decode a number of new Sony tags
 <li>Decode a few new Pentax tags and added a few new values
 <li>Decode a few new QuickTime and ID3 tags

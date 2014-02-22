@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.40';
+$VERSION = '1.41';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -1097,7 +1097,7 @@ sub ProcessID3v2($$$)
         }
         # uncompress data
         if ($flags{Compress}) {
-            if (eval 'require Compress::Zlib') {
+            if (eval { require Compress::Zlib }) {
                 my $inflate = Compress::Zlib::inflateInit();
                 my ($buff, $stat);
                 $inflate and ($buff, $stat) = $inflate->inflate($val);

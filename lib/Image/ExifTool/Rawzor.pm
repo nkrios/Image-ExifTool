@@ -14,7 +14,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 # currently support this version Rawzor images
 my $implementedRawzorVersion = 199; # (up to version 1.99)
@@ -86,7 +86,7 @@ sub ProcessRWZ($$)
         return 1;
     }
     # check for the ability to uncompress the information
-    unless (eval 'require IO::Uncompress::Bunzip2') {
+    unless (eval { require IO::Uncompress::Bunzip2 }) {
         $et->Warn('Install IO::Compress::Bzip2 to decode Rawzor bzip2 compression');
         return 1;
     }

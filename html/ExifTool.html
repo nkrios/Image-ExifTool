@@ -16,9 +16,9 @@ ul   { margin-top: 0 }
 
 <h2>Description</h2>
 
-<p>The Image::ExifTool library provides an extensible set of Perl modules to
-read and write meta information in a wide variety of image, audio, video and
-document files.</p>
+<p>The Image::ExifTool library provides a set of Perl modules to read and
+write meta information in a wide variety of image, audio, video and document
+files.</p>
 
 <hr><h2><a name="Methods">Methods</a></h2>
 
@@ -394,7 +394,7 @@ The following functions require an ExifTool object as the first argument
 <p>Get/set ExifTool options.  This function can be called to set the default
 options for an ExifTool object.  Options set this way are in effect for
 all function calls but may be overridden by options passed as arguments
-to some functions.  Option names are case sensitive.</p>
+to some functions.  Option names are not case sensitive.</p>
 <p>The default option values may be changed by defining a
 %Image::ExifTool::UserDefined::Options hash.  See the
 <a href="config.html">ExifTool_config file</a> in the full ExifTool
@@ -402,7 +402,7 @@ distribution for examples.</p>
 <blockquote><table class='norm'>
 <tr><td><b>Prototype</b></td><td>Options($$;@)</td></tr>
 <tr><td valign=top><b>Inputs</b></td><td><b>0)</b> ExifTool object reference
-    <br><b>1)</b> Parameter name (case-sensitive, see table below)
+    <br><b>1)</b> Parameter name (case-insensitive, see table below)
     <br><b>2)</b> [<i>optional</i>] Option value if specified (may be undef to clear option)
     <br><b>3-N)</b> [<i>optional</i>] Additional parameter/value pairs
 </td></tr>
@@ -574,7 +574,8 @@ distribution for examples.</p>
     date/time PrintConv values.  Does not affect ValueConv values.</td>
     <td align=center>Date/time shift string with leading '-' for negative shifts<br>(see <a href="Shift.html">Image::ExifTool::Shift.pl</a>)</td>
     <td align=center>undef</td></tr>
-<tr><td>Group#</td><td>Extract tags for specified groups.</td>
+<tr><td>Group#</td><td>Extract tags only for specified groups in family #
+    (Group0 assumed if # not given).</td>
     <td><a name="Group"></a>Group name or reference to list of group names.
     Group name may begin with '-' to exclude a group.  Case IS significant.
     See <a href="#GetGroup">GetGroup</a> for a description of group families,
@@ -663,8 +664,9 @@ distribution for examples.</p>
     the time zone).</td><td align=center>0 or 1</td><td align=center>0</td></tr>
 <tr><td>RequestAll</td><td><a name="RequestAll"></a>Flag to request all tags to be extracted.
     This causes some tags to be generated which normally would not be unless specifically
-    requested (by passing the tag name to ImageInfo or ExtractInfo).
-    </td><td align=center>0 or 1</td><td align=center>0</td></tr>
+    requested (by passing the tag name to ImageInfo or ExtractInfo).  Note that this flag is set
+    automatically during a call to <a href="#SetNewValuesFromFile">SetNewValuesFromFile</a> to
+    make all tags available for copying.</td><td align=center>0 or 1</td><td align=center>0</td></tr>
 <tr><td>ScanForXMP</td><td><a name="ScanForXMP"></a>Flag for scan all files (even unrecognized
     formats) for XMP information unless XMP was already found in the file.  When combined with
     the FastScan option, only unrecognized file types are scanned for XMP.  
@@ -865,8 +867,8 @@ but no changes made, 0 on file write error.
 </td></tr>
 </table></blockquote>
 <p>The source file name may be undefined to create a file from scratch
-(currently only XMP, MIE, ICC, VRD and EXIF files can be created in this way --
-see <a href="#CanCreate">CanCreate</a> for details). 
+(currently only XMP, MIE, ICC, VRD, EXV and EXIF files can be created in this
+way -- see <a href="#CanCreate">CanCreate</a> for details).
 If undefined, the destination file type is required unless the type can be
 determined from the extension of the destination file name.</p>
 <p>If a destination file name is given, the specified file must not exist
@@ -1807,15 +1809,15 @@ the specific IFD).
 <blockquote><table class='norm'>
 <tr><th>Family</th><th>Group Names</th></tr>
 <tr><td><b>0 (Information&nbsp;Type)</b></td>
-<td>AFCP, AIFF, APE, APP0, APP1, APP12, APP13, APP14, APP15, APP4, APP5, APP6,
-APP8, ASF, CanonVRD, Composite, DICOM, DNG, DV, DjVu, Ducky, EXE, EXIF,
-ExifTool, FLAC, FLIR, File, Flash, FlashPix, Font, FotoStation, GIF, GIMP,
-GeoTiff, H264, HTML, ICC_Profile, ID3, IPTC, ITC, JFIF, JPEG, Jpeg2000, LNK,
-Leaf, M2TS, MIE, MIFF, MNG, MPC, MPEG, MPF, MXF, MakerNotes, Matroska, Meta,
-Ogg, OpenEXR, PDF, PICT, PLIST, PNG, PSP, PanasonicRaw, PhotoCD,
-PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF, RIFF, RSRC,
-RTF, Radiance, Rawzor, Real, SVG, SigmaRaw, Stim, Theora, Torrent, Vorbis,
-XML, XMP, ZIP
+<td>AFCP, AIFF, APE, APP0, APP1, APP11, APP12, APP13, APP14, APP15, APP4, APP5,
+APP6, APP8, ASF, CanonVRD, Composite, DICOM, DNG, DV, DjVu, Ducky, EXE,
+EXIF, ExifTool, FLAC, FLIR, File, Flash, FlashPix, Font, FotoStation, GIF,
+GIMP, GeoTiff, H264, HTML, ICC_Profile, ID3, IPTC, ITC, JFIF, JPEG,
+Jpeg2000, LNK, Leaf, M2TS, MIE, MIFF, MNG, MPC, MPEG, MPF, MXF, MakerNotes,
+Matroska, Meta, Ogg, OpenEXR, PDF, PICT, PLIST, PNG, PSP, PanasonicRaw,
+PhotoCD, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF,
+RIFF, RSRC, RTF, Radiance, Rawzor, Real, SVG, SigmaRaw, Stim, Theora,
+Torrent, Vorbis, XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
 <td>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, AdobeDNG, CIFF, Canon,
@@ -1826,29 +1828,30 @@ GPS, GeoTiff, GlobParamIFD, GraphConv, H264, HP, HTML, HTML-dc, HTML-ncc,
 HTML-office, HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt,
 ICC-header, ICC-meas, ICC-meta, ICC-view, ICC_Profile, ICC_Profile#, ID3,
 ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC,
-InteropIFD, JFIF, JPEG, JVC, Jpeg2000, KDC_IFD, Kodak, KodakBordersIFD,
-KodakEffectsIFD, KodakIFD, KyoceraRaw, LNK, Leaf, LeafSubIFD, Leica, M2TS,
-MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash,
-MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
-MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
-MIFF, MNG, MPC, MPEG, MPF0, MPImage, MXF, MakerNotes, MakerUnknown,
-Matroska, MetaIFD, Microsoft, Minolta, MinoltaRaw, NITF, Nikon,
-NikonCapture, NikonCustom, NikonScan, Ocad, Ogg, Olympus, OpenEXR, PDF,
-PICT, PLIST, PNG, PSP, Panasonic, PanasonicRaw, Pentax, PhaseOne, PhotoCD,
-PhotoMechanic, Photoshop, PictureInfo, PostScript, PreviewIFD, PrintIM,
-ProfileIFD, Qualcomm, QuickTime, RAF, RAF2, RIFF, RMETA, RSRC, RTF,
-Radiance, Rawzor, Real, Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4,
-Real-RA5, Real-RJMD, Reconyx, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD,
-SRF#, SVG, Samsung, Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim,
-SubIFD, System, Theora, Torrent, Track#, Version0, Vorbis, XML, XMP,
-XMP-DICOM, XMP-GPano, XMP-MP, XMP-MP1, XMP-PixelLive, XMP-aas, XMP-acdsee,
-XMP-album, XMP-apple-fi, XMP-aux, XMP-cc, XMP-cell, XMP-crs, XMP-dc,
-XMP-dex, XMP-digiKam, XMP-dwc, XMP-exif, XMP-expressionmedia, XMP-extensis,
-XMP-fpv, XMP-ics, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro,
-XMP-microsoft, XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs, XMP-pdf, XMP-pdfx,
-XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur,
-XMP-rdf, XMP-swf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM,
-XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
+InteropIFD, JFIF, JPEG, JPEG-HDR, JVC, Jpeg2000, KDC_IFD, Kodak,
+KodakBordersIFD, KodakEffectsIFD, KodakIFD, KyoceraRaw, LNK, Leaf,
+LeafSubIFD, Leica, M2TS, MAC, MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc,
+MIE-Extender, MIE-Flash, MIE-GPS, MIE-Geo, MIE-Image, MIE-Lens, MIE-Main,
+MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM,
+MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MPF0, MPImage, MXF,
+MakerNotes, MakerUnknown, Matroska, MediaJukebox, MetaIFD, Microsoft,
+Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom, NikonScan,
+Ocad, Ogg, Olympus, OpenEXR, PDF, PICT, PLIST, PNG, PSP, Panasonic,
+PanasonicRaw, Pentax, PhaseOne, PhotoCD, PhotoMechanic, Photoshop,
+PictureInfo, PostScript, PreviewIFD, PrintIM, ProfileIFD, Qualcomm,
+QuickTime, RAF, RAF2, RIFF, RMETA, RSRC, RTF, Radiance, Rawzor, Real,
+Real-CONT, Real-MDPR, Real-PROP, Real-RA3, Real-RA4, Real-RA5, Real-RJMD,
+Reconyx, Ricoh, SPIFF, SR2, SR2DataIFD, SR2SubIFD, SRF#, SVG, Samsung,
+Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD, System,
+Theora, Torrent, Track#, Version0, Vorbis, XML, XMP, XMP-DICOM, XMP-GPano,
+XMP-MP, XMP-MP1, XMP-PixelLive, XMP-aas, XMP-acdsee, XMP-album,
+XMP-apple-fi, XMP-aux, XMP-cc, XMP-cell, XMP-crs, XMP-dc, XMP-dex,
+XMP-digiKam, XMP-dwc, XMP-exif, XMP-expressionmedia, XMP-extensis, XMP-fpv,
+XMP-ics, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft,
+XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs, XMP-pdf, XMP-pdfx, XMP-photomech,
+XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-swf,
+XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote,
+XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
@@ -1946,7 +1949,7 @@ my $writable = Image::ExifTool::<b>CanWrite</b>($filename);
 <td><b>0)</b> File name or extension</td></tr>
 <tr><td valign=top><b>Returns</b></td><td>True if ExifTool can create files with this
 extension from scratch.<br>Currently, this can only be done with XMP, MIE, ICC,
-VRD and EXIF files.</td></tr>
+VRD, EXV and EXIF files.</td></tr>
 </table></blockquote>
 <p><b>Example:</b></p>
 <blockquote><table class='box'><tr><td><pre>

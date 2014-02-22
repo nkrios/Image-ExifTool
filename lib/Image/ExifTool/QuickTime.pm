@@ -39,7 +39,7 @@ use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.75';
+$VERSION = '1.76';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -286,8 +286,8 @@ my %graphicsMode = (
         proprietary information written by many camera models.  Tags with a question
         mark after their name are not extracted unless the Unknown option is set.
 
-        ExifTool has the ability to write/create XMP, and edit date/time tags in
-        QuickTime format files.
+        ExifTool has the ability to write/create XMP, and edit some date/time tags
+        in QuickTime-format files.
 
         According to the specification, many QuickTime date/time tags should be
         stored as UTC.  Unfortunately, digital cameras often store local time values
@@ -522,7 +522,7 @@ my %graphicsMode = (
 #
 #   CompressorID  Offset  Child atoms
 #   -----------   ------  ----------------
-#   avc1          86      avcC, btrt, colr, pasp, fiel, clap
+#   avc1          86      avcC, btrt, colr, pasp, fiel, clap, svcC
 #   mp4v          86      esds, pasp
 #   s263          86      d263
 #
@@ -553,6 +553,7 @@ my %graphicsMode = (
         SubDirectory => { TagTable => 'Image::ExifTool::QuickTime::CleanAperture' },
     },
     # avcC - AVC configuration (ref http://thompsonng.blogspot.ca/2010/11/mp4-file-format-part-2.html)
+    # svcC - 7 bytes: 00 00 00 00 ff e0 00
     # esds - elementary stream descriptor
     # d263
     gama => { Name => 'Gamma', Format => 'fixed32u' },
@@ -1421,6 +1422,7 @@ my %graphicsMode = (
     # ducp - 4 bytes all zero (Samsung ST96,WB750), 52 bytes all zero (Samsung WB30F)
     # edli - 52 bytes all zero (Samsung WB30F)
     # @etc - 4 bytes all zero (Samsung WB30F)
+    # saut - 4 bytes all zero (Samsung SM-N900T)
     # smrd - string "TRUEBLUE" (Samsung SM-C101)
    '@sec' => { #PH (Samsung WB30F)
         Name => 'SamsungSec',
@@ -2557,6 +2559,7 @@ my %graphicsMode = (
 #   drms         36      esds, sinf
 #   samr         36      damr
 #   alac         36      alac
+#   ac-3         36      dac3
 #
 # (* child atoms found at different offsets in mp4a)
 #
@@ -2991,7 +2994,7 @@ my %graphicsMode = (
         Name => 'GPSLatitude',
         Require => 'QuickTime:LocationInformation',
         Groups => { 2 => 'Location' },
-        ValueConv => '$val =~ /Lat=([-+.\d]+)/; abs($1)',
+        ValueConv => '$val =~ /Lat=([-+.\d]+)/; $1',
         PrintConv => q{
             require Image::ExifTool::GPS;
             Image::ExifTool::GPS::ToDMS($self, $val, 1, 'N');
@@ -3001,7 +3004,7 @@ my %graphicsMode = (
         Name => 'GPSLongitude',
         Require => 'QuickTime:LocationInformation',
         Groups => { 2 => 'Location' },
-        ValueConv => '$val =~ /Lon=([-+.\d]+)/; abs($1)',
+        ValueConv => '$val =~ /Lon=([-+.\d]+)/; $1',
         PrintConv => q{
             require Image::ExifTool::GPS;
             Image::ExifTool::GPS::ToDMS($self, $val, 1, 'E');
@@ -3814,7 +3817,13 @@ sub ProcessMOV($$;$)
                     if ($format) {
                         $val = ReadValue(\$val, 0, $format, $$tagInfo{Count}, length($val));
                     }
+                    my $oldBase;
+                    if ($$tagInfo{SetBase}) {
+                        $oldBase = $$et{BASE};
+                        $$et{BASE} = $dataPos;
+                    }
                     my $key = $et->FoundTag($tagInfo, $val);
+                    $$et{BASE} = $oldBase if defined $oldBase;
                     # decode if necessary (NOTE: must be done after RawConv)
                     if (defined $key and (not $format or $format =~ /^string/) and
                         not $$tagInfo{Unknown} and not $$tagInfo{ValueConv} and

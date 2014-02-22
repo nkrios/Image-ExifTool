@@ -4,8 +4,9 @@
 # Description:  Read GeoTiff meta information
 #
 # Revisions:    02/23/2004 - P. Harvey Created
-#               02/25/2004 - P. Harvey Added new codes from libgeotiff-1.2.1
-#               02/01/2007 - P. Harvey Added new codes from libgeotiff-1.2.3
+#               02/25/2004 - PH Added new codes from libgeotiff-1.2.1
+#               02/01/2007 - PH Added new codes from libgeotiff-1.2.3
+#               01/22/2014 - PH Added new code from libgeotiff-1.4.0
 #
 # Reference:    ftp://ftp.remotesensing.org/geotiff/libgeotiff/libgeotiff-1.1.4.tar.gz
 #------------------------------------------------------------------------------
@@ -16,7 +17,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.08';
+$VERSION = '1.10';
 
 # format codes for geoTiff directory entries
 my %geoTiffFormat = (
@@ -504,6 +505,7 @@ my %epsg_units = (
         PrintConv => \%epsg_units,
     },
     2061 => 'GeogPrimeMeridianLong',
+    2062 => 'GeogToWGS84',
     3072 => {
         Name => 'ProjectedCSType',
         PrintConv => {
@@ -2070,11 +2072,15 @@ sub ProcessGeoTiff($)
 {
     my $et = shift;
     my $dirData = $et->GetValue('GeoTiffDirectory', 'ValueConv') or return;
+
+    # avoid re-processing if another EXIF directory is found
+    $$et{DidGeoTiff} and $$et{DidGeoTiff} eq $dirData and return;
+    $$et{DidGeoTiff} = $dirData;
+
     my $doubleData = $et->GetValue('GeoTiffDoubleParams', 'ValueConv');
     my $asciiData = $et->GetValue('GeoTiffAsciiParams', 'ValueConv');
     my $verbose = $et->Options('Verbose');
 
-    # restore or original EXIF byte order setting
     if (length($$dirData) >= 8 and
         length($$dirData) >= 8 * (Get16u($dirData,6) + 1))
     {
@@ -2103,11 +2109,19 @@ sub ProcessGeoTiff($)
             my $format = $geoTiffFormat{$loc};
             my ($val, $dataPt);
             if ($format eq 'double') {          # in the double parms
+                if (not $doubleData or length($$doubleData) < 8*($offset+$count)) {
+                    $et->Warn("Missing double data for $$tagInfo{Name}");
+                    next;
+                }
                 $dataPt = $doubleData;
                 $offset *= 8;
                 $val = Image::ExifTool::ReadValue($dataPt, $offset, $format,
                                                   $count, length($$doubleData)-$offset);
             } elsif ($format eq 'string') {     # in the ASCII parms
+                if (not $asciiData or length($$asciiData) < $offset+$count) {
+                    $et->Warn("Missing string data for $$tagInfo{Name}");
+                    next;
+                }
                 $dataPt = $asciiData;
                 $val = substr($$dataPt, $offset, $count);
                 $val =~ s/(\0|\|)$//;   # remove trailing terminator (NULL or '|')
@@ -2137,11 +2151,12 @@ sub ProcessGeoTiff($)
     } else {
         $et->Warn('Bad GeoTIFF directory');
     }
-    # must delete these tags once we've processed this information
-    # (to avoid re-processing if another EXIF directory is found)
-    $et->DeleteTag('GeoTiffDirectory');
-    $et->DeleteTag('GeoTiffDoubleParams');
-    $et->DeleteTag('GeoTiffAsciiParams');
+    # extract block tags only if requested
+    unless ($$et{OPTIONS}{RequestAll}) {
+        $et->DeleteTag('GeoTiffDirectory')    unless $$et{REQ_TAG_LOOKUP}{geotiffdirectory};
+        $et->DeleteTag('GeoTiffDoubleParams') unless $$et{REQ_TAG_LOOKUP}{geotiffdoubleparams};
+        $et->DeleteTag('GeoTiffAsciiParams')  unless $$et{REQ_TAG_LOOKUP}{geotiffasciiparams};
+    }
 }
 
 

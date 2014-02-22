@@ -24,7 +24,7 @@ $VERSION = '1.03';
         Tags found in Monkey's Audio (APE) information.  Only a few common tags are
         listed below, but ExifTool will extract any tag found.  ExifTool supports
         APEv1 and APEv2 tags, as well as ID3 information in APE files, and will also
-        read APE metadata from MP3 files.
+        read APE metadata from MP3 and MPC files.
     },
     Album   => { },
     Artist  => { },

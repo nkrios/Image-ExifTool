@@ -97,7 +97,7 @@ is an explanation of the meaning of each special key:
     ifd64       - Unsigned 64-bit integer sub-IFD pointer (BigTIFF 'IFD8')
     string      - Series of 8-bit ASCII characters        (EXIF 'ASCII')
     undef       - Undefined-format binary data            (EXIF 'UNDEFINED')
-    binary      - Binary data
+    binary      - Binary data (same as 'undef')
 
   Additionally, the following variable-length Format types may be used in
   individual tag information hashes of a BinaryData table.  The 'var_' formats
@@ -482,11 +482,12 @@ numerical.
                   ValueConv and PrintConv evals will no longer have access to
                   the source @val and @prt values unless the input $val is
                   returned.  RawConv may generate Warning or Error tags, while
-                  ValueConv and PrintConv may not. Note: RawConv should only be
+                  ValueConv and PrintConv may not.  Note: RawConv should only be
                   used if necessary (in general, only if the conversion may
-                  return undef to ignore the tag) because ValueConv is more
-                  efficient since it is only executed if the tag value is
-                  requested, while RawConv is executed for all extracted tags.
+                  return undef to ignore the tag, or if a Warning may be issued)
+                  because ValueConv is more efficient since it is only executed
+                  if the tag value is requested, while RawConv is executed for
+                  all extracted tags.
 
   ValueConv     : Used to convert the Raw value to a useable form. May be a hash
                   reference to act as a lookup table, a scalar which is
@@ -778,6 +779,10 @@ numerical.
                   a large number to effectively abort processing of the
                   directory after this tag.  Must have corresponding DATAMEMBER
                   entry in writable tables.  Must not have Unknown set.
+
+  SetBase       : [QuickTime and BinaryData tags only] Sets ExifTool BASE offset
+                  for use when ExtractInfo is called with the ReEntry flag from
+                  inside the RawConv of a tag.
 
   TagID         : [reserved] Used internally to save the table key for this tag.
                   Note: For XMP tables this corresponds to the XMP property

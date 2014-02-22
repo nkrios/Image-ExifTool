@@ -97,10 +97,20 @@
 <td class=c>-</td>
 <td>--&gt; <a href='JPEG.html#SPIFF'>JPEG SPIFF Tags</a></td></tr>
 <tr class=b>
+<td>'APP9'</td>
+<td>MediaJukebox</td>
+<td class=c>-</td>
+<td>--&gt; <a href='JPEG.html#MediaJukebox'>JPEG MediaJukebox Tags</a></td></tr>
+<tr>
 <td>'APP10'</td>
 <td>Comment</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(PhotoStudio Unicode comment)</span></span></td></tr>
+<tr class=b>
+<td>'APP11'</td>
+<td>JPEG-HDR</td>
+<td class=c>-</td>
+<td>--&gt; <a href='JPEG.html#HDR'>JPEG HDR Tags</a></td></tr>
 <tr>
 <td>'APP12'</td>
 <td>PictureInfo
@@ -134,7 +144,7 @@
 <td>'DQT'</td>
 <td>DefineQuantizationTable</td>
 <td class=c>N</td>
-<td><span class=s><span class=n>(used to calculate the Extra:JPEGDigest tag value)</span></span></td></tr>
+<td><span class=s><span class=n>(used to calculate the Extra JPEGDigest tag value)</span></span></td></tr>
 <tr>
 <td>'SOF'</td>
 <td>StartOfFrame</td>
@@ -369,6 +379,100 @@ SPIFF sample, version 1.2)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='MediaJukebox'>JPEG MediaJukebox Tags</a></h2>
+<p>Tags found in the XML metadata of the &quot;Media Jukebox&quot; APP9 segment.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>Album</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Caption</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Date</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Keywords</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Name</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>People</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Places</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Tool_Name</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Tool_Version</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='HDR'>JPEG HDR Tags</a></h2>
+<p>Information extracted from APP11 of a JPEG-HDR image.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'RatioImage'</td>
+<td>RatioImage</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(the embedded JPEG-compressed ratio image)</span></span></td></tr>
+<tr class=b>
+<td>'alp'</td>
+<td>Alpha</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'bet'</td>
+<td>Beta</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'cor'</td>
+<td>CorrectionMethod</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'ln0'</td>
+<td>Ln0</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'ln1'</td>
+<td>Ln1</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'s2n'</td>
+<td>S2n</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'ver'</td>
+<td>JPEG-HDRVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='AdobeCM'>JPEG AdobeCM Tags</a></h2>
 <p>The &quot;Adobe_CM&quot; APP13 segment presumably contains color management
 information, but the meaning of the data is currently unknown.  If anyone
@@ -489,7 +593,7 @@ because it may affect the appearance of the image.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Nov 11, 2013</i>
+<br><i>Last revised Feb 19, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

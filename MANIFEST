@@ -462,6 +462,7 @@ t/GPS_3.out
 t/GeoTiff.t
 t/GeoTiff_2.out
 t/GeoTiff_3.out
+t/GeoTiff_4.out
 t/Geotag.t
 t/Geotag_2.out
 t/Geotag_3.out
@@ -699,6 +700,8 @@ t/Writer_51.out
 t/Writer_52.out
 t/Writer_53.out
 t/Writer_54.out
+t/Writer_55.out
+t/Writer_56.out
 t/Writer_6.out
 t/Writer_7.out
 t/Writer_9.out

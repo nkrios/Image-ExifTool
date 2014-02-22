@@ -26,7 +26,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::FLAC;
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 sub ProcessMeta($$$;$);
 
@@ -557,7 +557,7 @@ sub ReadCompressed($$$$)
     # uncompress if necessary
     if ($inflate) {
         unless (ref $inflate) {
-            unless (eval 'require Compress::Zlib') {
+            unless (eval { require Compress::Zlib }) {
                 $_[3] = 'Install Compress::Zlib to extract compressed information';
                 return 0;
             }

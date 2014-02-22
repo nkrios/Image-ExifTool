@@ -24,7 +24,7 @@ use vars qw($VERSION %convMake);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 sub ProcessSEI($$);
 
@@ -495,7 +495,7 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
         Name => 'ExposureTime',
         Mask => 0x7fff, # (what is bit 0x8000 for?)
         RawConv => '$val == 0x7fff ? undef : $val', #7
-        ValueConv => '$val / 33640', #PH (conversion factor determined empirically)
+        ValueConv => '$val / 28125', #PH (Vixia HF G30, ref forum5588) (was $val/33640 until 9.49)
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },
 );
@@ -512,12 +512,21 @@ my $parsePictureTiming; # flag to enable parsing of picture timing information (
         RawConv => '$$self{Make} = ($Image::ExifTool::H264::convMake{$val} || "Unknown"); $val',
         PrintConv => \%convMake,
     },
-    # 1 => ModelIDCode according to ref 4/5 (I think not)
-    # vals: 0x3001 - Sony HDR-CX105E/TG3E/XR500V
+    # 1 => ModelIDCode according to ref 4/5 (I think not - PH)
+    # 1 => { Name => 'ModelIDCode', PrintConv => 'sprintf("%.4x",$val)' },
+    # vals: 0x0313 - various Pansonic HDC models
+    #       0x0345 - Panasonic HC-V7272
+    #       0x0414 - Panasonic AG-AF100
+    #       0x0591 - various Panasonic DMC models
+    #       0x3001 - various Sony DSC, HDR, NEX and SLT models
+    #       0x3003 - various Sony DSC models
+    #       0x3100 - various Sony DSC, ILCE, NEX and SLT models
     #       0x1000 - Sony HDR-UX1
-    #       0x3000 - Canon HF100 (30p)
     #       0x2000 - Canon HF100 (60i)
+    #       0x3000 - Canon HF100 (30p)
     #       0x3101 - Canon HFM300 (PH, all qualities and frame rates)
+    #       0x3102 - Canon HFS200
+    #       0x4300 - Canon HFG30
 );
 
 # camera info 0xe1 (ref 6)

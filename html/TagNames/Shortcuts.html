@@ -66,6 +66,15 @@ date/time tags.  To access all date/time tags, use Time:All instead)</span></spa
   <br>SerialNumber</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>ColorSpaceTags</td>
+<td class=c>Y</td>
+<td class=n>ExifIFD:ColorSpace
+  <br>ExifIFD:Gamma
+  <br>InteropIFD:InteropIndex
+  <br>ICC_Profile</td>
+<td><span class=s><span class=n>(standard tags which carry color space information.  Useful for preserving
+color space when deleting all other metadata)</span></span></td></tr>
+<tr class=b>
 <td>Common</td>
 <td class=c>Y</td>
 <td class=n>FileName
@@ -81,7 +90,7 @@ date/time tags.  To access all date/time tags, use Time:All instead)</span></spa
   <br>WhiteBalance
   <br>Flash</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>CommonIFD0</td>
 <td class=c>Y</td>
 <td class=n>IFD0:ImageDescription
@@ -104,7 +113,7 @@ date/time tags.  To access all date/time tags, use Time:All instead)</span></spa
 <td><span class=s><span class=n>(common metadata tags found in IFD0 of TIFF-format images.  Used to simpify
 deletion of all metadata from these images.  See
 <a href="../faq.html#Q7">FAQ number 7</a> for details)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>MakerNotes</td>
 <td class=c>Y</td>
 <td class=n>MakerNotes
@@ -135,6 +144,7 @@ deletion of all metadata from these images.  See
   <br>MakerNoteKodak7
   <br>MakerNoteKodak8a
   <br>MakerNoteKodak8b
+  <br>MakerNoteKodak8c
   <br>MakerNoteKodak9
   <br>MakerNoteKodak10
   <br>MakerNoteKodakUnknown
@@ -184,7 +194,7 @@ deletion of all metadata from these images.  See
   <br>MakerNoteUnknown</td>
 <td><span class=s><span class=n>(useful when copying tags between files to either copy the maker notes as a
 block or prevent it from being copied)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>Nikon</td>
 <td class=c>Y</td>
 <td class=n>Model
@@ -216,7 +226,7 @@ block or prevent it from being copied)</span></span></td></tr>
   <br>FlashMode
   <br>FlashExposureComp</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Unsafe</td>
 <td class=c>Y</td>
 <td class=n>IFD0:YCbCrPositioning
@@ -234,7 +244,7 @@ as a shortcut to use when rebuilding JPEG EXIF from scratch)</span></span></td><
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 3, 2014</i>
+<br><i>Last revised Feb 13, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

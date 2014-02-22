@@ -9,6 +9,7 @@
 #               2) http://www.cybercom.net/~dcoffin/dcraw/
 #               3) Pascal de Bruijn private communication (NX100)
 #               4) Jaroslav Stepanek via rt.cpan.org
+#               5) Niels Kristian Bech Jensen private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Samsung;
@@ -18,7 +19,7 @@ use vars qw($VERSION %samsungLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.21';
+$VERSION = '1.24';
 
 sub WriteSTMN($$$);
 sub ProcessINFO($$$);
@@ -42,6 +43,7 @@ sub ProcessSamsungIFD($$$);
     10 => 'Samsung NX 45mm F1.8', #3
     11 => 'Samsung NX 45mm F1.8 2D/3D', #3
     12 => 'Samsung NX 12-24mm F4-5.6 ED', #4
+    14 => 'Samsung NX 10mm F3.5 Fisheye', #5
 );
 
 # range of values for Formats used in encrypted information
@@ -53,7 +55,7 @@ my %formatMinMax = (
 );
 
 # Samsung "STMN" maker notes (ref PH)
-%Image::ExifTool::Samsung::Type1 = (
+%Image::ExifTool::Samsung::Main = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
     WRITE_PROC => \&WriteSTMN,
     CHECK_PROC => \&Image::ExifTool::CheckBinaryData,
@@ -97,7 +99,7 @@ my %formatMinMax = (
 %Image::ExifTool::Samsung::IFD = (
     PROCESS_PROC => \&ProcessSamsungIFD,
     NOTES => q{
-        This is a standard-format IFD found in the Type1 maker notes of some Samsung
+        This is a standard-format IFD found in the maker notes of some Samsung
         models, except that the entry count is a 4-byte integer and the offsets are
         relative to the end of the IFD.  Currently, no tags in this IFD are known,
         so the Unknown (-u) or Verbose (-v) option must be used to see this
@@ -619,9 +621,11 @@ my %formatMinMax = (
         Name => 'ThumbnailImage',
         Format => 'undef[$val{0x208}]',
         Notes => 'the THM image, embedded metadata is extracted as the first sub-document',
+        SetBase => 1,
         RawConv => q{
             my $pt = $self->ValidateImage(\$val, $tag);
             if ($pt) {
+                $$self{BASE} += 0x20c;
                 $$self{DOC_NUM} = ++$$self{DOC_COUNT};
                 $self->ExtractInfo($pt, { ReEntry => 1 });
                 $$self{DOC_NUM} = 0;
@@ -769,7 +773,7 @@ sub ProcessSamsungIFD($$$)
     my $numEntries = ord $1;
     if ($$et{HTML_DUMP}) {
         my $pt = $$dirInfo{DirStart} + $$dirInfo{DataPos} + $$dirInfo{Base};
-        $et->HDump($pt-44, 44, "MakerNotes header", 'Samsung Type1');
+        $et->HDump($pt-44, 44, "MakerNotes header", 'Samsung');
         $et->HDump($pt, 4, "MakerNotes entries", "Format: int32u\nEntry count: $numEntries");
         $$dirInfo{NoDumpEntryCount} = 1;
     }

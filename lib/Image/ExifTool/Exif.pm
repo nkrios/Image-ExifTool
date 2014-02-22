@@ -51,7 +51,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.60';
+$VERSION = '3.62';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -89,7 +89,7 @@ sub BINARY_DATA_LIMIT { return 10 * 1024 * 1024; }
     'rational64u' => 5,  # RATIONAL
     'int8s'       => 6,  # SBYTE
     'undef'       => 7,  # UNDEFINED
-    'binary'      => 7,  # (treat binary data as undef)
+    'binary'      => 7,  # (same as undef)
     'int16s'      => 8,  # SSHORT
     'int32s'      => 9,  # SLONG
     'rational64s' => 10, # SRATIONAL
@@ -1396,13 +1396,20 @@ my %sampleFormat = (
     0x87ac => 'ImageLayer',
     0x87af => {
         Name => 'GeoTiffDirectory',
-        Format => 'binary',
+        Format => 'undef',
         Binary => 1,
+        Notes => q{
+            these "GeoTiff" tags may read and written as a block, but they aren't
+            extracted unless specifically requested.  Byte order changes are handled
+            automatically when copying between TIFF images with different byte order
+        },
+        RawConv => '$val . GetByteOrder()', # save byte order
     },
     0x87b0 => {
         Name => 'GeoTiffDoubleParams',
-        Format => 'binary',
+        Format => 'undef',
         Binary => 1,
+        RawConv => '$val . GetByteOrder()', # save byte order
     },
     0x87b1 => {
         Name => 'GeoTiffAsciiParams',
@@ -1511,6 +1518,7 @@ my %sampleFormat = (
         Notes => 'called DateTimeDigitized by the EXIF spec.',
         PrintConv => '$self->ConvertDateTime($val)',
     },
+    # 0x9009 - undef[44] written by Google Plus uploader - PH
     0x9101 => {
         Name => 'ComponentsConfiguration',
         Format => 'int8u',
@@ -3043,9 +3051,7 @@ my %sampleFormat = (
     },
     LensID => {
         Groups => { 2 => 'Camera' },
-        Require => {
-            0 => 'LensType',
-        },
+        Require => 'LensType',
         Desire => {
             1 => 'FocalLength',
             2 => 'MaxAperture',

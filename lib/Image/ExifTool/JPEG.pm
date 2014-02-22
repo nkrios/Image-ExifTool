@@ -11,9 +11,10 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.20';
+$VERSION = '1.22';
 
 sub ProcessOcad($$$);
+sub ProcessJPEG_HDR($$$);
 
 # (this main JPEG table is for documentation purposes only)
 %Image::ExifTool::JPEG::Main = (
@@ -137,10 +138,20 @@ sub ProcessOcad($$$);
         Condition => '$$valPt =~ /^SPIFF\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::JPEG::SPIFF' },
     },
+    APP9 => {
+        Name => 'MediaJukebox',
+        Condition => '$$valPt =~ /^Media Jukebox\0/',
+        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::MediaJukebox' },
+    },
     APP10 => {
         Name => 'Comment',
         Condition => '$$valPt =~ /^UNICODE\0/',
         Notes => 'PhotoStudio Unicode comment',
+    },
+    APP11 => {
+        Name => 'JPEG-HDR',
+        Condition => '$$valPt =~ /^HDR_RI /',
+        SubDirectory => { TagTable => 'Image::ExifTool::JPEG::HDR' },
     },
     APP12 => [{
         Name => 'PictureInfo',
@@ -184,7 +195,7 @@ sub ProcessOcad($$$);
     },
     DQT => {
         Name => 'DefineQuantizationTable',
-        Notes => 'used to calculate the Extra:JPEGDigest tag value',
+        Notes => 'used to calculate the Extra JPEGDigest tag value',
     },
     Trailer => [{
         Name => 'AFCP',
@@ -321,6 +332,44 @@ sub ProcessOcad($$$);
     },
 );
 
+# Media Jukebox APP9 segment (ref PH)
+%Image::ExifTool::JPEG::MediaJukebox = (
+    GROUPS => { 0 => 'XML', 1 => 'MediaJukebox', 2 => 'Image' },
+    VARS => { NO_ID => 1 },
+    NOTES => 'Tags found in the XML metadata of the "Media Jukebox" APP9 segment.',
+    Date => {
+        Groups => { 2 => 'Time' },
+        # convert from days since Dec 30, 1899 to seconds since Jan 1, 1970
+        ValueConv => 'ConvertUnixTime(($val - (70 * 365 + 17 + 2)) * 24 * 3600)',
+        PrintConv => '$self->ConvertDateTime($val)',
+    },
+    Album        => { },
+    Caption      => { },
+    Keywords     => { },
+    Name         => { },
+    People       => { },
+    Places       => { },
+    Tool_Name    => { },
+    Tool_Version => { },
+);
+
+# JPEG-HDR APP11 information (ref PH, guessed from http://anyhere.com/gward/papers/cic05.pdf)
+%Image::ExifTool::JPEG::HDR = (
+    GROUPS => { 0 => 'APP11', 1 => 'JPEG-HDR', 2 => 'Image' },
+    PROCESS_PROC => \&ProcessJPEG_HDR,
+    TAG_PREFIX => '', # (no prefix for unknown tags)
+    NOTES => 'Information extracted from APP11 of a JPEG-HDR image.',
+    ver => 'JPEG-HDRVersion',
+    # (need names for the next 3 tags)
+    ln0 => { Description => 'Ln0' },
+    ln1 => { Description => 'Ln1' },
+    s2n => { Description => 'S2n' },
+    alp => { Name => 'Alpha' }, # (Alpha/Beta are saturation parameters)
+    bet => { Name => 'Beta' },
+    cor => { Name => 'CorrectionMethod' },
+    RatioImage => { Binary => 1, Notes => 'the embedded JPEG-compressed ratio image' },
+);
+
 # AdobeCM APP13 (no references)
 %Image::ExifTool::JPEG::AdobeCM = (
     PROCESS_PROC => \&Image::ExifTool::ProcessBinaryData,
@@ -396,6 +445,7 @@ sub ProcessOcad($$$);
 %Image::ExifTool::JPEG::Ocad = (
     PROCESS_PROC => \&ProcessOcad,
     GROUPS => { 0 => 'APP0', 1 => 'Ocad', 2 => 'Image' },
+    TAG_PREFIX => 'Ocad',
     FIRST_ENTRY => 0,
     NOTES => q{
         Tags extracted from the JPEG APP0 "Ocad" segment (found in Photobucket
@@ -480,11 +530,30 @@ sub ProcessOcad($$$)
         last unless $$dataPt =~ /\$(\w+):([^\0\$]+)/g;
         my ($tag, $val) = ($1, $2);
         $val =~ s/^\s+//; $val =~ s/\s+$//;     # remove leading/trailing spaces
-        unless ($$tagTablePtr{$tag}) {
-            AddTagToTable($tagTablePtr, $tag, { Name => "Ocad_$tag" });
-        }
+        AddTagToTable($tagTablePtr, $tag) unless $$tagTablePtr{$tag};
         $et->HandleTag($tagTablePtr, $tag, $val);
     }
+    return 1;
+}
+
+#------------------------------------------------------------------------------
+# Extract information from the JPEG APP0 Ocad segment
+# Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
+# Returns: 1 on success
+sub ProcessJPEG_HDR($$$)
+{
+    my ($et, $dirInfo, $tagTablePtr) = @_;
+    my $dataPt = $$dirInfo{DataPt};
+    $$dataPt =~ /~\0/g or $et->Warn('Unrecognized JPEG-HDR format'), return 0;
+    my $pos = pos $$dataPt;
+    my $meta = substr($$dataPt, 7, $pos-9);
+    $et->VerboseDir('APP11 JPEG-HDR', undef, length $$dataPt);
+    while ($meta =~ /(\w+)=([^,\s]*)/g) {
+        my ($tag, $val) = ($1, $2);
+        AddTagToTable($tagTablePtr, $tag) unless $$tagTablePtr{$tag};
+        $et->HandleTag($tagTablePtr, $tag, $val);
+    }
+    $et->HandleTag($tagTablePtr, 'RatioImage', substr($$dataPt, $pos));
     return 1;
 }
 

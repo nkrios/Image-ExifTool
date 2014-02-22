@@ -11,11 +11,99 @@
 
 <p>RSS feed: <a href="http://owl.phy.queensu.ca/~phil/exiftool/rss.xml">http://owl.phy.queensu.ca/~phil/exiftool/rss.xml</a></p>
 
-<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-9.46.tar.gz">Version 9.46</a>. (Other versions are
+<p><b>Note:</b> The most recent production release is <a href="Image-ExifTool-9.53.tar.gz">Version 9.53</a>. (Other versions are
 considered development releases, and are not uploaded to <a href="http://search.cpan.org/dist/Image-ExifTool/">CPAN</a>.)</p>
 
 <!-- Use line width of 80 -->
 <!-- *********************************************************************** -->
+
+<a name='v9.53'><b>Feb. 22, 2014 - Version 9.53</b></a></span> <span class=grn>(production release)</span>
+<ul>
+<li>Added user-defined file types feature
+<li>Added support for a few more XMP-expressionmedia tags
+<li>Decode CameraTemperature from a few new Canon models
+<li>Decode another Sony tag (thanks Jos Roost)
+<li>Recognize the JXR extension
+<li>Changed wording of IPTC "Unrecognized data" warning
+<li>Patched round-off error problem in seconds of some date/time values
+<li>Fixed problem creating EXV files with the -o option
+<li>Fixed problem conditionally replacing Extra block-type tags
+</ul>
+
+<a name='v9.52'><b>Feb. 17, 2014 - Version 9.52</b></a>
+<ul>
+<li>Fixed bug introduced in 9.44 which resulted in incorrect maker note offsets
+    when copying maker notes from DNG images of some Pentax models
+</ul>
+
+<a name='v9.51'><b>Feb. 15, 2014 - Version 9.51</b></a>
+<ul>
+<li>Added a number of new CanonModelID values
+<li>Added a new Sony/Minolta LensType (thanks Jos Roost)
+<li>Added a new Panasonic BurstMode
+<li>Added a new Pentax LensType
+<li>Added new ColorSpaceTags shortcut
+<li>Decode a number of new PanasonicRaw tags (thanks LibRaw)
+<li>Decode ColorData tags for the new Canon EOS 1200D
+<li>Improved Sony maker note decoding for some newer models (thanks Jos Roost)
+<li>Fixed conversion of XMP:LensID for Pentax lenses on Ricoh-branded cameras
+</ul>
+
+<a name='v9.50'><b>Feb. 8, 2014 - Version 9.50</b></a>
+<ul>
+<li>Added support for Exiv2 EXV metadata files
+<li>Added ability to read/write/copy GeoTiff tags as a block
+<li>Added ability to combine -b with -j to write base64-encoded binary data in
+    JSON output format
+<li>Added a new Nikon LensID
+<li>Added a new Sony/Minolta LensType (thanks Jos Roost)
+<li>Added new Extra ProcessingTime tag
+<li>Added a new Olympus CameraType
+<li>Added header signature to .EXIF files
+<li>Decode a new Olympus tag (thanks LibRaw)
+<li>Improved conversion of some Canon RecordMode values
+<li>Improved decoding of tags for Hasselblad Stellar (thanks Jos Roost)
+<li>Fixed -htmlDump offsets for information extracted from some embedded images
+<li>Fixed hemisphere problem in Composite GPS tags derived from
+    QuickTime:LocationInformation
+<li>API Changes:
+    <ul>
+    <li>Option names are now case insensitive
+    </ul>
+</ul>
+
+<a name='v9.49'><b>Feb. 1, 2014 - Version 9.49</b></a>
+<ul>
+<li>Added new Olympus and Samsung LensType values, and fixed an Olympus lens
+    name (thanks Niels Kristian Bech Jensen)
+<li>Added another Polish tag translation (thanks Kacper Perschke)
+<li>Added a new Panasonic ColorEffect value
+<li>Decode a new FujiFilm tag (thanks LibRaw)
+<li>Adjusted scaling factor for H264 ExposureTime values (thanks Francois)
+</ul>
+
+<a name='v9.48'><b>Jan. 25, 2014 - Version 9.48</b></a>
+<ul>
+<li>Added a new GeoTiff tag
+<li>Added a couple of new Canon LensType values
+<li>Added a few new XMP DarwinCore tags
+<li>Updated Sony MakerNotes for the ILCE-5000 (thanks Jos Roost)
+<li>Improved Polish translations (thanks Kacper Perschke)
+<li>Fixed problem writing RicohSubdirIFD in GR images
+<li>Fixed runtime error when writing PNG image with a TIFF-format EXIF profile
+</ul>
+
+<a name='v9.47'><b>Jan. 18, 2014 - Version 9.47</b></a>
+<ul>
+<li>Added read support for JPEG-HDR APP11 information
+<li>Added read support for Media Jukebox APP9 information
+<li>Added a new Olympus LensType (thanks Niels Kristian Bech Jensen)
+<li>Added a few new Nikon LensID's (thanks Robert Rottmerhusen)
+<li>Added a new Minolta/Sony LensType and fixed some Tamron lens names (thanks
+    Jos Roost)
+<li>Decode more FLIR tags (thanks Tomas)
+<li>Patched for quirk in Kodak PixPro AZ362 maker notes
+</ul>
 
 <a name='v9.46'><b>Jan. 11, 2014 - Version 9.46</b></a> <span class=grn>(production release)</span>
 <ul>
@@ -331,42 +419,6 @@ considered development releases, and are not uploaded to <a href="http://search.
     using the -X option
 <li>Fixed runtime warning which could occur when conditionally deleting XMP
     structure
-</ul>
-
-<a name='v9.26'><b>Apr. 13, 2013 - Version 9.26</b></a>
-<ul>
-<li>Added read support for FLIR FFF and FPF images and decode more FLIR tags
-<li>Added some new Pentax LensType's and Nikon LensID's
-<li>Added a few new Panasonic ContrastMode values
-<li>Decode a number of Canon 6D tags
-<li>Allow CanonRaw tags to be written using "CIFF" as a group name
-<li>Improved decoding of Canon ColorData information for newer EOS models
-<li>Improved decoding of a number of Sony tags (thanks Jos Roost)
-<li>Removed index number from duplicate Composite TagID's in XML output
-<li>Fixed byte-order problem for a few Nikon D5200 and D7100 tags
-<li>Fixed incompatibility with old-style (pre-8.46) XMP user-defined structure
-    definitions
-</ul>
-
-<a name='v9.25'><b>Apr. 6, 2013 - Version 9.25</b></a> <span class=grn>(production release)</span>
-<ul>
-<li>Added read support for FLIR thermal image metadata in JPEG images
-<li>Added write support for DNG version 1.4 images
-<li>Added a new Pentax DriveMode value and a new Pentax LensType
-<li>Added two new Olympus CameraType values
-<li>Added print conversion for XMP Flash tags to provide alternate language
-    support
-<li>Decode a few more Nikon and Pentax tags
-<li>Decode more Sony tags (thanks Jos Roost)
-<li>Decode more Panasonic tags and changed decoding of others
-<li>Enhanced -j and -php options to work with -D, -H and -l
-<li>Improved German translations (thanks Herbert Kauer)
-<li>Patched decoding of QuickTime date/time tags to accommodate Samsung and Sony
-    cameras that use an incorrect time zero of 1970 instead of 1904.  This patch
-    will only work for videos produced before 2036, so hopefully Samsung and
-    Sony will fix this problem at their end before then (care to place a wager?)
-<li>Fixed issues when using "-wm cg" and writing metadata as a block
-<li>Fixed possible "division by zero" error when reading undefined XMP rational
 </ul>
 
 <a name='ancient' href="ancient_history.html"><b>History of older versions</b> (back to 1.00) --></a><br><br>

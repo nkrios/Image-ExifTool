@@ -32,12 +32,12 @@ use Image::ExifTool::XMP;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.69';
+$VERSION = '2.72';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
 
-my $numbersFirst = 1;   # set to -1 to sort numbers last
+my $numbersFirst = 1;   # set to -1 to sort numbers last, or 2 to put negative numbers last
 
 # list of all tables in plug-in modules
 my @pluginTables = ('Image::ExifTool::MWG::Composite');
@@ -91,11 +91,6 @@ my %tweakOrder = (
    'Nikon::CameraSettingsD300' => 'Nikon::ShotInfoD300b',
    'Pentax::LensData' => 'Pentax::LensInfo2',
    'Sony::SRF2' => 'Sony::SRF',
-   'Samsung::PictureWizard' => 'Samsung::Type2', # (necessary because Samsung doesn't have a main table)
-   'Samsung::INFO' => 'Samsung::PictureWizard', # (ditto)
-   'Samsung::MP4' => 'Samsung::INFO', # (ditto)
-   'Samsung::Thumbnail' => 'Samsung::MP4', # (ditto)
-   'Samsung::sec' => 'Samsung::Thumbnail', # (ditto)
     DarwinCore => 'AFCP',
    'MWG::Regions' => 'MWG::Composite',
    'MWG::Keywords' => 'MWG::Regions',
@@ -399,7 +394,9 @@ been decoded.  Use the Unknown (-u) option to extract PrintIM information.
     GeoTiff => q{
 ExifTool extracts the following tags from GeoTIFF images.  See
 L<http://www.remotesensing.org/geotiff/spec/geotiffhome.html> for the
-complete GeoTIFF specification.
+complete GeoTIFF specification.  These tags are not writable individually,
+but they may be copied en mass via the containing GeoTiffDirectory,
+GeoTiffDoubleParams and GeoTiffAsciiParams tags.
 },
     JFIF => q{
 The following information is extracted from the JPEG JFIF header.  See
@@ -556,6 +553,10 @@ my %shortcutNotes = (
     MakerNotes => q{
         useful when copying tags between files to either copy the maker notes as a
         block or prevent it from being copied
+    },
+    ColorSpaceTags => q{
+        standard tags which carry color space information.  Useful for preserving
+        color space when deleting all other metadata
     },
     CommonIFD0 => q{
         common metadata tags found in IFD0 of TIFF-format images.  Used to simpify
@@ -741,6 +742,7 @@ sub new
             $id{$tableName} = 'Tag ID';
         }
         $caseInsensitive = $isXMP;
+        $numbersFirst = 2;
         $numbersFirst = -1 if $$table{VARS} and $$table{VARS}{ALPHA_FIRST};
         my @keys = sort NumbersFirst TagTableKeys($table);
         $numbersFirst = 1;
@@ -1247,10 +1249,12 @@ TagID:  foreach $tagID (@keys) {
 # save TagName information
 #
             my $tagIDstr;
-            if ($tagID =~ /^\d+(\.\d+)?$/) {
-                if (defined $hexID) {
+            if ($tagID =~ /^(-)?\d+(\.\d+)?$/) {
+                if ($1) {
+                    $tagIDstr = $tagID;
+                } elsif (defined $hexID) {
                     $tagIDstr = $hexID ? sprintf('0x%.4x',$tagID) : $tagID;
-                } elsif (not $1 and not $binaryTable and not $isIPTC and
+                } elsif (not $2 and not $binaryTable and not $isIPTC and
                          not ($short =~ /^CanonCustom/ and $tagID < 256))
                 {
                     $tagIDstr = sprintf('0x%.4x',$tagID);
@@ -1504,8 +1508,11 @@ sub NumbersFirst
     ($bNum, $bDec) = ($1, $3) if $b =~ /^(-?[0-9]+)(\.(\d*))?$/;
     if ($a =~ /^(-?[0-9]+)(\.(\d*))?$/) {
         if (defined $bNum) {
+            $bNum += 1e9 if $numbersFirst == 2 and $bNum < 0;
+            my $aInt = $1;
+            $aInt += 1e9 if $numbersFirst == 2 and $aInt < 0;
             # compare integer part as a number
-            $rtnVal = $1 <=> $bNum;
+            $rtnVal = $aInt <=> $bNum;
             unless ($rtnVal) {
                 my $aDec = $3 || 0;
                 $bDec or $bDec = 0;
@@ -2090,7 +2097,7 @@ sub WriteTagNames($$)
             my $wTag2 = $wTag;
             if (not $id) {
                 $idStr = '  ';
-            } elsif ($tagIDstr =~ /^\d+(\.\d+)?$/) {
+            } elsif ($tagIDstr =~ /^-?\d+(\.\d+)?$/) {
                 $w = $wID - 3;
                 $idStr = sprintf "  %${w}g    ", $tagIDstr;
                 $align = " class=r";
