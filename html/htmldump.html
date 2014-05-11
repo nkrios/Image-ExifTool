@@ -194,16 +194,17 @@ JavaScript enabled.)</p>
 
 <p>In this output, <span onmouseover="high(event,1)" onmouseout="high(event,0)">normal
 data blocks are <a name=XA class=Y>light</a> or <a name=XA class=W>dark green</a>,
-unused blocks are <a name=XB class=U>brown</a>, and double-referenced blocks
-are <a name=XC class=V>red</a> or <a name=XC class=X>pink</a>. A
+unused blocks are <a name=XB class=U>brown</a>, and double-referenced blocks are
+<a name=XC class=V>red</a> or <a name=XC class=X>pink</a>. A
 <a name=XD class=H>blue</a> tag name indicates the value is referenced by an
 offset in the IFD (ie. the value is longer than 4 bytes),
 <a name=XD class=F>purple</a> indicates that the actual offset differs from the
 recorded offset, and a <a name=XD class=V>red</a> name indicates an invalid
-offset.  Odd offsets are flagged with "<span class=V>(odd)</span>" because
-the TIFF specification states that values must begin on a (2-byte) word
-boundary. All data in the maker notes value block is
-<a name=XE class='W M'>underlined</a>.</span></p>
+offset.  Odd offsets are flagged with "<span class=V>(odd)</span>" and
+out-of-sequence tag ID's are indicated by "<span class=V>(seq)</span>" because
+the TIFF specification states that values must begin on a (2-byte) word boundary
+and that IFD entries must be in order of increasing tag ID. All data in the
+maker notes value block is <a name=XE class='W M'>underlined</a>.</span></p>
 
 <p>Currently, only TIFF/EXIF and JPEG meta information is dumped.  The leftmost
 column of the output gives the offset in hex relative to the start of the TIFF

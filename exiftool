@@ -12,7 +12,7 @@
 use strict;
 require 5.004;
 
-my $version = '9.53';
+my $version = '9.60';
 
 # add our 'lib' directory to the include list BEFORE 'use Image::ExifTool'
 my $exeDir;
@@ -51,6 +51,7 @@ sub ProcessFiles($;$);
 sub ScanDir($$;$);
 sub SetFileTime($@);
 sub PreserveTime();
+sub AbsPath($);
 sub SuggestedExtension($$$);
 sub LoadPrintFormat($);
 sub FilenameSPrintf($;$@);
@@ -104,12 +105,14 @@ my $condition;      # conditional processing of files
 my $count;          # count of files scanned
 my $countBad;       # count of files with errors
 my $countBadCr;     # count files not created due to errors
+my $countBadLink;   # count bad links
 my $countBadWr;     # count write errors
 my $countCopyWr;    # count of files copied without being changed
 my $countDir;       # count of directories scanned
 my $countFailed;    # count files that failed condition
 my $countGoodCr;    # count files created OK
 my $countGoodWr;    # count files written OK
+my $countLink;      # count number of links created
 my $countNewDir;    # count of directories created
 my $countSameWr;    # count files written OK but not changed
 my $critical;       # flag for critical operations (disable CTRL-C)
@@ -193,15 +196,17 @@ my %jsonChar = ( '"'=>'"', '\\'=>'\\', "\t"=>'t', "\n"=>'n', "\r"=>'r' );
 my %optArgs = (
     '-tagsfromfile' => 1, '-addtagsfromfile' => 1, '-alltagsfromfile' => 1,
     '-@' => 1,
+    '-api' => 1,
     '-c' => 1, '-coordformat' => 1,
     '-charset' => 0, # (optional arg; OK because arg cannot begin with "-")
     '-config' => 1,
     '-d' => 1, '-dateformat' => 1,
-    '-D' => 0, # nececessary to avoid matching lower-case equivalent
-    '-echo' => 1, '-echo2' => 1,
+    '-D' => 0, # necessary to avoid matching lower-case equivalent
+    '-echo' => 1, '-echo1' => 1, '-echo2' => 1, '-echo3' => 1, '-echo4' => 1,
     '-ext' => 1, '--ext' => 1, '-extension' => 1, '--extension' => 1,
     '-fileorder' => 1,
     '-geotag' => 1,
+    '-globaltimeshift' => 1,
     '-i' => 1, '-ignore' => 1,
     '-if' => 1,
     '-lang' => 0, # (optional arg; cannot begin with "-")
@@ -215,7 +220,11 @@ my %optArgs = (
     '-srcfile' => 1,
     '-stay_open' => 1,
     '-use' => 1,
-    '-w' => 1, '-w!' => 1, '-textout' => 1, '-textout!' => 1,
+    '-w' => 1, '-w!' => 1, '-w+' => 1, '-w+!' => 1, '-w!+' => 1,
+        '-textout' => 1, '-textout!' => 1, '-textout+' => 1, '-textout+!' => 1, '-textout!+' => 1,
+         '-tagout' => 1,  '-tagout!' => 1,  '-tagout+' => 1,  '-tagout+!' => 1,  '-tagout!+' => 1,
+    '-wext' => 1,
+    '-wm' => 1,
     '-x' => 1, '-exclude' => 1,
     '-X' => 0,
 );
@@ -388,12 +397,14 @@ undef $verbose;
 $count = 0;
 $countBad = 0;
 $countBadCr = 0;
+$countBadLink = 0;
 $countBadWr = 0;
 $countCopyWr = 0;
 $countDir = 0;
 $countFailed = 0;
 $countGoodCr = 0;
 $countGoodWr = 0;
+$countLink = 0;
 $countNewDir = 0;
 $countSameWr = 0;
 $csvSaveCount = 0;
@@ -1490,13 +1501,8 @@ if (@dbKeys and require Cwd) {
     undef $evalWarning;
     local $SIG{'__WARN__'} = sub { $evalWarning = $_[0] };
     foreach (@dbKeys) {
-        my $absFile = Cwd::abs_path($_);
-        if (defined $absFile) {
-            $database{$absFile} = $database{$_} unless $database{$absFile};
-        } else {
-            # (may happen on Mac if the filename encoding is incorrect in the database)
-            Warn "Error generating absolute path for $_\n";
-        }
+        my $absPath = AbsPath($_);
+        $database{$absPath} = $database{$_} if defined $absPath and not $database{$absPath};
     }
 }
 
@@ -1554,7 +1560,7 @@ if (defined $deleteOrig) {
     my $tot = $count + $countBad;
     my $totWr = $countGoodWr + $countBadWr + $countSameWr + $countCopyWr +
                 $countGoodCr + $countBadCr;
-    if ($countDir or $totWr or $countFailed or $tot > 1 or $textOut) {
+    if ($countDir or $totWr or $countFailed or $tot > 1 or $textOut or $countLink or $countBadLink) {
         my $o = (($html or $json or $xml or %printFmt or $csv) and not $textOut) ? \*STDERR : $vout;
         printf($o "%5d directories scanned\n", $countDir) if $countDir;
         printf($o "%5d directories created\n", $countNewDir) if $countNewDir;
@@ -1569,6 +1575,8 @@ if (defined $deleteOrig) {
         printf($o "%5d files could not be read\n", $countBad) if $countBad;
         printf($o "%5d output files created\n", scalar(keys %created)) if $textOut;
         printf($o "%5d output files appended\n", scalar(keys %appended)) if %appended;
+        printf($o "%5d hard links created\n", $countLink) if $countLink or $countBadLink;
+        printf($o "%5d hard links could not be created\n", $countBadLink) if $countBadLink;
     }
 }
 
@@ -2245,7 +2253,7 @@ TAG:    foreach $tag (@foundTags) {
 sub SetImageInfo($$$)
 {
     my ($et, $file, $orig) = @_;
-    my ($outfile, $restored, $isTemporary, $isStdout, $outType, $tagsFromSrc);
+    my ($outfile, $restored, $isTemporary, $isStdout, $outType, $tagsFromSrc, $hardLink);
     my $infile = $file;    # save infile in case we change it again
 
     undef $tmpFile; # make sure this isn't defined
@@ -2374,9 +2382,9 @@ sub SetImageInfo($$$)
                 foreach $f ('*', $file) {
                     my $csvInfo = $database{$f};
                     unless ($csvInfo) {
-                        next if $f eq '*' or not require Cwd;
+                        next if $f eq '*';
                         # check absolute path
-                        my $absPath = Cwd::abs_path($f);
+                        my $absPath = AbsPath($f);
                         next unless defined $absPath and $csvInfo = $database{$absPath};
                     }
                     $found = 1;
@@ -2391,10 +2399,8 @@ sub SetImageInfo($$$)
                 }
                 unless ($found) {
                     Warn("No SourceFile '$file' in imported $csv database\n");
-                    if (require Cwd) {
-                        my $absFile = Cwd::abs_path($file);
-                        Warn("(absolute path: '$absFile')\n") if defined $absFile;
-                    }
+                    my $absPath = AbsPath($file);
+                    Warn("(absolute path: '$absPath')\n") if defined $absPath;
                     return 0;
                 }
             }
@@ -2408,6 +2414,10 @@ sub SetImageInfo($$$)
             $binaryStdout = 1;
         }
     } else {
+        # get name of hard link if we are creating one
+        $hardLink = $et->GetNewValues('HardLink');
+        $hardLink = FilenameSPrintf($hardLink, $orig) if defined $hardLink;
+    
         # determine what our output file name should be
         my $newFileName = $et->GetNewValues('FileName');
         my $newDir = $et->GetNewValues('Directory');
@@ -2484,6 +2494,15 @@ sub SetImageInfo($$$)
                 } else {
                     ++$countSameWr;
                 }
+                if (defined $hardLink) {
+                    my $src = (defined $outfile and $r3 > 0) ? $outfile : $file;
+                    $hardLink = NextUnusedFilename($hardLink);
+                    if ($et->SetFileName($src, $hardLink, 'Link') > 0) {
+                        ++$countLink;
+                    } else {
+                        ++$countBadLink;
+                    }
+                }
                 return 1;
             }
             unless (defined $outfile) {
@@ -2502,6 +2521,17 @@ sub SetImageInfo($$$)
     }
     # rewrite the file
     my $success = $et->WriteInfo(Infile($file), $outfile, $outType);
+
+    # create hard link if specified
+    if (defined $hardLink and $success) {
+        my $src = defined $outfile ? $outfile : $file;
+        $hardLink = NextUnusedFilename($hardLink);
+        if ($et->SetFileName($src, $hardLink, 'Link') > 0) {
+            ++$countLink;
+        } else {
+            ++$countBadLink;
+        }
+    }
 
     # get file time if preserving it
     my ($aTime, $mTime, $cTime);
@@ -3043,13 +3073,31 @@ sub SetFileTime($@)
 }
 
 #------------------------------------------------------------------------------
-# patch for OS X 10.6 to preserve file modify date
+# Patch for OS X 10.6 to preserve file modify date
 # (this probably isn't a 100% fix, but it may solve a majority of the cases)
 sub PreserveTime()
 {
     local $_;
     SetFileTime($_, @{$preserveTime{$_}}) foreach keys %preserveTime;
     undef %preserveTime;
+}
+
+#------------------------------------------------------------------------------
+# Return absolute path for a file
+# Inputs: 0) file name
+# Returns: absolute path string, or undef if path could not be determined
+# Note: Warnings should be suppressed when calling this routine
+sub AbsPath($)
+{
+    my $file = shift;
+    my $path;
+    if (defined $file and require Cwd) {
+        $path = eval { Cwd::abs_path($file) };
+        # convert to forward slashes if necessary
+        # (abs_path doesn't consistently return one or the other)
+        $path =~ tr/\\/\// if defined $path and $hasBackslash{$^O};
+    }
+    return $path;
 }
 
 #------------------------------------------------------------------------------
@@ -3560,33 +3608,33 @@ supported by ExifTool (r = read, w = write, c = create):
   3G2   r/w   | EPS   r/w   | LNK   r     | PAC   r     | RWL   r/w
   3GP   r/w   | ERF   r/w   | M2TS  r     | PAGES r     | RWZ   r
   ACR   r     | EXE   r     | M4A/V r/w   | PBM   r/w   | RM    r
-  AFM   r     | EXIF  r/w/c | MEF   r/w   | PCD   r     | SO    r
-  AI    r/w   | EXR   r     | MIE   r/w/c | PDF   r/w   | SR2   r/w
-  AIFF  r     | EXV   r/w/c | MIFF  r     | PEF   r/w   | SRF   r
-  APE   r     | F4A/V r/w   | MKA   r     | PFA   r     | SRW   r/w
-  ARW   r/w   | FFF   r/w   | MKS   r     | PFB   r     | SVG   r
-  ASF   r     | FLA   r     | MKV   r     | PFM   r     | SWF   r
-  AVI   r     | FLAC  r     | MNG   r/w   | PGF   r     | THM   r/w
-  BMP   r     | FLV   r     | MODD  r     | PGM   r/w   | TIFF  r/w
-  BTF   r     | FPF   r     | MOS   r/w   | PLIST r     | TORRENT r
-  CHM   r     | FPX   r     | MOV   r/w   | PICT  r     | TTC   r
-  COS   r     | GIF   r/w   | MP3   r     | PMP   r     | TTF   r
-  CR2   r/w   | GZ    r     | MP4   r/w   | PNG   r/w   | VRD   r/w/c
-  CRW   r/w   | HDP   r/w   | MPC   r     | PPM   r/w   | VSD   r
-  CS1   r/w   | HDR   r     | MPG   r     | PPT   r     | WAV   r
-  DCM   r     | HTML  r     | MPO   r/w   | PPTX  r     | WDP   r/w
-  DCP   r/w   | ICC   r/w/c | MQV   r/w   | PS    r/w   | WEBP  r
-  DCR   r     | IDML  r     | MRW   r/w   | PSB   r/w   | WEBM  r
-  DFONT r     | IIQ   r/w   | MXF   r     | PSD   r/w   | WMA   r
-  DIVX  r     | IND   r/w   | NEF   r/w   | PSP   r     | WMV   r
-  DJVU  r     | INX   r     | NRW   r/w   | QTIF  r/w   | WV    r
-  DLL   r     | ITC   r     | NUMBERS r   | RA    r     | X3F   r/w
-  DNG   r/w   | J2C   r     | ODP   r     | RAF   r/w   | XCF   r
-  DOC   r     | JNG   r/w   | ODS   r     | RAM   r     | XLS   r
-  DOCX  r     | JP2   r/w   | ODT   r     | RAR   r     | XLSX  r
-  DPX   r     | JPEG  r/w   | OFR   r     | RAW   r/w   | XMP   r/w/c
-  DV    r     | K25   r     | OGG   r     | RIFF  r     | ZIP   r
-  DVB   r/w   | KDC   r     | OGV   r     | RSRC  r     |
+  AFM   r     | EXIF  r/w/c | MEF   r/w   | PCD   r     | SEQ   r
+  AI    r/w   | EXR   r     | MIE   r/w/c | PDF   r/w   | SO    r
+  AIFF  r     | EXV   r/w/c | MIFF  r     | PEF   r/w   | SR2   r/w
+  APE   r     | F4A/V r/w   | MKA   r     | PFA   r     | SRF   r
+  ARW   r/w   | FFF   r/w   | MKS   r     | PFB   r     | SRW   r/w
+  ASF   r     | FLA   r     | MKV   r     | PFM   r     | SVG   r
+  AVI   r     | FLAC  r     | MNG   r/w   | PGF   r     | SWF   r
+  BMP   r     | FLV   r     | MODD  r     | PGM   r/w   | THM   r/w
+  BTF   r     | FPF   r     | MOS   r/w   | PLIST r     | TIFF  r/w
+  CHM   r     | FPX   r     | MOV   r/w   | PICT  r     | TORRENT r
+  COS   r     | GIF   r/w   | MP3   r     | PMP   r     | TTC   r
+  CR2   r/w   | GZ    r     | MP4   r/w   | PNG   r/w   | TTF   r
+  CRW   r/w   | HDP   r/w   | MPC   r     | PPM   r/w   | VRD   r/w/c
+  CS1   r/w   | HDR   r     | MPG   r     | PPT   r     | VSD   r
+  DCM   r     | HTML  r     | MPO   r/w   | PPTX  r     | WAV   r
+  DCP   r/w   | ICC   r/w/c | MQV   r/w   | PS    r/w   | WDP   r/w
+  DCR   r     | IDML  r     | MRW   r/w   | PSB   r/w   | WEBP  r
+  DFONT r     | IIQ   r/w   | MXF   r     | PSD   r/w   | WEBM  r
+  DIVX  r     | IND   r/w   | NEF   r/w   | PSP   r     | WMA   r
+  DJVU  r     | INX   r     | NRW   r/w   | QTIF  r/w   | WMV   r
+  DLL   r     | ITC   r     | NUMBERS r   | RA    r     | WV    r
+  DNG   r/w   | J2C   r     | ODP   r     | RAF   r/w   | X3F   r/w
+  DOC   r     | JNG   r/w   | ODS   r     | RAM   r     | XCF   r
+  DOCX  r     | JP2   r/w   | ODT   r     | RAR   r     | XLS   r
+  DPX   r     | JPEG  r/w   | OFR   r     | RAW   r/w   | XLSX  r
+  DV    r     | K25   r     | OGG   r     | RIFF  r     | XMP   r/w/c
+  DVB   r/w   | KDC   r     | OGV   r     | RSRC  r     | ZIP   r
   DYLIB r     | KEY   r     | ORF   r/w   | RTF   r     |
 
   Meta Information
@@ -3690,7 +3738,7 @@ L<Processing control|/Processing control>
   -scanForXMP                      Brute force XMP scan
   -u          (-unknown)           Extract unknown tags
   -U          (-unknown2)          Extract unknown binary tags too
-  -wm MODE    (-writeMode)         Set tag write/create mode
+  -wm MODE    (-writeMode)         Set mode for writing/creating tags
   -z          (-zip)               Read/write compressed information
 
 L<Special features|/Special features>
@@ -3963,7 +4011,7 @@ allows copying of multiple tags into the same list.  ie)
 Other than this difference, the B<-tagsFromFile> and B<-addTagsFromFile>
 options are equivalent.
 
-6) The B<-a> option (allow duplicate tags) is always in effect when reading
+6) The B<-a> option (allow duplicate tags) is always in effect when copying
 tags from I<SRCFILE>.
 
 7) Structured tags are copied by default when copying tags.  See the
@@ -4091,8 +4139,8 @@ as the exported file.  The first row of the I<CSVFILE> must be the ExifTool
 tag names (with optional group names) for each column of the file, and
 values must be separated by commas.  A special "SourceFile" column specifies
 the files associated with each row of information (a SourceFile of "*" may
-be used to apply the information to all target images).  The following
-examples demonstrate basic use of this option:
+be used to match any source file name).  The following examples demonstrate
+basic use of this option:
 
     # generate CSV file with common tags from all images in a directory
     exiftool -common -csv dir > out.csv
@@ -4115,6 +4163,9 @@ heading for each tag.  When exporting specific tags, the CSV columns are
 arranged in the same order as the specified tags provided the column
 headings exactly match the specified tag names, otherwise the columns are
 sorted in alphabetical order.
+
+When importing from a CSV file, only files specified on the command line are
+processed.  Any extra entries in the CSV file are ignored.
 
 List-type tags are stored as simple strings in a CSV file, but the B<-sep>
 option may be used to split them back into separate items when importing.
@@ -4316,7 +4367,7 @@ with this command:
 
 produces output like this:
 
-    -- Generated by ExifTool 9.53 --
+    -- Generated by ExifTool 9.60 --
     File: a.jpg - 2003:10:31 15:44:19
     (f/5.6, 1/60s, ISO 100)
     File: b.jpg - 2006:05:23 11:57:38
@@ -4755,6 +4806,10 @@ the associated NEF:
 
     exiftool -if EXPR -p '$directory/$filename' -ext nef DIR > nef.txt
     exiftool -@ nef.txt -srcfile %d%f.xmp ...
+
+5) The B<-a> option has no effect on the evaluation of the expression, and
+the values of duplicate tags are accessible only by specifying a group name
+(such as a family 4 instance number, ie. C<$Copy1:TAG>, C<$Copy2:TAG>, etc).
 
 =item B<-m> (B<-ignoreMinorErrors>)
 

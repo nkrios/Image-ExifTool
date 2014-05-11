@@ -22,7 +22,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.40';
+$VERSION = '1.41';
 
 sub JITTER() { return 2 }       # maximum time jitter
 
@@ -112,7 +112,7 @@ sub LoadTrackLog($$;$)
     my ($et, $val) = @_;
     my ($raf, $from, $time, $isDate, $noDate, $noDateChanged, $lastDate, $dateFlarm);
     my ($nmeaStart, $fixSecs, @fixTimes, $lastFix, %nmea);
-    my ($canCut, $cutPDOP, $cutHDOP, $cutSats);
+    my ($canCut, $cutPDOP, $cutHDOP, $cutSats, $e0, $e1);
 
     unless (eval { require Time::Local }) {
         return 'Geotag feature requires Time::Local installed';
@@ -253,32 +253,35 @@ sub LoadTrackLog($$;$)
                         $td = 1;
                     }
                     # validate and store GPS fix
-                    if (defined $$fix{lat} and defined $$fix{lon} and $$fix{'time'} and
-                        $$fix{lat} =~ /^[+-]?\d+\.?\d*/ and
-                        $$fix{lon} =~ /^[+-]?\d+\.?\d*/ and
-                        $$fix{'time'} =~ /^(\d{4})-(\d+)-(\d+)T(\d+):(\d+):(\d+)(\.\d+)?(.*)/)
-                    {
-                        $time = Time::Local::timegm($6,$5,$4,$3,$2-1,$1-1900);
-                        $time += $7 if $7;  # add fractional seconds
-                        my $tz = $8;
-                        # adjust for time zone (otherwise assume UTC)
-                        # - allow timezone of +-HH:MM, +-H:MM, +-HHMM or +-HH since
-                        #   the spec is unclear about timezone format
-                        if ($tz =~ /^([-+])(\d+):(\d{2})\b/ or $tz =~ /^([-+])(\d{2})(\d{2})?\b/) {
-                            $tz = ($2 * 60 + ($3 || 0)) * 60;
-                            $tz *= -1 if $1 eq '+'; # opposite sign to change back to UTC
-                            $time += $tz;
-                        }
-                        # validate altitude
-                        undef $$fix{alt} if defined $$fix{alt} and $$fix{alt} !~ /^[+-]?\d+\.?\d*/;
-                        $isDate = 1;
-                        $canCut= 1 if defined $$fix{pdop} or defined $$fix{hdop} or defined $$fix{nsats};
-                        $$has{alt} = 1 if $$fix{alt};   # set "has altitude" flag if appropriate
-                        $$points{$time} = $fix;
-                        push @fixTimes, $time;  # save times of all fixes in order
-                        $fix = { };
-                        ++$numPoints;
+                    next unless defined $$fix{lat} and defined $$fix{lon} and $$fix{'time'};
+                    unless ($$fix{lat} =~ /^[+-]?\d+\.?\d*/ and $$fix{lon} =~ /^[+-]?\d+\.?\d*/) {
+                        $e0 or $et->VPrint(0, "Coordinate format error in $from\n"), $e0 = 1;
+                        next;
                     }
+                    unless ($$fix{'time'} =~ /^(\d{4})-(\d+)-(\d+)T(\d+):(\d+):(\d+)(\.\d+)?(.*)/) {
+                        $e1 or $et->VPrint(0, "Timestamp format error in $from\n"), $e1 = 1;
+                        next;
+                    }
+                    $time = Time::Local::timegm($6,$5,$4,$3,$2-1,$1-1900);
+                    $time += $7 if $7;  # add fractional seconds
+                    my $tz = $8;
+                    # adjust for time zone (otherwise assume UTC)
+                    # - allow timezone of +-HH:MM, +-H:MM, +-HHMM or +-HH since
+                    #   the spec is unclear about timezone format
+                    if ($tz =~ /^([-+])(\d+):(\d{2})\b/ or $tz =~ /^([-+])(\d{2})(\d{2})?\b/) {
+                        $tz = ($2 * 60 + ($3 || 0)) * 60;
+                        $tz *= -1 if $1 eq '+'; # opposite sign to change back to UTC
+                        $time += $tz;
+                    }
+                    # validate altitude
+                    undef $$fix{alt} if defined $$fix{alt} and $$fix{alt} !~ /^[+-]?\d+\.?\d*/;
+                    $isDate = 1;
+                    $canCut= 1 if defined $$fix{pdop} or defined $$fix{hdop} or defined $$fix{nsats};
+                    $$has{alt} = 1 if $$fix{alt};   # set "has altitude" flag if appropriate
+                    $$points{$time} = $fix;
+                    push @fixTimes, $time;  # save times of all fixes in order
+                    $fix = { };
+                    ++$numPoints;
                 }
             }
             # last ditch check KML description for timestamp (assume it is UTC)
@@ -546,7 +549,8 @@ sub LoadTrackLog($$;$)
     my $verbose = $et->Options('Verbose');
     if ($verbose) {
         my $out = $et->Options('TextOut');
-        print $out "Loaded $numPoints points from GPS track log $from\n";
+        $format or $format = 'unknown';
+        print $out "Loaded $numPoints points from $format-format GPS track log $from\n";
         print $out "Ignored $cutPDOP points due to GeoMaxPDOP cut\n" if $cutPDOP;
         print $out "Ignored $cutHDOP points due to GeoMaxHDOP cut\n" if $cutHDOP;
         print $out "Ignored $cutSats points due to GeoMinSats cut\n" if $cutSats;

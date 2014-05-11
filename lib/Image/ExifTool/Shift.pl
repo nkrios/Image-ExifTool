@@ -578,7 +578,7 @@ philosophy).
 =head1 BUGS
 
 Due to the use of the standard time library functions, dates are typically
-limited to the range 1970 to 2038.
+limited to the range 1970 to 2038 on 32-bit systems.
 
 =head1 AUTHOR
 

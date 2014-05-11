@@ -6,7 +6,7 @@ Added Geosync point:
   GPS time stamp:  2010:01:05 09:01:00 UTC
   Image date/time: 2001:08:01 16:00:00 UTC
 Writing File:Geosync
-Loaded 10 points from GPS track log file 't/images/Geotag.igc'
+Loaded 10 points from IGC-format GPS track log file 't/images/Geotag.igc'
   GPS track start: 2010:01:05 07:23:15 UTC
   GPS track end:   2010:01:05 08:52:56 UTC
 Writing File:Geotag

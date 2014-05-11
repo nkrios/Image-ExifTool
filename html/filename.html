@@ -15,8 +15,10 @@
 
 <p>By writing the <b>FileName</b> and/or <b>Directory</b> tags, ExifTool can be
 used to rename and/or move images into directories according to any information
-contained in the image.  The most common use of this feature is to organize
-images by date/time, but any other tag value may also be used.</p>
+contained in the image.  This is a powerful feature when combined with the
+<code>-tagsFromFile</code> ability to copy the values from other tags.  The most
+common use of this feature is to organize images by date/time, but any other tag
+value may also be used.</p>
 
 <p>Writing the <b>Directory</b> tag moves a file to a specified directory.  The
 directory is created if it doesn't already exist.</p>
@@ -42,6 +44,13 @@ default behaviour of these format codes.  See the <code>-w</code> option in the
 option is essential to specify a format for the filename (and/or directory
 name).  The examples below demonstrate the use of this feature.  Also, a list of
 of <a href="#codes">common date format codes</a> is provided for reference.</p>
+
+<blockquote class=prog><b class=red>Advanced feature:</b> The write-only
+<b>HardLink</b> tag may be written using a technique similar to <b>FileName</b>.
+Instead of renaming or moving the file, writing <b>HardLink</b> creates a hard
+link with the specified name.  This feature allows files to be organized without
+affecting the originals.  See the <a href="TagNames/extra.html">Extra Tags
+documentation</a> for more information.</blockquote>
 
 <h3>Notes:</h3>
 
@@ -94,7 +103,10 @@ Rename all images in directory '<code>DIR</code>' to names like
 '<code>20060327_1058-2.jpg</code>', with individual file names derived from the
 value of the CreateDate (plus a copy number with a leading '<code>-</code>' if a
 file with the same name already exists), and with the same extension as the
-original image.
+original image.  <i class=lt>[Note that copying tag values with '<code><</code>' implies
+'<code>-tagsfromfile @</code>' unless otherwise specified.  See the
+<code>-tagsFromFile</code> description in the
+<a href="exiftool_pod.html">application documentation</a> for details.]</i>
 <p><b>FAQ:</b> <i>"Why doesn't this command rename my files?"</i></p>
 <p>There are 2 common reasons for this:</p>
 <p>a) When a directory name is specified, this command will only rename "writable"

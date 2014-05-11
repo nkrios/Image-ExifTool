@@ -343,17 +343,18 @@ my %writeTable = (
     0x8298 => {             # Copyright
         Writable => 'string',
         WriteGroup => 'IFD0',
-        RawConvInv => sub {
+        RawConvInv => '$val . "\0"',
+        PrintConvInv => sub {
             my ($val, $self) = @_;
             # encode if necessary
             my $enc = $self->Options('CharsetEXIF');
             $val = $self->Encode($val,$enc) if $enc and $val !~ /\0/;
             if ($val =~ /(.*?)\s*[\n\r]+\s*(.*)/s) {
-                return $1 . "\0" unless length $2;
+                return $1 unless length $2;
                 # photographer copyright set to ' ' if it doesn't exist, according to spec.
-                return((length($1) ? $1 : ' ') . "\0" . $2 . "\0");
+                return((length($1) ? $1 : ' ') . "\0" . $2);
             }
-            return $val . "\0";
+            return $val;
         },
     },
 #
@@ -1515,19 +1516,19 @@ sub RebuildMakerNotes($$$)
 
 #------------------------------------------------------------------------------
 # Sort IFD directory entries
-# Inputs: 0) data reference, 1) directory start, 2) number of entries
-sub SortIFD($$$)
+# Inputs: 0) data reference, 1) directory start, 2) number of entries,
+#         3) flag to treat 0 as a valid tag ID (as opposed to an empty IFD entry)
+sub SortIFD($$$;$)
 {
-    my ($dataPt, $dirStart, $numEntries) = @_;
+    my ($dataPt, $dirStart, $numEntries, $allowZero) = @_;
     my ($index, %entries);
     # split the directory into separate entries
-    my $newDir = '';
     for ($index=0; $index<$numEntries; ++$index) {
         my $entry = $dirStart + 2 + 12 * $index;
         my $tagID = Get16u($dataPt, $entry);
         my $entryData = substr($$dataPt, $entry, 12);
         # silly software can pad directories with zero entries -- put these at the end
-        $tagID = 0x10000 unless $tagID or $index == 0;
+        $tagID = 0x10000 unless $tagID or $index == 0 or $allowZero;
         # add new entry (allow for duplicate tag ID's, which shouldn't normally happen)
         if ($entries{$tagID}) {
             $entries{$tagID} .= $entryData;
@@ -1537,6 +1538,8 @@ sub SortIFD($$$)
     }
     # sort the directory entries
     my @sortedTags = sort { $a <=> $b } keys %entries;
+    # generate the sorted IFD
+    my $newDir = '';
     foreach (@sortedTags) {
         $newDir .= $entries{$_};
     }
@@ -1807,8 +1810,8 @@ sub WriteExif($$$)
                 for ($index=0; $index<$numEntries; ++$index) {
                     my $tagID = Get16u($dataPt, $dirStart + 2 + 12 * $index);
                     # check for proper sequence (but ignore null entries at end)
-                    if ($tagID < $lastID and $tagID) {
-                        SortIFD($dataPt, $dirStart, $numEntries);
+                    if ($tagID < $lastID and ($tagID or $$tagTablePtr{0})) {
+                        SortIFD($dataPt, $dirStart, $numEntries, $$tagTablePtr{0});
                         $et->Warn("Entries in $name were out of sequence. Fixed.",1);
                         last;
                     }

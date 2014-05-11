@@ -26,7 +26,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.31';
+$VERSION = '1.32';
 
 sub ProcessPNG_tEXt($$$);
 sub ProcessPNG_iTXt($$$);
@@ -98,6 +98,10 @@ $Image::ExifTool::PNG::colorType = -1;
     },
     gAMA => {
         Name => 'Gamma',
+        Notes => q{
+            ExifTool reports the gamma for decoding the image, which is consistent with
+            the EXIF convention, but is the inverse of the stored encoding gamma
+        },
         ValueConv => 'my $a=unpack("N",$val);$a ? int(1e9/$a+0.5)/1e4 : $val',
     },
     gIFg => {

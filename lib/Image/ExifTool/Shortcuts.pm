@@ -19,7 +19,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.49';
+$VERSION = '1.51';
 
 # this is a special table used to define command-line shortcuts
 # (documentation Notes may be added for these via %shortcutNotes in BuildTagLookup.pm)
@@ -151,6 +151,7 @@ $VERSION = '1.49';
         'MakerNoteNikon',
         'MakerNoteNikon2',
         'MakerNoteNikon3',
+        'MakerNoteNintendo',
         'MakerNoteOlympus',
         'MakerNoteOlympus2',
         'MakerNoteLeica',
@@ -292,6 +293,10 @@ An example shortcut definition in .ExifTool_config:
 In this example, MyShortcut is a shortcut for the CreateDate,
 EXIF:ExposureTime and Aperture tags, and MyAlias is a shortcut for
 FocalLengthIn35mmFormat.
+
+The target tag names may contain an optional group name prefix.  A group
+name applied to the shortcut will be ignored for any target tag with a group
+name prefix.
 
 =head1 AUTHOR
 

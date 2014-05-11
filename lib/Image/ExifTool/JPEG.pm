@@ -11,7 +11,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.22';
+$VERSION = '1.23';
 
 sub ProcessOcad($$$);
 sub ProcessJPEG_HDR($$$);
@@ -76,7 +76,7 @@ sub ProcessJPEG_HDR($$$);
       }, {
         Name => 'PreviewImage',
         Condition => '$$valPt =~ /^(|QVGA\0|BGTH)\xff\xd8\xff\xdb/',
-        Notes => 'Samsung APP2 preview image', # (Samsung="", BenQ="QVGA\0", Digilife="BGTH")
+        Notes => 'Samsung APP2 preview image', # (Samsung/GoPro="", BenQ="QVGA\0", Digilife="BGTH")
     }],
     APP3 => [{
         Name => 'Meta',
@@ -399,13 +399,19 @@ sub ProcessJPEG_HDR($$$);
     0 => 'DCTEncodeVersion',
     1 => {
         Name => 'APP14Flags0',
-        PrintConv => { BITMASK => {
-            15 => 'Encoded with Blend=1 downsampling'
-        } },
+        PrintConv => {
+            0 => '(none)',
+            BITMASK => {
+                15 => 'Encoded with Blend=1 downsampling'
+            },
+        },
     },
     2 => {
         Name => 'APP14Flags1',
-        PrintConv => { BITMASK => { } },
+        PrintConv => {
+            0 => '(none)',
+            BITMASK => { },
+        },
     },
     3 => {
         Name => 'ColorTransform',

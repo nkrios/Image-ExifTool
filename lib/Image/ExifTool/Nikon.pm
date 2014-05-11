@@ -45,7 +45,7 @@
 #              30) http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3833.30.html
 #              31) Michael Relt private communication
 #              32) Stefan http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,4494.0.html
-#              33) Iliah Borg private communication
+#              33) Iliah Borg private communication (LibRaw)
 #              JD) Jens Duttke private communication
 #------------------------------------------------------------------------------
 
@@ -56,7 +56,7 @@ use vars qw($VERSION %nikonLensIDs %nikonTextEncoding);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.86';
+$VERSION = '2.88';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
@@ -318,6 +318,7 @@ sub PrintAFPointsInv($$;$);
     'E5 54 6A 6A 24 24 35 02' => 'Sigma Macro 105mm F2.8 EX DG',
     '48 48 76 76 24 24 4B 06' => 'Sigma APO Macro 150mm F2.8 EX DG HSM',
     'F5 48 76 76 24 24 4B 06' => 'Sigma APO Macro 150mm F2.8 EX DG HSM', #24
+    '99 48 76 76 24 24 4B 0E' => 'Sigma APO Macro 150mm F2.8 EX DG OS HSM', #(Christian Hesse)
     '48 4C 7C 7C 2C 2C 4B 02' => 'Sigma APO Macro 180mm F3.5 EX DG HSM',
     '48 4C 7D 7D 2C 2C 4B 02' => 'Sigma APO Macro 180mm F3.5 EX DG HSM',
     '48 54 8E 8E 24 24 4B 02' => 'Sigma APO 300mm F2.8 EX DG HSM',
@@ -1071,6 +1072,7 @@ my %binaryDataAttrs = (
             ByteOrder => 'BigEndian', #(NC)
         },
     },
+    # 0x0034 - Nikon 1 models only, values: 0,16,33
     0x0035 => { #32
         Name => 'HDRInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::HDRInfo' },
@@ -1098,6 +1100,8 @@ my %binaryDataAttrs = (
                 1 => 'D',
                 2 => 'G',
                 3 => 'VR',
+                # bit 4 set for Nikon 1 lenses - PH
+                # bit 5 set for FT-1 adapter? - PH
             }) : 'AF';
             # remove commas and change "D G" to just "G"
             s/,//g; s/\bD G\b/G/; $_
@@ -1423,6 +1427,8 @@ my %binaryDataAttrs = (
             2 => 'Uncompressed', #JD - D100 (even though TIFF compression is set!)
             3 => 'Lossless',
             4 => 'Lossy (type 2)',
+            6 => 'Uncompressed (reduced to 12 bit)', #33
+            8 => 'Small', #33
         },
     },
     0x0094 => { Name => 'Saturation',       Writable => 'int16s' },
@@ -1532,7 +1538,28 @@ my %binaryDataAttrs = (
                 DirOffset => 4,
             },
         },
-        {   # (D5200/D7100=0218, 1J1/1J2/1V1=0400, 1V2=0401, 1J3/1S1=0402, CoolpixA=0601)
+        {   # (D5200/D7100=0218, D5300=0219, D610/Df=0220, D3300=0221, CoolpixA=0601)
+            Name => 'ColorBalanceUnknown02',
+            Condition => '$$valPt =~ /^0[26]/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::ColorBalanceUnknown',
+                ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                DecryptStart => 284,
+                DecryptLen => 10, # (arbitrary)
+            },
+        },
+        {   # (1J1/1J2/1V1=0400, 1V2=0401, 1J3/1S1=0402, 1AW1=0403)
+            Name => 'ColorBalanceUnknown04',
+            Condition => '$$valPt =~ /^04/',
+            SubDirectory => {
+                TagTable => 'Image::ExifTool::Nikon::ColorBalanceUnknown',
+                ProcessProc => \&Image::ExifTool::Nikon::ProcessNikonEncrypted,
+                DecryptStart => 4,
+                DecryptLen => 10, # (arbitrary)
+            },
+        },
+        {
+            # (CoolpixP7700/P7800=0500, CoolpixP330/P520=0502)
             Name => 'ColorBalanceUnknown',
             SubDirectory => { TagTable => 'Image::ExifTool::Nikon::ColorBalanceUnknown' },
         },
@@ -1769,6 +1796,13 @@ my %binaryDataAttrs = (
         Flags => [ 'Binary', 'Protected' ],
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::PictureControl' },
     },
+    0x00c3 => {
+        Name => 'BarometerInfo',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nikon::BarometerInfo',
+            ByteOrder => 'LittleEndian',
+        },
+    },
     0x0e00 => {
         Name => 'PrintIM',
         Description => 'Print Image Matching',
@@ -1961,6 +1995,7 @@ my %binaryDataAttrs = (
     4 => {
         Name => 'VibrationReduction',
         PrintConv => {
+            0 => 'n/a', # (1V1 with a non-VR lens)
             1 => 'On',
             2 => 'Off',
         },
@@ -1970,6 +2005,7 @@ my %binaryDataAttrs = (
         Name => 'VRMode',
         PrintConv => {
             0 => 'Normal',
+            # 1 - seen this for 1V1 - PH
             2 => 'Active', # (1J1)
         },
     },
@@ -2313,7 +2349,11 @@ my %binaryDataAttrs = (
     },
     4 => {
         Name => 'AutoDistortionControl',
-        PrintConv => \%offOn,
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+            2 => 'On (underwater)', # (1AW1)
+        },
     },
 );
 
@@ -2385,6 +2425,7 @@ my %binaryDataAttrs = (
         Format => 'int16u',
         PrintConvColumns => 2,
         PrintConv => {
+            0 => '(none)',
             0x7ff => 'All 11 Points',
             BITMASK => {
                 0 => 'Center',
@@ -2559,6 +2600,7 @@ my %binaryDataAttrs = (
             ValueConvInv => 'pack("v",$val)',
             PrintConvColumns => 2,
             PrintConv => {
+                0 => '(none)',
                 0x7ff => 'All 11 Points',
                 BITMASK => {
                     0 => 'Center',
@@ -2705,6 +2747,24 @@ my %binaryDataAttrs = (
         PrintConv => 'sprintf("%.4d", $val)',
         PrintConvInv => '$val',
     },
+);
+
+# ref PH
+%Image::ExifTool::Nikon::BarometerInfo = (
+    %binaryDataAttrs,
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
+    0 => {
+        Name => 'BarometerInfoVersion',
+        Format => 'undef[4]',
+        Writable => 0,
+    },
+    6 => {
+        Name => 'Altitude',
+        Format => 'int32s',
+        PrintConv => '"$val m"', # (always stored as metres)
+        PrintConvInv => '$val=~s/\s*m$//; $val',
+    },
+    # 10: int16u - values: 0 (display in metres?), 18 (display in feet?)
 );
 
 # ref PH
@@ -4316,12 +4376,14 @@ my %nikonFocalConversions = (
     },
     8 => {
         Name => 'ExternalFlashFlags',
-        PrintConv => { BITMASK => {
-            0 => 'Fired', #28
-            2 => 'Bounce Flash', #PH
-            4 => 'Wide Flash Adapter',
-            5 => 'Dome Diffuser', #28
-        }},
+        PrintConv => { 0 => '(none)',
+            BITMASK => {
+                0 => 'Fired', #28
+                2 => 'Bounce Flash', #PH
+                4 => 'Wide Flash Adapter',
+                5 => 'Dome Diffuser', #28
+            },
+        },
     },
     9.1 => {
         Name => 'FlashCommanderMode',
@@ -4950,12 +5012,14 @@ my %nikonFocalConversions = (
         },
         PrintConv => \%Image::ExifTool::Nikon::nikonTextEncoding,
     },
-    # the following tag names chosen to correspond with XMP::iptcCore
+    # (the CountryCode and Location tag names chosen to correspond with XMP::iptcCore)
     5 => {
         Name => 'CountryCode',
-        Format => 'string[3]',
+        Format => 'undef[3]',
+        ValueConv => '$val=~s/\0.*//s; $val', # truncate at null
+        ValueConvInv => '$val',
     },
-    # 8 - value: 6 (what is this for?)
+    8 => 'POILevel', #forum5782
     9 => {
         Name => 'Location',
         Format => 'undef[70]',
@@ -5755,7 +5819,7 @@ my @xlat = (
     0xc6,0x67,0x4a,0xf5,0xa5,0x12,0x65,0x7e,0xb0,0xdf,0xaf,0x4e,0xb3,0x61,0x7f,0x2f ]
 );
 
-# decrypt Nikon data block (ref 4)
+# Decrypt Nikon data block (ref 4)
 # Inputs: 0) reference to data block, 1) serial number key, 2) shutter count key
 #         4) optional start offset (default 0)
 #         5) optional number of bytes to decode (default to the end of the data)
@@ -6021,7 +6085,7 @@ sub ProcessNikonCaptureEditVersions($$$)
 }
 
 #------------------------------------------------------------------------------
-# process Nikon Capture Offsets IFD (ref PH)
+# Process Nikon Capture Offsets IFD (ref PH)
 # Inputs: 0) ExifTool object ref, 1) dirInfo ref, 2) tag table ref
 # Returns: 1 on success
 # Notes: This isn't a normal IFD, but is close...

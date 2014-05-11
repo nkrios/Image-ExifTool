@@ -21,7 +21,7 @@ sub ProcessKodakPatch($$$);
 sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.89';
+$VERSION = '1.91';
 
 my $debug;          # set to 1 to enable debugging code
 
@@ -484,6 +484,15 @@ my $debug;          # set to 1 to enable debugging code
         },
     },
     {
+        Name => 'MakerNoteNintendo',
+        # (starts with an IFD)
+        Condition => '$$self{Make} eq "Nintendo"',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Nintendo::Main',
+            ByteOrder => 'Unknown',
+        },
+    },
+    {
         Name => 'MakerNoteOlympus',
         # (if Make is 'SEIKO EPSON CORP.', starts with "EPSON\0")
         # (if Make is 'OLYMPUS OPTICAL CO.,LTD' or 'OLYMPUS CORPORATION',
@@ -557,11 +566,12 @@ my $debug;          # set to 1 to enable debugging code
         },
     },
     {
-        Name => 'MakerNoteLeica5', # used by the X1/X2
+        Name => 'MakerNoteLeica5', # used by the X1/X2/X VARIO/T
         # (X1 starts with "LEICA\0\x01\0", Make is "LEICA CAMERA AG")
         # (X2 starts with "LEICA\0\x05\0", Make is "LEICA CAMERA AG")
         # (X VARIO starts with "LEICA\0\x04\0", Make is "LEICA CAMERA AG")
-        Condition => '$$valPt =~ /^LEICA\0[\x01\x04\x05]\0/',
+        # (T (Typ 701) starts with LEICA\0\0x6", Make is "LEICA CAMERA AG")
+        Condition => '$$valPt =~ /^LEICA\0[\x01\x04\x05\x06]\0/',
         SubDirectory => {
             TagTable => 'Image::ExifTool::Panasonic::Leica5',
             Start => '$valuePtr + 8',
@@ -570,10 +580,15 @@ my $debug;          # set to 1 to enable debugging code
         },
     },
     {
-        Name => 'MakerNoteLeica6', # used by the S2 and M (Typ 240)
-        # (starts with "LEICA\0\x02\xff", Make is "Leica Camera AG",
-        #  but maker notes aren't loaded at the time this is tested)
-        Condition => '$$self{Model} eq "S2" or $$self{Model} eq "LEICA M (Typ 240)"',
+        Name => 'MakerNoteLeica6', # used by the S2, M (Typ 240) and S (Typ 006)
+        # (starts with "LEICA\0\x02\xff", Make is "Leica Camera AG", but test the
+        # model names separately because the maker notes data may not be loaded
+        # at the time this is tested if they are in a JPEG trailer)
+        Condition => q{
+            ($$self{Make} eq 'Leica Camera AG' and ($$self{Model} eq "S2" or
+            $$self{Model} eq "LEICA M (Typ 240)" or $$self{Model} eq "LEICA S (Typ 006)")) or
+            $$valPt =~ /^LEICA\0\x02\xff/
+        },
         DataTag => 'LeicaTrailer',  # (generates fixup name for this tag)
         LeicaTrailer => 1, # flag to special-case this tag in the Exif code
         SubDirectory => {
@@ -1269,7 +1284,7 @@ sub LocateIFD($$)
     my $dirStart = $$dirInfo{DirStart} || 0;
     # (ignore MakerNotes DirLen since sometimes this is incorrect)
     my $size = $$dirInfo{DataLen} - $dirStart;
-    my $dirLen = $$dirInfo{DirLen} || $size;
+    my $dirLen = defined $$dirInfo{DirLen} ? $$dirInfo{DirLen} : $size;
     my $tagInfo = $$dirInfo{TagInfo};
     my $ifdOffsetPos;
     # the IFD should be within the first 32 bytes

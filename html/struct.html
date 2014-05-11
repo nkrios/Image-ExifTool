@@ -158,8 +158,10 @@ string.  The following two techniques are equivalent:</p>
 <h2>Copying</h2>
 
 <p>By default, tags are <b>copied as structures</b>, but flattened tag names
-may still be copied by specifying them explicitly.  Copying as structures
-allows the hierarchy of complex structures to be preserved.</p>
+may still be copied by specifying them explicitly. <span class=lt>(Flattened
+tags are treated as "unsafe" for copying so they are not copied by default
+unless the Struct feature is disabled.)</span> Copying as structures allows the
+hierarchy of complex structures to be preserved.</p>
 
 <blockquote><table class='box'><tr><td>
 <pre># this copies all XMP information as structures
@@ -336,7 +338,7 @@ See the NewXMPxxxStruct tag definition in the <a href="config.html#xmp-xxx">XMP-
 examples of the sample config file</a> for more details.</p>
 
 <hr>
-<i>Last revised Mar. 10, 2012</i>
+<i>Last revised Apr. 8, 2014</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

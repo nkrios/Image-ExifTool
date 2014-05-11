@@ -208,11 +208,12 @@
 <td>Categories</td>
 <td class=c>int32u[2]</td>
 <td><span class=s><span class=n>(2 values: 1. always 8, 2. Categories)</span></span><table class=cols><tr>
-  <td>Bit 0 = People
+  <td>0x0 = (none)
+  <br>Bit 0 = People
   <br>Bit 1 = Scenery
-  <br>Bit 2 = Events
-  <br>Bit 3 = User 1</td><td>&nbsp;&nbsp;</td>
-  <td>Bit 4 = User 2
+  <br>Bit 2 = Events</td><td>&nbsp;&nbsp;</td>
+  <td>Bit 3 = User 1
+  <br>Bit 4 = User 2
   <br>Bit 5 = User 3
   <br>Bit 6 = To Do</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
@@ -634,7 +635,7 @@
 </tr><tr><td class=r>0x3110000</td><td>= PowerShot S100 (new)</td>
 </tr><tr><td class=r>0x3120000</td><td>= PowerShot ELPH 310 HS / IXUS 230 HS / IXY 600F</td>
 </tr><tr><td class=r>0x3130000</td><td>= PowerShot SX40 HS</td>
-</tr><tr><td class=r>0x3140000</td><td>= PowerShot ELPH 500 HS / IXUS 320 HS / IXY 32S</td>
+</tr><tr><td class=r>0x3140000</td><td>= IXY 32S</td>
 </tr><tr><td class=r>0x3160000</td><td>= PowerShot A1300</td>
 </tr><tr><td class=r>0x3170000</td><td>= PowerShot A810</td>
 </tr><tr><td class=r>0x3180000</td><td>= PowerShot ELPH 320 HS / IXUS 240 HS / IXY 420F</td>
@@ -661,7 +662,7 @@
 </tr><tr><td class=r>0x3430000</td><td>= PowerShot A2600</td>
 </tr><tr><td class=r>0x3450000</td><td>= PowerShot A1400</td>
 </tr><tr><td class=r>0x3460000</td><td>= PowerShot ELPH 130 IS / IXUS 140 / IXY 110F</td>
-</tr><tr><td class=r>0x3470000</td><td>= PowerShot ELPH 115 IS / IXUS 132/135 / IXY 90F</td>
+</tr><tr><td class=r>0x3470000</td><td>= PowerShot ELPH 115/120 IS / IXUS 132/135 / IXY 90F/100F</td>
 </tr><tr><td class=r>0x3490000</td><td>= PowerShot ELPH 330 HS / IXUS 255 HS / IXY 610F</td>
 </tr><tr><td class=r>0x3510000</td><td>= PowerShot A2500</td>
 </tr><tr><td class=r>0x3540000</td><td>= PowerShot G16</td>
@@ -669,11 +670,16 @@
 </tr><tr><td class=r>0x3560000</td><td>= PowerShot SX170 IS</td>
 </tr><tr><td class=r>0x3580000</td><td>= PowerShot SX510 HS</td>
 </tr><tr><td class=r>0x3590000</td><td>= PowerShot S200 (new)</td>
+</tr><tr><td class=r>0x3600000</td><td>= IXY 620F</td>
 </tr><tr><td class=r>0x3610000</td><td>= PowerShot N100</td>
 </tr><tr><td class=r>0x3640000</td><td>= PowerShot G1 X Mark II</td>
 </tr><tr><td class=r>0x3650000</td><td>= PowerShot D30</td>
 </tr><tr><td class=r>0x3660000</td><td>= PowerShot SX700 HS</td>
 </tr><tr><td class=r>0x3670000</td><td>= PowerShot SX600 HS</td>
+</tr><tr><td class=r>0x3680000</td><td>= PowerShot ELPH 140 IS / IXUS 150</td>
+</tr><tr><td class=r>0x3690000</td><td>= PowerShot ELPH 135 / IXUS 145 / IXY 120</td>
+</tr><tr><td class=r>0x3700000</td><td>= PowerShot ELPH 340 HS / IXUS 265 HS / IXY 630</td>
+</tr><tr><td class=r>0x3710000</td><td>= PowerShot ELPH 150 IS / IXUS 155 / IXY 140</td>
 </tr><tr><td class=r>0x4040000</td><td>= PowerShot G1</td>
 </tr><tr><td class=r>0x6040000</td><td>= PowerShot S100 / Digital IXUS / IXY Digital</td>
 </tr><tr><td class=r>0x4007d673</td><td>= DC19/DC21/DC22</td>
@@ -807,7 +813,9 @@
   <br>3 = Continuous, Speed Priority
   <br>4 = Continuous, Low
   <br>5 = Continuous, High
-  <br>6 = Silent Single</td><td>&nbsp;&nbsp;</td></tr></table>
+  <br>6 = Silent Single
+  <br>9 = Single, Silent
+  <br>10 = Continuous, Silent</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr class=b>
 <td class=r title='7 = 0x7'>7</td>
@@ -846,16 +854,17 @@
 <td>CanonImageSize</td>
 <td class=c>int16s</td>
 <td><table class=cols><tr>
-  <td>0 = Large
+  <td>-1 = n/a
+  <br>0 = Large
   <br>1 = Medium
   <br>2 = Small
   <br>5 = Medium 1
   <br>6 = Medium 2
   <br>7 = Medium 3
   <br>8 = Postcard
-  <br>9 = Widescreen
-  <br>10 = Medium Widescreen</td><td>&nbsp;&nbsp;</td>
-  <td>14 = Small 1
+  <br>9 = Widescreen</td><td>&nbsp;&nbsp;</td>
+  <td>10 = Medium Widescreen
+  <br>14 = Small 1
   <br>15 = Small 2
   <br>16 = Small 3
   <br>128 = 640x480 Movie
@@ -1068,12 +1077,13 @@ others use a range of 0 to 7 where 0 is no sharpening)</span></span></td></tr>
 <td>FlashBits</td>
 <td class=c>int16s</td>
 <td><table class=cols><tr>
-  <td>Bit 0 = Manual
+  <td>0x0 = (none)
+  <br>Bit 0 = Manual
   <br>Bit 1 = TTL
   <br>Bit 2 = A-TTL
-  <br>Bit 3 = E-TTL
-  <br>Bit 4 = FP sync enabled</td><td>&nbsp;&nbsp;</td>
-  <td>Bit 7 = 2nd-curtain sync used
+  <br>Bit 3 = E-TTL</td><td>&nbsp;&nbsp;</td>
+  <td>Bit 4 = FP sync enabled
+  <br>Bit 7 = 2nd-curtain sync used
   <br>Bit 11 = FP sync used
   <br>Bit 13 = Built-in
   <br>Bit 14 = External</td><td>&nbsp;&nbsp;</td></tr></table>
@@ -1176,7 +1186,8 @@ attempting to identify the specific lens model.</p>
 <table class=frame><tr><td>
 <table class='inner sep' cellspacing=1>
 <tr class=h><th>Value</th><th>LensType</th></tr>
-<tr><td>1</td><td>= Canon EF 50mm f/1.8</td>
+<tr><td>-1</td><td>= n/a</td>
+</tr><tr><td>1</td><td>= Canon EF 50mm f/1.8</td>
 </tr><tr><td>2</td><td>= Canon EF 28mm f/2.8</td>
 </tr><tr><td>3</td><td>= Canon EF 135mm f/2.8 Soft</td>
 </tr><tr><td>4</td><td>= Canon EF 35-105mm f/3.5-4.5 or Sigma Lens</td>
@@ -1231,11 +1242,13 @@ attempting to identify the specific lens model.</p>
 </tr><tr><td>32.1</td><td>= Sigma 15mm f/2.8 EX Fisheye</td>
 </tr><tr><td>33</td><td>= Voigtlander or Carl Zeiss Lens</td>
 </tr><tr><td>33.1</td><td>= Voigtlander Ultron 40mm f/2 SLII Aspherical</td>
-</tr><tr><td>33.2</td><td>= Carl Zeiss Distagon T* 15mm f/2.8 ZE</td>
-</tr><tr><td>33.3</td><td>= Carl Zeiss Distagon T* 18mm f/3.5 ZE</td>
-</tr><tr><td>33.4</td><td>= Carl Zeiss Distagon T* 21mm f/2.8 ZE</td>
-</tr><tr><td>33.5</td><td>= Carl Zeiss Distagon T* 28mm f/2 ZE</td>
-</tr><tr><td>33.6</td><td>= Carl Zeiss Distagon T* 35mm f/2 ZE</td>
+</tr><tr><td>33.2</td><td>= Voigtlander Color Skopar 20mm f/3.5 SLII Aspherical</td>
+</tr><tr><td>33.3</td><td>= Voigtlander APO-Lanthar 90mm f/3.5 SLII Close Focus</td>
+</tr><tr><td>33.4</td><td>= Carl Zeiss Distagon T* 15mm f/2.8 ZE</td>
+</tr><tr><td>33.5</td><td>= Carl Zeiss Distagon T* 18mm f/3.5 ZE</td>
+</tr><tr><td>33.6</td><td>= Carl Zeiss Distagon T* 21mm f/2.8 ZE</td>
+</tr><tr><td>33.7</td><td>= Carl Zeiss Distagon T* 28mm f/2 ZE</td>
+</tr><tr><td>33.8</td><td>= Carl Zeiss Distagon T* 35mm f/2 ZE</td>
 </tr><tr><td>35</td><td>= Canon EF 35-80mm f/4-5.6</td>
 </tr><tr><td>36</td><td>= Canon EF 38-76mm f/4.5-5.6</td>
 </tr><tr><td>37</td><td>= Canon EF 35-80mm f/4-5.6 or Tamron Lens</td>
@@ -1368,7 +1381,8 @@ attempting to identify the specific lens model.</p>
 </tr><tr><td>177</td><td>= Canon EF 300mm f/4L IS</td>
 </tr><tr><td>178</td><td>= Canon EF 28-135mm f/3.5-5.6 IS</td>
 </tr><tr><td>179</td><td>= Canon EF 24mm f/1.4L</td>
-</tr><tr><td>180</td><td>= Canon EF 35mm f/1.4L</td>
+</tr><tr><td>180</td><td>= Canon EF 35mm f/1.4L or Sigma Lens</td>
+</tr><tr><td>180.1</td><td>= Sigma 50mm f/1.4 DG HSM | A</td>
 </tr><tr><td>181</td><td>= Canon EF 100-400mm f/4.5-5.6L IS + 1.4x</td>
 </tr><tr><td>182</td><td>= Canon EF 100-400mm f/4.5-5.6L IS + 2x</td>
 </tr><tr><td>183</td><td>= Canon EF 100-400mm f/4.5-5.6L IS or Sigma Lens</td>
@@ -1402,6 +1416,7 @@ attempting to identify the specific lens model.</p>
 </tr><tr><td>213.1</td><td>= Tamron SP 150-600mm F/5-6.3 Di VC USD</td>
 </tr><tr><td>214</td><td>= Canon EF-S 18-55mm f/3.5-5.6 USM</td>
 </tr><tr><td>215</td><td>= Canon EF 55-200mm f/4.5-5.6 II USM</td>
+</tr><tr><td>217</td><td>= Tamron AF 18-270mm f/3.5-6.3 Di II VC PZD</td>
 </tr><tr><td>224</td><td>= Canon EF 70-200mm f/2.8L IS</td>
 </tr><tr><td>225</td><td>= Canon EF 70-200mm f/2.8L IS + 1.4x</td>
 </tr><tr><td>226</td><td>= Canon EF 70-200mm f/2.8L IS + 2x</td>
@@ -1544,7 +1559,7 @@ models)</span></span></td></tr>
 <td class=r title='9 = 0x9'>9</td>
 <td>SequenceNumber</td>
 <td class=c>int16s</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(valid only for some models)</span></span></td></tr>
 <tr class=b>
 <td class=r title='10 = 0xa'>10</td>
 <td>OpticalZoomCode</td>
@@ -1911,16 +1926,17 @@ lists CameraInfo tags for the 1D and 1DS.</p>
 <td>CanonImageSize</td>
 <td class=c>int16u</td>
 <td><table class=cols><tr>
-  <td>0 = Large
+  <td>-1 = n/a
+  <br>0 = Large
   <br>1 = Medium
   <br>2 = Small
   <br>5 = Medium 1
   <br>6 = Medium 2
   <br>7 = Medium 3
   <br>8 = Postcard
-  <br>9 = Widescreen
-  <br>10 = Medium Widescreen</td><td>&nbsp;&nbsp;</td>
-  <td>14 = Small 1
+  <br>9 = Widescreen</td><td>&nbsp;&nbsp;</td>
+  <td>10 = Medium Widescreen
+  <br>14 = Small 1
   <br>15 = Small 2
   <br>16 = Small 3
   <br>128 = 640x480 Movie
@@ -3205,15 +3221,16 @@ versions 1.0.x, but they may be different for other firmware versions.</p>
 <td>AFPointsInFocus5D</td>
 <td class=c>int16uRev</td>
 <td><table class=cols><tr>
-  <td>Bit 0 = Center
+  <td>0x0 = (none)
+  <br>Bit 0 = Center
   <br>Bit 1 = Top
   <br>Bit 2 = Bottom
   <br>Bit 3 = Upper-left
   <br>Bit 4 = Upper-right
   <br>Bit 5 = Lower-left
-  <br>Bit 6 = Lower-right
-  <br>Bit 7 = Left</td><td>&nbsp;&nbsp;</td>
-  <td>Bit 8 = Right
+  <br>Bit 6 = Lower-right</td><td>&nbsp;&nbsp;</td>
+  <td>Bit 7 = Left
+  <br>Bit 8 = Right
   <br>Bit 9 = AI Servo1
   <br>Bit 10 = AI Servo2
   <br>Bit 11 = AI Servo3
@@ -5746,16 +5763,17 @@ on the 1DSmkII)</span></span></td></tr>
 <td>RawJpgSize</td>
 <td class=c>int16s</td>
 <td><table class=cols><tr>
-  <td>0 = Large
+  <td>-1 = n/a
+  <br>0 = Large
   <br>1 = Medium
   <br>2 = Small
   <br>5 = Medium 1
   <br>6 = Medium 2
   <br>7 = Medium 3
   <br>8 = Postcard
-  <br>9 = Widescreen
-  <br>10 = Medium Widescreen</td><td>&nbsp;&nbsp;</td>
-  <td>14 = Small 1
+  <br>9 = Widescreen</td><td>&nbsp;&nbsp;</td>
+  <td>10 = Medium Widescreen
+  <br>14 = Small 1
   <br>15 = Small 2
   <br>16 = Small 3
   <br>128 = 640x480 Movie
@@ -5822,6 +5840,16 @@ valid for all camera models)</span></span></td></tr>
 <td class=c>int16s</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
+<tr>
+<td class=r title='20 = 0x14'>20</td>
+<td>FocusDistanceUpper</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='21 = 0x15'>21</td>
+<td>FocusDistanceLower</td>
+<td class=c>int16u</td>
+<td>&nbsp;</td></tr>
 <tr>
 <td class=r title='25 = 0x19'>25</td>
 <td>FlashExposureLock</td>
@@ -5998,48 +6026,53 @@ valid for all camera models)</span></span></td></tr>
 <tr class=h><th>Index2</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
-<td class=r title='0 = 0x0'>0</td>
+<td class=r title='1 = 0x1'>1</td>
 <td>WB_RGGBLevelsAuto</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='4 = 0x4'>4</td>
+<td class=r title='5 = 0x5'>5</td>
 <td>WB_RGGBLevelsDaylight</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='8 = 0x8'>8</td>
+<td class=r title='9 = 0x9'>9</td>
 <td>WB_RGGBLevelsShade</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='12 = 0xc'>12</td>
+<td class=r title='13 = 0xd'>13</td>
 <td>WB_RGGBLevelsCloudy</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='16 = 0x10'>16</td>
+<td class=r title='17 = 0x11'>17</td>
 <td>WB_RGGBLevelsTungsten</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='20 = 0x14'>20</td>
+<td class=r title='21 = 0x15'>21</td>
 <td>WB_RGGBLevelsFluorescent</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='24 = 0x18'>24</td>
+<td class=r title='25 = 0x19'>25</td>
 <td>WB_RGGBLevelsFlash</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td class=r title='28 = 0x1c'>28</td>
+<td class=r title='29 = 0x1d'>29</td>
 <td>WB_RGGBLevelsCustom</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td class=r title='32 = 0x20'>32</td>
+<td class=r title='33 = 0x21'>33</td>
 <td>WB_RGGBLevelsKelvin</td>
+<td class=c>int16s[4]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='37 = 0x25'>37</td>
+<td>WB_RGGBBlackLevels</td>
 <td class=c>int16s[4]</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -6359,7 +6392,7 @@ the average black level)</span></span></td></tr>
 
 <h2><a name='ColorCalib'>Canon ColorCalib Tags</a></h2>
 <p>Camera color calibration data.  For the 20D, 350D, 1DmkII and 1DSmkII the
-order of the cooefficients is A, B, C, Temperature, but for newer models it
+order of the coefficients is A, B, C, Temperature, but for newer models it
 is B, C, A, Temperature.  These tags are extracted only when the Unknown
 option is used.</p>
 <blockquote>
@@ -8291,7 +8324,7 @@ SX280.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 18, 2014</i>
+<br><i>Last revised May 10, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::ja;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.19';
+$VERSION = '1.20';
 
 %Image::ExifTool::Lang::ja::Translate = (
    'AEAperture' => 'AE絞り',
@@ -5504,11 +5504,22 @@ $VERSION = '1.19';
       Description => 'ホワイトバランス調整、ライティング',
       PrintConv => {
         'Daylight' => '昼光',
+        'Daylight' => '昼光',
+        'Daylight' => '昼光',
         'Flash' => 'ストロボ',
-        'High Color Rendering Fluorescent' => 'ハイカラーレンダリング蛍光灯',
+        'High Color Rendering Fluorescent (warm white)' => 'ハイカラーレンダリング蛍光灯 (0)',
+        'High Color Rendering Fluorescent (3700K)' => 'ハイカラーレンダリング蛍光灯 (1)',
+        'High Color Rendering Fluorescent (cool white)' => 'ハイカラーレンダリング蛍光灯 (2)',
+        'High Color Rendering Fluorescent (5000K)' => 'ハイカラーレンダリング蛍光灯 (3)',
+        'High Color Rendering Fluorescent (daylight)' => 'ハイカラーレンダリング蛍光灯 (4)',
         'Incandescent' => '電球',
         'None' => '無し',
-        'Standard Fluorescent' => '標準蛍光灯',
+        'Standard Fluorescent (warm white)' => '標準蛍光灯 (0)',
+        'Standard Fluorescent (3700K)' => '標準蛍光灯 (1)',
+        'Standard Fluorescent (cool white)' => '標準蛍光灯 (2)',
+        'Standard Fluorescent (5000K)' => '標準蛍光灯 (3)',
+        'Standard Fluorescent (6500K)' => '標準蛍光灯 (4)',
+        'Standard Fluorescent (high temperature mercury vapor)' => '標準蛍光灯 (5)',
       },
     },
    'WBAdjMode' => {

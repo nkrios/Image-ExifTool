@@ -12,7 +12,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.40';
+$VERSION = '1.42';
 
 my %coordConv = (
     ValueConv    => 'Image::ExifTool::GPS::ToDegrees($val)',
@@ -38,7 +38,11 @@ my %coordConv = (
     0x0001 => {
         Name => 'GPSLatitudeRef',
         Writable => 'string',
-        Notes => 'tags 0x0001-0x0006 used for camera location according to MWG 2.0',
+        Notes => q{
+            tags 0x0001-0x0006 used for camera location according to MWG 2.0. ExifTool
+            will also accept a number when writing GPSLatitude -- positive for north
+            latitudes, or negative for south
+        },
         Count => 2,
         PrintConv => {
             # extract N/S if written from Composite:GPSLatitude
@@ -64,6 +68,10 @@ my %coordConv = (
         Name => 'GPSLongitudeRef',
         Writable => 'string',
         Count => 2,
+        Notes => q{
+            ExifTool will also accept a number when writing this tag -- positive for
+            east longitudes or negative for west
+        },
         PrintConv => {
             # extract E/W if written from Composite:GPSLongitude
             # (also allow writing from a signed number)
@@ -87,7 +95,16 @@ my %coordConv = (
     0x0005 => {
         Name => 'GPSAltitudeRef',
         Writable => 'int8u',
+        Notes => q{
+            ExifTool will also accept a signed number when writing this tag, beginning
+            with "+" for above sea level, or "-" for below
+        },
         PrintConv => {
+            OTHER => sub {
+                my ($val, $inv) = @_;
+                return undef unless $inv and $val =~ /^([-+])/;
+                return($1 eq '-' ? 1 : 0);
+            },
             0 => 'Above Sea Level',
             1 => 'Below Sea Level',
         },

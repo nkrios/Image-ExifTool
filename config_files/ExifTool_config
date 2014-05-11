@@ -231,6 +231,7 @@
                 return $bigImage;
             },
         },
+        # **** ADD ADDITIONAL COMPOSITE TAG DEFINITIONS HERE ****
     },
 );
 
@@ -307,23 +308,24 @@ use Image::ExifTool::MIE;
 
 # User-defined file types to recognize
 %Image::ExifTool::UserDefined::FileTypes = (
-    XXX => { # <-- the extension of the new file type
+    XXX => { # <-- the extension of the new file type (case insensitive)
         # BaseType specifies the format upon which this file is based.
         # If BaseType is defined, then the file will be fully supported,
         # and in this case the Magic pattern should not be defined
         BaseType => 'TIFF',
-        MIMEType => 'image/x-xxx',  # (defaults to 'application/unknown')
+        MIMEType => 'image/x-xxx',
         Description => 'My XXX file type',
     },
     YYY => {
         # without BaseType, the file will be recognized but not supported
         Magic => '0123abcd',    # regular expression to match at start of file
         MIMEType => 'application/test',
-        Description => 'Test imaginary file type',
+        Description => 'My YYY file type',
     },
     ZZZ => {
         # if neither BaseType nor Magic are defined, the file will be
         # recognized by extension only
+        Descripton => 'My ZZZ file type',
     },
 );
 

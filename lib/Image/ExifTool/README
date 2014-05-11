@@ -266,9 +266,10 @@ numerical.
                   values to write, or the number of characters in a fixed-length
                   string.  A value of -1 indicates that the count is variable
                   and should be determined by the number of values provided.
-                  Note that this count that corresponds to the specified Format,
-                  so if a different-sized Writable format is defined, the actual
-                  count written to the file will be different.
+                  Defaults to 1 if not specified for non-string formats.  Note
+                  that this count corresponds to the specified Format, so if a
+                  different-sized Writable format is defined, the actual count
+                  written to the file will be different.
 
   FixCount      : Flag set to determine correct count from offsets in IFD.  This
                   is necessary for some Kodak tags which write an incorrect
@@ -279,7 +280,7 @@ numerical.
                   or a reference to a hash of flag/value pairs.  If not a hash
                   reference, the flag value is set to 1.  Flags are expanded for
                   faster access at run time into members of the tagInfo hash,
-                  and may be written directly as members if desired. The
+                  and may be written directly as members if desired.  The
                   available flag names are:
 
                   'AutoSplit' - [List tags only] Similar to ListSplit option,
@@ -610,15 +611,15 @@ numerical.
                   the reference $valPt for EXIF, Jpeg2000 and BinaryData tags
                   only (note that for BinaryData tags, the raw data of $$valPt
                   is always 'undef' type, and may not be used when writing
-                  except for SubDirectory tags).  EXIF tags may also reference
-                  the format string and value count through $format and $count.
-                  Note that if the value is writable and $valPt is used, the tag
-                  must have a Format (unless 'undef' or 'string'), and a Count
-                  (unless 1 or length of the 'undef' or 'string'), so the raw
-                  data may be generated for evaluating the Condition.  When
-                  writing, $valPt, $format and $count refer to the new value,
-                  except for MakerNotes tags where $format and $count refer to
-                  the old tag if it existed.
+                  except for SubDirectory tags).  EXIF tags (and maybe some
+                  other types) may also reference the format string and value
+                  count through $format and $count. Note that if the value is
+                  writable and $valPt is used, the tag must have a Format
+                  (unless 'undef' or 'string'), and a Count (unless 1 or length
+                  of the 'undef' or 'string'), so the raw data may be generated
+                  for evaluating the Condition.  When writing, $valPt, $format
+                  and $count refer to the new value, except for MakerNotes tags
+                  where $format and $count refer to the old tag if it existed.
 
   Require       : [Composite tags only] A hash reference specifying the tags
                   required to calculate the Composite tag value.  The hash
@@ -802,8 +803,11 @@ numerical.
                   name.  Also used in structure field information hashes, but
                   for these the full property path is not stored.
 
-  SrcTagInfo    : [reserved] Used internally by XMP module to store reference to
-                  default language tagInfo hash for alternate-language tags.
+  SrcTagInfo    : [reserved] Used internally to store reference to default
+                  language tagInfo hash for alternate-language tags.
+
+  OtherLang     : [reserved] Used internally by QuickTime module to store a list
+                  of tag ID's for alternate-language tags based on this one.
 
   RootTagInfo   : [reserved] Used internally to store a reference to the tag
                   information hash of the top-level structure for flattened

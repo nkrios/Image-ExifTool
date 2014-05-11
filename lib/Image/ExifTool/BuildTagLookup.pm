@@ -32,7 +32,7 @@ use Image::ExifTool::XMP;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.72';
+$VERSION = '2.76';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -72,7 +72,7 @@ my %tweakOrder = (
     Nikon   => 'Minolta',
     NikonCustom => 'Nikon',
     NikonCapture => 'NikonCustom',
-    Olympus => 'NikonCapture',
+    Nintendo => 'NikonCapture',
     Minolta => 'Leaf',
     Pentax  => 'Panasonic',
     SonyIDC => 'Sony',
@@ -382,10 +382,10 @@ a few).
 
 Many Photoshop tags are marked as Unknown (indicated by a question mark
 after the tag name) because the information they provide is not very useful
-under normal circumstances I<[and because Adobe denied my application for
-their file format documentation -- apparently open source software is too
-big a concept for them]>.  These unknown tags are not extracted unless the
-Unknown (-u) option is used.
+under normal circumstances.  These unknown tags are not extracted unless the
+Unknown (-u) option is used.  See
+L<http://www.adobe.com/devnet-apps/photoshop/fileformatashtml/> for the
+official specification
 },
     PrintIM => q{
 The format of the PrintIM information is known, however no PrintIM tags have
@@ -395,8 +395,8 @@ been decoded.  Use the Unknown (-u) option to extract PrintIM information.
 ExifTool extracts the following tags from GeoTIFF images.  See
 L<http://www.remotesensing.org/geotiff/spec/geotiffhome.html> for the
 complete GeoTIFF specification.  These tags are not writable individually,
-but they may be copied en mass via the containing GeoTiffDirectory,
-GeoTiffDoubleParams and GeoTiffAsciiParams tags.
+but they may be copied en mass via the block tags GeoTiffDirectory,
+GeoTiffDoubleParams and GeoTiffAsciiParams.
 },
     JFIF => q{
 The following information is extracted from the JPEG JFIF header.  See
@@ -493,17 +493,17 @@ in this column are write-only.
 
 Tags in the family 1 "System" group are referred to as "pseudo" tags because
 they don't represent real metadata in the file.  Instead, this information
-is stored in the directory structure of the filesystem.  The four writable
-"pseudo" tags (FileName, Directory, FileModifyDate and FileCreateDate) may
-be written without modifying the file itself.
+is stored in the directory structure of the filesystem.  The five writable
+"pseudo" tags (FileName, Directory, FileModifyDate, FileCreateDate and
+HardLink) may be written without modifying the file itself.
 },
     Composite => q{
 The values of the composite tags are B<Derived From> the values of other
 tags.  These are convenience tags which are calculated after all other
 information is extracted.  Only a few of these tags are writable directly,
 the others are changed by writing the corresponding B<Derived From> tags.
-User-defined Composite tags, useful for custom-formatting of tag values, may
-created in the L<ExifTool configuration file|../config.html>.
+User-defined Composite tags, also useful for custom-formatting of tag
+values, may created via the L<ExifTool configuration file|../config.html>.
 },
     Shortcuts => q{
 Shortcut tags are convenience tags that represent one or more other tag

@@ -383,10 +383,14 @@ causes the other information to be re-encrypted with the new key)</span></span><
 <td title='0x0093 = 147'>0x0093</td>
 <td>NEFCompression</td>
 <td class=c>int16u</td>
-<td><span class=s>1 = Lossy (type 1)
+<td><table class=cols><tr>
+  <td>1 = Lossy (type 1)
   <br>2 = Uncompressed
   <br>3 = Lossless
-  <br>4 = Lossy (type 2)</span></td></tr>
+  <br>4 = Lossy (type 2)
+  <br>6 = Uncompressed (reduced to 12 bit)
+  <br>8 = Small</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr>
 <td title='0x0094 = 148'>0x0094</td>
 <td>Saturation</td>
@@ -413,8 +417,10 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>ColorBalance0211
   <br>ColorBalance0213
   <br>ColorBalance0215
+  <br>ColorBalanceUnknown02
+  <br>ColorBalanceUnknown04
   <br>ColorBalanceUnknown</td>
-<td class=c>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
+<td class=c>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-<br>-</td>
 <td>--&gt; <a href='Nikon.html#ColorBalance1'>Nikon ColorBalance1 Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalance2'>Nikon ColorBalance2 Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalance3'>Nikon ColorBalance3 Tags</a>
@@ -424,6 +430,8 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br>--&gt; <a href='Nikon.html#ColorBalance4'>Nikon ColorBalance4 Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalance2'>Nikon ColorBalance2 Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalance4'>Nikon ColorBalance4 Tags</a>
+  <br>--&gt; <a href='Nikon.html#ColorBalanceUnknown'>Nikon ColorBalanceUnknown Tags</a>
+  <br>--&gt; <a href='Nikon.html#ColorBalanceUnknown'>Nikon ColorBalanceUnknown Tags</a>
   <br>--&gt; <a href='Nikon.html#ColorBalanceUnknown'>Nikon ColorBalanceUnknown Tags</a></td></tr>
 <tr>
 <td title='0x0098 = 152'>0x0098</td>
@@ -604,11 +612,16 @@ causes the other information to be re-encrypted with the new key)</span></span><
 <td class=c title=' ! = Unsafe'>undef!</td>
 <td>--&gt; <a href='Nikon.html#PictureControl'>Nikon PictureControl Tags</a></td></tr>
 <tr>
+<td title='0x00c3 = 195'>0x00c3</td>
+<td>BarometerInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Nikon.html#BarometerInfo'>Nikon BarometerInfo Tags</a></td></tr>
+<tr class=b>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0e01 = 3585'>0x0e01</td>
 <td>NikonCaptureData</td>
 <td class=c title=' ! = Unsafe'>undef!</td>
@@ -616,22 +629,22 @@ causes the other information to be re-encrypted with the new key)</span></span><
   <br><span class='n s'>(this data is dropped when copying Nikon MakerNotes since it may be too large
 to fit in the EXIF segment of a JPEG image, but it may be copied as a block
 into existing Nikon MakerNotes later if desired)</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0e09 = 3593'>0x0e09</td>
 <td>NikonCaptureVersion</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0e0e = 3598'>0x0e0e</td>
 <td>NikonCaptureOffsets</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#CaptureOffsets'>Nikon CaptureOffsets Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0e10 = 3600'>0x0e10</td>
 <td>NikonScanIFD</td>
 <td class=c>-</td>
 <td>--&gt; <a href='Nikon.html#Scan'>Nikon Scan Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0e13 = 3603'>0x0e13</td>
 <td>NikonCaptureEditVersions
   <br>NikonCaptureEditVersions</td>
@@ -639,17 +652,17 @@ into existing Nikon MakerNotes later if desired)</span></td></tr>
 <td><span class=n>(the ExtractEmbedded option may be used to decode settings from the stored
 edit versions, otherwise this is extracted as a binary data block)</span>
   <br>--&gt; <a href='NikonCapture.html'>NikonCapture Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0e1d = 3613'>0x0e1d</td>
 <td>NikonICCProfile</td>
 <td class=c title=' ! = Unsafe'>undef!</td>
 <td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0e1e = 3614'>0x0e1e</td>
 <td>NikonCaptureOutput</td>
 <td class=c title=' ! = Unsafe'>undef!</td>
 <td>--&gt; <a href='Nikon.html#CaptureOutput'>Nikon CaptureOutput Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0e22 = 3618'>0x0e22</td>
 <td>NEFBitDepth</td>
 <td class=c title=' ! = Unsafe'>int16u[4]!</td>
@@ -758,7 +771,8 @@ edit versions, otherwise this is extracted as a binary data block)</span>
 <td class=r title='4 = 0x4'>4</td>
 <td>VibrationReduction</td>
 <td class=c>int8u</td>
-<td><span class=s>1 = On
+<td><span class=s>0 = n/a
+  <br>1 = On
   <br>2 = Off</span></td></tr>
 <tr>
 <td class=r title='6 = 0x6'>6</td>
@@ -1039,7 +1053,8 @@ FaceDetectFrameSize)</span></span></td></tr>
 <td>AutoDistortionControl</td>
 <td class=c>int8u</td>
 <td><span class=s>0 = Off
-  <br>1 = On</span></td></tr>
+  <br>1 = On
+  <br>2 = On (underwater)</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='UnknownInfo'>Nikon UnknownInfo Tags</a></h2>
@@ -1140,9 +1155,14 @@ FaceDetectFrameSize)</span></span></td></tr>
 <tr>
 <td class=r title='5 = 0x5'>5</td>
 <td>CountryCode</td>
-<td class=c>string[3]</td>
+<td class=c>undef[3]</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>POILevel</td>
+<td class=c>int8u</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td class=r title='9 = 0x9'>9</td>
 <td>Location</td>
 <td class=c>undef[70]</td>
@@ -1189,7 +1209,8 @@ FaceDetectFrameSize)</span></span></td></tr>
 <td>AFPointsInFocus</td>
 <td class=c>int16u</td>
 <td><table class=cols><tr>
-  <td>0x7ff = All 11 Points
+  <td>0x0 = (none)
+  <br>0x7ff = All 11 Points
   <br>Bit 0 = Center
   <br>Bit 1 = Top
   <br>Bit 2 = Bottom
@@ -2415,7 +2436,8 @@ D200.</p>
 <td class=r title='8 = 0x8'>8</td>
 <td>ExternalFlashFlags</td>
 <td class=c>int8u</td>
-<td><span class=s>Bit 0 = Fired
+<td><span class=s>0x0 = (none)
+  <br>Bit 0 = Fired
   <br>Bit 2 = Bounce Flash
   <br>Bit 4 = Wide Flash Adapter
   <br>Bit 5 = Dome Diffuser</span></td></tr>
@@ -3188,7 +3210,8 @@ D5200, D7000.</p>
 <td><span class=s><span class=n>(models with 51-point AF -- 5 rows: A1-9, B1-11, C1-11, D1-11, E1-9.  Center
 point is C6)</span>
   <br><span class=n>(models with 11-point AF)</span></span><table class=cols><tr>
-  <td>0x7ff = All 11 Points
+  <td>0x0 = (none)
+  <br>0x7ff = All 11 Points
   <br>Bit 0 = Center
   <br>Bit 1 = Top
   <br>Bit 2 = Bottom
@@ -3289,6 +3312,24 @@ corner points are not used for 41-point AF mode)</span></span></td></tr>
 <td>AFFineTuneAdj</td>
 <td class=c>int8s</td>
 <td><span class=s><span class=n>(may only be valid for saved lenses)</span></span></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='BarometerInfo'>Nikon BarometerInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>BarometerInfoVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='6 = 0x6'>6</td>
+<td>Altitude</td>
+<td class=c>int32s</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CaptureOffsets'>Nikon CaptureOffsets Tags</a></h2>
@@ -4399,6 +4440,7 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'97 3C A0 A0 30 30 99 0E'</td><td>= AF-S VR Nikkor 500mm f/4G ED</td>
 </tr><tr><td>'98 3C A6 A6 30 30 9A 0E'</td><td>= AF-S VR Nikkor 600mm f/4G ED</td>
 </tr><tr><td>'99 40 29 62 2C 3C 9B 0E'</td><td>= AF-S DX VR Zoom-Nikkor 16-85mm f/3.5-5.6G ED</td>
+</tr><tr><td>'99 48 76 76 24 24 4B 0E'</td><td>= Sigma APO Macro 150mm F2.8 EX DG OS HSM</td>
 </tr><tr><td>'9A 40 2D 53 2C 3C 9C 0E'</td><td>= AF-S DX VR Zoom-Nikkor 18-55mm f/3.5-5.6G</td>
 </tr><tr><td>'9B 00 4C 4C 24 24 9D 06'</td><td>= PC-E Micro Nikkor 45mm f/2.8D ED</td>
 </tr><tr><td>'9B 54 4C 4C 24 24 9D 02'</td><td>= PC-E Micro Nikkor 45mm f/2.8D ED</td>
@@ -4495,7 +4537,7 @@ ExifTool to choose in these cases (see the
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 3, 2014</i>
+<br><i>Last revised May 8, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

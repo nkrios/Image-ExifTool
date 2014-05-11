@@ -52,7 +52,7 @@ use vars qw($VERSION %minoltaLensTypes %minoltaTeleconverters %minoltaColorMode
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.11';
+$VERSION = '2.13';
 
 # Full list of product codes for Sony-compatible Minolta lenses
 # (ref http://www.kb.sony.com/selfservice/documentLink.do?externalId=C1000570)
@@ -161,6 +161,16 @@ $VERSION = '2.11';
 # 2687 1.4x TELE CONVERTER APO (D)
 # 2688 2x TELE CONVERTER APO (D)
 
+# high bytes in Canon LensID's identifying Metabones adapters
+my %metabonesID = (
+    0xef00 => \ 'Metabones Adapter',
+    0xf000 => 0xef00,
+    0xff00 => 0xef00,
+    0x7700 => \ 'Metabones Speed Booster',
+    0x7800 => 0x7700,
+    0x8700 => 0x7700,
+);
+
 # lens ID numbers (ref 3)
 # ("New" and "II" appear in brackets if original version also has this LensType)
 %minoltaLensTypes = (
@@ -168,14 +178,22 @@ $VERSION = '2.11';
         Decimal values have been added to differentiate lenses which would otherwise
         have the same LensType, and are used by the Composite LensID tag when
         attempting to identify the specific lens model.  "New" or "II" appear in
-        brackets if the original version of the lens has the same LensType.
+        brackets if the original version of the lens has the same LensType.  Special
+        logic is employed to identify the attached lens when a Metabones Canon EF
+        adapter is used.
     },
     OTHER => sub {
         my ($val, $inv) = @_;
-        return undef if $inv or ($val & 0xff00) != 0xef00;
+        return undef if $inv;
+        my $id = $val & 0xff00;
+        # Note: Metabones Smart Adapter firmware versions before 31 kill
+        # the high byte for 2-byte Canon LensType values, so the reported lens
+        # will be incorrect for these
+        my $mb = $metabonesID{$id} or return undef;
+        ref $mb or $id = $mb, $mb = $metabonesID{$id};
         require Image::ExifTool::Canon;
-        my $prt = $Image::ExifTool::Canon::canonLensTypes{$val & 0xff};
-        return $prt ? "$prt + Metabones Adapter" : undef;
+        my $lens = $Image::ExifTool::Canon::canonLensTypes{$val - $id};
+        return $lens ? "$lens + $$mb" : undef;
     },
     0 => 'Minolta AF 28-85mm F3.5-4.5 New', # New added (ref 13/18)
     1 => 'Minolta AF 80-200mm F2.8 HS-APO G',
@@ -444,6 +462,9 @@ $VERSION = '2.11';
     26671 => 'Minolta AF 35mm F2 New',
     26681 => 'Minolta AF 28mm F2 New',
     26721 => 'Minolta AF 24-105mm F3.5-4.5 (D)', #11
+    # 30464: newer firmware versions of the Speed Booster report type 30464 (=0x7700)
+    # - this is the base to which the Canon LensType is added
+    30464 => 'Metabones Canon EF Speed Booster', #Metabones
     45671 => 'Tokina 70-210mm F4-5.6', #22
     45741 => '2x Teleconverter or Tamron or Tokina Lens', #18
     45741.1 => 'Tamron SP AF 90mm F2.5', #JD
@@ -453,8 +474,10 @@ $VERSION = '2.11';
     45851 => 'Tamron SP AF 300mm F2.8 LD IF', #11
     45861 => 'Tamron SP AF 35-105mm F2.8 LD Aspherical IF', #Fredrik Agert
     45871 => 'Tamron AF 70-210mm F2.8 SP LD', #Fabio Suprani
-    # 61184: both the Speed Booster and the Smart Adapter report type 61184 (ref 25)
-    # - this is the base to which the low byte of the Canon LensType is added
+    # 61184: older firmware versions of both the Speed Booster and the Smart Adapter
+    # report type 61184 (=0xef00), and add only the lower byte of the Canon LensType (ref 25).
+    # For newer firmware versions this is only used by the Smart Adapter, and
+    # the full Canon LensType code is added - PH
     61184 => 'Metabones Canon EF Adapter', #25
     # all M42-type lenses give a value of 65535 (and FocalLength=0, FNumber=1)
     65535 => 'E-Mount, T-Mount, Other Lens or no lens', #JD/25
@@ -479,9 +502,8 @@ $VERSION = '2.11';
    '65535.16' => 'Sony E PZ 18-105mm F4 G OSS',     #25 (SELP18105G - 32800)
    '65535.17' => 'Sony E PZ 18-200mm F3.5-6.3 OSS', #25 (SELP18200  - 32807)
    '65535.18' => 'Sony FE 55mm F1.8 ZA',            #25 (SEL55F18Z  - 32808)
-   '65535.19' => 'Sony FE 28-70mm F3.5-5.6 OSS',    #25 (SEL2870    - 32813)
-
-   '65535.20' => 'Sony FE 70-200mm F4 G OSS',       #25 (SEL70200G  - 32xxx)
+   '65535.19' => 'Sony FE 70-200mm F4 G OSS',       #25 (SEL70200G  - 32810)
+   '65535.20' => 'Sony FE 28-70mm F3.5-5.6 OSS',    #25 (SEL2870    - 32813)
 #
 # 3rd party E lenses
 #
@@ -1343,17 +1365,20 @@ my %afStatusInfo = (
     },
     0x10 => {
         Name => 'AFPoints',
-        PrintConv => { BITMASK => {
-            0 => 'Center',
-            1 => 'Top',
-            2 => 'Top-Right',
-            3 => 'Right',
-            4 => 'Bottom-Right',
-            5 => 'Bottom',
-            6 => 'Bottom-Left',
-            7 => 'Left',
-            8 => 'Top-Left',
-        } },
+        PrintConv => {
+            0 => '(none)',
+            BITMASK => {
+                0 => 'Center',
+                1 => 'Top',
+                2 => 'Top-Right',
+                3 => 'Right',
+                4 => 'Bottom-Right',
+                5 => 'Bottom',
+                6 => 'Bottom-Left',
+                7 => 'Left',
+                8 => 'Top-Left',
+            },
+        },
     },
     0x15 => {
         Name => 'Flash',

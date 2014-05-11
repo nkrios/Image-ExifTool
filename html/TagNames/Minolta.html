@@ -287,7 +287,9 @@ image stabilization is enabled)</span></td></tr>
 <p>Decimal values have been added to differentiate lenses which would otherwise
 have the same LensType, and are used by the Composite LensID tag when
 attempting to identify the specific lens model.  &quot;New&quot; or &quot;II&quot; appear in
-brackets if the original version of the lens has the same LensType.</p>
+brackets if the original version of the lens has the same LensType.  Special
+logic is employed to identify the attached lens when a Metabones Canon EF
+adapter is used.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class='inner sep' cellspacing=1>
@@ -528,6 +530,7 @@ brackets if the original version of the lens has the same LensType.</p>
 </tr><tr><td>26671</td><td>= Minolta AF 35mm F2 New</td>
 </tr><tr><td>26681</td><td>= Minolta AF 28mm F2 New</td>
 </tr><tr><td>26721</td><td>= Minolta AF 24-105mm F3.5-4.5 (D)</td>
+</tr><tr><td>30464</td><td>= Metabones Canon EF Speed Booster</td>
 </tr><tr><td>45671</td><td>= Tokina 70-210mm F4-5.6</td>
 </tr><tr><td>45741</td><td>= 2x Teleconverter or Tamron or Tokina Lens</td>
 </tr><tr><td>45741.1</td><td>= Tamron SP AF 90mm F2.5</td>
@@ -557,8 +560,8 @@ brackets if the original version of the lens has the same LensType.</p>
 </tr><tr><td>65535.16</td><td>= Sony E PZ 18-105mm F4 G OSS</td>
 </tr><tr><td>65535.17</td><td>= Sony E PZ 18-200mm F3.5-6.3 OSS</td>
 </tr><tr><td>65535.18</td><td>= Sony FE 55mm F1.8 ZA</td>
-</tr><tr><td>65535.19</td><td>= Sony FE 28-70mm F3.5-5.6 OSS</td>
-</tr><tr><td>65535.20</td><td>= Sony FE 70-200mm F4 G OSS</td>
+</tr><tr><td>65535.19</td><td>= Sony FE 70-200mm F4 G OSS</td>
+</tr><tr><td>65535.20</td><td>= Sony FE 28-70mm F3.5-5.6 OSS</td>
 </tr><tr><td>65535.21</td><td>= Sigma 19mm F2.8 [EX] DN</td>
 </tr><tr><td>65535.22</td><td>= Sigma 30mm F2.8 [EX] DN</td>
 </tr><tr><td>65535.23</td><td>= Sigma 60mm F2.8 DN</td>
@@ -990,12 +993,13 @@ tags are disabled.</p>
 <td>AFPoints</td>
 <td class=c>int16u</td>
 <td><table class=cols><tr>
-  <td>Bit 0 = Center
+  <td>0x0 = (none)
+  <br>Bit 0 = Center
   <br>Bit 1 = Top
   <br>Bit 2 = Top-Right
-  <br>Bit 3 = Right
-  <br>Bit 4 = Bottom-Right</td><td>&nbsp;&nbsp;</td>
-  <td>Bit 5 = Bottom
+  <br>Bit 3 = Right</td><td>&nbsp;&nbsp;</td>
+  <td>Bit 4 = Bottom-Right
+  <br>Bit 5 = Bottom
   <br>Bit 6 = Bottom-Left
   <br>Bit 7 = Left
   <br>Bit 8 = Top-Left</td><td>&nbsp;&nbsp;</td></tr></table>
@@ -2565,7 +2569,7 @@ DiMAGE X and Xt.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 12, 2014</i>
+<br><i>Last revised May 8, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

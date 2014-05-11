@@ -50,82 +50,101 @@ way to tell which)</span></span></td></tr>
 <h2><a name='FFF'>FLIR FFF Tags</a></h2>
 <p>Information extracted from FLIR FFF images and the FLIR APP1 segment of JPEG
 images.  These tags may also be extracted from the first frame of an FLIR
-SEQ file, even though SEQ is not listed as a supported file type.</p>
+SEQ file.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
 <tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td>'_header'</td>
+<td>FFFHeader</td>
+<td class=c>-</td>
+<td>--&gt; <a href='FLIR.html#Header'>FLIR Header Tags</a></td></tr>
+<tr class=b>
 <td title='0x0001 = 1'>0x0001</td>
 <td>RawData</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#RawData'>FLIR RawData Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0005 = 5'>0x0005</td>
 <td>GainDeadData</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#GainDeadData'>FLIR GainDeadData Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0006 = 6'>0x0006</td>
 <td>CoarseData</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#CoarseData'>FLIR CoarseData Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x000e = 14'>0x000e</td>
 <td>EmbeddedImage</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#EmbeddedImage'>FLIR EmbeddedImage Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0020 = 32'>0x0020</td>
 <td>CameraInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#CameraInfo'>FLIR CameraInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0021 = 33'>0x0021</td>
 <td>MeasurementInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#MeasInfo'>FLIR MeasInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0022 = 34'>0x0022</td>
 <td>PaletteInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#PaletteInfo'>FLIR PaletteInfo Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0023 = 35'>0x0023</td>
 <td>TextInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#TextInfo'>FLIR TextInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0024 = 36'>0x0024</td>
 <td>EmbeddedAudioFile</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x0028 = 40'>0x0028</td>
 <td>PaintData</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#PaintData'>FLIR PaintData Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x002a = 42'>0x002a</td>
 <td>PiP</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#PiP'>FLIR PiP Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x002b = 43'>0x002b</td>
 <td>GPSInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#GPSInfo'>FLIR GPSInfo Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td title='0x002c = 44'>0x002c</td>
 <td>MeterLink</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#MeterLink'>FLIR MeterLink Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x002e = 46'>0x002e</td>
 <td>ParameterInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#ParamInfo'>FLIR ParamInfo Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Header'>FLIR Header Tags</a></h2>
+<p>Tags extracted from the FLIR FFF/AFF header.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>CreatorSoftware</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='RawData'>FLIR RawData Tags</a></h2>
@@ -309,131 +328,156 @@ for details.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r title='112 = 0x70'>112</td>
+<td>AtmosphericTransAlpha1</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='116 = 0x74'>116</td>
+<td>AtmosphericTransAlpha2</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='120 = 0x78'>120</td>
+<td>AtmosphericTransBeta1</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='124 = 0x7c'>124</td>
+<td>AtmosphericTransBeta2</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='128 = 0x80'>128</td>
+<td>AtmosphericTransX</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td class=r title='144 = 0x90'>144</td>
 <td>CameraTemperatureRangeMax</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='148 = 0x94'>148</td>
 <td>CameraTemperatureRangeMin</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='152 = 0x98'>152</td>
 <td>UnknownTemperature1?</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='156 = 0x9c'>156</td>
 <td>UnknownTemperature2?</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='160 = 0xa0'>160</td>
 <td>UnknownTemperature3?</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='164 = 0xa4'>164</td>
 <td>UnknownTemperature4?</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='168 = 0xa8'>168</td>
 <td>UnknownTemperature5?</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='172 = 0xac'>172</td>
 <td>UnknownTemperature6?</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='212 = 0xd4'>212</td>
 <td>CameraModel</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='244 = 0xf4'>244</td>
 <td>CameraPartNumber</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='260 = 0x104'>260</td>
 <td>CameraSerialNumber</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='276 = 0x114'>276</td>
 <td>CameraSoftware</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='368 = 0x170'>368</td>
 <td>LensModel</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='400 = 0x190'>400</td>
 <td>LensPartNumber</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='416 = 0x1a0'>416</td>
 <td>LensSerialNumber</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='436 = 0x1b4'>436</td>
 <td>FieldOfView</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='492 = 0x1ec'>492</td>
 <td>FilterModel</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='508 = 0x1fc'>508</td>
 <td>FilterPartNumber</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='540 = 0x21c'>540</td>
 <td>FilterSerialNumber</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='776 = 0x308'>776</td>
 <td>PlanckO</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='780 = 0x30c'>780</td>
 <td>PlanckR2</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='824 = 0x338'>824</td>
 <td>RawValueMedian</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='828 = 0x33c'>828</td>
 <td>RawValueRange</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='900 = 0x384'>900</td>
 <td>DateTimeOriginal</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td class=r title='912 = 0x390'>912</td>
 <td>FocusStepCount</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td class=r title='1116 = 0x45c'>1116</td>
 <td>FocusDistance</td>
 <td class=c>N</td>
@@ -1033,6 +1077,66 @@ in FLIR MP4 videos.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='AFF'>FLIR AFF Tags</a></h2>
+<p>Tags extracted from FLIR &quot;AFF&quot; SEQ images.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'_header'</td>
+<td>AFFHeader</td>
+<td class=c>-</td>
+<td>--&gt; <a href='FLIR.html#Header'>FLIR Header Tags</a></td></tr>
+<tr class=b>
+<td title='0x0001 = 1'>0x0001</td>
+<td>AFF1</td>
+<td class=c>-</td>
+<td>--&gt; <a href='FLIR.html#AFF1'>FLIR AFF1 Tags</a></td></tr>
+<tr>
+<td title='0x0005 = 5'>0x0005</td>
+<td>AFF5</td>
+<td class=c>-</td>
+<td>--&gt; <a href='FLIR.html#AFF5'>FLIR AFF5 Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AFF1'>FLIR AFF1 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index2</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='1 = 0x1'>1</td>
+<td>SensorWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='2 = 0x2'>2</td>
+<td>SensorHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AFF5'>FLIR AFF5 Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index2</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='19 = 0x13'>19</td>
+<td>SensorWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='20 = 0x14'>20</td>
+<td>SensorHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='FPF'>FLIR FPF Tags</a></h2>
 <p>Tags extracted from FLIR Public image Format (FPF) files.</p>
 <blockquote>
@@ -1230,7 +1334,7 @@ in FLIR MP4 videos.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 14, 2014</i>
+<br><i>Last revised Mar 25, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

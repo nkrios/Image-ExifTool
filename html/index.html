@@ -74,9 +74,9 @@ span.sup        { font-size: 0.8em; font-weight: normal; position: relative; top
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-9.53.tar.gz">
-Download        Version 9.53</a> (3.6 MB) -
-<a href="history.html">Feb. 22, 2014</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-9.60.tar.gz">
+Download        Version 9.60</a> (3.6 MB) -
+<a href="history.html">May 11, 2014</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -106,6 +106,7 @@ as well as the maker notes of many digital cameras by
 <a href="TagNames/Leaf.html">Leaf</a>,
 <a href="TagNames/Minolta.html">Minolta/Konica-Minolta</a>,
 <a href="TagNames/Nikon.html">Nikon</a>,
+<a href="TagNames/Nintendo.html">Nintendo</a>,
 <a href="TagNames/Olympus.html">Olympus/Epson</a>,
 <a href="TagNames/Panasonic.html">Panasonic/Leica</a>,
 <a href="TagNames/Pentax.html">Pentax/Asahi</a>,
@@ -124,8 +125,8 @@ distribution above.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-9.53.zip">
-         exiftool-9.53.zip</a> (3.7 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-9.60.zip">
+         exiftool-9.60.zip</a> (3.7 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -136,8 +137,8 @@ of Windows (including Windows 7).</p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 Mac OS X Package:
-<a href="ExifTool-9.53.dmg">
-         ExifTool-9.53.dmg</a> (2.3 MB)</b></td></tr></table></blockquote>
+<a href="ExifTool-9.60.dmg">
+         ExifTool-9.60.dmg</a> (2.4 MB)</b></td></tr></table></blockquote>
 
 <p><b>The OS X package</b> installs the ExifTool command-line application and
 libraries in /usr/bin. After installing, type "<code>exiftool</code>" in a
@@ -323,10 +324,10 @@ for each file format.</p>
 <tr><td>MODD</td><td>R</td><td>Sony Picture Motion metadata (XML <a href="TagNames/PLIST.html">PLIST</a>-based)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/PLIST.html">PLIST</a></td></tr>
 <tr><td><a href="TagNames/Leaf.html">MOS</a></td><td>R/W</td><td>Creo Leaf Mosaic (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R <a href="TagNames/Leaf.html">Leaf</a></td></tr>
 <tr><td><a href="TagNames/QuickTime.html">MOV, QT</a></td><td>R/W</td><td>Apple QuickTime Movie</td><td>R</td><td>R</td><td>R/W/C</td><td>-</td><td>R/W <a href="TagNames/QuickTime.html">QuickTime</a><span class=sup>3</span></td></tr>
-<tr><td><a href="TagNames/MPEG.html#Audio">MP3</a></td><td>R</td><td>MPEG-1 layer 3 audio (uses <a href="TagNames/ID3.html">ID3</a> information)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/MPEG.html">MPEG</a> <a href="TagNames/ID3.html">ID3</a> <a href="TagNames/APE.html">APE</a></td></tr>
+<tr><td><a href="TagNames/MPEG.html#Audio">MP3</a></td><td>R</td><td>MPEG-1 layer 3 audio</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/MPEG.html">MPEG</a> <a href="TagNames/ID3.html">ID3</a> <a href="TagNames/APE.html">APE</a></td></tr>
 <tr><td>MP4</td><td>R/W</td><td>Motion Picture Experts Group version 4 (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td><td>R<span class=sup>2</span></td><td>R<span class=sup>2</span></td><td>R/W/C</td><td>-</td><td>R/W <a href="TagNames/QuickTime.html">QuickTime</a><span class=sup>3</span></td></tr>
 <tr><td><a href="TagNames/MPC.html">MPC</a></td><td>R</td><td>Musepack Audio</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/MPC.html">MPC</a> <a href="TagNames/ID3.html">ID3</a> <a href="TagNames/APE.html">APE</a></td></tr>
-<tr><td><a href="TagNames/MPEG.html">MPEG, MPG, M2V</a></td><td>R</td><td>Motion Picture Experts Group version 1 or 2</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/MPEG.html">MPEG</a></td></tr>
+<tr><td><a href="TagNames/MPEG.html">MPEG, MPG, M2V</a></td><td>R</td><td>Motion Picture Experts Group version 1 or 2</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/MPEG.html">MPEG</a> <a href="TagNames/ID3.html">ID3</a></td></tr>
 <tr><td>MPO</td><td>R/W</td><td>Extended Multi-Picture format (<a href="TagNames/JPEG.html">JPEG</a> with <a href="TagNames/MPF.html">MPF</a> extensions)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td><a href="#JPEG">Supported JPEG Meta Information</a></td></tr>
 <tr><td><a href="TagNames/QuickTime.html">MQV</a></td><td>R/W</td><td>Sony Mobile QuickTime Video</td><td>R<span class=sup>2</span></td><td>R<span class=sup>2</span></td><td>R/W/C</td><td>-</td><td>R/W <a href="TagNames/QuickTime.html">QuickTime</a><span class=sup>3</span></td></tr>
 <tr><td><a href="TagNames/MinoltaRaw.html">MRW</a></td><td>R/W</td><td>Minolta RAW</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W <a href="TagNames/MinoltaRaw.html">MinoltaRaw</a> <a href="TagNames/Minolta.html">Minolta</a></td></tr>
@@ -360,7 +361,7 @@ for each file format.</p>
 <tr><td><a href="TagNames/Photoshop.html">PSD, PSB</a></td><td>R/W</td><td>PhotoShop Drawing / Large Document</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R <a href="TagNames/Photoshop.html">Photoshop</a></td></tr>
 <tr><td><a href="TagNames/PSP.html">PSP, PSPIMAGE</a></td><td>R</td><td>Paint Shop Pro</td><td>R</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/PSP.html">PSP</a></td></tr>
 <tr><td><a href="TagNames/QuickTime.html">QTIF, QTI, QIF</a></td><td>R/W</td><td>QuickTime Image File</td><td>R<span class=sup>2</span></td><td>R<span class=sup>2</span></td><td>R/W/C</td><td>-</td><td>R/W <a href="TagNames/QuickTime.html">QuickTime</a><span class=sup>3</span></td></tr>
-<tr><td><a href="TagNames/Real.html#Audio">RA</a></td><td>R</td><td>Real Audio</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Real.html#Audio">Real</a></td></tr>
+<tr><td><a href="TagNames/Real.html#Audio">RA</a></td><td>R</td><td>Real Audio</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Real.html#Audio">Real</a> <a href="TagNames/ID3.html">ID3</a></td></tr>
 <tr><td><a href="TagNames/FujiFilm.html#RAF">RAF</a></td><td>R/W</td><td>FujiFilm RAW Format</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W <a href="TagNames/FujiFilm.html">FujiFilm</a></td></tr>
 <tr><td><a href="TagNames/Real.html#Metafile">RAM, RPM</a></td><td>R</td><td>Real Audio/Plug-in Metafile</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Real.html#Metafile">Real</a></td></tr>
 <tr><td><a href="TagNames/ZIP.html#RAR">RAR</a></td><td>R</td><td>RAR Archive</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/ZIP.html#RAR">ZIP</a></td></tr>
@@ -373,6 +374,7 @@ for each file format.</p>
 <tr><td><a href="TagNames/PanasonicRaw.html">RW2</a></td><td>R/W</td><td>Panasonic RAW 2 (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W <a href="TagNames/PanasonicRaw.html">PanasonicRaw</a> <a href="TagNames/Panasonic.html">Panasonic</a></td></tr>
 <tr><td><a href="TagNames/PanasonicRaw.html">RWL</a></td><td>R/W</td><td>Leica RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W <a href="TagNames/PanasonicRaw.html">PanasonicRaw</a> <a href="TagNames/Panasonic.html">Panasonic</a></td></tr>
 <tr><td><a href="TagNames/Rawzor.html">RWZ</a></td><td>R</td><td>Rawzor compressed image</td><td>R</td><td>R</td><td>R</td><td>R</td><td>R <a href="TagNames/Rawzor.html">Rawzor</a></td></tr>
+<tr><td><a href="TagNames/FLIR.html#AFF">SEQ</a></td><td>R</td><td>FLIR Systems image Sequence</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/FLIR.html#AFF">FLIR</a></td></tr>
 <tr><td><a href="TagNames/EXE.html#ELF">SO</a></td><td>R</td><td>Unix ELF executable and Shared Object files</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/EXE.html#ELF">EXE</a></td></tr>
 <tr><td>SR2</td><td>R/W</td><td>Sony RAW 2 (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W <a href="TagNames/Sony.html">Sony</a></td></tr>
 <tr><td>SRF</td><td>R</td><td>Sony RAW Format (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R</td><td>R</td><td>R</td><td>R</td><td>R <a href="TagNames/Sony.html">Sony</a></td></tr>
@@ -381,7 +383,7 @@ for each file format.</p>
 <tr><td><a href="TagNames/Flash.html">SWF</a></td><td>R</td><td>Shockwave Flash</td><td>-</td><td>-</td><td>R</td><td>-</td><td>R <a href="TagNames/Flash.html">Flash</a></td></tr>
 <tr><td>THM</td><td>R/W</td><td>Canon Thumbnail (<a href="TagNames/JPEG.html">JPEG</a>)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td><a href="#JPEG">Supported JPEG Meta Information</a></td></tr>
 <tr><td><a href="TagNames/OOXML.html">THMX</a></td><td>R</td><td>Office Open XML Theme</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/OOXML.html">XML</a> <a href="TagNames/ZIP.html">ZIP</a></td></tr>
-<tr><td><a href="TagNames/EXIF.html">TIFF, TIF</a></td><td>R/W</td><td>Tagged Image File Format</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C <a href="TagNames/GeoTiff.html">GeoTiff</a><span class=sup>1</span></td></tr>
+<tr><td><a href="TagNames/EXIF.html">TIFF, TIF</a></td><td>R/W</td><td>Tagged Image File Format</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C <a href="TagNames/GeoTiff.html">GeoTIFF</a><span class=sup>1</span>, R/W <a href="#Trailers">Trailers</a></td></tr>
 <tr><td><a href="TagNames/Font.html">TTF, TTC</a></td><td>R</td><td>True Type Font/Collection</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Font.html">Font</a></td></tr>
 <tr><td><a href="TagNames/Torrent.html">TORRENT</a></td><td>R</td><td>BitTorrent description file</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Torrent.html">Torrent</a></td></tr>
 <tr><td>VOB</td><td>R</td><td>Video Object (<a href="TagNames/MPEG.html">MPEG</a>-based)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/MPEG.html">MPEG</a></td></tr>
@@ -406,7 +408,7 @@ for each file format.</p>
 <h3><a name="JPEG">Supported JPEG Meta Information</a></h3>
 <p>ExifTool can <b>R</b>ead, <b>W</b>rite and/or <b>C</b>reate the following types
 of meta information in JPEG images:</p>
-<blockquote><table class='norm tight sm'>
+<blockquote><table class='norm tight sm bm'>
 <tr><th>JPEG Meta Information</th><th>Support</th><th>Description</th></tr>
 <tr><td>APP0 - <a href="TagNames/JFIF.html">JFIF</a></td><td>R/W/C</td><td>JPEG File Interchange Format</td></tr>
 <tr><td>APP0 - <a href="TagNames/JFIF.html#Extension">JFXX</a></td><td>R</td><td>Extended JFIF</td></tr>
@@ -420,7 +422,7 @@ of meta information in JPEG images:</p>
 <tr><td>APP2 - <a href="TagNames/ICC_Profile.html">ICC</a></td><td>R/W/C</td><td>International Color Consortium (multi-segment)</td></tr>
 <tr><td>APP2 - <a href="TagNames/FlashPix.html">FPXR</a></td><td>R</td><td>FlashPix Ready (multi-segment)</td></tr>
 <tr><td>APP2 - <a href="TagNames/MPF.html">MPF</a></td><td>R</td><td>Multi-Picture Format</td></tr>
-<tr><td>APP2 - PreviewImage</td><td>R</td><td>Samsung APP2 preview image (multi-segment)</td></tr>
+<tr><td>APP2 - PreviewImage</td><td>R</td><td>Samsung/GE APP2 preview image (multi-segment)</td></tr>
 <tr><td>APP3 - <a href="TagNames/Kodak.html#Meta">Kodak Meta</a></td><td>R/W</td><td>Kodak Meta information (EXIF-like)</td></tr>
 <tr><td>APP3 - <a href="TagNames/Stim.html">Stim</a></td><td>R</td><td>Stereo Still Image format</td></tr>
 <tr><td>APP3 - PreviewImage</td><td>R</td><td>Samsung/HP preview image (multi-segment)</td></tr>
@@ -447,13 +449,14 @@ of meta information in JPEG images:</p>
 <tr><td>COM</td><td>R/W/C</td><td>JPEG Comment (multi-segment)</td></tr>
 <tr><td>DQT</td><td>R</td><td>(used to calculate the <a href="TagNames/Extra.html">Extra:JPEGDigest</a> tag value)</td></tr>
 <tr><td><a href="TagNames/JPEG.html#SOF">SOF</a></td><td>R</td><td>JPEG Start Of Frame</td></tr>
+<tr><th colspan=3><a name="Trailers">Trailers <span class=sup>1</span></a></th></tr>
 <tr><td><a href="TagNames/AFCP.html">AFCP trailer</a></td><td>R/W</td><td>AXS File Concatenation Protocol (includes <a href="TagNames/IPTC.html">IPTC</a>)</td></tr>
 <tr><td><a href="TagNames/CanonVRD.html">CanonVRD trailer</a></td><td>R/W/C</td><td>Canon DPP Recipe Data</td></tr>
 <tr><td><a href="TagNames/FotoStation.html">FotoStation trailer</a></td><td>R/W</td><td>FotoWare FotoStation (includes <a href="TagNames/IPTC.html">IPTC</a>)</td></tr>
 <tr><td><a href="TagNames/PhotoMechanic.html">PhotoMechanic trailer</a></td><td>R/W</td><td>Camera Bits Photo Mechanic</td></tr>
 <tr><td><a href="TagNames/MIE.html">MIE trailer</a></td><td>R/W</td><td><a href="MIE1.1-20070121.pdf">Meta Information Encapsulation</a></td></tr>
 <tr><td>PreviewImage trailer</td><td>R/W/C</td><td>(preview image written after JPEG EOI)</td></tr>
-</table></blockquote>
+</table><span class=sm><span class=sup>1</span> All trailers except PreviewImage also have R/W support in TIFF images.</span></blockquote>
 
 <h2><a name="system">System Requirements</a></h2>
 
@@ -708,12 +711,12 @@ RIFF, RSRC, RTF, Radiance, Rawzor, Real, SVG, SigmaRaw, Stim, Theora,
 Torrent, Vorbis, XML, XMP, ZIP
 </td></tr>
 <tr><td><b>1&nbsp;(Specific&nbsp;Location)</b></td>
-<td class=sm>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, AdobeDNG, CIFF, Canon,
-CanonCustom, CanonRaw, CanonVRD, Casio, Chapter#, Composite, DICOM, DNG, DV,
-DjVu, DjVu-Meta, Ducky, EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC, File,
-Flash, FlashPix, FLIR, Font, FotoStation, FujiFilm, FujiIFD, GE, GIF, GIMP,
-GPS, GeoTiff, GlobParamIFD, GraphConv, H264, HP, HTML, HTML-dc, HTML-ncc,
-HTML-office, HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt,
+<td class=sm>AC3, AFCP, AIFF, APE, ASF, AVI1, Adobe, AdobeCM, AdobeDNG, Apple, CIFF,
+Canon, CanonCustom, CanonRaw, CanonVRD, Casio, Chapter#, Composite, DICOM,
+DNG, DV, DjVu, DjVu-Meta, Ducky, EPPIM, EXE, EXIF, ExifIFD, ExifTool, FLAC,
+FLIR, File, Flash, FlashPix, Font, FotoStation, FujiFilm, FujiIFD, GE, GIF,
+GIMP, GPS, GeoTiff, GlobParamIFD, GraphConv, H264, HP, HTC, HTML, HTML-dc,
+HTML-ncc, HTML-office, HTML-prod, HTML-vw96, HTTP-equiv, ICC-chrm, ICC-clrt,
 ICC-header, ICC-meas, ICC-meta, ICC-view, ICC_Profile, ICC_Profile#, ID3,
 ID3v1, ID3v1_Enh, ID3v2_2, ID3v2_3, ID3v2_4, IFD0, IFD1, IPTC, IPTC#, ITC,
 InteropIFD, JFIF, JPEG, JPEG-HDR, JVC, Jpeg2000, KDC_IFD, Kodak,
@@ -724,7 +727,7 @@ MIE-MakerNotes, MIE-Meta, MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM,
 MIE-Unknown, MIE-Video, MIFF, MNG, MPC, MPEG, MPF0, MPImage, MXF,
 MakerNotes, MakerUnknown, Matroska, MediaJukebox, MetaIFD, Microsoft,
 Minolta, MinoltaRaw, NITF, Nikon, NikonCapture, NikonCustom, NikonScan,
-Ocad, Ogg, Olympus, OpenEXR, PDF, PICT, PLIST, PNG, PSP, Panasonic,
+Nintendo, Ocad, Ogg, Olympus, OpenEXR, PDF, PICT, PNG, PSP, Panasonic,
 PanasonicRaw, Pentax, PhaseOne, PhotoCD, PhotoMechanic, Photoshop,
 PictureInfo, PostScript, PreviewIFD, PrintIM, ProfileIFD, Qualcomm,
 QuickTime, RAF, RAF2, RIFF, RMETA, RSRC, RTF, Radiance, Rawzor, Real,
@@ -734,12 +737,13 @@ Sanyo, Scalado, Sigma, SigmaRaw, Sony, SonyIDC, Stim, SubIFD, System,
 Theora, Torrent, Track#, Version0, Vorbis, XML, XMP, XMP-DICOM, XMP-GPano,
 XMP-MP, XMP-MP1, XMP-PixelLive, XMP-aas, XMP-acdsee, XMP-album,
 XMP-apple-fi, XMP-aux, XMP-cc, XMP-cell, XMP-crs, XMP-dc, XMP-dex,
-XMP-digiKam, XMP-dwc, XMP-exif, XMP-expressionmedia, XMP-extensis, XMP-fpv,
-XMP-ics, XMP-iptcCore, XMP-iptcExt, XMP-lr, XMP-mediapro, XMP-microsoft,
-XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs, XMP-pdf, XMP-pdfx, XMP-photomech,
-XMP-photoshop, XMP-plus, XMP-prism, XMP-prl, XMP-pur, XMP-rdf, XMP-swf,
-XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ, XMP-xmpDM, XMP-xmpMM, XMP-xmpNote,
-XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg, ZIP
+XMP-digiKam, XMP-dwc, XMP-exif, XMP-exifEX, XMP-expressionmedia,
+XMP-extensis, XMP-fpv, XMP-getty, XMP-ics, XMP-iptcCore, XMP-iptcExt,
+XMP-lr, XMP-mediapro, XMP-microsoft, XMP-mwg-coll, XMP-mwg-kw, XMP-mwg-rs,
+XMP-pdf, XMP-pdfx, XMP-photomech, XMP-photoshop, XMP-plus, XMP-prism,
+XMP-prl, XMP-pur, XMP-rdf, XMP-swf, XMP-tiff, XMP-x, XMP-xmp, XMP-xmpBJ,
+XMP-xmpDM, XMP-xmpMM, XMP-xmpNote, XMP-xmpPLUS, XMP-xmpRights, XMP-xmpTPg,
+ZIP
 </td></tr>
 <tr><td><b>2&nbsp;(Category)</b></td>
 <td>Audio, Author, Camera, Document, ExifTool, Image, Location, Other, Printing,
@@ -1133,6 +1137,7 @@ three droplets to extract information [exiftool must be installed] (thanks to Ro
 <ul>
 <li><a href="http://regex.info/exif.cgi">Jeffrey's Exif Viewer</a>: Web utility to view meta information in online images</li>
 <li><a href="http://www.thexifer.net/">The eXif.er</a>: Web-based EXIF editor</li>
+<li><a href="http://www.exif-search.com/">exif Photo Search</a>: Search the internet for photos base on EXIF metadata</li>
 </ul>
 
 <p><b><a name="related_lightroom">Lightroom Plugins</a></b></p>

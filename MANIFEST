@@ -88,6 +88,7 @@ html/TagNames/MinoltaRaw.html
 html/TagNames/Nikon.html
 html/TagNames/NikonCapture.html
 html/TagNames/NikonCustom.html
+html/TagNames/Nintendo.html
 html/TagNames/OOXML.html
 html/TagNames/Ogg.html
 html/TagNames/Olympus.html
@@ -284,6 +285,7 @@ lib/Image/ExifTool/MinoltaRaw.pm
 lib/Image/ExifTool/Nikon.pm
 lib/Image/ExifTool/NikonCapture.pm
 lib/Image/ExifTool/NikonCustom.pm
+lib/Image/ExifTool/Nintendo.pm
 lib/Image/ExifTool/OOXML.pm
 lib/Image/ExifTool/Ogg.pm
 lib/Image/ExifTool/Olympus.pm

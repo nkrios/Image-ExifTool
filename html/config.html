@@ -239,6 +239,7 @@
                 return $bigImage;
             },
         },
+        <span class=com># **** ADD ADDITIONAL COMPOSITE TAG DEFINITIONS HERE ****</span>
     },
 );
 
@@ -315,12 +316,12 @@ use Image::ExifTool::MIE;
 
 <span class=com># User-defined file types to recognize</span>
 %Image::ExifTool::UserDefined::FileTypes = (
-    XXX =&gt; { <span class=com># &lt;-- the extension of the new file type</span>
+    XXX =&gt; { <span class=com># &lt;-- the extension of the new file type (case insensitive)</span>
         <span class=com># BaseType specifies the format upon which this file is based.
         # If BaseType is defined, then the file will be fully supported,
         # and in this case the Magic pattern should not be defined</span>
         BaseType =&gt; 'TIFF',
-        MIMEType =&gt; 'image/x-xxx',  <span class=com># (defaults to 'application/unknown')</span>
+        MIMEType =&gt; 'image/x-xxx',
         Description =&gt; 'My XXX file type',
     },
     YYY =&gt; {
@@ -332,6 +333,7 @@ use Image::ExifTool::MIE;
     ZZZ =&gt; {
         <span class=com># if neither BaseType nor Magic are defined, the file will be
         # recognized by extension only</span>
+        Description =&gt; 'My ZZZ file type',
     },
 );
 

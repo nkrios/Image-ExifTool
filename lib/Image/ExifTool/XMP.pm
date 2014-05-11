@@ -47,7 +47,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.74';
+$VERSION = '2.75';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -1835,6 +1835,7 @@ my %sPantryItem = (
     },
     GPSTrack => { Groups => { 2 => 'Location' }, Writable => 'rational' },
     GPSImgDirectionRef => {
+        Groups => { 2 => 'Location' },
         PrintConv => {
             M => 'Magnetic North',
             T => 'True North',
@@ -2641,8 +2642,6 @@ sub GetLangInfo($$)
     return undef unless $$tagInfo{Writable} and $$tagInfo{Writable} eq 'lang-alt';
     $langCode =~ tr/_/-/;   # RFC 3066 specifies '-' as a separator
     my $langInfo = Image::ExifTool::GetLangInfo($tagInfo, $langCode);
-    # save reference to source tagInfo hash in case we need to set the PropertyPath later
-    $$langInfo{SrcTagInfo} = $tagInfo;
     return $langInfo;
 }
 

@@ -32,7 +32,7 @@ use vars qw($VERSION %leicaLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.83';
+$VERSION = '1.84';
 
 sub ProcessPanasonicType2($$$);
 sub WhiteBalanceConv($;$$);
@@ -1550,7 +1550,14 @@ my %shootingMode = (
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
     GROUPS => { 0 => 'MakerNotes', 1 => 'Leica', 2 => 'Camera' },
     WRITABLE => 1,
-    NOTES => 'This information is written by the X1.',
+    PRIORITY => 0,
+    NOTES => 'This information is written by the X1, X2, X VARIO and T.',
+    0x0303 => {
+        Name => 'LensModel',
+        Condition => '$format eq "string"',
+        Notes => 'Leica T only',
+        Writable => 'string',
+    },
     # 0x0406 - saturation or sharpness
     0x0407 => { Name => 'OriginalFileName', Writable => 'string' },
     0x0408 => { Name => 'OriginalDirectory',Writable => 'string' },
@@ -1562,6 +1569,7 @@ my %shootingMode = (
         PrintConv => {
             '0 0 0 0' => 'Program AE',
             '1 0 0 0' => 'Aperture-priority AE',
+            '1 1 0 0' => 'Aperture-priority AE (1)', # (see for Leica T)
             '2 0 0 0' => 'Shutter speed priority AE', #(guess)
             '3 0 0 0' => 'Manual',
         },

@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION %sigmaLensTypes);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.12';
+$VERSION = '1.13';
 
 # sigma LensType lookup (ref PH)
 %sigmaLensTypes = (
@@ -365,6 +365,7 @@ $VERSION = '1.12';
             5 => 'Neutral',
             6 => 'Portrait',
             7 => 'Landscape',
+            8 => 'FOV Classic Blue',
         },
     },
     # 0x002d - int32u: 0
@@ -499,6 +500,7 @@ $VERSION = '1.12';
         PrintConv => '$val and $val =~ s/^(\d)/\+$1/; $val',
         PrintConvInv => '$val',
     },
+    # 0x0054 - string: "F20"
     0x0055 => { #PH
         Name => 'SensorTemperature',
         Condition => '$$self{Model} =~ /^SIGMA (SD1( Merrill)?|DP\d Merrill)$/',
@@ -531,7 +533,7 @@ $VERSION = '1.12';
         Notes => 'SD1 and Merrill models only',
         # seen: Standard, Landscape,Monochrome,Neutral,Portrait,Sepia,Vivid
     },
-    # 0x005a/b/c = 0/10 for the SD1
+    # 0x005a/b/c - rational64s: 0/10 for the SD1
 );
 
 1;  # end

@@ -21,6 +21,7 @@ $VERSION = '1.01';
     GROUPS => { 0 => 'MakerNotes', 2 => 'Image' },
     NOTES => 'Tags extracted from maker notes of images from the iPhone 5 with iOS 7.',
     # 0x0001 - int32s: seen 0, 1
+    # 0x0002 - binary plist with a single data object of size 512 bytes (iPhone5s)
     0x0003 => {
         Name => 'RunTime',
         SubDirectory => { TagTable => 'Image::ExifTool::Apple::RunTime' },
@@ -29,6 +30,7 @@ $VERSION = '1.01';
     # 0x0005 - int32s: seen values 147-247, and 100 for blank images
     # 0x0006 - int32s: seen values 186-241, and 20 for blank images
     # 0x0007 - int32s: seen 1
+    # 0x0009 - int32s: seen 19
     0x000a => {
         Name => 'HDRImageType',
         Writable => 'int32s',

@@ -27,6 +27,7 @@
 #              19) Brad Grier private communication
 #              20) Niels Kristian Bech Jensen private communication
 #              21) Iliah Borg private communication (LibRaw)
+#              22) Herbert Kauer private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Olympus;
@@ -36,7 +37,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '2.16';
+$VERSION = '2.18';
 
 sub PrintLensInfo($$$);
 
@@ -320,6 +321,7 @@ my %olympusCameraTypes = (
     D4537 => 'VR340,D750',
     D4541 => 'SZ-12',
     D4545 => 'VH410',
+    D4546 => 'XZ-10', #21
     D4547 => 'TG-2',
     D4548 => 'TG-830',
     D4549 => 'TG-630',
@@ -328,6 +330,9 @@ my %olympusCameraTypes = (
     D4562 => 'SP-820UZ',
     D4566 => 'SZ-15',
     D4572 => 'STYLUS1',
+    D4575 => 'TG-850',
+    D4579 => 'SP-100EE',
+    D4581 => 'SH-1',
     D4809 => 'C2500L',
     D4842 => 'E-10',
     D4856 => 'C-1',
@@ -599,7 +604,7 @@ my %indexInfo = (
                 2 => 'SHQ (Fine)',
                 6 => 'RAW', #PH - C5050WZ
             );
-            my %t2 = ( # all other types
+            my %t2 = ( # all other types (except D4322, ref 22)
                 1 => 'SQ (Low)',
                 2 => 'HQ (Normal)',
                 3 => 'SHQ (Fine)',
@@ -608,7 +613,7 @@ my %indexInfo = (
                 6 => 'Small-Fine', #PH
                 33 => 'Uncompressed', #PH - C2100Z
             );
-            my $conv = $self->{CameraType} =~ /^SX(?!151\b)/ ? \%t1 : \%t2;
+            my $conv = $self->{CameraType} =~ /^(SX(?!151\b)|D4322)/ ? \%t1 : \%t2;
             return $$conv{$val} ? $$conv{$val} : "Unknown ($val)";
         },
         # (no PrintConvInv because we don't know CameraType at write time)
@@ -626,7 +631,11 @@ my %indexInfo = (
         Name => 'BWMode',
         Description => 'Black And White Mode',
         Writable => 'int16u',
-        PrintConv => \%offOn,
+        PrintConv => {
+            0 => 'Off',
+            1 => 'On',
+            6 => '(none)', #22
+        },
     },
     0x0204 => {
         Name => 'DigitalZoom',
@@ -1690,7 +1699,7 @@ my %indexInfo = (
             1027 => 'Spot+Shadow control', #6
         },
     },
-    0x203 => { Name => 'ExposureShift', Writable => 'rational64s' }, #11 (some E-models only)
+    0x203 => { Name => 'ExposureShift', Writable => 'rational64s' }, #11 (some models only)
     0x204 => { #11 (XZ-1)
         Name => 'NDFilter',
         PrintConv => \%offOn,
@@ -1716,15 +1725,18 @@ my %indexInfo = (
             3 => 'Multi AF',
             5 => 'Face detect', #11
             10 => 'MF',
-        }, { BITMASK => { #11
-            0 => 'S-AF',
-            2 => 'C-AF',
-            4 => 'MF',
-            5 => 'Face detect',
-            6 => 'Imager AF',
-            7 => 'Live View Magnification Frame',
-            8 => 'AF sensor',
-        }}],
+        }, {
+            0 => '(none)',
+            BITMASK => { #11
+                0 => 'S-AF',
+                2 => 'C-AF',
+                4 => 'MF',
+                5 => 'Face detect',
+                6 => 'Imager AF',
+                7 => 'Live View Magnification Frame',
+                8 => 'AF sensor',
+            },
+        }],
     },
     0x302 => { #6
         Name => 'FocusProcess',
@@ -1763,9 +1775,15 @@ my %indexInfo = (
         ValueConv => '$val =~ s/\S* //; $val', # ignore first undefined value
         ValueConvInv => '"undef $val"',
         PrintConv => q{
-            return $val if $val =~ /undef/;
+            return 'n/a' if $val =~ /undef/;
             sprintf("(%d%%,%d%%) (%d%%,%d%%)", map {$_ * 100} split(" ",$val));
-        }
+        },
+        PrintConvInv => q{
+            return 'undef undef undef undef' if $val eq 'n/a';
+            my @nums = $val =~ /\d+(?:\.\d+)?/g;
+            return undef unless @nums == 4;
+            join ' ', map {$_ / 100} @nums;
+        },
     },
     0x306 => { #11
         Name => 'AFFineTune',
@@ -1818,7 +1836,8 @@ my %indexInfo = (
     0x404 => { #11
         Name => 'FlashControlMode',
         Writable => 'int16u',
-        Count => 3,
+        Count => -1,
+        Notes => '3 or 4 values',
         PrintConv => [{
             0 => 'Off',
             3 => 'TTL',
@@ -1829,16 +1848,24 @@ my %indexInfo = (
     0x405 => { #11
         Name => 'FlashIntensity',
         Writable => 'rational64s',
-        Count => 3,
-        PrintConv => '$val eq "undef undef undef" ? "n/a" : $val',
-        PrintConvInv => '$val eq "n/a" ? "undef undef undef" : $val',
+        Count => -1,
+        Notes => '3 or 4 values',
+        PrintConv => {
+            OTHER => sub { shift },
+            'undef undef undef' => 'n/a',
+            'undef undef undef undef' => 'n/a (x4)',
+        },
     },
     0x406 => { #11
         Name => 'ManualFlashStrength',
         Writable => 'rational64s',
-        Count => 3,
-        PrintConv => '$val eq "undef undef undef" ? "n/a" : $val',
-        PrintConvInv => '$val eq "n/a" ? "undef undef undef" : $val',
+        Count => -1,
+        Notes => '3 or 4 values',
+        PrintConv => {
+            OTHER => sub { shift },
+            'undef undef undef' => 'n/a',
+            'undef undef undef undef' => 'n/a (x4)',
+        },
     },
     0x500 => { #6
         Name => 'WhiteBalance2',
@@ -1992,6 +2019,7 @@ my %indexInfo = (
         Name => 'NoiseReduction',
         Writable => 'int16u',
         PrintConv => {
+            0 => '(none)',
             BITMASK => {
                 0 => 'Noise Reduction',
                 1 => 'Noise Filter',
@@ -2323,6 +2351,7 @@ my %indexInfo = (
         Name => 'RawDevNoiseReduction',
         Writable => 'int16u',
         PrintConv => { #11
+            0 => '(none)',
             BITMASK => {
                 0 => 'Noise Reduction',
                 1 => 'Noise Filter',
@@ -2344,6 +2373,7 @@ my %indexInfo = (
         Name => 'RawDevSettings',
         Writable => 'int16u',
         PrintConv => { #11
+            0 => '(none)',
             BITMASK => {
                 0 => 'WB Color Temp',
                 1 => 'WB Gray Point',
@@ -2399,6 +2429,7 @@ my %indexInfo = (
         Name => 'RawDevNoiseReduction',
         Writable => 'int16u',
         PrintConv => {
+            0 => '(none)',
             BITMASK => {
                 0 => 'Noise Reduction',
                 1 => 'Noise Filter',
@@ -2558,6 +2589,7 @@ my %indexInfo = (
         Name => 'NoiseReduction2',
         Writable => 'int16u',
         PrintConv => {
+            0 => '(none)',
             BITMASK => {
                 0 => 'Noise Reduction',
                 1 => 'Noise Filter',

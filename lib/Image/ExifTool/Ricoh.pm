@@ -8,6 +8,7 @@
 # References:   1) http://www.ozhiker.com/electronics/pjmt/jpeg_info/ricoh_mn.html
 #               2) http://homepage3.nifty.com/kamisaka/makernote/makernote_ricoh.htm
 #               3) Tim Gray private communication (GR)
+#               4) https://github.com/atotto/ricoh-theta-tools/
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Ricoh;
@@ -17,7 +18,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.26';
+$VERSION = '1.27';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -421,6 +422,15 @@ my %ricohLensIDs = (
             },
         },
     ],
+    0x4001 => {
+        Name => 'ThetaSubdir',
+        Groups => { 1 => 'MakerNotes' },    # SubIFD needs group 1 set
+        Flags => 'SubIFD',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Ricoh::ThetaSubdir',
+            Start => '$val',
+        },
+    },
 );
 
 # Ricoh image info (ref 2)
@@ -594,6 +604,31 @@ my %ricohLensIDs = (
         SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::SerialInfo' },
     }
     # 0x000E ProductionNumber? (ref 2) [no. zero for most models - PH]
+);
+
+
+# Ricoh Theta subdirectory tags - Contains orientation information (ref 4)
+%Image::ExifTool::Ricoh::ThetaSubdir = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
+    CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
+    # 0x0001 => Unknown
+    # 0x0002 => Unknown
+    0x0003 => {
+        Name => 'Accelerometer',
+        Writable => 'rational64s',
+        Count => 2,
+    },
+    0x0004 => {
+        Name => 'Compass',
+        Writable => 'rational64u',
+    },
+    # 0x0005 => Unknown
+    # 0x0101 => Unknown - ISO Speed?
+    # 0x0102 => Unknown - F Number?
+    # 0x0103 => Unknown - Exposure?
+    # 0x0104 => Unknown - Serial Number?
+    # 0x0105 => Unknown - Serial Number?
 );
 
 # face detection information (ref PH, CX4)
@@ -826,6 +861,14 @@ my %ricohLensIDs = (
         RawConv => '$val[0] ? $val[0] : undef',
         ValueConv => '$val=~s/\s*:.*//; $val',
         PrintConv => \%ricohLensIDs,
+    },
+    RicohPitch => {
+        Require => 'Ricoh:Accelerometer',
+        ValueConv => 'my @v = split(" ",$val); $v[1]',
+    },
+    RicohRoll => {
+        Require => 'Ricoh:Accelerometer',
+        ValueConv => 'my @v = split(" ",$val); $v[0] <= 180 ? $v[0] : $v[0] - 360',
     },
 );
 

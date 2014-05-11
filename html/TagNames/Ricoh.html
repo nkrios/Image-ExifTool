@@ -355,6 +355,11 @@ models)</span></span></td></tr>
 <td>--&gt; <a href='Ricoh.html#Subdir'>Ricoh Subdir Tags</a>
   <br>--&gt; <a href='Ricoh.html#Subdir'>Ricoh Subdir Tags</a>
   <br>--&gt; <a href='Ricoh.html#Subdir'>Ricoh Subdir Tags</a></td></tr>
+<tr class=b>
+<td title='0x4001 = 16385'>0x4001</td>
+<td>ThetaSubdir</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Ricoh.html#ThetaSubdir'>Ricoh ThetaSubdir Tags</a></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='ImageInfo'>Ricoh ImageInfo Tags</a></h2>
@@ -600,6 +605,24 @@ FaceDetectFrameSize with increasing Y downwards)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='ThetaSubdir'>Ricoh ThetaSubdir Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td title='0x0003 = 3'>0x0003</td>
+<td>Accelerometer</td>
+<td class=c>rational64s[2]</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0004 = 4'>0x0004</td>
+<td>Compass</td>
+<td class=c>rational64u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='Text'>Ricoh Text Tags</a></h2>
 <p>Some Ricoh DC and RDC models use a text-based format for their maker notes
 instead of the IFD format used by the Caplio models.  Below is a list of known
@@ -749,7 +772,7 @@ model names have already been scaled to include the 35mm crop factor.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jul 24, 2013</i>
+<br><i>Last revised Mar 17, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

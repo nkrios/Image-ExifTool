@@ -1,6 +1,6 @@
 Summary: perl module for image data extraction
 Name: perl-Image-ExifTool
-Version: 9.53
+Version: 9.60
 Release: 1
 License: Artistic/GPL
 Group: Development/Libraries/Perl
@@ -22,38 +22,38 @@ supported by ExifTool (r = read, w = write, c = create):
 
   File Types
   ------------+-------------+-------------+-------------+------------
-  3FR   r     | EIP   r     | LNK   r     | PAC   r     | RWL   r/w
-  3G2   r/w   | EPS   r/w   | M2TS  r     | PAGES r     | RWZ   r
-  3GP   r/w   | ERF   r/w   | M4A/V r/w   | PBM   r/w   | RM    r
-  ACR   r     | EXE   r     | MEF   r/w   | PCD   r     | SO    r
-  AFM   r     | EXIF  r/w/c | MIE   r/w/c | PDF   r/w   | SR2   r/w
-  AI    r/w   | EXR   r     | MIFF  r     | PEF   r/w   | SRF   r
-  AIFF  r     | F4A/V r/w   | MKA   r     | PFA   r     | SRW   r/w
-  APE   r     | FFF   r/w   | MKS   r     | PFB   r     | SVG   r
-  ARW   r/w   | FLA   r     | MKV   r     | PFM   r     | SWF   r
-  ASF   r     | FLAC  r     | MNG   r/w   | PGF   r     | THM   r/w
-  AVI   r     | FLV   r     | MODD  r     | PGM   r/w   | TIFF  r/w
-  BMP   r     | FPF   r     | MOS   r/w   | PLIST r     | TORRENT r
-  BTF   r     | FPX   r     | MOV   r/w   | PICT  r     | TTC   r
-  CHM   r     | GIF   r/w   | MP3   r     | PMP   r     | TTF   r
-  COS   r     | GZ    r     | MP4   r/w   | PNG   r/w   | VRD   r/w/c
-  CR2   r/w   | HDP   r/w   | MPC   r     | PPM   r/w   | VSD   r
-  CRW   r/w   | HDR   r     | MPG   r     | PPT   r     | WAV   r
-  CS1   r/w   | HTML  r     | MPO   r/w   | PPTX  r     | WDP   r/w
-  DCM   r     | ICC   r/w/c | MQV   r/w   | PS    r/w   | WEBP  r
-  DCP   r/w   | IDML  r     | MRW   r/w   | PSB   r/w   | WEBM  r
-  DCR   r     | IIQ   r/w   | MXF   r     | PSD   r/w   | WMA   r
-  DFONT r     | IND   r/w   | NEF   r/w   | PSP   r     | WMV   r
-  DIVX  r     | INX   r     | NRW   r/w   | QTIF  r/w   | WV    r
-  DJVU  r     | ITC   r     | NUMBERS r   | RA    r     | X3F   r/w
-  DLL   r     | J2C   r     | ODP   r     | RAF   r/w   | XCF   r
-  DNG   r/w   | JNG   r/w   | ODS   r     | RAM   r     | XLS   r
-  DOC   r     | JP2   r/w   | ODT   r     | RAR   r     | XLSX  r
-  DOCX  r     | JPEG  r/w   | OFR   r     | RAW   r/w   | XMP   r/w/c
-  DPX   r     | K25   r     | OGG   r     | RIFF  r     | ZIP   r
-  DV    r     | KDC   r     | OGV   r     | RSRC  r     |
-  DVB   r/w   | KEY   r     | ORF   r/w   | RTF   r     |
-  DYLIB r     | LA    r     | OTF   r     | RW2   r/w   |
+  3FR   r     | EIP   r     | LA    r     | OTF   r     | RW2   r/w
+  3G2   r/w   | EPS   r/w   | LNK   r     | PAC   r     | RWL   r/w
+  3GP   r/w   | ERF   r/w   | M2TS  r     | PAGES r     | RWZ   r
+  ACR   r     | EXE   r     | M4A/V r/w   | PBM   r/w   | RM    r
+  AFM   r     | EXIF  r/w/c | MEF   r/w   | PCD   r     | SEQ   r
+  AI    r/w   | EXR   r     | MIE   r/w/c | PDF   r/w   | SO    r
+  AIFF  r     | EXV   r/w/c | MIFF  r     | PEF   r/w   | SR2   r/w
+  APE   r     | F4A/V r/w   | MKA   r     | PFA   r     | SRF   r
+  ARW   r/w   | FFF   r/w   | MKS   r     | PFB   r     | SRW   r/w
+  ASF   r     | FLA   r     | MKV   r     | PFM   r     | SVG   r
+  AVI   r     | FLAC  r     | MNG   r/w   | PGF   r     | SWF   r
+  BMP   r     | FLV   r     | MODD  r     | PGM   r/w   | THM   r/w
+  BTF   r     | FPF   r     | MOS   r/w   | PLIST r     | TIFF  r/w
+  CHM   r     | FPX   r     | MOV   r/w   | PICT  r     | TORRENT r
+  COS   r     | GIF   r/w   | MP3   r     | PMP   r     | TTC   r
+  CR2   r/w   | GZ    r     | MP4   r/w   | PNG   r/w   | TTF   r
+  CRW   r/w   | HDP   r/w   | MPC   r     | PPM   r/w   | VRD   r/w/c
+  CS1   r/w   | HDR   r     | MPG   r     | PPT   r     | VSD   r
+  DCM   r     | HTML  r     | MPO   r/w   | PPTX  r     | WAV   r
+  DCP   r/w   | ICC   r/w/c | MQV   r/w   | PS    r/w   | WDP   r/w
+  DCR   r     | IDML  r     | MRW   r/w   | PSB   r/w   | WEBP  r
+  DFONT r     | IIQ   r/w   | MXF   r     | PSD   r/w   | WEBM  r
+  DIVX  r     | IND   r/w   | NEF   r/w   | PSP   r     | WMA   r
+  DJVU  r     | INX   r     | NRW   r/w   | QTIF  r/w   | WMV   r
+  DLL   r     | ITC   r     | NUMBERS r   | RA    r     | WV    r
+  DNG   r/w   | J2C   r     | ODP   r     | RAF   r/w   | X3F   r/w
+  DOC   r     | JNG   r/w   | ODS   r     | RAM   r     | XCF   r
+  DOCX  r     | JP2   r/w   | ODT   r     | RAR   r     | XLS   r
+  DPX   r     | JPEG  r/w   | OFR   r     | RAW   r/w   | XLSX  r
+  DV    r     | K25   r     | OGG   r     | RIFF  r     | XMP   r/w/c
+  DVB   r/w   | KDC   r     | OGV   r     | RSRC  r     | ZIP   r
+  DYLIB r     | KEY   r     | ORF   r/w   | RTF   r     |
 
   Meta Information
   ----------------------+----------------------+---------------------
@@ -92,11 +92,14 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %doc Changes html
-/usr/lib/perl5/*
+%{_libdir}/perl5/*
+/usr/share/*/*
 %{_mandir}/*/*
 %{_bindir}/*
 
 %changelog
+* Tue May 06 2014 - Norbert de Rooy <nsrderooy@gmail.com>
+- Spec file fixed for Redhat 6
 * Tue May 09 2006 - Niels Kristian Bech Jensen <nkbj@mail.tele.dk>
 - Spec file fixed for Mandriva Linux 2006.
 * Mon May 08 2006 - Volker Kuhlmann <VolkerKuhlmann@gmx.de>

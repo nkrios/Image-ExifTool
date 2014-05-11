@@ -27,7 +27,7 @@ use vars qw($VERSION $RELEASE @ISA @EXPORT_OK %EXPORT_TAGS $AUTOLOAD @fileTypes
             %mimeType $swapBytes $swapWords $currentByteOrder %unpackStd
             %jpegMarker %specialTags);
 
-$VERSION = '9.53';
+$VERSION = '9.60';
 $RELEASE = '';
 @ISA = qw(Exporter);
 %EXPORT_TAGS = (
@@ -67,7 +67,7 @@ sub SaveNewValues($);
 sub RestoreNewValues($);
 sub WriteInfo($$;$$);
 sub SetFileModifyDate($$;$$);
-sub SetFileName($$;$);
+sub SetFileName($$;$$);
 sub GetAllTags(;$);
 sub GetWritableTags(;$);
 sub GetAllGroups($);
@@ -130,7 +130,7 @@ sub ReadValue($$$$$;$);
     QuickTime QuickTime::ImageFile Matroska MXF DV Flash Flash::FLV Real::Media
     Real::Audio Real::Metafile RIFF AIFF ASF DICOM MIE HTML XMP::SVG Torrent EXE
     EXE::PEVersion EXE::PEString EXE::MachO EXE::PEF EXE::ELF EXE::CHM LNK Font
-    RSRC Rawzor ZIP ZIP::GZIP ZIP::RAR RTF OOXML iWork FLIR::FPF
+    RSRC Rawzor ZIP ZIP::GZIP ZIP::RAR RTF OOXML iWork FLIR::AFF FLIR::FPF
 );
 
 # alphabetical list of current Lang modules
@@ -288,8 +288,8 @@ my %fileTypeLookup = (
     JPC  =>  'J2C',
     JPF  =>  'JP2',
     # JP4? - looks like a JPEG but the image data is different
-    JPEG =>  'JPG',
-    JPG  => ['JPEG', 'Joint Photographic Experts Group'],
+    JPEG => ['JPEG', 'Joint Photographic Experts Group'],
+    JPG =>   'JPEG',
     JPM  => ['JP2',  'JPEG 2000 compound image'],
     JPX  => ['JP2',  'JPEG 2000 with extensions'],
     JXR  => ['TIFF', 'JPEG XR'],
@@ -325,7 +325,7 @@ my %fileTypeLookup = (
     MPO  => ['JPEG', 'Extended Multi-Picture format'],
     MQV  => ['MOV',  'Sony Mobile Quicktime Video'],
     MRW  => ['MRW',  'Minolta RAW format'],
-    MTS  => ['M2TS', 'MPEG-2 Transport Stream'],
+    MTS  =>  'M2TS',
     MXF  => ['MXF',  'Material Exchange Format'],
   # NDPI => ['TIFF', 'Hamamatsu NanoZoomer Digital Pathology Image'],
     NEF  => ['TIFF', 'Nikon (RAW) Electronic Format'],
@@ -389,7 +389,7 @@ my %fileTypeLookup = (
     PSPSHAPE => 'PSP',
     PSPTUBE  => 'PSP',
     QIF  =>  'QTIF',
-    QT   => ['MOV',  'QuickTime movie'],
+    QT   =>  'MOV',
     QTI  =>  'QTIF',
     QTIF => ['QTIF', 'QuickTime Image File'],
     RA   => ['Real', 'Real Audio'],
@@ -408,6 +408,7 @@ my %fileTypeLookup = (
     RW2  => ['TIFF', 'Panasonic RAW 2'],
     RWL  => ['TIFF', 'Leica RAW'],
     RWZ  => ['RWZ',  'Rawzor compressed image'],
+    SEQ  => ['FLIR', 'FLIR image Sequence'],
     SO   => ['EXE',  'Shared Object file'],
     SR2  => ['TIFF', 'Sony RAW Format 2'],
     SRF  => ['TIFF', 'Sony RAW Format'],
@@ -527,7 +528,6 @@ my %fileDescription = (
     LNK  => 'application/octet-stream',
     M2T  => 'video/mpeg',
     M2TS => 'video/m2ts',
-    M4P  => 'audio/m4p',
     MEF  => 'image/x-mamiya-mef',
     MIE  => 'application/x-mie',
     MIFF => 'application/x-magick-image',
@@ -707,7 +707,7 @@ my %moduleName = (
     EXR  => '\x76\x2f\x31\x01',
     EXV  => '\xff\x01Exiv2',
     FLAC => '(fLaC|ID3)',
-    FLIR => 'FFF\0',
+    FLIR => '[AF]FF\0',
     FLV  => 'FLV\x01',
     Font => '((\0\x01\0\0|OTTO|true|typ1)[\0\x01]|ttcf\0[\x01\x02]\0\0|\0[\x01\x02]|' .
             '(.{6})?%!(PS-(AdobeFont-|Bitstream )|FontType1-)|Start(Comp|Master)?FontMetrics)',
@@ -716,7 +716,7 @@ my %moduleName = (
     GIF  => 'GIF8[79]a',
     GZIP => '\x1f\x8b\x08',
     HDR  => '#\?(RADIANCE|RGBE)\x0a',
-    HTML => '\s*(?i)<(!DOCTYPE\s+HTML|HTML|\?xml)', # (case insensitive)
+    HTML => '(\xef\xbb\xbf)?\s*(?i)<(!DOCTYPE\s+HTML|HTML|\?xml)', # (case insensitive)
     ICC  => '.{12}(scnr|mntr|prtr|link|spac|abst|nmcl|nkpf)(XYZ |Lab |Luv |YCbr|Yxy |RGB |GRAY|HSV |HLS |CMYK|CMY |[2-9A-F]CLR){2}',
     IND  => '\x06\x06\xed\xf5\xd8\x1d\x46\xe5\xbd\x31\xef\xe7\xfe\x74\xb7\x1d',
     ITC  => '.{4}itch',
@@ -1020,6 +1020,20 @@ sub DummyWriteProc { return 1; }
             }
             return $str;
         },
+    },
+    HardLink => {
+        Writable => 1,
+        WriteOnly => 1,
+        Protected => 1,
+        Notes => q{
+            this write-only tag is used to create a hard link to the file.  If the file
+            is edited, copied, renamed or moved in the same operation as writing
+            HardLink, then the link is made to the updated file.  Note that subsequent
+            editing of either the linked file or the original by the exiftool
+            application will break the link unless the -overwrite_original_in_place
+            option is used
+        },
+        ValueConvInv => '$val=~tr/\\\\/\//; $val',
     },
     MIMEType    => { Notes => 'the MIME type of the source file' },
     ImageWidth  => { },
@@ -3352,7 +3366,7 @@ sub DoAutoLoad(@)
         $file .= 'r.pl';
     }
     # attempt to load the package
-    eval "require '$file'" or die "Error while attempting to call $autoload\n$@\n";
+    eval { require $file } or die "Error while attempting to call $autoload\n$@\n";
     unless (defined &$autoload) {
         my @caller = caller(0);
         # reproduce Perl's standard 'undefined subroutine' message:
@@ -5187,8 +5201,9 @@ sub ProcessJPEG($$)
                 # extract the MPF information (it is in standard TIFF format)
                 my $tagTablePtr = GetTagTable('Image::ExifTool::MPF::Main');
                 $self->ProcessTIFF(\%dirInfo, $tagTablePtr);
-            } elsif ($$segDataPt =~ /^(|QVGA\0|BGTH)\xff\xd8\xff\xdb/) {
-                # Samsung="", BenQ DC C1220="QVGA\0", Digilife DDC-690="BGTH"
+            } elsif ($$segDataPt =~ /^(|QVGA\0|BGTH)\xff\xd8\xff[\xdb\xe0\xe1]/) {
+                # Samsung/GE/GoPro="", BenQ DC C1220/Pentacon/Polaroid="QVGA\0",
+                # Digilife DDC-690/Rollei="BGTH"
                 $dumpType = 'Preview Image';
                 $preview = substr($$segDataPt, length($1));
             } elsif ($preview) {
@@ -5266,6 +5281,8 @@ sub ProcessJPEG($$)
             }
         } elsif ($marker == 0xe5) {         # APP5 (Ricoh "RMETA")
             if ($$segDataPt =~ /^RMETA\0/) {
+                # (NOTE: apparently these may span multiple segments, but I haven't seen
+                # a sample like this, so multi-segment support hasn't yet been implemented)
                 $dumpType = 'Ricoh RMETA';
                 DirStart(\%dirInfo, 6, 6);
                 my $tagTablePtr = GetTagTable('Image::ExifTool::Ricoh::RMETA');
@@ -6205,7 +6222,7 @@ sub AddTagToTable($$;$$)
 #------------------------------------------------------------------------------
 # Handle simple extraction of new tag information
 # Inputs: 0) ExifTool object ref, 1) tag table reference, 2) tagID, 3) value,
-#         4-N) parameters hash: Index, DataPt, DataPos, Start, Size, Parent,
+#         4-N) parameters hash: Index, DataPt, DataPos, Base, Start, Size, Parent,
 #              TagInfo, ProcessProc, RAF
 # Returns: tag key or undef if tag not found
 # Notes: if value is not defined, it is extracted from DataPt using TagInfo
@@ -6214,7 +6231,7 @@ sub HandleTag($$$$;%)
 {
     my ($self, $tagTablePtr, $tag, $val, %parms) = @_;
     my $verbose = $$self{OPTIONS}{Verbose};
-    my $tagInfo = $parms{TagInfo} || $self->GetTagInfo($tagTablePtr, $tag, \$val);
+    my $tagInfo = $parms{TagInfo} || $self->GetTagInfo($tagTablePtr, $tag, \$val, $parms{Format}, $parms{Count});
     my $dataPt = $parms{DataPt};
     my ($subdir, $format, $count, $size, $noTagInfo, $rational);
 
@@ -6515,7 +6532,16 @@ sub SetFileType($;$$)
     my ($self, $fileType, $mimeType) = @_;
     unless ($$self{VALUE}{FileType} and not $$self{DOC_NUM}) {
         my $baseType = $$self{FILE_TYPE};
+        my $ext = $$self{FILE_EXT};
         $fileType or $fileType = $baseType;
+        # handle sub-types which are identified by extension
+        if (defined $ext and $ext ne $fileType and not $$self{DOC_NUM}) {
+            my ($f,$e) = @fileTypeLookup{$fileType,$ext};
+            if (ref $f eq 'ARRAY' and ref $e eq 'ARRAY' and $$f[0] eq $$e[0]) {
+                # make sure $fileType was a root type and not another sub-type
+                $fileType = $ext if $$f[0] eq $fileType or not $fileTypeLookup{$$f[0]};
+            }
+        }
         $mimeType or $mimeType = $mimeType{$fileType};
         # use base file type if necessary (except if 'TIFF', which is a special case)
         $mimeType = $mimeType{$baseType} unless $mimeType or $baseType eq 'TIFF';
@@ -6877,7 +6903,9 @@ sub ProcessBinaryData($$$)
                 DirLen   => $len - $start,
                 Base     => $subdirBase,
             );
+            delete $$self{NO_UNKNOWN};
             $self->ProcessDirectory(\%subdirInfo, $subTablePtr, $$subdir{ProcessProc});
+            $$self{NO_UNKNOWN} = 1 if $unknown < 2;
             next;
         }
         if ($$tagInfo{IsOffset} and $$tagInfo{IsOffset} ne '3') {
@@ -6922,7 +6950,7 @@ until ($Image::ExifTool::noConfig) {
         length $file or last;   # filename of "" disables configuration
         -r $file or warn("Config file not found\n"), last;
     }
-    eval "require '$file'"; # load the config file
+    eval { require $file }; # load the config file
     # print warning (minus "Compilation failed" part)
     $@ and $_=$@, s/Compilation failed.*//s, warn $_;
     last;
@@ -6938,7 +6966,7 @@ if (%Image::ExifTool::UserDefined::FileTypes) {
     foreach (sort keys %Image::ExifTool::UserDefined::FileTypes) {
         my $fileInfo = $Image::ExifTool::UserDefined::FileTypes{$_};
         my $type = uc $_;
-        ref $fileInfo eq 'HASH' or $fileTypeLookup{$type} = $type, next;
+        ref $fileInfo eq 'HASH' or $fileTypeLookup{$type} = $fileInfo, next;
         if ($$fileInfo{BaseType}) {
             if ($$fileInfo{Description}) {
                 $fileTypeLookup{$type} = [ $$fileInfo{BaseType}, $$fileInfo{Description} ];

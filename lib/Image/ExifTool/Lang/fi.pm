@@ -508,7 +508,6 @@ $VERSION = '1.01';
       },
     },
    'ColorMoireReduction' => 'Värimoareen vaimennus',
-   'ColorMoireReductionMode' => '',
    'ColorPalette' => 'Väripaletti',
    'ColorProfile' => 'Väriprofiili',
    'ColorRepresentation' => 'Väriesitys',
@@ -1106,7 +1105,6 @@ $VERSION = '1.01';
    'FocusArea' => 'Tarkennusalue',
    'FocusAreaSelection' => 'Tarkennusalueen valinta',
    'FocusContinuous' => 'Jatkuva tarkennus',
-   'FocusDistance' => '',
    'FocusDistanceLower' => 'Lähitarkennus',
    'FocusDistanceUpper' => 'Kaukotarkennus',
    'FocusMode' => {

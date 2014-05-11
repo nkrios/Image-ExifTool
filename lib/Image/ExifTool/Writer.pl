@@ -443,28 +443,22 @@ sub SetNewValue($;$$%)
                 push @matchingTags, $langInfo if $langInfo;
             }
             last if @matchingTags;
-        } else {
+        } elsif (not $options{NoShortcut}) {
             # look for a shortcut or alias
             require Image::ExifTool::Shortcuts;
             my ($match) = grep /^\Q$tag\E$/i, keys %Image::ExifTool::Shortcuts::Main;
             undef $err;
-            if ($match and not $options{NoShortcut}) {
-                if (@{$Image::ExifTool::Shortcuts::Main{$match}} == 1) {
-                    $tag = $Image::ExifTool::Shortcuts::Main{$match}[0];
-                    @matchingTags = FindTagInfo($tag);
-                    last if @matchingTags;
-                } else {
-                    $options{NoShortcut} = 1;
-                    foreach $tag (@{$Image::ExifTool::Shortcuts::Main{$match}}) {
-                        my ($n, $e) = $self->SetNewValue($tag, $value, %options);
-                        $numSet += $n;
-                        $e and $err = $e;
-                    }
-                    undef $err if $numSet;  # no error if any set successfully
-                    return ($numSet, $err) if wantarray;
-                    $err and warn "$err\n";
-                    return $numSet;
+            if ($match) {
+                $options{NoShortcut} = 1;
+                foreach $tag (@{$Image::ExifTool::Shortcuts::Main{$match}}) {
+                    my ($n, $e) = $self->SetNewValue($tag, $value, %options);
+                    $numSet += $n;
+                    $e and $err = $e;
                 }
+                undef $err if $numSet;  # no error if any set successfully
+                return ($numSet, $err) if wantarray;
+                $err and warn "$err\n";
+                return $numSet;
             }
         }
         unless ($listOnly) {
@@ -1489,7 +1483,7 @@ sub CountNewValues($)
     my $pseudo = 0;
     if ($newVal) {
         # (Note: all writable "pseudo" tags must be found in Extra table)
-        foreach $tag (qw{FileName Directory FileModifyDate FileCreateDate}) {
+        foreach $tag (qw{FileName Directory FileModifyDate FileCreateDate HardLink}) {
             ++$pseudo if defined $$newVal{$Image::ExifTool::Extra{$tag}};
         }
     }
@@ -1626,26 +1620,32 @@ sub SetFileModifyDate($$;$$)
 #------------------------------------------------------------------------------
 # Change file name and/or directory from FileName and Directory tags
 # Inputs: 0) ExifTool object reference, 1) current file name (including path)
-#         2) New name (or undef to build from FileName and Directory tags)
+#         2) new name (or undef to build from FileName and Directory tags)
+#         3) option: 'Link' to create link instead of renaming file
 # Returns: 1=name changed OK, 0=nothing changed, -1=error changing name
 #          (and increments CHANGED flag if filename changed)
 # Notes: Will not overwrite existing file.  Creates directories as necessary.
-sub SetFileName($$;$)
+sub SetFileName($$;$$)
 {
-    my ($self, $file, $newName) = @_;
+    my ($self, $file, $newName, $opt) = @_;
     my ($nvHash, $doName, $doDir);
     # determine the new file name
     unless (defined $newName) {
-        my $filename = $self->GetNewValues('FileName', \$nvHash);
-        $doName = 1 if defined $filename and $self->IsOverwriting($nvHash, $file);
-        my $dir = $self->GetNewValues('Directory', \$nvHash);
-        $doDir = 1 if defined $dir and $self->IsOverwriting($nvHash, $file);
-        return 0 unless $doName or $doDir;  # nothing to do
-        if ($doName) {
-            $newName = GetNewFileName($file, $filename);
-            $newName = GetNewFileName($newName, $dir) if $doDir;
+        if ($opt and $opt eq 'Link') {
+            $newName = $self->GetNewValues('HardLink');
+            return 0 unless defined $newName;
         } else {
-            $newName = GetNewFileName($file, $dir);
+            my $filename = $self->GetNewValues('FileName', \$nvHash);
+            $doName = 1 if defined $filename and $self->IsOverwriting($nvHash, $file);
+            my $dir = $self->GetNewValues('Directory', \$nvHash);
+            $doDir = 1 if defined $dir and $self->IsOverwriting($nvHash, $file);
+            return 0 unless $doName or $doDir;  # nothing to do
+            if ($doName) {
+                $newName = GetNewFileName($file, $filename);
+                $newName = GetNewFileName($newName, $dir) if $doDir;
+            } else {
+                $newName = GetNewFileName($file, $dir);
+            }
         }
     }
     $newName =~ tr/\0//d;   # make sure name doesn't contain nulls
@@ -1662,6 +1662,15 @@ sub SetFileName($$;$)
             return -1;
         }
         $self->VPrint(0, "Created directory for '$newName'");
+    }
+    if ($opt and $opt eq 'Link') {
+        unless (link $file, $newName) {
+            $self->Warn("Error creating link '$newName'");
+            return -1;
+        }
+        ++$$self{CHANGED};
+        $self->VerboseValue('+ HardLink', $newName);
+        return 1;
     }
     # attempt to rename the file
     unless (rename $file, $newName) {
@@ -1696,6 +1705,7 @@ sub SetFileName($$;$)
         # remove the original file
         unlink $file or $self->Warn('Error removing old file');
     }
+    $$self{NewName} = $newName; # remember new file name
     ++$$self{CHANGED};
     $self->VerboseValue('+ FileName', $newName);
     return 1;
@@ -1713,7 +1723,7 @@ sub WriteInfo($$;$$)
 {
     local ($_, *EXIFTOOL_FILE2, *EXIFTOOL_OUTFILE);
     my ($self, $infile, $outfile, $outType) = @_;
-    my (@fileTypeList, $fileType, $tiffType, $hdr, $seekErr, $type, $tmpfile);
+    my (@fileTypeList, $fileType, $tiffType, $hdr, $seekErr, $type, $tmpfile, $hardLink);
     my ($inRef, $outRef, $closeIn, $closeOut, $outPos, $outBuff, $eraseIn, $raf);
     my $oldRaf = $$self{RAF};
     my $rtnVal = 0;
@@ -1741,7 +1751,15 @@ sub WriteInfo($$;$$)
 #
     my ($numNew, $numPseudo) = $self->CountNewValues();
     if (not defined $outfile and defined $infile) {
+        $hardLink = $self->GetNewValues('HardLink');
+        undef $hardLink if defined $hardLink and not length $hardLink;
         my $newFileName =  $self->GetNewValues('FileName', \$nvHash);
+        my $newDir = $self->GetNewValues('Directory');
+        if (defined $newDir and length $newDir) {
+            $newDir .= '/' unless $newDir =~ m{/$};
+        } else {
+            undef $newDir;
+        }
         if ($numNew == $numPseudo) {
             $rtnVal = 2;
             if (defined $fileModifyDate and (not ref $infile or UNIVERSAL::isa($infile,'GLOB'))) {
@@ -1750,8 +1768,13 @@ sub WriteInfo($$;$$)
             if (defined $fileCreateDate and (not ref $infile or UNIVERSAL::isa($infile,'GLOB'))) {
                 $self->SetFileModifyDate($infile, undef, 'FileCreateDate') > 0 and $rtnVal = 1;
             }
-            if (defined $newFileName and not ref $infile) {
+            if ((defined $newFileName or defined $newDir) and not ref $infile) {
                 $self->SetFileName($infile) > 0 and $rtnVal = 1;
+            }
+            if (defined $hardLink) {
+                my $src = $$self{NewName};
+                $src = $infile unless defined $src;
+                $self->SetFileName($src, $hardLink, 'Link') and $rtnVal = 1;
             }
             return $rtnVal;
         } elsif (defined $newFileName and length $newFileName) {
@@ -1763,6 +1786,14 @@ sub WriteInfo($$;$$)
             } elsif ($self->IsOverwriting($nvHash, $infile)) {
                 $outfile = GetNewFileName($infile, $newFileName);
                 $eraseIn = 1; # delete original
+            }
+        }
+        # set new directory if specified
+        if (defined $newDir) {
+            $outfile = $infile unless defined $outfile or ref $infile;
+            if (defined $outfile) {
+                $outfile = GetNewFileName($outfile, $newDir);
+                $eraseIn = 1 unless ref $infile;
             }
         }
     }
@@ -2120,18 +2151,19 @@ sub WriteInfo($$;$$)
         }
     }
     # set FileModifyDate if requested (and if possible!)
-    if (defined $fileModifyDate and $rtnVal > 0 and
-        ($closeOut or ($closeIn and defined $outBuff)) and
-        $self->SetFileModifyDate($closeOut ? $outfile : $infile, $originalTime) > 0)
-    {
-        ++$$self{CHANGED}; # we changed something
-    }
-    # set FileCreateDate if requested (and if possible!)
-    if (defined $fileCreateDate and $rtnVal > 0 and
-        ($closeOut or ($closeIn and defined $outBuff)) and
-        $self->SetFileModifyDate($closeOut ? $outfile : $infile, $createTime, 'FileCreateDate') > 0)
-    {
-        ++$$self{CHANGED}; # we changed something
+    if ($rtnVal > 0 and ($closeOut or ($closeIn and defined $outBuff))) {
+        my $target = $closeOut ? $outfile : $infile;
+        if (defined $fileModifyDate and $self->SetFileModifyDate($target, $originalTime) > 0) {
+            ++$$self{CHANGED}; # we changed something
+        }
+        # set FileCreateDate if requested (and if possible!)
+        if (defined $fileCreateDate and $self->SetFileModifyDate($target, $createTime, 'FileCreateDate')) {
+            ++$$self{CHANGED}; # we changed something
+        }
+        # create hard link if requested and no output filename specified (and if possible!)
+        if (defined $hardLink and $self->SetFileName($target, $hardLink, 'Link')) {
+            ++$$self{CHANGED}; # we changed something (sort of)
+        }
     }
     # check for write error and set appropriate error message and return value
     if ($rtnVal < 0) {
@@ -2212,7 +2244,7 @@ sub GetWritableTags(;$)
             my $i = $#parts - 1;
             $parts[$i] = "Write$parts[$i]";   # add 'Write' before class name
             my $module = join('::',@parts[0..$i]);
-            eval "require $module"; # (fails silently if nothing loaded)
+            eval { require $module }; # (fails silently if nothing loaded)
         }
         my $tagID;
         foreach $tagID (TagTableKeys($table)) {
@@ -3125,6 +3157,7 @@ sub GetNewTagInfoList($;$)
 # Get hash of tagInfo references keyed on tagID for a specific table
 # Inputs: 0) ExifTool object reference, 1-N) tag table pointers
 # Returns: hash reference
+# Notes: returns only one tagInfo ref for each conditional list
 sub GetNewTagInfoHash($@)
 {
     my $self = shift;
@@ -3201,6 +3234,7 @@ sub GetLangInfo($$)
             Description => Image::ExifTool::MakeDescription($$tagInfo{Name}) .
                            " ($langCode)",
             LangCode => $langCode,
+            SrcTagInfo => $tagInfo, # save reference to original tagInfo
         };
         AddTagToTable($table, $tagID, $langInfo);
     }
@@ -3511,8 +3545,9 @@ sub GetExtended($$)
 # Dump data in hex and ASCII to console
 # Inputs: 0) data reference, 1) length or undef, 2-N) Options:
 # Options: Start => offset to start of data (default=0)
-#          Addr => address to print for data start (default=DataPos+Start)
-#          DataPos => address of start of data
+#          Addr => address to print for data start (default=DataPos+Base+Start)
+#          DataPos => position of data within block (relative to Base)
+#          Base => base offset for pointers from start of file
 #          Width => width of printout (bytes, default=16)
 #          Prefix => prefix to print at start of line (default='')
 #          MaxLen => maximum length to dump
@@ -3533,7 +3568,7 @@ sub HexDump($;$%)
     my $more;
     $len = $opts{Len} if defined $opts{Len};
 
-    $addr = $start + ($opts{DataPos} || 0) unless defined $addr;
+    $addr = $start + ($opts{DataPos} || 0) + ($opts{Base} || 0) unless defined $addr;
     $len = $datLen unless defined $len;
     if ($maxLen and $len > $maxLen) {
         # print one line less to allow for $more line below
@@ -3570,6 +3605,7 @@ sub HexDump($;$%)
 #        Value => Tag value
 #        DataPt => reference to value data block
 #        DataPos => location of data block in file
+#        Base => base added to all offsets
 #        Size => length of value data within block
 #        Format => value format string
 #        Count => number of values

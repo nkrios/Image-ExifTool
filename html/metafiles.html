@@ -23,6 +23,7 @@ p.c         { margin: 1em 2em 1em 2.2em; color: #666 }
 <br><a href="#xml">ExifTool XML Files</a>
 <br><a href="#exif">EXIF Files</a>
 <br><a href="#mie">MIE Files</a>
+<br><a href="#exv">EXV Files</a>
 </div>
 
 <h1 class=up>Metadata Sidecar Files</h1>
@@ -31,8 +32,8 @@ p.c         { margin: 1em 2em 1em 2.2em; color: #666 }
 file. These are the only files that exiftool can create from scratch.  A common
 example of this is the XMP "sidecar" file (which is discussed in the next
 section in some detail).  Other supported metadata file types are EXIF, MIE,
-ICC and VRD.  As well, ExifTool supports XML-format output, which can also be
-used to generate metadata sidecar files.</p>
+EXV, ICC and VRD.  As well, ExifTool supports XML-format output, which can also
+be used to generate metadata sidecar files.</p>
 
 <hr>
 <a name="xmp"></a>
@@ -295,8 +296,17 @@ the <code>-z</code> option (provided Compress::Zlib is installed on your system)
 which may be useful if disk space is at a premium.</p>
 
 <hr>
+<a name="exv"></a>
+<h3>EXV Files</h3>
+
+<p>EXV files are used by <a href="http://exiv2.org/">Exiv2</a>, and are
+basically a JPEG file without the image data, so they may be used as a metadata
+file to contain any information supported by the JPEG format.  ExifTool has full
+read, write and create support for this format.</p>
+
+<hr>
 <i>Created Nov 12, 2008</i><br>
-<i>Last revised Jan 29, 2014</i>
+<i>Last revised Feb 22, 2014</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

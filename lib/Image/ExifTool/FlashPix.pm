@@ -1361,7 +1361,7 @@ sub ProcessFPXR($$$)
     my $verbose = $et->Options('Verbose');
 
     if ($dirLen < 13) {
-        $et->Warn('FPXR segment to small');
+        $et->Warn('FPXR segment too small');
         return 0;
     }
 
