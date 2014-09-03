@@ -32,7 +32,7 @@ use Image::ExifTool::XMP;
 use Image::ExifTool::Canon;
 use Image::ExifTool::Nikon;
 
-$VERSION = '2.76';
+$VERSION = '2.80';
 @ISA = qw(Exporter);
 
 sub NumbersFirst;
@@ -84,6 +84,7 @@ my %tweakOrder = (
     MinoltaRaw => 'KyoceraRaw',
     KyoceraRaw => 'CanonRaw',
     SigmaRaw => 'PanasonicRaw',
+    Lytro   => 'SigmaRaw',
     PhotoMechanic => 'FotoStation',
     Microsoft     => 'PhotoMechanic',
    'Microsoft::MP'=> 'Microsoft::MP1',
@@ -256,7 +257,7 @@ specification.
 Some GPS tags have values which are fixed-length strings. For these, the
 indicated string lengths include a null terminator which is added
 automatically by ExifTool.  Remember that the descriptive values are used
-when writing (ie. 'Above Sea Level', not '0') unless the print conversion is
+when writing (eg. 'Above Sea Level', not '0') unless the print conversion is
 disabled (with '-n' on the command line or the PrintConv option in the API,
 or by suffixing the tag name with a C<#> character).
 
@@ -303,12 +304,12 @@ has no effect, and both structured and flattened tags may be written.  See
 L<http://owl.phy.queensu.ca/~phil/exiftool/struct.html> for more details.
 
 Individual languages for C<lang-alt> tags are accessed by suffixing the tag
-name with a '-', followed by an RFC 3066 language code (ie. "XMP:Title-fr",
+name with a '-', followed by an RFC 3066 language code (eg. "XMP:Title-fr",
 or "Rights-en-US").  (See L<http://www.ietf.org/rfc/rfc3066.txt> for the RFC
 3066 specification.)  A C<lang-alt> tag with no language code accesses the
 "x-default" language, but causes other languages for this tag to be deleted
 when writing.  The "x-default" language code may be specified when writing
-to preserve other existing languages (ie. "XMP-dc:Description-x-default"). 
+to preserve other existing languages (eg. "XMP-dc:Description-x-default"). 
 When reading, "x-default" is not specified.
 
 The XMP tags are organized according to schema B<Namespace> in the following
@@ -317,7 +318,7 @@ been shortened for convenience (since the family 1 group names are derived
 from these by adding a leading "XMP-").  In cases where a tag name exists in
 more than one namespace, less common namespaces are avoided when writing.
 However, any namespace may be written by specifying a family 1 group name
-for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.  When deciding on
+for the tag, eg) XMP-exif:Contrast or XMP-crs:Contrast.  When deciding on
 which tags to add to an image, using standard schemas such as
 L<dc|/XMP dc Tags>, L<xmp|/XMP xmp Tags>, L<iptcCore|/XMP iptcCore Tags>
 and L<iptcExt|/XMP iptcExt Tags> is recommended if possible.
@@ -374,6 +375,13 @@ doesn't include a timezone then the current local timezone offset is used
 (unless written with a combined date/time, in which case the local timezone
 offset at the specified date/time is used, which may be different due to
 changes in daylight savings time).
+
+Note that it is not uncommon for IPTC to be found in non-standard locations
+in JPEG and TIFF-based images.  When reading, the family 1 group name has a
+number added for non-standard IPTC ("IPTC2", "IPTC3", etc), but when writing
+only "IPTC" may be specified as the group.  To keep the IPTC consistent,
+ExifTool updates tags in all existing IPTC locations, but will create a new
+IPTC group only in the standard location.
 },
     Photoshop => q{
 Photoshop tags are found in PSD and PSB files, as well as inside embedded
@@ -495,7 +503,8 @@ Tags in the family 1 "System" group are referred to as "pseudo" tags because
 they don't represent real metadata in the file.  Instead, this information
 is stored in the directory structure of the filesystem.  The five writable
 "pseudo" tags (FileName, Directory, FileModifyDate, FileCreateDate and
-HardLink) may be written without modifying the file itself.
+HardLink) may be written without modifying the file itself.  The TestName
+tag is used for dry run testing of writes to FileName.
 },
     Composite => q{
 The values of the composite tags are B<Derived From> the values of other
@@ -566,6 +575,10 @@ my %shortcutNotes = (
     Unsafe => q{
         "unsafe" tags in JPEG images which are normally not copied.  Defined here
         as a shortcut to use when rebuilding JPEG EXIF from scratch
+    },
+    LargeTags => q{
+        large binary data tags which may be excluded to reduce memory usage if
+        memory limitations are a problem
     },
 );
 
@@ -1344,7 +1357,7 @@ TagID:  foreach $tagID (@keys) {
 #------------------------------------------------------------------------------
 # Rewrite this file to build the lookup tables
 # Inputs: 0) BuildTagLookup object reference
-#         1) output tag lookup module name (ie. 'lib/Image/ExifTool/TagLookup.pm')
+#         1) output tag lookup module name (eg. 'lib/Image/ExifTool/TagLookup.pm')
 # Returns: true on success
 sub WriteTagLookup($$)
 {
@@ -1813,8 +1826,8 @@ sub CloseHtmlFiles($)
 #------------------------------------------------------------------------------
 # Write the TagName HTML and POD documentation
 # Inputs: 0) BuildTagLookup object reference
-#         1) output pod file (ie. 'lib/Image/ExifTool/TagNames.pod')
-#         2) output html directory (ie. 'html')
+#         1) output pod file (eg. 'lib/Image/ExifTool/TagNames.pod')
+#         2) output html directory (eg. 'html')
 # Returns: true on success
 # Notes: My apologies for the patchwork code, but this is only used to generate the docs.
 sub WriteTagNames($$)
@@ -2074,7 +2087,7 @@ sub WriteTagNames($$)
         $line .= sprintf " %-${wGrp}s", 'Group' if $showGrp;
         $line .= ' Writable';
         print PODFILE $line;
-        $line =~ s/^(\s*\w.{6}\w) /$1\t/;   # change space to tab after long ID label (ie. "Sequence")
+        $line =~ s/^(\s*\w.{6}\w) /$1\t/;   # change space to tab after long ID label (eg. "Sequence")
         $line =~ s/\S/-/g;
         $line =~ s/- -/---/g;
         $line =~ tr/\t/ /;                  # change tab back to space

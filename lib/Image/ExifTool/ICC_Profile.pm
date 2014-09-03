@@ -23,7 +23,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.28';
+$VERSION = '1.29';
 
 sub ProcessICC($$);
 sub ProcessICC_Profile($$$);
@@ -409,6 +409,7 @@ my %profileClass = (
         Name => 'MeasurementGeometry',
         Format => 'int32u',
         PrintConv => {
+            0 => 'Unknown',
             1 => '0/45 or 45/0',
             2 => '0/d or d/0',
         },

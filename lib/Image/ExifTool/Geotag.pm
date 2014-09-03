@@ -22,11 +22,12 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:Public);
 
-$VERSION = '1.41';
+$VERSION = '1.44';
 
 sub JITTER() { return 2 }       # maximum time jitter
 
 sub SetGeoValues($$;$);
+sub PrintFixTime($);
 sub PrintFix($@);
 
 # XML tags that we recognize (keys are forced to lower case)
@@ -176,8 +177,8 @@ sub LoadTrackLog($$;$)
             if (/^<(\?xml|gpx)[\s>]/) { # look for XML or GPX header
                 $format = 'XML';
             # check for NMEA sentence
-            # (must ONLY start with ones that have timestamps! ie. not GSA or PTNTHPR!)
-            } elsif (/^\$(GP(RMC|GGA|GLL)|PMGNTRK),/) {
+            # (must ONLY start with ones that have timestamps! eg. not GSA or PTNTHPR!)
+            } elsif (/^\$(GP(RMC|GGA|GLL|ZDA)|PMGNTRK),/) {
                 $format = 'NMEA';
                 $nmeaStart = $2 || $1;    # save type of first sentence
             } elsif (/^A(FLA|XSY|FIL)/) {
@@ -211,7 +212,7 @@ sub LoadTrackLog($$;$)
             # lat/lon/alt are space-separated; we want commas.
             s{(\S+)\s+(\S+)\s+(\S+)(</gx:coord>)}{$1,$2,$3$4};
             foreach $arg (split) {
-                # parse attributes (ie. GPX 'lat' and 'lon')
+                # parse attributes (eg. GPX 'lat' and 'lon')
                 # (note: ignore namespace prefixes if they exist)
                 if ($arg =~ /^(\w+:)?(\w+)=(['"])(.*?)\3/g) {
                     my $tag = $xmlTag{lc $2};
@@ -306,7 +307,7 @@ sub LoadTrackLog($$;$)
         my (%fix, $secs, $date, $nmea);
         if ($format eq 'NMEA') {
             # ignore unrecognized NMEA sentences
-            next unless /^\$(GP(RMC|GGA|GLL|GSA)|PMGNTRK|PTNTHPR),/;
+            next unless /^\$(GP(RMC|GGA|GLL|GSA|ZDA)|PMGNTRK|PTNTHPR),/;
             $nmea = $2 || $1;
         }
 #
@@ -333,8 +334,9 @@ sub LoadTrackLog($$;$)
 #
         } elsif ($nmea eq 'RMC') {
             #  $GPRMC,092204.999,A,4250.5589,S,14718.5084,E,0.00,89.68,211200,,*25
+            #  $GPRMC,093657.007,,3652.835020,N,01053.104094,E,1.642,,290913,,,A*0F
             #  $GPRMC,hhmmss.sss,A/V,ddmm.mmmm,N/S,ddmmm.mmmm,E/W,spd(knots),dir(deg),DDMMYY,,*cs
-            /^\$GPRMC,(\d{2})(\d{2})(\d+)(\.\d+)?,A,(\d*?)(\d{1,2}\.\d+),([NS]),(\d*?)(\d{1,2}\.\d+),([EW]),(\d*\.?\d*),(\d*\.?\d*),(\d{2})(\d{2})(\d+)/ or next;
+            /^\$GPRMC,(\d{2})(\d{2})(\d+(\.\d*)?),A?,(\d*?)(\d{1,2}\.\d+),([NS]),(\d*?)(\d{1,2}\.\d+),([EW]),(\d*\.?\d*),(\d*\.?\d*),(\d{2})(\d{2})(\d+)/ or next;
             next if $13 > 31 or $14 > 12 or $15 > 99;   # validate day/month/year
             $fix{lat} = (($5 || 0) + $6/60) * ($7 eq 'N' ? 1 : -1);
             $fix{lon} = (($8 || 0) + $9/60) * ($10 eq 'E' ? 1 : -1);
@@ -342,22 +344,21 @@ sub LoadTrackLog($$;$)
             $fix{track} = $12 if length $12;
             my $year = $15 + ($15 >= 70 ? 1900 : 2000);
             $secs = (($1 * 60) + $2) * 60 + $3;
-            $secs += $4 if $4;      # add fractional seconds
             $date = Time::Local::timegm(0,0,0,$13,$14-1,$year-1900);
 #
 # NMEA GGA sentence (no date)
 #
         } elsif ($nmea eq 'GGA') {
             #  $GPGGA,092204.999,4250.5589,S,14718.5084,E,1,04,24.4,19.7,M,,,,0000*1F
+            #  $GPGGA,093657.000,3652.835020,N,01053.104094,E,,8,,166.924,M,40.9,M,,*77
             #  $GPGGA,hhmmss.sss,ddmm.mmmm,N/S,dddmm.mmmm,E/W,0=invalid,sats,hdop,alt,M,...
-            /^\$GPGGA,(\d{2})(\d{2})(\d+)(\.\d+)?,(\d*?)(\d{1,2}\.\d+),([NS]),(\d*?)(\d{1,2}\.\d+),([EW]),[1-6],(\d+)?,(\.\d+|\d+\.?\d*)?,(-?\d+\.?\d*)?,M?,/ or next;
+            /^\$GPGGA,(\d{2})(\d{2})(\d+(\.\d*)?),(\d*?)(\d{1,2}\.\d+),([NS]),(\d*?)(\d{1,2}\.\d+),([EW]),[1-6]?,(\d+)?,(\.\d+|\d+\.?\d*)?,(-?\d+\.?\d*)?,M?,/ or next;
             $fix{lat} = (($5 || 0) + $6/60) * ($7 eq 'N' ? 1 : -1);
             $fix{lon} = (($8 || 0) + $9/60) * ($10 eq 'E' ? 1 : -1);
             $fix{nsats} = $11;
             $fix{hdop} = $12;
             $fix{alt} = $13;
             $secs = (($1 * 60) + $2) * 60 + $3;
-            $secs += $4 if $4;      # add fractional seconds
             $canCut = 1;
 #
 # NMEA GLL sentence (no date)
@@ -365,11 +366,10 @@ sub LoadTrackLog($$;$)
         } elsif ($nmea eq 'GLL') {
             #  $GPGLL,4250.5589,S,14718.5084,E,092204.999,A*2D
             #  $GPGLL,ddmm.mmmm,N/S,dddmm.mmmm,E/W,hhmmss.sss,A/V*cs
-            /^\$GPGLL,(\d*?)(\d{1,2}\.\d+),([NS]),(\d*?)(\d{1,2}\.\d+),([EW]),(\d{2})(\d{2})(\d+)(\.\d+),A/ or next;
+            /^\$GPGLL,(\d*?)(\d{1,2}\.\d+),([NS]),(\d*?)(\d{1,2}\.\d+),([EW]),(\d{2})(\d{2})(\d+(\.\d*)?),A/ or next;
             $fix{lat} = (($1 || 0) + $2/60) * ($3 eq 'N' ? 1 : -1);
             $fix{lon} = (($4 || 0) + $5/60) * ($6 eq 'E' ? 1 : -1);
             $secs = (($7 * 60) + $8) * 60 + $9;
-            $secs += $10 if $10;    # add fractional seconds
 #
 # NMEA GSA sentence (satellite status, no date)
 #
@@ -382,17 +382,25 @@ sub LoadTrackLog($$;$)
             $fix{nsats} = scalar @a;
             $canCut = 1;
 #
+# NMEA ZDA sentence (date/time, contains date)
+#
+        } elsif ($nmea eq 'ZDA') {
+            #  $GPZDA,093655.000,29,09,2013,,*58
+            #  $GPZDA,hhmmss.ss,DD,MM,YYYY,tzh,tzm (hhmmss in UTC)
+            /^\$GPZDA,(\d{2})(\d{2})(\d{2}(\.\d*)?),(\d+),(\d+),(\d+)/ or next;
+            $secs = (($1 * 60) + $2) * 60 + $3;
+            $date = Time::Local::timegm(0,0,0,$5,$6-1,$7-1900);
+#
 # Magellan eXplorist PMGNTRK (Proprietary MaGellaN TRacK) sentence (optional date)
 #
         } elsif ($nmea eq 'PMGNTRK') {
             # $PMGNTRK,4415.026,N,07631.091,W,00092,M,185031.06,A,,020409*65
             # $PMGNTRK,ddmm.mmm,N/S,dddmm.mmm,E/W,alt,F/M,hhmmss.ss,A/V,trkname,DDMMYY*cs
-            /^\$PMGNTRK,(\d+)(\d{2}\.\d+),([NS]),(\d+)(\d{2}\.\d+),([EW]),(-?\d+\.?\d*),([MF]),(\d{2})(\d{2})(\d+)(\.\d+)?,A,(?:[^,]*,(\d{2})(\d{2})(\d+))?/ or next;
+            /^\$PMGNTRK,(\d+)(\d{2}\.\d+),([NS]),(\d+)(\d{2}\.\d+),([EW]),(-?\d+\.?\d*),([MF]),(\d{2})(\d{2})(\d+(\.\d*)?),A,(?:[^,]*,(\d{2})(\d{2})(\d+))?/ or next;
             $fix{lat} = ($1 + $2/60) * ($3 eq 'N' ? 1 : -1);
             $fix{lon} = ($4 + $5/60) * ($6 eq 'E' ? 1 : -1);
             $fix{alt} = $8 eq 'M' ? $7 : $7 * 12 * 0.0254;
             $secs = (($9 * 60) + $10) * 60 + $11;
-            $secs += $12 if $12;    # add fractional seconds
             if (defined $15) {
                 next if $13 > 31 or $14 > 12 or $15 > 99;   # validate day/month/year
                 # optional date is available in PMGNTRK sentence
@@ -555,11 +563,14 @@ sub LoadTrackLog($$;$)
         print $out "Ignored $cutHDOP points due to GeoMaxHDOP cut\n" if $cutHDOP;
         print $out "Ignored $cutSats points due to GeoMinSats cut\n" if $cutSats;
         if ($numPoints and $verbose > 1) {
-            print $out '  GPS track start: ' . Image::ExifTool::ConvertUnixTime($fixTimes[0]) . " UTC\n";
+            my @lbl = ('start:', 'end:  ');
+            # (fixes may be in reverse order in GPX files)
+            @lbl = reverse @lbl if $fixTimes[0] > $fixTimes[-1];
+            print $out "  GPS track $lbl[0] " . PrintFixTime($fixTimes[0]) . "\n";
             if ($verbose > 3) {
                 print $out PrintFix($points, $_) foreach @fixTimes;
             }
-            print $out '  GPS track end:   ' . Image::ExifTool::ConvertUnixTime($fixTimes[-1]) . " UTC\n";
+            print $out "  GPS track $lbl[1] " . PrintFixTime($fixTimes[-1]) . "\n";
         }
     }
     if ($numPoints) {
@@ -753,18 +764,19 @@ sub SetGeoValues($$;$)
 
         if ($et->Options('Verbose') > 1 and not $secondTry) {
             my $out = $et->Options('TextOut');
-            my $str = "$fsec UTC";
+            my $str = '';
             $str .= sprintf(" (incl. Geosync offset of %+.3f sec)", $sync) if defined $sync;
             unless ($tz) {
                 my $tzs = Image::ExifTool::TimeZoneString([$sec,$min,$hr,$day,$mon-1,$year-1900],$time);
                 $str .= " (local timezone is $tzs)";
             }
-            print $out '  Geotime value:   ' . Image::ExifTool::ConvertUnixTime(int $time) . "$str\n";
+            print $out '  Geotime value:   ' . PrintFixTime($time) . "$str\n";
         }
         # interpolate GPS track at $time
         if ($time < $$times[0]) {
             if ($time < $$times[0] - $geoMaxExtSecs) {
                 $err or $err = 'Time is too far before track';
+                $et->VPrint(2, '  Track start:     ', PrintFixTime($$times[0]), "\n") if $verbose > 2;
             } else {
                 $fix = $$points{$$times[0]};
                 $iExt = 0;  $iDir = 1;
@@ -774,6 +786,7 @@ sub SetGeoValues($$;$)
         } elsif ($time > $$times[-1]) {
             if ($time > $$times[-1] + $geoMaxExtSecs) {
                 $err or $err = 'Time is too far beyond track';
+                $et->VPrint(2, '  Track end:       ', PrintFixTime($$times[-1]), "\n") if $verbose > 2;
             } else {
                 $fix = $$points{$$times[-1]};
                 $iExt = $#$times;  $iDir = -1;
@@ -810,6 +823,7 @@ sub SetGeoValues($$;$)
                 }
                 if (abs($time - $tn) > $geoMaxExtSecs) {
                     $err or $err = 'Time is too far from nearest GPS fix';
+                    $et->VPrint(2, '  Nearest fix:     ', PrintFixTime($tn), "\n") if $verbose > 2;
                 } else {
                     $fix = $$points{$tn};
                     $et->VPrint(2, "  Taking pos from fix:\n",
@@ -818,7 +832,7 @@ sub SetGeoValues($$;$)
             } else {
                 my $f0 = $t1 == $t0 ? 0 : ($time - $t0) / ($t1 - $t0);
                 my $p0 = $$points{$t0};
-                $et->VPrint(2, "  Interpolating pos between fixes (f=$f0):\n",
+                $et->VPrint(2, "  Interpolating between fixes (f=$f0):\n",
                     PrintFix($points, $t0, $t1)) if $verbose > 2;
                 $fix = { };
                 # loop through available fix information categories
@@ -1063,13 +1077,9 @@ sub ConvertGeosync($$)
             # print verbose output
             if ($et->Options('Verbose') > 1) {
                 # print GPS and image timestamps in UTC
-                my $gps = Image::ExifTool::ConvertUnixTime($gpsSecs);
-                my $img = Image::ExifTool::ConvertUnixTime($imgSecs);
-                $gps .= $1 if $gpsTime =~ /(\.\d+)/;
-                $img .= $1 if $imgTime =~ /(\.\d+)/;
                 $et->VPrint(1, "Added Geosync point:\n",
-                               "  GPS time stamp:  $gps UTC\n",
-                               "  Image date/time: $img UTC\n");
+                               '  GPS time stamp:  ', PrintFixTime($gpsSecs), "\n",
+                               '  Image date/time: ', PrintFixTime($imgSecs), "\n");
             }
             # save sorted list of image sync times if we have more than one
             my @times = keys %{$$sync{Points}};
@@ -1095,6 +1105,17 @@ sub ConvertGeosync($$)
 }
 
 #------------------------------------------------------------------------------
+# Print fix time
+# Inputs: 0) time since the epoch
+# Returns: UTC time string with fractional seconds
+sub PrintFixTime($)
+{
+    my $time = $_[0] + 0.0005;  # round off to nearest ms
+    my $fsec = int(($time - int($time)) * 1000);
+    return sprintf('%s.%.3d UTC', Image::ExifTool::ConvertUnixTime($time), $fsec);
+}
+
+#------------------------------------------------------------------------------
 # Print fix information
 # Inputs: 0) lookup for all fix points, 1-n) list of fix times
 # Returns: fix string (including leading indent and trailing newline)
@@ -1105,11 +1126,11 @@ sub PrintFix($@)
     my $str = '';
     while (@_) {
         my $time = shift;
-        $str .= '    ' . Image::ExifTool::ConvertUnixTime($time) . ' UTC -';
+        $str .= '    ' . PrintFixTime($time) . ' -';
         my $fix = $$points{$time};
         if ($fix) {
             foreach (sort keys %$fix) {
-                $str .= " $_=$$fix{$_}" unless $_ eq 'time';
+                $str .= " $_=$$fix{$_}" unless $_ eq 'time' or not defined $$fix{$_};
             }
         }
         $str .= "\n";

@@ -814,7 +814,7 @@ sub ProcessCRW($$)
     # initialize maker note data if building maker notes
     $buildMakerNotes and InitMakerNotes($et);
 
-    # set the FileType tag unless already done (ie. APP0 CIFF record in JPEG image)
+    # set the FileType tag unless already done (eg. APP0 CIFF record in JPEG image)
     $et->SetFileType();
 
     # build directory information for main raw directory

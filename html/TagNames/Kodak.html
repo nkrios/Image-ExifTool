@@ -545,8 +545,8 @@ with much duplication), but relatively few tags have so far been decoded.</p>
   <br>25 = Back Light
   <br>28 = Candlelight
   <br>29 = Sunset
-  <br>31 = Panorama Left-Right
-  <br>32 = Panorama Right-Left
+  <br>31 = Panorama Left-right
+  <br>32 = Panorama Right-left
   <br>33 = Smart Scene
   <br>34 = High ISO</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
@@ -933,6 +933,44 @@ indicator instead of a full TIFF header.  These tags are used by the Z980.</p>
 <td title='0x001d = 29'>0x001d</td>
 <td>FocalLength</td>
 <td class=c>int32u</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Type11'>Kodak Type11 Tags</a></h2>
+<p>These tags are found in models such as the PixPro S-1.  They are not
+writable because the inconsistency of Kodak maker notes is beginning to get
+on my nerves.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td title='0x0203 = 515'>0x0203</td>
+<td>PictureEffect</td>
+<td class=c>N</td>
+<td><span class=s>0 = None
+  <br>3 = Monochrome
+  <br>9 = Kodachrome</span></td></tr>
+<tr class=b>
+<td title='0x0207 = 519'>0x0207</td>
+<td>KodakModel</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0300 = 768'>0x0300</td>
+<td>KodakMake</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td title='0x0308 = 776'>0x0308</td>
+<td>LensSerialNumber</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td title='0x0309 = 777'>0x0309</td>
+<td>LensModel</td>
+<td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -1753,7 +1791,7 @@ such as the P880.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 7, 2013</i>
+<br><i>Last revised Jul 1, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

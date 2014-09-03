@@ -100,7 +100,7 @@ sub ProcessJPEG_HDR($$$);
         Condition => '$$valPt =~ /^FPXR\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::FlashPix::Main' },
       }, {
-        Name => 'PreviewImage', # (ie. Samsung S1060)
+        Name => 'PreviewImage', # (eg. Samsung S1060)
         Notes => 'continued from APP3',
     }],
     APP5 => [{
@@ -108,7 +108,7 @@ sub ProcessJPEG_HDR($$$);
         Condition => '$$valPt =~ /^RMETA\0/',
         SubDirectory => { TagTable => 'Image::ExifTool::Ricoh::RMETA' },
       }, {
-        Name => 'PreviewImage', # (ie. BenQ DC E1050)
+        Name => 'PreviewImage', # (eg. BenQ DC E1050)
         Notes => 'continued from APP4',
     }],
     APP6 => [{

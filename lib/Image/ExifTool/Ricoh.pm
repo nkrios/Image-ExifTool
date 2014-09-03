@@ -18,7 +18,7 @@ use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 sub ProcessRicohText($$$);
 sub ProcessRicohRMETA($$$);
@@ -48,7 +48,7 @@ my %ricohLensIDs = (
     0x0002 => { #PH
         Name => 'FirmwareVersion',
         Writable => 'string',
-        # ie. "Rev0113" is firmware version 1.13
+        # eg. "Rev0113" is firmware version 1.13
         PrintConv => '$val=~/^Rev(\d+)$/ ? sprintf("%.2f",$1/100) : $val',
         PrintConvInv => '$val=~/^(\d+)\.(\d+)$/ ? sprintf("Rev%.2d%.2d",$1,$2) : $val',
     },
@@ -431,6 +431,38 @@ my %ricohLensIDs = (
             Start => '$val',
         },
     },
+);
+
+# Ricoh type 2 maker notes (ref PH)
+# (similar to Kodak::Type11 and GE::Main)
+%Image::ExifTool::Ricoh::Type2 = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
+    NOTES => q{
+        Tags written by models such as the Ricoh HZ15 and the Pentax XG-1.  These
+        are not writable due to numerous formatting errors as written by these
+        cameras.
+    },
+    # 0x104 - int32u: 1
+    # 0x200 - int32u[3]: 0 0 0
+    # 0x202 - int16u: 0 (GE Macro?)
+    # 0x203 - int16u: 0,3 (Kodak PictureEffect?)
+    # 0x204 - rational64u: 0/10
+    # 0x206 - float[6]: (not really float because size should be 2 bytes)
+    # 0x207 - string[4]: zeros (GE/Kodak Model?)
+    0x300 => {
+        # brutal.  There are lots of errors in the XG-1 maker notes.  For the XG-1,
+        # 0x300 has a value of "XG-1Pentax".  The "XG-1" part is likely an improperly
+        # stored 0x207 RicohModel, resulting in an erroneous 4-byte offset for this tag
+        Name => 'RicohMake',
+        Writable => 'undef',
+        ValueConv => '$val =~ s/ *$//; $val',
+    },
+    # 0x306 - int16u: 1
+    # 0x500 - int16u: 0
+    # 0x501 - int16u: 0
+    # 0x502 - int16u: 0
+    # 0x9c9c - int8u[6]: ?
+    # 0xadad - int8u[20480]: ?
 );
 
 # Ricoh image info (ref 2)

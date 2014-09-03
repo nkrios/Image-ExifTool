@@ -1318,7 +1318,7 @@ sub ConvertLensInfo($)
 
 #------------------------------------------------------------------------------
 # Get binary CFA Pattern from a text string
-# Inputs: Print-converted CFA pattern (ie. '[Blue,Green][Green,Red]')
+# Inputs: Print-converted CFA pattern (eg. '[Blue,Green][Green,Red]')
 # Returns: CFA pattern as a string of numbers
 sub GetCFAPattern($)
 {
@@ -1882,7 +1882,7 @@ sub WriteExif($$$)
                 next unless $et->IsOverwriting($nvHash);
                 # don't cross delete if specifically deleting from the other directory
                 # (Note: don't call GetValue() here because it shouldn't be called
-                #  if IsOverwriting returns < 0 -- ie. when shifting)
+                #  if IsOverwriting returns < 0 -- eg. when shifting)
                 next if not defined $$nvHash{Value} and $$nvHash{WantGroup} and
                         lc($$nvHash{WantGroup}) eq lc($wrongDir);
                 # remove this tag if found in this IFD
@@ -2437,7 +2437,7 @@ NoOverwrite:            next if $isNew > 0;
 # create new subdirectory
 #
                     # newInfo may not be defined if we try to add a mandatory tag
-                    # to a directory that doesn't support it (ie. IFD1 in RW2 images)
+                    # to a directory that doesn't support it (eg. IFD1 in RW2 images)
                     $newInfo = $$addDirs{$newID} or next;
                     # make sure we don't try to generate a new MakerNotes directory
                     # or a SubIFD
@@ -2488,7 +2488,7 @@ NoOverwrite:            next if $isNew > 0;
                     $newFormat = $formatNumber{$newFormName};
                 } elsif ($$addDirs{$newID} and $newInfo ne $$addDirs{$newID}) {
                     # this can happen if we are trying to add a directory that doesn't exist
-                    # in this type of file (ie. try adding a SubIFD tag to an A100 image)
+                    # in this type of file (eg. try adding a SubIFD tag to an A100 image)
                     $isNew = -1;
                 }
             }
@@ -2803,7 +2803,7 @@ NoOverwrite:            next if $isNew > 0;
                                 $et->Error("Error writing $subdirName") unless $$et{VALUE}{Error};
                                 return undef;
                             }
-                            # add back original header if necessary (ie. Ricoh GR)
+                            # add back original header if necessary (eg. Ricoh GR)
                             if ($hdrLen and $hdrLen > 0 and $subdirStart <= $dataLen) {
                                 $subdirData = substr($$dataPt, $subdirStart - $hdrLen, $hdrLen) . $subdirData;
                                 $subdirInfo{Fixup}{Start} += $hdrLen;

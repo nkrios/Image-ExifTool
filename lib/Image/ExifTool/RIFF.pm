@@ -1104,7 +1104,7 @@ my %riffMimeType = (
         },
         Desire => {
             # check FrameCount because this calculation only applies
-            # to audio-only files (ie. WAV)
+            # to audio-only files (eg. WAV)
             2 => 'FrameCount',
             3 => 'VideoFrameCount',
         },
@@ -1133,7 +1133,7 @@ sub ConvertRIFFDate($)
     my @part = split ' ', $val;
     my $mon;
     if (@part >= 5 and $mon = $monthNum{ucfirst(lc($part[1]))}) {
-        # the standard AVI date format (ie. "Mon Mar 10 15:04:43 2003")
+        # the standard AVI date format (eg. "Mon Mar 10 15:04:43 2003")
         $val = sprintf("%.4d:%.2d:%.2d %s", $part[4],
                        $mon, $part[2], $part[3]);
     } elsif ($val =~ m{(\d{4})/\s*(\d+)/\s*(\d+)/?\s+(\d+):\s*(\d+)\s*(P?)}) {
@@ -1171,9 +1171,9 @@ sub CalcDuration($@)
     my @keyList;
     for (;;) {
         # this is annoying.  Apparently (although I couldn't verify this), FrameCount
-        # in the RIFF header includes multiple video tracks if they exist (ie. with the
+        # in the RIFF header includes multiple video tracks if they exist (eg. with the
         # FujiFilm REAL 3D AVI's), but the video stream information isn't reliable for
-        # some cameras (ie. Olympus FE models), so use the video stream information
+        # some cameras (eg. Olympus FE models), so use the video stream information
         # only if the RIFF header duration is 2 to 3 times longer
         my $dur1 = $val[1] / $val[0] if $val[0];
         if ($val[2] and $val[3]) {
@@ -1410,7 +1410,7 @@ sub ProcessRIFF($$)
                 Base    => $pos,
             );
         } elsif ($tag eq 'RIFF') {
-            # don't read into RIFF chunk (ie. concatenated video file)
+            # don't read into RIFF chunk (eg. concatenated video file)
             $raf->Read($buff, 4) == 4 or $err=1, last;
             # extract information from remaining file as an embedded file
             $$et{DOC_NUM} = ++$$et{DOC_COUNT}

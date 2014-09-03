@@ -11,7 +11,7 @@ package Image::ExifTool::Lang::fr;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.27';
+$VERSION = '1.28';
 
 %Image::ExifTool::Lang::fr::Translate = (
    'AEAperture' => 'Ouverture AE',
@@ -1161,6 +1161,7 @@ $VERSION = '1.27';
    'Creator' => 'Créateur',
    'CreatorAddress' => 'Adresse du créateur',
    'CreatorCity' => 'Lieu d\'Habitation du créateur',
+   'CreatorContactInfo' => 'Contact créateur',
    'CreatorCountry' => 'Pays du créateur',
    'CreatorPostalCode' => 'Code postal du créateur',
    'CreatorRegion' => 'Région du créateur',
@@ -4518,9 +4519,9 @@ $VERSION = '1.27';
     },
    'WBAdjLighting' => {
       PrintConv => {
+        'Daylight (cloudy)' => 'Lumière du jour (2)',
         'Daylight (direct sunlight)' => 'Lumière du jour (0)',
         'Daylight (shade)' => 'Lumière du jour (1)',
-        'Daylight (cloudy)' => 'Lumière du jour (2)',
         'None' => 'Aucune',
       },
     },

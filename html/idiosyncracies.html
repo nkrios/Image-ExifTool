@@ -168,7 +168,10 @@ of the EXIF data), but for the RR1 the offsets are relative to the start of the
 subdirectory.  The G700 uses MPF offsets relative to the start of the file,
 instead of the start of the MPF segment as per the MPF spec.  The HX15 uses
 a standard EXIF maker note structure, but there are 2 extra padding bytes
-between the IFD entry count and the 1st IFD entry.</p>
+between the IFD entry count and the 1st IFD entry.  The HZ15 and Pentax XG-1 (by
+Ricoh) both have an extra 2 bytes after the IFD entry counts.  All value offsets
+are erroneously 0 for the HZ15, and there are other problems with the offsets
+stored by the XG-1.</p>
 
 <p><a name="Rollei"><b>Rollei:</b></a> The DK4010 writes all maker notes offsets relative to the
 start of the individual IFD entry.</p>
@@ -257,7 +260,7 @@ WB2000] [2013-07-25: Add the NX2000 to this list]</i>)</p>
 
 <hr>
 <i>Created Mar. 25, 2005</i>
-<br><i>Last revised Oct. 22, 2013</i>
+<br><i>Last revised Jul. 21, 2014</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

@@ -7103,7 +7103,7 @@ $VERSION = '1.11';
    'SubjectReference' => 'Codice Soggetto',
    'SubjectUnits' => {
       PrintConv => {
-        'Radians' => 'Radianti',
+        'radians' => 'Radianti',
       },
     },
    'Subsystem' => {

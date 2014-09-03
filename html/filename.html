@@ -29,6 +29,10 @@ the file is also moved to the specified directory (see
 <a href="#ex6">example 6</a> below).  Existing files will not be overwritten
 (but see "Warning" below).</p>
 
+<p>The <b>TestName</b> tag provides a mechanism for dry-run testing of the
+rename feature.  Writing <b>TestName</b> displays the old and new names without
+making any changes to the files.</p>
+
 <p>The <code>%d</code>, <code>%f</code>, <code>%e</code> file name format codes
 may be used to represent the directory, name and extension of the original file
 when specifying <b>FileName</b> and <b>Directory</b> tags via the command-line
@@ -94,6 +98,24 @@ of any tag value used in a format string.  See the <code>-p</code> option in the
 
 <h2>Examples</h2>
 
+<a name="ex0"></a><table cellpadding=6>
+<tr><td valign='top'>&nbsp;0.</td><td bgcolor='#dddddd'><code class='blk'>
+exiftool -d %Y%m%d_%H%M%%-c.%%e "-testname&lt;CreateDate" DIR
+</code></td></tr></table>
+<blockquote>
+The <b>TestName</b> tag is used for dry-run testing of the file renaming
+feature.  The above command is identical to that of example 1 except that
+<b>TestName</b> is written instead of <b>FileName</b>.  So instead of renaming
+the files, this command prints the old and new file names without actually
+changing anything.  For example:
+<blockquote><pre>&gt; <span class=code>exiftool -d %Y%m%d_%H%M%%-c.%%e "-testname&lt;CreateDate" tmp</span>
+'tmp/a.jpg' --&gt; 'tmp/20031031_1544.jpg'
+'tmp/b.jpg' --&gt; 'tmp/20010519_1836.jpg'
+    1 directories scanned
+    0 image files updated
+    2 image files unchanged</pre></blockquote>
+</blockquote>
+
 <a name="ex1"></a><table cellpadding=6>
 <tr><td valign='top'>&nbsp;1.</td><td bgcolor='#dddddd'><code class='blk'>
 exiftool -d %Y%m%d_%H%M%%-c.%%e "-filename&lt;CreateDate" DIR
@@ -103,7 +125,7 @@ Rename all images in directory '<code>DIR</code>' to names like
 '<code>20060327_1058-2.jpg</code>', with individual file names derived from the
 value of the CreateDate (plus a copy number with a leading '<code>-</code>' if a
 file with the same name already exists), and with the same extension as the
-original image.  <i class=lt>[Note that copying tag values with '<code><</code>' implies
+original image.  <i class=lt>[Note that copying tag values with '<code>&lt;</code>' implies
 '<code>-tagsfromfile @</code>' unless otherwise specified.  See the
 <code>-tagsFromFile</code> description in the
 <a href="exiftool_pod.html">application documentation</a> for details.]</i>
@@ -112,11 +134,12 @@ original image.  <i class=lt>[Note that copying tag values with '<code><</code>'
 <p>a) When a directory name is specified, this command will only rename "writable"
 files in the directory.  Use '<code>exiftool -listwf</code>' to list the
 extensions of currently writable file types.  The <code>-ext</code> option may
-be used to rename other file types (ie. '<code>-ext avi</code>').</p>
+be used to rename other file types (eg. '<code>-ext avi</code>').</p>
 <p>b) For this command to work, the CreateDate tag must exist in the source
 file. Use '<code>exiftool -createdate FILE</code>' to see if a file contains
 this information.  If it doesn't, you may need to use another date/time tag such
-as DateTimeOriginal or FileModifyDate.</p>
+as DateTimeOriginal or FileModifyDate.  To see all available date/time tags in a
+file (and their locations), use '<code>exiftool -a -G1 -s -time:all FILE</code>'.</p>
 </blockquote>
 
 <a name="ex2"></a><table cellpadding=6>
@@ -162,7 +185,7 @@ images are copied instead of moved since the <code>-o</code> option was used. In
 the second command the trailing '<code>/</code>' on '<code>dummy/</code>' is
 necessary because otherwise '<code>dummy</code>' would be interpreted as a file
 name.  This technique of using <code>-o</code> with a dummy directory name is
-necessary when the directory name is derived from the value of other tags (ie.
+necessary when the directory name is derived from the value of other tags (eg.
 '<code>-directory&lt;createDate</code>') and you want the files to be copied
 instead of moved.  (Because the values of other tags may not be used with the
 <code>-o</code> option.)
@@ -271,7 +294,7 @@ to most systems, but additional codes may be available on your specific system
 <tr><th>%x</th><td>- preferred locale date representation</td></tr>
 <tr><th>%X</th><td>- preferred locale time representation</td></tr>
 <tr><th>%y</th><td>- 2-digit year (00-99)</td></tr>
-<tr><th>%Y</th><td>- 4-digit year (ie. 2006)</td></tr>
+<tr><th>%Y</th><td>- 4-digit year (eg. 2006)</td></tr>
 <tr><th>%z</th><td>- time zone in the form +/-hhmm (see note 1 below)</td></tr>
 <tr><th>%Z</th><td>- system time zone name (see note 2 below)</td></tr>
 <tr><th>%%</th><td>- a literal '%' character</td></tr>

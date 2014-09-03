@@ -28,7 +28,7 @@ $VERSION = '1.01';
     },
     # 0x0004 - int32s: normally 1, but 0 for low-light images
     # 0x0005 - int32s: seen values 147-247, and 100 for blank images
-    # 0x0006 - int32s: seen values 186-241, and 20 for blank images
+    # 0x0006 - int32s: seen values 129-241, and 20 for blank images
     # 0x0007 - int32s: seen 1
     # 0x0009 - int32s: seen 19
     0x000a => {

@@ -80,43 +80,48 @@ for the official specification.</p>
 <td><span class=s><span class=n>(not a real tag ID, this tag represents the size of the &#39;mdat&#39; data in bytes
 and is used in the AvgBitrate calculation)</span></span></td></tr>
 <tr class=b>
+<td>'meta'</td>
+<td>Meta</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Meta'>QuickTime Meta Tags</a></td></tr>
+<tr>
 <td>'moov'</td>
 <td>Movie</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Movie'>QuickTime Movie Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'pict'</td>
 <td>PreviewPICT</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'pnot'</td>
 <td>Preview</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Preview'>QuickTime Preview Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'prrt'</td>
 <td>ARDroneTelemetry</td>
 <td class=c>N</td>
 <td><span class=s><span class=n>(telemetry information for each video frame: status1, status2, time, pitch,
 roll, yaw, speed, altitude)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>'skip'</td>
 <td>CanonSkip
   <br>Skip?</td>
 <td class=c>-<br>N</td>
 <td>--&gt; <a href='Canon.html#Skip'>Canon Skip Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'thum'</td>
 <td>ThumbnailImage</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>'udta'</td>
 <td>UserData</td>
 <td class=c>-</td>
 <td>--&gt; <a href='FLIR.html#UserData'>FLIR UserData Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'uuid'</td>
 <td>UUID-XMP
   <br>UUID-PROF
@@ -126,7 +131,7 @@ roll, yaw, speed, altitude)</span></span></td></tr>
 <td>--&gt; <a href='XMP.html'>XMP Tags</a>
   <br>--&gt; <a href='QuickTime.html#Profile'>QuickTime Profile Tags</a>
   <br>--&gt; <a href='QuickTime.html#Flip'>QuickTime Flip Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td>'wide'</td>
 <td>Wide?</td>
 <td class=c>N</td>
@@ -199,6 +204,7 @@ roll, yaw, speed, altitude)</span></span></td></tr>
   <br>&#39;NDXP&#39; = H.264/MPEG-4 AVC (.MP4) Nero Portable Profile
   <br>&#39;NDXS&#39; = H.264/MPEG-4 AVC (.MP4) Nero Standard Profile
   <br>&#39;ROSS&#39; = Ross Video
+  <br>&#39;XAVC&#39; = Sony XAVC
   <br>&#39;avc1&#39; = MP4 Base w/ AVC ext [ISO 14496-12:2005]
   <br>&#39;caqv&#39; = Casio Digital Camera
   <br>&#39;da0a&#39; = DMB MAF w/ MPEG Layer II aud, MOT slides, DLS, JPG/PNG/MNG images
@@ -249,1058 +255,6 @@ roll, yaw, speed, altitude)</span></span></td></tr>
 <tr>
 <td class=r title='2 = 0x2'>2</td>
 <td>CompatibleBrands</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='Movie'>QuickTime Movie Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'cmov'</td>
-<td>CompressedMovie</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#CMovie'>QuickTime CMovie Tags</a></td></tr>
-<tr class=b>
-<td>'htka'</td>
-<td>HTCTrack</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Track'>QuickTime Track Tags</a></td></tr>
-<tr>
-<td>'iods'</td>
-<td>InitialObjectDescriptor?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'meta'</td>
-<td>Meta</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Meta'>QuickTime Meta Tags</a></td></tr>
-<tr>
-<td>'mvhd'</td>
-<td>MovieHeader</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#MovieHeader'>QuickTime MovieHeader Tags</a></td></tr>
-<tr class=b>
-<td>'trak'</td>
-<td>Track</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Track'>QuickTime Track Tags</a></td></tr>
-<tr>
-<td>'udta'</td>
-<td>UserData</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#UserData'>QuickTime UserData Tags</a></td></tr>
-<tr class=b>
-<td>'uuid'</td>
-<td>UUID-USMT
-  <br>UUID-Canon
-  <br>UUID-Unknown?</td>
-<td class=c>-<br>-<br>N</td>
-<td>--&gt; <a href='QuickTime.html#UserMedia'>QuickTime UserMedia Tags</a>
-  <br>--&gt; <a href='Canon.html#uuid'>Canon uuid Tags</a></td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='CMovie'>QuickTime CMovie Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'dcom'</td>
-<td>Compression</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='Track'>QuickTime Track Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'mdia'</td>
-<td>Media</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Media'>QuickTime Media Tags</a></td></tr>
-<tr class=b>
-<td>'meta'</td>
-<td>Meta</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Meta'>QuickTime Meta Tags</a></td></tr>
-<tr>
-<td>'tapt'</td>
-<td>TrackAperture</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#TrackAperture'>QuickTime TrackAperture Tags</a></td></tr>
-<tr class=b>
-<td>'tkhd'</td>
-<td>TrackHeader</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#TrackHeader'>QuickTime TrackHeader Tags</a></td></tr>
-<tr>
-<td>'tref'</td>
-<td>TrackRef</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#TrackRef'>QuickTime TrackRef Tags</a></td></tr>
-<tr class=b>
-<td>'udta'</td>
-<td>UserData</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#UserData'>QuickTime UserData Tags</a></td></tr>
-<tr>
-<td>'uuid'</td>
-<td>UUID-USMT
-  <br>UUID-Unknown?</td>
-<td class=c>-<br>N</td>
-<td>--&gt; <a href='QuickTime.html#UserMedia'>QuickTime UserMedia Tags</a></td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='Media'>QuickTime Media Tags</a></h2>
-<p>MP4 media box.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'hdlr'</td>
-<td>Handler</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Handler'>QuickTime Handler Tags</a></td></tr>
-<tr class=b>
-<td>'mdhd'</td>
-<td>MediaHeader</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#MediaHeader'>QuickTime MediaHeader Tags</a></td></tr>
-<tr>
-<td>'minf'</td>
-<td>MediaInfo</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#MediaInfo'>QuickTime MediaInfo Tags</a></td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='Handler'>QuickTime Handler Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index1</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='4 = 0x4'>4</td>
-<td>HandlerClass</td>
-<td class=c>N</td>
-<td><span class=s>&#39;dhlr&#39; = Data Handler
-  <br>&#39;mhlr&#39; = Media Handler</span></td></tr>
-<tr class=b>
-<td class=r title='8 = 0x8'>8</td>
-<td>HandlerType</td>
-<td class=c>N</td>
-<td><table class=cols><tr>
-  <td>&#39;alis&#39; = Alias Data
-  <br>&#39;crsm&#39; = Clock Reference
-  <br>&#39;hint&#39; = Hint Track
-  <br>&#39;ipsm&#39; = IPMP
-  <br>&#39;m7sm&#39; = MPEG-7 Stream
-  <br>&#39;mdir&#39; = Metadata
-  <br>&#39;mdta&#39; = Metadata Tags
-  <br>&#39;meta&#39; = NRT Metadata
-  <br>&#39;mjsm&#39; = MPEG-J
-  <br>&#39;ocsm&#39; = Object Content</td><td>&nbsp;&nbsp;</td>
-  <td>&#39;odsm&#39; = Object Descriptor
-  <br>&#39;priv&#39; = Private
-  <br>&#39;sdsm&#39; = Scene Description
-  <br>&#39;soun&#39; = Audio Track
-  <br>&#39;subp&#39; = Subpicture
-  <br>&#39;text&#39; = Text
-  <br>&#39;tmcd&#39; = Time Code
-  <br>&#39;url &#39; = URL
-  <br>&#39;vide&#39; = Video Track</td><td>&nbsp;&nbsp;</td></tr></table>
-</td></tr>
-<tr>
-<td class=r title='12 = 0xc'>12</td>
-<td>HandlerVendorID</td>
-<td class=c>N</td>
-<td>--&gt; <a href='QuickTime.html#VendorID'>QuickTime VendorID Values</a></td></tr>
-<tr class=b>
-<td class=r title='24 = 0x18'>24</td>
-<td>HandlerDescription</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='VendorID'>QuickTime VendorID Values</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class='inner sep' cellspacing=1>
-<tr class=h><th>Value</th><th>VendorID</th><th>Value</th><th>VendorID</th><th>Value</th><th>VendorID</th></tr>
-<tr><td>'AR.D'</td><td>= Parrot AR.Drone</td>
-<td class=b>'ZORA'</td><td class=b>= Zoran Corporation</td>
-<td>'niko'</td><td>= Nikon</td>
-</tr><tr><td>'FFMP'</td><td>= FFmpeg</td>
-<td class=b>'appl'</td><td class=b>= Apple</td>
-<td>'olym'</td><td>= Olympus</td>
-</tr><tr><td>'GIC '</td><td>= General Imaging Co.</td>
-<td class=b>'fe20'</td><td class=b>= Olympus (fe20)</td>
-<td>'pana'</td><td>= Panasonic</td>
-</tr><tr><td>'KMPI'</td><td>= Konica-Minolta</td>
-<td class=b>'kdak'</td><td class=b>= Kodak</td>
-<td>'pent'</td><td>= Pentax</td>
-</tr><tr><td>'NIKO'</td><td>= Nikon</td>
-<td class=b>'leic'</td><td class=b>= Leica</td>
-<td>'pr01'</td><td>= Olympus (pr01)</td>
-</tr><tr><td>'SMI '</td><td>= Sorenson Media Inc.</td>
-<td class=b>'mino'</td><td class=b>= Minolta</td>
-<td>'sany'</td><td>= Sanyo</td>
-</tr></table></td></tr></table></blockquote>
-
-<h2><a name='MediaHeader'>QuickTime MediaHeader Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index4</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='0 = 0x0'>0</td>
-<td>MediaHeaderVersion</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='1 = 0x1'>1</td>
-<td>MediaCreateDate</td>
-<td class=c>int32u</td>
-<td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
-<tr>
-<td class=r title='2 = 0x2'>2</td>
-<td>MediaModifyDate</td>
-<td class=c>int32u</td>
-<td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
-<tr class=b>
-<td class=r title='3 = 0x3'>3</td>
-<td>MediaTimeScale</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='4 = 0x4'>4</td>
-<td>MediaDuration</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='5 = 0x5'>5</td>
-<td>MediaLanguageCode</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='MediaInfo'>QuickTime MediaInfo Tags</a></h2>
-<p>MP4 media info box.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'dinf'</td>
-<td>DataInfo</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#DataInfo'>QuickTime DataInfo Tags</a></td></tr>
-<tr class=b>
-<td>'gmhd'</td>
-<td>GenMediaHeader</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#GenMediaHeader'>QuickTime GenMediaHeader Tags</a></td></tr>
-<tr>
-<td>'hdlr'</td>
-<td>Handler</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Handler'>QuickTime Handler Tags</a></td></tr>
-<tr class=b>
-<td>'hmhd'</td>
-<td>HintHeader</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#HintHeader'>QuickTime HintHeader Tags</a></td></tr>
-<tr>
-<td>'nmhd'</td>
-<td>NullMediaHeader?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'smhd'</td>
-<td>AudioHeader</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#AudioHeader'>QuickTime AudioHeader Tags</a></td></tr>
-<tr>
-<td>'stbl'</td>
-<td>SampleTable</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#SampleTable'>QuickTime SampleTable Tags</a></td></tr>
-<tr class=b>
-<td>'vmhd'</td>
-<td>VideoHeader</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#VideoHeader'>QuickTime VideoHeader Tags</a></td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='DataInfo'>QuickTime DataInfo Tags</a></h2>
-<p>MP4 data information box.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'dref'</td>
-<td>DataRef</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#DataRef'>QuickTime DataRef Tags</a></td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='DataRef'>QuickTime DataRef Tags</a></h2>
-<p>MP4 data reference box.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'url '</td>
-<td>URL</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'urn '</td>
-<td>URN</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='GenMediaHeader'>QuickTime GenMediaHeader Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'gmin'</td>
-<td>GenMediaInfo</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#GenMediaInfo'>QuickTime GenMediaInfo Tags</a></td></tr>
-<tr class=b>
-<td>'text'</td>
-<td>Text?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'tmcd'</td>
-<td>TimeCode</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#TimeCode'>QuickTime TimeCode Tags</a></td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='GenMediaInfo'>QuickTime GenMediaInfo Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index1</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='0 = 0x0'>0</td>
-<td>GenMediaVersion</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='1 = 0x1'>1</td>
-<td>GenFlags</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='4 = 0x4'>4</td>
-<td>GenGraphicsMode</td>
-<td class=c>N</td>
-<td>--&gt; <a href='QuickTime.html#GraphicsMode'>QuickTime GraphicsMode Values</a></td></tr>
-<tr class=b>
-<td class=r title='6 = 0x6'>6</td>
-<td>GenOpColor</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='12 = 0xc'>12</td>
-<td>GenBalance</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='GraphicsMode'>QuickTime GraphicsMode Values</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class='inner sep' cellspacing=1>
-<tr class=h><th>Value</th><th>GraphicsMode</th><th>Value</th><th>GraphicsMode</th><th>Value</th><th>GraphicsMode</th></tr>
-<tr><td class=r>0x0</td><td>= srcCopy</td>
-<td class='r b'>0xb</td><td class=b>= patBic</td>
-<td class=r>0x26</td><td>= subOver</td>
-</tr><tr><td class=r>0x1</td><td>= srcOr</td>
-<td class='r b'>0xc</td><td class=b>= notPatCopy</td>
-<td class=r>0x27</td><td>= addMin</td>
-</tr><tr><td class=r>0x2</td><td>= srcXor</td>
-<td class='r b'>0xd</td><td class=b>= notPatOr</td>
-<td class=r>0x31</td><td>= grayishTextOr</td>
-</tr><tr><td class=r>0x3</td><td>= srcBic</td>
-<td class='r b'>0xe</td><td class=b>= notPatXor</td>
-<td class=r>0x32</td><td>= hilite</td>
-</tr><tr><td class=r>0x4</td><td>= notSrcCopy</td>
-<td class='r b'>0xf</td><td class=b>= notPatBic</td>
-<td class=r>0x40</td><td>= ditherCopy</td>
-</tr><tr><td class=r>0x5</td><td>= notSrcOr</td>
-<td class='r b'>0x20</td><td class=b>= blend</td>
-<td class=r>0x100</td><td>= Alpha</td>
-</tr><tr><td class=r>0x6</td><td>= notSrcXor</td>
-<td class='r b'>0x21</td><td class=b>= addPin</td>
-<td class=r>0x101</td><td>= White Alpha</td>
-</tr><tr><td class=r>0x7</td><td>= notSrcBic</td>
-<td class='r b'>0x22</td><td class=b>= addOver</td>
-<td class=r>0x102</td><td>= Pre-multiplied Black Alpha</td>
-</tr><tr><td class=r>0x8</td><td>= patCopy</td>
-<td class='r b'>0x23</td><td class=b>= subPin</td>
-<td class=r>0x110</td><td>= Component Alpha</td>
-</tr><tr><td class=r>0x9</td><td>= patOr</td>
-<td class='r b'>0x24</td><td class=b>= transparent</td>
-<td class=r>&nbsp;</td><td>&nbsp;</td>
-</tr><tr><td class=r>0xa</td><td>= patXor</td>
-<td class='r b'>0x25</td><td class=b>= addMax</td>
-<td class=r>&nbsp;</td><td>&nbsp;</td>
-</tr></table></td></tr></table></blockquote>
-
-<h2><a name='TimeCode'>QuickTime TimeCode Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'tcmi'</td>
-<td>TCMediaInfo</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#TCMediaInfo'>QuickTime TCMediaInfo Tags</a></td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='TCMediaInfo'>QuickTime TCMediaInfo Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index1</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='4 = 0x4'>4</td>
-<td>TextFont</td>
-<td class=c>N</td>
-<td><span class=s>0 = System</span></td></tr>
-<tr class=b>
-<td class=r title='6 = 0x6'>6</td>
-<td>TextFace</td>
-<td class=c>N</td>
-<td><table class=cols><tr>
-  <td>0x0 = Plain
-  <br>Bit 0 = Bold
-  <br>Bit 1 = Italic
-  <br>Bit 2 = Underline</td><td>&nbsp;&nbsp;</td>
-  <td>Bit 3 = Outline
-  <br>Bit 4 = Shadow
-  <br>Bit 5 = Condense
-  <br>Bit 6 = Extend</td><td>&nbsp;&nbsp;</td></tr></table>
-</td></tr>
-<tr>
-<td class=r title='8 = 0x8'>8</td>
-<td>TextSize</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='12 = 0xc'>12</td>
-<td>TextColor</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='18 = 0x12'>18</td>
-<td>BackgroundColor</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='24 = 0x18'>24</td>
-<td>FontName</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='HintHeader'>QuickTime HintHeader Tags</a></h2>
-<p>MP4 hint media header.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index2</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='2 = 0x2'>2</td>
-<td>MaxPDUSize</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='3 = 0x3'>3</td>
-<td>AvgPDUSize</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='4 = 0x4'>4</td>
-<td>MaxBitrate</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='6 = 0x6'>6</td>
-<td>AvgBitrate</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='AudioHeader'>QuickTime AudioHeader Tags</a></h2>
-<p>MP4 audio media header.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index2</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='2 = 0x2'>2</td>
-<td>Balance</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='SampleTable'>QuickTime SampleTable Tags</a></h2>
-<p>MP4 sample table box.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'co64'</td>
-<td>ChunkOffset64?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'cslg'</td>
-<td>CompositionToDecodeTimelineMapping?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'ctts'</td>
-<td>CompositionTimeToSample?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'padb'</td>
-<td>SamplePaddingBits?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'sbgp'</td>
-<td>SampleToGroup?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'sdtp'</td>
-<td>IdependentAndDisposableSamples?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'sgpd'</td>
-<td>SampleGroupDescription?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'stco'</td>
-<td>ChunkOffset?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'stdp'</td>
-<td>SampleDegradationPriority?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'stps'</td>
-<td>PartialSyncSamples</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'stsc'</td>
-<td>SampleToChunk?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'stsd'</td>
-<td>AudioSampleDesc
-  <br>VideoSampleDesc
-  <br>HintSampleDesc
-  <br>OtherSampleDesc</td>
-<td class=c>-<br>-<br>-<br>-</td>
-<td>--&gt; <a href='QuickTime.html#AudioSampleDesc'>QuickTime AudioSampleDesc Tags</a>
-  <br>--&gt; <a href='QuickTime.html#ImageDesc'>QuickTime ImageDesc Tags</a>
-  <br>--&gt; <a href='QuickTime.html#HintSampleDesc'>QuickTime HintSampleDesc Tags</a>
-  <br>--&gt; <a href='QuickTime.html#OtherSampleDesc'>QuickTime OtherSampleDesc Tags</a></td></tr>
-<tr>
-<td>'stsh'</td>
-<td>ShadowSyncSampleTable?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'stss'</td>
-<td>SyncSampleTable?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'stsz'</td>
-<td>SampleSizes?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'stts'</td>
-<td>VideoFrameRate
-  <br>TimeToSampleTable?</td>
-<td class=c>N<br>N</td>
-<td><span class=s><span class=n>(average rate calculated from time-to-sample table for video media)</span></span></td></tr>
-<tr>
-<td>'stz2'</td>
-<td>CompactSampleSizes?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'subs'</td>
-<td>Sub-sampleInformation?</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='AudioSampleDesc'>QuickTime AudioSampleDesc Tags</a></h2>
-<p>MP4 audio sample description.  This hybrid atom contains both data and child
-atoms.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>ID/Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='4 = 0x4'>4</td>
-<td>AudioFormat</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='20 = 0x14'>20</td>
-<td>AudioVendorID</td>
-<td class=c>N</td>
-<td>--&gt; <a href='QuickTime.html#VendorID'>QuickTime VendorID Values</a></td></tr>
-<tr>
-<td class=r title='24 = 0x18'>24</td>
-<td>AudioChannels</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='26 = 0x1a'>26</td>
-<td>AudioBitsPerSample</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='32 = 0x20'>32</td>
-<td>AudioSampleRate</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'damr'</td>
-<td>DecodeConfig</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#DecodeConfig'>QuickTime DecodeConfig Tags</a></td></tr>
-<tr>
-<td>'pinf'</td>
-<td>PurchaseInfo</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#ProtectionInfo'>QuickTime ProtectionInfo Tags</a></td></tr>
-<tr class=b>
-<td>'sinf'</td>
-<td>ProtectionInfo</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#ProtectionInfo'>QuickTime ProtectionInfo Tags</a></td></tr>
-<tr>
-<td>'wave'</td>
-<td>Wave</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Wave'>QuickTime Wave Tags</a></td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='DecodeConfig'>QuickTime DecodeConfig Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index1</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='0 = 0x0'>0</td>
-<td>EncoderVendor</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='4 = 0x4'>4</td>
-<td>EncoderVersion</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='ProtectionInfo'>QuickTime ProtectionInfo Tags</a></h2>
-<p>Child atoms found in &quot;sinf&quot; and/or &quot;pinf&quot; atoms.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'frma'</td>
-<td>OriginalFormat</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'schi'</td>
-<td>SchemeInfo</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#SchemeInfo'>QuickTime SchemeInfo Tags</a></td></tr>
-<tr>
-<td>'schm'</td>
-<td>SchemeType</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#SchemeType'>QuickTime SchemeType Tags</a></td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='SchemeInfo'>QuickTime SchemeInfo Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'cert'</td>
-<td>Certificate</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'iviv'</td>
-<td>InitializationVector</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'key '</td>
-<td>KeyID</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'name'</td>
-<td>UserName</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'righ'</td>
-<td>Rights</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Rights'>QuickTime Rights Tags</a></td></tr>
-<tr class=b>
-<td>'user'</td>
-<td>UserID</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='Rights'>QuickTime Rights Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'aver'</td>
-<td>VersionRestrictions</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'medi'</td>
-<td>MediaFlags</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'mode'</td>
-<td>ModeFlags</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'plat'</td>
-<td>Platform</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'song'</td>
-<td>ItemID</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'tool'</td>
-<td>ItemTool</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'tran'</td>
-<td>TransactionID</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'veID'</td>
-<td>ItemVendorID</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='SchemeType'>QuickTime SchemeType Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index1</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='4 = 0x4'>4</td>
-<td>SchemeType</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='8 = 0x8'>8</td>
-<td>SchemeVersion</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='10 = 0xa'>10</td>
-<td>SchemeURL</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='Wave'>QuickTime Wave Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'frma'</td>
-<td>PurchaseFileFormat</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='ImageDesc'>QuickTime ImageDesc Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>ID/Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='2 = 0x2'>2</td>
-<td>CompressorID</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='10 = 0xa'>10</td>
-<td>VendorID</td>
-<td class=c>N</td>
-<td>--&gt; <a href='QuickTime.html#VendorID'>QuickTime VendorID Values</a></td></tr>
-<tr>
-<td class=r title='16 = 0x10'>16</td>
-<td>SourceImageWidth</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='17 = 0x11'>17</td>
-<td>SourceImageHeight</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='18 = 0x12'>18</td>
-<td>XResolution</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='20 = 0x14'>20</td>
-<td>YResolution</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='25 = 0x19'>25</td>
-<td>CompressorName</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='41 = 0x29'>41</td>
-<td>BitDepth</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'btrt'</td>
-<td>BitrateInfo</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Bitrate'>QuickTime Bitrate Tags</a></td></tr>
-<tr class=b>
-<td>'clap'</td>
-<td>CleanAperture</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#CleanAperture'>QuickTime CleanAperture Tags</a></td></tr>
-<tr>
-<td>'colr'</td>
-<td>ColorRepresentation</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'fiel'</td>
-<td>VideoFieldOrder</td>
-<td class=c>N</td>
-<td><span class=s>[Value 0]
-  <br>1 = Progressive
-  <br>2 = 2:1 Interlaced</span></td></tr>
-<tr>
-<td>'gama'</td>
-<td>Gamma</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'pasp'</td>
-<td>PixelAspectRatio</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='Bitrate'>QuickTime Bitrate Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index4</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='0 = 0x0'>0</td>
-<td>BufferSize</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='1 = 0x1'>1</td>
-<td>MaxBitrate</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='2 = 0x2'>2</td>
-<td>AverageBitrate</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='CleanAperture'>QuickTime CleanAperture Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index8</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='0 = 0x0'>0</td>
-<td>CleanApertureWidth</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='1 = 0x1'>1</td>
-<td>CleanApertureHeight</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='2 = 0x2'>2</td>
-<td>CleanApertureOffsetX</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='3 = 0x3'>3</td>
-<td>CleanApertureOffsetY</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='HintSampleDesc'>QuickTime HintSampleDesc Tags</a></h2>
-<p>MP4 hint sample description.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>ID/Index</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='4 = 0x4'>4</td>
-<td>HintFormat</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td class=r title='16 = 0x10'>16</td>
-<td>HintTrackVersion</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td class=r title='20 = 0x14'>20</td>
-<td>MaxPacketSize</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'snro'</td>
-<td>SequenceNumberRandomOffset</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'tims'</td>
-<td>RTPTimeScale</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-<tr class=b>
-<td>'tsro'</td>
-<td>TimestampRandomOffset</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='OtherSampleDesc'>QuickTime OtherSampleDesc Tags</a></h2>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td title='0x0004 = 4'>0x0004</td>
-<td>OtherFormat</td>
-<td class=c>N</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='VideoHeader'>QuickTime VideoHeader Tags</a></h2>
-<p>MP4 video media header.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Index2</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td class=r title='2 = 0x2'>2</td>
-<td>GraphicsMode</td>
-<td class=c>N</td>
-<td>--&gt; <a href='QuickTime.html#GraphicsMode'>QuickTime GraphicsMode Values</a></td></tr>
-<tr class=b>
-<td class=r title='3 = 0x3'>3</td>
-<td>OpColor</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -1370,8 +324,83 @@ atoms.</p>
 <td>'xml '</td>
 <td>XML</td>
 <td class=c>-</td>
-<td>--&gt; <a href='XMP.html'>XMP Tags</a></td></tr>
+<td>--&gt; <a href='XMP.html#XML'>XMP XML Tags</a></td></tr>
 </table></td></tr></table></blockquote>
+
+<h2><a name='Handler'>QuickTime Handler Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>HandlerClass</td>
+<td class=c>N</td>
+<td><span class=s>&#39;dhlr&#39; = Data Handler
+  <br>&#39;mhlr&#39; = Media Handler</span></td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>HandlerType</td>
+<td class=c>N</td>
+<td><table class=cols><tr>
+  <td>&#39;alis&#39; = Alias Data
+  <br>&#39;crsm&#39; = Clock Reference
+  <br>&#39;hint&#39; = Hint Track
+  <br>&#39;ipsm&#39; = IPMP
+  <br>&#39;m7sm&#39; = MPEG-7 Stream
+  <br>&#39;mdir&#39; = Metadata
+  <br>&#39;mdta&#39; = Metadata Tags
+  <br>&#39;meta&#39; = NRT Metadata
+  <br>&#39;mjsm&#39; = MPEG-J
+  <br>&#39;nrtm&#39; = Non-Real Time Metadata</td><td>&nbsp;&nbsp;</td>
+  <td>&#39;ocsm&#39; = Object Content
+  <br>&#39;odsm&#39; = Object Descriptor
+  <br>&#39;priv&#39; = Private
+  <br>&#39;sdsm&#39; = Scene Description
+  <br>&#39;soun&#39; = Audio Track
+  <br>&#39;subp&#39; = Subpicture
+  <br>&#39;text&#39; = Text
+  <br>&#39;tmcd&#39; = Time Code
+  <br>&#39;url &#39; = URL
+  <br>&#39;vide&#39; = Video Track</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr>
+<td class=r title='12 = 0xc'>12</td>
+<td>HandlerVendorID</td>
+<td class=c>N</td>
+<td>--&gt; <a href='QuickTime.html#VendorID'>QuickTime VendorID Values</a></td></tr>
+<tr class=b>
+<td class=r title='24 = 0x18'>24</td>
+<td>HandlerDescription</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='VendorID'>QuickTime VendorID Values</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class='inner sep' cellspacing=1>
+<tr class=h><th>Value</th><th>VendorID</th><th>Value</th><th>VendorID</th><th>Value</th><th>VendorID</th></tr>
+<tr><td>'AR.D'</td><td>= Parrot AR.Drone</td>
+<td class=b>'ZORA'</td><td class=b>= Zoran Corporation</td>
+<td>'niko'</td><td>= Nikon</td>
+</tr><tr><td>'FFMP'</td><td>= FFmpeg</td>
+<td class=b>'appl'</td><td class=b>= Apple</td>
+<td>'olym'</td><td>= Olympus</td>
+</tr><tr><td>'GIC '</td><td>= General Imaging Co.</td>
+<td class=b>'fe20'</td><td class=b>= Olympus (fe20)</td>
+<td>'pana'</td><td>= Panasonic</td>
+</tr><tr><td>'KMPI'</td><td>= Konica-Minolta</td>
+<td class=b>'kdak'</td><td class=b>= Kodak</td>
+<td>'pent'</td><td>= Pentax</td>
+</tr><tr><td>'NIKO'</td><td>= Nikon</td>
+<td class=b>'leic'</td><td class=b>= Leica</td>
+<td>'pr01'</td><td>= Olympus (pr01)</td>
+</tr><tr><td>'SMI '</td><td>= Sorenson Media Inc.</td>
+<td class=b>'mino'</td><td class=b>= Minolta</td>
+<td>'sany'</td><td>= Sanyo</td>
+</tr></table></td></tr></table></blockquote>
 
 <h2><a name='ItemList'>QuickTime ItemList Tags</a></h2>
 <p>As well as these tags, the &#39;mdta&#39; handler uses numerical tag ID&#39;s which are
@@ -4218,6 +3247,989 @@ ItemList tags written by the &quot;mdta&quot; handler.  The prefix of
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='Movie'>QuickTime Movie Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'cmov'</td>
+<td>CompressedMovie</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#CMovie'>QuickTime CMovie Tags</a></td></tr>
+<tr class=b>
+<td>'htka'</td>
+<td>HTCTrack</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Track'>QuickTime Track Tags</a></td></tr>
+<tr>
+<td>'iods'</td>
+<td>InitialObjectDescriptor?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'meta'</td>
+<td>Meta</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Meta'>QuickTime Meta Tags</a></td></tr>
+<tr>
+<td>'mvhd'</td>
+<td>MovieHeader</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#MovieHeader'>QuickTime MovieHeader Tags</a></td></tr>
+<tr class=b>
+<td>'trak'</td>
+<td>Track</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Track'>QuickTime Track Tags</a></td></tr>
+<tr>
+<td>'udta'</td>
+<td>UserData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#UserData'>QuickTime UserData Tags</a></td></tr>
+<tr class=b>
+<td>'uuid'</td>
+<td>UUID-USMT
+  <br>UUID-Canon
+  <br>UUID-Unknown?</td>
+<td class=c>-<br>-<br>N</td>
+<td>--&gt; <a href='QuickTime.html#UserMedia'>QuickTime UserMedia Tags</a>
+  <br>--&gt; <a href='Canon.html#uuid'>Canon uuid Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CMovie'>QuickTime CMovie Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'dcom'</td>
+<td>Compression</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Track'>QuickTime Track Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'mdia'</td>
+<td>Media</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Media'>QuickTime Media Tags</a></td></tr>
+<tr class=b>
+<td>'meta'</td>
+<td>Meta</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Meta'>QuickTime Meta Tags</a></td></tr>
+<tr>
+<td>'tapt'</td>
+<td>TrackAperture</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#TrackAperture'>QuickTime TrackAperture Tags</a></td></tr>
+<tr class=b>
+<td>'tkhd'</td>
+<td>TrackHeader</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#TrackHeader'>QuickTime TrackHeader Tags</a></td></tr>
+<tr>
+<td>'tref'</td>
+<td>TrackRef</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#TrackRef'>QuickTime TrackRef Tags</a></td></tr>
+<tr class=b>
+<td>'udta'</td>
+<td>UserData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#UserData'>QuickTime UserData Tags</a></td></tr>
+<tr>
+<td>'uuid'</td>
+<td>UUID-USMT
+  <br>UUID-Unknown?</td>
+<td class=c>-<br>N</td>
+<td>--&gt; <a href='QuickTime.html#UserMedia'>QuickTime UserMedia Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Media'>QuickTime Media Tags</a></h2>
+<p>MP4 media box.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'hdlr'</td>
+<td>Handler</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Handler'>QuickTime Handler Tags</a></td></tr>
+<tr class=b>
+<td>'mdhd'</td>
+<td>MediaHeader</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#MediaHeader'>QuickTime MediaHeader Tags</a></td></tr>
+<tr>
+<td>'minf'</td>
+<td>MediaInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#MediaInfo'>QuickTime MediaInfo Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='MediaHeader'>QuickTime MediaHeader Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index4</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>MediaHeaderVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>MediaCreateDate</td>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>MediaModifyDate</td>
+<td class=c>int32u</td>
+<td><span class=s><span class=n>(converted from UTC to local time if the QuickTimeUTC option is set)</span></span></td></tr>
+<tr class=b>
+<td class=r title='3 = 0x3'>3</td>
+<td>MediaTimeScale</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>MediaDuration</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='5 = 0x5'>5</td>
+<td>MediaLanguageCode</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='MediaInfo'>QuickTime MediaInfo Tags</a></h2>
+<p>MP4 media info box.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'dinf'</td>
+<td>DataInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#DataInfo'>QuickTime DataInfo Tags</a></td></tr>
+<tr class=b>
+<td>'gmhd'</td>
+<td>GenMediaHeader</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#GenMediaHeader'>QuickTime GenMediaHeader Tags</a></td></tr>
+<tr>
+<td>'hdlr'</td>
+<td>Handler</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Handler'>QuickTime Handler Tags</a></td></tr>
+<tr class=b>
+<td>'hmhd'</td>
+<td>HintHeader</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#HintHeader'>QuickTime HintHeader Tags</a></td></tr>
+<tr>
+<td>'nmhd'</td>
+<td>NullMediaHeader?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'smhd'</td>
+<td>AudioHeader</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#AudioHeader'>QuickTime AudioHeader Tags</a></td></tr>
+<tr>
+<td>'stbl'</td>
+<td>SampleTable</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#SampleTable'>QuickTime SampleTable Tags</a></td></tr>
+<tr class=b>
+<td>'vmhd'</td>
+<td>VideoHeader</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#VideoHeader'>QuickTime VideoHeader Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='DataInfo'>QuickTime DataInfo Tags</a></h2>
+<p>MP4 data information box.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'dref'</td>
+<td>DataRef</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#DataRef'>QuickTime DataRef Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='DataRef'>QuickTime DataRef Tags</a></h2>
+<p>MP4 data reference box.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'url '</td>
+<td>URL</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'urn '</td>
+<td>URN</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='GenMediaHeader'>QuickTime GenMediaHeader Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'gmin'</td>
+<td>GenMediaInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#GenMediaInfo'>QuickTime GenMediaInfo Tags</a></td></tr>
+<tr class=b>
+<td>'text'</td>
+<td>Text?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'tmcd'</td>
+<td>TimeCode</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#TimeCode'>QuickTime TimeCode Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='GenMediaInfo'>QuickTime GenMediaInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>GenMediaVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>GenFlags</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>GenGraphicsMode</td>
+<td class=c>N</td>
+<td>--&gt; <a href='QuickTime.html#GraphicsMode'>QuickTime GraphicsMode Values</a></td></tr>
+<tr class=b>
+<td class=r title='6 = 0x6'>6</td>
+<td>GenOpColor</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='12 = 0xc'>12</td>
+<td>GenBalance</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='GraphicsMode'>QuickTime GraphicsMode Values</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class='inner sep' cellspacing=1>
+<tr class=h><th>Value</th><th>GraphicsMode</th><th>Value</th><th>GraphicsMode</th><th>Value</th><th>GraphicsMode</th></tr>
+<tr><td class=r>0x0</td><td>= srcCopy</td>
+<td class='r b'>0xb</td><td class=b>= patBic</td>
+<td class=r>0x26</td><td>= subOver</td>
+</tr><tr><td class=r>0x1</td><td>= srcOr</td>
+<td class='r b'>0xc</td><td class=b>= notPatCopy</td>
+<td class=r>0x27</td><td>= addMin</td>
+</tr><tr><td class=r>0x2</td><td>= srcXor</td>
+<td class='r b'>0xd</td><td class=b>= notPatOr</td>
+<td class=r>0x31</td><td>= grayishTextOr</td>
+</tr><tr><td class=r>0x3</td><td>= srcBic</td>
+<td class='r b'>0xe</td><td class=b>= notPatXor</td>
+<td class=r>0x32</td><td>= hilite</td>
+</tr><tr><td class=r>0x4</td><td>= notSrcCopy</td>
+<td class='r b'>0xf</td><td class=b>= notPatBic</td>
+<td class=r>0x40</td><td>= ditherCopy</td>
+</tr><tr><td class=r>0x5</td><td>= notSrcOr</td>
+<td class='r b'>0x20</td><td class=b>= blend</td>
+<td class=r>0x100</td><td>= Alpha</td>
+</tr><tr><td class=r>0x6</td><td>= notSrcXor</td>
+<td class='r b'>0x21</td><td class=b>= addPin</td>
+<td class=r>0x101</td><td>= White Alpha</td>
+</tr><tr><td class=r>0x7</td><td>= notSrcBic</td>
+<td class='r b'>0x22</td><td class=b>= addOver</td>
+<td class=r>0x102</td><td>= Pre-multiplied Black Alpha</td>
+</tr><tr><td class=r>0x8</td><td>= patCopy</td>
+<td class='r b'>0x23</td><td class=b>= subPin</td>
+<td class=r>0x110</td><td>= Component Alpha</td>
+</tr><tr><td class=r>0x9</td><td>= patOr</td>
+<td class='r b'>0x24</td><td class=b>= transparent</td>
+<td class=r>&nbsp;</td><td>&nbsp;</td>
+</tr><tr><td class=r>0xa</td><td>= patXor</td>
+<td class='r b'>0x25</td><td class=b>= addMax</td>
+<td class=r>&nbsp;</td><td>&nbsp;</td>
+</tr></table></td></tr></table></blockquote>
+
+<h2><a name='TimeCode'>QuickTime TimeCode Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'tcmi'</td>
+<td>TCMediaInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#TCMediaInfo'>QuickTime TCMediaInfo Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='TCMediaInfo'>QuickTime TCMediaInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>TextFont</td>
+<td class=c>N</td>
+<td><span class=s>0 = System</span></td></tr>
+<tr class=b>
+<td class=r title='6 = 0x6'>6</td>
+<td>TextFace</td>
+<td class=c>N</td>
+<td><table class=cols><tr>
+  <td>0x0 = Plain
+  <br>Bit 0 = Bold
+  <br>Bit 1 = Italic
+  <br>Bit 2 = Underline</td><td>&nbsp;&nbsp;</td>
+  <td>Bit 3 = Outline
+  <br>Bit 4 = Shadow
+  <br>Bit 5 = Condense
+  <br>Bit 6 = Extend</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
+<tr>
+<td class=r title='8 = 0x8'>8</td>
+<td>TextSize</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='12 = 0xc'>12</td>
+<td>TextColor</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='18 = 0x12'>18</td>
+<td>BackgroundColor</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='24 = 0x18'>24</td>
+<td>FontName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='HintHeader'>QuickTime HintHeader Tags</a></h2>
+<p>MP4 hint media header.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index2</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>MaxPDUSize</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='3 = 0x3'>3</td>
+<td>AvgPDUSize</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>MaxBitrate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='6 = 0x6'>6</td>
+<td>AvgBitrate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AudioHeader'>QuickTime AudioHeader Tags</a></h2>
+<p>MP4 audio media header.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index2</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>Balance</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SampleTable'>QuickTime SampleTable Tags</a></h2>
+<p>MP4 sample table box.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'co64'</td>
+<td>ChunkOffset64?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'cslg'</td>
+<td>CompositionToDecodeTimelineMapping?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'ctts'</td>
+<td>CompositionTimeToSample?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'padb'</td>
+<td>SamplePaddingBits?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'sbgp'</td>
+<td>SampleToGroup?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'sdtp'</td>
+<td>IdependentAndDisposableSamples?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'sgpd'</td>
+<td>SampleGroupDescription?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'stco'</td>
+<td>ChunkOffset?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'stdp'</td>
+<td>SampleDegradationPriority?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'stps'</td>
+<td>PartialSyncSamples</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'stsc'</td>
+<td>SampleToChunk?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'stsd'</td>
+<td>AudioSampleDesc
+  <br>VideoSampleDesc
+  <br>HintSampleDesc
+  <br>OtherSampleDesc</td>
+<td class=c>-<br>-<br>-<br>-</td>
+<td>--&gt; <a href='QuickTime.html#AudioSampleDesc'>QuickTime AudioSampleDesc Tags</a>
+  <br>--&gt; <a href='QuickTime.html#ImageDesc'>QuickTime ImageDesc Tags</a>
+  <br>--&gt; <a href='QuickTime.html#HintSampleDesc'>QuickTime HintSampleDesc Tags</a>
+  <br>--&gt; <a href='QuickTime.html#OtherSampleDesc'>QuickTime OtherSampleDesc Tags</a></td></tr>
+<tr>
+<td>'stsh'</td>
+<td>ShadowSyncSampleTable?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'stss'</td>
+<td>SyncSampleTable?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'stsz'</td>
+<td>SampleSizes?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'stts'</td>
+<td>VideoFrameRate
+  <br>TimeToSampleTable?</td>
+<td class=c>N<br>N</td>
+<td><span class=s><span class=n>(average rate calculated from time-to-sample table for video media)</span></span></td></tr>
+<tr>
+<td>'stz2'</td>
+<td>CompactSampleSizes?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'subs'</td>
+<td>Sub-sampleInformation?</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='AudioSampleDesc'>QuickTime AudioSampleDesc Tags</a></h2>
+<p>MP4 audio sample description.  This hybrid atom contains both data and child
+atoms.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>ID/Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>AudioFormat</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='20 = 0x14'>20</td>
+<td>AudioVendorID</td>
+<td class=c>N</td>
+<td>--&gt; <a href='QuickTime.html#VendorID'>QuickTime VendorID Values</a></td></tr>
+<tr>
+<td class=r title='24 = 0x18'>24</td>
+<td>AudioChannels</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='26 = 0x1a'>26</td>
+<td>AudioBitsPerSample</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='32 = 0x20'>32</td>
+<td>AudioSampleRate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'damr'</td>
+<td>DecodeConfig</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#DecodeConfig'>QuickTime DecodeConfig Tags</a></td></tr>
+<tr>
+<td>'pinf'</td>
+<td>PurchaseInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#ProtectionInfo'>QuickTime ProtectionInfo Tags</a></td></tr>
+<tr class=b>
+<td>'sinf'</td>
+<td>ProtectionInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#ProtectionInfo'>QuickTime ProtectionInfo Tags</a></td></tr>
+<tr>
+<td>'wave'</td>
+<td>Wave</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Wave'>QuickTime Wave Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='DecodeConfig'>QuickTime DecodeConfig Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>EncoderVendor</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4</td>
+<td>EncoderVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ProtectionInfo'>QuickTime ProtectionInfo Tags</a></h2>
+<p>Child atoms found in &quot;sinf&quot; and/or &quot;pinf&quot; atoms.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'frma'</td>
+<td>OriginalFormat</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'schi'</td>
+<td>SchemeInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#SchemeInfo'>QuickTime SchemeInfo Tags</a></td></tr>
+<tr>
+<td>'schm'</td>
+<td>SchemeType</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#SchemeType'>QuickTime SchemeType Tags</a></td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SchemeInfo'>QuickTime SchemeInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'cert'</td>
+<td>Certificate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'iviv'</td>
+<td>InitializationVector</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'key '</td>
+<td>KeyID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'name'</td>
+<td>UserName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'righ'</td>
+<td>Rights</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Rights'>QuickTime Rights Tags</a></td></tr>
+<tr class=b>
+<td>'user'</td>
+<td>UserID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Rights'>QuickTime Rights Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'aver'</td>
+<td>VersionRestrictions</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'medi'</td>
+<td>MediaFlags</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'mode'</td>
+<td>ModeFlags</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'plat'</td>
+<td>Platform</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'song'</td>
+<td>ItemID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'tool'</td>
+<td>ItemTool</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'tran'</td>
+<td>TransactionID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'veID'</td>
+<td>ItemVendorID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='SchemeType'>QuickTime SchemeType Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>SchemeType</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>SchemeVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='10 = 0xa'>10</td>
+<td>SchemeURL</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Wave'>QuickTime Wave Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'frma'</td>
+<td>PurchaseFileFormat</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ImageDesc'>QuickTime ImageDesc Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>ID/Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>CompressorID</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='10 = 0xa'>10</td>
+<td>VendorID</td>
+<td class=c>N</td>
+<td>--&gt; <a href='QuickTime.html#VendorID'>QuickTime VendorID Values</a></td></tr>
+<tr>
+<td class=r title='16 = 0x10'>16</td>
+<td>SourceImageWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='17 = 0x11'>17</td>
+<td>SourceImageHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='18 = 0x12'>18</td>
+<td>XResolution</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='20 = 0x14'>20</td>
+<td>YResolution</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='25 = 0x19'>25</td>
+<td>CompressorName</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='41 = 0x29'>41</td>
+<td>BitDepth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'btrt'</td>
+<td>BitrateInfo</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Bitrate'>QuickTime Bitrate Tags</a></td></tr>
+<tr class=b>
+<td>'clap'</td>
+<td>CleanAperture</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#CleanAperture'>QuickTime CleanAperture Tags</a></td></tr>
+<tr>
+<td>'colr'</td>
+<td>ColorRepresentation</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'fiel'</td>
+<td>VideoFieldOrder</td>
+<td class=c>N</td>
+<td><span class=s>[Value 0]
+  <br>1 = Progressive
+  <br>2 = 2:1 Interlaced</span></td></tr>
+<tr>
+<td>'gama'</td>
+<td>Gamma</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'pasp'</td>
+<td>PixelAspectRatio</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Bitrate'>QuickTime Bitrate Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index4</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>BufferSize</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>MaxBitrate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>AverageBitrate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='CleanAperture'>QuickTime CleanAperture Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index8</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>CleanApertureWidth</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1 = 0x1'>1</td>
+<td>CleanApertureHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>CleanApertureOffsetX</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='3 = 0x3'>3</td>
+<td>CleanApertureOffsetY</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='HintSampleDesc'>QuickTime HintSampleDesc Tags</a></h2>
+<p>MP4 hint sample description.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>ID/Index</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='4 = 0x4'>4</td>
+<td>HintFormat</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='16 = 0x10'>16</td>
+<td>HintTrackVersion</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='20 = 0x14'>20</td>
+<td>MaxPacketSize</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'snro'</td>
+<td>SequenceNumberRandomOffset</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'tims'</td>
+<td>RTPTimeScale</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'tsro'</td>
+<td>TimestampRandomOffset</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='OtherSampleDesc'>QuickTime OtherSampleDesc Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td title='0x0004 = 4'>0x0004</td>
+<td>OtherFormat</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'ftab'</td>
+<td>FontTable</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='VideoHeader'>QuickTime VideoHeader Tags</a></h2>
+<p>MP4 video media header.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index2</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='2 = 0x2'>2</td>
+<td>GraphicsMode</td>
+<td class=c>N</td>
+<td>--&gt; <a href='QuickTime.html#GraphicsMode'>QuickTime GraphicsMode Values</a></td></tr>
+<tr class=b>
+<td class=r title='3 = 0x3'>3</td>
+<td>OpColor</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='TrackAperture'>QuickTime TrackAperture Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -4425,9 +4437,12 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 <td>--&gt; <a href='Pentax.html#PENT'>Pentax PENT Tags</a></td></tr>
 <tr>
 <td>'PXMN'</td>
-<td>MakerNotePentax5b</td>
-<td class=c>-</td>
-<td>--&gt; <a href='Pentax.html'>Pentax Tags</a></td></tr>
+<td>MakerNotePentax5b
+  <br>MakerNotePentax5c
+  <br>MakerNotePentaxUnknown</td>
+<td class=c>-<br>-<br>N</td>
+<td>--&gt; <a href='Pentax.html'>Pentax Tags</a>
+  <br>--&gt; <a href='Pentax.html'>Pentax Tags</a></td></tr>
 <tr class=b>
 <td>'PXTH'</td>
 <td>PentaxPreview</td>
@@ -5534,7 +5549,7 @@ multi-language user data tags found, even if they don&#39;t exist in this table.
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 7, 2014</i>
+<br><i>Last revised Aug 22, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

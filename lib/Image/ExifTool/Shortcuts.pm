@@ -19,7 +19,7 @@ package Image::ExifTool::Shortcuts;
 use strict;
 use vars qw($VERSION);
 
-$VERSION = '1.51';
+$VERSION = '1.53';
 
 # this is a special table used to define command-line shortcuts
 # (documentation Notes may be added for these via %shortcutNotes in BuildTagLookup.pm)
@@ -143,6 +143,7 @@ $VERSION = '1.51';
         'MakerNoteKodak8c',
         'MakerNoteKodak9',
         'MakerNoteKodak10',
+        'MakerNoteKodak11',
         'MakerNoteKodakUnknown',
         'MakerNoteKyocera',
         'MakerNoteMinolta',
@@ -171,6 +172,7 @@ $VERSION = '1.51';
         'MakerNotePhaseOne',
         'MakerNoteReconyx',
         'MakerNoteRicoh',
+        'MakerNoteRicoh2',
         'MakerNoteRicohText',
         'MakerNoteSamsung1a',
         'MakerNoteSamsung1b',
@@ -232,6 +234,25 @@ $VERSION = '1.51';
         'IFD0:XPAuthor',
         'IFD0:XPKeywords',
         'IFD0:XPSubject',
+    ],
+    # large binary data tags which won't be loaded if excluded when extracting
+    LargeTags => [
+        'CanonVRD',
+        'DLOData',
+        'EXIF',
+        'ICC_Profile',
+        'IDCPreviewImage',
+        'ImageData',
+        'IPTC',
+        'JpgFromRaw',
+        'OriginalRawImage',
+        'OtherImage',
+        'PreviewImage',
+        'ThumbnailImage',
+        'TIFFPreview',
+        'XML',
+        'XMP',
+        'ZoomedPreviewImage',
     ],
 );
 

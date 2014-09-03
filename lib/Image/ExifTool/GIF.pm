@@ -276,7 +276,7 @@ Block:
             while ($length) {
                 last unless $raf->Read($buff, $length) == $length;
                 if ($verbose > 2 and not $outfile) {
-                    Image::ExifTool::HexDump(\$buff, undef, Out => $out);
+                    HexDump(\$buff, undef, Out => $out);
                 }
                 # add buffer to comment string
                 $comment .= $buff;

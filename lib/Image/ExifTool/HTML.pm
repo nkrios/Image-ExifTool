@@ -344,7 +344,7 @@ sub SetHTMLCharset($$)
 #------------------------------------------------------------------------------
 # Convert single UTF-8 character to HTML character reference
 # Inputs: 0) UTF-8 character sequence
-# Returns: HTML character reference (ie. "&quot;");
+# Returns: HTML character reference (eg. "&quot;");
 # Note: Must be called via EscapeHTML to load name lookup
 sub EscapeChar($)
 {

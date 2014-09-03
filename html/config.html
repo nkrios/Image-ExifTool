@@ -102,7 +102,7 @@
             Writable =&gt; 'rational64s',
         },
     },
-    <span class=com># IPTC tags are added to a specific record type (ie. application record):
+    <span class=com># IPTC tags are added to a specific record type (eg. application record):
     # (Note: IPTC tag ID's are limited to the range 0-255)</span>
     'Image::ExifTool::IPTC::ApplicationRecord' =&gt; {
         <span class=com># Example 4.  IPTC:NewIPTCTag</span>
@@ -125,7 +125,7 @@
         <span class=com># Example 7.  XMP-exif:GPSRoll</span>
         GPSRoll  =&gt; { Writable =&gt; 'rational', Groups =&gt; { 2 =&gt; 'Location' } },
     },
-    <span class=com># new XMP namespaces (ie. xxx) must be added to the Main XMP table:</span>
+    <span class=com># new XMP namespaces (eg. xxx) must be added to the Main XMP table:</span>
     'Image::ExifTool::XMP::Main' =&gt; {
         <span class=com># namespace definition for examples 8 to 11</span>
         xxx =&gt; { <span class=com># &lt;-- must be the same as the NAMESPACE prefix</span>
@@ -252,7 +252,7 @@
     GROUPS =&gt; { 0 =&gt; 'XMP', 1 =&gt; 'XMP-xxx', 2 =&gt; 'Image' },
     NAMESPACE =&gt; { 'xxx' =&gt; 'http://ns.myname.com/xxx/1.0/' },
     WRITABLE =&gt; 'string',
-    <span class=com># replace "NewXMPxxxTag1" with your own tag name (ie. "MyTag")</span>
+    <span class=com># replace "NewXMPxxxTag1" with your own tag name (eg. "MyTag")</span>
     <span class=com># Example 8.  XMP-xxx:NewXMPxxxTag1</span>
     NewXMPxxxTag1 =&gt; { Writable => 'lang-alt' },
     <span class=com># Example 9.  XMP-xxx:NewXMPxxxTag2</span>

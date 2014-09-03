@@ -19,7 +19,7 @@ use Image::ExifTool qw(:DataAccess);
 use Image::ExifTool::Canon;
 use Image::ExifTool::Exif;
 
-$VERSION = '1.48';
+$VERSION = '1.49';
 
 sub ProcessCanonCustom($$$);
 sub ProcessCanonCustom2($$$);
@@ -1533,6 +1533,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
             PrintConv => \%enableDisable,
         },
     ],
+    # 0x0205 - Added in 5DmkII firmware update
     #### 2b) Flash exposure
     0x0304 => {
         Name => 'ETTLII',
@@ -1862,7 +1863,7 @@ my %convPFn = ( PrintConv => \&ConvertPfn, PrintConvInv => \&ConvertPfnInv );
     0x0516 => { # new for 7D and 1DmkIV
         Name => 'OrientationLinkedAFPoint',
         PrintConv => {
-            0 => 'Same for verical and horizontal',
+            0 => 'Same for vertical and horizontal',
             1 => 'Select different AF points',
         },
     },

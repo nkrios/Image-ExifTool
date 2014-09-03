@@ -115,7 +115,7 @@ position in the track log.  This time difference may be of the form "SS",
 "MM:SS", "HH:MM:SS" or "DD HH:MM:SS" (where SS=seconds, MM=minutes, HH=hours and
 DD=days), and a leading "+" or "-" may be added for positive or negative
 differences (negative if the camera clock was ahead of GPS time).  Fractional
-seconds are allowed (ie. "SS.ss").</p>
+seconds are allowed (eg. "SS.ss").</p>
 
 <p>For example, "<code>-geosync=-1:20</code>" specifies that synchronization
 with GPS time is achieved by subtracting 1 minute and 20 seconds from the
@@ -145,12 +145,12 @@ more than one synchronization point is provided.  For this, the value written to
 <tr><th>Format</th><th>Notes</th></tr>
 <tr><td><i>FILE</i></td>
 <td>Both GPS and image timestamps are extracted from the
-specified file. ie) <code>-geosync=image.jpg</code></td></tr>
+specified file. eg) <code>-geosync=image.jpg</code></td></tr>
 <tr><td><i>GPSTIME</i>@<i>FILE</i></td><td>GPS time is taken from the
 <code>Geosync</code> value and the image timestamp is extracted from the
-specified file. ie) <code>-geosync="12:58:05@image.jpg"</code></td></tr>
+specified file. eg) <code>-geosync="12:58:05@image.jpg"</code></td></tr>
 <tr><td><i>GPSTIME</i>@<i>IMGTIME</i></td><td>Both GPS and image timestamps are
-taken from the <code>Geosync</code> value.  ie)
+taken from the <code>Geosync</code> value.  eg)
 <code>-geosync="12:58:05@2010:01:02 12:25:26"</code></td></tr>
 </table></blockquote>
 
@@ -192,9 +192,9 @@ groups.  If a value for <code>Geotime</code> is not given, it is taken from
 may be copied from any other date/time tag or set directly from a date/time
 string.</p>
 
-<p>If the date/time tag does not include a timezone then one may be added (ie.
+<p>If the date/time tag does not include a timezone then one may be added (eg.
 <code>"-Geotime&lt;${CreateDate}-05:00"</code>), otherwise the local system time
-is assumed.</p>
+is assumed.  Decimal seconds are supported in the time value.</p>
 
 <p>By default, GPS tags are created in EXIF and the corresponding
 XMP tags are updated only if they already exist.  However, an EXIF or XMP group
@@ -646,7 +646,7 @@ the full ExifTool distribution.</p>
 
 <hr>
 <i>Created Apr. 2, 2009</i><br>
-<i>Last revised Sept. 30, 2013</i>
+<i>Last revised May 14, 2014</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

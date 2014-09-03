@@ -151,7 +151,7 @@ my $testnum = 1;
     print "ok $testnum\n";
 }
 
-# test 8-11: Test reading/writing XMP with blank nodes
+# test 8-11: Test reading/writing XMP with blank nodes and some problems that need correcting
 {
     my $file;
     foreach $file ('XMP2.xmp', 'XMP3.xmp') {
@@ -165,7 +165,11 @@ my $testnum = 1;
         my $testfile = "t/${testname}_${testnum}_failed.xmp";
         unlink $testfile;
         $exifTool->SetNewValue('XMP:Creator' => 'Phil', AddValue => 1);
+        $exifTool->SetNewValue('manifestplacedXResolution' => 1);
+        $exifTool->SetNewValue('attributionname' => 'something else');
         $exifTool->WriteInfo("t/images/$file", $testfile);
+        my $err = $exifTool->GetValue('Error');
+        warn "\n  $err\n" if $err;
         print 'not ' unless testCompare("t/XMP_$testnum.out",$testfile,$testnum);
         print "ok $testnum\n";
     }

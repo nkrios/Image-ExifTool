@@ -61,11 +61,12 @@ ExifTool issues can be discussed on the ExifTool forum at
 <blockquote>When you run exiftool, by default it prints descriptions, not tag
 names, for the information it extracts.  These descriptions are in English
 unless the <code>-lang</code> option is used to select another language. Note
-that descriptions often contain spaces between words but tag names never do. To
-print the tag names instead instead of descriptions, use the <code>-s</code>
-option when extracting information.  Valid characters in tag names are
-<code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code> and
-<code>-</code>.  See the <a href="TagNames/index.html">tag name
+that descriptions often contain spaces between words, but tag names never do.
+Also, tag names are always English, regardless of the <code>-lang</code>
+setting. To print the tag names instead instead of descriptions, use the
+<code>-s</code> option when extracting information.  Valid characters in tag
+names are <code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, <code>_</code>
+and <code>-</code>.  See the <a href="TagNames/index.html">tag name
 documentation</a> for a complete list of available tag names.</blockquote>
 
 <blockquote>Tag names may be optionally prefixed by a family 0 or 1 group name
@@ -115,7 +116,7 @@ then use ExifTool (with the <code>-a</code> and <code>-G1</code> options) to
 determine where the information was written. Once you know where it should go,
 you can use ExifTool to write to this location. You can read or write
 information in a specific location by prefixing the tag name on the command line
-with the desired group name.  ie) "<code>-ExifIFD:DateTimeOriginal</code>"
+with the desired group name.  eg.) "<code>-ExifIFD:DateTimeOriginal</code>"
 </blockquote>
 
 <blockquote>This problem may also occur if contradictory information exists in
@@ -190,7 +191,7 @@ command
 
 will set the common date/time tags from the file name for all images in the
 directory "<code>c:\images</code>".  This will work for any file name which
-matches the above criteria (ie. "IMG_20110927_103000.jpg").
+matches the above criteria (eg. "IMG_20110927_103000.jpg").
 <i class=lt>[AllDates is a shortcut for 3 tag names: DateTimeOriginal,
 CreateDate and ModifyDate.  See the <a href="TagNames/Shortcuts.html">Shortcuts
 Tags documentation</a> for more information.]</i></blockquote>
@@ -232,7 +233,7 @@ that form.  (In other words, the inverse print conversion is applied when writin
 values.)  For example, to write GPSAltitudeRef you can type:
 <pre>exiftool -gpsaltituderef="Above Sea Level" image.jpg
 </pre>
-or any unambiguous short form may be used and ExifTool will know what you mean, ie)
+or any unambiguous short form may be used and ExifTool will know what you mean, eg)
 <pre>exiftool -gpsaltituderef=above image.jpg
 </pre>
 Alternatively, the print conversion can be disabled for all tags with the
@@ -302,7 +303,7 @@ exiftool -make= -model= -makernotes= image.jpg
 </pre>
 For the same reason, maker notes can not be copied to an image with an
 incompatible Make or Model.  To do this, the Make and Model tags must also be
-copied.  ie)
+copied.  eg)
 <pre>exiftool -tagsfromfile src.jpg -makernotes -make -model dst.jpg
 </pre>
 (Note that in this case the "<code>-makernotes:all</code>" syntax does not work
@@ -1092,7 +1093,7 @@ change the the Windows console to UTF&#8209;8, follow these steps:
 
 <ol><li>Run "cmd.exe" to open a Windows console (select "Run..." from the
 Start menu and enter "cmd").</li>
-<li>Change the font in the console Properties to any True Type font (ie. "TT
+<li>Change the font in the console Properties to any True Type font (eg. "TT
 Lucida Console").</li>
 <li>Type "<code>chcp 65001</code>" then press RETURN at the command prompt.</li>
 </ol>
@@ -1208,8 +1209,11 @@ without errors, but note that <u>some metadata from the original image may have
 been lost in the process</u>.</blockquote>
 
 <blockquote><b>Note</b>: ExifTool will not modify the JPEG image data, so if the
-image itself is corrupted (ie. if you get a message saying "Not a valid JPEG"),
-then ExifTool can not be used to repair the image.</blockquote>
+image itself is corrupted (eg. if you get a message saying "Not a valid JPEG"),
+then ExifTool can not be used to repair the image.  Also, TIFF-based files may
+not be repaired like this because the image is stored in the same IFD as the
+metadata in these files, which makes the risk of corrupting the image too
+great.</blockquote>
 
 <blockquote>If there are also MakerNote problems in the file, you may want to
 add the <code>-F</code> option to the command.  See <a href='#Q15'>FAQ 15</a>
@@ -1226,7 +1230,7 @@ not copied with <code>-exif:all</code> above (but would be copied with
 then the byte order is determined by the ordering of the MakerNotes if they are
 copied, otherwise big-endian ("MM") byte order is used by default. 
 ExifByteOrder may be set to a specific value to force a particular byte order
-when creating new EXIF (ie. "<code>-ExifByteOrder=II</code>" for little-endian).
+when creating new EXIF (eg. "<code>-ExifByteOrder=II</code>" for little-endian).
 </blockquote>
 
 <a name="Q21"></a>
@@ -1286,9 +1290,9 @@ processing pass to read tags from the file.)
 applied together as each target file is processed.  In general, assignments
 later on the command line override earlier assignments, but there are
 exceptions:
-<ol><li>When writing list-type tags (ie. <code>-keywords=one</code>), new values
+<ol><li>When writing list-type tags (eg. <code>-keywords=one</code>), new values
 are accumulated rather than overriding earlier assignments.<br>&nbsp;</li>
-<li>When copying values to list-type tags (ie.
+<li>When copying values to list-type tags (eg.
 <code>"-keywords&lt;filename"</code>), new values are accumulated only if
 <code>-addTagsFromFile</code> is used, otherwise they override earlier
 assigments if <code>-tagsFromFile</code> is used or implied.<br>&nbsp;</li>
@@ -1335,7 +1339,7 @@ formats.</blockquote>
 
 <blockquote>Tags are not written if the format of the target file doesn't
 support the specific type of meta information.  For example, CRW images do not
-support EXIF or IPTC metdata.  Follow the links in the
+support EXIF or IPTC metdata.  See the
 <a href="index.html#supported">Supported File Types</a> table for an indication
 of the tags supported by your file.  If the tags aren't supported for your file
 type, then a <a href='metafiles.html'>metadata sidecar file</a> is an
@@ -1373,14 +1377,15 @@ and should give an output something like this:
 
 The <code>-G0:1</code> option causes the family 0 and 1 group names to be
 reported in square brackets for each tag.  Tags labelled "File:System" are
-stored in the filesystem, while other tags are stored in the location indicated
-inside the metadata of the file itself.</blockquote>
+"pseudo" tags stored in the filesystem, while the others are "real" tags stored
+in the metadata of the file.</blockquote>
 
 <blockquote>ExifTool's <b>default behaviour is to set all filesystem times to
-the current date/time when writing</b>, but the <code>-P</code> option may be
-used to preserve the original FileModifyDate. FileAccessDate represents the time
-the file was last accessed, and is set to the current date/time whenever any
-software (including ExifTool) accesses the file.</blockquote>
+the current date/time when any "real" tag is written</b>, but the
+<code>-P</code> option may be used to preserve the original FileModifyDate.
+FileAccessDate represents the time the file was last accessed, and is set to the
+current date/time whenever any software (including ExifTool) accesses the
+file.</blockquote>
 
 <blockquote>On systems where a filesystem creation date is maintained, ExifTool
 also sets this to the current date/time when the file is edited.  On Windows the
@@ -1476,7 +1481,7 @@ importing.</blockquote>
 for more details.</blockquote>
 
 <hr>
-<i>Last revised Jan. 24, 2014</i>
+<i>Last revised Jul 20, 2014</i>
 <p class='lf'><a href="index.html">&lt;-- Back to ExifTool home page</a></p>
 </body>
 </html>

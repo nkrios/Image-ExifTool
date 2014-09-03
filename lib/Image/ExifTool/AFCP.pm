@@ -147,7 +147,7 @@ NoAFCP: for (;;) {
         if ($verbose > 2 and not $outfile) {
             my $dat = $buff . $dir;
             print $out "  AFCP Directory:\n";
-            Image::ExifTool::HexDump(\$dat, undef,
+            HexDump(\$dat, undef,
                 Addr   => $$dirInfo{DataPos},
                 Width  => 12,
                 Prefix => $$et{INDENT},

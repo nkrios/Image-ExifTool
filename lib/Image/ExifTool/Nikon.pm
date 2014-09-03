@@ -56,7 +56,7 @@ use vars qw($VERSION %nikonLensIDs %nikonTextEncoding);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.88';
+$VERSION = '2.92';
 
 sub LensIDConv($$$);
 sub ProcessNikonAVI($$$);
@@ -84,6 +84,7 @@ sub PrintAFPointsInv($$;$);
     # http://www.rottmerhusen.com/objektives/lensid/files/exif/fmountlens.p.txt
     # (hex digits must be uppercase in keys below)
     '01 58 50 50 14 14 02 00' => 'AF Nikkor 50mm f/1.8',
+    '01 58 50 50 14 14 05 00' => 'AF Nikkor 50mm f/1.8',
     '02 42 44 5C 2A 34 02 00' => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5',
     '02 42 44 5C 2A 34 08 00' => 'AF Zoom-Nikkor 35-70mm f/3.3-4.5',
     '03 48 5C 81 30 30 02 00' => 'AF Zoom-Nikkor 70-210mm f/4',
@@ -343,6 +344,7 @@ sub PrintAFPointsInv($$;$);
     '48 48 2B 44 24 30 4B 06' => 'Sigma 17-35mm F2.8-4 EX DG  Aspherical HSM',
     '26 54 2B 44 24 30 1C 02' => 'Sigma 17-35mm F2.8-4 EX Aspherical',
     '9D 48 2B 50 24 24 4B 0E' => 'Sigma 17-50mm F2.8 EX DC OS HSM',
+    '8F 48 2B 50 24 24 4B 0E' => 'Sigma 17-50mm F2.8 EX DC OS HSM', #http://dev.exiv2.org/boards/3/topics/1747
     '7A 47 2B 5C 24 34 4B 06' => 'Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF HSM',
     '7A 48 2B 5C 24 34 4B 06' => 'Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF HSM',
     '7F 48 2B 5C 24 34 1C 06' => 'Sigma 17-70mm F2.8-4.5 DC Macro Asp. IF',
@@ -382,6 +384,7 @@ sub PrintAFPointsInv($$;$);
   # '92 3E 2D 88 2C 40 4B 0E' (22mm)
   # '92 40 2D 88 2C 40 4B 0E' (18mm)
     '26 48 31 49 24 24 1C 02' => 'Sigma 20-40mm F2.8',
+    '02 3A 37 50 31 3D 02 00' => 'Sigma 24-50mm F4-5.6 UC',
     '26 48 37 56 24 24 1C 02' => 'Sigma 24-60mm F2.8 EX DG',
     'B6 48 37 56 24 24 1C 02' => 'Sigma 24-60mm F2.8 EX DG',
     'A6 48 37 5C 24 24 4B 06' => 'Sigma 24-70mm F2.8 IF EX DG HSM', #JD
@@ -428,7 +431,7 @@ sub PrintAFPointsInv($$;$);
     '02 37 5E 8E 35 3D 02 00' => 'Sigma 75-300mm F4.5-5.6 APO',
     '02 3A 5E 8E 32 3D 02 00' => 'Sigma 75-300mm F4.0-5.6',
     '77 44 61 98 34 3C 7B 0E' => 'Sigma 80-400mm F4.5-5.6 EX OS',
-    '48 48 68 8E 30 30 4B 02' => 'Sigma 100-300mm F4 EX IF HSM',
+    '48 48 68 8E 30 30 4B 02' => 'Sigma APO 100-300mm F4 EX IF HSM',
     'F3 48 68 8E 30 30 4B 02' => 'Sigma APO 100-300mm F4 EX IF HSM',
     '48 54 6F 8E 24 24 4B 02' => 'Sigma APO 120-300mm F2.8 EX DG HSM',
     '7A 54 6E 8E 24 24 4B 02' => 'Sigma APO 120-300mm F2.8 EX DG HSM',
@@ -495,6 +498,7 @@ sub PrintAFPointsInv($$;$);
     '69 47 5C 8E 30 3C 00 02' => 'Tamron AF 70-300mm f/4-5.6 Di LD Macro 1:2 (A17N)',
     '00 48 5C 8E 30 3C 00 06' => 'Tamron AF 70-300mm f/4-5.6 Di LD Macro 1:2 (A17NII)', #JD
     'F1 47 5C 8E 30 3C DF 0E' => 'Tamron SP 70-300mm f/4-5.6 Di VC USD (A005)',
+    'EB 40 76 A6 38 40 DF 0E' => 'Tamron SP AF 150-600mm f/5-6.3 VC USD (A011)',
     '20 3C 80 98 3D 3D 1E 02' => 'Tamron AF 200-400mm f/5.6 LD IF (75D)',
     '00 3E 80 A0 38 3F 00 02' => 'Tamron SP AF 200-500mm f/5-6.3 Di LD (IF) (A08)',
     '00 3F 80 A0 38 3F 00 02' => 'Tamron SP AF 200-500mm f/5-6.3 Di (A08)',
@@ -558,6 +562,7 @@ sub PrintAFPointsInv($$;$);
     '4A 48 24 24 24 0C 4D 02' => 'Samyang AE 14mm f/2.8 ED AS IF UMC', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,3150.0.html
     '4A 60 44 44 0C 0C 4D 02' => 'Samyang 35mm f/1.4 AS UMC',
     '4A 60 62 62 0C 0C 4D 02' => 'Samyang AE 85mm f/1.4 AS IF UMC', #http://u88.n24.queensu.ca/exiftool/forum/index.php/topic,2888.0.html
+    '4A 54 29 29 18 0C 4D 02' => 'Samyang 16mm F2.0 ED AS UMC CS', #Jon Bloom (by email)
 #
     '02 40 44 5C 2C 34 02 00' => 'Exakta AF 35-70mm 1:3.5-4.5 MC',
 #
@@ -681,7 +686,7 @@ my %retouchValues = ( #PH
     40 => 'Drawing', # (S9200)
 );
 
-# AF point indices for models with 51 focus points, ie. D3 (ref JD/PH)
+# AF point indices for models with 51 focus points, eg. D3 (ref JD/PH)
 #        A1  A2  A3  A4  A5  A6  A7  A8  A9
 #    B1  B2  B3  B4  B5  B6  B7  B8  B9  B10  B11
 #    C1  C2  C3  C4  C5  C6  C7  C8  C9  C10  C11
@@ -700,7 +705,7 @@ my %afPoints51 = (
     10 => 'E6', 20 => 'E7', 30 => 'E9', 40 => 'B3', 50 => 'B1',
 );
 
-# AF point indices for models with 39 focus points, ie. D7000 (ref 29)
+# AF point indices for models with 39 focus points, eg. D7000 (ref 29)
 #                    A1  A2  A3
 #    B1  B2  B3  B4  B5  B6  B7  B8  B9  B10  B11
 #    C1  C2  C3  C4  C5  C6  C7  C8  C9  C10  C11
@@ -719,7 +724,7 @@ my %afPoints39 = (
     10 => 'E3', 20 => 'B9', 30 => 'D4',
 );
 
-# AF point indices for models with 135 focus points, ie. 1J1 (ref PH)
+# AF point indices for models with 135 focus points, eg. 1J1 (ref PH)
 # - 9 rows (A-I) with 15 columns (1-15), center is E8
 # - odd columns, columns 2 and 14, and the remaining corner points are
 #   not used in 41-point mode
@@ -1077,6 +1082,7 @@ my %binaryDataAttrs = (
         Name => 'HDRInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::HDRInfo' },
     },
+    # 0x0037 - int32u (1V models only): an image count maybe? - PH
     0x0039 => {
         Name => 'LocationInfo',
         SubDirectory => { TagTable => 'Image::ExifTool::Nikon::LocationInfo' },
@@ -1085,7 +1091,7 @@ my %binaryDataAttrs = (
         Name => 'BlackLevel',
         Writable => 'int16u',
         Count => 4,
-        # (may need to divide by 4 for some images, ie. D3300/D5300, 12 bit - ref 33)
+        # (may need to divide by 4 for some images, eg. D3300/D5300, 12 bit - ref 33)
     },
     0x0080 => { Name => 'ImageAdjustment',  Writable => 'string' },
     0x0081 => { Name => 'ToneComp',         Writable => 'string' }, #2
@@ -2219,6 +2225,7 @@ my %binaryDataAttrs = (
             0x88 => 'Purple-blue',
             0x89 => 'Red-purple',
             0xff => 'n/a',
+            # 0x04 - seen for D810 (PH)
         },
     },
     57 => { #21
@@ -2295,6 +2302,14 @@ my %binaryDataAttrs = (
             0x106 => 'Hi 1.5',
             0x107 => 'Hi 1.7',
             0x108 => 'Hi 2.0', #(NC) - D3 should have this mode
+            0x109 => 'Hi 2.3', #33
+            0x10a => 'Hi 2.5', #33
+            0x10b => 'Hi 2.7', #33
+            0x10c => 'Hi 3.0', #33
+            0x10d => 'Hi 3.3', #33
+            0x10e => 'Hi 3.5', #33
+            0x10f => 'Hi 3.7', #33
+            0x110 => 'Hi 4.0', #33
             0x201 => 'Lo 0.3',
             0x202 => 'Lo 0.5',
             0x203 => 'Lo 0.7',
@@ -2513,6 +2528,7 @@ my %binaryDataAttrs = (
             2 => 'On (11-point)', #PH
             3 => 'On (39-point)', #29 (D7000)
             4 => 'On (hybrid)', #PH (1J1)
+            5 => 'On (105-point)', #PH (1J4)
         },
     },
     7 => [
@@ -3027,7 +3043,7 @@ my %nikonFocalConversions = (
     },
     0x09 => { #8/9
         # With older AF lenses this does not work... (ref 13)
-        # ie) AF Nikkor 50mm f/1.4 => 48 (0x30)
+        # eg) AF Nikkor 50mm f/1.4 => 48 (0x30)
         # AF Zoom-Nikkor 35-105mm f/3.5-4.5 => @35mm => 15 (0x0f), @105mm => 141 (0x8d)
         Notes => 'this focus distance is approximate, and not very accurate for some lenses',
         Name => 'FocusDistance',
@@ -3113,7 +3129,7 @@ my %nikonFocalConversions = (
     # --> extra byte at position 0x09 in this version of LensData (PH)
     0x0a => { #8/9
         # With older AF lenses this does not work... (ref 13)
-        # ie) AF Nikkor 50mm f/1.4 => 48 (0x30)
+        # eg) AF Nikkor 50mm f/1.4 => 48 (0x30)
         # AF Zoom-Nikkor 35-105mm f/3.5-4.5 => @35mm => 15 (0x0f), @105mm => 141 (0x8d)
         Notes => 'this focus distance is approximate, and not very accurate for some lenses',
         Name => 'FocusDistance',
@@ -4967,6 +4983,7 @@ my %nikonFocalConversions = (
             1 => '1 EV',
             2 => '2 EV',
             3 => '3 EV',
+            # 5 - seen for 1J4
             255 => 'n/a', #PH
         },
     },
@@ -5285,8 +5302,8 @@ my %nikonFocalConversions = (
 %Image::ExifTool::Nikon::NCDT = (
     GROUPS => { 0 => 'MakerNotes', 1 => 'Nikon', 2 => 'Video' },
     NOTES => q{
-        Nikon-specific QuickTime tags found in the NCDT atom of MOV videos from some
-        Nikon cameras such as the Coolpix S8000.
+        Nikon-specific QuickTime tags found in the NCDT atom of MOV videos from
+        various Nikon models.
     },
     NCHD => {
         Name => 'MakerNoteVersion',
@@ -5312,8 +5329,9 @@ my %nikonFocalConversions = (
 # Nikon NCDB tags from MOV videos (ref PH)
 %Image::ExifTool::Nikon::NCDB = (
     GROUPS => { 0 => 'MakerNotes', 1 => 'Nikon', 2 => 'Video' },
-    # OP01 - 320 bytes, starts with "0200" (D600,D610,D3200,D5200)
+    # OP01 - 320 bytes, starts with "0200" (D600,D610,D810,D3200,D5200)
     #      - 638 bytes, starts with "0200" (D7100)
+    # OP02 - 2048 bytes, starts with "0200" (D810)
 );
 
 # Nikon NCTG tags from MOV videos (ref PH)
@@ -5476,6 +5494,7 @@ my %nikonFocalConversions = (
             require Image::ExifTool::GPS;
             Image::ExifTool::GPS::ConvertTimeStamp($val);
         },
+        PrintConv => 'Image::ExifTool::GPS::PrintTimeStamp($val)',
     },
     0x1200008 => {
         Name => 'GPSSatellites',

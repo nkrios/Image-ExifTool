@@ -378,8 +378,8 @@ $VERSION = '1.29';
         'Bottom Center' => 'Unten Mitte',
         'Bottom Left' => 'Unten Links',
         'Bottom Right' => 'Unten Rechts',
-        'Bottom-Left' => 'Unten Links',
-        'Bottom-Right' => 'Unten Rechts',
+        'Bottom-left' => 'Unten Links',
+        'Bottom-right' => 'Unten Rechts',
         'Bottom-center (horizontal)' => 'Unten Mitte (horizontal)',
         'Bottom-center (vertical)' => 'Unten Mitte (vertikal)',
         'Bottom-left (horizontal)' => 'Unten Links (horizontal)',
@@ -434,11 +434,11 @@ $VERSION = '1.29';
         'Top (vertical)' => 'Oben (vertikal)',
         'Top Center' => 'Oben Mitte',
         'Top Left' => 'Oben Links',
-        'Top Near-Left' => 'Oben nahe-Links',
-        'Top Near-Right' => 'Nahe Rechts-oben',
+        'Top Near-left' => 'Oben nahe-Links',
+        'Top Near-right' => 'Nahe Rechts-oben',
         'Top Right' => 'Oben Rechts',
-        'Top-Left' => 'Oben Links',
-        'Top-Right' => 'Oben Rechts',
+        'Top-left' => 'Oben Links',
+        'Top-right' => 'Oben Rechts',
         'Top-center (horizontal)' => 'Oben Mitte (horizontal)',
         'Top-center (vertical)' => 'Oben Mitte (vertikal)',
         'Top-left (horizontal)' => 'Oben Links (horizontal)',
@@ -622,8 +622,8 @@ $VERSION = '1.29';
         'Auto' => 'Automatisch',
         'Automatic Tracking AF' => 'Nachführ AF',
         'Bottom' => 'Unten',
-        'Bottom-Left' => 'Unten-links',
-        'Bottom-Right' => 'Unten-rechts',
+        'Bottom-left' => 'Unten-links',
+        'Bottom-right' => 'Unten-rechts',
         'Center' => 'Mitte',
         'Face Detect AF' => 'Gesichtserkennungs-AF',
         'Far Left' => 'Weit links',
@@ -641,8 +641,8 @@ $VERSION = '1.29';
         'Near Right' => 'Nahe Rechts',
         'Right' => 'Rechts',
         'Top' => 'Oben',
-        'Top-Left' => 'Oben-links',
-        'Top-Right' => 'Oben-rechts',
+        'Top-left' => 'Oben-links',
+        'Top-right' => 'Oben-rechts',
         'Upper Far Left' => 'Oben weit Links',
         'Upper Far Right' => 'Oben weit Rechts',
         'Upper-left' => 'Links oben',
@@ -817,13 +817,13 @@ $VERSION = '1.29';
       Description => 'Aktiver AF Sensor',
       PrintConv => {
         'Bottom' => 'Unten',
-        'Bottom-Left' => 'Unten Links',
-        'Bottom-Right' => 'Unten Rechts',
+        'Bottom-left' => 'Unten Links',
+        'Bottom-right' => 'Unten Rechts',
         'Center Vertical' => 'Mitte vertikal',
         'Middle Horizontal' => 'Mitte horizontal',
         'Top' => 'Oben',
-        'Top-Left' => 'Oben Links',
-        'Top-Right' => 'Rechts Oben',
+        'Top-left' => 'Oben Links',
+        'Top-right' => 'Rechts Oben',
       },
     },
    'AFStatusActiveSensor' => {
@@ -840,14 +840,14 @@ $VERSION = '1.29';
         'Out of Focus' => 'Nicht im Fokus',
       },
     },
-   'AFStatusBottom-Left' => {
+   'AFStatusBottom-left' => {
       Description => 'AF Status Unten Links',
       PrintConv => {
         'In Focus' => 'Im Fokus',
         'Out of Focus' => 'Nicht im Fokus',
       },
     },
-   'AFStatusBottom-Right' => {
+   'AFStatusBottom-right' => {
       Description => 'AF Status Unten Rechts',
       PrintConv => {
         'In Focus' => 'Im Fokus',
@@ -896,14 +896,14 @@ $VERSION = '1.29';
         'Out of Focus' => 'Nicht im Fokus',
       },
     },
-   'AFStatusTop-Left' => {
+   'AFStatusTop-left' => {
       Description => 'AF Status Oben Links',
       PrintConv => {
         'In Focus' => 'Im Fokus',
         'Out of Focus' => 'Nicht im Fokus',
       },
     },
-   'AFStatusTop-Right' => {
+   'AFStatusTop-right' => {
       Description => 'AF Status Oben Rechts',
       PrintConv => {
         'In Focus' => 'Im Fokus',
@@ -6386,7 +6386,7 @@ $VERSION = '1.29';
    'PixelUnits' => {
       Description => 'Pixel Einheit',
       PrintConv => {
-        'Meters' => 'Meter',
+        'meters' => 'Meter',
         'Unknown' => 'Unbekannt',
       },
     },
@@ -7723,8 +7723,8 @@ $VERSION = '1.29';
    'SubjectReference' => 'Themencode',
    'SubjectUnits' => {
       PrintConv => {
-        'Meters' => 'Meter',
-        'Radians' => 'Winkelgrade',
+        'meters' => 'Meter',
+        'radians' => 'Winkelgrade',
       },
     },
    'Subsystem' => {

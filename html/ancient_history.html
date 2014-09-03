@@ -66,7 +66,7 @@
 <a name='v9.41'><b>Nov. 16, 2013 - Version 9.41</b></a>
 <ul>
 <li>Added the ability to use multiple group qualifiers on tag names when writing
-    and copying (ie. "-QuickTime:Time:All=now")
+    and copying (eg. "-QuickTime:Time:All=now")
 <li>Added ability to geotag from Google Location Services KML files
 <li>Added a new Pentax LensType (thanks Louis Granboulan)
 <li>Added a new Canon LensType (thanks David Monro)
@@ -79,7 +79,7 @@
 <a name='v9.40'><b>Nov. 8, 2013 - Version 9.40</b> - "Write QuickTime"</a>
 <ul>
 <li>Added ability to write XMP and edit date/time tags in QuickTime-format files
-    (ie. MOV, MP4)
+    (eg. MOV, MP4)
 <li>Added -api option to allow API options to be set via the command line
 <li>Added ability to specify family 2 group name when writing
 <li>Added write support for a number of new XMP tags
@@ -701,7 +701,7 @@
 <li>Changed names of some PanasonicRaw DistortionInfo tags
 <li>Changed decoding for a Sony ExposureMode value
 <li>Fixed hang/crash that could occur when writing to an image with corrupted
-    Sony MoreInfo data (ie. SLT-A55V JPEG corrupted by GIMP)
+    Sony MoreInfo data (eg. SLT-A55V JPEG corrupted by GIMP)
 </ul>
 
 <a name='v9.01'><b>Aug. 25, 2012 - Version 9.01</b></a> <span class=grn>(production release)</span>
@@ -757,7 +757,7 @@
 <li>Decode a number of new Sony tags (thanks Jos Roost)
 <li>Changed name of Minolta BatteryLevel tag to BatteryState
 <li>Patched problem with conditional deletion of IPTC string-type tags which are
-    incorrectly null terminated (ie. written by Picasa 2.0)
+    incorrectly null terminated (eg. written by Picasa 2.0)
 <li>Fixed problem copying Canon 5DmkIII MakerNotes from CR2 to JPEG images
 <li>Fixed runtime error when writing some images with corrupted EXIF
 </ul>
@@ -1695,7 +1695,7 @@
 <a name='v8.36'><b>Oct. 30, 2010 - Version 8.36</b></a>
 <ul>
 <li>Added ability to read/write metadata in Sigma X3F images containing a
-    JpgFromRaw (ie. all Sigma models except the SD9 and SD10)
+    JpgFromRaw (eg. all Sigma models except the SD9 and SD10)
 <li>Added -stay_open option to avoid startup delay when called from other
     applications
 <li>Added a new Pentax LensType (thanks Hubert Meier)
@@ -1723,7 +1723,7 @@
 <li>Extract Olympus ZoomedPreviewImage
 <li>Updated decoding of Olympus AFPoint for recent E-models
 <li>Avoid writing mandatory IPTC tags unless another IPTC tag actually changes
-    (ie. trying to delete a non-existent IPTC tag will no longer have the side
+    (eg. trying to delete a non-existent IPTC tag will no longer have the side
     effect of generating mandatory IPTC tags)
 <li>Improved language translations
 <li>Improved error message when trying to write a file with the wrong extension
@@ -2462,7 +2462,7 @@
 <li>Added a few new Pentax LensType's
 <li>Decode a number of new tags for the Canon EOS 7D
 <li>Calculate Duration for WAV audio files
-<li>Allow exponents when writing GPS coordinates (ie. "-gpslatitude=7.657e+01")
+<li>Allow exponents when writing GPS coordinates (eg. "-gpslatitude=7.657e+01")
 <li>Print available character sets if no CHARSET is given for -charset option
 <li>Improved -v3 and -htmldump output to show MPF image data
 <li>Fixed -E option to work with tag descriptions when -lang option used
@@ -2786,7 +2786,7 @@
 <li>Changed Composite:LensID to also return a value for Olympus lenses
 <li>Changed copying behaviour to preserve the specific location (family 1 group)
     when source group is specified and destination group is "all" or "*"
-    (ie. "-exif:all>all:all" now preserves the IFD of each tag)
+    (eg. "-exif:all>all:all" now preserves the IFD of each tag)
 <li>Fixed a number of incorrect Minolta/Sony lens names (thanks Olaf Ulrich)
 <li>Fixed bug rewriting MIE trailers on TIFF images
 </ul>
@@ -3161,7 +3161,7 @@
 <li>Implemented character set translation for MIE information (-L option)
 <li>Improved speed when scanning unknown file to determine FileType
 <li>Fixed bug where some writable EXIF tags gave a "not writable" message when
-    reading tag value from a dynamic file (ie. "-TAG&lt;=%f.txt")
+    reading tag value from a dynamic file (eg. "-TAG&lt;=%f.txt")
 <li>Fixed problem double-escaping characters when -h and -S were used together
 <li>Fixed decoding of Nikon FlashModel for SU-800 Remote Commander
 <li>Fixed swapped Nikon FlashGroupBControlMode/FlashGroupCControlMode tags
@@ -3196,7 +3196,7 @@
 <li>Updated iptc2xmp.args and xmp2iptc.args to write IPTCDigest as per MWG
     recommendation
 <li>Allow zone-less date/time values in XMP (as per MWG and upcoming XMP spec)
-<li>Allow brackets in $$ and $/ expressions (ie. ${$} and ${/} now work)
+<li>Allow brackets in $$ and $/ expressions (eg. ${$} and ${/} now work)
 <li>Changed decoding of EXIF:Copyright to allow two separate strings as per spec
 <li>Changed a number of XMP Iptc4xmpCore tag names and added a corresponding set
     of aliases (shortcuts) for backward compatibility
@@ -3461,7 +3461,7 @@
 <li>Decode Panasonic Title tag (thanks Jens Duttke)
 <li>Recognize a few more uncommon top-level QuickTime atoms
 <li>Changed decoding of some Olympus tags for new E-520
-<li>Changed warning when empty PrintIM data is encountered (ie. as written in
+<li>Changed warning when empty PrintIM data is encountered (eg. as written in
     Sony A700 ARW files when Adobe RGB color mode is used)
 <li>Dropped Canon PreviewFocalPlaneX/YResolution tags since they never really
     existed (thanks Ger Vermeulen for pointing out the Canon bug which lead to
@@ -3611,7 +3611,7 @@
 <ul>
 <li>Extract duplicate tags when -p option is used
 <li>Fixed bug introduced in 7.00 which broke the use of group family numbers and
-    groups ending with a digit in tag format strings (ie. "$IFD0:Model")
+    groups ending with a digit in tag format strings (eg. "$IFD0:Model")
 </ul>
 
 <a name='v7.16'><b>Feb. 14, 2008 - Version 7.16</b></a>
@@ -3758,7 +3758,7 @@
     LightSource, MeteringMode and SubjectDistanceRange) instead of handling as a
     truly unknown value (if this makes sense)
 <li>Extract PreviewImage from newer Panasonic RAW images (thanks Jens Duttke)
-<li>Recognize Pentax-type Kodak maker notes (ie. Easyshare 883)
+<li>Recognize Pentax-type Kodak maker notes (eg. Easyshare 883)
 <li>Made "Entries out of sequence" a minor warning since this problem is fixed
 <li>Allow decimal seconds to be written in time values without needing to use -n
 <li>Improved parsing of PDF files
@@ -3815,7 +3815,7 @@
 
 <a name='v7.02'><b>Nov. 16, 2007 - Version 7.02</b></a>
 <ul>
-<li>Added ability to delete XMP family 1 groups (ie. "-XMP-crss:all=")
+<li>Added ability to delete XMP family 1 groups (eg. "-XMP-crss:all=")
 <li>Fixed problem writing XMP as a block to XMP file
 </ul>
 
@@ -3886,7 +3886,7 @@
 <li>Increased precision of 64-bit rational conversion from 7 to 10 digits
 <li>Fixed problem which caused failed tests with Perl 5.005_05
 <li>Fixed problem where some groups could not easily be excluded when deleting
-    all other information (ie. "-all= --exif:all" now behaves as expected)
+    all other information (eg. "-all= --exif:all" now behaves as expected)
 <li>Fixed problem decoding ICC Profile "dtim" format values
 <li>Fixed typo in a Minolta FlashMetering value (thanks Jens Duttke)
 <li>Fixed problem in API which could result in a UTF-8 encoded file not being
@@ -4164,7 +4164,7 @@
 
 <a name='v6.81'><b>Mar. 17, 2007 - Version 6.81</b></a>
 <ul>
-<li>Added l/u modifiers for lower/uppercase in filename format codes (ie. "%le")
+<li>Added l/u modifiers for lower/uppercase in filename format codes (eg. "%le")
 <li>Added equivalent IXY names to CanonModelID for PowerShot SD750 and SD1000
 <li>Added a few new Pentax ModelID's (Optio E30, T30, W30, A30)
 <li>Allow non-encrypted Nikon ColorBalance values to be written
@@ -4189,7 +4189,7 @@
 <ul>
 <li>Translate special characters in ID3 information when reading
 <li>Improved conversions for GPSTimeStamp and GPSDateStamp when writing so they
-    can be set from a normal date/time tag (ie. "-gpstimestamp&lt;createdate")
+    can be set from a normal date/time tag (eg. "-gpstimestamp&lt;createdate")
 <li>Added support for Nikon D40X plus a new LensID (thanks Robert Rottmerhusen)
 <li>Added a new Canon LensType (thanks Warren Stockton)
 <li>Removed D70Boring shortcut tag
@@ -4252,7 +4252,7 @@
 <a name='v6.73'><b>Jan. 31, 2007 - Version 6.73</b></a>
 <ul>
 <li>Added read support for meta information in HTML and XHTML documents
-<li>Added ability to write certain EXIF tags (ie. UserComment) as Unicode
+<li>Added ability to write certain EXIF tags (eg. UserComment) as Unicode
 <li>Added character set translation for XMP information; the -L option now works
     for all common meta information formats! (see updated <a href="faq.html#Q10">FAQ #10</a> for details)
 <li>Added a few more XMP-microsoft tags (thanks Kees Moerman)
@@ -4276,7 +4276,7 @@
 <li>Patched Microsoft Photo bug in EXIF Unicode text byte ordering
 <li>Added support for XMP-microsoft tags and 2 new Microsoft EXIF tags
 <li>Added a few new XMP tags (NativeDigest, ColorMode and ICCProfileName)
-<li>Added ability to add or delete copied tags from list (ie. "-SRCTAG+&gt;DSTTAG")
+<li>Added ability to add or delete copied tags from list (eg. "-SRCTAG+&gt;DSTTAG")
 <li>Added a few more Canon EasyMode values (thanks Samson Tai)
 <li>Added CanonModelID values for new A450, A460 and A550
 <li>Changed the -if option so the condition automatically fails if the
@@ -5045,7 +5045,7 @@
 <a name='v6.02'><b>Feb. 26, 2006 - Version 6.02</b></a>
 <ul>
 <li>Fixed problem rewriting Photoshop IRB resources as written by some
-    applications (ie. PixVue)
+    applications (eg. PixVue)
 <li>Improved decoding of AVI files to increase speed and extract more tags
 <li>Added -overwrite_original_in_place option
 <li>Added a number of new XMP tags and bring XMP support up to new
@@ -5521,7 +5521,7 @@
 
 <a name='v5.51'><b>July 27, 2005 - Version 5.51</b></a>
 <ul>
-<li>Assume '-TagsFromFile @' for any redirected tags (ie. '-SRCTAG&gt;DSTTAG' or
+<li>Assume '-TagsFromFile @' for any redirected tags (eg. '-SRCTAG&gt;DSTTAG' or
     '-DSTTAG&lt;SRCTAG') which are specified without a prior '-TagsFromFile'
 </ul>
 
@@ -5809,7 +5809,7 @@
 <a name='v5.17'><b>May 14, 2005 - Version 5.17</b></a>
 <ul>
 <li>Allow 'All' to be used as a group name with '-TagsFromFile' option to
-    preserve original tag groups (ie. '-all:all')
+    preserve original tag groups (eg. '-all:all')
 <li>PrintIM information is now copied with -TagsFromFile
 <li>Decode EXIF:Gamma tag
 <li>Decode Canon 350D FileNumber
@@ -5968,7 +5968,7 @@
 <li>Added 'Directory' tag
 <li>Decode a few more Pentax tags (thanks to John Francis)
 <li>Allow newlines in tag values on command line when writing
-<li>Fixed problem rewriting makernotes with sub directories (ie. Olympus)
+<li>Fixed problem rewriting makernotes with sub directories (eg. Olympus)
 </ul>
 
 <a name='v4.91'><b>Mar. 28, 2005 - Version 4.91</b></a>
@@ -6028,7 +6028,7 @@
 <li>Fixed problem which caused an error when adding XMP information to a TIFF
     file which didn't previously contain XMP
 <li>Made '=' optional with -AllTagsFromFile option
-<li>Fixed problem with verbose dump of zero-length directory (ie. Sony F717
+<li>Fixed problem with verbose dump of zero-length directory (eg. Sony F717
     maker notes)
 </ul>
 
@@ -6193,7 +6193,7 @@
 <a name='v4.50'><b>Feb. 2, 2005 - Version 4.50</b></a>
 <ul>
 <li>Allow writing to specific IFD
-<li>Allow permanent tags (ie. MakerNotes tags) 'deleted' by setting them to an
+<li>Allow permanent tags (eg. MakerNotes tags) 'deleted' by setting them to an
     empty string if '' is a valid value for the tag
 <li>Added test for rewriting Nikon D70 information
 <li>Added missing inverse conversion routines for GPS tags (now they are all
@@ -6465,7 +6465,7 @@
 <a name='v4.03'><b>Dec. 6, 2004 - Version 4.03</b></a>
 <ul>
 <li>Major overhaul of verbose message output
-<li>Change -v option to allow verbose level to be specified (ie. -v3 = very very
+<li>Change -v option to allow verbose level to be specified (eg. -v3 = very very
     verbose)
 <li>Added a new Nikon tag (SceneMode)
 <li>Count images which were unchanged when writing tags

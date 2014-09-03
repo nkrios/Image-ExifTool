@@ -51,7 +51,7 @@ use vars qw($VERSION $AUTOLOAD @formatSize @formatName %formatNumber %intFormat
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::MakerNotes;
 
-$VERSION = '3.64';
+$VERSION = '3.65';
 
 sub ProcessExif($$$);
 sub WriteExif($$$);
@@ -1556,6 +1556,7 @@ my %sampleFormat = (
         },
     },
     0x9102 => 'CompressedBitsPerPixel',
+    # 0x9103 - int16u: 1 (found in Pentax XG-1 samples)
     0x9201 => {
         Name => 'ShutterSpeedValue',
         Notes => 'displayed in seconds, but stored as an APEX value',
@@ -3199,7 +3200,7 @@ sub CalcScaleFactor35efl
             my %lkup = ( 3=>10, 4=>1, 5=>0.001 , cm=>10, mm=>1, um=>0.001 );
             my $units = $lkup{ shift() || $res || '' } || 25.4;
             my $x_res = shift || return undef;
-            my $y_res = shift || return undef;
+            my $y_res = shift || $x_res;
             Image::ExifTool::IsFloat($x_res) and $x_res != 0 or return undef;
             Image::ExifTool::IsFloat($y_res) and $y_res != 0 or return undef;
             my ($w, $h);
@@ -3655,7 +3656,7 @@ sub PrintLensID($$@)
     return join(' or ', @best) if @best;
     return join(' or ', @matches) if @matches;
     $lens = $$printConv{$lensType};
-    return $lensModel if $lensModel and $lens =~ / or /; # (ie. Sony NEX-5N)
+    return $lensModel if $lensModel and $lens =~ / or /; # (eg. Sony NEX-5N)
     return $lens;
 }
 
@@ -3681,7 +3682,7 @@ sub ExifDate($)
 # Returns: time in format '10:30:55'
 # - bad formats recognized: '10 30 55', '103055', '103055+0500'
 # - removes null terminator if it exists
-# - leaves time zone intact if specified (ie. '10:30:55+05:00')
+# - leaves time zone intact if specified (eg. '10:30:55+05:00')
 sub ExifTime($)
 {
     my $time = shift;
@@ -3949,7 +3950,7 @@ sub ProcessExif($$$)
                 my $buff;
                 if ($raf) {
                     # avoid loading large binary data unless necessary
-                    # (ie. ImageSourceData -- layers in Photoshop TIFF image)
+                    # (eg. ImageSourceData -- layers in Photoshop TIFF image)
                     while ($size > BINARY_DATA_LIMIT) {
                         if ($tagInfo) {
                             # make large unknown blocks binary data

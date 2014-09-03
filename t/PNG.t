@@ -31,6 +31,7 @@ my $testnum = 1;
     $exifTool->SetNewValuesFromFile('t/images/IPTC.jpg');
     $exifTool->SetNewValuesFromFile('t/images/XMP.jpg');
     $exifTool->SetNewValue('PNG:Comment');  # and delete a tag
+    $exifTool->SetNewValue('PixelsPerUnitX', 1234);
     my $image;  
     my $rtnVal = $exifTool->WriteInfo('t/images/PNG.png', \$image);
     # must ignore FileSize because size is variable (depends on Zlib availability)

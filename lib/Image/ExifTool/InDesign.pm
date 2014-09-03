@@ -109,7 +109,7 @@ sub ProcessIND($$)
                 my %parms = (Addr => $raf->Tell());
                 $parms{MaxLen} = $verbose > 3 ? 1024 : 96 if $verbose < 5;
                 $raf->Seek(-$raf->Read($buff, $len2), 1) or $err = 1;
-                Image::ExifTool::HexDump(\$buff, undef, %parms);
+                HexDump(\$buff, undef, %parms);
             }
         }
         # check for XMP if stream data is long enough

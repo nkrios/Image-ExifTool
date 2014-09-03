@@ -296,8 +296,24 @@ L10 and LC80)</span></span><table class=cols><tr>
   <br>47 = Dynamic Mono
   <br>50 = Impressive Art
   <br>51 = Cross Process
+  <br>100 = High Dynamic 2
+  <br>101 = Retro 2
+  <br>102 = High Key 2
+  <br>103 = Low Key 2
+  <br>104 = Toy Effect 2
   <br>107 = Expressive 2
+  <br>112 = Sepia
+  <br>117 = Miniature
   <br>122 = Dynamic Monochrome
+  <br>127 = Old Days
+  <br>132 = Dynamic Monochrome 2
+  <br>135 = Impressive Art 2
+  <br>136 = Cross Process 2
+  <br>137 = Toy Pop
+  <br>138 = Fantasy
+  <br>256 = Normal 3
+  <br>272 = Standard
+  <br>288 = High
   <br><span class=n>(these values are used by the TZ10 and ZS7)</span>
   <br>0 = Normal
   <br>1 = -2
@@ -583,7 +599,7 @@ L10 and LC80)</span></span><table class=cols><tr>
 <td title='0x006d = 109'>0x006d</td>
 <td>City</td>
 <td class=c>undef</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(City/Town as stored by some models, or County/Township for others)</span></span></td></tr>
 <tr>
 <td title='0x006f = 111'>0x006f</td>
 <td>Landmark</td>
@@ -618,11 +634,16 @@ L10 and LC80)</span></span><table class=cols><tr>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
 <tr class=b>
+<td title='0x0080 = 128'>0x0080</td>
+<td>City2</td>
+<td class=c>undef</td>
+<td><span class=s><span class=n>(City/Town/Village as stored by some models)</span></span></td></tr>
+<tr>
 <td title='0x0086 = 134'>0x0086</td>
 <td>ManometerPressure</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0089 = 137'>0x0089</td>
 <td>PhotoStyle</td>
 <td class=c>int16u</td>
@@ -635,28 +656,28 @@ L10 and LC80)</span></span><table class=cols><tr>
   <br>5 = Scenery
   <br>6 = Portrait</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x008a = 138'>0x008a</td>
 <td>ShadingCompensation</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x008c = 140'>0x008c</td>
 <td>AccelerometerZ</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(positive is acceleration upwards)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x008d = 141'>0x008d</td>
 <td>AccelerometerX</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(positive is acceleration to the left)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x008e = 142'>0x008e</td>
 <td>AccelerometerY</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(positive is acceleration backwards)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x008f = 143'>0x008f</td>
 <td>CameraOrientation</td>
 <td class=c>int8u</td>
@@ -668,17 +689,17 @@ L10 and LC80)</span></span><table class=cols><tr>
   <br>4 = Tilt Upwards
   <br>5 = Tilt Downwards</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr>
+<tr class=b>
 <td title='0x0090 = 144'>0x0090</td>
 <td>RollAngle</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(degrees of clockwise camera rotation)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0091 = 145'>0x0091</td>
 <td>PitchAngle</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(degrees of upward camera tilt)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0093 = 147'>0x0093</td>
 <td>SweepPanoramaDirection</td>
 <td class=c>int8u</td>
@@ -687,24 +708,24 @@ L10 and LC80)</span></span><table class=cols><tr>
   <br>2 = Right to Left
   <br>3 = Top to Bottom
   <br>4 = Bottom to Top</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x0094 = 148'>0x0094</td>
 <td>SweepPanoramaFieldOfView</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x0096 = 150'>0x0096</td>
 <td>TimerRecording</td>
 <td class=c>int8u</td>
 <td><span class=s>0 = Off
   <br>1 = Time Lapse
   <br>2 = Stop-motion Animation</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x009d = 157'>0x009d</td>
 <td>InternalNDFilter</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x009e = 158'>0x009e</td>
 <td>HDR</td>
 <td class=c>int16u</td>
@@ -717,35 +738,35 @@ L10 and LC80)</span></span><table class=cols><tr>
   <br>32968 = 2 EV (Auto)
   <br>33068 = 3 EV (Auto)</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x009f = 159'>0x009f</td>
 <td>ShutterType</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Mechanical
   <br>1 = Electronic
   <br>2 = Hybrid</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x00a3 = 163'>0x00a3</td>
 <td>ClearRetouchValue</td>
 <td class=c>rational64u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x00ab = 171'>0x00ab</td>
 <td>TouchAE</td>
 <td class=c>int16u</td>
 <td><span class=s>0 = Off
   <br>1 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x0e00 = 3584'>0x0e00</td>
 <td>PrintIM</td>
 <td class=c>-</td>
 <td>--&gt; <a href='PrintIM.html'>PrintIM Tags</a></td></tr>
-<tr class=b>
+<tr>
 <td title='0x8000 = 32768'>0x8000</td>
 <td>MakerNoteVersion</td>
 <td class=c>undef</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x8001 = 32769'>0x8001</td>
 <td>SceneMode</td>
 <td class=c>int16u</td>
@@ -829,45 +850,45 @@ L10 and LC80)</span></span><table class=cols><tr>
   <br>89 = Monochrome
   <br>90 = Creative Control</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td title='0x8004 = 32772'>0x8004</td>
 <td>WBRedLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x8005 = 32773'>0x8005</td>
 <td>WBGreenLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td title='0x8006 = 32774'>0x8006</td>
 <td>WBBlueLevel</td>
 <td class=c>int16u</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td title='0x8007 = 32775'>0x8007</td>
 <td>FlashFired</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = No
   <br>2 = Yes</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x8008 = 32776'>0x8008</td>
 <td>TextStamp</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Off
   <br>2 = On</span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x8009 = 32777'>0x8009</td>
 <td>TextStamp</td>
 <td class=c>int16u</td>
 <td><span class=s>1 = Off
   <br>2 = On</span></td></tr>
-<tr class=b>
+<tr>
 <td title='0x8010 = 32784'>0x8010</td>
 <td>BabyAge</td>
 <td class=c>string</td>
 <td><span class=s><span class=n>(or pet age)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td title='0x8012 = 32786'>0x8012</td>
 <td>Transform</td>
 <td class=c>undef[4]</td>
@@ -1480,18 +1501,48 @@ iPalm.</p>
 </table></td></tr></table></blockquote>
 
 <h2><a name='PANA'>Panasonic PANA Tags</a></h2>
-<p>Tags extracted from the PANA user data found in MP4 videos from models such
-as the DMC-FT20.</p>
+<p>Tags extracted from the PANA and LEIC user data found in MP4 videos from
+various Panasonic and Leica models.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
 <tr class=h><th>Index1</th><th>Tag Name</th>
 <th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
 <tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>Make</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td class=r title='4 = 0x4'>4</td>
 <td>Model</td>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
+<tr>
+<td class=r title='12 = 0xc'>12</td>
+<td>Model</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='22 = 0x16'>22</td>
+<td>Model</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='52 = 0x34'>52</td>
+<td>Version1</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='62 = 0x3e'>62</td>
+<td>Version2</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='80 = 0x50'>80</td>
+<td>MakerNoteLeica5</td>
+<td class=c>-</td>
+<td>--&gt; <a href='Panasonic.html#Leica5'>Panasonic Leica5 Tags</a></td></tr>
 <tr class=b>
 <td class=r title='88 = 0x58'>88</td>
 <td>ThumbnailWidth</td>
@@ -1528,7 +1579,32 @@ as the DMC-FT20.</p>
 <td class=c>N</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td class=r title='1358 = 0x54e'>1358</td>
+<td>ThumbnailWidth</td>
+<td class=c>N</td>
+<td><span class=s><span class=n>(Leica X Vario)</span></span></td></tr>
+<tr class=b>
+<td class=r title='1362 = 0x552'>1362</td>
+<td>ThumbnailHeight</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td class=r title='1366 = 0x556'>1366</td>
+<td>ThumbnailLength</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='1374 = 0x55e'>1374</td>
+<td>ThumbnailImage</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td class=r title='16488 = 0x4068'>16488</td>
+<td>ExifData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
+<tr class=b>
+<td class=r title='16512 = 0x4080'>16512</td>
 <td>ExifData</td>
 <td class=c>-</td>
 <td>--&gt; <a href='EXIF.html'>EXIF Tags</a></td></tr>
@@ -1602,7 +1678,7 @@ as the DMC-FT20.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 28, 2014</i>
+<br><i>Last revised Aug 22, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

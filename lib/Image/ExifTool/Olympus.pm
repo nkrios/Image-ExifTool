@@ -37,7 +37,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '2.18';
+$VERSION = '2.24';
 
 sub PrintLensInfo($$$);
 
@@ -149,8 +149,11 @@ my %olympusLensTypes = (
     '2 19 10' => 'Lumix G Vario 14-140mm F3.5-5.6 Asph. Power OIS', #20
     '2 20 10' => 'Lumix G Vario 12-32mm F3.5-5.6 Asph. Mega OIS', #20
     '2 21 10' => 'Leica DG Nocticron 42.5mm F1.2 Asph. Power OIS', #20
+    '2 22 10' => 'Leica DG Summilux 15mm F1.7 Asph.', #20
     '3 01 00' => 'Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.',
     '3 02 00' => 'Leica D Summilux 25mm F1.4 Asph.',
+    # Tamron lenses
+    '5 01 10' => 'Tamron 14-150mm F3.5-5.8 Di III', #20 (model C001)
 );
 
 # lookup for Olympus camera types (ref PH)
@@ -319,6 +322,7 @@ my %olympusCameraTypes = (
     D4535 => 'SP-620UZ',
     D4536 => 'TG-320',
     D4537 => 'VR340,D750',
+    D4538 => 'VG160,X990,D745',
     D4541 => 'SZ-12',
     D4545 => 'VH410',
     D4546 => 'XZ-10', #21
@@ -330,9 +334,12 @@ my %olympusCameraTypes = (
     D4562 => 'SP-820UZ',
     D4566 => 'SZ-15',
     D4572 => 'STYLUS1',
+    D4574 => 'TG-3',
     D4575 => 'TG-850',
     D4579 => 'SP-100EE',
+    D4580 => 'SH-60',
     D4581 => 'SH-1',
+    D4582 => 'TG-835',
     D4809 => 'C2500L',
     D4842 => 'E-10',
     D4856 => 'C-1',
@@ -365,6 +372,7 @@ my %olympusCameraTypes = (
     S0043 => 'E-PM2',
     S0044 => 'E-P5',
     S0045 => 'E-PL6',
+    S0046 => 'E-PL7', #21
     S0047 => 'E-M1',
     S0051 => 'E-M10',
     SR45 => 'D220',
@@ -567,8 +575,8 @@ my %indexInfo = (
         Name => 'SpecialMode',
         Notes => q{
             3 numbers: 1. Shooting mode: 0=Normal, 2=Fast, 3=Panorama;
-            2. Sequence Number; 3. Panorama Direction: 1=Left-Right,
-            2=Right-Left, 3=Bottom-Top, 4=Top-Bottom
+            2. Sequence Number; 3. Panorama Direction: 1=Left-right,
+            2=Right-left, 3=Bottom-Top, 4=Top-Bottom
         },
         Writable => 'int32u',
         Count => 3,
@@ -1518,7 +1526,7 @@ my %indexInfo = (
         # 5: 0, 16(new Lumix lenses)
         ValueConv => 'my @a=split(" ",$val); sprintf("%x %.2x %.2x",@a[0,2,3])',
         # set unknown values to zero when writing
-        ValueConvInv => 'my @a=split(" ",$val); hex($a[0])." 0 ".hex($a[1]).hex($a[2])." 0 0"',
+        ValueConvInv => 'my @a=split(" ",$val); hex($a[0])." 0 ".hex($a[1])." ".hex($a[2])." 0 0"',
         PrintConv => \%olympusLensTypes,
     },
     # apparently the first 3 digits of the lens s/n give the type (ref 4):
@@ -1723,7 +1731,7 @@ my %indexInfo = (
             1 => 'Sequential shooting AF',
             2 => 'Continuous AF',
             3 => 'Multi AF',
-            5 => 'Face detect', #11
+            4 => 'Face detect', #11
             10 => 'MF',
         }, {
             0 => '(none)',
@@ -2947,7 +2955,7 @@ my %indexInfo = (
 %Image::ExifTool::Olympus::RawInfo = (
     WRITE_PROC => \&Image::ExifTool::Exif::WriteExif,
     CHECK_PROC => \&Image::ExifTool::Exif::CheckExif,
-    NOTES => 'These tags are found only in ORF images of some models (ie. C8080WZ).',
+    NOTES => 'These tags are found only in ORF images of some models (eg. C8080WZ).',
     GROUPS => { 0 => 'MakerNotes', 2 => 'Camera' },
     0x000 => {
         Name => 'RawInfoVersion',
@@ -3074,7 +3082,7 @@ my %indexInfo = (
         Name => 'ExposureUnknown',
         Unknown => 1,
         Format => 'int32u',
-        # this conversion doesn't work for all models (ie. gives "1/100000")
+        # this conversion doesn't work for all models (eg. gives "1/100000")
         ValueConv => '$val ? 10 / $val : 0',
         PrintConv => 'Image::ExifTool::Exif::PrintExposureTime($val)',
     },

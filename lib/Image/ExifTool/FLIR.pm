@@ -429,7 +429,7 @@ my %float8g = ( Format => 'float', PrintConv => 'sprintf("%.8g",$val)' );
     0x114 => { Name => 'CameraSoftware',    Format => 'string[16]' }, #1/PH (NC)
     0x170 => { Name => 'LensModel',         Format => 'string[32]' },
     # note: it seems that FLIR updated their lenses at some point, so lenses with the same
-    # name may have different part numbers (ie. the FOL38 is either 1196456 or T197089)
+    # name may have different part numbers (eg. the FOL38 is either 1196456 or T197089)
     0x190 => { Name => 'LensPartNumber',    Format => 'string[16]' },
     0x1a0 => { Name => 'LensSerialNumber',  Format => 'string[16]' },
     0x1b4 => { Name => 'FieldOfView',       Format => 'float', PrintConv => 'sprintf("%.1f deg", $val)' }, #1
@@ -1238,7 +1238,7 @@ sub GetImageType($$$)
 sub UnescapeFLIR($)
 {
     my $char = shift;
-    return $char unless length $char eq 4; # escaped ASCII char (ie. '\\')
+    return $char unless length $char eq 4; # escaped ASCII char (eg. '\\')
     my $val = hex $char;
     return chr($val) if $val < 0x80;   # simple ASCII
     return pack('C0U', $val) if $] >= 5.006001;
@@ -1310,7 +1310,7 @@ sub ProcessMeasInfo($$$)
         my $pre = 'Meas' . $i;
         $et->VerboseDir("MeasInfo $i", undef, $recLen);
         if ($verbose > 2) {
-            Image::ExifTool::HexDump($dataPt, $recLen,
+            HexDump($dataPt, $recLen,
                 Start=>$pos, Prefix=>$$et{INDENT}, DataPos=>$dataPos);
         }
         my $coordLen = Get16u($dataPt, $pos+4);
@@ -1445,7 +1445,7 @@ sub ProcessFLIR($$;$)
         } elsif ($verbose > 2) {
             my %parms = ( DataPos => $recPos, Prefix => $$et{INDENT} );
             $parms{MaxLen} = 96 if $verbose < 4;
-            Image::ExifTool::HexDump(\$rec, $recLen, %parms);
+            HexDump(\$rec, $recLen, %parms);
         }
     }
     delete $$et{SET_GROUP0};

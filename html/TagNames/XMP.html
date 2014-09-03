@@ -44,12 +44,12 @@ has no effect, and both structured and flattened tags may be written.  See
 <a href="../struct.html">struct.html</a> for more details.</p>
 
 <p>Individual languages for <code>lang-alt</code> tags are accessed by suffixing the tag
-name with a &#39;-&#39;, followed by an RFC 3066 language code (ie. &quot;XMP:Title-fr&quot;,
+name with a &#39;-&#39;, followed by an RFC 3066 language code (eg. &quot;XMP:Title-fr&quot;,
 or &quot;Rights-en-US&quot;).  (See <a href="http://www.ietf.org/rfc/rfc3066.txt">http://www.ietf.org/rfc/rfc3066.txt</a> for the RFC
 3066 specification.)  A <code>lang-alt</code> tag with no language code accesses the
 &quot;x-default&quot; language, but causes other languages for this tag to be deleted
 when writing.  The &quot;x-default&quot; language code may be specified when writing
-to preserve other existing languages (ie. &quot;XMP-dc:Description-x-default&quot;). 
+to preserve other existing languages (eg. &quot;XMP-dc:Description-x-default&quot;). 
 When reading, &quot;x-default&quot; is not specified.</p>
 
 <p>The XMP tags are organized according to schema <b>Namespace</b> in the following
@@ -58,7 +58,7 @@ been shortened for convenience (since the family 1 group names are derived
 from these by adding a leading &quot;XMP-&quot;).  In cases where a tag name exists in
 more than one namespace, less common namespaces are avoided when writing.
 However, any namespace may be written by specifying a family 1 group name
-for the tag, ie) XMP-exif:Contrast or XMP-crs:Contrast.  When deciding on
+for the tag, eg) XMP-exif:Contrast or XMP-crs:Contrast.  When deciding on
 which tags to add to an image, using standard schemas such as
 <a href="#dc">dc</a>, <a href="#xmp">xmp</a>, <a href="#iptcCore">iptcCore</a>
 and <a href="#iptcExt">iptcExt</a> is recommended if possible.</p>
@@ -7875,6 +7875,24 @@ XMP properties.</p>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='XML'>XMP XML Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'dc'</td>
+<td>dc</td>
+<td class=c>-</td>
+<td>--&gt; <a href='XMP.html#dc'>XMP dc Tags</a></td></tr>
+<tr class=b>
+<td>'lastUpdate'</td>
+<td>LastUpdate</td>
+<td class=c>N</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='SVG'>XMP SVG Tags</a></h2>
 <p>SVG (Scalable Vector Graphics) image tags.  By default, only the top-level
 SVG and Metadata tags are extracted from these images, but all graphics tags
@@ -7947,7 +7965,7 @@ XMP module for convenience.  (see <a href="http://www.w3.org/TR/SVG11/">http://w
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Feb 19, 2014</i>
+<br><i>Last revised Jul 3, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

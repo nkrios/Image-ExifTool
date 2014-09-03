@@ -21,7 +21,7 @@ sub ProcessKodakPatch($$$);
 sub WriteUnknownOrPreview($$$);
 sub FixLeicaBase($$;$);
 
-$VERSION = '1.91';
+$VERSION = '1.93';
 
 my $debug;          # set to 1 to enable debugging code
 
@@ -411,6 +411,22 @@ my $debug;          # set to 1 to enable debugging code
         },
     },
     {
+        Name => 'MakerNoteKodak11',
+        # these maker notes have an extra 2 bytes after the entry count
+        # - written by the PixPro S-1 (Note: Make is "JK Imaging, Ltd.", so check Model for "Kodak")
+        Condition => q{
+            $$self{Model}=~/Kodak/i and
+            $$valPt =~ /^II\x2a\0\x08\0\0\0.\0\0\0/
+        },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Kodak::Type11',
+            ProcessProc => \&ProcessKodakPatch,
+            ByteOrder => 'LittleEndian',
+            Start => '$valuePtr + 8',
+            Base => '$start - 8',
+        },
+    },
+    {
         Name => 'MakerNoteKodakUnknown',
         Condition => '$$self{Make}=~/Kodak/i and $$valPt!~/^AOC\0/',
         NotIFD => 1,
@@ -727,13 +743,33 @@ my $debug;          # set to 1 to enable debugging code
     {
         Name => 'MakerNoteRicoh',
         # (my test R50 image starts with "      \x02\x01" - PH)
-        # (the HZ15 starts with "MM\0\x2a" but an extra 2 bytes of padding after
-        #  the IFD entry count prevents these from being processed as a standard IFD)
-        Condition => '$$self{Make}=~/^(PENTAX )?RICOH/ and $$valPt=~/^(Ricoh|      |MM\0\x2a|II\x2a\0)/i',
+        Condition => q{
+            $$self{Make} =~ /^(PENTAX )?RICOH/ and
+            $$valPt =~ /^(Ricoh|      |MM\0\x2a|II\x2a\0)/i and
+            $$valPt !~ /^(MM\0\x2a\0\0\0\x08\0.\0\0|II\x2a\0\x08\0\0\0.\0\0\0)/s
+        },
         SubDirectory => {
             TagTable => 'Image::ExifTool::Ricoh::Main',
             Start => '$valuePtr + 8',
             ByteOrder => 'Unknown',
+        },
+    },
+    {
+        Name => 'MakerNoteRicoh2',
+        # (the Ricoh HZ15 starts with "MM\0\x2a" and the Pentax XG-1 starts with "II\x2a\0",
+        # but an extra 2 bytes of padding after the IFD entry count prevents these from
+        # being processed as a standard IFD.  Note that the offsets for the HZ15 are all
+        # zeros, but they seem to be mostly OK for the XG-1)
+        Condition => q{
+            $$self{Make} =~ /^(PENTAX )?RICOH/ and
+            $$valPt =~ /^(MM\0\x2a\0\0\0\x08\0.\0\0|II\x2a\0\x08\0\0\0.\0\0\0)/s
+        },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Ricoh::Type2',
+            Start => '$valuePtr + 8',
+            Base => '$start - 8',
+            ByteOrder => 'Unknown',
+            ProcessProc => \&ProcessKodakPatch,
         },
     },
     {

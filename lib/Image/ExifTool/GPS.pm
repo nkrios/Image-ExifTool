@@ -129,6 +129,7 @@ my %coordConv = (
         },
         ValueConv => 'Image::ExifTool::GPS::ConvertTimeStamp($val)',
         ValueConvInv => '$val=~tr/:/ /;$val',
+        PrintConv => 'Image::ExifTool::GPS::PrintTimeStamp($val)',
         # pull time out of any format date/time string
         # (converting to UTC if a timezone is given)
         PrintConvInv => sub {
@@ -333,7 +334,8 @@ my %coordConv = (
         PrintConvInv => '$val=~s/\s*m$//; $val',
         Writable => 'rational64u',
     },
-    # 0xea1c - Nokia Lumina 1020 writes this (padding) in GPS IFD - PH
+    # 0xea1c - Nokia Lumina 1020, Samsung GT-I8750, and other Windows 8
+    #          phones write this (padding) in GPS IFD - PH
 );
 
 # Composite GPS tags
@@ -408,13 +410,26 @@ sub ConvertTimeStamp($)
     $h = int($f / 3600); $f -= $h * 3600;
     $m = int($f / 60);   $f -= $m * 60;
     $s = int($f);        $f -= $s;
-    $f = int($f * 1000000 + 0.5);
+    $f = int($f * 1000000000 + 0.5);
     if ($f) {
-        ($f = sprintf(".%.6d", $f)) =~ s/0+$//;
+        ($f = sprintf(".%.9d", $f)) =~ s/0+$//;
     } else {
         $f = ''
     }
-    return sprintf("%.2d:%.2d:%.2d$f",$h,$m,$s);
+    return sprintf("%.2d:%.2d:%.2d%s",$h,$m,$s,$f);
+}
+
+#------------------------------------------------------------------------------
+# Print GPS timestamp
+# Inputs: 0) EXIF-formatted time string
+# Returns: time rounded to the nearest microsecond
+sub PrintTimeStamp($)
+{
+    my $val = shift;
+    return $val unless $val =~ s/:(\d{2}\.\d+)$//;
+    my $s = int($1 * 1000000 + 0.5) / 1000000;
+    $s = "0$s" if $s < 10;
+    return "${val}:$s";
 }
 
 #------------------------------------------------------------------------------

@@ -55,7 +55,7 @@ use vars qw($VERSION %pentaxLensTypes);
 use Image::ExifTool::Exif;
 use Image::ExifTool::HP;
 
-$VERSION = '2.76';
+$VERSION = '2.80';
 
 sub CryptShutterCount($$);
 sub PrintFilter($$$);
@@ -78,7 +78,7 @@ sub PrintFilter($$$);
         return undef if $inv;
         # *istD may report a series number of 4 for series 7 lenses
         $val =~ s/^4 /7 / and $$conv{$val} and return $$conv{$val} . " ($_[0])";
-        # cameras that don't recognize SDM lenses (ie. older K10 firmware)
+        # cameras that don't recognize SDM lenses (eg. older K10 firmware)
         # may report series 7 instead of 8
         $val =~ s/^7 /8 / and $$conv{$val} and return $$conv{$val} . " ? ($_[0])";
         return undef;
@@ -312,6 +312,7 @@ sub PrintFilter($$$);
     '8 28' => 'Sigma 18-250mm F3.5-6.3 DC Macro HSM', #27
     '8 29' => 'Sigma 35mm F1.4 DG HSM', #27
     '8 30' => 'Sigma 17-70mm F2.8-4 DC Macro HSM Contemporary', #27
+    '8 31' => 'Sigma 18-35mm F1.8 DC HSM', #27
     '8 32' => 'Sigma 30mm F1.4 DC HSM | A', #27
     '8 209' => 'HD PENTAX-DA 20-40mm F2.8-4 ED Limited DC WR', #29
     '8 210' => 'smc PENTAX-DA 18-270mm F3.5-6.3 ED SDM', #Helmut Schutz
@@ -353,6 +354,7 @@ sub PrintFilter($$$);
     '13 18' => 'smc PENTAX-D FA 645 55mm F2.8 AL [IF] SDM AW', #PH
     '13 19' => 'smc PENTAX-D FA 645 25mm F4 AL [IF] SDM AW', #PH
     '13 20' => 'HD PENTAX-D FA 645 90mm F2.8 ED AW SR', #PH
+    '13 253' => 'HD PENTAX-DA 645 28-45mm F4.5 ED AW SR', #Dominique Schrekling email
     # missing:
     # 'smc PENTAX-DA 645 25mm F4.0 AL SDM AW [IF]' ? different than D FA version?
 #
@@ -497,6 +499,7 @@ my %pentaxModelID = (
     0x12fde => 'WG-4 GPS', # (Ricoh)
     0x13006 => 'WG-20', # (Ricoh)
     0x13010 => '645Z',
+    0x1301a => 'K-S1',
 );
 
 # Pentax city codes - (PH, Optio WP)
@@ -1075,6 +1078,7 @@ my %binaryDataAttrs = (
         Name => 'AFPointSelected',
         Condition => '$$self{Model} !~ /K-3\b/',
         Writable => 'int16u',
+        Notes => 'all models but the K-3',
         PrintConvColumns => 2,
         PrintConv => [{
             # 0 - Contrast-detect AF? - PH (K-5)
@@ -1102,6 +1106,7 @@ my %binaryDataAttrs = (
     },{
         Name => 'AFPointSelected',
         Writable => 'int16u',
+        Notes => 'K-3',
         PrintConvColumns => 2,
         PrintConv => [{
             # 0 - Contrast-detect AF? - PH (K-5)
@@ -1124,7 +1129,7 @@ my %binaryDataAttrs = (
             5 => 'Top-right',
             6 => 'Upper-left',
             7 => 'Upper Near-left',
-            8 => 'Upper-midle',
+            8 => 'Upper-middle',
             9 => 'Upper Near-right',
             10 => 'Upper-right',
             11 => 'Far Left',
@@ -1144,6 +1149,39 @@ my %binaryDataAttrs = (
             25 => 'Bottom',
             26 => 'Bottom Near-right',
             27 => 'Bottom-right',
+            #forum5892
+            257 => 'Zone Select Top-left',
+            258 => 'Zone Select Top Near-left',
+            259 => 'Zone Select Top',
+            260 => 'Zone Select Top Near-right',
+            261 => 'Zone Select Top-right',
+            262 => 'Zone Select Upper-left',
+            263 => 'Zone Select Upper Near-left',
+            264 => 'Zone Select Upper-middle',
+            265 => 'Zone Select Upper Near-right',
+            266 => 'Zone Select Upper-right',
+            267 => 'Zone Select Far Left',
+            268 => 'Zone Select Left',
+            269 => 'Zone Select Near-left',
+            270 => 'Zone Select Center',
+            271 => 'Zone Select Near-right',
+            272 => 'Zone Select Right',
+            273 => 'Zone Select Far Right',
+            274 => 'Zone Select Lower-left',
+            275 => 'Zone Select Lower Near-left',
+            276 => 'Zone Select Lower-middle',
+            277 => 'Zone Select Lower Near-right',
+            278 => 'Zone Select Lower-right',
+            279 => 'Zone Select Bottom-left',
+            280 => 'Zone Select Bottom Near-left',
+            281 => 'Zone Select Bottom',
+            282 => 'Zone Select Bottom Near-right',
+            283 => 'Zone Select Bottom-right',
+        },{ #forum5892
+            0 => 'Single Point',
+            1 => 'Expanded Area 9-point (S)',
+            3 => 'Expanded Area 25-point (M)',
+            5 => 'Expanded Area 27-point (L)',
         }],
     }],
     0x000f => [{ #PH
@@ -1178,7 +1216,7 @@ my %binaryDataAttrs = (
                 4 => 'Top-right',
                 5 => 'Upper-left',
                 6 => 'Upper Near-left',
-                7 => 'Upper-midle',
+                7 => 'Upper-middle',
                 8 => 'Upper Near-right',
                 9 => 'Upper-right',
                 10 => 'Far Left',
@@ -1305,7 +1343,7 @@ my %binaryDataAttrs = (
         # ranges from 0-12 for my Optio WP - PH
         Notes => q{
             calibrated differently for different models.  For the Optio WP, add 6 to get
-            approximate Light Value.  May not be valid for some models, ie. Optio S
+            approximate Light Value.  May not be valid for some models, eg. Optio S
         },
     },
     0x0016 => { #PH
@@ -1896,7 +1934,7 @@ my %binaryDataAttrs = (
         # 246 [7], and 209 [18 (one of the first 20 shots)], so there must be a number
         # of test images shot in the factory. (But my new K-5 started at 1 - PH)
         # This count includes shutter actuations even if they don't result in a
-        # recorded image (ie. manual white balance frame or digital preview), but
+        # recorded image (eg. manual white balance frame or digital preview), but
         # does not include actuations due to Live View or video recording - PH
         Name => 'ShutterCount',
         Writable => 'undef',
@@ -2386,12 +2424,12 @@ my %binaryDataAttrs = (
     ],
     0x0209 => { #PH
         Name => 'AEMeteringSegments',
-        Condition => '$count <= 77', # (doesn't work for K-3)
         Format => 'int8u',
         Count => -1,
         Notes => q{
             measurements from each of the 16 AE metering segments for models such as the
-            K10D, and 77 metering segments for models such as the K-5, converted to LV
+            K10D, 77 metering segments for models such as the K-5, and 4050 metering
+            segments for the K-3, converted to LV
         },
         %convertMeteringSegments,
         #  16 metering segment              77 metering segment
@@ -2410,14 +2448,12 @@ my %binaryDataAttrs = (
     },
     0x020a => { #PH/JD/19
         Name => 'FlashMeteringSegments',
-        Condition => '$count <= 77', # (likely doesn't work for K-3)
         Format => 'int8u',
         Count => -1,
         %convertMeteringSegments,
     },
     0x020b => { #PH/JD/19
         Name => 'SlaveFlashMeteringSegments',
-        Condition => '$count <= 77', # (likely doesn't work for K-3)
         Format => 'int8u',
         Count => -1,
         Notes => 'used in wireless control mode',
@@ -2925,7 +2961,7 @@ my %binaryDataAttrs = (
     2.1 => {
         Name => 'MeteringMode2',
         Mask => 0x0f,
-        Notes => 'may not be valid for some models, ie. *ist D',
+        Notes => 'may not be valid for some models, eg. *ist D',
         PrintConv => {
             0 => 'Multi-segment',
             BITMASK => {
@@ -3529,7 +3565,7 @@ my %binaryDataAttrs = (
         Name => 'AEError',
         Format => 'int8s',
         # this is usually zero except in M exposure mode, but it can be non-zero
-        # in other modes (ie. if you hit an aperture limit in Tv mode)
+        # in other modes (eg. if you hit an aperture limit in Tv mode)
         ValueConv => '-($val-64)/8', # (negate to make overexposed positive)
         ValueConvInv => '-$val * 8 + 64',
     },
@@ -5506,6 +5542,7 @@ my %binaryDataAttrs = (
         Groups => { 1 => 'GPS', 2 => 'Time' },
         Format => 'rational64u[3]',
         ValueConv => 'Image::ExifTool::GPS::ConvertTimeStamp($val)',
+        PrintConv => 'Image::ExifTool::GPS::PrintTimeStamp($val)',
     },
     0x134 => {
         Name => 'GPSSatellites',
@@ -5678,7 +5715,7 @@ sub PrintFilter($$$)
 #------------------------------------------------------------------------------
 # Convert Pentax hex-based EV (modulo 8) to real number
 # Inputs: 0) value to convert
-# ie) 0x00 -> 0
+# eg) 0x00 -> 0
 #     0x03 -> 0.33333
 #     0x04 -> 0.5
 #     0x05 -> 0.66666

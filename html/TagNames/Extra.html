@@ -17,7 +17,8 @@ in this column are write-only.</p>
 they don&#39;t represent real metadata in the file.  Instead, this information
 is stored in the directory structure of the filesystem.  The five writable
 &quot;pseudo&quot; tags (FileName, Directory, FileModifyDate, FileCreateDate and
-HardLink) may be written without modifying the file itself.
+HardLink) may be written without modifying the file itself.  The TestName
+tag is used for dry run testing of writes to FileName.
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -128,15 +129,17 @@ system&#39;s standard libraries)</span></span></td></tr>
 <td class=c title=' ! = Unsafe'>Y!</td>
 <td class=c>System</td>
 <td><span class=s><span class=n>(may be written with a full path name to set FileName and Directory in one
-operation.  See <a href="../filename.html">filename.html</a> for more information on
-writing the FileName and Directory tags)</span></span></td></tr>
+operation.  This is such a powerful feature that a TestName tag is provided
+to allow dry-run tests before actually writing the file name. See
+<a href="../filename.html">filename.html</a> for more information on writing the
+FileName, Directory and TestName tags)</span></span></td></tr>
 <tr class=b>
 <td>FilePermissions</td>
 <td class=c>N</td>
 <td class=c>System</td>
 <td><span class=s><span class=n>(r=read, w=write and x=execute permissions for the file owner, group and
 others.  The ValueConv value is an octal number so bit test operations on
-this value should be done in octal, ie. &#39;oct($filePermissions#) &amp; 0200&#39;)</span></span></td></tr>
+this value should be done in octal, eg. &#39;oct($filePermissions#) &amp; 0200&#39;)</span></span></td></tr>
 <tr>
 <td>FileSequence</td>
 <td class=c>N</td>
@@ -240,7 +243,7 @@ generated only if specifically requested)</span></span></td></tr>
 <td>MaxVal</td>
 <td class=c>N</td>
 <td class=c>File</td>
-<td>&nbsp;</td></tr>
+<td><span class=s><span class=n>(maximum pixel value in PPM or PGM image)</span></span></td></tr>
 <tr class=b>
 <td>NewGUID</td>
 <td class=c>N</td>
@@ -254,7 +257,7 @@ unless specifically requested)</span></span></td></tr>
 <td>Now</td>
 <td class=c>N</td>
 <td class=c>ExifTool</td>
-<td><span class=s><span class=n>(the current date/time.  Useful when setting the tag values, ie.
+<td><span class=s><span class=n>(the current date/time.  Useful when setting the tag values, eg.
 <code>&quot;-modifydate&lt;now&quot;</code>.  Not generated unless specifically requested)</span></span></td></tr>
 <tr class=b>
 <td>PreviewImage</td>
@@ -292,6 +295,13 @@ resource-fork information as a sub-document.  When writing, the resource
 fork is preserved by default, but it may be deleted with <code>-rsrc:all=</code> on
 the command line)</span></span></td></tr>
 <tr class=b>
+<td>TestName</td>
+<td class=c>Y</td>
+<td class=c>-</td>
+<td><span class=s><span class=n>(this write-only tag may be used instead of FileName for dry-run tests of the
+file renaming feature.  Writing this tag prints the old and new file names
+to the console, but does not affect the file itself)</span></span></td></tr>
+<tr>
 <td>Warning</td>
 <td class=c>N</td>
 <td class=c>ExifTool</td>
@@ -300,18 +310,18 @@ Use the -a or Duplicates option to see all warnings if more than one
 occurred. Minor warnings may be ignored with the -m or IgnoreMinorErrors
 option.  Minor warnings with a capital &quot;M&quot; in the &quot;[Minor]&quot; designation
 indicate that the processing is affected by ignoring the warning)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>XMP</td>
 <td class=c title=' ! = Unsafe'>Y!</td>
 <td class=c>XMP</td>
 <td><span class=s><span class=n>(the XMP data block, but note that extended XMP in JPEG images may be split
 into multiple blocks)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>XResolution</td>
 <td class=c>N</td>
 <td class=c>File</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>YResolution</td>
 <td class=c>N</td>
 <td class=c>File</td>
@@ -320,7 +330,7 @@ into multiple blocks)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Mar 27, 2014</i>
+<br><i>Last revised Jul 2, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -40,7 +40,7 @@ use vars qw($VERSION $AUTOLOAD);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.80';
+$VERSION = '1.83';
 
 sub FixWrongFormat($);
 sub ProcessMOV($$;$);
@@ -166,6 +166,7 @@ my %ftypLookup = (
     'sdv ' => 'SD Memory Card Video', # various?
     'ssc1' => 'Samsung stereoscopic, single stream',
     'ssc2' => 'Samsung stereoscopic, dual stream',
+    'XAVC' => 'Sony XAVC', #PH
 );
 
 # information for time/date-based tags (time zero is Jan 1, 1904)
@@ -301,6 +302,13 @@ my %graphicsMode = (
         See
         L<http://developer.apple.com/mac/library/documentation/QuickTime/QTFF/QTFFChap1/qtff1.html>
         for the official specification.
+    },
+    meta => { # 'meta' is found here in my Sony ILCE-7S MP4 sample - PH
+        Name => 'Meta',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::QuickTime::Meta',
+            Start => 4, # skip 4-byte version number header
+        },
     },
     free => [
         {
@@ -1326,10 +1334,11 @@ my %graphicsMode = (
     },
     # CNDB - 2112 bytes (550D)
     # CNDM - 4 bytes - 0xff,0xd8,0xff,0xd9 (S95)
+    # CNDG - 10232 bytes, mostly zeros (N100)
     # ---- Casio ----
     QVMI => { #PH
         Name => 'CasioQVMI',
-        # Casio stores standard EXIF-format information in MOV videos (ie. EX-S880)
+        # Casio stores standard EXIF-format information in MOV videos (eg. EX-S880)
         SubDirectory => {
             TagTable => 'Image::ExifTool::Exif::Main',
             ProcessProc => \&Image::ExifTool::Exif::ProcessExif, # (because ProcessMOV is default)
@@ -1446,7 +1455,7 @@ my %graphicsMode = (
         Name => 'PentaxPreview',
         SubDirectory => { TagTable => 'Image::ExifTool::Pentax::PXTH' },
     },
-    PXMN => { #PH (Pentax K-01)
+    PXMN => [{ #PH (Pentax K-01)
         Name => 'MakerNotePentax5b',
         Condition => '$$valPt =~ /^PENTAX \0MM/',
         SubDirectory => {
@@ -1456,7 +1465,20 @@ my %graphicsMode = (
             Base => '$start - 10',
             ByteOrder => 'BigEndian',
         },
-    },
+    },{ #PH (Pentax 645Z)
+        Name => 'MakerNotePentax5c',
+        Condition => '$$valPt =~ /^PENTAX \0II/',
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::Pentax::Main',
+            ProcessProc => \&Image::ExifTool::Exif::ProcessExif, # (because ProcessMOV is default)
+            Start => 10,
+            Base => '$start - 10',
+            ByteOrder => 'LittleEndian',
+        },
+    },{
+        Name => 'MakerNotePentaxUnknown',
+        Binary => 1,
+    }],
     # ---- Ricoh ----
     RTHU => { #PH (GR)
         Name => 'PreviewImage',
@@ -1755,7 +1777,10 @@ my %graphicsMode = (
    'xml ' => {
         Name => 'XML',
         Flags => [ 'Binary', 'Protected', 'BlockExtract' ],
-        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Main' },
+        SubDirectory => {
+            TagTable => 'Image::ExifTool::XMP::XML',
+            IgnoreProp => { NonRealTimeMeta => 1 }, # ignore container for Sony 'nrtm'
+        },
     },
    'keys' => {
         Name => 'Keys',
@@ -4215,7 +4240,7 @@ my %graphicsMode = (
     'iTunEXTC' => {
         Name => 'ContentRating',
         Notes => 'standard | rating | score | reasons',
-        # ie. 'us-tv|TV-14|500|V', 'mpaa|PG-13|300|For violence and sexuality'
+        # eg. 'us-tv|TV-14|500|V', 'mpaa|PG-13|300|For violence and sexuality'
         # (see http://shadowofged.blogspot.ca/2008/06/itunes-content-ratings.html)
     },
     'iTunNORM' => {
@@ -4858,6 +4883,7 @@ my %graphicsMode = (
 #   mp4s         16      esds
 #   tmcd         34      name
 #
+    ftab => { Name => 'FontTable',  Format => 'undef', ValueConv => 'substr($val, 5)' },
 );
 
 # MP4 data information box (ref 5)
@@ -5021,6 +5047,7 @@ my %graphicsMode = (
            'url '=> 'URL', #3
             vide => 'Video Track',
             subp => 'Subpicture', #http://www.google.nl/patents/US7778526
+            nrtm => 'Non-Real Time Metadata', #PH (Sony ILCE-7S) [how is this different from "meta"?]
         },
     },
     12 => { #PH
@@ -5199,7 +5226,7 @@ sub CalcRotation($)
     my $et = shift;
     my $value = $$et{VALUE};
     my ($i, $track);
-    # get the video track family 1 group (ie. "Track1");
+    # get the video track family 1 group (eg. "Track1");
     for ($i=0; ; ++$i) {
         my $idx = $i ? " ($i)" : '';
         my $tag = "HandlerType$idx";
@@ -5676,13 +5703,14 @@ sub ProcessMOV($$;$)
             $et->SetFileType();       # MOV
         }
         SetByteOrder('MM');
+        $$et{PRIORITY_DIR} = 'XMP';   # have XMP take priority
     }
     for (;;) {
         if ($size < 8) {
             if ($size == 0) {
                 if ($dataPt) {
                     # a zero size isn't legal for contained atoms, but Canon uses it to
-                    # terminate the CNTH atom (ie. CanonEOS100D.mov), so tolerate it here
+                    # terminate the CNTH atom (eg. CanonEOS100D.mov), so tolerate it here
                     my $pos = $raf->Tell() - 4;
                     $raf->Seek(0,2);
                     my $str = $$dirInfo{DirName} . ' with ' . ($raf->Tell() - $pos) . ' bytes';
@@ -5831,16 +5859,16 @@ sub ProcessMOV($$;$)
                         $base -= $dPos;
                     }
                     my %dirInfo = (
-                        DataPt   => \$val,
-                        DataLen  => $size,
-                        DirStart => $start,
-                        DirLen   => $size - $start,
-                        DirName  => $$subdir{DirName} || $$tagInfo{Name},
-                        HasData  => $$subdir{HasData},
-                        Multi    => $$subdir{Multi},
-                        DataPos  => $dPos,
-                        # Base needed for IsOffset tags in binary data
-                        Base     => $base,
+                        DataPt     => \$val,
+                        DataLen    => $size,
+                        DirStart   => $start,
+                        DirLen     => $size - $start,
+                        DirName    => $$subdir{DirName} || $$tagInfo{Name},
+                        HasData    => $$subdir{HasData},
+                        Multi      => $$subdir{Multi},
+                        IgnoreProp => $$subdir{IgnoreProp}, # (XML hack)
+                        DataPos    => $dPos,
+                        Base       => $base, # (needed for IsOffset tags in binary data)
                     );
                     $dirInfo{BlockInfo} = $tagInfo if $$tagInfo{BlockExtract};
                     if ($$subdir{ByteOrder} and $$subdir{ByteOrder} =~ /^Little/) {

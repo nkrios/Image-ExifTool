@@ -275,7 +275,7 @@ information is always created as compressed zTXt if Compress::Zlib is
 available, or tEXt otherwise.  Standard XMP is written as uncompressed iTXt.</p>
 
 <p>Alternate languages are accessed by suffixing the tag name with a &#39;-&#39;,
-followed by an RFC 3066 language code (ie. &quot;PNG:Comment-fr&quot;, or
+followed by an RFC 3066 language code (eg. &quot;PNG:Comment-fr&quot;, or
 &quot;Title-en-US&quot;).  See <a href="http://www.ietf.org/rfc/rfc3066.txt">http://www.ietf.org/rfc/rfc3066.txt</a> for the RFC 3066
 specification.</p>
 
@@ -437,6 +437,9 @@ image didn't already contain XMP)</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='PhysicalPixel'>PNG PhysicalPixel Tags</a></h2>
+<p>These tags are found in the PNG pHYs chunk and belong to the PNG-pHYs family
+1 group.  They are all created together with default values if necessary
+when any of these tags is written, and may only be deleted as a group.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -445,19 +448,19 @@ image didn't already contain XMP)</span></td></tr>
 <tr>
 <td class=r title='0 = 0x0'>0</td>
 <td>PixelsPerUnitX</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td class=r title='4 = 0x4'>4</td>
 <td>PixelsPerUnitY</td>
-<td class=c>N</td>
+<td class=c>int32u</td>
 <td>&nbsp;</td></tr>
 <tr>
 <td class=r title='8 = 0x8'>8</td>
 <td>PixelUnits</td>
-<td class=c>N</td>
+<td class=c>int8u</td>
 <td><span class=s>0 = Unknown
-  <br>1 = Meters</span></td></tr>
+  <br>1 = meters</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='SubjectScale'>PNG SubjectScale Tags</a></h2>
@@ -470,8 +473,8 @@ image didn't already contain XMP)</span></td></tr>
 <td class=r title='0 = 0x0'>0</td>
 <td>SubjectUnits</td>
 <td class=c>N</td>
-<td><span class=s>1 = Meters
-  <br>2 = Radians</span></td></tr>
+<td><span class=s>1 = meters
+  <br>2 = radians</span></td></tr>
 <tr class=b>
 <td class=r title='1 = 0x1'>1</td>
 <td>SubjectPixelWidth</td>
@@ -523,7 +526,7 @@ image didn't already contain XMP)</span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Apr 21, 2014</i>
+<br><i>Last revised Jul 23, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

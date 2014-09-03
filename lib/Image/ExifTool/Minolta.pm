@@ -48,11 +48,11 @@ package Image::ExifTool::Minolta;
 
 use strict;
 use vars qw($VERSION %minoltaLensTypes %minoltaTeleconverters %minoltaColorMode
-            %sonyColorMode %minoltaSceneMode);
+            %sonyColorMode %minoltaSceneMode %afStatusInfo);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '2.13';
+$VERSION = '2.15';
 
 # Full list of product codes for Sony-compatible Minolta lenses
 # (ref http://www.kb.sony.com/selfservice/documentLink.do?externalId=C1000570)
@@ -500,31 +500,31 @@ my %metabonesID = (
    '65535.14' => 'Sony E 20mm F2.8',                #PH (SEL20F28   - 32798)
    '65535.15' => 'Sony E 35mm F1.8 OSS',            #25 (SEL35F18   - 32799)
    '65535.16' => 'Sony E PZ 18-105mm F4 G OSS',     #25 (SELP18105G - 32800)
-   '65535.17' => 'Sony E PZ 18-200mm F3.5-6.3 OSS', #25 (SELP18200  - 32807)
-   '65535.18' => 'Sony FE 55mm F1.8 ZA',            #25 (SEL55F18Z  - 32808)
-   '65535.19' => 'Sony FE 70-200mm F4 G OSS',       #25 (SEL70200G  - 32810)
-   '65535.20' => 'Sony FE 28-70mm F3.5-5.6 OSS',    #25 (SEL2870    - 32813)
+   '65535.17' => 'Sony E 18-50mm F4-5.6',           #25 (SEL1850    - 32803)
+   '65535.18' => 'Sony E PZ 18-200mm F3.5-6.3 OSS', #25 (SELP18200  - 32807)
+   '65535.19' => 'Sony FE 55mm F1.8 ZA',            #25 (SEL55F18Z  - 32808)
+   '65535.20' => 'Sony FE 70-200mm F4 G OSS',       #25 (SEL70200G  - 32810)
+   '65535.21' => 'Sony FE 28-70mm F3.5-5.6 OSS',    #25 (SEL2870    - 32813)
 #
 # 3rd party E lenses
 #
-   '65535.21' => 'Sigma 19mm F2.8 [EX] DN', #25
-   '65535.22' => 'Sigma 30mm F2.8 [EX] DN', #25
-   '65535.23' => 'Sigma 60mm F2.8 DN', #25
-   '65535.24' => 'Tamron 18-200mm F3.5-6.3 Di III VC', #25 (Model B011)
-   '65535.25' => 'Zeiss Touit 12mm F2.8', #25
-   '65535.26' => 'Zeiss Touit 32mm F1.8', #25
-   '65535.27' => 'Zeiss Touit 50mm F2.8 Macro', #25 
-# 
-# other lenses 
-# 
-   '65535.28' => 'Arax MC 35mm F2.8 Tilt+Shift', #JD 
-   '65535.29' => 'Arax MC 80mm F2.8 Tilt+Shift', #JD 
-   '65535.30' => 'Zenitar MF 16mm F2.8 Fisheye M42', #JD 
-   '65535.31' => 'Samyang 500mm Mirror F8.0', #19 
-   '65535.32' => 'Pentacon Auto 135mm F2.8', #19 
-   '65535.33' => 'Pentacon Auto 29mm F2.8', #19 
-   '65535.34' => 'Helios 44-2 58mm F2.0', #19 
-
+   '65535.22' => 'Sigma 19mm F2.8 [EX] DN', #25
+   '65535.23' => 'Sigma 30mm F2.8 [EX] DN', #25
+   '65535.24' => 'Sigma 60mm F2.8 DN', #25
+   '65535.25' => 'Tamron 18-200mm F3.5-6.3 Di III VC', #25 (Model B011)
+   '65535.26' => 'Zeiss Touit 12mm F2.8', #25
+   '65535.27' => 'Zeiss Touit 32mm F1.8', #25
+   '65535.28' => 'Zeiss Touit 50mm F2.8 Macro', #25
+#
+# other lenses
+#
+   '65535.29' => 'Arax MC 35mm F2.8 Tilt+Shift', #JD
+   '65535.30' => 'Arax MC 80mm F2.8 Tilt+Shift', #JD
+   '65535.31' => 'Zenitar MF 16mm F2.8 Fisheye M42', #JD
+   '65535.32' => 'Samyang 500mm Mirror F8.0', #19
+   '65535.33' => 'Pentacon Auto 135mm F2.8', #19
+   '65535.34' => 'Pentacon Auto 29mm F2.8', #19
+   '65535.35' => 'Helios 44-2 58mm F2.0', #19
 );
 
 %minoltaTeleconverters = (
@@ -607,7 +607,24 @@ my %metabonesID = (
     26 => 'Fireworks', #28
     27 => 'Food', #28
     28 => 'Pet', #28
+    33 => 'HDR', #25
     0xffff => 'n/a', #PH
+);
+
+# tag information for AFStatus tags (ref 20)
+%afStatusInfo = (
+    Format => 'int16s',
+    # 0=in focus, -32768=out of focus, -ve=front focus, +ve=back focus
+    PrintConvColumns => 2,
+    PrintConv => {
+        0 => 'In Focus',
+        -32768 => 'Out of Focus',
+        OTHER => sub {
+            my ($val, $inv) = @_;
+            $inv and $val =~ /([-+]?\d+)/, return $1;
+            return $val < 0 ? "Front Focus ($val)" : "Back Focus (+$val)";
+        },
+    },
 );
 
 my %exposureIndicator = (
@@ -637,22 +654,6 @@ my %exposureIndicator = (
 
 my %onOff = ( 0 => 'On', 1 => 'Off' );
 my %offOn = ( 0 => 'Off', 1 => 'On' );
-
-# tag information for AFStatus tags (ref 20)
-my %afStatusInfo = (
-    Format => 'int16s',
-    # 0=in focus, -32768=out of focus, -ve=front focus, +ve=back focus
-    PrintConvColumns => 2,
-    PrintConv => {
-        0 => 'In Focus',
-        -32768 => 'Out of Focus',
-        OTHER => sub {
-            my ($val, $inv) = @_;
-            $inv and $val =~ /([-+]?\d+)/, return $1;
-            return $val < 0 ? "Front Focus ($val)" : "Back Focus (+$val)";
-        },
-    },
-);
 
 # Minolta tag table
 %Image::ExifTool::Minolta::Main = (
@@ -1370,13 +1371,13 @@ my %afStatusInfo = (
             BITMASK => {
                 0 => 'Center',
                 1 => 'Top',
-                2 => 'Top-Right',
+                2 => 'Top-right',
                 3 => 'Right',
-                4 => 'Bottom-Right',
+                4 => 'Bottom-right',
                 5 => 'Bottom',
-                6 => 'Bottom-Left',
+                6 => 'Bottom-left',
                 7 => 'Left',
-                8 => 'Top-Left',
+                8 => 'Top-left',
             },
         },
     },
@@ -1724,14 +1725,14 @@ my %afStatusInfo = (
     0x01 => { #PH
         Name => 'AFSensorActive',
         PrintConv => {
-            0 => 'Top-Right',
-            1 => 'Bottom-Right',
+            0 => 'Top-right',
+            1 => 'Bottom-right',
             2 => 'Bottom',
             3 => 'Middle Horizontal',
             4 => 'Center Vertical',
             5 => 'Top',
-            6 => 'Top-Left',
-            7 => 'Bottom-Left',
+            6 => 'Top-left',
+            7 => 'Bottom-left',
         },
     },
     0x02 => {
@@ -1742,8 +1743,8 @@ my %afStatusInfo = (
             focusing if the image is focused then recomposed
         },
     },
-    0x04 => { Name => 'AFStatusTop-Right',      %afStatusInfo },
-    0x06 => { Name => 'AFStatusBottom-Right',   %afStatusInfo },
+    0x04 => { Name => 'AFStatusTop-right',      %afStatusInfo },
+    0x06 => { Name => 'AFStatusBottom-right',   %afStatusInfo },
     0x08 => { Name => 'AFStatusBottom',         %afStatusInfo },
     0x0a => {
         Name => 'AFStatusMiddleHorizontal',
@@ -1755,8 +1756,8 @@ my %afStatusInfo = (
     },
     0x0c => { Name => 'AFStatusCenterVertical', %afStatusInfo },
     0x0e => { Name => 'AFStatusTop',            %afStatusInfo },
-    0x10 => { Name => 'AFStatusTop-Left',       %afStatusInfo },
-    0x12 => { Name => 'AFStatusBottom-Left',    %afStatusInfo },
+    0x10 => { Name => 'AFStatusTop-left',       %afStatusInfo },
+    0x12 => { Name => 'AFStatusBottom-left',    %afStatusInfo },
     0x14 => {
         Name => 'FocusLocked',
         # (Focus can be locked in all modes other than Manual and Continuous,
@@ -1775,13 +1776,13 @@ my %afStatusInfo = (
             0 => 'Auto',
             1 => 'Center',
             2 => 'Top',
-            3 => 'Top-Right',
+            3 => 'Top-right',
             4 => 'Right',
-            5 => 'Bottom-Right',
+            5 => 'Bottom-right',
             6 => 'Bottom',
-            7 => 'Bottom-Left',
+            7 => 'Bottom-left',
             8 => 'Left',
-            9 => 'Top-Left',
+            9 => 'Top-left',
         },
     },
     0x16 => {
@@ -1944,13 +1945,13 @@ my %afStatusInfo = (
         PrintConv => {
             1 => 'Center',
             2 => 'Top',
-            3 => 'Top-Right',
+            3 => 'Top-right',
             4 => 'Right',
-            5 => 'Bottom-Right',
+            5 => 'Bottom-right',
             6 => 'Bottom',
-            7 => 'Bottom-Left',
+            7 => 'Bottom-left',
             8 => 'Left',
-            9 => 'Top-Left',
+            9 => 'Top-left',
         },
     },
     0x0e => { #20

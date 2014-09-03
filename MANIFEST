@@ -72,6 +72,7 @@ html/TagNames/Kodak.html
 html/TagNames/KyoceraRaw.html
 html/TagNames/LNK.html
 html/TagNames/Leaf.html
+html/TagNames/Lytro.html
 html/TagNames/M2TS.html
 html/TagNames/MIE.html
 html/TagNames/MIFF.html
@@ -99,6 +100,7 @@ html/TagNames/PICT.html
 html/TagNames/PLIST.html
 html/TagNames/PNG.html
 html/TagNames/PSP.html
+html/TagNames/Palm.html
 html/TagNames/Panasonic.html
 html/TagNames/PanasonicRaw.html
 html/TagNames/Pentax.html
@@ -267,6 +269,7 @@ lib/Image/ExifTool/Lang/tr.pm
 lib/Image/ExifTool/Lang/zh_cn.pm
 lib/Image/ExifTool/Lang/zh_tw.pm
 lib/Image/ExifTool/Leaf.pm
+lib/Image/ExifTool/Lytro.pm
 lib/Image/ExifTool/M2TS.pm
 lib/Image/ExifTool/MIE.pm
 lib/Image/ExifTool/MIEUnits.pod
@@ -297,6 +300,7 @@ lib/Image/ExifTool/PLIST.pm
 lib/Image/ExifTool/PNG.pm
 lib/Image/ExifTool/PPM.pm
 lib/Image/ExifTool/PSP.pm
+lib/Image/ExifTool/Palm.pm
 lib/Image/ExifTool/Panasonic.pm
 lib/Image/ExifTool/PanasonicRaw.pm
 lib/Image/ExifTool/Pentax.pm
@@ -521,6 +525,8 @@ t/Lang_6.out
 t/Lang_7.out
 t/Lang_8.out
 t/Lang_9.out
+t/Lytro.t
+t/Lytro_2.out
 t/M2TS.t
 t/M2TS_2.out
 t/MIE.t
@@ -598,6 +604,8 @@ t/PPM_2.out
 t/PPM_3.out
 t/PSP.t
 t/PSP_2.out
+t/Palm.t
+t/Palm_2.out
 t/Panasonic.t
 t/Panasonic_2.out
 t/Panasonic_3.out
@@ -816,6 +824,7 @@ t/images/Jpeg2000.jp2
 t/images/Kodak.jpg
 t/images/KyoceraRaw.raw
 t/images/LNK.lnk
+t/images/Lytro.lfp
 t/images/M2TS.mts
 t/images/MIE.mie
 t/images/MIFF.miff
@@ -844,6 +853,7 @@ t/images/PLIST-xml.plist
 t/images/PNG.png
 t/images/PPM.ppm
 t/images/PSP.psp
+t/images/Palm.mobi
 t/images/Panasonic.jpg
 t/images/Panasonic.rw2
 t/images/Pentax.avi

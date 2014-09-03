@@ -40,7 +40,14 @@ formats.</p>
 doesn&#39;t include a timezone then the current local timezone offset is used
 (unless written with a combined date/time, in which case the local timezone
 offset at the specified date/time is used, which may be different due to
-changes in daylight savings time).
+changes in daylight savings time).</p>
+
+<p>Note that it is not uncommon for IPTC to be found in non-standard locations
+in JPEG and TIFF-based images.  When reading, the family 1 group name has a
+number added for non-standard IPTC (&quot;IPTC2&quot;, &quot;IPTC3&quot;, etc), but when writing
+only &quot;IPTC&quot; may be specified as the group.  To keep the IPTC consistent,
+ExifTool updates tags in all existing IPTC locations, but will create a new
+IPTC group only in the standard location.
 </p>
 <blockquote>
 <table class=frame><tr><td>
@@ -889,7 +896,7 @@ won&#39;t be able to read these tags as written by ExifTool)</span></span></td><
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Oct 16, 2013</i>
+<br><i>Last revised Jun 23, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -1,10 +1,10 @@
-[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.60
+[ExifTool, ExifTool, ExifTool] ExifToolVersion - ExifTool Version Number: 9.65
 [File, System, Image] FileName - File Name: Writer_9_failed.jpg
 [File, System, Image] Directory - Directory: t
 [File, System, Image] FileSize - File Size: 9.7 kB
-[File, System, Time] FileModifyDate - File Modification Date/Time: 2014:05:08 10:53:37-04:00
-[File, System, Time] FileAccessDate - File Access Date/Time: 2014:05:08 10:53:37-04:00
-[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2014:05:08 10:53:37-04:00
+[File, System, Time] FileModifyDate - File Modification Date/Time: 2014:06:20 06:35:01-04:00
+[File, System, Time] FileAccessDate - File Access Date/Time: 2014:06:20 06:35:01-04:00
+[File, System, Time] FileInodeChangeDate - File Inode Change Date/Time: 2014:06:20 06:35:01-04:00
 [File, System, Image] FilePermissions - File Permissions: rw-r--r--
 [File, File, Image] FileType - File Type: JPEG
 [File, File, Image] MIMEType - MIME Type: image/jpeg
@@ -162,7 +162,7 @@
 [MakerNotes, Canon, Camera] 9 - AF Area Y Positions: 0 0 -506 0 506 0 0
 [MakerNotes, Canon, Camera] 10 - AF Points In Focus: (none)
 [MakerNotes, Canon, Camera] 19 - Thumbnail Image Valid Area: 0 159 7 112
-[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 9.60
+[XMP, XMP-x, Document] xmptk - XMP Toolkit: Image::ExifTool 9.65
 [XMP, XMP-aux, Camera] Lens - Lens: 18.0 - 55.0 mm
 [XMP, XMP-exif, Image] ComponentsConfiguration - Components Configuration: Y, Cb, Cr, -
 [XMP, XMP-exif, Image] CompressedBitsPerPixel - Compressed Bits Per Pixel: 9
@@ -209,7 +209,7 @@
 [ICC_Profile, ICC_Profile, Image] lumi - Luminance: 76.03647 80 87.12462
 [ICC_Profile, ICC-meas, Image] 8 - Measurement Observer: CIE 1931
 [ICC_Profile, ICC-meas, Image] 12 - Measurement Backing: 0 0 0
-[ICC_Profile, ICC-meas, Image] 24 - Measurement Geometry: Unknown (0)
+[ICC_Profile, ICC-meas, Image] 24 - Measurement Geometry: Unknown
 [ICC_Profile, ICC-meas, Image] 28 - Measurement Flare: 0.999%
 [ICC_Profile, ICC-meas, Image] 32 - Measurement Illuminant: D65
 [ICC_Profile, ICC_Profile, Image] tech - Technology: Cathode Ray Tube Display

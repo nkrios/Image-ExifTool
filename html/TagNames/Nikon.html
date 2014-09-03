@@ -1003,9 +1003,17 @@ FaceDetectFrameSize)</span></span></td></tr>
   <br>0x103 = Hi 0.7
   <br>0x104 = Hi 1.0
   <br>0x105 = Hi 1.3
-  <br>0x106 = Hi 1.5</td><td>&nbsp;&nbsp;</td>
-  <td>0x107 = Hi 1.7
+  <br>0x106 = Hi 1.5
+  <br>0x107 = Hi 1.7
   <br>0x108 = Hi 2.0
+  <br>0x109 = Hi 2.3
+  <br>0x10a = Hi 2.5</td><td>&nbsp;&nbsp;</td>
+  <td>0x10b = Hi 2.7
+  <br>0x10c = Hi 3.0
+  <br>0x10d = Hi 3.3
+  <br>0x10e = Hi 3.5
+  <br>0x10f = Hi 3.7
+  <br>0x110 = Hi 4.0
   <br>0x201 = Lo 0.3
   <br>0x202 = Lo 0.5
   <br>0x203 = Lo 0.7
@@ -2942,12 +2950,14 @@ D5200, D7000.</p>
 <td class=r title='6 = 0x6'>6</td>
 <td>PhaseDetectAF</td>
 <td class=c>int8u</td>
-<td><span class=s><span class=n>(PrimaryAFPoint and AFPointsUsed below are only valid when this is On)</span>
-  <br>0 = Off
+<td><span class=s><span class=n>(PrimaryAFPoint and AFPointsUsed below are only valid when this is On)</span></span><table class=cols><tr>
+  <td>0 = Off
   <br>1 = On (51-point)
-  <br>2 = On (11-point)
-  <br>3 = On (39-point)
-  <br>4 = On (hybrid)</span></td></tr>
+  <br>2 = On (11-point)</td><td>&nbsp;&nbsp;</td>
+  <td>3 = On (39-point)
+  <br>4 = On (hybrid)
+  <br>5 = On (105-point)</td><td>&nbsp;&nbsp;</td></tr></table>
+</td></tr>
 <tr>
 <td class=r title='7 = 0x7'>7</td>
 <td>PrimaryAFPoint</td>
@@ -3523,8 +3533,8 @@ corner points are not used for 41-point AF mode)</span></span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='NCDT'>Nikon NCDT Tags</a></h2>
-<p>Nikon-specific QuickTime tags found in the NCDT atom of MOV videos from some
-Nikon cameras such as the Coolpix S8000.</p>
+<p>Nikon-specific QuickTime tags found in the NCDT atom of MOV videos from
+various Nikon models.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -4134,10 +4144,12 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'01 00 00 00 00 00 02 00'</td><td>= TC-16A</td>
 </tr><tr><td>'01 00 00 00 00 00 08 00'</td><td>= TC-16A</td>
 </tr><tr><td>'01 58 50 50 14 14 02 00'</td><td>= AF Nikkor 50mm f/1.8</td>
+</tr><tr><td>'01 58 50 50 14 14 05 00'</td><td>= AF Nikkor 50mm f/1.8</td>
 </tr><tr><td>'02 2F 98 98 3D 3D 02 00'</td><td>= Sigma APO 400mm F5.6</td>
 </tr><tr><td>'02 34 A0 A0 44 44 02 00'</td><td>= Sigma APO 500mm F7.2</td>
 </tr><tr><td>'02 37 5E 8E 35 3D 02 00'</td><td>= Sigma 75-300mm F4.5-5.6 APO</td>
 </tr><tr><td>'02 37 A0 A0 34 34 02 00'</td><td>= Sigma APO 500mm F4.5</td>
+</tr><tr><td>'02 3A 37 50 31 3D 02 00'</td><td>= Sigma 24-50mm F4-5.6 UC</td>
 </tr><tr><td>'02 3A 5E 8E 32 3D 02 00'</td><td>= Sigma 75-300mm F4.0-5.6</td>
 </tr><tr><td>'02 3B 44 61 30 3D 02 00'</td><td>= Sigma 35-80mm F4-5.6</td>
 </tr><tr><td>'02 3C B0 B0 3C 3C 02 00'</td><td>= Sigma APO 800mm F5.6</td>
@@ -4322,7 +4334,7 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'48 44 A0 A0 34 34 4B 02'</td><td>= Sigma APO 500mm F4.5 EX HSM</td>
 </tr><tr><td>'48 48 24 24 24 24 4B 02'</td><td>= Sigma 14mm F2.8 EX Aspherical HSM</td>
 </tr><tr><td>'48 48 2B 44 24 30 4B 06'</td><td>= Sigma 17-35mm F2.8-4 EX DG  Aspherical HSM</td>
-</tr><tr><td>'48 48 68 8E 30 30 4B 02'</td><td>= Sigma 100-300mm F4 EX IF HSM</td>
+</tr><tr><td>'48 48 68 8E 30 30 4B 02'</td><td>= Sigma APO 100-300mm F4 EX IF HSM</td>
 </tr><tr><td>'48 48 76 76 24 24 4B 06'</td><td>= Sigma APO Macro 150mm F2.8 EX DG HSM</td>
 </tr><tr><td>'48 48 8E 8E 24 24 4B 02'</td><td>= AF-S Nikkor 300mm f/2.8D IF-ED</td>
 </tr><tr><td>'48 48 8E 8E 24 24 E1 02'</td><td>= AF-S Nikkor 300mm f/2.8D IF-ED + TC-17E</td>
@@ -4340,6 +4352,7 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'49 3C A6 A6 30 30 F2 02'</td><td>= AF-S Nikkor 600mm f/4D IF-ED + TC-20E</td>
 </tr><tr><td>'4A 40 11 11 2C 0C 4D 02'</td><td>= Samyang 8mm f/3.5 Fish-Eye CS</td>
 </tr><tr><td>'4A 48 24 24 24 0C 4D 02'</td><td>= Samyang AE 14mm f/2.8 ED AS IF UMC</td>
+</tr><tr><td>'4A 54 29 29 18 0C 4D 02'</td><td>= Samyang 16mm F2.0 ED AS UMC CS</td>
 </tr><tr><td>'4A 54 62 62 0C 0C 4D 02'</td><td>= AF Nikkor 85mm f/1.4D IF</td>
 </tr><tr><td>'4A 60 44 44 0C 0C 4D 02'</td><td>= Samyang 35mm f/1.4 AS UMC</td>
 </tr><tr><td>'4A 60 62 62 0C 0C 4D 02'</td><td>= Samyang AE 85mm f/1.4 AS IF UMC</td>
@@ -4427,6 +4440,7 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'8D 44 5C 8E 34 3C 8F 0E'</td><td>= AF-S VR Zoom-Nikkor 70-300mm f/4.5-5.6G IF-ED</td>
 </tr><tr><td>'8E 3C 2B 5C 24 30 4B 0E'</td><td>= Sigma 17-70mm F2.8-4 DC Macro OS HSM Contemporary</td>
 </tr><tr><td>'8F 40 2D 72 2C 3C 91 06'</td><td>= AF-S DX Zoom-Nikkor 18-135mm f/3.5-5.6G IF-ED</td>
+</tr><tr><td>'8F 48 2B 50 24 24 4B 0E'</td><td>= Sigma 17-50mm F2.8 EX DC OS HSM</td>
 </tr><tr><td>'90 3B 53 80 30 3C 92 0E'</td><td>= AF-S DX VR Zoom-Nikkor 55-200mm f/4-5.6G IF-ED</td>
 </tr><tr><td>'91 54 44 44 0C 0C 4B 06'</td><td>= Sigma 35mm F1.4 DG HSM</td>
 </tr><tr><td>'92 2C 2D 88 2C 40 4B 0E'</td><td>= Sigma 18-250mm F3.5-6.3 DC Macro OS HSM</td>
@@ -4500,6 +4514,7 @@ ExifTool to choose in these cases (see the
 </tr><tr><td>'E6 41 3C 8E 2C 40 1C 02'</td><td>= Sigma 28-300mm F3.5-6.3 DG Macro</td>
 </tr><tr><td>'E9 54 37 5C 24 24 1C 02'</td><td>= Sigma 24-70mm F2.8 EX DG Macro</td>
 </tr><tr><td>'EA 48 27 27 24 24 1C 02'</td><td>= Sigma 15mm F2.8 EX Diagonal Fisheye</td>
+</tr><tr><td>'EB 40 76 A6 38 40 DF 0E'</td><td>= Tamron SP AF 150-600mm f/5-6.3 VC USD (A011)</td>
 </tr><tr><td>'ED 40 2D 80 2C 40 4B 0E'</td><td>= Sigma 18-200mm F3.5-6.3 DC OS HSM</td>
 </tr><tr><td>'EE 48 5C 80 24 24 4B 06'</td><td>= Sigma 70-200mm F2.8 EX APO DG Macro HSM II</td>
 </tr><tr><td>'F0 38 1F 37 34 3C 4B 06'</td><td>= Sigma 12-24mm F4.5-5.6 EX DG Aspherical HSM</td>
@@ -4537,7 +4552,7 @@ ExifTool to choose in these cases (see the
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 8, 2014</i>
+<br><i>Last revised Sep 3, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

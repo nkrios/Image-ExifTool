@@ -94,7 +94,7 @@
             Writable => 'rational64s',
         },
     },
-    # IPTC tags are added to a specific record type (ie. application record):
+    # IPTC tags are added to a specific record type (eg. application record):
     # (Note: IPTC tag ID's are limited to the range 0-255)
     'Image::ExifTool::IPTC::ApplicationRecord' => {
         # Example 4.  IPTC:NewIPTCTag
@@ -117,7 +117,7 @@
         # Example 7.  XMP-exif:GPSRoll
         GPSRoll  => { Writable => 'rational', Groups => { 2 => 'Location' } },
     },
-    # new XMP namespaces (ie. xxx) must be added to the Main XMP table:
+    # new XMP namespaces (eg. xxx) must be added to the Main XMP table:
     'Image::ExifTool::XMP::Main' => {
         # namespace definition for examples 8 to 11
         xxx => { # <-- must be the same as the NAMESPACE prefix
@@ -244,7 +244,7 @@
     GROUPS        => { 0 => 'XMP', 1 => 'XMP-xxx', 2 => 'Image' },
     NAMESPACE     => { 'xxx' => 'http://ns.myname.com/xxx/1.0/' },
     WRITABLE      => 'string',
-    # replace "NewXMPxxxTag1" with your own tag name (ie. "MyTag")
+    # replace "NewXMPxxxTag1" with your own tag name (eg. "MyTag")
     # Example 8.  XMP-xxx:NewXMPxxxTag1
     NewXMPxxxTag1 => { Writable => 'lang-alt' },
     # Example 9.  XMP-xxx:NewXMPxxxTag2

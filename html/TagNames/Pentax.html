@@ -233,7 +233,8 @@ different from other models)</span>
 <td title='0x000e = 14'>0x000e</td>
 <td>AFPointSelected</td>
 <td class=c>int16u</td>
-<td><span class=s>[Value 0]</span><table class=cols><tr>
+<td><span class=s><span class=n>(all models but the K-3)</span>
+  <br>[Value 0]</span><table class=cols><tr>
   <td>0 = None
   <br>1 = Upper-left
   <br>2 = Top
@@ -251,7 +252,8 @@ different from other models)</span>
   <br>65533 = Automatic Tracking AF
   <br>65534 = Fixed Center
   <br>65535 = Auto</td><td>&nbsp;&nbsp;</td></tr></table>
-<span class=s>[Value 0]</span><table class=cols><tr>
+<span class=s><span class=n>(K-3)</span>
+  <br>[Value 0]</span><table class=cols><tr>
   <td>0 = None
   <br>1 = Top-left
   <br>2 = Top Near-left
@@ -260,7 +262,7 @@ different from other models)</span>
   <br>5 = Top-right
   <br>6 = Upper-left
   <br>7 = Upper Near-left
-  <br>8 = Upper-midle
+  <br>8 = Upper-middle
   <br>9 = Upper Near-right
   <br>10 = Upper-right
   <br>11 = Far Left
@@ -268,8 +270,8 @@ different from other models)</span>
   <br>13 = Near-left
   <br>14 = Center
   <br>15 = Near-right
-  <br>16 = Right</td><td>&nbsp;&nbsp;</td>
-  <td>17 = Far Right
+  <br>16 = Right
+  <br>17 = Far Right
   <br>18 = Lower-left
   <br>19 = Lower Near-left
   <br>20 = Lower-middle
@@ -280,11 +282,43 @@ different from other models)</span>
   <br>25 = Bottom
   <br>26 = Bottom Near-right
   <br>27 = Bottom-right
+  <br>257 = Zone Select Top-left
+  <br>258 = Zone Select Top Near-left</td><td>&nbsp;&nbsp;</td>
+  <td>259 = Zone Select Top
+  <br>260 = Zone Select Top Near-right
+  <br>261 = Zone Select Top-right
+  <br>262 = Zone Select Upper-left
+  <br>263 = Zone Select Upper Near-left
+  <br>264 = Zone Select Upper-middle
+  <br>265 = Zone Select Upper Near-right
+  <br>266 = Zone Select Upper-right
+  <br>267 = Zone Select Far Left
+  <br>268 = Zone Select Left
+  <br>269 = Zone Select Near-left
+  <br>270 = Zone Select Center
+  <br>271 = Zone Select Near-right
+  <br>272 = Zone Select Right
+  <br>273 = Zone Select Far Right
+  <br>274 = Zone Select Lower-left
+  <br>275 = Zone Select Lower Near-left
+  <br>276 = Zone Select Lower-middle
+  <br>277 = Zone Select Lower Near-right
+  <br>278 = Zone Select Lower-right
+  <br>279 = Zone Select Bottom-left
+  <br>280 = Zone Select Bottom Near-left
+  <br>281 = Zone Select Bottom
+  <br>282 = Zone Select Bottom Near-right
+  <br>283 = Zone Select Bottom-right
   <br>65531 = AF Select
   <br>65532 = Face Detect AF
   <br>65533 = Automatic Tracking AF
   <br>65534 = Fixed Center
   <br>65535 = Auto</td><td>&nbsp;&nbsp;</td></tr></table>
+<span class=s>[Value 1]</span><table class=cols><tr>
+  <td>0 = Single Point
+  <br>1 = Expanded Area 9-point (S)</td><td>&nbsp;&nbsp;</td>
+  <td>3 = Expanded Area 25-point (M)
+  <br>5 = Expanded Area 27-point (L)</td><td>&nbsp;&nbsp;</td></tr></table>
 </td></tr>
 <tr>
 <td title='0x000f = 15'>0x000f</td>
@@ -312,7 +346,7 @@ different from other models)</span>
   <br>Bit 4 = Top-right
   <br>Bit 5 = Upper-left
   <br>Bit 6 = Upper Near-left
-  <br>Bit 7 = Upper-midle
+  <br>Bit 7 = Upper-middle
   <br>Bit 8 = Upper Near-right
   <br>Bit 9 = Upper-right
   <br>Bit 10 = Far Left
@@ -418,7 +452,7 @@ different from other models)</span>
 <td>LightReading</td>
 <td class=c>int16u</td>
 <td><span class=s><span class=n>(calibrated differently for different models.  For the Optio WP, add 6 to get
-approximate Light Value.  May not be valid for some models, ie. Optio S)</span></span></td></tr>
+approximate Light Value.  May not be valid for some models, eg. Optio S)</span></span></td></tr>
 <tr>
 <td title='0x0016 = 22'>0x0016</td>
 <td>ExposureCompensation</td>
@@ -1222,7 +1256,8 @@ other models)</span>
 <td>AEMeteringSegments</td>
 <td class=c>int8u[n]</td>
 <td><span class=s><span class=n>(measurements from each of the 16 AE metering segments for models such as the
-K10D, and 77 metering segments for models such as the K-5, converted to LV)</span></span></td></tr>
+K10D, 77 metering segments for models such as the K-5, and 4050 metering
+segments for the K-3, converted to LV)</span></span></td></tr>
 <tr class=b>
 <td title='0x020a = 522'>0x020a</td>
 <td>FlashMeteringSegments</td>
@@ -1419,131 +1454,134 @@ are left, top, width and height in a 720x480 frame, with Y downwards)</span></sp
 <table class='inner sep' cellspacing=1>
 <tr class=h><th>Value</th><th>PentaxModelID</th><th>Value</th><th>PentaxModelID</th><th>Value</th><th>PentaxModelID</th></tr>
 <tr><td class=r>0xd</td><td>= Optio 330/430</td>
-<td class='r b'>0x12bb0</td><td class=b>= Optio T10/T20</td>
-<td class=r>0x12db8</td><td>= K-7</td>
-</tr><tr><td class=r>0x12926</td><td>= Optio 230</td>
 <td class='r b'>0x12be2</td><td class=b>= Optio W10</td>
-<td class=r>0x12dcc</td><td>= Optio W80</td>
-</tr><tr><td class=r>0x12958</td><td>= Optio 330GS</td>
-<td class='r b'>0x12bf6</td><td class=b>= Optio M10</td>
 <td class=r>0x12dea</td><td>= Optio P80</td>
-</tr><tr><td class=r>0x12962</td><td>= Optio 450/550</td>
-<td class='r b'>0x12c1e</td><td class=b>= K10D</td>
+</tr><tr><td class=r>0x12926</td><td>= Optio 230</td>
+<td class='r b'>0x12bf6</td><td class=b>= Optio M10</td>
 <td class=r>0x12df4</td><td>= Optio WS80</td>
-</tr><tr><td class=r>0x1296c</td><td>= Optio S</td>
-<td class='r b'>0x12c20</td><td class=b>= Samsung GX10</td>
+</tr><tr><td class=r>0x12958</td><td>= Optio 330GS</td>
+<td class='r b'>0x12c1e</td><td class=b>= K10D</td>
 <td class=r>0x12dfe</td><td>= K-x</td>
-</tr><tr><td class=r>0x12971</td><td>= Optio S V1.01</td>
-<td class='r b'>0x12c28</td><td class=b>= Optio S7</td>
+</tr><tr><td class=r>0x12962</td><td>= Optio 450/550</td>
+<td class='r b'>0x12c20</td><td class=b>= Samsung GX10</td>
 <td class=r>0x12e08</td><td>= 645D</td>
-</tr><tr><td class=r>0x12994</td><td>= *ist D</td>
-<td class='r b'>0x12c2d</td><td class=b>= Optio L20</td>
+</tr><tr><td class=r>0x1296c</td><td>= Optio S</td>
+<td class='r b'>0x12c28</td><td class=b>= Optio S7</td>
 <td class=r>0x12e12</td><td>= Optio E80</td>
-</tr><tr><td class=r>0x129b2</td><td>= Optio 33L</td>
-<td class='r b'>0x12c32</td><td class=b>= Optio M20</td>
+</tr><tr><td class=r>0x12971</td><td>= Optio S V1.01</td>
+<td class='r b'>0x12c2d</td><td class=b>= Optio L20</td>
 <td class=r>0x12e30</td><td>= Optio W90</td>
-</tr><tr><td class=r>0x129bc</td><td>= Optio 33LF</td>
-<td class='r b'>0x12c3c</td><td class=b>= Optio W20</td>
+</tr><tr><td class=r>0x12994</td><td>= *ist D</td>
+<td class='r b'>0x12c32</td><td class=b>= Optio M20</td>
 <td class=r>0x12e3a</td><td>= Optio I-10</td>
-</tr><tr><td class=r>0x129c6</td><td>= Optio 33WR/43WR/555</td>
-<td class='r b'>0x12c46</td><td class=b>= Optio A20</td>
+</tr><tr><td class=r>0x129b2</td><td>= Optio 33L</td>
+<td class='r b'>0x12c3c</td><td class=b>= Optio W20</td>
 <td class=r>0x12e44</td><td>= Optio H90</td>
-</tr><tr><td class=r>0x129d5</td><td>= Optio S4</td>
-<td class='r b'>0x12c78</td><td class=b>= Optio E30</td>
+</tr><tr><td class=r>0x129bc</td><td>= Optio 33LF</td>
+<td class='r b'>0x12c46</td><td class=b>= Optio A20</td>
 <td class=r>0x12e4e</td><td>= Optio E90</td>
-</tr><tr><td class=r>0x12a02</td><td>= Optio MX</td>
-<td class='r b'>0x12c7d</td><td class=b>= Optio E35</td>
+</tr><tr><td class=r>0x129c6</td><td>= Optio 33WR/43WR/555</td>
+<td class='r b'>0x12c78</td><td class=b>= Optio E30</td>
 <td class=r>0x12e58</td><td>= X90</td>
-</tr><tr><td class=r>0x12a0c</td><td>= Optio S40</td>
-<td class='r b'>0x12c82</td><td class=b>= Optio T30</td>
+</tr><tr><td class=r>0x129d5</td><td>= Optio S4</td>
+<td class='r b'>0x12c7d</td><td class=b>= Optio E35</td>
 <td class=r>0x12e6c</td><td>= K-r</td>
-</tr><tr><td class=r>0x12a16</td><td>= Optio S4i</td>
-<td class='r b'>0x12c8c</td><td class=b>= Optio M30</td>
+</tr><tr><td class=r>0x12a02</td><td>= Optio MX</td>
+<td class='r b'>0x12c82</td><td class=b>= Optio T30</td>
 <td class=r>0x12e76</td><td>= K-5</td>
-</tr><tr><td class=r>0x12a34</td><td>= Optio 30</td>
-<td class='r b'>0x12c91</td><td class=b>= Optio L30</td>
+</tr><tr><td class=r>0x12a0c</td><td>= Optio S40</td>
+<td class='r b'>0x12c8c</td><td class=b>= Optio M30</td>
 <td class=r>0x12e8a</td><td>= Optio RS1000/RS1500</td>
-</tr><tr><td class=r>0x12a52</td><td>= Optio S30</td>
-<td class='r b'>0x12c96</td><td class=b>= Optio W30</td>
+</tr><tr><td class=r>0x12a16</td><td>= Optio S4i</td>
+<td class='r b'>0x12c91</td><td class=b>= Optio L30</td>
 <td class=r>0x12e94</td><td>= Optio RZ10</td>
-</tr><tr><td class=r>0x12a66</td><td>= Optio 750Z</td>
-<td class='r b'>0x12ca0</td><td class=b>= Optio A30</td>
+</tr><tr><td class=r>0x12a34</td><td>= Optio 30</td>
+<td class='r b'>0x12c96</td><td class=b>= Optio W30</td>
 <td class=r>0x12e9e</td><td>= Optio LS1000</td>
-</tr><tr><td class=r>0x12a70</td><td>= Optio SV</td>
-<td class='r b'>0x12cb4</td><td class=b>= Optio E40</td>
+</tr><tr><td class=r>0x12a52</td><td>= Optio S30</td>
+<td class='r b'>0x12ca0</td><td class=b>= Optio A30</td>
 <td class=r>0x12ebc</td><td>= Optio WG-1 GPS</td>
-</tr><tr><td class=r>0x12a75</td><td>= Optio SVi</td>
-<td class='r b'>0x12cbe</td><td class=b>= Optio M40</td>
+</tr><tr><td class=r>0x12a66</td><td>= Optio 750Z</td>
+<td class='r b'>0x12cb4</td><td class=b>= Optio E40</td>
 <td class=r>0x12ed0</td><td>= Optio S1</td>
-</tr><tr><td class=r>0x12a7a</td><td>= Optio X</td>
-<td class='r b'>0x12cc3</td><td class=b>= Optio L40</td>
+</tr><tr><td class=r>0x12a70</td><td>= Optio SV</td>
+<td class='r b'>0x12cbe</td><td class=b>= Optio M40</td>
 <td class=r>0x12ee4</td><td>= Q</td>
-</tr><tr><td class=r>0x12a8e</td><td>= Optio S5i</td>
-<td class='r b'>0x12cc5</td><td class=b>= Optio L36</td>
+</tr><tr><td class=r>0x12a75</td><td>= Optio SVi</td>
+<td class='r b'>0x12cc3</td><td class=b>= Optio L40</td>
 <td class=r>0x12ef8</td><td>= K-01</td>
-</tr><tr><td class=r>0x12a98</td><td>= Optio S50</td>
-<td class='r b'>0x12cc8</td><td class=b>= Optio Z10</td>
+</tr><tr><td class=r>0x12a7a</td><td>= Optio X</td>
+<td class='r b'>0x12cc5</td><td class=b>= Optio L36</td>
 <td class=r>0x12f0c</td><td>= Optio RZ18</td>
-</tr><tr><td class=r>0x12aa2</td><td>= *ist DS</td>
-<td class='r b'>0x12cd2</td><td class=b>= K20D</td>
+</tr><tr><td class=r>0x12a8e</td><td>= Optio S5i</td>
+<td class='r b'>0x12cc8</td><td class=b>= Optio Z10</td>
 <td class=r>0x12f16</td><td>= Optio VS20</td>
-</tr><tr><td class=r>0x12ab6</td><td>= Optio MX4</td>
-<td class='r b'>0x12cd4</td><td class=b>= Samsung GX20</td>
+</tr><tr><td class=r>0x12a98</td><td>= Optio S50</td>
+<td class='r b'>0x12cd2</td><td class=b>= K20D</td>
 <td class=r>0x12f2a</td><td>= Optio WG-2 GPS</td>
-</tr><tr><td class=r>0x12ac0</td><td>= Optio S5n</td>
-<td class='r b'>0x12cdc</td><td class=b>= Optio S10</td>
+</tr><tr><td class=r>0x12aa2</td><td>= *ist DS</td>
+<td class='r b'>0x12cd4</td><td class=b>= Samsung GX20</td>
 <td class=r>0x12f48</td><td>= Optio LS465</td>
-</tr><tr><td class=r>0x12aca</td><td>= Optio WP</td>
-<td class='r b'>0x12ce6</td><td class=b>= Optio A40</td>
+</tr><tr><td class=r>0x12ab6</td><td>= Optio MX4</td>
+<td class='r b'>0x12cdc</td><td class=b>= Optio S10</td>
 <td class=r>0x12f52</td><td>= K-30</td>
-</tr><tr><td class=r>0x12afc</td><td>= Optio S55</td>
-<td class='r b'>0x12cf0</td><td class=b>= Optio V10</td>
+</tr><tr><td class=r>0x12ac0</td><td>= Optio S5n</td>
+<td class='r b'>0x12ce6</td><td class=b>= Optio A40</td>
 <td class=r>0x12f5c</td><td>= X-5</td>
-</tr><tr><td class=r>0x12b10</td><td>= Optio S5z</td>
-<td class='r b'>0x12cfa</td><td class=b>= K200D</td>
+</tr><tr><td class=r>0x12aca</td><td>= Optio WP</td>
+<td class='r b'>0x12cf0</td><td class=b>= Optio V10</td>
 <td class=r>0x12f66</td><td>= Q10</td>
-</tr><tr><td class=r>0x12b1a</td><td>= *ist DL</td>
-<td class='r b'>0x12d04</td><td class=b>= Optio S12</td>
+</tr><tr><td class=r>0x12afc</td><td>= Optio S55</td>
+<td class='r b'>0x12cfa</td><td class=b>= K200D</td>
 <td class=r>0x12f70</td><td>= K-5 II</td>
-</tr><tr><td class=r>0x12b24</td><td>= Optio S60</td>
-<td class='r b'>0x12d0e</td><td class=b>= Optio E50</td>
+</tr><tr><td class=r>0x12b10</td><td>= Optio S5z</td>
+<td class='r b'>0x12d04</td><td class=b>= Optio S12</td>
 <td class=r>0x12f71</td><td>= K-5 II s</td>
-</tr><tr><td class=r>0x12b2e</td><td>= Optio S45</td>
-<td class='r b'>0x12d18</td><td class=b>= Optio M50</td>
+</tr><tr><td class=r>0x12b1a</td><td>= *ist DL</td>
+<td class='r b'>0x12d0e</td><td class=b>= Optio E50</td>
 <td class=r>0x12f7a</td><td>= Q7</td>
-</tr><tr><td class=r>0x12b38</td><td>= Optio S6</td>
-<td class='r b'>0x12d22</td><td class=b>= Optio L50</td>
+</tr><tr><td class=r>0x12b24</td><td>= Optio S60</td>
+<td class='r b'>0x12d18</td><td class=b>= Optio M50</td>
 <td class=r>0x12f84</td><td>= MX-1</td>
-</tr><tr><td class=r>0x12b4c</td><td>= Optio WPi</td>
-<td class='r b'>0x12d2c</td><td class=b>= Optio V20</td>
+</tr><tr><td class=r>0x12b2e</td><td>= Optio S45</td>
+<td class='r b'>0x12d22</td><td class=b>= Optio L50</td>
 <td class=r>0x12f8e</td><td>= WG-3 GPS</td>
-</tr><tr><td class=r>0x12b56</td><td>= BenQ DC X600</td>
-<td class='r b'>0x12d40</td><td class=b>= Optio W60</td>
+</tr><tr><td class=r>0x12b38</td><td>= Optio S6</td>
+<td class='r b'>0x12d2c</td><td class=b>= Optio V20</td>
 <td class=r>0x12f98</td><td>= WG-3</td>
-</tr><tr><td class=r>0x12b60</td><td>= *ist DS2</td>
-<td class='r b'>0x12d4a</td><td class=b>= Optio M60</td>
+</tr><tr><td class=r>0x12b4c</td><td>= Optio WPi</td>
+<td class='r b'>0x12d40</td><td class=b>= Optio W60</td>
 <td class=r>0x12fa2</td><td>= WG-10</td>
-</tr><tr><td class=r>0x12b62</td><td>= Samsung GX-1S</td>
-<td class='r b'>0x12d68</td><td class=b>= Optio E60/M90</td>
+</tr><tr><td class=r>0x12b56</td><td>= BenQ DC X600</td>
+<td class='r b'>0x12d4a</td><td class=b>= Optio M60</td>
 <td class=r>0x12fb6</td><td>= K-50</td>
-</tr><tr><td class=r>0x12b6a</td><td>= Optio A10</td>
-<td class='r b'>0x12d72</td><td class=b>= K2000</td>
+</tr><tr><td class=r>0x12b60</td><td>= *ist DS2</td>
+<td class='r b'>0x12d68</td><td class=b>= Optio E60/M90</td>
 <td class=r>0x12fc0</td><td>= K-3</td>
-</tr><tr><td class=r>0x12b7e</td><td>= *ist DL2</td>
-<td class='r b'>0x12d73</td><td class=b>= K-m</td>
+</tr><tr><td class=r>0x12b62</td><td>= Samsung GX-1S</td>
+<td class='r b'>0x12d72</td><td class=b>= K2000</td>
 <td class=r>0x12fca</td><td>= K-500</td>
-</tr><tr><td class=r>0x12b80</td><td>= Samsung GX-1L</td>
-<td class='r b'>0x12d86</td><td class=b>= Optio P70</td>
+</tr><tr><td class=r>0x12b6a</td><td>= Optio A10</td>
+<td class='r b'>0x12d73</td><td class=b>= K-m</td>
 <td class=r>0x12fde</td><td>= WG-4 GPS</td>
-</tr><tr><td class=r>0x12b9c</td><td>= K100D</td>
-<td class='r b'>0x12d90</td><td class=b>= Optio L70</td>
+</tr><tr><td class=r>0x12b7e</td><td>= *ist DL2</td>
+<td class='r b'>0x12d86</td><td class=b>= Optio P70</td>
 <td class=r>0x12fe8</td><td>= WG-4</td>
-</tr><tr><td class=r>0x12b9d</td><td>= K110D</td>
-<td class='r b'>0x12d9a</td><td class=b>= Optio E70</td>
+</tr><tr><td class=r>0x12b80</td><td>= Samsung GX-1L</td>
+<td class='r b'>0x12d90</td><td class=b>= Optio L70</td>
 <td class=r>0x13006</td><td>= WG-20</td>
-</tr><tr><td class=r>0x12ba2</td><td>= K100D Super</td>
-<td class='r b'>0x12dae</td><td class=b>= X70</td>
+</tr><tr><td class=r>0x12b9c</td><td>= K100D</td>
+<td class='r b'>0x12d9a</td><td class=b>= Optio E70</td>
 <td class=r>0x13010</td><td>= 645Z</td>
+</tr><tr><td class=r>0x12b9d</td><td>= K110D</td>
+<td class='r b'>0x12dae</td><td class=b>= X70</td>
+<td class=r>0x1301a</td><td>= K-S1</td>
+</tr><tr><td class=r>0x12ba2</td><td>= K100D Super</td>
+<td class='r b'>0x12db8</td><td class=b>= K-7</td>
+<td class=r>&nbsp;</td><td>&nbsp;</td>
+</tr><tr><td class=r>0x12bb0</td><td>= Optio T10/T20</td>
+<td class='r b'>0x12dcc</td><td class=b>= Optio W80</td>
+<td class=r>&nbsp;</td><td>&nbsp;</td>
 </tr></table></td></tr></table></blockquote>
 
 <h2><a name='City'>Pentax City Values</a></h2>
@@ -1876,6 +1914,7 @@ identify the specific lens model.</p>
 </tr><tr><td>'8 28'</td><td>= Sigma 18-250mm F3.5-6.3 DC Macro HSM</td>
 </tr><tr><td>'8 29'</td><td>= Sigma 35mm F1.4 DG HSM</td>
 </tr><tr><td>'8 30'</td><td>= Sigma 17-70mm F2.8-4 DC Macro HSM Contemporary</td>
+</tr><tr><td>'8 31'</td><td>= Sigma 18-35mm F1.8 DC HSM</td>
 </tr><tr><td>'8 32'</td><td>= Sigma 30mm F1.4 DC HSM | A</td>
 </tr><tr><td>'8 209'</td><td>= HD PENTAX-DA 20-40mm F2.8-4 ED Limited DC WR</td>
 </tr><tr><td>'8 210'</td><td>= smc PENTAX-DA 18-270mm F3.5-6.3 ED SDM</td>
@@ -1914,6 +1953,7 @@ identify the specific lens model.</p>
 </tr><tr><td>'13 18'</td><td>= smc PENTAX-D FA 645 55mm F2.8 AL [IF] SDM AW</td>
 </tr><tr><td>'13 19'</td><td>= smc PENTAX-D FA 645 25mm F4 AL [IF] SDM AW</td>
 </tr><tr><td>'13 20'</td><td>= HD PENTAX-D FA 645 90mm F2.8 ED AW SR</td>
+</tr><tr><td>'13 253'</td><td>= HD PENTAX-DA 645 28-45mm F4.5 ED AW SR</td>
 </tr><tr><td>'21 0'</td><td>= Pentax Q Manual Lens</td>
 </tr><tr><td>'21 1'</td><td>= 01 Standard Prime 8.5mm F1.9</td>
 </tr><tr><td>'21 2'</td><td>= 02 Standard Zoom 5-15mm F2.8-4.5</td>
@@ -2181,7 +2221,7 @@ with positive Y downwards)</span></span></td></tr>
 <td class=r title='2 = 0x2'>2.1</td>
 <td>MeteringMode2</td>
 <td class=c>int8u</td>
-<td><span class=s><span class=n>(may not be valid for some models, ie. *ist D)</span>
+<td><span class=s><span class=n>(may not be valid for some models, eg. *ist D)</span>
   <br>[Mask 0x0f]
   <br>0x0 = Multi-segment
   <br>Bit 0 = Center-weighted average
@@ -4536,7 +4576,7 @@ stored as ASCII text in a format very similar to some HP models.</p>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised May 11, 2014</i>
+<br><i>Last revised Sep 3, 2014</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

@@ -232,7 +232,7 @@ sub ProcessAIFF($$)
             );
         } elsif ($verbose > 2 and $len2 < 1024000) {
             $raf->Read($buff, $len2) == $len2 or $err = 1, last;
-            Image::ExifTool::HexDump(\$buff, undef, MaxLen => 512);
+            HexDump(\$buff, undef, MaxLen => 512);
         } else {
             $raf->Seek($len2, 1) or $err=1, last;
         }

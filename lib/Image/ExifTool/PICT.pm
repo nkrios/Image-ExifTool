@@ -1024,7 +1024,7 @@ sub ReadPictValue($$$;$)
                     if ($verbose > 2) {
                         my %parms = ( Out => $out );
                         $parms{MaxLen} = 96 if $verbose < 4;
-                        Image::ExifTool::HexDump(\$val, undef, %parms);
+                        HexDump(\$val, undef, %parms);
                     }
                 } else {
                     print $out " = $val\n";
@@ -1054,7 +1054,7 @@ sub ReadPictValue($$$;$)
                     if ($verbose > 2) {
                         my %parms = ( Out => $out );
                         $parms{MaxLen} = 96 if $verbose < 4;
-                        Image::ExifTool::HexDump($val, undef, %parms);
+                        HexDump($val, undef, %parms);
                     }
                 }
             } elsif ($fmt =~ /(.+)\[(.+)\]/s) {

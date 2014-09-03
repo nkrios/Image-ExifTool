@@ -114,7 +114,7 @@ sub ProcessPPM($$)
 #
     if ($verbose > 2) {
         print $out "$type header ($len bytes):\n";
-        Image::ExifTool::HexDump(\$buff, $len, Out => $out);
+        HexDump(\$buff, $len, Out => $out);
     }
     my $tag;
     foreach $tag (qw{Comment ImageWidth ImageHeight MaxVal}) {

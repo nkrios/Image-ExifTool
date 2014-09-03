@@ -16,7 +16,7 @@ use strict;
 use vars qw($VERSION);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.41';
+$VERSION = '1.42';
 
 sub ProcessID3v2($$$);
 sub ProcessPrivate($$$);
@@ -69,9 +69,9 @@ my %dateTimeConv = (
     VARS => { NO_ID => 1 },
     NOTES => q{
         ExifTool extracts ID3 information from MP3, MPEG, AIFF, OGG, FLAC, APE, MPC
-        and RealAudio files.  ID3v2 tags which support multiple languages (ie.
+        and RealAudio files.  ID3v2 tags which support multiple languages (eg.
         Comment and Lyrics) are extracted by specifying the tag name, followed by a
-        dash ('-'), then a 3-character ISO 639-2 language code (ie. "Comment-spa").
+        dash ('-'), then a 3-character ISO 639-2 language code (eg. "Comment-spa").
         See L<http://www.id3.org/> for the official ID3 specification and
         L<http://www.loc.gov/standards/iso639-2/php/code_list.php> for a list of ISO
         639-2 language codes.
@@ -804,8 +804,8 @@ sub ConvertID3v1Text($$)
 
 #------------------------------------------------------------------------------
 # Re-format time stamp in synchronized lyrics
-# Inputs: 0) synchronized lyrics entry (ie. "[84.030]Da do do do")
-# Returns: entry with formatted timestamp (ie. "[01:24.03]Da do do do")
+# Inputs: 0) synchronized lyrics entry (eg. "[84.030]Da do do do")
+# Returns: entry with formatted timestamp (eg. "[01:24.03]Da do do do")
 sub ConvertTimeStamp($)
 {
     my $val = shift;
@@ -1471,7 +1471,9 @@ sub ProcessMP3($$)
             } else {
                 # look for audio frame sync in first $scanLen bytes
                 # (set MP3 flag to 1 so this will fail unless layer 3 audio)
-                $rtnVal = 1 if Image::ExifTool::MPEG::ParseMPEGAudio($et, \$buff, 1);
+                my $ext = $$et{FILE_EXT} || '';
+                my $mp3 = ($ext eq 'MUS') ? 0 : 1;  # MUS files are MP2
+                $rtnVal = 1 if Image::ExifTool::MPEG::ParseMPEGAudio($et, \$buff, $mp3);
             }
         }
     }
