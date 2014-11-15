@@ -24,7 +24,7 @@
 #               9) http://www.w3.org/TR/SVG11/
 #               10) http://www.adobe.com/devnet/xmp/pdfs/XMPSpecificationPart2.pdf (Oct 2008)
 #               11) http://www.extensis.com/en/support/kb_article.jsp?articleNumber=6102211
-#               12) http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-010-2012_E.pdf
+#               12) http://www.cipa.jp/std/documents/e/DC-010-2012_E.pdf
 #
 # Notes:      - Property qualifiers are handled as if they were separate
 #               properties (with no associated namespace).
@@ -47,7 +47,7 @@ use Image::ExifTool qw(:Utils);
 use Image::ExifTool::Exif;
 require Exporter;
 
-$VERSION = '2.78';
+$VERSION = '2.81';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -66,7 +66,9 @@ sub FormatXMPDate($);
 sub ConvertRational($);
 sub ConvertRationalList($);
 
-my %curNS;  # namespaces currently in effect while parsing the file
+# namespaces and prefixes currently in effect while parsing the file,
+# and lookup to translate brain-dead-Microsoft-Photo-software prefixes
+my (%curURI, %curNS, %xlatNS);
 
 # lookup for translating to ExifTool namespaces
 # Note: Use $xlatNamespace (only valid during processing) to do the translation
@@ -1366,7 +1368,7 @@ my %sPantryItem = (
     TABLE_DESC => 'XMP TIFF',
     NOTES => q{
         EXIF namespace for TIFF tags.  See
-        L<http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-010-2012_E.pdf> for the
+        L<http://www.cipa.jp/std/documents/e/DC-010-2012_E.pdf> for the
         specification.
     },
     ImageWidth    => { Writable => 'integer' },
@@ -1457,7 +1459,7 @@ my %sPantryItem = (
     PRIORITY => 0, # not as reliable as actual EXIF tags
     NOTES => q{
         EXIF namespace for EXIF tags.  See
-        L<http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-010-2012_E.pdf> for the
+        L<http://www.cipa.jp/std/documents/e/DC-010-2012_E.pdf> for the
         specification.
     },
     ExifVersion     => { },
@@ -1912,7 +1914,7 @@ my %sPantryItem = (
     PRIORITY => 0, # not as reliable as actual EXIF tags
     NOTES => q{
         EXIF tags added by the EXIF 2.3 for XMP specification (see
-        L<http://www.cipa.jp/english/hyoujunka/kikaku/pdf/DC-010-2012_E.pdf>).
+        L<http://www.cipa.jp/std/documents/e/DC-010-2012_E.pdf>).
     },
     Gamma                       => { Writable => 'rational' },
     PhotographicSensitivity     => { Writable => 'integer' },
@@ -2218,9 +2220,10 @@ my %sPantryItem = (
             2 => 'LensInfo',
             3 => 'FocalLength',
             4 => 'LensModel',
+            5 => 'MaxApertureValue',
         },
         Inhibit => {
-            5 => 'Composite:LensID',    # don't override existing Composite:LensID
+            6 => 'Composite:LensID',    # don't override existing Composite:LensID
         },
         ValueConv => '$val',
         PrintConv => 'Image::ExifTool::XMP::PrintLensID($self, @val)',
@@ -2522,6 +2525,7 @@ sub RegisterNamespace($)
     if (ref $nsRef eq 'ARRAY') {
         $ns = $$nsRef[0];
         $nsURI{$ns} = $$nsRef[1];
+        $uri2ns{$$nsRef[1]} = $ns;
     } else { # must be a hash
         my @ns = sort keys %$nsRef; # allow multiple namespace definitions
         while (@ns) {
@@ -2530,6 +2534,7 @@ sub RegisterNamespace($)
                 warn "User-defined namespace prefix '$ns' conflicts with existing namespace\n";
             }
             $nsURI{$ns} = $$nsRef{$ns};
+            $uri2ns{$$nsRef{$ns}} = $ns;
         }
     }
     return $$table{NAMESPACE} = $ns;
@@ -2730,12 +2735,13 @@ sub ScanForXMP($$)
 
 #------------------------------------------------------------------------------
 # Print conversion for XMP-aux:LensID
-# Inputs: 0) ExifTool ref, 1) LensID, 2) Make, 3) LensInfo, 4) FocalLength, 5) LensModel
+# Inputs: 0) ExifTool ref, 1) LensID, 2) Make, 3) LensInfo, 4) FocalLength,
+#         5) LensModel, 6) MaxApertureValue
 # (yes, this is ugly -- blame Adobe)
 sub PrintLensID(@)
 {
     local $_;
-    my ($et, $id, $make, $info, $focalLength, $lensModel) = @_;
+    my ($et, $id, $make, $info, $focalLength, $lensModel, $maxAv) = @_;
     my ($mk, $printConv);
     my %alt = ( Pentax => 'Ricoh' );    # Pentax changed its name to Ricoh
     # missing: Olympus (no XMP:LensID written by Adobe)
@@ -2778,7 +2784,7 @@ sub PrintLensID(@)
             $printConv = \%newConv;
         }
         return Image::ExifTool::Exif::PrintLensID($et, $str, $printConv,
-                    undef, $id, $focalLength, $maxa, undef, $minf, $maxf, $lensModel);
+                    undef, $id, $focalLength, $maxa, $maxAv, $minf, $maxf, $lensModel);
     }
     return "Unknown ($id)";
 }
@@ -2984,7 +2990,7 @@ NoLoop:
 
         # add tag Namespace entry for tags in variable-namespace tables
         $$tagInfo{Namespace} = $xns if $xns;
-        if ($curNS{$ns} and $curNS{$ns} =~ m{^http://ns.exiftool.ca/(.*?)/(.*?)/}) {
+        if ($curURI{$ns} and $curURI{$ns} =~ m{^http://ns.exiftool.ca/(.*?)/(.*?)/}) {
             my %grps = ( 0 => $1, 1 => $2 );
             # apply a little magic to recover original group names
             # from this exiftool-written RDF/XML file
@@ -3164,7 +3170,65 @@ sub ParseXMPElement($$$;$$$$)
             $valEnd = $valStart;
         }
         $start = pos($$dataPt);         # start from here the next time around
-        my $parseResource;
+
+        # extract property attributes
+        my ($parseResource, %attrs, @attrs);
+        while ($attrs =~ m/(\S+?)\s*=\s*(['"])(.*?)\2/sg) {
+            my ($attr, $val) = ($1, $3);
+            # handle namespace prefixes (defined by xmlns:PREFIX, or used with PREFIX:tag)
+            if ($attr =~ /(.*?):/) {
+                if ($1 eq 'xmlns') {
+                    my $ns = substr($attr, 6);
+                    my $stdNS = $uri2ns{$val};
+                    unless ($stdNS) {
+                        my $try = $val;
+                        # patch for Nikon NX2 URI bug for Microsoft PhotoInfo namespace
+                        $try =~ s{/$}{} or $try .= '/';
+                        $stdNS = $uri2ns{$try};
+                        if ($stdNS) {
+                            $val = $try;
+                            $et->WarnOnce("Fixed incorrect URI for xmlns:$ns", 1);
+                        }
+                    }
+                    # tame wild namespace prefixes (patches Microsoft stupidity)
+                    if ($stdNS) {
+                        # use standard namespace prefix if pre-defined
+                        if ($stdNS ne $ns) {
+                            $xlatNS{$ns} = $stdNS;
+                            $attr = 'xmlns:' . $stdNS;
+                        }
+                    } elsif ($curNS{$val}) {
+                        # use a consistent prefix for a given namespace URI
+                        if ($curNS{$val} ne $ns) {
+                            $xlatNS{$ns} = $curNS{$val};
+                            $attr = 'xmlns:' . $xlatNS{$ns};
+                        }
+                    } else {
+                        # use unique prefixes for all namespaces
+                        if ($curURI{$ns} or $nsURI{$ns}) {
+                            # generate a temporary namespace prefix to resolve any conflict
+                            my $i = 0;
+                            ++$i while $curURI{"tmp$i"};
+                            $xlatNS{$ns} = "tmp$i";
+                            $attr = 'xmlns:' . $xlatNS{$ns};
+                            $ns = $xlatNS{$ns};
+                        }
+                        # keep track of the namespace prefixes and URI's used in this XMP
+                        $curNS{$val} = $ns;
+                        $curURI{$ns} = $val;
+                    }
+                } elsif ($xlatNS{$1}) {
+                    $attr = $xlatNS{$1} . substr($attr, length($1));
+                }
+            }
+            push @attrs, $attr;    # preserve order
+            $attrs{$attr} = $val;
+        }
+        # tame wild namespace prefixes (patch for Microsoft stupidity)
+        if ($prop =~ /(.*?):/ and $xlatNS{$1}) {
+            $prop = $xlatNS{$1} . substr($prop, length($1));
+        }
+
         if ($prop eq 'rdf:li') {
             # impose a reasonable maximum on the number of items in a list
             if ($nItems == 1000) {
@@ -3200,14 +3264,8 @@ sub ParseXMPElement($$$;$$$$)
             $prop = 'x:xmpmeta';
         }
 
-        # extract property attributes
-        my (%attrs, @attrs, $val);
-        while ($attrs =~ m/(\S+?)\s*=\s*(['"])(.*?)\2/sg) {
-            push @attrs, $1;    # preserve order
-            $attrs{$1} = $3;
-        }
-
         # hook for special parsing of attributes
+        my $val;
         if ($attrProc) {
             $val = substr($$dataPt, $valStart, $valEnd - $valStart);
             if (&$attrProc(\@attrs, \%attrs, \$prop, \$val)) {
@@ -3245,6 +3303,7 @@ sub ParseXMPElement($$$;$$$$)
         # (attributes take the form a:b='c' or a:b="c")
         my ($shortName, $shorthand, $ignored);
         foreach $shortName (@attrs) {
+            next unless defined $attrs{$shortName};
             my $propName = $shortName;
             my ($ns, $name);
             if ($propName =~ /(.*?):(.*)/) {
@@ -3260,29 +3319,6 @@ sub ParseXMPElement($$$;$$$$)
                 # but what the heck, let's allow this anyway
                 $ns = '';
                 $name = $propName;
-            }
-            # keep track of the namespace prefixes used
-            if ($ns eq 'xmlns') {
-                my $uri = $attrs{$shortName};
-                next unless $uri; # (shouldn't happen)
-                my $stdNS = $uri2ns{$uri};
-                unless ($stdNS) {
-                    # patch for Nikon NX2 URI bug for Microsoft PhotoInfo namespace
-                    $uri =~ s{/$}{} or $uri .= '/';
-                    $stdNS = $uri2ns{$uri};
-                    if ($stdNS) {
-                        $attrs{$shortName} = $uri;
-                        $et->WarnOnce("Fixed incorrect URI for $shortName", 1);
-                    }
-                }
-                $curNS{$name} = $attrs{$shortName};
-                # translate namespace if non-standard (except 'x' and 'iX')
-                if ($stdNS and $name ne $stdNS and $stdNS ne 'x' and $stdNS ne 'iX') {
-                    # make a copy of the standard translations so we can modify it
-                    $xlatNamespace = { %stdXlatNS } if $xlatNamespace eq \%stdXlatNS;
-                    # translate this namespace prefix to the standard version
-                    $$xlatNamespace{$name} = $stdXlatNS{$stdNS} || $stdNS;
-                }
             }
             if ($isWriting) {
                 # keep track of our namespaces when writing
@@ -3428,7 +3464,9 @@ sub ProcessXMP($$;$)
     my ($buff, $fmt, $hasXMP, $isXML, $isRDF, $isSVG);
     my $rtnVal = 0;
     my $bom = 0;
+    undef %curURI;
     undef %curNS;
+    undef %xlatNS;
 
     # ignore non-standard XMP while in strict MWG compatibility mode
     if ($Image::ExifTool::MWG::strict and not $$et{XMP_CAPTURE} and
@@ -3549,6 +3587,9 @@ sub ProcessXMP($$;$)
             }
         }
         $et->SetFileType($type);
+
+        my $fast = $et->Options('FastScan');
+        return 1 if $fast and $fast == 3;
 
         if ($type and $type eq 'INX') {
             # brute force search for first XMP packet in INX file
@@ -3746,7 +3787,9 @@ sub ProcessXMP($$;$)
     delete $$et{NO_LIST};
     delete $$et{XMPParseOpts};
 
+    undef %curURI;
     undef %curNS;
+    undef %xlatNS;
     return $rtnVal;
 }
 

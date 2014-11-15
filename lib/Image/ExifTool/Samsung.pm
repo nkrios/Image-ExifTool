@@ -10,6 +10,7 @@
 #               3) Pascal de Bruijn private communication (NX100)
 #               4) Jaroslav Stepanek via rt.cpan.org
 #               5) Niels Kristian Bech Jensen private communication
+#               6) Nick Livchits private communication
 #------------------------------------------------------------------------------
 
 package Image::ExifTool::Samsung;
@@ -19,7 +20,7 @@ use vars qw($VERSION %samsungLensTypes);
 use Image::ExifTool qw(:DataAccess :Utils);
 use Image::ExifTool::Exif;
 
-$VERSION = '1.24';
+$VERSION = '1.27';
 
 sub WriteSTMN($$$);
 sub ProcessINFO($$$);
@@ -43,7 +44,10 @@ sub ProcessSamsungIFD($$$);
     10 => 'Samsung NX 45mm F1.8', #3
     11 => 'Samsung NX 45mm F1.8 2D/3D', #3
     12 => 'Samsung NX 12-24mm F4-5.6 ED', #4
+    13 => 'Saumsun NX 16-50mm F2-2.8 S ED OIS', #forum3833
     14 => 'Samsung NX 10mm F3.5 Fisheye', #5
+    15 => 'Samsung NX 16-50mm F3.5-5.6 Power Zoom ED OIS', #6
+    20 => 'Samsung NX 50-150mm F2.8 S ED OIS', #PH
 );
 
 # range of values for Formats used in encrypted information
@@ -180,7 +184,8 @@ my %formatMinMax = (
         Name => 'LensType',
         Groups => { 2 => 'Camera' },
         Writable => 'int16u',
-        PrintConv => \%samsungLensTypes,
+        Count => -1,
+        PrintConv => [ \%samsungLensTypes ],
     },
     0xa004 => { #1
         Name => 'LensFirmware',
@@ -673,6 +678,26 @@ my %formatMinMax = (
     4 => { Name => 'ThumbnailOffset', IsOffset => 1 },
 );
 
+# information extracted from Samsung trailer (ie. Samsung SM-T805 "Sound & Shot" JPEG)
+%Image::ExifTool::Samsung::Trailer = (
+    GROUPS => { 0 => 'MakerNotes', 2 => 'Other' },
+    VARS => { NO_ID => 1 },
+    NOTES => q{
+        Tags extracted from the trailer of JPEG images written when using certain
+        features (such as "Sound & Shot" or "Shot & More") from Samsung models such
+        as the Galaxy S4 and Tab S.
+    },
+    # stuff written with "Shot & More" feature
+    '0x0001' => { Name => 'EmbeddedImage', Binary => 1 },
+    '0x0001-name' => 'EmbeddedImageName',
+    # 0x0830 - unknown (164004 bytes, name like "1165724808.pre")
+
+    # stuff written with "Sound & Shot" feature
+    '0x0100' => { Name => 'EmbeddedAudioFile', Binary => 1 },
+    '0x0100-name' => 'EmbeddedAudioFileName',
+    # 0x0800 - SoundShot_Meta_Info (contains only already-extracted sound shot name)
+);
+
 # Samsung composite tags
 %Image::ExifTool::Samsung::Composite = (
     GROUPS => { 2 => 'Image' },
@@ -788,6 +813,160 @@ sub ProcessSamsungIFD($$$)
     my $rtn = Image::ExifTool::Exif::ProcessExif($et, $dirInfo, $tagTablePtr);
     substr($$dataPt, $pos + 2, 1) = "\0";   # remove bogus count
     return $rtn;
+}
+
+#------------------------------------------------------------------------------
+# Read/write Samsung trailer (ie. "Sound & Shot" written by Galaxy Tab S (SM-T805))
+# Inputs: 0) ExifTool object reference, 1) dirInfo reference
+# Returns: 1 on success, 0 not valid Samsung trailer, or -1 error writing
+# - updates DataPos to point to start of Samsung trailer
+# - updates DirLen to existing trailer length
+sub ProcessSamsung($$$)
+{
+    my ($et, $dirInfo) = @_;
+    my $raf = $$dirInfo{RAF};
+    my $offset = $$dirInfo{Offset} || 0;
+    my $outfile = $$dirInfo{OutFile};
+    my $verbose = $et->Options('Verbose');
+    my $unknown = $et->Options('Unknown');
+    my ($buff, $buf2, $index, $offsetPos, $audioNOff, $audioSize);
+
+    return 0 unless $raf->Seek(-6-$offset, 2) and $raf->Read($buff, 6) == 6 and
+                    ($buff eq 'QDIOBS' or $buff eq "\0\0SEFT");
+    my $endPos = $raf->Tell();
+    $raf->Seek(-2, 1) or return 0 if $buff eq 'QDIOBS'; # rewind to before 'BS'
+    my $blockEnd = $raf->Tell();
+    SetByteOrder('II');
+
+    # read blocks backward until we find the SEFH/SEFT block
+    # (the only other block I have seen is QDIO/QDIO)
+SamBlock:
+    for (;;) {
+        last unless $raf->Seek($blockEnd-8, 0) and $raf->Read($buff, 8) == 8;
+        my $type = substr($buff, 4);
+        last unless $type =~ /^\w+$/;
+        my $len = Get32u(\$buff, 0);
+        last unless $len < 0x10000 and $len >= 4 and $len + 8 < $blockEnd;
+        last unless $raf->Seek(-8-$len, 1) and $raf->Read($buff, $len) == $len;
+        $blockEnd -= $len + 8;
+        unless ($type eq 'SEFT') {  # look for directory block (ends with "SEFT")
+            next unless $outfile and $type eq 'QDIO';
+            # QDIO block format:
+            #   0 - 'QDIO'
+            #   4 - int32u: 101 (version)
+            #   8 - int32u: 1
+            #  12 - int32u: absolute offset of audio file start (augh!!)
+            #  16 - int32u: absolute offset of audio file end (augh!!)
+            #  20 - int32u: 20 (QDIO block length minus 8)
+            #  24 - 'QDIO'
+            if ($len == 20) {
+                # save position of audio file offset in QDIO block
+                $offsetPos = $endPos - $raf->Tell() + $len - 12;
+            } else {
+                $et->Error('Unsupported Samsung trailer QDIO block', 1);
+            }
+            next;
+        }
+        last unless $buff =~ /^SEFH/ and $len >= 12;   # validate SEFH header
+        my $dirPos = $raf->Tell() - $len;
+        # my $ver = Get32u(\$buff, 0x04);  # version (=101)
+        my $count = Get32u(\$buff, 0x08);
+        last if 12 + 12 * $count > $len;
+        my $tagTablePtr = GetTagTable('Image::ExifTool::Samsung::Trailer');
+
+        # scan ahead quickly to look for the block where the data comes first
+        # (have only seen this to be the first in the directory, but just in case)
+        my $firstBlock = 0;
+        for ($index=0; $index<$count; ++$index) {
+            my $entry = 12 + 12 * $index;
+            my $noff = Get32u(\$buff, $entry + 4);  # negative offset
+            $firstBlock = $noff if $firstBlock < $noff;
+        }
+        # save trailer position and length
+        my $dataPos = $$dirInfo{DataPos} = $dirPos - $firstBlock;
+        my $dirLen = $$dirInfo{DirLen} = $endPos - $dataPos;
+        if (($verbose or $$et{HTML_DUMP}) and not $outfile) {
+            $et->DumpTrailer($dirInfo);
+            return 1 if $$et{HTML_DUMP};
+        }
+        # read through the SEFH/SEFT directory entries
+        for ($index=0; $index<$count; ++$index) {
+            my $entry = 12 + 12 * $index;
+            # first 2 bytes always 0 (may be part of block type)
+            my $type = Get16u(\$buff, $entry + 2);  # block type
+            my $noff = Get32u(\$buff, $entry + 4);  # negative offset
+            my $size = Get32u(\$buff, $entry + 8);  # block size
+            last SamBlock if $noff > $dirPos or $size > $noff or $size < 8;
+            $firstBlock = $noff if $firstBlock < $noff;
+            if ($outfile) {
+                next unless $type == 0x0100 and not $audioNOff;
+                # save offset and length of first audio file for QDIO block
+                last unless $raf->Seek($dirPos-$noff, 0) and $raf->Read($buf2, 8) == 8;
+                $len = Get32u(\$buf2, 4);
+                $audioNOff = $noff - 8 - $len;   # negative offset to start of audio data
+                $audioSize = $size - 8 - $len;
+                next;
+            }
+            # add unknown tags if necessary
+            my $tag = sprintf("0x%.4x", $type);
+            unless ($$tagTablePtr{$tag}) {
+                next unless $unknown or $verbose;
+                my %tagInfo = (
+                    Name        => "SamsungTrailer_$tag",
+                    Description => "Samsung Trailer $tag",
+                    Unknown     => 1,
+                    Binary      => 1,
+                );
+                AddTagToTable($tagTablePtr, $tag, \%tagInfo);
+                my %tagInfo2 = (
+                    Name        => "SamsungTrailer_${tag}Name",
+                    Description => "Samsung Trailer $tag Name",
+                    Unknown     => 1,
+                );
+                AddTagToTable($tagTablePtr, "$tag-name", \%tagInfo2);
+            }
+            last unless $raf->Seek($dirPos-$noff, 0) and $raf->Read($buf2, $size) == $size;
+            # (could validate the first 4 bytes of the block because they
+            # are the same as the first 4 bytes of the directory entry)
+            $len = Get32u(\$buf2, 4);
+            last if $len + 8 > $size;
+            # extract tag name and value
+            $et->HandleTag($tagTablePtr, "$tag-name", undef,
+                DataPt  => \$buf2,
+                DataPos => $dirPos - $noff,
+                Start   => 8,
+                Size    => $len,
+            );
+            $et->HandleTag($tagTablePtr, $tag, undef,
+                DataPt  => \$buf2,
+                DataPos => $dirPos - $noff,
+                Start   => 8 + $len,
+                Size    => $size - (8 + $len),
+            );
+        }
+        if ($outfile) {
+            last unless $raf->Seek($dataPos, 0) and $raf->Read($buff, $dirLen) == $dirLen;
+            # adjust the absolute offset in the QDIO block if necessary
+            if ($offsetPos and $audioNOff) {
+                # initialize the audio file start/end position in the QDIO block
+                my $newPos = Tell($outfile) + $dirPos - $audioNOff - $dataPos;
+                Set32u($newPos, \$buff, length($buff) - $offsetPos);
+                Set32u($newPos + $audioSize, \$buff, length($buff) - $offsetPos + 4);
+                # add a fixup so the calling routine can apply further shifts if necessary
+                require Image::ExifTool::Fixup;
+                my $fixup = $$dirInfo{Fixup};
+                $fixup or $fixup = $$dirInfo{Fixup} = new Image::ExifTool::Fixup;
+                $fixup->AddFixup(length($buff) - $offsetPos);
+                $fixup->AddFixup(length($buff) - $offsetPos + 4);
+            }
+            $et->VPrint(0, "Writing Samsung trailer ($dirLen bytes)\n") if $verbose;
+            Write($$dirInfo{OutFile}, $buff) or return -1;
+            return 1;
+        }
+        return 1;
+    }
+    $et->Warn('Error processing Samsung trailer',1);
+    return 0;
 }
 
 #------------------------------------------------------------------------------

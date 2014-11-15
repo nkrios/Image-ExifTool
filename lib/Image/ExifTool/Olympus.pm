@@ -37,7 +37,7 @@ use vars qw($VERSION);
 use Image::ExifTool::Exif;
 use Image::ExifTool::APP12;
 
-$VERSION = '2.24';
+$VERSION = '2.26';
 
 sub PrintLensInfo($$$);
 
@@ -87,7 +87,7 @@ my %olympusLensTypes = (
     '0 18 10' => 'Olympus M.Zuiko Digital ED 75-300mm F4.8-6.7 II', #20
     '0 19 10' => 'Olympus M.Zuiko Digital ED 12-40mm F2.8 Pro', #PH
     '0 20 00' => 'Olympus Zuiko Digital 35mm F3.5 Macro', #9
-  # '0 20 10' => 'Olympus M.Zuiko Digital ED 40-150mm F2.8 Pro', #PH (guess)
+    '0 20 10' => 'Olympus M.Zuiko Digital ED 40-150mm F2.8 Pro', #20
     '0 21 10' => 'Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6 EZ', #20
     '0 22 00' => 'Olympus Zuiko Digital 17.5-45mm F3.5-5.6', #9
     '0 22 10' => 'Olympus M.Zuiko Digital 25mm F1.8', #20
@@ -703,7 +703,14 @@ my %indexInfo = (
     },
     0x0303 => { Name => 'WhiteBalanceBracket',  Writable => 'int16u' }, #11
     0x0304 => { Name => 'WhiteBalanceBias',     Writable => 'int16u' }, #11
-   # 0x0305 => 'PrintMaching', ? #11
+   # 0x0305 => 'PrintMatching', ? #11
+    0x0401 => { #21
+        Name => 'BlackLevel',
+        Condition => '$format eq "int32u" and $count == 4',
+        Writable => 'int32u',
+        Count => 4,
+        Notes => 'found in Epson ERF images',
+    },
     0x0403 => { #11
         Name => 'SceneMode',
         Writable => 'int16u',
@@ -1880,22 +1887,28 @@ my %indexInfo = (
         Writable => 'int16u',
         PrintConv => {
             0 => 'Auto',
+            1 => 'Auto (Keep Warm Color Off)', #21
             16 => '7500K (Fine Weather with Shade)',
             17 => '6000K (Cloudy)',
             18 => '5300K (Fine Weather)',
             20 => '3000K (Tungsten light)',
             21 => '3600K (Tungsten light-like)',
+            22 => 'Auto Setup', #21
+            23 => '5500K (Flash)', #21
             33 => '6600K (Daylight fluorescent)',
             34 => '4500K (Neutral white fluorescent)',
             35 => '4000K (Cool white fluorescent)',
+            36 => 'White Fluorescent', #21
             48 => '3600K (Tungsten light-like)',
-            256 => 'Custom WB 1',
-            257 => 'Custom WB 2',
-            258 => 'Custom WB 3',
-            259 => 'Custom WB 4',
-            512 => 'Custom WB 5400K',
-            513 => 'Custom WB 2900K',
-            514 => 'Custom WB 8000K',
+            67 => 'Underwater', #21
+            256 => 'One Touch WB 1', #21
+            257 => 'One Touch WB 2', #21
+            258 => 'One Touch WB 3', #21
+            259 => 'One Touch WB 4', #21
+            512 => 'Custom WB 1', #21
+            513 => 'Custom WB 2', #21
+            514 => 'Custom WB 3', #21
+            515 => 'Custom WB 4', #21
         },
     },
     0x501 => { #PH/4
@@ -2515,6 +2528,7 @@ my %indexInfo = (
         Count => 4,
     },
     0x100 => { Name => 'WB_RBLevels',       Writable => 'int16u', Count => 2 }, #6
+    # 0x101 - in-camera AutoWB unless it is all 0's or all 256's (ref 21)
     0x102 => { Name => 'WB_RBLevels3000K',  Writable => 'int16u', Count => 2 }, #11
     0x103 => { Name => 'WB_RBLevels3300K',  Writable => 'int16u', Count => 2 }, #11
     0x104 => { Name => 'WB_RBLevels3600K',  Writable => 'int16u', Count => 2 }, #11
@@ -2544,6 +2558,8 @@ my %indexInfo = (
     0x11d => { Name => 'WB_GLevel6600K',    Writable => 'int16u' }, #11
     0x11e => { Name => 'WB_GLevel7500K',    Writable => 'int16u' }, #11
     0x11f => { Name => 'WB_GLevel',         Writable => 'int16u' }, #11
+    # 0x121 = WB preset for flash (about 6000K) (ref 21)
+    # 0x125 = WB preset for underwater (ref 21)
     0x200 => { #6
         Name => 'ColorMatrix',
         Writable => 'int16u',

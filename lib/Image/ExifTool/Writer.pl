@@ -1591,13 +1591,14 @@ sub RestoreNewValues($)
 #------------------------------------------------------------------------------
 # Set filesystem time from from FileModifyDate or FileCreateDate tag
 # Inputs: 0) ExifTool object reference, 1) file name or file ref
-#         2) modify time (-M) of original file (needed for time shift)
+#         2) time (-M or -C) of original file (used for shift; obtained from file if not given)
 #         3) tag name to write (undef for 'FileModifyDate')
+#         4) flag set if argument 2 has already been converted to Unix seconds
 # Returns: 1=time changed OK, 0=nothing done, -1=error setting time
 #          (and increments CHANGED flag if time was changed)
-sub SetFileModifyDate($$;$$)
+sub SetFileModifyDate($$;$$$)
 {
-    my ($self, $file, $originalTime, $tag) = @_;
+    my ($self, $file, $originalTime, $tag, $isUnixTime) = @_;
     my ($nvHash, $err);
     $tag = 'FileModifyDate' unless defined $tag;
     my $val = $self->GetNewValues($tag, \$nvHash);
@@ -1610,9 +1611,11 @@ sub SetFileModifyDate($$;$$)
         # use original time of this file if not specified
         unless (defined $originalTime) {
             $originalTime = ($tag eq 'FileCreateDate') ? -C $file : -M $file;
+            return 0 unless defined $originalTime;
+            undef $isUnixTime;
         }
-        return 0 unless defined $originalTime;
-        return 0 unless $self->IsOverwriting($nvHash, int($^T - $originalTime*(24*3600) + 0.5));
+        $originalTime = int($^T - $originalTime*(24*3600) + 0.5) unless $isUnixTime;
+        return 0 unless $self->IsOverwriting($nvHash, $originalTime);
         $val = $$nvHash{Value}[0]; # get shifted value
     }
     if ($tag eq 'FileCreateDate') {
@@ -2416,7 +2419,7 @@ sub Sanitize($$)
 # Apply inverse conversions
 # Inputs: 0) ExifTool ref, 1) value, 2) tagInfo (or Struct item) ref,
 #         3) tag name, 4) group 1 name, 5) conversion type (or undef),
-#         6) [optional] want group
+#         6) [optional] want group ("" for structure field)
 # Returns: 0) converted value, 1) error string (or undef on success)
 # Notes:
 # - uses ExifTool "ConvType" member when conversion type is undef
@@ -2431,7 +2434,9 @@ Conv: for (;;) {
             # split value into list if necessary
             if ($$tagInfo{List}) {
                 my $listSplit = $$tagInfo{AutoSplit} || $$self{OPTIONS}{ListSplit};
-                if (defined $listSplit) {
+                if (defined $listSplit and not $$tagInfo{Struct} and
+                    ($wantGroup or not defined $wantGroup))
+                {
                     $listSplit = ',?\s+' if $listSplit eq '1' and $$tagInfo{AutoSplit};
                     my @splitVal = split /$listSplit/, $val;
                     $val = \@splitVal if @splitVal > 1;
